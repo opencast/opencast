@@ -77,6 +77,10 @@ li#titleNote {padding:0 0 4px 0;}
 #prevPage { float: left; }
 #pageWidget { float: right; }
 
+/* page: episodes */
+#episodesTable {margin-top: 15px}
+#episodes-header {padding-top: 15px}
+
 /* page: capture_agents */
 /*#captureTable {margin-top:30px;}*/
 #captureTable th div { position: relative; padding: 2px;}
@@ -98,8 +102,8 @@ ul.itemnav li span.dev-prop-val { text-align:left; width:70%;}
 #search-result { width: 360px; float: right;}
 .searchbox-text-input:focus { outline: none; border: none;}
 #controlsTop { width: 100%; float: left; }
-#runningStatesContainer, #notRunningStatesContainer, .IE_buffer { float: left;}
-#runningStatesContainer { margin-right: 20px; }
+#runningStatesContainer, #notRunningStatesContainer, #otherActionsContainer, .IE_buffer { float: left;}
+#runningStatesContainer, #notRunningStatesContainer, #otherActionsContainer { margin-right: 20px; }
 #uploadContainer button { float: right; margin: 7px 0 28px 10px;}
 #uploadContainer button span.ui-button-text { padding: 0.4em 1em 0.4em 2.1em; }
 #uploadContainer button span.ui-button-icon-primary { left: 0.5em; }

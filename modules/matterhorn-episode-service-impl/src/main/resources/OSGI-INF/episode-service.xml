@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.episode.impl.EpisodeServiceImpl" immediate="true" activate="activate" deactivate="deactivate">
+  <implementation class="org.opencastproject.episode.impl.EpisodeServiceImpl" />
+  <property name="service.description" value="Episode Service" />
+  <service>
+    <provide interface="org.opencastproject.episode.api.EpisodeService" />
+  </service>
+  <reference name="staticMetadata"
+          interface="org.opencastproject.metadata.api.StaticMetadataService"
+          cardinality="1..n"
+          policy="dynamic"
+          bind="setStaticMetadataService"
+          unbind="unsetStaticMetadataService"/>
+  <reference name="mpeg7" interface="org.opencastproject.metadata.mpeg7.Mpeg7CatalogService"
+          cardinality="1..1" policy="static" bind="setMpeg7CatalogService" />
+  <reference name="series" interface="org.opencastproject.series.api.SeriesService"
+          cardinality="1..1" policy="static" bind="setSeriesService" />
+  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+          cardinality="1..1" policy="static" bind="setWorkspace"/>
+  <reference name="authorization" interface="org.opencastproject.security.api.AuthorizationService"
+          cardinality="1..1" policy="static" bind="setAuthorizationService"/>
+  <reference name="security" interface="org.opencastproject.security.api.SecurityService"
+          cardinality="1..1" policy="static" bind="setSecurityService"/>
+  <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+          cardinality="1..1" policy="static" bind="setServiceRegistry"/>
+  <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+    cardinality="1..1" policy="static" bind="setOrgDirectory" />
+  <reference name="workflow" interface="org.opencastproject.workflow.api.WorkflowService"
+    cardinality="1..1" policy="static" bind="setWorkflowService" />
+</scr:component>

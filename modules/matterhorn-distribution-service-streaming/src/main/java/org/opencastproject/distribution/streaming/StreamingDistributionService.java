@@ -250,7 +250,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    * 
    * @param job
    *          the associated job
-   * @param mediapackageId
+   * @param mediaPackageId
    *          the mediapackage identifier
    */
   protected void retract(Job job, String mediaPackageId) throws DistributionException {

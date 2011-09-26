@@ -157,6 +157,21 @@ public final class WorkflowUtils {
   }
 
   /**
+   * Return the number of succeeded workflows.
+   */
+  public static int countSucceededWorkflows() {
+    TrustedHttpClient client = Main.getClient();
+    HttpGet get = new HttpGet(BASE_URL + "/workflow/count?state=SUCCEEDED");
+    HttpResponse response = client.execute(get);
+    Main.returnClient(client);
+    try {
+      return Integer.parseInt(EntityUtils.toString(response.getEntity()));
+    } catch (IOException e) {
+      return -1;
+    }
+  }
+
+  /**
    * Registers a new workflow definition
    * 
    * @param workflowDefinition

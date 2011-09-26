@@ -19,7 +19,6 @@ package org.opencastproject.remotetest.server;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -37,12 +36,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.remotetest.Main.BASE_URL;
+import static org.opencastproject.remotetest.util.WorkflowUtils.countSucceededWorkflows;
 
 public class OaiPmhServerTest {
   private static final Logger logger = LoggerFactory.getLogger(OaiPmhServerTest.class);
@@ -53,20 +52,9 @@ public class OaiPmhServerTest {
   @BeforeClass
   public static void setupClass() throws Exception {
     logger.info("Running " + OaiPmhServerTest.class.getName());
-    TrustedHttpClient client = Main.getClient();
-    while (countSucceededWorkflows(client) < 2) {
+    while (countSucceededWorkflows() < 2) {
       logger.info("waiting 5 sec. for workflows to succeed");
       Thread.sleep(5000);
-    }
-  }
-
-  private static int countSucceededWorkflows(TrustedHttpClient client) {
-    HttpGet get = new HttpGet(BASE_URL + "/workflow/count?state=SUCCEEDED");
-    HttpResponse response = client.execute(get);
-    try {
-      return Integer.parseInt(EntityUtils.toString(response.getEntity()));
-    } catch (IOException e) {
-      return -1;
     }
   }
 

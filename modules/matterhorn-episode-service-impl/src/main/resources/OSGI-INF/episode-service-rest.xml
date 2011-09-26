@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" immediate="true"
+               name="org.opencastproject.episode.endpoint.EpisodeRestService">
+  <implementation class="org.opencastproject.episode.endpoint.EpisodeRestService" />
+  <property name="service.description" value="Episode REST Endpoint" />
+
+  <property name="opencast.service.type" value="org.opencastproject.episode" />
+  <property name="opencast.service.path" value="/episode" />
+
+  <service>
+    <provide interface="org.opencastproject.episode.endpoint.EpisodeRestService" />
+  </service>
+  <reference name="service-impl" interface="org.opencastproject.episode.api.EpisodeService"
+    cardinality="1..1" policy="static" bind="setEpisodeService" />
+</scr:component>

@@ -48,6 +48,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-episode-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-distribution-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -161,6 +166,7 @@
               OSGI-INF/operations/analyze-videosegments.xml,
               OSGI-INF/operations/append.xml,
               OSGI-INF/operations/apply-acl.xml,
+              OSGI-INF/operations/archive.xml,
               OSGI-INF/operations/capture.xml,
               OSGI-INF/operations/caption.xml,
               OSGI-INF/operations/cli.xml,
@@ -176,7 +182,10 @@
               OSGI-INF/operations/inspect.xml,
               OSGI-INF/operations/prepare-av.xml,
               OSGI-INF/operations/publish.xml,
+              OSGI-INF/operations/retract-download.xml,
+              OSGI-INF/operations/retract-streaming.xml,
               OSGI-INF/operations/review.xml,
+              OSGI-INF/operations/searchindex-remove.xml,
               OSGI-INF/operations/schedule.xml,
               OSGI-INF/operations/segmentpreviews.xml,
               OSGI-INF/operations/trim.xml,

@@ -9,6 +9,11 @@
     <link rel="stylesheet" type="text/css" href="css/jquery-ui-opencast-admin/jquery-ui-opencast-admin.css" />
     <link rel="stylesheet" type="text/css" href="css/admin.css" />
     <!-- SCRIPTS -->
+    <script type="text/javascript" src="jquery/jquery-1.6.4.min.js"></script>
+    <script type="text/javascript">
+      // make jquery 1.6.x available under $6
+      $6 = jQuery.noConflict(true);
+    </script>
     <script type="text/javascript" src="jquery/jquery-1.4.4.min.js"></script>
     <script type="text/javascript" src="jquery/jquery-ui-1.8.6.custom.min.js"></script>
 
@@ -16,6 +21,8 @@
     <script type="text/javascript" src="jquery/plugins/jquery.i18n.properties-min.js"></script>
 
     <script type="text/javascript" src="js/jquery.jqote2.js"></script>
+
+    <script type="text/javascript" src="js/underscore-1.1.7.min.js"></script>
 
     <!-- script type="text/javascript" src="js/jquery.ui.spinner.js"></script -->
     <script type="text/javascript" src="js/jquery.ui.searchbox.js"></script>
@@ -39,111 +46,216 @@
     <script type="text/javascript" src="js/oc.series.js"></script>
     <script type="text/javascript" src="js/oc.inspect.js"></script>
     <script type="text/javascript" src="js/oc.security.js"></script>
+    <script type="text/javascript" src="js/oc.episode.js"></script>
+
+    <!-- define all possible tabs here -->
+    <script type="text/x-jqote-template" id="tabs-template">
+      <ul id="tabs">
+        <li>
+          <a href="#recordings" title="Recordings" id="i18n_tab_recording">Recordings</a>
+        </li>
+        <li>
+          <a href="#series_list" title="Series" id="i18n_tab_series">Series</a>
+        </li>
+        <li>
+          <a href="#agents_status" title="Capture Agents" id="i18n_tab_agent">Capture Agents</a>
+        </li>
+        <li>
+          <a href="#statistics" title="Statistics" id="i18n_tab_statistics">Statistics</a>
+        </li>
+        <li>
+          <a href="#episode" title="Episodes" id="i18n_tab_episode">Episodes</a>
+        </li>
+      </ul>
+    </script>
 
     <script type="text/javascript">
-      var tabs,
-      recordings = "recordings",
-      linkSelector = "#tabsWrapper ul:first a",
-      path = "",
-      matterhorn = " | Opencast Matterhorn",
+      var defaultPath = "/recordings", // the path to use when the base page directory is requested
+          meJsonUrl = "/info/me.json", // path to the RuntimeInfo REST endpoint
+          linkSelector = "#tabsWrapper ul:first a",
+          matterhorn = " | Opencast Matterhorn",
+          ////
+          // define routing here
+          //
+          routing = {
+            "/recordings": {
+              // tab membership -> this path belongs to the tab with the said id
+              tab: "i18n_tab_recording",
+              // initialization code to run
+              init: function() {
+                ocRecordings.init();
+                document.title = "Recordings" + matterhorn;
+              }
+            },
+            "/series_list": {
+              tab: "i18n_tab_series",
+              init: function() {
+                ocSeriesList.init();
+                document.title = "Series" + matterhorn;
+              }
+            },
+            "/agents_status": {
+              init: function() {
+                ocCaptureAgent.init();
+                document.title = "Capture Agents" + matterhorn;
+              },
+              tab: "i18n_tab_agent"
+            },
+            "/statistics": {
+              init: function() {
+                ocStatistics.init();
+                document.title = "Statistics" + matterhorn;
+              },
+              tab: "i18n_tab_statistics"
+            },
+            "/scheduler": {
+              init: function() {
+                ocScheduler.init();
+                document.title = "Scheduler" + matterhorn;
+              },
+              tab: "i18n_tab_recording"
+            },
+            "/upload": {
+              init: function() {
+                ocUpload.init();
+                document.title = "Upload" + matterhorn;
+              },
+              tab: "i18n_tab_recording"
+            },
+            "/series": {
+              init: function() {
+                ocSeries.init();
+                document.title = "Series" + matterhorn;
+              },
+              tab: "i18n_tab_series"
+            },
+            "/viewseries": {
+              init: function() {
+                ocViewSeries.initViewSeries();
+                document.title = "Series" + matterhorn;
+              },
+              tab: "i18n_tab_series"
+            },
+            "/viewinfo": {
+              init: function() {
+                Opencast.WorkflowInspect.initialize();
+                document.title = "Info" + matterhorn;
+              },
+              tab: "i18n_tab_recording"
+            },
+            "/episode": {
+              init: function() {
+                document.title = "Episode" + matterhorn;
+                ocArchive.init();
+              },
+              tab: "i18n_tab_episode"
+            },
+            "/review": {
+              init: function() {
+              },
+              tab: "i18n_tab_recording"
+            }
+          };
 
-      getSelected = function ()
-      {
-        switch ($.address.path()) {
-          case "/recordings":
-            ocRecordings.init();
-            document.title = "Recordings" + matterhorn;
-            return 0;
-            break;
-          case "/series_list":
-            ocSeriesList.init();
-            document.title = "Series" + matterhorn;
-            return 1;
-            break;
-          case "/agents_status":
-            ocCaptureAgent.init();
-            document.title = "Capture Agents" + matterhorn;
-            return 2;
-            break;
-          case "/statistics":
-            ocStatistics.init();
-            document.title = "Statistics" + matterhorn;
-            return 3;
-            break;  
-          case "/scheduler":
-            ocScheduler.init();
-            document.title = "Scheduler" + matterhorn;
-            return 0;
-            break; 
-          case "/upload":
-            ocUpload.init();
-            document.title = "Upload" + matterhorn;
-            return 0;
-            break;   
-          case "/series":
-            ocSeries.init();
-            document.title = "Series" + matterhorn;
-            return 1;
-            break; 
-          case "/viewseries":
-            ocViewSeries.initViewSeries();
-            document.title = "Series" + matterhorn;
-            return 1;
-            break;   
-          case "/viewinfo":
-            Opencast.WorkflowInspect.initialize();
-            document.title = "Info" + matterhorn;
-            return 0;
-            break;   
-          case "/inspect":
-            Opencast.WorkflowInspect.initInspect();
-            document.title = "Inspect" + matterhorn;
-            return 0;
-            break;   
+      // --
+
+      /** Run the init code for the tab corresponding to the current path.
+       *  @param path -- current path
+       *  @param enabledTabIds -- all enabled tabs
+       *  @return the (html) id of the associated main tab
+       */
+      function setupTabFor(path, enabledTabIds) {
+        var mapping = routing[path];
+        if (mapping && ocUtils.contains(enabledTabIds, mapping.tab)) {
+          mapping.init();
+          return mapping.tab;
         }
       }
-      
-      $(document).ready( function() {
-        
+
+      /** Get a list of all enabled tabs.
+       *  @param $html -- tab html (jQuery object)
+       *  @return deferred([id])
+       */
+      function getEnabledTabs($html) {
+        var deferred = $6.Deferred();
+        var allTabIds = $("a", $html).map(function() {return this.id}).toArray();
+        $6.getJSON(meJsonUrl, function(data) {
+          var enabledTabIds = _.filter(allTabIds, function(id) {
+            // todo test code
+            var enabled = data.org.properties["adminui." + id + ".enable"];
+            return enabled == "true" || enabled == true || typeof enabled === "undefined";
+          });
+          deferred.resolve(enabledTabIds);
+        });
+        return deferred;
+      }
+
+      /** Remove all tabs not in enabledTabIds from $html.
+       *  @param $html -- tab html (jQuery object)
+       *  @param enabledTabIds -- [id]
+       *  @return html
+       */
+      function removeDisabledTabs($html, enabledTabIds) {
+        $("a", $html).each(function() {
+          if (!ocUtils.contains(enabledTabIds, $(this).attr("id"))) {
+            $(this).remove();
+          }
+        });
+        return $html;
+      }
+
+      /** DOM ready
+       */
+      $(document).ready(function() {
+        var $tabsHtml = $($("#tabs-template").jqote());
+
         if ($.address.value() == '/') {
-          $.address.value(recordings);
+          $.address.value(defaultPath);
         }
-        path = $.address.value();
-        
+        var path = $.address.value();
+
         // Address handler
-        $.address.init(function(event) {
-          // Tabs setup
-          tabs = $('#tabsWrapper')
-          .tabs({
-            selected: getSelected()
-          })
-          .css('display', 'block');
+        $.address
+            .init(function(event) {
+              getEnabledTabs($tabsHtml).done(function(enabledTabIds) {
+                // inject tabs
+                $("#tabsWrapper").append(removeDisabledTabs($tabsHtml, enabledTabIds));
 
-          // Enables the plugin for all the tab links
-          $(linkSelector).address();
-            
-        }).change(function(event) {
-          if($.address.path() == '/hold')
-          {
-            path = $.address.value();
-          }
-          if($.address.value() != path)
-          {
-            location.hash = "#" + $.address.value();
-            location.reload();
-          }
+                // Tabs setup
+                var selectedTabId = setupTabFor($.address.path(), enabledTabIds);
+                var selectedTabNr = $("a", "#tabs").map(
+                    function(i) {
+                      return this.id == selectedTabId ? i : -1
+                    }).toArray().sort().pop();
 
-        }).externalChange(function(event) {
-          if($.address.path() == '/hold')
-          {
-            path = $.address.value();
-          }
-          if($.address.value() != path)
-          {
-            location.hash = "#" + $.address.value();
-            location.reload();
-          }
-        }).history(true);
+                $('#tabsWrapper')
+                    .tabs({
+                      selected: selectedTabNr
+                    })
+                    .css('display', 'block');
+                // Enables the plugin for all the tab links
+                $(linkSelector).address();
+              })
+            })
+            .change(function(event) {
+              if ($.address.path() == '/hold') {
+                path = $.address.value();
+              }
+              if ($.address.value() != path) {
+                location.hash = "#" + $.address.value();
+                location.reload();
+              }
+            })
+            .externalChange(function(event) {
+              if ($.address.path() == '/hold') {
+                path = $.address.value();
+              }
+              if ($.address.value() != path) {
+                location.hash = "#" + $.address.value();
+                location.reload();
+              }
+            })
+            .history(true);
       });
     </script>
   </head>
@@ -187,25 +299,8 @@
 
       <!-- PAGE TABS -->
       <div class="layout-page-header recordings-page" id="page-header">
-        <div id="tabsWrapper" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
-          <ul id="tabs">
-            <li>
-              <a href="#recordings" title="Recordings" id="i18n_tab_recording">Recordings</a>
-            </li>
-            <li>
-              <a href="#series_list" title="Series" id="i18n_tab_series">Series</a>
-            </li>
-            <li>
-              <a href="#agents_status" title="Capture Agents" id="i18n_tab_agent">Capture Agents</a>
-            </li>
-            <li>
-              <a href="#statistics" title="Statistics" id="i18n_tab_statistics">Statistics</a>
-            </li>
-          </ul>
-        </div>
-        <div id="addHeader">
-
-        </div>
+        <div id="tabsWrapper" class="ui-tabs ui-widget ui-widget-content ui-corner-all"></div>
+        <div id="addHeader"></div>
         <div id="holdActionStage" style="display:none">
           <input type="hidden" id="holdWorkflowId" value="" />
           <iframe id="holdActionUI" border="0" frameborder="0" style="height:640px;"></iframe>

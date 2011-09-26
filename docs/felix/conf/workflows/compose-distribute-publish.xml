@@ -472,6 +472,19 @@
         <configuration key="source-tags">publish</configuration>
       </configurations>
     </operation>
+
+    <!-- Archive -->
+
+    <operation
+      id="archive"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Archived">
+      <configurations>
+        <!-- archive everything that got published -->
+        <configuration key="source-tags">publish</configuration>
+      </configurations>
+    </operation>
  
     <!-- Cleanup the working file repository -->
  

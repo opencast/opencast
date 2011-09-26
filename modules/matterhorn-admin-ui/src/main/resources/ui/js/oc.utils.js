@@ -307,6 +307,10 @@ ocUtils.exists = function(obj) {
     return true;
   }
   return false;
+};
+
+ocUtils.contains = function(array, value) {
+  return array.indexOf(value) >= 0;
 }
 
 ocUtils.getDCJSONParam = function(dcJSON, param, namespace) {
@@ -322,4 +326,28 @@ ocUtils.getDCJSONParam = function(dcJSON, param, namespace) {
     }
   }
   return false;
+}
+
+/** Join all elements of an array with separator string "sep".
+ *  @param as -- an array, a single value or "undefined"
+ *  @param sep -- the separator string
+ *  @return the array elements joined or "" if as is undefined
+ */
+ocUtils.joinArray = function(as, sep) {
+  if (as !== undefined) {
+    return ocUtils.ensureArray(as).join(sep);
+  } else {
+    return "";
+  }
+}
+
+/** Map undefined or null values to the empty string.
+ *  @param s -- a string
+ */
+ocUtils.emptyUndef = function(s) {
+  if (typeof s === "undefined")
+    return "";
+  if (s === null)
+    return "";
+  return s
 }
