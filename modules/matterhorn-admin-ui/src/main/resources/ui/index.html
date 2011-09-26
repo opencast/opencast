@@ -154,6 +154,13 @@
               init: function() {
               },
               tab: "i18n_tab_recording"
+            },
+            "/inspect": {
+              init: function() {
+                Opencast.WorkflowInspect.initInspect();
+                document.title = "Inspect" + matterhorn;
+              },
+              tab: "i18n_tab_recording"
             }
           };
 
