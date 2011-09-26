@@ -293,8 +293,8 @@
     <field name="oc_elementflavors" type="text" indexed="true" stored="true" omitNorms="true"/>
 
     <!-- The dynamic fields with segment text and hint -->
-    <dynamicField name="oc_text_*"  type="text" indexed="true" stored="true"/>
-    <dynamicField name="oc_hint_*"  type="text" indexed="false" stored="true"/>
+    <dynamicField name="oc_text_*" type="text" indexed="true" stored="true"/>
+    <dynamicField name="oc_hint_*" type="text" indexed="false" stored="true"/>
 
     <!-- A fulltext copy field. -->
     <field name="fulltext" type="text" indexed="true" stored="false" multiValued="true"/>
