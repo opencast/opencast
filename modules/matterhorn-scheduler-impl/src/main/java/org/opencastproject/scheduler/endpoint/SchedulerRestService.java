@@ -230,7 +230,7 @@ public class SchedulerRestService {
   @RestQuery(name = "newrecordings", description = "Creates new event or group of event with specified parameters", returnDescription = "If events were successfully generated, status CREATED is returned, otherwise BAD REQUEST",
           restParameters = {
           @RestParameter(name = "dublincore", isRequired = true, type = Type.TEXT, description = "Dublin Core describing event", defaultValue = "${this.sampleDublinCore}"),
-          @RestParameter(name = "caproperties", isRequired = true, type = Type.TEXT, description = "Capture agent properties for event", defaultValue = "${this.sampleCAProperties}"),
+          @RestParameter(name = "agentparameters", isRequired = true, type = Type.TEXT, description = "Capture agent properties for event", defaultValue = "${this.sampleCAProperties}"),
           @RestParameter(name = "event", isRequired = false, type = Type.TEXT, description = "Catalog containing information about the event that doesn't exist in DC (IE: Recurrence rule)") }, 
           reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Event or events were successfully created"),
