@@ -104,6 +104,21 @@
         $('#continueBtn').mouseleave(function() {
           $('#notification').css('color', 'white');
         });
+        
+        //hide some stuff we don't want to see
+        window.parent.$('#uploadContainer').hide(0);
+        $('#trimming-hint').toggle();
+                
+        window.parent.$('#controlsTop').hide(0);
+        window.parent.$('#searchBox').hide(0);
+        window.parent.$('#tableContainer').hide(0);
+        if(window.parent.$('#refreshEnabled').is(':checked')) {
+          window.parent.$('#refreshEnabled').trigger('click');
+          window.parent.$('#refreshEnabled').trigger('change');
+        }
+        window.parent.$('#controlsFoot').hide(0);
+        
+        
         /*
         // Event edit link clicked
         $('#edit-link').click( function() {
@@ -226,7 +241,11 @@
     </div>
     <div id="actions">
         <button type="button" id="continueBtn" onclick="continueWorkflow();" style="margin-right:16px;width:160px;" title="Move on to next steps in processing this recording without captions.">Continue processing</button>
+<<<<<<< .working
         <button type="button" style="margin-right:16px;" title="Cancel" onclick="cancel();">Cancel</button>
+=======
+        <button type="button" style="margin-right:16px;" title="Cancel" onclick="window.parent.location.href = window.parent.location.href;">Cancel</button>
+>>>>>>> .merge-right.r10781
     </div>
     <!-- <a href="javascript: return false;" id="edit-link">Edit before continuing</a> -->
 

@@ -137,9 +137,11 @@
         window.parent.$('#controlsTop').hide(0);
         window.parent.$('#searchBox').hide(0);
         window.parent.$('#tableContainer').hide(0);
+        if(window.parent.$('#refreshEnabled').is(':checked')) {
+          window.parent.$('#refreshEnabled').trigger('click');
+          window.parent.$('#refreshEnabled').trigger('change');
+        }
         window.parent.$('#controlsFoot').hide(0);
-        window.parent.$('#refreshEnabled').removeAttr('checked');
-        window.parent.ocRecordings.updateRefreshInterval(false, $('#refreshInterval').val());
                 
         // Event edit link clicked
         $('#edit-link').click(function(){
@@ -228,6 +230,7 @@
             $('#ispartof').val('');
           }
         });
+
         /**
          * Checks if In point is bigger than Out point and prints an Error Message if this is the case
          */
@@ -693,7 +696,11 @@
       }
             
       function cancel(){
+<<<<<<< .working
         window.parent.location.href = "/admin";
+=======
+        window.parent.location.href = window.parent.location.href;
+>>>>>>> .merge-right.r10781
       }
 
 

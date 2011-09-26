@@ -627,7 +627,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
      * @param value
      *          the element value
      */
-    CatalogEntry(EName name, String value) {
+    public CatalogEntry(EName name, String value) {
       this(name, value, null);
     }
 

@@ -50,7 +50,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -187,7 +186,6 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
             MediaPackageReferenceImpl.ANY_MEDIAPACKAGE);
     if (dcCatalogs.length > 0) {
       DublinCoreCatalog dublinCore = loadDublinCoreCatalog(dcCatalogs[0]);
-      Date today = new Date();
 
       // Extent
       if (!dublinCore.hasValue(DublinCore.PROPERTY_EXTENT)) {
@@ -198,7 +196,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
       // Date created
       if (!dublinCore.hasValue(DublinCore.PROPERTY_CREATED)) {
-        DublinCoreValue date = EncodingSchemeUtils.encodeDate(today, Precision.Day);
+        DublinCoreValue date = EncodingSchemeUtils.encodeDate(mediaPackage.getDate(), Precision.Minute);
         dublinCore.set(DublinCore.PROPERTY_CREATED, date);
         logger.debug("Setting dc:date to '{}'", date.getValue());
       }
