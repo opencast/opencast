@@ -81,7 +81,6 @@ ocSeriesList.buildSeriesView = function(data) {
     $.cookie('direction', 0) //standard is ASC
   }
   sorting = [[$.cookie('column'), $.cookie('direction')]];
-  console.log(sorting);
   $('#seriesTableContainer').jqotesubtpl("templates/series_list-table.tpl", ocSeriesList.views);
   $('#seriesTable').tablesorter({
     cssHeader: 'oc-ui-sortable',
