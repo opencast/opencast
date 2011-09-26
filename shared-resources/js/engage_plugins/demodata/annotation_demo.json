@@ -1,0 +1,45 @@
+{
+  "annotations": {
+    "limit": "10",
+    "offset": "0",
+    "total": "3",
+    "annotation": [
+      {
+        "annotationId": 1,
+        "mediapackage-id": "f23a1655-6f0b-4b40-9096-0bc787cb3c3f",
+        "user-id": "admin",
+        "session-id": "18bflpmnc9aqg",
+        "inpoint": 0,
+        "outpoint": 10,
+        "length": 10,
+        "key": "chapter",
+        "value": "Introduction",
+        "created": "2010-10-13T22:02:11.693+02:00"
+      },
+      {
+        "annotationId": 2,
+        "mediapackage-id": "f23a1655-6f0b-4b40-9096-0bc787cb3c3f",
+        "user-id": "admin",
+        "session-id": "18bflpmnc9aqg",
+        "inpoint": 10,
+        "outpoint": 20,
+        "length": 10,
+        "key": "chapter",
+        "value": "Related work",
+        "created": "2010-10-13T22:02:57.472+02:00"
+      },
+      {
+        "annotationId": 3,
+        "mediapackage-id": "f23a1655-6f0b-4b40-9096-0bc787cb3c3f",
+        "user-id": "admin",
+        "session-id": "18bflpmnc9aqg",
+        "inpoint": 20,
+        "outpoint": 30,
+        "length": 10,
+        "key": "chapter",
+        "value": "Summary",
+        "created": "2010-10-13T22:02:57.472+02:00"
+      }
+    ]
+  }
+}

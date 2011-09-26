@@ -1,0 +1,44 @@
+--- src/atom_hdlr.cpp	2009-05-20 19:52:32.000000000 -0700
++++ src/atom_hdlr.cpp	2010-06-20 15:45:27.154920701 -0700
+@@ -30,7 +30,10 @@
+         : MP4Atom("hdlr")
+ {
+     AddVersionAndFlags(); /* 0, 1 */
+-    AddReserved("reserved1", 4); /* 2 */
++    // QT requires component type to be specified
++    MP4StringProperty* cProp = new MP4StringProperty("compType");
++    cProp -> SetFixedLength(4);
++    AddProperty(cProp); /* 2 */
+     MP4StringProperty* pProp = new MP4StringProperty("handlerType");
+     pProp->SetFixedLength(4);
+     AddProperty(pProp); /* 3 */
+
+--- src/atom_standard.cpp	2010-06-18 13:46:49.501840077 -0700
++++ src/atom_standard.cpp	2010-06-18 13:47:59.149806792 -0700
+@@ -223,6 +223,8 @@
+         ExpectChildAtom("hmhd", Optional, OnlyOne);
+         ExpectChildAtom("nmhd", Optional, OnlyOne);
+         ExpectChildAtom("gmhd", Optional, OnlyOne);
++        // QT: for alias handler
++        ExpectChildAtom("hdlr", Optional, OnlyOne);
+         ExpectChildAtom("dinf", Required, OnlyOne);
+         ExpectChildAtom("stbl", Required, OnlyOne);
+
+--- src/mp4file.cpp	2010-06-19 12:05:02.117218963 -0700
++++ src/mp4file.cpp	2010-06-19 12:15:52.545430473 -0700
+@@ -2064,7 +2064,14 @@
+     MP4TrackId trackId =
+         AddTrack(MP4_SUBTITLE_TRACK_TYPE, timescale);
+ 
+-    InsertChildAtom(MakeTrackName(trackId, "mdia.minf"), "nmhd", 0);
++    // set handler to graphics media handler
++    InsertChildAtom(MakeTrackName(trackId, "mdia.minf"), "gmhd", 0);
++    // create record for alias handler
++    InsertChildAtom(MakeTrackName(trackId, "mdia.minf"), "hdlr", 1);
++    // setting handler properties
++    SetTrackStringProperty(trackId, "mdia.hdlr.compType", "mhlr");
++    SetTrackStringProperty(trackId, "mdia.minf.hdlr.compType", "dhlr");
++    SetTrackStringProperty(trackId, "mdia.minf.hdlr.handlerType", "alis");
+ 
+     AddChildAtom(MakeTrackName(trackId, "mdia.minf.stbl.stsd"), "tx3g");
+ 

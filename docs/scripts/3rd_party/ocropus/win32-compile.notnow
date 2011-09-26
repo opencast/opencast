@@ -1,0 +1,157 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-win32 ] && exit 0
+pkg=`getcfg PKG:`
+chkpkg "$pkg" || exit 1
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+pcp1=`getcfg PCP1:`
+pcp2=`getcfg PCP2:`
+[ -z "$pcp1" -o -z "$pcp2" ] && exit 1
+#
+rm -fr "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+gzip -dc "$pkg" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+cd "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+#
+rm -fr iulib
+[ $? -ne 0 ] && exit 1
+mv ocropus/* .
+[ $? -ne 0 ] && exit 1
+rm -f ocropus/.hg*
+[ $? -ne 0 ] && exit 1
+rmdir ocropus
+[ $? -ne 0 ] && exit 1
+#
+cp ../SConstruct.mingw SConstruct
+[ $? -ne 0 ] && exit 1
+cp ../xml-entities.cc ocr-utils
+[ $? -ne 0 ] && exit 1
+mv ocr-utils/queue.h ocr-utils/queue-loc.h
+[ $? -ne 0 ] && exit 1
+cp ../ocr-utils.h ocr-utils
+[ $? -ne 0 ] && exit 1
+cp ../sysutil.h ocr-utils
+[ $? -ne 0 ] && exit 1
+cp ../ocropus.h include
+[ $? -ne 0 ] && exit 1
+cp ../glinerec.h include
+[ $? -ne 0 ] && exit 1
+cp ../ocrofst-io.cc ocr-pfst
+[ $? -ne 0 ] && exit 1
+cp ../sysutil.cc ocr-utils
+[ $? -ne 0 ] && exit 1
+cp ../tesseract.cc ocr-tesseract
+[ $? -ne 0 ] && exit 1
+cp ../ocr-commands.cc ocr-commands
+[ $? -ne 0 ] && exit 1
+cp ../ocropus.cc commands
+[ $? -ne 0 ] && exit 1
+#
+sudox cp ../winsock2.h ${MINGW32_PREFIX}/include/winsock2.h
+[ $? -ne 0 ] && exit 1
+#
+scons
+[ $? -ne 0 ] && exit 1
+cp commands/ocr-distance commands/ocr-distance.exe
+[ $? -ne 0 ] && exit 1
+cp commands/ocropus commands/ocropus.exe
+[ $? -ne 0 ] && exit 1
+#
+mkdir ocropus
+[ $? -ne 0 ] && exit 1
+cp \
+ocr-utils/arraypaint.h \
+ocr-utils/components.h \
+ocr-utils/didegrade.h \
+ocr-utils/docproc.h \
+ocr-utils/editdist.h \
+ocr-utils/enumerator.h \
+include/glclass.h \
+include/glcuts.h \
+include/gldataset.h \
+include/glfmaps.h \
+include/glinerec.h \
+include/glutils.h \
+ocr-utils/grid.h \
+include/grouper.h \
+include/gsl.h \
+ocr-utils/init-ocropus.h \
+include/line-info.h \
+ocr-utils/linesegs.h \
+ocr-utils/logger.h \
+ocr-utils/narray-binio.h \
+ocr-utils/narray-io.h \
+include/ocr-layout.h \
+include/ocr-openfst.h \
+include/ocr-pfst.h \
+ocr-utils/ocr-utils.h \
+ocr-utils/ocrinterfaces.h \
+include/ocropus.h \
+ocr-utils/pages.h \
+ocr-utils/pagesegs.h \
+ocr-utils/queue-loc.h \
+ocr-utils/resource-path.h \
+ocr-utils/segmentation.h \
+ocr-utils/stringutil.h \
+ocr-utils/sysutil.h \
+include/tesseract.h \
+ocropus
+[ $? -ne 0 ] && exit 1
+sudox rm -fr ${MINGW32_PREFIX}/include/ocropus
+[ $? -ne 0 ] && exit 1
+sudox mkdir -p ${MINGW32_PREFIX}/include/ocropus
+[ $? -ne 0 ] && exit 1
+sudox cp ocropus/*.h ${MINGW32_PREFIX}/include/ocropus
+[ $? -ne 0 ] && exit 1
+sudox cp libocropus.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+#
+zip "../$pcp1" ocropus/*.h
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" libocropus.a
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" commands/ocr-distance.exe commands/ocropus.exe
+[ $? -ne 0 ] && exit 1
+#
+mkdir -p x/ocropus
+[ $? -ne 0 ] && exit 1
+cd x
+[ $? -ne 0 ] && exit 1
+cp -r ../data/models ocropus
+[ $? -ne 0 ] && exit 1
+gzip -d ocropus/models/default.fst.gz
+[ $? -ne 0 ] && exit 1
+gzip -d ocropus/models/ocr-dict-case.fst.gz
+[ $? -ne 0 ] && exit 1
+cp -r ../data/words ocropus
+[ $? -ne 0 ] && exit 1
+zip -r "../../$pcp1" ocropus
+[ $? -ne 0 ] && exit 1
+zip -r "../../$pcp2" ocropus
+[ $? -ne 0 ] && exit 1
+copypc usr/local/share -r ocropus
+[ $? -ne 0 ] && exit 1
+cd -
+[ $? -ne 0 ] && exit 1
+#
+${MINGW32}-gcc -pipe -O2 -s -Wall ../ocrocmd-1.0-win.c -o ocrocmd.exe
+[ $? -ne 0 ] && exit 1
+zip "../$pcp1" ocrocmd.exe
+[ $? -ne 0 ] && exit 1
+copypc usr/local/bin commands/ocropus.exe ocrocmd.exe
+[ $? -ne 0 ] && exit 1
+#
+touch ../.done-win32
+[ $? -ne 0 ] && exit 1
+exit 0

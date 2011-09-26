@@ -1,0 +1,17 @@
+<definition>
+
+  <id>preprocessing-additions</id>
+  <title>Additions to the automatically created preprocessing workflow</title>
+
+  <operations>
+
+    <!-- Cleanup the working file repository -->
+ 
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+    </operation>
+  </operations>
+
+</definition>

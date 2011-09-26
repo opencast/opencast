@@ -1,0 +1,149 @@
+#!/bin/bash
+TMPFILE=`mktemp /tmp/${0##*/}.XXXXX`
+trap 'rm -f $TMPFILE' 0
+UA="Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)"
+#UA="Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.9) Gecko/20100824 Firefox/3.6.9"
+NOTFOUND=not_found.txt
+set -x
+[ -z "$HOME3P" ] && export HOME3P=`cd "${0%/*}" 2>/dev/null; echo $PWD`
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+# Main repositories
+export CENTOS_MIRROR=`getmcfg CENTOS_MIRROR:`
+export EPEL_MIRROR=`getmcfg EPEL_MIRROR:`
+export RPMFORGE_MIRROR=`getmcfg RPMFORGE_MIRROR:`
+export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`
+#
+getcfgx() {
+  set +x
+  CFG=`awk '
+/^[     ]*'$1'/ {
+  sub("^[       ]*'$1'[         ]*", "");
+  sub("[        ]*$", "");
+  print $0
+}' $2`
+  if [ $? -ne 0 ]; then
+    set -x
+    return 1
+  fi
+  eval echo "$CFG"
+  set -x
+  return 0
+}
+#
+fetch() {
+  first=1
+  for URL in $1; do
+    mirror=0
+    sm="${URL#mirror-}"
+    [ x"$sm" != x"$URL" ] && mirror=1
+    [ $first -eq 0 ] && mirror=1
+#
+#   wget -U "$UA" --spider "$sm"
+    java wget -h "$sm"
+    error=$?
+    if [ $error -ne 0 ]; then
+      # Check if protocol error
+      if [ $error -eq 102 ]; then
+        # Try with wget instead
+        wget -U "$UA" --spider "$sm"
+        if [ $? -ne 0 ]; then
+          [ $mirror -gt 0 ] && echo -n "mirror: " >> "$2"
+          echo "$sm" >> "$2"
+        fi
+      else
+        [ $mirror -gt 0 ] && echo -n "mirror: " >> "$2"
+        echo "$sm" >> "$2"
+      fi
+    fi
+    first=0
+  done
+  return 0
+}
+#
+# 1. Check master config
+#
+awk '
+  /^[ 	]*[^#]+$/ {
+    sub("^[ 	]*", ""); sub("[ 	]*$", "");
+    prog = $1;
+    if (match(prog, "._url[s]*:$")) {
+      sub("_url[s]*:$", "", prog);
+      sub("[^ 	]+_url[s]*:[ 	]*", "");
+      sub("[/]*$", "");
+      urls[prog] = $0;
+    }
+    else if (match(prog, "._pkg[s]*:$")) {
+      sub("_pkg[s]*:$", "", prog);
+      sub("[^ 	]+_pkg[s]*:[ 	]*", "");
+      pkgs[prog] = $0;
+    }
+  }
+END {
+  for (ii in urls) {
+    if (ii in pkgs) {
+      m = split(urls[ii], a);
+      n = split(pkgs[ii], b);
+      for (jj = 1; jj <= m; jj++) {
+        for (kk = 1; kk <= n; kk++) {
+          if (jj > 1) { printf("mirror-") }
+          print a[jj] "/" b[kk] 
+        }
+      }
+    }
+    else {
+      print "URL for " ii " defined without packages in master config.txt" > "/dev/stderr"
+    }
+  }
+  for (ii in pkgs) {
+    if (!(ii in urls)) {
+      print "Pkgs for " ii " defined without URL in master config.txt" > "/dev/stderr"
+    }
+  }
+}' "${HOME3P}/config.txt" > $TMPFILE
+[ $? -ne 0 ] && exit 1
+#
+sort -fu $TMPFILE > "$NOTFOUND"
+[ $? -ne 0 ] && exit 1
+mv "$NOTFOUND" $TMPFILE
+[ $? -ne 0 ] && exit 1
+#cp $TMPFILE expanded.txt
+#[ $? -ne 0 ] && exit 1
+MAXN=`awk 'END {print NR}' $TMPFILE`
+[ $? -ne 0 ] && exit 1
+touch "$NOTFOUND"
+[ $? -ne 0 ] && exit 1
+if [ ! -s wget.class ]; then
+  javac -d . "${HOME3P}/wget.java"
+  [ $? -ne 0 ] && exit 1
+fi
+N=1
+while [ $N -le $MAXN ]; do
+  URL=`awk 'NR=='$N' {print; exit}' $TMPFILE`
+  [ $? -ne 0 ] && exit 1
+  # Expand environment variables
+  URL=`eval echo "$URL"`
+  fetch "$URL" "$NOTFOUND"
+  N=`expr $N + 1`
+done
+#
+# 2. Check all other configs
+#
+for config in `find "${HOME3P}" -name config.txt`; do
+  URL=`getcfgx URL: "$config"`
+  [ -n "$URL" ] && fetch "$URL" "$NOTFOUND"
+  URL1=`getcfgx URL1: "$config"`
+  [ -n "$URL1" ] && fetch "$URL1" "$NOTFOUND"
+  URL2=`getcfgx URL2: "$config"`
+  [ -n "$URL2" ] && fetch "$URL2" "$NOTFOUND"
+  URL3=`getcfgx URL3: "$config"`
+  [ -n "$URL3" ] && fetch "$URL3" "$NOTFOUND"
+done
+#
+if [ -s "$NOTFOUND" ]; then
+  echo "`awk 'END {print NR}' "$NOTFOUND"` URLs not found - see file \"$NOTFOUND\""
+  exit 1
+fi
+echo "All URLs found"
+exit 0

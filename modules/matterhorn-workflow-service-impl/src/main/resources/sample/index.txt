@@ -1,0 +1,7 @@
+This directory contains sample files for use in testing workflows:
+
+dc-1.xml
+audio.mp3
+camera.mpg
+screen.mpg
+image.jpg

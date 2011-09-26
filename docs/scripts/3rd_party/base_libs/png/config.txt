@@ -1,0 +1,5 @@
+URL: http://downloads.sourceforge.net/project/libpng/libpng12/older-releases/1.2.44
+PKG: libpng-1.2.44.tar.gz
+SHA: 776bb8e42d86bd71ae58e0d96f85472c1d63beeb
+DIR: libpng-1.2.44
+PCP: pc-png.zip

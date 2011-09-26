@@ -1,0 +1,15 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-ports ] && exit 0
+#
+sudox port install x264 || exit 1
+#
+touch .done-ports
+[ $? -ne 0 ] && exit 1
+exit 0

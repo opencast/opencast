@@ -1,0 +1,148 @@
+# -*- Python -*-
+
+# Copyright 2008 Deutsches Forschungszentrum fuer Kuenstliche Intelligenz 
+# or its licensors, as applicable.
+# 
+# You may not use this file except under the terms of the accompanying license.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License"); you
+# may not use this file except in compliance with the License. You may
+# obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# 
+# Project: iulib - the open source image understanding library
+# File: SConstruct
+# Purpose: building iulib
+# Responsible: kofler
+# Reviewer: 
+# Primary Repository: http://iulib.googlecode.com/svn/trunk/
+# Web Sites: www.iupr.org, www.dfki.de
+
+# hints for make users
+#
+#  make all = scons
+#   install = scons install
+#     clean = scons -c
+# uninstall = scons -c install
+
+EnsureSConsVersion(0,98,1)
+
+import glob,os,sys,string,re
+
+### Options exposed via SCons
+opts = Variables('custom.py')
+opts.Add('opt', 'Compiler flags for optimization/debugging', "-g -O3")
+opts.Add('warn', 'Compiler flags for warnings', "-Wall -D__warn_unused_result__=__far__")
+opts.Add('prefix', 'The installation root for iulib', "/opt/local")
+
+### globals
+env = Environment(options=opts, CXXFLAGS="${opt} ${warn}")
+Help(opts.GenerateHelpText(env))
+conf = Configure(env)
+if "-DUNSAFE" in env["opt"]:
+    print "WARNING: compile with -DUNSAFE or high optimization only for production use"
+if re.search(r'-O[234]',env["opt"]):
+    print "compiling with high optimization"
+if not re.search(r'-O[234]',env["opt"]):
+    print "compiling for development (slower but safer)"
+
+env.Append(CPPPATH="/opt/local/include");
+env.Append(LIBPATH="/opt/local/lib");
+env.Append(LIBS=["tiff","jpeg","z"]);
+
+### FIXME these libraries should be optional, and compilation should
+### be conditional based on their presence
+
+### check for required (dev-) libraries (automatically added to env LIBS)
+missing = ""
+if not conf.CheckLibWithHeader('png', 'png.h', 'C', 'png_byte;', 1):
+    missing += " libpng12-dev"
+if not conf.CheckLibWithHeader('jpeg', 'jconfig.h', 'C', 'jpeg_std_error();', 1):
+    missing += " libjpeg62-dev"    
+if not conf.CheckLibWithHeader('z', 'zlib.h', 'C', 'inflate;', 1):
+    missing += " zlib-dev"
+if not conf.CheckLibWithHeader('tiff', 'tiff.h', 'C', 'TIFFOpen();', 1):
+    missing += " libtiff4-dev"
+
+if missing:
+    print "\nPlease install the following required libraries (or equivalent):"
+    print missing
+    print
+    Exit(1)
+
+### check for optional parts
+have_vidio = conf.CheckCXXHeader("ffmpeg/avcodec.h") and \
+             conf.CheckCXXHeader("ffmpeg/avformat.h")
+have_v4l2 = conf.CheckHeader("linux/videodev2.h")
+have_sdl = conf.CheckCXXHeader("SDL/SDL_gfxPrimitives.h") and \
+           conf.CheckCXXHeader("SDL/SDL.h")
+
+have_vidio = 0 # FIXME
+have_v4l2 = 0 # FIXME
+have_sdl = 1
+conf.Finish()
+
+### install folders
+prefix = "${prefix}"
+incdir_iulib = prefix+"/include/iulib"
+incdir_colib = prefix+"/include/colib"
+libdir = prefix+"/lib"
+datadir = prefix+"/share/iulib"
+bindir = prefix+"/bin"
+
+### collect sources etc.
+env.Prepend(CPPPATH=[".","colib","imglib","imgio","imgbits","utils","vidio"])
+
+sources = glob.glob("imglib/img*.cc") 
+sources += glob.glob("imgbits/img*.cc")
+sources += """
+    imgio/autoinvert.cc imgio/imgio.cc imgio/io_jpeg.cc
+    imgio/io_pbm.cc imgio/io_png.cc imgio/io_tiff.cc
+""".split()
+
+if have_vidio:
+    sources += glob.glob("vidio/vidio.cc")
+if have_v4l2:
+    sources += glob.glob("vidio/v4l2cap.cc")
+if have_sdl:
+    sources += ["utils/dgraphics.cc","utils/SDL_lines.cc"]
+else:
+    sources += ["utils/dgraphics_nosdl.cc"]
+
+libiulib = env.StaticLibrary('libiulib.a',sources)
+
+env.Append(LIBPATH=['.'])
+progs = env.Clone()
+progs.Append(LIBS=libiulib)
+for file in glob.glob("commands/*.cc"):
+    progs.Program(file[:-3],file)
+if have_vidio:
+    progs.Program("vidio/test-vidio","vidio/test-vidio.cc")
+    progs.Append(LIBS=["avformat","avcodec"])
+if 0 and have_v4l2:
+    progs.Program("vidio/test-vidcap","vidio/test-vidcap.cc")
+
+env.Install(libdir,libiulib)
+for header in glob.glob("*/*.h"): 
+    if "colib/" in header:
+        env.Install(incdir_colib,header)
+    else:
+        env.Install(incdir_iulib,header)
+env.Alias('install',[libdir,incdir_iulib,incdir_colib])
+
+test_builder = Builder(action='$SOURCE&&touch $TARGET',
+                  suffix = '.passed',
+                  src_suffix = '')
+progs.Append(BUILDERS={'Test':test_builder})
+
+if True: #"test" in COMMAND_LINE_TARGETS:
+    for file in glob.glob("*/test-*.cc") + glob.glob("*/*/test-*.cc"):
+        if not file.startswith('vidio'):
+            progs.Program(file[:-3],file)
+            progs.Test(file[:-3])
+            progs.Alias("test",file[:-3]+".passed")

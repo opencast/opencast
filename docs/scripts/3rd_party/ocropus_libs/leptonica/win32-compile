@@ -1,0 +1,74 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-win32 ] && exit 0
+pkg=`getcfg PKG:`
+chkpkg "$pkg" || exit 1
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+pcp=`getcfg PCP:`
+[ -z "$pcp" ] && exit 1
+#
+rm -fr "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+gzip -dc "$pkg" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+cd "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+#
+cp ../Makefile.am .
+[ $? -ne 0 ] && exit 1
+cp ../Makefile.in .
+[ $? -ne 0 ] && exit 1
+#
+export ENDIANNESS=-DL_LITTLE_ENDIAN
+./configure \
+--host=${MINGW32} \
+LIBTIFF_LIBS="-ltiff -ljpeg -lz"
+[ $? -ne 0 ] && exit 1
+make \
+CC=${MINGW32}-gcc \
+CPP=${MINGW32}-g++ \
+CXX=${MINGW32}-g++ \
+LD=${MINGW32}-ld \
+AR=${MINGW32}-ar \
+RANLIB=${MINGW32}-ranlib \
+STRIP=${MINGW32}-strip
+[ $? -ne 0 ] && exit 1
+#
+mkdir liblept
+[ $? -ne 0 ] && exit 1
+cp \
+src/allheaders.h src/alltypes.h src/array.h \
+src/arrayaccess.h src/bbuffer.h src/bmf.h \
+src/bmp.h src/ccbord.h src/dewarp.h src/environ.h \
+src/gplot.h src/heap.h src/imageio.h src/jbclass.h \
+src/leptprotos.h src/list.h src/morph.h src/pix.h \
+src/ptra.h src/queue.h src/readbarcode.h \
+src/regutils.h src/stack.h src/watershed.h \
+liblept
+[ $? -ne 0 ] && exit 1
+sudox rm -fr ${MINGW32_PREFIX}/include/liblept
+[ $? -ne 0 ] && exit 1
+sudox mkdir -p ${MINGW32_PREFIX}/include/liblept
+[ $? -ne 0 ] && exit 1
+sudox cp liblept/*.h ${MINGW32_PREFIX}/include/liblept
+[ $? -ne 0 ] && exit 1
+sudox cp src/liblept.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+#
+zip "../$pcp" liblept/*.h
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp" src/liblept.a
+[ $? -ne 0 ] && exit 1
+#
+touch ../.done-win32
+[ $? -ne 0 ] && exit 1
+exit 0

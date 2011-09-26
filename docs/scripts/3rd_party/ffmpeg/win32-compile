@@ -1,0 +1,201 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-win32 ] && exit 0
+pkg=`getcfg PKG:`
+chkpkg "$pkg" || exit 1
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+pcp1=`getcfg PCP1:`
+pcp2=`getcfg PCP2:`
+[ -z "$pcp1" -o -z "$pcp2" ] && exit 1
+#
+rm -fr "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+gzip -dc "$pkg" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+cd "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+#
+./configure \
+--enable-gpl \
+--enable-version3 \
+--enable-nonfree \
+--enable-avisynth \
+--enable-libxvid --extra-libs='-lxvidcore' \
+--enable-libx264 --extra-libs='-lx264 -lpthread' \
+--enable-libmp3lame --extra-libs='-lmp3lame' \
+--enable-libfaac --extra-libs='-lfaac' \
+--enable-libvorbis --extra-libs='-lvorbis' \
+--enable-libtheora --extra-libs='-ltheora' \
+--enable-libvpx --extra-libs='-lvpx' \
+--target-os=mingw32 --arch=x86 --cross-prefix=${MINGW32}- \
+--enable-memalign-hack \
+--enable-runtime-cpudetect
+[ $? -ne 0 ] && exit 1
+make
+[ $? -ne 0 ] && exit 1
+#
+sudox rm -fr ${MINGW32_PREFIX}/include/libavcodec
+[ $? -ne 0 ] && exit 1
+sudox mkdir -p ${MINGW32_PREFIX}/include/libavcodec
+[ $? -ne 0 ] && exit 1
+sudox cp \
+libavcodec/avcodec.h \
+libavcodec/avfft.h \
+libavcodec/dxva2.h \
+libavcodec/opt.h \
+libavcodec/vaapi.h \
+libavcodec/vdpau.h \
+libavcodec/xvmc.h \
+${MINGW32_PREFIX}/include/libavcodec
+[ $? -ne 0 ] && exit 1
+#
+sudox rm -fr ${MINGW32_PREFIX}/include/libavdevice
+[ $? -ne 0 ] && exit 1
+sudox mkdir -p ${MINGW32_PREFIX}/include/libavdevice
+[ $? -ne 0 ] && exit 1
+sudox cp \
+libavdevice/avdevice.h \
+${MINGW32_PREFIX}/include/libavdevice
+[ $? -ne 0 ] && exit 1
+#
+sudox rm -fr ${MINGW32_PREFIX}/include/libavformat
+[ $? -ne 0 ] && exit 1
+sudox mkdir -p ${MINGW32_PREFIX}/include/libavformat
+[ $? -ne 0 ] && exit 1
+sudox cp \
+libavformat/avformat.h \
+libavformat/avio.h \
+${MINGW32_PREFIX}/include/libavformat
+[ $? -ne 0 ] && exit 1
+#
+sudox rm -fr ${MINGW32_PREFIX}/include/libavutil
+[ $? -ne 0 ] && exit 1
+sudox mkdir -p ${MINGW32_PREFIX}/include/libavutil
+[ $? -ne 0 ] && exit 1
+sudox cp \
+libavutil/adler32.h \
+libavutil/attributes.h \
+libavutil/avconfig.h \
+libavutil/avstring.h \
+libavutil/avutil.h \
+libavutil/base64.h \
+libavutil/common.h \
+libavutil/crc.h \
+libavutil/error.h \
+libavutil/fifo.h \
+libavutil/intfloat_readwrite.h \
+libavutil/log.h \
+libavutil/lzo.h \
+libavutil/mathematics.h \
+libavutil/md5.h \
+libavutil/mem.h \
+libavutil/pixdesc.h \
+libavutil/pixfmt.h \
+libavutil/rational.h \
+libavutil/sha1.h \
+${MINGW32_PREFIX}/include/libavutil
+[ $? -ne 0 ] && exit 1
+#
+sudox rm -fr ${MINGW32_PREFIX}/include/libswscale
+[ $? -ne 0 ] && exit 1
+sudox mkdir -p ${MINGW32_PREFIX}/include/libswscale
+[ $? -ne 0 ] && exit 1
+sudox cp \
+libswscale/swscale.h \
+${MINGW32_PREFIX}/include/libswscale
+[ $? -ne 0 ] && exit 1
+#
+sudox rm -fr ${MINGW32_PREFIX}/include/ffmpeg
+[ $? -ne 0 ] && exit 1
+sudox mkdir -p ${MINGW32_PREFIX}/include/ffmpeg
+[ $? -ne 0 ] && exit 1
+cd ${MINGW32_PREFIX}/include/ffmpeg
+[ $? -ne 0 ] && exit 1
+sudox ln -s ../libavcodec/avcodec.h avcodec.h
+[ $? -ne 0 ] && exit 1
+sudox ln -s ../libavformat/avformat.h avformat.h
+[ $? -ne 0 ] && exit 1
+sudox ln -s ../libavformat/avio.h avio.h
+[ $? -ne 0 ] && exit 1
+cd -
+[ $? -ne 0 ] && exit 1
+#
+sudox cp libavcodec/libavcodec.a libavdevice/libavdevice.a libavformat/libavformat.a libavutil/libavutil.a libswscale/libswscale.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+#
+zip "../$pcp1" \
+libavcodec/avcodec.h \
+libavcodec/avfft.h \
+libavcodec/dxva2.h \
+libavcodec/opt.h \
+libavcodec/vaapi.h \
+libavcodec/vdpau.h \
+libavcodec/xvmc.h
+[ $? -ne 0 ] && exit 1
+#
+zip "../$pcp1" \
+libavdevice/avdevice.h
+[ $? -ne 0 ] && exit 1
+#
+zip "../$pcp1" \
+libavformat/avformat.h \
+libavformat/avio.h
+[ $? -ne 0 ] && exit 1
+#
+zip "../$pcp1" \
+libavutil/adler32.h \
+libavutil/attributes.h \
+libavutil/avconfig.h \
+libavutil/avstring.h \
+libavutil/avutil.h \
+libavutil/base64.h \
+libavutil/common.h \
+libavutil/crc.h \
+libavutil/error.h \
+libavutil/fifo.h \
+libavutil/intfloat_readwrite.h \
+libavutil/log.h \
+libavutil/lzo.h \
+libavutil/mathematics.h \
+libavutil/md5.h \
+libavutil/mem.h \
+libavutil/pixdesc.h \
+libavutil/pixfmt.h \
+libavutil/rational.h \
+libavutil/sha1.h
+[ $? -ne 0 ] && exit 1
+#
+zip "../$pcp1" \
+libswscale/swscale.h
+[ $? -ne 0 ] && exit 1
+#
+zip -j "../$pcp1" libavcodec/libavcodec.a libavdevice/libavdevice.a libavformat/libavformat.a libavutil/libavutil.a libswscale/libswscale.a
+[ $? -ne 0 ] && exit 1
+#
+zip -j "../$pcp1" ffmpeg.exe ffprobe.exe
+[ $? -ne 0 ] && exit 1
+#
+mkdir .ffmpeg
+[ $? -ne 0 ] && exit 1
+cp ffpresets/* .ffmpeg
+[ $? -ne 0 ] && exit 1
+zip "../$pcp1" .ffmpeg/*
+[ $? -ne 0 ] && exit 1
+zip "../$pcp2" .ffmpeg/*
+[ $? -ne 0 ] && exit 1
+#
+copypc usr/local/bin ffmpeg.exe ffprobe.exe
+[ $? -ne 0 ] && exit 1
+#
+touch ../.done-win32
+[ $? -ne 0 ] && exit 1
+exit 0

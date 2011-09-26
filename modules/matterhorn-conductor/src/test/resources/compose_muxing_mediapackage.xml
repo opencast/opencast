@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:mediapackage start="2010-05-19T09:27:46"
+	id="d51f9d4e-b5e7-41e0-8640-0d1f43b2fed0" duration="65649"
+	xmlns:ns2="http://mediapackage.opencastproject.org">
+	<title>Compose workflow operation handler test</title>
+	<media>
+		
+		<track type="presentation/source" id="compose-workflow-operation-test-source-video-track-id">
+			<mimetype>video/msvideo</mimetype>
+			<tags />
+			<url>fooVideoTrack.avi</url>
+			<checksum type="md5">322293948673e98459becf5b7ad82585</checksum>
+			<duration>65649</duration>
+			<audio id="compose-workflow-operation-test-source-audio-id">
+				<device />
+				<encoder type="MPEG Audio" />
+				<bitdepth>16</bitdepth>
+				<channels>2</channels>
+				<samplingrate>48000</samplingrate>
+				<bitrate>128000.0</bitrate>
+			</audio>
+			<video id="compose-workflow-operation-test-source-video-id">
+				<device />
+				<encoder type="MPEG-4 Visual" />
+				<bitrate>1340065.0</bitrate>
+				<framerate>23.976</framerate>
+				<resolution>624x352</resolution>
+				<scantype type="Progressive" />
+			</video>
+		</track>
+		<track type="presenter/source" id="compose-workflow-operation-test-source-audio-track-id">
+			<mimetype>video/msvideo</mimetype>
+			<tags />
+			<url>fooAudioTrack.avi</url>
+			<checksum type="md5">322293948673e98459becf5b7ad82585</checksum>
+			<duration>65649</duration>
+			<audio id="compose-workflow-operation-test-source-audiotrack-audio-id">
+				<device />
+				<encoder type="MPEG Audio" />
+				<bitdepth>16</bitdepth>
+				<channels>2</channels>
+				<samplingrate>48000</samplingrate>
+				<bitrate>128000.0</bitrate>
+			</audio>
+			<video id="compose-workflow-operation-test-source-audiotrack-video-id">
+				<device />
+				<encoder type="MPEG-4 Visual" />
+				<bitrate>1340065.0</bitrate>
+				<framerate>23.976</framerate>
+				<resolution>624x352</resolution>
+				<scantype type="Progressive" />
+			</video>
+		</track>
+	</media>
+	<metadata>
+		<catalog type="dublincore/episode" id="9a9eb5dd-e0e1-4321-b46b-66a1feb5bac7">
+			<mimetype>text/xml</mimetype>
+			<tags />
+			<url>fooDC.xml</url>
+		</catalog>
+		<catalog ref="track:91bec596-cc93-4315-96c5-9c790c4db875"
+			type="mpeg-7/segments" id="catalog-2">
+			<mimetype>text/xml</mimetype>
+			<tags />
+			<url>fooMPEG7.xml</url>
+		</catalog>
+	</metadata>
+	<attachments />
+</ns2:mediapackage>

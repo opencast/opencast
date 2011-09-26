@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" immediate="true" name="org.opencastproject.capture.endpoint.CaptureRestService">
+  <implementation class="org.opencastproject.capture.endpoint.CaptureRestService" />
+  <property name="service.description" value="Capture REST Endpoint" />
+
+  <property name="opencast.service.type" value="org.opencastproject.capture" />
+  <property name="opencast.service.path" value="/captureagent" />
+  <property name="opencast.service.remote" value="false" />
+
+  <service>
+    <provide interface="org.opencastproject.capture.endpoint.CaptureRestService" />
+  </service>
+  <reference name="service-impl" interface="org.opencastproject.capture.api.CaptureAgent"
+    cardinality="1..1" policy="static" bind="setService" unbind="unsetService" />
+</scr:component>

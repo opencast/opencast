@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:mediapackage start="2011-03-07T17:33:14Z" id="f69c5e29-5a63-4cb3-b58a-7c5a00fdb8d9" duration="65649" xmlns:ns2="http://mediapackage.opencastproject.org">
+	<title>Split handler test.</title>
+	<media>
+		<track id="original-video-id">
+			<mimetype>video/quicktime</mimetype>
+			<tags/>
+			<url>src/test/resources/split.mp4</url>
+			<checksum type="md5">e6c697c8c79a8ca057846bce0b17faa9</checksum>
+			<duration>-1</duration>
+<video id="video-1">
+<device/>
+<encoder/>
+<bitrate>387969.0</bitrate>
+<framerate>10.0</framerate>
+<resolution>1792x1028</resolution>
+<scantype type="Progressive"/>
+</video>
+	</track>
+<track id="right-split-track-id">
+<mimetype>video/quicktime</mimetype>
+<tags/>
+<url>tmp/split1_split.mp4</url>
+<checksum type="md5">fa083a7cdb1a1d62a85a8fa6d3c8e962</checksum><duration>-1</duration>
+<video id="video-1">
+<device/>
+<encoder/>
+<bitrate>387969.0</bitrate>
+<framerate>10.0</framerate>
+<resolution>1024x768</resolution>
+<scantype type="Progressive"/>
+</video>
+</track>
+<track id="left-split-track-id">
+<mimetype>video/quicktime</mimetype>
+<tags/>
+<url>tmp/split2_split.mp4</url>
+<duration>-1</duration>
+<video id="video-1">
+<device/>
+<encoder/>
+<bitrate>387969.0</bitrate>
+<framerate>10.0</framerate>
+<resolution>768x576</resolution>
+<scantype type="Progressive"/>
+</video>
+</track>
+</media>
+	</ns2:mediapackage>
+	

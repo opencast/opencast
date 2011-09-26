@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>Opencast Matterhorn</title>
+    <link rel="shortcut icon" href="img/favicon.ico" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <!-- STYLESHEETS -->
+    <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.8.6.custom.css" />
+    <link rel="stylesheet" type="text/css" href="css/jquery-ui-opencast-admin/jquery-ui-opencast-admin.css" />
+    <link rel="stylesheet" type="text/css" href="css/admin.css" />
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="jquery/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="jquery/jquery-ui-1.8.6.custom.min.js"></script>
+
+    <script type="text/javascript" src="jquery/plugins/jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="jquery/plugins/jquery.i18n.properties-min.js"></script>
+
+    <script type="text/javascript" src="js/jquery.jqote2.js"></script>
+
+    <!-- script type="text/javascript" src="js/jquery.ui.spinner.js"></script -->
+    <script type="text/javascript" src="js/jquery.ui.searchbox.js"></script>
+    <script type="text/javascript" src="js/oc.utils.js"></script>
+    <script type="text/javascript" src="js/oc.admin.js"></script>
+    <script type="text/javascript" src="js/jquery.address-1.4.min.js"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+
+    <!--[if IE]><script type="text/javascript" language="javascript" src="js/excanvas.js"></script><![endif]-->
+    <script type="text/javascript" language="javascript" src="js/js-class.js"></script>
+    <script type="text/javascript" language="javascript" src="js/bluff-min.js"></script>
+
+    <script type="text/javascript" src="js/oc.recordings.js"></script>
+    <script type="text/javascript" src="js/oc.series.list.js"></script>
+    <script type="text/javascript" src="js/oc.capture.agent.js"></script>
+    <script type="text/javascript" src="js/oc.statistics.js"></script>
+    <script type="text/javascript" src="js/oc.scheduler.js"></script>
+    <script type="text/javascript" src="js/oc.workflow.js"></script>
+    <script type="text/javascript" src="js/oc.view.series.js"></script>
+    <script type="text/javascript" src="js/oc.upload.new.js"></script>
+    <script type="text/javascript" src="js/oc.series.js"></script>
+    <script type="text/javascript" src="js/oc.inspect.js"></script>
+    <script type="text/javascript" src="js/oc.security.js"></script>
+
+    <script type="text/javascript">
+      var tabs,
+      recordings = "recordings",
+      linkSelector = "#tabsWrapper ul:first a",
+      path = "",
+      matterhorn = " | Opencast Matterhorn",
+
+      getSelected = function ()
+      {
+        switch ($.address.path()) {
+          case "/recordings":
+            ocRecordings.init();
+            document.title = "Recordings" + matterhorn;
+            return 0;
+            break;
+          case "/series_list":
+            ocSeriesList.init();
+            document.title = "Series" + matterhorn;
+            return 1;
+            break;
+          case "/agents_status":
+            ocCaptureAgent.init();
+            document.title = "Capture Agents" + matterhorn;
+            return 2;
+            break;
+          case "/statistics":
+            ocStatistics.init();
+            document.title = "Statistics" + matterhorn;
+            return 3;
+            break;  
+          case "/scheduler":
+            ocScheduler.init();
+            document.title = "Scheduler" + matterhorn;
+            return 0;
+            break; 
+          case "/upload":
+            ocUpload.init();
+            document.title = "Upload" + matterhorn;
+            return 0;
+            break;   
+          case "/series":
+            ocSeries.init();
+            document.title = "Series" + matterhorn;
+            return 1;
+            break; 
+          case "/viewseries":
+            ocViewSeries.initViewSeries();
+            document.title = "Series" + matterhorn;
+            return 1;
+            break;   
+          case "/viewinfo":
+            Opencast.WorkflowInspect.initialize();
+            document.title = "Info" + matterhorn;
+            return 0;
+            break;   
+          case "/inspect":
+            Opencast.WorkflowInspect.initInspect();
+            document.title = "Inspect" + matterhorn;
+            return 0;
+            break;   
+        }
+      }
+      
+      $(document).ready( function() {
+        
+        if ($.address.value() == '/') {
+          $.address.value(recordings);
+        }
+        path = $.address.value();
+        
+        // Address handler
+        $.address.init(function(event) {
+          // Tabs setup
+          tabs = $('#tabsWrapper')
+          .tabs({
+            selected: getSelected()
+          })
+          .css('display', 'block');
+
+          // Enables the plugin for all the tab links
+          $(linkSelector).address();
+            
+        }).change(function(event) {
+          if($.address.path() == '/hold')
+          {
+            path = $.address.value();
+          }
+          if($.address.value() != path)
+          {
+            location.hash = "#" + $.address.value();
+            location.reload();
+          }
+
+        }).externalChange(function(event) {
+          if($.address.path() == '/hold')
+          {
+            path = $.address.value();
+          }
+          if($.address.value() != path)
+          {
+            location.hash = "#" + $.address.value();
+            location.reload();
+          }
+        }).history(true);
+      });
+    </script>
+  </head>
+  <body>
+    <!-- VERSION AND LOGOUT BAR -->
+    <div class="layout-page-header oc-ui-version-bar ui-helper-clearfix">
+      <div id="pageHeader">
+        <span id="currentVersion"></span>
+        <a href="/j_spring_security_logout">Log out</a>
+        <div class="clear"></div>
+      </div>
+
+      <!-- notification that javaScript is disabled -->
+      <noscript>
+        <div style="border:1px solid red;width:530px;margin:20px;margin-left:auto;margin-right:auto;">
+          <div style="text-align: left;background:red; color:white;padding-top:2px;padding-bottom:2px;">
+            <div class="icon icon-error" style="margin-left:5px;margin-right:5px;">&nbsp;</div>
+            JavaScript is disabled
+          </div>
+          <div style="padding:10px;">
+            JavaScript is turned off in your web browser, so this site won't work properly! <br />
+            <strong>
+              Please turn JavaScript on to use this site, then refresh the page.
+            </strong>
+          </div>
+        </div>
+      </noscript>
+
+      <div id="wrapper">
+        <div id="header">
+          <a href="index.html" style="text-decoration: none;">
+            <img src="img/MatterhornLogo.png" onclick="document.location='../welcome.html'; return false;" alt="Matterhorn Home Page" title="Matterhorn Home Page" width="104" height="72" align="left" />
+            <h1>Admin Tools</h1>
+          </a>
+          <a href="http://www.opencastproject.org" id="oc-logo">
+            <img src="img/OpencastLogo.png" width="143" height="38" alt="Opencast Community Project" title="Opencast Community Project" />
+          </a>
+          <div class="clear"></div>
+        </div>
+      </div>
+
+      <!-- PAGE TABS -->
+      <div class="layout-page-header recordings-page" id="page-header">
+        <div id="tabsWrapper" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+          <ul id="tabs">
+            <li>
+              <a href="#recordings" title="Recordings" id="i18n_tab_recording">Recordings</a>
+            </li>
+            <li>
+              <a href="#series_list" title="Series" id="i18n_tab_series">Series</a>
+            </li>
+            <li>
+              <a href="#agents_status" title="Capture Agents" id="i18n_tab_agent">Capture Agents</a>
+            </li>
+            <li>
+              <a href="#statistics" title="Statistics" id="i18n_tab_statistics">Statistics</a>
+            </li>
+          </ul>
+        </div>
+        <div id="addHeader">
+
+        </div>
+        <div id="holdActionStage" style="display:none">
+          <input type="hidden" id="holdWorkflowId" value="" />
+          <iframe id="holdActionUI" border="0" frameborder="0" style="height:640px;"></iframe>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

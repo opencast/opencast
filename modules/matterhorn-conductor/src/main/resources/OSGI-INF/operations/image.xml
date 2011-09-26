@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.workflow.handler.ImageWorkflowOperationHandler" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.workflow.handler.ImageWorkflowOperationHandler" />
+  <property name="service.description" value="Image Workflow Operation Handler" />
+  <property name="workflow.operation" value="image" />
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+  <reference cardinality="1..1" interface="org.opencastproject.composer.api.ComposerService"
+  name="ComposerService" policy="static" bind="setComposerService"/>
+  <reference cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace" name="Workspace"
+    policy="static" bind="setWorkspace" />
+  <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    policy="static" bind="setServiceRegistry" />
+</scr:component>

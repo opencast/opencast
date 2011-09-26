@@ -1,0 +1,22 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+compile jam     linux || exit 1
+compile scons   linux || exit 1
+compile yasm    linux || exit 1
+compile pthread linux || exit 1
+compile rand48  linux || exit 1
+#
+compile zlib    linux || exit 1
+compile jpeg    linux || exit 1
+# png depends on zlib
+compile png     linux || exit 1
+# tiff depends on pthread, zlib and jpeg
+compile tiff    linux || exit 1
+#
+exit 0

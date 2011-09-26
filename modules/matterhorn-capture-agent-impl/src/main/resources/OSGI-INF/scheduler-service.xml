@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.capture.api.Scheduler" immediate="true" deactivate="deactivate">
+  <implementation class="org.opencastproject.capture.impl.SchedulerImpl" />
+  <property name="service.description" value="Capture Scheduling Service" />
+  <property name="service.pid" value="org.opencastproject.capture.impl.SchedulerImpl" />  
+  <service>
+    <provide interface="org.opencastproject.capture.api.Scheduler" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
+  </service>
+  <reference name="captureAgent" interface="org.opencastproject.capture.impl.CaptureAgentImpl"
+    cardinality="1..1" policy="static" bind="setCaptureAgent" />
+  <reference name="configService" interface="org.opencastproject.capture.impl.ConfigurationManager"
+    cardinality="1..1" policy="static" bind="setConfigService" />
+  <reference name="trustedClient" interface="org.opencastproject.security.api.TrustedHttpClient"
+    cardinality="1..1" policy="dynamic" bind="setTrustedClient" />
+</scr:component>

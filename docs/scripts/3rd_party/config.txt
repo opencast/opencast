@@ -1,0 +1,148 @@
+# Master repositories
+CENTOS_MIRROR: http://mirrors.kernel.org
+EPEL_MIRROR: http://mirror.switch.ch/ftp/mirror
+RPMFORGE_MIRROR: http://apt.sw.be/redhat/el5/en
+MACPORTS_SVN: http://svn.macports.org/repository/macports/trunk/dports
+
+wget_x86_url: ${CENTOS_MIRROR}/centos/5/os/i386/CentOS
+wget_x86_pkgs: wget-1.11.4-2.el5_4.1.i386.rpm
+
+wget_x64_url: ${CENTOS_MIRROR}/centos/5/os/x86_64/CentOS
+wget_x64_pkgs: wget-1.11.4-2.el5_4.1.x86_64.rpm
+
+zip_x86_url: ${CENTOS_MIRROR}/centos/5/os/i386/CentOS
+zip_x86_pkgs: zip-2.31-2.el5.i386.rpm
+
+zip_x64_url: ${CENTOS_MIRROR}/centos/5/os/x86_64/CentOS
+zip_x64_pkgs: zip-2.31-2.el5.x86_64.rpm
+
+unzip_x86_url: ${CENTOS_MIRROR}/centos/5/os/i386/CentOS
+unzip_x86_pkgs: unzip-5.52-3.el5.i386.rpm
+
+unzip_x64_url: ${CENTOS_MIRROR}/centos/5/os/x86_64/CentOS
+unzip_x64_pkgs: unzip-5.52-3.el5.x86_64.rpm
+
+xz_x86_url: ${CENTOS_MIRROR}/centos/5/os/i386/CentOS
+xz_x86_pkgs: xz-4.999.9-0.3.beta.20091007git.el5.i386.rpm xz-libs-4.999.9-0.3.beta.20091007git.el5.i386.rpm
+
+xz_x64_url: ${CENTOS_MIRROR}/centos/5/os/x86_64/CentOS
+xz_x64_pkgs: xz-4.999.9-0.3.beta.20091007git.el5.x86_64.rpm xz-libs-4.999.9-0.3.beta.20091007git.el5.x86_64.rpm
+
+gcc_x86_url: ${CENTOS_MIRROR}/centos/5/os/i386/CentOS
+gcc_x86_pkgs: gcc-4.1.2-50.el5.i386.rpm cpp-4.1.2-50.el5.i386.rpm libgcc-4.1.2-50.el5.i386.rpm libgomp-4.4.4-13.el5.i386.rpm
+
+gcc_x86_upd_url: ${CENTOS_MIRROR}/centos/5/updates/i386/RPMS
+gcc_x86_upd_pkgs: glibc-devel-2.5-58.el5_6.3.i386.rpm glibc-headers-2.5-58.el5_6.3.i386.rpm kernel-headers-2.6.18-238.5.1.el5.i386.rpm glibc-2.5-58.el5_6.3.i686.rpm glibc-common-2.5-58.el5_6.3.i386.rpm nscd-2.5-58.el5_6.3.i386.rpm
+
+gcc_x64_url: ${CENTOS_MIRROR}/centos/5/os/x86_64/CentOS
+gcc_x64_pkgs: gcc-4.1.2-50.el5.x86_64.rpm cpp-4.1.2-50.el5.x86_64.rpm libgcc-4.1.2-50.el5.x86_64.rpm libgomp-4.4.4-13.el5.x86_64.rpm
+
+gcc_x64_upd_url: ${CENTOS_MIRROR}/centos/5/updates/x86_64/RPMS
+gcc_x64_upd_pkgs: glibc-devel-2.5-58.el5_6.3.x86_64.rpm glibc-headers-2.5-58.el5_6.3.x86_64.rpm kernel-headers-2.6.18-238.5.1.el5.x86_64.rpm glibc-2.5-58.el5_6.3.i686.rpm glibc-2.5-58.el5_6.3.x86_64.rpm glibc-common-2.5-58.el5_6.3.x86_64.rpm nscd-2.5-58.el5_6.3.x86_64.rpm
+
+gpp_x86_url: ${CENTOS_MIRROR}/centos/5/os/i386/CentOS
+gpp_x86_pkgs: gcc-c++-4.1.2-50.el5.i386.rpm gcc-4.1.2-50.el5.i386.rpm cpp-4.1.2-50.el5.i386.rpm libstdc++-4.1.2-50.el5.i386.rpm libgomp-4.4.4-13.el5.i386.rpm libstdc++-devel-4.1.2-50.el5.i386.rpm
+
+gpp_x86_upd_url: ${CENTOS_MIRROR}/centos/5/updates/i386/RPMS
+gpp_x86_upd_pkgs: glibc-devel-2.5-58.el5_6.3.i386.rpm glibc-headers-2.5-58.el5_6.3.i386.rpm kernel-headers-2.6.18-238.5.1.el5.i386.rpm glibc-2.5-58.el5_6.3.i686.rpm glibc-common-2.5-58.el5_6.3.i386.rpm nscd-2.5-58.el5_6.3.i386.rpm
+
+gpp_x64_url: ${CENTOS_MIRROR}/centos/5/os/x86_64/CentOS
+gpp_x64_pkgs: gcc-c++-4.1.2-50.el5.x86_64.rpm gcc-4.1.2-50.el5.x86_64.rpm cpp-4.1.2-50.el5.x86_64.rpm libstdc++-4.1.2-50.el5.x86_64.rpm libgomp-4.4.4-13.el5.x86_64.rpm libstdc++-devel-4.1.2-50.el5.x86_64.rpm
+
+gpp_x64_upd_url: ${CENTOS_MIRROR}/centos/5/updates/x86_64/RPMS
+gpp_x64_upd_pkgs: glibc-devel-2.5-58.el5_6.3.x86_64.rpm glibc-headers-2.5-58.el5_6.3.x86_64.rpm kernel-headers-2.6.18-238.5.1.el5.x86_64.rpm glibc-2.5-58.el5_6.3.i686.rpm glibc-2.5-58.el5_6.3.x86_64.rpm glibc-common-2.5-58.el5_6.3.x86_64.rpm nscd-2.5-58.el5_6.3.x86_64.rpm
+
+yacc_x86_url: ${CENTOS_MIRROR}/centos/5/os/i386/CentOS
+# yacc_x86_pkgs: flex-2.5.4a-41.fc6.i386.rpm bison-2.3-2.1.i386.rpm
+yacc_x86_pkgs: byacc-1.9-29.2.2.i386.rpm
+
+yacc_x64_url: ${CENTOS_MIRROR}/centos/5/os/x86_64/CentOS
+# yacc_x64_pkgs: flex-2.5.4a-41.fc6.x86_64.rpm bison-2.3-2.1.x86_64.rpm
+yacc_x64_pkgs: byacc-1.9-29.2.2.x86_64.rpm
+
+perl-dbi_x86_url: ${CENTOS_MIRROR}/centos/5/os/i386/CentOS
+perl-dbi_x86_pkgs: perl-DBI-1.52-2.el5.i386.rpm
+
+perl-dbi_x64_url: ${CENTOS_MIRROR}/centos/5/os/x86_64/CentOS
+perl-dbi_x64_pkgs: perl-DBI-1.52-2.el5.x86_64.rpm
+
+git_x86_url: http://packages.sw.be/git
+git_x86_pkgs: git-1.7.3-1.el5.rf.i386.rpm perl-Git-1.7.3-1.el5.rf.i386.rpm
+
+git_x64_url: http://packages.sw.be/git
+git_x64_pkgs: git-1.7.3-1.el5.rf.x86_64.rpm perl-Git-1.7.3-1.el5.rf.x86_64.rpm
+
+jam_x86_url: ${EPEL_MIRROR}/epel/5/i386
+jam_x86_pkgs: jam-2.5-4.el5.i386.rpm
+
+jam_x64_url: ${EPEL_MIRROR}/epel/5/x86_64
+jam_x64_pkgs: jam-2.5-4.el5.x86_64.rpm
+
+yasm_x86_url: http://packages.sw.be/yasm
+yasm_x86_pkgs: yasm-1.0.1-1.el5.rf.i386.rpm
+
+yasm_x64_url: http://packages.sw.be/yasm
+yasm_x64_pkgs: yasm-1.0.1-1.el5.rf.x86_64.rpm
+
+ImageMagick_x86_url: ${CENTOS_MIRROR}/centos/5/os/i386/CentOS
+ImageMagick_x86_pkgs: ImageMagick-6.2.8.0-4.el5_5.3.i386.rpm
+
+ImageMagick_x64_url: ${CENTOS_MIRROR}/centos/5/os/x86_64/CentOS
+ImageMagick_x64_pkgs: ImageMagick-6.2.8.0-4.el5_5.3.x86_64.rpm
+
+automake_x86_url: ${CENTOS_MIRROR}/centos/5/os/i386/CentOS
+automake_x86_pkgs: automake-1.9.6-2.3.el5.noarch.rpm autoconf-2.59-12.noarch.rpm imake-1.0.2-3.i386.rpm
+
+automake_x64_url: ${CENTOS_MIRROR}/centos/5/os/x86_64/CentOS
+automake_x64_pkgs: automake-1.9.6-2.3.el5.noarch.rpm autoconf-2.59-12.noarch.rpm imake-1.0.2-3.x86_64.rpm
+
+gsl-devel_x86_url: ${CENTOS_MIRROR}/centos/5/os/i386/CentOS
+gsl-devel_x86_pkgs: gsl-devel-1.13-3.el5.i386.rpm gsl-1.13-3.el5.i386.rpm pkgconfig-0.21-2.el5.i386.rpm
+
+gsl-devel_x64_url: ${CENTOS_MIRROR}/centos/5/os/x86_64/CentOS
+gsl-devel_x64_pkgs: gsl-devel-1.13-3.el5.i386.rpm gsl-devel-1.13-3.el5.x86_64.rpm gsl-1.13-3.el5.i386.rpm gsl-1.13-3.el5.x86_64.rpm pkgconfig-0.21-2.el5.x86_64.rpm
+
+desktop-file-utils_x86_url: ${CENTOS_MIRROR}/centos/5/os/i386/CentOS
+desktop-file-utils_x86_pkgs: desktop-file-utils-0.10-7.i386.rpm
+
+desktop-file-utils_x64_url: ${CENTOS_MIRROR}/centos/5/os/x86_64/CentOS
+desktop-file-utils_x64_pkgs: desktop-file-utils-0.10-7.x86_64.rpm
+
+gmp_x86_url: ${CENTOS_MIRROR}/centos/5/os/i386/CentOS
+gmp_x86_pkgs: gmp-4.1.4-10.el5.i386.rpm
+
+gmp_x64_url: ${CENTOS_MIRROR}/centos/5/os/x86_64/CentOS
+gmp_x64_pkgs: gmp-4.1.4-10.el5.x86_64.rpm
+
+zlib-devel_x86_url: ${CENTOS_MIRROR}/centos/5/os/i386/CentOS
+zlib-devel_x86_pkgs: zlib-devel-1.2.3-3.i386.rpm
+
+zlib-devel_x64_url: ${CENTOS_MIRROR}/centos/5/os/x86_64/CentOS
+zlib-devel_x64_pkgs: zlib-devel-1.2.3-3.x86_64.rpm
+
+MacPorts_mac_url: http://distfiles.macports.org/MacPorts
+MacPorts_mac_pkgs: MacPorts-1.9.2-10.6-SnowLeopard.dmg
+
+git_mac_url: http://git-osx-installer.googlecode.com/files
+git_mac_pkgs: git-1.6.5.1-UNIVERSALbinary-leopard.dmg
+
+mingw32-gcc_x86_url: ${EPEL_MIRROR}/epel/5/i386
+mingw32-gcc_x86_pkgs: mingw32-gcc-4.3.2-12.el5.i386.rpm mingw32-binutils-2.19-3.el5.i386.rpm mingw32-cpp-4.3.2-12.el5.i386.rpm mingw32-filesystem-56-1.el5.noarch.rpm mingw32-runtime-3.15.1-10.el5.noarch.rpm mingw32-w32api-3.12-8.el5.noarch.rpm rpmlint-0.94-2.el5.noarch.rpm
+
+mingw32-gcc_x64_url: ${EPEL_MIRROR}/epel/5/x86_64
+mingw32-gcc_x64_pkgs: mingw32-gcc-4.3.2-12.el5.x86_64.rpm mingw32-binutils-2.19-3.el5.x86_64.rpm mingw32-cpp-4.3.2-12.el5.x86_64.rpm mingw32-filesystem-56-1.el5.noarch.rpm mingw32-runtime-3.15.1-10.el5.noarch.rpm mingw32-w32api-3.12-8.el5.noarch.rpm rpmlint-0.94-2.el5.noarch.rpm
+
+mingw32-gpp_x86_url: ${EPEL_MIRROR}/epel/5/i386
+mingw32-gpp_x86_pkgs: mingw32-gcc-c++-4.3.2-12.el5.i386.rpm
+
+mingw32-gpp_x64_url: ${EPEL_MIRROR}/epel/5/x86_64
+mingw32-gpp_x64_pkgs: mingw32-gcc-c++-4.3.2-12.el5.x86_64.rpm
+
+mingw32-w32api_src_url: http://downloads.sourceforge.net/project/mingw/MinGW/BaseSystem/RuntimeLibrary/Win32-API/w32api-3.15
+mingw32-w32api_src_pkgs: w32api-3.15-1-mingw32-dev.tar.lzma
+
+#Original, but now defunct
+# patchelf_src_url: http://hydra.nixos.org/build/114505/download/3
+# patchelf_src_pkgs: patchelf-0.5.tar.gz
+patchelf_src_url: http://www.mirrorservice.org/sites/www.ibiblio.org/gentoo/distfiles
+patchelf_src_pkgs: patchelf-0.5.tar.bz2

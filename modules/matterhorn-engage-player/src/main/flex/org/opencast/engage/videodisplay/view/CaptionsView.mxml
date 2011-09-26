@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+	 /**
+	 *  Copyright 2009 The Regents of the University of California
+	 *  Licensed under the Educational Community License, Version 2.0
+	 *  (the "License"); you may not use this file except in compliance
+	 *  with the License. You may obtain a copy of the License at
+	 *
+	 *  http://www.osedu.org/licenses/ECL-2.0
+	 *
+	 *  Unless required by applicable law or agreed to in writing,
+	 *  software distributed under the License is distributed on an "AS IS"
+	 *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+	 *  or implied. See the License for the specific language governing
+	 *  permissions and limitations under the License.
+	 *
+	 */
+-->
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
+		 creationComplete="{ onCreationComplete() }"
+		 verticalScrollPolicy="off"
+		 horizontalScrollPolicy="off">
+
+	<mx:Script>
+		<![CDATA[
+			import mx.events.ValidationResultEvent;
+			import org.opencast.engage.videodisplay.control.event.SetVolumeEvent;
+			import org.opencast.engage.videodisplay.control.event.VideoControlEvent;
+			import org.opencast.engage.videodisplay.model.VideodisplayModel;
+			import org.opencast.engage.videodisplay.state.PlayerState;
+			import org.swizframework.Swiz;
+
+			[Autowire]
+			[Bindable]
+			public var model:VideodisplayModel;
+
+			/**
+			 * copyToClipboard
+			 * Copy the text in to the system clipboard.
+			 */
+			private function copyToClipboard():void
+			{
+				System.setClipboard(txt_captions.text);
+			}
+
+			/**
+			 * onCreationComplete
+			 * Add a shadow text filter around the captions.
+			 */
+			private function onCreationComplete():void
+			{
+				var myfilters:Array=[];
+				var dropShadow:DropShadowFilter=new DropShadowFilter();
+				dropShadow.distance=0;
+				dropShadow.angle=25;
+				dropShadow.alpha=1.0;
+				dropShadow.blurX=3;
+				dropShadow.blurY=3;
+				dropShadow.strength=2;
+				dropShadow.quality=3;
+				myfilters.push(dropShadow);
+				txt_captions.filters=myfilters;
+			}
+		]]>
+	</mx:Script>
+
+	<mx:VBox backgroundColor="#999999"
+			 backgroundAlpha="0.8"
+			 width="{ txt_captions.width }"
+			 visible="{ model.ccBoolean == true ? model.currentSubtitle == '' ? false : true : false }"
+			 includeInLayout="{ model.ccBoolean == true ? model.currentSubtitle == '' ? false : true : false }">
+
+		<mx:Text id="txt_captions"
+				 fontSize="{ model.fontSizeCaptions }"
+				 htmlText="{ model.currentSubtitle }"
+				 styleName="captions"
+				 focusOut="{ txt_captions.setFocus() }"
+				 click="{ copyToClipboard() }"
+				 toolTip="Click to copy the text."/>
+	</mx:VBox>
+</mx:VBox>

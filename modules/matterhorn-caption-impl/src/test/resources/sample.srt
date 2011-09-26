@@ -1,0 +1,27 @@
+1
+00:00:49,520 --> 00:00:52,961
+This is caption testing.
+1. line.
+
+2
+00:00:53,161 --> 00:00:55,861
+Only one line this time.
+
+3
+00:00:56,331 --> 00:00:58,802
+3. line. Do you feel the heat?
+- Gone with the snow...
+
+4
+00:00:59,002 --> 00:01:02,023
+4. line - advanced srt
+this <i>should not be</ i> here.
+
+5
+00:01:02,233 --> 00:01:04,793
+5. line
+Still running.
+
+6
+00:01:05,003 --> 00:01:05,943
+The end.

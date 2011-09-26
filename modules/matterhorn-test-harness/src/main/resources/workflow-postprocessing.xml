@@ -1,0 +1,12 @@
+<definition>
+
+  <id>postprocess_integrationtest</id>
+  <title>Postprocessing workflow for integration testing</title>
+
+  <operations>
+    <!-- Cleanup the working file repository -->
+    <operation id="cleanup" fail-on-error="false" description="Cleaning up">
+    </operation>
+  </operations>
+
+</definition>

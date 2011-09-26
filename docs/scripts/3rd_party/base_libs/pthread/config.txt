@@ -1,0 +1,5 @@
+URL: ftp://sourceware.org/pub/pthreads-win32
+PKG: pthreads-w32-2-8-0-release.tar.gz
+SHA: da8371cb20e8e238f96a1d0651212f154d84a9ac
+DIR: pthreads-w32-2-8-0-release
+PCP: pc-pthread.zip

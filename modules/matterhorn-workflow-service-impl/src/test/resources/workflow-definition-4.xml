@@ -1,0 +1,10 @@
+<definition>
+  <id>definition-4</id>
+  <description>Unit testing workflow</description>
+  <operations>
+    <operation
+      id="opPause"
+      fail-on-error="true"
+      description="Pausing operation"/>
+  </operations>
+</definition>

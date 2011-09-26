@@ -1,0 +1,26 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+compile mp4v2  win32 || exit 1
+compile sdl    win32 || exit 1
+compile ogg    win32 || exit 1
+compile vorbis win32 || exit 1
+compile lame   win32 || exit 1
+#
+# x264 depends on yasm and pthread
+compile x264   win32 || exit 1
+# xvid depends on yasm (latest version) and pthread
+compile xvid   win32 || exit 1
+# faac and faad depends on mp4v2 (not really?!)
+compile faac   win32 || exit 1
+# theora depends on sdl, ogg, vorbis and png12 (base_libs)
+compile theora win32 || exit 1
+# webM support depends on ogg and vorbis
+compile libvpx win32 || exit 1
+#
+exit 0

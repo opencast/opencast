@@ -1,0 +1,59 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-linux ] && exit 0
+pkg1=`getcfg PKG1:`
+chkpkg "$pkg1" || exit 1
+pkg2=`getcfg PKG2:`
+chkpkg "$pkg2" || exit 1
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+#
+rm -fr "$dir" "${dir}-linux"
+[ $? -ne 0 ] && exit 1
+gzip -dc "$pkg1" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-linux"
+[ $? -ne 0 ] && exit 1
+#
+cd "${dir}-linux/tessdata"
+[ $? -ne 0 ] && exit 1
+cp "../../$pkg2" .
+[ $? -ne 0 ] && exit 1
+chmod 644 "$pkg2"
+[ $? -ne 0 ] && exit 1
+gzip -df "$pkg2"
+[ $? -ne 0 ] && exit 1
+cd ..
+[ $? -ne 0 ] && exit 1
+#
+./configure LIBS=-lgif
+[ $? -ne 0 ] && exit 1
+make
+[ $? -ne 0 ] && exit 1
+#
+sudox make install
+[ $? -ne 0 ] && exit 1
+# Needed for tesseract's shared libs
+sudox /sbin/ldconfig
+[ $? -ne 0 ] && exit 1
+#
+OLDCD=`pwd`
+[ $? -ne 0 ] && exit 1
+sudox cp "../$pkg2" ${LOCAL_PREFIX}/share/tessdata
+[ $? -ne 0 ] && exit 1
+cd ${LOCAL_PREFIX}/share/tessdata
+[ $? -ne 0 ] && exit 1
+sudox gzip -df "$pkg2"
+[ $? -ne 0 ] && exit 1
+cd "$OLDCD"
+[ $? -ne 0 ] && exit 1
+#
+touch ../.done-linux
+[ $? -ne 0 ] && exit 1
+exit 0

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" immediate="true"
+    name="org.opencastproject.serviceregistry.impl.endpoint.ServiceRegistryEndpoint">
+  <implementation class="org.opencastproject.serviceregistry.impl.endpoint.ServiceRegistryEndpoint" />
+  <property name="service.description" value="Service Registry REST Endpoint" />
+
+  <property name="opencast.service.type" value="org.opencastproject.serviceregistry" />
+  <property name="opencast.service.path" value="/services" />
+
+  <service>
+    <provide interface="org.opencastproject.serviceregistry.impl.endpoint.ServiceRegistryEndpoint" />
+  </service>
+  <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    cardinality="1..1" policy="static" bind="setServiceRegistry" />
+</scr:component>

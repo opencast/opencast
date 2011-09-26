@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" immediate="true" name="org.opencastproject.capture.admin.endpoint.CaptureAgentStateRestService">
+  <implementation class="org.opencastproject.capture.admin.endpoint.CaptureAgentStateRestService" />
+  <property name="service.description" value="Capture Agent Admin REST Endpoint" />
+
+  <property name="opencast.service.type" value="org.opencastproject.capture.admin" />
+  <property name="opencast.service.path" value="/capture-admin" />
+
+  <service>
+    <provide interface="org.opencastproject.capture.admin.endpoint.CaptureAgentStateRestService" />
+  </service>
+  <reference name="service-impl" interface="org.opencastproject.capture.admin.api.CaptureAgentStateService"
+    cardinality="0..1" policy="dynamic" bind="setService" unbind="unsetService" />
+</scr:component>

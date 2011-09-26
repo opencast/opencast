@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		   width="250"
+		   height="100%"
+		   borderStyle="solid"
+		   borderThickness="1">
+	<mx:Script>
+		<![CDATA[
+			import org.opencast.engage.videodisplay.model.VideodisplayModel;
+
+			[Autowire]
+			[Bindable]
+			public var model:VideodisplayModel;
+		]]>
+	</mx:Script>
+
+	<mx:VBox>
+
+		<mx:Label text="Debug information:"/>
+		<mx:Label text="is HTML: {model.HTML}"/>
+		<mx:Label text="is RTMP: {model.RTMP}"/>
+		<mx:Label text="durationPlayerOne: {model.durationPlayerOne}"/>
+		<mx:Label text="currentDurationString: {model.currentDurationString}"/>
+		<mx:Label text="currentDuration: {model.currentDuration}"/>
+		<mx:Label text="currentPlayerState: {model.currentPlayerState}"/>
+		<mx:Label text="currentPlayhead: {model.currentPlayhead}"/>
+		<mx:Label text="currentPlayheadSingle: {model.currentPlayheadSingle}"/>
+		<mx:Label text="currentPlayheadPlayerOne: {model.currentPlayheadPlayerOne}"/>
+
+		<mx:Label text="currentSeekPosition: {model.currentSeekPosition}"/>
+		<mx:Label text="bytesTotal: {model.bytesTotal}"/>
+		<mx:Label text="bytesTotalOne: {model.bytesTotalOne}"/>
+		<mx:Label text="bytesTotalTwo: {model.bytesTotalTwo}"/>
+		<mx:Label text="bytesLoaded: {model.bytesLoaded}"/>
+		<mx:Label text="bytesLoadedOne: {model.bytesLoadedOne}"/>
+		<mx:Label text="bytesLoadedTwo: {model.bytesLoadedTwo}"/>
+		<mx:Label text="progress: {model.progress}"/>
+
+		<mx:Label text="progressFullscreen: {model.progressFullscreen}"/>
+		<mx:Label text="progressMediaOne: {model.progressMediaOne}"/>
+		<mx:Label text="progressMediaTwo: {model.progressMediaTwo}"/>
+
+		<mx:Label text="startPlay: {model.startPlay}"/>
+		<mx:Label text="startSeek: {model.startSeek}"/>
+		<mx:Label text="startPlayOne: {model.startPlayOne}"/>
+		<mx:Label text="startPlayTwo: {model.startPlayTwo}"/>
+		<mx:Label text="startPlaySingle: {model.startPlaySingle}"/>
+
+		<mx:Label text="onBufferingChangeMediaOne: {model.onBufferingChangeMediaOne}"/>
+		<mx:Label text="onBufferChangeMediaOneTime: {model.onBufferChangeMediaOneTime}"/>
+		<mx:Label text="onBufferingChangeMediaTwo: {model.onBufferingChangeMediaTwo}"/>
+		<mx:Label text="onBufferChangeMediaTwoTime: {model.onBufferChangeMediaTwoTime}"/>
+
+
+	</mx:VBox>
+
+
+</mx:Canvas>
