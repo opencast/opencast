@@ -25,6 +25,7 @@ import org.opencastproject.remotetest.util.TrustedHttpClient;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -41,6 +42,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -182,6 +185,41 @@ public class ComposerRestEndpointTest {
     String jobXml = JobUtils.getJobAsXml(jobId);
     long duration = getDurationFromJob(jobXml);
     Assert.assertTrue(duration < 14546);
+  }
+  
+  @Test
+  public void testWatermarking() throws Exception {
+    File workingDirectory = new File (System.getProperty("java.io.tmpdir"), "watermarktest");
+    if (!workingDirectory.exists()) workingDirectory.mkdirs();
+    URL sourceUrl = getClass().getResource("/watermark.png");
+    File sourceFile = new File(workingDirectory, "watermark.png");
+    FileUtils.copyURLToFile(sourceUrl, sourceFile);
+    
+    HttpPost postEncode = new HttpPost(ComposerResources.getServiceUrl() + "watermark");
+    List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+    formParams.add(new BasicNameValuePair("sourceTrack", SampleUtils.generateVideoTrack(BASE_URL)));
+    formParams.add(new BasicNameValuePair("watermark", sourceFile.getAbsolutePath()));
+    formParams.add(new BasicNameValuePair("profileId", "watermark.branding"));
+    postEncode.setEntity(new UrlEncodedFormEntity(formParams, "UTF-8"));
+
+    // Grab the job from the response
+    HttpResponse postResponse = client.execute(postEncode);
+    String postResponseXml = EntityUtils.toString(postResponse.getEntity());
+    String jobId = getJobId(postResponseXml);
+
+    Assert.assertEquals(200, postResponse.getStatusLine().getStatusCode());
+    Assert.assertTrue(postResponseXml.contains("job"));
+
+    FileUtils.forceDelete(workingDirectory);
+    
+    // Poll the service for the status of the job.
+    while (!JobUtils.isJobInState(jobId, "FINISHED")) {
+      Thread.sleep(2000); // wait and try again
+      System.out.println("Waiting for watermarking job " + jobId + " to finish");
+      if(JobUtils.isJobInState(jobId, "FAILED")) {
+        Assert.fail();
+      }
+    }
   }
 
   /**
