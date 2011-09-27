@@ -122,6 +122,16 @@ public class Main {
       System.exit(1);
     }
 
+    if (line.hasOption("url")) {
+      BASE_URL = line.getOptionValue("url");
+    }
+    if (line.hasOption("username")) {
+      USERNAME = line.getOptionValue("username");
+    }
+    if (line.hasOption("password")) {
+      PASSWORD = line.getOptionValue("password");
+    }    
+    
     if (line.hasOption("help")) {
       HelpFormatter formatter = new HelpFormatter();
       formatter.printHelp("java -jar matterhorn-test-harness-<version>-jar-with-dependencies.jar>", options);
@@ -173,16 +183,6 @@ public class Main {
     if (testClasses.size() == 0) {
       System.out.println("No test suites specified... running server (not including performance) tests");
       testClasses.add(ServerTests.class);
-    }
-
-    if (line.hasOption("url")) {
-      BASE_URL = line.getOptionValue("url");
-    }
-    if (line.hasOption("username")) {
-      USERNAME = line.getOptionValue("username");
-    }
-    if (line.hasOption("password")) {
-      PASSWORD = line.getOptionValue("password");
     }
 
     // run the tests
