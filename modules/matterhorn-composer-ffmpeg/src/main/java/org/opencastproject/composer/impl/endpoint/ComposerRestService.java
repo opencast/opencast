@@ -212,11 +212,11 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
     // Make sure the trim times make sense
     Track sourceTrack = (Track) sourceElement;
     if (start < 0) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("start time must be greater than 00:00:00").build();
+      start = 0;
     } else if (duration <= 0) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("duration must be greater than 00:00:00").build();
+      duration = (sourceTrack.getDuration() - start);
     } else if (start + duration > sourceTrack.getDuration()) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("requested duration exceeds track").build();
+      duration = (sourceTrack.getDuration() - start);     
     }
 
     // Asynchronously encode the specified tracks
