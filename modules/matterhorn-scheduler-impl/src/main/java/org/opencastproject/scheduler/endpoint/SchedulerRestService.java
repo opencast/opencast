@@ -239,15 +239,17 @@ public class SchedulerRestService {
     DublinCoreCatalog eventCatalog;
     Properties recordingProperties;
     Properties caProperties = null;
-    String start;
-    String end;
-    String duration;
-    String recurrence;
-    String timezone;
+    String start = null;
+    String end = null;
+    String duration = null;
+    String recurrence = null;
+    String timezone = null;
     
     if (catalogs.containsKey("dublincore")) {
+      logger.debug("DublinCore catalog found.");
       try {
         eventCatalog = parseDublinCore(catalogs.getFirst("dublincore"));
+        logger.debug(eventCatalog.toXmlString());
       } catch (Exception e) {
         logger.warn("Could not parse Dublin core catalog: {}",e);
         return Response.status(Status.BAD_REQUEST).build();
@@ -258,8 +260,10 @@ public class SchedulerRestService {
     }
     
     if (catalogs.containsKey("event")) {
+      logger.debug("Event catalog found.");
       try {
         recordingProperties = parseProperties(catalogs.getFirst("event"));
+        logger.debug(recordingProperties.toString());
       } catch (Exception e) {
         logger.warn("Could not parse event catalog: {}", catalogs.getFirst("event"));
         return Response.status(Status.BAD_REQUEST).build();
@@ -270,8 +274,9 @@ public class SchedulerRestService {
       recurrence = recordingProperties.getProperty("recurrence");
       timezone = recordingProperties.getProperty("timezone");
     } else {
-      logger.warn("Cannot add event without event catalog.");
-      return Response.status(Status.BAD_REQUEST).build();
+      //logger.warn("Cannot add event without event catalog.");
+      //return Response.status(Status.BAD_REQUEST).build();
+      logger.debug("No Event catalog found!");
     }
     
     Long startAsLong = null;

@@ -214,7 +214,7 @@ public class PreProcessingWorkflowTest {
    * @return the event identifier
    */
   private String scheduleEvent(Date start, Date end) throws Exception {
-    HttpPost request = new HttpPost(BASE_URL + "/scheduler/recordings");
+    HttpPost request = new HttpPost(BASE_URL + "/recordings");
 
     // Create the request body
     SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -235,8 +235,8 @@ public class PreProcessingWorkflowTest {
 
     // Prepare the request
     List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-    formParams.add(new BasicNameValuePair("event", dublinCoreXml));
-    formParams.add(new BasicNameValuePair("caproperties", captureAgentMetadata));
+    formParams.add(new BasicNameValuePair("dublincore", dublinCoreXml));
+    formParams.add(new BasicNameValuePair("agentparameters", captureAgentMetadata));
     request.setEntity(new UrlEncodedFormEntity(formParams, "UTF-8"));
 
     // Submit and check the response
