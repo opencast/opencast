@@ -15,6 +15,8 @@
  */
 package org.opencastproject.kernel.security;
 
+import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
+
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -29,6 +31,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -49,13 +52,13 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(OrganizationDirectoryServiceImpl.class);
-  
+
   /** The organization service PID */
   public static final String PID = "org.opencastproject.organization";
 
   /** The prefix for configurations to use for arbitrary organization properties */
   public static final String ORG_PROPERTY_PREFIX = "prop.";
-  
+
   /** The managed property that specifies the organization id */
   public static final String ORG_ID_KEY = "id";
 
@@ -76,9 +79,12 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
 
   /** The configuration admin service */
   protected ConfigurationAdmin configAdmin = null;
-  
+
   /** The registered organizations */
   protected Map<String, Organization> organizations = new ConcurrentHashMap<String, Organization>();
+
+  /** The default configuration */
+  protected Configuration defaultConfiguration = null;
 
   /**
    * Sets the default organization to return when no organization directory is registered.
@@ -95,15 +101,25 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
       URL url = new URL(configuredServerName);
       defaultOrganization = new DefaultOrganization(url.getHost(), url.getPort());
     }
-    Configuration config = configAdmin.createFactoryConfiguration(PID);
-    Dictionary<String, String> props = new Hashtable<String, String>();
-    props.put(ORG_ID_KEY, defaultOrganization.getId());
-    props.put(ORG_NAME_KEY, defaultOrganization.getName());
-    props.put(ORG_SERVER_KEY, defaultOrganization.getServerName());
-    props.put(ORG_PORT_KEY, Integer.toString(defaultOrganization.getServerPort()));
-    props.put(ORG_ADMIN_ROLE_KEY, defaultOrganization.getAdminRole());
-    props.put(ORG_ANONYMOUS_ROLE_KEY, defaultOrganization.getAnonymousRole());
-    config.update(props);
+
+    // Make sure there is a default organization
+    StringBuilder filter = new StringBuilder("(").append(ORG_ID_KEY).append("=").append(DEFAULT_ORGANIZATION_ID)
+            .append(")");
+    Configuration[] orgConfigurations = configAdmin.listConfigurations(filter.toString());
+    if (orgConfigurations != null) {
+      defaultConfiguration = orgConfigurations[0];
+    } else {
+      defaultConfiguration = configAdmin.createFactoryConfiguration(PID);
+      logger.info("Registering organization '{}'", defaultOrganization.getId());
+      Dictionary<String, String> props = new Hashtable<String, String>();
+      props.put(ORG_ID_KEY, defaultOrganization.getId());
+      props.put(ORG_NAME_KEY, defaultOrganization.getName());
+      props.put(ORG_SERVER_KEY, defaultOrganization.getServerName());
+      props.put(ORG_PORT_KEY, Integer.toString(defaultOrganization.getServerPort()));
+      props.put(ORG_ADMIN_ROLE_KEY, defaultOrganization.getAdminRole());
+      props.put(ORG_ANONYMOUS_ROLE_KEY, defaultOrganization.getAnonymousRole());
+      defaultConfiguration.update(props);
+    }
   }
 
   /**
@@ -195,13 +211,21 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    * @see org.osgi.service.cm.ManagedServiceFactory#updated(java.lang.String, java.util.Dictionary)
    */
   @Override
+  @SuppressWarnings("rawtypes")
   public void updated(String pid, Dictionary properties) throws ConfigurationException {
-    logger.info("Updating organization pid='{}'", pid);
-    
+    logger.debug("Updating organization pid='{}'", pid);
+
     // Gather the properties
     String id = (String) properties.get(ORG_ID_KEY);
     String name = (String) properties.get(ORG_NAME_KEY);
     String server = (String) properties.get(ORG_SERVER_KEY);
+
+    // Make sure the configuration meets the minimum requirments
+    if (StringUtils.isBlank(id))
+      throw new ConfigurationException(ORG_ID_KEY, ORG_ID_KEY + " must be set");
+    if (StringUtils.isBlank(server))
+      throw new ConfigurationException(ORG_SERVER_KEY, ORG_SERVER_KEY + " must be set");
+
     String portAsString = StringUtils.trimToNull((String) properties.get(ORG_PORT_KEY));
     int port = 80;
     if (portAsString != null) {
@@ -220,6 +244,21 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
       orgProperties.put(key.substring(ORG_PROPERTY_PREFIX.length()), (String) properties.get(key));
     }
 
+    // If this is a replacement for the default configuration, make sure it is unregistered
+    if (DEFAULT_ORGANIZATION_ID.equals(id) && !pid.equals(defaultConfiguration.getPid())) {
+      try {
+        organizations.remove(defaultConfiguration.getPid());
+        defaultConfiguration.delete();
+        logger.info("Updating organization '{}'", id);
+      } catch (IOException e) {
+        logger.warn("Error unregistering default organization", e);
+      }
+    } else if (!organizations.containsKey(pid)) {
+      logger.info("Registering organization '{}'", id);
+    } else if (!pid.equals(defaultConfiguration.getPid())) {
+      logger.info("Updating organization '{}'", id);
+    }
+
     // Replace the old immutable organization with a new one
     organizations.put(pid, new Organization(id, name, server, port, adminRole, anonRole, orgProperties));
   }
@@ -233,12 +272,13 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   public void deleted(String pid) {
     organizations.remove(pid);
   }
-  
+
   /**
-   * @param configAdmin the configAdmin to set
+   * @param configAdmin
+   *          the configAdmin to set
    */
   public void setConfigurationAdmin(ConfigurationAdmin configAdmin) {
     this.configAdmin = configAdmin;
   }
-  
+
 }
