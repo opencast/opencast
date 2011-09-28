@@ -406,7 +406,27 @@
             if (params.hasOwnProperty(key)) {
                 var value = params[key];
                 if (value !== undefined && value !== null && value !== '') {
-                    newPath = newPath.replace('{' + key + '}', value);
+					// The Regex here handles syntax like /episode.{format:xml|json}.
+					// In this case, the {format:xml|json} part is extracted, then
+					// the xml|json part is used as the second regex to verify user's input.
+					// If the input is valid, the path /episode.{format:xml|json} would be 
+					// replaced by /episode.xml for example.
+                    var regex = new RegExp( "{" + key + "(:[^}]*|)}", "");
+                    if (regex.test(newPath))
+                    {
+                         var pat = regex.exec(newPath)[1].substring(1);
+                         var regex2 = new RegExp(pat, "");
+                         if (regex2.test(value))
+                         {
+                           newPath = newPath.replace(regex, value);
+                         } else
+                         {
+                           alert('The value for ' + key + ' is invalid.');
+                         }
+                    } else
+                    {
+                         alert("wrong syntax");
+                    }
                 }
             }
         }
