@@ -707,7 +707,7 @@ Opencast.Player = (function ()
                 {
                     // Bind the video size controls to its functions
                     Opencast.Initialize.bindVidSize();
-                    // Hide Screen Settings until clicked 'play'
+                    // Show Screen Settings
                     $("#oc_btn-dropdown").css("display", 'block');
                     $("#oc_player_video-dropdown").css("display", 'block');
                 }

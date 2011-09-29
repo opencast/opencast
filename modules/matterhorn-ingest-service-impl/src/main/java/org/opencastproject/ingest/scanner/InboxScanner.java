@@ -123,7 +123,7 @@ public class InboxScanner implements ArtifactInstaller, ManagedService {
               logger.info("Ingested '{}' as a mediapackage", artifact.getAbsolutePath());
               mediaPackageIngestSuccess = true;
             } catch (Exception e) {
-              logger.warn("Unable to ingest mediapackage '{}', {}", artifact.getAbsolutePath(), e);
+              logger.warn("Unable to ingest mediapackage '" + artifact.getAbsolutePath() + "':", e);
             } finally {
               IOUtils.closeQuietly(in);
             }
