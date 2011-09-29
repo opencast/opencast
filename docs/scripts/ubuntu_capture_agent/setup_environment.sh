@@ -77,7 +77,7 @@ fi
 ask -d "$DEFAULT_CORE_URL" -f $VALID_URL_REGEX "Please enter the URL and port (if ingestion is not on port 80) of the machine hosting the ingestion service in the form of http://URL:PORT" core
 sed -i "s#^${CORE_URL_KEY//./\\.}=.*\$#${CORE_URL_KEY}=$core#" "$CAPTURE_PROPS"
 #Use this value to update the location of the service registry, too                                                                                          
-sed -i "s#^${SERV_REG_KEY//./\\.}=.*\$#${SERV_REG_KEY}=$core/$SERV_REG_SUFFIX#" "$GEN_PROPS"
+sed -i "s#^${SERVICE_REG_KEY//./\\.}=.*\$#${SERVICE_REG_KEY}=$core/$SERVICE_REG_SUFFIX#" "$GEN_PROPS"
 
 # Prompt for the time between two updates of the recording schedule
 default_poll=$(grep "${SCHEDULE_POLL_KEY}" "$CAPTURE_PROPS" | cut -d '=' -f 2) #<-- This reads the default value from the config file
