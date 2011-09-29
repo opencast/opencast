@@ -18,6 +18,7 @@ package org.opencastproject.scheduler.api;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Query object used for storing search parameters.
@@ -29,6 +30,8 @@ public class SchedulerQuery {
   protected String text;
   /** Identifier search */
   protected String identifier;
+  /** ID Set */
+  protected List<String> idList;
   /** Title search */
   protected String title;
   /** Series id search */
@@ -324,6 +327,18 @@ public class SchedulerQuery {
   }
 
   /**
+   * Set a list of identifiers
+   * 
+   * @param ids
+   * @return
+   */
+  public SchedulerQuery withIdInList(List<String> ids) {
+    if (!ids.isEmpty()) {
+      this.idList = ids;
+    }
+    return this;
+  }
+  /**
    * Set sort field with ascending order
    * 
    * @param sort
@@ -523,6 +538,10 @@ public class SchedulerQuery {
 
   public String getIdentifier() {
     return identifier;
+  }
+  
+  public List<String> getIdsList() {
+    return idList;
   }
 
   public String getTitle() {

@@ -21,6 +21,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -76,8 +77,7 @@ public interface SchedulerService {
    * @throws UnauthorizedException
    *           if the caller is not authorized to take this action
    */
-  Long[] addReccuringEvent(DublinCoreCatalog eventCatalog, String recPattern, Date beginning, Date end, long duration,
-          String timeZone) throws SchedulerException, UnauthorizedException;
+  Long[] addReccuringEvent(DublinCoreCatalog eventCatalog) throws SchedulerException, UnauthorizedException;
 
   /**
    * Updates existing events with capture agent metadata. Configuration will be updated from event's DublinCore:
@@ -225,4 +225,6 @@ public interface SchedulerService {
    *           if exception occurred
    */
   Date getScheduleLastModified(SchedulerQuery filter) throws SchedulerException;
+  
+  void updateEvents(List<String> idList, final DublinCoreCatalog eventCatalog) throws NotFoundException, SchedulerException, UnauthorizedException;
 }

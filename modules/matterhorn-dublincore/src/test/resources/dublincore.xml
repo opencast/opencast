@@ -3,7 +3,7 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance/"
             xsi:schemaLocation="http://www.opencastproject.org http://www.opencastproject.org/schema.xsd"
             xmlns:dc="http://purl.org/dc/elements/1.1/"
-            xmlns:dcterms="http://purl.org/dc/terms/" xmlns:oc="http://www.opencastproject.org/matterhorn">
+            xmlns:dcterms="http://purl.org/dc/terms/" xmlns:oc="http://www.opencastproject.org/matterhorn/">
   <dcterms:title>Land and Vegetation: Key players on the Climate Scene</dcterms:title>
   <dcterms:title xml:lang="de">Land und Vegetation: Key Player in der Klima-Szene</dcterms:title>
   <dcterms:subject>climate, land, vegetation</dcterms:subject>

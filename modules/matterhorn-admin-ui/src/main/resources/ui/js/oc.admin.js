@@ -17,10 +17,12 @@
 /* @namespace Holds functions and properites related to all Admin UIs. */
 var ocAdmin = (function() {
   var admin = {};
-  var DC_CATALOG_ROOT_NS  = 'http://www.opencastproject.org/xsd/1.0/dublincore/';
-  var DC_CATALOG_ROOT_EL  = 'dublincore';
-  var DUBLIN_CORE_NS_URI  = 'http://purl.org/dc/terms/';
-  var DUBLIN_CORE_NS      = 'dcterms';
+  var DC_CATALOG_ROOT_NS    = 'http://www.opencastproject.org/xsd/1.0/dublincore/';
+  var DC_CATALOG_ROOT_EL    = 'dublincore';
+  var DUBLINCORE_NS_URI     = 'http://purl.org/dc/terms/';
+  var DUBLINCORE_NS_PREFIX  = 'dcterms';
+  var OC_NS_URI             = 'http://www.opencastproject.org/oc';
+  var OC_NS_PREFIX          = 'oc';
   
   /* @class The Component class is a collection of form elements and associated functions for use
    * with the ocAdmin.Manager. It provides basic implementations for setting, getting, displaying,
@@ -32,6 +34,8 @@ var ocAdmin = (function() {
     this.required = false;
     this.value = null;
     this.key = null;
+    this.nsPrefix = DUBLINCORE_NS_PREFIX;
+    this.nsURI = DUBLINCORE_NS_URI;
     this.errors = { missingRequired: new ocAdmin.Error('missingRequired') };
     
     /* @lends ocAdmin.Component.prototype */
@@ -81,6 +85,12 @@ var ocAdmin = (function() {
               break;
             case 'errors':
               this.errors = props[f];
+              break;
+            case 'nsPrefix':
+              this.nsPrefix = props[f];
+              break;
+            case 'nsURI':
+              this.nsURI = props[f];
               break;
             default:
               this.properties[f] = props[f];
@@ -155,48 +165,6 @@ var ocAdmin = (function() {
       return this.getValue();
     };
     
-    /** 
-     *  Default toNode function
-     *  @param {DOM Node} Node to which to attach this Components value
-     *  @return DOM Node created from this Component.
-     *	@type DOM Node
-     */
-    this.toNode = function(parent, isAdditionalMetadata) {
-      var doc, container, value, key, keyName;
-      if(typeof isAdditionalMetadata == 'undefined') {
-        isAdditionalMetadata = false;
-      }
-      for(var el in this.fields) {
-        if(parent){
-          doc = parent.ownerDocument;
-        } else {
-          doc = document;
-        }
-        if(this.nodeKey !== null) {
-           keyName = this.key;
-        } else {
-           keyName = el;
-        }
-        if(isAdditionalMetadata) {
-          container = doc.createElement('metadata');
-          value = doc.createElement('value');
-          key = doc.createElement('key');
-          value.appendChild(doc.createTextNode(this.getValue()));
-          key.appendChild(doc.createTextNode(keyName));
-          container.appendChild(value);
-          container.appendChild(key);
-        } else {
-          container = doc.createElement(keyName);
-          container.appendChild(doc.createTextNode(this.getValue()));
-        }
-      }
-      if(parent && parent.nodeType && container) {
-        parent.appendChild(container); //license bug
-      } else {
-        ocUtils.log('Unable to append node to document. ', parent, container);
-      }
-      return container;
-    };
     /** 
      *  Default validation function, displays Component's error message
      *  @return True if Component is required and valid, otherwise false.
@@ -289,7 +257,6 @@ var ocAdmin = (function() {
       for(i in components) {
         var comp = components[i];
         this.errors = this.errors.concat(comp.validate());
-        ocUtils.log(comp);
         body += comp.key + '=' + comp.getValue() + '\n';
       }
       return body;
@@ -309,31 +276,43 @@ var ocAdmin = (function() {
   
   admin.DublinCoreSerializer = function DublinCoreSerializer() {
     this.errors = [];
+    this.namespaces = [];
     this.serialize = function serialize(components) {
       this.errors = [];
       var doc = ocUtils.createDoc(DC_CATALOG_ROOT_EL, DC_CATALOG_ROOT_NS);
-      var ns = doc.createAttribute('xmlns:' + DUBLIN_CORE_NS);
-      ns.nodeValue = DUBLIN_CORE_NS_URI;
-      doc.documentElement.setAttributeNode(ns);
       for(i in components){
         var comp = components[i];
         this.errors = this.errors.concat(comp.validate());
-        var node = doc.createElement(DUBLIN_CORE_NS + ':' + comp.key);
+        this.addNS(comp.nsPrefix, comp.nsURI);
+        var node = doc.createElement(comp.nsPrefix + ':' + comp.key);
         node.appendChild(doc.createTextNode(comp.getValue()));
         doc.documentElement.appendChild(node);
+      }
+      for(j in this.namespaces) {
+        ns = doc.createAttribute('xmlns:' + j);
+        ns.nodeValue = this.namespaces[j];
+        doc.documentElement.setAttributeNode(ns);
       }
       return ocUtils.xmlToString(doc);
     };
     
     this.deserialize = function deserialze(catalogBody) {
       var catalog = {};
-      ocUtils.log(catalogBody[DUBLIN_CORE_NS_URI]);
-      if(typeof catalogBody[DUBLIN_CORE_NS_URI] != 'undefined') {
-        for(i in catalogBody[DUBLIN_CORE_NS_URI]) {
-          catalog[i] = catalogBody[DUBLIN_CORE_NS_URI][i][0].value;
+      if(typeof catalogBody[DUBLINCORE_NS_URI] != 'undefined') {
+        for(i in catalogBody[DUBLINCORE_NS_URI]) {
+          catalog[i] = catalogBody[DUBLINCORE_NS_URI][i][0].value;
         }
       }
       return catalog;
+    }
+    
+    this.addNS = function addNS(nsPrefix, ns) {
+      for(var i in this.namespaces) {
+        if(i === nsPrefix || this.namespaces[i] === ns ) {
+          return;
+        }
+      }
+      this.namespaces[nsPrefix] = ns;
     }
   }
   

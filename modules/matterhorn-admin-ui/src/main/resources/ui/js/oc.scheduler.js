@@ -35,6 +35,7 @@ var ocScheduler = (function() {
   sched.selectedInputs    = '';
   sched.conflictingEvents = false;
   sched.tzDiff            = 0;
+  sched.components        = null; //contains components used to make other components like temporal but aren't used in a catalog directly.
   
   // Catalogs
   sched.catalogs = [];
@@ -43,12 +44,7 @@ var ocScheduler = (function() {
     serializer: new ocAdmin.DublinCoreSerializer()
   });
   sched.catalogs.push(sched.dublinCore);
-  sched.recording = new ocAdmin.Catalog({ // Additional Recording properties
-    name: 'event',
-    serializer: new ocAdmin.Serializer()
-  });
-  sched.catalogs.push(sched.recording);
-  sched.capture = new ocAdmin.Catalog({ //Workflow Properties
+  sched.capture = new ocAdmin.Catalog({ //Capture Agent Properties
     name: 'agentparameters',
     serializer: new ocAdmin.Serializer()
   });
@@ -93,7 +89,7 @@ var ocScheduler = (function() {
       document.title = i18n.window.edit + " " + i18n.window.prefix;
       $('#i18n_page_title').text(i18n.page.title.edit);
       $('#eventId').val(eventId);
-      this.recording.components.eventId = new ocAdmin.Component('eventId');
+      this.components.eventId = new ocAdmin.Component('eventId');
       $('#recordingType').hide();
       $('#agent').change(
         function() {
@@ -258,7 +254,7 @@ var ocScheduler = (function() {
       this.inputList = '#inputList';
       $(this.inputList).empty();
       $('#seriesRequired').remove(); //Remove series required indicator.
-      this.recording.components.startDate.setValue(d.getTime().toString());
+      this.components.startDate.setValue(d.getTime().toString());
     }else{
       // Multiple recordings have some differnt fields and different behaviors
       //show recurring_recording panel, hide single.
@@ -272,7 +268,7 @@ var ocScheduler = (function() {
         $('#seriesContainer label').prepend('<span id="seriesRequired" class="scheduler-required-text">* </span>'); //series is required, indicate as such.
       }
       this.dublinCore.components.seriesId.required = true;
-      this.recording.components.recurrenceStart.setValue(d.getTime().toString());
+      this.components.recurrenceStart.setValue(d.getTime().toString());
     }
     this.loadKnownAgents();
   };
@@ -347,7 +343,8 @@ var ocScheduler = (function() {
     var time;
     var agent = elm.target.value;
     $(ocScheduler.inputList).empty();
-    sched.recording.components.agentTimeZone = new ocAdmin.Component(['agentTimeZone'], {key: 'agentTimeZone'});
+    sched.dublinCore.components.agentTimeZone = new ocAdmin.Component(['agentTimeZone'],
+        {key: 'agentTimeZone', nsPrefix: 'oc', nsURI: 'http://www.opencastproject.org/matterhorn/',});
     if(agent){
       $.get('/capture-admin/agents/' + agent + '/configuration.xml',
       function(doc){
@@ -363,7 +360,7 @@ var ocScheduler = (function() {
           } else if(s == 'capture.device.timezone.offset') {
             var agentTz = parseInt($(i).text());
             if(agentTz !== 'NaN'){
-              sched.recording.components.agentTimeZone.setValue(agentTz);
+              sched.dublinCore.components.agentTimeZone.setValue(agentTz);
               sched.handleAgentTZ(agentTz);
             }else{
               ocUtils.log("Couldn't parse TZ");
@@ -378,16 +375,16 @@ var ocScheduler = (function() {
         }else{
           sched.tzDiff = 0; //No agent timezone could be found, assume local time.
           $('#inputList').html('Agent defaults will be used.');
-          delete sched.recording.components.agentTimeZone;
+          delete sched.dublinCore.components.agentTimeZone;
         }
       });
     } else {
       // no valid agent, change time to local form what ever it was before.
-      delete sched.recording.components.agentTimeZone; //Being empty will end up defaulting to the server's Timezone.
+      delete sched.dublinCore.components.agentTimeZone; //Being empty will end up defaulting to the server's Timezone.
       if(sched.type === SINGLE_EVENT){
-        time = sched.recording.components.startDate.getValue();
+        time = sched.components.startDate.getValue();
       }else if(sched.type === MULTIPLE_EVENTS){
-        time = sched.recording.components.recurrenceStart.getValue();
+        time = sched.components.recurrenceStart.getValue();
       }
     };
   }
@@ -435,11 +432,11 @@ var ocScheduler = (function() {
       //update time picker to agent time
       sched.tzDiff = tz - localTZ;
       if(this.type == SINGLE_EVENT) {
-        agentLocalTime = this.recording.components.startDate.getValue() + (sched.tzDiff * 60 * 1000);
-        this.recording.components.startDate.setValue(agentLocalTime);
+        agentLocalTime = this.components.startDate.getValue() + (sched.tzDiff * 60 * 1000);
+        this.components.startDate.setValue(agentLocalTime);
       }else if(this.type == MULTIPLE_EVENTS){
-        agentLocalTime = this.recording.components.recurrenceStart.getValue() + (sched.tzDiff * 60 * 1000);
-        this.recording.components.recurrenceStart.setValue(agentLocalTime);
+        agentLocalTime = this.components.recurrenceStart.getValue() + (sched.tzDiff * 60 * 1000);
+        this.components.recurrenceStart.setValue(agentLocalTime);
       }
       diff = Math.round((sched.tzDiff/60)*100)/100;
       if(diff < 0) {
@@ -531,20 +528,20 @@ var ocScheduler = (function() {
       return false;
     }
     if(sched.type === SINGLE_EVENT) {
-      if(sched.recording.components.startDate.validate().length === 0 && sched.recording.components.duration.validate().length === 0) {
-        data.start = sched.recording.components.startDate.getValue();
-        data.duration = sched.recording.components.duration.getValue();
+      if(sched.components.startDate.validate().length === 0 && sched.components.duration.validate().length === 0) {
+        data.start = sched.components.startDate.getValue();
+        data.duration = sched.components.duration.getValue();
         data.end = data.start + data.duration;
       } else {
         return false;
       }
     } else if(sched.type === MULTIPLE_EVENTS) {
-      if(sched.recording.components.recurrenceStart.validate().length === 0 && sched.recording.components.recurrenceEnd.validate().length === 0 &&
-          sched.recording.components.recurrence.validate().length === 0 && sched.recording.components.recurrenceDuration.validate().length === 0){
-        data.start = sched.recording.components.recurrenceStart.getValue();
-        data.end = sched.recording.components.recurrenceEnd.getValue();
-        data.duration = sched.recording.components.recurrenceDuration.getValue();
-        data.rrule = sched.recording.components.recurrence.getValue();
+      if(sched.components.recurrenceStart.validate().length === 0 && sched.components.recurrenceEnd.validate().length === 0 &&
+          sched.dublinCore.components.recurrence.validate().length === 0 && sched.components.recurrenceDuration.validate().length === 0){
+        data.start = sched.components.recurrenceStart.getValue();
+        data.end = sched.components.recurrenceEnd.getValue();
+        data.duration = sched.components.recurrenceDuration.getValue();
+        data.rrule = sched.dublinCore.components.recurrence.getValue();
       } else {
         return false;
       }
@@ -571,9 +568,9 @@ var ocScheduler = (function() {
   }
 
   sched.registerCatalogs = function registerCatalogs() {
-    var recComps = {};
-    var dcComps = {};
-    var extraComps = {};
+    var compositeComps = {}; //These components are used to make composite components like temporal (start, end, duration)
+    var dcComps = {}; //Dublin Core components
+    var agentComps = {}; //Capture agent parameters
     
     dcComps.title = new ocAdmin.Component(['title'], { key: 'title', required: true,
       errors: { missingRequired: new ocAdmin.Error('missingTitle', 'titleLabel') }
@@ -669,7 +666,7 @@ var ocScheduler = (function() {
     dcComps.subject = new ocAdmin.Component(['subject'], { key: 'subject' });
     dcComps.language = new ocAdmin.Component(['language'], { key: 'language' });
     dcComps.description = new ocAdmin.Component(['description'], { key: 'description' });
-    extraComps.resources = new ocAdmin.Component([],
+    agentComps.resources = new ocAdmin.Component([],
       { key: 'capture.device.names', required: true,
         errors: { missingRequired: new ocAdmin.Error('missingInputs', 'inputLabel') }
       },
@@ -700,7 +697,7 @@ var ocScheduler = (function() {
         }
       });
 
-    extraComps.workflowDefinition = new ocAdmin.Component(['workflowSelector'], {key: 'org.opencastproject.workflow.definition'});
+    agentComps.workflowDefinition = new ocAdmin.Component(['workflowSelector'], {key: 'org.opencastproject.workflow.definition'});
     
     if(sched.type === MULTIPLE_EVENTS){
       
@@ -721,13 +718,13 @@ var ocScheduler = (function() {
           },
           setValue: function(val) {
             var temporal = parseDublinCoreTemporal(val);
-            ocScheduler.recording.components.recurrenceStart.setValue(temporal.start);
-            ocScheduler.recording.components.recurrenceEnd.setValue(temporal.end);
-            ocScheduler.recording.components.recurrenceDuration.setValue(temporal.dur);
+            ocScheduler.components.recurrenceStart.setValue(temporal.start);
+            ocScheduler.components.recurrenceEnd.setValue(temporal.end);
+            ocScheduler.components.recurrenceDuration.setValue(temporal.dur);
           }
         });
       
-      recComps.recurrenceStart = new ocAdmin.Component(['recurStart', 'recurStartTimeHour', 'recurStartTimeMin'],
+      compositeComps.recurrenceStart = new ocAdmin.Component(['recurStart', 'recurStartTimeHour', 'recurStartTimeMin'],
         { required: true, key: 'startDate',
           errors: { missingRequired: new ocAdmin.Error('errorRecurStartEnd', ['recurStartLabel', 'recurStartTimeLabel']) }
         },
@@ -779,7 +776,7 @@ var ocScheduler = (function() {
           }
         });
       
-      recComps.recurrenceDuration = new ocAdmin.Component(['recurDurationHour', 'recurDurationMin'],
+      compositeComps.recurrenceDuration = new ocAdmin.Component(['recurDurationHour', 'recurDurationMin'],
         { required: true, key: 'duration',
           errors: { missingRequired: new ocAdmin.Error('missingDuration', 'recurDurationLabel') }
         },
@@ -822,7 +819,7 @@ var ocScheduler = (function() {
           }
         });
   
-      recComps.recurrenceEnd = new ocAdmin.Component(['recurEnd', 'recurStart', 'recurStartTimeHour', 'recurStartTimeMin'],
+      compositeComps.recurrenceEnd = new ocAdmin.Component(['recurEnd', 'recurStart', 'recurStartTimeHour', 'recurStartTimeMin'],
         { required: true, key: 'endDate',
           errors: { missingRequired: new ocAdmin.Error('errorRecurStartEnd', 'recurEndLabel') }
         },
@@ -836,7 +833,7 @@ var ocScheduler = (function() {
                 end += this.fields.recurStartTimeMin.val() * 60; //convert minutes to seconds, add to date.
                 end -= sched.tzDiff * 60; //Agent TZ offset
                 end = end * 1000; //back to milliseconds
-                end += sched.recording.components.recurrenceDuration.getValue(); //Add to duration start time for end time.
+                end += sched.components.recurrenceDuration.getValue(); //Add to duration start time for end time.
                 this.value = end;
               }
             }
@@ -897,8 +894,9 @@ var ocScheduler = (function() {
           }
         });
   
-      recComps.recurrence = new ocAdmin.Component(['scheduleRepeat', 'repeatSun', 'repeatMon', 'repeatTue', 'repeatWed', 'repeatThu', 'repeatFri', 'repeatSat'],
+      dcComps.recurrence = new ocAdmin.Component(['scheduleRepeat', 'repeatSun', 'repeatMon', 'repeatTue', 'repeatWed', 'repeatThu', 'repeatFri', 'repeatSat'],
         { required: true, key: 'recurrence',
+          nsPrefix: 'oc', nsURI: 'http://www.opencastproject.org/matterhorn/',
           errors: { missingRequired: new ocAdmin.Error('errorRecurrence', 'recurrenceLabel') }
         },
         { getValue: function() {
@@ -908,7 +906,7 @@ var ocScheduler = (function() {
                 rrule     = "FREQ=WEEKLY;BYDAY=";
                 dotw      = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
                 days      = [];
-                date      = new Date(ocScheduler.recording.components.recurrenceStart.getValue());
+                date      = new Date(ocScheduler.components.recurrenceStart.getValue());
                 hour      = date.getUTCHours();
                 min       = date.getUTCMinutes();
                 dayOffset = 0;
@@ -989,9 +987,9 @@ var ocScheduler = (function() {
                  this.fields.repeatThu[0].checked ||
                  this.fields.repeatFri[0].checked ||
                  this.fields.repeatSat[0].checked ){
-                if(ocScheduler.recording.components.recurrenceStart.validate() &&
+                if(ocScheduler.components.recurrenceStart.validate() &&
                    // ocScheduler.components.recurrenceDuration.validate() &&
-                   ocScheduler.recording.components.recurrenceEnd.validate()) {
+                   ocScheduler.components.recurrenceEnd.validate()) {
                   return [];
                 }
               }
@@ -1068,12 +1066,12 @@ var ocScheduler = (function() {
             },
             setValue: function(val) {
               var temporal = parseDublinCoreTemporal(val);
-              ocScheduler.recording.components.startDate.setValue(temporal.start);
-              ocScheduler.recording.components.duration.setValue(temporal.dur);
+              ocScheduler.components.startDate.setValue(temporal.start);
+              ocScheduler.components.duration.setValue(temporal.dur);
             }
           });
       
-      recComps.startDate = new ocAdmin.Component(['startDate', 'startTimeHour', 'startTimeMin'],
+      compositeComps.startDate = new ocAdmin.Component(['startDate', 'startTimeHour', 'startTimeMin'],
         { required: true, key: 'startDate',
           errors: { missingRequired: new ocAdmin.Error('missingStartdate', ['startDateLabel', 'startTimeLabel']) }
         },
@@ -1125,7 +1123,7 @@ var ocScheduler = (function() {
           }
         });
   
-      recComps.duration = new ocAdmin.Component(['durationHour', 'durationMin'],
+      compositeComps.duration = new ocAdmin.Component(['durationHour', 'durationMin'],
         { key: 'duration', required: true, errors: {missingRequired: new ocAdmin.Error('missingDuration', 'durationLabel')} },
         { getValue: function() {
             if(this.validate()) {
@@ -1157,22 +1155,6 @@ var ocScheduler = (function() {
               return [];
             }
             return this.errors.missingRequired;
-          },
-          toNode: function(parent) {
-            var duration, endDate, doc;
-            if(parent){
-              doc = parent.ownerDocument;
-            }else{
-              doc = document;
-            }
-            duration = doc.createElement('duration');
-            duration.appendChild(doc.createTextNode(this.getValue()));
-            parent.appendChild(duration);
-            if(typeof ocScheduler.dublinCore.components.startDate != 'undefined' && ocScheduler.dublinCore.components.startDate.getValue() != null) {
-              endDate = doc.createElement('endDate');
-              endDate.appendChild(doc.createTextNode(ocScheduler.dublinCore.components.startDate.getValue() + this.getValue()));
-              parent.appendChild(endDate);
-            }
           },
           asString: function() {
             var dur = this.getValue() / 1000;
@@ -1219,8 +1201,8 @@ var ocScheduler = (function() {
         });
     }
     this.dublinCore.components = dcComps;
-    this.recording.components = recComps;
-    this.capture.components = extraComps;
+    this.components = compositeComps;
+    this.capture.components = agentComps;
   }
   
   function handleSeriesSearch(data, callback) {

@@ -214,9 +214,9 @@ public class DublinCoreTest {
       dcNew.add(PROPERTY_LICENSE, new DublinCoreValue("http://www.opencastproject.org/license",
               DublinCore.LANGUAGE_UNDEFINED, ENC_SCHEME_URI));
       // Don't forget to bind the namespace...
-      dcNew.bindPrefix("octest", "http://www.opencastproject.org");
+      dcNew.bindPrefix("octest", "http://www.opencastproject.org/octest");
       dcNew.add(PROPERTY_PROMOTED, new DublinCoreValue("true", DublinCore.LANGUAGE_UNDEFINED, new EName(
-              "http://www.opencastproject.org", "Boolean")));
+              "http://www.opencastproject.org/octest", "Boolean")));
       try {
         dcNew.add(PROPERTY_PROMOTED, new DublinCoreValue("true", DublinCore.LANGUAGE_UNDEFINED, new EName(
                 "http://www.opencastproject.org/enc-scheme", "Boolean")));
