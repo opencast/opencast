@@ -30,11 +30,9 @@
       episodes per page.
     </div>
 
-    <!--<label for="page">Goto page: </label><input type="text" id="page" value="1" />-->
                         <span id="pageWidget" class="layout-inline">
                             <span id="prevButtons">
-            <a class="prevPage" href="javascript:ocArchive.conf.page=0;ocArchive.reload();">
-              &lt;&lt;first</a>
+        <a class="prevPage" href="javascript:ocArchive.firstPage();">&lt;&lt;first</a>
             <a class="prevPage" href="javascript:ocArchive.previousPage();" id="previousPage">&lt;previous</a>
                             </span>
                             <span id="prevText" class="ui-helper-hidden">

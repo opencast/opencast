@@ -61,5 +61,5 @@
     </div>
   </div>
   <br>
-  <center><a href="javascript:window.history.back();" title="Go Back to Recordings">&lt;&lt; Back to Series</a></center>
+  <center><a href="javascript:window.history.back();" title="Go Back">&lt;&lt; Back to Series</a></center>
 </div>

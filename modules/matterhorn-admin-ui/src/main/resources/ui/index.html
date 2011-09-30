@@ -55,6 +55,9 @@
           <a href="#recordings" title="Recordings" id="i18n_tab_recording">Recordings</a>
         </li>
         <li>
+          <a href="#episode" title="Episodes" id="i18n_tab_episode">Episodes</a>
+        </li>
+        <li>
           <a href="#series_list" title="Series" id="i18n_tab_series">Series</a>
         </li>
         <li>
@@ -62,9 +65,6 @@
         </li>
         <li>
           <a href="#statistics" title="Statistics" id="i18n_tab_statistics">Statistics</a>
-        </li>
-        <li>
-          <a href="#episode" title="Episodes" id="i18n_tab_episode">Episodes</a>
         </li>
       </ul>
     </script>
@@ -147,6 +147,13 @@
               init: function() {
                 document.title = "Episode" + matterhorn;
                 ocArchive.init();
+              },
+              tab: "i18n_tab_episode"
+            },
+            "/episodedetails": {
+              init: function() {
+                document.title = "Episode Details" + matterhorn;
+                opencast.episode.Details.init();
               },
               tab: "i18n_tab_episode"
             },

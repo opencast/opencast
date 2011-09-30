@@ -3,5 +3,5 @@
 
   <div id="inspectContainer" class="form-box layout-centered"></div>
   <br>
-  <center><a href="javascript:window.history.back();" title="Go Back to Recordings">&lt;&lt; Back to Recordings</a></center>
+  <center><a href="javascript:window.history.back();" title="Go Back">&lt;&lt; Back</a></center>
 </div>

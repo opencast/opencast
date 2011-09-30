@@ -23,9 +23,9 @@
         <div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div>
       </div>
     </th>
-    <th class="ui-widget-header">Media</th>
     <th class="ui-widget-header">Process</th>
-    <th class="ui-widget-header">Action</th>
+    <th class="ui-widget-header">Start Workflow</th>
+    <th class="ui-widget-header"></th>
   </tr>
   </thead>
   <tbody>
@@ -34,13 +34,8 @@
         <!--<td class="ui-state-active"><input type="checkbox" value="${mp.id}" class="selectRecording"/></td>-->
         <td class="ui-state-active"><%= e.title %></td>
         <td class="ui-state-active"><%= e.creators %></td>
-        <td class="ui-state-active"><%= ocUtils.emptyUndef(e.seriesTitle) %></td>
-        <td class="ui-state-active"><%= e.date %></td>
-        <td class="ui-state-active">
-          <% _.each(e.media, function(m) { %>
-            <a href="<%= m.url %>"><%= m.mimetype %></a>
-          <% }); %>
-        </td>
+        <td class="ui-state-active"><%= ocUtils.dflt(e.seriesTitle) %></td>
+        <td class="ui-state-active" style="text-align: right"><%= e.date %></td>
         <td class="ui-state-active">
           <% if (e.workflow) { %>
             <span class="active-workflow"><%= e.workflow %></span>
@@ -50,6 +45,12 @@
           <% if (e.media.length > 0) { %>
             <a onclick="ocArchive.retract('<%= e.id %>'); return false;" href="#">Retract</a>
           <% } %>
+        </td>
+        <td class="ui-state-active" style="text-align: center">
+          <a href="#/episodedetails?id=<%= e.id %>">Details</a>
+          <!--<% _.each(e.media, function(m) { %>-->
+          <!--<a href="<%= m.url %>"><%= m.mimetype %></a>-->
+          <!--<% }); %>-->
         </td>
       </tr>
     <% }); %>

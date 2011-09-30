@@ -362,7 +362,7 @@ ocRecordings = new (function() {
           };
         }
       } else {
-        ocUtils.log('No current operation for worklfow ' + wf.id);
+        ocUtils.log('No current operation for workflow ' + wf.id);
         this.state = 'Paused';
       }
     } else if (wf.state == 'RUNNING') {

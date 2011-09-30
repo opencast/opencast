@@ -215,3 +215,14 @@ for inspect
 .unfoldable-tr :hover {background: silver;}
 .unfoldable-content {display:none;}
 .subdetails {float:left;margin-right:5px;margin-top:5px;}
+
+/* Episode */
+#episode-detail-header h2 {text-align: center}
+#episode-detail-header .section {margin: 15px 0px 30px 10px}
+#episode-detail-header .section-title {font-size: 15px; margin: 0 0 5px -10px}
+#episodesTable th div {position: relative; padding: 2px;}
+#episodesTable th div.sort-icon {position: absolute; right: 5px; top: 0.1em; padding: 0px;}
+#episodesTable tr {height: 30px;}
+#episodesTable tr td {color: black;}
+#episodesTable .sortable {cursor: pointer;}
+

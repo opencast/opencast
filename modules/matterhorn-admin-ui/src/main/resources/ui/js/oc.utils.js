@@ -103,17 +103,21 @@ ocUtils.makeLocaleDateString = function(timestamp) {
 
 /** converts a date to a human readable date string
  * @param date
+ *  @param compact -- (boolean) without day name
  * @return formatted date string
  */
-ocUtils.getDateString = function(date) {
+ocUtils.getDateString = function(date, compact) {
   var days = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ];
   var months = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
   var daySeparator = ", ";
   var dateSeparator = " ";
   var yearSeparator = " ";
   var d = date;
-  var datestring = days[d.getDay()];
+  var datestring = "";
+  if (compact == undefined || !compact) {
+    datestring += days[d.getDay()];
   datestring += daySeparator;
+  }
   datestring += months[d.getMonth() % 12];
   datestring += dateSeparator;
   datestring += (d.getDate() >= 10) ? d.getDate() : "0".concat(d.getDate());
@@ -124,9 +128,10 @@ ocUtils.getDateString = function(date) {
 
 /** converts a date to a human readable time string
  * @param date
+ * @param withSeconds -- boolean
  * @return formatted time string
  */
-ocUtils.getTimeString = function(date) {
+ocUtils.getTimeString = function(date, withSeconds) {
   var timeSeparator = ":";
   var d = date;
   var h = (d.getHours() >= 10) ? d.getHours() : "0".concat(d.getHours());
@@ -134,7 +139,16 @@ ocUtils.getTimeString = function(date) {
   .concat(d.getMinutes());
   var s = (d.getSeconds() >= 10) ? d.getSeconds() : "0"
   .concat(d.getSeconds());
-  return (h + timeSeparator + m /* + timeSeparator + s*/);
+  return (h + timeSeparator + m + (withSeconds ? timeSeparator + s : ""));
+}
+
+/** Converts a date to a human readable date and time string.
+ *  @param date
+ *  @param withSeconds -- boolean
+ *  @return formatted time string
+ */
+ocUtils.getDateTimeStringCompact = function(date, withSeconds) {
+  return ocUtils.getDateString(date, true) + " " + ocUtils.getTimeString(date, withSeconds);
 }
 
 ocUtils.fromUTCDateString = function(UTCDate) {
@@ -341,13 +355,25 @@ ocUtils.joinArray = function(as, sep) {
   }
 }
 
-/** Map undefined or null values to the empty string.
- *  @param s -- a string
+/** Return the first argument that is neither undefined nor null.
+ *  @param a variable list of arguments
  */
-ocUtils.emptyUndef = function(s) {
-  if (typeof s === "undefined")
-    return "";
-  if (s === null)
-    return "";
-  return s
+ocUtils.dflt = function() {
+  // arguments is an object _not_ an array so let's turn it into one
+  return _.detect(Array.prototype.slice.call(arguments).concat(""), function(a) {
+    return typeof a !== "undefined" && a != null;
+  });
+}
+
+/** Return the first element of array a. If a is not an array return a. Return undefined if the array is empty.
+ */
+ocUtils.first = function(a) {
+  return ocUtils.ensureArray(a)[0];
+}
+
+/** Return the last element of array a. If a is not an array return a. Return undefined if the array is empty.
+ */
+ocUtils.last = function(a) {
+  var aa = ocUtils.ensureArray(a);
+  return aa[aa.length - 1];
 }
