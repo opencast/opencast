@@ -72,7 +72,7 @@
           <tr>
             <th>Role</th>
             <th>View</th>
-            <th>Edit</th>
+            <th>Administer</th>
             <th></th>
           </tr>
         </thead>
