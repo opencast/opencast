@@ -216,8 +216,9 @@ public class CaptureRestService {
   
   @GET
   @Produces({ MediaType.TEXT_XML, MediaType.TEXT_PLAIN })
-  @Path("configuration{type: \\.xml|\\.txt|}")
-  @RestQuery(name = "config", description = "Returns a list with the default agent configuration properties.  This is in the same format as the startCapture endpoint.", pathParameters = { }, restParameters = { }, reponses = {
+  @Path("configuration.{type:xml|txt}")
+  @RestQuery(name = "config", description = "Returns a list with the default agent configuration properties.  This is in the same format as the startCapture endpoint.", pathParameters = {
+		      @RestParameter(name = "type", description = "The Document Type", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = { }, reponses = {
           @RestResponse(description = "the configuration values are returned", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "the configuration properties could not be retrieved", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
           @RestResponse(description = "Capture Agent is unavailable", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
@@ -228,7 +229,7 @@ public class CaptureRestService {
     }
 
     try {
-      if (".xml".equals(type)) {
+      if ("xml".equals(type)) {
         return Response.ok(new PropertiesResponse(service.getDefaultAgentProperties())).type(MediaType.TEXT_XML).build();
       } else {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

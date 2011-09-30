@@ -259,7 +259,7 @@ public class CaptureDeviceBinTest {
             + "/fileSrc.mpg");
   }
   
-  @Test
+  @Ignore@Test
   public void captureDeviceBinUsesCustomConsumers() throws UnableToLinkGStreamerElementsException,
           UnableToCreateGhostPadsForBinException, UnableToSetElementPropertyBecauseElementWasNullException,
           NoConsumerFoundException, CaptureDeviceNullPointerException, UnableToCreateElementException,

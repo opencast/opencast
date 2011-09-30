@@ -40,7 +40,7 @@ function getResponse(target) {
 	var end = "<a href='http://" + window.location.hostname + ":8080/captureagent/stopCapture'>Stop Capture</a>";
 	
 	var client = new XMLHttpRequest();
-	client.open("GET", "http://" + window.location.hostname + ":8080/captureagent/configuration", false);
+	client.open("GET", "http://" + window.location.hostname + ":8080/captureagent/configuration.txt", false);
 	client.send();
 	var form = "<form name='form' action=" + start + " method='POST'><textarea name=config rows='20' cols='100'>" + client.responseText + "</textarea><br>" +
 		"<input type='submit' value='Start Capture'>" +
