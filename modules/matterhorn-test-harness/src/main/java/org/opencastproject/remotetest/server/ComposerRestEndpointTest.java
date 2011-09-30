@@ -190,7 +190,9 @@ public class ComposerRestEndpointTest {
   @Test
   public void testWatermarking() throws Exception {
     File workingDirectory = new File (System.getProperty("java.io.tmpdir"), "watermarktest");
-    if (!workingDirectory.exists()) workingDirectory.mkdirs();
+    if (!workingDirectory.exists()) {
+      workingDirectory.mkdirs();
+    }
     URL sourceUrl = getClass().getResource("/watermark.png");
     File sourceFile = new File(workingDirectory, "watermark.png");
     FileUtils.copyURLToFile(sourceUrl, sourceFile);
@@ -210,8 +212,6 @@ public class ComposerRestEndpointTest {
     Assert.assertEquals(200, postResponse.getStatusLine().getStatusCode());
     Assert.assertTrue(postResponseXml.contains("job"));
 
-    FileUtils.forceDelete(workingDirectory);
-    
     // Poll the service for the status of the job.
     while (!JobUtils.isJobInState(jobId, "FINISHED")) {
       Thread.sleep(2000); // wait and try again
@@ -220,6 +220,8 @@ public class ComposerRestEndpointTest {
         Assert.fail();
       }
     }
+    
+    FileUtils.forceDelete(workingDirectory);
   }
 
   /**
