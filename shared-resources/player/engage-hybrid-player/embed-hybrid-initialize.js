@@ -882,12 +882,34 @@ Opencast.Initialize = (function ()
                 },
                 error: function (a, b, c)
                 {
+                    Opencast.Player.addEvent("EMBED-SEARCH-AJAX-FAILED");
                     // Some error while trying to get the search result
                 }
             }); //close ajax
         } // close if
         //control bar hide effect
         Opencast.embedControlHide.initialize();
+        $.ajax(
+        {
+            type: 'GET',
+            url: "../../usertracking/detailenabled",
+            dataType: 'text',
+            success: function (text)
+            {
+                if (text === 'true') {
+                  Opencast.Player.detailedLogging = true;
+                  //This is done here because otherwise it doesn't fire (due to async threads I'm guessing)
+                  Opencast.Player.addEvent("EMBED-STARTUP");
+                } else {
+                  Opencast.Player.detailedLogging = false;
+                }
+            },
+            error: function (a, b, c)
+            {
+                Opencast.Player.addEvent("EMBED-DETAILED-LOGGING-AJAX-FAILED");
+                Opencast.Player.detailedLogging = false;
+            }
+        });
     });
     
     /**

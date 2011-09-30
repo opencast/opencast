@@ -34,7 +34,19 @@ public interface UserTrackingService {
    * @throws UserTrackingException
    *           if the user tracking service encounters an error
    */
-  UserAction addUserAction(UserAction a) throws UserTrackingException;
+  UserAction addUserFootprint(UserAction a) throws UserTrackingException;
+
+  /**
+   * Adds a new tracking event to the database and returns the event with an updated annotationId, to make sure the
+   * annotationId stays unique
+   * 
+   * @param a
+   *          The UserAction that will be added to the database
+   * @return the updated annotation, with a new ID. NULL if there are errors while adding the annotation.
+   * @throws UserTrackingException
+   *           if the user tracking service encounters an error
+   */
+  UserAction addUserTrackingEvent(UserAction a) throws UserTrackingException;
 
   /**
    * Returns annotations
@@ -180,5 +192,13 @@ public interface UserTrackingService {
    *           if the no user action with this identifier exists
    */
   UserAction getUserAction(Long id) throws UserTrackingException, NotFoundException;
+
+  /**
+   * Returns the flag turning user tracking on or off.
+   * Turning user tracking off disables the detailed information gathering, but does *not* disable footprint gathering.
+   * 
+   * @return True if detailed user tracking should be gathered, false otherwise
+   */
+  boolean getUserTrackingEnabled();
 
 }

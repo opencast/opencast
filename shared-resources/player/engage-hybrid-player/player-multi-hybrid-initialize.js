@@ -802,12 +802,13 @@ Opencast.Initialize = (function ()
             }
         });
         $("#oc_ui_tabs .ui-tabs-nav li").last().css('float', 'right');
-        $(window).resize(function ()
+        $(window).resize(function (e)
         {
             if (Opencast.Player.shareOverlayDisplayed())
             {
                 Opencast.Player.showShare();
             }
+            Opencast.Player.addEvent('RESIZE-TO-' + $(window).width() + 'x' + $(window).height());
         });
         //bind click functions
         $('#oc_share-button').click(function (e)
@@ -816,6 +817,7 @@ Opencast.Initialize = (function ()
         });
         $('#oc_btn-email').click(function ()
         {
+            Opencast.Player.addEvent('EMAIL');
             Opencast.Player.doToggleShare();
         });
         $('#oc_time-chooser').click(function ()
@@ -901,6 +903,31 @@ Opencast.Initialize = (function ()
                 {
                     $('#oc_title').html('');
                 }
+            },
+            error: function ()
+            {
+                Opencast.Player.addEvent("NORMAL-SEARCH-AJAX-FAILED");
+            }
+        });
+        $.ajax(
+        {
+            type: 'GET',
+            url: "../../usertracking/detailenabled",
+            dataType: 'text',
+            success: function (text)
+            {
+                if (text === 'true') {
+                  Opencast.Player.detailedLogging = true;
+                  //This is done here because otherwise it doesn't fire (due to async threads I'm guessing)
+                  Opencast.Player.addEvent("NORMAL-STARTUP");
+                } else {
+                  Opencast.Player.detailedLogging = false;
+                }
+            },
+            error: function (a, b, c)
+            {
+                Opencast.Player.detailedLogging = false;
+                Opencast.Player.addEvent("NORMAL-DETAILED-LOGGING-AJAX-FAILED");
             }
         });
     });

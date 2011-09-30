@@ -74,6 +74,7 @@ Opencast.Analytics = (function ()
             error: function (xhr, ajaxOptions, thrownError)
             {
                 $.log("Analytics Ajax call: Requesting data failed");
+                Opencast.Player.addEvent("ANALYTICS-INIT-AJAX-FAILED");
                 displayNoAnalyticsAvailable("No data available (1), initialize");
             }
         });
@@ -178,6 +179,7 @@ Opencast.Analytics = (function ()
             error: function (xhr, ajaxOptions, thrownError)
             {
                 $.log("Analytics Ajax call: Requesting data failed");
+                Opencast.Player.addEvent("ANALYTICS-DATA-AJAX-FAILED");
                 displayNoAnalyticsAvailable("No data available (1)");
             }
         });
@@ -270,6 +272,9 @@ Opencast.Analytics = (function ()
         {
             initResizeEnd();
             showAnalytics(false);
+            //This is done here so that we don't get a million events when the
+            //analytics components get resized
+            Opencast.Player.addEvent("SHOW-ANALYTICS");
         }
         else
         {

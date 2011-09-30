@@ -35,6 +35,10 @@ public interface UserAction {
 
   void setUserId(String userId);
 
+  String getUserIp();
+
+  void setUserIp(String userIp);
+
   String getSessionId();
 
   void setSessionId(String sessionId);
@@ -46,12 +50,16 @@ public interface UserAction {
   int getOutpoint();
 
   void setOutpoint(int outpoint);
-  
+
   int getLength();
 
   String getType();
 
   void setType(String type);
+
+  boolean getIsPlaying();
+
+  void setIsPlaying(boolean isPlaying);
 
   Date getCreated();
 }

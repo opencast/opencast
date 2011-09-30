@@ -63,6 +63,7 @@ Opencast.Annotation_Chapter = (function ()
             error: function (xhr, ajaxOptions, thrownError)
             {
                 $.log("Annotation Ajax call: Requesting data failed");
+                Opencast.Player.addEvent("ANNOTATION-INIT-AJAX-FAILED");
                 displayNoAnnotationsAvailable("No data available");
             }
         });
@@ -74,6 +75,7 @@ Opencast.Annotation_Chapter = (function ()
      */
     function showAnnotation_Chapter()
     {
+        Opencast.Player.addEvent("SHOW-ANNOTATIONS");
         // Request JSONP data
         $.ajax(
         {
@@ -130,6 +132,7 @@ Opencast.Annotation_Chapter = (function ()
             error: function (xhr, ajaxOptions, thrownError)
             {
                 $.log("Annotation Ajax call: Requesting data failed");
+                Opencast.Player.addEvent("ANNOTATION-CHAPTER-AJAX-FAILED");
                 displayNoAnnotationsAvailable("No data available");
             }
         });

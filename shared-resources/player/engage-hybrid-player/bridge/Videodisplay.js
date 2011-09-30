@@ -432,6 +432,7 @@ Videodisplay = (function ()
             if (initialized())
             {
                 var v = b_Videodisplay_root.setVolumePlayer(argNumber);
+                Opencast.Player.addEvent("SET-VOLUME-" + argNumber);
                 return v;
             }
             else

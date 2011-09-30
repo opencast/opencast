@@ -370,6 +370,7 @@ Opencast.segments = (function ()
      */
     function showSegments()
     {
+        Opencast.Player.addEvent("SHOW-SEGMENTS");
         // Hide other Tabs
         Opencast.Description.hideDescription();
         Opencast.segments_text.hideSegmentsText();
@@ -414,6 +415,7 @@ Opencast.segments = (function ()
                 error: function (xhr, ajaxOptions, thrownError)
                 {
                     $.log("Segments Ajax call: Requesting data failed");
+                    Opencast.Player.addEvent("SEGMENTS-AJAX-FAILED");
                     $('#scrollcontainer').html('No Slides available');
                     $('#scrollcontainer').hide();
                 }

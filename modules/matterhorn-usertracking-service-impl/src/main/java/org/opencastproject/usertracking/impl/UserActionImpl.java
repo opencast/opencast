@@ -46,6 +46,7 @@ import javax.xml.bind.annotation.XmlType;
         @NamedQuery(name = "countSessionsGroupByMediapackage", query = "SELECT a.mediapackageId, COUNT(distinct a.sessionId), SUM(a.length) FROM UserAction a GROUP BY a.mediapackageId"),
         @NamedQuery(name = "countSessionsGroupByMediapackageByIntervall", query = "SELECT a.mediapackageId, COUNT(distinct a.sessionId), SUM(a.length) FROM UserAction a WHERE :begin <= a.created AND a.created <= :end GROUP BY a.mediapackageId"),
         @NamedQuery(name = "countSessionsOfMediapackage", query = "SELECT COUNT(distinct a.sessionId) FROM UserAction a WHERE a.mediapackageId = :mediapackageId"),
+        @NamedQuery(name = "findLastUserFootprintOfSession", query = "SELECT a FROM UserAction a  WHERE a.sessionId = :sessionId AND a.type = \'FOOTPRINT\'  ORDER BY a.created DESC"),
         @NamedQuery(name = "findLastUserActionsOfSession", query = "SELECT a FROM UserAction a  WHERE a.sessionId = :sessionId ORDER BY a.created DESC"),
         @NamedQuery(name = "findUserActionsByType", query = "SELECT a FROM UserAction a WHERE a.type = :type"),
         @NamedQuery(name = "findUserActionsByTypeAndMediapackageId", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type"),
@@ -77,6 +78,10 @@ public class UserActionImpl implements UserAction {
   @XmlElement(name = "userId")
   private String userId;
 
+  @Column(name = "USER_IP")
+  @XmlElement(name = "userIp")
+  private String userIp;
+
   @Column(name = "SESSION_ID")
   @XmlElement(name = "sessionId")
   private String sessionId;
@@ -96,6 +101,10 @@ public class UserActionImpl implements UserAction {
   @Column(name = "TYPE")
   @XmlElement(name = "type")
   private String type;
+
+  @Column(name = "IS_PLAYING")
+  @XmlElement(name = "isPlaying")
+  private boolean isPlaying;
 
   @Basic(optional = false)
   @Column(name = "CREATED")
@@ -131,6 +140,14 @@ public class UserActionImpl implements UserAction {
 
   public void setUserId(String userId) {
     this.userId = userId;
+  }
+
+  public String getUserIp() {
+    return userIp;
+  }
+
+  public void setUserIp(String userIp) {
+    this.userIp = userIp;
   }
 
   public String getSessionId() {
@@ -169,6 +186,14 @@ public class UserActionImpl implements UserAction {
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  public boolean getIsPlaying() {
+    return isPlaying;
+  }
+
+  public void setIsPlaying(boolean isPlaying) {
+    this.isPlaying = isPlaying;
   }
 
   public Date getCreated() {

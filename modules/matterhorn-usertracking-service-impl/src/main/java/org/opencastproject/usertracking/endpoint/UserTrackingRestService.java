@@ -245,8 +245,10 @@ public class UserTrackingRestService {
           @RestParameter(name = "type", description = "The episode identifier", isRequired = true, type = Type.STRING),
           @RestParameter(name = "in", description = "The beginning of the time range", isRequired = false, type = Type.STRING),
           @RestParameter(name = "out", description = "The end of the time range", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_CREATED, description = "An XML representation of the user action") })
-  public Response add(@FormParam("id") String mediapackageId, @FormParam("in") String inString,
-          @FormParam("out") String outString, @FormParam("type") String type, @Context HttpServletRequest request) {
+  public Response addFootprint(@FormParam("id") String mediapackageId, @FormParam("in") String inString,
+          @FormParam("out") String outString, @FormParam("type") String type, @FormParam("playing") String isPlaying,
+          @Context HttpServletRequest request) {
+
     String sessionId = request.getSession().getId();
     String userId = securityService.getUser().getUserName();
 
@@ -280,9 +282,15 @@ public class UserTrackingRestService {
     a.setInpoint(in);
     a.setOutpoint(out);
     a.setType(type);
+    a.setIsPlaying(Boolean.valueOf(isPlaying));
+    a.setUserIp(request.getRemoteAddr());
 
     try {
-      a = (UserActionImpl) usertrackingService.addUserAction(a);
+      if ("FOOTPRINT".equals(type)) {
+        a = (UserActionImpl) usertrackingService.addUserFootprint(a);
+      } else {
+        a = (UserActionImpl) usertrackingService.addUserTrackingEvent(a);
+      }
     } catch (UserTrackingException e) {
       throw new WebApplicationException(e);
     }
@@ -350,4 +358,10 @@ public class UserTrackingRestService {
     return getFootprintAsXml(mediapackageId); // this is the same logic... it's just annotated differently
   }
 
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("/detailenabled")
+  public Response getUserTrackingEnabled() {
+    return Response.ok(usertrackingService.getUserTrackingEnabled()).build();
+  }
 }

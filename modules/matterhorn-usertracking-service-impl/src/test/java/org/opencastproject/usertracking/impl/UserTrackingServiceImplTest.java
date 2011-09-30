@@ -59,7 +59,7 @@ public class UserTrackingServiceImplTest {
   }
 
   @Test
-  public void test() throws Exception {
+  public void testfootprint() throws Exception {
     UserActionImpl userAction = new UserActionImpl();
     userAction.setInpoint(10);
     userAction.setOutpoint(20);
@@ -67,8 +67,9 @@ public class UserTrackingServiceImplTest {
     userAction.setSessionId("session123");
     userAction.setType("play_media");
     userAction.setUserId("me"); // TODO: move this into the service implementation
+    userAction.setType("FOOTPRINT");
     
-    service.addUserAction(userAction);
+    service.addUserFootprint(userAction);
     Long id = userAction.getId();
     
     // Ensure that, once persisted, the user action has an ID
@@ -80,7 +81,33 @@ public class UserTrackingServiceImplTest {
     UserActionImpl fromDb = (UserActionImpl)service.getUserAction(id);
     Assert.assertNotNull(fromDb);
     Assert.assertEquals(userAction.getMediapackageId(), fromDb.getMediapackageId());
+    Assert.assertEquals(userAction.getType(), fromDb.getType());
     
   }
 
+  @Test
+  public void testAction() throws Exception {
+    UserActionImpl userAction = new UserActionImpl();
+    userAction.setInpoint(10);
+    userAction.setOutpoint(20);
+    userAction.setMediapackageId("mp");
+    userAction.setSessionId("session123");
+    userAction.setType("play_media");
+    userAction.setUserId("me"); // TODO: move this into the service implementation
+    userAction.setType("arbitraryType");
+    
+    service.addUserTrackingEvent(userAction);
+    Long id = userAction.getId();
+    
+    // Ensure that, once persisted, the user action has an ID
+    Assert.assertNotNull(id);
+    
+    // Ensure that, once persisted, the user action has a date created
+    Assert.assertNotNull(userAction.getCreated());
+
+    UserActionImpl fromDb = (UserActionImpl)service.getUserAction(id);
+    Assert.assertNotNull(fromDb);
+    Assert.assertEquals(userAction.getMediapackageId(), fromDb.getMediapackageId());
+    Assert.assertEquals(userAction.getType(), fromDb.getType());
+  }
 }

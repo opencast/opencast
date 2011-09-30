@@ -69,6 +69,7 @@ Opencast.Series = (function ()
             error: function (xhr, ajaxOptions, thrownError)
             {
                 $.log("Series Ajax call: Requesting data failed");
+                Opencast.Player.addEvent("SERIES-PAGE-AJAX-FAILED");
             }
         });
     }
@@ -136,6 +137,10 @@ Opencast.Series = (function ()
                     'tabindex': '0'
                 });
                 series_visible = true;
+            },
+            error: function (data)
+            {
+              Opencast.Player.addEvent("SERIES-DROPDOWN-AJAX-FAILED");
             }
         });
     }
@@ -217,6 +222,7 @@ Opencast.Series = (function ()
                             error: function (xhr, ajaxOptions, thrownError)
                             {
                                 $.log("Series Ajax call #2: Requesting data failed");
+                                Opencast.Player.addEvent("SERIES-AJAX-2-FAILED");
                             }
                         });
                     }
@@ -229,6 +235,7 @@ Opencast.Series = (function ()
             error: function (xhr, ajaxOptions, thrownError)
             {
                 $.log("Series Ajax call #1: Requesting data failed");
+                Opencast.Player.addEvent("SERIES-AJAX-1-FAILED");
             }
         });
     }

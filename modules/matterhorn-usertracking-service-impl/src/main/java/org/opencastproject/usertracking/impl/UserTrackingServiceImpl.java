@@ -30,11 +30,14 @@ import org.opencastproject.usertracking.endpoint.ReportImpl;
 import org.opencastproject.usertracking.endpoint.ReportItemImpl;
 import org.opencastproject.util.NotFoundException;
 
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +54,7 @@ import javax.persistence.spi.PersistenceProvider;
  * 
  * @see org.opencastproject.usertracking.api.UserTrackingService
  */
-public class UserTrackingServiceImpl implements UserTrackingService {
+public class UserTrackingServiceImpl implements UserTrackingService, ManagedService {
 
   public static final String FOOTPRINT_KEY = "FOOTPRINT";
 
@@ -59,6 +62,8 @@ public class UserTrackingServiceImpl implements UserTrackingService {
 
   @SuppressWarnings("unused")
   private SearchService searchService;
+
+  private boolean detailedTracking = false;
 
   /**
    * Sets the search service
@@ -115,6 +120,19 @@ public class UserTrackingServiceImpl implements UserTrackingService {
     }
   }
 
+  @Override
+  public void updated(Dictionary props) throws ConfigurationException {
+    if (props == null) {
+      logger.debug("Null properties in user tracking service, not doing detailed logging");
+      return;
+    }
+
+    Object val = props.get("org.opencastproject.usertracking.detailedtrack");
+    if (val != null && String.class.isInstance(val)) {
+      detailedTracking = Boolean.valueOf((String) val);
+    }
+  }
+
   public int getViews(String mediapackageId) {
     EntityManager em = null;
     try {
@@ -130,14 +148,15 @@ public class UserTrackingServiceImpl implements UserTrackingService {
   }
 
   @SuppressWarnings("unchecked")
-  public UserAction addUserAction(UserAction a) throws UserTrackingException {
+  public UserAction addUserFootprint(UserAction a) throws UserTrackingException {
+    a.setType("FOOTPRINT");
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
-      Query q = em.createNamedQuery("findLastUserActionsOfSession");
+      Query q = em.createNamedQuery("findLastUserFootprintOfSession");
       q.setMaxResults(1);
       q.setParameter("sessionId", a.getSessionId());
       Collection<UserAction> userActions = q.getResultList();
@@ -154,6 +173,28 @@ public class UserTrackingServiceImpl implements UserTrackingService {
       } else {
         em.persist(a);
       }
+      tx.commit();
+      return a;
+    } catch (Exception e) {
+      if (tx != null && tx.isActive()) {
+        tx.rollback();
+      }
+      throw new UserTrackingException(e);
+    } finally {
+      if (em != null && em.isOpen()) {
+        em.close();
+      }
+    }
+  }
+
+  public UserAction addUserTrackingEvent(UserAction a) throws UserTrackingException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      em.persist(a);
       tx.commit();
       return a;
     } catch (Exception e) {
@@ -566,5 +607,15 @@ public class UserTrackingServiceImpl implements UserTrackingService {
     } else {
       return result;
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.usertracking.api.UserTrackingService#getUserTrackingEnabled()
+   */
+  @Override
+  public boolean getUserTrackingEnabled() {
+    return detailedTracking;
   }
 }
