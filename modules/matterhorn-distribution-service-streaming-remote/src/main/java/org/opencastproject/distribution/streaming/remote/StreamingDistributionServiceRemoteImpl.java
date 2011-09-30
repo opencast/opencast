@@ -19,9 +19,8 @@ import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
-import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageElementParser;
-import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 
 import org.apache.http.HttpResponse;
@@ -68,20 +67,14 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.distribution.api.DistributionService#distribute(String, MediaPackageElement)
+   * @see org.opencastproject.distribution.api.DistributionService#distribute(org.opencastproject.mediapackage.MediaPackage,
+   *      java.lang.String)
    */
-  @Override
-  public Job distribute(String mediaPackageId, MediaPackageElement element) throws DistributionException {
-    String elementXml = null;
-    try {
-      elementXml = MediaPackageElementParser.getAsXml(element);
-    } catch (MediaPackageException e) {
-      throw new DistributionException("Unable to marshall mediapackage to xml: " + e.getMessage());
-    }
-
+  public Job distribute(MediaPackage mediaPackage, String elementId) throws DistributionException {
+    String mediapackageXml = MediaPackageParser.getAsXml(mediaPackage);
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    params.add(new BasicNameValuePair("mediapackageId", mediaPackageId));
-    params.add(new BasicNameValuePair("element", elementXml));
+    params.add(new BasicNameValuePair("mediapackage", mediapackageXml));
+    params.add(new BasicNameValuePair("elementId", elementId));
     HttpPost post = new HttpPost();
     HttpResponse response = null;
     Job receipt = null;
@@ -90,60 +83,62 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
       post.setEntity(entity);
       response = getResponse(post);
       if (response != null) {
-        logger.info("distributed {} to {}", mediaPackageId, distributionChannel);
+        logger.info("distributed {} to {}", elementId, distributionChannel);
         try {
           receipt = JobParser.parseJob(response.getEntity().getContent());
           return receipt;
         } catch (Exception e) {
-          throw new DistributionException("Unable to distribute mediapackage '" + mediaPackageId
+          throw new DistributionException("Unable to distribute mediapackage '" + elementId
                   + "' using a remote distribution service", e);
         }
       }
     } catch (Exception e) {
-      throw new DistributionException("Unable to distribute mediapackage " + mediaPackageId
+      throw new DistributionException("Unable to distribute mediapackage " + elementId
               + " using a remote distribution service proxy.", e);
     } finally {
       closeConnection(response);
     }
-    throw new DistributionException("Unable to distribute mediapackage " + mediaPackageId
+    throw new DistributionException("Unable to distribute mediapackage " + elementId
             + " using a remote distribution service proxy.");
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.distribution.api.DistributionService#retract(java.lang.String)
+   * @see org.opencastproject.distribution.api.DistributionService#retract(MediaPackage, String)
    */
   @Override
-  public Job retract(String mediaPackageId) throws DistributionException {
+  public Job retract(MediaPackage mediaPackage, String elementId) throws DistributionException {
+    String mediapackageXml = MediaPackageParser.getAsXml(mediaPackage);
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    params.add(new BasicNameValuePair("mediapackageId", mediaPackageId));
+    params.add(new BasicNameValuePair("mediapackage", mediapackageXml));
+    params.add(new BasicNameValuePair("elementId", elementId));
     HttpPost post = new HttpPost();
     HttpResponse response = null;
     UrlEncodedFormEntity entity = null;
     try {
       entity = new UrlEncodedFormEntity(params);
     } catch (UnsupportedEncodingException e) {
-      throw new DistributionException("Unable to retract mediapackage " + mediaPackageId + " for http post", e);
+      throw new DistributionException("Unable to retract mediapackage " + mediaPackage + " for http post", e);
     }
     post.setEntity(entity);
     try {
       response = getResponse(post, HttpStatus.SC_NO_CONTENT);
       Job receipt = null;
       if (response != null) {
-        logger.info("retracted {} from {}", mediaPackageId, distributionChannel);
+        logger.info("retracted {} from {}", mediaPackage, distributionChannel);
         try {
           receipt = JobParser.parseJob(response.getEntity().getContent());
           return receipt;
         } catch (Exception e) {
-          throw new DistributionException("Unable to retract mediapackage '" + mediaPackageId
+          throw new DistributionException("Unable to retract mediapackage '" + mediaPackage
                   + "' using a remote distribution service", e);
         }
       }
     } finally {
       closeConnection(response);
     }
-    throw new DistributionException("Unable to retract mediapackage " + mediaPackageId
+    throw new DistributionException("Unable to retract mediapackage " + mediaPackage
             + " using a remote distribution service proxy");
   }
 

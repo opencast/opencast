@@ -29,6 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -71,7 +72,7 @@ public class DistributeWorkflowOperationHandlerTest {
     uriMP = InspectWorkflowOperationHandler.class.getResource("/distribute_mediapackage.xml").toURI();
     mp = builder.loadFromXml(uriMP.toURL().openStream());
     service = new TestDistributionService();
-    
+
     User anonymous = new User("anonymous", DEFAULT_ORGANIZATION_ID, new String[] { DEFAULT_ORGANIZATION_ANONYMOUS });
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
@@ -88,7 +89,8 @@ public class DistributeWorkflowOperationHandlerTest {
     EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
     EasyMock.replay(securityService);
 
-    serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService, organizationDirectoryService);
+    serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
+            organizationDirectoryService);
 
     // set up the handler
     operationHandler = new DistributeWorkflowOperationHandler();
@@ -129,20 +131,21 @@ public class DistributeWorkflowOperationHandlerTest {
     public static final String JOB_TYPE = "distribute";
 
     @Override
-    public Job distribute(String mediaPackageId, MediaPackageElement element) throws DistributionException,
+    public Job distribute(MediaPackage mediapackage, String elementId) throws DistributionException,
             MediaPackageException {
       try {
-        return serviceRegistry.createJob("distribute", "distribute",
-                Arrays.asList(new String[] { MediaPackageElementParser.getAsXml(element) }));
+        return serviceRegistry.createJob(JOB_TYPE, "distribute",
+                Arrays.asList(new String[] { MediaPackageParser.getAsXml(mediapackage), elementId }));
       } catch (ServiceRegistryException e) {
         throw new DistributionException(e);
       }
     }
 
     @Override
-    public Job retract(String mediaPackageId) throws DistributionException {
+    public Job retract(MediaPackage mediapackage, String elementId) throws DistributionException {
       try {
-        return serviceRegistry.createJob(JOB_TYPE, "retract");
+        return serviceRegistry.createJob(JOB_TYPE, "retract",
+                Arrays.asList(new String[] { MediaPackageParser.getAsXml(mediapackage), elementId }));
       } catch (ServiceRegistryException e) {
         throw new DistributionException(e);
       }
@@ -160,7 +163,16 @@ public class DistributeWorkflowOperationHandlerTest {
 
     @Override
     public boolean acceptJob(Job job) throws ServiceRegistryException {
-      job.setPayload(job.getArguments().get(0));
+      MediaPackage mp = null;
+      MediaPackageElement element = null;
+      try {
+        mp = MediaPackageParser.getFromXml(job.getArguments().get(0));
+        String elementId = job.getArguments().get(1);
+        element = mp.getElementById(elementId);
+        job.setPayload(MediaPackageElementParser.getAsXml(element));
+      } catch (MediaPackageException e1) {
+        throw new ServiceRegistryException("Error serializing or deserializing");
+      }
       job.setStatus(Status.FINISHED);
       try {
         serviceRegistry.updateJob(job);

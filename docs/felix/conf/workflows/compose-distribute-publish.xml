@@ -492,6 +492,15 @@
         <configuration key="target-tags">publish</configuration>
       </configurations>
     </operation>
+
+    <!-- Archive the current state of the mediapackage -->
+
+    <operation
+      id="archive"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Archived">
+    </operation>
  
     <!-- Publish to engage search index -->
  
@@ -501,19 +510,6 @@
       exception-handler-workflow="error"
       description="Published">
       <configurations>
-        <configuration key="source-tags">publish</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Archive -->
-
-    <operation
-      id="archive"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Archived">
-      <configurations>
-        <!-- archive everything that got published -->
         <configuration key="source-tags">publish</configuration>
       </configurations>
     </operation>

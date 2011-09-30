@@ -199,7 +199,7 @@ public class SeriesUpdatedEventHandler implements EventHandler {
                 Attachment fileRepoCopy = mp.getAttachments(XACML_POLICY)[0];
 
                 // Distribute the updated XACML file
-                Job distributionJob = distributionService.distribute(mp.getIdentifier().toString(), fileRepoCopy);
+                Job distributionJob = distributionService.distribute(mp, fileRepoCopy.getIdentifier());
                 JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
                 Result jobResult = barrier.waitForJobs();
                 if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {

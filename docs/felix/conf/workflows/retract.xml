@@ -2,6 +2,13 @@
   <id>retract</id>
   <description>Retract a media package from all distribution channels.</description>
   <operations>
+
+    <!-- Remove from search index -->
+
+    <operation
+      id="searchindex-remove"
+      description="Remove media package from search index">
+    </operation>
   
     <!-- Retract from distribution channels -->
 
@@ -18,13 +25,6 @@
       exception-handler-workflow="error"
       if="${org.opencastproject.streaming.url}"
       description="Retract media package from the streaming distribution channels">
-    </operation>
-
-    <!-- Remove from search index -->
-
-    <operation
-      id="searchindex-remove"
-      description="Remove media package from search index">
     </operation>
 
     <!-- todo clean up the episode from the working file repository -->

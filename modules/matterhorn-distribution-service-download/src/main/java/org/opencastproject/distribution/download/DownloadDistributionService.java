@@ -13,15 +13,18 @@
  *  permissions and limitations under the License.
  *
  */
+
 package org.opencastproject.distribution.download;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -43,6 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -114,21 +118,20 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.distribution.api.DistributionService#distribute(java.lang.String,
-   *      org.opencastproject.mediapackage.MediaPackageElement)
+   * @see org.opencastproject.distribution.api.DistributionService#distribute(org.opencastproject.mediapackage.MediaPackage,
+   *      java.lang.String)
    */
-  @Override
-  public Job distribute(String mediaPackageId, MediaPackageElement element) throws DistributionException,
+  public Job distribute(MediaPackage mediapackage, String elementId) throws DistributionException,
           MediaPackageException {
 
-    if (mediaPackageId == null)
-      throw new MediaPackageException("Mediapackage ID must be specified");
-    if (element == null)
-      throw new MediaPackageException("Mediapackage element must be specified");
+    if (mediapackage == null)
+      throw new MediaPackageException("Mediapackage must be specified");
+    if (elementId == null)
+      throw new MediaPackageException("Element ID must be specified");
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Distribute.toString(),
-              Arrays.asList(mediaPackageId, MediaPackageElementParser.getAsXml(element)));
+              Arrays.asList(MediaPackageParser.getAsXml(mediapackage), elementId));
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -140,15 +143,20 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
    * 
    * @see org.opencastproject.distribution.api.DistributionService#distribute(String, MediaPackageElement)
    */
-  protected MediaPackageElement distribute(Job job, String mediaPackageId, MediaPackageElement element)
+  protected MediaPackageElement distribute(Job job, MediaPackage mediapackage, String elementId)
           throws DistributionException, MediaPackageException {
 
-    if (mediaPackageId == null)
-      throw new IllegalArgumentException("Mediapackage ID must be specified");
-    if (element == null)
-      throw new IllegalArgumentException("Mediapackage element must be specified");
-    if (element.getIdentifier() == null)
-      throw new IllegalArgumentException("Mediapackage element must have an identifier");
+    if (mediapackage == null)
+      throw new IllegalArgumentException("Mediapackage must be specified");
+    if (elementId == null)
+      throw new IllegalArgumentException("Element ID must be specified");
+
+    String mediaPackageId = mediapackage.getIdentifier().compact();
+    MediaPackageElement element = mediapackage.getElementById(elementId);
+
+    // Make sure the element exists
+    if (mediapackage.getElementById(elementId) == null)
+      throw new IllegalStateException("No element " + elementId + " found in mediapackage");
 
     try {
       File sourceFile;
@@ -159,7 +167,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
       } catch (IOException e) {
         throw new DistributionException("Error loading " + element.getURI() + " from the workspace", e);
       }
-      File destination = getDistributionFile(mediaPackageId, element);
+      File destination = getDistributionFile(mediapackage, element);
 
       // Put the file in place
       try {
@@ -167,7 +175,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
       } catch (IOException e) {
         throw new DistributionException("Unable to create " + destination.getParentFile(), e);
       }
-      logger.info("Distributing {} to {}", element, destination);
+      logger.info("Distributing {} to {}", elementId, destination);
 
       try {
         FileSupport.copy(sourceFile, destination);
@@ -200,16 +208,19 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.distribution.api.DistributionService#retract(java.lang.String)
+   * @see org.opencastproject.distribution.api.DistributionService#retract(org.opencastproject.mediapackage.MediaPackage,
+   *      java.lang.String)
    */
-  @Override
-  public Job retract(String mediaPackageId) throws DistributionException {
-
-    if (mediaPackageId == null)
-      throw new IllegalArgumentException("Mediapackage ID must be specified");
-
+  public Job retract(MediaPackage mediaPackage, String elementId) throws DistributionException {
+    if (mediaPackage == null)
+      throw new IllegalArgumentException("Mediapackage must be specified");
+    if (elementId == null)
+      throw new IllegalArgumentException("Element ID must be specified");
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(), Arrays.asList(mediaPackageId));
+      List<String> arguments = new ArrayList<String>();
+      arguments.add(MediaPackageParser.getAsXml(mediaPackage));
+      arguments.add(elementId);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(), arguments);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -220,27 +231,77 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
    * 
    * @param job
    *          the associated job
-   * @param mediapackageId
-   *          the mediapackage identifier
+   * @param mediapackage
+   *          the mediapackage
+   * @param elementId
+   *          the element identifier
+   * @return the retracted element or <code>null</code> if the element was not retracted
    */
-  protected void retract(Job job, String mediaPackageId) throws DistributionException {
+  protected MediaPackageElement retract(Job job, MediaPackage mediapackage, String elementId)
+          throws DistributionException {
+
+    if (mediapackage == null)
+      throw new IllegalArgumentException("Mediapackage must be specified");
+    if (elementId == null)
+      throw new IllegalArgumentException("Element ID must be specified");
+
+    // Make sure the element exists
+    MediaPackageElement element = mediapackage.getElementById(elementId);
+    if (element == null)
+      throw new IllegalStateException("No element " + elementId + " found in mediapackage");
+
+    // Find the element that has been created as part of the distribution process
+    String mediaPackageId = mediapackage.getIdentifier().compact();
+    URI distributedURI = null;
+    MediaPackageElement distributedElement = null; 
+    try {
+      distributedURI = getDistributionUri(mediaPackageId, element);
+      for (MediaPackageElement e : mediapackage.getElements()) {
+        if (distributedURI.equals(e.getURI())) {
+          distributedElement = e;
+          break;
+        }
+      }
+    } catch (URISyntaxException e) {
+      throw new DistributionException("Retracted element produces an invalid URI", e);
+    }
+
+    // Has this element been distributed?
+    if (distributedElement == null)
+      return null;
+        
+    String mediapackageId = mediapackage.getIdentifier().compact();
     try {
 
-      // Try to remove the file
-      File mediapackageDir = getMediaPackageDirectory(mediaPackageId);
-      if (mediapackageDir.exists() && !FileSupport.delete(mediapackageDir, true)) {
-        throw new DistributionException("Unable to retract mediapackage " + mediaPackageId);
+      File mediapackageDir = getMediaPackageDirectory(mediapackageId);
+      File elementDir = getDistributionFile(mediapackage, element);
+
+      logger.info("Retracting element {} from {}", distributedElement, elementDir);
+
+      // Does the file exist? If not, the current element has not been distributed to this channel
+      if (!elementDir.exists()) {
+        logger.warn("Unable to delete element from {}", elementDir);
+        return null;
       }
 
-      logger.info("Finished rectracting media package {}", mediaPackageId);
+      // Try to remove the file and - if possible - the parent folder
+      FileUtils.forceDelete(elementDir.getParentFile());
+      if (mediapackageDir.list().length == 0) {
+        FileSupport.delete(mediapackageDir);
+      }
+
+      logger.info("Finished rectracting element {} of media package {}", elementId, mediapackageId);
+
+      return distributedElement;
     } catch (Exception e) {
-      logger.warn("Error retracting mediapackage " + mediaPackageId, e);
+      logger.warn("Error retracting element " + elementId + " of mediapackage " + mediapackageId, e);
       if (e instanceof DistributionException) {
         throw (DistributionException) e;
       } else {
         throw new DistributionException(e);
       }
     }
+
   }
 
   /**
@@ -255,16 +316,15 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
     List<String> arguments = job.getArguments();
     try {
       op = Operation.valueOf(operation);
-      String mediapackageId = arguments.get(0);
-
+      MediaPackage mediapackage = MediaPackageParser.getFromXml(arguments.get(0));
+      String elementId = arguments.get(1);
       switch (op) {
         case Distribute:
-          MediaPackageElement sourceElement = MediaPackageElementParser.getFromXml(arguments.get(1));
-          MediaPackageElement distributedElement = distribute(job, mediapackageId, sourceElement);
+          MediaPackageElement distributedElement = distribute(job, mediapackage, elementId);
           return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
         case Retract:
-          retract(job, mediapackageId);
-          return null;
+          MediaPackageElement retractedElement = retract(job, mediapackage, elementId);
+          return (retractedElement != null) ? MediaPackageElementParser.getAsXml(retractedElement) : null;
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
       }
@@ -280,16 +340,18 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
   /**
    * Gets the destination file to copy the contents of a mediapackage element.
    * 
+   * @param mediaPackage
+   *          the media package
    * @param element
    *          The mediapackage element being distributed
    * @return The file to copy the content to
    */
-  protected File getDistributionFile(String mediaPackageId, MediaPackageElement element) {
+  protected File getDistributionFile(MediaPackage mediaPackage, MediaPackageElement element) {
     String elementId = element.getIdentifier();
     String fileName = FilenameUtils.getName(element.getURI().toString());
     String directoryName = distributionDirectory.getAbsolutePath();
-    String destinationFileName = PathSupport
-            .concat(new String[] { directoryName, mediaPackageId, elementId, fileName });
+    String destinationFileName = PathSupport.concat(new String[] { directoryName,
+            mediaPackage.getIdentifier().compact(), elementId, fileName });
     return new File(destinationFileName);
   }
 

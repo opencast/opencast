@@ -15,7 +15,6 @@
  */
 package org.opencastproject.workflow.handler;
 
-import org.apache.commons.lang.StringUtils;
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -27,6 +26,7 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,15 +149,23 @@ public class ArchiveWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
     // Check which tags have been configured
     String tags = workflowInstance.getCurrentOperation().getConfiguration("source-tags");
-    if (StringUtils.trimToNull(tags) == null) {
-      logger.warn("No source tags have been specified, so nothing will be added to the search index");
-      return createResult(mediaPackageFromWorkflow, Action.CONTINUE);
+    logger.debug("No source tags have been specified, so everything will be added to the archive index");
+
+    MediaPackage mediaPackageForArchive = null;
+    
+    // If a set of tags has been specified, use it
+    if (tags != null) {
+      try {
+        List<String> tagSet = asList(tags);
+        mediaPackageForArchive = getMediaPackageForArchival(mediaPackageFromWorkflow, tagSet);
+      } catch (MediaPackageException e) {
+        throw new WorkflowOperationException(e);
+      }
+    } else {
+      mediaPackageForArchive = mediaPackageFromWorkflow;
     }
 
-    List<String> tagSet = asList(tags);
-
     try {
-      MediaPackage mediaPackageForArchive = getMediaPackageForArchival(mediaPackageFromWorkflow, tagSet);
       if (mediaPackageForArchive == null) {
         createResult(mediaPackageForArchive, Action.CONTINUE);
       }

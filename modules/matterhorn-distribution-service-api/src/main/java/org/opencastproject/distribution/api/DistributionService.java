@@ -16,7 +16,7 @@
 package org.opencastproject.distribution.api;
 
 import org.opencastproject.job.api.Job;
-import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
 
 /**
@@ -32,26 +32,29 @@ public interface DistributionService {
   /**
    * Distribute the elementIds from a media package.
    * 
-   * @param mediaPackageId
-   *          The media package to distribute
-   * @param element
+   * @param mediapackage
+   *          The media package
+   * @param elementId
    *          The element in the media package to distribute
+   * 
    * @return The job
    * @throws DistributionException
    *           if there was a problem distributing the media
    * @throws MediaPackageException
    *           if there was a problem with the mediapackage element
    */
-  Job distribute(String mediaPackageId, MediaPackageElement element) throws DistributionException, MediaPackageException;
+  Job distribute(MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException;
 
   /**
    * Retract all media and metadata associated with this media package from the distribution channel.
    * 
-   * @param mediaPackageId
-   *          The identifier of the media package to retract
+   * @param mediaPackage
+   *          the media package
+   * @param elementId
+   *          The media package element to retract
    * @throws DistributionException
    *           if there was a problem retracting the mediapackage
    */
-  Job retract(String mediaPackageId) throws DistributionException;
+  Job retract(MediaPackage mediaPackage, String elementId) throws DistributionException;
 
 }

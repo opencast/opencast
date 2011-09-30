@@ -1024,6 +1024,20 @@ public final class MediaPackageImpl implements MediaPackage {
   /**
    * {@inheritDoc}
    * 
+   * @see org.opencastproject.mediapackage.MediaPackage#removeElementById(java.lang.String)
+   */
+  @Override
+  public MediaPackageElement removeElementById(String id) {
+    MediaPackageElement element = getElementById(id);
+    if (element == null)
+      return null;
+    remove(element);
+    return element;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see org.opencastproject.mediapackage.MediaPackage#remove(org.opencastproject.mediapackage.MediaPackageElement)
    */
   public void remove(MediaPackageElement element) {
@@ -1420,7 +1434,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Reads the media package from an xml node.
-   *
+   * 
    * @param xml
    *          the node
    * @return the deserialized media package

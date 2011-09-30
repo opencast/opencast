@@ -19,7 +19,6 @@ import static org.opencastproject.remotetest.Main.BASE_URL;
 
 import org.opencastproject.remotetest.Main;
 import org.opencastproject.remotetest.util.TrustedHttpClient;
-import org.opencastproject.remotetest.util.Utils;
 
 import junit.framework.Assert;
 
@@ -36,13 +35,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.xpath.XPathConstants;
 
 /**
  * Tests the functionality of the local distribution service rest endpoint
@@ -83,14 +78,13 @@ public class DistributionDownloadRestEndpointTest {
 
   @Test
   public void testDistribute() throws Exception {
-    Document mp = getSampleMediaPackage();
-    String mpId = (String)Utils.xpath(mp, "/oc:mediapackage/@id", XPathConstants.STRING);
-    String track = Utils.nodeToString((Node)Utils.xpath(mp, "//media/track[@id=\"track-1\"]", XPathConstants.NODE));
+    String mediapackage = getSampleMediaPackage();
+    String trackId = "track-1";
     
     HttpPost post = new HttpPost(BASE_URL + "/distribution/download");
     List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-    formParams.add(new BasicNameValuePair("mediapackageId", mpId));
-    formParams.add(new BasicNameValuePair("element", track));
+    formParams.add(new BasicNameValuePair("mediapackage", mediapackage));
+    formParams.add(new BasicNameValuePair("elementId", trackId));
     post.setEntity(new UrlEncodedFormEntity(formParams, "UTF-8"));
 
     // Ensure we get a 200 OK (we don't really care about the body of the result)
@@ -101,10 +95,10 @@ public class DistributionDownloadRestEndpointTest {
     // that the server is local.  So we'll just have to trust that our unit tests cover that.
   }
 
-  protected Document getSampleMediaPackage() throws Exception {
+  protected String getSampleMediaPackage() throws Exception {
     String template = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("mediapackage-1.xml"), "UTF-8");
     template = template.replaceAll("@SAMPLES_URL@", BASE_URL + "/workflow/samples");
-    return Utils.parseXml(IOUtils.toInputStream(template, "UTF-8"));
+    return template;
   }
 
 }

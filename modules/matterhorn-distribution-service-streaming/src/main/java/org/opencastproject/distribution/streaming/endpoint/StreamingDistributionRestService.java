@@ -21,8 +21,8 @@ import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
-import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -94,16 +94,15 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
   @POST
   @Path("/")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "distribute", description = "Distribute a media package to this distribution channel", returnDescription = "The job that can be used to track the distribution", restParameters = {
-          @RestParameter(name = "mediapackageId", isRequired = true, description = "The mediapackage identifier", type = Type.STRING),
-          @RestParameter(name = "element", isRequired = true, description = "The element to distribute", type = Type.TEXT) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job") })
-  public Response distribute(@FormParam("mediapackageId") String mediaPackageId, @FormParam("element") String elementXml)
+  @RestQuery(name = "distribute", description = "Distribute a media package element to this distribution channel", returnDescription = "The job that can be used to track the distribution", restParameters = {
+          @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
+          @RestParameter(name = "elementId", isRequired = true, description = "The element to distribute", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job") })
+  public Response distribute(@FormParam("mediapackage") String mediaPackageXml, @FormParam("elementId") String elementId)
           throws Exception {
     Job job = null;
-
     try {
-      MediaPackageElement element = MediaPackageElementParser.getFromXml(elementXml);
-      job = service.distribute(mediaPackageId, element);
+      MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
+      job = service.distribute(mediapackage, elementId);
     } catch (Exception e) {
       logger.warn("Error distributing element", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
@@ -114,13 +113,17 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
   @POST
   @Path("/retract")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "retract", description = "Retract a media package from this distribution channel", returnDescription = "The job that can be used to track the retraction", restParameters = { @RestParameter(name = "mediapackageId", isRequired = true, description = "The mediapackage identifier", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job") })
-  public Response retract(@FormParam("mediapackageId") String mediaPackageId) throws Exception {
+  @RestQuery(name = "retract", description = "Retract a media package element from this distribution channel", returnDescription = "The job that can be used to track the retraction", restParameters = {
+          @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
+          @RestParameter(name = "elementId", isRequired = true, description = "The element to retract", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job") })
+  public Response retract(@FormParam("mediapackage") String mediaPackageXml, @FormParam("elementId") String elementId)
+          throws Exception {
     Job job = null;
     try {
-      job = service.retract(mediaPackageId);
+      MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
+      job = service.retract(mediapackage, elementId);
     } catch (Exception e) {
-      logger.warn("Unable to retract mediapackage '{}' from streaming channel: {}", new Object[] { mediaPackageId, e });
+      logger.warn("Unable to retract mediapackage '{}' from download channel: {}", new Object[] { mediaPackageXml, e });
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
     return Response.ok(new JaxbJob(job)).build();

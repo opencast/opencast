@@ -565,6 +565,13 @@ public interface MediaPackage extends Cloneable {
   void add(Track track);
 
   /**
+   * Removes the element with the given identifier from the mediapackage and returns it.
+   * 
+   * @param id the element identifier
+   */
+  MediaPackageElement removeElementById(String id);
+  
+  /**
    * Removes the track from the media package.
    * 
    * @param track

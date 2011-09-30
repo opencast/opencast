@@ -137,10 +137,7 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
       Map<String, Job> jobs = new HashMap<String, Job>(elementIds.size());
       try {
         for (String elementId : elementIds) {
-          MediaPackageElement element = mediaPackage.getElementById(elementId);
-          if (element == null)
-            throw new WorkflowOperationException("Unable to find element " + elementId);
-          jobs.put(elementId, distributionService.distribute(mediaPackage.getIdentifier().compact(), element));
+          jobs.put(elementId, distributionService.distribute(mediaPackage, elementId));
         }
       } catch (DistributionException e) {
         throw new WorkflowOperationException(e);
