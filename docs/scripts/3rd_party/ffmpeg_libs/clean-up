@@ -16,6 +16,6 @@ cleanup x264   "$1" || exit 1
 cleanup xvid   "$1" || exit 1
 cleanup faac   "$1" || exit 1
 cleanup theora "$1" || exit 1
-cleanup libvpx "$1" || exit 1
+cleanup vpx    "$1" || exit 1
 #
 exit 0

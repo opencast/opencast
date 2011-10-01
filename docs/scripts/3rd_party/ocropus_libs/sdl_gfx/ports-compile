@@ -8,7 +8,7 @@ source "${HOME3P}/utilx"
 #
 [ -f .done-ports ] && exit 0
 #
-sudox port install libsdl_gfx || exit 1
+sudox port -f install libsdl_gfx || exit 1
 #
 touch .done-ports
 [ $? -ne 0 ] && exit 1

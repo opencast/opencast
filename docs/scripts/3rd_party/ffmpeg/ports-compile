@@ -9,24 +9,25 @@ source "${HOME3P}/utilx"
 [ -f .done-ports ] && exit 0
 export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`
 #
-OLDCD=`pwd`
-[ $? -ne 0 ] && exit 1
-cd /Users/Shared
-[ $? -ne 0 ] && exit 1
-mkdir -p dports/multimedia/ffmpeg
-[ $? -ne 0 ] && exit 1
-cd dports/multimedia
-[ $? -ne 0 ] && exit 1
-# http://trac.macports.org/log/trunk/dports/multimedia/ffmpeg
-# revision 71434 is last ffmpeg 0.6
-svn co --revision 71434 ${MACPORTS_SVN}/multimedia/ffmpeg
-[ $? -ne 0 ] && exit 1
-portindex -f /Users/Shared/dports
-[ $? -ne 0 ] && exit 1
-cd "$OLDCD"
-[ $? -ne 0 ] && exit 1
+#OLDCD=`pwd`
+#[ $? -ne 0 ] && exit 1
+#cd /Users/Shared
+#[ $? -ne 0 ] && exit 1
+#mkdir -p dports/multimedia/ffmpeg
+#[ $? -ne 0 ] && exit 1
+#cd dports/multimedia
+#[ $? -ne 0 ] && exit 1
+## http://trac.macports.org/log/trunk/dports/multimedia/ffmpeg
+## revision 71434 is last ffmpeg 0.6
+#svn co --revision 71434 ${MACPORTS_SVN}/multimedia/ffmpeg
+#[ $? -ne 0 ] && exit 1
+#portindex -f /Users/Shared/dports
+#[ $? -ne 0 ] && exit 1
+#cd "$OLDCD"
+#[ $? -ne 0 ] && exit 1
 #
-sudox port install ffmpeg @0.6 || exit 1
+#sudox port -f install ffmpeg @0.6 || exit 1
+sudox port -f install ffmpeg || exit 1
 #
 touch .done-ports
 [ $? -ne 0 ] && exit 1

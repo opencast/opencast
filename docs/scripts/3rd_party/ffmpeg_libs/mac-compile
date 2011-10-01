@@ -20,7 +20,7 @@ compile xvid   mac || exit 1
 compile faac   mac || exit 1
 # theora depends on sdl, ogg, vorbis and png12 (base_libs)
 compile theora mac || exit 1
-# webM support depends on ogg and vorbis
-compile libvpx mac || exit 1
+# WebM support depends on ogg and vorbis
+compile vpx    mac || exit 1
 #
 exit 0

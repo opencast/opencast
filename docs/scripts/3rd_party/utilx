@@ -83,6 +83,44 @@ os() {
   return 0
 }
 #
+# os_ver
+#  <M.N>
+#
+os_ver() {
+  set +x
+  case `uname` in
+    Linux )
+      # CentOS, RHEL, Ubuntu, Debian, openSUSE, Amazon
+      awk '{
+  sub("^[^0-9.]*", ""); sub("[^0-9.]*$", "");
+  print $0;
+  exit 0
+}' /etc/issue
+      if [ $? -ne 0 ]; then
+        set -x
+        return 1
+      fi
+      ;;
+    Darwin )
+      sw_vers | awk '/^ProductVersion:/ {
+  sub("^[^0-9.]*", ""); sub("[^0-9.]*$", "");
+  print $0;
+  exit 0
+}'
+      if [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ]; then
+        set -x
+        return 1
+      fi
+      ;;
+    * )
+      set -x
+      return 1
+      ;;
+  esac
+  set -x
+  return 0
+}
+#
 # chkprog
 #   $1 = binary to check
 #
@@ -99,9 +137,12 @@ chkprog() {
 #   $1 = library to check (short form)
 #
 # Default library path:
-#   CentOS, RHEL:  /lib:/usr/lib:/lib/i686:/usr/lib/sse2:/usr/lib/tls
-#   Ubuntu:        /lib:/usr/lib:/lib/tls:/lib/i686:/usr/lib/sse2:/lib/tls/i686
-#   MacOS:         ~/lib:/usr/local/lib:/opt/local/lib:/lib:/usr/lib
+#   CentOS, RHEL:
+#     /lib:/usr/lib:/lib/i686:/usr/lib/sse2:/usr/lib/tls
+#   Ubuntu:
+#     /lib:/usr/lib:/lib/tls:/lib/i686:/usr/lib/sse2:/lib/tls/i686
+#   MacOS:
+#     ~/lib:/usr/local/lib:/opt/local/lib:/lib:/usr/lib
 #
 chklib() {
   case `uname` in
@@ -112,6 +153,12 @@ chklib() {
       for dir in /lib64 /usr/lib64 /lib64/tls /lib64/i686 /lib64/tls/i686 /usr/lib64/sse2 /usr/lib64/tls; do
         [ -s "$dir/lib$1.so" ] && return 0
       done
+#     for dir in /lib/i386-linux-gnu /usr/lib/i386-linux-gnu /lib/i486-linux-gnu /usr/lib/i486-linux-gnu /lib/i586-linux-gnu /usr/lib/i586-linux-gnu /lib/i686-linux-gnu /usr/lib/i686-linux-gnu; do
+#       [ -s "$dir/lib$1.so" ] && return 0
+#     done
+#     for dir in /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu; do
+#       [ -s "$dir/lib$1.so" ] && return 0
+#     done
       echo "lib$1.so is missing" 1>&2
       ;;
     Darwin )
@@ -119,6 +166,39 @@ chklib() {
         [ -s "$dir/lib$1.dylib" ] && return 0
       done
       echo "lib$1.dylib is missing" 1>&2
+      ;;
+  esac
+  return 1
+}
+#
+# chkinc
+#   $1 = include file to check
+#
+# Default include path:
+#   CentOS, RHEL, Ubuntu:
+#     /usr/local/include:/usr/lib/gcc/*/*/include:/usr/lib/gcc/*/*/include-fixed:/usr/include
+#   Ubuntu x64:
+#     /usr/local/include:/usr/lib/*-linux-gnu/gcc/*/*/include:/usr/lib/*-linux-gnu/gcc/*/*/include-fixed:/usr/include/*-linux-gnu:/usr/include
+#   MacOS:
+#     /usr/local/include:/usr/lib/gcc/*/*/include:/usr/include:/System/Library/Frameworks:/Library/Frameworks
+#
+chkinc() {
+  case `uname` in
+    Linux )
+      DIRLIST=`echo /usr/local/include /usr/lib/gcc/*/*/include /usr/lib/gcc/*/*/include-fixed /usr/lib/*-linux-gnu/gcc/*/*/include /usr/lib/*-linux-gnu/gcc/*/*/include-fixed /usr/include/*-linux-gnu /usr/include`
+      for dir in $DIRLIST; do
+        FILE=`find "$dir" -type f -name "$1" 2>/dev/null`
+        [ -n "$FILE" ] && return 0
+      done
+      echo "$1 is missing" 1>&2
+      ;;
+    Darwin )
+      DIRLIST=`echo /usr/local/include /usr/lib/gcc/*/*/include /usr/include /System/Library/Frameworks /Library/Frameworks`
+      for dir in $DIRLIST; do
+        FILE=`find "$dir" -type f -name "$1" 2>/dev/null`
+        [ -n "$FILE" ] && return 0
+      done
+      echo "$1 is missing" 1>&2
       ;;
   esac
   return 1
@@ -283,7 +363,7 @@ download() {
             if [ $? -ne 0 ]; then
               ok=1
               for URL in `getcfg URL${ii}:`; do
-                wget -4O "$pkg" "$URL/$pkg"
+                wget -t 5 -4 -O "$pkg" "$URL/$pkg"
                 ok=$?
                 [ $ok -eq 0 ] && break
               done

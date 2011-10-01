@@ -20,7 +20,7 @@ compile xvid   win32 || exit 1
 compile faac   win32 || exit 1
 # theora depends on sdl, ogg, vorbis and png12 (base_libs)
 compile theora win32 || exit 1
-# webM support depends on ogg and vorbis
-compile libvpx win32 || exit 1
+# WebM support depends on ogg and vorbis
+compile vpx    win32 || exit 1
 #
 exit 0

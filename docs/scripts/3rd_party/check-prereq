@@ -120,14 +120,14 @@ install_prog() {
             i386 )
               URLS=`getmcfg gcc_x86_url:`
               rpms=`getmcfg gcc_x86_pkgs:`
-              UPD_URLS=`getmcfg gcc_x86_upd_url:`
-              upd_rpms=`getmcfg gcc_x86_upd_pkgs:`
+              #UPD_URLS=`getmcfg gcc_x86_upd_url:`
+              #upd_rpms=`getmcfg gcc_x86_upd_pkgs:`
               ;;
             x86_64 )
               URLS=`getmcfg gcc_x64_url:`
               rpms=`getmcfg gcc_x64_pkgs:`
-              UPD_URLS=`getmcfg gcc_x64_upd_url:`
-              upd_rpms=`getmcfg gcc_x64_upd_pkgs:`
+              #UPD_URLS=`getmcfg gcc_x64_upd_url:`
+              #upd_rpms=`getmcfg gcc_x64_upd_pkgs:`
               ;;
           esac
           ;;
@@ -136,14 +136,14 @@ install_prog() {
             i386 )
               URLS=`getmcfg gpp_x86_url:`
               rpms=`getmcfg gpp_x86_pkgs:`
-              UPD_URLS=`getmcfg gpp_x86_upd_url:`
-              upd_rpms=`getmcfg gpp_x86_upd_pkgs:`
+              #UPD_URLS=`getmcfg gpp_x86_upd_url:`
+              #upd_rpms=`getmcfg gpp_x86_upd_pkgs:`
               ;;
             x86_64 )
               URLS=`getmcfg gpp_x64_url:`
               rpms=`getmcfg gpp_x64_pkgs:`
-              UPD_URLS=`getmcfg gpp_x64_upd_url:`
-              upd_rpms=`getmcfg gpp_x64_upd_pkgs:`
+              #UPD_URLS=`getmcfg gpp_x64_upd_url:`
+              #upd_rpms=`getmcfg gpp_x64_upd_pkgs:`
               ;;
           esac
           ;;
@@ -290,7 +290,7 @@ install_prog() {
           if [ $? -ne 0 ]; then
             ok=1
             for URL in $URLS; do
-              wget -4O "$rpm" "$URL/$rpm"
+              wget -t 5 -4 -O "$rpm" "$URL/$rpm"
               ok=$?
               [ $ok -eq 0 ] && break
             done
@@ -307,7 +307,7 @@ install_prog() {
           if [ $? -ne 0 ]; then
             ok=1
             for UPD_URL in $UPD_URLS; do
-              wget -4O "$upd_rpm" "$UPD_URL/$upd_rpm"
+              wget -t 5 -4 -O "$upd_rpm" "$UPD_URL/$upd_rpm"
               ok=$?
               [ $ok -eq 0 ] && break
             done
@@ -363,8 +363,19 @@ install_macports() {
   cd packages
   [ $? -ne 0 ] && return 1
   #
-  URLS=`getmcfg MacPorts_mac_url:`
-  dmgs=`getmcfg MacPorts_mac_pkgs:`
+  case `os_ver` in
+    10.6* )
+      URLS=`getmcfg MacPorts_Snow_url:`
+      dmgs=`getmcfg MacPorts_Snow_pkgs:`
+      ;;
+    10.7* )
+      URLS=`getmcfg MacPorts_Lion_url:`
+      dmgs=`getmcfg MacPorts_Lion_pkgs:`
+      ;;
+  esac
+  MPVER="${dmgs##MacPorts-}"
+  MPVER="${MPVER%%-*}"
+  #
   for dmg in $dmgs; do
     if [ ! -s "$dmg" ]; then
       copypkg "$dmg"
@@ -388,11 +399,11 @@ install_macports() {
   #
   sudox hdiutil attach "$dmg"
   [ $? -ne 0 ] && return 1
-  # mounted to /Volumes/MacPorts-1.9.2
-  sudox installer -pkg "/Volumes/MacPorts-1.9.2/MacPorts-1.9.2.pkg" -target /
+  # mounted to /Volumes/MacPorts-${MPVER}
+  sudox installer -pkg "/Volumes/MacPorts-${MPVER}/MacPorts-${MPVER}.pkg" -target /
   [ $? -ne 0 ] && return 1
   # installed to /opt/local/bin/port
-  sudox hdiutil detach "/Volumes/MacPorts-1.9.2"
+  sudox hdiutil detach "/Volumes/MacPorts-${MPVER}"
   [ $? -ne 0 ] && return 1
 # sudox port -v selfupdate
 # [ $? -ne 0 -a $? -ne 25 ] && return 1
@@ -633,7 +644,7 @@ install_mingw32() {
           if [ $? -ne 0 ]; then
             ok=1
             for URL in $URLS; do
-              wget -4O "$rpm" "$URL/$rpm"
+              wget -t 5 -4 -O "$rpm" "$URL/$rpm"
               ok=$?
               [ $ok -eq 0 ] && break
             done
@@ -664,7 +675,7 @@ install_mingw32() {
           if [ $? -ne 0 ]; then
             ok=1
             for URL in $URLS; do
-              wget -4O "$rpm" "$URL/$rpm"
+              wget -t 5 -4 -O "$rpm" "$URL/$rpm"
               ok=$?
               [ $ok -eq 0 ] && break
             done
@@ -686,7 +697,7 @@ install_mingw32() {
           if [ $? -ne 0 ]; then
             ok=1
             for URL in $URLS; do
-              wget -4O "$pkg" "$URL/$pkg"
+              wget -t 5 -4 -O "$pkg" "$URL/$pkg"
               ok=$?
               [ $ok -eq 0 ] && break
             done
@@ -742,7 +753,7 @@ fix_libs() {
             if [ $? -ne 0 ]; then
               ok=1
               for URL in $URLS; do
-                wget -4O "$pkg" "$URL/$pkg"
+                wget -t 5 -4 -O "$pkg" "$URL/$pkg"
                 ok=$?
                 [ $ok -eq 0 ] && break
               done
@@ -809,7 +820,7 @@ EOF
             if [ $? -ne 0 ]; then
               ok=1
               for URL in $URLS; do
-                wget -4O "$rpm" "$URL/$rpm"
+                wget -t 5 -4 -O "$rpm" "$URL/$rpm"
                 ok=$?
                 [ $ok -eq 0 ] && break
               done
