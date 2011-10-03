@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+
+  <scr:component name="org.opencastproject.kernel.rest.JsonpFilter" immediate="true">
+    <implementation class="org.opencastproject.kernel.rest.JsonpFilter" />
+    <property name="service.description" value="JSONP Filter" />
+    <property name="contextId" value="opencast.httpcontext" />
+    <property name="service.ranking" value="10" />
+    <property name="pattern" value=".*" />
+    <service>
+      <provide interface="javax.servlet.Filter" />
+    </service>
+  </scr:component>
+
+</scr:components>

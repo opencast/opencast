@@ -1,0 +1,113 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-win32 ] && exit 0
+pkg=`getcfg PKG:`
+chkpkg "$pkg" || exit 1
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+pcp=`getcfg PCP:`
+[ -z "$pcp" ] && exit 1
+#
+rm -fr "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+gzip -dc "$pkg" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+cd "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+#
+rm -fr .hg*
+[ $? -ne 0 ] && exit 1
+cp ../compat.h colib
+[ $? -ne 0 ] && exit 1
+cp ../quicksort.h colib
+[ $? -ne 0 ] && exit 1
+cp ../narray.h colib
+[ $? -ne 0 ] && exit 1
+cp ../io_jpeg.cc imgio
+[ $? -ne 0 ] && exit 1
+cp ../test-pbmpng.cc imgio/tests
+[ $? -ne 0 ] && exit 1
+cp ../SConstruct.mingw SConstruct
+[ $? -ne 0 ] && exit 1
+#
+#  make all = scons
+#   install = scons install
+#     clean = scons -c
+# uninstall = scons -c install
+#
+# scons -Q <option>=<value>
+#   Option  Help                                       Value
+#   opt     Compiler flags for optimization/debugging  "-g -O3"
+#   warn    Compiler flags for warnings                "-Wall -D__warn_unused_result__=__far__"
+#   prefix  The installation root for iulib            "/usr/local"
+#
+scons --debug=findlibs
+[ $? -ne 0 ] && exit 1
+#
+mkdir iulib
+[ $? -ne 0 ] && exit 1
+cp \
+utils/SDL_lines.h imgio/autoinvert.h imgbits/bithacks.h \
+utils/dgraphics.h imgbits/imgbitptr.h imgbits/imgbits.h \
+imglib/imgbrushfire.h imglib/imgedges.h imglib/imgfilters.h \
+imglib/imggauss.h imglib/imggraymorph.h imgio/imgio.h \
+imglib/imglabels.h imglib/imglib.h imglib/imgmap.h \
+imglib/imgmisc.h imglib/imgmorph.h imglib/imgops.h \
+imglib/imgrescale.h imgbits/imgrle.h imglib/imgthin.h \
+imglib/imgtrace.h imgio/io_jpeg.h imgio/io_pbm.h \
+imgio/io_png.h imgio/io_tiff.h imglib/iulib.h vidio/vidio.h \
+iulib
+[ $? -ne 0 ] && exit 1
+sudox rm -fr ${MINGW32_PREFIX}/include/iulib
+[ $? -ne 0 ] && exit 1
+sudox mkdir -p ${MINGW32_PREFIX}/include/iulib
+[ $? -ne 0 ] && exit 1
+sudox cp iulib/*.h ${MINGW32_PREFIX}/include/iulib
+[ $? -ne 0 ] && exit 1
+#
+mkdir -p x/colib
+[ $? -ne 0 ] && exit 1
+cp \
+colib/checks.h colib/classifier.h colib/clib.h \
+colib/colib.h colib/compat.h colib/coords.h \
+colib/debugf.h colib/deprecation.h colib/env.h \
+colib/hash.h colib/heap.h colib/iarith.h \
+colib/iustring.h colib/misc.h colib/narray-ops.h \
+colib/narray-util.h colib/narray.h colib/nbest.h \
+colib/nustring.h colib/objlist.h colib/quicksort.h \
+colib/rowarrays.h colib/smartptr.h colib/strbuf.h \
+colib/unionfind.h colib/vec2.h \
+x/colib
+[ $? -ne 0 ] && exit 1
+sudox rm -fr ${MINGW32_PREFIX}/include/colib
+[ $? -ne 0 ] && exit 1
+sudox mkdir -p ${MINGW32_PREFIX}/include/colib
+[ $? -ne 0 ] && exit 1
+sudox cp x/colib/*.h ${MINGW32_PREFIX}/include/colib
+[ $? -ne 0 ] && exit 1
+#
+sudox cp libiulib.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+#
+zip "../$pcp" iulib/*.h
+[ $? -ne 0 ] && exit 1
+cd x
+[ $? -ne 0 ] && exit 1
+zip "../../$pcp" colib/*.h
+[ $? -ne 0 ] && exit 1
+cd -
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp" libiulib.a
+[ $? -ne 0 ] && exit 1
+#
+touch ../.done-win32
+[ $? -ne 0 ] && exit 1
+exit 0

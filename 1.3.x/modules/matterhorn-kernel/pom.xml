@@ -1,0 +1,308 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>matterhorn-kernel</artifactId>
+  <name>matterhorn-kernel</name>
+  <packaging>bundle</packaging>
+  <parent>
+    <groupId>org.opencastproject</groupId>
+    <artifactId>base</artifactId>
+    <version>1.3-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  <properties>
+    <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
+    <checkstyle.skip>false</checkstyle.skip>
+  </properties>
+
+  <dependencies>
+  
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  
+      <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>org.springframework.security.core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>org.springframework.security.web</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>org.springframework.security.openid</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.security.oauth</groupId>
+      <artifactId>spring-security-oauth</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.openid4java</groupId>
+      <artifactId>com.springsource.org.openid4java</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.osgi</groupId>
+      <artifactId>org.springframework.osgi.core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>net.sourceforge.nekohtml</groupId>
+      <artifactId>com.springsource.org.cyberneko.html</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.security</groupId>
+      <artifactId>jboss-xacml</artifactId>
+      <version>2.0.5.final</version>
+      <exclusions>
+        <exclusion>
+          <groupId>apache-xerces</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
+      <version>1.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.fileinstall</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>org.osgi.core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>org.osgi.compendium</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-bundle-jaxrs</artifactId>
+    </dependency>
+
+    <!-- Logging -->
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    
+    <!-- Testing -->
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <version>2.5.1</version>
+      <scope>test</scope>
+    </dependency>
+        
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.0.1</version>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Embed-Dependency>
+              spring-security-oauth;inline=true,
+              jboss-xacml;inline=true,
+              json-simple;inline=true
+            </Embed-Dependency>
+            <Private-Package>
+              org.jboss.security.xacml.core,
+              org.jboss.security.xacml.core.model.policy
+            </Private-Package>
+            <Import-Package>
+              javax.activation,
+              javax.servlet;version=2.5,
+              javax.servlet.http;version=2.5,
+              javax.xml.stream,
+              javax.ws.rs,
+              javax.ws.rs.core,
+              javax.ws.rs.ext,
+              META-INF.cxf,
+              META-INF.cxf.osgi,
+              org.apache.cxf,
+              org.apache.cxf.resource,
+              org.apache.cxf.bus,
+              org.apache.cxf.bus.extension,
+              org.apache.cxf.phase,
+              org.apache.cxf.workqueue,
+              org.apache.cxf.buslifecycle,
+              org.apache.cxf.endpoint,
+              org.apache.cxf.transport,
+              org.apache.cxf.transport.http,
+              org.apache.cxf.transports.http,
+              org.apache.cxf.transport.servlet,
+              org.apache.cxf.management,
+              org.apache.cxf.binding,
+              org.apache.cxf.binding.xml,
+              org.apache.cxf.headers,
+              org.apache.cxf.catalog,
+              org.apache.cxf.jaxrs,
+              org.apache.cxf.jaxrs.impl,
+              org.apache.cxf.jaxrs.lifecycle,
+              org.apache.cxf.jaxrs.provider,
+              org.apache.cxf.jaxrs.utils,
+              org.apache.cxf.wsdl,
+              org.apache.cxf.wsdl11,
+              org.apache.commons.codec.digest,
+              org.apache.commons.io,
+              org.apache.commons.lang,
+              org.apache.http,
+              org.apache.http.client,
+              org.apache.http.client.entity,
+              org.apache.http.client.methods,
+              org.apache.http.conn,
+              org.apache.http.impl.client,
+              org.apache.http.message,
+              org.apache.http.util,
+              org.codehaus.jettison.mapped,
+              org.osgi.framework,
+              org.osgi.service.component,
+              org.osgi.service.http,
+              org.osgi.util.tracker,
+              org.slf4j,
+              javax.management,
+              javax.xml.namespace;version=0,
+              org.springframework.beans,
+              org.springframework.beans.factory,
+              org.springframework.beans.factory.config,
+              org.springframework.beans.factory.support,
+              org.springframework.beans.factory.xml,
+              org.springframework.context,
+              org.springframework.context.annotation,
+              org.springframework.dao,
+              org.springframework.security,
+              org.springframework.security.access,
+              org.springframework.security.access.event,
+              org.springframework.security.authentication,
+              org.springframework.security.authentication.event,
+              org.springframework.security.config,
+              org.springframework.security.core,
+              org.springframework.security.core.userdetails,
+              org.springframework.security.core.userdetails.cache,
+              org.springframework.security.core.userdetails.memory,
+              org.springframework.security.openid;resolution:=optional,
+              org.springframework.security.web,
+              org.springframework.security.web.authentication,
+              org.springframework.security.web.authentication.www,
+              org.springframework.util,              
+              org.opencastproject.job.api;version=${project.version},
+              org.opencastproject.rest;version=${project.version},
+              org.opencastproject.serviceregistry.api;version=${project.version},
+              org.opencastproject.security.api;version=${project.version},
+              org.opencastproject.util;version=${project.version},
+              *;resolution:=optional
+            </Import-Package>
+            <Export-Package>
+              org.opencastproject.kernel.http;version=${project.version},
+              org.opencastproject.kernel.pingback;version=${project.version},
+              org.opencastproject.kernel.rest;version=${project.version},
+              org.opencastproject.kernel.security;version=${project.version},
+              org.opencastproject.kernel.userdirectory;version=${project.version},
+              org.springframework.security.oauth;version=1.0.0.M1,
+              org.springframework.security.oauth.common;version=1.0.0.M1,
+              org.springframework.security.oauth.config;version=1.0.0.M1,
+              org.springframework.security.oauth.consumer;version=1.0.0.M1,
+              org.springframework.security.oauth.provider;version=1.0.0.M1,
+              org.springframework.security.oauth.provider.token;version=1.0.0.M1,
+            </Export-Package>
+            <Service-Component>
+              OSGI-INF/http-client.xml,
+              OSGI-INF/http-context.xml,
+              OSGI-INF/jsonp.xml,
+              OSGI-INF/organization-directory-service.xml,
+              OSGI-INF/organization-filter.xml,
+              OSGI-INF/pingback.xml,
+              OSGI-INF/rest.xml,
+              OSGI-INF/security-service.xml,
+              OSGI-INF/user-and-role-directory-service.xml,
+              OSGI-INF/security-config-scanner.xml
+            </Service-Component>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

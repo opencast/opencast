@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+  <scr:component name="org.opencastproject.videosegmenter.impl.VideoSegmenterServiceImpl" immediate="true">
+    <implementation class="org.opencastproject.videosegmenter.impl.VideoSegmenterServiceImpl" />
+    <property name="service.description" value="VideoSegmenter Service" />
+    <service>
+      <provide interface="org.opencastproject.videosegmenter.api.VideoSegmenterService" />
+      <provide interface="org.osgi.service.cm.ManagedService" />
+    </service>
+    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+    <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace" cardinality="1..1"
+      policy="static" bind="setWorkspace" />
+    <reference name="Mpeg7Service" interface="org.opencastproject.metadata.mpeg7.Mpeg7CatalogService"
+      cardinality="1..1" policy="static" bind="setMpeg7CatalogService" />
+    <reference name="ComposerService" interface="org.opencastproject.composer.api.ComposerService"
+      cardinality="1..1" policy="static" bind="setComposerService" />
+    <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+      cardinality="1..1" policy="static" bind="setSecurityService" />
+    <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"
+      cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+    <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+      cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+  </scr:component>
+
+  <scr:component name="org.opencastproject.videosegmenter.impl.endpoint.VideoSegmenterRestEndpoint" immediate="true"
+    activate="activate">
+    <implementation class="org.opencastproject.videosegmenter.impl.endpoint.VideoSegmenterRestEndpoint" />
+    <property name="service.description" value="Video Segmentation REST Endpoint" />
+
+    <property name="opencast.service.type" value="org.opencastproject.videosegmenter" />
+    <property name="opencast.service.path" value="/analysis/videosegmenter" />
+    <property name="opencast.service.jobproducer" value="true" />
+
+    <service>
+      <provide interface="org.opencastproject.videosegmenter.impl.endpoint.VideoSegmenterRestEndpoint" />
+    </service>
+
+    <reference name="segmenter" interface="org.opencastproject.videosegmenter.api.VideoSegmenterService"
+      cardinality="1..1" policy="static" bind="setVideoSegmenter" />
+    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+  </scr:component>
+
+</scr:components>

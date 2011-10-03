@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.caption.converters.SubRipCaptionConverter" immediate="true">
+  <implementation class="org.opencastproject.caption.converters.SubRipCaptionConverter" />
+  <property name="service.description" value="SubRip caption converter" />
+  <property name="caption.format" value="subrip" />
+  <service>
+    <provide interface="org.opencastproject.caption.api.CaptionConverter" />
+  </service>
+</scr:component>

@@ -1,0 +1,5 @@
+URL: http://openfst.cs.nyu.edu/twiki/pub/FST/FstDownload
+PKG: openfst-1.2.3.tar.gz
+SHA: 64551d89605b109957fd863b921c2c92e80c3ba9
+DIR: openfst-1.2.3
+PCP: pc-fst.zip

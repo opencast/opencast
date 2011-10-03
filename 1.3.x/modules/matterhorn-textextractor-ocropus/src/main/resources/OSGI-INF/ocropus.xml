@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+  <scr:component name="org.opencastproject.textextractor.ocropus.OcroupsTextExtractor" immediate="true">
+    <implementation class="org.opencastproject.textextractor.ocropus.OcroupsTextExtractor" />
+    <property name="service.description" value="Ocropus Text Extractor" />
+    <service>
+      <provide interface="org.opencastproject.textextractor.api.TextExtractor" />
+    </service>
+  </scr:component>
+</scr:components>

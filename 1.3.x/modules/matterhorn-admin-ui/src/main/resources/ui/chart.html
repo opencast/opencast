@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Recording Performance</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!--[if IE]><script type="text/javascript" language="javascript" src="js/excanvas.js"></script><![endif]-->
+    <script type="text/javascript" language="javascript" src="jquery/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" language="javascript" src="js/oc.utils.js"></script>
+    <script type="text/javascript" language="javascript" src="js/js-class.js"></script>
+    <script type="text/javascript" language="javascript" src="js/bluff-min.js"></script>
+    <script type="text/javascript" language="javascript">
+      var Opencast = Opencast || {};
+  
+      Opencast.renderWorkflowPerformance = function (data) {
+        // Make a graph object with canvas id and width
+        var g = new Bluff.SideStackedBar('graph', '600x300');
+      
+        // Set theme and options
+        //g.theme_keynote();
+        g.title = 'Processing times for ' + data.workflow.mediapackage.title;
+        g.x_axis_label = 'Seconds';
+        
+        // Add data and labels
+        var queue = [];
+        var run = [];
+        var labels = {};
+        jQuery.each(data.workflow.operations.operation, function(index, operationInstance) {
+          var op = data.workflow.operations.operation[index];
+          if(op.state == 'SUCCEEDED') {
+            var runtime = (op.completed - op.started) / 1000;
+            if(runtime < 1) {
+              return;
+            }
+            run.push(runtime);
+            queue.push(op['time-in-queue'] / 1000);
+            labels['' + run.length-1] = op.id;
+          }
+        });
+
+        g.data('Queue', queue);
+        g.data('Run', run);
+        g.labels = labels;
+      
+        // Render the graph
+        g.draw();
+      }
+
+      $(document).ready(function() {
+        Opencast.workflowId = ocUtils.getURLParam('id');
+        if (!Opencast.workflowId) {
+          $('<div></div>').text('Could not get Workflow Id').prependTo('body');
+        } else {
+          jQuery.ajax({
+            type: 'GET',
+            url: '/workflow/instance/' + Opencast.workflowId + '.json',
+            dataType: 'jsonp',
+            jsonp: 'jsonp',
+            error: function() {
+              $('<div></div>').text('Workflow (Id=' + Opencast.workflowId + ') not found.').prependTo('body');
+            },
+            success: function(workflow) {
+              Opencast.renderWorkflowPerformance(workflow);
+            }
+          });
+        }
+      });
+      
+    </script>
+  </head>
+  <body>
+    <canvas id="graph" width="300" height="225"></canvas>
+  </body>
+</html>

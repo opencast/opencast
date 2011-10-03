@@ -1,0 +1,5 @@
+URL: http://download.osgeo.org/libtiff
+PKG: tiff-3.9.4.tar.gz
+SHA: a4e32d55afbbcabd0391a9c89995e8e8a19961de
+DIR: tiff-3.9.4
+PCP: pc-tiff.zip

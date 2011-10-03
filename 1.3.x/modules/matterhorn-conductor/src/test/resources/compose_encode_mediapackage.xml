@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:mediapackage start="2010-05-19T09:27:46"
+	id="d51f9d4e-b5e7-41e0-8640-0d1f43b2fed0" duration="65649"
+	xmlns:ns2="http://mediapackage.opencastproject.org">
+	<title>Compose workflow operation handler test</title>
+	<media>
+		<track id="compose-workflow-operation-test-encode-track-id">
+			<mimetype>video/x-flv</mimetype>
+			<tags />
+			<url>fooVideo.flv</url>
+			<checksum type="md5">46cb2e9df2e73756b0d96c33b1aaf055</checksum>
+			<duration>65680</duration>
+			<audio id="audio-1">
+				<device />
+				<encoder type="ADPCM" />
+				<bitdepth>16</bitdepth>
+				<channels>2</channels>
+				<bitrate>62500.0</bitrate>
+			</audio>
+			<video id="video-1">
+				<device />
+				<encoder type="H.263" />
+				<bitrate>781250.0</bitrate>
+				<framerate>25.0</framerate>
+				<resolution>624x352</resolution>
+			</video>
+		</track>
+		<track id="compose-workflow-operation-test-encode-muxing-audiotrack-id">
+			<mimetype>video/x-flv</mimetype>
+			<tags />
+			<url>fooVideo.flv</url>
+			<checksum type="md5">46cb2e9df2e73756b0d96c33b1aaf055</checksum>
+			<duration>65680</duration>
+			<audio id="audio-1">
+				<device />
+				<encoder type="ADPCM" />
+				<bitdepth>16</bitdepth>
+				<channels>2</channels>
+				<bitrate>62500.0</bitrate>
+			</audio>
+		</track>
+		<track id="compose-workflow-operation-test-encode-muxing-videotrack-id">
+			<mimetype>video/x-flv</mimetype>
+			<tags />
+			<url>fooVideo.flv</url>
+			<checksum type="md5">46cb2e9df2e73756b0d96c33b1aaf055</checksum>
+			<duration>65680</duration>
+			<video id="video-1">
+				<device />
+				<encoder type="H.263" />
+				<bitrate>781250.0</bitrate>
+				<framerate>25.0</framerate>
+				<resolution>624x352</resolution>
+			</video>
+		</track>
+	</media>
+	<metadata>
+		<catalog type="dublincore/episode" id="9a9eb5dd-e0e1-4321-b46b-66a1feb5bac7">
+			<mimetype>text/xml</mimetype>
+			<tags />
+			<url>fooDC.xml</url>
+		</catalog>
+		<catalog ref="track:91bec596-cc93-4315-96c5-9c790c4db875"
+			type="mpeg-7/segments" id="catalog-2">
+			<mimetype>text/xml</mimetype>
+			<tags />
+			<url>fooMPEG7.xml</url>
+		</catalog>
+	</metadata>
+	<attachments />
+</ns2:mediapackage>

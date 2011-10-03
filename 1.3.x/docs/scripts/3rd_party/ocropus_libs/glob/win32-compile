@@ -1,0 +1,49 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-win32 ] && exit 0
+pkg1=`getcfg PKG1:`
+chkpkg "$pkg1" || exit 1
+pkg2=`getcfg PKG2:`
+chkpkg "$pkg2" || exit 1
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+pcp=`getcfg PCP:`
+[ -z "$pcp" ] && exit 1
+#
+rm -fr "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+bzip2 -dc "$pkg1" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+cd "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+#
+patch -p1 < "../$pkg2"
+[ $? -ne 0 ] && exit 1
+./configure \
+--host=${MINGW32} \
+AR=${MINGW32}-ar
+[ $? -ne 0 ] && exit 1
+make
+[ $? -ne 0 ] && exit 1
+#
+sudox cp glob.h fnmatch.h ${MINGW32_PREFIX}/include
+[ $? -ne 0 ] && exit 1
+sudox cp libglob.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+#
+zip -j "../$pcp" glob.h fnmatch.h
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp" glob.dll libglob.a libglob.dll.a
+[ $? -ne 0 ] && exit 1
+#
+touch ../.done-win32
+[ $? -ne 0 ] && exit 1
+exit 0

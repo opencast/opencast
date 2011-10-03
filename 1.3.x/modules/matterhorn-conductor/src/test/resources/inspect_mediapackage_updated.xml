@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:mediapackage start="2010-05-12T18:29:20"
+	id="971180f2-66bc-4b3c-a484-f65d664e15fd" duration="0"
+	xmlns:ns2="http://mediapackage.opencastproject.org">
+	<title>inspect-workflow-operation-handler-3</title>
+	<media>
+		<track type="presentation/source" id="6b574c7b-bf85-4023-bc41-c3145fa189d6">
+			<mimetype>video/quicktime</mimetype>
+			<tags />
+			<url>/av.mov
+			</url>
+			<checksum type="md5">9d3523e464f18ad51f59564acde4b95a</checksum>
+			<duration>14546</duration>
+			<audio id="audio-1">
+				<device />
+				<encoder type="AAC" />
+				<bitdepth>16</bitdepth>
+				<channels>2</channels>
+				<samplingrate>44100</samplingrate>
+				<bitrate>128004.0</bitrate>
+			</audio>
+			<video id="video-1">
+				<device />
+				<encoder type="AVC" />
+				<bitrate>387969.0</bitrate>
+				<framerate>1.994</framerate>
+				<resolution>640x480</resolution>
+				<scantype type="Progressive" />
+			</video>
+		</track>
+	</media>
+	<metadata>
+		<catalog type="dublincore/episode" id="c20cd01f-f50b-416f-a3fb-4502fcfae1b7">
+			<mimetype>text/xml</mimetype>
+			<tags />
+			<url>/dublincore.xml
+			</url>
+		</catalog>
+	</metadata>
+	<attachments />
+</ns2:mediapackage>

@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+	<link rel="shortcut icon" href="img/favicon.ico" /> 
+    <title>Opencast Matterhorn - Release 1.2: Enjoy the view!</title>
+    
+    <script type="text/javascript" src="jquery/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+      $.getJSON("/info/components.json", function(data) {
+        var contentDiv = $("#content");
+        $.each(data, function(section) {
+            if("rest" == section) {
+               $.each(data.rest, function(i) {
+                  /*if(i < Math.floor(data.rest.length / 2)){
+                     col = $('#docs1');
+                  }else{
+                     col = $('#docs2');
+                  }*/
+                  var col = $('#docs1');
+                  col.append("<li>" + data.rest[i].description + " <a href='" + data.rest[i].docs + "'>Docs</a></li>");
+               })
+            } else if("engage" == section) {
+               $('#engagelink').attr('href', data.engage + '/engage/ui');
+            } else if("admin" == section) {
+               $('#adminlink').attr('href', data.admin + '/admin/');
+            }
+          });
+        });
+      });
+    </script>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="topbanner">
+        <div id="matterhornlogo"><img src="img/MatterhornLogo_large.png" alt="Matterhorn logo" width="260" height="182" class="matterhornlogo" /></div>
+        <div id="opencastlogo"><a href="http://www.opencastproject.org"><img src="img/OpencastLogo.png" alt="Opencast" width="143" height="38" hspace="20" vspace="5" border="0" /></a></div>
+        <h1>Release 1.2: Enjoy the view!</h1>
+        <div id="promotext">
+          <p>Matterhorn is a free, open-source   system that provides a lecture capture solution and an enterprise media infrastructure for educational audio and video content.</p>
+          <p>Learn more about the features of Matterhorn by taking the <a href="http://www.opencastproject.org/matterhorn_tour">Product Tour</a> or viewing an <a href="http://www.opencastproject.org/matterhorn_features">Overview of Features</a>. </p>
+        </div>
+      </div>
+      <div id="middlebanner">
+        <div id="col1m">
+          <img src="img/clock_icon.png" width="70" height="70" />
+          <h2>Administrative Tools</h2>
+          <p>These tools enable the capture, ingest, and distribution of lecture recordings:</p>
+          <ul>
+            <li>Schedule an event for automated capture</li>
+            <li>Upload a media file for processing and
+              distribution.</li>
+            <li> Monitor progress of recording through media pipeline.</li>
+          </ul>
+          <a class="redbutton" id="adminlink">Go to Admin Tools</a>
+        </div>
+        <div id="col2m">
+          <img src="img/computer_icon.png" width="85" height="59" />
+          <h2>Engage Tools</h2>
+          <p>These tools support enagement and discovery of distributed media derived from the admin tools:</p>
+          <ul>
+            <li>Create custom RSS feeds</li>
+            <li>Search for Video by keyword</li>
+            <li>Accessible media player</li>
+          </ul>
+          
+          <a class="redbutton" id="engagelink"> Go to  Media Module</a>        
+        </div>
+      </div>
+      <div id="bottombanner">
+        <div id="col1b">
+          <h2>Services Documentation</h2>
+            <ul id="docs1">
+            </ul>
+        </div>
+        <div id="col2b">
+          <h2>Release Notes</h2>
+          <p>Covers &quot;what&#39;s new&quot;, install/build instructions, known issues, and frequently asked questions .  Please read these notes and the bug/feature reporting instructions before reporting any issues.</p>
+          <ul>
+            <li><a href="http://opencast.jira.com/wiki/x/KgYFAQ">Read Notes</a></li>
+            <li><a href="http://www.opencastproject.org/matterhorn_release_10">Release 1.1 Overview</a></li>
+          </ul>
+
+            <h2>Community Resources</h2>
+            <ul class="links">
+              <li><a href="http://opencast.jira.com/wiki/display/MH/Communication">Mailing Lists and Communication</a></li>
+              <li><a href="http://opencast.jira.com/browse/MH">Issue Tracker</a> (report a bug, request a feature)</li>
+            </ul>
+
+        </div>
+
+        <div id="col3b">
+            <h2>Developer Links</h2>
+            <p class="emphasis">Install and Configure</p>
+            <ul>
+			  <!-- TODO update the links-->
+               <li><a href="http://opencast.jira.com/wiki/display/MH/Matterhorn+Core+1.1">Matterhorn Core</a></li>
+               <li><a href="http://opencast.jira.com/wiki/display/MH/Capture+Agent+1.1">Capture Agent</a></li>
+               <li><a href="http://opencast.jira.com/wiki/display/MH/Install+Source+Across+Multiple+Servers+1.1">Distributed Deployment</a></li>
+             </ul>
+             <ul>
+              <li><a href="http://opencast.jira.com/wiki/display/MH/Take+a+Look+Under+the+Hood">System Overview</a></li>
+              <li><a href="http://opencast.jira.com/wiki/display/MH/Cookbook">Cookbooks</a></li>
+            </ul>
+        </div>
+      </div>
+      <div id="footer">
+        <p>Opencast Matterhorn code is licensed under the <a href="http://www.osedu.org/licenses/ECL-2.0/ecl2.txt">Educational Community License, Version 2.0</a>.<br />
+        All other (non-code) intellectual propery is licensed under a <a href="http://creativecommons.org/licenses/by/3.0/us/" rel="license">Creative Commons Attribution 3.0 United States License</a>.<br />Permissions beyond the scope of this license may be available <a href="http://www.opencastproject.org/contact" rel="cc:morePermissions">on request</a>.</p>
+      </div>  
+    </div>
+</body>
+</html>

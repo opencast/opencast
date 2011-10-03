@@ -1,0 +1,72 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-ports ] && exit 0
+pkg=`getcfg PKG:`
+chkpkg "$pkg" || exit 1
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+#
+rm -fr "$dir" "${dir}-mac"
+[ $? -ne 0 ] && exit 1
+gzip -dc "$pkg" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-mac"
+[ $? -ne 0 ] && exit 1
+cd "${dir}-mac"
+[ $? -ne 0 ] && exit 1
+#
+rm -fr iulib
+[ $? -ne 0 ] && exit 1
+mv ocropus/* .
+[ $? -ne 0 ] && exit 1
+rm -f ocropus/.hg*
+[ $? -ne 0 ] && exit 1
+rmdir ocropus
+[ $? -ne 0 ] && exit 1
+cp ../SConstruct.ports SConstruct
+[ $? -ne 0 ] && exit 1
+cp ../xml-entities.cc ocr-utils
+[ $? -ne 0 ] && exit 1
+mv ocr-utils/queue.h ocr-utils/queue-loc.h
+[ $? -ne 0 ] && exit 1
+cp ../ocr-utils.h ocr-utils
+[ $? -ne 0 ] && exit 1
+cp ../components.cc ocr-utils
+[ $? -ne 0 ] && exit 1
+cp ../ocr-commands.cc ocr-commands
+[ $? -ne 0 ] && exit 1
+cp ../ocropus.h include
+[ $? -ne 0 ] && exit 1
+#
+LOGFILE=`mktemp /tmp/${0##*/}-patch.log.XXXXX`
+sudox patch -N ${LOCAL_PREFIX}/include/SDL/SDL_main.h ../SDL_main.patch 2>&1 | tee $LOGFILE
+if [ ${PIPESTATUS[0]} -ne 0 ]; then
+  grep "Reversed .* patch detected!" $LOGFILE >/dev/null
+  [ $? -ne 0 ] && exit 1
+fi
+#
+scons
+[ $? -ne 0 ] && exit 1
+sudox scons install
+[ $? -ne 0 ] && exit 1
+#./configure
+#[ $? -ne 0 ] && exit 1
+#make
+#[ $? -ne 0 ] && exit 1
+#sudox make install
+#[ $? -ne 0 ] && exit 1
+#
+gcc -pipe -O2 -s -Wall ../ocrocmd-1.0-unix.c -o ocrocmd
+[ $? -ne 0 ] && exit 1
+sudox cp ocrocmd ${LOCAL_PREFIX}/bin
+[ $? -ne 0 ] && exit 1
+#
+touch ../.done-ports
+[ $? -ne 0 ] && exit 1
+exit 0

@@ -1,0 +1,140 @@
+@charset "utf-8";
+.style.css {
+}
+
+body {
+	background: #EDEDED url(images/body.gif);
+	margin: 20px 0;
+	font-family: helvetica, verdana, arial, sans-serif;
+	line-height:1.3em;/*18px*/
+	font-size:76%;/*set regular font size*/
+	}
+
+#wrapper {
+	margin:0 auto;
+	padding: 0;
+	position:relative;
+	width:970px;
+	background-color:#FFFFFF;
+	border: 1px solid #ccc;
+	-moz-border-radius: .7em;
+	-webkit-border-radius: .7em;
+	}
+	
+#topbanner, #middlebanner, #bottombanner {
+	padding: 10px;
+	}
+	
+#topbanner {
+	background-image:url(images/topbanner_bg.jpg);
+	background-repeat:repeat-y;
+	width:950px;
+	display:inline-block;
+	}
+
+#middlebanner {
+	background-color:#F8EEE8;
+	width:950px;
+	display:inline-block;
+	}
+
+#bottombanner {
+	width:950px;
+	display:inline-block;
+	}
+
+
+#matterhornlogo {
+	float:right;
+	margin-top:-30px;
+	}
+
+#promotext {
+	font-size: 1.2em;
+	padding: 10px 0 0 40px;
+	}
+
+#col1, #col2, #col3 {
+	float:left;
+	width:300px;
+	padding: 0 15px 0 0;
+	}
+
+#col1-2 {
+	float:left;
+	width:615px;
+	padding: 0 15px 0 0;
+	}
+
+#col1-2 #col2 {
+	padding: 0;
+	}
+
+#bottombanner #col1-2 {
+	background-image:url(images/gears.png);
+	background-repeat:no-repeat;
+	}
+
+#dev_links {
+	background-image:url(images/documentation.png);
+	background-repeat:no-repeat;
+	}
+	
+#bottombanner #col1-2 h2,
+#dev_links h2 {
+	padding: 10px 0 0 70px;
+	}
+
+#dev_links ul {
+	padding-top: 13px;
+	}
+
+#community {
+	}
+
+#footer {
+	text-align:center;
+	border-top: 1px solid #ccc;
+	}
+
+#headergraphic {
+	}
+
+h2 {
+	font-size: 1.4em;
+	color:#F6921E;
+	}
+
+h1 {
+	font-size: 2.2em;
+	color:#FFFFFF;
+	}
+	
+.emphasis {
+	font-size: 1.2em;
+	font-weight: bold;
+	font-style:italic;
+	}
+	
+a, a:link, a:visited {
+	color: #871B1D;
+	text-decoration:none;
+	font-weight:bold;
+	}
+
+a:hover, a:focus {
+	text-decoration: underline;
+	}
+	
+ul {
+	list-style-image:url("images/arrow_bullet.gif");
+	padding-left:22px;
+}
+
+#topbanner ul {
+	list-style-image:url("images/arrow_bullet_redbg.gif");
+}
+
+ul.links {
+	list-style-image:url("images/arrow_bullet_doublered.gif");
+}

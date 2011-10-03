@@ -1,0 +1,30 @@
+#
+# A simple, old format, mime.types file
+#
+text/html		html htm HTML HTM
+text/plain		txt text TXT TEXT
+text/css    css CSS
+text/xml    xml xsl
+image/gif		gif GIF
+image/ief		ief
+image/jpeg		jpeg jpg jpe JPG
+image/tiff		tiff tif
+image/png		png PNG
+image/x-xwindowdump	xwd
+application/postscript	ai eps ps
+application/rtf		rtf
+application/x-tex	tex
+application/x-texinfo	texinfo texi
+application/x-troff	t tr roff
+application/x-javascript js json
+audio/basic		au
+audio/midi		midi mid
+audio/x-aifc		aifc
+audio/x-aiff            aif aiff
+audio/x-mpeg		mpeg mpg
+audio/x-wav             wav
+auido/mpeg    mp3
+video/mpeg		mpeg mpg mpe
+video/quicktime		qt mov
+video/x-msvideo		avi
+video/mp4   mp4

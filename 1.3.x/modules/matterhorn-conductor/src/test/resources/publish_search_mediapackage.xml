@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:mediapackage start="2007-12-05T13:40:00" id="10.0000/1"
+	duration="1004400000" xmlns:ns2="http://mediapackage.opencastproject.org">
+	<media>
+		<track type="presentation/source" id="publish-track-2">
+			<mimetype>video/quicktime</mimetype>
+			<tags>
+				<tag>engage</tag>
+				<tag>publish</tag>
+			</tags>
+			<url>media.mov</url>
+			<checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</checksum>
+			<duration>1004400000</duration>
+			<video id="f4516757-faa4-4ee9-8fae-85df92240b9b">
+				<device vendor="Unigraf" version="30112007" type="UFG03" />
+				<encoder vendor="Apple Inc" version="7.4" type="H.264" />
+				<bitrate>540520.0</bitrate>
+				<resolution>640x480</resolution>
+			</video>
+		</track>
+		<track type="presentation/source" id="publish-track-3">
+			<mimetype>video/quicktime</mimetype>
+			<tags>
+				<tag>engage</tag>
+				<tag>publish</tag>
+			</tags>
+			<url>media.mov</url>
+			<checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</checksum>
+			<duration>1004400000</duration>
+			<video id="f42eb9d8-bb6f-4bee-8000-2d07a9691664">
+				<device vendor="Unigraf" version="30112007" type="UFG03" />
+				<encoder vendor="Apple Inc" version="7.4" type="H.264" />
+				<bitrate>540520.0</bitrate>
+				<resolution>640x480</resolution>
+			</video>
+		</track>
+	</media>
+	<metadata>
+		<catalog type="metadata/mpeg-7" id="publish-catalog-2">
+			<mimetype>text/xml</mimetype>
+			<tags>
+				<tag>engage</tag>
+				<tag>publish</tag>
+			</tags>
+			<url>mpeg7.xml</url>
+			<checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
+		</catalog>
+		<catalog type="presentation/source" id="publish-catalog-3">
+			<mimetype>text/xml</mimetype>
+			<tags>
+				<tag>engage</tag>
+				<tag>publish</tag>
+			</tags>
+			<url>mpeg7.xml</url>
+			<checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
+		</catalog>
+	</metadata>
+	<attachments>
+		<attachment type="attachment/notes" id="publish-attachment-2">
+			<mimetype>text/plain</mimetype>
+			<tags>
+				<tag>atom</tag>
+				<tag>publish</tag>
+				<tag>rss</tag>
+			</tags>
+			<url>attachment.txt</url>
+			<checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</checksum>
+		</attachment>
+		<attachment type="presentation/source" id="publish-attachment-3">
+			<mimetype>text/plain</mimetype>
+			<tags>
+				<tag>atom</tag>
+				<tag>publish</tag>
+				<tag>rss</tag>
+			</tags>
+			<url>attachment.txt</url>
+			<checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</checksum>
+		</attachment>
+	</attachments>
+</ns2:mediapackage>

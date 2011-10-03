@@ -1,0 +1,27 @@
+<oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" start="2007-12-05T13:40:00" duration="1004400000">
+  <media>
+    <track id="track-1" type="presentation/source">
+      <mimetype>audio/mp3</mimetype>
+      <url>@SAMPLES_URL@/audio.mp3</url>
+    </track>
+
+    <track id="track-2" type="presentation/source">
+      <mimetype>video/mpeg</mimetype>
+      <url>@SAMPLES_URL@/screen.mpg</url>
+      <checksum type="md5">d1ffefd78c384d3eacf1bc7075c58d25</checksum>
+      <duration>47082</duration>
+      <video>
+        <scanType type="Progressive" />
+        <bitrate>184012.0</bitrate>
+        <frameRate>29.97</frameRate>
+        <resolution>768x480</resolution>
+      </video>
+    </track>
+  </media>
+  <metadata>
+    <catalog id="catalog-1" type="dublincore/episode">
+      <mimetype>text/xml</mimetype>
+      <url>@SAMPLES_URL@/dc-1.xml</url>
+    </catalog>
+  </metadata>
+</oc:mediapackage>

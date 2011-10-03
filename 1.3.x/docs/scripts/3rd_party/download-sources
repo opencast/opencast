@@ -1,0 +1,20 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+[ -z "$HOME3P" ] && export HOME3P=`cd "${0%/*}" 2>/dev/null; echo $PWD`
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+download .            || exit 1
+download base_libs    || exit 1
+download ffmpeg_libs  || exit 1
+download ffmpeg       || exit 1
+download mediainfo    || exit 1
+download tesseract    || exit 1
+download ocropus_libs || exit 1
+download ocropus      || exit 1
+download qtembedder   || exit 1
+#
+exit 0

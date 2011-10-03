@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.distribution.youtube.remote.YouTubeDistributionServiceRemoteImpl" immediate="true" activate="activate">
+  <implementation
+    class="org.opencastproject.distribution.youtube.remote.YouTubeDistributionServiceRemoteImpl" />
+  <property name="service.description" value="Distribution (youTube) Remote Service Proxy" />
+  <property name="distribution.channel" value="youtube" />
+  <service>
+    <provide interface="org.opencastproject.distribution.api.DistributionService" />
+  </service>
+  <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
+    cardinality="1..1" policy="static" bind="setTrustedHttpClient" />
+  <reference name="remoteServiceManager" interface="org.opencastproject.serviceregistry.api.ServiceRegistry" cardinality="1..1" policy="static" bind="setRemoteServiceManager" />
+</scr:component>

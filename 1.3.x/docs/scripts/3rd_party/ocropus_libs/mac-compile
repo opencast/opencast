@@ -1,0 +1,24 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+compile regex     mac || exit 1
+compile glob      mac || exit 1
+compile gsl       mac || exit 1
+compile dlfcn     mac || exit 1
+# fst depends on (dlfcn)
+compile fst       mac || exit 1
+compile gif       mac || exit 1
+compile sdl_gfx   mac || exit 1
+compile sdl_image mac || exit 1
+#
+# iulib depends on (regex) and sdl_gfx
+compile iulib     mac || exit 1
+# leptonica depends on gif
+compile leptonica mac || exit 1
+#
+exit 0

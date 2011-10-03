@@ -1,0 +1,5 @@
+URL: http://dlfcn-win32.googlecode.com/files
+PKG: dlfcn-win32-r19.tar.bz2
+SHA: a0033e37a547c52059d0bf8664a96ecdeeb66419
+DIR: dlfcn-win32-r19
+PCP: pc-dlfcn.zip

@@ -1,0 +1,198 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:sec="http://www.springframework.org/schema/security"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:osgi="http://www.springframework.org/schema/osgi"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/osgi  
+       http://www.springframework.org/schema/osgi/spring-osgi.xsd
+       http://www.springframework.org/schema/security
+       http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+
+  <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast Matterhorn"
+    entry-point-ref="matterhornEntryPoint">
+
+    <!-- ################ -->
+    <!-- # URL SECURITY # -->
+    <!-- ################ -->
+    <sec:intercept-url pattern='/login.html' access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern="/admin/img/favicon.ico" filters="none" />
+    <sec:intercept-url pattern="/favicon.ico" filters="none" />
+    <sec:intercept-url pattern='/images/**' filters="none" />
+    <sec:intercept-url pattern="/img/**" filters="none" />
+    <sec:intercept-url pattern="/js/**" filters="none" />
+    <sec:intercept-url pattern='/style.css' filters='none' />
+    <sec:intercept-url pattern="/css/**" filters="none" />
+
+    <!-- Enable anonymous access to the /info/me.json resource -->
+    <sec:intercept-url pattern='/info/me.json' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+
+    <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
+    <sec:intercept-url pattern='/engage/ui/**' access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern='/search/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern='/usertracking/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern='/static/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+
+    <!-- Enable anonymous access to the OAI-PMH repository              -->
+    <!-- The OAI-PMH specification demands boths GET and POST requests  -->
+    <!-- Please make sure that the path configured here matches         -->
+    <!-- the path configured for the repository servlet.                -->
+    <sec:intercept-url pattern='/oaipmh/**' method='GET' access='ROLE_ANONYMOUS, ROLE_USER'/>
+    <sec:intercept-url pattern='/oaipmh/**' method='POST' access='ROLE_ANONYMOUS, ROLE_USER'/>
+
+    <!-- Enable anonymous access to the rss and atom feeds -->
+    <sec:intercept-url pattern='/feeds/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+
+    <!-- Secure the system management URLs for admins only -->
+    <sec:intercept-url pattern='/services/*' access='ROLE_ADMIN' />
+    <sec:intercept-url pattern='/system/**' access='ROLE_ADMIN' />
+    
+    <!-- Secure the user management URLs for admins only -->
+    <sec:intercept-url pattern='/users/**' access='ROLE_ADMIN' />
+    <sec:intercept-url pattern='/admin/users.html' access='ROLE_ADMIN' />
+
+    <!-- Enable 2-legged OAuth access ("signed fetch") to the LTI launch servlet -->
+    <sec:intercept-url pattern="/lti" access="ROLE_OAUTH_USER" />
+
+    <!-- Enable access to the LTI sample tool -->
+    <sec:intercept-url pattern="/ltisample/**" access="ROLE_OAUTH_USER" />
+
+    <!-- Everything else is for the admin users -->
+    <sec:intercept-url pattern='/**' access='ROLE_ADMIN, ROLE_COURSE_ADMIN, ROLE_INSTRUCTOR' />
+
+    <!-- ############################# -->
+    <!-- # LOGIN / LOGOUT MECHANISMS # -->
+    <!-- ############################# -->
+
+    <!-- Uncomment to enable x509 client certificates for identifying clients -->
+    <!-- sec:x509 subject-principal-regex="CN=(.*?)," user-service-ref="userDetailsService" / -->
+
+    <!-- Enable and configure the failure URL for form-based logins -->
+    <sec:form-login authentication-failure-url="/login.html?error" authentication-success-handler-ref="authSuccessHandler" />
+
+    <!-- Comment out to disable support for openID. OpenID URLs must be specified in the user detail service below -->
+    <sec:openid-login authentication-failure-url="/login.html?error" user-service-ref="userDetailsService" />
+
+    <!-- Digest auth is used by capture agents and is used to enable transparent clustering of services -->
+    <sec:custom-filter position="BASIC_AUTH_FILTER" ref="digestFilter" />
+
+    <!--
+      2-legged oauth is used by trusted 3rd party applications, including LTI producers.
+      If you do not plan to use OAuth, comment this out.
+    -->
+    <sec:custom-filter after="BASIC_AUTH_FILTER" ref="oauthProtectedResourceFilter" />
+
+    <!-- Enables "remember me" functionality -->
+    <sec:remember-me key="matterhorn" user-service-ref="userDetailsService" />
+
+    <!-- Set the request cache -->
+    <sec:request-cache ref="requestCache" />
+
+    <!-- If any URLs are to be exposed to anonymous users, the "sec:anonymous" filter must be present -->
+    <sec:anonymous />
+
+    <!-- Enables log out -->
+    <sec:logout />
+  </sec:http>
+
+  <!-- ######################################## -->
+  <!-- # Authentication Entry and Exit Points # -->
+  <!-- ######################################## -->
+
+  <!-- Differentiates between "normal" user requests and those requesting digest auth -->
+  <bean id="matterhornEntryPoint" class="org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint">
+    <property name="userEntryPoint" ref="userEntryPoint" />
+    <property name="digestAuthenticationEntryPoint" ref="digestEntryPoint" />
+  </bean>
+
+  <!-- Redirects unauthenticated requests to the login form -->
+  <bean id="userEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+    <property name="loginFormUrl" value="/login.html" />
+  </bean>
+
+  <!-- Returns a 401 request for authentication via digest auth -->
+  <bean id="digestEntryPoint" class="org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint">
+    <property name="realmName" value="Opencast Matterhorn" />
+    <property name="key" value="matterhorn" />
+    <property name="nonceValiditySeconds" value="10" />
+  </bean>
+
+  <bean id="authSuccessHandler" class="org.opencastproject.kernel.security.AuthenticationSuccessHandler">
+    <property name="securityService" ref="securityService" />
+    <property name="welcomePages">
+      <map>
+        <entry key="ROLE_ADMIN" value="/welcome.html" />
+        <entry key="ROLE_USER" value="/engage/ui/index.html" />
+        <entry key="*" value="/engage/ui/index.html" /> <!-- Any role not listed explicitly will redirect here -->
+      </map>
+    </property>
+  </bean>
+
+
+  <!-- ################# -->
+  <!-- # Digest Filter # -->
+  <!-- ################# -->
+
+  <!-- Handles the details of the digest authentication dance -->
+  <bean id="digestFilter" class="org.springframework.security.web.authentication.www.DigestAuthenticationFilter">
+    <!--  Use only the in-memory users, as these have passwords that are not hashed -->
+    <property name="userDetailsService" ref="userDetailsService" />
+    <property name="authenticationEntryPoint" ref="digestEntryPoint" />
+    <property name="createAuthenticatedToken" value="true" />
+    <property name="userCache">
+      <bean class="org.springframework.security.core.userdetails.cache.NullUserCache" />
+    </property>
+  </bean>
+
+
+  <!-- ####################### -->
+  <!-- # OAuth (LTI) Support # -->
+  <!-- ####################### -->
+
+  <bean name="oAuthConsumerDetailsService" class="org.opencastproject.kernel.security.OAuthSingleConsumerDetailsService">
+    <constructor-arg index="0" ref="userDetailsService" />
+  </bean>
+
+  <bean name="oauthProtectedResourceFilter" class="org.opencastproject.kernel.security.LtiProcessingFilter">
+    <property name="consumerDetailsService" ref="oAuthConsumerDetailsService" />
+    <property name="tokenServices">
+      <bean class="org.springframework.security.oauth.provider.token.InMemoryProviderTokenServices" />
+    </property>
+    <property name="nonceServices">
+      <bean class="org.springframework.security.oauth.provider.nonce.InMemoryNonceServices" />
+    </property>
+    <property name="authHandler">
+      <bean class="org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler">
+        <constructor-arg index="0" ref="userDetailsService" />
+      </bean>
+    </property>
+  </bean>
+
+  <!-- #################### -->
+  <!-- # OSGI Integration # -->
+  <!-- #################### -->
+
+  <!-- Obtain services from the OSGI service registry -->
+  <osgi:reference id="userDetailsService" cardinality="1..1"
+    interface="org.springframework.security.core.userdetails.UserDetailsService" />
+
+  <osgi:reference id="securityService" cardinality="1..1" interface="org.opencastproject.security.api.SecurityService" />
+
+
+  <!-- ############################# -->
+  <!-- # Spring Security Internals # -->
+  <!-- ############################# -->
+
+  <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
+  <sec:authentication-manager>
+    <sec:authentication-provider user-service-ref="userDetailsService">
+      <sec:password-encoder hash="md5"><sec:salt-source user-property="username" /></sec:password-encoder>
+    </sec:authentication-provider>
+  </sec:authentication-manager>
+
+  <!-- Do not use a request cache -->
+  <bean id="requestCache" class="org.springframework.security.web.savedrequest.NullRequestCache" />
+
+  <!-- Uncomment to enable logging interceptors -->
+  <!-- bean class="org.springframework.security.access.event.LoggerListener" / -->
+  <!-- bean class="org.springframework.security.authentication.event.LoggerListener" / -->
+
+</beans>

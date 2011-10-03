@@ -1,0 +1,11 @@
+<definition>
+  <id>default</id>
+  <description>A workflow that puts mediapackages on hold</description>
+  <operations>
+    <operation
+      id="append"
+      fail-on-error="true"
+      description="Hold for workflow selection">
+    </operation>
+  </operations>  
+</definition>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component
+  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.event.handler.SeriesUpdatedEventHandler"
+  immediate="true"
+  activate="activate"
+  >
+    <implementation class="org.opencastproject.event.handler.SeriesUpdatedEventHandler" />
+    <property name="service.description" value="Series Updated Event Handler" />
+    <property name="event.topics" value="org/opencastproject/series/*" />
+    <service>
+      <provide interface="org.osgi.service.event.EventHandler" />
+    </service>
+  <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    cardinality="1..1" policy="static" bind="setServiceRegistry" />
+  <reference name="searchService" interface="org.opencastproject.search.api.SearchService"
+    cardinality="1..1" policy="static" bind="setSearchService" />
+  <reference name="distributionService" interface="org.opencastproject.distribution.api.DistributionService"
+    cardinality="1..1" policy="static" target="(distribution.channel=download)" bind="setDistributionService" />
+  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="authorizationService" interface="org.opencastproject.security.api.AuthorizationService"
+    cardinality="1..1" policy="static" bind="setAuthorizationService" />
+  <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />    
+</scr:component>

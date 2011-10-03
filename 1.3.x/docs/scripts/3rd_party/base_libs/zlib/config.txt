@@ -1,0 +1,5 @@
+URL: http://zlib.net
+PKG: zlib-1.2.5.tar.gz
+SHA: 8e8b93fa5eb80df1afe5422309dca42964562d7e
+DIR: zlib-1.2.5
+PCP: pc-zlib.zip

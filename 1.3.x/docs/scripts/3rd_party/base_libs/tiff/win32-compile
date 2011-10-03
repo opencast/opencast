@@ -1,0 +1,59 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-win32 ] && exit 0
+pkg=`getcfg PKG:`
+chkpkg "$pkg" || exit 1
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+pcp=`getcfg PCP:`
+[ -z "$pcp" ] && exit 1
+#
+rm -fr "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+gzip -dc "$pkg" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+cd "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+#
+./configure \
+--host=${MINGW32} \
+CFLAGS="$CFLAGS -I${MINGW32_PREFIX}/include/pthread"
+[ $? -ne 0 ] && exit 1
+make
+[ $? -ne 0 ] && exit 1
+#
+mkdir tiff
+[ $? -ne 0 ] && exit 1
+cp libtiff/tiff.h libtiff/tiffconf.h libtiff/tiffvers.h libtiff/tiffio.h libtiff/tiffio.hxx tiff
+[ $? -ne 0 ] && exit 1
+sudox cp tiff/* ${MINGW32_PREFIX}/include
+[ $? -ne 0 ] && exit 1
+sudox cp libtiff/.libs/libtiff.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+sudox cp libtiff/.libs/libtiffxx.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+#
+zip -j "../$pcp" tiff/*
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp" libtiff/.libs/libtiff.a libtiff/.libs/libtiffxx.a
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp" contrib/iptcutil/.libs/iptcutil.exe
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp" contrib/addtiffo/.libs/addtiffo.exe
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp" contrib/dbs/.libs/*.exe
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp" tools/.libs/*.exe
+[ $? -ne 0 ] && exit 1
+#
+touch ../.done-win32
+[ $? -ne 0 ] && exit 1
+exit 0

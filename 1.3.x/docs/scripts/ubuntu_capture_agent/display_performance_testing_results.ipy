@@ -1,0 +1,143 @@
+import sys, os, re
+
+def ripFrames(run):
+	print("Ripping frames for " + run)
+	capturedFrames = []
+	#Create the snapshots of each video
+	#                                N/A    HH:MM:SS.MS
+	pattern = re.compile("Duration: (N/A|\d+:\d+:\d+\.\d+)")
+	videos = !ls
+	for video in videos:
+		print("Ripping frame from " + video)
+		continue
+		ffmpeg_output = !ffmpeg -i $video 2>&1
+		for line in ffmpeg_output:
+			match = pattern.search(line)
+			#This is None in the case where the line doesn't contain a Duration...
+			if match == None:
+				continue
+			duration = match.group(1)
+			if duration == "N/A":
+				print(video + " has N/A in the duration field...")
+			else:
+				print(video + " has a duration of " + duration)
+				times = duration.split(":")
+				time = int(duration[0]) * 60 * 60
+				time = time + int(times[1]) * 60
+				time = time + float(times[2])
+				outputfilename = video + ".png"
+				!ffmpeg -i $video -t ${time/2} $outputfilename 2>&1
+				if ".mp3" not in video:
+					capturedFrames.append(outputfilename)
+	return capturedFrames
+
+def parseOpencastLogfile(run):
+	print("Starting log parse for " + run)
+	#Create a dictionary of dictionaries of timestamp:buffer value pairs
+	log=!cat opencast.log
+	devices = {}
+	#                       HH:MM:SS   dbglvl  class:line  dev   val,val,val
+	pattern = re.compile("(\d+:\d+:\d+) \w+ \(\w+:\d+\) - (\w+),(\d+,\d+,\d+)")
+	for line in log:
+		match = pattern.search(line)
+		if match == None:
+			continue
+		time = match.group(1)
+		name = match.group(2)
+		stats = match.group(3)
+		if name not in devices:
+			device = {}
+			device[time] = stats
+			devices[name] = device
+		else:
+			device = devices[name]
+			device[time] = stats
+	plot_cmds = []
+	for device in devices:
+		deviceData = []
+		for time in devices[device]:
+			deviceData.append(devices[device][time].replace(","," "))
+		filename = device + ".gp"
+		writeGnuplotDatafile(filename, deviceData)
+		plot_cmds.append(createGnuplotHeader(filename, 2, "current-level-buffers - " + device))
+		plot_cmds.append(createGnuplotHeader(filename, 3, "current-level-bytes - " + device))
+		plot_cmds.append(createGnuplotHeader(filename, 4, "current-level-time - " + device))
+	return plot_cmds
+
+def parseDstatLogfile(run):
+	print("Creating dstat graphs for " + run)
+	graph=!cat dstat.log
+	
+	while graph[0]!= '':
+		del graph[0]
+	
+	del graph[0]
+	headers=""
+	
+	while graph[0].startswith('"'):
+		#just pick the most specific of the header labels
+		headers = graph.pop(0)
+	
+	headers=headers.replace('"','')
+	headers=headers.split(",")
+
+	lines = []
+	for line in graph:
+		lines.append(line.replace(","," "))
+
+	writeGnuplotDatafile("dstat.gp", lines)
+
+	plot_cmds=[]
+	for i, item in enumerate(headers):
+		plot_cmds.append(createGnuplotHeader("dstat.gp", str(i+2), item))
+
+	return plot_cmds
+
+
+def createGnuplotHeader(filename, column, header):
+	return 'plot "' + str(filename) + '" u 1:' + str(column) + ' w l t "' + str(header) + '"'
+
+def writeGnuplotHeaderfile(filename, commands):
+	fil = open(filename,"w")
+	for i, cmd in enumerate(commands):
+		fil.write( "set terminal png" + "\n")
+		fil.write( "set output '" + str(i) + ".png'\n")
+		fil.write( str(cmd) + "\n")
+	fil.close()
+
+def writeGnuplotDatafile(filename, lines):
+	fil = open(filename,"w")
+	for i, line in enumerate(lines):
+		fil.write(str(i) + " " + line + "\n")
+	fil.close()
+
+runs=!ls oc_perf
+cd oc_perf
+for run in runs:
+	pushd .
+	cd $run
+
+	capturedFrames = ripFrames(run)
+
+	headers = []
+	headers.extend(parseOpencastLogfile(run))
+
+	headers.extend(parseDstatLogfile(run))
+
+	writeGnuplotHeaderfile("graph.gp", headers)
+
+	!gnuplot -persist graph.gp
+
+	!rm -f *.gp
+	
+	output="<html><body>\n"
+	for frame in capturedFrames:
+		output = output + "<img src='" + frame + "'/><p>\n"
+	for i in range(0,len(headers)):
+		output = output + "<img src='" + str(i) + ".png'/><p>\n"
+	
+	output=output+"</body></html>"
+	fil = open("results.html","w")
+	fil.write(output)
+	fil.close()
+	popd

@@ -1,0 +1,16 @@
+<oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" start="2007-12-05T13:40:00" duration="1004400000">
+  <media>
+    <track id="track-1" type="presentation/source">
+      <mimetype>video/quicktime</mimetype>
+      <url>av.mov</url>
+      <video>
+        <device type="UFG03" version="30112007" vendor="Unigraf" />
+        <encoder type="H.264" version="7.4" vendor="Apple Inc" />
+        <resolution>640x480</resolution>
+        <scanType type="progressive" />
+        <bitrate>540520</bitrate>
+        <frameRate>2</frameRate>
+      </video>
+    </track>
+  </media>
+</oc:mediapackage>

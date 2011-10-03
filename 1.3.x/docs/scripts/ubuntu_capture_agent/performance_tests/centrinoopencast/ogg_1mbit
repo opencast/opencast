@@ -1,0 +1,37 @@
+# bt878: 30 fps
+# confidence monitoring enabled
+# vga: 1024x768, 15 fps
+# ogg at 1mbit
+# 1 hour
+
+capture.device.bt878.buffer.bytes=512000000
+capture.device.bt878.buffer.size=0
+capture.device.bt878.buffer.time=0
+capture.device.bt878.codec.bitrate=1000
+capture.device.bt878.codec=theoraenc
+capture.device.bt878.container=oggmux
+capture.device.bt878.flavor=presenter/source
+capture.device.bt878.framerate=30
+capture.device.bt878.outputfile=bt878.ogg
+capture.device.bt878.src=/dev/bt878
+capture.device.microphone.codec.bitrate=-1
+capture.device.microphone.codec=vorbisenc
+capture.device.microphone.container=oggmux
+capture.device.microphone.flavor=presenter/source
+capture.device.microphone.outputfile=microphone.ogg
+capture.device.microphone.src=hw:0
+capture.device.names=bt878,vga,microphone
+capture.device.vga.buffer.bytes=512000000
+capture.device.vga.buffer.size=0
+capture.device.vga.buffer.time=0
+capture.device.vga.codec.bitrate=1000
+capture.device.vga.codec=theoraenc
+capture.device.vga.container=oggmux
+capture.device.vga.flavor=presenter/source
+capture.device.vga.framerate=15
+capture.device.vga.outputfile=vga.ogg
+capture.device.vga.src=/dev/vga
+capture.ingest.endpoint.url=
+capture.max.length=3600
+capture.recording.id=ogg_1mbit
+media.zip=ogg_1mbit.zip

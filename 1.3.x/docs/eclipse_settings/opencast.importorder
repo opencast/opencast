@@ -1,0 +1,10 @@
+#Organize Import Order
+#Fri Apr 03 15:13:01 CEST 2009
+6=java
+5=org
+4=net
+3=junit
+2=com
+1=org.opencastproject
+0=\#
+7=javax

@@ -1,0 +1,185 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-win32 ] && exit 0
+pkg1=`getcfg PKG1:`
+chkpkg "$pkg1" || exit 1
+pkg2=`getcfg PKG2:`
+chkpkg "$pkg2" || exit 1
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+pcp1=`getcfg PCP1:`
+pcp2=`getcfg PCP2:`
+[ -z "$pcp1" -o -z "$pcp2" ] && exit 1
+#
+rm -fr "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+gzip -dc "$pkg1" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+#
+cd "${dir}-win32/tessdata"
+[ $? -ne 0 ] && exit 1
+cp "../../$pkg2" .
+[ $? -ne 0 ] && exit 1
+chmod 644 "$pkg2"
+[ $? -ne 0 ] && exit 1
+gzip -df "$pkg2"
+[ $? -ne 0 ] && exit 1
+cd ..
+[ $? -ne 0 ] && exit 1
+#
+gzip -dc ../tesseract-3.00m.tar.gz | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+#
+sudox cp ../winsock2.h ${MINGW32_PREFIX}/include/winsock2.h
+[ $? -ne 0 ] && exit 1
+#
+./configure \
+--host=${MINGW32} \
+CFLAGS=-D__MSW32__ \
+CPPFLAGS=-D__MSW32__ \
+LIBS="-lws2_32 -lgif" \
+LIBTIFF_LIBS="-ltiff -ljpeg -lpng -lz"
+[ $? -ne 0 ] && exit 1
+make
+[ $? -ne 0 ] && exit 1
+#
+mkdir tesseract
+[ $? -ne 0 ] && exit 1
+cp api/*.h tesseract
+[ $? -ne 0 ] && exit 1
+cp ccmain/*.h tesseract
+[ $? -ne 0 ] && exit 1
+cp ccstruct/*.h tesseract
+[ $? -ne 0 ] && exit 1
+cp ccutil/*.h tesseract
+[ $? -ne 0 ] && exit 1
+cp classify/*.h tesseract
+[ $? -ne 0 ] && exit 1
+cp cutil/*.h tesseract
+[ $? -ne 0 ] && exit 1
+cp dict/*.h tesseract
+[ $? -ne 0 ] && exit 1
+cp image/*.h tesseract
+[ $? -ne 0 ] && exit 1
+cp textord/*.h tesseract
+[ $? -ne 0 ] && exit 1
+cp viewer/*.h tesseract
+[ $? -ne 0 ] && exit 1
+cp wordrec/*.h tesseract
+[ $? -ne 0 ] && exit 1
+cp training/*.h tesseract
+[ $? -ne 0 ] && exit 1
+cp vs2008/dlltest/dlltest.* tesseract
+[ $? -ne 0 ] && exit 1
+cp viewer/svpaint.cpp tesseract
+[ $? -ne 0 ] && exit 1
+sudox rm -fr ${MINGW32_PREFIX}/include/tesseract
+[ $? -ne 0 ] && exit 1
+sudox mkdir -p ${MINGW32_PREFIX}/include/tesseract
+[ $? -ne 0 ] && exit 1
+sudox cp tesseract/* ${MINGW32_PREFIX}/include/tesseract
+[ $? -ne 0 ] && exit 1
+#
+sudox cp api/.libs/libtesseract_api.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+sudox cp ccmain/.libs/libtesseract_main.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+sudox cp ccstruct/.libs/libtesseract_ccstruct.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+sudox cp ccutil/.libs/libtesseract_ccutil.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+sudox cp classify/.libs/libtesseract_classify.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+sudox cp cutil/.libs/libtesseract_cutil.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+sudox cp dict/.libs/libtesseract_dict.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+sudox cp image/.libs/libtesseract_image.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+sudox cp textord/.libs/libtesseract_textord.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+sudox cp training/.libs/libtesseract_training.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+sudox cp viewer/.libs/libtesseract_viewer.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+sudox cp wordrec/.libs/libtesseract_wordrec.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+#
+zip -j "../$pcp1" api/.libs/tesseract.exe
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" training/.libs/cntraining.exe
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" training/.libs/combine_tessdata.exe
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" training/.libs/mftraining.exe
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" training/.libs/unicharset_extractor.exe
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" training/.libs/wordlist2dawg.exe
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" api/.libs/libtesseract_api.a
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" ccmain/.libs/libtesseract_main.a
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" ccstruct/.libs/libtesseract_ccstruct.a
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" ccutil/.libs/libtesseract_ccutil.a
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" classify/.libs/libtesseract_classify.a
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" cutil/.libs/libtesseract_cutil.a
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" dict/.libs/libtesseract_dict.a
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" image/.libs/libtesseract_image.a
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" textord/.libs/libtesseract_textord.a
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" training/.libs/libtesseract_training.a
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" viewer/.libs/libtesseract_viewer.a
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp1" wordrec/.libs/libtesseract_wordrec.a
+[ $? -ne 0 ] && exit 1
+#
+mkdir -p x
+[ $? -ne 0 ] && exit 1
+cd x
+[ $? -ne 0 ] && exit 1
+cp -r ../tessdata .
+[ $? -ne 0 ] && exit 1
+find . -name 'Makefile*' -exec rm {} \;
+[ $? -ne 0 ] && exit 1
+zip -r "../../$pcp1" tessdata
+[ $? -ne 0 ] && exit 1
+zip -r "../../$pcp2" tessdata
+[ $? -ne 0 ] && exit 1
+copypc usr/local/share -r tessdata
+[ $? -ne 0 ] && exit 1
+cd -
+[ $? -ne 0 ] && exit 1
+#
+copypc usr/local/bin api/.libs/tesseract.exe
+[ $? -ne 0 ] && exit 1
+copypc usr/local/bin training/.libs/cntraining.exe
+[ $? -ne 0 ] && exit 1
+copypc usr/local/bin training/.libs/combine_tessdata.exe
+[ $? -ne 0 ] && exit 1
+copypc usr/local/bin training/.libs/mftraining.exe
+[ $? -ne 0 ] && exit 1
+copypc usr/local/bin training/.libs/unicharset_extractor.exe
+[ $? -ne 0 ] && exit 1
+copypc usr/local/bin training/.libs/wordlist2dawg.exe
+[ $? -ne 0 ] && exit 1
+#
+touch ../.done-win32
+[ $? -ne 0 ] && exit 1
+exit 0

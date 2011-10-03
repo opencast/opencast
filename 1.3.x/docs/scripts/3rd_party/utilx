@@ -1,0 +1,540 @@
+# HOME3P must already be defined!
+#
+# Print system info, define global variables and functions
+#
+case `uname` in
+  Linux )
+    [ -s /etc/issue ] && head -1 /etc/issue
+    uname -smr
+    export LOCAL_PREFIX=/usr/local
+    ;;
+  Darwin )
+    sw_vers
+    uname -smr
+#   export LOCAL_PREFIX=/usr/local
+    export LOCAL_PREFIX=/opt/local # if compiling with MacPorts
+    ;;
+esac
+export MINGW32=i686-pc-mingw32
+export MINGW32_PREFIX=/usr/i686-pc-mingw32/sys-root/mingw
+export CFLAGS=""
+unset CDPATH
+#
+# echox
+#   $1 = "on"/"off"
+#
+echox() {
+  ECHO=`set -o | awk '/^xtrace/{print $2}'`
+  if [ "$ECHO" = "on" ]; then
+    [ "$1" = "off" ] && set +x
+  else
+    [ "$1" = "on" ] && set -x
+  fi
+  echo $ECHO
+}
+#
+# arch
+#  i386, x86_64, <unknown>
+#
+arch() {
+  set +x
+  case `uname -m` in
+    i386 | i486 | i586 | i686 )
+      echo i386
+      ;;
+    x86_64 | x64 )
+      echo x86_64
+      ;;
+    * )
+      uname -m
+      ;;
+  esac
+  set -x
+  return 0
+}
+#
+# os
+#  CentOS, RHEL, Ubuntu, Debian, openSUSE, Amazon, MacOS, <unknown>
+#
+os() {
+  set +x
+  case `uname` in
+    Linux )
+      # CentOS, RHEL, Ubuntu, Debian, openSUSE, Amazon
+      awk '{
+  sub("Welcome to",""); # Appears in openSUSE
+  if (match($0, "Red Hat Enterprise Linux")) { print "RHEL"; }
+  else { print $1; }
+  exit 0
+}' /etc/issue
+      if [ $? -ne 0 ]; then
+        set -x
+        return 1
+      fi
+      ;;
+    Darwin )
+      echo MacOS
+      ;;
+    * )
+      uname
+      ;;
+  esac
+  set -x
+  return 0
+}
+#
+# os_ver
+#  <M.N>
+#
+os_ver() {
+  set +x
+  case `uname` in
+    Linux )
+      # CentOS, RHEL, Ubuntu, Debian, openSUSE, Amazon
+      awk '{
+  sub("^[^0-9.]*", ""); sub("[^0-9.]*$", "");
+  print $0;
+  exit 0
+}' /etc/issue
+      if [ $? -ne 0 ]; then
+        set -x
+        return 1
+      fi
+      ;;
+    Darwin )
+      sw_vers | awk '/^ProductVersion:/ {
+  sub("^[^0-9.]*", ""); sub("[^0-9.]*$", "");
+  print $0;
+  exit 0
+}'
+      if [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ]; then
+        set -x
+        return 1
+      fi
+      ;;
+    * )
+      set -x
+      return 1
+      ;;
+  esac
+  set -x
+  return 0
+}
+#
+# chkprog
+#   $1 = binary to check
+#
+chkprog() {
+  which "$1" >/dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "$1 is missing" 1>&2
+    return 1
+  fi
+  return 0
+}
+#
+# chklib
+#   $1 = library to check (short form)
+#
+# Default library path:
+#   CentOS, RHEL:
+#     /lib:/usr/lib:/lib/i686:/usr/lib/sse2:/usr/lib/tls
+#   Ubuntu:
+#     /lib:/usr/lib:/lib/tls:/lib/i686:/usr/lib/sse2:/lib/tls/i686
+#   MacOS:
+#     ~/lib:/usr/local/lib:/opt/local/lib:/lib:/usr/lib
+#
+chklib() {
+  case `uname` in
+    Linux )
+      for dir in /lib /usr/lib /lib/tls /lib/i686 /lib/tls/i686 /usr/lib/sse2 /usr/lib/tls; do
+        [ -s "$dir/lib$1.so" ] && return 0
+      done
+      for dir in /lib64 /usr/lib64 /lib64/tls /lib64/i686 /lib64/tls/i686 /usr/lib64/sse2 /usr/lib64/tls; do
+        [ -s "$dir/lib$1.so" ] && return 0
+      done
+#     for dir in /lib/i386-linux-gnu /usr/lib/i386-linux-gnu /lib/i486-linux-gnu /usr/lib/i486-linux-gnu /lib/i586-linux-gnu /usr/lib/i586-linux-gnu /lib/i686-linux-gnu /usr/lib/i686-linux-gnu; do
+#       [ -s "$dir/lib$1.so" ] && return 0
+#     done
+#     for dir in /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu; do
+#       [ -s "$dir/lib$1.so" ] && return 0
+#     done
+      echo "lib$1.so is missing" 1>&2
+      ;;
+    Darwin )
+      for dir in /lib /usr/lib /opt/local/lib /usr/local/lib ~/lib; do
+        [ -s "$dir/lib$1.dylib" ] && return 0
+      done
+      echo "lib$1.dylib is missing" 1>&2
+      ;;
+  esac
+  return 1
+}
+#
+# chkinc
+#   $1 = include file to check
+#
+# Default include path:
+#   CentOS, RHEL, Ubuntu:
+#     /usr/local/include:/usr/lib/gcc/*/*/include:/usr/lib/gcc/*/*/include-fixed:/usr/include
+#   Ubuntu x64:
+#     /usr/local/include:/usr/lib/*-linux-gnu/gcc/*/*/include:/usr/lib/*-linux-gnu/gcc/*/*/include-fixed:/usr/include/*-linux-gnu:/usr/include
+#   MacOS:
+#     /usr/local/include:/usr/lib/gcc/*/*/include:/usr/include:/System/Library/Frameworks:/Library/Frameworks
+#
+chkinc() {
+  case `uname` in
+    Linux )
+      DIRLIST=`echo /usr/local/include /usr/lib/gcc/*/*/include /usr/lib/gcc/*/*/include-fixed /usr/lib/*-linux-gnu/gcc/*/*/include /usr/lib/*-linux-gnu/gcc/*/*/include-fixed /usr/include/*-linux-gnu /usr/include`
+      for dir in $DIRLIST; do
+        FILE=`find "$dir" -type f -name "$1" 2>/dev/null`
+        [ -n "$FILE" ] && return 0
+      done
+      echo "$1 is missing" 1>&2
+      ;;
+    Darwin )
+      DIRLIST=`echo /usr/local/include /usr/lib/gcc/*/*/include /usr/include /System/Library/Frameworks /Library/Frameworks`
+      for dir in $DIRLIST; do
+        FILE=`find "$dir" -type f -name "$1" 2>/dev/null`
+        [ -n "$FILE" ] && return 0
+      done
+      echo "$1 is missing" 1>&2
+      ;;
+  esac
+  return 1
+}
+#
+# chksudo
+#
+chksudo() {
+  if [ `id -u` -eq 0 ]; then
+    return 0
+  elif [ -z "$SUDOPWD" ]; then
+    USER=`id -un`
+    SUDOPWD=`getpwd "[sudo] password for $USER: "`
+    sudo -S -p "" id << EOF > /dev/null
+$SUDOPWD
+EOF
+    if [ $? -ne 0 ]; then
+      SUDOPWD=""
+      return 1
+    fi
+  fi
+  return 0
+}
+#
+# getpwd
+#
+getpwd() {
+  unset ANS
+# Allow password to be empty
+# while [ -z "$ANS" ]; do
+    echo -n "$1" 1>&2
+    read -s ANS
+    echo "" 1>&2
+# done
+  echo "$ANS"
+  return 0
+}
+#
+# getans
+#
+getans() {
+  unset ANS
+  DEF=${1##*\[}; DEF=${DEF%%\]*}
+  if [ "$DEF" != "$1" ]; then
+    echo -n "$1" 1>&2
+    read ANS
+    if [ -z "$ANS" ]; then
+      ANS=$DEF
+    fi
+  else
+    while [ -z "$ANS" ]; do
+      echo -n "$1" 1>&2
+      read ANS
+    done
+  fi
+  echo "$ANS"
+  return 0
+}
+#
+# getmcfg
+#   $1 = keyword to search in master config.txt (${HOME3P}/config.txt)
+#
+getmcfg() {
+  set +x
+  [ -z "$HOME3P" ] && HOME3P=`cd "${0%/*}" 2>/dev/null; echo $PWD`
+  CFG=`awk '
+/^[ 	]*'$1'/ {
+  sub("^[ 	]*'$1'[ 	]*", "");
+  sub("[ 	]*$", "");
+  print $0
+}' "${HOME3P}/config.txt"`
+  if [ $? -ne 0 ]; then
+    set -x
+    return 1
+  fi
+  eval echo "$CFG"
+  set -x
+  return 0
+}
+#
+# getcfg
+#   $1 = keyword to search in config.txt in current dir
+#
+getcfg() {
+  set +x
+  CFG=`awk '
+/^[ 	]*'$1'/ {
+  sub("^[ 	]*'$1'[ 	]*", "");
+  sub("[ 	]*$", "");
+  print $0
+}' config.txt`
+  if [ $? -ne 0 ]; then
+    set -x
+    return 1
+  fi
+  eval echo "$CFG"
+  set -x
+  return 0
+}
+#
+# shasumx
+#   $1 = file name for sha1sum
+#
+shasumx() {
+  case `uname` in
+    Linux )
+      sha1sum "$1" | awk '{print $1}'
+      [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && return 1
+      ;;
+    Darwin )
+      shasum "$1" | awk '{print $1}'
+      [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && return 1
+      ;;
+  esac
+  return 0
+}
+#
+# copypkg
+#   $1 = package name
+#
+copypkg() {
+  [ -z "$HOME3P" ] && HOME3P=`cd "${0%/*}" 2>/dev/null; echo $PWD`
+  [ ! -f "${HOME3P}/tarballs/$1" ] && return 1
+  cp "${HOME3P}/tarballs/$1" .
+  [ $? -ne 0 ] && return 1
+  return 0
+}
+#
+# chkpkg
+#   $1 = package name
+#
+chkpkg() {
+  set +x
+  if [ ! -s "$1" ]; then
+    echo "File $1 is missing - download it first!" 1>&2
+    set -x
+    return 1
+  fi
+  set -x
+  return 0
+}
+#
+# download
+#   $1 = directory to enter for download
+#
+download() {
+  OLDCD=`pwd`
+  [ $? -ne 0 ] && return 1
+  cd "$1"
+  [ $? -ne 0 ] && return 1
+  if [ -x download-sources -a ! "`pwd`" = "$OLDCD" ]; then
+    ./download-sources
+    [ $? -ne 0 ] && return 1
+  else
+    if [ -f config.txt ]; then
+      for ii in "" 1 2 3; do
+        ppos=0
+        for pkg in `getcfg PKG${ii}:`; do
+          let ppos=ppos+1
+          if [ ! -s "$pkg" ]; then
+            copypkg "$pkg"
+            if [ $? -ne 0 ]; then
+              ok=1
+              for URL in `getcfg URL${ii}:`; do
+                wget -t 5 -4 -O "$pkg" "$URL/$pkg"
+                ok=$?
+                [ $ok -eq 0 ] && break
+              done
+              if [ $ok -ne 0 ]; then
+                rm -f "$pkg"
+                return 1
+              else
+                shas=`getcfg SHA${ii}:`
+                sha=""; jj=0
+                for sha in $shas; do
+                  let jj=jj+1
+                  [ $jj -eq $ppos ] && break
+                done
+                if [ -n "$sha" ]; then
+                  shax=`shasumx "$pkg"`
+                  if [ "$shax" != "$sha" ]; then
+                    echo "Error transferring PKG${ii}: $pkg" 1>&2
+                    return 1
+                  fi
+                fi
+              fi
+            fi
+          fi
+        done
+      done
+    fi
+  fi
+  cd "$OLDCD"
+  [ $? -ne 0 ] && return 1
+  return 0
+}
+#
+# cleanup
+#   $1 = directory to enter for clean-up
+#   $2 = optional parameter for clean-up script ("all")
+#
+cleanup() {
+  OLDCD=`pwd`
+  [ $? -ne 0 ] && return 1
+  cd "$1"
+  [ $? -ne 0 ] && return 1
+  if [ -x clean-up -a ! "`pwd`" = "$OLDCD" ]; then
+    ./clean-up "$2"
+    [ $? -ne 0 ] && return 1
+  else
+    if [ -f config.txt ]; then
+      pkg=`getcfg PKG:`
+      pkg1=`getcfg PKG1:`
+      pkg2=`getcfg PKG2:`
+      pkg3=`getcfg PKG3:`
+      dir=`getcfg DIR:`
+      [ "$dir" = "/" ] && dir=""
+      pcp=`getcfg PCP:`
+      pcp1=`getcfg PCP1:`
+      pcp2=`getcfg PCP2:`
+      pcp3=`getcfg PCP3:`
+      #
+      rm -fr "$dir"
+      #
+      rm -fr "${dir}-win32"
+      rm -f "$pcp" "$pcp1" "$pcp2" "$pcp3"
+      rm -f .done-win32
+      #
+      rm -fr "${dir}-linux"
+      rm -f .done-linux
+      #
+      rm -fr "${dir}-mac"
+      rm -f .done-mac
+      #
+      if [ "$2" = "all" ]; then
+        rm -f "$pkg" "$pkg1" "$pkg2" "$pkg3"
+      fi
+    fi
+  fi
+  cd "$OLDCD"
+  [ $? -ne 0 ] && return 1
+  return 0
+}
+#
+# compile
+#   $1 = directory to enter for compile
+#   $2 = which compile to invoke ("linux", "win32" or "mac")
+#
+compile() {
+  set +x
+  OS=`uname`
+  [ "$OS" = "Darwin" ] && OS=MacOS
+  WHAT="${OS}-$2"
+  case "$WHAT" in
+    Linux-linux ) ;;
+    Linux-win32 ) ;;
+    MacOS-mac ) ;;
+    MacOS-ports ) ;;
+    * )
+      echo "Don't know how to compile $1 for \"$2\" on $OS" 1>&2
+      set -x
+      return 1
+      ;;
+  esac
+  set -x
+  OLDCD=`pwd`
+  [ $? -ne 0 ] && return 1
+  cd "$1"
+  [ $? -ne 0 ] && return 1
+  if [ -x ${2}-compile -a ! "`pwd`" = "$OLDCD" ]; then
+    ./${2}-compile
+    [ $? -ne 0 ] && return 1
+  fi
+  cd "$OLDCD"
+  [ $? -ne 0 ] && return 1
+  return 0
+}
+#
+# sudox
+#   $@ = command line to be executed as root
+#   $SUDOPWD = password for sudo (if defined)
+#
+sudox() {
+  set +x
+  if [ `id -u` -eq 0 ]; then
+    "$@"
+    RC=$?
+  elif [ -n "$SUDOPWD" ]; then
+    sudo -S -p "" "$@" << EOF
+$SUDOPWD
+EOF
+    RC=$?
+  else
+    sudo "$@"
+    RC=$?
+  fi
+  set -x
+  return $RC
+}
+#
+# copypc
+#
+copypc() {
+  [ -z "$HOME3P" ] && HOME3P=`cd "${0%/*}" 2>/dev/null; echo $PWD`
+  LOC=`expr "$1" : '/*\(.*\)'`
+  DEST="${HOME3P}/$LOC"; shift
+  if [ ! -d "$DEST" ]; then
+    rm -f "$DEST"
+    mkdir -p "$DEST"
+    [ $? -ne 0 ] && return 1
+  fi
+  cp "$@" "$DEST"
+  [ $? -ne 0 ] && return 1
+  return 0
+}
+#
+# fix_scons
+#
+fix_scons() {
+  [ -z "$HOME3P" ] && HOME3P=`cd "${0%/*}" 2>/dev/null; echo $PWD`
+  cat > files.lst << EOF
+/usr/lib/scons-1.2.0/SCons/Tool/mingw.py
+/usr/lib/scons-2.0.1/SCons/Tool/mingw.py
+/usr/lib/scons/SCons/Tool/mingw.py
+/usr/local/lib/scons-1.2.0/SCons/Tool/mingw.py
+/usr/local/lib/scons-2.0.1/SCons/Tool/mingw.py
+/usr/local/lib/scons/SCons/Tool/mingw.py
+EOF
+  [ $? -ne 0 ] && exit 1
+  for file in `cat files.lst`; do
+    if [ -s "$file" ]; then
+      sudox cp "${HOME3P}/base_libs/scons/mingw.py" "$file"
+      [ $? -ne 0 ] && return 1
+    fi
+  done
+  rm -f files.lst
+  [ $? -ne 0 ] && return 1
+  return 0
+}

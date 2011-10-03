@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.capture.impl.monitoring.ConfidenceMonitorImpl" immediate="true">
+  <implementation class="org.opencastproject.capture.impl.monitoring.ConfidenceMonitorImpl" />
+  <property name="service.description" value="Confidence Monitor Service" />
+  <property name="service.pid" value="org.opencastproject.capture.impl.monitoring.ConfidenceMonitorImpl" />
+  <service>
+    <provide interface="org.opencastproject.capture.api.ConfidenceMonitor" />
+  </service>
+  <reference name="configService" interface="org.opencastproject.capture.impl.ConfigurationManager"
+    cardinality="1..1" policy="static" bind="setConfigService" />
+</scr:component>

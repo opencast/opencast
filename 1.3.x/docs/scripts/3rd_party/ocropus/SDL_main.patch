@@ -1,0 +1,18 @@
+--- SDL_main-1.2.14.h.org	2010-12-13 10:53:51.000000000 +0100
++++ SDL_main-1.2.14.h	2010-12-13 10:51:50.000000000 +0100
+@@ -33,6 +33,7 @@
+     (defined(__MWERKS__) && !defined(__BEOS__)) || \
+     defined(__MACOS__) || defined(__MACOSX__) || \
+     defined(__SYMBIAN32__) || defined(QWS)
++#if !defined(SDL_CONSOLE)
+ 
+ #ifdef __cplusplus
+ #define C_LINKAGE	"C"
+@@ -101,6 +102,7 @@
+ #endif
+ /*@}*/
+ 
++#endif
+ #endif /* Need to redefine main()? */
+ 
+ #endif /* _SDL_main_h */

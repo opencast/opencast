@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tt xmlns="http://www.w3.org/2006/04/ttaf1" xmlns:tts="http://www.w3.org/2006/04/ttaf1#styling"
+	xml:lang="en">
+	<head>
+		<styling>
+			<style id="defaultSpeaker" tts:fontSize="12" tts:fontFamily="SansSerif"
+				tts:fontWeight="normal" tts:fontStyle="normal" tts:textDecoration="none"
+				tts:color="white" tts:backgroundColor="black" tts:textAlign="left" />
+			<style id="defaultCaption" tts:fontSize="12" tts:fontFamily="SansSerif"
+				tts:fontWeight="normal" tts:fontStyle="normal" tts:textDecoration="none"
+				tts:color="white" tts:backgroundColor="black" tts:textAlign="left" />
+		</styling>
+	</head>
+	<body style="defaultCaption" id="thebody">
+		<div xml:lang="en">
+			<p begin="0:00:00.00" end="0:00:05.00">Alex <span tts:color="red">Cross</span><br />This is my 1st caption</p>
+			<p begin="0:00:05.00" end="0:00:10.00" tts:textAlign="center">Alex<br /><span tts:fontSize="18" tts:color="red">This is my 2nd caption</span></p>
+			<p begin="0:00:10.00" end="0:00:15.00" tts:textAlign="center" tts:backgroundColor="#FFC800"><span tts:fontWeight="bold" tts:fontStyle="italic">This is my 3rd caption</span></p>
+			<p begin="0:00:15.00" end="0:00:20.00" tts:textAlign="right"><span tts:fontFamily="Zapfino">This is my 4th caption</span></p>
+			<p begin="0:00:20.00" end="0:00:25.00"><span tts:fontSize="36">This is my 5th caption</span></p>
+			<p begin="0:00:25.00" end="0:00:30.00" tts:textAlign="center"><span tts:textDecoration="underline" tts:fontSize="18" tts:color="magenta">This is my 6th caption</span></p>
+			<p begin="0:00:30.00" end="0:00:35.00"><span tts:fontFamily="SchoolHouse Cursive B" tts:fontSize="48">This is my 7th caption</span></p>
+		</div>
+		<div xml:lang="fr">
+			<p begin="0:00:00.00" end="0:00:05.00">Bonjour</p>
+		</div>
+	</body>
+</tt> 

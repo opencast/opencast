@@ -1,0 +1,922 @@
+#!/bin/bash
+set -x
+[ -z "$HOME3P" ] && export HOME3P=`cd "${0%/*}" 2>/dev/null; echo $PWD`
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+install_rpms() {
+  name=`echo "$1" | awk '{sub("-[0-9.]+.*",""); print $0}'`
+  name_ver=`echo "$1" | awk '{sub("\\\.(i386|x86_64|noarch)\\\.rpm$",""); print $0}'`
+  case `os` in
+    CentOS | RHEL )
+      installed=`rpm -q "$name"`
+      if [ ! "$installed" = "$name_ver" ]; then
+        sudox rpm -iv --force "$@"
+        [ $? -ne 0 ] && return 1
+      fi
+      ;;
+    Ubuntu )
+      installed=`dpkg --get-selections "$name" | awk '{print $1}'`
+      if [ ! "$installed" = "$name" ]; then
+        for rpm in $@; do
+          sudox alien -i $rpm
+          [ $? -ne 0 ] && return 1
+        done
+      fi
+      ;;
+    Debian )
+      ;;
+    openSUSE )
+      ;;
+    Amazon )
+      ;;
+    MacOS )
+      ;;
+  esac
+  return 0
+}
+#
+install_prog() {
+  cd "$HOME3P"
+  [ $? -ne 0 ] && return 1
+  mkdir -p packages
+  [ $? -ne 0 ] && return 1
+  cd packages
+  [ $? -ne 0 ] && return 1
+  #
+  case `os` in
+    CentOS | RHEL )
+      rpms=""; upd_rpms=""
+      case "$1" in
+        wget ) # wget is missing, get it with java wget
+          case `arch` in
+            i386 )
+              URLS=`getmcfg wget_x86_url:`
+              rpms=`getmcfg wget_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg wget_x64_url:`
+              rpms=`getmcfg wget_x64_pkgs:`
+              ;;
+          esac
+          #
+          for rpm in $rpms; do
+            if [ ! -s "$rpm" ]; then
+              copypkg "$rpm"
+              if [ $? -ne 0 ]; then
+                if [ ! -s wget.class ]; then
+                  javac -d . ../wget.java
+                  [ $? -ne 0 ] && return 1
+                fi
+                ok=1
+                for URL in $URLS; do
+                  java wget "$URL/$rpm" > "$rpm"
+                  ok=$?
+                  [ $ok -eq 0 ] && break
+                done
+                [ $ok -ne 0 ] && return 1
+              fi
+            fi
+          done
+          ;;
+        zip )
+          case `arch` in
+            i386 )
+              URLS=`getmcfg zip_x86_url:`
+              rpms=`getmcfg zip_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg zip_x64_url:`
+              rpms=`getmcfg zip_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        unzip )
+          case `arch` in
+            i386 )
+              URLS=`getmcfg unzip_x86_url:`
+              rpms=`getmcfg unzip_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg unzip_x64_url:`
+              rpms=`getmcfg unzip_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        xz )
+          case `arch` in
+            i386 )
+              URLS=`getmcfg xz_x86_url:`
+              rpms=`getmcfg xz_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg xz_x64_url:`
+              rpms=`getmcfg xz_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        gcc )
+          case `arch` in
+            i386 )
+              URLS=`getmcfg gcc_x86_url:`
+              rpms=`getmcfg gcc_x86_pkgs:`
+              #UPD_URLS=`getmcfg gcc_x86_upd_url:`
+              #upd_rpms=`getmcfg gcc_x86_upd_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg gcc_x64_url:`
+              rpms=`getmcfg gcc_x64_pkgs:`
+              #UPD_URLS=`getmcfg gcc_x64_upd_url:`
+              #upd_rpms=`getmcfg gcc_x64_upd_pkgs:`
+              ;;
+          esac
+          ;;
+        g++ )
+          case `arch` in
+            i386 )
+              URLS=`getmcfg gpp_x86_url:`
+              rpms=`getmcfg gpp_x86_pkgs:`
+              #UPD_URLS=`getmcfg gpp_x86_upd_url:`
+              #upd_rpms=`getmcfg gpp_x86_upd_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg gpp_x64_url:`
+              rpms=`getmcfg gpp_x64_pkgs:`
+              #UPD_URLS=`getmcfg gpp_x64_upd_url:`
+              #upd_rpms=`getmcfg gpp_x64_upd_pkgs:`
+              ;;
+          esac
+          ;;
+        yacc )
+          case `arch` in
+            i386 )
+              URLS=`getmcfg yacc_x86_url:`
+              rpms=`getmcfg yacc_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg yacc_x64_url:`
+              rpms=`getmcfg yacc_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        perl-dbi )
+          case `arch` in
+            i386 )
+              URLS=`getmcfg perl-dbi_x86_url:`
+              rpms=`getmcfg perl-dbi_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg perl-dbi_x64_url:`
+              rpms=`getmcfg perl-dbi_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        git ) 
+          case `arch` in
+            i386 )
+              URLS=`getmcfg git_x86_url:`
+              rpms=`getmcfg git_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg git_x64_url:`
+              rpms=`getmcfg git_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        jam ) 
+          case `arch` in
+            i386 )
+              URLS=`getmcfg jam_x86_url:`
+              rpms=`getmcfg jam_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg jam_x64_url:`
+              rpms=`getmcfg jam_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        yasm ) 
+          case `arch` in
+            i386 )
+              URLS=`getmcfg yasm_x86_url:`
+              rpms=`getmcfg yasm_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg yasm_x64_url:`
+              rpms=`getmcfg yasm_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        ImageMagick )
+          case `arch` in
+            i386 )
+              URLS=`getmcfg ImageMagick_x86_url:`
+              rpms=`getmcfg ImageMagick_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg ImageMagick_x64_url:`
+              rpms=`getmcfg ImageMagick_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        automake )
+          case `arch` in
+            i386 )
+              URLS=`getmcfg automake_x86_url:`
+              rpms=`getmcfg automake_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg automake_x64_url:`
+              rpms=`getmcfg automake_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        gsl-devel )
+          case `arch` in
+            i386 )
+              URLS=`getmcfg gsl-devel_x86_url:`
+              rpms=`getmcfg gsl-devel_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg gsl-devel_x64_url:`
+              rpms=`getmcfg gsl-devel_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        desktop-file-utils )
+          case `arch` in
+            i386 )
+              URLS=`getmcfg desktop-file-utils_x86_url:`
+              rpms=`getmcfg desktop-file-utils_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg desktop-file-utils_x64_url:`
+              rpms=`getmcfg desktop-file-utils_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        gmp )
+          case `arch` in
+            i386 )
+              URLS=`getmcfg gmp_x86_url:`
+              rpms=`getmcfg gmp_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg gmp_x64_url:`
+              rpms=`getmcfg gmp_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        zlib-devel )
+          case `arch` in
+            i386 )
+              URLS=`getmcfg zlib-devel_x86_url:`
+              rpms=`getmcfg zlib-devel_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg zlib-devel_x64_url:`
+              rpms=`getmcfg zlib-devel_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        * )
+          echo "Don't know how to install $1 on `os`" 1>&2
+          return 1
+          ;;
+      esac
+      for rpm in $rpms; do
+        if [ ! -s "$rpm" ]; then
+          copypkg "$rpm"
+          if [ $? -ne 0 ]; then
+            ok=1
+            for URL in $URLS; do
+              wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+              ok=$?
+              [ $ok -eq 0 ] && break
+            done
+            if [ $ok -ne 0 ]; then
+              rm -f "$rpm"
+              return 1
+            fi
+          fi
+        fi
+      done
+      for upd_rpm in $upd_rpms; do
+        if [ ! -s "$upd_rpm" ]; then
+          copypkg "$upd_rpm"
+          if [ $? -ne 0 ]; then
+            ok=1
+            for UPD_URL in $UPD_URLS; do
+              wget -t 5 -4 -O "$upd_rpm" "$UPD_URL/$upd_rpm"
+              ok=$?
+              [ $ok -eq 0 ] && break
+            done
+            if [ $ok -ne 0 ]; then
+              rm -f "$upd_rpm"
+              return 1
+            fi
+          fi
+        fi
+      done
+      install_rpms $rpms $upd_rpms
+      [ $? -ne 0 ] && return 1
+      ;;
+    Ubuntu )
+      case "$1" in
+        xz ) prog=xz-utils ;;
+      # yacc ) prog="flex bison" ;;
+        yacc ) prog=byacc ;;
+        perl-dbi ) prog=libdbi-perl ;;
+        git ) prog=git-core ;;
+        ImageMagick ) prog=imagemagick ;;
+        gsl-devel ) prog=libgsl0-dev ;;
+        gmp ) prog=libgmp3c2 ;;
+        zlib-devel ) prog=zlib1g-dev ;;
+        Xext-devel ) prog="libx11-dev libxpm-dev x11proto-xext-dev libxext-dev" ;;
+        * ) prog="$1" ;;
+      esac
+      sudox apt-get -y install $prog
+      [ $? -ne 0 ] && return 1
+      ;;
+    Debian )
+      ;;
+    openSUSE )
+      ;;
+    Amazon )
+      ;;
+    MacOS )
+      case "$1" in
+        * ) prog="$1" ;;
+      esac
+      sudox port install $prog
+      [ $? -ne 0 ] && return 1
+      ;;
+  esac
+  return 0
+}
+#
+install_macports() {
+  cd "$HOME3P"
+  [ $? -ne 0 ] && return 1
+  mkdir -p packages
+  [ $? -ne 0 ] && return 1
+  cd packages
+  [ $? -ne 0 ] && return 1
+  #
+  case `os_ver` in
+    10.6* )
+      URLS=`getmcfg MacPorts_Snow_url:`
+      dmgs=`getmcfg MacPorts_Snow_pkgs:`
+      ;;
+    10.7* )
+      URLS=`getmcfg MacPorts_Lion_url:`
+      dmgs=`getmcfg MacPorts_Lion_pkgs:`
+      ;;
+  esac
+  MPVER="${dmgs##MacPorts-}"
+  MPVER="${MPVER%%-*}"
+  #
+  for dmg in $dmgs; do
+    if [ ! -s "$dmg" ]; then
+      copypkg "$dmg"
+      if [ $? -ne 0 ]; then
+        if [ ! -s wget.class ]; then
+          javac -d . ../wget.java
+          [ $? -ne 0 ] && return 1
+        fi
+        ok=1
+        for URL in $URLS; do
+          java wget "$URL/$dmg" > "$dmg"
+          ok=$?
+          [ $ok -eq 0 ] && break
+        done
+        [ $ok -ne 0 ] && return 1
+      fi
+    fi
+    # There can be only one!
+    break
+  done
+  #
+  sudox hdiutil attach "$dmg"
+  [ $? -ne 0 ] && return 1
+  # mounted to /Volumes/MacPorts-${MPVER}
+  sudox installer -pkg "/Volumes/MacPorts-${MPVER}/MacPorts-${MPVER}.pkg" -target /
+  [ $? -ne 0 ] && return 1
+  # installed to /opt/local/bin/port
+  sudox hdiutil detach "/Volumes/MacPorts-${MPVER}"
+  [ $? -ne 0 ] && return 1
+# sudox port -v selfupdate
+# [ $? -ne 0 -a $? -ne 25 ] && return 1
+  return 0
+}
+#
+macports_version() {
+  port version | awk '{ n = split($2, a, "."); v = 0;
+    if (n == 1) { v = a[1] * 100; }
+    else if (n == 2) { v = a[1] * 100 + a[2] * 10; }
+    else if (n == 3) { v = a[1] * 100 + a[2] * 10 + a[3]; }
+    print v }'
+  [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && return 1
+  return 0
+}
+#
+install_git() {
+  cd "$HOME3P"
+  [ $? -ne 0 ] && return 1
+  mkdir -p packages
+  [ $? -ne 0 ] && return 1
+  cd packages
+  [ $? -ne 0 ] && return 1
+  #
+  URLS=`getmcfg git_mac_url:`
+  dmgs=`getmcfg git_mac_pkgs:`
+  for dmg in $dmgs; do
+    if [ ! -s "$dmg" ]; then
+      copypkg "$dmg"
+      if [ $? -ne 0 ]; then
+        if [ ! -s wget.class ]; then
+          javac -d . ../wget.java
+          [ $? -ne 0 ] && return 1
+        fi
+        ok=1
+        for URL in $URLS; do
+          java wget "$URL/$dmg" > "$dmg"
+          ok=$?
+          [ $ok -eq 0 ] && break
+        done
+        [ $ok -ne 0 ] && return 1
+      fi
+    fi
+    # There can be only one!
+    break
+  done
+  #
+  sudox hdiutil attach "$dmg"
+  [ $? -ne 0 ] && return 1
+  # mounted to /Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard
+  sudox installer -pkg "/Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard/git-1.6.5.1-UNIVERSALbinary-leopard.pkg" -target /
+  [ $? -ne 0 ] && return 1
+  # installed to /usr/local/git/bin/git
+  sudox mkdir -p /usr/local/bin
+  [ $? -ne 0 ] && return 1
+  sudox ln -fs /usr/local/git/bin/git /usr/local/bin/git
+  [ $? -ne 0 ] && return 1
+  sudox ln -fs /usr/local/git/bin/git-cvsserver /usr/local/bin/git-cvsserver
+  [ $? -ne 0 ] && return 1
+  sudox ln -fs /usr/local/git/bin/git-receive-pack /usr/local/bin/git-receive-pack
+  [ $? -ne 0 ] && return 1
+  sudox ln -fs /usr/local/git/bin/git-shell /usr/local/bin/git-shell
+  [ $? -ne 0 ] && return 1
+  sudox ln -fs /usr/local/git/bin/git-upload-archive /usr/local/bin/git-upload-archive
+  [ $? -ne 0 ] && return 1
+  sudox ln -fs /usr/local/git/bin/git-upload-pack /usr/local/bin/git-upload-pack
+  [ $? -ne 0 ] && return 1
+  sudox ln -fs /usr/local/git/bin/gitk /usr/local/bin/gitk
+  [ $? -ne 0 ] && return 1
+  sudox hdiutil detach "/Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard"
+  [ $? -ne 0 ] && return 1
+# sudox port -v selfupdate
+# [ $? -ne 0 -a $? -ne 25 ] && return 1
+  return 0
+}
+#
+preinstall_scons() {
+  cd "$HOME3P/base_libs/scons"
+  [ $? -ne 0 ] && return 1
+  #
+  case `os` in
+    CentOS | RHEL | Ubuntu | Debian | openSUSE | Amazon )
+      download .
+      [ $? -ne 0 ] && return 1
+      ./linux-compile
+      [ $? -ne 0 ] && return 1
+      ;;
+    MacOS )
+      ;;
+  esac
+  return 0
+}
+#
+check_prereq() {
+  case `os` in
+    CentOS | RHEL )
+      chkprog wget    || install_prog wget     || return 1
+      chkprog zip     || install_prog zip      || return 1
+      chkprog unzip   || install_prog unzip    || return 1
+      chkprog xz      || install_prog xz       || return 1
+      chkprog gcc     || install_prog gcc      || return 1
+      chkprog g++     || install_prog g++      || return 1
+      chkprog yacc    || install_prog yacc     || return 1
+      # this was reported as missing on some systems and is needed by git
+      chkprog dbiprof || install_prog perl-dbi || return 1
+      chkprog git     || install_prog git      || return 1
+      # These are needed for Windows compile
+      chkprog jam     || install_prog jam      || return 1
+      chkprog yasm    || install_prog yasm     || return 1
+      chkprog scons   || preinstall_scons      || return 1
+      #fix_scons || return 1
+      #
+      # convert (part of ImageMagick) is needed by ocropus_libs/iulib
+      #chkprog convert || install_prog ImageMagick  || return 1
+      #
+      # automake is missing on some systems and is needed by gsl-devel
+      chkprog automake   || install_prog automake  || return 1
+      # gsl-devel is needed by ocropus
+      chkprog gsl-config || install_prog gsl-devel || return 1
+      #
+      # desktop-file-utils is needed by some versions of rpmlint
+      chkprog desktop-file-install || install_prog desktop-file-utils || return 1
+      #
+      # libgmp is missing on some systems and is needed by mingw32-gcc
+      chklib gmp || install_prog gmp || return 1
+      #
+      if [ ! -f /usr/include/zlib.h ]; then
+        install_prog zlib-devel || return 1
+      fi
+      ;;
+    Ubuntu )
+      sudox apt-get update || return 1
+      #
+      chkprog wget    || install_prog wget     || return 1
+      chkprog zip     || install_prog zip      || return 1
+      chkprog unzip   || install_prog unzip    || return 1
+      chkprog alien   || install_prog alien    || return 1
+      chkprog gcc     || install_prog gcc      || return 1
+      chkprog g++     || install_prog g++      || return 1
+      chkprog yacc    || install_prog yacc     || return 1
+      chkprog patch   || install_prog patch    || return 1
+      # this was reported as missing on some systems and is needed by git
+      chkprog dbiprof || install_prog perl-dbi || return 1
+      chkprog git     || install_prog git      || return 1
+      # These are needed for Windows compile
+      chkprog jam     || install_prog jam      || return 1
+      chkprog yasm    || install_prog yasm     || return 1
+      chkprog scons   || preinstall_scons      || return 1
+      #fix_scons || return 1
+      #
+      # convert (part of ImageMagick) is needed by ocropus_libs/iulib
+      #chkprog convert || install_prog ImageMagick  || return 1
+      #
+      # automake is missing on some systems and is needed by gsl-devel
+      chkprog automake   || install_prog automake  || return 1
+      # gsl-devel is needed by ocropus
+      chkprog gsl-config || install_prog gsl-devel || return 1
+      #
+      # desktop-file-utils is needed by some versions of rpmlint
+      chkprog desktop-file-install || install_prog desktop-file-utils || return 1
+      #
+      # libgmp is missing on some systems and is needed by mingw32-gcc
+      chklib gmp || install_prog gmp || return 1
+      #
+      if [ ! -f /usr/include/zlib.h ]; then
+        install_prog zlib-devel || return 1
+      fi
+      # check for X11 extensions files
+      if [ ! -f /usr/include/X11/extensions/XShm.h ]; then
+        install_prog Xext-devel || return 1
+      fi
+      ;;
+    Debian )
+      ;;
+    openSUSE )
+      ;;
+    Amazon )
+      ;;
+    MacOS )
+      chkprog port  || install_macports   || return 1
+      if [ `macports_version` -lt 192 ]; then
+        echo "Mac ports version is too old - should be at least 1.9.2 or greater" 1>&2
+        return 1
+      fi
+      #
+      LOGFILE=`mktemp /tmp/${0##*/}-patch.log.XXXXX`
+      sudox patch -N /opt/local/etc/macports/sources.conf "${HOME3P}/sources.conf.patch" 2>&1 | tee $LOGFILE
+      if [ ${PIPESTATUS[0]} -ne 0 ]; then
+        grep "Reversed .* patch detected!" $LOGFILE >/dev/null
+        [ $? -ne 0 ] && return 1
+      fi
+      mkdir -p /Users/Shared/dports
+      [ $? -ne 0 ] && return 1
+      portindex -f /Users/Shared/dports
+      [ $? -ne 0 ] && return 1
+      #
+      sudox port -v selfupdate
+      [ $? -ne 0 -a $? -ne 25 ] && return 1
+      #
+      chkprog wget  || install_prog wget  || return 1
+      chkprog git   || install_git        || return 1
+      #
+      # convert (part of ImageMagick) is needed by ocropus_libs/iulib
+      #chkprog convert || install_prog ImageMagick  || return 1
+      #if [ ! -x /usr/bin/convert ]; then
+      #  sudox ln -fs /opt/local/bin/convert /usr/bin/convert
+      #  [ $? -ne 0 ] && return 1
+      #fi
+      ;;
+  esac
+  return 0
+}
+#
+install_mingw32() {
+  cd "$HOME3P"
+  [ $? -ne 0 ] && return 1
+  mkdir -p packages
+  [ $? -ne 0 ] && return 1
+  cd packages
+  [ $? -ne 0 ] && return 1
+  #
+  case `os` in
+    CentOS | RHEL | Ubuntu )
+      rpms=""
+      case `arch` in
+        i386 )
+          URLS=`getmcfg mingw32-gcc_x86_url:`
+          rpms=`getmcfg mingw32-gcc_x86_pkgs:`
+          ;;
+        x86_64 )
+          URLS=`getmcfg mingw32-gcc_x64_url:`
+          rpms=`getmcfg mingw32-gcc_x64_pkgs:`
+          ;;
+      esac
+      for rpm in $rpms; do
+        if [ ! -s "$rpm" ]; then
+          copypkg "$rpm"
+          if [ $? -ne 0 ]; then
+            ok=1
+            for URL in $URLS; do
+              wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+              ok=$?
+              [ $ok -eq 0 ] && break
+            done
+            if [ $ok -ne 0 ]; then
+              rm -f "$rpm"
+              return 1
+            fi
+          fi
+        fi
+      done
+      install_rpms $rpms
+      [ $? -ne 0 ] && return 1
+      #
+      rpms=""
+      case `arch` in
+        i386 )
+          URLS=`getmcfg mingw32-gpp_x86_url:`
+          rpms=`getmcfg mingw32-gpp_x86_pkgs:`
+          ;;
+        x86_64 )
+          URLS=`getmcfg mingw32-gpp_x64_url:`
+          rpms=`getmcfg mingw32-gpp_x64_pkgs:`
+          ;;
+      esac
+      for rpm in $rpms; do
+        if [ ! -s "$rpm" ]; then
+          copypkg "$rpm"
+          if [ $? -ne 0 ]; then
+            ok=1
+            for URL in $URLS; do
+              wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+              ok=$?
+              [ $ok -eq 0 ] && break
+            done
+            if [ $ok -ne 0 ]; then
+              rm -f "$rpm"
+              return 1
+            fi
+          fi
+        fi
+      done
+      install_rpms $rpms
+      [ $? -ne 0 ] && return 1
+      #
+      URLS=`getmcfg mingw32-w32api_src_url:`
+      pkgs=`getmcfg mingw32-w32api_src_pkgs:`
+      for pkg in $pkgs; do
+        if [ ! -s "$pkg" -a ! -s "${pkg%.lzma}" ]; then
+          copypkg "$pkg"
+          if [ $? -ne 0 ]; then
+            ok=1
+            for URL in $URLS; do
+              wget -t 5 -4 -O "$pkg" "$URL/$pkg"
+              ok=$?
+              [ $ok -eq 0 ] && break
+            done
+            if [ $ok -ne 0 ]; then
+              rm -f "$pkg"
+              return 1
+            fi
+          fi
+        fi
+        # There can be only one!
+        break
+      done
+      if [ ! -s "${pkg%.lzma}" ]; then
+        xz -d "$pkg"
+        [ $? -ne 0 ] && return 1
+      fi
+      cd $MINGW32_PREFIX
+      [ $? -ne 0 ] && return 1
+      sudox tar -xvf "${HOME3P}/packages/${pkg%.lzma}"
+      [ $? -ne 0 ] && return 1
+      ;;
+    Debian )
+      ;;
+    openSUSE )
+      ;;
+    Amazon )
+      ;;
+    MacOS )
+      ;;
+  esac
+  return 0
+}
+#
+fix_libs() {
+  cd "$HOME3P"
+  [ $? -ne 0 ] && return 1
+  mkdir -p packages
+  [ $? -ne 0 ] && return 1
+  cd packages
+  [ $? -ne 0 ] && return 1
+  #
+  case `os` in
+    CentOS | RHEL | Ubuntu | Debian | openSUSE | Amazon )
+      #
+      # Install patchelf 0.5
+      #
+      if [ ! "`patchelf --version 2>/dev/null`" = "patchelf 0.5" ]; then
+        URLS=`getmcfg patchelf_src_url:`
+        pkgs=`getmcfg patchelf_src_pkgs:`
+        for pkg in $pkgs; do
+          if [ ! -s "$pkg" ]; then
+            copypkg "$pkg"
+            if [ $? -ne 0 ]; then
+              ok=1
+              for URL in $URLS; do
+                wget -t 5 -4 -O "$pkg" "$URL/$pkg"
+                ok=$?
+                [ $ok -eq 0 ] && break
+              done
+              if [ $ok -ne 0 ]; then
+                rm -f "$pkg"
+                return 1
+              fi
+            fi
+          fi
+          # There can be only one!
+          break
+        done
+        bzip2 -dc "$pkg" | tar -xv
+        [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+        cd patchelf-0.5
+        [ $? -ne 0 ] && return 1
+        ./configure
+        [ $? -ne 0 ] && return 1
+        sudox make install
+        [ $? -ne 0 ] && return 1
+      fi
+      ;;
+    MacOS )
+      ;;
+  esac
+  #
+  case `os` in
+    CentOS | RHEL )
+      # Check & set /usr/local/lib in LD_LIBRARY_PATH
+      grep '/usr/local/lib' /etc/ld.so.conf.d/* >/dev/null
+      if [ $? -ne 0 ]; then
+        cat > local.conf << EOF
+/usr/local/lib
+EOF
+        [ $? -ne 0 ] && return 1
+        if [ -s /etc/ld.so.conf.d/local.conf ]; then
+          echo "File /etc/ld.so.conf.d/local.conf already exists" 1>&2
+          rm -f local.conf
+          return 1
+        fi
+        sudox cp local.conf /etc/ld.so.conf.d
+        [ $? -ne 0 ] && return 1
+        rm -f local.conf
+        [ $? -ne 0 ] && return 1
+      fi
+      sudox /sbin/ldconfig
+      [ $? -ne 0 ] && return 1
+      ;;
+    Ubuntu )
+      if [ ! -d /usr/libx ]; then
+        case `arch` in
+          i386 )
+            URLS=`getmcfg gmp_x86_url:`
+            rpms=`getmcfg gmp_x86_pkgs:`
+            ;;
+          x86_64 )
+            URLS=`getmcfg gmp_x64_url:`
+            rpms=`getmcfg gmp_x64_pkgs:`
+            ;;
+        esac
+        for rpm in $rpms; do
+          if [ ! -s "$rpm" ]; then
+            copypkg "$rpm"
+            if [ $? -ne 0 ]; then
+              ok=1
+              for URL in $URLS; do
+                wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+                ok=$?
+                [ $ok -eq 0 ] && break
+              done
+              if [ $ok -ne 0 ]; then
+                rm -f "$rpm"
+                return 1
+              fi
+            fi
+          fi
+          # There can be only one!
+          break
+        done
+        rpm2cpio "$rpm" | cpio -i -dmuv
+        [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+        case `arch` in
+          i386 )
+            sudox mv usr/lib /usr/libx
+            [ $? -ne 0 ] && return 1
+            ;;
+          x86_64 )
+            sudox mv usr/lib64 /usr/libx
+            [ $? -ne 0 ] && return 1
+            ;;
+        esac
+        rm -fr usr
+        [ $? -ne 0 ] && return 1
+        cd /usr/libexec/gcc/i686-pc-mingw32/4.3.2
+        [ $? -ne 0 ] && return 1
+        if [ -s cc1 ]; then
+          sudox patchelf --set-rpath /usr/libx:/usr/lib:/lib cc1
+          [ $? -ne 0 ] && return 1
+        fi
+        if [ -s cc1plus ]; then
+          sudox patchelf --set-rpath /usr/libx:/usr/lib:/lib cc1plus
+          [ $? -ne 0 ] && return 1
+        fi
+      fi
+      #
+      # Check & set /usr/local/lib in LD_LIBRARY_PATH
+      grep '/usr/local/lib' /etc/ld.so.conf.d/* >/dev/null
+      if [ $? -ne 0 ]; then
+        cat > local.conf << EOF
+/usr/local/lib
+EOF
+        [ $? -ne 0 ] && return 1
+        if [ -s /etc/ld.so.conf.d/local.conf ]; then
+          echo "File /etc/ld.so.conf.d/local.conf already exists" 1>&2
+          rm -f local.conf
+          return 1
+        fi
+        sudox cp local.conf /etc/ld.so.conf.d
+        [ $? -ne 0 ] && return 1
+        rm -f local.conf
+        [ $? -ne 0 ] && return 1
+      fi
+      sudox /sbin/ldconfig
+      [ $? -ne 0 ] && return 1
+      ;;
+    Debian )
+      ;;
+    openSUSE )
+      ;;
+    Amazon )
+      ;;
+    MacOS )
+      ;;
+  esac
+  return 0
+}
+#
+case `os` in
+  CentOS | RHEL | Ubuntu | Debian | openSUSE | Amazon | MacOS )
+    ;;
+  * )
+    echo "Unsupported operating system: `os`" 1>&2
+    exit 1
+    ;;
+esac
+#
+case `arch` in
+  i386 | x86_64 )
+    ;;
+  * )
+    echo "Unsupported architecture: `arch`" 1>&2
+    exit 1
+    ;;
+esac
+#
+# Main repositories
+export CENTOS_MIRROR=`getmcfg CENTOS_MIRROR:`
+export EPEL_MIRROR=`getmcfg EPEL_MIRROR:`
+export RPMFORGE_MIRROR=`getmcfg RPMFORGE_MIRROR:`
+export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`
+#
+check_prereq    || exit 1
+install_mingw32 || exit 1
+fix_libs        || exit 1
+#
+exit 0

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+  <scr:component name="org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl" immediate="true">
+    <implementation class="org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl" />
+    <property name="service.description" value="Text Analysis Service" />
+    <service>
+      <provide interface="org.opencastproject.textanalyzer.api.TextAnalyzerService" />
+    </service>
+    <reference name="textExtractor" interface="org.opencastproject.textextractor.api.TextExtractor"
+      cardinality="1..1" policy="static" bind="setTextExtractor" />
+    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+    <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace" cardinality="1..1"
+      policy="static" bind="setWorkspace" />
+    <reference name="mpeg7service" interface="org.opencastproject.metadata.mpeg7.Mpeg7CatalogService"
+      cardinality="1..1" policy="static" bind="setMpeg7CatalogService" />
+    <reference name="dictionaryService" interface="org.opencastproject.dictionary.api.DictionaryService"
+      cardinality="1..1" policy="static" bind="setDictionaryService" />
+    <reference name="composer" interface="org.opencastproject.composer.api.ComposerService"
+      cardinality="1..1" policy="static" bind="setComposerService" />
+    <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+      cardinality="1..1" policy="static" bind="setSecurityService" />
+    <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"
+      cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+    <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+      cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+  </scr:component>
+
+  <scr:component name="org.opencastproject.textanalyzer.impl.endpoint.TextAnalysisRestEndpoint" immediate="true"
+    activate="activate">
+    <implementation class="org.opencastproject.textanalyzer.impl.endpoint.TextAnalysisRestEndpoint" />
+    <property name="service.description" value="Text Analysis REST Endpoint" />
+
+    <property name="opencast.service.type" value="org.opencastproject.textanalyzer" />
+    <property name="opencast.service.path" value="/analysis/text" />
+    <property name="opencast.service.jobproducer" value="true" />
+
+    <service>
+      <provide interface="org.opencastproject.textanalyzer.impl.endpoint.TextAnalysisRestEndpoint" />
+    </service>
+
+    <reference name="textAnalyzer" interface="org.opencastproject.textanalyzer.api.TextAnalyzerService"
+      cardinality="1..1" policy="static" bind="setTextAnalyzer" />
+    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+  </scr:component>
+
+</scr:components>
+
