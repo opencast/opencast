@@ -196,10 +196,15 @@ export SOURCE_SUFFIX="src"
 export OUT_SUFFIX="outputfile"
 # Suffix for the flavor of a certain device in the capture properties file
 export FLAVOR_SUFFIX="flavor"
+# Suffix for the type of device in the capture properties file
+export TYPE_SUFFIX="type"
 # Suffix for the size of the queue for a certain device in the capture properties file
 export QUEUE_SUFFIX="buffer.bytes"
 # Suffix for the comma-separated list of all the devices attached to a capture agent in the capture properties file
 export LIST_SUFFIX="names"
+
+# One of the possible values for the ".type" suffix, indicating an Epiphan device, in the capture properties file
+export EPIPHAN_TYPE="EPIPHAN_VGA2USB"
 
 # Required scripts for installation
 SETUP_USER=./setup_user.sh
