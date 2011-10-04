@@ -4,12 +4,8 @@
 <h2>Details for <%= this.episode.title %></h2>
 
 <div class="section">
-  <div class="section-title">Resources</div>
-  <ul id="episodeResourceLinks" class="ui-widget">
-    <% _.each(this.episode.media, function(a) { %>
-      <li><a href="<%= a.url %>"><%= a.url.split("/").pop() %></a> <span class="mimetype"><%= a.mimetype %></span></li>
-    <% }); %>
-  </ul>
+  <div class="section-title">Mediapackage</div>
+  <div id="mediaPackageDetails"></div>
 </div>
 
 <div class="section">

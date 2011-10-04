@@ -1,5 +1,15 @@
 /** Attention: underscore.js is needed to operate this script!
  */
+
+//
+// underscore related
+function __(a) { return _(ocUtils.ensureArray(a)) }
+
+// invoke the whole list with function f
+_.mixin({whole: function(xs, f) {
+  return f(xs)
+}});
+
 var opencast = opencast || {};
 
 opencast.episode = (function() {
@@ -50,40 +60,40 @@ opencast.episode = (function() {
      */
     Archive: new (function() {
 
-  var URL_EPISODE_LIST = "../episode/episode.json";
-  var URL_WORKFLOW_INSTANCES = "../workflow/instances.json";
+      var URL_EPISODE_LIST = "../episode/episode.json";
+      var URL_WORKFLOW_INSTANCES = "../workflow/instances.json";
 
-  var SORT_FIELDS = {
-    'Title': 'TITLE',
-    'Presenter': 'CREATOR',
-    'Series': 'SERIES_TITLE',
-    'Date': 'DATE_CREATED'
-  };
+      var SORT_FIELDS = {
+        'Title': 'TITLE',
+        'Presenter': 'CREATOR',
+        'Series': 'SERIES_TITLE',
+        'Date': 'DATE_CREATED'
+      };
 
       var SEARCH_FILTER_FIELDS = [
         {
-    q: "Full text"
+          q: "Full text"
         }
       ];
 
-  var refreshId = null;
+      var refreshId = null;
 
       var totalEpisodes = 0;
       var currentShownEpisodes = 0;
       var numSelectedEpisodes = 0;
 
-  // components
-  this.searchbox = null;
-  this.pager = null;
+      // components
+      this.searchbox = null;
+      this.pager = null;
 
-  this.statistics = null;
+      this.statistics = null;
 
-  var refreshing = false;      // indicates if JSONP requesting recording data is in progress
-  this.refreshingStats = false; // indicates if JSONP requesting statistics data is in progress
-  this.statsInterval = null;
+      var refreshing = false;      // indicates if JSONP requesting recording data is in progress
+      this.refreshingStats = false; // indicates if JSONP requesting statistics data is in progress
+      this.statsInterval = null;
 
       /** Create a state object from the current URL.
-   */
+       */
       function stateFromUrl() {
         var defaults = {
           state: "all",
@@ -109,7 +119,7 @@ opencast.episode = (function() {
           lastPage: parseInt,
           doRefresh: function(a) {
             return (/^true$/i).test(a);
-        }
+          }
         };
 
         // parse url parameters
@@ -133,7 +143,7 @@ opencast.episode = (function() {
       function stateToUrl(state) {
         var query = _.map(state, function(v, k) { return k + "=" + escape(v) }).join("&");
         return document.location.href.split('?', 2)[0] + (query.length > 0 ? "?" + query : "");
-    }
+      }
 
       var state = stateFromUrl();
 
@@ -144,76 +154,76 @@ opencast.episode = (function() {
         document.location.href = stateToUrl(_.defaults(newState || {}, state));
       }
 
-  /** Initiate new JSONP call to workflow instances list endpoint
-   */
-  function refresh() {
-    if (!refreshing) {
-      refreshing = true;
+      /** Initiate new JSONP call to workflow instances list endpoint
+       */
+      function refresh() {
+        if (!refreshing) {
+          refreshing = true;
 
           /** Extract data from the json response suitable for the render function.
            */
           function extractData(json) {
-          return {
-            raw: json,
-            totalCount: parseInt(json["search-results"].total),
-            count: parseInt(json["search-results"].limit),
-            mkRenderData: function() {
+            return {
+              raw: json,
+              totalCount: parseInt(json["search-results"].total),
+              count: parseInt(json["search-results"].limit),
+              mkRenderData: function() {
                 return mkRenderDataEpisodes(json);
+              }
             }
           }
-        }
 
           // define query parameters
           var params = _([
-      // sorting if specified
+            // sorting if specified
             (function() {
               if (state.sortField != null) {
                 var sort = SORT_FIELDS[state.sortField];
                 if (state.sortOrder == 'DESC') sort += "_DESC";
                 return "sort=" + sort;
-      }
+              }
             })(),
-      // filtering if specified
+            // filtering if specified
             (function() {
               if (state.filterText != '') {
                 return state.filterField + '=' + encodeURI(state.filterText);
-      }
+              }
             })(),
             "limit=" + state.pageSize,
             "offset=" + (state.page * state.pageSize)
           ]).compact();
 
-      // issue the ajax request
-      $.ajax({
+          // issue the ajax request
+          $.ajax({
             url: URL_EPISODE_LIST + "?" + params.join("&"),
-        dataType: 'jsonp',
-        jsonp: 'jsonp',
-        success: function(data) {
+            dataType: 'jsonp',
+            jsonp: 'jsonp',
+            success: function(data) {
               render(extractData(data));
+            }
+          });
         }
-      });
-    }
-  }
+      }
 
-  /** Prepare json data delivered by episode service endpoint for template rendering.
-   *  @param json -- the json data as it is returned by the server
+      /** Prepare json data delivered by episode service endpoint for template rendering.
+       *  @param json -- the json data as it is returned by the server
        *  @return { episodes: [] }
-   */
+       */
       function mkRenderDataEpisodes(json) {
-    return {
+        return {
           episodes: _.map(A(json["search-results"].result), mkEpisode)
-    }
-  }
+        }
+      }
 
-  /** Query the workflows that are currently being active, i.e. they do have either of the states
-   *  SUCCEEDED or FAILED.
+      /** Query the workflows that are currently being active, i.e. they do have either of the states
+       *  SUCCEEDED or FAILED.
        *  @return jqXHR
-   */
-  function getAllActiveWorkflows() {
-    return $6.getJSON(URL_WORKFLOW_INSTANCES + "?compact=true&state=-SUCCEEDED&state=-FAILED");
-  }
+       */
+      function getAllActiveWorkflows() {
+        return $6.getJSON(URL_WORKFLOW_INSTANCES + "?compact=true&state=-SUCCEEDED&state=-FAILED");
+      }
 
-  /** JSONP callback for calls to the workflow instances list endpoint.
+      /** JSONP callback for calls to the workflow instances list endpoint.
        *  @param pdata -- "parsed data"
        *    {
        *      raw: json,
@@ -221,43 +231,43 @@ opencast.episode = (function() {
        *      count: <INT>
        *      mkRenderData: function: {episodes: [episode]}
        *    }
-   */
+       */
       function render(pdata) {
-    // select template
-    $("#controlsFoot").show();
-    refreshing = false;
+        // select template
+        $("#controlsFoot").show();
+        refreshing = false;
 
         totalEpisodes = pdata.totalCount;
         if (totalEpisodes >= pdata.count) {
           currentShownEpisodes = pdata.count;
-    } else {
+        } else {
           currentShownEpisodes = totalEpisodes;
-    }
+        }
 
-    /** @param episodes -- {episodes: [Episode]}
-     */
-    function renderTable(episodes) {
-      $('#tableContainer').jqotesubtpl("templates/episodes-table.tpl", episodes);
-    }
+        /** @param episodes -- {episodes: [Episode]}
+         */
+        function renderTable(episodes) {
+          $('#tableContainer').jqotesubtpl("templates/episodes-table.tpl", episodes);
+        }
 
-    /** Adds the current workflow to each episode in the list.
-     *  @param episodes -- [Episode]
-     *  @param workflows -- [workflow_json]
-     */
-    function addCurrentWorkflow(episodes, workflows) {
-      _(episodes).each(function(episode) {
-        _.detect(workflows, function(workflow) {
-          if (workflow.mediapackage.id === episode.id) {
+        /** Adds the current workflow to each episode in the list.
+         *  @param episodes -- [Episode]
+         *  @param workflows -- [workflow_json]
+         */
+        function addCurrentWorkflow(episodes, workflows) {
+          _(episodes).each(function(episode) {
+            _.detect(workflows, function(workflow) {
+              if (workflow.mediapackage.id === episode.id) {
                 var lastOperation = A(workflow.operations.operation).pop()
                 episode.workflow = workflowDisplayName(workflow) + " : "
                     + ocUtils.dflt(lastOperation.description, lastOperation.id);
-            return true;
-          } else {
-            return false;
-          }
-        });
-      });
-    }
+                return true;
+              } else {
+                return false;
+              }
+            });
+          });
+        }
 
         function attachSortHandlers() {
           // When table is ready, attach event handlers
@@ -292,133 +302,133 @@ opencast.episode = (function() {
           }
         }
 
-    getAllActiveWorkflows()
-      .done(function(workflowJson) {
-          var episodes = pdata.mkRenderData();
+        getAllActiveWorkflows()
+            .done(function(workflowJson) {
+              var episodes = pdata.mkRenderData();
               addCurrentWorkflow(episodes.episodes, A(workflowJson.workflows.workflow));
-          renderTable(episodes);
+              renderTable(episodes);
               attachSortHandlers();
-      });
+            });
 
-    // display number of matches if filtered
+        // display number of matches if filtered
         if (state.filterText) {
-      if (pdata.totalCount == '0') {
-        $('#filterRecordingCount').css('color', 'red');
-      } else {
-        $('#filterRecordingCount').css('color', 'black');
-      }
-      $('#filterRecordingCount').text(pdata.totalCount + ' found').show();
-    } else {
-      $('#filterRecordingCount').hide();
-    }
+          if (pdata.totalCount == '0') {
+            $('#filterRecordingCount').css('color', 'red');
+          } else {
+            $('#filterRecordingCount').css('color', 'black');
+          }
+          $('#filterRecordingCount').text(pdata.totalCount + ' found').show();
+        } else {
+          $('#filterRecordingCount').hide();
+        }
 
         var page = state.page + 1;
         var pageCount = Math.ceil(pdata.totalCount / state.pageSize);
-    pageCount = pageCount == 0 ? 1 : pageCount;
-    $('#pageList').text(page + " of " + pageCount);
-    if (page == 1) {
-      $('#prevButtons').hide();
-      $('#prevText').show();
-    } else {
-      $('#prevButtons').show();
-      $('#prevText').hide();
-    }
-    if (page == pageCount) {
-      $('#nextButtons').hide();
-      $('#nextText').show();
-    } else {
-      $('#nextButtons').show();
-      $('#nextText').hide();
-    }
-  }
+        pageCount = pageCount == 0 ? 1 : pageCount;
+        $('#pageList').text(page + " of " + pageCount);
+        if (page == 1) {
+          $('#prevButtons').hide();
+          $('#prevText').show();
+        } else {
+          $('#prevButtons').show();
+          $('#prevText').hide();
+        }
+        if (page == pageCount) {
+          $('#nextButtons').hide();
+          $('#nextText').show();
+        } else {
+          $('#nextButtons').show();
+          $('#nextText').hide();
+        }
+      }
 
       /** Setup the page on first load. Call refresh afterwards to initialize the content area.
-   */
-  this.init = function() {
-    $('#addHeader').jqotesubtpl('templates/episodes-header.tpl', {});
+       */
+      this.init = function() {
+        $('#addHeader').jqotesubtpl('templates/episodes-header.tpl', {});
 
-    // initialize search box
-    (function(controller) {
-      $('#searchBox').css('width', $('#addButtonsContainer').outerWidth(false) - 10);   // make searchbox beeing aligned with upload/schedule buttons (MH-6519)
-      controller.searchbox = $("#searchBox").searchbox({
-        search: function(text, field) {
-          if ($.trim(text) != '') {
+        // initialize search box
+        (function(controller) {
+          $('#searchBox').css('width', $('#addButtonsContainer').outerWidth(false) - 10);   // make searchbox beeing aligned with upload/schedule buttons (MH-6519)
+          controller.searchbox = $("#searchBox").searchbox({
+            search: function(text, field) {
+              if ($.trim(text) != '') {
                 state.filterField = field;
                 state.filterText = text;
                 state.page = 0;
-          }
-          refresh();
-        },
-        clear: function() {
+              }
+              refresh();
+            },
+            clear: function() {
               state.filterField = '';
               state.filterText = '';
               state.page = 0;
-          refresh();
-        },
+              refresh();
+            },
             searchText: state.filterText,
-        options: SEARCH_FILTER_FIELDS,
+            options: SEARCH_FILTER_FIELDS,
             selectedOption: state.filterField
-      });
-    })(this);
+          });
+        })(this);
 
-    // initialize pager
-    (function(controller) {
+        // initialize pager
+        (function(controller) {
           $('#pageSize').val(state.pageSize);
 
-      $('#pageSize').change(function() {
+          $('#pageSize').change(function() {
             state.pageSize = $(this).val();
             state.page = 0;
-      });
+          });
 
           $('#page').val(state.page + 1);
 
-      $('#page').blur(function() {
-        controller.gotoPage($(this).val() - 1);
-      });
+          $('#page').blur(function() {
+            controller.gotoPage($(this).val() - 1);
+          });
 
-      $('#page').keypress(function(event) {
-        if (event.keyCode == '13') {
-          event.preventDefault();
-          controller.gotoPage($(this).val() - 1);
-        }
-      });
-    })(this);
+          $('#page').keypress(function(event) {
+            if (event.keyCode == '13') {
+              event.preventDefault();
+              controller.gotoPage($(this).val() - 1);
+            }
+          });
+        })(this);
 
-    // initialize refresh controls
-    (function(controller) {
+        // initialize refresh controls
+        (function(controller) {
           controller.updateRefreshInterval(state.doRefresh, state.refresh);
 
-      // Refresh Controls
-      // set values according to config
+          // Refresh Controls
+          // set values according to config
           if (state.doRefresh) {
-        $('#refreshEnabled').attr('checked', 'checked');
-        $('#refreshInterval').removeAttr('disabled');
-        $('#refreshControlsContainer span').removeAttr('style');
-      } else {
-        $('#refreshEnabled').removeAttr('checked');
-        $('#refreshInterval').attr('disabled', 'true');
-        $('#refreshControlsContainer span').css('color', 'silver');
-      }
+            $('#refreshEnabled').attr('checked', 'checked');
+            $('#refreshInterval').removeAttr('disabled');
+            $('#refreshControlsContainer span').removeAttr('style');
+          } else {
+            $('#refreshEnabled').removeAttr('checked');
+            $('#refreshInterval').attr('disabled', 'true');
+            $('#refreshControlsContainer span').css('color', 'silver');
+          }
           $('#refreshInterval').val(state.refresh);
-      // attatch event handlers
-      $('#refreshEnabled').change(function() {
-        if ($(this).is(':checked')) {
-          $('#refreshInterval').removeAttr('disabled');
-          $('#refreshControlsContainer span').removeAttr('style');
-        } else {
-          $('#refreshInterval').attr('disabled', 'true');
-          $('#refreshControlsContainer span').css('color', 'silver');
-        }
-        controller.updateRefreshInterval($(this).is(':checked'), $('#refreshInterval').val());
-      });
-      $('#refreshInterval').change(function() {
-        controller.updateRefreshInterval($('#refreshEnabled').is(':checked'), $(this).val());
-      });
-    })(this);
+          // attatch event handlers
+          $('#refreshEnabled').change(function() {
+            if ($(this).is(':checked')) {
+              $('#refreshInterval').removeAttr('disabled');
+              $('#refreshControlsContainer span').removeAttr('style');
+            } else {
+              $('#refreshInterval').attr('disabled', 'true');
+              $('#refreshControlsContainer span').css('color', 'silver');
+            }
+            controller.updateRefreshInterval($(this).is(':checked'), $('#refreshInterval').val());
+          });
+          $('#refreshInterval').change(function() {
+            controller.updateRefreshInterval($('#refreshEnabled').is(':checked'), $(this).val());
+          });
+        })(this);
 
-    //
-    refresh();
-  };
+        //
+        refresh();
+      };
 
       /** Start the retract workflow for a certain media package.
        *  @param mediaPackageId -- the id of the package to retract
@@ -439,9 +449,9 @@ opencast.episode = (function() {
               } else {
                 alert("Unexpected response " + xhr.status);
               }
-    }
+            }
           });
-  }
+        }
       };
 
       this.nextPage = function() {
@@ -451,12 +461,12 @@ opencast.episode = (function() {
         reload({ page: currentPage < numPages ? currentPage + 1 : currentPage });
       };
 
-  this.previousPage = function() {
+      this.previousPage = function() {
         var currentPage = state.page;
         reload({ page: currentPage > 0 ? currentPage - 1 : currentPage });
-  };
+      };
 
-  this.lastPage = function() {
+      this.lastPage = function() {
         reload({ page: Math.floor(totalEpisodes / state.pageSize) });
       };
 
@@ -464,35 +474,35 @@ opencast.episode = (function() {
         reload({ page: 0 });
       };
 
-  this.gotoPage = function(page) {
+      this.gotoPage = function(page) {
         if (page > (totalEpisodes / state.pageSize)) {
-      this.lastPage();
-    } else {
-      if (page < 0) {
-        page = 0;
-      }
+          this.lastPage();
+        } else {
+          if (page < 0) {
+            page = 0;
+          }
           reload({ page: page });
-    }
-  };
+        }
+      };
 
-  this.disableRefresh = function() {
-    if (refreshId) {
-      window.clearInterval(refreshId);
-    }
-  };
+      this.disableRefresh = function() {
+        if (refreshId) {
+          window.clearInterval(refreshId);
+        }
+      };
 
-  this.updateRefreshInterval = function(enable, delay) {
-    delay = delay < 5 ? 5 : delay;
+      this.updateRefreshInterval = function(enable, delay) {
+        delay = delay < 5 ? 5 : delay;
         state.refresh = delay;
-    ocUtils.log('Setting Refresh to ' + enable + " - " + delay + " sec");
+        ocUtils.log('Setting Refresh to ' + enable + " - " + delay + " sec");
         state.doRefresh = enable;
-    this.disableRefresh();
-    if (enable) {
-      refreshId = window.setInterval(refresh, delay * 1000);
-    }
-  };
+        this.disableRefresh();
+        if (enable) {
+          refreshId = window.setInterval(refresh, delay * 1000);
+        }
+      };
 
-  return this;
+      return this;
     })(),
 
     /** Details page.
@@ -506,15 +516,28 @@ opencast.episode = (function() {
         $6.when(queryWorkflowsOfMediaPackage(mpId), queryMediaPackage(mpId))
             .done(function(ajaxWorkflow, ajaxMpSearchResult) {
               // both args are arrays where [0] contains the response data
-              injectDetailOverview({
+              injectDetailOverview($("#tableContainer"), {
                 episode: mkEpisode(ajaxMpSearchResult[0]["search-results"].result),
                 workflows: _.map(A(ajaxWorkflow[0].workflows.workflow), mkWorkflow)
               });
+              injectMediaPackageDetails($("#mediaPackageDetails"), ajaxMpSearchResult[0]["search-results"].result.mediapackage);
             });
       }
 
-      function injectDetailOverview(data) {
-        $("#tableContainer").jqotesubtpl("templates/episode-detail-overview.tpl", data);
+      function injectDetailOverview($container, data) {
+        $container.jqotesubtpl("templates/episode-detail-overview.tpl", data);
+      }
+
+      function injectMediaPackageDetails($container, mediapackage) {
+        $container.jqotesubtpl("templates/episode-detail-mediapackage.tpl", mediapackage);
+        $('.unfoldable-tr').click(function() {
+          var $content = $(this).find('.unfoldable-content');
+          var unfolded = $content.is(':visible');
+          $('.unfoldable-content').hide('fast');
+          if (!unfolded) {
+            $content.show('fast');
+          }
+        });
       }
 
       /** @param id -- the media package id
@@ -549,7 +572,24 @@ opencast.episode = (function() {
       return {
         init: init
       };
-    })()
+    })(),
+
+    /** Utility functions.
+     */
+    Utils: {
+      /** Return a function that applies f to its argument if it is not empty, i.e. an empty array.
+       */
+      full: function(f) {
+        return function(as) {
+          if (ocUtils.ensureArray(as).length > 0)
+            f(as);
+          return as;
+        }
+      },
+      isStringOrNumber: function(a) {
+        return _.isString(a) || _.isNumber(a);
+      }
+    }
   };
 })();
 
