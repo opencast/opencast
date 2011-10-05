@@ -254,8 +254,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
     }
 
     // Stop the job dispatcher
-    if (scheduledExecutor != null)
+    if (scheduledExecutor != null) {
       scheduledExecutor.shutdown();
+    }
   }
 
   /**
@@ -308,12 +309,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
    */
   public Job createJob(String host, String serviceType, String operation, List<String> arguments, String payload,
           boolean dispatchable) throws ServiceRegistryException {
-    if (StringUtils.isBlank(host))
+    if (StringUtils.isBlank(host)) {
       throw new IllegalArgumentException("Host can't be null");
-    if (StringUtils.isBlank(serviceType))
+    } if (StringUtils.isBlank(serviceType)) {
       throw new IllegalArgumentException("Service type can't be null");
-    if (StringUtils.isBlank(operation))
+    } if (StringUtils.isBlank(operation)) {
       throw new IllegalArgumentException("Operation can't be null");
+    }
 
     User currentUser = securityService.getUser();
     Organization currentOrganization = securityService.getOrganization();
@@ -383,7 +385,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
       setJobUri(job);
       return job;
     } catch (RollbackException e) {
-      tx.rollback();
+      if (tx.isActive()) {
+        tx.rollback();
+      }
       throw e;
     } finally {
       em.close();
@@ -467,8 +471,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
       tx.begin();
       JobJpaImpl fromDb;
       fromDb = em.find(JobJpaImpl.class, job.getId());
-      if (fromDb == null)
+      if (fromDb == null) {
         throw new NoResultException();
+      }
       update(fromDb, (JaxbJob) job);
       em.merge(fromDb);
       tx.commit();
@@ -476,8 +481,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
       setJobUri(job);
       return job;
     } catch (PersistenceException e) {
-      if (tx.isActive())
+      if (tx.isActive()) {
         tx.rollback();
+      }
       throw e;
     }
   }
@@ -562,11 +568,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
    */
   @Override
   public void registerHost(String host, int maxJobs) throws ServiceRegistryException {
-    EntityManager em = null;
-    EntityTransaction tx = null;
+    EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
     try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
       tx.begin();
       // Find the existing registrations for this host and if it exists, update it
       HostRegistration existingHostRegistration = fetchHostRegistration(em, host);
@@ -580,13 +584,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
       logger.info("Registering {} with a maximum load of {}", host, maxJobs);
       tx.commit();
     } catch (Exception e) {
-      if (tx.isActive())
+      if (tx.isActive()) {
         tx.rollback();
+      }
       throw new ServiceRegistryException(e);
     } finally {
-      if (em != null && em.isOpen()) {
-        em.close();
-      }
+      em.close();
     }
   }
 
@@ -597,11 +600,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
    */
   @Override
   public void unregisterHost(String host) throws ServiceRegistryException {
-    EntityManager em = null;
-    EntityTransaction tx = null;
+    EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
     try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
       tx.begin();
       HostRegistration existingHostRegistration = fetchHostRegistration(em, host);
       if (existingHostRegistration == null) {
@@ -617,13 +618,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
       logger.info("Unregistering {}", host, maxJobs);
       tx.commit();
     } catch (Exception e) {
-      if (tx.isActive())
+      if (tx.isActive()) {
         tx.rollback();
+      }
       throw new ServiceRegistryException(e);
     } finally {
-      if (em != null && em.isOpen()) {
-        em.close();
-      }
+      em.close();
     }
   }
 
@@ -713,8 +713,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
       tx.commit();
       return registration;
     } catch (Exception e) {
-      if (tx.isActive())
+      if (tx.isActive()) {
         tx.rollback();
+      }
       throw new ServiceRegistryException(e);
     } finally {
       em.close();
@@ -753,8 +754,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
       }
       tx.commit();
     } catch (Exception e) {
-      if (tx.isActive())
+      if (tx.isActive()) {
         tx.rollback();
+      }
       throw new ServiceRegistryException(e);
     } finally {
       em.close();
@@ -780,8 +782,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
       em.merge(reg);
       tx.commit();
     } catch (RollbackException e) {
-      if (tx.isActive())
+      if (tx.isActive()) {
         tx.rollback();
+      }
       throw e;
     } finally {
       em.close();
@@ -825,9 +828,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
   @Override
   public List<Job> getJobs(String type, Status status) throws ServiceRegistryException {
     Query query = null;
-    EntityManager em = null;
+    EntityManager em = emf.createEntityManager();
     try {
-      em = emf.createEntityManager();
       if (type == null && status == null) {
         query = em.createNamedQuery("Job.all");
       } else if (type == null) {
@@ -958,9 +960,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
             || status == null)
       throw new IllegalArgumentException("service type, host, operation, and status must be provided");
     Query query = null;
-    EntityManager em = null;
+    EntityManager em = emf.createEntityManager();
     try {
-      em = emf.createEntityManager();
       query = em.createNamedQuery("Job.fullMonty");
       query.setParameter("status", status);
       query.setParameter("serviceType", serviceType);
@@ -1139,14 +1140,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
    */
   @Override
   public ServiceRegistration getServiceRegistration(String serviceType, String host) {
-    EntityManager em = null;
+    EntityManager em = emf.createEntityManager();
     try {
-      em = emf.createEntityManager();
       return getServiceRegistration(em, serviceType, host);
     } finally {
-      if (em != null) {
-        em.close();
-      }
+      em.close();
     }
   }
 
@@ -1398,9 +1396,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
   @Override
   public int getMaxConcurrentJobs() throws ServiceRegistryException {
     Query query = null;
-    EntityManager em = null;
+    EntityManager em = emf.createEntityManager();
     try {
-      em = emf.createEntityManager();
       query = em.createNamedQuery("HostRegistration.cores");
       return ((Number) query.getSingleResult()).intValue();
     } catch (Exception e) {

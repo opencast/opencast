@@ -174,8 +174,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   @Override
   public void deleteSeries(String seriesId) throws SeriesServiceDatabaseException, NotFoundException {
     EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
     try {
-      EntityTransaction tx = em.getTransaction();
       tx.begin();
       SeriesEntity entity = getSeriesEntity(seriesId, em);
       if (entity == null) {
@@ -197,6 +197,9 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       throw e;
     } catch (Exception e) {
       logger.error("Could not delete series: {}", e.getMessage());
+      if (tx.isActive()) {
+        tx.rollback();
+      }
       throw new SeriesServiceDatabaseException(e);
     } finally {
       em.close();
@@ -285,9 +288,9 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       throw new SeriesServiceDatabaseException(e1);
     }
     EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
     DublinCoreCatalog newSeries = null;
     try {
-      EntityTransaction tx = em.getTransaction();
       tx.begin();
       SeriesEntity entity = getSeriesEntity(seriesId, em);
       if (entity == null) {
@@ -317,6 +320,9 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       return newSeries;
     } catch (Exception e) {
       logger.error("Could not update series: {}", e.getMessage());
+      if (tx.isActive()) {
+        tx.rollback();
+      }
       throw new SeriesServiceDatabaseException(e);
     } finally {
       em.close();
@@ -332,8 +338,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   @Override
   public DublinCoreCatalog getSeries(String seriesId) throws NotFoundException, SeriesServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
     try {
-      EntityTransaction tx = em.getTransaction();
       tx.begin();
       SeriesEntity entity = getSeriesEntity(seriesId, em);
       if (entity == null) {
@@ -357,6 +363,9 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       throw e;
     } catch (Exception e) {
       logger.error("Could not update series: {}", e.getMessage());
+      if (tx.isActive()) {
+        tx.rollback();
+      }
       throw new SeriesServiceDatabaseException(e);
     } finally {
       em.close();
@@ -385,9 +394,9 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       throw new SeriesServiceDatabaseException(e);
     }
     EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
     boolean updated = false;
     try {
-      EntityTransaction tx = em.getTransaction();
       tx.begin();
       SeriesEntity entity = getSeriesEntity(seriesId, em);
       if (entity == null) {
@@ -414,6 +423,9 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       throw e;
     } catch (Exception e) {
       logger.error("Could not update series: {}", e.getMessage());
+      if (tx.isActive()) {
+        tx.rollback();
+      }
       throw new SeriesServiceDatabaseException(e);
     } finally {
       em.close();
