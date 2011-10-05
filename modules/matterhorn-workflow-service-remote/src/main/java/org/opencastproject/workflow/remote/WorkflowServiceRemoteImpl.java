@@ -83,12 +83,15 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
       throw new WorkflowDatabaseException("Unable to connect to a remote workflow service");
     }
     if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+      closeConnection(response);
       throw new NotFoundException("Workflow definition " + id + " does not exist.");
     } else {
       try {
         return WorkflowParser.parseWorkflowDefinition(response.getEntity().getContent());
       } catch (Exception e) {
         throw new WorkflowDatabaseException(e);
+      } finally {
+        closeConnection(response);
       }
     }
   }
@@ -106,12 +109,15 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
       throw new WorkflowDatabaseException("Unable to connect to a remote workflow service");
     }
     if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+      closeConnection(response);
       throw new NotFoundException("Workflow instance " + id + " does not exist.");
     } else {
       try {
         return WorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
       } catch (Exception e) {
         throw new WorkflowDatabaseException(e);
+      } finally {
+        closeConnection(response);
       }
     }
   }
@@ -203,6 +209,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
         return WorkflowParser.parseWorkflowSet(response.getEntity().getContent());
       } catch (Exception e) {
         throw new WorkflowDatabaseException(e);
+      } finally {
+        closeConnection(response);
       }
     }
 
@@ -304,6 +312,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
         return instance;
       } catch (Exception e) {
         throw new WorkflowDatabaseException("Unable to build a workflow from xml: " + xml);
+      } finally {
+        closeConnection(response);
       }
     }
   }
@@ -359,13 +369,13 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
         throw new WorkflowDatabaseException("Unable to parse the response body");
       } catch (IOException e) {
         throw new WorkflowDatabaseException("Unable to parse the response body");
+      } finally {
+        closeConnection(response);
       }
       try {
         return Long.parseLong(body);
       } catch (NumberFormatException e) {
         throw new WorkflowDatabaseException("Unable to parse the response body as a long: " + body);
-      } finally {
-        closeConnection(response);
       }
     }
   }
@@ -389,6 +399,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     if (response == null) {
       throw new WorkflowDatabaseException("Unexpected HTTP response code");
     } else if (response.getStatusLine().getStatusCode() == SC_NOT_FOUND) {
+      closeConnection(response);
       throw new NotFoundException("Workflow instance with id='" + workflowInstanceId + "' not found");
     } else {
       logger.info("Workflow '{}' stopped", workflowInstanceId);
@@ -465,6 +476,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     if (response == null) {
       throw new WorkflowDatabaseException("Unexpected HTTP response code");
     } else if (response.getStatusLine().getStatusCode() == SC_NOT_FOUND) {
+      closeConnection(response);
       throw new NotFoundException("Workflow instance with id='" + workflowInstanceId + "' not found");
     } else {
       logger.info("Workflow '{}' resumed", workflowInstanceId);
@@ -503,6 +515,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     if (response == null) {
       throw new WorkflowDatabaseException("Unexpected HTTP response code");
     } // otherwise, our work is done
+    closeConnection(response);
   }
 
   /**
@@ -522,6 +535,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
         return WorkflowParser.parseWorkflowDefinitions(response.getEntity().getContent());
       } catch (Exception e) {
         throw new IllegalStateException("Unable to parse workflow definitions");
+      } finally {
+        closeConnection(response);
       }
     }
   }
@@ -551,6 +566,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     if (response == null) {
       throw new WorkflowDatabaseException("Unexpected HTTP response code");
     } // otherwise, our work is done
+
+    closeConnection(response);
   }
 
   /**
@@ -566,6 +583,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     if (response == null) {
       throw new WorkflowDatabaseException("Unable to delete workflow definition '" + workflowDefinitionId + "'");
     }
+    closeConnection(response);
   }
 
   /**

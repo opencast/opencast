@@ -699,8 +699,9 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
     filesToZip.add(new File(recording.getBaseDir(), CaptureParameters.MANIFEST_NAME));
 
     logger.info("Zipping {} files:", filesToZip.size());
-    for (File f : filesToZip)
+    for (File f : filesToZip) {
       logger.debug("--> {}", f.getName());
+    }
 
     // Nuke any existing zipfile, we want to recreate it if it already exists.
     File outputZip = new File(recording.getBaseDir(), CaptureParameters.ZIP_NAME);
@@ -911,6 +912,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
       logger.error("Unable to serialize recording, bad id parameter: null!");
       return;
     }
+    ObjectOutputStream serializer = null;
     try {
       RecordingImpl newRec = (RecordingImpl) pendingRecordings.get(id);
       if (newRec == null) {
@@ -923,11 +925,14 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
       }
       File output = new File(newRec.getBaseDir(), newRec.getID() + ".recording");
       logger.debug("Serializing recording {} to {}.", newRec.getID(), output.getAbsolutePath());
-      ObjectOutputStream serializer = new ObjectOutputStream(new FileOutputStream(output));
+      serializer = new ObjectOutputStream(new FileOutputStream(output));
       serializer.writeObject(newRec);
-      serializer.close();
     } catch (IOException e) {
       logger.error("Unable to serialize recording {}, IO exception.  Message: {}.", id, e);
+    } finally {
+      if (serializer != null) {
+        IOUtils.closeQuietly(serializer);
+      }
     }
   }
 
@@ -940,9 +945,10 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
    */
   protected RecordingImpl loadRecording(File recording) {
     RecordingImpl rec = null;
+    ObjectInputStream stream = null;
     try {
       logger.debug("Loading {}.", recording.getAbsolutePath());
-      ObjectInputStream stream = new ObjectInputStream(new FileInputStream(recording));
+      stream = new ObjectInputStream(new FileInputStream(recording));
       rec = (RecordingImpl) stream.readObject();
       if (context != null) {
         rec.getProperties().setBundleContext(context.getBundleContext());
@@ -953,6 +959,10 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
       logger.error("IOException loading recording {}: {}.", recording.getAbsolutePath(), e);
     } catch (ClassNotFoundException e) {
       logger.error("Unable to load recording {}, file not found!", recording.getAbsolutePath());
+    } finally {
+      if (stream != null) {
+        IOUtils.closeQuietly(stream);
+      }
     }
     return rec;
   }

@@ -181,8 +181,8 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
   @Override
   public void deleteEvent(long eventId) throws NotFoundException, SchedulerServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
     try {
-      EntityTransaction tx = em.getTransaction();
       tx.begin();
       EventEntity entity = em.find(EventEntity.class, eventId);
       if (entity == null) {
@@ -191,6 +191,9 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       em.remove(entity);
       tx.commit();
     } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
       if (e instanceof NotFoundException) {
         throw (NotFoundException) e;
       }
@@ -282,8 +285,8 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       throw new SchedulerServiceDatabaseException(e1);
     }
     EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
     try {
-      EntityTransaction tx = em.getTransaction();
       tx.begin();
       EventEntity entity = em.find(EventEntity.class, eventId);
       if (entity == null) {
@@ -295,6 +298,9 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
       logger.error("Could not store event: {}", e.getMessage());
       throw new SchedulerServiceDatabaseException(e);
     } finally {
@@ -312,8 +318,8 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
   public void storeEvents(DublinCoreCatalog... events) throws SchedulerServiceDatabaseException {
 
     EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
     try {
-      EntityTransaction tx = em.getTransaction();
       tx.begin();
       for (DublinCoreCatalog event : events) {
         Long eventId = Long.parseLong(event.getFirst(DublinCore.PROPERTY_IDENTIFIER));
@@ -333,6 +339,9 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     } catch (SchedulerServiceDatabaseException e) {
       throw e;
     } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
       logger.error("Could not store events: {}", e);
       throw new SchedulerServiceDatabaseException(e);
     } finally {
@@ -360,8 +369,8 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       throw new SchedulerServiceDatabaseException(e);
     }
     EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
     try {
-      EntityTransaction tx = em.getTransaction();
       tx.begin();
       EventEntity entity = em.find(EventEntity.class, eventId);
       if (entity == null) {
@@ -374,6 +383,9 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       logger.error("Event with ID '{}' does not exist", eventId);
       throw e;
     } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
       logger.error("Could not store event metadata: {}", e.getMessage());
       throw new SchedulerServiceDatabaseException(e);
     } finally {
