@@ -66,7 +66,7 @@ Opencast.embedControlHide = (function ()
      */
     function initialize(time)
     { 
-        log('initalize');
+        $.log('Initializing');
         _time = time | 500;
         
         //start width height listener and call it one time direct
@@ -199,7 +199,6 @@ Opencast.embedControlHide = (function ()
         } else {
             margin = '-='+ _height.toString() +'px';
         }
-        log('margiin:  ' + margin);
         
         $('#oc_flash-player').animate({
                 marginBottom:  margin
@@ -327,15 +326,6 @@ Opencast.embedControlHide = (function ()
                 }).mouseleave(function() {
                     hide();
                 });
-        }
-    }
-    /**
-     * debug function
-     */
-    function log(string)
-    {
-        if(window.console) {
-            window.console.log(string)
         }
     }
     return {
