@@ -50,7 +50,6 @@
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-metadata</module>
         <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-oaipmh</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-scheduler-api</module>
@@ -158,7 +157,6 @@
         <module>modules/matterhorn-lti</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-oaipmh</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
@@ -360,6 +358,27 @@
       </activation>
       <modules>
         <module>modules/matterhorn-cas</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>oaipmh</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-json</module>
+        <module>modules/matterhorn-search-service-api</module>
+        <module>modules/matterhorn-search-service-impl</module>
+        <module>modules/matterhorn-series-service-api</module>
+        <module>modules/matterhorn-series-service-impl</module>
+        <module>modules/matterhorn-solr</module>
+        <module>modules/matterhorn-dublincore</module>
+        <module>modules/matterhorn-metadata-api</module>
+        <module>modules/matterhorn-workspace-api</module>
+        <module>modules/matterhorn-mpeg7</module>
+        <module>modules/matterhorn-oaipmh</module>
       </modules>
     </profile>
 
