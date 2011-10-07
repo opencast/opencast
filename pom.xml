@@ -1429,6 +1429,17 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
+    <developer>
+      <id>wsmirnow</id>
+      <name>Waldemar Smirnow</name>
+      <email>wsmirnow@uni-osnabrueck.de</email>
+      <organization>University of Osnabrueck</organization>
+      <organizationUrl>ttp://www.uni-osnabrueck.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
 
   <contributors><!-- TODO? -->
