@@ -9,7 +9,7 @@
         clear: both;
         border: none;
         width: 90%;
-        height: 300px;
+        height: 320px;
       }
 
       .hidden {
@@ -374,7 +374,7 @@
                 }
                 url += previewFiles[i];
               }
-              $('#player-container').attr('src', url + "&play=false&preview=true");
+              $('#player-container').attr('src', url + "&play=false&preview=true&hideControls=false&hideAPLogo=true");
             }
             else {
               $('#player-container').text("No preview media files found for this media package.");
