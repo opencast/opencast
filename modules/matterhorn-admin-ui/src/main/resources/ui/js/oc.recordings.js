@@ -573,7 +573,7 @@ ocRecordings = new (function() {
   this.reload = function() {
     var url = document.location.href.split('?', 2)[0];
     url += '?' + ocRecordings.buildURLparams();
-    document.location.href = url;
+    document.location.href = "/admin";
   }
   
   /** Returns the workflow with the specified id from the currently loaded
