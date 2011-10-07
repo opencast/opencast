@@ -108,6 +108,7 @@ Opencast.embedControlHide = (function ()
         } else
         {
             doShowFast();
+            $('#oc_flash-player').css('marginBottom', '-50px');
         }
         
         if(hideAPLogo)
