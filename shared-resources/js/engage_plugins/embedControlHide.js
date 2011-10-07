@@ -58,6 +58,7 @@ Opencast.embedControlHide = (function ()
      * var array
      */
     var _elements = ['#oc_controlbar-embed', '#oc_video-player-controls', '#analytics-and-annotations'];
+    var hideAPLogo = false;
     
     /**
      * initalize the effects
@@ -68,16 +69,27 @@ Opencast.embedControlHide = (function ()
     { 
         $.log('Initializing');
         
-        var controls = $.getURLParameter('controls');
-        if((controls != null) && controls.toLowerCase() == "true")
+        var hideControls = $.getURLParameter('hideControls');
+        if((hideControls != null) && hideControls.toLowerCase() == "false")
         {
-            $.log("Controls hiding disabled.");
-            controls = true;
+            $.log("Not hiding the controls.");
+            hideControls = false;
         } else
         {
-            $.log("Controls hiding enabled.");
-            controls = false;
+            $.log("Hiding the controls.");
+            hideControls = true;
         }
+        hideAPLogo = $.getURLParameter('hideAPLogo');
+        if((hideAPLogo != null) && hideAPLogo.toLowerCase() == "true")
+        {
+            $.log("Hiding the Advanced Player logo.");
+            hideAPLogo = true;
+        } else
+        {
+            $.log("Not hiding the Advanced Player logo.");
+            hideAPLogo = false;
+        }
+        
         _time = time | 500;
         
         //start width height listener and call it one time direct
@@ -89,13 +101,18 @@ Opencast.embedControlHide = (function ()
         $('#oc_flash-player').css('marginTop', '-'+ (advHeight + 2)  +'px');
         doHideAdvLinkFast();
         
-        if(!controls)
+        if(hideControls)
         {
             //start interval to bind key and mouse actions
             bindActions();
         } else
         {
             doShowFast();
+        }
+        
+        if(hideAPLogo)
+        {
+            $('#oc-link-advanced-player').css('marginLeft', '-'+_width+'px');
         }
     }
     
@@ -222,7 +239,10 @@ Opencast.embedControlHide = (function ()
                 duration: _time,
                 specialEasing: 'swing' 
             });
-        doShowAdvLinkSlide();
+        if(!hideAPLogo)
+        {
+            doShowAdvLinkSlide();
+        }
     }
     /**
      * Hide link to advanced player with slide effect
