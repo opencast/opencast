@@ -23,105 +23,138 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  */
- 
 /**
  * jQuery client-side XSLT plugins.
  * 
  * @author <a href="mailto:jb@eaio.com">Johann Burkard</a>
  * @version $Id: jquery.xslt.js,v 1.10 2008/08/29 21:34:24 Johann Exp $
+ * @update 10.10.2011 by Denis Meyer (denmeyer@uos.de): Updated this plugin to work with jQuery 1.6.4
  */
-(function($) {
-    $.fn.xslt = function() {
+(function ($)
+{
+    $.fn.xslt = function ()
+    {
         return this;
     }
     var str = /^\s*</;
-    if ($.browser.msie) { // IE 5+
-        $.fn.xslt = function(xml, xslt, callback) {
+    if ($.browser.msie)
+    { // IE 5+
+        $.fn.xslt = function (xml, xslt, callback)
+        {
             var target = $(this);
 
             var xmlResult = $.ajax(
             {
-              url: xml,
-              async: false
+                url: xml,
+                async: false
             }).responseXML;
 
             var xsltResult = $.ajax(
             {
-              url: xslt,
-              async: false
+                url: xslt,
+                async: false
             }).responseXML;
-                
+
             target.html(xmlResult.transformNode(xsltResult));
-            if (callback) {
-              callback();
+            if (callback)
+            {
+                callback();
             }
 
             return this;
-       };
+        };
     }
-    else if (window.DOMParser != undefined && window.XMLHttpRequest != undefined && window.XSLTProcessor != undefined) { // Mozilla 0.9.4+, Opera 9+
-       var processor = new XSLTProcessor();
-       var support = false;
-       if ($.isFunction(processor.transformDocument)) {
-           support = window.XMLSerializer != undefined;
-       }
-       else {
-           support = true;
-       }
-       if (support) {
-            $.fn.xslt = function(xml, xslt, callback) {
+    else if (window.DOMParser != undefined && window.XMLHttpRequest != undefined && window.XSLTProcessor != undefined)
+    { // Mozilla 0.9.4+, Opera 9+
+        var processor = new XSLTProcessor();
+        var support = false;
+        if ($.isFunction(processor.transformDocument))
+        {
+            support = window.XMLSerializer != undefined;
+        }
+        else
+        {
+            support = true;
+        }
+        if (support)
+        {
+            $.fn.xslt = function (xml, xslt, callback)
+            {
                 var target = $(this);
                 var transformed = false;
-
                 var xm = {
                     readyState: 4
                 };
                 var xs = {
                     readyState: 4
                 };
-                
+
                 var xsDoc = null;
                 var xmDoc = null;
 
-                var change = function() {
-                    if(xm.readyState == 4){xmDoc = xm.responseXML;}
-                    if(xs.readyState == 4){xsDoc = xs.responseXML;}
-                    if (xmDoc && xsDoc && !transformed) {
-                        var processor = new XSLTProcessor();
-                        if ($.isFunction(processor.transformDocument)) {
-                            // obsolete Mozilla interface
-                            resultDoc = document.implementation.createDocument("", "", null);
-                            processor.transformDocument(xmDoc, xsDoc, resultDoc, null);
-                            target.html(new XMLSerializer().serializeToString(resultDoc));
+                var change = function ()
+                    {
+                        if (xmDoc && xsDoc && !transformed)
+                        {
+                            var processor = new XSLTProcessor();
+                            if ($.isFunction(processor.transformDocument))
+                            {
+                                // obsolete Mozilla interface
+                                resultDoc = document.implementation.createDocument("", "", null);
+                                processor.transformDocument(xmDoc, xsDoc, resultDoc, null);
+                                target.html(new XMLSerializer().serializeToString(resultDoc));
+                            }
+                            else
+                            {
+                                processor.importStylesheet(xsDoc);
+                                resultDoc = processor.transformToFragment(xmDoc, document);
+                                target.empty().append(resultDoc);
+                            }
+                            transformed = true;
+                            callback();
                         }
-                        else {
-                            processor.importStylesheet(xsDoc);
-                            resultDoc = processor.transformToFragment(xmDoc, document);
-                            target.empty().append(resultDoc);
-                        }
-                        transformed = true;
-                        callback();
-                    }
-                };
+                    };
 
-                if (str.test(xml)) {
+                if (str.test(xml))
+                {
                     xm.responseXML = new DOMParser().parseFromString(xml, "text/xml");
                 }
-                else {
-                    xm = $.ajax({dataType: "xml", url: xml});
+                else
+                {
+                    xm = $.ajax(
+                    {
+                        dataType: "xml",
+                        url: xml,
+                        success: function()
+                        {
+                            xmDoc = xm.responseXML;
+                            change();
+                        }
+                    });
                     xm.onreadystatechange = change;
                 }
 
-                if (str.test(xslt)) {
+                if (str.test(xslt))
+                {
                     xs.responseXML = new DOMParser().parseFromString(xslt, "text/xml");
                     change();
                 }
-                else {
-                    xs = $.ajax({dataType: "xml", url: xslt});
+                else
+                {
+                    xs = $.ajax(
+                    {
+                        dataType: "xml",
+                        url: xslt,
+                        success: function()
+                        {
+                            xsDoc = xs.responseXML;
+                            change();
+                        }
+                    });
                     xs.onreadystatechange = change;
                 }
                 return this;
             };
-       }
+        }
     }
 })(jQuery);

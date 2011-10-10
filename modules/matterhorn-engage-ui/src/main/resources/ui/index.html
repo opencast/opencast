@@ -11,118 +11,134 @@
     <link rel="stylesheet" type="text/css" href="css/oc.pager.css" />
     <link rel="stylesheet" type="text/css" href="css/shared.css">
     <!-- scripts -->
-    <script type="text/javascript" src="jquery/jquery-1.4.2.min.js">
-    </script>
-    <script type="text/javascript" src="jquery/plugins/jquery.xslt.js">
+    <script type="text/javascript" src="jquery/jquery-1.6.4.min.js">
     </script>
     <script type="text/javascript" src="js/jquery.utils-1.0.js">
+    </script>
+    <script type="text/javascript" src="jquery/plugins/jquery.xslt.js">
     </script>
     <script type="text/javascript" src="js/oc-pager.js">
     </script>
     <script type="text/javascript" src="js/engage-ui.js">
     </script>
     <script type="text/javascript">
-      $(document).ready(function(){
-            
-        var page = Opencast.pager.getCurrentPageID();
-        var searchQuery = Opencast.pager.getCurrentSearchQuery();
-        var restEndpoint = "../../search/episode.xml?";
-                
-        var keywordString = "";
-                
-        if (searchQuery != null && searchQuery != "") {
-          restEndpoint = restEndpoint + "q=" + searchQuery + "&";
-                    
-          // replace all occurences of + by a space
-          searchQuery = searchQuery.replace(/\+/g, " ");
-                    
-          keywordString = " for “" + unescape(searchQuery) + "”";
-                    
-          $('#searchField').attr("value", unescape(searchQuery));
-                    
-        }
-        
-        //check whether a user is logged in and show logout link 
-        $.ajax({
-          url: '/info/me.json',
-          type: 'GET',
-          dataType: 'json',
-          success: function(data)
+      $(document).ready(function ()
+      {
+          var page = Opencast.pager.getCurrentPageID();
+          var searchQuery = Opencast.pager.getCurrentSearchQuery();
+          var restEndpoint = "../../search/episode.xml?";
+
+          var keywordString = "";
+
+          if (searchQuery != null && searchQuery != "")
           {
-            if(data.username != "anonymous")
-            {
-                $('#logout').show();
-            }
+              restEndpoint = restEndpoint + "q=" + searchQuery + "&";
+
+              // replace all occurences of + by a space
+              searchQuery = searchQuery.replace(/\+/g, " ");
+
+              keywordString = " for “" + unescape(searchQuery) + "”";
+
+              $('#searchField').attr("value", unescape(searchQuery));
+
           }
-        });
-                
-        restEndpoint = restEndpoint + "limit=10";
-                
-        restEndpoint = restEndpoint + "&offset=" + (page - 1) * 10;
-                
-        restEndpoint = restEndpoint + "&_=" + new Date().getTime(); // workaround for IE ajax caching problem
-        $('#stage').xslt(restEndpoint, "xsl/episodes.xsl", function(){
-          Opencast.pager.renderPager();
-                    
-          var total = $('#oc-episodes-total').html();
-          var toIndex = parseInt($('#oc-episodes-limit').html()) + (page - 1) * 10;
-          var fromIndex = Math.min(parseInt($('#oc-episodes-offset').html()) + 1, toIndex);
-                    
-          if (total > 0) {
-            $('.title').text("Results " + fromIndex + "-" + toIndex + " of " + total + keywordString).html();
-                        
-            $('.timeDate').each(function(){
-              var timeDate = $(this).text();
-              if (timeDate) {
-                //JavaScript parseInt(string, radix)
-                var sd = new Date();
-                sd.setFullYear(parseInt(timeDate.substring(0, 4), 10));
-                sd.setMonth(parseInt(timeDate.substring(5, 7), 10) - 1);
-                sd.setDate(parseInt(timeDate.substring(8, 10), 10));
-                sd.setHours(parseInt(timeDate.substring(11, 13), 10));
-                sd.setMinutes(parseInt(timeDate.substring(14, 16), 10));
-                sd.setSeconds(parseInt(timeDate.substring(17, 19), 10));
-                $(this).html(sd.toLocaleString());
+
+          //check whether a user is logged in and show logout link 
+          $.ajax(
+          {
+              url: '/info/me.json',
+              type: 'GET',
+              dataType: 'json',
+              success: function (data)
+              {
+                  if (data.username != "anonymous")
+                  {
+                      $('#logout').show();
+                  }
               }
-              else {
-                $(this).html("n.a.");
+          });
+
+          restEndpoint = restEndpoint + "limit=10";
+
+          restEndpoint = restEndpoint + "&offset=" + (page - 1) * 10;
+
+          restEndpoint = restEndpoint + "&_=" + new Date().getTime(); // workaround for IE ajax caching problem
+          $('#stage').xslt(restEndpoint, "xsl/episodes.xsl", function ()
+          {
+              Opencast.pager.renderPager();
+              var total = $('#oc-episodes-total').html();
+              var toIndex = parseInt($('#oc-episodes-limit').html()) + (page - 1) * 10;
+              var fromIndex = Math.min(parseInt($('#oc-episodes-offset').html()) + 1, toIndex);
+
+              if (total > 0)
+              {
+                  $('.title').text("Results " + fromIndex + "-" + toIndex + " of " + total + keywordString).html();
+
+                  $('.timeDate').each(function ()
+                  {
+                      var timeDate = $(this).text();
+                      if (timeDate)
+                      {
+                          //JavaScript parseInt(string, radix)
+                          var sd = new Date();
+                          sd.setFullYear(parseInt(timeDate.substring(0, 4), 10));
+                          sd.setMonth(parseInt(timeDate.substring(5, 7), 10) - 1);
+                          sd.setDate(parseInt(timeDate.substring(8, 10), 10));
+                          sd.setHours(parseInt(timeDate.substring(11, 13), 10));
+                          sd.setMinutes(parseInt(timeDate.substring(14, 16), 10));
+                          sd.setSeconds(parseInt(timeDate.substring(17, 19), 10));
+                          $(this).html(sd.toLocaleString());
+                      }
+                      else
+                      {
+                          $(this).html("n.a.");
+                      }
+                  });
+                  $(".thumb").each(function (index)
+                  {
+                      var src = $(this).attr("src");
+                      if (src === undefined || src === "")
+                      {
+                          $(this).attr("src", "img/thumbnail.png");
+                      }
+                  });
+                  $(".search-item").each(function (index)
+                  {
+                      if (index % 2 == 1)
+                      {
+                          $(this).css('background-color', '#F7FBFC');
+                      }
+                      else
+                      {
+                          $(this).css('background-color', '#EFF7F9');
+                      }
+                  });
               }
-            });
-            $(".thumb").each(function(index){
-              var src = $(this).attr("src");
-              if (src === undefined || src === "") {
-                $(this).attr("src", "img/thumbnail.png");
+              else
+              {
+                  if (Opencast.pager.getCurrentSearchQuery() != null)
+                  {
+                      $('.title').text('No recordings found for : "' + searchQuery + '"');
+                  }
+                  else
+                  {
+                      $('.title').text("No recordings published yet.");
+
+                  }
               }
-            });
-            $(".search-item").each(function(index){
-              if (index % 2 == 1) {
-                $(this).css('background-color', '#F7FBFC');
-              }
-              else {
-                $(this).css('background-color', '#EFF7F9');
-              }
-            });
+
+          });
+
+          if (searchQuery != null && searchQuery != "")
+          {
+              $('#rsslink').attr("href", "/feeds/rss/2.0/custom/" + searchQuery);
+              $('#atomlink').attr("href", "/feeds/atom/0.3/custom/" + searchQuery);
           }
-          else {
-            if (Opencast.pager.getCurrentSearchQuery() != null) {
-              $('.title').text('No recordings found for : "' + searchQuery + '"');
-            }
-            else {
-              $('.title').text("No recordings published yet.");
-                            
-            }
+          else
+          {
+              $('#rsslink').attr("href", "/feeds/rss/2.0/latest");
+              $('#atomlink').attr("href", "/feeds/atom/0.3/latest");
           }
-                    
-        });
-                
-        if (searchQuery != null && searchQuery != "") {
-          $('#rsslink').attr("href", "/feeds/rss/2.0/custom/" + searchQuery);
-          $('#atomlink').attr("href", "/feeds/atom/0.3/custom/" + searchQuery);
-        }
-        else {
-          $('#rsslink').attr("href", "/feeds/rss/2.0/latest");
-          $('#atomlink').attr("href", "/feeds/atom/0.3/latest");
-        }
       });
     </script>
   </head>
