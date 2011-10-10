@@ -1470,7 +1470,7 @@
 
   <issueManagement>
     <system>jira</system>
-    <url>https://issues.apache.org/jira</url>
+    <url>http://opencast.jira.com</url>
   </issueManagement>
 
   <!-- These should be the right locations for opencast maven 2 distribution, make sure you have <scm> defined for your sub 
