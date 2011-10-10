@@ -48,6 +48,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
@@ -322,7 +323,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       }
 
       // Build the map that the API defines as agent name->agent
-      Map<String, Agent> map = new HashMap<String, Agent>();
+      Map<String, Agent> map = new TreeMap<String, Agent>();
       for (AgentImpl agent : agents) {
         map.put(agent.getName(), agent);
       }
