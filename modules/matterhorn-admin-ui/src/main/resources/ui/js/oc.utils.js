@@ -102,9 +102,9 @@ ocUtils.makeLocaleDateString = function(timestamp) {
 }
 
 /** converts a date to a human readable date string
- * @param date
+ *  @param date
  *  @param compact -- (boolean) without day name
- * @return formatted date string
+ *  @return formatted date string
  */
 ocUtils.getDateString = function(date, compact) {
   var days = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ];
@@ -116,7 +116,7 @@ ocUtils.getDateString = function(date, compact) {
   var datestring = "";
   if (compact == undefined || !compact) {
     datestring += days[d.getDay()];
-  datestring += daySeparator;
+    datestring += daySeparator;
   }
   datestring += months[d.getMonth() % 12];
   datestring += dateSeparator;
@@ -360,7 +360,7 @@ ocUtils.joinArray = function(as, sep) {
  */
 ocUtils.dflt = function() {
   // arguments is an object _not_ an array so let's turn it into one
-  return _.detect(Array.prototype.slice.call(arguments).concat(""), function(a) {
+  return _.detect(_.toArray(arguments).concat(""), function(a) {
     return typeof a !== "undefined" && a != null;
   });
 }

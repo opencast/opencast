@@ -30,24 +30,24 @@
       episodes per page.
     </div>
 
-                        <span id="pageWidget" class="layout-inline">
-                            <span id="prevButtons">
+    <span id="pageWidget" class="layout-inline">
+      <span id="prevButtons">
         <a class="prevPage" href="javascript:ocArchive.firstPage();">&lt;&lt;first</a>
-            <a class="prevPage" href="javascript:ocArchive.previousPage();" id="previousPage">&lt;previous</a>
-                            </span>
-                            <span id="prevText" class="ui-helper-hidden">
-                              <span>&lt;&lt;first</span>
-                              <span>&lt;previous</span>
-                            </span>
-                            <span id="pageList"></span>
-                            <span id="nextButtons">
-            <a class="nextPage" href="javascript:ocArchive.nextPage();" id="nextPage">next&gt;</a>
-            <a class="nextPage" href="javascript:ocArchive.lastPage();" id="lastPage">last&gt;&gt;</a>
-                            </span>
-                            <span id="nextText" class="ui-helper-hidden">
-                              <span>next&gt;</span>
-                              <span>last&gt;&gt;</span>
-                            </span>
-                        </span>
+        <a class="prevPage" href="javascript:ocArchive.previousPage();" id="previousPage">&lt;previous</a>
+      </span>
+      <span id="prevText" class="ui-helper-hidden">
+        <span>&lt;&lt;first</span>
+        <span>&lt;previous</span>
+      </span>
+      <span id="pageList"></span>
+      <span id="nextButtons">
+        <a class="nextPage" href="javascript:ocArchive.nextPage();" id="nextPage">next&gt;</a>
+        <a class="nextPage" href="javascript:ocArchive.lastPage();" id="lastPage">last&gt;&gt;</a>
+      </span>
+      <span id="nextText" class="ui-helper-hidden">
+        <span>next&gt;</span>
+        <span>last&gt;&gt;</span>
+      </span>
+    </span>
   </div>
 </div>
