@@ -21,6 +21,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -47,10 +48,11 @@ public class OaiPmhServerTest {
   private static final Logger logger = LoggerFactory.getLogger(OaiPmhServerTest.class);
 
   private TrustedHttpClient client;
-  private String baseUrl = BASE_URL + "/oaipmh";
+  private static final String baseUrl = BASE_URL + "/oaipmh";
 
   @BeforeClass
   public static void setupClass() throws Exception {
+    Assume.assumeTrue(checkPresenceOfOaiPmhRepository());
     logger.info("Running " + OaiPmhServerTest.class.getName());
     while (countSucceededWorkflows() < 2) {
       logger.info("waiting 5 sec. for workflows to succeed");
@@ -58,11 +60,24 @@ public class OaiPmhServerTest {
     }
   }
 
+  private static boolean checkPresenceOfOaiPmhRepository() {
+    HttpGet get = new HttpGet(baseUrl);
+    TrustedHttpClient client = Main.getClient();
+    HttpResponse response = client.execute(get);
+    Main.returnClient(client);
+    boolean serverPresent = response.getStatusLine().getStatusCode() != HttpStatus.SC_NOT_FOUND;
+    if (serverPresent) {
+      logger.info("OAI-PMH server present. Running tests.");
+    } else {
+      logger.info("OAI-PMH server not deployed. Skipping tests.");
+    }
+    return serverPresent;
+  }
+
   @AfterClass
   public static void tearDownClass() throws Exception {
     logger.info("Finished " + OaiPmhServerTest.class.getName());
   }
-
 
   @Before
   public void setUp() throws Exception {
