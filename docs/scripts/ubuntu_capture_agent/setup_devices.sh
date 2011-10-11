@@ -190,6 +190,12 @@ for (( i = 0; i < ${#device[@]}; i++ )); do
     echo "$DEVICE_PREFIX.${cleanName[$i]}.$OUT_SUFFIX=${cleanName[$i]}.${extension[$i]}" >> $CAPTURE_PROPS
     echo "$DEVICE_PREFIX.${cleanName[$i]}.$FLAVOR_SUFFIX=$flavor" >> $CAPTURE_PROPS
     echo "$DEVICE_PREFIX.${cleanName[$i]}.$QUEUE_SUFFIX=$((q_size*1024*1024))" >> $CAPTURE_PROPS
+
+    # Fix for MH-8196
+    if [[ "$(echo ${devName[$i]} | grep -i "Epiphan")" ]]; then
+	echo "$DEVICE_PREFIX.${cleanName[$i]}.${TYPE_SUFFIX}=${EPIPHAN_TYPE}" >> $CAPTURE_PROPS
+    fi
+
     allDevices="${allDevices}${cleanName[$i]},"
     
     # Log this device
