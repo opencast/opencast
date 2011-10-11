@@ -81,7 +81,8 @@ Opencast.Player = (function ()
         outPosition = 0,
         curPosition = 0,
         INTERVAL_LENGTH = 5,
-        detailedLogging = false;
+        detailedLogging = false,
+        lastValidTime = "Initializing";
         
         
     /*************************************************************/
