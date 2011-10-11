@@ -17,11 +17,7 @@
 package org.opencastproject.oaipmh.harvester;
 
 import org.joda.time.DateTime;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilder;
-import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.oaipmh.util.PersistenceEnv;
-import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -54,8 +50,8 @@ import static org.opencastproject.oaipmh.util.PersistenceUtil.newEntityManagerFa
 import static org.opencastproject.oaipmh.util.PersistenceUtil.newPersistenceEnvironment;
 
 /**
- * The matterhorn harvester is intended to harvest the "matterhorn" metadata prefix from
- * other matterhorn OPI-PMH repositories and store the results in the local search index.
+ * The harvester queries OAI-PMH repositories for a certain metadata prefix and passes
+ * the retrieved records to the configured {@link RecordHandler} for the actual processing.
  * <p/>
  * todo
  * <h3>Currently not supported</h3>
@@ -65,9 +61,9 @@ import static org.opencastproject.oaipmh.util.PersistenceUtil.newPersistenceEnvi
  * <li>Selective harvesting by time is not yet implemented. The harvester always requests the whole repository.</li>
  * </ul>
  */
-public class MatterhornHarvester implements ManagedService {
+public class OaiPmhHarvester implements ManagedService {
 
-  private static final Logger logger = LoggerFactory.getLogger(MatterhornHarvester.class);
+  private static final Logger logger = LoggerFactory.getLogger(OaiPmhHarvester.class);
 
   // config keys
 
@@ -82,7 +78,7 @@ public class MatterhornHarvester implements ManagedService {
   private static final String REF_ORG_SERVICE = "orgDirectory";
   private static final String REF_SECURITY_SERVICE = "securityService";
   private static final String REF_USER_SERVICE = "userDirectory";
-  private static final String REF_SEARCH_SERVICE = "searchService";
+  private static final String REF_RECORD_HANDLER = "recordHandler";
 
   private ComponentContext componentContext;
 
@@ -90,13 +86,16 @@ public class MatterhornHarvester implements ManagedService {
 
   private PersistenceEnv penv;
 
+  /**
+   * @see #activate(ComponentContext)
+   */
   @Override
   public synchronized void updated(Dictionary properties) throws ConfigurationException {
     logger.info("Updated");
     try {
       checkDictionary(properties, componentContext);
       // locate all services
-      final SearchService searchService = (SearchService) componentContext.locateService(REF_SEARCH_SERVICE);
+      final RecordHandler recordhandler = (RecordHandler) componentContext.locateService(REF_RECORD_HANDLER);
       // collect all config params
       final int period = getCfgAsInt(properties, CFG_PERIOD);
       final int initialDelay = getCfgAsInt(properties, CFG_INITIAL_DELEY);
@@ -111,7 +110,7 @@ public class MatterhornHarvester implements ManagedService {
       // get persistence provider
       penv = newPersistenceEnvironment(newEntityManagerFactory(componentContext, "org.opencastproject.oaipmh.harvester"));
       // create a new worker
-      Worker worker = new Worker(urls, searchService, secConf, penv);
+      Worker worker = new Worker(urls, recordhandler, secConf, penv);
       scheduler.scheduleAtFixedRate(worker, initialDelay, period, TimeUnit.MINUTES);
     } catch (ConfigurationException e) {
       logger.info("Configuration not complete since at least property " + e.getProperty() + " is missing or malformed. "
@@ -186,25 +185,22 @@ public class MatterhornHarvester implements ManagedService {
 
   static class Worker implements Runnable {
 
-    private static final String MH_METADATA_PREFIX = "matterhorn";
-
     private final String[] urls;
-    private final SearchService searchService;
-    private final MediaPackageBuilder mediaPackageBuilder;
+    private final RecordHandler handler;
     private final Function0<Void> securityConfigurator;
     private final PersistenceEnv penv;
 
     /**
      * @param urls the urls, i.e. the repositories, to harvest
-     * @param searchService the search service to feed
      * @param securityConfigurator a function to configure the security service in order to access the search service
      */
-    Worker(String[] urls, SearchService searchService,
-           Function0<Void> securityConfigurator, PersistenceEnv penv) {
+    Worker(String[] urls,
+           RecordHandler handler,
+           Function0<Void> securityConfigurator,
+           PersistenceEnv penv) {
       this.urls = urls;
-      this.searchService = searchService;
+      this.handler = handler;
       this.securityConfigurator = securityConfigurator;
-      this.mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
       this.penv = penv;
     }
 
@@ -229,12 +225,10 @@ public class MatterhornHarvester implements ManagedService {
       logger.info("Harvesting " + url + " from " + from + " on thread " + Thread.currentThread());
       OaiPmhRepositoryClient repositoryClient = OaiPmhRepositoryClient.newHarvester(url);
       ListRecordsResponse response =
-          repositoryClient.listRecords(MH_METADATA_PREFIX, from, Option.<Date>none(), Option.<String>none());
+          repositoryClient.listRecords(handler.getMetadataPrefix(), from, Option.<Date>none(), Option.<String>none());
       if (!response.isError()) {
-        for (Node mediaPackageNode : ListRecordsResponse.getAllMetadataElems(response, repositoryClient)) {
-          MediaPackage mediaPackage = mediaPackageBuilder.loadFromXml(mediaPackageNode);
-          logger.info("Harvested mediapackage " + mediaPackage.getIdentifier().toString());
-          searchService.add(mediaPackage);
+        for (Node recordNode : ListRecordsResponse.getAllRecords(response, repositoryClient)) {
+          handler.handle(recordNode);
         }
       } else if (response.isErrorNoRecordsMatch()) {
         logger.info("Repository returned no records.");

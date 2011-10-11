@@ -140,7 +140,8 @@
               OSGI-INF/oai-pmh-server.xml,
               OSGI-INF/oai-dc-metadata-provider.xml,
               OSGI-INF/matterhorn-metadata-provider.xml,
-              OSGI-INF/matterhorn-harvester.xml
+              OSGI-INF/matterhorn-harvester.xml,
+              OSGI-INF/matterhorn-record-handler.xml
             </Service-Component>
             <JPA-PersistenceUnits>org.opencastproject.oaipmh.harvester</JPA-PersistenceUnits>
           </instructions>

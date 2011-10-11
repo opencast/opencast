@@ -38,6 +38,12 @@ public class OaiPmhResponseTest {
     assertEquals("matterhorn", response.getMetadataPrefix());
   }
 
+  public void testMetadataFromRecord() throws Exception {
+    ListRecordsResponse response = new ListRecordsResponse(loadDoc("list-records-response.xml"));
+    assertEquals(1, response.getRecords().getLength());
+    assertEquals("mediapackage", ListRecordsResponse.metadataOfRecord(response.getRecords().item(0)).getNodeName());
+  }
+
   public Document loadDoc(String name) throws Exception {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     factory.setNamespaceAware(true);
