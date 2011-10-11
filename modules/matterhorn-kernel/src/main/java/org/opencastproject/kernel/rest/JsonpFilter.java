@@ -51,7 +51,7 @@ public class JsonpFilter implements Filter {
   public static final String CALLBACK_PARAM = "jsonp";
 
   /** The regular expression to ensure that the callback is safe for display to a browser */
-  public static final Pattern SAFE_PATTERN = Pattern.compile("[a-zA-Z0-9\\.]+");
+  public static final Pattern SAFE_PATTERN = Pattern.compile("[a-zA-Z0-9\\.\\_]+");
 
   /** The content type for jsonp is "application/x-javascript", not "application/json". */
   public static final String JS_CONTENT_TYPE = "application/x-javascript";

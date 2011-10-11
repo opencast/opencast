@@ -205,6 +205,7 @@ Opencast.Watch = (function ()
         // Parse the plugin URLs
         $.getJSON('js/servicedata.json', function(data)
         {
+            $.log("Start parsing servicedata.json");
             analyticsURL = data.plugin_urls.analytics;
             annotationURL = data.plugin_urls.annotation;
             descriptionEpisodeURL = data.plugin_urls.description.episode;
@@ -228,13 +229,22 @@ Opencast.Watch = (function ()
             $.log("Series (Series) URL: " + seriesSeriesURL);
             $.log("Series (Episode) URL: " + seriesEpisodeURL);
             
-            mediaPackageId = (data.mediaDebugInfo.mediaPackageId == "") ? $.getURLParameter('id') : data.mediaDebugInfo.mediaPackageId;
-            mediaUrlOne = (data.mediaDebugInfo.mediaUrlOne == "") ? null : data.mediaDebugInfo.mediaUrlOne;
-            mediaUrlTwo = (data.mediaDebugInfo.mediaUrlTwo == "") ? null : data.mediaDebugInfo.mediaUrlTwo;
-            mediaResolutionOne = (data.mediaDebugInfo.mediaResolutionOne == "") ? null : data.mediaDebugInfo.mediaResolutionOne;
-            mediaResolutionTwo = (data.mediaDebugInfo.mediaResolutionTwo == "") ? null : data.mediaDebugInfo.mediaResolutionTwo;
-            mimetypeOne = (data.mediaDebugInfo.mimetypeOne == "") ? null : data.mediaDebugInfo.mimetypeOne;
-            mimetypeTwo = (data.mediaDebugInfo.mimetypeTwo == "") ? null : data.mediaDebugInfo.mimetypeTwo;
+            var URLParamId = $.getURLParameter('id');
+            var URLParamMediaURL1 = $.getURLParameter('mediaUrl1');
+            var URLParamMediaURL2 = $.getURLParameter('mediaUrl2');
+            var URLParamRes1 = $.getURLParameter('mediaResolution1');
+            var URLParamRes2 = $.getURLParameter('mediaResolution2');
+            var URLParamMT1 = $.getURLParameter('mimetype1');
+            var URLParamMT2 = $.getURLParameter('mimetype2');
+            
+            // prefer URL parameter, don't set any of it to empty string because then flash init fails
+            mediaPackageId = (URLParamId == null) ? ((data.mediaDebugInfo.mediaPackageId == "") ? null : data.mediaDebugInfo.mediaPackageId) : URLParamId;
+            mediaUrlOne = (URLParamMediaURL1 == null) ? ((data.mediaDebugInfo.mediaUrlOne == "") ? null : data.mediaDebugInfo.mediaUrlOne) : URLParamMediaURL1;
+            mediaUrlTwo = (URLParamMediaURL2 == null) ? ((data.mediaDebugInfo.mediaUrlTwo == "") ? null : data.mediaDebugInfo.mediaUrlTwo) : URLParamMediaURL2;
+            mediaResolutionOne = (URLParamRes1 == null) ? ((data.mediaDebugInfo.mediaResolutionOne == "") ? null : data.mediaDebugInfo.mediaResolutionOne) : URLParamRes1;
+            mediaResolutionTwo = (URLParamRes2 == null) ? ((data.mediaDebugInfo.mediaResolutionTwo == "") ? null : data.mediaDebugInfo.mediaResolutionTwo) : URLParamRes2;
+            mimetypeOne = (URLParamMT1 == null) ? ((data.mediaDebugInfo.mimetypeOne == "") ? null : data.mediaDebugInfo.mimetypeOne) : URLParamMT1;
+            mimetypeTwo = (URLParamMT2 == null) ? ((data.mediaDebugInfo.mimetypeTwo == "") ? null : data.mediaDebugInfo.mimetypeTwo) : URLParamMT2;
             
             $.log("Media Debug Info");
             $.log("Mediapackage ID: " + mediaPackageId);
@@ -244,6 +254,8 @@ Opencast.Watch = (function ()
             $.log("Media resolution 1: " + mediaResolutionTwo);
             $.log("Mimetype 1: " + mimetypeOne);
             $.log("Mimetype 2: " + mimetypeTwo);
+            
+            $.log("Successfully parsed servicedata.json");
             
             if(advancedPlayer)
             {
