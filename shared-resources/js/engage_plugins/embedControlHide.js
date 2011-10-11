@@ -67,6 +67,17 @@ Opencast.embedControlHide = (function ()
     function initialize(time)
     { 
         $.log('Initializing');
+        
+        var controls = $.getURLParameter('controls');
+        if((controls != null) && controls.toLowerCase() == "true")
+        {
+            $.log("Controls hiding disabled.");
+            controls = true;
+        } else
+        {
+            $.log("Controls hiding enabled.");
+            controls = false;
+        }
         _time = time | 500;
         
         //start width height listener and call it one time direct
@@ -78,9 +89,14 @@ Opencast.embedControlHide = (function ()
         $('#oc_flash-player').css('marginTop', '-'+ (advHeight + 2)  +'px');
         doHideAdvLinkFast();
         
-        //start interval to bind key and mouse actions
-        bindActions();
-     
+        if(!controls)
+        {
+            //start interval to bind key and mouse actions
+            bindActions();
+        } else
+        {
+            doShowFast();
+        }
     }
     
     /**
