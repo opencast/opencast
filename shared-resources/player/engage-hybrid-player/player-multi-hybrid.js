@@ -1271,7 +1271,7 @@ Opencast.Player = (function ()
         var embedUrl = advancedUrl.replace(/watch.html/g, "embed.html");
         if($('#oc_embed-costum-hide-controls-checkbox').is(':checked'))
         {
-            embedUrl += "&controls=true";
+            embedUrl += "&hideControls=false";
         }
         $('#oc_embed-costum-width-textinput').val(width);
         $('#oc_embed-costum-height-textinput').val(height);

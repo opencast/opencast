@@ -47,26 +47,120 @@ public class ListRecordsResponse extends OaiPmhResponse {
   }
 
   /**
-   * Perform complete request resuming any partial responses.
+   * Get all records in the current response.
+   * <pre>
+   *  &lt;record&gt;
+   *    &lt;header&gt;...
+   *    &lt;/header&gt;
+   *    &lt;metadata&gt;...
+   *    &lt;/metadata&gt;
+   *  &lt;/record&gt;
+   * </pre>
    */
-  public static Iterable<Node> getAllMetadataElems(final ListRecordsResponse response, final OaiPmhRepositoryClient client) {
-    class MetadataIterator implements Iterator<Node> {
+  public NodeList getRecords() {
+    return xpathNodeList("/oai20:OAI-PMH/oai20:ListRecords/oai20:record");
+  }
 
-      private NodeList metadataElems;
+  /**
+   * Extract the content, i.e. the first child node, of the metadata node of a record.
+   * <pre>
+   *  &lt;record&gt;
+   *    &lt;header&gt;...
+   *    &lt;/header&gt;
+   *    &lt;metadata&gt;
+   *      &lt;myMd&gt;
+   *      &lt;/myMd&gt;
+   *    &lt;/metadata&gt;
+   *  &lt;/record&gt;
+   *
+   *  =&gt;
+   *
+   *  &lt;myMd&gt;
+   *  &lt;/myMd&gt;
+   * </pre>
+   */
+  public static Node metadataOfRecord(Node recordNode) {
+    return xpathNode(createXPath(), recordNode, "//oai20:metadata/*[1]");
+  }
+
+  /**
+   * Get all records performing a complete request resuming any partial responses.
+   */
+  public static Iterable<Node> getAllRecords(final ListRecordsResponse first, final OaiPmhRepositoryClient client) {
+    return new Iterable<Node>() {
+      @Override
+      public Iterator<Node> iterator() {
+        return new ResponseIterator(first) {
+          @Override
+          protected OaiPmhRepositoryClient getClient() {
+            return client;
+          }
+
+          @Override
+          protected NodeList extractNodes(ListRecordsResponse response) {
+            return response.getRecords();
+          }
+        };
+      }
+    };
+  }
+
+  /**
+   * Get all metadata performing a complete request resuming any partial responses.
+   */
+  public static Iterable<Node> getAllMetadataElems(final ListRecordsResponse first, final OaiPmhRepositoryClient client) {
+    return new Iterable<Node>() {
+      @Override
+      public Iterator<Node> iterator() {
+        return new ResponseIterator(first) {
+          @Override
+          protected OaiPmhRepositoryClient getClient() {
+            return client;
+          }
+
+          @Override
+          protected NodeList extractNodes(ListRecordsResponse response) {
+            return response.getMetadataElems();
+          }
+        };
+      }
+    };
+  }
+
+  public String getMetadataPrefix() {
+    return xpathString("/oai20:OAI-PMH/oai20:request/@metadataPrefix");
+  }
+
+  public Option<String> getResumptionToken() {
+    return Option.wrap(trimToNull(xpathString("/oai20:OAI-PMH/oai20:ListRecords/oai20:resumptionToken/text()")));
+  }
+
+  //
+
+  private abstract static class ResponseIterator implements Iterator<Node> {
+
+    private NodeList elems;
       private Option<String> token;
       private String metadataPrefix;
       private int i;
 
-      MetadataIterator(ListRecordsResponse response) {
-        init(response);
+    ResponseIterator(ListRecordsResponse response) {
+      initIteration(response);
       }
 
-      void init(ListRecordsResponse response) {
-        metadataElems = response.getMetadataElems();
+    private void initIteration(ListRecordsResponse response) {
+      elems = extractNodes(response);
         token = response.getResumptionToken();
         metadataPrefix = response.getMetadataPrefix();
         i = 0;
       }
+
+    protected abstract OaiPmhRepositoryClient getClient();
+
+    /**
+     * Extract the relevant part of the response.
+     */
+    protected abstract NodeList extractNodes(ListRecordsResponse response);
 
       @Override
       public boolean hasNext() {
@@ -79,9 +173,9 @@ public class ListRecordsResponse extends OaiPmhResponse {
           throw new NoSuchElementException();
         if (!hasNextInCurrent()) {
           // get next document
-          init(client.resumeListRecords(metadataPrefix, token.get()));
+        initIteration(getClient().resumeListRecords(metadataPrefix, token.get()));
         }
-        return metadataElems.item(i++);
+      return elems.item(i++);
       }
 
       @Override
@@ -90,23 +184,7 @@ public class ListRecordsResponse extends OaiPmhResponse {
       }
 
       private boolean hasNextInCurrent() {
-        return i < metadataElems.getLength();
-      }
-    }
-
-    return new Iterable<Node>() {
-      @Override
-      public Iterator<Node> iterator() {
-        return new MetadataIterator(response);
-      }
-    };
+      return i < elems.getLength();
   }
-
-  public String getMetadataPrefix() {
-    return xpathString("/oai20:OAI-PMH/oai20:request/@metadataPrefix");
-  }
-
-  public Option<String> getResumptionToken() {
-    return Option.wrap(trimToNull(xpathString("/oai20:OAI-PMH/oai20:ListRecords/oai20:resumptionToken/text()")));
   }
 }

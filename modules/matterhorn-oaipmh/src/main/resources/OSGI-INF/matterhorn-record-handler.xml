@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.oaipmh.matterhorn.MatterhornRecordHandler"
+               immediate="true">
+  <implementation class="org.opencastproject.oaipmh.matterhorn.MatterhornRecordHandler"/>
+  <property name="service.description" value="Record handler for feeding Matterhorn MediaPackages into the search index."/>
+  <property name="service.pid" value="org.opencastproject.oaipmh.matterhorn.MatterhornRecordHandler"/>
+  <service>
+    <provide interface="org.opencastproject.oaipmh.harvester.RecordHandler"/>
+  </service>
+  <reference name="searchService"
+             interface="org.opencastproject.search.api.SearchService"
+             cardinality="1..1"
+             policy="static"
+             bind="setSearchService"/>
+</scr:component>
