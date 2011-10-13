@@ -424,6 +424,16 @@
       </build>
     </profile>
 
+    <profile>
+      <id>integrationtests</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-test-harness</module>
+      </modules>
+    </profile>
+
   </profiles>
 
   <build>
