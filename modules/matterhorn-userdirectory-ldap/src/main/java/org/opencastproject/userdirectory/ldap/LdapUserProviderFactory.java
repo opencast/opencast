@@ -123,15 +123,15 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     String roleAttributesGlob = (String) properties.get(ROLE_ATTRIBUTES_KEY);
 
     int cacheSize = 1000;
-    String configuredCacheSize = (String) properties.get(CACHE_SIZE);
+    Integer configuredCacheSize = (Integer) properties.get(CACHE_SIZE);
     if (configuredCacheSize != null) {
-      cacheSize = Integer.parseInt(configuredCacheSize); // just throw the format exception
+      cacheSize = configuredCacheSize.intValue();
     }
 
     int cacheExpiration = 1;
-    String configuredCacheExpiration = (String) properties.get(CACHE_EXPIRATION);
+    Integer configuredCacheExpiration = (Integer) properties.get(CACHE_EXPIRATION);
     if (configuredCacheExpiration != null) {
-      cacheExpiration = Integer.parseInt(configuredCacheExpiration); // just throw the format exception
+      cacheExpiration = configuredCacheExpiration.intValue();
     }
 
     // Now that we have everything we need, go ahead and activate a new provider, removing an old one if necessary
