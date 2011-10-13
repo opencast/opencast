@@ -60,7 +60,7 @@ public class RestDocData extends DocData {
   /**
    * Regular expression used to validate a path.
    */
-  public static final String PATH_VALIDATION_REGEX = "^[\\w\\/{}|\\:\\.\\*\\+]+$";
+  public static final String PATH_VALIDATION_REGEX = "^[\\w\\/{}|\\:\\.\\*\\+|\\[\\w-\\w\\]\\+]+$";
 
   /**
    * A slash character.
