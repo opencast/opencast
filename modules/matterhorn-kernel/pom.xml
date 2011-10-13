@@ -267,6 +267,7 @@
               org.springframework.security.web,
               org.springframework.security.web.authentication,
               org.springframework.security.web.authentication.www,
+              org.springframework.security.web.authentication.logout,
               org.springframework.util,              
               org.opencastproject.job.api;version=${project.version},
               org.opencastproject.rest;version=${project.version},
