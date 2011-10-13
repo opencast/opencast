@@ -39,9 +39,6 @@ import java.util.List;
  * <li>key=consumerkey <li>name=consumername <li>secret=consumersecret
  * 
  * A UserDetailsService must be provided for delegating user lookup requests.
- * 
- * TODO: Replace the single, hard-coded consumer with database lookup from a separate service.
- * 
  */
 public class OAuthSingleConsumerDetailsService implements ConsumerDetailsService, UserDetailsService {
 
@@ -55,16 +52,34 @@ public class OAuthSingleConsumerDetailsService implements ConsumerDetailsService
   private UserDetailsService delegate;
 
   /**
-   * Constructs this consumer detail service with a user details service to delegate user lookups.
+   * Full constructor that accepts all the consumer details
    * 
    * @param delegate
    *          the user detail service to handle user lookups
+   * @param consumerKey
+   *          The consumer's secret key
+   * @param consumerSecret
+   *          The shared secret for the consumer
+   * @param consumerName
+   *          The consumer's name
    */
-  public OAuthSingleConsumerDetailsService(UserDetailsService delegate) {
+  public OAuthSingleConsumerDetailsService(UserDetailsService delegate, String consumerKey, String consumerSecret,
+          String consumerName) {
     this.delegate = delegate;
-    consumer = createConsumerDetails("consumerkey", "consumername", "consumersecret");
+    consumer = createConsumerDetails(consumerKey, consumerName, consumerSecret);
   }
 
+  /**
+   * Creates a spring security consumer details object, suitable to achieve two-legged OAuth.
+   * 
+   * @param consumerKey
+   *          the consumer key
+   * @param consumerName
+   *          the consumer name
+   * @param consumerSecret
+   *          the consumer secret
+   * @return the consumer details
+   */
   private ExtraTrustConsumerDetails createConsumerDetails(String consumerKey, String consumerName, String consumerSecret) {
     SharedConsumerSecret secret = new SharedConsumerSecret(consumerSecret);
     BaseConsumerDetails bcd = new BaseConsumerDetails();
