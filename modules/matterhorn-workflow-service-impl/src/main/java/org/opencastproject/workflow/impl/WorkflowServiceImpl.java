@@ -519,6 +519,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     String seriesId = updatedMediaPackage.getSeries();
     if (seriesId != null) {
 
+      // FIXME: For 1.2.x, we don't yet have ACL enforcement during processing. Re-enable this for 1.3.
+
       // If the mediapackage contains a series, find the series ACLs and add the security information to the
       // mediapackage
       try {

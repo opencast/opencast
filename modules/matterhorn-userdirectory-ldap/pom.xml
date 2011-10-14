@@ -131,6 +131,7 @@
               org.osgi.service.cm,
               !netscape.ldap.ber.stream,
               com.sun.jndi.ldap,
+              com.sun.net.ssl.internal.ssl,
               *;resolution:=optional
             </Import-Package>
           </instructions>

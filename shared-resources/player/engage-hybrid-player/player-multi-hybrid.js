@@ -718,7 +718,7 @@ Opencast.Player = (function ()
             {
                 FLASH_PLAYERSTATE = playing;
                 setCurrentPlayPauseState(PLAYING);
-                if (displVidSizeControl)
+                if (displayVideoSizeControl())
                 {
                     // Bind the video size controls to its functions
                     Opencast.Initialize.bindVidSize();

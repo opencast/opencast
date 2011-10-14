@@ -317,10 +317,10 @@ public class XACMLAuthorizationService implements AuthorizationService {
     ClassLoader originalClassLoader = currentThread.getContextClassLoader();
     try {
       currentThread.setContextClassLoader(XACMLAuthorizationService.class.getClassLoader());
-      if (acl == null) {
-        logger.debug("No ACL specified: no XACML attachment will be added to mediapackage '{}'", mediapackage);
-        return mediapackage;
-      }
+    if (acl == null) {
+      logger.debug("No ACL specified: no XACML attachment will be added to mediapackage '{}'", mediapackage);
+      return mediapackage;
+    }
       // Get XACML representation of these role + action tuples
       String xacmlContent = null;
       try {

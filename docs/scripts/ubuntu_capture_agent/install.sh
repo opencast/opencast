@@ -37,7 +37,7 @@ export BRANCHES_URL=$SVN_URL/branches
 export TAGS_URL=$SVN_URL/tags
 
 # Default URL from where scripts and java source will be dowloaded
-export SRC_DEFAULT=$TRUNK_URL
+export SRC_DEFAULT=$BRANCHES_URL/1.2.x
 
 # File containing the rules to be applied by udev to the configured devices -- not a pun!
 export DEV_RULES=/etc/udev/rules.d/matterhorn.rules

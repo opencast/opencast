@@ -20,6 +20,7 @@ import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.XMLCatalogImpl;
+//import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeTypes;
 

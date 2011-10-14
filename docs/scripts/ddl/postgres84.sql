@@ -29,6 +29,8 @@ CREATE TABLE dictionary (
 
 CREATE TABLE sched_event (
     event_id bigint NOT NULL,
+    ca_metadata text,
+    dublin_core text,
     startdate timestamp without time zone,
     resources character varying(255),
     series character varying(255),
