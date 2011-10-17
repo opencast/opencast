@@ -481,6 +481,8 @@
     </httpCaching>
   </requestDispatcher>
 
+  <!-- Modified version of the regular SolrQueryParser that allows for full wildcard queries -->
+  <queryParser name="wildcardqueryparser" class="org.opencastproject.solr.WildcardQueryParserPlugin"/>
 
   <!-- requestHandler plugins... incoming queries will be dispatched to the
      correct handler based on the path or the qt (query type) param.
@@ -494,6 +496,7 @@
     <!-- default values for query parameters -->
      <lst name="defaults">
        <str name="echoParams">explicit</str>
+       <str name="defType">wildcardqueryparser</str>
        <!--
        <int name="rows">10</int>
        <str name="fl">*</str>
