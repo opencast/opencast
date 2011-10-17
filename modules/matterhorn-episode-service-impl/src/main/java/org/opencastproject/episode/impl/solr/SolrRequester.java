@@ -22,6 +22,7 @@ import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.opencastproject.episode.api.MediaSegment;
@@ -30,7 +31,6 @@ import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultImpl;
 import org.opencastproject.episode.api.SearchResultItem;
-import org.opencastproject.episode.api.SearchResultItem.SearchResultItemType;
 import org.opencastproject.episode.api.SearchResultItemImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
@@ -451,7 +451,7 @@ public class SolrRequester {
    *          The user query.
    * @return The boosted query
    */
-  public StringBuffer boost(String query) {
+  public StringBuffer createBoostedFullTextQuery(String query) {
     String uq = SolrUtils.clean(query);
     StringBuffer sb = new StringBuffer();
 
@@ -507,9 +507,9 @@ public class SolrRequester {
     sb.append(" ");
 
     sb.append(Schema.FULLTEXT);
-    sb.append(":(");
+    sb.append(":(*");
     sb.append(uq);
-    sb.append(") ");
+    sb.append("*) ");
 
     sb.append(")");
 
@@ -542,7 +542,7 @@ public class SolrRequester {
    *          whether to apply the permissions to the query. Set to false for administrative queries.
    * @return the search results
    */
-  private SolrQuery getForAction(EpisodeQuery q, String action, boolean applyPermissions) throws SolrServerException {
+  private SolrQuery createQuery(EpisodeQuery q, String action, boolean applyPermissions) throws SolrServerException {
     StringBuilder sb = new StringBuilder();
 
     String solrQueryRequest = q.getQuery();
@@ -559,15 +559,10 @@ public class SolrRequester {
       sb.append(Schema.ID);
       sb.append(":");
       sb.append(cleanSolrIdRequest);
-      if (q.isIncludeEpisodes()) {
-        sb.append(" OR ");
-        sb.append(Schema.DC_IS_PART_OF);
-        sb.append(":");
-        sb.append(cleanSolrIdRequest);
-      }
       sb.append(")");
     }
 
+    // full text query with boost
     String solrTextRequest = StringUtils.trimToNull(q.getText());
     if (solrTextRequest != null) {
       String cleanSolrTextRequest = SolrUtils.clean(q.getText());
@@ -575,9 +570,15 @@ public class SolrRequester {
         if (sb.length() > 0)
           sb.append(" AND ");
         sb.append("*:");
-        sb.append(boost(cleanSolrTextRequest));
+        sb.append(createBoostedFullTextQuery(cleanSolrTextRequest));
       }
     }
+
+    appendFuzzy(sb, Schema.DC_CREATOR_SUM, q.getCreator());
+    appendFuzzy(sb, Schema.DC_CONTRIBUTOR_SUM, q.getContributor());
+    append(sb, Schema.DC_LANGUAGE, q.getLanguage());
+    appendFuzzy(sb, Schema.DC_LICENSE_SUM, q.getLicense());
+    appendFuzzy(sb, Schema.DC_TITLE_SUM, q.getTitle());
 
     if (q.getElementTags() != null && q.getElementTags().length > 0) {
       if (sb.length() > 0)
@@ -653,34 +654,125 @@ public class SolrRequester {
 
     SolrQuery query = new SolrQuery(sb.toString());
 
-    if (q.isIncludeSeries() && !q.isIncludeEpisodes()) {
-      query.addFilterQuery(Schema.OC_MEDIATYPE + ":" + SearchResultItemType.Series);
-    }
-
-    if (q.isIncludeEpisodes() && !q.isIncludeSeries()) {
-      query.addFilterQuery(Schema.OC_MEDIATYPE + ":" + SearchResultItemType.AudioVisual);
-    }
-
     if (q.getDeletedDate() == null) {
       query.addFilterQuery("-" + Schema.OC_DELETED + ":[* TO *]");
     }
 
+    // limit & offset
     if (q.getLimit() > 0)
       query.setRows(q.getLimit());
 
     if (q.getOffset() > 0)
       query.setStart(q.getOffset());
 
-    if (q.isSortByPublicationDate()) {
-      query.addSortField(Schema.OC_MODIFIED, ORDER.desc);
-    } else if (q.isSortByCreationDate()) {
+    // only episodes
+    query.addFilterQuery(Schema.OC_MEDIATYPE + ":" + SearchResultItem.SearchResultItemType.AudioVisual);
+
+    // sorting
+    // todo multiValued fields cannot be used for sorting -- need to have the language here
+//    if (q.getSort() != null) {
+//      ORDER order = q.isSortAscending() ? ORDER.asc : ORDER.desc;
+//      query.addSortField(getSortField(q.getSort()), order);
+//    }
+//    if (!EpisodeQuery.Sort.DATE_CREATED.equals(q.getSort())) {
+//      query.addSortField(getSortField(EpisodeQuery.Sort.DATE_CREATED), ORDER.desc);
+//    }
       query.addSortField(Schema.DC_CREATED, ORDER.desc);
       // If the dublin core field dc:created has not been filled in...
       query.addSortField(Schema.OC_MODIFIED, ORDER.desc);
-    }
 
     query.setFields("* score");
     return query;
+  }
+
+  private static String getSortField(EpisodeQuery.Sort sort) {
+    switch (sort) {
+      case TITLE:
+        return Schema.DC_TITLE_SUM;
+      case DATE_CREATED:
+        return Schema.DC_CREATED;
+      case CREATOR:
+        return Schema.DC_CREATOR_SUM;
+      case LANGUAGE:
+        return Schema.DC_LANGUAGE;
+      case LICENSE:
+        return Schema.DC_LICENSE_SUM;
+      case SUBJECT:
+        return Schema.DC_SUBJECT_SUM;
+      case MEDIA_PACKAGE_ID:
+        return Schema.ID;
+      default:
+        throw new IllegalArgumentException("No mapping found between sort field and index");
+    }
+  }
+
+  /**
+   * Appends query parameters to a solr query
+   *
+   * @param sb The {@link StringBuilder} containing the query
+   * @param key the key for this search parameter
+   * @param value the value for this search parameter
+   * @return the appended {@link StringBuilder}
+   */
+  private StringBuilder append(StringBuilder sb, String key, String value) {
+    if (StringUtils.isBlank(key) || StringUtils.isBlank(value)) {
+      return sb;
+    }
+    if (sb.length() > 0) {
+      sb.append(" AND ");
+    }
+    sb.append(key);
+    sb.append(":");
+    sb.append(ClientUtils.escapeQueryChars(value.toLowerCase()));
+    return sb;
+  }
+
+  /**
+   * Appends query parameters to a solr query in a way that they are found even though they are not treated as a full
+   * word in solr.
+   *
+   * @param sb The {@link StringBuilder} containing the query
+   * @param key the key for this search parameter
+   * @param value the value for this search parameter
+   * @return the appended {@link StringBuilder}
+   */
+  private StringBuilder appendFuzzy(StringBuilder sb, String key, String value) {
+    if (StringUtils.isBlank(key) || StringUtils.isBlank(value)) {
+      return sb;
+    }
+    if (sb.length() > 0) {
+      sb.append(" AND ");
+    }
+    sb.append("(");
+    sb.append(key).append(":").append(ClientUtils.escapeQueryChars(value.toLowerCase()));
+    sb.append(" OR ");
+    sb.append(key).append(":*").append(ClientUtils.escapeQueryChars(value.toLowerCase())).append("*");
+    sb.append(")");
+    return sb;
+  }
+
+  /**
+   * Appends query parameters to a solr query
+   *
+   * @param sb The {@link StringBuilder} containing the query
+   * @param key the key for this search parameter
+   * @return the appended {@link StringBuilder}
+   */
+  private StringBuilder append(StringBuilder sb, String key, Date startDate, Date endDate) {
+    if (StringUtils.isBlank(key) || (startDate == null && endDate == null)) {
+      return sb;
+    }
+    if (sb.length() > 0) {
+      sb.append(" AND ");
+    }
+    if (startDate == null)
+      startDate = new Date(0);
+    if (endDate == null)
+      endDate = new Date(Long.MAX_VALUE);
+    sb.append(key);
+    sb.append(":");
+    sb.append(SolrUtils.serializeDateRange(startDate, endDate));
+    return sb;
   }
 
   /**
@@ -692,7 +784,7 @@ public class SolrRequester {
    * @throws SolrServerException
    */
   public SearchResult getForAdministrativeRead(EpisodeQuery q) throws SolrServerException {
-    SolrQuery query = getForAction(q, READ_PERMISSION, false);
+    SolrQuery query = createQuery(q, READ_PERMISSION, false);
     return createSearchResult(query);
   }
 
@@ -705,7 +797,7 @@ public class SolrRequester {
    * @throws SolrServerException
    */
   public SearchResult getForRead(EpisodeQuery q) throws SolrServerException {
-    SolrQuery query = getForAction(q, READ_PERMISSION, true);
+    SolrQuery query = createQuery(q, READ_PERMISSION, true);
     return createSearchResult(query);
   }
 
@@ -718,7 +810,7 @@ public class SolrRequester {
    * @throws SolrServerException
    */
   public SolrDocumentList getForWriteRaw(EpisodeQuery q) throws SolrServerException {
-    SolrQuery query = getForAction(q, WRITE_PERMISSION, true);
+    SolrQuery query = createQuery(q, WRITE_PERMISSION, true);
     try {
       return solrServer.query(query).getResults();
     } catch (Exception e) {
@@ -735,7 +827,7 @@ public class SolrRequester {
    * @throws SolrServerException
    */
   public SearchResult getForWrite(EpisodeQuery q) throws SolrServerException {
-    SolrQuery query = getForAction(q, WRITE_PERMISSION, true);
+    SolrQuery query = createQuery(q, WRITE_PERMISSION, true);
     return createSearchResult(query);
   }
 

@@ -20,31 +20,29 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import java.util.Date;
 
 /**
- * Represents a query to find search results
+ * Represents a query to find search results.
  */
 public class EpisodeQuery {
-  protected boolean includeEpisode = true;
-  protected boolean includeSeries = false;
-  protected boolean includeLocked = false;
-  protected boolean sortByCreationDate = false;
-  protected boolean sortByPublicationDate = false;
-  protected String id;
-  protected String text;
-  protected String query;
-  protected int limit = -1;
-  protected int offset = -1;
-  protected String[] tags = null;
-  protected MediaPackageElementFlavor[] flavors = null;
-  protected Date deletedDate = null;
+  private boolean includeLocked = false;
+  private String id;
+  private String text;
+  private String seriesTitle;
+  private String creator;
+  private String contributor;
+  private String language;
+  private String license;
+  private String title;
+  private String query;
+  private int limit = -1;
+  private int offset = -1;
+  private String[] tags = null;
+  private MediaPackageElementFlavor[] flavors = null;
+  private Date deletedDate = null;
+  private Sort sort = Sort.DATE_CREATED;
+  private boolean sortAscending = true;
 
-  public EpisodeQuery includeEpisodes(boolean includeEpisode) {
-    this.includeEpisode = includeEpisode;
-    return this;
-  }
-
-  public EpisodeQuery includeSeries(boolean includeSeries) {
-    this.includeSeries = includeSeries;
-    return this;
+  public enum Sort {
+    DATE_CREATED, TITLE, CREATOR, LANGUAGE, LICENSE, SUBJECT, MEDIA_PACKAGE_ID
   }
 
   public EpisodeQuery includeLocked(boolean includeLocked) {
@@ -77,6 +75,60 @@ public class EpisodeQuery {
     return this;
   }
 
+  public EpisodeQuery withSeriesTitle(String seriesTitle) {
+    this.seriesTitle = seriesTitle;
+    return this;
+  }
+
+  public EpisodeQuery withCreator(String creator) {
+    this.creator = creator;
+    return this;
+  }
+
+  public EpisodeQuery withContributor(String contributor) {
+    this.contributor = contributor;
+    return this;
+  }
+
+  public EpisodeQuery withLanguage(String language) {
+    this.language = language;
+    return this;
+  }
+
+  public EpisodeQuery withLicense(String license) {
+    this.license = license;
+    return this;
+  }
+
+  public EpisodeQuery withTitle(String title) {
+    this.title = title;
+    return this;
+  }
+
+  public String getSeriesTitle() {
+    return seriesTitle;
+  }
+
+  public String getCreator() {
+    return creator;
+  }
+
+  public String getContributor() {
+    return contributor;
+  }
+
+  public String getLanguage() {
+    return language;
+  }
+
+  public String getLicense() {
+    return license;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
   public String getId() {
     return id;
   }
@@ -97,30 +149,34 @@ public class EpisodeQuery {
     return text;
   }
 
-  public boolean isIncludeEpisodes() {
-    return includeEpisode;
-  }
-
-  public boolean isIncludeSeries() {
-    return includeSeries;
-  }
-
-  public EpisodeQuery withCreationDateSort(boolean sortByDate) {
-    this.sortByCreationDate = sortByDate;
+  /**
+   * Sort the results by the specified field, either ascending or descending.
+   *
+   * @param sort the sort field
+   * @param ascending whether to sort ascending (true) or descending (false)
+   */
+  public EpisodeQuery withSort(Sort sort, boolean ascending) {
+    this.sort = sort;
+    this.sortAscending = ascending;
     return this;
   }
 
-  public boolean isSortByCreationDate() {
-    return sortByCreationDate;
+  /**
+   * Return the field to use in sorting the results of the query.
+   *
+   * @return the sort field
+   */
+  public Sort getSort() {
+    return sort;
   }
 
-  public EpisodeQuery withPublicationDateSort(boolean sortByDate) {
-    this.sortByPublicationDate = sortByDate;
-    return this;
-  }
-
-  public boolean isSortByPublicationDate() {
-    return sortByPublicationDate;
+  /**
+   * Return whether to sort the results in ascending order.
+   *
+   * @return whether the search results should be sorted in ascending order
+   */
+  public boolean isSortAscending() {
+    return sortAscending;
   }
 
   public MediaPackageElementFlavor[] getElementFlavors() {

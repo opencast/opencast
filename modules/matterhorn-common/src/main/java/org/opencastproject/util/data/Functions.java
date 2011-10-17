@@ -16,6 +16,10 @@
 
 package org.opencastproject.util.data;
 
+import org.apache.commons.lang.StringUtils;
+
+import static org.opencastproject.util.data.Option.wrap;
+
 /**
  * Hosts a collection of general purpose functions or function creating functions.
  */
@@ -46,4 +50,23 @@ public final class Functions {
       }
     };
   }
+
+  /**
+   * Identity function returning always <code>a</code>.
+   */
+  public static <B, A extends B> Function0<B> identity(final A a) {
+    return new Function0<B>() {
+      @Override
+      public B apply() {
+        return a;
+      }
+    };
+  }
+
+  public static final Function<String, Option<String>> trimToNone = new Function<String, Option<String>>() {
+    @Override
+    public Option<String> apply(String s) {
+      return wrap(StringUtils.trimToNull(s));
+    }
+  };
 }
