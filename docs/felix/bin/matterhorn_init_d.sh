@@ -50,6 +50,7 @@ PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN -Dopencas
 UTIL_LOGGING_OPTS="-Djava.util.logging.config.file=$FELIX/conf/services/java.util.logging.properties"
 GRAPHICS_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
 JAVA_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
+TEMP_OPTS="-Djava.io.tmpdir=$FELIX_HOME/work"
 
 # The following lines are required to run Matterhorn as a service in Redhat.  
 # These lines should remain commented out.  
@@ -108,7 +109,7 @@ case "$1" in
 
 # starting felix
 
-    su -c "java -Dgosh.args='--noshutdown -c noop=true' $DEBUG_OPTS $GRAPHICS_OPTS $MAVEN_ARG $JAVA_OPTS $FELIX_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS $UTIL_LOGGING_OPTS $CXF_OPTS -jar $FELIX/bin/felix.jar $FELIX_CACHE 2>&1 > /dev/null &" $MATTERHORN_USER
+    su -c "java -Dgosh.args='--noshutdown -c noop=true' $DEBUG_OPTS $GRAPHICS_OPTS $TEMP_OPTS $MAVEN_ARG $JAVA_OPTS $FELIX_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS $UTIL_LOGGING_OPTS $CXF_OPTS -jar $FELIX/bin/felix.jar $FELIX_CACHE 2>&1 > /dev/null &" $MATTERHORN_USER
     echo "done." 
     ;;    
   stop)
