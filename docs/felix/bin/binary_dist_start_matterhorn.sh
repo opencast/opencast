@@ -16,6 +16,7 @@ fi
 # Only change the line below if you want to customize the server
 ##
 
+FELIX_OPTS="-Dfelix.home=$FELIX_HOME"
 FELIX_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$FELIX/load"
 PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX/conf"
 PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN -Dopencast.logdir=$LOGDIR"
@@ -29,4 +30,4 @@ FELIX_CACHE="$FELIX/felix-cache"
 rm -rf $FELIX_CACHE
 
 # Finally start felix
-java $MEM $GRAPHICS_OPTS $TEMP_OPTS $FELIX_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS $UTIL_LOGGING_OPTS $CXF_OPTS -jar $FELIX/bin/felix.jar $FELIX_CACHE
+java $FELIX_OPTS $MEM $GRAPHICS_OPTS $TEMP_OPTS $FELIX_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS $UTIL_LOGGING_OPTS $CXF_OPTS -jar $FELIX/bin/felix.jar $FELIX_CACHE
