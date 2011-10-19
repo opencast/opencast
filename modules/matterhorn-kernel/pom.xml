@@ -289,6 +289,7 @@
               org.springframework.security.oauth.provider.token;version=1.0.0.M1,
             </Export-Package>
             <Service-Component>
+              OSGI-INF/cleansessions.xml, 
               OSGI-INF/http-client.xml,
               OSGI-INF/http-context.xml,
               OSGI-INF/jsonp.xml,
