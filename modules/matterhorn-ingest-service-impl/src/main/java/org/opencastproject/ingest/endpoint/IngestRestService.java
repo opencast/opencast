@@ -644,7 +644,7 @@ public class IngestRestService {
       String uploadURL = "addElementMonitored/" + job.getId();
       html = html.replaceAll("\\{uploadURL\\}", uploadURL);
       html = html.replaceAll("\\{jobId\\}", job.getId());
-      logger.info("New upload job created: " + job.getId());
+      logger.debug("New upload job created: " + job.getId());
       jobs.put(job.getId(), job);
       return Response.ok(html).build();
     } catch (Exception ex) {
