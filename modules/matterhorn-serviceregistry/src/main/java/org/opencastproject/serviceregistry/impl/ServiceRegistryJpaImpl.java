@@ -729,6 +729,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
    */
   @Override
   public void unRegisterService(String serviceType, String baseUrl) throws ServiceRegistryException {
+    logger.debug("Unregistering Service " + serviceType + "@" + baseUrl);
     // TODO: create methods that accept an entity manager, so we can execute multiple queries using the same em and tx
     setOnlineStatus(serviceType, baseUrl, null, false, null);
 
@@ -1496,8 +1497,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
               response = client.execute(options);
               if (response != null && response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // this service is reachable, continue checking other services
+                logger.trace("Service " + registration.toString() + " is fine and responsive " + response.getStatusLine());
+                continue;
+              } else if (response != null && response.getStatusLine().getStatusCode() == HttpStatus.SC_SERVICE_UNAVAILABLE) {
+                // this service appears overloaded.
+                logger.info("Service " + registration.toString() + " appears overloaded but will not be unregistered and had status line " + response.getStatusLine());
                 continue;
               } else {
+                logger.debug("Service " + registration.toString() + " is broken " + response.getStatusLine());
                 unresponsiveCount++;
               }
             } catch (TrustedHttpClientException e) {
