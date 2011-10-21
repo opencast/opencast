@@ -427,24 +427,24 @@ Videodisplay = (function ()
      */
     function setVolumePlayer(argNumber)
     {
-        try
+      try
+      {
+        if (initialized())
         {
-            if (initialized())
-            {
-                var v = b_Videodisplay_root.setVolumePlayer(argNumber);
-                Opencast.Player.addEvent("SET-VOLUME-" + argNumber);
-                return v;
-            }
-            else
-            {
-                volPlayerArgs = argNumber;
-            }
+          var v = b_Videodisplay_root.setVolumePlayer(argNumber);
+          Opencast.Player.addEvent(Opencast.logging.SET_VOLUME + argNumber);
+          return v;
         }
-        catch (err)
+        else
         {
-            Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+          volPlayerArgs = argNumber;
         }
-        return false;
+      }
+      catch (err)
+      {
+        Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      }
+      return false;
     };
 
     /**

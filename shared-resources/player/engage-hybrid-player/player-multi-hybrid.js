@@ -446,7 +446,7 @@ Opencast.Player = (function ()
         {
             addFootprint();
             inPosition = fullPosition;
-            addEvent("SEEK");
+            addEvent(Opencast.logging.SEEK);
             outPosition = fullPosition;
         }
         if (getDragging() === false)
@@ -474,7 +474,7 @@ Opencast.Player = (function ()
     function setVolumeSlider(newVolume)
     {
         Opencast.ariaSpinbutton.jumpToRange(newVolume);
-        addEvent("SET-VOLUME");
+        addEvent(Opencast.logging.SET_VOLUME + newVolume);
     }
     
     /**
@@ -558,7 +558,7 @@ Opencast.Player = (function ()
             showNotes();
             Opencast.Description.hideDescription();
             setShowSections(true);
-            addEvent('SHOW-NOTES');
+            addEvent(Opencast.logging.SHOW_NOTES);
         }
         else
         {
@@ -578,7 +578,7 @@ Opencast.Player = (function ()
             showTranscript();
             hideSlideText();
             setShowSections(true);
-            addEvent('SHOW-TRANSCRIPT');
+            addEvent(Opencast.logging.SHOW_TRANSCRIPT);
         }
         else
         {
@@ -600,7 +600,7 @@ Opencast.Player = (function ()
         else
         {
             showEmbed();
-            addEvent('SHOW-EMBED');
+            addEvent(Opencast.logging.SHOW_EMBED);
         }
         // Opencast.Initialize.doResize();
     }
@@ -620,7 +620,7 @@ Opencast.Player = (function ()
         {
             showShare();
             $('#oc_share-layer').focus();
-            addEvent('SHOW-SHARE');
+            addEvent(Opencast.logging.SHOW_SHARE);
         }
         if (e !== undefined)
         {
@@ -641,7 +641,7 @@ Opencast.Player = (function ()
         else
         {
             showTimeLayer();
-            addEvent('SHOW-TIME-LAYER');
+            addEvent(Opencast.logging.SHOW_TIME_LAYER);
         }
     }
     
@@ -658,7 +658,7 @@ Opencast.Player = (function ()
         else
         {
             showShortcuts();
-            addEvent('SHOW-SHORTCUTS');
+            addEvent(Opencast.logging.SHOW_SHORTCUTS);
         }
         if (who !== undefined)
         {
@@ -697,9 +697,9 @@ Opencast.Player = (function ()
     {
         FLASH_MUTE = Videodisplay.mute();
         if (!FLASH_MUTE) {
-            addEvent('MUTE');
+            addEvent(Opencast.logging.MUTE);
         } else {
-            addEvent('UNMUTE');
+            addEvent(Opencast.logging.UNMUTE);
         }
         Opencast.ariaSpinbutton.toggleMute();
     }
@@ -726,7 +726,7 @@ Opencast.Player = (function ()
                     $("#oc_btn-dropdown").css("display", 'block');
                     $("#oc_player_video-dropdown").css("display", 'block');
                 }
-                addEvent('PLAY');
+                addEvent(Opencast.logging.PLAY);
             }
             else
             {
@@ -746,7 +746,7 @@ Opencast.Player = (function ()
         {
             setCurrentPlayPauseState(PAUSING);
             FLASH_PLAYERSTATE = Videodisplay.pause();
-            addEvent('PAUSE');
+            addEvent(Opencast.logging.PAUSE);
         }
     }
     
@@ -761,7 +761,7 @@ Opencast.Player = (function ()
             setSeekState(getCurrentPlayPauseState());
             Videodisplay.fastForward();
             intvalFastForward = window.setInterval("Videodisplay.fastForward()", 1000);
-            addEvent('FAST-FORWARD');
+            addEvent(Opencast.logging.FAST_FORWARD);
         }
     }
     
@@ -773,7 +773,7 @@ Opencast.Player = (function ()
     {
         var sec = Opencast.segments.getSecondsBeforeSlide();
         Opencast.Watch.seekSegment(sec);
-        addEvent('SKIP-BACKWARD');
+        addEvent(Opencast.logging.SKIP_BACKWARD);
     }
     
     /**
@@ -787,7 +787,7 @@ Opencast.Player = (function ()
             setSeekState(getCurrentPlayPauseState());
             Videodisplay.rewind();
             intvalRewind = window.setInterval("Videodisplay.rewind()", 1000);
-            addEvent('REWIND');
+            addEvent(Opencast.logging.REWIND);
         }
     }
     
@@ -799,7 +799,7 @@ Opencast.Player = (function ()
     {
         var sec = Opencast.segments.getSecondsNextSlide();
         Opencast.Watch.seekSegment(sec);
-        addEvent('SKIP-FORWARD');
+        addEvent(Opencast.logging.SKIP_FORWARD);
     }
     
     /**
@@ -820,7 +820,7 @@ Opencast.Player = (function ()
     function doToogleClosedCaptions()
     {
         Videodisplay.closedCaptions();
-        addEvent('CLOSED-CAPTIONS');
+        addEvent(Opencast.logging.CLOSED_CAPTIONS);
     }
     
     /*************************************************************/
@@ -942,7 +942,7 @@ Opencast.Player = (function ()
     {
         $("#oc_btn-dropdown").attr("className", "oc_btn-singleDisplay");
         setCurrentVideoSize(VIDEOSIZESINGLE);
-        addEvent('VIDEOSIZE-SINGLE');
+        addEvent(Opencast.logging.VIDEOSIZE_SINGLE);
     }
     
     /**
@@ -958,7 +958,7 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-audioDisplay");
         setCurrentVideoSize(VIDEOSIZEAUDIO);
         Opencast.Initialize.doResize();
-        addEvent('VIDEOSIZE-AUDIO');
+        addEvent(Opencast.logging.VIDEOSIZE_AUDIO);
     }
     
     /**
@@ -971,7 +971,7 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-singleDisplay-presenter");
         setCurrentVideoSize(VIDEOSIZEONLYLEFT);
         Opencast.Initialize.doResize();
-        addEvent('VIDEOSIZE-LEFT-ONLY');
+        addEvent(Opencast.logging.VIDEOSIZE_LEFT_ONLY);
     }
     
     /**
@@ -984,7 +984,7 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-singleDisplay-presentation");
         setCurrentVideoSize(VIDEOSIZEONLYRIGHT);
         Opencast.Initialize.doResize();
-        addEvent('VIDEOSIZE-RIGHT-ONLY');
+        addEvent(Opencast.logging.VIDEOSIZE_RIGHT_ONLY);
     }
     
     /**
@@ -997,7 +997,7 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-bigRightDisplay");
         setCurrentVideoSize(VIDEOSIZEBIGRIGHT);
         Opencast.Initialize.doResize();
-        addEvent('VIDEOSIZE-BIG-RIGHT');
+        addEvent(Opencast.logging.VIDEOSIZE_BIG_RIGHT);
     }
     
     /**
@@ -1010,7 +1010,7 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-bigLeftDisplay");
         setCurrentVideoSize(VIDEOSIZEBIGLEFT);
         Opencast.Initialize.doResize();
-        addEvent('VIDEOSIZE-BIG-LEFT');
+        addEvent(Opencast.logging.VIDEOSIZE_BIG_LEFT);
     }
     
     /**
@@ -1023,7 +1023,7 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-centerDisplay");
         setCurrentVideoSize(VIDEOSIZEMULTI);
         Opencast.Initialize.doResize();
-        addEvent('VIDEOSIZE-MULTI');
+        addEvent(Opencast.logging.VIDEOSIZE_MULTI);
     }
     
     /**
@@ -1273,7 +1273,7 @@ Opencast.Player = (function ()
         $('#oc_embed-costum-height-textinput').val(height);
         iFrameText = '<iframe src="' + embedUrl + '" style="border:0px #FFFFFF none;" name="Opencast Matterhorn - Media Player" scrolling="no" frameborder="0" marginheight="0px" marginwidth="0px" width="' + width + '" height="' + height + '"></iframe>';
         $('#oc_embed-textarea').val(iFrameText);
-        addEvent('GENERATE-EMBED-' + width + 'x' + height);
+        addEvent(Opencast.logging.GENERATE_EMBED + width + 'x' + height);
     }
     
     /**
@@ -1358,13 +1358,12 @@ Opencast.Player = (function ()
                 {
                     addAlert('Wrong time enter like this: HH:MM:SS');
                     $("#oc_edit-time").addClass("oc_edit-time-error");
-                    //addEvent('BAD-EDIT-TIME');
                 }
                 else
                 {
                     Videodisplay.seek(newPlayhead);
                     hideEditTime();
-                    addEvent('VALID-EDIT-TIME');
+                    addEvent(Opencast.logging.VALID_EDIT_TIME);
                 }
             }
         }
@@ -1372,7 +1371,6 @@ Opencast.Player = (function ()
         {
             addAlert('Wrong time enter like this: HH:MM:SS');
             $("#oc_edit-time").addClass("oc_edit-time-error");
-            //addEvent('EDIT-TIME-EXCEPTION');
         }
     }
     
@@ -1561,7 +1559,7 @@ Opencast.Player = (function ()
         });
         $("#oc_btn-notes").html(NOTESHIDE);
         $("#oc_btn-notes").attr('aria-pressed', 'true');
-        addEvent('SHOW-NOTES');
+        addEvent(Opencast.logging.SHOW_NOTES);
     }
     
     /**
@@ -1577,7 +1575,7 @@ Opencast.Player = (function ()
         });
         $("#oc_btn-notes").html(NOTES);
         $("#oc_btn-notes").attr('aria-pressed', 'false');
-        addEvent('HIDE-NOTES');
+        addEvent(Opencast.logging.HIDE_NOTES);
     }
     
     /**
@@ -1594,7 +1592,7 @@ Opencast.Player = (function ()
             value: TRANSCRIPTHIDE
         });
         $("#oc_btn-transcript").attr('aria-pressed', 'true');
-        addEvent('SHOW-TRANSCRIPT');
+        addEvent(Opencast.logging.SHOW_TRANSCRIPT);
     }
     
     /**
@@ -1611,7 +1609,7 @@ Opencast.Player = (function ()
             value: TRANSCRIPT
         });
         $("#oc_btn-transcript").attr('aria-pressed', 'false');
-        addEvent('HIDE-TRANSCRIPT');
+        addEvent(Opencast.logging.HIDE_TRANSCRIPT);
     }
     
     /**
@@ -1634,7 +1632,7 @@ Opencast.Player = (function ()
         });
         $('#oc_time-chooser-layer').focus();
         timeLayerDisplayed = true;
-        addEvent('SHOW-TIME-LAYER');
+        addEvent(Opencast.logging.SHOW_TIME_LAYER);
     }
     
     /**
@@ -1651,7 +1649,7 @@ Opencast.Player = (function ()
         $('#oc_time-chooser-layer').hide();
         $('#oc_time-chooser').focus();
         timeLayerDisplayed = false;
-        addEvent('HIDE-TIME-LAYER');
+        addEvent(Opencast.logging.HIDE_TIME_LAYER);
     }
     
     /**
@@ -1671,7 +1669,7 @@ Opencast.Player = (function ()
      */
     function addFootprint()
     {
-        addEvent("FOOTPRINT");
+        addEvent(Opencast.logging.FOOTPRINT);
     }
 
     /**
@@ -1681,7 +1679,7 @@ Opencast.Player = (function ()
     function addEvent(eventType)
     {
         //If the detailed logging is turned off (false), and the log type is not a footprint then return.
-        if (!Opencast.Player.detailedLogging && (eventType != "FOOTPRINT" || eventType.matches("/.*AJAX-FAILED/i"))) {
+        if (!Opencast.Player.detailedLogging && (eventType != Opencast.logging.FOOTPRINT || eventType.matches("/.*AJAX-FAILED/i"))) {
           return;
         }
         $.ajax(

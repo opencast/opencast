@@ -768,7 +768,7 @@ Opencast.Watch = (function ()
     function seekSegment(seconds)
     {
         var eventSeek = Videodisplay.seek(seconds);
-        Opencast.Player.addEvent("SEEK-SEGMENT");
+        Opencast.Player.addEvent(Opencast.logging.SEEK_SEGMENT);
     }
     
     

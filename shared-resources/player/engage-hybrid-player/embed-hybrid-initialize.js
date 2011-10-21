@@ -882,7 +882,7 @@ Opencast.Initialize = (function ()
                 },
                 error: function (a, b, c)
                 {
-                    Opencast.Player.addEvent("EMBED-SEARCH-AJAX-FAILED");
+                    Opencast.Player.addEvent(Opencast.logging.EMBED_SEARCH_AJAX_FAILED);
                     // Some error while trying to get the search result
                 }
             }); //close ajax
@@ -899,14 +899,13 @@ Opencast.Initialize = (function ()
                 if (text === 'true') {
                   Opencast.Player.detailedLogging = true;
                   //This is done here because otherwise it doesn't fire (due to async threads I'm guessing)
-                  Opencast.Player.addEvent("EMBED-STARTUP");
+                  Opencast.Player.addEvent(Opencast.logging.EMBED_STARTUP);
                 } else {
                   Opencast.Player.detailedLogging = false;
                 }
             },
             error: function (a, b, c)
             {
-                Opencast.Player.addEvent("EMBED-DETAILED-LOGGING-AJAX-FAILED");
                 Opencast.Player.detailedLogging = false;
             }
         });
