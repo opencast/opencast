@@ -652,11 +652,18 @@ public class SolrRequester {
       }
     }
 
-    SolrQuery query = new SolrQuery(sb.toString());
+    // only episodes
+    if (sb.length() > 0)
+      sb.append(" AND ");
+    sb.append(Schema.OC_MEDIATYPE + ":" + SearchResultItem.SearchResultItemType.AudioVisual);
 
     if (q.getDeletedDate() == null) {
-      query.addFilterQuery("-" + Schema.OC_DELETED + ":[* TO *]");
+      if (sb.length() > 0)
+        sb.append(" AND ");
+      sb.append("-" + Schema.OC_DELETED + ":[* TO *]");
     }
+
+    SolrQuery query = new SolrQuery(sb.toString());
 
     // limit & offset
     if (q.getLimit() > 0)
@@ -664,9 +671,6 @@ public class SolrRequester {
 
     if (q.getOffset() > 0)
       query.setStart(q.getOffset());
-
-    // only episodes
-    query.addFilterQuery(Schema.OC_MEDIATYPE + ":" + SearchResultItem.SearchResultItemType.AudioVisual);
 
     // sorting
     // todo multiValued fields cannot be used for sorting -- need to have the language here

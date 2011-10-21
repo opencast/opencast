@@ -645,19 +645,25 @@ public class SolrRequester {
       }
     }
 
-    SolrQuery query = new SolrQuery(sb.toString());
-
     if (q.isIncludeSeries() && !q.isIncludeEpisodes()) {
-      query.addFilterQuery(Schema.OC_MEDIATYPE + ":" + SearchResultItemType.Series);
+      if (sb.length() > 0)
+        sb.append(" AND ");
+      sb.append(Schema.OC_MEDIATYPE + ":" + SearchResultItemType.Series);
     }
 
     if (q.isIncludeEpisodes() && !q.isIncludeSeries()) {
-      query.addFilterQuery(Schema.OC_MEDIATYPE + ":" + SearchResultItemType.AudioVisual);
+      if (sb.length() > 0)
+        sb.append(" AND ");
+      sb.append(Schema.OC_MEDIATYPE + ":" + SearchResultItemType.AudioVisual);
     }
 
     if (q.getDeletedDate() == null) {
-      query.addFilterQuery("-" + Schema.OC_DELETED + ":[* TO *]");
+      if (sb.length() > 0)
+        sb.append(" AND ");
+      sb.append("-" + Schema.OC_DELETED + ":[* TO *]");
     }
+
+    SolrQuery query = new SolrQuery(sb.toString());
 
     if (q.getLimit() > 0)
       query.setRows(q.getLimit());
