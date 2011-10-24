@@ -6,16 +6,16 @@
         <td class="td-key">Title:</td>
         <td class="td-value"><%= data[j].workflow.info.title %></td>
       </tr>
+      <tr>
+        <td class="td-key">Presenter:</td>
+        <td class="td-value"><%= data[j].workflow.info.creators %></td>
+      </tr>
       <% if ( data[j].workflow.info.seriestitle) { %>
       <tr>
         <td class="td-key">Series:</td>
         <td class="td-value"><%= data[j].workflow.info.seriestitle %></td>
       </tr>
       <% } %>
-      <tr>
-        <td class="td-key">Presenter:</td>
-        <td class="td-value"><%= data[j].workflow.info.creators %></td>
-      </tr>
       <tr>
         <td class="td-key">Recording Date:</td>
         <td class="td-value"><%= ocUtils.fromUTCDateStringToFormattedTime(data[j].workflow.info.start) %></td>
