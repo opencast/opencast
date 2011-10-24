@@ -226,3 +226,4 @@ for inspect
 #episodesTable tr td {color: black;}
 #episodesTable .sortable {cursor: pointer;}
 
+.role-label {width: 200px; display: inline-block; text-align: right; margin-right: 10px; padding: 2px;}

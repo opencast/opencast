@@ -59,6 +59,16 @@
         <!-- <div id="additionalTab">Some Stuff</div> -->
       </div>
     </div>
+    <div id="privileges" class="form-box layout-centered ui-widget">
+      <div class="form-box-head ui-widget-header ui-corner-top oc-ui-cursor">
+        <div id="i18n_privileges">Privileges</div>
+        <div class="clear"></div>
+      </div>
+      <div class="form-box-content ui-widget-content ui-corner-bottom" id="privileges-list">
+
+      </div>
+
+    </div>
   </div>
   <br>
   <center><a href="javascript:window.history.back();" title="Go Back">&lt;&lt; Back to Series</a></center>
