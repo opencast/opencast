@@ -37,7 +37,7 @@ Opencast.Description_Plugin = (function ()
                         '{else}' +
                             '<span style="color:grey;">${result.dcCreator}</span><br />' +
                         '{/if}' +
-                        // 'Contents: <br />' +
+                        'Description:&nbsp;<span style="color:grey;">${result.dcDescription}</span><br />' +
                     '</div>' +
                     '<div style="clear: both">' + 
                     '</div>';
@@ -91,6 +91,17 @@ Opencast.Description_Plugin = (function ()
         if ((element !== undefined) && (description_data !== undefined))
         {
             $.log("Description Plugin: Data available, processing template");
+            if((description_data != undefined) &&
+               (description_data.result != undefined))
+               {
+                   description_data.defaultChar = description_data.defaultChar || "-";
+                   description_data.result.dcCreated = description_data.result.dcCreated || description_data.defaultChar;
+                   description_data.result.dcContributor = description_data.result.dcContributor || description_data.defaultChar;
+                   description_data.result.dcLanguage = description_data.result.dcLanguage || description_data.defaultChar;
+                   description_data.result.dcViews = description_data.result.dcViews || description_data.defaultChar;
+                   description_data.result.dcSeriesTitle = description_data.result.dcSeriesTitle || description_data.defaultChar;
+                   description_data.result.dcDescription = description_data.result.dcDescription || description_data.defaultChar;
+               }
             processedTemplateData = template.process(description_data);
             element.html(processedTemplateData);
             return true;
