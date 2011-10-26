@@ -653,7 +653,9 @@ var ocScheduler = (function() {
               success: function(data){
                 window.debug = data;
                 creationSucceeded = true;
-                seriesComponent.fields.series.val($('dcterms\\:identifier',data).text());
+                seriesId = $(data).find('[nodeName="dcterms:identifier"]').text();
+                $('#series').val(seriesId);
+                seriesComponent.fields.series.val(seriesId);
               },
               error: function() {
                 creationSucceeded = false;
