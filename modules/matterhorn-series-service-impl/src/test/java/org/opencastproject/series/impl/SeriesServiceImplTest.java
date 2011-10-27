@@ -32,6 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -66,6 +67,7 @@ public class SeriesServiceImplTest {
   private SeriesServiceImpl seriesService;
 
   private DublinCoreCatalog testCatalog;
+  private DublinCoreCatalog testCatalog2;
 
   /**
    * @throws java.lang.Exception
@@ -127,6 +129,12 @@ public class SeriesServiceImplTest {
     } finally {
       IOUtils.closeQuietly(in);
     }
+    try {
+      in = getClass().getResourceAsStream("/dublincore2.xml");
+      testCatalog2 = dcService.load(in);
+    } finally {
+      IOUtils.closeQuietly(in);
+    }
   }
 
   /**
@@ -144,7 +152,7 @@ public class SeriesServiceImplTest {
   }
 
   @Test
-  public void testSeriesManagemnt() throws Exception {
+  public void testSeriesManagement() throws Exception {
     testCatalog.set(DublinCore.PROPERTY_TITLE, "Some title");
     seriesService.updateSeries(testCatalog);
     DublinCoreCatalog retrivedSeries = seriesService.getSeries(testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER));
@@ -161,6 +169,36 @@ public class SeriesServiceImplTest {
       Assert.fail("Series should not be available after removal.");
     } catch (NotFoundException e) {
       // expected
+    }
+  }
+
+  @Test
+  public void testSorting() throws Exception {
+    seriesService.updateSeries(testCatalog);
+    seriesService.updateSeries(testCatalog2);
+    {
+      SeriesQuery q = new SeriesQuery().withSort(SeriesQuery.Sort.TITLE, true);
+      DublinCoreCatalogList r = seriesService.getSeries(q);
+      Assert.assertEquals(2, r.getCatalogList().size());
+      Assert.assertEquals("ABC", r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_TITLE));
+    }
+    {
+      SeriesQuery q = new SeriesQuery().withSort(SeriesQuery.Sort.TITLE, false);
+      DublinCoreCatalogList r = seriesService.getSeries(q);
+      Assert.assertEquals(2, r.getCatalogList().size());
+      Assert.assertEquals("Land and Vegetation: Key players on the Climate Scene", r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_TITLE));
+    }
+    {
+      SeriesQuery q = new SeriesQuery().withSort(SeriesQuery.Sort.SUBJECT, true);
+      DublinCoreCatalogList r = seriesService.getSeries(q);
+      Assert.assertEquals(2, r.getCatalogList().size());
+      Assert.assertEquals("climate, land, vegetation", r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_SUBJECT));
+    }
+    {
+      SeriesQuery q = new SeriesQuery().withSort(SeriesQuery.Sort.SUBJECT, false);
+      DublinCoreCatalogList r = seriesService.getSeries(q);
+      Assert.assertEquals(2, r.getCatalogList().size());
+      Assert.assertEquals("x, y, z", r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_SUBJECT));
     }
   }
 

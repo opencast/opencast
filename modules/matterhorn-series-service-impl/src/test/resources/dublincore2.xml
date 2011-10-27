@@ -6,10 +6,10 @@
             xmlns:dcterms="http://purl.org/dc/terms/" xmlns:oc="http://www.opencastproject.org/matterhorn">
 
   <dcterms:title xml:lang="en">
-    Land and Vegetation: Key players on the Climate Scene
+    ABC
   </dcterms:title>
   <dcterms:subject>
-    climate, land, vegetation
+    x, y, z
   </dcterms:subject>
   <dcterms:description xml:lang="en">
     Introduction lecture from the Institute for
@@ -22,7 +22,7 @@
     ETH Zürich, Switzerland
   </dcterms:publisher>
   <dcterms:identifier>
-    10.0000/5819
+    10.0000/5820
   </dcterms:identifier>
   <dcterms:modified xsi:type="dcterms:W3CDTF">
     2007-12-05
