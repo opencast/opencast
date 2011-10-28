@@ -3,8 +3,8 @@
     <thead>
       <tr>
         <th width="25%" class="ui-widget-header"><div>Title</div></th>
-    <th width="25%" class="ui-widget-header"><div>Contributor</div></th>
-    <th width="25%" class="ui-widget-header"><div>Organizer</div></th>                        
+    <th width="25%" class="ui-widget-header"><div>Organizer</div></th>
+    <th width="25%" class="ui-widget-header"><div>Contributor</div></th>                        
     <th width="25%" class="ui-widget-header"><div>Action</div></th>
     </tr>
     </thead>
