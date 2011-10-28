@@ -18,6 +18,8 @@ package org.opencastproject.loadtest.impl;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -49,6 +51,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+/** Handles an individual ingest from copying the media package, changing the correct metadata and posting it to the server. **/
 public class IngestJob implements Runnable {
   // The logger.
   private static final Logger logger = LoggerFactory.getLogger(IngestJob.class);
@@ -90,10 +93,13 @@ public class IngestJob implements Runnable {
       e.printStackTrace();
     }
     logger.info("Starting to run " + id);
-    String workingDirectory = loadTest.getWorkspaceLocation() + id + "/";
+    String workingDirectory = loadTest.getWorkspaceLocation() + IOUtils.DIR_SEPARATOR + id + "/";
     // Create working directory
-    String createWorkingDirectoryCommand = "mkdir " + workingDirectory;
-    Execute.launch(createWorkingDirectoryCommand);
+    try {
+      FileUtils.forceMkdir(new File(workingDirectory));
+    } catch (IOException e) {
+      logger.error("Had trouble creating working directory at " + workingDirectory + " because " + e.getMessage());
+    }
     // Copy source media package
     logger.info("Beginning Copy of " + id);
     String copyCommand = "cp " + loadTest.getSourceMediaPackageLocation() + " " + workingDirectory + id + ".zip";

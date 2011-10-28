@@ -25,6 +25,7 @@ import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.LinkedList;
 
+/** Keeps track of a group of media packages that will be ingested together at the same time. **/
 public class IngestionGroup {
   // The logger.
   private static final Logger logger = LoggerFactory.getLogger(IngestionGroup.class);
@@ -62,7 +63,7 @@ public class IngestionGroup {
    * 
    * @return The ingest jobs that will be executed at the same time.  
    */
-  public Collection<? extends IngestJob> getJobs() {
+  public Collection<IngestJob> getJobs() {
     return ingestJobs;
   }
 }

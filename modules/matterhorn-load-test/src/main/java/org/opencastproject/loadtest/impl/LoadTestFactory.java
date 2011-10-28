@@ -27,11 +27,15 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Properties;
 
+/**
+ * A factory for exposing the default configuration for a load test set in the configuration file and spawning new load
+ * tests using the xml format of the load test configuration.
+ **/
 public class LoadTestFactory implements ManagedService {
   // The logger.
   private static final Logger logger = LoggerFactory.getLogger(LoadTestFactory.class);
 
-  /** The http client used to communicate with the core */
+  // The http client used to communicate with the core
   private TrustedHttpClient client = null;
 
   // Configuration for Load Testing.

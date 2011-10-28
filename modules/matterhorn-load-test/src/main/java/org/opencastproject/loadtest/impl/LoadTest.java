@@ -17,18 +17,25 @@ package org.opencastproject.loadtest.impl;
 
 import org.opencastproject.security.api.TrustedHttpClient;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.quartz.impl.jdbcjobstore.InvalidConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Dictionary;
 import java.util.LinkedList;
 import java.util.Properties;
 
+/**
+ * A single load test that can be run concurrently with other load tests. This will ingest a configurable number of
+ * mediapackages to a matterhorn server with different intervals set between them.
+ **/
 public class LoadTest implements Runnable {
   // The key for the storage location for use as a default location to find and process the source media package.
   public static final String BUNDLE_CONTEXT_STORAGE_DIR = "org.opencastproject.storage.dir";
@@ -83,7 +90,7 @@ public class LoadTest implements Runnable {
   // the amount of time in between each set of ingests in minutes
   private int[] packageDistributionTiming = { 0 };
 
-  /** The http client used to communicate with the core */
+  // The http client used to communicate with the core
   private TrustedHttpClient client = null;
 
   // Configuration for Load Testing.
@@ -135,11 +142,14 @@ public class LoadTest implements Runnable {
     logger.info("Starting load test on core " + coreAddress + " with distribution " + getPrettyPackageDistribution()
             + "@" + getPrettyPackageDistributionTimings());
     logger.info("Creating Workspace");
-    String createWorkspaceCommand = "mkdir " + workspaceLocation;
-    Execute.launch(createWorkspaceCommand);
+    try {
+      FileUtils.forceMkdir(new File(workspaceLocation));
+    } catch (IOException e) {
+      logger.error("Had trouble creating workspace at " + workspaceLocation + " because " + e.getMessage());
+    }
+    
     if (this.packageDistribution.length != this.packageDistributionTiming.length) {
-      System.out
-              .println("The length of the distribution must be 1 greater than the number of package distribution timings. ");
+      logger.warn("The length of the distribution must be 1 greater than the number of package distribution timings. ");
       return;
     }
     long delay = 0;
@@ -365,7 +375,7 @@ public class LoadTest implements Runnable {
           if (packageDistributionValue < 0) {
             packageDistributionValue *= -1;
           }
-          logger.info("Set this package distribution to {}", packageDistributionValue);
+          logger.debug("Set this package distribution to {}", packageDistributionValue);
         } catch (NumberFormatException e) {
           packageDistributionValue = DEFAULT_PACKAGE_DISTRIBUTION_VALUE;
           logger.warn("Can not set current package distribution to {}. {} must be an integer. It is set to default "
@@ -407,7 +417,7 @@ public class LoadTest implements Runnable {
           if (packageDistributionTimingValue < 0) {
             packageDistributionTimingValue *= -1;
           }
-          logger.info("Set ingest job check interval to {}", packageDistributionTimingValue);
+          logger.debug("Set package distribution timing value to {}", packageDistributionTimingValue);
         } catch (NumberFormatException e) {
           packageDistributionTimingValue = DEFAULT_PACKAGE_DISTRIBUTION_TIMING_VALUE;
           logger.warn("Can not set current package distribution to {}. {} must be an integer. It is set to default "

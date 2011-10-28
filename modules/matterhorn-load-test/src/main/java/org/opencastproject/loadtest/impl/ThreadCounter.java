@@ -15,6 +15,7 @@
  */
 package org.opencastproject.loadtest.impl;
 
+/** Keeps track of the still executing threads so that the parent thread knows when they are all finished. **/
 public final class ThreadCounter {
   // The number of threads still executing.
   private static int threadCount = 0;

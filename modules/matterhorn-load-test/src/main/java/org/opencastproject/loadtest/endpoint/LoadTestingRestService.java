@@ -70,20 +70,20 @@ public class LoadTestingRestService {
   }
 
   /**
-   * Set {@link org.opencastproject.capture.api.CaptureAgent} service.
+   * Set {@link org.opencastproject.loadtest.impl.LoadTestFactory} service.
    * 
    * @param service
-   *          Service implemented {@link org.opencastproject.capture.api.CaptureAgent}
+   *          Service implemented {@link org.opencastproject.loadtest.impl.LoadTestFactory}
    */
   public void setService(LoadTestFactory loadTestFactory) {
     this.loadTestFactory = loadTestFactory;
   }
 
   /**
-   * Unset {@link org.opencastproject.capture.api.CaptureAgent} service.
+   * Unset {@link org.opencastproject.loadtest.impl.LoadTestFactory} service.
    * 
    * @param service
-   *          Service implemented {@link org.opencastproject.capture.api.CaptureAgent}
+   *          Service implemented {@link org.opencastproject.loadtest.impl.LoadTestFactory}
    */
   public void unsetService(LoadTestFactory loadTestFactory) {
     this.loadTestFactory = null;
@@ -95,11 +95,11 @@ public class LoadTestingRestService {
   @RestQuery(name = "config", description = "Returns a list with the default load test configuration properties.  This can be used for the startLoadTesting endpoint.", pathParameters = { }, restParameters = { }, reponses = {
           @RestResponse(description = "the configuration values are returned", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "the configuration properties could not be retrieved", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
-          @RestResponse(description = "Capture Agent is unavailable", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
+          @RestResponse(description = "Load Test Service is unavailable", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
   public Response getConfiguration() {
     if (loadTestFactory == null) {
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).entity(
-              "Capture Agent is unavailable, please wait...").build();
+              "Load Test Service is unavailable, please wait...").build();
     }
 
     try {

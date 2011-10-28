@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
 
+/** Checks every interval whether the ingest jobs have finished executing. **/
 public class JobChecker implements Runnable {
   //The logger.
   private static final Logger logger = LoggerFactory.getLogger(JobChecker.class);

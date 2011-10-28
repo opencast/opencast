@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-/** A class to execute command line operations such as copy, zip or curl. **/
+/** A class to execute command line operations such as zip. **/
 public final class Execute {
   private static final Logger logger = LoggerFactory.getLogger(Execute.class);
 
@@ -38,11 +38,12 @@ public final class Execute {
    *          The command line utility to execute.
    * **/
   public static void launch(String command) {
+    InputStream stderr = null;
+    InputStream stdout = null;
+    BufferedReader bufferedReader = null;
     try {
       String line;
-      InputStream stderr = null;
-      InputStream stdout = null;
-
+      
       // launch EXE and grab stdin/stdout and stderr
       Process process = Runtime.getRuntime().exec(command);
 
@@ -50,7 +51,7 @@ public final class Execute {
       stdout = process.getInputStream();
 
       // Printout any stdout messages
-      BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stdout));
+      bufferedReader = new BufferedReader(new InputStreamReader(stdout));
       while ((line = bufferedReader.readLine()) != null) {
         logger.info(line);
       }
@@ -69,6 +70,23 @@ public final class Execute {
       e.printStackTrace();
     } catch (InterruptedException e) {
       e.printStackTrace();
+    } finally {
+      // Close the streams regardless of what may have gone wrong.
+      try {
+        bufferedReader.close();
+      } catch (IOException e) {
+        logger.error("While trying to close buffered reader " + e.getMessage());
+      }
+      try {
+        stderr.close();
+      } catch (IOException e) {
+        logger.error("While trying to close stderr " + e.getMessage());
+      }
+      try {
+        stdout.close();
+      } catch (IOException e) {
+        logger.error("While trying to close stdout " + e.getMessage());
+      }
     }
   }
 
