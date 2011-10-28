@@ -1,6 +1,6 @@
 <div class="layout-page-content">
   <div>
-    <h2 style="text-align:center"><span id="i18n_page_title">View Series</span></h2>
+    <h2 style="text-align:center"><span id="i18n_page_title">View Series Info</span></h2>
   </div>
   <div class="form-box layout-centered ui-widget">
     <div class="form-box-content ui-widget-content ui-corner-all">
