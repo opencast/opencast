@@ -134,7 +134,7 @@ public class SchedulerQuery {
    */
   public SchedulerQuery setText(String text) {
     if (StringUtils.isNotBlank(text)) {
-      this.text = text.toLowerCase();
+      this.text = text;
     }
     return this;
   }
@@ -147,7 +147,7 @@ public class SchedulerQuery {
    */
   public SchedulerQuery setSeriesId(String seriesId) {
     if (StringUtils.isNotBlank(seriesId)) {
-      this.seriesId = seriesId.toLowerCase();
+      this.seriesId = seriesId;
     }
     return this;
   }
@@ -160,7 +160,7 @@ public class SchedulerQuery {
    */
   public SchedulerQuery setCreator(String creator) {
     if (StringUtils.isNotBlank(creator)) {
-      this.creator = creator.toLowerCase();
+      this.creator = creator;
     }
     return this;
   }
@@ -173,7 +173,7 @@ public class SchedulerQuery {
    */
   public SchedulerQuery setContributor(String contributor) {
     if (StringUtils.isNotBlank(contributor)) {
-      this.contributor = contributor.toLowerCase();
+      this.contributor = contributor;
     }
     return this;
   }
@@ -186,7 +186,7 @@ public class SchedulerQuery {
    */
   public SchedulerQuery setLanguage(String language) {
     if (StringUtils.isNotBlank(language)) {
-      this.language = language.toLowerCase();
+      this.language = language;
     }
     return this;
   }
@@ -199,7 +199,7 @@ public class SchedulerQuery {
    */
   public SchedulerQuery setSubject(String subject) {
     if (StringUtils.isNotBlank(subject)) {
-      this.subject = subject.toLowerCase();
+      this.subject = subject;
     }
     return this;
   }
@@ -212,7 +212,7 @@ public class SchedulerQuery {
    */
   public SchedulerQuery setPublisher(String publisher) {
     if (StringUtils.isNotBlank(subject)) {
-      this.publisher = publisher.toLowerCase();
+      this.publisher = publisher;
     }
     return this;
   }
@@ -225,7 +225,7 @@ public class SchedulerQuery {
    */
   public SchedulerQuery setDescription(String description) {
     if (StringUtils.isNotBlank(subject)) {
-      this.description = description.toLowerCase();
+      this.description = description;
     }
     return this;
   }
@@ -238,7 +238,7 @@ public class SchedulerQuery {
    */
   public SchedulerQuery setSpatial(String spatial) {
     if (StringUtils.isNotBlank(spatial)) {
-      this.spatial = spatial.toLowerCase();
+      this.spatial = spatial;
     }
     return this;
   }
@@ -295,7 +295,7 @@ public class SchedulerQuery {
    */
   public SchedulerQuery setRightsHolder(String rightsHolder) {
     if (StringUtils.isNotBlank(subject)) {
-      this.rightsHolder = rightsHolder.toLowerCase();
+      this.rightsHolder = rightsHolder;
     }
     return this;
   }
@@ -308,7 +308,7 @@ public class SchedulerQuery {
    */
   public SchedulerQuery setTitle(String title) {
     if (StringUtils.isNotBlank(title)) {
-      this.title = title.toLowerCase();
+      this.title = title;
     }
     return this;
   }
@@ -321,7 +321,7 @@ public class SchedulerQuery {
    */
   public SchedulerQuery setIdentifier(String identifier) {
     if (StringUtils.isNotBlank(identifier)) {
-      this.identifier = identifier.toLowerCase();
+      this.identifier = identifier;
     }
     return this;
   }

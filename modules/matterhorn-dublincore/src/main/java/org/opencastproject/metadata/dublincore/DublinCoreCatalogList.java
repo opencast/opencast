@@ -42,7 +42,7 @@ public class DublinCoreCatalogList {
 
   /** Array storing Dublin cores */
   private List<DublinCoreCatalog> catalogList;
-  private int totalCatalogCount = 0;
+  private int totalCatalogCount = 1;
 
   /** Default no-arg constructor initialized with an empty catalog list */
   public DublinCoreCatalogList() {
@@ -58,6 +58,7 @@ public class DublinCoreCatalogList {
   public DublinCoreCatalogList(List<DublinCoreCatalog> catalogs) {
     this();
     catalogList.addAll(catalogs);
+    totalCatalogCount = catalogs.size();
   }
 
   /**
@@ -66,8 +67,9 @@ public class DublinCoreCatalogList {
    * @return List of {@link DublinCoreCatalog}s
    */
   public List<DublinCoreCatalog> getCatalogList() {
-    if (catalogList == null)
+    if (catalogList == null) {
       return new LinkedList<DublinCoreCatalog>();
+    }
     return new LinkedList<DublinCoreCatalog>(catalogList);
   }
 
@@ -79,6 +81,7 @@ public class DublinCoreCatalogList {
    */
   public void setCatalogList(List<DublinCoreCatalog> catalogList) {
     this.catalogList = catalogList;
+    totalCatalogCount = catalogList.size();
   }
 
   /**
@@ -88,9 +91,10 @@ public class DublinCoreCatalogList {
    *          {@link DublinCoreCatalog} to be added
    */
   public void addCatalog(DublinCoreCatalog catalog) {
-    if (catalog == null)
-      catalogList = new LinkedList<DublinCoreCatalog>();
-    catalogList.add(catalog);
+    if (catalog != null) {
+      catalogList.add(catalog);
+      totalCatalogCount = totalCatalogCount + 1;
+    }
   }
   
   /**
