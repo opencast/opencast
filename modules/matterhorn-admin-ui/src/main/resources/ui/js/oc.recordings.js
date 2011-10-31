@@ -173,6 +173,10 @@ ocRecordings = new (function() {
         success: function (data)
         {
           ocRecordings.render(data);
+          if(ocRecordings.Configuration.state == 'bulkedit' || ocRecordings.Configuration.state == 'bulkdelete')
+          {
+              $('.bulkSelect').show();
+          }
         }
       });
     }
@@ -433,7 +437,6 @@ ocRecordings = new (function() {
     var template = 'tableTemplate';
     var registerRecordingSelectHandler = false;
     if(ocRecordings.Configuration.state === 'bulkedit' || ocRecordings.Configuration.state === 'bulkdelete') {
-      template = 'tableSelectTemplate'
       $('#controlsFoot').hide();
       registerRecordingSelectHandler = true;
     } else {
@@ -814,7 +817,7 @@ ocRecordings = new (function() {
           url: SERIES_URL + '/series.json',
           data: {
             q: search.term
-            },
+          },
           success: function(data){
             handleSeriesSearch(data, callback);
           }
@@ -903,7 +906,7 @@ ocRecordings = new (function() {
               id: id
             },
             error: function(XHR,status,e){
-                alert('Could not stop Processing.');
+              alert('Could not stop Processing.');
             },
             success: function(){
               ocRecordings.reload();
@@ -925,7 +928,7 @@ ocRecordings = new (function() {
             id: id
           },
           error: function(XHR,status,e){
-              alert('Could not stop Processing.');
+            alert('Could not stop Processing.');
           },
           success: function(){
             ocRecordings.reload();
@@ -1055,7 +1058,9 @@ ocRecordings = new (function() {
       $('#bulkDeletePanel').hide();
       $('#bulkActionApply').hide();
       $('#cancelBulkAction').show();
+      $('.bulkSelect').hide();
     } else {
+      $('.bulkSelect').show();
       ocRecordings.numSelectedRecordings = 0;
       if(action === 'edit'){
         $('#bulkActionApplyMessage').text(bulkEditApplyMessage());
@@ -1218,28 +1223,28 @@ ocRecordings = new (function() {
                     failed++;
                     $('#deleteErrorMessage').text('Failed to delete ' + failed + ' recordings.');
                   } else {
-                $.ajax({
-                  url: WORKFLOW_URL + '/stop',
-                  type: 'POST',
-                  data: {
-                    id: id
-                  },
-                  error: function(XHR,status,e){
-                    failed++;
-                    $('#deleteErrorMessage').text('Could not stop Processing ' + failed + ' recordings.');
-                  },
-                  success: function(){
-                    progress = progress + progressChunk;
-                    $('#deleteProgress').progressbar('value', progress);
+                    $.ajax({
+                      url: WORKFLOW_URL + '/stop',
+                      type: 'POST',
+                      data: {
+                        id: id
+                      },
+                      error: function(XHR,status,e){
+                        failed++;
+                        $('#deleteErrorMessage').text('Could not stop Processing ' + failed + ' recordings.');
+                      },
+                      success: function(){
+                        progress = progress + progressChunk;
+                        $('#deleteProgress').progressbar('value', progress);
+                      }
+                    });
                   }
-                });
-            }
                 }
               });
             }, 250);
           });
         }
-}
+      }
     }
   }
 
