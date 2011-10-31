@@ -31,7 +31,8 @@ body {
 	position:relative;
 	}
 
-#middlebanner {
+#middlebanner,
+#middlebanner2 {
 	background-color:#861B1D;
 	width:100%;
 	display:inline-block;
@@ -84,6 +85,13 @@ body {
 	padding-left: 42px;
 	}
 
+#middlebanner2 #col3m,
+#middlebanner2 #col4m {
+	float:left;
+	width:425px;
+	padding-left: 42px;
+	}
+
 #bottombanner #col1b,
 #bottombanner #col2b,
 #bottombanner #col3b {
@@ -108,7 +116,8 @@ h2 {
 	color:#FFFFFF;
 	}
 
-#middlebanner h2 {
+#middlebanner h2,
+#middlebanner2 h2 {
 	font-size:1.9em;
 	margin-top:0;
 	}
@@ -119,7 +128,9 @@ h2 {
 	}
 
 #middlebanner p,
-#middlebanner ul {
+#middlebanner ul,
+#middlebanner2 p,
+#middlebanner2 ul {
 	color:#CCCCCC;
 	}
 #middlebanner #col1m p,
@@ -134,6 +145,18 @@ h2 {
 #middlebanner #col2m ul {
 	margin-left:110px;
 	}
+#middlebanner2 #col3m p,
+#middlebanner2 #col3m a,
+#middlebanner2 #col3m h2,
+#middlebanner2 #col3m ul {
+	margin-left:94px;
+	}
+#middlebanner2 #col4m p,
+#middlebanner2 #col4m a,
+#middlebanner2 #col4m h2,
+#middlebanner2 #col4m ul {
+	margin-left:110px;
+	}
 
 #bottombanner p,
 #bottombanner ul,
@@ -141,11 +164,13 @@ h2 {
 	color:#0E2E2D;
 	}
 
-#middlebanner img {
+#middlebanner img,
+#middlebanner2 img {
 	position:absolute;
 	}
 	
-#middlebanner a.redbutton {
+#middlebanner a.redbutton,
+#middlebanner2 a.redbutton {
 	border:2px solid #FFF;
 	background-color:#0E2E2D;
 	color:#FFF;
@@ -156,7 +181,8 @@ h2 {
 	-khtml-border-radius:8px; /* Linux browsers */ 
 	border-radius:8px; /* CSS3 */ 
 	}
-#middlebanner a.redbutton:hover {
+#middlebanner a.redbutton:hover,
+#middlebanner2 a.redbutton:hover {
 	border:2px solid #F6921E;
 	background-color:#A72123;
 	color:#FFF;
@@ -181,7 +207,8 @@ a:hover {
 	padding-left: 16px;
 	color:#A72123;
 }
-#middlebanner ul {
+#middlebanner ul
+#middlebanner2 ul {
 	/*list-style-image:url(img/bullet_white.png);*/
 	padding: 0 0 16px 16px;
 }
