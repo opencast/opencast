@@ -94,7 +94,7 @@ var ocScheduler = (function() {
       $('#agent').change(
         function() {
           $('#noticeContainer').hide();
-          $.get(CAPTURE_ADMIN_URL + '/agents/' + $('#agent option:selected').val(), this.checkAgentStatus);
+          $.get(CAPTURE_ADMIN_URL + '/agents/' + $('#agent option:selected').val() + ".json", this.checkAgentStatus);
         });
     }
   };
