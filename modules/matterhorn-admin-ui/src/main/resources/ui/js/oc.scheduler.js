@@ -302,19 +302,22 @@ var ocScheduler = (function() {
       showUserMessages(errors);
     } else {
       $('#submitButton').attr('disabled', 'disabled');
-      $('#submitModal').dialog(
+      if(sched.type !== SINGLE_EVENT)
       {
-        modal: true,
-        resizable: false,
-        draggable: false,
-        close: function(){ 
-          document.location = RECORDINGS_URL;
-        },
-        create: function (event, ui)
+        $('#submitModal').dialog(
         {
-          $('.ui-dialog-titlebar-close').hide();
-        }
-      });
+          modal: true,
+          resizable: false,
+          draggable: false,
+          close: function(){ 
+            document.location = RECORDINGS_URL;
+          },
+          create: function (event, ui)
+          {
+            $('.ui-dialog-titlebar-close').hide();
+          }
+        });
+      }
       if(ocUtils.getURLParam('edit')) {
         $.ajax({type: 'PUT',
                 url: SCHEDULER_URL + '/' + $('#eventId').val(),
