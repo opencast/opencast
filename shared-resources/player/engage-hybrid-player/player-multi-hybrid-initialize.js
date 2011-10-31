@@ -326,6 +326,7 @@ Opencast.Initialize = (function ()
             $('#oc_video-size-dropdown-div').css('width', '20%');
             $('#oc_player_video-dropdown').css('left', $('#oc_video-size-dropdown').offset().left - $('#oc_body').offset().left);
             $('#oc_player_video-dropdown').css('visibility', 'visible');
+            $("#oc_player_video-dropdown").css("display", 'block');
             $('#oc_volume-menue').css('visibility', 'hidden');
             ddmenuitem = $('#oc_player_video-dropdown');
         }
