@@ -434,6 +434,22 @@
       </modules>
     </profile>
 
+    <profile>
+      <id>loadtest</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-json</module>
+        <module>modules/matterhorn-kernel</module>
+        <module>modules/matterhorn-load-test</module>
+        <module>modules/matterhorn-runtime-info-ui</module>
+        <module>modules/matterhorn-static</module>
+        <module>modules/matterhorn-webconsole</module>
+      </modules>
+    </profile>
+
   </profiles>
 
   <build>
