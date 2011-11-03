@@ -1014,7 +1014,7 @@ var ocScheduler = (function() {
         });
       
       dcComps.temporal = new ocAdmin.Component(['recurDurationHour', 'recurDurationMin', 'recurStart', 'recurStartTimeHour', 'recurStartTimeMin', 'recurEnd'],
-          { key: 'temporal'},
+          { key: 'temporal', required: true },
           { getValue: function() {
               var date = this.fields.recurStart.datepicker('getDate');
               if(date && date.constructor == Date) {
@@ -1032,6 +1032,22 @@ var ocScheduler = (function() {
               end = end * 1000;
               return 'start=' + ocUtils.toISODate(new Date(start)) + 
                 '; end=' + ocUtils.toISODate(new Date(end)) + '; scheme=W3C-DTF;';
+            },
+            validate: function() {
+              var startValid = ocScheduler.components.recurrenceStart.validate();
+              var durationValid = ocScheduler.components.recurrenceDuration.validate();
+              var endValid = ocScheduler.components.recurrenceEnd.validate();
+              var error = [];
+              if (startValid.length != 0) {
+                error.push(start.concat(startValid));
+              }
+              if (durationValid.length != 0) {
+                error.push(durationValid);
+              }
+              if (endValid.length != 0) {
+                error.push(endValid);
+              }
+              return error;
             }
           });
                                                                           
@@ -1052,7 +1068,7 @@ var ocScheduler = (function() {
         });
       
       dcComps.temporal = new ocAdmin.Component(['durationHour', 'durationMin', 'startDate', 'startTimeHour', 'startTimeMin'],
-          { key: 'temporal'},
+          { key: 'temporal', required: true },
           { getValue: function() {
               var date = this.fields.startDate.datepicker('getDate');
               if(date && date.constructor == Date) {
@@ -1073,6 +1089,18 @@ var ocScheduler = (function() {
               var temporal = parseDublinCoreTemporal(val);
               ocScheduler.components.startDate.setValue(temporal.start);
               ocScheduler.components.duration.setValue(temporal.dur);
+            },
+            validate: function() {
+              var startValid = ocScheduler.components.startDate.validate();
+              var durationValid = ocScheduler.components.duration.validate();
+              var error = [];
+              if (startValid.length != 0) {
+                error.push(start.concat(startValid));
+              }
+              if (durationValid.length != 0) {
+                error.push(durationValid);
+              }
+              return error;
             }
           });
       
