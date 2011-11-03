@@ -1236,6 +1236,9 @@ var ocScheduler = (function() {
     this.dublinCore.components = dcComps;
     this.components = compositeComps;
     this.capture.components = agentComps;
+    if(typeof ocWorkflowPanel != 'undefined') {
+      ocWorkflowPanel.registerComponents(ocScheduler.capture.components);
+    }
   }
   
   function handleSeriesSearch(data, callback) {
