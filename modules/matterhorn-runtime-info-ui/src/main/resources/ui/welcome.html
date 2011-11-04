@@ -10,6 +10,8 @@
     $(document).ready(function() {
       $.getJSON("/info/components.json", function(data) {
         var contentDiv = $("#content");
+		var capt    = false,
+			confMon = false;
         $.each(data, function(section) {
             if("rest" == section) {
                $.each(data.rest, function(i) {
@@ -20,6 +22,16 @@
                   }*/
                   var col = $('#docs1');
                   col.append("<li>" + data.rest[i].description + " <a href='" + data.rest[i].docs + "'>Docs</a></li>");
+
+				  if(data.rest[i].description.toLowerCase() == "Capture REST Endpoint".toLowerCase())
+				  {
+					  $('#col3m').append('<br /><a class="redbutton" id="captureLink" href="/capture">Go to Capture</a>');
+					  capt = true;
+				  } else if(data.rest[i].description.toLowerCase() == "Confidence Monitoring REST Endpoint".toLowerCase())
+				  {
+					  $('#col4m').append('<br /><a class="redbutton" id="confidenceMonitoringLink" href="/confidence-monitoring">Go to Confidence Monitoring</a>');
+					  confMon = true;
+				  }
                })
             } else if("engage" == section) {
                $('#engagelink').attr('href', data.engage + '/engage/ui');
@@ -27,6 +39,14 @@
                $('#adminlink').attr('href', data.admin + '/admin/');
             }
           });
+		  if(!capt)
+		  {
+			  $('#col3m').hide();
+		  }
+		  if(!confMon)
+		  {
+			  $('#col4m').hide();
+		  }
         });
       });
     </script>
@@ -54,6 +74,7 @@
               distribution.</li>
             <li> Monitor progress of recording through media pipeline.</li>
           </ul>
+		  <br />
           <a class="redbutton" id="adminlink">Go to Admin Tools</a>
         </div>
         <div id="col2m">
@@ -65,8 +86,28 @@
             <li>Search for Video by keyword</li>
             <li>Accessible media player</li>
           </ul>
-          
+		  <br />
           <a class="redbutton" id="engagelink"> Go to  Media Module</a>        
+        </div>
+      </div>
+      <div id="middlebanner2">
+        <div id="col3m">
+          <img src="img/capture.png" width="70" height="70" />
+          <h2>Capture Tools</h2>
+          <p>These tools enable you to capture immediately and to modify the capture settings:</p>
+          <ul>
+            <li>Start and stop capturing</li>
+			<li>Test new configurations</li>
+          </ul>
+        </div>
+        <div id="col4m">
+          <img src="img/confidence_monitoring.png" width="80" height="61" />
+          <h2>Confidence Monitoring</h2>
+          <p>These tools enable you to watch the status of the capture devices:</p>
+          <ul>
+            <li>Preview image of video and VGA</li>
+			<li>VU-meter for audio</li>
+          </ul>
         </div>
       </div>
       <div id="bottombanner">
