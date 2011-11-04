@@ -25,6 +25,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -174,8 +175,12 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     // Make sure the element exists
     if (mediapackage.getElementById(elementId) == null)
       throw new IllegalStateException("No element " + elementId + " found in mediapackage");
-
+    
     try {
+      // The streaming server only supports tracks
+      if (!(element instanceof Track)) {
+        return null;
+      }
       File sourceFile;
       try {
         sourceFile = workspace.get(element.getURI());
