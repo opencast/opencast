@@ -25,11 +25,11 @@
 
 				  if(data.rest[i].description.toLowerCase() == "Capture REST Endpoint".toLowerCase())
 				  {
-					  $('#col3m').append('<a class="redbutton" id="captureLink" href="/capture">Go to Capture</a>');
+					  $('#col3m').append('<br /><a class="redbutton" id="captureLink" href="/capture">Go to Capture</a>');
 					  capt = true;
 				  } else if(data.rest[i].description.toLowerCase() == "Confidence Monitoring REST Endpoint".toLowerCase())
 				  {
-					  $('#col4m').append('<a class="redbutton" id="confidenceMonitoringLink" href="/confidence-monitoring">Go to Confidence Monitoring</a>');
+					  $('#col4m').append('<br /><a class="redbutton" id="confidenceMonitoringLink" href="/confidence-monitoring">Go to Confidence Monitoring</a>');
 					  confMon = true;
 				  }
                })
@@ -74,6 +74,7 @@
               distribution.</li>
             <li> Monitor progress of recording through media pipeline.</li>
           </ul>
+		  <br />
           <a class="redbutton" id="adminlink">Go to Admin Tools</a>
         </div>
         <div id="col2m">
@@ -85,6 +86,7 @@
             <li>Search for Video by keyword</li>
             <li>Accessible media player</li>
           </ul>
+		  <br />
           <a class="redbutton" id="engagelink"> Go to  Media Module</a>        
         </div>
       </div>
