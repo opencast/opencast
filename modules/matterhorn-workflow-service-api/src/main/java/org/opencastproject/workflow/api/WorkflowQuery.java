@@ -27,6 +27,7 @@ import java.util.List;
  * A fluent API for issuing WorkflowInstance queries. This object is thread unsafe.
  */
 public class WorkflowQuery {
+  protected String id;
   protected long count;
   protected long startPage;
   protected String text;
@@ -60,6 +61,11 @@ public class WorkflowQuery {
   protected List<QueryTerm> stateTerms = new ArrayList<QueryTerm>();
 
   public WorkflowQuery() {
+  }
+  
+  public WorkflowQuery withId(String id) {
+    this.id = id;
+    return this;
   }
 
   /** Include a limit for the number of items to return in the result */
@@ -302,7 +308,7 @@ public class WorkflowQuery {
     this.sortAscending = ascending;
     return this;
   }
-
+  
   /**
    * Return the field to use in sorting the results of the query.
    * 
@@ -321,6 +327,10 @@ public class WorkflowQuery {
     return sortAscending;
   }
 
+  public String getId() {
+    return id;
+  }
+  
   /**
    * Returns the number of result items to return.
    * 

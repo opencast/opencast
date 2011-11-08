@@ -434,8 +434,9 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
           UnauthorizedException {
     try {
       Job job = serviceRegistry.getJob(id);
-      if (Status.DELETED.equals(job.getStatus()))
+      if (Status.DELETED.equals(job.getStatus())) {
         throw new NotFoundException("Workflow '" + id + "' has been deleted");
+      }
       if (JOB_TYPE.equals(job.getJobType()) && Operation.START_WORKFLOW.toString().equals(job.getOperation())) {
         WorkflowInstanceImpl workflow = WorkflowParser.parseWorkflowInstance(job.getPayload());
         assertPermission(workflow, READ_PERMISSION);
@@ -518,9 +519,6 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     populateMediaPackageMetadata(updatedMediaPackage);
     String seriesId = updatedMediaPackage.getSeries();
     if (seriesId != null) {
-
-      // FIXME: For 1.2.x, we don't yet have ACL enforcement during processing. Re-enable this for 1.3.
-
       // If the mediapackage contains a series, find the series ACLs and add the security information to the
       // mediapackage
       try {
@@ -851,6 +849,31 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     instance.setState(STOPPED);
     update(instance);
     return instance;
+  }
+  
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workflow.api.WorkflowService#remove(long)
+   */
+  public void remove(long workflowInstanceId) throws WorkflowDatabaseException, NotFoundException,
+          UnauthorizedException, WorkflowParsingException {
+    WorkflowQuery query = new WorkflowQuery();
+    query.withId(Long.toString(workflowInstanceId));
+    WorkflowSet workflows = index.getWorkflowInstances(query);
+    if (workflows.size() == 1) {
+      WorkflowInstance[] w = workflows.getItems();
+      try {
+        assertPermission(w[0], WRITE_PERMISSION);
+      } catch (MediaPackageException e) {
+        throw new WorkflowParsingException(e);
+      }
+      index.remove(workflowInstanceId);
+    } else if (workflows.size() == 0) {
+      throw new NotFoundException();
+    } else {
+      throw new WorkflowDatabaseException("More than one workflow found with id: " + Long.toString(workflowInstanceId));
+    }
   }
 
   /**

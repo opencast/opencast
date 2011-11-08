@@ -224,6 +224,16 @@ public interface WorkflowService {
    */
   WorkflowInstance stop(long workflowInstanceId) throws WorkflowDatabaseException, NotFoundException,
           WorkflowParsingException, UnauthorizedException;
+  
+  /**
+   * Permenantly removes a workflow instance.
+   * 
+   * @param workflowInstanceId
+   * @throws WorkflowDatabaseException
+   * @throws NotFoundException
+   * @throws UnauthorizedException
+   */
+  void remove(long workflowInstanceId) throws WorkflowDatabaseException, WorkflowParsingException, NotFoundException, UnauthorizedException;
 
   /**
    * Temporarily suspends a started workflow instance.
