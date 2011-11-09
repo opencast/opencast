@@ -786,6 +786,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   protected String buildSolrQueryString(WorkflowQuery query) {
     String orgId = securityService.getOrganization().getId();
     StringBuilder sb = new StringBuilder().append(ORG_KEY).append(":").append(orgId);
+    append(sb, ID_KEY, query.getId());
     append(sb, MEDIAPACKAGE_KEY, query.getMediaPackageId());
     append(sb, SERIES_ID_KEY, query.getSeriesId());
     appendFuzzy(sb, SERIES_TITLE_KEY, query.getSeriesTitle());
@@ -803,6 +804,8 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
     // Limit the results to only those workflow instances the current user can read
     appendSolrAuthFragment(sb);
+    
+    logger.debug(sb.toString());
 
     return sb.toString();
   }
