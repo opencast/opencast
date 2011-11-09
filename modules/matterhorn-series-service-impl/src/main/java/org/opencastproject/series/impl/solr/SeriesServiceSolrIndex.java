@@ -15,21 +15,6 @@
  */
 package org.opencastproject.series.impl.solr;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -67,6 +52,21 @@ import org.opencastproject.util.SolrUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
 /**
  * Implements {@link SeriesServiceIndex}.
@@ -417,6 +417,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     // single valued fields
     if (dc.hasValue(DublinCore.PROPERTY_TITLE)) {
       doc.addField(SolrFields.TITLE_KEY, dc.getFirst(DublinCore.PROPERTY_TITLE));
+      doc.addField(SolrFields.TITLE_KEY + "_sort", dc.getFirst(DublinCore.PROPERTY_TITLE));
     }
     if (dc.hasValue(DublinCore.PROPERTY_CREATED)) {
       final Temporal temporal = EncodingSchemeUtils.decodeTemporal(dc.get(DublinCore.PROPERTY_CREATED).get(0));

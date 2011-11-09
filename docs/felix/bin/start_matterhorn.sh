@@ -35,6 +35,7 @@ DEBUG_OPTS="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=$DEBUG_PORT,
 ##
 
 MAVEN_ARG="-DM2_REPO=$M2_REPO"
+FELIX_OPTS="-Dfelix.home=$FELIX_HOME"
 FELIX_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$FELIX_HOME/load"
 PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX_HOME/conf"
 MATTERHORN_LOGGING_OPTS="-Dopencast.logdir=$LOGDIR"
@@ -42,6 +43,7 @@ PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN"
 ECLIPSELINK_LOGGING_OPTS="-Declipselink.logging.level=SEVERE"
 UTIL_LOGGING_OPTS="-Djava.util.logging.config.file=$FELIX_HOME/conf/services/java.util.logging.properties"
 GRAPHICS_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
+TEMP_OPTS="-Djava.io.tmpdir=$FELIX_HOME/work"
 JAVA_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
 
 #!/bin/sh
@@ -69,4 +71,4 @@ fi
 
 # Finally start felix
 cd "$FELIX_HOME"
-java $DEBUG_OPTS $GRAPHICS_OPTS $MAVEN_ARG $JAVA_OPTS "$FELIX_FILEINSTALL_OPTS" "$PAX_CONFMAN_OPTS" $PAX_LOGGING_OPTS $ECLIPSELINK_LOGGING_OPTS "$MATTERHORN_LOGGING_OPTS" "$UTIL_LOGGING_OPTS" -jar "$FELIX_HOME/bin/felix.jar" "$FELIX_CACHE"
+java $DEBUG_OPTS $GRAPHICS_OPTS "$FELIX_OPTS" "$TEMP_OPTS" $MAVEN_ARG $JAVA_OPTS "$FELIX_FILEINSTALL_OPTS" "$PAX_CONFMAN_OPTS" $PAX_LOGGING_OPTS $ECLIPSELINK_LOGGING_OPTS "$MATTERHORN_LOGGING_OPTS" "$UTIL_LOGGING_OPTS" -jar "$FELIX_HOME/bin/felix.jar" "$FELIX_CACHE"

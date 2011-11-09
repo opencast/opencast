@@ -91,6 +91,10 @@ public abstract class OaiPmhResponse {
   }
 
   public static Node xpathNode(XPath xpath, Node context, String expr) {
+    if (expr.startsWith("/"))
+      throw new IllegalArgumentException("an xpath expression that evaluates relative to a given context node " +
+          "must not be absolute, i.e. start with a '/'. In this case the expression is evaluated against the" +
+          "whole document which might not be wanted.");
     try {
       return (Node) xpath.evaluate(expr, context, XPathConstants.NODE);
     } catch (XPathExpressionException e) {

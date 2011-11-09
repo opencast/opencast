@@ -5,7 +5,8 @@
     <implementation class="org.opencastproject.kernel.rest.JsonpFilter" />
     <property name="service.description" value="JSONP Filter" />
     <property name="contextId" value="opencast.httpcontext" />
-    <property name="service.ranking" value="10" />
+    <!-- The CleanSessionsFilter must have the highest service.ranking value. See CleanSessionsFilter.java for details. -->
+    <property name="service.ranking" value="9" />
     <property name="pattern" value=".*" />
     <service>
       <provide interface="javax.servlet.Filter" />

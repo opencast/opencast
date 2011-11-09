@@ -69,7 +69,7 @@ Opencast.Series = (function ()
             error: function (xhr, ajaxOptions, thrownError)
             {
                 $.log("Series Ajax call: Requesting data failed");
-                Opencast.Player.addEvent("SERIES-PAGE-AJAX-FAILED");
+                Opencast.Player.addEvent(Opencast.logging.SERIES_PAGE_AJAX_FAILED);
             }
         });
     }
@@ -140,7 +140,7 @@ Opencast.Series = (function ()
             },
             error: function (data)
             {
-              Opencast.Player.addEvent("SERIES-DROPDOWN-AJAX-FAILED");
+              Opencast.Player.addEvent(Opencast.logging.SERIES_DROPDOWN_AJAX_FAILED);
             }
         });
     }
@@ -225,7 +225,7 @@ Opencast.Series = (function ()
                             error: function (xhr, ajaxOptions, thrownError)
                             {
                                 $.log("Series Ajax call #2: Requesting data failed");
-                                Opencast.Player.addEvent("SERIES-AJAX-2-FAILED");
+                                Opencast.Player.addEvent(Opencast.logging.SERIES_EPISODES_AJAX_FAILED);
                             }
                         });
                     }
@@ -238,7 +238,7 @@ Opencast.Series = (function ()
             error: function (xhr, ajaxOptions, thrownError)
             {
                 $.log("Series Ajax call #1: Requesting data failed");
-                Opencast.Player.addEvent("SERIES-AJAX-1-FAILED");
+                Opencast.Player.addEvent(Opencast.logging.SERIES_INFO_AJAX_FAILED);
             }
         });
     }

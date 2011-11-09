@@ -94,7 +94,7 @@ var ocScheduler = (function() {
       $('#agent').change(
         function() {
           $('#noticeContainer').hide();
-          $.get(CAPTURE_ADMIN_URL + '/agents/' + $('#agent option:selected').val(), this.checkAgentStatus);
+          $.get(CAPTURE_ADMIN_URL + '/agents/' + $('#agent option:selected').val() + ".json", this.checkAgentStatus);
         });
     }
   };
@@ -302,19 +302,22 @@ var ocScheduler = (function() {
       showUserMessages(errors);
     } else {
       $('#submitButton').attr('disabled', 'disabled');
-      $('#submitModal').dialog(
+      if(sched.type !== SINGLE_EVENT)
       {
-        modal: true,
-        resizable: false,
-        draggable: false,
-        close: function(){ 
-          document.location = RECORDINGS_URL;
-        },
-        create: function (event, ui)
+        $('#submitModal').dialog(
         {
-          $('.ui-dialog-titlebar-close').hide();
-        }
-      });
+          modal: true,
+          resizable: false,
+          draggable: false,
+          close: function(){ 
+            document.location = RECORDINGS_URL;
+          },
+          create: function (event, ui)
+          {
+            $('.ui-dialog-titlebar-close').hide();
+          }
+        });
+      }
       if(ocUtils.getURLParam('edit')) {
         $.ajax({type: 'PUT',
                 url: SCHEDULER_URL + '/' + $('#eventId').val(),
@@ -653,7 +656,9 @@ var ocScheduler = (function() {
               success: function(data){
                 window.debug = data;
                 creationSucceeded = true;
-                seriesComponent.fields.series.val($('dcterms\\:identifier',data).text());
+                seriesId = $(data).find('[nodeName="dcterms:identifier"]').text();
+                $('#series').val(seriesId);
+                seriesComponent.fields.series.val(seriesId);
               },
               error: function() {
                 creationSucceeded = false;
@@ -1009,7 +1014,7 @@ var ocScheduler = (function() {
         });
       
       dcComps.temporal = new ocAdmin.Component(['recurDurationHour', 'recurDurationMin', 'recurStart', 'recurStartTimeHour', 'recurStartTimeMin', 'recurEnd'],
-          { key: 'temporal'},
+          { key: 'temporal', required: true },
           { getValue: function() {
               var date = this.fields.recurStart.datepicker('getDate');
               if(date && date.constructor == Date) {
@@ -1027,6 +1032,22 @@ var ocScheduler = (function() {
               end = end * 1000;
               return 'start=' + ocUtils.toISODate(new Date(start)) + 
                 '; end=' + ocUtils.toISODate(new Date(end)) + '; scheme=W3C-DTF;';
+            },
+            validate: function() {
+              var startValid = ocScheduler.components.recurrenceStart.validate();
+              var durationValid = ocScheduler.components.recurrenceDuration.validate();
+              var endValid = ocScheduler.components.recurrenceEnd.validate();
+              var error = [];
+              if (startValid.length != 0) {
+                error.push(start.concat(startValid));
+              }
+              if (durationValid.length != 0) {
+                error.push(durationValid);
+              }
+              if (endValid.length != 0) {
+                error.push(endValid);
+              }
+              return error;
             }
           });
                                                                           
@@ -1047,7 +1068,7 @@ var ocScheduler = (function() {
         });
       
       dcComps.temporal = new ocAdmin.Component(['durationHour', 'durationMin', 'startDate', 'startTimeHour', 'startTimeMin'],
-          { key: 'temporal'},
+          { key: 'temporal', required: true },
           { getValue: function() {
               var date = this.fields.startDate.datepicker('getDate');
               if(date && date.constructor == Date) {
@@ -1068,6 +1089,18 @@ var ocScheduler = (function() {
               var temporal = parseDublinCoreTemporal(val);
               ocScheduler.components.startDate.setValue(temporal.start);
               ocScheduler.components.duration.setValue(temporal.dur);
+            },
+            validate: function() {
+              var startValid = ocScheduler.components.startDate.validate();
+              var durationValid = ocScheduler.components.duration.validate();
+              var error = [];
+              if (startValid.length != 0) {
+                error.push(start.concat(startValid));
+              }
+              if (durationValid.length != 0) {
+                error.push(durationValid);
+              }
+              return error;
             }
           });
       
@@ -1203,6 +1236,9 @@ var ocScheduler = (function() {
     this.dublinCore.components = dcComps;
     this.components = compositeComps;
     this.capture.components = agentComps;
+    if(typeof ocWorkflowPanel != 'undefined') {
+      ocWorkflowPanel.registerComponents(ocScheduler.capture.components);
+    }
   }
   
   function handleSeriesSearch(data, callback) {

@@ -70,9 +70,16 @@ opencast.episode = (function() {
         'Date': 'DATE_CREATED'
       };
 
-      var SEARCH_FILTER_FIELDS = [
+      var FILTER_FIELDS = [
         {
-          q: "Full text"
+          q: "Any fields",
+          title: "Title",
+          creator: "Presenter"
+        },
+        {
+          contributor: "Contributor",
+          language: "Language",
+          license: "License"
         }
       ];
 
@@ -366,7 +373,7 @@ opencast.episode = (function() {
               refresh();
             },
             searchText: state.filterText,
-            options: SEARCH_FILTER_FIELDS,
+            options: FILTER_FIELDS,
             selectedOption: state.filterField
           });
         })(this);

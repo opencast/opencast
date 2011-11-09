@@ -164,7 +164,9 @@ Opencast.WorkflowInspect = (function() {
 
     // in case of an 'upcoming event' episode dublin core catalog is obtained from scheduler service
     if (workflow.template == 'scheduling') {
-      out.info.episodeDC = this.SCHEDULER_URL + workflow.id;//+"/dublincore";
+      out.info.episodeDC = {};
+      out.info.episodeDC.url = this.SCHEDULER_URL + workflow.id + ".xml";//+"/dublincore";
+      out.info.episodeDC.sameHost = true;
     }
 
     return {
@@ -238,8 +240,6 @@ Opencast.WorkflowInspect = (function() {
           }
         });
       } else {	
-        //        var episode = TrimPath.processDOMTemplate('catalog', workflow.workflow.info.episodeDC);
-        //        $('#episodeContainer').append(episode);			        
         $('#episodeContainer').jqoteapptpl("templates/viewinfo-catalog.tpl", workflow.workflow.info.episodeDC);
       }
     }

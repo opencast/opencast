@@ -80,7 +80,7 @@ public class ListRecordsResponse extends OaiPmhResponse {
    * </pre>
    */
   public static Node metadataOfRecord(Node recordNode) {
-    return xpathNode(createXPath(), recordNode, "//oai20:metadata/*[1]");
+    return xpathNode(createXPath(), recordNode, "oai20:metadata/*[1]");
   }
 
   /**

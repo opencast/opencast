@@ -306,7 +306,7 @@ Opencast.search = (function ()
             error: function (xhr, ajaxOptions, thrownError)
             {
                 $.log("Search Ajax call: Requesting data failed");
-                Opencast.Player.addEvent("SEARCH-AJAX-FAILED");
+                Opencast.Player.addEvent(Opencast.logging.SEARCH_AJAX_FAILED);
                 if (!foundAlready)
                 {
                     setNoSegmentDataAvailable();
@@ -331,7 +331,7 @@ Opencast.search = (function ()
             }
             displayResult();
         }
-        Opencast.Player.addEvent("SEARCH-" + searchValue);
+        Opencast.Player.addEvent(Opencast.logging.SEARCH + searchValue);
     }
     
     /**

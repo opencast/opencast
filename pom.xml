@@ -36,6 +36,7 @@
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-capture-admin-service-api</module>
         <module>modules/matterhorn-capture-admin-service-impl</module>
+	<module>modules/matterhorn-cas</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-conductor</module>
         <module>modules/matterhorn-db</module>
@@ -57,6 +58,7 @@
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
         <module>modules/matterhorn-solr</module>
+        <module>modules/matterhorn-userdirectory-ldap</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-workflow-service-impl</module>
@@ -422,6 +424,32 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+
+    <profile>
+      <id>integrationtests</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-test-harness</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>loadtest</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-json</module>
+        <module>modules/matterhorn-kernel</module>
+        <module>modules/matterhorn-load-test</module>
+        <module>modules/matterhorn-runtime-info-ui</module>
+        <module>modules/matterhorn-static</module>
+        <module>modules/matterhorn-webconsole</module>
+      </modules>
     </profile>
 
   </profiles>

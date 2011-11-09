@@ -6,6 +6,7 @@
         <th class="recordings-table-head ui-helper-hidden" id="bulkActionButton"><a href="javascript:ocRecordings.displayBulkAction()">Bulk Action</a></th>
       </tr>
       <tr>
+        <th class="ui-state-default ui-helper-hidden bulkSelect"><input type="checkbox" id="selectAllRecordings" onclick="ocRecordings.selectAll(this.checked);" /></th>
         <th id="sortTitle" width="25%" class="ui-widget-header sortable"><div>Title<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
     <th id="sortPresenter" width="15%" class="ui-widget-header sortable"><div>Presenter<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
     <th id="sortSeries" width="15%" class="ui-widget-header sortable"><div>Course/Series<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
@@ -20,6 +21,9 @@
     <tbody>
       <% for(var i = 0; i < data[j].recordings.length; i++) { %>
       <tr valign="middle">
+        <td  class="ui-state-active ui-helper-hidden bulkSelect">
+          <input type="checkbox" value="<%= data[j].recordings[i].id %>" class="selectRecording" />
+        </td>
         <td class="ui-state-active">
           <%= data[j].recordings[i].title %>
         </td>

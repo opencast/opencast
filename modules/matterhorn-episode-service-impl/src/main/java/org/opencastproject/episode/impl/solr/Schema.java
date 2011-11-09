@@ -56,16 +56,27 @@ public final class Schema {
 
   // Localized fields
   public static final String DC_TITLE_PREFIX = "dc_title_";
+  public static final String DC_TITLE_SUM = "dc_title-sum";
   public static final String DC_SUBJECT_PREFIX = "dc_subject_";
+  public static final String DC_SUBJECT_SUM = "dc_subject-sum";
   public static final String DC_CREATOR_PREFIX = "dc_creator_";
+  public static final String DC_CREATOR_SUM = "dc_creator-sum";
   public static final String DC_PUBLISHER_PREFIX = "dc_publisher_";
+  public static final String DC_PUBLISHER_SUM = "dc_publisher-sum";
   public static final String DC_CONTRIBUTOR_PREFIX = "dc_contributor_";
+  public static final String DC_CONTRIBUTOR_SUM = "dc_contributor-sum";
   public static final String DC_ABSTRACT_PREFIX = "dc_abstract_";
+  public static final String DC_ABSTRACT_SUM = "dc_abstract-sum";
   public static final String DC_DESCRIPTION_PREFIX = "dc_description_";
+  public static final String DC_DESCRIPTION_SUM = "dc_description-sum";
   public static final String DC_RIGHTS_HOLDER_PREFIX = "dc_rights_holder_";
+  public static final String DC_RIGHTS_HOLDER_SUM = "dc_rights_holder-sum";
   public static final String DC_SPATIAL_PREFIX = "dc_spatial_";
+  public static final String DC_SPATIAL_SUM = "dc_spatial-sum";
   public static final String DC_ACCESS_RIGHTS_PREFIX = "dc_access_rights_";
+  public static final String DC_ACCESS_RIGHTS_SUM = "dc_access_rights-sum";
   public static final String DC_LICENSE_PREFIX = "dc_license_";
+  public static final String DC_LICENSE_SUM = "dc_license-sum";
 
   // Filters for audio and video files
   public static final String HAS_AUDIO = "has_audio_file";

@@ -190,6 +190,37 @@
         $('#series').autocomplete({
           source: function(request, response) {
             $.ajax({
+              url: '/series/series.json',
+              data: {
+                q: request.term,
+                sort: 'TITLE'
+              },
+              success: function(data) {
+                data = data.catalogs;
+                var series_list = [];
+                $.each(data, function(){
+                  series_list.push({value: this['http://purl.org/dc/terms/']['title'][0].value,
+                                    id: this['http://purl.org/dc/terms/']['identifier'][0].value});
+                });
+                response(series_list);
+              }, 
+              error: function() {
+                ocUtils.log('could not retrieve series_data');
+              }
+            });
+          },
+          select: function(event, ui){
+            $('#ispartof').val(ui.item.id);
+          },
+          search: function(){
+            $('#ispartof').val('');
+          }
+        });
+        
+        ocUtils.log('Initializing autocomplete for series field')
+        $('#series').autocomplete({
+          source: function(request, response) {
+            $.ajax({
               url: '/series/series.json' + '?q=' + request.term,
               dataType: 'json',
               type: 'GET',
@@ -311,6 +342,7 @@
             if (seriesid != '') {
               $('#ispartof').val(seriesid);
               $('#series').val($(data.documentElement).find("mediapackage > seriestitle").text());
+	      $('#info-series')[0].innerHTML = $(data.documentElement).find("mediapackage > seriestitle").text();
             }
 
             // load metadata from DC xml for editing
@@ -326,7 +358,8 @@
                 $(data.documentElement).children().each(function(index, elm){
                   var tagName = elm.tagName.split(/:/)[1];
                   if ($(elm).text() != '') {
-                    $('#meta-' + tagName).val($(elm).text());                    
+                    $('#meta-' + tagName).val($(elm).text());               
+		    if ($('#info-' + tagName).length>0) $('#info-' + tagName)[0].innerHTML = $(elm).text();        
                     if ( tagName === "created" ) {            
                       $('#recordDate').datepicker('setDate',$(elm).text());
                       $('#startTimeHour').val((new Date($(elm).text())).getHours()); 
@@ -805,7 +838,15 @@
     </script>
   </head>
   <body>
-    <h1>Review/Trim Media</h1>
+	<div class="lectureInfo" style="">
+	  <h2 id="info-title"></h2>
+	  <h4 id="info-creator"></h4>
+	  <h4 id="info-series"></h4>
+	</div>
+
+<div class="holdStateUI" >
+   <h1>Review/Trim Media</h1>
+
   <center>
     <iframe id="player-container">
     </iframe>
@@ -983,6 +1024,6 @@
     <!-- a id="edit-link" class="secondaryButton">Edit metadata, then continue</a -->
     <a onclick="cancel()" title="Cancel" class="secondaryButton">Cancel</a>
   </div>
-
+</div>
 </body>
 </html>

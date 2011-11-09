@@ -142,6 +142,9 @@
 
   <bean name="oAuthConsumerDetailsService" class="org.opencastproject.kernel.security.OAuthSingleConsumerDetailsService">
     <constructor-arg index="0" ref="userDetailsService" />
+    <constructor-arg index="1" value="consumerkey" />
+    <constructor-arg index="2" value="consumersecret" />
+    <constructor-arg index="3" value="constructorName" />
   </bean>
 
   <bean name="oauthProtectedResourceFilter" class="org.opencastproject.kernel.security.LtiProcessingFilter">

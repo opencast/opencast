@@ -16,9 +16,9 @@
 package org.opencastproject.episode.endpoint;
 
 import org.apache.commons.lang.StringUtils;
+import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.api.EpisodeServiceException;
-import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageImpl;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -49,6 +49,8 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
+
 /**
  * The REST endpoint
  */
@@ -64,6 +66,11 @@ import java.util.List;
 public class EpisodeRestService {
 
   private static final Logger logger = LoggerFactory.getLogger(EpisodeRestService.class);
+
+  /**
+   * The constant used to switch the direction of the sorting query string parameter.
+   */
+  public static final String DESCENDING_SUFFIX = "_DESC";
 
   protected EpisodeService episodeService;
 
@@ -291,23 +298,40 @@ public class EpisodeRestService {
       },
       restParameters = {
           @RestParameter(description = "The ID of the single episode to be returned, if it exists.", isRequired = false, name = "id", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Any episode that matches this free-text query.", isRequired = false, name = "q", type = RestParameter.Type.STRING),
+          @RestParameter(name = "q", description = "Any episode that matches this free-text query.", isRequired = false, type = RestParameter.Type.STRING),
+          @RestParameter(name = "creator", isRequired = false, description = "Filter results by the mediapackage's creator", type = STRING),
+          @RestParameter(name = "contributor", isRequired = false, description = "Filter results by the mediapackage's contributor", type = STRING),
+          @RestParameter(name = "language", isRequired = false, description = "Filter results by mediapackage's language.", type = STRING),
+          @RestParameter(name = "license", isRequired = false, description = "Filter results by mediapackage's license.", type = STRING),
+          @RestParameter(name = "title", isRequired = false, description = "Filter results by mediapackage's title.", type = STRING),
           @RestParameter(defaultValue = "false", description = "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".", isRequired = false, name = "episodes", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.STRING)
+          @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.STRING),
+          @RestParameter(name = "sort", description = "The sort order.  May include any "
+              + "of the following: DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, "
+              + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", isRequired = false, type = RestParameter.Type.STRING)
       },
       reponses = {
           @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK)
       },
       returnDescription = "The search results, expressed as xml or json.")
+  // CHECKSTYLE:OFF -- more than 7 parameters
   public Response getEpisode(@QueryParam("id") String id,
                              @QueryParam("q") String text,
+                             @QueryParam("creator") String creator,
+                             @QueryParam("contributor") String contributor,
+                             @QueryParam("language") String language,
+                             @QueryParam("license") String license,
+                             @QueryParam("title") String title,
                              @QueryParam("tag") String[] tags,
                              @QueryParam("flavor") String[] flavors,
                              @QueryParam("limit") int limit,
                              @QueryParam("offset") int offset,
-                             @PathParam("format") String format) {
+                             @QueryParam("sort") String sort,
+                             @PathParam("format") String format)
+      throws Exception {
+    // CHECKSTYLE:ON
 
     // Prepare the flavors
     List<MediaPackageElementFlavor> flavorSet = new ArrayList<MediaPackageElementFlavor>();
@@ -328,7 +352,32 @@ public class EpisodeRestService {
         .withLimit(limit)
         .withOffset(offset)
         .withText(StringUtils.trimToNull(text))
-        .withCreationDateSort(true);
+        .withCreator(creator)
+        .withContributor(contributor)
+        .withLanguage(language)
+        .withLicense(license)
+        .withTitle(title);
+
+    if (StringUtils.isNotBlank(sort)) {
+      // Parse the sort field and direction
+      EpisodeQuery.Sort sortField = null;
+      if (sort.endsWith(DESCENDING_SUFFIX)) {
+        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
+        try {
+          sortField = EpisodeQuery.Sort.valueOf(enumKey);
+          search.withSort(sortField, false);
+        } catch (IllegalArgumentException e) {
+          logger.warn("No sort enum matches '{}'", enumKey);
+        }
+      } else {
+        try {
+          sortField = EpisodeQuery.Sort.valueOf(sort);
+          search.withSort(sortField, true);
+        } catch (IllegalArgumentException e) {
+          logger.warn("No sort enum matches '{}'", sort);
+        }
+      }
+    }
 
     // Return the results using the requested format
     final String type = "json".equals(format) ? MediaType.APPLICATION_JSON : MediaType.APPLICATION_XML;

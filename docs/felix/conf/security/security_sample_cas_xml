@@ -84,6 +84,11 @@
 
     <!-- Enables log out -->
     <sec:logout />
+    
+    <!-- Enables Single Sign Out -->
+	<sec:logout logout-success-url="/cas-logout.jsp"/>
+	<sec:custom-filter ref="requestSingleLogoutFilter" before="LOGOUT_FILTER"/>
+	<sec:custom-filter ref="singleLogoutFilter" before="FORM_LOGIN_FILTER"/>
   </sec:http>
 
   <!-- ######################################## -->
@@ -190,6 +195,19 @@
     <property name="key" value="cas"/>
   </bean>
   
+  <!-- This filter handles a Single Logout Request from the CAS Server -->
+  <bean id="singleLogoutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter"/>
+
+  <!-- This filter redirects to the CAS Server to signal Single Logout should be performed -->
+  <bean id="requestSingleLogoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
+    <constructor-arg value="https://auth-test.berkeley.edu/cas/logout"/>
+    <constructor-arg>
+      <bean class= "org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
+    </constructor-arg>
+    <property name="filterProcessesUrl" value="/j_spring_cas_security_logout"/>
+  </bean>
+
+
 
   <!-- #################### -->
   <!-- # OSGI Integration # -->

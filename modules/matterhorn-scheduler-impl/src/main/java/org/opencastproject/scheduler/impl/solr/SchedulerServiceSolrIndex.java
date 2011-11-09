@@ -678,7 +678,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
       sb.append("*:*");
     }
 
-    logger.info("Solr query: " + sb.toString());
+    logger.debug("Solr query: " + sb.toString());
     return sb.toString();
   }
 

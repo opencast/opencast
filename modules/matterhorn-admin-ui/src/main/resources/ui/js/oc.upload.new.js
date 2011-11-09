@@ -102,6 +102,11 @@ var ocUpload = (function() {
       ocUtils.log('Missing input: title');
       missing.push('title');
     }
+    
+    if ($.trim($('#recordDate').val()) == '') {
+      ocUtils.log('Missing input: recordDate');
+      missing.push('recordDate');
+    }
 
     var fileSelected = false;
     $('.uploadForm-container:visible').each(function() {
@@ -586,7 +591,8 @@ ocUpload.Ingest = (function() {
       },
       success: function(data){
         window.debug = data;
-        id = $('identifier', data).text();
+        //id = $('identifier', data).text();
+        id = $(data).find('[nodeName="dcterms:identifier"]').text();
       }
     });
     return id;

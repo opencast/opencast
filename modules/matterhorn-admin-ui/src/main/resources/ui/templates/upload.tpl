@@ -8,7 +8,7 @@
 
     <!-- missing fields notification -->
 
-    <div  id="missingFieldsContainer" class="layout-page-header ui-helper-hidden">
+    <div id="missingFieldsContainer" class="layout-page-header ui-helper-hidden">
       <div class="layout-centered ui-state-error ui-corner-all scheduler-info-container">
         <h3 style="position: relative; padding-left: 20px;">
           <span class="ui-icon ui-icon-alert"></span> <b>Missing or invalid input</b>
@@ -26,6 +26,12 @@
             <span class="ui-icon ui-icon-carat-1-e"></span>
             <span>
               Please select a <a href="javascript:document.getElementById('track').focus();">media file</a> to upload. Supported file formats are: .avi, .mp3, .mp4, .mov, .mpg, .mkv, .flv or .wmv.
+            </span>
+          </li>
+          <li id="item-recordDate" class="missing-fields-item">
+            <span class="ui-icon ui-icon-carat-1-e"></span>
+            <span>
+              Please select a <a href="javascript:document.uploadForm.recordDate.focus();">recording date</a> for the recording.
             </span>
           </li>
         </ul>
@@ -55,7 +61,7 @@
               </li>
               <li>
                 <label class="scheduler-label" id="recordingDateLabel"><span class="scheduler-required-text">* </span><span id="i18n_date_label">Recording Date</span>:</label>
-                <input type="text" size="10" id="recordDate" />
+                <input type="text" size="10" id="recordDate" name="recordDate" class="dc-metadata-field" />
               </li> 
               <li>
 
@@ -386,4 +392,20 @@
 
     <!-- END of stage -->
   </div>
+</div>
+
+<div id="gray-out">
+  &nbsp;
+</div>
+
+<div id="progressStage" class="ui-corner-all progress-stage" style="display:none;">
+  <div class="progress-label-top upload-label">
+    &nbsp;
+  </div>
+  <div class="progressbar ui-corner-all ui-helper-clearfix">
+    <div class="progressbar-indicator ui-state-default ui-corner-all" style="width:0%;">&nbsp;</div>
+    <div class="progressbar-label"><span id="i18n_progress"></span></div>
+  </div>
+  <div class="progress-label-left upload-label">&nbsp;</div>
+  <div class="progress-label-right upload-label">&nbsp;</div>
 </div>

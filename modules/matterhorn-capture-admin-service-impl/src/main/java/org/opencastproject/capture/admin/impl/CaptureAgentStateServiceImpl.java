@@ -369,6 +369,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#setAgentConfiguration
    */
   public int setAgentConfiguration(String agentName, Properties configuration) {
+
     AgentImpl agent = getAgent(agentName);
     if (agent != null) {
       logger.debug("Setting Agent {}'s capabilities", agentName);

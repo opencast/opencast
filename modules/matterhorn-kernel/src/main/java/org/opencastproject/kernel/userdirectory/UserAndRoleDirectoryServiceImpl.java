@@ -139,7 +139,6 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       throw new IllegalStateException("No organization is set");
     }
     String orgId = org.getId();
-
     // Collect all of the roles known from each of the user providers for this user
     User user = null;
     for (UserProvider userProvider : userProviders) {

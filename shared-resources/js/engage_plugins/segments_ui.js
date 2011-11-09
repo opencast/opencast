@@ -556,7 +556,7 @@ Opencast.segments_ui = (function ()
             error: function (xhr, ajaxOptions, thrownError)
             {
                 $.log("Segments UI Ajax call: Requesting data failed");
-                Opencast.Player.addEvent("SEGMENT-UI-AJAX-FAILED");
+                Opencast.Player.addEvent(Opencast.logging.SEGMENT_UI_AJAX_FAILED);
                 $('#data').html('No Segment UI available');
                 $('#data').hide();
                 Opencast.Watch.continueProcessing(true);

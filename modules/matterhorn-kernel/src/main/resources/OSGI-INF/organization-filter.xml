@@ -5,6 +5,7 @@
     <implementation class="org.opencastproject.kernel.security.OrganizationFilter" />
     <property name="service.description" value="Organization Filter" />
     <property name="contextId" value="opencast.httpcontext" />
+    <!-- The CleanSessionsFilter must have the highest service.ranking value. See CleanSessionsFilter.java for details. -->
     <property name="service.ranking" value="5" />
     <property name="pattern" value=".*" />
     <service>

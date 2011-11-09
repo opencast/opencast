@@ -41,7 +41,7 @@ Opencast.segments_text = (function ()
      */
     function showSegmentsText()
     {
-        Opencast.Player.addEvent("SHOW-TEXT-SEGMENTS");
+        Opencast.Player.addEvent(Opencast.logging.SHOW_TEXT_SEGMENTS);
         // Hide other Tabs
         Opencast.Description.hideDescription();
         Opencast.segments.hideSegments();
@@ -113,7 +113,7 @@ Opencast.segments_text = (function ()
                 error: function (xhr, ajaxOptions, thrownError)
                 {
                     $.log("Segments Text Ajax call: Requesting data failed");
-                    Opencast.Player.addEvent("SEGMENTS-TEXT-AJAX-FAILED");
+                    Opencast.Player.addEvent(Opencast.logging.SEGMENTS_TEXT_AJAX_FAILED);
                     $('#oc-segments_text').html('No Segment Text available');
                     $('#oc-segments_text').hide();
                 }

@@ -1,6 +1,6 @@
 <div class="layout-page-content">
   <div>
-    <h2 style="text-align:center"><span id="i18n_page_title">View Series</span></h2>
+    <h2 style="text-align:center"><span id="i18n_page_title">View Series Info</span></h2>
   </div>
   <div class="form-box layout-centered ui-widget">
     <div class="form-box-content ui-widget-content ui-corner-all">
@@ -58,6 +58,16 @@
         </div>
         <!-- <div id="additionalTab">Some Stuff</div> -->
       </div>
+    </div>
+    <div id="privileges" class="form-box layout-centered ui-widget">
+      <div class="form-box-head ui-widget-header ui-corner-top oc-ui-cursor">
+        <div id="i18n_privileges">Privileges</div>
+        <div class="clear"></div>
+      </div>
+      <div class="form-box-content ui-widget-content ui-corner-bottom" id="privileges-list">
+
+      </div>
+
     </div>
   </div>
   <br>

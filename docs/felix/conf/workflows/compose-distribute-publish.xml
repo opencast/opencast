@@ -91,30 +91,6 @@
 
     <!-- prepare audio/video tracks -->
 
-    <operation
-      id="compose"
-      fail-on-error="false"
-      exception-handler-workflow="error"
-      description="Splitting Epiphan Media (if needed)">
-      <configurations>
-        <configuration key="source-flavor">multitrack/source</configuration>
-        <configuration key="target-flavor">presenter/source</configuration>
-        <configuration key="encoding-profile">epiphan.presenter</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="compose"
-      fail-on-error="false"
-      exception-handler-workflow="error"
-      description="Splitting Epiphan Media (if needed)">
-      <configurations>
-        <configuration key="source-flavor">multitrack/source</configuration>
-        <configuration key="target-flavor">presentation/source</configuration>
-        <configuration key="encoding-profile">epiphan.presentation</configuration>
-      </configurations>
-    </operation>
-
     <!-- Begin Epiphan MCA operations -->
 
     <!-- This section is only relevant for the Epiphan MCA devices, however

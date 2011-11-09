@@ -267,6 +267,7 @@
               org.springframework.security.web,
               org.springframework.security.web.authentication,
               org.springframework.security.web.authentication.www,
+              org.springframework.security.web.authentication.logout,
               org.springframework.util,              
               org.opencastproject.job.api;version=${project.version},
               org.opencastproject.rest;version=${project.version},
@@ -289,6 +290,7 @@
               org.springframework.security.oauth.provider.token;version=1.0.0.M1,
             </Export-Package>
             <Service-Component>
+              OSGI-INF/cleansessions.xml, 
               OSGI-INF/http-client.xml,
               OSGI-INF/http-context.xml,
               OSGI-INF/jsonp.xml,

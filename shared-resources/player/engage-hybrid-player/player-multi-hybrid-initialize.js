@@ -326,6 +326,7 @@ Opencast.Initialize = (function ()
             $('#oc_video-size-dropdown-div').css('width', '20%');
             $('#oc_player_video-dropdown').css('left', $('#oc_video-size-dropdown').offset().left - $('#oc_body').offset().left);
             $('#oc_player_video-dropdown').css('visibility', 'visible');
+            $("#oc_player_video-dropdown").css("display", 'block');
             $('#oc_volume-menue').css('visibility', 'hidden');
             ddmenuitem = $('#oc_player_video-dropdown');
         }
@@ -808,7 +809,7 @@ Opencast.Initialize = (function ()
             {
                 Opencast.Player.showShare();
             }
-            Opencast.Player.addEvent('RESIZE-TO-' + $(window).width() + 'x' + $(window).height());
+            Opencast.Player.addEvent(Opencast.logging.RESIZE_TO + $(window).width() + 'x' + $(window).height());
         });
         //bind click functions
         $('#oc_share-button').click(function (e)
@@ -817,7 +818,7 @@ Opencast.Initialize = (function ()
         });
         $('#oc_btn-email').click(function ()
         {
-            Opencast.Player.addEvent('EMAIL');
+            Opencast.Player.addEvent(Opencast.logging.EMAIL);
             Opencast.Player.doToggleShare();
         });
         $('#oc_time-chooser').click(function ()
@@ -906,7 +907,7 @@ Opencast.Initialize = (function ()
             },
             error: function ()
             {
-                Opencast.Player.addEvent("NORMAL-SEARCH-AJAX-FAILED");
+                Opencast.Player.addEvent(Opencast.logging.NORMAL_SEARCH_AJAX_FAILED);
             }
         });
         $.ajax(
@@ -919,7 +920,11 @@ Opencast.Initialize = (function ()
                 if (text === 'true') {
                   Opencast.Player.detailedLogging = true;
                   //This is done here because otherwise it doesn't fire (due to async threads I'm guessing)
-                  Opencast.Player.addEvent("NORMAL-STARTUP");
+                  Opencast.Player.addEvent(Opencast.logging.NORMAL_STARTUP);
+                  window.setInterval(function event() {
+                    Opencast.Player.addEvent(Opencast.logging.HEARTBEAT);
+                  },
+                  30 * 1000); //30 seconds
                 } else {
                   Opencast.Player.detailedLogging = false;
                 }
@@ -927,7 +932,7 @@ Opencast.Initialize = (function ()
             error: function (a, b, c)
             {
                 Opencast.Player.detailedLogging = false;
-                Opencast.Player.addEvent("NORMAL-DETAILED-LOGGING-AJAX-FAILED");
+                Opencast.Player.addEvent(Opencast.logging.NORMAL_DETAILED_LOGGING_AJAX_FAILED);
             }
         });
     });

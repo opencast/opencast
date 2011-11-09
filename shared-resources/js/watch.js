@@ -259,9 +259,9 @@ Opencast.Watch = (function ()
             
             if(advancedPlayer)
             {
-                // Hide Screen Settings until clicked 'play'
-                $("#oc_btn-dropdown").css("display", 'none');
-                $("#oc_player_video-dropdown").css("display", 'none');
+                // Hide Screen Settings until fully initialized
+                $("#oc_btn-dropdown").hide();
+                $("#oc_player_video-dropdown").hide();
                 var userId = $.getURLParameter('user');
                 var restEndpoint = Opencast.engage.getSearchServiceEpisodeIdURL() + mediaPackageId;
                 Opencast.Player.setSessionId(Opencast.engage.getCookie("JSESSIONID"));
@@ -780,7 +780,7 @@ Opencast.Watch = (function ()
     function seekSegment(seconds)
     {
         var eventSeek = Videodisplay.seek(seconds);
-        Opencast.Player.addEvent("SEEK-SEGMENT");
+        Opencast.Player.addEvent(Opencast.logging.SEEK_SEGMENT);
     }
     
     

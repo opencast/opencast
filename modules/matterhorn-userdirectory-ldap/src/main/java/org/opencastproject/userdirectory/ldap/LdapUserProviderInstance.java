@@ -218,7 +218,9 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
           roles[i++] = authority.getAuthority();
         }
       }
-      return new User(userDetails.getUsername(), getOrganization(), roles);
+      User user =  new User(userDetails.getUsername(), getOrganization(), roles);
+      cache.put(userName , user);
+      return user;
     } finally {
       currentThread.setContextClassLoader(originalClassloader);
     }
