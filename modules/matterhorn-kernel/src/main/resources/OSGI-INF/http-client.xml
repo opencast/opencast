@@ -7,4 +7,6 @@
   <service>
     <provide interface="org.opencastproject.security.api.TrustedHttpClient" />
   </service>
+   <reference name="service-impl" interface="org.opencastproject.kernel.http.impl.HttpClientFactory"
+    cardinality="1..1" policy="static" bind="setHttpClientFactory" unbind="unsetHttpClientFactory" />
 </scr:component>
