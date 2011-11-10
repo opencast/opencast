@@ -78,6 +78,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -604,6 +605,25 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     return service.stop(workflowInstanceId);
   }
 
+  @DELETE
+  @Path("remove/{id}")
+  @Produces(MediaType.TEXT_PLAIN)
+  @RestQuery(name = "remove", description = "Danger! Permenantly removes a workflow instance. This does not remove associated jobs, and there are potential harmful effects by removing a workflow. In most circumstances, /stop is what you should use.",
+          returnDescription = "HTTP 204 No Content",
+          pathParameters = {
+            @RestParameter(name = "id", isRequired = true,
+            description = "The workflow instance identifier", type = STRING)
+          },
+          reponses = {
+            @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT , description = "No Conent."),
+            @RestResponse(responseCode = SC_NOT_FOUND, description = "No running workflow instance with that identifier exists.")
+          })
+  public Response remove(@PathParam("id") long workflowInstanceId) throws WorkflowException, NotFoundException,
+          UnauthorizedException {
+    service.remove(workflowInstanceId);
+    return Response.noContent().build();
+  }
+  
   @POST
   @Path("suspend")
   @Produces(MediaType.TEXT_XML)
