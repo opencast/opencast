@@ -57,7 +57,7 @@ TEMP_OPTS="-Djava.io.tmpdir=$FELIX_HOME/work"
 # These lines should remain commented out.  
 # It is necessary to run "chkconfig matterhorn on" to enable matterhorn service management with Redhat.
 
-#chkconfig: 2345 20 80 
+#chkconfig: 2345 99 01 
 #description: lecture recording and management system 
 
 # If this computer is OS X and $DYLD_FALLBACK_LIBRARY_PATH environment variable
