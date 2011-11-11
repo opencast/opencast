@@ -28,6 +28,15 @@
       description="Retract media package from the streaming distribution channels">
     </operation>
 
+    <!-- Archive the current state of the mediapackage -->
+
+    <operation
+        id="archive"
+        fail-on-error="true"
+        exception-handler-workflow="error"
+        description="Archived">
+    </operation>
+
     <!-- todo clean up the episode from the working file repository -->
   
   </operations>
