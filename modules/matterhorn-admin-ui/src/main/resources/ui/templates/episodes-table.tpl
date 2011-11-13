@@ -44,6 +44,8 @@
         <td class="ui-state-active">
           <% if (e.media.length > 0) { %>
             <a onclick="ocArchive.retract('<%= e.id %>'); return false;" href="#">Retract</a>
+          <% } else { %>
+            retracted
           <% } %>
         </td>
         <td class="ui-state-active" style="text-align: center">

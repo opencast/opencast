@@ -19,8 +19,9 @@ opencast.episode = (function() {
   /** @param track -- track object from media package json
    */
   function isDistributedTrack(track) {
-    // todo discard tracks located inside the working file repository
-    return /[^/]\/delivery$/.test(track.type)
+    // todo do not have "delivery" and path segment "files/mediapackage" hard coded here!
+    // tracks with a flavor of */delivery _not_ residing in the mediapackage are recognized as being distributed
+    return /[^/]\/delivery$/.test(track.type) && !/\/files\/mediapackage\//.test(track.url);
   }
 
   /** Make episode object from json returned by the episode service.
