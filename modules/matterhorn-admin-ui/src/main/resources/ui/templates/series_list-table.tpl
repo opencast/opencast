@@ -12,8 +12,8 @@
       <% $.each(data[j].seriesView, function(key, series ) { %>
       <tr>
         <td class="ui-state-active"><%= series.title %></td>                       
-        <td class="ui-state-active"><%= series.creator %></td>
-        <td class="ui-state-active"><%= series.contributor %></td>
+        <td class="ui-state-active"><%= (series.creator) ? series.creator : '' %></td>
+        <td class="ui-state-active"><%= (series.contributor) ? series.contributor : '' %></td>
         <td class="ui-state-active" align="center">
           <a href="index.html#/viewseries?seriesId=<%= series.id %>">View Info</a><br />
           <a href="index.html#/series?seriesId=<%= series.id %>&edit=true">Edit</a>
