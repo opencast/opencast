@@ -699,6 +699,24 @@ var ocScheduler = (function() {
             }
           }
           ocScheduler.selectedInputs = value;
+        },
+        validate: function() {
+          if(!this.required) {
+            return []; //empty error array.
+          } else {
+            var oneIsValid = false;
+            var noInputFields = true;
+            for(var e in this.fields) {
+              noInputFields = false;
+              if(this.fields[e][0].checked) {
+                return [];
+              }
+            }
+            if (noInputFields) {
+              return [];
+            }
+          }
+          return this.errors.missingRequired;
         }
       });
 
