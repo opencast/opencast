@@ -21,6 +21,8 @@ mv "$dir" "${dir}-linux"
 cd "${dir}-linux"
 [ $? -ne 0 ] && exit 1
 #
+cp ../Makefile.in .
+[ $? -ne 0 ] && exit 1
 ./configure
 [ $? -ne 0 ] && exit 1
 make
