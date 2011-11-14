@@ -47,7 +47,7 @@ cp ../SConstruct.linux SConstruct
 #   warn    Compiler flags for warnings                "-Wall -D__warn_unused_result__=__far__"
 #   prefix  The installation root for iulib            "/usr/local"
 #
-scons --debug=findlibs
+sudox scons --debug=findlibs
 [ $? -ne 0 ] && exit 1
 sudox scons install
 [ $? -ne 0 ] && exit 1

@@ -3,6 +3,7 @@
 CENTOS_MIRROR: http://mirror.ox.ac.uk/sites/mirror.centos.org
 EPEL_MIRROR: http://mirror.switch.ch/ftp/mirror
 RPMFORGE_MIRROR: http://apt.sw.be/redhat/el5/en
+GNU_MIRROR: http://ftpmirror.gnu.org
 MACPORTS_SVN: http://svn.macports.org/repository/macports/trunk/dports
 
 wget_x86_url: ${CENTOS_MIRROR}/5/os/i386/CentOS
@@ -142,8 +143,8 @@ mingw32-gpp_x86_pkgs: mingw32-gcc-c++-4.3.2-12.el5.i386.rpm
 mingw32-gpp_x64_url: ${EPEL_MIRROR}/epel/5/x86_64
 mingw32-gpp_x64_pkgs: mingw32-gcc-c++-4.3.2-12.el5.x86_64.rpm
 
-mingw32-w32api_src_url: http://downloads.sourceforge.net/project/mingw/MinGW/BaseSystem/RuntimeLibrary/Win32-API/w32api-3.15
-mingw32-w32api_src_pkgs: w32api-3.15-1-mingw32-dev.tar.lzma
+mingw32-w32api_src_url: http://downloads.sourceforge.net/project/mingw/MinGW/Base/w32api/w32api-3.17
+mingw32-w32api_src_pkgs: w32api-3.17-2-mingw32-dev.tar.lzma
 
 #Original, but now defunct
 # patchelf_src_url: http://hydra.nixos.org/build/114505/download/3
