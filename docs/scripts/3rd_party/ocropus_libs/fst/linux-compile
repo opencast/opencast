@@ -21,7 +21,8 @@ mv "$dir" "${dir}-linux"
 cd "${dir}-linux"
 [ $? -ne 0 ] && exit 1
 #
-./configure
+./configure \
+LDFLAGS="-L/usr/lib/i386-linux-gnu -ldl"
 [ $? -ne 0 ] && exit 1
 make
 [ $? -ne 0 ] && exit 1

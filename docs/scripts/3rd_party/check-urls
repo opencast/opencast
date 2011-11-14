@@ -13,6 +13,7 @@ source "${HOME3P}/utilx"
 export CENTOS_MIRROR=`getmcfg CENTOS_MIRROR:`
 export EPEL_MIRROR=`getmcfg EPEL_MIRROR:`
 export RPMFORGE_MIRROR=`getmcfg RPMFORGE_MIRROR:`
+export GNU_MIRROR=`getmcfg GNU_MIRROR:`
 export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`
 #
 getcfgx() {

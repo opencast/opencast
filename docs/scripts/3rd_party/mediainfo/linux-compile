@@ -26,6 +26,8 @@ OLDCD=`pwd`
 #
 cd ZenLib/Project/GNU/Library
 [ $? -ne 0 ] && exit 1
+cp ../../../../../Conf.h ../../../Source/ZenLib
+[ $? -ne 0 ] && exit 1
 ./configure
 [ $? -ne 0 ] && exit 1
 make
