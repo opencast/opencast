@@ -727,7 +727,7 @@ ocRecordings = new (function() {
       }
     })
     .click( function() {
-      window.location.href = '../../admin/index.html#/scheduler';
+      window.location.href = '../../admin/index.html#/scheduler' + '?' + ocRecordings.buildURLparams();
     });
 
     // ocRecordings state selectors
