@@ -266,9 +266,11 @@ opencast.episode = (function() {
           _(episodes).each(function(episode) {
             _.detect(workflows, function(workflow) {
               if (workflow.mediapackage.id === episode.id) {
-                var lastOperation = A(workflow.operations.operation).pop()
-                episode.workflow = workflowDisplayName(workflow) + " : "
-                    + ocUtils.dflt(lastOperation.description, lastOperation.id);
+                var lastOperation = A(workflow.operations.operation).pop();
+                if (lastOperation) {
+                  episode.workflow = workflowDisplayName(workflow) + " : "
+                      + ocUtils.dflt(lastOperation.description, lastOperation.id);
+                }
                 return true;
               } else {
                 return false;
