@@ -136,7 +136,7 @@ var ocUpload = (function() {
   }
 
   this.backToRecordings = function() {
-    location.href = "/admin/index.html";
+    location.href = "/admin/index.html#/recordings?" + window.location.hash.split('?')[1];
   }
 
   return this;
@@ -302,7 +302,7 @@ ocUpload.UI = (function() {
     ocUpload.UI.hideProgressDialog();
     alert("Ingest failed:\n" + message);
     //ocUpload.backToRecordings();
-    window.location = '/admin';
+    window.location = '/admin/index.html#/recordings?' + window.location.hash.split('?')[1];;
   }
   
   /**
