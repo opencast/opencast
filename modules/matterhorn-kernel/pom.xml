@@ -166,10 +166,11 @@
     
     <dependency>
       <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <version>2.5.1</version>
+      <artifactId>easymockclassextension</artifactId>
+      <version>2.5.2</version>
       <scope>test</scope>
     </dependency>
+
         
   </dependencies>
   
@@ -278,6 +279,8 @@
             </Import-Package>
             <Export-Package>
               org.opencastproject.kernel.http;version=${project.version},
+              org.opencastproject.kernel.http.api;version=${project.version},
+              org.opencastproject.kernel.http.impl;version=${project.version},
               org.opencastproject.kernel.pingback;version=${project.version},
               org.opencastproject.kernel.rest;version=${project.version},
               org.opencastproject.kernel.security;version=${project.version},
@@ -291,6 +294,7 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/cleansessions.xml, 
+              OSGI-INF/http-client-factory.xml,
               OSGI-INF/http-client.xml,
               OSGI-INF/http-context.xml,
               OSGI-INF/jsonp.xml,

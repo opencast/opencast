@@ -23,6 +23,8 @@ mv "$dir" "${dir}-win32"
 cd "${dir}-win32"
 [ $? -ne 0 ] && exit 1
 #
+#cp ../Makefile.in .
+#[ $? -ne 0 ] && exit 1
 #./configure \
 #--host=${MINGW32} \
 #--with-sdl-prefix=${MINGW32_PREFIX}

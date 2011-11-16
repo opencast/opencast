@@ -20,7 +20,7 @@ var ocScheduler = (function() {
   var WORKFLOW_URL      = '/workflow';
   var CAPTURE_ADMIN_URL = '/capture-admin';
   var SERIES_URL        = '/series';
-  var RECORDINGS_URL    = '/admin/index.html';
+  var RECORDINGS_URL    = '/admin/index.html#/recordings';
   var DUBLIN_CORE_NS_URI  = 'http://purl.org/dc/terms/';
   
   // Constants
@@ -338,7 +338,7 @@ var ocScheduler = (function() {
   };
 
   sched.cancelForm = function() {
-    document.location = 'index.html'+window.location.search;
+    document.location = RECORDINGS_URL + "?" + window.location.hash.split('?')[1];
   };
 
 
@@ -509,7 +509,7 @@ var ocScheduler = (function() {
 
   sched.eventSubmitComplete = function(xhr, status) {
     if(status == "success") {
-      document.location = RECORDINGS_URL+window.location.search;
+      document.location = RECORDINGS_URL + "?" + window.location.hash.split('?')[1];
     }
   }
 
@@ -699,6 +699,24 @@ var ocScheduler = (function() {
             }
           }
           ocScheduler.selectedInputs = value;
+        },
+        validate: function() {
+          if(!this.required) {
+            return []; //empty error array.
+          } else {
+            var oneIsValid = false;
+            var noInputFields = true;
+            for(var e in this.fields) {
+              noInputFields = false;
+              if(this.fields[e][0].checked) {
+                return [];
+              }
+            }
+            if (noInputFields) {
+              return [];
+            }
+          }
+          return this.errors.missingRequired;
         }
       });
 

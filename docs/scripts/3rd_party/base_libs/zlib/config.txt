@@ -1,4 +1,4 @@
-URL: http://zlib.net
+URL: http://zlib.net http://downloads.sourceforge.net/project/libpng/zlib/1.2.5
 PKG: zlib-1.2.5.tar.gz
 SHA: 8e8b93fa5eb80df1afe5422309dca42964562d7e
 DIR: zlib-1.2.5

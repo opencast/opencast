@@ -195,7 +195,7 @@
         var allTabIds = $("a", $html).map(function() {return this.id}).toArray();
         $6.getJSON(meJsonUrl, function(data) {
           var enabledTabIds = _.filter(allTabIds, function(id) {
-            // todo test code
+            // todo test codejquery remove 
             var enabled = data.org.properties["adminui." + id + ".enable"];
             return enabled == "true" || enabled == true || typeof enabled === "undefined";
           });
@@ -247,6 +247,7 @@
                       selected: selectedTabNr
                     })
                     .css('display', 'block');
+                $('#' + selectedTabId).parent().removeClass('ui-tabs-selected');
                 // Enables the plugin for all the tab links
                 $(linkSelector).address();
               })
