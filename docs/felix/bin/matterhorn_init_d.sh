@@ -51,7 +51,6 @@ PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN -Dopencas
 UTIL_LOGGING_OPTS="-Djava.util.logging.config.file=$FELIX/conf/services/java.util.logging.properties"
 GRAPHICS_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
 JAVA_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
-TEMP_OPTS="-Djava.io.tmpdir=$FELIX_HOME/work"
 
 # The following lines are required to run Matterhorn as a service in Redhat.  
 # These lines should remain commented out.  
