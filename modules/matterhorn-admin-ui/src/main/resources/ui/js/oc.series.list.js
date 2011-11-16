@@ -24,25 +24,78 @@ ocSeriesList.Configuration = new (function(){
   this.startPage = 0;  
   this.lastPage = 0;
   this.sort = 'TITLE_ASC';  
+  this.edit = 'true';
 });
 
 ocSeriesList.init = function(){
   $('#addHeader').jqotesubtpl('templates/series_list-header.tpl', {});
   
-  $.ajax({
-    url: "/series/series.json?edit=true",
-    type: "GET",
-    success: function(data)
-    {
-      ocSeriesList.buildSeriesView(data);
-    }
-  });
+  $('#pageSize').change(function(event, ui)
+  {
+    ocSeriesList.Configuration.count = event.target.value;
+    ocSeriesList.askForSeries();
+  })
+  
+  ocSeriesList.askForSeries();
   
   $("#addSeriesButton").button({
     icons:{
       primary:"ui-icon-circle-plus"
     }
   });
+}
+
+ocSeriesList.askForSeries = function()
+{
+  $.ajax({
+    url : "/series/series.json?"+ocSeriesList.buildURLparams(),
+    type: "GET",
+    success: function(data)
+    {
+      ocSeriesList.buildSeriesView(data);
+      ocSeriesList.Configuration.total = data.totalCount;
+      if(ocSeriesList.Configuration.startPage == 0) {
+        $('#prevText').show();
+        $('#prevButtons').hide();
+
+        $('#nextText').hide();
+        $('#nextButtons').show();
+      } else if(ocSeriesList.Configuration.startPage == ocSeriesList.Configuration.lastPage) {
+        $('#nextText').show();
+        $('#nextButtons').hide();
+
+        $('#prevText').hide();
+        $('#prevButtons').show();
+      } else if(ocSeriesList.Configuration.total == ocSeriesList.Configuration.count){
+        $('#prevText').hide();
+        $('#prevButtons').show();
+
+        $('#nextText').hide();
+        $('#nextButtons').show();
+      } else {
+        $('#prevText').show();
+        $('#prevButtons').hide();
+
+        $('#nextText').show();
+        $('#nextButtons').hide();  
+      }
+    }
+  });
+}
+
+ocSeriesList.previousPage = function(){
+  if(ocSeriesList.Configuration.startPage > 0) {
+    ocSeriesList.Configuration.startPage--;
+    ocSeriesList.askForSeries();
+  }
+}
+
+ocSeriesList.nextPage = function(){
+  numPages = Math.floor(ocSeriesList.Configuration.total / ocSeriesList.Configuration.count);
+  if( ocSeriesList.Configuration.startPage < numPages ) {
+    ocSeriesList.Configuration.startPage++;
+    ocSeriesList.askForSeries();
+  }
 }
 
 ocSeriesList.buildURLparams = function() {
@@ -59,6 +112,8 @@ ocSeriesList.buildURLparams = function() {
 ocSeriesList.buildSeriesView = function(data) {
   var PURL = "http://purl.org/dc/terms/";
   var sorting;
+  ocSeriesList.views = {};
+  ocSeriesList.views.seriesView = {};
   for(var i = 0; i < data.catalogs.length; i++) {
     var s = ocSeriesList.views.seriesView[data.catalogs[i][PURL]['identifier'][0].value] = {};
     s.id = data.catalogs[i][PURL]['identifier'][0].value;
@@ -99,7 +154,7 @@ ocSeriesList.buildSeriesView = function(data) {
     {
       if(index == $.cookie('column'))
       {
-          $.cookie('direction', $.cookie('direction') == 0 ? 1 : 0);
+        $.cookie('direction', $.cookie('direction') == 0 ? 1 : 0);
       }
       $.cookie('column', index)
     }
