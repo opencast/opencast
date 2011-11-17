@@ -319,9 +319,9 @@ Opencast.Watch = (function ()
                 return;
             } else
             {
-                $('body').css('background-color', '#FFFFFF');
+                $('body').css('background-color', '#000000');
                 $('body').html('<span id="initializing-matter">matter</span><span id="initializing-horn">horn</span><span id="initializing">&nbsp;The media is not available.</span>');
-                $('#initializing').css('color', '#000000');
+                $('#initializing').css('color', '#FFFFFF');
                 return;
             }
         }
@@ -468,6 +468,7 @@ Opencast.Watch = (function ()
             mediaResolutionTwo = tmpMediaResolution;
         }
         
+	$.log("-----");
         $.log("Final Mediadata");
         $.log("Mediapackage ID: " + mediaPackageId);
         $.log("Media URL 1: " + mediaUrlOne);
@@ -476,6 +477,7 @@ Opencast.Watch = (function ()
         $.log("Media resolution 1: " + mediaResolutionTwo);
         $.log("Mimetype 1: " + mimetypeOne);
         $.log("Mimetype 2: " + mimetypeTwo);
+	$.log("-----");
         
         if(advancedPlayer)
         {
@@ -487,18 +489,22 @@ Opencast.Watch = (function ()
             Opencast.Player.setMediaURL(coverUrlOne, coverUrlTwo, mediaUrlOne, mediaUrlTwo, mimetypeOne, mimetypeTwo, PLAYERSTYLE, slideLength);
             if (mediaUrlOne !== '' && mediaUrlTwo !== '')
             {
+		$.log('Both media URLs are not empty, setting up a multiplayer');
                 Opencast.Player.setVideoSizeList(MULTIPLAYER);
             }
             else if (mediaUrlOne !== '' && mediaUrlTwo === '')
             {
+		$.log('Media URL one is not empty');
                 var pos = mimetypeOne.lastIndexOf("/");
                 var fileType = mimetypeOne.substring(0, pos);
                 if (fileType === 'audio')
                 {
+		    $.log('File type is audio, setting up an audio player');
                     Opencast.Player.setVideoSizeList(AUDIOPLAYER);
                 }
                 else
                 {
+		    $.log('File type is not audio, setting up a single player');
                     Opencast.Player.setVideoSizeList(SINGLEPLAYER);
                 }
             }
