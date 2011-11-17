@@ -339,6 +339,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   protected File getDistributionFile(MediaPackage mediaPackage, MediaPackageElement element) {
     String elementId = element.getIdentifier();
     String fileName = FilenameUtils.getName(element.getURI().toString());
+    
     String directoryName = distributionDirectory.getAbsolutePath();
     String destinationFileName = PathSupport.concat(new String[] { directoryName,
             mediaPackage.getIdentifier().compact(), elementId, fileName });
@@ -359,6 +360,10 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   protected URI getDistributionUri(String mediaPackageId, MediaPackageElement element) throws URISyntaxException {
     String elementId = element.getIdentifier();
     String fileName = FilenameUtils.getName(element.getURI().toString());
+    
+    if (fileName.endsWith(".mp4"))
+    	fileName = "mp4:" + fileName;
+    
     String destinationURI = UrlSupport.concat(new String[] { streamingUrl, mediaPackageId, elementId, fileName });
     return new URI(destinationURI);
   }
