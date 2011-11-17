@@ -119,7 +119,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -141,7 +141,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+     $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -163,7 +163,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -185,7 +185,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -207,7 +207,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -229,7 +229,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -251,7 +251,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -273,7 +273,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -295,7 +295,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -318,7 +318,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -332,6 +332,7 @@ Videodisplay = (function ()
      */
   function seek(argNumber)
   {
+      $.log("WOOT");
     try
     {
       if (initialized())
@@ -365,7 +366,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -387,7 +388,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -414,7 +415,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -442,7 +443,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -469,7 +470,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -493,6 +494,19 @@ Videodisplay = (function ()
     {
       argMimetypeOne = "video/flv";
     }
+
+    $.log("-----");
+    $.log("Videodisplay data");
+    $.log("argCoverOne: " + argCoverOne);
+    $.log("argCoverTwo: " + argCoverTwo);
+    $.log("argStringOne: " + argStringOne);
+    $.log("argStringTwo: " + argStringTwo);
+    $.log("argMimetypeOne: " + argMimetypeOne);
+    $.log("argMimetypeTwo: " + argMimetypeTwo);
+    $.log("argPlayerstyle: " + argPlayerstyle);
+    $.log("slideLength: " + slideLength);
+    $.log("-----");
+
     try
     {
       if (initialized())
@@ -514,7 +528,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -541,7 +555,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -570,7 +584,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -590,8 +604,8 @@ Videodisplay = (function ()
         return v;
       } 
     } catch(err)
-{
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+    {
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };
@@ -626,7 +640,7 @@ Videodisplay = (function ()
     }
     catch (err)
     {
-      Opencast.Utils.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
+      $.log("Error in Videodisplay '" + arguments.callee.toString().substr(0, arguments.callee.toString().indexOf('(')) + "': " + err);
     }
     return false;
   };

@@ -40,7 +40,7 @@ input.ui-button {
 
 /* Start: Flash Player loading */
 #oc_flash-player-loading {
-    background-color: #FDE7CE;
+    background-color: none;
     vertical-align: middle;
     text-align: center;
     margin-bottom: 0px;
