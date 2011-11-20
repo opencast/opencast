@@ -246,7 +246,9 @@
                 <label class="scheduler-label"><span id="i18n_upload_flavor">Media Characteristics</span>:</label>
                 <input type="checkbox" class="flavor-presentation-checkbox" id="containsSlides">
                 <input type="hidden" class="track-flavor" value="presenter/source">
-                <label for="containsSlides" style="text-align: left; width: 300px;">Contains discrete images/slides/scenes</label>
+                <label for="containsSlides" style="text-align: left; width: 300px;">
+                  Contains discrete images/slides/scenes.
+                </label>
               </li>
 
               <li class="ui-helper-clearfix">
@@ -268,8 +270,8 @@
             <fieldset class="upload-widget">
               <legend>File with segmentable video</legend>
               <div class="informationText">
-
-                Contains discrete images/slides/scenes.
+                Contains discrete images/slides/scenes (example: VGA output of presentation). Audio in this file
+                will be ignored if File with non-segmentable video contains audio.
               </div>
               <ul class="oc-ui-form-list">
                 <li class="ui-helper-clearfix" id="regularFileSelection">
@@ -294,7 +296,7 @@
             <fieldset class="upload-widget">
               <legend>File with non-segmentable video</legend>
               <div class="informationText">
-                Has no clear changes that could identify new segments; typically video of the presenter.
+                Has no clear changes that could identify new segments (example: video of the presenter).
               </div>
 
               <ul class="oc-ui-form-list">
@@ -319,9 +321,9 @@
 
             <fieldset class="upload-widget">
               <legend>Audio-only file</legend>
-              <!-- <div class="informationText">
-                 If you select a file here, this files's audio will override audio in "File with non-segmentable video" above.
-               </div>-->
+              <div class="informationText">
+                This file's audio will only be used if no other files contain audio.
+              </div>
               <ul class="oc-ui-form-list">
                 <li class="ui-helper-clearfix" id="regularFileSelection">
 
