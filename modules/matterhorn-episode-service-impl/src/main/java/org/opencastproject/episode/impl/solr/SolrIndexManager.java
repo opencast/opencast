@@ -659,11 +659,19 @@ public class SolrIndexManager {
           continue;
         }
         List<String> actionPermissions = permissions.get(entry.getAction());
+        /*MH-8353 a series could have a permission defined we don't know how
+         * to handle -DH
+        */
+        if (actionPermissions == null) {
+        	logger.warn("Search service doesn't know how to handle action: " + entry.getAction());
+        	continue;
+        }
         if (acl == null) {
-          actionPermissions = new ArrayList<String>();
-          permissions.put(entry.getAction(), actionPermissions);
+        	actionPermissions = new ArrayList<String>();
+        	permissions.put(entry.getAction(), actionPermissions);
         }
         actionPermissions.add(entry.getRole());
+
       }
     }
 
