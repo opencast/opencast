@@ -270,7 +270,7 @@
     
     <operation
       id="segment-video"
-      fail-on-error="true"
+      fail-on-error="false"
       exception-handler-workflow="error"
       description="Extracting segments from presentation">
       <configurations>
@@ -395,7 +395,7 @@
     
     <operation
       id="segmentpreviews"
-      fail-on-error="true"
+      fail-on-error="false"
       exception-handler-workflow="error"
       description="Encoding presentation (screen) to segment preview image">
       <configurations>
@@ -413,7 +413,7 @@
 
     <operation
       id="extract-text"
-      fail-on-error="true"
+      fail-on-error="false"
       exception-handler-workflow="error"
       description="Extracting text from presentation segments">
       <configurations>
