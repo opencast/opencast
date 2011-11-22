@@ -128,7 +128,7 @@ public interface SchedulerService {
    * @throws NotFoundException
    *           if event with specified ID cannot be found
    */
-  void removeEvent(long eventID) throws SchedulerException, NotFoundException;
+  void removeEvent(long eventID) throws SchedulerException, NotFoundException, UnauthorizedException;
 
   /**
    * Retrieves DublinCore associated with specified event ID.

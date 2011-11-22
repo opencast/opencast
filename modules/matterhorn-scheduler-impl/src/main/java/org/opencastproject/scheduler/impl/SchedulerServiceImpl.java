@@ -782,8 +782,9 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * @see org.opencastproject.scheduler.api.SchedulerService#removeEvent(long)
    */
   @Override
-  public void removeEvent(final long eventID) throws SchedulerException, NotFoundException {
+  public void removeEvent(final long eventID) throws SchedulerException, NotFoundException, UnauthorizedException {
     try {
+      stopWorkflowInstance(eventID);
       persistence.deleteEvent(eventID);
     } catch (SchedulerServiceDatabaseException e) {
       logger.error("Could not remove event '{}' from persistent storage: {}", eventID, e);
