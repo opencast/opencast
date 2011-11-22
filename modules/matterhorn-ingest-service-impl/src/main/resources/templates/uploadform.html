@@ -10,7 +10,7 @@
     <form id="uploadForm" name="uploadForm" method="POST" action="{uploadURL}" enctype="multipart/form-data">
       <input id="flavor" type="hidden" name="flavor" value="">
       <input id="mediapackage" type="hidden" name="mediaPackage" value="">
-      <input type="hidden" name="elementType" value="track">
+      <input type="hidden" name="elementType" value="{elementType}">
       <input type="file" name="file" class="file-selector" onchange="parent.ocUpload.UI.formFieldChanged();">
     </form>
   </body>
