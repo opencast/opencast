@@ -18,11 +18,6 @@
             <input type="checkbox" id="trimHold" name="trimHold" class="configField holdCheckbox" value="true">
             <label for="trimHold" id="i18n_hold_for_trim">&nbsp;Review / Trim before encoding (with option to edit info)</label>
 	  </span>
-          <label class="scheduler-label"></label>
-	  <span id="captionconfig">
-            <input type="checkbox" id="captionHold" name="captionHold" class="configField holdCheckbox" value="true">
-            <label for="captionHold" id="i18n_hold_for_caption">&nbsp;Captions file upload</label>
-          </span>
       </ul>
     </fieldset>    
     <fieldset>
@@ -59,10 +54,6 @@
           ['trimHold'],
           {key: 'org.opencastproject.workflow.config.trimHold'});
           
-        components['org.opencastproject.workflow.config.captionHold'] = new ocAdmin.Component(
-          ['captionHold'],
-          {key: 'org.opencastproject.workflow.config.captionHold'});
-          
         ocScheduler.dublinCore.components['license'] = new ocAdmin.Component(
           ['license'],
           {label: 'licenseLabel', key: 'license'});
@@ -70,7 +61,6 @@
           //etc...
       }
       ocWorkflowPanel.setComponentValues = function(values, components){
-        components['org.opencastproject.workflow.config.captionHold'].setValue(values['org.opencastproject.workflow.config.captionHold']);
         components['org.opencastproject.workflow.config.trimHold'].setValue(values['org.opencastproject.workflow.config.trimHold']);
         components['license'].setValue(values['license']);
       }
@@ -216,19 +206,6 @@
       </configurations>
     </operation>  
 
-    <!-- hold for captions -->
- 
-    <operation
-      id="caption"
-      if="${captionHold}"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Waiting for user to upload captions">
-      <configurations>
-        <configuration key="caption-flavor">caption/dfxp</configuration>
-      </configurations>
-    </operation>
-    
     <!-- encode to engage player preview images -->
  
     <operation

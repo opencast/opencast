@@ -71,6 +71,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -634,8 +635,9 @@ public class IngestRestService {
   @GET
   @Path("filechooser-local.html")
   @Produces(MediaType.TEXT_HTML)
-  public Response createUploadJobHtml() {
+  public Response createUploadJobHtml(@QueryParam("elementType")String elementType) {
     InputStream is = null;
+    elementType = (elementType == null) ? "track" : elementType;
     try {
       UploadJob job = createUploadJob();
       is = getClass().getResourceAsStream("/templates/uploadform.html");
@@ -644,6 +646,7 @@ public class IngestRestService {
       String uploadURL = "addElementMonitored/" + job.getId();
       html = html.replaceAll("\\{uploadURL\\}", uploadURL);
       html = html.replaceAll("\\{jobId\\}", job.getId());
+      html = html.replaceAll("\\{elementType\\}", elementType);
       logger.debug("New upload job created: " + job.getId());
       jobs.put(job.getId(), job);
       return Response.ok(html).build();
