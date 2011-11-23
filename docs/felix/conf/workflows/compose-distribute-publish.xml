@@ -182,19 +182,6 @@
       </configurations>
     </operation>  
 
-    <!-- hold for captions -->
- 
-    <operation
-      id="caption"
-      if="${captionHold}"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Waiting for user to upload captions">
-      <configurations>
-        <configuration key="caption-flavor">caption/dfxp</configuration>
-      </configurations>
-    </operation>
-    
     <!-- encode to engage player preview images -->
  
     <operation
