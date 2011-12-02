@@ -74,7 +74,6 @@ Opencast.Player = (function ()
         displVidSizeControl = false,
         shareDisplayed = false,
         timeLayerDisplayed = false,
-        shortcutDialogDisplayed = false,
         shortcutTabReturnId = '',
         embedDialogDisplayed = false,
         mediaPackageId, userId, sessionId, inPosition = 0,
@@ -660,7 +659,7 @@ Opencast.Player = (function ()
      */
     function doToggleShortcuts(e, who)
     {
-        if (shortcutDialogDisplayed)
+        if ($('#oc_shortcuts').dialog('isOpen'))
         {
             hideShortcuts();
         }
@@ -902,7 +901,6 @@ Opencast.Player = (function ()
         {
             $('#' + shortcutTabReturnId).focus();
         }
-        shortcutDialogDisplayed = false;
         $('#oc_shortcuts').dialog('close');
     }
     
@@ -1660,7 +1658,6 @@ Opencast.Player = (function ()
     function showShortcuts()
     {
         $('#oc_shortcuts').dialog('open');
-        shortcutDialogDisplayed = true;
     }
     
     /**
