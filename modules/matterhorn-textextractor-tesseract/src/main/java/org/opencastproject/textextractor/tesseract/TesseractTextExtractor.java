@@ -43,7 +43,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
   public static final String TESSERACT_BINARY_DEFAULT = "tesseract";
 
   /** The configuration admin property that defines the path to the tesseract binary */
-  public static final String TESSERACT_BINARY_CONFIG_KEY = "tesseract.path";
+  public static final String TESSERACT_BINARY_CONFIG_KEY = "org.opencastproject.textanalyzer.tesseract.path";
 
   /** Binary of the tesseract command */
   protected String binary = null;
