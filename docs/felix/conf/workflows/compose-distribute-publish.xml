@@ -37,7 +37,7 @@
         </li>
         <!-- field: License -->
         <li class="ui-helper-clearfix">
-          <label class="scheduler-label" for="license" id="licenseLabel"><span id="i18n_license_label">License</span>:</label>
+          <label class="scheduler-label" for="license configField" id="licenseLabel"><span id="i18n_license_label">License</span>:</label>
           <input type="text" class="oc-ui-form-field" id="license" name="license" maxlength="255" style="width:300px;"/>
         </li>
       </ul>
