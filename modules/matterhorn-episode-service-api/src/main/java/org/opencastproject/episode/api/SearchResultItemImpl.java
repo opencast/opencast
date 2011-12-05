@@ -675,7 +675,9 @@ public class SearchResultItemImpl implements SearchResultItem {
    * @see org.opencastproject.episode.api.SearchResultItem#getSegments()
    */
   public MediaSegment[] getSegments() {
-    return mediaSegments.toArray(new MediaSegment[mediaSegments.size()]);
+    return mediaSegments != null
+        ? mediaSegments.toArray(new MediaSegment[mediaSegments.size()])
+        : new MediaSegmentImpl[0];
   }
 
   /**

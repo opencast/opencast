@@ -279,9 +279,10 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
       logger.info("Retracting element {} from {}", distributedElement, elementDir);
 
       // Does the file exist? If not, the current element has not been distributed to this channel
+      // or has been removed otherwise
       if (!elementDir.exists()) {
         logger.warn("Unable to delete element from {}", elementDir);
-        return null;
+        return distributedElement;
       }
 
       // Try to remove the file and - if possible - the parent folder

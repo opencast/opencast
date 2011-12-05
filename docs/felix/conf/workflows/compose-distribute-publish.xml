@@ -37,7 +37,7 @@
         </li>
         <!-- field: License -->
         <li class="ui-helper-clearfix">
-          <label class="scheduler-label" for="license" id="licenseLabel"><span id="i18n_license_label">License</span>:</label>
+          <label class="scheduler-label" for="license configField" id="licenseLabel"><span id="i18n_license_label">License</span>:</label>
           <input type="text" class="oc-ui-form-field" id="license" name="license" maxlength="255" style="width:300px;"/>
         </li>
       </ul>
@@ -182,19 +182,6 @@
       </configurations>
     </operation>  
 
-    <!-- hold for captions -->
- 
-    <operation
-      id="caption"
-      if="${captionHold}"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Waiting for user to upload captions">
-      <configurations>
-        <configuration key="caption-flavor">caption/dfxp</configuration>
-      </configurations>
-    </operation>
-    
     <!-- encode to engage player preview images -->
  
     <operation
@@ -270,7 +257,7 @@
     
     <operation
       id="segment-video"
-      fail-on-error="true"
+      fail-on-error="false"
       exception-handler-workflow="error"
       description="Extracting segments from presentation">
       <configurations>
@@ -395,7 +382,7 @@
     
     <operation
       id="segmentpreviews"
-      fail-on-error="true"
+      fail-on-error="false"
       exception-handler-workflow="error"
       description="Encoding presentation (screen) to segment preview image">
       <configurations>
@@ -413,7 +400,7 @@
 
     <operation
       id="extract-text"
-      fail-on-error="true"
+      fail-on-error="false"
       exception-handler-workflow="error"
       description="Extracting text from presentation segments">
       <configurations>

@@ -304,8 +304,9 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       File elementDir = getDistributionFile(mediapackage, element);
 
       // Does the file exist? If not, the current element has not been distributed to this channel
+      // or has been removed otherwise
       if (!elementDir.exists())
-        return null;
+        return distributedElement;
 
       // Try to remove the file and - if possible - the parent folder
       FileUtils.forceDelete(elementDir);

@@ -55,6 +55,15 @@ public class PingBackService {
 
   /** The trusted http client used to connect to the runtime info ui */
   private TrustedHttpClient httpClient = null;
+  
+  /** Name of the "id" form parameters */
+  private static final String PARAM_NAME_ID = "form_id"; 
+
+  /** Name of the "submitted" form parameters */
+  private static final String PARAM_NAME_SUBMITTED = "submitted[data]"; 
+
+  /** Value of the "id" form parameters */
+  private static final String PARAM_VALUE_ID = "webform_client_form_1445"; 
 
   /**
    * Osgi callback that is executed on component activation.
@@ -80,8 +89,8 @@ public class PingBackService {
               List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
               // TODO: we are currently using drupal to store this information. Use something less demanding so
               // we can simply post the data.
-              params.add(new BasicNameValuePair("form_id", "webform_client_form_1834"));
-              params.add(new BasicNameValuePair("submitted[data]", getRuntimeInfo(hostUrl)));
+              params.add(new BasicNameValuePair(PARAM_NAME_ID, PARAM_VALUE_ID));
+              params.add(new BasicNameValuePair(PARAM_NAME_SUBMITTED, getRuntimeInfo(hostUrl)));
               UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
               post.setEntity(entity);
               HttpResponse response = httpClient.execute(post);

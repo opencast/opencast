@@ -56,11 +56,7 @@
          */
         components['org.opencastproject.workflow.config.trimHold'] = new ocAdmin.Component(
           ['trimHold'],
-          {nodeKey: 'org.opencastproject.workflow.config.trimHold'});
-          
-        components['org.opencastproject.workflow.config.captionHold'] = new ocAdmin.Component(
-          ['captionHold'],
-          {nodeKey: 'org.opencastproject.workflow.config.captionHold'});
+          {key: 'org.opencastproject.workflow.config.trimHold'});
           
         components['license'] = new ocAdmin.Component(
           ['license'],
@@ -69,7 +65,6 @@
           //etc...
       }
       ocWorkflowPanel.setComponentValues = function(values, components){
-        components['org.opencastproject.workflow.config.captionHold'].setValue(values['org.opencastproject.workflow.config.captionHold']);
         components['org.opencastproject.workflow.config.trimHold'].setValue(values['org.opencastproject.workflow.config.trimHold']);
         components['license'].setValue(values['license']);
       }
@@ -159,19 +154,6 @@
       </configurations>
     </operation>  
 
-    <!-- hold for captions -->
- 
-    <operation
-      id="caption"
-      if="${captionHold}"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Waiting for user to upload captions">
-      <configurations>
-        <configuration key="caption-flavor">caption/dfxp</configuration>
-      </configurations>
-    </operation>
-    
     <!-- encode to engage player preview images -->
  
     <operation

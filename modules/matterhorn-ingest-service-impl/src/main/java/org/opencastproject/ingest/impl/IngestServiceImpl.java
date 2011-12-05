@@ -665,11 +665,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   public WorkflowInstance ingest(MediaPackage mp, String workflowDefinitionID, Map<String, String> properties,
           Long workflowId) throws IngestException, NotFoundException, UnauthorizedException {
-    // If the workflow definition ID is null, use the default, or throw if there is none
-    if (workflowDefinitionID == null) {
+    // If the workflow definition and instance ID are null, use the default, or throw if there is none
+    if (workflowDefinitionID == null && workflowId == null) {
       if (this.defaultWorkflowDefinionId == null) {
         throw new IllegalStateException(
-                "Can not ingest a workflow without a workflow definition.  No default definition is specified");
+                "Can not ingest a workflow without a workflow definition or an existing instance. No default definition is specified");
       } else {
         workflowDefinitionID = this.defaultWorkflowDefinionId;
       }
