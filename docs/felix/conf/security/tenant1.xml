@@ -49,7 +49,7 @@
     <sec:intercept-url pattern="/ltisample/**" access="ROLE_OAUTH_USER" />
 
     <!-- Everything else is for any logged in user -->
-    <sec:intercept-url pattern='/**' access='ROLE_ADMIN' />
+    <sec:intercept-url pattern='/**' access='ROLE_ADMIN, ROLE_COURSE_ADMIN, ROLE_INSTRUCTOR' />
 
     <!-- ############################# -->
     <!-- # LOGIN / LOGOUT MECHANISMS # -->
