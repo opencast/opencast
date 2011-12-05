@@ -27,6 +27,11 @@
         text-align: center;
         width: 100%;
       }
+      
+      .rule {
+        width: 115px;
+        margin-right: 62%;
+      }
 
       a.secondaryButton, a.secondaryButton:link, a.secondaryButton:visited {
         margin-right: 16px;
@@ -121,6 +126,7 @@
             ($('#player-container')[0].contentWindow.Opencast.Player.getDuration() != -1) &&
             $('#player-container').contents().find('#oc_duration').text() != 'Initializing') {
             $('#outPoint').val($('#player-container').contents().find('#oc_duration').text());
+            $('#newLength').val($('#player-container').contents().find('#oc_duration').text());
             timerSet = true;
             return true;
           }
@@ -283,6 +289,7 @@
             $('div#errorMessage').show();
           }
           else {
+            calculateNewLength();
             $('div#errorMessage').hide();
             $('#trimming-hint').show();
           }
@@ -573,11 +580,22 @@
           }
         }
       }
+      
+      /**
+       *calculates the new length of the media and shows the result
+       *in the according field
+       */
+      function calculateNewLength() {
+        inPoint = getTimeInMilliseconds($('#inPoint').val());
+        outPoint = getTimeInMilliseconds($('#outPoint').val());
+        newLength = (outPoint - inPoint) / 1000;
+        $('#newLength').val(getTimeString(Math.floor(newLength / 3600), Math.floor(newLength / 60), newLength % 60));
+      }
             
       /**
        * Returns a correct formatted Time String in the Format ab:cd:ef
        * @param val0 Hours element (0, 99)
-       * @param val0 Mintes element (0, 60)
+       * @param val0 Minutes element (0, 60)
        * @param val0 Seconds element (0, 60)
        * @return a correct formatted Time String in the Format ab:cd:ef
        */
@@ -1014,6 +1032,12 @@
       Out point
     </label>
     <input type="text" id="outPoint" readonly="readonly" class="pointInput"/><input type="button" style="width: 160px; background-color: #C7D7D7;" id="set-trimout" title="Set to current time" value="Set to current time" class="ui-button" /><input type="button" id="play-to-out" style="width: 160px; background-color: #C7D7D7;" title="Play last 10 seconds to Out point" value="&gt; Play to Out point" class="ui-button" /><input type="button" id="step-out-forward" style="background-color: #C7D7D7;" title="Increase Out point by one second" value="&gt;&gt;" class="ui-button" /><input type="button" id="step-out-backward" style="background-color: #C7D7D7;" title="Decrease Out point by one second" value="&lt;&lt;" class="ui-button" />
+    <br/>
+    <hr class="rule"/>
+    <label for="newLength" class="label">
+      New Length
+    </label>
+    <input type="text" id="newLength" readonly="readonly" class="pointInput" value="00:00:00"/><span style="margin-right: 34em;"> </span>
     <br/>
     <br/>
     <div id="errorMessage" class="error">
