@@ -136,6 +136,7 @@ ocSeriesList.buildSeriesView = function(data) {
     $.cookie('direction', 0) //standard is ASC
   }
   sorting = [[$.cookie('column'), $.cookie('direction')]];
+  ocSeriesList.views.totalCount = ocSeriesList.Configuration.total;
   $('#seriesTableContainer').jqotesubtpl("templates/series_list-table.tpl", ocSeriesList.views);
   $('#seriesTable').tablesorter({
     cssHeader: 'oc-ui-sortable',
