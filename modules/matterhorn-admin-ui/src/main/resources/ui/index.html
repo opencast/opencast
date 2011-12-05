@@ -9,12 +9,7 @@
     <link rel="stylesheet" type="text/css" href="css/jquery-ui-opencast-admin/jquery-ui-opencast-admin.css" />
     <link rel="stylesheet" type="text/css" href="css/admin.css" />
     <!-- SCRIPTS -->
-    <script type="text/javascript" src="jquery/jquery-1.6.4.min.js"></script>
-    <script type="text/javascript">
-      // make jquery 1.6.x available under $6
-      $6 = jQuery.noConflict(true);
-    </script>
-    <script type="text/javascript" src="jquery/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="jquery/jquery-1.7.min.js"></script>
     <script type="text/javascript" src="jquery/jquery-ui-1.8.6.custom.min.js"></script>
 
     <script type="text/javascript" src="jquery/plugins/jquery.tablesorter.min.js"></script>
@@ -191,9 +186,9 @@
        *  @return deferred([id])
        */
       function getEnabledTabs($html) {
-        var deferred = $6.Deferred();
+        var deferred = $.Deferred();
         var allTabIds = $("a", $html).map(function() {return this.id}).toArray();
-        $6.getJSON(meJsonUrl, function(data) {
+        $.getJSON(meJsonUrl, function(data) {
           var enabledTabIds = _.filter(allTabIds, function(id) {
             // todo test codejquery remove 
             var enabled = data.org.properties["adminui." + id + ".enable"];
