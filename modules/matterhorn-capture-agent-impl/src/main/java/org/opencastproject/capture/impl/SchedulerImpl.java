@@ -40,6 +40,7 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.QueryStringBuilder;
+import org.opencastproject.util.XProperties;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;

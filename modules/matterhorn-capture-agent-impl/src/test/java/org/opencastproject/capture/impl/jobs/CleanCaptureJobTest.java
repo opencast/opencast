@@ -19,7 +19,7 @@ import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.RecordingState;
 import org.opencastproject.capture.api.AgentRecording;
 import org.opencastproject.capture.impl.RecordingImpl;
-import org.opencastproject.capture.impl.XProperties;
+import org.opencastproject.util.XProperties;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;

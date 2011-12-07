@@ -68,6 +68,16 @@
     </dependency>
 
     <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-json</artifactId>
       <version>${project.version}</version>

@@ -49,6 +49,7 @@ import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.XProperties;
 import org.opencastproject.util.ZipUtil;
 
 import org.apache.commons.io.FileUtils;

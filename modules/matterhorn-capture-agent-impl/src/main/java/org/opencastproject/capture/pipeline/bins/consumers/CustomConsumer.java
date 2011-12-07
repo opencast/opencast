@@ -16,13 +16,13 @@
 
 package org.opencastproject.capture.pipeline.bins.consumers;
 
-import org.opencastproject.capture.impl.XProperties;
 import org.opencastproject.capture.pipeline.bins.CaptureDevice;
 import org.opencastproject.capture.pipeline.bins.CaptureDeviceNullPointerException;
 import org.opencastproject.capture.pipeline.bins.UnableToCreateElementException;
 import org.opencastproject.capture.pipeline.bins.UnableToCreateGhostPadsForBinException;
 import org.opencastproject.capture.pipeline.bins.UnableToLinkGStreamerElementsException;
 import org.opencastproject.capture.pipeline.bins.UnableToSetElementPropertyBecauseElementWasNullException;
+import org.opencastproject.util.XProperties;
 
 import org.gstreamer.Bin;
 import org.gstreamer.Element;

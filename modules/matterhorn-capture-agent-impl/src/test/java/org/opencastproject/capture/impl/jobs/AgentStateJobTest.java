@@ -20,9 +20,9 @@ import org.opencastproject.capture.api.AgentRecording;
 import org.opencastproject.capture.api.StateService;
 import org.opencastproject.capture.impl.ConfigurationManager;
 import org.opencastproject.capture.impl.RecordingImpl;
-import org.opencastproject.capture.impl.XProperties;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.util.XProperties;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;

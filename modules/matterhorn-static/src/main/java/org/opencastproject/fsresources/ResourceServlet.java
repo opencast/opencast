@@ -15,10 +15,18 @@
  */
 package org.opencastproject.fsresources;
 
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.util.XProperties;
+
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,6 +38,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Serves static content from a configured path on the filesystem. In production systems, this should be replaced with
@@ -41,7 +52,9 @@ public class ResourceServlet extends HttpServlet {
 
   protected String root;
   protected String serverAlias;
+  protected DocumentBuilder builder = null;
   private static final String dateFormat = "yyyy-MM-dd HH:mm:ss Z";
+  private SecurityService securityService = null;
   
   public ResourceServlet() {
   }
@@ -51,11 +64,42 @@ public class ResourceServlet extends HttpServlet {
     serverAlias = alias;
   }
 
-  public void activate(ComponentContext cc) {
-    if (root == null)
-      root = (String) cc.getProperties().get("filesystemDir");
+  public SecurityService getSecurityService() {
+    return securityService;
+  }
+
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
+  public void activate(ComponentContext cc) throws ParserConfigurationException {
+    builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    XProperties props = new XProperties();
+    props.setBundleContext(cc.getBundleContext());
+
+    String rootKey = (String) cc.getProperties().get("rootKey");
+    if (rootKey != null) {
+      if (root == null)
+        root = (String) cc.getProperties().get(rootKey);
+    } else {
+      if (root == null)
+        root = (String) cc.getBundleContext().getProperty("org.opencastproject.download.directory");
+    }
+
     if (serverAlias == null)
       serverAlias = (String) cc.getProperties().get("alias");
+
+    //Get the interpreted values of the keys.
+    props.put("root", root);
+    root = props.getProperty("root");
+    props.put("serverAlias", serverAlias);
+    serverAlias = props.getProperty("serverAlias");
+
+    if (serverAlias == null || StringUtils.isBlank(serverAlias)) {
+      throw new IllegalStateException("Unable to create servlet, alias property is null");
+    } else if (root == null) {
+      throw new IllegalStateException("Unable to create servlet, root property is null");
+    }
 
     if (serverAlias.charAt(0) != '/') {
       serverAlias = '/' + serverAlias;
@@ -73,9 +117,7 @@ public class ResourceServlet extends HttpServlet {
       throw new IllegalStateException("Unable to create servlet for " + serverAlias + " because "
               + rootDir.getAbsolutePath() + " is not a file or directory!");
     }
-  }
-
-  public void deactivate() {
+    logger.debug("Activating servlet with alias " + serverAlias + " on directory " + rootDir.getAbsolutePath());
   }
 
   /**
@@ -94,7 +136,14 @@ public class ResourceServlet extends HttpServlet {
     }
 
     File f = new File(root, normalized);
+    boolean allowed = true;
     if (f.isFile() && f.canRead()) {
+      allowed = checkDirectory(f.getParentFile());
+      if (!allowed) {
+        resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+        return;
+      }
+
       logger.debug("Serving static resource '{}'", f.getAbsolutePath());
       FileInputStream in = new FileInputStream(f);
       try {
@@ -103,17 +152,29 @@ public class ResourceServlet extends HttpServlet {
         IOUtils.closeQuietly(in);
       }
     } else if (f.isDirectory() && f.canRead()) {
+      allowed = checkDirectory(f);
+      if (!allowed) {
+        resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+        return;
+      }
+      
       logger.debug("Serving index page for '{}'", f.getAbsolutePath());
       PrintWriter out = resp.getWriter();
       resp.setContentType("text/html;charset=UTF-8");
       out.write("<html>");
       out.write("<head><title>File Index for " + normalized + "</title></head>");
       out.write("<body>");
-      out.write("<pre>");
+      out.write("<table>");
       SimpleDateFormat sdf = new SimpleDateFormat();
       sdf.applyPattern(dateFormat);
       for (File child : f.listFiles()) {
+
+        if (child.isDirectory() && !checkDirectory(child)) {
+          continue;
+        }
+        
         StringBuffer sb = new StringBuffer();
+        sb.append("<tr><td>");
         sb.append("<a href=\"");
         if (req.getRequestURL().charAt(req.getRequestURL().length() - 1) != '/') {
           sb.append(req.getRequestURL().append("/").append(child.getName()));
@@ -122,14 +183,16 @@ public class ResourceServlet extends HttpServlet {
         }
         sb.append("\">");
         sb.append(child.getName());
-        sb.append("</a>\t");
+        sb.append("</a>");
+        sb.append("</td><td>");
         sb.append(formatLength(child.length()));
-        sb.append("\t");
+        sb.append("</td><td>");
         sb.append(sdf.format(child.lastModified()));
-        sb.append("\n");
+        sb.append("</td>");
+        sb.append("</tr>");
         out.write(sb.toString());
       }
-      out.write("</pre>");
+      out.write("</table>");
       out.write("</body>");
       out.write("</html>");
     } else {
@@ -138,6 +201,41 @@ public class ResourceServlet extends HttpServlet {
     }
   }
 
+  protected boolean checkDirectory(File directory) {
+    //If security is off then everyone has access!
+    if (securityService == null) {
+      return true;
+    }
+
+    boolean allowed = false;
+    File aclFile = null;
+    try {
+      String[] pathBits = directory.getAbsolutePath().split("" + File.separatorChar);
+      aclFile = new File(directory, pathBits[pathBits.length - 1] + ".acl");
+      allowed = isUserAllowed(aclFile);
+    } catch (IOException e) {
+      logger.debug("Unable to read file " + aclFile.getAbsolutePath() + ", denying access by default");
+    } catch (SAXException e) {
+      if (aclFile.isFile()) {
+        logger.warn("Invalid XML in file " + aclFile.getAbsolutePath() + ", denying access by default");
+      }
+    }
+    return allowed;
+  }
+
+  protected boolean isUserAllowed(File aclFile) throws SAXException, IOException {
+    Document aclDoc = builder.parse(aclFile);
+    NodeList roles = aclDoc.getElementsByTagName("role");
+    for (int i = 0; i < roles.getLength(); i++) {
+      Node role = roles.item(i);
+      for (String userRole : securityService.getUser().getRoles()) {
+        if (userRole.equals(role.getTextContent())) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
   protected String formatLength(long length) {
     // FIXME: Why isn't there a library function for this?!
     // TODO: Make this better
@@ -151,5 +249,4 @@ public class ResourceServlet extends HttpServlet {
       return length + " B";
     }
   }
-
 }

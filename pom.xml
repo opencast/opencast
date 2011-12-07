@@ -36,7 +36,7 @@
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-capture-admin-service-api</module>
         <module>modules/matterhorn-capture-admin-service-impl</module>
-	<module>modules/matterhorn-cas</module>
+        <module>modules/matterhorn-cas</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-conductor</module>
         <module>modules/matterhorn-db</module>
@@ -103,6 +103,7 @@
         <module>modules/matterhorn-distribution-service-api</module>
         <module>modules/matterhorn-distribution-service-download</module>
         <module>modules/matterhorn-distribution-service-streaming</module>
+        <module>modules/matterhorn-export-distribution-ui</module>
         <!-- <module>modules/matterhorn-distribution-service-common</module> <module>modules/matterhorn-distribution-service-itunesu</module> 
           <module>modules/matterhorn-distribution-service-youtube</module> -->
         <module>modules/matterhorn-dublincore</module>
