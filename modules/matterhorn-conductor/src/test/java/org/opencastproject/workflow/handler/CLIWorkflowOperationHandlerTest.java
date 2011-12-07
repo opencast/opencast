@@ -71,7 +71,7 @@ public class CLIWorkflowOperationHandlerTest {
    * Make sure that all of the binaries used by the tests are there.
    */
   @BeforeClass
-  public static void textEnvironment() throws IOException {
+  public static void testEnvironment() throws IOException {
     File tmp = File.createTempFile("test", "txt");
     Map<String, String> commands = new HashMap<String, String>();
     commands.put("touch", tmp.getAbsolutePath());

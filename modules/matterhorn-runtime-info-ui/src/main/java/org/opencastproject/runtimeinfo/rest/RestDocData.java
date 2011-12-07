@@ -15,6 +15,7 @@
  */
 package org.opencastproject.runtimeinfo.rest;
 
+import org.opencastproject.util.doc.DocData;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;

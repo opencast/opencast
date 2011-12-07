@@ -13,8 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.runtimeinfo.rest;
-
+package org.opencastproject.util.doc;
 
 import freemarker.core.ParseException;
 import freemarker.template.Configuration;
@@ -83,7 +82,7 @@ public final class DocUtil {
    *          "username" => "aaronz"<br/>
    * @return the processed template
    */
-  private static String processTextTemplate(String templateName, String textTemplate, Map<String, Object> data) {
+  public static String processTextTemplate(String templateName, String textTemplate, Map<String, Object> data) {
     if (freemarkerConfig == null) {
       throw new IllegalStateException("freemarkerConfig is not initialized");
     }
