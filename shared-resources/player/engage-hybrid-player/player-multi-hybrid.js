@@ -76,6 +76,7 @@ Opencast.Player = (function ()
         timeLayerDisplayed = false,
         shortcutTabReturnId = '',
         embedDialogDisplayed = false,
+        shareTimeDialogDisplayed = false,
         mediaPackageId, userId, sessionId, inPosition = 0,
         outPosition = 0,
         curPosition = 0,
@@ -339,6 +340,7 @@ Opencast.Player = (function ()
             $("#oc_edit-time").attr("value", text);
             $("#slider_seek_Rail").attr("title", "Time " + text);
             $("#scrubber").attr("aria-valuenow", text);
+	    setShareTimeLink();
         }
         currentTimeString = text;
     }
@@ -550,9 +552,25 @@ Opencast.Player = (function ()
             Opencast.Initialize.bindVidSize();
         }
     }
+
+    /**
+     * @memberOf Opencast.Player
+     * @description Sets the share time link
+     */
+    function setShareTimeLink()
+    {
+        var advancedUrl = $.getCleanURL();
+	var unfTime = $('#oc_current-time').val();
+	var time = $.getURLTimeFormat(unfTime);
+	if(time != 0)
+	{
+	    advancedUrl += "&t=" + time;
+	}
+	$('#oc_share-time-content').html('Video URL at current time (' + unfTime + '):<br /><a href="' + advancedUrl + '">' + advancedUrl + '</a>').show();
+    }
     
     /*************************************************************/
-	/* do
+    /* do
     /*************************************************************/
     
     /**
@@ -609,6 +627,23 @@ Opencast.Player = (function ()
         {
             showEmbed();
             addEvent(Opencast.logging.SHOW_EMBED);
+        }
+        // Opencast.Initialize.doResize();
+    }
+    
+    /**
+     * @memberOf Opencast.Player
+     * @description Toggle the share time
+     */
+    function doToggleShareTime()
+    {
+        if (shareTimeDialogDisplayed)
+        {
+            hideShareTime();
+        }
+        else
+        {
+            showShareTime();
         }
         // Opencast.Initialize.doResize();
     }
@@ -887,6 +922,22 @@ Opencast.Player = (function ()
         embedDialogDisplayed = true;
     }
     
+    /**
+     * @memberOf Opencast.Player
+     * @description Show the shared time dialog
+     */
+    function showShareTime()
+    {
+        hideShareTime();
+	setShareTimeLink();
+        $('#oc_share-time').dialog('open');
+        $('#oc_share-time').bind('dialogclose', function ()
+        {
+            Opencast.Player.hideShareTime();
+        });
+        shareTimeDialogDisplayed = true;
+    }
+    
     /*************************************************************/
 	/* hide
     /*************************************************************/
@@ -927,6 +978,16 @@ Opencast.Player = (function ()
     {
         $('#oc_share-button').focus();
         embedDialogDisplayed = false;
+    }
+
+    /**
+     * @memberOf Opencast.Player
+     * @description Hide the share time dialog
+     */
+    function hideShareTime()
+    {
+        $('#oc_share-button').focus();
+        shareTimeDialogDisplayed = false;
     }
     
     /*************************************************************/
@@ -1729,10 +1790,12 @@ Opencast.Player = (function ()
         setProgress: setProgress,
         setVolumeSlider: setVolumeSlider,
         setVideoSizeList: setVideoSizeList,
+	setShareTimeLink: setShareTimeLink,
         // do
         doToggleNotes: doToggleNotes,
         doToggleTranscript: doToggleTranscript,
         doToggleEmbed: doToggleEmbed,
+	doToggleShareTime: doToggleShareTime,
         doToggleShare: doToggleShare,
         doToggleTimeLayer: doToggleTimeLayer,
         doToggleShortcuts: doToggleShortcuts,
@@ -1750,10 +1813,12 @@ Opencast.Player = (function ()
         showShare: showShare,
         showEditTime: showEditTime,
         showEmbed: showEmbed,
+	showShareTime: showShareTime,
         // hide
         hideShortcuts: hideShortcuts,
         hideShare: hideShare,
         hideEmbed: hideEmbed,
+	hideShareTime: hideShareTime,
         // video size control
         videoSizeControlSingleDisplay: videoSizeControlSingleDisplay,
         videoSizeControlAudioDisplay: videoSizeControlAudioDisplay,

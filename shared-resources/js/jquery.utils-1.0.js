@@ -61,6 +61,34 @@
     {
         return $.getAsciiAlphabet()[charToConvert]||'';
     }
+   
+    /**
+     * @description Returns a time in the URL time format, e.g. 30m10s
+     * @param data Time in the format ab:cd:ef
+     * @return data in the URl time format when data correct, 0 else
+     */
+    $.getURLTimeFormat = function(data)
+    {
+        if ((data !== undefined) && (data !== null) && (data != 0) && (data.length) && (data.indexOf(':') != -1))
+        {
+            var values = data.split(':');
+            // If the Format is correct
+            if (values.length == 3)
+            {
+                // Try to convert to Numbers
+                var val0 = values[0] * 1;
+                var val1 = values[1] * 1;
+                var val2 = values[2] * 1;
+                // Check and parse
+                if (!isNaN(val0) && !isNaN(val1) && !isNaN(val2))
+                {
+		    var valMin = val0 * 60 + val1;
+		    return valMin + "m" + val2 + "s";
+		}
+	    }
+	}
+	return 0;
+    }
         
     /**
      * @description Returns the Input Time in Milliseconds
@@ -297,7 +325,7 @@
     }
     
     /**
-     * @description Checks if URL parameters are duplicate and cleans it if appropriate (clean => page reload)
+     * @description Checks whether URL parameters are duplicate and cleans it if appropriate (clean => page reload)
      */
     $.gotoCleanedURL = function()
     {
@@ -309,9 +337,21 @@
             window.location = newLoc;
         }
     }
+
+    /**
+     * @description Returns a clean URL only containing the ID
+     * @return a clean URL only containing the ID
+     */
+    $.getCleanURL = function()
+    {
+	var url = window.location.href;
+	var id = $.getURLParameter('id');
+	url = url.substring(0, url.indexOf('?')) + "?id=" + id;
+	return url;
+    }
     
     /**
-     * @description Checks if URL parameters are duplicate and cleans it if appropriate and returns the cleaned URL afterwards
+     * @description Checks whether URL parameters are duplicate and cleans it if appropriate and returns the cleaned URL afterwards
      * @param embed true if watch.html should be replaced with embed.html, false if embed.html should be replaced with watch.html
      * @param withTime true if adding the current Time, false else
      * @param videoQuality the videoQuality if available, false else
