@@ -566,7 +566,21 @@ Opencast.Player = (function ()
 	{
 	    advancedUrl += "&t=" + time;
 	}
-	$('#oc_share-time-content').html('Video URL at current time (' + unfTime + '):<br /><a href="' + advancedUrl + '">' + advancedUrl + '</a>').show();
+	$('#oc_share-time-text').html('Video at current time (' + unfTime + '):').show();
+	$('#oc_share-time-textfield').html(advancedUrl).show();
+	$('#oc_share-time-textfield').focus(
+	    function()
+	    {
+		$(this).select();
+	    }
+	);
+	if(Opencast.Player.isPlaying())
+	{
+	    $('#oc_share-time-tip').show();
+	} else
+	{
+	    $('#oc_share-time-tip').hide();
+	}
     }
     
     /*************************************************************/
@@ -781,6 +795,7 @@ Opencast.Player = (function ()
         {
             setCurrentPlayPauseState(PAUSING);
             FLASH_PLAYERSTATE = Videodisplay.pause();
+	    setShareTimeLink();
             addEvent(Opencast.logging.PAUSE);
         }
     }
