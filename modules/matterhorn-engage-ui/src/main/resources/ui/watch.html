@@ -391,8 +391,13 @@
           </a>
         </li>
         <li>
-          <a id="oc_btn-email" class="handcursor" title="Email" role="button">
+          <a href="javascript: " id="oc_btn-email" class="handcursor" title="Email" role="button">
             Email
+          </a>
+        </li>
+        <li>
+          <a href="javascript: " id="oc_btn-share-time" class="handcursor" title="Share video URL at current time" role="button">
+            Video at current time
           </a>
         </li>
       </ul>
@@ -449,7 +454,9 @@
           Controls:
         </label>
 		&nbsp;
-        <input id="oc_embed-costum-hide-controls-checkbox" type="checkbox" name="" alt="" title="" value="" />
+        <input id="oc_embed-costum-hide-controls-checkbox" type="checkbox" name="Display controls" alt="Display controls" title="Display controls" value="" />
+	<br />
+        <label for="oc_embed-costum-hide-controls-checkbox" class="handcursor">
 
         <a href="javascript: " id="oc_btn-leave-session-time" onclick="$('#oc_embed').dialog('close');" class="handcursor ui-helper-hidden-accessible" title="Leave embed dialog" role="button">
           Leave embed dialog
@@ -463,6 +470,18 @@
       <textarea id="oc_embed-textarea" class="oc_embed-textarea" rows="2" cols="1"></textarea>
     </div>
     <!-- END #oc_embed -->
+
+    <!-- Share video at current time Dialog -->
+    <div id="oc_share-time" title="Video at current time">
+      <div id="oc_share-time-text"></div>
+      <div>
+	<textarea id="oc_share-time-textfield" class="oc_embed-textarea" rows="1" cols="1"></textarea>
+      </div>
+      <div id="oc_share-time-tip">
+	Press the pause button in the player to get the exact time.
+      </div>
+    </div>
+    <!-- END #oc_share-time -->
 
     <!-- Series dialog -->
     <div id="oc_series" class="ui-widget ui-widget-content ui-corner-all oc_popuplayer ui-state-hover" title="see more of this series" tabindex="-1" role="dialog" aria-hidden="true"></div>
