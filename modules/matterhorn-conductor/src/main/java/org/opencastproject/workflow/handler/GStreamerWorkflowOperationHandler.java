@@ -31,6 +31,7 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.osgi.service.component.ComponentContext;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -44,12 +45,15 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperationHandlerBase {
   /** The id for the workflow operation which is recognized in the workflow xml file. */
   public static final String ID = "gstreamer";
   /** This is the description of the workflow operation. */
   public static final String DESCRIPTION = "Executes gstreamer command line workflow operations";
+  /** Path to the hold ui resources */
+  private static final String HOLD_UI_PATH = "/ui/operation/trim/index.html";
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
   /** The workspace to pull files out of. */
@@ -86,10 +90,17 @@ public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperatio
     this.workspace = workspace;
   }
 
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
+    setHoldActionTitle("Configure Export");
+    registerHoldStateUserInterface(HOLD_UI_PATH);
+    logger.info("Registering export template settings hold state ui from classpath {}", HOLD_UI_PATH);
+  }
+
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
-    logger.info("Holding for review / trim...");
+    logger.info("Holding for export configuration...");
     return createResult(Action.PAUSE);
   }
 
@@ -116,6 +127,9 @@ public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperatio
         logger.info("Couldn't load properties from file " + attachment.getURI() + ", skipping it. ", e);
       }
     }
+    if (properties != null) {
+      totalProperties.putAll(properties);
+    }
 
     String gstreamerLine = totalProperties.getProperty("org.opencastproject.workflow.config.gstreamer");
 
@@ -136,6 +150,7 @@ public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperatio
     }
     replaceTemplateValues(gstreamerLine, tracks);
 
+    logger.info("Creating gstreamer template process");
     Process process = null;
     try {
       ArrayList<String> args = new ArrayList<String>();
@@ -163,6 +178,7 @@ public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperatio
       throw new WorkflowOperationException("Could not start gstreamer pipeline: " + gstreamerLine + "\n"
               + e.getMessage());
     }
+    logger.info("Gstreamer process finished");
 
     return new WorkflowOperationResultImpl(workflowInstance.getMediaPackage(), null, Action.CONTINUE, 0);
   }
@@ -181,6 +197,7 @@ public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperatio
   public static String replaceTemplateValues(String gstreamerCommandLine, Map<String, String> substitutions) {
     Map<String, Object> castedMap = new HashMap<String, Object>();
     castedMap.putAll(substitutions);
-    return DocUtil.processTextTemplate("1", gstreamerCommandLine, castedMap);
+    String id = UUID.randomUUID().toString();
+    return DocUtil.processTextTemplate(id, gstreamerCommandLine, castedMap);
   }
 }

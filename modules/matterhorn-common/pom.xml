@@ -152,8 +152,12 @@
               *;resolution:=optional
             </Import-Package>
             <Embed-Dependency>
-              truezip;inline=true
+              truezip;inline=true,
+              freemarker;inline=true
             </Embed-Dependency>
+            <Private-Package>
+              freemarker.core, freemarker.template
+            </Private-Package>
             <Export-Package>
               org.opencastproject.util.*;version=${project.version};-split-package:=merge-first,
               org.opencastproject.mediapackage;version=${project.version},

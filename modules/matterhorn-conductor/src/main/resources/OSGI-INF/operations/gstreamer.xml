@@ -10,5 +10,4 @@
   </service>
   <reference cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace"
     name="Workspace" policy="static" bind="setWorkspace"/>
-  <reference bind="activate" cardinality="1..1" interface="org.osgi.service.component.ComponentContext" name="ComponentContext" policy="static"/>
 </scr:component>

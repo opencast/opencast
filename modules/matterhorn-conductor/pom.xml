@@ -182,6 +182,7 @@
               OSGI-INF/operations/download-dvd.xml,
               OSGI-INF/operations/embed.xml,
               OSGI-INF/operations/error-handler.xml,
+              OSGI-INF/operations/gstreamer.xml,
               OSGI-INF/operations/image.xml,
               OSGI-INF/operations/ingest.xml,
               OSGI-INF/operations/inspect.xml,
