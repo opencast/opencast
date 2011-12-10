@@ -18,7 +18,13 @@ package org.opencastproject.workflow.handler;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementBuilder;
+import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.identifier.IdBuilder;
+import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -29,15 +35,18 @@ import org.opencastproject.workflow.api.WorkflowOperationResultImpl;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang.StringUtils;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.osgi.service.component.ComponentContext;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -146,9 +155,18 @@ public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperatio
     // Replace all tracks with the proper location.
     HashMap<String, String> tracks = new HashMap<String, String>();
     for (Track track : mediaPackage.getTracks()) {
-      tracks.put(track.getIdentifier(), track.getURI().toString());
+      try {
+        tracks.put(track.getIdentifier(), workspace.get(track.getURI()).getAbsolutePath());
+      } catch (NotFoundException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
     }
-    replaceTemplateValues(gstreamerLine, tracks);
+    gstreamerLine = replaceTemplateValues(gstreamerLine, tracks);
+    String outputFileString = replaceTemplateValues(totalProperties.getProperty("org.opencastproject.workflow.config.gstreamer.outputfiles"), tracks);
 
     logger.info("Creating gstreamer template process");
     Process process = null;
@@ -180,7 +198,35 @@ public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperatio
     }
     logger.info("Gstreamer process finished");
 
-    return new WorkflowOperationResultImpl(workflowInstance.getMediaPackage(), null, Action.CONTINUE, 0);
+    String[] outputFiles = outputFileString.split(";");
+    IdBuilder idBuilder = IdBuilderFactory.newInstance().newIdBuilder();
+    //TODO:  Clone this?
+    MediaPackage mediapackage = workflowInstance.getMediaPackage();
+    for (String file : outputFiles) {
+      String path = StringUtils.trimToNull(file);
+      if (path == null) {
+        continue;
+      }
+      File outputFile = new File(path);
+      MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+      URI workspaceFile = null;
+      try {
+        InputStream in = new FileInputStream(outputFile);
+        workspaceFile = workspace.putInCollection("gstreamer", outputFile.getName(), in);
+      } catch (IOException e) {
+        throw new WorkflowOperationException("Could not start gstreamer pipeline: " + gstreamerLine + "\n"
+                + e.getMessage());
+      }
+      Track t = (Track) builder.elementFromURI(workspaceFile, MediaPackageElement.Type.Track, new MediaPackageElementFlavor("video", "generic"));
+      t.setIdentifier(idBuilder.createNew().toString());
+      t.addTag("export");
+      mediapackage.add(t);
+    }
+
+    //TODO:  Once we are actually calling a service please change the zero in the line below to the correct job.getQueueTime
+    WorkflowOperationResult result = createResult(mediaPackage, Action.CONTINUE, 0);
+    logger.debug("Compose operation completed");
+    return result;
   }
 
   @Override

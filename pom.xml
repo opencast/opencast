@@ -459,12 +459,12 @@
     <defaultGoal>install</defaultGoal>
     <testResources>
       <!-- Add a log4j configuration file to the test resources -->
-      <testResource>
+<!--      <testResource>
         <directory>${matterhorn.basedir}/docs/log4j</directory>
         <includes>
           <include>log4j.properties</include>
         </includes>
-      </testResource>
+      </testResource>-->
       <!-- Re-add the test resources as defined by the project -->
       <testResource>
         <directory>${project.basedir}/src/test/resources</directory>

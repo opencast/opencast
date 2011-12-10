@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -107,6 +108,8 @@ public class GStreamerWorkflowOperationHandlerTest {
     EasyMock.expect(workspace.get(withoutGStreamerURI)).andReturn(new File(withoutGStreamerURI));
     EasyMock.expect(workspace.get(withGStreamerURI)).andReturn(new File(withGStreamerURI));
     EasyMock.expect(workspace.get(randomXMLURI)).andReturn(new File(randomXMLURI));
+    EasyMock.expect(workspace.get(movieFileURI)).andReturn(new File(movieFileURI)).anyTimes();
+    EasyMock.expect(workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (InputStream) EasyMock.anyObject())).andReturn(movieFileURI);
     EasyMock.replay(workspace);
 
   }
@@ -174,6 +177,7 @@ public class GStreamerWorkflowOperationHandlerTest {
 
     workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(badGStreamerURI)).andReturn(new File(badGStreamerURI));
+    EasyMock.expect(workspace.get(movieFileURI)).andReturn(new File(movieFileURI)).anyTimes();
     EasyMock.replay(workspace);
 
     gstreamerWorkflowOperationHandler = new GStreamerWorkflowOperationHandler();
@@ -231,6 +235,7 @@ public class GStreamerWorkflowOperationHandlerTest {
 
     workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(complicatedFileURI)).andReturn(new File(complicatedFileURI));
+    EasyMock.expect(workspace.get(movieFileURI)).andReturn(new File(movieFileURI)).anyTimes();
     EasyMock.replay(workspace);
 
     gstreamerWorkflowOperationHandler = new GStreamerWorkflowOperationHandler();

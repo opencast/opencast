@@ -32,11 +32,6 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.freemarker</groupId>
-      <artifactId>freemarker</artifactId>
-      <version>2.3.15</version>
-    </dependency>
-    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
     </dependency>
@@ -199,11 +194,8 @@
                 org.json.simple.parser,
                 *;resolution:=optional
             </Import-Package>
-            <Embed-Dependency>
-              freemarker;inline=true
-            </Embed-Dependency>
             <Private-Package>
-              freemarker.core, freemarker.template, org.opencastproject.runtimeinfo.rest, ui.*
+              org.opencastproject.runtimeinfo.rest, ui.*
             </Private-Package>
             <Export-Package>org.opencastproject.runtimeinfo</Export-Package>
             <Service-Component>
