@@ -1,0 +1,105 @@
+<html>
+  <head>
+    <title>Hold for export</title>
+    <link rel="stylesheet" type="text/css" href="/admin/css/jquery-ui-1.8.6.custom.css" />
+    <link rel="stylesheet" type="text/css" href="/admin/css/jquery-ui-opencast-admin/jquery-ui-opencast-admin.css" />   
+    <link rel="stylesheet" type="text/css" href="/admin/css/admin.css">
+    <script type="text/javascript" src="/admin/jquery/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="/admin/jquery/jquery-ui-1.8.9.custom.min.js"></script>    
+    <script type="text/javascript" src="/admin/js/oc.utils.js"></script>
+    <script type="text/javascript" src="/admin/trimpath/trimpath-template-1.0.38.js"></script>
+    <script type="text/javascript">
+            
+      var postData = {
+        'id': parent.document.getElementById("holdWorkflowId").value
+      };
+
+      var templateFrames = '{for f in frames}' +
+                                '<div ' +
+                                    'id="${f.id}" ' +
+                                    'class="source-frame" ' +
+                                    'style="width:100%; height:20%; background-color: blue;" ' +
+                                 '>' +
+                                  '<span id="${f.id}_width" style="display: none">${f.width}</span>' +
+                                  '<span id="${f.id}_height" style="display: none">${f.height}</span>' +
+                                '</div><p></p>' +
+                              '{/for}';
+
+      $(document).ready(function() {
+        var id = postData.id;             
+
+        // load preview player and metadata
+        $.ajax({
+          url: '/workflow/instance/' + id + '.json',
+          dataType: 'json', // or XML..
+          success: function(data) {
+
+            var tracks = data.workflow.mediapackage.media.track;
+            if (!$.isArray(tracks)) {
+              tracks = [tracks];
+            }
+
+            var frames = [];
+            for (var i = 0; i < tracks.length; i++) {
+              var track = tracks[i];
+              if (track.type.indexOf("/source") != -1 && track.video != undefined) {
+                frames.push({id: track.id, width: track.video.resolution.split("x")[0], height: track.video.resolution.split("x")[1]});
+              }
+            }
+            var sources = {frames: frames};
+            processedTemplateData = templateFrames.process(sources);
+            $("#source-frames").html(processedTemplateData);
+            $(".source-frame").draggable({
+              containment: $("#holdStateUI"),
+              stack: ".source-frame",
+              revert: 'invalid'
+            });
+            $(".droppable-area").droppable({
+              accept: '.source-frame',
+              tolerance: 'fit'
+            });
+          }
+        });
+      });
+
+      /**
+       * Continues the Workflow
+       */
+      function continueWorkflow(){
+        postData["org.opencastproject.workflow.config.gstreamer"] = $("#gstreamer-line").val();
+        postData["org.opencastproject.workflow.config.gstreamer.outputfiles"] = $("#gstreamer-output-files").val();
+        parent.ocRecordings.continueWorkflow(postData);
+      }
+            
+      function cancel(){
+        window.parent.location.href = "/admin";
+      }
+    </script>
+  </head>
+  <body>
+	  <div class="lectureInfo" style="">
+	    <h2 id="info-title"></h2>
+	    <h4 id="info-creator"></h4>
+	    <h4 id="info-series"></h4>
+	  </div>
+
+    <div class="holdStateUI" style="height: 100%; width: 100%;">
+      <h1>Export Media</h1>
+
+      <textarea id="gstreamer-line" style="width: 100%; height: 75%;" wrap="hard" >Enter Gstreamer Line</textarea>
+      <textarea id="gstreamer-output-files" style="width: 100%; height: 10%;">Enter output filesnames (with paths)</textarea>
+      <div style="height: 100%; width: 100%; display: none;">
+        <div id="source-frames" class="droppable-area" style="height: 100%; width: 20%; float: left;">
+        </div>
+        <div id="layout-area" class="droppable-area" style="height: 100%; width: 80%; float: left; border: 1px solid">
+        </div>
+      </div>
+
+      <div id="actions">
+        <input title="Continue processing this template" style="margin-left: 65px; margin-right: 16px; width: 160px;" onclick="continueWorkflow();" id="continueBtn" type="button" class="ui-button ui-corner-all" value="Continue processing" />
+        <!-- a id="edit-link" class="secondaryButton">Edit metadata, then continue</a -->
+        <a onclick="cancel()" title="Cancel" class="secondaryButton">Cancel</a>
+      </div>
+    </div>
+  </body>
+</html>

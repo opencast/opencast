@@ -62,7 +62,7 @@ public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperatio
   /** This is the description of the workflow operation. */
   public static final String DESCRIPTION = "Executes gstreamer command line workflow operations";
   /** Path to the hold ui resources */
-  private static final String HOLD_UI_PATH = "/ui/operation/trim/index.html";
+  private static final String HOLD_UI_PATH = "/ui/operation/export/index.html";
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
   /** The workspace to pull files out of. */
