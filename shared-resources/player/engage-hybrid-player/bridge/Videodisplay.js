@@ -332,7 +332,6 @@ Videodisplay = (function ()
      */
   function seek(argNumber)
   {
-      $.log("WOOT");
     try
     {
       if (initialized())

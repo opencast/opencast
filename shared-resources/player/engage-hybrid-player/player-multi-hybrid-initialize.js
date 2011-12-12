@@ -821,6 +821,10 @@ Opencast.Initialize = (function ()
             Opencast.Player.addEvent(Opencast.logging.EMAIL);
             Opencast.Player.doToggleShare();
         });
+        $('#oc_btn-email').click(function ()
+        {
+            Opencast.Player.doToggleShareTime();
+        });
         $('#oc_time-chooser').click(function ()
         {
             Opencast.Player.doToggleTimeLayer();
@@ -848,9 +852,18 @@ Opencast.Initialize = (function ()
             autoOpen: false,
             width: 800
         });
+        $('#oc_share-time').dialog(
+        {
+            autoOpen: false,
+            width: 800
+        });
         $('#oc_btn-embed').click(function ()
         {
             Opencast.Player.doToggleEmbed();
+        });
+        $('#oc_btn-share-time').click(function ()
+        {
+            Opencast.Player.doToggleShareTime();
         });
         $('#oc_series').hide();
         $('#oc_see-more-button').click(function (e)
