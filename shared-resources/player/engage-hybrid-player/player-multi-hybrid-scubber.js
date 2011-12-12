@@ -27,7 +27,6 @@ Opencast.Scrubber = (function ()
     offsetX                = 32,
     offsetY                = 8;
     
-
     /**
         @memberOf Opencast.Scrubber
         @description Create a tooltip div
@@ -45,10 +44,9 @@ Opencast.Scrubber = (function ()
      */
     function init()
     {
-       
-    	
     	$('#draggable').bind('dragstart', function (event, ui) 
         {
+	    Opencast.Player.addEvent(Opencast.logging.SEEK_TIMELINE_DRAG_START);
             tooltipTop = $('#oc_flash-player').height() + offsetY;
             $("#divToolTip").css('top', tooltipTop);
             $("#divToolTip").css('left', 0);
@@ -78,10 +76,10 @@ Opencast.Scrubber = (function ()
             var toolTipPlayheadSeconds = Math.round(toolTipPlayheadPercent * Opencast.Player.getDuration());
             var toolTipPlayhead = $.formatSeconds(toolTipPlayheadSeconds);
             	        	
-        	$("#divToolTip").attr("value", toolTipPlayhead);
+            $("#divToolTip").attr("value", toolTipPlayhead);
             $("#divToolTip").html(toolTipPlayhead);
         	
-        	var tooltipLeft = $(this).position().left - offsetX;
+            var tooltipLeft = $(this).position().left - offsetX;
             
             if(tooltipLeft < 0)
             {
@@ -96,7 +94,7 @@ Opencast.Scrubber = (function ()
             	$("#divToolTip").css('left', tooltipLeft);
             }
         	
-        	if (!locked)
+            if (!locked)
             {
                 locked = true;
                 setTimeout(function ()
@@ -125,6 +123,7 @@ Opencast.Scrubber = (function ()
 
         $('#draggable').bind('dragstop', function (event, ui)         
         {
+	    Opencast.Player.addEvent(Opencast.logging.SEEK_TIMELINE_DRAG_END);
             var position =  $(this).css("left").replace(/[^0-9:]/g, ''); 
             var positionInt = parseInt(position, 10);
             var newPosition = 0;
@@ -175,6 +174,7 @@ Opencast.Scrubber = (function ()
 
         $("#scubber-channel").click(function (e)
         {
+	    Opencast.Player.addEvent(Opencast.logging.SEEK_TIMELINE_CLICK);
             var newPosition = 0;
             var x = e.pageX - $("#scubber-channel").offset().left;
             x = Math.max(4, x - 8);
@@ -225,7 +225,6 @@ Opencast.Scrubber = (function ()
         $("#draggable").click(function (e)
         {
             $("#scrubber").focus();
-            
         }); 
         
         // create tooltip
