@@ -160,6 +160,7 @@
             </Private-Package>
             <Export-Package>
               org.opencastproject.util.*;version=${project.version};-split-package:=merge-first,
+              org.opencastproject.capture;version=${project.version},
               org.opencastproject.mediapackage;version=${project.version},
               org.opencastproject.mediapackage.attachment;version=${project.version},
               org.opencastproject.mediapackage.track;version=${project.version},
