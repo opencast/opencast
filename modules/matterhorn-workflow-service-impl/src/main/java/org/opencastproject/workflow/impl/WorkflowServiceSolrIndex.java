@@ -444,9 +444,10 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       doc.addField(SUBJECT_KEY, buf.toString());
     }
 
-    User currentUser = securityService.getUser();
-    doc.addField(WORKFLOW_CREATOR_KEY, currentUser.getUserName());
-    doc.addField(ORG_KEY, currentUser.getOrganization());
+    User workflowCreator = instance.getCreator(); 
+    doc.addField(WORKFLOW_CREATOR_KEY, workflowCreator.getUserName()); 
+    doc.addField(ORG_KEY, workflowCreator.getOrganization()); 
+
     try {
       AccessControlList acl = authorizationService.getAccessControlList(mp);
       addAuthorization(doc, acl);
