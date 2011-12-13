@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
- 
+
 var Opencast = Opencast || {};
 
 /**
@@ -22,7 +22,7 @@ var Opencast = Opencast || {};
 Opencast.engage = (function ()
 {
     var loadProgressPercent = -1;
-    
+
     /**
      * @memberOf Opencast.engage
      * @description Gets player type ("watch" or "embed")
@@ -33,7 +33,7 @@ Opencast.engage = (function ()
         var pathname = window.location.pathname;
         return pathname;
     }
-    
+
     /**
      * @memberOf Opencast.engage
      * @description Gets the url to the search service;
@@ -41,12 +41,23 @@ Opencast.engage = (function ()
      */
     function getSearchServiceEpisodeIdURL()
     {
-        var restEndpoint = "../../search/episode.xml?id="; // Production 
+        var restEndpoint = "../../search/episode.xml?id="; // Production
         //var restEndpoint = "xml/episode.xml?id="; // Activate for testing purposes
         //var restEndpoint = "episode-segments.xml?id="; // Activate for testing purposes
         return restEndpoint;
     }
-    
+
+    /**
+     * @memberOf Opencast.engage
+     * @description Gets the JSON url to the search service;
+     * @return the search service endpoint url
+     */
+    function getSearchServiceEpisodeJsonURL()
+    {
+        var restEndpoint = "../../search/episode.json"; // Production
+        return restEndpoint;
+    }
+
     /**
      * @memberOf Opencast.engage
      * @description Gets the current load progress
@@ -61,7 +72,7 @@ Opencast.engage = (function ()
             return duration * loadProgressPercent / 100;
         }
     }
-    
+
     /**
      * @memberOf Opencast.engage
      * @description Sets the current load progress
@@ -74,7 +85,7 @@ Opencast.engage = (function ()
             loadProgressPercent = value;
         }
     }
-    
+
     /**
      * @memberOf Opencast.engage
      * @description Returns a specific Cookie
@@ -94,12 +105,14 @@ Opencast.engage = (function ()
         if (end == -1) end = document.cookie.length;
         return unescape(document.cookie.substring(len, end));
     }
-    
+
     return {
         getCookie: getCookie,
         getPlayerType: getPlayerType,
         getLoadProgress: getLoadProgress,
         setLoadProgressPercent: setLoadProgressPercent,
-        getSearchServiceEpisodeIdURL: getSearchServiceEpisodeIdURL
+        getSearchServiceEpisodeIdURL: getSearchServiceEpisodeIdURL,
+        getSearchServiceEpisodeJsonURL: getSearchServiceEpisodeJsonURL
     };
 }());
+
