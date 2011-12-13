@@ -1,0 +1,17 @@
+acpid
+alsa-utils
+curl
+gcc
+gstreamer0.10-alsa
+gstreamer0.10-plugins-base
+gstreamer0.10-plugins-good
+gstreamer0.10-plugins-ugly
+gstreamer0.10-ffmpeg
+ivtv-utils
+libglib2.0-dev
+maven2
+ntp
+openssh-server
+subversion
+v4l-conf
+wget

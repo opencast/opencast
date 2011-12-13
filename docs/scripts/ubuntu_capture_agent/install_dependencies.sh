@@ -152,8 +152,27 @@ for (( i=0; i < ${#noinst[@]}; i++ )); do
     echo "${noinst[$i]}" >> $PKG_BACKUP
 done
 
+# Find the version of java to use. 
+found_java=false
+for java_version in $JAVA_PATTERNS
+do
+    # The location we would expect to find java. 
+    java_location="$JAVA_PREFIX/`ls $JAVA_PREFIX | grep ^$java_version$`"
+    # Check to make sure that it found the $java_version and that it is a valid directory. 
+    if [[ "$java_location" != "$JAVA_PREFIX/" && -d $java_location ]]; then
+        echo Found java at $java_location
+        JAVA_PATTERN="$java_version"
+        found_java=true
+    fi
+done
+
+if ! $found_java ; then
+    echo "Haven't found a valid install of java ($JAVA_PATTERNS)in $JAVA_PREFIX so exiting."
+    exit 1
+fi
+
 # Set up java-6-sun as the default alternative
-echo -n "Setting up java-6-sun as the default jvm... "
+echo -n "Setting up $JAVA_PATTERN as the default jvm... "
 update-java-alternatives -s $JAVA_PATTERN 2> /dev/null
 echo "Done"
 

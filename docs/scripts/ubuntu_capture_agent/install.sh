@@ -67,15 +67,10 @@ export TRACKING_URL=http://www.opencastproject.org/form/tracking
 
 # Third-party dependencies variables
 # Packages that are installed by default (one per line --please note the quotation mark at the end!!!)
-export PKG_LIST="alsa-utils
-v4l-conf
-ivtv-utils
+# These may be changed by the $SETUP_DEPENDENCIES script depending on the version of Ubuntu. 
+export PKG_LIST="acpid
+alsa-utils
 curl
-maven2
-sun-java6-jdk
-subversion
-wget
-openssh-server
 gcc
 gstreamer0.10-alsa
 gstreamer0.10-plugins-base
@@ -83,8 +78,25 @@ gstreamer0.10-plugins-good
 gstreamer0.10-plugins-ugly
 gstreamer0.10-plugins-ugly-multiverse
 gstreamer0.10-ffmpeg
+ivtv-utils
+libglib2.0-dev
+maven2
 ntp
-acpid"
+openssh-server
+subversion
+sun-java6-jdk
+v4l-conf
+wget"
+
+# Versions of Ubuntu that we have package lists for. The above defaults will be used
+export UBUNTU_10_10="Ubuntu 10.10 \n \l"
+export UBUNTU_10_10_PACKAGES_FILE="Ubuntu-10-10.packages"
+export UBUNTU_11_04="Ubuntu 11.04 \n \l"
+export UBUNTU_11_04_PACKAGES_FILE="Ubuntu-11-04.packages"
+export UBUNTU_11_10="Ubuntu 11.10 \n \l"
+export UBUNTU_11_10_PACKAGES_FILE="Ubuntu-11-10.packages"
+export PACKAGE_LIST_DEFAULT_FILE="default.packages"
+
 
 # Packages that require the user approval to be installed (Please note the quotation mark at the end!!!)
 # There should be one package per line, but several packages may be included if they need to be treated 'as a block'
@@ -127,8 +139,8 @@ export DEPLOY_DIR=matterhorn
 export JAVA_PREFIX=/usr/lib/jvm
 # A regexp to filter the right jvm directory from among all the installed ones
 # The chosen JAVA_HOME will be $JAVA_PREFIX/`ls $JAVA_PREFIX | grep $JAVA_PATTERN`
-export JAVA_PATTERN=java-6-sun                                           
-                                                                         
+export JAVA_PATTERNS="java-6-sun java-7-oracle"
+                           
 # Path to the maven2 repository, under the user home
 export M2_SUFFIX=.m2/repository
 
@@ -210,6 +222,7 @@ export EPIPHAN_TYPE="EPIPHAN_VGA2USB"
 SETUP_USER=./setup_user.sh
 INSTALL_VGA2USB=./install_vga2usb_drivers.sh
 SETUP_DEVICES=./setup_devices.sh
+SETUP_DEPENDENCIES=./setup_dependencies.sh
 INSTALL_DEPENDENCIES=./install_dependencies.sh
 SETUP_SOURCE=./setup_source.sh
 SETUP_ENVIRONMENT=./setup_environment.sh
@@ -219,8 +232,8 @@ export FUNCTIONS=./functions.sh
 # This one is exported because it has to be modified by another script
 export CLEANUP=./cleanup.sh
 
-SCRIPTS=( "$SETUP_USER" "$INSTALL_VGA2USB" "$SETUP_DEVICES" "$INSTALL_DEPENDENCIES" "$SETUP_ENVIRONMENT"\
-          "$SETUP_SOURCE" "$SETUP_BOOT" "$CLEANUP" "$FUNCTIONS" )
+SCRIPTS=( "$SETUP_USER" "$INSTALL_VGA2USB" "$SETUP_DEVICES" "$SETUP_DEPENDENCIES" "$INSTALL_DEPENDENCIES"\
+          "$SETUP_ENVIRONMENT" "$SETUP_SOURCE" "$SETUP_BOOT" "$CLEANUP" "$FUNCTIONS")
 SCRIPTS_EXT=docs/scripts/ubuntu_capture_agent
 
 # The subsidiary scripts will check for this variable to check they are being run from here
@@ -293,6 +306,9 @@ done
 
 # Create the directory where all the capture-agent-related files will be stored
 mkdir -p $CA_DIR
+
+# Setup dependencies for individual versions of Ubuntu. 
+. ${SETUP_DEPENDENCIES}
 
 # Install the 3rd party dependencies (WARNING: The initial perdiod (.) MUST be there so that the script can export several variables)
 . ${INSTALL_DEPENDENCIES}
