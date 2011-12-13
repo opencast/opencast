@@ -35,6 +35,7 @@
     <script type="text/javascript" src="js/bookmarks.js"></script>
     <script type="text/javascript" src="js/engage_plugins/json2.js"></script>
     <script type="text/javascript" src="js/engage_plugins/description.js"></script>
+    <script type="text/javascript" src="js/engage_plugins/download.js"></script>
     <script type="text/javascript" src="js/engage_plugins/description-plugin.js"></script>
     <script type="text/javascript" src="js/engage_plugins/segments_ui.js"></script>
     <script type="text/javascript" src="js/engage_plugins/segments_ui-plugin.js"></script>
@@ -57,7 +58,7 @@
     <script type="text/javascript" src="js/watch.js"></script>
     <script type="text/javascript">
       $(document).ready( function() {
-        //check whether a user is logged in and show logout link 
+        //check whether a user is logged in and show logout link
         $.ajax({
           url: '/info/me.json',
           type: 'GET',
@@ -71,6 +72,24 @@
           }
         });
       });
+
+      $(function hideDisabledLinks(){
+          $.ajax({
+            url: '/info/me.json',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data){
+                var download_enabled;
+
+                if (data.org.properties["engageui.link_download.enable"]){
+                   download_enabled = data.org.properties["engageui.link_download.enable"];
+                   if(download_enabled === "false"){
+                       $("#oc_download-button").hide();
+                  }
+                }
+             }
+          });
+      });
     </script>
   </head>
   <body>
@@ -81,7 +100,7 @@
     </div>
 
     <div id="skip">
-      <a id="oc_a11y-shortcut"href="#shortcuts" onclick="Opencast.Player.doToggleShortcuts(event, 'oc_a11y-shortcut');" tabindex="20">
+      <a id="oc_a11y-shortcut" href="#shortcuts" onclick="Opencast.Player.doToggleShortcuts(event, 'oc_a11y-shortcut');" tabindex="20">
         Skip to Shortcuts
       </a>
     </div>
@@ -137,6 +156,13 @@
             Share
           </div>
         </a>
+
+        <a href="javascript: " id="oc_download-button" title="click to show downloads" role="button" aria-pressed="false" tabindex="60">
+          <div>
+            Download
+          </div>
+      </a>
+
       </div>
       <div class="clear"></div>
     </div>
@@ -378,10 +404,17 @@
 
     <!-- Shortcut dialog -->
     <div id="oc_shortcuts" title="Shortcuts">
-      <span id="skip"><a name="shortcuts"></a></span>
+      <span><a name="shortcuts"></a></span>
       <div id="oc_client_shortcuts"></div>
     </div>
     <!-- END #oc_shortcuts -->
+
+    <!-- Download dialog -->
+    <div id="oc_downloads" title="Download Media Files">
+      <span id="skip"><a name="downloads"></a></span>
+      <div id="oc_client_downloads"></div>
+    </div>
+    <!-- END #oc_downloads -->
 
     <!-- #share-button-layer dialog -->
     <div id="oc_share-layer" class="ui-widget ui-widget-content ui-corner-all oc_popuplayer ui-helper-hidden" title="share this Video" tabindex="-1" role="dialog" aria-hidden="true">
@@ -436,18 +469,18 @@
       </div>
       <div id="oc_embed-right">
         <div id="oc_embed-custom-title">
-          Custom size and appearance:
+          Custom size:
         </div>
         <label for="oc_embed-costum-width-textinput" class="handcursor">
           Width:
         </label>
-		&nbsp;
+	&nbsp;
         <input id="oc_embed-costum-width-textinput" maxlength="4" type="text" name="Costum width min 300px" alt="Costum width min 300px" title="Costum width min 300px" value="" />
         <div class="clear"></div>
         <label for="oc_embed-costum-height-textinput" class="handcursor">
           Height:
         </label>
-		&nbsp;
+	&nbsp;
         <input id="oc_embed-costum-height-textinput" maxlength="4" type="text" name="" alt="" title="" value="" />
 
         <div class="clear"></div>

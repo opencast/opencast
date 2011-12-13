@@ -75,6 +75,7 @@ Opencast.Player = (function ()
         shareDisplayed = false,
         timeLayerDisplayed = false,
         shortcutTabReturnId = '',
+        downloadTabReturnId = '',
         embedDialogDisplayed = false,
         shareTimeDialogDisplayed = false,
         mediaPackageId, userId, sessionId, inPosition = 0,
@@ -97,7 +98,7 @@ Opencast.Player = (function ()
     {
         return showSections;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the duration.
@@ -107,7 +108,7 @@ Opencast.Player = (function ()
     {
         return (isNaN(duration) ? -1 : duration);
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the captionsBool.
@@ -116,7 +117,7 @@ Opencast.Player = (function ()
     {
         return captionsBool;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the current position
@@ -125,7 +126,7 @@ Opencast.Player = (function ()
     {
         return curPosition;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the current sessionId
@@ -134,7 +135,7 @@ Opencast.Player = (function ()
     {
         return mediaPackageId;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the current sessionId
@@ -143,7 +144,7 @@ Opencast.Player = (function ()
     {
         return sessionId;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the currentVideoSize.
@@ -152,7 +153,7 @@ Opencast.Player = (function ()
     {
         return currentVideoSize;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the View State.
@@ -161,7 +162,7 @@ Opencast.Player = (function ()
     {
         FLASH_VIEWSTATE = Videodisplay.getViewState();
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the htmlBool.
@@ -170,7 +171,7 @@ Opencast.Player = (function ()
     {
         return htmlBool;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the current time of the video.
@@ -179,11 +180,11 @@ Opencast.Player = (function ()
     {
         return currentTimeString;
     }
-    
+
     /*************************************************************/
 	/* setter
     /*************************************************************/
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the dragging.
@@ -193,7 +194,7 @@ Opencast.Player = (function ()
     {
         dragging = bool;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the media URL.
@@ -212,7 +213,7 @@ Opencast.Player = (function ()
         }
         Videodisplay.setMediaURL(coverURLOne, coverURLTwo, mediaURLOne, mediaURLTwo, mimetypeOne, mimetypeTwo, playerstyle, slideLength);
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the captions URL.
@@ -226,7 +227,7 @@ Opencast.Player = (function ()
         }
         Videodisplay.setCaptionsURL(captionsURL);
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the browserWidth.
@@ -236,7 +237,7 @@ Opencast.Player = (function ()
     {
         browserWidth = witdh;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the cc icon
@@ -258,7 +259,7 @@ Opencast.Player = (function ()
         });
         setCaptionsBool(true);
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the cc icon
@@ -280,7 +281,7 @@ Opencast.Player = (function ()
         });
         setCaptionsBool(false);
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the volume slider
@@ -290,7 +291,7 @@ Opencast.Player = (function ()
     {
         Videodisplay.setVolumePlayer(newPlayerVolume);
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the play/pause state and change the css style of the play/pause button.
@@ -321,7 +322,7 @@ Opencast.Player = (function ()
             setCurrentPlayPauseState(PLAYING);
         }
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the current time of the video.
@@ -344,7 +345,7 @@ Opencast.Player = (function ()
         }
         currentTimeString = text;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the total time of the video.
@@ -374,7 +375,7 @@ Opencast.Player = (function ()
             $("#scrubber").attr("aria-valuemax", "00:00:00");
         }
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the mediaPackageId
@@ -384,7 +385,7 @@ Opencast.Player = (function ()
     {
         mediaPackageId = id;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the userId
@@ -394,7 +395,7 @@ Opencast.Player = (function ()
     {
         userId = id;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the mediaPackageId
@@ -404,7 +405,7 @@ Opencast.Player = (function ()
     {
         sessionId = id;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the optionClassName.
@@ -414,7 +415,7 @@ Opencast.Player = (function ()
     {
         optionClassName = className;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the slider max time and set the duration.
@@ -424,7 +425,7 @@ Opencast.Player = (function ()
     {
         duration = time;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the new position of the seek slider.
@@ -447,7 +448,7 @@ Opencast.Player = (function ()
         {
             addFootprint();
             inPosition = fullPosition;
-            addEvent(Opencast.logging.SEEK);
+            addEvent("SEEK");
             outPosition = fullPosition;
         }
         if (getDragging() === false)
@@ -455,7 +456,7 @@ Opencast.Player = (function ()
             refreshScrubberPosition();
         }
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the with of the progress bar.
@@ -466,7 +467,7 @@ Opencast.Player = (function ()
         Opencast.engage.setLoadProgressPercent(value);
         $('.load-progress').css("width", (Math.min(value, 100) + "%"));
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the volume slider
@@ -475,9 +476,9 @@ Opencast.Player = (function ()
     function setVolumeSlider(newVolume)
     {
         Opencast.ariaSpinbutton.jumpToRange(newVolume);
-        addEvent(Opencast.logging.SET_VOLUME + newVolume);
+        addEvent("SET-VOLUME");
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the video size list
@@ -598,7 +599,7 @@ Opencast.Player = (function ()
             showNotes();
             Opencast.Description.hideDescription();
             setShowSections(true);
-            addEvent(Opencast.logging.SHOW_NOTES);
+            addEvent('SHOW-NOTES');
         }
         else
         {
@@ -606,7 +607,7 @@ Opencast.Player = (function ()
             setShowSections(false);
         }
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Toggle the Transcript
@@ -618,7 +619,7 @@ Opencast.Player = (function ()
             showTranscript();
             hideSlideText();
             setShowSections(true);
-            addEvent(Opencast.logging.SHOW_TRANSCRIPT);
+            addEvent('SHOW-TRANSCRIPT');
         }
         else
         {
@@ -626,7 +627,7 @@ Opencast.Player = (function ()
             setShowSections(false);
         }
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Toggle the embed
@@ -640,11 +641,11 @@ Opencast.Player = (function ()
         else
         {
             showEmbed();
-            addEvent(Opencast.logging.SHOW_EMBED);
+            addEvent('SHOW-EMBED');
         }
         // Opencast.Initialize.doResize();
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Toggle the share time
@@ -677,14 +678,14 @@ Opencast.Player = (function ()
         {
             showShare();
             $('#oc_share-layer').focus();
-            addEvent(Opencast.logging.SHOW_SHARE);
+            addEvent('SHOW-SHARE');
         }
         if (e !== undefined)
         {
             e.preventDefault();
         }
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Toggle the time layer
@@ -698,10 +699,10 @@ Opencast.Player = (function ()
         else
         {
             showTimeLayer();
-            addEvent(Opencast.logging.SHOW_TIME_LAYER);
+            addEvent('SHOW-TIME-LAYER');
         }
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Toggle the shortcuts
@@ -715,7 +716,7 @@ Opencast.Player = (function ()
         else
         {
             showShortcuts();
-            addEvent(Opencast.logging.SHOW_SHORTCUTS);
+            addEvent('SHOW-SHORTCUTS');
         }
         if (who !== undefined)
         {
@@ -728,7 +729,34 @@ Opencast.Player = (function ()
         }
         return false;
     }
-    
+
+    /**
+     * @memberOf Opencast.Player
+     * @description Toggle the downloads
+     */
+    function doToggleDownloads(e, who)
+    {
+        if ($('#oc_downloads').dialog('isOpen'))
+        {
+            hideDownloads();
+        }
+        else
+        {
+            showDownloads();
+            addEvent('SHOW-DOWNLOADS');
+        }
+        if (who !== undefined)
+        {
+            //set jump back point for tab navigation
+            downloadTabReturnId = who;
+        }
+        if (e !== undefined)
+        {
+            e.preventDefault();
+        }
+        return false;
+    }
+
     /**
      * @memberOf Opencast.Player
      * @description Toggle between play and pause the video.
@@ -745,7 +773,7 @@ Opencast.Player = (function ()
             doPause();
         }
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Toggle between mute and unmute
@@ -754,13 +782,13 @@ Opencast.Player = (function ()
     {
         FLASH_MUTE = Videodisplay.mute();
         if (!FLASH_MUTE) {
-            addEvent(Opencast.logging.MUTE);
+            addEvent('MUTE');
         } else {
-            addEvent(Opencast.logging.UNMUTE);
+            addEvent('UNMUTE');
         }
         Opencast.ariaSpinbutton.toggleMute();
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Do play the video.
@@ -784,7 +812,7 @@ Opencast.Player = (function ()
         }
         return isPlaying();
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Do pause the video.
@@ -811,10 +839,10 @@ Opencast.Player = (function ()
             setSeekState(getCurrentPlayPauseState());
             Videodisplay.fastForward();
             intvalFastForward = window.setInterval("Videodisplay.fastForward()", 1000);
-            addEvent(Opencast.logging.FAST_FORWARD);
+            addEvent('FAST-FORWARD');
         }
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Do skip backward in the video.
@@ -823,9 +851,9 @@ Opencast.Player = (function ()
     {
         var sec = Opencast.segments.getSecondsBeforeSlide();
         Opencast.Watch.seekSegment(sec);
-        addEvent(Opencast.logging.SKIP_BACKWARD);
+        addEvent('SKIP-BACKWARD');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Do rewind in the video.
@@ -837,10 +865,10 @@ Opencast.Player = (function ()
             setSeekState(getCurrentPlayPauseState());
             Videodisplay.rewind();
             intvalRewind = window.setInterval("Videodisplay.rewind()", 1000);
-            addEvent(Opencast.logging.REWIND);
+            addEvent('REWIND');
         }
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Do skip forward in the vido.
@@ -849,9 +877,9 @@ Opencast.Player = (function ()
     {
         var sec = Opencast.segments.getSecondsNextSlide();
         Opencast.Watch.seekSegment(sec);
-        addEvent(Opencast.logging.SKIP_FORWARD);
+        addEvent('SKIP-FORWARD');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description seeks
@@ -861,7 +889,7 @@ Opencast.Player = (function ()
     {
         Videodisplay.seek(ms);
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Toggle between closed captions on or off.
@@ -870,13 +898,13 @@ Opencast.Player = (function ()
     function doToogleClosedCaptions()
     {
         Videodisplay.closedCaptions();
-        addEvent(Opencast.logging.CLOSED_CAPTIONS);
+        addEvent('CLOSED-CAPTIONS');
     }
-    
+
     /*************************************************************/
 	/* show
     /*************************************************************/
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Shows the share overlay
@@ -905,7 +933,7 @@ Opencast.Player = (function ()
         });
         shareDisplayed = true;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Show the edit time input and hide the current time span.
@@ -921,7 +949,7 @@ Opencast.Player = (function ()
         }
         $("#oc_edit-time").focus();
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Show the embed
@@ -952,11 +980,11 @@ Opencast.Player = (function ()
         });
         shareTimeDialogDisplayed = true;
     }
-    
+
     /*************************************************************/
 	/* hide
     /*************************************************************/
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Hides the shortcuts
@@ -969,7 +997,20 @@ Opencast.Player = (function ()
         }
         $('#oc_shortcuts').dialog('close');
     }
-    
+
+    /**
+     * @memberOf Opencast.Player
+     * @description Hides the downloads
+     */
+    function hideDownloads()
+    {
+        if (downloadTabReturnId !== undefined)
+        {
+            $('#' + downloadTabReturnId).focus();
+        }
+        $('#oc_downloads').dialog('close');
+    }
+
     /**
      * @memberOf Opencast.Player
      * @description Hides the share overlay
@@ -984,7 +1025,7 @@ Opencast.Player = (function ()
         });
         shareDisplayed = false;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Hide the embed
@@ -1004,11 +1045,11 @@ Opencast.Player = (function ()
         $('#oc_share-button').focus();
         shareTimeDialogDisplayed = false;
     }
-    
+
     /*************************************************************/
 	/* video size control
     /*************************************************************/
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Show the single video display
@@ -1017,9 +1058,9 @@ Opencast.Player = (function ()
     {
         $("#oc_btn-dropdown").attr("className", "oc_btn-singleDisplay");
         setCurrentVideoSize(VIDEOSIZESINGLE);
-        addEvent(Opencast.logging.VIDEOSIZE_SINGLE);
+        addEvent('VIDEOSIZE-SINGLE');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Show the audio display
@@ -1033,9 +1074,9 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-audioDisplay");
         setCurrentVideoSize(VIDEOSIZEAUDIO);
         Opencast.Initialize.doResize();
-        addEvent(Opencast.logging.VIDEOSIZE_AUDIO);
+        addEvent('VIDEOSIZE-AUDIO');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Show only the presenter video display
@@ -1046,9 +1087,9 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-singleDisplay-presenter");
         setCurrentVideoSize(VIDEOSIZEONLYLEFT);
         Opencast.Initialize.doResize();
-        addEvent(Opencast.logging.VIDEOSIZE_LEFT_ONLY);
+        addEvent('VIDEOSIZE-LEFT-ONLY');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Show only the presentation video display
@@ -1059,9 +1100,9 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-singleDisplay-presentation");
         setCurrentVideoSize(VIDEOSIZEONLYRIGHT);
         Opencast.Initialize.doResize();
-        addEvent(Opencast.logging.VIDEOSIZE_RIGHT_ONLY);
+        addEvent('VIDEOSIZE-RIGHT-ONLY');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Resize the presentation video
@@ -1072,9 +1113,9 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-bigRightDisplay");
         setCurrentVideoSize(VIDEOSIZEBIGRIGHT);
         Opencast.Initialize.doResize();
-        addEvent(Opencast.logging.VIDEOSIZE_BIG_RIGHT);
+        addEvent('VIDEOSIZE-BIG-RIGHT');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Resize the presenter video
@@ -1085,9 +1126,9 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-bigLeftDisplay");
         setCurrentVideoSize(VIDEOSIZEBIGLEFT);
         Opencast.Initialize.doResize();
-        addEvent(Opencast.logging.VIDEOSIZE_BIG_LEFT);
+        addEvent('VIDEOSIZE-BIG-LEFT');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Show presenter and presentation video
@@ -1098,9 +1139,9 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-centerDisplay");
         setCurrentVideoSize(VIDEOSIZEMULTI);
         Opencast.Initialize.doResize();
-        addEvent(Opencast.logging.VIDEOSIZE_MULTI);
+        addEvent('VIDEOSIZE-MULTI');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Show only the presenter video display
@@ -1131,11 +1172,11 @@ Opencast.Player = (function ()
         }
         Opencast.Initialize.doResize();
     }
-    
+
     /*************************************************************/
 	/* alert
     /*************************************************************/
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Remove the old alert div and create an new div with the aria role alert.
@@ -1152,7 +1193,7 @@ Opencast.Player = (function ()
         newAlert.appendChild(msg);
         document.body.appendChild(newAlert);
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Remove the alert div.
@@ -1165,11 +1206,11 @@ Opencast.Player = (function ()
             document.body.removeChild(oldAlert);
         }
     }
-    
+
     /*************************************************************/
 	/* sound
     /*************************************************************/
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the volume icon
@@ -1184,7 +1225,7 @@ Opencast.Player = (function ()
         });
         $("#oc_btn-volume").attr('aria-pressed', 'false');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the volume icon
@@ -1199,7 +1240,7 @@ Opencast.Player = (function ()
         });
         $("#oc_btn-volume").attr('aria-pressed', 'false');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the volume icon
@@ -1214,7 +1255,7 @@ Opencast.Player = (function ()
         });
         $("#oc_btn-volume").attr('aria-pressed', 'false');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the volume icon
@@ -1229,11 +1270,11 @@ Opencast.Player = (function ()
         });
         $("#oc_btn-volume").attr('aria-pressed', 'true');
     }
-   
+
     /*************************************************************/
 	/* play/pause
     /*************************************************************/
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Mouse over effect, change the css style.
@@ -1249,7 +1290,7 @@ Opencast.Player = (function ()
             setMouseOverBool(true);
         }
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Mouse out effect, change the css style.
@@ -1267,7 +1308,7 @@ Opencast.Player = (function ()
             setMouseOverBool(false);
         }
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Mouse down effect, change the css style.
@@ -1276,11 +1317,11 @@ Opencast.Player = (function ()
     {
         return true;
     }
-    
+
     /*************************************************************/
 	/* misc
     /*************************************************************/
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Returns if playing
@@ -1290,7 +1331,7 @@ Opencast.Player = (function ()
     {
         return getCurrentPlayPauseState() === PLAYING;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Returns true if Share Overlay is display, false else
@@ -1300,7 +1341,7 @@ Opencast.Player = (function ()
     {
         return shareDisplayed;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Returns true if Share Overlay is display, false else
@@ -1310,7 +1351,7 @@ Opencast.Player = (function ()
     {
         return shortcutDialogDisplayed;
     }
-   
+
     /**
      * @memberOf Opencast.Player
      * @description Set the scrubber postion
@@ -1329,7 +1370,7 @@ Opencast.Player = (function ()
             $("#play-progress").css("width", newPos);
         }
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the embed Player.
@@ -1340,17 +1381,13 @@ Opencast.Player = (function ()
         var iFrameText = '';
         var advancedUrl = window.location.href;
         var embedUrl = advancedUrl.replace(/watch.html/g, "embed.html");
-        if($('#oc_embed-costum-hide-controls-checkbox').is(':checked'))
-        {
-            embedUrl += "&hideControls=false";
-        }
         $('#oc_embed-costum-width-textinput').val(width);
         $('#oc_embed-costum-height-textinput').val(height);
         iFrameText = '<iframe src="' + embedUrl + '" style="border:0px #FFFFFF none;" name="Opencast Matterhorn - Media Player" scrolling="no" frameborder="0" marginheight="0px" marginwidth="0px" width="' + width + '" height="' + height + '"></iframe>';
         $('#oc_embed-textarea').val(iFrameText);
-        addEvent(Opencast.logging.GENERATE_EMBED + width + 'x' + height);
+        addEvent('GENERATE-EMBED-' + width + 'x' + height);
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Stop the rewind in the video.
@@ -1364,7 +1401,7 @@ Opencast.Player = (function ()
         }
         Videodisplay.stopRewind();
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Stop fast forward the video.
@@ -1378,7 +1415,7 @@ Opencast.Player = (function ()
         }
         Videodisplay.stopFastForward();
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Show the current time span and hide the edit time input.
@@ -1398,7 +1435,7 @@ Opencast.Player = (function ()
         }
         backupPlayPauseState = '';
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Check the new time and seek the video to the new time.
@@ -1433,12 +1470,13 @@ Opencast.Player = (function ()
                 {
                     addAlert('Wrong time enter like this: HH:MM:SS');
                     $("#oc_edit-time").addClass("oc_edit-time-error");
+                    //addEvent('BAD-EDIT-TIME');
                 }
                 else
                 {
                     Videodisplay.seek(newPlayhead);
                     hideEditTime();
-                    addEvent(Opencast.logging.VALID_EDIT_TIME);
+                    addEvent('VALID-EDIT-TIME');
                 }
             }
         }
@@ -1446,9 +1484,10 @@ Opencast.Player = (function ()
         {
             addAlert('Wrong time enter like this: HH:MM:SS');
             $("#oc_edit-time").addClass("oc_edit-time-error");
+            //addEvent('EDIT-TIME-EXCEPTION');
         }
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description addAlert in html code.
@@ -1458,7 +1497,7 @@ Opencast.Player = (function ()
     {
         addAlert(alertMessage);
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Returns communication values from the Flash Videodisplay
@@ -1472,11 +1511,11 @@ Opencast.Player = (function ()
             'mute': FLASH_MUTE
         };
     }
-    
+
     /*************************************************************/
 	/* non-public
     /*************************************************************/
-    
+
     /**
      * @memberOf Opencast.Player
      * @return true if video size control is visible
@@ -1485,7 +1524,7 @@ Opencast.Player = (function ()
     {
         return displVidSizeControl;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the current play pause state.
@@ -1494,7 +1533,7 @@ Opencast.Player = (function ()
     {
         return currentPlayPauseState;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the current play pause state.
@@ -1504,7 +1543,7 @@ Opencast.Player = (function ()
     {
         currentPlayPauseState = state;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the seek state.
@@ -1514,7 +1553,7 @@ Opencast.Player = (function ()
     {
         seekState = state;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the showSections.
@@ -1524,7 +1563,7 @@ Opencast.Player = (function ()
     {
         showSections = bool;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the mouseOverBool.
@@ -1533,7 +1572,7 @@ Opencast.Player = (function ()
     {
         return mouseOverBool;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the mouseOverBool.
@@ -1543,7 +1582,7 @@ Opencast.Player = (function ()
     {
         mouseOverBool = bool;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the captionsBool.
@@ -1553,7 +1592,7 @@ Opencast.Player = (function ()
     {
         captionsBool = bool;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the durationText.
@@ -1562,7 +1601,7 @@ Opencast.Player = (function ()
     {
         durationText = text;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the durationText.
@@ -1571,7 +1610,7 @@ Opencast.Player = (function ()
     {
         return durationText;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the dragging.
@@ -1581,7 +1620,7 @@ Opencast.Player = (function ()
     {
         return dragging;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the htmlBool.
@@ -1591,7 +1630,7 @@ Opencast.Player = (function ()
     {
         htmlBool = bool;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Get the displayMode.
@@ -1600,7 +1639,7 @@ Opencast.Player = (function ()
     {
         return displayMode;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the displayMode.
@@ -1610,7 +1649,7 @@ Opencast.Player = (function ()
     {
         displayMode = mode;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Set the displayMode.
@@ -1620,7 +1659,7 @@ Opencast.Player = (function ()
     {
         currentVideoSize = videoSize;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Show the notes
@@ -1634,9 +1673,9 @@ Opencast.Player = (function ()
         });
         $("#oc_btn-notes").html(NOTESHIDE);
         $("#oc_btn-notes").attr('aria-pressed', 'true');
-        addEvent(Opencast.logging.SHOW_NOTES);
+        addEvent('SHOW-NOTES');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Hide the notes
@@ -1650,9 +1689,9 @@ Opencast.Player = (function ()
         });
         $("#oc_btn-notes").html(NOTES);
         $("#oc_btn-notes").attr('aria-pressed', 'false');
-        addEvent(Opencast.logging.HIDE_NOTES);
+        addEvent('HIDE-NOTES');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Show the transcript
@@ -1667,9 +1706,9 @@ Opencast.Player = (function ()
             value: TRANSCRIPTHIDE
         });
         $("#oc_btn-transcript").attr('aria-pressed', 'true');
-        addEvent(Opencast.logging.SHOW_TRANSCRIPT);
+        addEvent('SHOW-TRANSCRIPT');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Hide the transcript
@@ -1684,9 +1723,9 @@ Opencast.Player = (function ()
             value: TRANSCRIPT
         });
         $("#oc_btn-transcript").attr('aria-pressed', 'false');
-        addEvent(Opencast.logging.HIDE_TRANSCRIPT);
+        addEvent('HIDE-TRANSCRIPT');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Shows the time layer
@@ -1707,9 +1746,9 @@ Opencast.Player = (function ()
         });
         $('#oc_time-chooser-layer').focus();
         timeLayerDisplayed = true;
-        addEvent(Opencast.logging.SHOW_TIME_LAYER);
+        addEvent('SHOW-TIME-LAYER');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Hides the time layer
@@ -1724,9 +1763,9 @@ Opencast.Player = (function ()
         $('#oc_time-chooser-layer').hide();
         $('#oc_time-chooser').focus();
         timeLayerDisplayed = false;
-        addEvent(Opencast.logging.HIDE_TIME_LAYER);
+        addEvent('HIDE-TIME-LAYER');
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Shows Shortcuts
@@ -1735,7 +1774,16 @@ Opencast.Player = (function ()
     {
         $('#oc_shortcuts').dialog('open');
     }
-    
+
+    /**
+     * @memberOf Opencast.Player
+     * @description Shows downloads
+     */
+    function showDownloads()
+    {
+        $('#oc_downloads').dialog('open');
+    }
+
     /**
      * @memberOf Opencast.Player
      * @description Add a Footpring.
@@ -1743,7 +1791,7 @@ Opencast.Player = (function ()
      */
     function addFootprint()
     {
-        addEvent(Opencast.logging.FOOTPRINT);
+        addEvent("FOOTPRINT");
     }
 
     /**
@@ -1753,7 +1801,7 @@ Opencast.Player = (function ()
     function addEvent(eventType)
     {
         //If the detailed logging is turned off (false), and the log type is not a footprint then return.
-        if (!Opencast.Player.detailedLogging && (eventType != Opencast.logging.FOOTPRINT || eventType.matches("/.*AJAX-FAILED/i"))) {
+        if (!Opencast.Player.detailedLogging && (eventType != "FOOTPRINT" || eventType.matches("/.*AJAX-FAILED/i"))) {
           return;
         }
         $.ajax(
@@ -1772,7 +1820,7 @@ Opencast.Player = (function ()
             }
         });
     }
-    
+
     return {
         // getter
         getShowSections: getShowSections,
@@ -1814,6 +1862,7 @@ Opencast.Player = (function ()
         doToggleShare: doToggleShare,
         doToggleTimeLayer: doToggleTimeLayer,
         doToggleShortcuts: doToggleShortcuts,
+        doToggleDownloads: doToggleDownloads,
         doTogglePlayPause: doTogglePlayPause,
         doToggleMute: doToggleMute,
         doPlay: doPlay,

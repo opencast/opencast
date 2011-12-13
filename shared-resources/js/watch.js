@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
- 
+
 var Opencast = Opencast || {};
 
 /**
@@ -42,7 +42,7 @@ Opencast.Watch = (function ()
         mediaPackageIdAvailable = true,
         durationSetSuccessfully = false,
         mediaPackageId;
-        
+
     var analyticsURL = "",
         annotationURL = "",
         descriptionEpisodeURL = "",
@@ -53,7 +53,7 @@ Opencast.Watch = (function ()
         segmentsURL = "",
         seriesSeriesURL = "",
         seriesEpisodeURL = "";
-      
+
     /**
      * @memberOf Opencast.Watch
      * @description Returns a plugin URL
@@ -63,7 +63,7 @@ Opencast.Watch = (function ()
     {
         return analyticsURL;
     }
-    
+
     /**
      * @memberOf Opencast.Watch
      * @description Returns a plugin URL
@@ -73,7 +73,7 @@ Opencast.Watch = (function ()
     {
         return annotationURL;
     }
-    
+
     /**
      * @memberOf Opencast.Watch
      * @description Returns a plugin URL
@@ -83,7 +83,7 @@ Opencast.Watch = (function ()
     {
         return descriptionEpisodeURL;
     }
-    
+
     /**
      * @memberOf Opencast.Watch
      * @description Returns a plugin URL
@@ -93,7 +93,7 @@ Opencast.Watch = (function ()
     {
         return descriptionStatsURL;
     }
-    
+
     /**
      * @memberOf Opencast.Watch
      * @description Returns a plugin URL
@@ -103,7 +103,7 @@ Opencast.Watch = (function ()
     {
         return searchURL;
     }
-    
+
     /**
      * @memberOf Opencast.Watch
      * @description Returns a plugin URL
@@ -113,7 +113,7 @@ Opencast.Watch = (function ()
     {
         return segmentsTextURL;
     }
-    
+
     /**
      * @memberOf Opencast.Watch
      * @description Returns a plugin URL
@@ -123,7 +123,7 @@ Opencast.Watch = (function ()
     {
         return segmentsUIURL;
     }
-    
+
     /**
      * @memberOf Opencast.Watch
      * @description Returns a plugin URL
@@ -133,7 +133,7 @@ Opencast.Watch = (function ()
     {
         return segmentsURL;
     }
-    
+
     /**
      * @memberOf Opencast.Watch
      * @description Returns a plugin URL
@@ -143,7 +143,7 @@ Opencast.Watch = (function ()
     {
         return seriesSeriesURL;
     }
-    
+
     /**
      * @memberOf Opencast.Watch
      * @description Returns a plugin URL
@@ -153,7 +153,7 @@ Opencast.Watch = (function ()
     {
         return seriesEpisodeURL;
     }
- 
+
     /**
      * @memberOf Opencast.Watch
      * @description Parses a query string
@@ -178,7 +178,7 @@ Opencast.Watch = (function ()
         }
         return urlParams;
     }
-    
+
     /**
      * @memberOf Opencast.Watch
      * @description Sets up the Plugins
@@ -187,9 +187,9 @@ Opencast.Watch = (function ()
     {
         var logsEnabled = ($.getURLParameter('log') == "true") ? true : false;
         $.enableLogging(logsEnabled);
-        
+
         $.log("Player ready");
-        
+
         // check if advanced player or embed player
         var loc = window.location.href;
         if(loc.search(/embed.html.+/g) != -1)
@@ -201,7 +201,7 @@ Opencast.Watch = (function ()
         {
             $.log("Player is: Advanced Player");
         }
-         
+
         // Parse the plugin URLs
         $.getJSON('js/servicedata.json', function(data)
         {
@@ -215,7 +215,7 @@ Opencast.Watch = (function ()
             segmentsURL = data.plugin_urls.segments;
             seriesSeriesURL = data.plugin_urls.series.series;
             seriesEpisodeURL = data.plugin_urls.series.episode;
-            
+
             $.log("Plugin URLs");
             $.log("Analytics URL: " + analyticsURL);
             $.log("Annotation URL: " + annotationURL);
@@ -227,7 +227,7 @@ Opencast.Watch = (function ()
             $.log("Segments URL: " + segmentsURL);
             $.log("Series (Series) URL: " + seriesSeriesURL);
             $.log("Series (Episode) URL: " + seriesEpisodeURL);
-            
+
             mediaPackageId = (data.mediaDebugInfo.mediaPackageId == "") ? $.getURLParameter('id') : data.mediaDebugInfo.mediaPackageId;
             mediaUrlOne = (data.mediaDebugInfo.mediaUrlOne == "") ? null : data.mediaDebugInfo.mediaUrlOne;
             mediaUrlTwo = (data.mediaDebugInfo.mediaUrlTwo == "") ? null : data.mediaDebugInfo.mediaUrlTwo;
@@ -235,7 +235,7 @@ Opencast.Watch = (function ()
             mediaResolutionTwo = (data.mediaDebugInfo.mediaResolutionTwo == "") ? null : data.mediaDebugInfo.mediaResolutionTwo;
             mimetypeOne = (data.mediaDebugInfo.mimetypeOne == "") ? null : data.mediaDebugInfo.mimetypeOne;
             mimetypeTwo = (data.mediaDebugInfo.mimetypeTwo == "") ? null : data.mediaDebugInfo.mimetypeTwo;
-            
+
             $.log("Media Debug Info");
             $.log("Mediapackage ID: " + mediaPackageId);
             $.log("Media URL 1: " + mediaUrlOne);
@@ -244,7 +244,7 @@ Opencast.Watch = (function ()
             $.log("Media resolution 1: " + mediaResolutionTwo);
             $.log("Mimetype 1: " + mimetypeOne);
             $.log("Mimetype 2: " + mimetypeTwo);
-            
+
             if(advancedPlayer)
             {
                 // Hide Screen Settings until fully initialized
@@ -298,7 +298,7 @@ Opencast.Watch = (function ()
             }
         });
     }
-    
+
     /**
      * @memberOf Opencast.Watch
      * @description Sets up the html page after the player and the Plugins have been initialized.
@@ -433,7 +433,7 @@ Opencast.Watch = (function ()
         mimetypeTwo = mimetypeTwo === null ? '' : mimetypeTwo;
         mediaResolutionOne = mediaResolutionOne === null ? '' : mediaResolutionOne;
         mediaResolutionTwo = mediaResolutionTwo === null ? '' : mediaResolutionTwo;
-        
+
         // Check for videoUrl and videoUrl2 URL Parameters
         var mediaUrlTmp = $.getURLParameter('videoUrl');
         mediaUrlOne = (mediaUrlTmp == null) ? mediaUrlOne : mediaUrlTmp;
@@ -447,7 +447,7 @@ Opencast.Watch = (function ()
         {
             $.log('Set Video URL 2 manually');
         }
-        
+
         // If URL Parameter display exists and is set to revert
         var display = $.getURLParameter('display');
         if ((display != null) && (display.toLowerCase() == 'invert') && (mediaUrlTwo != ''))
@@ -467,7 +467,7 @@ Opencast.Watch = (function ()
             mimetypeTwo = tmpMimetypeOne;
             mediaResolutionTwo = tmpMediaResolution;
         }
-        
+
 	$.log("-----");
         $.log("Final Mediadata");
         $.log("Mediapackage ID: " + mediaPackageId);
@@ -478,7 +478,7 @@ Opencast.Watch = (function ()
         $.log("Mimetype 1: " + mimetypeOne);
         $.log("Mimetype 2: " + mimetypeTwo);
 	$.log("-----");
-        
+
         if(advancedPlayer)
         {
             // init the segements
@@ -575,6 +575,7 @@ Opencast.Watch = (function ()
             Opencast.Bookmarks.initialize();
         }
         getClientShortcuts();
+        Opencast.download.showLinks();
         if(advancedPlayer)
         {
             // init
@@ -593,7 +594,7 @@ Opencast.Watch = (function ()
                 $('#oc_slidetext').addClass('scroll');
             }
         }
-        
+
         // Hide loading indicators
         $('#oc_flash-player-loading').hide();
         // Show video controls and data
@@ -629,9 +630,9 @@ Opencast.Watch = (function ()
         }
         var formattedSecs = $.formatSeconds(Opencast.Player.getDuration());
         Opencast.Player.setTotalTime(formattedSecs);
-        
+
         $.log("Media duration: " + formattedSecs);
-        
+
         // Give the player a second to finish loading, then proceed
         setTimeout(function()
         {
@@ -645,7 +646,7 @@ Opencast.Watch = (function ()
         // Opencast.ariaSpinbutton.initialize has to be called after #oc_video-player-controls is visible!
         Opencast.ariaSpinbutton.initialize('oc_volume-container', 'oc_volume-back', 'oc_volume-front', 8, 0, 100, true);
     }
-    
+
     /**
      * @memberOf Opencast.Watch
      * @description Checks and executes the URL Parameters 't' and 'play'
@@ -744,7 +745,7 @@ Opencast.Watch = (function ()
             }
         }
     }
-    
+
     /**
      * @memberOf Opencast.Watch
      * @description tries to jump to a given time
@@ -763,7 +764,7 @@ Opencast.Watch = (function ()
             return true;
         }
     }
-    
+
     /**
      * @memberOf Opencast.Watch
      * @description Seeks the video to the passed position. Is called when the
@@ -776,8 +777,8 @@ Opencast.Watch = (function ()
         var eventSeek = Videodisplay.seek(seconds);
         Opencast.Player.addEvent(Opencast.logging.SEEK_SEGMENT);
     }
-    
-    
+
+
     /**
      * @memberOf Opencast.Watch
      * @description Gets the OS-specific shortcuts of the client
@@ -810,7 +811,7 @@ Opencast.Watch = (function ()
             break;
         }
     }
-    
+
     return {
         getAnalyticsURL: getAnalyticsURL,
         getAnnotationURL: getAnnotationURL,
@@ -827,5 +828,5 @@ Opencast.Watch = (function ()
         continueProcessing: continueProcessing,
         durationSet: durationSet,
         getClientShortcuts: getClientShortcuts
-    };          
+    };
 }());
