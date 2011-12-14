@@ -93,6 +93,9 @@ gstreamer0.10-ffmpeg
 ntp
 acpid"
 
+# yum packages for CentOS
+export CENTOS_PKG_LIST="ant ant-nodeps ntp curl openssh-server subversion gcc"
+
 # yum Package to install the JDK under CentOS
 export JAVA_CENTOS="java-1.6.0-devel"
 
@@ -503,6 +506,9 @@ ${SETUP_BOOT}
 if [ $build_3rdparty ]; then 
   cd $SOURCE/docs/scripts/3rd_party/
   ./do-all
+  if [[ "$?" -ne 0 ]]; then
+  	echo "Installing the 3rd-party tools failed. Please run $SOURCE/docs/scripts/3rd_party/do-all. I f you still encounter problems Contact matterhorn-users@opencastproject.org for assistance.\nThe rest of Matterhorn system installed without further problems."
+  fi
 fi
 
 # Log the contents of /etc/issue

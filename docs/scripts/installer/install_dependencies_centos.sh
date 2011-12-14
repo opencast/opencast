@@ -30,6 +30,9 @@ fi
 
 export JAVA_HOME="/usr/java/default"
 
+echo "Installing CentOS packages..."
+yum -y install $CENTOS_PKG_LIST
+
 # Setup maven
 echo -n "Downloading Maven... "
 while [[ true ]]; do 
@@ -38,16 +41,16 @@ while [[ true ]]; do
     fi
     # On success, uncompress the felix files in their location
     if [[ $? -eq 0 ]]; then
-	echo -n "Uncompressing... "
-	dir_name=$(tar tzf ${MAVEN_FILENAME} | grep -om1 '^[^/]*')
-	tar xzf ${MAVEN_FILENAME}
-	if [[ $? -eq 0 ]]; then
-	    rm -rf $MAVEN_HOME
-	    mv ${dir_name%/} -T $MAVEN_HOME
-	    ln -s $MAVEN_HOME/bin/mvn /usr/local/bin/mvn
-	    echo "Done"
-	    break
-	fi
+		echo -n "Uncompressing... "
+		dir_name=$(tar tzf ${MAVEN_FILENAME} | grep -om1 '^[^/]*')
+		tar xzf ${MAVEN_FILENAME}
+		if [[ $? -eq 0 ]]; then
+		    rm -rf $MAVEN_HOME
+		    mv ${dir_name%/} -T $MAVEN_HOME
+		    ln -s $MAVEN_HOME/bin/mvn /usr/local/bin/mvn
+		    echo "Done"
+		    break
+		fi
     fi
     # Else, ask for the actions to take
     echo
