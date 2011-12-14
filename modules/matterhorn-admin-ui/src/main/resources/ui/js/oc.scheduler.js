@@ -1243,7 +1243,6 @@ var ocScheduler = (function() {
               }
               if(!found) { //Couldn't find the previsouly selected agent, add to list and notifiy user.
                 this.fields.agent.append($('<option selected="selected">' + agentId + '</option>').val(agentId));
-                $('#agent').change();
               }
               this.fields.agent.val(agentId);
               this.fields.agent.change();
