@@ -33,6 +33,7 @@ import junit.framework.Assert;
 import org.easymock.classextension.EasyMock;
 import org.gstreamer.Gst;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,7 @@ public class GStreamerWorkflowOperationHandlerTest {
   private static final Logger logger = LoggerFactory.getLogger(GStreamerWorkflowOperationHandlerTest.class.getName());
 
   /** True if the environment provides the tools needed for the test suite */
-  private static boolean isGStreamerInstalled = true;
+  private static boolean gstreamerInstalled = true;
 
   /** The temp directory */
   private final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
@@ -68,16 +69,23 @@ public class GStreamerWorkflowOperationHandlerTest {
   private URI withGStreamerURI;
   private URI randomXMLURI;
   
-  /**
-   * Make sure that all of the binaries used by the tests are there.
-   * 
-   * @throws URISyntaxException
-   * @throws IOException
-   * @throws NotFoundException
-   */
+  
+  /** Make sure that gstreamer is installed and available. **/
+  @BeforeClass
+  public static void testGst() {
+    try {
+      Gst.init();
+    } catch (Throwable t) {
+      logger.warn("Skipping gstreamer related tests due to unsatisifed gstreamer installation");
+      gstreamerInstalled = false;
+    }
+  }
+
   @Before
-  public void testEnvironment() throws NotFoundException, IOException, URISyntaxException {
-    Gst.init();
+  public void setUp() throws NotFoundException, IOException, URISyntaxException {
+     if (!gstreamerInstalled) {
+       return;
+    }
     badGStreamerURI = GStreamerWorkflowOperationHandlerTest.class.getResource("/with.bad.gstreamer.properties").toURI();
     movieFileURI = GStreamerWorkflowOperationHandlerTest.class.getResource("/av.mov").toURI();
     complicatedFileURI = GStreamerWorkflowOperationHandlerTest.class.getResource(
@@ -122,6 +130,9 @@ public class GStreamerWorkflowOperationHandlerTest {
 
   @Test
   public void testAttachmentProcessing() throws Exception {
+    if (!gstreamerInstalled) {
+       return; 
+    }
     gstreamerWorkflowOperationHandler = new GStreamerWorkflowOperationHandler();
     gstreamerWorkflowOperationHandler.setWorkspace(workspace);
 
@@ -133,6 +144,9 @@ public class GStreamerWorkflowOperationHandlerTest {
 
   @Test
   public void noGStreamerLineInProperties() throws NotFoundException, IOException {
+     if (!gstreamerInstalled) {
+       return;
+    }
     Attachment binaryFile = AttachmentImpl.fromURI(movieFileURI);
     Attachment withoutGStreamerFile = AttachmentImpl.fromURI(withoutGStreamerURI);
     Attachment randomXML = AttachmentImpl.fromURI(randomXMLURI);
@@ -165,6 +179,9 @@ public class GStreamerWorkflowOperationHandlerTest {
 
   @Test
   public void badGStreamerLineInProperties() throws NotFoundException, IOException {
+     if (!gstreamerInstalled) {
+       return;
+    }
     Attachment badGStreamerFile = AttachmentImpl.fromURI(badGStreamerURI);
     Attachment[] attachments = { badGStreamerFile };
     Track movieTrack = TrackImpl.fromURI(movieFileURI);
@@ -196,6 +213,9 @@ public class GStreamerWorkflowOperationHandlerTest {
 
   @Test
   public void noTracksAvailable() throws NotFoundException, IOException {
+     if (!gstreamerInstalled) {
+       return;
+    }
     Attachment withGStreamer = AttachmentImpl.fromURI(withGStreamerURI);
     Attachment[] attachments = { withGStreamer };
 
@@ -223,6 +243,9 @@ public class GStreamerWorkflowOperationHandlerTest {
 
   @Test
   public void complicatedGStreamerLineInProperties() throws NotFoundException, IOException, WorkflowOperationException {
+    if (!gstreamerInstalled) {
+       return;
+    }
     Attachment complicatedGStreamerFile = AttachmentImpl.fromURI(complicatedFileURI);
     Attachment[] attachments = { complicatedGStreamerFile };
     Track movieTrack = TrackImpl.fromURI(movieFileURI);
@@ -252,6 +275,9 @@ public class GStreamerWorkflowOperationHandlerTest {
   @Test
   public void substitutionOfTrackGStreamerLineInProperties() throws NotFoundException, IOException,
           WorkflowOperationException {
+    if (!gstreamerInstalled) {
+       return;
+    }
     HashMap<String, String> replacements;
     String input;
     String output;
