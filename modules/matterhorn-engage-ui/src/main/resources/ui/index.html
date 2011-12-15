@@ -42,7 +42,7 @@
                     
         }
         
-        if ($.getURLParameter('series') != "") {
+        if ($.getURLParameter('series') != "" && $.getURLParameter('series') != null) {
           restEndpoint += "sid=" + $.getURLParameter('series') + "&";
         }
         
