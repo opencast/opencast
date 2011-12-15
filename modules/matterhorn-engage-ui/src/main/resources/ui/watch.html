@@ -82,9 +82,13 @@
 
                 if (data.org.properties["engageui.link_download.enable"]){
                    download_enabled = data.org.properties["engageui.link_download.enable"];
-                   if(download_enabled === "false"){
-                       $("#oc_download-button").hide();
+                   if(download_enabled !== "true"){
+                       $("#oc_download-button").detach();
                   }
+                }
+                else
+                {
+                      $("#oc_download-button").detach();
                 }
              }
           });
@@ -495,8 +499,8 @@
           Leave embed dialog
         </a>
       </div>
-         
-      <div class="clear"></div>            
+
+      <div class="clear"></div>
       <label for="oc_embed-textarea">
         Choose your embed size. Copy the text and paste it in your html page.
       </label>

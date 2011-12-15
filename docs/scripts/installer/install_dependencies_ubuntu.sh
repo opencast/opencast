@@ -17,16 +17,16 @@ fi
 while [[ true ]]; do
     echo
     yesno -d no -? "These are the locations were the necessary software is downloaded"\
-                   "Do you wish to use a custom software mirror instead of the Ubuntu defaults?" modify
+		  "Do you wish to use a custom software mirror instead of the Ubuntu defaults?" modify
 
     if [[ "$modify" ]]; then
 	while [[ true ]]; do
 	    echo
 	    choose -t "Please choose which mirror you want to modify" -p "Selection (leave blank to continue installation)" -a\
-                       "Archive Mirror\t(current value: ${mirrors[0]:-$DEFAULT_MIRROR})"\
-                       "Security Mirror\t(current value: ${mirrors[1]:-$DEFAULT_SECURITY})"\
-                       "Partner Mirror\t(current value: ${mirrors[2]:-$DEFAULT_PARTNER})"\
-                       answer
+		      "Archive Mirror\t(current value: ${mirrors[0]:-$DEFAULT_MIRROR})"\
+		      "Security Mirror\t(current value: ${mirrors[1]:-$DEFAULT_SECURITY})"\
+		      "Partner Mirror\t(current value: ${mirrors[2]:-$DEFAULT_PARTNER})"\
+		      answer
 	    if [[ "$answer" ]]; then
 		read -p "Please enter the mirror URL: " mirrors[$answer]
 	    else
@@ -96,9 +96,9 @@ for (( i = 0; i < ${#bad[@]}; i++ )); do
 
     # Check if the packages are installed before asking the user
     for item in $(echo "${bad[$i]}" | cut -d ' ' -f 1-); do
-        if [[ -z "$(dpkg -l | grep "$item")" ]]; then
-            install="$install $item "
-        fi
+	if [[ -z "$(dpkg -l | grep "$item")" ]]; then
+	    install="$install $item "
+	fi
     done
 
     if [[ "$install" ]]; then
@@ -116,12 +116,12 @@ for (( i = 0; i < ${#bad[@]}; i++ )); do
 		fi
 	    done
 	else
-            yesno -d no -? "${reason[$i]}" -h "? for details" "Do you wish to install ${install}?" ok
+	    yesno -d no -? "${reason[$i]}" -h "? for details" "Do you wish to install ${install}?" ok
 	fi
 	
-        if [[ "$ok" ]]; then
-            pkgs[${#pkgs[@]}]="$install"
-        fi
+	if [[ "$ok" ]]; then
+	    pkgs[${#pkgs[@]}]="$install"
+	fi
     fi 
 done
 
@@ -152,27 +152,8 @@ for (( i=0; i < ${#noinst[@]}; i++ )); do
     echo "${noinst[$i]}" >> $PKG_BACKUP
 done
 
-# Find the version of java to use. 
-found_java=false
-for java_version in $JAVA_PATTERNS
-do
-    # The location we would expect to find java. 
-    java_location="$JAVA_PREFIX/`ls $JAVA_PREFIX | grep ^$java_version$`"
-    # Check to make sure that it found the $java_version and that it is a valid directory. 
-    if [[ "$java_location" != "$JAVA_PREFIX/" && -d $java_location ]]; then
-        echo Found java at $java_location
-        JAVA_PATTERN="$java_version"
-        found_java=true
-    fi
-done
-
-if ! $found_java ; then
-    echo "Haven't found a valid install of java ($JAVA_PATTERNS)in $JAVA_PREFIX so exiting."
-    exit 1
-fi
-
 # Set up java-6-sun as the default alternative
-echo -n "Setting up $JAVA_PATTERN as the default jvm... "
+echo -n "Setting up java-6-sun as the default jvm... "
 update-java-alternatives -s $JAVA_PATTERN 2> /dev/null
 echo "Done"
 
@@ -183,70 +164,3 @@ export JAVA_HOME=$JAVA_PREFIX/`ls $JAVA_PREFIX | grep ^$JAVA_PATTERN$`
 echo >> $LOG_FILE
 echo "# Installed packages" >> $LOG_FILE
 [[ -e $PKG_BACKUP ]] && echo "$(cat $PKG_BACKUP)" >> $LOG_FILE
-
-# Setup felix
-echo -n "Downloading Felix... "
-while [[ true ]]; do 
-    if [[ ! -s ${FELIX_FILENAME} ]]; then
-	wget -q ${FELIX_URL}
-    fi
-    # On success, uncompress the felix files in their location
-    if [[ $? -eq 0 ]]; then
-	echo -n "Uncompressing... "
-	dir_name=$(tar tzf ${FELIX_FILENAME} | grep -om1 '^[^/]*')
-	tar xzf ${FELIX_FILENAME}
-	if [[ $? -eq 0 ]]; then
-	    rm -rf $FELIX_HOME
-	    mv ${dir_name%/} -T $FELIX_HOME
-	    mv $FELIX_FILENAME $CA_DIR
-	    #mkdir -p ${FELIX_HOME}/load
-	    echo "Done"
-	    break
-	fi
-    fi
-    # Else, ask for the actions to take
-    echo
-    yesno -d yes "Error retrieving the Felix files from the web. Retry?" retry
-    if [[ "$retry" ]]; then
-    	echo -n "Retrying... "
-    else
-    	echo "You must download Felix manually and install it under $OC_DIR, in order for matterhorn to work"
-	break
-    fi
-done
-
-# Setup jv4linfo
-if [[ ! -e "$JV4LINFO_PATH/$JV4LINFO_LIB" ]]; then
-    mkdir -p $JV4LINFO_DIR
-    cd $JV4LINFO_DIR
-
-    echo -n "Installing jv4linfo... "
-    if [[ ! -e "$JV4LINFO_JAR" ]]; then
-	wget -q $JV4LINFO_URL/$JV4LINFO_JAR
-    fi
-    jar xf $JV4LINFO_JAR
-    cd jv4linfo/src
-    # The ant build script has a hardcoded path to the openjdk, this sed line will
-    # switch it to be whatever is defined in JAVA_HOME
-    sed -i '74i\\t<arg value="-fPIC"/>' build.xml
-    sed -i "s#\"/usr/lib/jvm/java-6-openjdk/include\"#\"$JAVA_HOME/include\"#g" build.xml
-    
-    ant -lib ${JAVA_HOME}/lib &> /dev/null
-    if [[ "$?" -ne 0 ]]; then
-	echo "Error building libjv4linfo.so"
-	exit 1
-    fi
-    cp ../lib/$JV4LINFO_LIB $JV4LINFO_PATH
-    
-    cd $WORKING_DIR
-    echo "Done"
-else
-    echo "libjv4linfo.so already installed"
-fi
-
-# Setup ntdp
-echo 
-ask -d "$DEFAULT_NTP_SERVER" "Which NTP server would you like to use?" server
-sed -i "s#^server .*#server $server#" $NTP_CONF
-echo "NTP server set to $server"
-echo "Consider editing the file $NTP_CONF for manually changing the default NTP server or adding more servers to the list"

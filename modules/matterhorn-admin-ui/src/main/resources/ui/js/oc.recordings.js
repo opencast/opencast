@@ -391,7 +391,7 @@ ocRecordings = new (function() {
           var start = elm['$'];
           var now = new Date().getTime() - UPCOMMING_EVENTS_GRACE_PERIOD;
           if (parseInt(start) < now) {
-            self.error = 'It seems the core system did not recieve proper status updates from the Capture Agent that should have conducted this recording.';
+            self.error = 'It seems the core system did not receive proper status updates from the Capture Agent that should have conducted this recording.';
             self.state = 'WARNING : Recording may have failed to start or ingest!';
             recordingActions.push('ignore');
           }
