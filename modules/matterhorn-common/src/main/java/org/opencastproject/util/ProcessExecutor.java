@@ -19,6 +19,7 @@ package org.opencastproject.util;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,6 +43,13 @@ public class ProcessExecutor<T extends Exception> {
     commandLineList.add(command);
     for (String s : options.split("\\s+"))
       commandLineList.add(s);
+    commandLine = commandLineList.toArray(new String[commandLineList.size()]);
+  }
+
+  protected ProcessExecutor(String command, String[] options) {
+    List<String> commandLineList = new ArrayList<String>();
+    commandLineList.add(command);
+    commandLineList.addAll(Arrays.asList(options));
     commandLine = commandLineList.toArray(new String[commandLineList.size()]);
   }
 
