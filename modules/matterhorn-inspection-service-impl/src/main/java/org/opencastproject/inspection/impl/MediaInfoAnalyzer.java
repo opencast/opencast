@@ -98,20 +98,18 @@ public class MediaInfoAnalyzer extends CmdlineMediaAnalyzerSupport {
     videoStreamSection.put("FrameRate_Mode", new Setter("frameRateMode", "frameRateMode"));
     videoStreamSection.put("ScanType", new Setter("scanType", "scanType"));
     videoStreamSection.put("ScanOrder", new Setter("scanOrder", "scanOrder"));
-            
+
     Map<String, Setter> audioStreamSection = new HashMap<String, Setter>();
     audioStreamSection.putAll(CommonStreamProperties);
     audioStreamSection.put("Channel(s)", new Setter("channels", "int"));
     audioStreamSection.put("ChannelPositions", new Setter("channelPositions", "string"));
     audioStreamSection.put("SamplingRate", new Setter("samplingRate", "int"));
     audioStreamSection.put("SamplingCount", new Setter("samplingCount", "long"));
-    
+
     Parser.put(StreamSection.general, generalStreamSection);
     Parser.put(StreamSection.video, videoStreamSection);
     Parser.put(StreamSection.audio, audioStreamSection);
   }
-
-  // --------------------------------------------------------------------------------------------
 
   public MediaInfoAnalyzer() {
     // instantiated using MediaAnalyzerFactory via newInstance()
@@ -133,14 +131,9 @@ public class MediaInfoAnalyzer extends CmdlineMediaAnalyzerSupport {
     }
   }
 
-  /*
-   * NOT used as far as I can see -AZ public MediaInfoAnalyzer(String binary) { super(binary); }
-   */
-
-  /* Analysis */
-
-  protected String getAnalysisOptions(File media) {
-    return "--Language=raw --Full " + media.getAbsolutePath();
+  protected String[] getAnalysisOptions(File media) {
+    String mediaPath = media.getAbsolutePath().replaceAll(" ", "\\ ");
+    return new String[] { "--Language=raw", "--Full", mediaPath};
   }
 
   protected void onAnalysis(String line) {
@@ -150,19 +143,19 @@ public class MediaInfoAnalyzer extends CmdlineMediaAnalyzerSupport {
         streamSection = section;
         logger.debug("New section " + streamSection);
         switch (streamSection) {
-        case general:
-          currentMetadata = metadata;
-          break;
-        case video:
-          currentMetadata = new VideoStreamMetadata();
-          metadata.getVideoStreamMetadata().add((VideoStreamMetadata) currentMetadata);
-          break;
-        case audio:
-          currentMetadata = new AudioStreamMetadata();
-          metadata.getAudioStreamMetadata().add((AudioStreamMetadata) currentMetadata);
-          break;
-        default:
-          logger.warn("Bug: Unknown stream section {}", streamSection);
+          case general:
+            currentMetadata = metadata;
+            break;
+          case video:
+            currentMetadata = new VideoStreamMetadata();
+            metadata.getVideoStreamMetadata().add((VideoStreamMetadata) currentMetadata);
+            break;
+          case audio:
+            currentMetadata = new AudioStreamMetadata();
+            metadata.getAudioStreamMetadata().add((AudioStreamMetadata) currentMetadata);
+            break;
+          default:
+            logger.warn("Bug: Unknown stream section {}", streamSection);
         }
         return; // LEAVE
       }
@@ -202,8 +195,6 @@ public class MediaInfoAnalyzer extends CmdlineMediaAnalyzerSupport {
         i.remove();
     }
   }
-
-  // --------------------------------------------------------------------------------------------
 
   static String convertString(String value) {
     return value;
@@ -257,8 +248,6 @@ public class MediaInfoAnalyzer extends CmdlineMediaAnalyzerSupport {
     return new SimpleDateFormat("z yyyy-MM-dd hh:mm:ss").parse(value);
   }
 
-  // --------------------------------------------------------------------------------------------
-
   private static final class Setter {
 
     private static final String CONVERTER_METHOD_PREFIX = "convert";
@@ -279,9 +268,9 @@ public class MediaInfoAnalyzer extends CmdlineMediaAnalyzerSupport {
       } catch (NoSuchMethodException e) {
         // throw new RuntimeException(e);
       } catch (InvocationTargetException e) {
-        //throw new RuntimeException(e);
+        // throw new RuntimeException(e);
       } catch (IllegalAccessException e) {
-        //throw new RuntimeException(e);
+        // throw new RuntimeException(e);
       }
     }
 
