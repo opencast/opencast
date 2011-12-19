@@ -42,6 +42,10 @@
                     
         }
         
+        if ($.getURLParameter('series') != "" && $.getURLParameter('series') != null) {
+          restEndpoint += "sid=" + $.getURLParameter('series') + "&";
+        }
+        
         //check whether a user is logged in and show logout link 
         $.ajax({
           url: '/info/me.json',
