@@ -54,7 +54,7 @@ public class IoSupportTest {
    */
   @BeforeClass
   public static void setUpBeforeClass() throws IOException, URISyntaxException {
-    baseDir = new File(IoSupportTest.class.getResource("/.").toURI()).getCanonicalFile();
+    baseDir = new File(IoSupportTest.class.getResource("/").toURI()).getCanonicalFile();
     spacesDir = new File(baseDir, "spaces in name").getCanonicalFile();
     spacesFile = new File(spacesDir, "testfile.txt").getCanonicalFile();
     spacesFileURL = spacesFile.toURI().toURL();
