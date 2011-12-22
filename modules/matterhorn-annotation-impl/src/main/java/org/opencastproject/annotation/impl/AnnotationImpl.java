@@ -17,6 +17,8 @@ package org.opencastproject.annotation.impl;
 
 import org.opencastproject.annotation.api.Annotation;
 
+import org.eclipse.persistence.annotations.Index;
+
 import java.util.Date;
 
 import javax.persistence.Basic;
@@ -41,7 +43,7 @@ import javax.xml.bind.annotation.XmlType;
  * A JAXB-annotated implementation of {@link Annotation}
  */
 @Entity(name = "Annotation")
-@Table(name = "ANNOTATION")
+@Table(name = "annotation")
 @NamedQueries({
         @NamedQuery(name = "findAnnotations", query = "SELECT a FROM Annotation a WHERE a.userId = :userId"),
 	@NamedQuery(name = "findAnnotationsByMediapackageId", query = "SELECT a FROM Annotation a WHERE a.mediapackageId = :mediapackageId AND a.userId = :userId"),
@@ -63,46 +65,50 @@ import javax.xml.bind.annotation.XmlType;
 public class AnnotationImpl implements Annotation {
 
   @Id
-  @Column(name = "ID")
+  @Column(name = "id")
   @GeneratedValue(strategy = GenerationType.AUTO)
   @XmlElement(name = "annotationId")
   private Long annotationId;
 
-  @Column(name = "MEDIA_PACKAGE_ID", length = 36)
+  @Index
+  @Column(name = "mediapackage_id", length = 36)
   @XmlElement(name = "mediapackageId")
   private String mediapackageId;
 
-  @Column(name = "USER_ID")
+  @Lob
+  @Column(name = "user_id", length = 65535)
   @XmlElement(name = "userId")
   private String userId;
 
-  @Column(name = "SESSION_ID")
+  @Lob
+  @Column(name = "session_id", length = 65535)
   @XmlElement(name = "sessionId")
   private String sessionId;
 
-  @Column(name = "INPOINT")
+  @Column(name = "inpoint")
   @XmlElement(name = "inpoint")
   private int inpoint;
 
-  @Column(name = "OUTPOINT")
+  @Column(name = "outpoint")
   @XmlElement(name = "outpoint")
   private int outpoint;
 
-  @Column(name = "LENGTH")
+  @Column(name = "length")
   @XmlElement(name = "length")
   private int length;
 
-  @Column(name = "ANNOTATION_TYPE")
+  @Lob
+  @Column(name = "annotation_type", length = 65535)
   @XmlElement(name = "type")
   private String type;
 
   @Lob
-  @Column(name = "ANNOTATION_VAL", length = 65535)
+  @Column(name = "annotation_value", length = 65535)
   @XmlElement(name = "value")
   private String value;
 
   @Basic(optional = false)
-  @Column(name = "CREATED")
+  @Column(name = "created")
   @Temporal(TemporalType.TIMESTAMP)
   @XmlElement(name = "created")
   private Date created = new Date();

@@ -94,7 +94,7 @@ public class IngestRestService {
 
   /** Key for the default workflow definition in config.properties */
   private static final String DEFAULT_WORKFLOW_DEFINITION = "org.opencastproject.workflow.default.definition";
-  
+
   /** The http request parameter used to provide the workflow instance id */
   private static final String WORKFLOW_INSTANCE_ID_PARAM = "workflowInstanceId";
 
@@ -113,7 +113,7 @@ public class IngestRestService {
   protected EntityManagerFactory emf = null;
   // For the progress bar -1 bug workaround, keeping UploadJobs in memory rather than saving them using JPA
   private HashMap<String, UploadJob> jobs;
-  
+
   public IngestRestService() {
     factory = MediaPackageBuilderFactory.newInstance();
     jobs = new HashMap<String, UploadJob>();
@@ -135,8 +135,7 @@ public class IngestRestService {
     this.workspace = workspace;
   }
 
-  @SuppressWarnings("unchecked")
-  public void setPersistenceProperties(Map persistenceProperties) {
+  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
     this.persistenceProperties = persistenceProperties;
   }
 
@@ -151,7 +150,8 @@ public class IngestRestService {
       logger.error("Unable to initialize JPA EntityManager: " + e.getMessage());
     }
     if (cc != null) {
-      defaultWorkflowDefinitionId = StringUtils.trimToNull((String) cc.getBundleContext().getProperty(DEFAULT_WORKFLOW_DEFINITION));
+      defaultWorkflowDefinitionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(
+              DEFAULT_WORKFLOW_DEFINITION));
       if (defaultWorkflowDefinitionId == null)
         throw new IllegalStateException("Default workflow definition is null: " + DEFAULT_WORKFLOW_DEFINITION);
     }
@@ -338,17 +338,17 @@ public class IngestRestService {
           }
         }
         switch (type) {
-          case Attachment:
-            mp = ingestService.addAttachment(in, fileName, flavor, mp);
-            break;
-          case Catalog:
-            mp = ingestService.addCatalog(in, fileName, flavor, mp);
-            break;
-          case Track:
-            mp = ingestService.addTrack(in, fileName, flavor, mp);
-            break;
-          default:
-            throw new IllegalStateException("Type must be one of track, catalog, or attachment");
+        case Attachment:
+          mp = ingestService.addAttachment(in, fileName, flavor, mp);
+          break;
+        case Catalog:
+          mp = ingestService.addCatalog(in, fileName, flavor, mp);
+          break;
+        case Track:
+          mp = ingestService.addTrack(in, fileName, flavor, mp);
+          break;
+        default:
+          throw new IllegalStateException("Type must be one of track, catalog, or attachment");
         }
         // ingestService.ingest(mp);
         return Response.ok(MediaPackageParser.getAsXml(mp)).build();
@@ -556,14 +556,40 @@ public class IngestRestService {
   @POST
   @Produces(MediaType.TEXT_HTML)
   @Path("ingest")
-  @RestQuery(name = "ingest", description = "Ingest the completed media package into the system, retrieving all URL-referenced files", restParameters = { @RestParameter(description = "The ID of the given media package", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, reponses = {
+  @RestQuery(name = "ingest", description = "Ingest the completed media package into the system, retrieving all URL-referenced files", restParameters = {
+          @RestParameter(description = "The media package", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT),
+          @RestParameter(description = "Workflow definition id", isRequired = false, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING),
+          @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) }, reponses = {
           @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
-  public Response ingest(@FormParam("mediaPackage") String mpx) {
+  public Response ingest(@FormParam("mediaPackage") String mpx,
+          @FormParam(WORKFLOW_DEFINITION_ID_PARAM) String workflowDefinition,
+          @FormParam(WORKFLOW_INSTANCE_ID_PARAM) String workflowInstance) {
     logger.debug("ingest(MediaPackage): {}", mpx);
     try {
       MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
-      WorkflowInstance workflow = ingestService.ingest(mp);
+      WorkflowInstance workflow = null;
+
+      // a workflow defintion was specified
+      if (StringUtils.isNotBlank(workflowDefinition)) {
+        workflow = ingestService.ingest(mp, workflowDefinition, null, null);
+      }
+
+      // a workflow instance has been specified
+      else if (StringUtils.isNotBlank(workflowInstance)) {
+        try {
+          Long workflowInstanceId = Long.parseLong(workflowInstance);
+          workflow = ingestService.ingest(mp, null, null, workflowInstanceId);
+        } catch (NumberFormatException e) {
+          logger.warn("{} '{}' is not numeric", WORKFLOW_INSTANCE_ID_PARAM, workflowInstance);
+          return Response.status(Status.BAD_REQUEST).build();
+        }
+      }
+
+      // nothing was specified, so we start a new workflow
+      else {
+        workflow = ingestService.ingest(mp);
+      }
       return Response.ok(WorkflowParser.toXml(workflow)).build();
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
@@ -597,9 +623,9 @@ public class IngestRestService {
       for (Iterator<String> i = params.keySet().iterator(); i.hasNext();) {
         String key = i.next();
         if ("MEDIAPACKAGE".equalsIgnoreCase(key)) {
-          mp = factory.newMediaPackageBuilder().loadFromXml(((String[]) params.get(key))[0]);
+          mp = factory.newMediaPackageBuilder().loadFromXml(params.get(key)[0]);
         } else {
-          wfConfig.put(key, ((String[]) params.get(key))[0]); // TODO how do we handle multiple values eg. resulting
+          wfConfig.put(key, params.get(key)[0]); // TODO how do we handle multiple values eg. resulting
           // from checkboxes
         }
       }
@@ -635,7 +661,7 @@ public class IngestRestService {
   @GET
   @Path("filechooser-local.html")
   @Produces(MediaType.TEXT_HTML)
-  public Response createUploadJobHtml(@QueryParam("elementType")String elementType) {
+  public Response createUploadJobHtml(@QueryParam("elementType") String elementType) {
     InputStream is = null;
     elementType = (elementType == null) ? "track" : elementType;
     try {
@@ -800,10 +826,10 @@ public class IngestRestService {
   @RestQuery(name = "addDCCatalog", description = "Add a dublincore episode catalog to a given media package using an url", restParameters = {
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT),
           @RestParameter(description = "DublinCore catalog as XML", isRequired = true, name = "dublinCore", type = RestParameter.Type.STRING), // TODO
-                                                                                                                                                                  // should
-                                                                                                                                                                  // this
-                                                                                                                                                                  // be
-                                                                                                                                                                  // TEXT??
+                                                                                                                                               // should
+                                                                                                                                               // this
+                                                                                                                                               // be
+                                                                                                                                               // TEXT??
           @RestParameter(defaultValue = "dublincore/episode", description = "DublinCore Flavor", isRequired = false, name = "flavor", type = RestParameter.Type.STRING) }, reponses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")

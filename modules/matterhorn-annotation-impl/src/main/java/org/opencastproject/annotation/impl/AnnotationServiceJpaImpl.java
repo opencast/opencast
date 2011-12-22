@@ -46,8 +46,7 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
   private static final Logger logger = LoggerFactory.getLogger(AnnotationRestService.class);
 
   /** The persistence unit properties */
-  @SuppressWarnings("unchecked")
-  protected Map persistenceProperties;
+  protected Map<String, Object> persistenceProperties;
 
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
@@ -72,8 +71,7 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
    * @param persistenceProperties
    *          the persistenceProperties to set
    */
-  @SuppressWarnings("unchecked")
-  public void setPersistenceProperties(Map persistenceProperties) {
+  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
     this.persistenceProperties = persistenceProperties;
   }
 

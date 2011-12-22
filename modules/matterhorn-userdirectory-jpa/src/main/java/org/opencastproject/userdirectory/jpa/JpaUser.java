@@ -24,6 +24,7 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -34,7 +35,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "MH_USER")
+@Table(name = "matterhorn_user")
 @NamedQueries({
         @NamedQuery(name = "user", query = "select u from JpaUser u where u.username=:u and u.organization=:o"),
         @NamedQuery(name = "users", query = "select u from JpaUser u where u.organization=:o"),
@@ -45,20 +46,22 @@ public class JpaUser {
   private static final long serialVersionUID = -6693877536928844019L;
 
   @Id
-  @Column
+  @Column(name = "username")
   protected String username;
 
-  @Column
+  @Lob
+  @Column(name = "password", length = 65535)
   protected String password;
 
   @Id
-  @Column
+  @Column(name = "organization")
   protected String organization;
 
   @ElementCollection
-  @CollectionTable(name = "MH_ROLE", joinColumns = { @JoinColumn(name = "USERNAME", referencedColumnName = "USERNAME"),
-          @JoinColumn(name = "ORGANIZATION", referencedColumnName = "ORGANIZATION") })
-  @Column(name = "ROLE")
+  @CollectionTable(name = "matterhorn_role", joinColumns = { @JoinColumn(name = "username", referencedColumnName = "username"),
+          @JoinColumn(name = "organization", referencedColumnName = "organization") })
+  @Lob
+  @Column(name = "role", length = 65535)
   protected Set<String> roles;
 
   /**
