@@ -563,14 +563,15 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     // Get all definitions and then query for the numbers and the current operation per definition
     try {
       String orgId = securityService.getOrganization().getId();
-      String queryString = new StringBuilder().append(ORG_KEY).append(":").append(orgId).toString();
-      SolrQuery solrQuery = new SolrQuery(queryString);
+      StringBuilder queryString = new StringBuilder().append(ORG_KEY).append(":").append(orgId);
+      appendSolrAuthFragment(queryString);
+      SolrQuery solrQuery = new SolrQuery(queryString.toString());
       solrQuery.addFacetField(WORKFLOW_DEFINITION_KEY);
       solrQuery.addFacetField(OPERATION_KEY);
       solrQuery.setFacetMinCount(0);
       solrQuery.setFacet(true);
       QueryResponse response = solrServer.query(solrQuery);
-
+      
       FacetField templateFacet = response.getFacetField(WORKFLOW_DEFINITION_KEY);
       FacetField operationFacet = response.getFacetField(OPERATION_KEY);
 
@@ -598,8 +599,9 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
               OperationReport operationReport = new OperationReport();
               operationReport.setId(operation.getName());
 
-              String baseSolrQueryString = new StringBuilder().append(ORG_KEY).append(":").append(orgId).toString();
-              solrQuery = new SolrQuery(baseSolrQueryString);
+              StringBuilder baseSolrQuery = new StringBuilder().append(ORG_KEY).append(":").append(orgId);
+              appendSolrAuthFragment(baseSolrQuery);
+              solrQuery = new SolrQuery(baseSolrQuery.toString());
               solrQuery.addFacetField(STATE_KEY);
               solrQuery.addFacetQuery(STATE_KEY + ":" + WorkflowState.FAILED);
               solrQuery.addFacetQuery(STATE_KEY + ":" + WorkflowState.FAILING);
