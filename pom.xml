@@ -458,12 +458,12 @@
     <defaultGoal>install</defaultGoal>
     <testResources>
       <!-- Add a log4j configuration file to the test resources -->
-      <testResource>
+<!--      <testResource>
         <directory>${matterhorn.basedir}/docs/log4j</directory>
         <includes>
           <include>log4j.properties</include>
         </includes>
-      </testResource>
+      </testResource>-->
       <!-- Re-add the test resources as defined by the project -->
       <testResource>
         <directory>${project.basedir}/src/test/resources</directory>
@@ -870,31 +870,31 @@
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.core</artifactId>
-        <version>2.0.2</version>
+        <version>2.2.0</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.jpa</artifactId>
-        <version>2.0.2</version>
+        <version>2.2.0</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.asm</artifactId>
-        <version>2.0.2</version>
+        <version>2.2.0</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.antlr</artifactId>
-        <version>2.0.2</version>
+        <version>2.2.0</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>javax.persistence</artifactId>
-        <version>2.0.2</version>
+        <version>2.0.3</version>
       </dependency>
 
       <!-- CXF -->
@@ -1666,6 +1666,11 @@
       <releases>
         <enabled>false</enabled>
       </releases>
+    </repository>
+    <repository>
+      <id>eclipselink</id>
+      <name>Eclipselink Repo</name>
+      <url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
     </repository>
     <!-- these are here as a backup in case the matterhorn nexus repository is down -->
     <!-- <repository> <id>com.springsource.repository.bundles.release</id> <name>SpringSource Enterprise Bundle Repository 

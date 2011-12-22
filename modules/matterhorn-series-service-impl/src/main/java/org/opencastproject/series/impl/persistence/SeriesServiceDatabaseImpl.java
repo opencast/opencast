@@ -215,7 +215,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   @Override
   public DublinCoreCatalog[] getAllSeries() throws SeriesServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
-    Query query = em.createQuery("SELECT e FROM SeriesEntity e");
+    Query query = em.createNamedQuery("Series.findAll");
     List<SeriesEntity> seriesEntities = null;
     try {
       seriesEntities = (List<SeriesEntity>) query.getResultList();
@@ -434,7 +434,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   
   public int countSeries() throws SeriesServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
-    Query query = em.createQuery("SELECT COUNT(e) FROM SeriesEntity e");
+    Query query = em.createNamedQuery("Series.getCount");
     try {
       Long total = (Long) query.getSingleResult();
       return total.intValue();

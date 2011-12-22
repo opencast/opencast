@@ -5,7 +5,11 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
     http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
-    <persistence-unit name="org.opencastproject.series.impl.persistence" transaction-type="RESOURCE_LOCAL">
-       <class>org.opencastproject.series.impl.persistence.SeriesEntity</class>
-    </persistence-unit>
+  <persistence-unit name="org.opencastproject.series.impl.persistence" transaction-type="RESOURCE_LOCAL">
+    <class>org.opencastproject.series.impl.persistence.SeriesEntity</class>
+    <properties>
+      <property name="eclipselink.create-ddl-jdbc-file-name" value="create-matterhorn-series-service-impl.jdbc"/>
+      <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-matterhorn-series-service-impl.jdbc"/>
+    </properties>
+  </persistence-unit>
 </persistence>

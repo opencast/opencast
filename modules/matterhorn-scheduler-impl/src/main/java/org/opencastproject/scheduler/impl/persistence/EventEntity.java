@@ -19,6 +19,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -27,22 +29,26 @@ import javax.persistence.Table;
  * 
  */
 @Entity(name = "EventEntity")
-@Table(name = "SCHED_EVENT")
+@NamedQueries({
+  // Job queries
+  @NamedQuery(name = "Event.findAll", query = "SELECT e FROM EventEntity e ")
+})
+@Table(name = "scheduled_event")
 public class EventEntity {
 
   /** Event ID, primary key */
   @Id
-  @Column(name = "EVENT_ID", length = 36)
+  @Column(name = "event_id")
   protected Long eventId;
 
   /** Serialized Dublin core */
   @Lob
-  @Column(name = "DUBLIN_CORE", length = 65535)
+  @Column(name = "dublin_core", length = 65535)
   protected String dublinCoreXML;
 
   /** Serialized Capture agent metadata */
   @Lob
-  @Column(name = "CA_METADATA", length = 65535)
+  @Column(name = "capture_agent_metadata", length = 65535)
   protected String captureAgentMetadata;
 
   /**

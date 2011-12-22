@@ -128,8 +128,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectoryService = null;
 
-  @SuppressWarnings("unchecked")
-  protected Map persistenceProperties;
+  protected Map<String, Object> persistenceProperties;
 
   /**
    * A static list of statuses that influence how load balancing is calculated
@@ -154,8 +153,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
    * @param persistenceProperties
    *          the persistenceProperties to set
    */
-  @SuppressWarnings("unchecked")
-  public void setPersistenceProperties(Map persistenceProperties) {
+  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
     this.persistenceProperties = persistenceProperties;
   }
 

@@ -76,8 +76,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   protected PersistenceProvider persistenceProvider;
 
   /** The persistence properties */
-  @SuppressWarnings("unchecked")
-  protected Map persistenceProperties;
+  protected Map<String, Object> persistenceProperties;
 
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
@@ -124,8 +123,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    * @param persistenceProperties
    *          the persistenceProperties to set
    */
-  @SuppressWarnings("unchecked")
-  public void setPersistenceProperties(Map persistenceProperties) {
+  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
     this.persistenceProperties = persistenceProperties;
   }
 
@@ -134,7 +132,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     recordings = new HashMap<String, Recording>();
   }
 
-  @SuppressWarnings("unchecked")
   public void activate(ComponentContext cc) {
     emf = persistenceProvider.createEntityManagerFactory(
             "org.opencastproject.capture.admin.impl.CaptureAgentStateServiceImpl", persistenceProperties);
@@ -193,7 +190,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    */
   protected AgentImpl getAgent(String name, String organization, EntityManager em) {
     try {
-      Query q = em.createQuery("select a from AgentImpl a where a.name = :id and a.organization = :org");
+      Query q = em.createNamedQuery("Agent.get");
       q.setParameter("id", name);
       q.setParameter("org", organization);
       return (AgentImpl) q.getSingleResult();
@@ -295,7 +292,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     String orgAdmin = org.getAdminRole();
     String[] roles = user.getRoles();
     try {
-      Query q = em.createQuery("SELECT a FROM AgentImpl a where a.organization = :org");
+      Query q = em.createNamedQuery("Agent.byOrganization");
       q.setParameter("org", securityService.getOrganization().getId());
 
       // Filter the results in memory if this user is not an administrator

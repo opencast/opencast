@@ -135,8 +135,7 @@ public class IngestRestService {
     this.workspace = workspace;
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public void setPersistenceProperties(Map persistenceProperties) {
+  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
     this.persistenceProperties = persistenceProperties;
   }
 

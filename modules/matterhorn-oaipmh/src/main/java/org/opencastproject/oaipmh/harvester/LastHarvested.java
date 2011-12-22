@@ -24,6 +24,7 @@ import org.opencastproject.util.data.Option;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
@@ -41,7 +42,7 @@ import static org.opencastproject.util.data.Option.some;
  * Persists the last harvested time of a url.
  */
 @Entity
-@Table(name = "LAST_HARVESTED")
+@Table(name = "last_harvested")
 @NamedQueries({
     @NamedQuery(name = "findLastHarvested",
         query = "SELECT a.timestamp FROM LastHarvested a WHERE a.url = :url"),
@@ -51,8 +52,10 @@ import static org.opencastproject.util.data.Option.some;
 public class LastHarvested {
 
   @Id
+  @Column(name = "url")
   private String url;
 
+  @Column(name = "timestamp")
   @Temporal(TemporalType.TIMESTAMP)
   private Date timestamp;
 

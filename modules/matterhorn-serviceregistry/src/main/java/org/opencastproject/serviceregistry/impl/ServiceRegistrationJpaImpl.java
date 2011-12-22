@@ -29,6 +29,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -51,7 +52,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "service", namespace = "http://serviceregistry.opencastproject.org")
 @Entity(name = "ServiceRegistration")
 @Access(AccessType.PROPERTY)
-@Table(name = "SERVICE_REGISTRATION", uniqueConstraints = @UniqueConstraint(columnNames = { "HOST_REG", "SERVICE_TYPE" }))
+@Table(name = "service_registration", uniqueConstraints = @UniqueConstraint(columnNames = { "host_registration", "service_type" }))
 @NamedQueries({
         @NamedQuery(name = "ServiceRegistration.statistics", query = "SELECT sr, job.status, "
                 + "count(job.status) as numJobs, " + "avg(job.queueTime) as meanQueue, "
@@ -128,7 +129,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
    * @return the primary key
    */
   @Id
-  @Column
+  @Column(name = "id")
   @GeneratedValue
   public Long getId() {
     return id;
@@ -144,28 +145,30 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
     this.id = id;
   }
 
-  @Column(name = "SERVICE_TYPE", nullable = false)
+  /** The length was chosen this short because MySQL complains when trying to create an index larger than this */
+  @Column(name = "service_type", nullable = false, length = 255)
   @XmlElement(name = "type")
   @Override
   public String getServiceType() {
     return super.getServiceType();
   }
 
-  @Column(name = "PATH", nullable = false)
+  @Lob
+  @Column(name = "path", nullable = false, length = 65535)
   @XmlElement(name = "path")
   @Override
   public String getPath() {
     return super.getPath();
   }
 
-  @Column(name = "ONLINE", nullable = false)
+  @Column(name = "online", nullable = false)
   @XmlElement(name = "online")
   @Override
   public boolean isOnline() {
     return super.isOnline();
   }
 
-  @Column(name = "JOB_PRODUCER", nullable = false)
+  @Column(name = "job_producer", nullable = false)
   @XmlElement(name = "jobproducer")
   @Override
   public boolean isJobProducer() {
@@ -207,7 +210,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
    * @return the host registration
    */
   @ManyToOne
-  @JoinColumn(name = "host_reg")
+  @JoinColumn(name = "host_registration")
   public HostRegistration getHostRegistration() {
     return hostRegistration;
   }
