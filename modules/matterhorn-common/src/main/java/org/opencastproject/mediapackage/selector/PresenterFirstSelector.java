@@ -29,8 +29,8 @@ import org.opencastproject.mediapackage.Track;
  * <li></li>
  * <ul>
  * 
- * This basically means that if there is a presentation track, this is the one that will be returnd. If not, then the
- * selctor will try to find a presenter track and so on.
+ * This basically means that if there is a presenter track, this is the one that will be returnd. If not, then the
+ * selctor will try to find a presentation track and so on.
  */
 public class PresenterFirstSelector extends FlavorPrioritySelector<Track> {
 
