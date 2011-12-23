@@ -15,6 +15,8 @@
  */
 package org.opencastproject.kernel.security;
 
+import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
+
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -89,11 +92,22 @@ public class OrganizationFilter implements Filter {
     URL url = new URL(httpRequest.getRequestURL().toString());
     Organization org = null;
     try {
-      org = organizationDirectory.getOrganization(url);
-      securityService.setOrganization(org);
-      chain.doFilter(request, response);
-    } catch (NotFoundException e) {
-      logger.warn("No organization is mapped to handle {}", url);
+      try {
+        org = organizationDirectory.getOrganization(url);
+      } catch (NotFoundException e) {
+        logger.trace("No organization mapped to {}", url);
+        List<Organization> orgs = organizationDirectory.getOrganizations();
+        if (orgs.size() == 1 && DEFAULT_ORGANIZATION_ID.equals(orgs.get(0).getId())) {
+          logger.trace("Defaulting organization to {}", DEFAULT_ORGANIZATION_ID);
+          org = orgs.get(0);
+        } else {
+          logger.warn("No organization is mapped to handle {}", url);
+        }
+      }
+      if (org != null) {
+        securityService.setOrganization(org);
+        chain.doFilter(request, response);
+      }
     } finally {
       securityService.setOrganization(null);
       securityService.setUser(null);
