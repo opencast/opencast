@@ -144,9 +144,14 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    */
   @Override
   public Organization getOrganization(URL url) throws NotFoundException {
+    String requestUrl = StringUtils.strip(url.getHost(), "/");
+    int requestPort = url.getPort();
     for (Organization o : organizations.values()) {
-      if (o.getServerName().equals(url.getHost()) && o.getServerPort() == url.getPort())
-        return o;
+      if (!o.getServerName().equals(requestUrl))
+        continue;
+      if (requestPort != -1 && !(requestPort == o.getServerPort()))
+        continue;
+      return o;
     }
     throw new NotFoundException(url.toExternalForm());
   }

@@ -15,6 +15,8 @@
  */
 package org.opencastproject.security.api;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -132,7 +134,7 @@ public class Organization {
     this();
     this.id = id;
     this.name = name;
-    this.serverName = serverName;
+    this.serverName = StringUtils.strip(serverName, "/");
     this.serverPort = serverPort;
     this.adminRole = adminRole;
     this.anonymousRole = anonymousRole;
