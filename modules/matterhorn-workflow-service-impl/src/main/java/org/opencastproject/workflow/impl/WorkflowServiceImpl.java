@@ -514,25 +514,6 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
             parentWorkflowId, currentUser, properties);
     workflowInstance = updateConfiguration(workflowInstance, properties);
 
-    // Use the workflow instance's mediapackage, which has been updated. The source mediaPackage has not been modified
-    MediaPackage updatedMediaPackage = workflowInstance.getMediaPackage();
-    populateMediaPackageMetadata(updatedMediaPackage);
-    String seriesId = updatedMediaPackage.getSeries();
-    if (seriesId != null) {
-      // If the mediapackage contains a series, find the series ACLs and add the security information to the
-      // mediapackage
-      try {
-        AccessControlList acl = seriesService.getSeriesAccessControl(seriesId);
-        authorizationService.setAccessControl(updatedMediaPackage, acl);
-      } catch (SeriesException e) {
-        throw new WorkflowDatabaseException(e);
-      } catch (MediaPackageException e) {
-        throw new WorkflowDatabaseException(e);
-      } catch (NotFoundException e) {
-        logger.warn("Series {} not found, unable to set ACLs", seriesId);
-      }
-    }
-
     // Create and configure the workflow instance
     try {
       // Create a new job for this workflow instance
@@ -558,6 +539,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       workflowInstance.setId(job.getId());
 
       // Add the workflow to the search index and have the job enqueued for dispatch.
+      // Update also sets ACL and mediapackage metadata
       update(workflowInstance);
 
       return workflowInstance;
@@ -1033,7 +1015,23 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     }
 
     // Before we persist this, extract the metadata
-    populateMediaPackageMetadata(workflowInstance.getMediaPackage());
+    MediaPackage updatedMediaPackage = workflowInstance.getMediaPackage();
+    populateMediaPackageMetadata(updatedMediaPackage);
+    String seriesId = updatedMediaPackage.getSeries();
+    if (seriesId != null) {
+      // If the mediapackage contains a series, find the series ACLs and add the security information to the
+      // mediapackage
+      try {
+        AccessControlList acl = seriesService.getSeriesAccessControl(seriesId);
+        authorizationService.setAccessControl(updatedMediaPackage, acl);
+      } catch (SeriesException e) {
+        throw new WorkflowDatabaseException(e);
+      } catch (MediaPackageException e) {
+        throw new WorkflowDatabaseException(e);
+      } catch (NotFoundException e) {
+        logger.warn("Series {} not found, unable to set ACLs", seriesId);
+      }
+    }
 
     // Synchronize the job status with the workflow
     WorkflowState workflowState = workflowInstance.getState();
