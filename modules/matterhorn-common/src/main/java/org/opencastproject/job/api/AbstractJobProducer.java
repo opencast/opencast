@@ -182,13 +182,17 @@ public abstract class AbstractJobProducer implements JobProducer {
         User user = getUserDirectoryService().loadUser(job.getCreator());
         securityService.setUser(user);
         String payload = process(job);
+        if (job.getStatus() == Status.FAILED) {
+          logger.warn("Error handling operation '{}' of job {}", job.getOperation(), job.getId());
+          return null;
+        }
         job.setPayload(payload);
         job.setStatus(Status.FINISHED);
       } catch (Exception e) {
         job.setStatus(Status.FAILED);
         if (e instanceof ServiceRegistryException)
           throw (ServiceRegistryException) e;
-        logger.warn("Error handling operation '" + job.getOperation() + "': " + e.getMessage(), e);
+        logger.warn("Error handling operation '{}': {}", job.getOperation(), e.getMessage());
       } finally {
         try {
           getServiceRegistry().updateJob(job);
