@@ -153,7 +153,7 @@ public class StreamHelper extends Thread {
           writer.flush();
       }
     } catch (IOException ioe) {
-      ioe.printStackTrace();
+      logger.error("Error reading process stream: {}", ioe.getMessage(), ioe);
     } finally {
       IoSupport.closeQuietly(reader);
       IoSupport.closeQuietly(isreader);
