@@ -301,7 +301,7 @@ public final class FileSupport {
       // Find does not return with an error if -exec fails
       if (p.exitValue() != 0 || error.length() > 0) {
         logger.debug("Unable to link files from " + sourceDirectory + " to " + targetDirectory + ": " + error);
-        copyContent(sourceDirectory, targetDirectory);
+        copyContent(sourceDirectory, targetDirectory, overwrite);
       }
     } catch (InterruptedException e) {
       throw new IOException("Interrupted while creating links from " + sourceDirectory + " to " + targetDirectory
@@ -403,7 +403,7 @@ public final class FileSupport {
         // Find does not return with an error if -exec fails
         if (p.exitValue() != 0 || error.length() > 0) {
           logger.debug("Unable to link files from " + sourceLocation + " to " + dest + ": " + error);
-          copy(sourceLocation, dest);
+          copy(sourceLocation, dest, overwrite);
         }
       } catch (InterruptedException e) {
         throw new IOException("Interrupted while creating links from " + sourceLocation + " to " + dest + ": "
@@ -437,7 +437,7 @@ public final class FileSupport {
         // Find does not return with an error if -exec fails
         if (p.exitValue() != 0 || error.length() > 0) {
           logger.debug("Unable to create a link from " + sourceLocation + " to " + dest + ": " + error);
-          copy(sourceLocation, dest);
+          copy(sourceLocation, dest, overwrite);
         }
         if (sourceLocation.length() != dest.length()) {
           logger.warn("Source " + sourceLocation + " and target " + dest + " do not have the same length");
