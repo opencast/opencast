@@ -553,11 +553,16 @@ ocUpload.Ingest = (function() {
     ocUtils.log('Uploading ' + filename + ' (' + track.id + ')');
     ocUpload.UI.setProgress("Uploading " + filename);
 
+    var checkBox = $('input.file-source-select:checked');
+    var checkBoxId = $(checkBox).attr('id');
+    
     // set flavor and mediapackage in upload form before submit
     $uploader.contents().find('#flavor').val(track.flavor);
     $uploader.contents().find('#mediapackage').val(MediaPackage.document);
     $uploader.contents().find('#uploadForm').submit();
-    ocUpload.Listener.startProgressUpdate(track.id);
+    
+    if(checkBoxId == 'fileSourceSingleA')
+    	ocUpload.Listener.startProgressUpdate(track.id);
   }
 
   this.trackDone = function(jobId) {
