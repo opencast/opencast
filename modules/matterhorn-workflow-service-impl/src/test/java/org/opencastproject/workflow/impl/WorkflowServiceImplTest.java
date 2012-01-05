@@ -334,6 +334,9 @@ public class WorkflowServiceImplTest {
     WorkflowSet workflowsInDb = service.getWorkflowInstances(new WorkflowQuery().withText("Climate").withCount(100)
             .withStartPage(0));
     Assert.assertEquals(1, workflowsInDb.getItems().length);
+    Assert.assertEquals(1, service.getWorkflowInstances(new WorkflowQuery().withText("limate")).size());
+    Assert.assertEquals(1, service.getWorkflowInstances(new WorkflowQuery().withText("mate")).size());
+    Assert.assertEquals(1, service.getWorkflowInstances(new WorkflowQuery().withText("lima")).size());
   }
 
   @Test
