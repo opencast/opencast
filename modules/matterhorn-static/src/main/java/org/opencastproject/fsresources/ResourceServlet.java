@@ -86,6 +86,10 @@ public class ResourceServlet extends HttpServlet {
         root = (String) cc.getBundleContext().getProperty("org.opencastproject.download.directory");
     }
 
+    if (root == null) {
+      throw new IllegalStateException("Unable to find root for servlet, please check your config files.");
+    }
+
     if (serverAlias == null)
       serverAlias = (String) cc.getProperties().get("alias");
 
