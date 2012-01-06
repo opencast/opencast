@@ -84,7 +84,7 @@
       id="gstreamer"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="Waiting for user to template">
+      description="Running gstreamer pipeline">
     </operation>  
 
     <!-- Distribute to download server -->
