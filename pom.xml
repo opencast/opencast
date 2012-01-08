@@ -36,7 +36,7 @@
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-capture-admin-service-api</module>
         <module>modules/matterhorn-capture-admin-service-impl</module>
-	<module>modules/matterhorn-cas</module>
+		<module>modules/matterhorn-cas</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-conductor</module>
         <module>modules/matterhorn-db</module>
@@ -870,31 +870,31 @@
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.core</artifactId>
-        <version>2.2.0</version>
+        <version>2.0.2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.jpa</artifactId>
-        <version>2.2.0</version>
+        <version>2.0.2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.asm</artifactId>
-        <version>2.2.0</version>
+        <version>2.0.2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.antlr</artifactId>
-        <version>2.2.0</version>
+        <version>2.0.2</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>javax.persistence</artifactId>
-        <version>2.0.3</version>
+        <version>2.0.0</version>
       </dependency>
 
       <!-- CXF -->

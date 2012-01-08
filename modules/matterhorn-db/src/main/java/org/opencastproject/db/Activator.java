@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Dictionary;
@@ -70,7 +71,6 @@ public class Activator implements BundleActivator {
    * 
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
-  @SuppressWarnings("unchecked")
   @Override
   public void start(BundleContext bundleContext) throws Exception {
     this.bundleContext = bundleContext;
@@ -106,7 +106,7 @@ public class Activator implements BundleActivator {
     }
 
     // Register the persistence properties
-    Dictionary props = new Hashtable();
+    Dictionary<String, Serializable> props = new Hashtable<String, Serializable>();
     props.put("type", "persistence");
     props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
     props.put("eclipselink.target-database", vendor);

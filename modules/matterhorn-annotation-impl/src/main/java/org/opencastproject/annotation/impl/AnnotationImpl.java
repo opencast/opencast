@@ -17,8 +17,6 @@ package org.opencastproject.annotation.impl;
 
 import org.opencastproject.annotation.api.Annotation;
 
-import org.eclipse.persistence.annotations.Index;
-
 import java.util.Date;
 
 import javax.persistence.Basic;
@@ -70,7 +68,6 @@ public class AnnotationImpl implements Annotation {
   @XmlElement(name = "annotationId")
   private Long annotationId;
 
-  @Index
   @Column(name = "mediapackage_id", length = 36)
   @XmlElement(name = "mediapackageId")
   private String mediapackageId;
