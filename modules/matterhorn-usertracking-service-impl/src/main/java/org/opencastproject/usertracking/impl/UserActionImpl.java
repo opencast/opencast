@@ -17,8 +17,6 @@ package org.opencastproject.usertracking.impl;
 
 import org.opencastproject.usertracking.api.UserAction;
 
-import org.eclipse.persistence.annotations.Index;
-
 import java.util.Date;
 
 import javax.persistence.Basic;
@@ -74,13 +72,11 @@ public class UserActionImpl implements UserAction {
   private Long id;
 
   @Lob
-  @Index
   @Column(name = "mediapackage_id", length = 65535)
   @XmlElement(name = "mediapackageId")
   private String mediapackageId;
 
   @Lob
-  @Index
   @Column(name = "user_id", length = 65535)
   @XmlElement(name = "userId")
   private String userId;

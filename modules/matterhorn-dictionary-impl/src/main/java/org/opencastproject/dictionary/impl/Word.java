@@ -15,8 +15,6 @@
  */
 package org.opencastproject.dictionary.impl;
 
-import org.eclipse.persistence.annotations.Index;
-
 import java.util.Locale;
 
 import javax.persistence.Column;
@@ -43,13 +41,11 @@ public class Word {
 
   /** The text of the word itself */
   @Id
-  @Index
   @Column(name = "text")
   protected String text;
 
   /** The language in which this word appears */
   @Id
-  @Index
   @Column(name = "language")
   protected String language;
 
