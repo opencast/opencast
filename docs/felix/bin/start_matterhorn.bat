@@ -92,7 +92,6 @@ SET ECLIPSELINK_LOGGING_OPTS=-Declipselink.logging.level=SEVERE
 SET UTIL_LOGGING_OPTS=-Djava.util.logging.config.file="%FELIX_HOME%\conf\services\java.util.logging.properties"
 SET FELIX_CACHE=%FELIX_HOME%\felix-cache
 SET GRAPHICS_OPTS=-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit
-SET TEMP_OPTS=-Djava.io.tmpdir=%FELIX_HOME%\work
 
 REM # Make sure matterhorn bundles are reloaded
 if exist "%FELIX_CACHE%" (
@@ -103,7 +102,7 @@ if exist "%FELIX_CACHE%" (
 REM # Finally start felix
 
 pushd "%FELIX_HOME%"
-java %DEBUG_OPTS% %FELIX_OPTS% %GRAPHICS_OPTS% %TEMP_OPTS% %MAVEN_ARG% %FELIX_FILEINSTALL_OPTS% %PAX_CONFMAN_OPTS% %PAX_LOGGING_OPTS% %ECLIPSELINK_LOGGING_OPTS% %UTIL_LOGGING_OPTS% -jar "%FELIX_HOME%\bin\felix.jar" "%FELIX_CACHE%"
+java %DEBUG_OPTS% %FELIX_OPTS% %GRAPHICS_OPTS% %MAVEN_ARG% %FELIX_FILEINSTALL_OPTS% %PAX_CONFMAN_OPTS% %PAX_LOGGING_OPTS% %ECLIPSELINK_LOGGING_OPTS% %UTIL_LOGGING_OPTS% -jar "%FELIX_HOME%\bin\felix.jar" "%FELIX_CACHE%"
 popd
 
 ENDLOCAL

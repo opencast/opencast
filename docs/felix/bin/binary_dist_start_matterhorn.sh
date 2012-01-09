@@ -22,7 +22,6 @@ PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX/conf"
 PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN -Dopencast.logdir=$LOGDIR"
 UTIL_LOGGING_OPTS="-Djava.util.logging.config.file=$FELIX/conf/services/java.util.logging.properties"
 GRAPHICS_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
-TEMP_OPTS="-Djava.io.tmpdir=$FELIX_HOME/work"
 MEM="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
 
 # Make sure matterhorn bundles are reloaded
@@ -30,4 +29,4 @@ FELIX_CACHE="$FELIX/felix-cache"
 rm -rf $FELIX_CACHE
 
 # Finally start felix
-java $FELIX_OPTS $MEM $GRAPHICS_OPTS $TEMP_OPTS $FELIX_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS $UTIL_LOGGING_OPTS $CXF_OPTS -jar $FELIX/bin/felix.jar $FELIX_CACHE
+java $FELIX_OPTS $MEM $GRAPHICS_OPTS $FELIX_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS $UTIL_LOGGING_OPTS $CXF_OPTS -jar $FELIX/bin/felix.jar $FELIX_CACHE
