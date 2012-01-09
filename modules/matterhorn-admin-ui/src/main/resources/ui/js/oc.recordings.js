@@ -1360,7 +1360,7 @@ ocRecordings = new (function() {
             data = $.parseJSON(data);
             ENGAGE_URL = data.engage;
           }
-          links.push('<a href="' + ENGAGE_URL + '/engage/ui/watch.html?id=' + mpId + '" title="Go to Matterhorn Media Module Watch page to view this recording">Play</a>');
+          links.push('<a target="_blank" href="' + ENGAGE_URL + '/engage/ui/watch.html?id=' + mpId + '" title="Go to Matterhorn Media Module Watch page to view this recording">Play</a>');
         }
 
       } else if (action == 'delete') {
