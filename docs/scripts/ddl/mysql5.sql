@@ -77,10 +77,10 @@ CREATE TABLE job (
 	organization TEXT(65535) NOT NULL,
 	date_created DATETIME,
 	queue_time BIGINT,
-	processor_svc BIGINT,
-	ROOTJOB_id BIGINT,
-	PARENTJOB_id BIGINT,
 	creator_service BIGINT,
+	parent_id BIGINT,
+	processor_svc BIGINT,
+	root_id BIGINT,
 	PRIMARY KEY (
 	id)
 );
@@ -169,8 +169,8 @@ ALTER TABLE job ADD CONSTRAINT FK_job_creator_service FOREIGN KEY (
 	id
 );
 
-ALTER TABLE job ADD CONSTRAINT FK_job_PARENTJOB_id FOREIGN KEY (
-	PARENTJOB_id) REFERENCES job (
+ALTER TABLE job ADD CONSTRAINT FK_job_parent_id FOREIGN KEY (
+	parent_id) REFERENCES job (
 	id
 );
 
@@ -179,8 +179,8 @@ ALTER TABLE job ADD CONSTRAINT FK_job_processor_svc FOREIGN KEY (
 	id
 );
 
-ALTER TABLE job ADD CONSTRAINT FK_job_ROOTJOB_id FOREIGN KEY (
-	ROOTJOB_id) REFERENCES job (
+ALTER TABLE job ADD CONSTRAINT FK_job_root_id FOREIGN KEY (
+	root_id) REFERENCES job (
 	id
 );
 

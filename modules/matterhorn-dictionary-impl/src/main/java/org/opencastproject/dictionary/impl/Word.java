@@ -41,11 +41,13 @@ public class Word {
 
   /** The text of the word itself */
   @Id
+  //@Index
   @Column(name = "text")
   protected String text;
 
   /** The language in which this word appears */
   @Id
+  //@Index
   @Column(name = "language")
   protected String language;
 

@@ -121,10 +121,8 @@ public class JobJpaImpl extends JaxbJob {
   /** The job context, to be created after loading by JPA */
   protected JaxbJobContext context = null;
 
-  @JoinColumn(name = "root_id", referencedColumnName = "id", updatable = false)
   protected JobJpaImpl rootJob = null;
 
-  @JoinColumn(name = "parent_id", referencedColumnName = "id", updatable = false)
   protected JobJpaImpl parentJob = null;
 
   /** Default constructor needed by jaxb and jpa */
@@ -491,6 +489,7 @@ public class JobJpaImpl extends JaxbJob {
   /**
    * @return the parentJob
    */
+  @JoinColumn(name = "parent_id", referencedColumnName = "id", updatable = false)
   public JobJpaImpl getParentJob() {
     return parentJob;
   }
@@ -506,6 +505,7 @@ public class JobJpaImpl extends JaxbJob {
   /**
    * @return the rootJob
    */
+  @JoinColumn(name = "root_id", referencedColumnName = "id", updatable = false)
   public JobJpaImpl getRootJob() {
     return rootJob;
   }
