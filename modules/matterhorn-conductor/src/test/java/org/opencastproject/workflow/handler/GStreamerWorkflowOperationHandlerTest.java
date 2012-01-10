@@ -35,6 +35,9 @@ import org.gstreamer.Gst;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +46,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Properties;
 
 public class GStreamerWorkflowOperationHandlerTest {
 
@@ -341,5 +346,79 @@ public class GStreamerWorkflowOperationHandlerTest {
     Assert.assertTrue(
             "Input did not match output when nothing should has changed with nothing in tempate but two substitutions. Output:"
                     + output, output.equals(expected));
+  }
+  
+  @Test
+  public void gstreamerBinaryLocationSetBeforeActivation() {
+    gstreamerWorkflowOperationHandler = new GStreamerWorkflowOperationHandler();
+    Assert.assertEquals(GStreamerWorkflowOperationHandler.DEFAULT_GSTREAMER_LOCATION, gstreamerWorkflowOperationHandler.getGStreamerLocation());
+  }
+  
+  @Test
+  public void defaultGstreamerBinaryLocationSetAfterActivation() {
+    gstreamerWorkflowOperationHandler = new GStreamerWorkflowOperationHandler();
+    gstreamerWorkflowOperationHandler.activate(null);
+    Assert.assertEquals(GStreamerWorkflowOperationHandler.DEFAULT_GSTREAMER_LOCATION, gstreamerWorkflowOperationHandler.getGStreamerLocation());
+  }
+  
+  @Test
+  public void nullGstreamerBinaryLocationDoesntBreak() {
+    ServiceRegistration mockServiceRegistration = EasyMock.createMock(ServiceRegistration.class);
+    Properties properties = new Properties();
+    
+    BundleContext mockBundleContext = EasyMock.createMock(BundleContext.class);
+    EasyMock.expect(mockBundleContext.registerService((String) EasyMock.anyObject(), EasyMock.anyObject(), (Dictionary) EasyMock.anyObject())).andReturn(mockServiceRegistration);
+    EasyMock.expect(mockBundleContext.getProperty(GStreamerWorkflowOperationHandler.CONFIG_GSTREAMER_LOCATION_KEY)).andReturn(null);
+    EasyMock.replay(mockBundleContext);
+    
+    ComponentContext mockComponentContext = EasyMock.createMock(ComponentContext.class);
+    EasyMock.expect(mockComponentContext.getProperties()).andReturn(properties).anyTimes();
+    EasyMock.expect(mockComponentContext.getBundleContext()).andReturn(mockBundleContext).anyTimes();
+    EasyMock.replay(mockComponentContext);
+    
+    gstreamerWorkflowOperationHandler = new GStreamerWorkflowOperationHandler();
+    gstreamerWorkflowOperationHandler.activate(mockComponentContext);
+    Assert.assertEquals(GStreamerWorkflowOperationHandler.DEFAULT_GSTREAMER_LOCATION, gstreamerWorkflowOperationHandler.getGStreamerLocation());
+  }
+  
+  @Test
+  public void emptyStringGstreamerBinaryLocationDoesntBreak() {
+    ServiceRegistration mockServiceRegistration = EasyMock.createMock(ServiceRegistration.class);
+    Properties properties = new Properties();
+    
+    BundleContext mockBundleContext = EasyMock.createMock(BundleContext.class);
+    EasyMock.expect(mockBundleContext.registerService((String) EasyMock.anyObject(), EasyMock.anyObject(), (Dictionary) EasyMock.anyObject())).andReturn(mockServiceRegistration);
+    EasyMock.expect(mockBundleContext.getProperty(GStreamerWorkflowOperationHandler.CONFIG_GSTREAMER_LOCATION_KEY)).andReturn("");
+    EasyMock.replay(mockBundleContext);
+    
+    ComponentContext mockComponentContext = EasyMock.createMock(ComponentContext.class);
+    EasyMock.expect(mockComponentContext.getProperties()).andReturn(properties).anyTimes();
+    EasyMock.expect(mockComponentContext.getBundleContext()).andReturn(mockBundleContext).anyTimes();
+    EasyMock.replay(mockComponentContext);
+    
+    gstreamerWorkflowOperationHandler = new GStreamerWorkflowOperationHandler();
+    gstreamerWorkflowOperationHandler.activate(mockComponentContext);
+    Assert.assertEquals(GStreamerWorkflowOperationHandler.DEFAULT_GSTREAMER_LOCATION, gstreamerWorkflowOperationHandler.getGStreamerLocation());
+  }
+  
+  @Test
+  public void gstreamerBinaryLocationCanBeSetInConfigProperties() {
+    String location = "/to/nowhere/gstreamer";
+    ServiceRegistration mockServiceRegistration = EasyMock.createMock(ServiceRegistration.class);
+    Properties properties = new Properties();
+    
+    BundleContext mockBundleContext = EasyMock.createMock(BundleContext.class);
+    EasyMock.expect(mockBundleContext.registerService((String) EasyMock.anyObject(), EasyMock.anyObject(), (Dictionary) EasyMock.anyObject())).andReturn(mockServiceRegistration);
+    EasyMock.expect(mockBundleContext.getProperty(GStreamerWorkflowOperationHandler.CONFIG_GSTREAMER_LOCATION_KEY)).andReturn(location);
+    EasyMock.replay(mockBundleContext);
+    
+    ComponentContext mockComponentContext = EasyMock.createMock(ComponentContext.class);
+    EasyMock.expect(mockComponentContext.getProperties()).andReturn(properties).anyTimes();
+    EasyMock.expect(mockComponentContext.getBundleContext()).andReturn(mockBundleContext).anyTimes();
+    EasyMock.replay(mockComponentContext);
+    
+    gstreamerWorkflowOperationHandler = new GStreamerWorkflowOperationHandler();
+    gstreamerWorkflowOperationHandler.activate(mockComponentContext);
+    Assert.assertEquals(location, gstreamerWorkflowOperationHandler.getGStreamerLocation());
   }
 }

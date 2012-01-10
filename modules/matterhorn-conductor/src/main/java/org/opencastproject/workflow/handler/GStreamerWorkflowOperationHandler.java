@@ -57,6 +57,10 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperationHandlerBase {
+  public static final String DEFAULT_GSTREAMER_LOCATION = "/usr/bin/gst-launch";
+  public static final String CONFIG_GSTREAMER_LOCATION_KEY  = "org.opencastproject.export.gstreamerpath";
+  /** The location of the gstreamer binary for running commands. **/
+  private String gstreamerLocation = DEFAULT_GSTREAMER_LOCATION;
   /** The id for the workflow operation which is recognized in the workflow xml file. */
   public static final String ID = "gstreamer";
   /** This is the description of the workflow operation. */
@@ -84,6 +88,10 @@ public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperatio
     return DESCRIPTION;
   }
 
+  public String getGStreamerLocation() {
+    return gstreamerLocation;
+  }
+  
   @Override
   public SortedMap<String, String> getConfigurationOptions() {
     return CONFIG_OPTIONS;
@@ -98,12 +106,23 @@ public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperatio
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
-
+  
   public void activate(ComponentContext cc) {
-    super.activate(cc);
-    setHoldActionTitle("Configure Export");
-    registerHoldStateUserInterface(HOLD_UI_PATH);
-    logger.info("Registering export template settings hold state ui from classpath {}", HOLD_UI_PATH);
+    if (cc != null) {
+      super.activate(cc);
+
+      setHoldActionTitle("Configure Export");
+      registerHoldStateUserInterface(HOLD_UI_PATH);
+      logger.info("Registering export template settings hold state ui from classpath {}", HOLD_UI_PATH);
+
+      String path = StringUtils.trimToNull((String) cc.getBundleContext().getProperty(CONFIG_GSTREAMER_LOCATION_KEY));
+      if (path == null) {
+        logger.debug("DEFAULT " + CONFIG_GSTREAMER_LOCATION_KEY + ": " + DEFAULT_GSTREAMER_LOCATION);
+      } else {
+        gstreamerLocation = path;
+        logger.debug("GStreamerWorkflowOperationHandler is going to be using binary: {}", path);
+      }
+    }
   }
 
   @Override
@@ -116,7 +135,7 @@ public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperatio
   @Override
   public WorkflowOperationResult resume(WorkflowInstance workflowInstance, JobContext context,
           Map<String, String> properties) throws WorkflowOperationException {
-    logger.info("Processing gstreamer commandline workflow {} using {}", workflowInstance.getId(), properties);
+    logger.debug("Processing gstreamer commandline workflow {} using {}", workflowInstance.getId(), properties);
     // MediaPackage from previous workflow operations
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     Attachment[] attachments = mediaPackage.getAttachments();
@@ -167,12 +186,11 @@ public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperatio
     }
     gstreamerLine = replaceTemplateValues(gstreamerLine, tracks);
     String outputFileString = replaceTemplateValues(totalProperties.getProperty("org.opencastproject.workflow.config.gstreamer.outputfiles"), tracks);
-
-    logger.info("Creating gstreamer template process");
+    logger.info("Creating gstreamer template process for workflow {} using {}",workflowInstance.getId(), properties);
     Process process = null;
     try {
       ArrayList<String> args = new ArrayList<String>();
-      args.add("/usr/bin/gst-launch");
+      args.add(DEFAULT_GSTREAMER_LOCATION);
       args.addAll(Arrays.asList(gstreamerLine.split(" ")));
       ProcessBuilder pb = new ProcessBuilder(args);
       pb.redirectErrorStream(true); // Unfortunately merges but necessary for deadlock prevention

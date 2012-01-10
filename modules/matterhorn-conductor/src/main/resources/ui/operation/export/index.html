@@ -1,6 +1,7 @@
 <html>
 	<head>
 		<title>Hold for export</title>
+		
 		<link rel="stylesheet" type="text/css" href="/admin/css/jquery-ui-1.8.6.custom.css" />
 		<link rel="stylesheet" type="text/css" href="/admin/css/jquery-ui-opencast-admin/jquery-ui-opencast-admin.css" />   
 		<link rel="stylesheet" type="text/css" href="/admin/css/admin.css">
@@ -8,14 +9,6 @@
 		<script type="text/javascript" src="/admin/jquery/jquery-ui-1.8.9.custom.min.js"></script>    
 		<script type="text/javascript" src="/admin/js/oc.utils.js"></script>
     	<script type="text/javascript" src="/admin/trimpath/trimpath-template-1.0.38.js"></script>
-    
-    <!-- link rel="stylesheet" type="text/css" href="file:///home/akm220/workspace/matterhorn/MH-8395/shared-resources/css/jquery-ui-1.8.6.custom.css" />
-    <link rel="stylesheet" type="text/css" href="file:///home/akm220/workspace/matterhorn/MH-8395/shared-resources/css/jquery-ui-opencast-admin/jquery-ui-opencast-admin.css" />   
-    <link rel="stylesheet" type="text/css" href="file:///home/akm220/workspace/matterhorn/MH-8395/shared-resources/css/admin.css">
-    <script type="text/javascript" src="file:///home/akm220/workspace/matterhorn/MH-8395/shared-resources/jquery/jquery-1.4.4.min.js"></script>
-    <script type="text/javascript" src="file:///home/akm220/workspace/matterhorn/MH-8395/shared-resources/jquery/jquery-ui-1.8.9.custom.min.js"></script>    
-    <script type="text/javascript" src="file:///home/akm220/workspace/matterhorn/MH-8395/shared-resources/js/oc.utils.js"></script>
-    <script type="text/javascript" src="file:///home/akm220/workspace/matterhorn/MH-8395/shared-resources/trimpath/trimpath-template-1.0.38.js"></script-->
 
 <script type="text/javascript">
 	var postData = {
@@ -33,39 +26,46 @@
                                 '</div><p></p>' +
                               '{/for}';
 
-	var cameraScreenAudioTemplate = "filesrc location=VGA ! decodebin2 name=VgaDecodeBin ! videorate ! video/x-raw-yuv,framerate=\(fraction\)30/1 ! " +
-		"videobox border-alpha=1 top=0 bottom=0 left=-CAMERAWIDTH ! " +
-		"videomixer name=mix sink_0::alpha=1 sink_1::alpha=1 background=black ! " +
-		"ffmpegcolorspace ! x264enc pass=5 quantizer=25 speed-preset=6 profile=3 ! queue name=camera ! mp4mux name=mux ! filesink location=OUTPUTFILE " +
-		"filesrc location=CAMERA ! decodebin2 name=CameraDecodeBin ! videorate ! video/x-raw-yuv,framerate=\(fraction\)30/1 ! mix. " +
-		"filesrc location=AUDIO ! decodebin2 name=AudioDecodeBin ! audioconvert ! audio/x-raw-int,rate=44100,channels=2 ! faac bitrate=160000 profile=2 ! queue name=audio ! mux."
+    var vgaDecodebin = "decodebin2 name=VgaDecodeBin";
+    var vgaMpegPS = "mpegpsdemux name=VgaPSDemux ! mpeg2dec name=VgaMpeg2Dec";
+    var vgaMpegTS = "mpegtsdemux name=VgaTSDemux ! mpeg2dec name=VgaMpeg2Dec";
+    var vgaMp4x264 = "qtdemux name=VgaQTDemux ! ffdec_h264 name=VgaH264Dec";
+	
+    var cameraDecodebin = "decodebin2 name=CameraDecodeBin";
+    var cameraMpegPS = "mpegpsdemux name=CameraPSDemux ! mpeg2dec name=CameraMpeg2Dec";
+    var cameraMpegTS = "mpegtsdemux name=CameraTSDemux ! mpeg2dec name=CameraMpeg2Dec";
+    var cameraMp4x264 = "qtdemux name=CameraQTDemux ! ffdec_h264 name=CameraH264Dec";
+    
+    var cameraScreenAudioTemplate = "filesrc location=VGA ! VgaDECODE ! videorate ! video/x-raw-yuv,framerate=\(fraction\)30/1 ! " +
+	"videobox border-alpha=1 top=0 bottom=0 left=-CameraWIDTH ! " +
+	"videomixer name=mix sink_0::alpha=1 sink_1::alpha=1 background=black ! " +
+	"VIDEOSCALE" + 
+	"ffmpegcolorspace ! x264enc pass=5 quantizer=25 speed-preset=6 profile=3 ! queue name=camera ! mp4mux name=mux ! filesink location=OUTPUTFILE " +
+	"filesrc location=CAMERA ! CameraDECODE ! videorate ! video/x-raw-yuv,framerate=\(fraction\)30/1 ! mix. " +
+	"filesrc location=AUDIO ! decodebin2 name=AudioDecodeBin ! audioconvert ! audio/x-raw-int,rate=44100,channels=2 ! faac bitrate=160000 profile=2 ! queue name=audio ! mux."
                               
-	var screenAudioTemplate = "filesrc location=VGA ! decodebin2 ! videorate ! video/x-raw-yuv,framerate=\(fraction\)30/1 ! " +
+	var screenAudioTemplate = "filesrc location=VGA ! VgaDECODE ! videorate ! video/x-raw-yuv,framerate=\(fraction\)30/1 ! " +
+		"VIDEOSCALE" + 
 		"ffmpegcolorspace ! x264enc pass=5 quantizer=25 speed-preset=6 profile=3 ! queue name=camera ! mp4mux name=mux ! filesink location=OUTPUTFILE " +
-		"filesrc location=AUDIO ! decodebin2 ! audioconvert ! audio/x-raw-int,rate=44100,channels=2 ! faac bitrate=160000 profile=2 ! queue name=audio ! mux."
-
-	var mobileTemplate = "filesrc location=VGA ! decodebin2 ! videorate ! video/x-raw-yuv,framerate=\(fraction\)30/1 ! " +
-		"videoscale ! video/x-raw-yuv,width=640,height=480 ! " +
-		"ffmpegcolorspace ! x264enc pass=5 quantizer=25 speed-preset=6 profile=1 ! queue name=vga ! mp4mux name=mux ! filesink location=OUTPUTFILE " +
-		"filesrc location=AUDIO ! decodebin2 ! audioconvert ! audio/x-raw-int,rate=44100,channels=2 ! faac bitrate=160000 profile=2 ! queue name=audio ! mux." 
-      
-	var tabletTemplate = "filesrc location=VGA ! decodebin2 ! videorate ! video/x-raw-yuv,framerate=\(fraction\)30/1 ! " +
-		"videoscale ! video/x-raw-yuv,width=1024,height=768 ! " + 
-		"ffmpegcolorspace ! x264enc pass=5 quantizer=25 speed-preset=6 profile=3 ! queue name=vga ! mp4mux name=mux ! filesink location=OUTPUTFILE " +
-		"filesrc location=AUDIO ! decodebin2 ! audioconvert ! audio/x-raw-int,rate=44100,channels=2 ! faac bitrate=160000 profile=2 ! queue name=audio ! mux."
-      
-	var hdTemplate = "filesrc location=VGA ! decodebin2 ! videorate ! video/x-raw-yuv,framerate=\(fraction\)30/1 ! " +
-		"videoscale ! video/x-raw-yuv,width=1280,height=720 ! " + 
-		"ffmpegcolorspace ! x264enc pass=5 quantizer=25 speed-preset=6 profile=3 ! queue name=vga ! mp4mux name=mux ! filesink location=OUTPUTFILE " +
-		"filesrc location=AUDIO ! decodebin2 ! audioconvert ! audio/x-raw-int,rate=44100,channels=2 ! faac bitrate=160000 profile=2 ! queue name=audio ! mux."
-      
-	var fullHDTemplate = "filesrc location=VGA ! decodebin2 ! videorate ! video/x-raw-yuv,framerate=\(fraction\)30/1 ! " +
-		"videoscale ! video/x-raw-yuv,width=1920,height=1080 ! " + 
-		"ffmpegcolorspace ! x264enc pass=5 quantizer=25 speed-preset=6 profile=3 ! queue name=vga ! mp4mux name=mux ! filesink location=OUTPUTFILE " +
-		"filesrc location=AUDIO ! decodebin2 ! audioconvert ! audio/x-raw-int,rate=44100,channels=2 ! faac bitrate=160000 profile=2 ! queue name=audio ! mux."
+		"filesrc location=AUDIO ! decodebin2 name=AudioDecodeBin ! audioconvert ! audio/x-raw-int,rate=44100,channels=2 ! faac bitrate=160000 profile=2 ! queue name=audio ! mux."
           
+	var original = "";
+    var mobile = "videoscale ! video/x-raw-yuv,width=640,height=480 ! ";
+    var tablet = "videoscale ! video/x-raw-yuv,width=1024,height=768 ! ";
+    var hd = "videoscale ! video/x-raw-yuv,width=1280,height=720 ! ";
+    var fullhd = "videoscale ! video/x-raw-yuv,width=1920,height=1080 ! ";
+	
+    var outputFile = "";
+	var presentation = "";
+	var presenter = "";
+	var presenterWidth = "";
+	var audio = "";
+	var title = "";
+	var id = "";
+	
 	$(document).ready(function() {
-		var id = postData.id;             
+		id = postData.id;             
+		
 		
         // load preview player and metadata
 		$.ajax({
@@ -99,92 +99,122 @@
 			}
 		});
         
-		var presentation = "";
-		var presenter = "";
-		var presenterWidth = "";
-		var audio = "";
-        
+	
+		
 		// Get the necessary details about the tracks. 
 		$.ajax({
 			url: '/workflow/instance/' + id + '.json',
 			dataType: 'json', // or XML..
 			success: function(data) {
-
-			var tracks = data.workflow.mediapackage.media.track;
-			if (!$.isArray(tracks)) {
-				tracks = [tracks];
-			}
-
-			var frames = [];
-			for (var i = 0; i < tracks.length; i++) {
-				var track = tracks[i];
-				// Find presenter track. 
-				if (track.type.indexOf("presenter/source") != -1 && track.video != undefined) {
-	           		// frames.push({id: track.id, width: track.video.resolution.split("x")[0], height: track.video.resolution.split("x")[1]});
-					presenter = "${.vars[\"" + track.id + "\"]}";
-					presenterWidth = track.video.resolution.split("x")[0];
-				} 
-				// Find presentation track. 
-				else if (track.type.indexOf("presentation/source") != -1 && track.video != undefined) {
-					presentation = "${.vars[\"" + track.id + "\"]}";
-				} 
-				// Find audio. 
-				else if (track.type.indexOf("/source") != -1 && track.audio != undefined) {
-					audio = "${.vars[\"" + track.id + "\"]}";
+				title = data.workflow.mediapackage.title;
+				var tracks = data.workflow.mediapackage.media.track;
+				if (!$.isArray(tracks)) {
+					tracks = [tracks];
 				}
-			}
-			
-				cameraScreenAudioTemplate = cameraScreenAudioTemplate.replace("VGA", presentation);
-				cameraScreenAudioTemplate = cameraScreenAudioTemplate.replace("CAMERAWIDTH", presenterWidth);
-				cameraScreenAudioTemplate = cameraScreenAudioTemplate.replace("CAMERA", presenter);
-				cameraScreenAudioTemplate = cameraScreenAudioTemplate.replace("AUDIO", audio);
-		      
-				screenAudioTemplate = screenAudioTemplate.replace("VGA", presentation);
-				screenAudioTemplate = screenAudioTemplate.replace("AUDIO", audio);
-		      
-				mobileTemplate = mobileTemplate.replace("VGA", presentation);
-				mobileTemplate = mobileTemplate.replace("AUDIO", audio);
-		      
-				tabletTemplate = tabletTemplate.replace("VGA", presentation);
-				tabletTemplate = tabletTemplate.replace("AUDIO", audio);
-				
-				hdTemplate = hdTemplate.replace("VGA", presentation);
-				hdTemplate = hdTemplate.replace("AUDIO", audio);
-				
-				fullHDTemplate = fullHDTemplate.replace("VGA", presentation);
-				fullHDTemplate = fullHDTemplate.replace("AUDIO", audio);
+	
+				var frames = [];
+				for (var i = 0; i < tracks.length; i++) {
+					var track = tracks[i];
+					// Find presenter track. 
+					if (track.type.indexOf("presenter/source") != -1 && track.video != undefined) {
+						presenter = "${.vars[\"" + track.id + "\"]}";
+						presenterWidth = track.video.resolution.split("x")[0];
+					} 
+					// Find presentation track. 
+					else if (track.type.indexOf("presentation/source") != -1 && track.video != undefined) {
+						presentation = "${.vars[\"" + track.id + "\"]}";
+					} 
+					// Find audio. 
+					else if (track.type.indexOf("/source") != -1 && track.audio != undefined) {
+						audio = "${.vars[\"" + track.id + "\"]}";
+					}
+				}
+				updateTemplate();
 			}
 		});
-      	
-		var outputFile = "/tmp/output-" + id + ".mp4";
-		cameraScreenAudioTemplate = cameraScreenAudioTemplate.replace("OUTPUTFILE", outputFile);
-		screenAudioTemplate = screenAudioTemplate.replace("OUTPUTFILE", outputFile);
-		mobileTemplate = mobileTemplate.replace("OUTPUTFILE", outputFile);
-		tabletTemplate = tabletTemplate.replace("OUTPUTFILE", outputFile);
-		hdTemplate = hdTemplate.replace("OUTPUTFILE", outputFile);
-		fullHDTemplate = fullHDTemplate.replace("OUTPUTFILE", outputFile);
-		$("#gstreamer-output-files").attr("value", outputFile);
+		
+		
 		
 		$("input:radio").click(function(){
-			// Get the template type of the checked radio button. 
-			var type = $("input:radio:checked").val();
-        	
-        	if (type == "CameraScreenAudio") {
-				$("#gstreamer-line").attr("value", cameraScreenAudioTemplate);
-        	} else if (type == "ScreenAudio") {
-        		$("#gstreamer-line").attr("value", screenAudioTemplate);
-        	} else if (type == "Mobile") {
-        		$("#gstreamer-line").attr("value", mobileTemplate);
-        	} else if (type == "Tablet") {
-        		$("#gstreamer-line").attr("value", tabletTemplate);
-        	} else if (type == "HD") {
-        		$("#gstreamer-line").attr("value", hdTemplate);
-        	} else if (type == "FullHD") {
-        		$("#gstreamer-line").attr("value", fullHDTemplate);
-        	}
+			updateTemplate();
 		});
 	});
-      
+    
+	function updateTemplate(){
+		var inputChecked = "";
+		var sourceChecked = "";
+		var scaleChecked = "";
+		
+		$("input:radio:checked").each(function(i){
+			if(this.name == "gstreamer-input") {
+				inputChecked = this.value;
+			} else if (this.name == "gstreamer-sources"){
+				sourceChecked = this.value;
+			} else if (this.name == "gstreamer-scale") {
+				scaleChecked = this.value;
+			}
+		});
+		
+		var vgaInput = "";
+		var cameraInput = "";
+		if(inputChecked == "decodebin") {
+			vgaInput = vgaDecodebin;
+			cameraInput = cameraDecodebin;
+		} else if(inputChecked == "mpegps") {
+			vgaInput = vgaMpegPS;
+			cameraInput = cameraMpegPS;
+		} else if(inputChecked == "mpegts") {
+			vgaInput = vgaMpegTS;
+			cameraInput = cameraMpegTS;
+		} else if(inputChecked == "x264") {
+			vgaInput = vgaMp4x264;
+			cameraInput = cameraMp4x264;
+		} else {
+			vgaInput = vgaDecodebin;
+			cameraInput = cameraDecodebin;
+		}
+		
+		var template = "";
+		if(sourceChecked == "CameraScreenAudio") {
+			template = cameraScreenAudioTemplate;
+		} else if(sourceChecked == "ScreenAudio") {
+			template = screenAudioTemplate;
+		} else {
+			template = screenAudioTemplate;
+		}
+		
+		var scale = "";
+		if(scaleChecked == "Original") {
+			scale = original;
+		} else if(scaleChecked == "Mobile") {
+			scale = mobile;
+		} else if(scaleChecked == "Tablet") {
+			scale = tablet;
+		}else if(scaleChecked == "HD") {
+			scale = hd;
+		}else if(scaleChecked == "FullHD") {
+			scale = fullhd;
+		} else {
+			scale = original;
+		}
+		
+		outputFile = "/tmp/" + title.replace(" ", "_") + "_" + sourceChecked + "_" + scaleChecked + "Scaled_" + id + ".mp4";	
+		$("#gstreamer-output-files").attr("value", outputFile);
+		
+		var gstreamerCommand = template;
+		gstreamerCommand = gstreamerCommand.replace("VgaDECODE", vgaInput);
+		gstreamerCommand = gstreamerCommand.replace("CameraDECODE", cameraInput);
+		gstreamerCommand = gstreamerCommand.replace("VIDEOSCALE", scale);
+		gstreamerCommand = gstreamerCommand.replace("VGA", presentation);
+		gstreamerCommand = gstreamerCommand.replace("CameraWIDTH", presenterWidth);
+		gstreamerCommand = gstreamerCommand.replace("CAMERA", presenter);
+		gstreamerCommand = gstreamerCommand.replace("AUDIO", audio);
+		gstreamerCommand = gstreamerCommand.replace("OUTPUTFILE", outputFile);
+		
+		$("#gstreamer-line").attr("value", gstreamerCommand);
+	}
+	
+	
 	/**
 	* Continues the Workflow
 	*/
@@ -208,43 +238,67 @@
 
     <div class="holdStateUI" style="height: 100%; width: 100%;">
       <h1>Export Media</h1>
-      <h3>Editing Templates</h3>
+      <h3>Video Input Type</h3>
       <ul>
 	      <li>
-	      	<Input type = radio Name = gstreamer-template Value = "CameraScreenAudio">
-		  	Camera, Screen and Audio
-		  </li>
-		  <li>
-	      	<Input type = radio Name = gstreamer-template Value = "ScreenAudio">
-	      	Screen and Audio
+	      	<Input type = radio Name = gstreamer-input Value = "decodebin">
+	      	Automatic (decodebin2)
+	      </li>
+	      <li>
+	      	<Input type = radio Name = gstreamer-input Value = "mpegps" checked>
+	      	MPEG 2 Program Stream (Default for capture agent, mpegpsdemux ! mpeg2dec)
+	      </li>
+	      <li>
+	      	<Input type = radio Name = gstreamer-input Value = "mpegts">
+	      	MPEG 2 Transport Stream (Mpeg2 from another source, mpegtsdemux ! mpeg2dec)
+	      </li>
+	      <li>
+	      	<Input type = radio Name = gstreamer-input Value = "x264">
+	      	H.264 AVC (x264 or H.264 in a mp4 or mov container, qtdemux ! ffdec_h264)
 	      </li>
 	  </ul>
-	  <br>
-	  <h3>Scaled Templates</h3>
-	  <ul>
+      <h3>Sources</h3>
+      <ul>
+       <li>
+	      	<Input type = radio Name = gstreamer-sources Value = "CameraScreenAudio">
+	      	Camera, Screen and Audio
+	      </li>
 	      <li>
-	      	<Input type = radio Name = gstreamer-template Value = "Mobile">
+	      	<Input type = radio Name = gstreamer-sources Value = "ScreenAudio" checked>
+	      	Screen and Audio
+	      </li>
+      </ul>
+      <h3>Output Scale</h3>
+      <ul>
+          <li>
+            <Input type = radio Name = gstreamer-scale Value = "Original" checked>
+	      	Original Resolution
+          </li>
+	      <li>
+	      	<Input type = radio Name = gstreamer-scale Value = "Mobile">
 	      	Mobile (Scaled to 640 x 480)
 	      </li>
 	      <li>
-	      	<Input type = radio Name = gstreamer-template Value = "Tablet">
+	      	<Input type = radio Name = gstreamer-scale Value = "Tablet">
 	      	Tablet (Scaled to 1024 x 768)
 	      </li>
 	      <li>
-	      	<Input type = radio Name = gstreamer-template Value = "HD">
+	      	<Input type = radio Name = gstreamer-scale Value = "HD">
 	      	Scaled to HD (720p, 1280x720)
 	      </li>
 	      <li>
-	      	<Input type = radio Name = gstreamer-template Value = "FullHD">
+	      	<Input type = radio Name = gstreamer-scale Value = "FullHD">
 	      	Scaled to Full HD (1080p, 1920x1080p)
 	      </li>
 	  </ul>
       <br>
       <h3>gstreamer Command (enter without gst-launch e.g. fakesrc ! fakesink)</h3>
-      <textarea id="gstreamer-line" style="width: 100%; height: 30%;" wrap="hard" >Enter Gstreamer Line without gst-launch e.g. fakesrc ! fakesink</textarea>
+      Enter Gstreamer Line without gst-launch e.g. fakesrc ! fakesink
+      <textarea id="gstreamer-line" style="width: 100%; height: 20%;" wrap="hard" ></textarea>
       <br>
-      <h3>Output Files Paths (e.g./tmp/file1,/tmp/file2,/tmp/file3)</h3>
-      <textarea id="gstreamer-output-files" style="width: 100%; height: 10%;">Enter output filesnames (with paths) e.g. /tmp/test.mp4 and it will be added to the export download location.</textarea>
+      <h3>Temporary Output Files Paths (e.g./tmp/file1,/tmp/file2,/tmp/file3)</h3>
+      Enter output filesnames (with paths) e.g. /tmp/test.mp4 and it will be added to the export download location.
+      <textarea id="gstreamer-output-files" style="width: 100%; height: 10%;"></textarea>
       <div style="height: 100%; width: 100%; display: none;">
         <div id="source-frames" class="droppable-area" style="height: 100%; width: 20%; float: left;">
         </div>
