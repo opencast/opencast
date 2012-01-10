@@ -68,6 +68,7 @@ public class AnnotationImpl implements Annotation {
   @XmlElement(name = "annotationId")
   private Long annotationId;
 
+  //@Index
   @Column(name = "mediapackage_id", length = 36)
   @XmlElement(name = "mediapackageId")
   private String mediapackageId;

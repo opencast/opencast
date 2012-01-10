@@ -114,7 +114,11 @@ public class Activator implements BundleActivator {
     props.put("eclipselink.cache.shared.default", "false");
     if ("true".equalsIgnoreCase(bundleContext.getProperty("org.opencastproject.db.ddl.generation"))) {
       props.put("eclipselink.ddl-generation", "create-tables");
-      props.put("eclipselink.ddl-generation.output-mode", "both");
+      if ("true".equalsIgnoreCase(bundleContext.getProperty("org.opencastproject.db.ddl.script.generation"))) {
+        props.put("eclipselink.ddl-generation.output-mode", "both");        
+      } else {
+        props.put("eclipselink.ddl-generation.output-mode", "database");
+      }
     }
     propertiesRegistration = bundleContext.registerService(Map.class.getName(), props, props);
 
