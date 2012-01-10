@@ -575,7 +575,9 @@ Opencast.Watch = (function ()
             Opencast.Bookmarks.initialize();
         }
         getClientShortcuts();
-        Opencast.download.showLinks();
+        if(window.location.href.indexOf('#/hold') =! -1) {
+          Opencast.download.showLinks();
+        }
         if(advancedPlayer)
         {
             // init
