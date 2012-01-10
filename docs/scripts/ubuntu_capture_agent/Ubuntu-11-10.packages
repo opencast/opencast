@@ -9,6 +9,8 @@ gstreamer0.10-plugins-ugly
 gstreamer0.10-ffmpeg
 ivtv-utils
 libglib2.0-dev
+libgstreamer0.10-dev
+libgstreamer-plugins-base0.10-dev
 maven2
 ntp
 openssh-server
