@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 /**
  * Loads language packs into the dictionary service, deleting the language pack on completion.
@@ -57,12 +58,16 @@ public class DictionaryScanner implements ArtifactInstaller {
    */
   @Override
   public void install(File artifact) throws Exception {
-    logger.info("Loading language pack from {}", artifact);
     Integer numAllW = 1;
     String language = artifact.getName().split("\\.")[0];
+    
+    // Make sure we are not importing something that already exists
+    if (Arrays.asList(dictionaryService.getLanguages()).contains(language)) {
+      logger.debug("Skipping existing dictionary '{}'", language);
+      return;
+    }
 
-    // clear this language
-    dictionaryService.clear(language);
+    logger.info("Loading language pack from {}", artifact);
 
     // read csv file and fill dictionary index
     BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(artifact)), 1024 * 1024);
@@ -84,9 +89,7 @@ public class DictionaryScanner implements ArtifactInstaller {
         logger.warn("Unable to add word '{}' to the {} dictionary: {}", new String[] { word, language, e.getMessage() });
       }
     }
-    if (!artifact.delete()) {
-      logger.warn("Unable to delete language pack {}", artifact);
-    }
+
     logger.info("Finished loading language pack from {}", artifact);
   }
 
