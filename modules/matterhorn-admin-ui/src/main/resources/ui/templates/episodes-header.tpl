@@ -1,6 +1,10 @@
 <div id="episodes-header">
   <div id="searchBox" class="ui-state-hover"></div>
   <div class="clear"></div>
+  <div>
+    <select id="selectWorkflow"></select>
+    <button id="applyWorkflow">Apply</button>
+  </div>  
   <div id="search-result"><span id="filterRecordingCount"></span></div>
 
   <div id="tableContainer" class="ui-widget ui-helper-clearfix"></div>
@@ -29,6 +33,11 @@
       </select>
       episodes per page.
     </div>
+
+
+    <span class="layout-inline">
+      <span id="selectedEpisodesCount"></span>
+    </span>
 
     <span id="pageWidget" class="layout-inline">
       <span id="prevButtons">
