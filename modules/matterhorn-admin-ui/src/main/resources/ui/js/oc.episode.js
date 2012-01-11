@@ -16,6 +16,45 @@ opencast.episode = (function() {
 
   var A = ocUtils.ensureArray;
 
+  // -- Service calls
+
+  /** Query the workflows that are currently being active, i.e. they do have either of the states
+   *  SUCCEEDED or FAILED.
+   *  @return jqXHR
+   */
+  function getAllActiveWorkflows() {
+    return $6.getJSON("../workflow/instances.json?compact=true&state=-SUCCEEDED&state=-FAILED");
+  }
+
+  /** @param id -- the media package id
+   *  @return jqXHR containing raw json
+   */
+  function queryWorkflowsOfMediaPackage(id) {
+    return $6.getJSON("../workflow/instances.json", { mp:id, startPage:0, count:999999, compact:false });
+  }
+
+  /** @param id -- the media package id
+   *  @return jqXHR containing raw json
+   */
+  function queryMediaPackage(id) {
+    return $6.getJSON("../episode/episode.json", { id:id })
+  }
+
+  /** @param params -- parameter object for the episode rest endpoint
+   *  @return jqXHR containing raw json
+   */
+  function getEpisodes(params) {
+    return $6.getJSON("../episode/episode.json", params);
+  }
+
+  /** @return jqXHR containing raw json
+   */
+  function getAvailableWorkflowDefinitions() {
+    return $6.getJSON("../workflow/definitions.json");
+  }
+
+  // --
+
   /** @param track -- track object from media package json
    */
   function isDistributedTrack(track) {
@@ -59,16 +98,13 @@ opencast.episode = (function() {
   return {
     /** Archive page.
      */
-    Archive: new (function() {
-
-      var URL_EPISODE_LIST = "../episode/episode.json";
-      var URL_WORKFLOW_INSTANCES = "../workflow/instances.json";
+    Archive: (function() {
 
       var SORT_FIELDS = {
-        'Title': 'TITLE',
-        'Presenter': 'CREATOR',
-        'Series': 'SERIES_TITLE',
-        'Date': 'DATE_CREATED'
+        "Title": "TITLE",
+        "Presenter": "CREATOR",
+        "Series": "SERIES_TITLE",
+        "Date": "DATE_CREATED"
       };
 
       var FILTER_FIELDS = [
@@ -84,40 +120,204 @@ opencast.episode = (function() {
         }
       ];
 
+      var defaultState = {
+        state: "all",
+        pageSize: 10,
+        page: 0,
+        refresh: 5,
+        doRefresh: true,
+        sortField: "Date",
+        sortOrder: "ASC",
+        filterField: null,
+        filterText: "",
+        lastState: "all",
+        lastPageSize: 10,
+        lastPage: 0
+      };
+
+      var state = stateFromUrl();
+
       var refreshId = null;
 
       var totalEpisodes = 0;
       var currentShownEpisodes = 0;
-      var numSelectedEpisodes = 0;
-
-      // components
-      this.searchbox = null;
-      this.pager = null;
-
-      this.statistics = null;
+      var selectedEpisodes = {};
 
       var refreshing = false;      // indicates if JSONP requesting recording data is in progress
-      this.refreshingStats = false; // indicates if JSONP requesting statistics data is in progress
-      this.statsInterval = null;
+
+      /** Setup the page on first load. Call refresh afterwards to initialize the content area.
+       */
+      function init() {
+        $("#addHeader").jqotesubtpl("templates/episodes-header.tpl", {});
+
+        // each initializer function may return an array of parameterless functions that shall be applied
+        // after refreshing has finished
+        var applyAfterRefresh = [
+          // log
+          function () {
+            console.log("done")
+          },
+          // initialize search box
+          (function () {
+            $("#searchBox")
+                    .css("width", $("#addButtonsContainer")
+                    .outerWidth(false) - 10)// make searchbox being aligned with upload/schedule buttons (MH-6519)
+                    .searchbox({
+                      search: function (text, field) {
+                        if ($.trim(text) != "") {
+                          state.filterField = field;
+                          state.filterText = text;
+                          state.page = 0;
+                        }
+                        refresh();
+                      },
+                      clear: function () {
+                        state.filterField = "";
+                        state.filterText = "";
+                        state.page = 0;
+                        refresh();
+                      },
+                      searchText: state.filterText,
+                      options: FILTER_FIELDS,
+                      selectedOption: state.filterField
+                    });
+          })(),
+          // initialize pager
+          (function () {
+            $("#pageSize").val(state.pageSize);
+            $("#pageSize").change(function () {
+              state.pageSize = $(this).val();
+              state.page = 0;
+            });
+            $("#page").val(state.page + 1);
+            $("#page").blur(function () {
+              gotoPage($(this).val() - 1);
+            });
+            $("#page").keypress(function (event) {
+              if (event.keyCode == "13") {
+                event.preventDefault();
+                gotoPage($(this).val() - 1);
+              }
+            });
+          })(),
+          // initialize refresh controls
+          (function () {
+            updateRefreshInterval(state.doRefresh, state.refresh);
+
+            // Refresh Controls
+            // set values according to config
+            if (state.doRefresh) {
+              $("#refreshEnabled").attr("checked", "checked");
+              $("#refreshInterval").removeAttr("disabled");
+              $("#refreshControlsContainer span").removeAttr("style");
+            } else {
+              $("#refreshEnabled").removeAttr("checked");
+              $("#refreshInterval").attr("disabled", "true");
+              $("#refreshControlsContainer span").css("color", "silver");
+            }
+            $("#refreshInterval").val(state.refresh);
+            // attatch event handlers
+            $("#refreshEnabled").change(function () {
+              if ($(this).is(":checked")) {
+                $("#refreshInterval").removeAttr("disabled");
+                $("#refreshControlsContainer span").removeAttr("style");
+              } else {
+                $("#refreshInterval").attr("disabled", "true");
+                $("#refreshControlsContainer span").css("color", "silver");
+              }
+              updateRefreshInterval($(this).is(":checked"), $("#refreshInterval").val());
+            });
+            $("#refreshInterval").change(function () {
+              updateRefreshInterval($("#refreshEnabled").is(":checked"), $(this).val());
+            });
+          })(),
+          // initialize episode selection checkboxes
+          (function () {
+            $6("body")
+                    .delegate(".selectEpisode", "change", function () {
+                      check(this, $(this).is(":checked"));
+                      showSelectedEpisodesCount();
+                    })
+                    .delegate("#selectAllEpisodes", "change", function () {
+                      var checked = $(this).is(":checked");
+                      $6(".selectEpisode").each(function () {
+                        check(this, checked);
+                      });
+                      showSelectedEpisodesCount();
+                    });
+
+            showSelectedEpisodesCount();
+            return [restoreCheckboxes];
+            // -- where
+            function check(box, checked) {
+              $(box).attr("checked", checked);
+              var eid = $(box).val();
+              selectedEpisodes[eid] = checked;
+              checkSelectAllEpisodes();
+            }
+
+            function allChecked() {
+              var $e = $(".selectEpisode");
+              return $e.size() == $e.filter(":checked").size();
+            }
+
+            function restoreCheckboxes() {
+              $(".selectEpisode").each(function () {
+                var eid = $(this).val();
+                $(this).attr("checked", selectedEpisodes[eid] == true);
+              });
+              checkSelectAllEpisodes();
+            }
+
+            function checkSelectAllEpisodes() {
+              $("#selectAllEpisodes").attr("checked", allChecked());
+            }
+          })(),
+          // pager
+          (function () {
+            var $pageSize = $("#pageSize");
+            $pageSize.val(state.pageSize);
+            $pageSize.change(function () {
+              state.pageSize = $(this).val();
+              state.page = 0;
+              refresh();
+            });
+          })(),
+          // apply workflow widget
+          (function() {
+            var $selectWorkflow = $("#selectWorkflow");
+            getAvailableWorkflowDefinitions().done(function (json) {
+              var tmpl = _.template("<option value='<%= id %>'><%= title ? title : id %></option>");
+              var selectBoxes = _.map(json["workflow_definitions"], function (a) {
+                return tmpl(a);
+              }).join("");
+              $selectWorkflow.append(selectBoxes);
+              $("#applyWorkflow").click(function() {
+                applyWorkflowToSelectedEpisodes($selectWorkflow.val());
+                showSelectedEpisodesCount();
+              });
+            });
+          })()
+        ];
+        // flatten and filter out undefined values, refresh and apply functions afterwards
+        var f = _(applyAfterRefresh).chain().flatten().compact().value();
+        _theRefreshFunc = function () {
+          return _refresh().done(f);
+        };
+        refresh();
+      }
+
+      function showSelectedEpisodesCount() {
+        var c = _(selectedEpisodes).chain().keys().filter(
+                function (a) {
+                  return selectedEpisodes[a]
+                }).value().length;
+        $6("#selectedEpisodesCount").html(c + " episode(s) selected");
+      }
 
       /** Create a state object from the current URL.
        */
       function stateFromUrl() {
-        var defaults = {
-          state: "all",
-          pageSize: 10,
-          page: 0,
-          refresh: 5,
-          doRefresh: true,
-          sortField: "Date",
-          sortOrder: "ASC",
-          filterField: null,
-          filterText: "",
-          lastState: "all",
-          lastPageSize: 10,
-          lastPage: 0
-        };
-
         // define converter functions for certain state properties
         var conv = {
           pageSize: parseInt,
@@ -131,7 +331,7 @@ opencast.episode = (function() {
         };
 
         // parse url parameters
-        var state = _(A(document.location.href.split('?', 2)[1])).chain()
+        var state = _(A(document.location.href.split("?", 2)[1])).chain()
             .map(function(a) { return a.split("&") })
             .flatten()
             .foldl(function(a, b) {
@@ -142,32 +342,39 @@ opencast.episode = (function() {
             }, {})
             .value();
 
-        // merge them into one
-        return _.defaults(state, defaults);
+        // merge them with defaults
+        return _.defaults(state, defaultState);
       }
 
       /** Transform a state object into a URL.
        */
       function stateToUrl(state) {
         var query = _.map(state, function(v, k) { return k + "=" + escape(v) }).join("&");
-        return document.location.href.split('?', 2)[0] + (query.length > 0 ? "?" + query : "");
+        return document.location.href.split("?", 2)[0] + (query.length > 0 ? "?" + query : "");
       }
-
-      var state = stateFromUrl();
 
       /** Make the page reload with the currently set configuration
        *  @param newState -- object with new state parameters, see the main state object
        */
       function reload(newState) {
-        document.location.href = stateToUrl(_.defaults(newState || {}, state));
+        state = _.defaults(newState || {}, state);
+        refresh();
+      }
+
+      // this var holds the actual refresh function and gets initialized lazily
+      var _theRefreshFunc = function () {return $6.Deferred()};
+
+      function refresh() {
+        return _theRefreshFunc();
       }
 
       /** Initiate new JSONP call to workflow instances list endpoint
+       *  @return deferred object
        */
-      function refresh() {
+      function _refresh() {
         if (!refreshing) {
           refreshing = true;
-
+          // # LET
           /** Extract data from the json response suitable for the render function.
            */
           function extractData(json) {
@@ -175,41 +382,47 @@ opencast.episode = (function() {
               raw: json,
               totalCount: parseInt(json["search-results"].total),
               count: parseInt(json["search-results"].limit),
-              mkRenderData: function() {
+              mkRenderData: function () {
                 return mkRenderDataEpisodes(json);
               }
             }
           }
-
+          // # IN
           // define query parameters
-          var params = _([
-            // sorting if specified
-            (function() {
-              if (state.sortField != null) {
-                var sort = SORT_FIELDS[state.sortField];
-                if (state.sortOrder == 'DESC') sort += "_DESC";
-                return "sort=" + sort;
-              }
-            })(),
-            // filtering if specified
-            (function() {
-              if (state.filterText != '') {
-                return state.filterField + '=' + encodeURI(state.filterText);
-              }
-            })(),
-            "limit=" + state.pageSize,
-            "offset=" + (state.page * state.pageSize)
-          ]).compact();
-
+          var params = _.extend(
+                  {
+                    limit: state.pageSize,
+                    offset: (state.page * state.pageSize)
+                  },
+                  // sorting if specified
+                  (function () {
+                    if (state.sortField != null) {
+                      var sort = SORT_FIELDS[state.sortField];
+                      if (state.sortOrder == "DESC") sort += "_DESC";
+                      return {sort: sort};
+                    }
+                  })(),
+                  // filtering if specified
+                  (function () {
+                    if (state.filterText != "") {
+                      var a = {};
+                      a[state.filterField] = encodeURI(state.filterText);
+                      return a;
+                    }
+                  })());
           // issue the ajax request
-          $.ajax({
-            url: URL_EPISODE_LIST + "?" + params.join("&"),
-            dataType: 'jsonp',
-            jsonp: 'jsonp',
-            success: function(data) {
-              render(extractData(data));
-            }
+          return $6.Deferred(function (d) {
+            getEpisodes(params).success(function (data) {
+              console.log("success");
+              // ensure rendering has finished before any further functions apply
+              render(extractData(data))
+                      .done(function () {d.resolve()})
+                      .fail(function () {d.fail()});
+            })
           });
+        } else {
+          // return an empty deferred
+          return $6.Deferred();
         }
       }
 
@@ -223,14 +436,6 @@ opencast.episode = (function() {
         }
       }
 
-      /** Query the workflows that are currently being active, i.e. they do have either of the states
-       *  SUCCEEDED or FAILED.
-       *  @return jqXHR
-       */
-      function getAllActiveWorkflows() {
-        return $6.getJSON(URL_WORKFLOW_INSTANCES + "?compact=true&state=-SUCCEEDED&state=-FAILED");
-      }
-
       /** JSONP callback for calls to the workflow instances list endpoint.
        *  @param pdata -- "parsed data"
        *    {
@@ -239,6 +444,7 @@ opencast.episode = (function() {
        *      count: <INT>
        *      mkRenderData: function: {episodes: [episode]}
        *    }
+       *  @return deferred render object
        */
       function render(pdata) {
         // select template
@@ -252,13 +458,63 @@ opencast.episode = (function() {
           currentShownEpisodes = totalEpisodes;
         }
 
+        // display number of matches if filtered
+        if (state.filterText) {
+          if (pdata.totalCount == "0") {
+            $("#filterRecordingCount").css("color", "red");
+          } else {
+            $("#filterRecordingCount").css("color", "black");
+          }
+          $("#filterRecordingCount").text(pdata.totalCount + " found").show();
+        } else {
+          $("#filterRecordingCount").hide();
+        }
+
+        var page = state.page + 1;
+        var pageCount = Math.ceil(pdata.totalCount / state.pageSize);
+        pageCount = pageCount == 0 ? 1 : pageCount;
+        $("#pageList").text(page + " of " + pageCount);
+        if (page == 1) {
+          $("#prevButtons").hide();
+          $("#prevText").show();
+        } else {
+          $("#prevButtons").show();
+          $("#prevText").hide();
+        }
+        if (page == pageCount) {
+          $("#nextButtons").hide();
+          $("#nextText").show();
+        } else {
+          $("#nextButtons").show();
+          $("#nextText").hide();
+        }
+
+        return getAllActiveWorkflows()
+                .done(function (workflowJson) {
+                  var episodes = pdata.mkRenderData();
+                  addCurrentWorkflow(episodes.episodes, A(workflowJson.workflows.workflow));
+                  renderTable(episodes);
+                  attachSortHandlers();
+                  console.log("done workflows");
+                });
+
+        // -- where
+
         /** @param episodes -- {episodes: [Episode]}
          */
         function renderTable(episodes) {
-          $('#tableContainer').jqotesubtpl("templates/episodes-table.tpl", episodes);
+          var $table = $("#tableContainer");
+          $table.jqotesubtpl("templates/episodes-table.tpl", episodes);
+          // do some postprocessing
+          // disable episodes currently being processed, highlight them
+          $table.find("tr:has(span.active-workflow)")
+                  .find(".selectEpisode").each(function() {this.disabled = true})
+                  .end()
+                  .addClass("highlight");
         }
 
-        /** Adds the current workflow to each episode in the list.
+        /** If an episode is currently being processed by a workflow, add the workflow information
+         *  to the episode.
          *  @param episodes -- [Episode]
          *  @param workflows -- [workflow_json]
          */
@@ -282,168 +538,41 @@ opencast.episode = (function() {
         function attachSortHandlers() {
           // When table is ready, attach event handlers
           $(".sortable").click(function() {
-            var sortDesc = $(this).find('.sort-icon').hasClass('ui-icon-circle-triangle-s');
-            var sortField = ($(this).attr('id')).substr(4);
-            $('#episodesTable th .sort-icon')
-                .removeClass('ui-icon-circle-triangle-s')
-                .removeClass('ui-icon-circle-triangle-n')
-                .addClass('ui-icon-triangle-2-n-s');
+            var sortDesc = $(this).find(".sort-icon").hasClass("ui-icon-circle-triangle-s");
+            var sortField = ($(this).attr("id")).substr(4);
+            $("#episodesTable th .sort-icon")
+                .removeClass("ui-icon-circle-triangle-s")
+                .removeClass("ui-icon-circle-triangle-n")
+                .addClass("ui-icon-triangle-2-n-s");
             if (sortDesc) {
               state.sortField = sortField;
-              state.sortOrder = 'ASC';
+              state.sortOrder = "ASC";
               state.page = 0;
               reload();
             } else {
               state.sortField = sortField;
-              state.sortOrder = 'DESC';
+              state.sortOrder = "DESC";
               state.page = 0;
               reload();
             }
           });
           // if results are sorted, display icon indicating sort order in respective table header cell
           if (state.sortField != null) {
-            var th = $('#sort' + state.sortField);
-            $(th).find('.sort-icon').removeClass('ui-icon-triangle-2-n-s');
-            if (state.sortOrder == 'ASC') {
-              $(th).find('.sort-icon').addClass('ui-icon-circle-triangle-n');
-            } else if (state.sortOrder == 'DESC') {
-              $(th).find('.sort-icon').addClass('ui-icon-circle-triangle-s');
+            var th = $("#sort" + state.sortField);
+            $(th).find(".sort-icon").removeClass("ui-icon-triangle-2-n-s");
+            if (state.sortOrder == "ASC") {
+              $(th).find(".sort-icon").addClass("ui-icon-circle-triangle-n");
+            } else if (state.sortOrder == "DESC") {
+              $(th).find(".sort-icon").addClass("ui-icon-circle-triangle-s");
             }
           }
-        }
-
-        getAllActiveWorkflows()
-            .done(function(workflowJson) {
-              var episodes = pdata.mkRenderData();
-              addCurrentWorkflow(episodes.episodes, A(workflowJson.workflows.workflow));
-              renderTable(episodes);
-              attachSortHandlers();
-            });
-
-        // display number of matches if filtered
-        if (state.filterText) {
-          if (pdata.totalCount == '0') {
-            $('#filterRecordingCount').css('color', 'red');
-          } else {
-            $('#filterRecordingCount').css('color', 'black');
-          }
-          $('#filterRecordingCount').text(pdata.totalCount + ' found').show();
-        } else {
-          $('#filterRecordingCount').hide();
-        }
-
-        var page = state.page + 1;
-        var pageCount = Math.ceil(pdata.totalCount / state.pageSize);
-        pageCount = pageCount == 0 ? 1 : pageCount;
-        $('#pageList').text(page + " of " + pageCount);
-        if (page == 1) {
-          $('#prevButtons').hide();
-          $('#prevText').show();
-        } else {
-          $('#prevButtons').show();
-          $('#prevText').hide();
-        }
-        if (page == pageCount) {
-          $('#nextButtons').hide();
-          $('#nextText').show();
-        } else {
-          $('#nextButtons').show();
-          $('#nextText').hide();
         }
       }
-
-      /** Setup the page on first load. Call refresh afterwards to initialize the content area.
-       */
-      this.init = function() {
-        $('#addHeader').jqotesubtpl('templates/episodes-header.tpl', {});
-
-        // initialize search box
-        (function(controller) {
-          $('#searchBox').css('width', $('#addButtonsContainer').outerWidth(false) - 10);   // make searchbox beeing aligned with upload/schedule buttons (MH-6519)
-          controller.searchbox = $("#searchBox").searchbox({
-            search: function(text, field) {
-              if ($.trim(text) != '') {
-                state.filterField = field;
-                state.filterText = text;
-                state.page = 0;
-              }
-              refresh();
-            },
-            clear: function() {
-              state.filterField = '';
-              state.filterText = '';
-              state.page = 0;
-              refresh();
-            },
-            searchText: state.filterText,
-            options: FILTER_FIELDS,
-            selectedOption: state.filterField
-          });
-        })(this);
-
-        // initialize pager
-        (function(controller) {
-          $('#pageSize').val(state.pageSize);
-
-          $('#pageSize').change(function() {
-            state.pageSize = $(this).val();
-            state.page = 0;
-          });
-
-          $('#page').val(state.page + 1);
-
-          $('#page').blur(function() {
-            controller.gotoPage($(this).val() - 1);
-          });
-
-          $('#page').keypress(function(event) {
-            if (event.keyCode == '13') {
-              event.preventDefault();
-              controller.gotoPage($(this).val() - 1);
-            }
-          });
-        })(this);
-
-        // initialize refresh controls
-        (function(controller) {
-          controller.updateRefreshInterval(state.doRefresh, state.refresh);
-
-          // Refresh Controls
-          // set values according to config
-          if (state.doRefresh) {
-            $('#refreshEnabled').attr('checked', 'checked');
-            $('#refreshInterval').removeAttr('disabled');
-            $('#refreshControlsContainer span').removeAttr('style');
-          } else {
-            $('#refreshEnabled').removeAttr('checked');
-            $('#refreshInterval').attr('disabled', 'true');
-            $('#refreshControlsContainer span').css('color', 'silver');
-          }
-          $('#refreshInterval').val(state.refresh);
-          // attatch event handlers
-          $('#refreshEnabled').change(function() {
-            if ($(this).is(':checked')) {
-              $('#refreshInterval').removeAttr('disabled');
-              $('#refreshControlsContainer span').removeAttr('style');
-            } else {
-              $('#refreshInterval').attr('disabled', 'true');
-              $('#refreshControlsContainer span').css('color', 'silver');
-            }
-            controller.updateRefreshInterval($(this).is(':checked'), $('#refreshInterval').val());
-          });
-          $('#refreshInterval').change(function() {
-            controller.updateRefreshInterval($('#refreshEnabled').is(':checked'), $(this).val());
-          });
-        })(this);
-
-        //
-        refresh();
-      };
 
       /** Start the retract workflow for a certain media package.
        *  @param mediaPackageId -- the id of the package to retract
        */
-      this.retract = function(mediaPackageId) {
+      function retract(mediaPackageId) {
         if (confirm("Start retraction of episode?")) {
           $.ajax({
             type: "POST",
@@ -452,7 +581,7 @@ opencast.episode = (function() {
               id: mediaPackageId,
               definitionId: "retract"
             },
-            complete: function(xhr, status) {
+            complete: function(xhr) {
               if (xhr.status == 204) {
                 // 204: NO_CONTENT -> ok, expected response
                 refresh();
@@ -462,57 +591,102 @@ opencast.episode = (function() {
             }
           });
         }
-      };
+      }
 
-      this.nextPage = function() {
+      /**
+       * @param workflowDefinitionId -- id of the workflow to apply
+       * @param mediaPackageId -- String: Id of a single media package | Array: List of ids.
+       */
+      function applyWorkflow(workflowDefinitionId, mediaPackageId) {
+        var mids = _.isArray(mediaPackageId) ? mediaPackageId : [mediaPackageId];
+        $6.ajax({
+          type: "POST",
+          url: "../episode/applyworkflow",
+          data: {
+            id: mids,
+            definitionId: workflowDefinitionId
+          },
+          // IMPORTANT! Must be true otherwise the id array gets serialized like this "id%5B%5D=1&id%5B%5D=2"
+          // which the server does not understand
+          traditional: true,
+          complete: function(xhr) {
+            if (xhr.status == 204) {
+              // 204: NO_CONTENT -> ok, expected response
+              refresh();
+            } else {
+              alert("Unexpected response " + xhr.status);
+            }
+          }
+        });
+      }
+
+      function applyWorkflowToSelectedEpisodes(workflowDefinitionId) {
+        var selected = _(selectedEpisodes).chain().keys().filter(function (a) {return selectedEpisodes[a]}).value();
+        if (selected.length > 0) {
+          selectedEpisodes = {};
+          applyWorkflow(workflowDefinitionId, selected);
+        }
+      }
+
+      function nextPage() {
         var numPages = Math.floor(totalEpisodes / state.pageSize);
         // make sure we have an int
         var currentPage = state.page;
         reload({ page: currentPage < numPages ? currentPage + 1 : currentPage });
-      };
+      }
 
-      this.previousPage = function() {
+      function previousPage() {
         var currentPage = state.page;
         reload({ page: currentPage > 0 ? currentPage - 1 : currentPage });
-      };
+      }
 
-      this.lastPage = function() {
+      function lastPage() {
         reload({ page: Math.floor(totalEpisodes / state.pageSize) });
-      };
+      }
 
-      this.firstPage = function() {
+      function firstPage() {
         reload({ page: 0 });
-      };
+      }
 
-      this.gotoPage = function(page) {
+      function gotoPage(page) {
         if (page > (totalEpisodes / state.pageSize)) {
-          this.lastPage();
+          lastPage();
         } else {
           if (page < 0) {
             page = 0;
           }
           reload({ page: page });
         }
-      };
+      }
 
-      this.disableRefresh = function() {
+      function disableRefresh() {
         if (refreshId) {
           window.clearInterval(refreshId);
         }
-      };
+      }
 
-      this.updateRefreshInterval = function(enable, delay) {
+      function updateRefreshInterval(enable, delay) {
         delay = delay < 5 ? 5 : delay;
         state.refresh = delay;
-        ocUtils.log('Setting Refresh to ' + enable + " - " + delay + " sec");
+        ocUtils.log("Setting Refresh to " + enable + " - " + delay + " sec");
         state.doRefresh = enable;
-        this.disableRefresh();
+        disableRefresh();
         if (enable) {
           refreshId = window.setInterval(refresh, delay * 1000);
         }
+      }
+      ////
+      // exports
+      //
+      return {
+        init: init,
+        retract: retract,
+        nextPage: nextPage,
+        previousPage: previousPage,
+        lastPage: lastPage,
+        firstPage: firstPage,
+        gotoPage: gotoPage
       };
-
-      return this;
     })(),
 
     /** Details page.
@@ -523,15 +697,16 @@ opencast.episode = (function() {
         var mpId = ocUtils.getURLParam("id");
         // load header and inject it
         $("#addHeader").jqotesubtpl("templates/episode-detail-header.tpl", {});
-        $6.when(queryWorkflowsOfMediaPackage(mpId), queryMediaPackage(mpId))
-            .done(function(ajaxWorkflow, ajaxMpSearchResult) {
-              // both args are arrays where [0] contains the response data
-              injectDetailOverview($("#tableContainer"), {
-                episode: mkEpisode(ajaxMpSearchResult[0]["search-results"].result),
-                workflows: _.map(A(ajaxWorkflow[0].workflows.workflow), mkWorkflow)
-              });
-              injectMediaPackageDetails($("#mediaPackageDetails"), ajaxMpSearchResult[0]["search-results"].result.mediapackage);
-            });
+        $6.when(queryWorkflowsOfMediaPackage(mpId),
+                queryMediaPackage(mpId))
+          .done(function (ajaxWorkflow, ajaxMpSearchResult) {
+                  // both args are arrays where [0] contains the response data
+                  injectDetailOverview($("#tableContainer"), {
+                    episode: mkEpisode(ajaxMpSearchResult[0]["search-results"].result),
+                    workflows: _.map(A(ajaxWorkflow[0].workflows.workflow), mkWorkflow)
+                  });
+                  injectMediaPackageDetails($("#mediaPackageDetails"), ajaxMpSearchResult[0]["search-results"].result.mediapackage);
+                });
       }
 
       function injectDetailOverview($container, data) {
@@ -540,28 +715,14 @@ opencast.episode = (function() {
 
       function injectMediaPackageDetails($container, mediapackage) {
         $container.jqotesubtpl("templates/episode-detail-mediapackage.tpl", mediapackage);
-        $('.unfoldable-tr').click(function() {
-          var $content = $(this).find('.unfoldable-content');
-          var unfolded = $content.is(':visible');
-          $('.unfoldable-content').hide('fast');
+        $(".unfoldable-tr").click(function() {
+          var $content = $(this).find(".unfoldable-content");
+          var unfolded = $content.is(":visible");
+          $(".unfoldable-content").hide("fast");
           if (!unfolded) {
-            $content.show('fast');
+            $content.show("fast");
           }
         });
-      }
-
-      /** @param id -- the media package id
-       *  @return jqXHR containing raw json
-       */
-      function queryWorkflowsOfMediaPackage(id) {
-        return $6.getJSON("../workflow/instances.json", { mp: id, startPage: 0, count: 999999, compact: false });
-      }
-
-      /** @param id -- the media package id
-       *  @return jqXHR containing raw json
-       */
-      function queryMediaPackage(id) {
-        return $6.getJSON("../episode/episode.json", { id: id })
       }
 
       function mkWorkflow(json) {
