@@ -81,8 +81,11 @@ public class ResourceServlet extends HttpServlet {
     if (rootKey != null) {
       if (root == null)
         root = (String) cc.getProperties().get(rootKey);
-    } else {
-      if (root == null)
+        if (root == null) {
+          logger.warn("No value for key " + rootKey + " found for this service.  Defaulting to value of org.opencastproject.download.directory.");
+    }
+
+    if (root == null)
         root = (String) cc.getBundleContext().getProperty("org.opencastproject.download.directory");
     }
 
