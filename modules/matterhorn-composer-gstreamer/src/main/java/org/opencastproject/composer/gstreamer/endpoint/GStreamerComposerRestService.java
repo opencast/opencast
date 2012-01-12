@@ -144,7 +144,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("encode")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "encode", description = "Starts an encoding process, based on the specified encoding profile ID and the track", pathParameters = {}, restParameters = {
+  @RestQuery(name = "encode", description = "Starts an encoding process, based on the specified encoding profile ID and the track", pathParameters = { }, restParameters = {
           @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "flash.http") }, reponses = { @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response encode(@FormParam("sourceTrack") String sourceTrackAsXml, @FormParam("profileId") String profileId)
@@ -184,7 +184,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("trim")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "trim", description = "Starts a trimming process, based on the specified track, start time and duration in ms", pathParameters = {}, restParameters = {
+  @RestQuery(name = "trim", description = "Starts a trimming process, based on the specified track, start time and duration in ms", pathParameters = { }, restParameters = {
           @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
           @RestParameter(description = "The encoding profile to use for trimming", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "trim.work"),
           @RestParameter(description = "The start time in milisecond", isRequired = true, name = "start", type = Type.STRING, defaultValue = "0"),
@@ -237,7 +237,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("mux")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "mux", description = "Starts an encoding process, which will mux the two tracks using the given encoding profile", pathParameters = {}, restParameters = {
+  @RestQuery(name = "mux", description = "Starts an encoding process, which will mux the two tracks using the given encoding profile", pathParameters = { }, restParameters = {
           @RestParameter(description = "The track containing the audio stream", isRequired = true, name = "sourceAudioTrack", type = Type.TEXT, defaultValue = "${this.audioTrackDefault}"),
           @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceVideoTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "flash.http") }, reponses = { @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
@@ -284,7 +284,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("image")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "image", description = "Starts an image extraction process, based on the specified encoding profile ID and the source track", pathParameters = {}, restParameters = {
+  @RestQuery(name = "image", description = "Starts an image extraction process, based on the specified encoding profile ID and the source track", pathParameters = { }, restParameters = {
           @RestParameter(description = "The number of seconds (many numbers can be specified, separated by comma) into the video to extract the image", isRequired = true, name = "time", type = Type.STRING, defaultValue = "1"),
           @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "player-preview.http") }, reponses = { @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
@@ -334,7 +334,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("captions")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "captions", description = "Starts caption embedding process, based on the specified source track and captions", pathParameters = {}, restParameters = {
+  @RestQuery(name = "captions", description = "Starts caption embedding process, based on the specified source track and captions", pathParameters = { }, restParameters = {
           @RestParameter(description = "QuickTime file containg video stream", isRequired = true, name = "mediaTrack", type = Type.TEXT, defaultValue = "${this.mediaTrackDefault}"),
           @RestParameter(description = "Catalog(s) containing captions in SRT format", isRequired = true, name = "captions", type = Type.TEXT, defaultValue = "${this.captionsCatalogsDefault}") }, reponses = { @RestResponse(description = "Result in an xml document containing resulting media file.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response captions(@FormParam("mediaTrack") String sourceTrackXml, @FormParam("captions") String captionsAsXml,
@@ -373,7 +373,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
   @GET
   @Path("profiles.xml")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "profiles", description = "Retrieve the encoding profiles", pathParameters = {}, restParameters = {}, reponses = { @RestResponse(description = "Results in an xml document describing the available encoding profiles", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(name = "profiles", description = "Retrieve the encoding profiles", pathParameters = { }, restParameters = { }, reponses = { @RestResponse(description = "Results in an xml document describing the available encoding profiles", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public EncodingProfileList listProfiles() {
     List<EncodingProfileImpl> list = new ArrayList<EncodingProfileImpl>();
     for (EncodingProfile p : composerService.listProfiles()) {
@@ -385,7 +385,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
   @GET
   @Path("profile/{id}.xml")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "profilesID", description = "Retrieve an encoding profile", pathParameters = { @RestParameter(name = "id", description = "the profile ID", isRequired = false, type = RestParameter.Type.STRING) }, restParameters = {}, reponses = { @RestResponse(description = "Results in an xml document describing the requested encoding profile", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(name = "profilesID", description = "Retrieve an encoding profile", pathParameters = { @RestParameter(name = "id", description = "the profile ID", isRequired = false, type = RestParameter.Type.STRING) }, restParameters = { }, reponses = { @RestResponse(description = "Results in an xml document describing the requested encoding profile", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response getProfile(@PathParam("id") String profileId) {
     EncodingProfileImpl profile = (EncodingProfileImpl) composerService.getProfile(profileId);
     if (profile == null)
@@ -451,8 +451,8 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
     String[] timeStringArray = times.split(",");
     List<Long> parsedTimeArray = new LinkedList<Long>();
     for (String timeString : timeStringArray) {
-      if (!(timeString = timeString.trim()).equals("")) {
-        parsedTimeArray.add(Long.parseLong(timeString));
+      if (!timeString.trim().isEmpty()) {
+        parsedTimeArray.add(Long.parseLong(timeString.trim()));
       }
     }
     long[] timeArray = new long[parsedTimeArray.size()];
