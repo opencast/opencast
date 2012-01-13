@@ -36,6 +36,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Inspects request URLs and sets the organization for the request.
@@ -89,8 +90,9 @@ public class OrganizationFilter implements Filter {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
           ServletException {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
+    HttpServletResponse httpResponse = (HttpServletResponse) response;
     URL url = new URL(httpRequest.getRequestURL().toString());
-    Organization org = null;
+    Organization org = null;    
     try {
       try {
         org = organizationDirectory.getOrganization(url);
@@ -107,6 +109,8 @@ public class OrganizationFilter implements Filter {
       if (org != null) {
         securityService.setOrganization(org);
         chain.doFilter(request, response);
+      } else {
+        httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "No organization is mapped to handle " + url);
       }
     } finally {
       securityService.setOrganization(null);

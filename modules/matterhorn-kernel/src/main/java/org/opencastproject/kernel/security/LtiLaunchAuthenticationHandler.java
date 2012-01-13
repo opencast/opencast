@@ -15,6 +15,8 @@
  */
 package org.opencastproject.kernel.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
@@ -27,8 +29,10 @@ import org.springframework.security.oauth.provider.ConsumerAuthentication;
 import org.springframework.security.oauth.provider.token.OAuthAccessProviderToken;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,8 +43,25 @@ import javax.servlet.http.HttpServletRequest;
 public class LtiLaunchAuthenticationHandler implements
         org.springframework.security.oauth.provider.OAuthAuthenticationHandler {
 
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(LtiLaunchAuthenticationHandler.class);
+  
   /** The Http request parameter, sent by the LTI consumer, containing the user ID. */
   public static final String LTI_USER_ID_PARAM = "user_id";
+  
+  /** The http request paramater containing the Consumer GUI **/
+  public static final String LTI_CONSUMER_GUI = "tool_consumer_instance_guid";
+  
+  /** LTI field containing a comma delimeted list of roles */
+  public static final String ROLES = "roles";
+  
+  /** The LTI field containing the context_id */
+  public static final String CONTEXT_ID = "context_id";
+  
+  /** The prefix for LTI user ids   */
+  public static final String LTI_USER_ID_PREFIX = "BLTI";
+  
+  public static final String LTI_ID_DELIMITER = ":";
 
   /** The user details service */
   protected UserDetailsService userDetailsService = null;
@@ -67,6 +88,13 @@ public class LtiLaunchAuthenticationHandler implements
           OAuthAccessProviderToken authToken) {
     // The User ID must be provided by the LTI consumer
     String userIdFromConsumer = request.getParameter(LTI_USER_ID_PARAM);
+    //We need to construct a complex ID to avoid confusion
+    //TODO if this is a trusted consumer we won't want to do this
+    userIdFromConsumer = LTI_USER_ID_PREFIX + LTI_ID_DELIMITER + request.getParameter(LTI_CONSUMER_GUI) + LTI_ID_DELIMITER + userIdFromConsumer;
+    if (logger.isDebugEnabled()) {
+      logger.debug("got userId: " + userIdFromConsumer);
+    }
+    
     UserDetails userDetails = null;
     Collection<GrantedAuthority> userAuthorities = null;
     try {
@@ -75,9 +103,19 @@ public class LtiLaunchAuthenticationHandler implements
     } catch (UsernameNotFoundException e) {
       // This user is known to the tool consumer, but not to Matterhorn. Create a user "on the fly"
       userAuthorities = new HashSet<GrantedAuthority>();
-      // TODO: should we add the authorities passed in from the tool consumer?
+      // We should add the authorities passed in from the tool consumer?
       userAuthorities.add(new GrantedAuthorityImpl("ROLE_USER"));
       userAuthorities.add(new GrantedAuthorityImpl("ROLE_OAUTH_USER"));
+      String roles = request.getParameter(ROLES);
+      String context = request.getParameter(CONTEXT_ID);
+      //Roles could be a list
+      List<String> roleList = Arrays.asList(roles.split(","));
+      for (int i = 0; i < roleList.size(); i++) {
+        String role = context + "_" + roleList.get(i);
+        logger.debug("adding role: {}", role);
+        userAuthorities.add(new GrantedAuthorityImpl(role));
+      }
+      
       userDetails = new User(userIdFromConsumer, "oauth", true, true, true, true, userAuthorities);
     }
     Authentication ltiAuth = new PreAuthenticatedAuthenticationToken(userDetails, authentication.getCredentials(),
