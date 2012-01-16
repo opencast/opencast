@@ -58,7 +58,7 @@
     </div>
   </div>
   <% } %>
-  <% if ( data[j].workflow.template == "scheduling") { %>
+  <% if ( data[j].workflow.config['schedule.location']) { %>
   <div class="form-box layout-centered ui-widget layout-centered">
     <div class="form-box-head ui-widget-header ui-corner-top">Capture</div>
     <div class="form-box-content ui-widget-content ui-corner-bottom">
