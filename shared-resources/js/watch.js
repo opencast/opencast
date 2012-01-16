@@ -247,9 +247,6 @@ Opencast.Watch = (function ()
 
             if(advancedPlayer)
             {
-                // Hide Screen Settings until fully initialized
-                $("#oc_btn-dropdown").hide();
-                $("#oc_player_video-dropdown").hide();
                 var userId = $.getURLParameter('user');
                 var restEndpoint = Opencast.engage.getSearchServiceEpisodeIdURL() + mediaPackageId;
                 Opencast.Player.setSessionId(Opencast.engage.getCookie("JSESSIONID"));
@@ -641,10 +638,6 @@ Opencast.Watch = (function ()
             Opencast.Watch.durationSet();
         }, 1000);
 
-        if(advancedPlayer)
-        {
-            $('#oc_player_video-dropdown').hide();
-        }
         // Opencast.ariaSpinbutton.initialize has to be called after #oc_video-player-controls is visible!
         Opencast.ariaSpinbutton.initialize('oc_volume-container', 'oc_volume-back', 'oc_volume-front', 8, 0, 100, true);
     }

@@ -253,12 +253,12 @@ function AC_AddExtension(src, ext)
             {
                 str = '<input id="oc_image" type="image" src="" alt="Matterhorn Player" title="Click to start" />';
                 $('#oc_flash-player-loading').hide();
-                $('#oc_player_video-dropdown').hide();
+                $('#oc_player_video-dropdown').css('visibility', 'hidden');
                 $('#data').hide();
             } else
             {
                 $('#oc_flash-player-loading').show();
-                $('#oc_player_video-dropdown').show();
+                $('#oc_player_video-dropdown').css('visibility', 'visible');
             }
         }
         // DO NOT CHANGE THIS. IE8 Flash 10.0 cannot handle adding the SWF by jquery
