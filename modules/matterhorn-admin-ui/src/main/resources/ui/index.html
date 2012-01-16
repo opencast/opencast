@@ -64,6 +64,9 @@
           <a href="#agents_status" title="Capture Agents" id="i18n_tab_agent">Capture Agents</a>
         </li>
         <li>
+          <a href="#users" title="Users" id="i18n_tab_users">Users</a>
+        </li>
+        <li>
           <a href="#statistics" title="Statistics" id="i18n_tab_statistics">Statistics</a>
         </li>
       </ul>
@@ -162,6 +165,12 @@
               },
               tab: "i18n_tab_recording"
             },
+            "/users": {
+                init: function() {
+                    document.title = "Users" + matterhorn;
+                  },
+                tab: "i18n_tab_users"
+              },
             "/inspect": {
               init: function() {
                 Opencast.WorkflowInspect.initInspect();
