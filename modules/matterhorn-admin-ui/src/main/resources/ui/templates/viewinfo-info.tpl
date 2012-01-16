@@ -90,7 +90,24 @@
         </tr>
         <tr>
           <td class="td-key">License:</td>
-          <td id="licenseField" class="td-value"><%= data[j].workflow.config.license %></td>
+          <td id="licenseField" class="td-value"><%= (data[j].workflow.config.license) ? data[j].workflow.config.license : '' %></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="form-box layout-centered ui-widget layout-centered">
+    <div class="form-box-head ui-widget-header ui-corner-top">Workflow</div>
+    <div class="form-box-content ui-widget-content ui-corner-bottom">
+      <table>
+        <tr>
+          <td class="td-key">Processing Instructions:</td>
+          <td class="td-value"><%= data[j].workflow.title %></td>
+        </tr>
+        <tr>
+          <td class="td-key">Holds:</td>
+          <td id="licenseField" class="td-value">
+            <%= (data[j].workflow.config.trimHold) ? 'Review / Trim before encoding (with option to edit info)' : '' %>
+          </td>
         </tr>
       </table>
     </div>
