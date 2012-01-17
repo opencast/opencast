@@ -4,10 +4,9 @@
 # Configure these variables to match your environment
 ##
 
-if [ ! -z "$FELIX_HOME" ]; then
-  FELIX_HOME="$FELIX_HOME"
-else
-  FELIX_HOME="/Applications/Matterhorn"
+if [ -z "$FELIX_HOME" ]; then
+  echo "FELIX_HOME is not set"
+  exit 1
 fi
 
 if [ ! -z "$M2_REPO" ]; then
