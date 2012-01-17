@@ -335,7 +335,7 @@
     <profile>
       <id>capture</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
