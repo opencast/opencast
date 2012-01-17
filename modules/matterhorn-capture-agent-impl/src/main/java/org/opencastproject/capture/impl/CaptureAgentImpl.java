@@ -571,6 +571,16 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
         flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
 
         String outputProperty = CaptureParameters.CAPTURE_DEVICE_PREFIX + name + CaptureParameters.CAPTURE_DEVICE_DEST;
+        if (null == recording.getProperty(outputProperty)) {
+          logger.error(CaptureParameters.CAPTURE_DEVICE_PREFIX + name + CaptureParameters.CAPTURE_DEVICE_DEST +
+                  " does not exist in the recording's properties.  Your CA's configuration file, or the configuration " +
+                  "received from the core is missing information.  This should be checked ASAP.");
+          // FIXME: Is the admin reading the agent logs? (jt)
+          // FIXME: Who will find out why one of the tracks is missing from the media package? (jt)
+          // FIXME: Think about a notification scheme, this looks like an emergency to me (jt)
+          setRecordingState(recording.getID(), RecordingState.MANIFEST_ERROR);
+          return false;
+        }
         File outputFile = new File(recording.getBaseDir(), recording.getProperty(outputProperty));
 
         // Adds the file to the MediaPackage
