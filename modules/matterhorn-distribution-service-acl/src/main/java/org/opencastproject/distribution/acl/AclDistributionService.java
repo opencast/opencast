@@ -14,14 +14,16 @@
  *
  */
 
-package org.opencastproject.distribution.download;
+package org.opencastproject.distribution.acl;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
@@ -51,12 +53,12 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Distributes media to the local media delivery directory.
+ * Distributes an access control list to control media to the local media delivery directory.
  */
-public class DownloadDistributionService extends AbstractJobProducer implements DistributionService {
+public class AclDistributionService extends AbstractJobProducer implements DistributionService {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(DownloadDistributionService.class);
+  private static final Logger logger = LoggerFactory.getLogger(AclDistributionService.class);
 
   /** List of available operations on jobs */
   private enum Operation {
@@ -64,7 +66,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
   };
 
   /** Receipt type */
-  public static final String JOB_TYPE = "org.opencastproject.distribution.download";
+  public static final String JOB_TYPE = "org.opencastproject.distribution.acl";
 
   /** Default distribution directory */
   public static final String DEFAULT_DISTRIBUTION_DIR = "opencast" + File.separator + "static";
@@ -93,7 +95,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
   /**
    * Creates a new instance of the download distribution service.
    */
-  public DownloadDistributionService() {
+  public AclDistributionService() {
     super(JOB_TYPE);
   }
 
@@ -138,89 +140,79 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
   }
 
   /**
-   * Distributes the mediapackage's element to the location that is returned by the concrete implementation. In
-   * addition, a representation of the distributed element is added to the mediapackage.
+   * Distributes an access control list from the media package to the location of a media package element. 
    * 
    * @see org.opencastproject.distribution.api.DistributionService#distribute(String, MediaPackageElement)
    */
-  protected MediaPackageElement distribute(Job job, MediaPackage mediapackage, String elementId)
+  protected MediaPackageElement distribute(Job job, MediaPackage mediaPackage, String elementId)
           throws DistributionException, MediaPackageException {
-    return distributeElement(mediapackage, elementId);
-  }
-
-  /**
-   * Distribute a Mediapackage element to the download distribution service.
-   * 
-   * @param mediapackage
-   *          The media package that contains the element to distribute.
-   * @param elementId
-   *          The id of the element that should be distributed contained within the media package.
-   * @return A reference to the MediaPackageElement that has been distributed.
-   * @throws DistributionException
-   *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
-   *           cannot be copied or another unexpected exception occurs.
-   */
-  public MediaPackageElement distributeElement(MediaPackage mediapackage, String elementId) 
-          throws DistributionException {
-    if (mediapackage == null)
-      throw new IllegalArgumentException("Mediapackage must be specified");
-    if (elementId == null)
-      throw new IllegalArgumentException("Element ID must be specified");
-
-    String mediaPackageId = mediapackage.getIdentifier().compact();
-    MediaPackageElement element = mediapackage.getElementById(elementId);
-
-    // Make sure the element exists
-    if (mediapackage.getElementById(elementId) == null)
-      throw new IllegalStateException("No element " + elementId + " found in mediapackage");
-
     try {
-      File source;
-      try {
-        source = workspace.get(element.getURI());
-      } catch (NotFoundException e) {
-        throw new DistributionException("Unable to find " + element.getURI() + " in the workspace", e);
-      } catch (IOException e) {
-        throw new DistributionException("Error loading " + element.getURI() + " from the workspace", e);
+      File source = getAclXmlAttachmentFile(mediaPackage);
+      if (source == null) {
+        throw new DistributionException("No available acl for mediapackage " + mediaPackage);
       }
-      File destination = getDistributionFile(mediapackage, element);
 
-      // Put the file in place
+      File destination = new File(PathSupport.concat(new String[] { distributionDirectory.getAbsolutePath(),
+              mediaPackage.getIdentifier().compact(), elementId, elementId + ".acl" }));
+
+      // Create the parent directory if it doesn't exist.
       try {
         FileUtils.forceMkdir(destination.getParentFile());
       } catch (IOException e) {
         throw new DistributionException("Unable to create " + destination.getParentFile(), e);
       }
       logger.info("Distributing {} to {}", elementId, destination);
-
+      // Copy the acl from source to destination.
       try {
         FileSupport.copy(source, destination);
       } catch (IOException e) {
         throw new DistributionException("Unable to copy " + source + " to " + destination, e);
       }
-
-      // Create a representation of the distributed file in the mediapackage
-      MediaPackageElement distributedElement = (MediaPackageElement) element.clone();
-      try {
-        distributedElement.setURI(getDistributionUri(mediaPackageId, element));
-      } catch (URISyntaxException e) {
-        throw new DistributionException("Distributed element produces an invalid URI", e);
-      }
-      distributedElement.setIdentifier(null);
-
-      logger.info("Finished distribution of {}", element);
-      return distributedElement;
-
+      
+      return (MediaPackageElement)getAclXmlAttachment(mediaPackage);
     } catch (Exception e) {
-      logger.warn("Error distributing " + element, e);
-      if (e instanceof DistributionException) {
-        throw (DistributionException) e;
-      } else {
-        throw new DistributionException(e);
-      }
+      logger.warn("Could not distribute acl XML with " + elementId + " from " + mediaPackage.getIdentifier().compact(), e);
+      return null;
     }
   }
   
+  /**
+   * @param mediaPackage The media package to find the attachment that has an ACL. 
+   * @return Returns the attachment if possible or null. 
+   */
+  private Attachment getAclXmlAttachment(MediaPackage mediaPackage) {
+    Attachment[] aclAttachments = mediaPackage.getAttachments(new MediaPackageElementFlavor("text", "acl"));
+    if (aclAttachments.length > 0) {
+      return aclAttachments[0];
+    } else
+    {
+      return null;
+    }
+  }
+  
+  
+  /**
+   * @param mediaPackage
+   *          The media package to find the acl xml.
+   * @return Returns a File object representing the attachment acl xml
+   * @throws DistributionException
+   *           Thrown if it is unable to access the acl xml.
+   */
+  private File getAclXmlAttachmentFile(MediaPackage mediaPackage) throws DistributionException {
+    File aclSourceFile = null;
+    Attachment acl = getAclXmlAttachment(mediaPackage);
+    if (acl != null) {
+      try {
+        aclSourceFile = workspace.get(acl.getURI());
+      } catch (NotFoundException e) {
+        throw new DistributionException("Unable to find " + acl.getURI() + " in the workspace", e);
+      } catch (IOException e) {
+        throw new DistributionException("Error loading " + acl.getURI() + " from the workspace", e);
+      }
+    }
+    return aclSourceFile;
+  }
+
   /**
    * {@inheritDoc}
    * 
@@ -255,76 +247,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
    */
   protected MediaPackageElement retract(Job job, MediaPackage mediapackage, String elementId)
           throws DistributionException {
-
-    if (mediapackage == null)
-      throw new IllegalArgumentException("Mediapackage must be specified");
-    if (elementId == null)
-      throw new IllegalArgumentException("Element ID must be specified");
-
-    // Make sure the element exists
-    MediaPackageElement element = mediapackage.getElementById(elementId);
-    if (element == null)
-      throw new IllegalStateException("No element " + elementId + " found in mediapackage");
-
-    // Find the element that has been created as part of the distribution process
-    String mediaPackageId = mediapackage.getIdentifier().compact();
-    URI distributedURI = null;
-    MediaPackageElement distributedElement = null; 
-    try {
-      distributedURI = getDistributionUri(mediaPackageId, element);
-      for (MediaPackageElement e : mediapackage.getElements()) {
-        if (distributedURI.equals(e.getURI())) {
-          distributedElement = e;
-          break;
-        }
-      }
-    } catch (URISyntaxException e) {
-      throw new DistributionException("Retracted element produces an invalid URI", e);
-    }
-
-    // Has this element been distributed?
-    if (distributedElement == null)
-      return null;
-        
-    String mediapackageId = mediapackage.getIdentifier().compact();
-    try {
-
-      File mediapackageDir = getMediaPackageDirectory(mediapackageId);
-      File elementDir = getDistributionFile(mediapackage, element);
-
-      logger.info("Retracting element {} from {}", distributedElement, elementDir);
-
-      // Does the file exist? If not, the current element has not been distributed to this channel
-      // or has been removed otherwise
-      if (!elementDir.exists()) {
-        logger.warn("Unable to delete element from {}", elementDir);
-        return distributedElement;
-      }
-
-      retractAclXmlFile();
-      
-      // Try to remove the file and - if possible - the parent folder
-      FileUtils.forceDelete(elementDir.getParentFile());
-      if (mediapackageDir.list().length == 0) {
-        FileSupport.delete(mediapackageDir);
-      }
-
-      logger.info("Finished rectracting element {} of media package {}", elementId, mediapackageId);
-
-      return distributedElement;
-    } catch (Exception e) {
-      logger.warn("Error retracting element " + elementId + " of mediapackage " + mediapackageId, e);
-      if (e instanceof DistributionException) {
-        throw (DistributionException) e;
-      } else {
-        throw new DistributionException(e);
-      }
-    }
-
-  }
-
-  private void retractAclXmlFile() {
-    
+   return null;
   }
 
   /**

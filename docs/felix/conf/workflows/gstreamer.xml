@@ -74,6 +74,17 @@
       </configurations>
     </operation>
 
+    <operation
+      id="distribute-acl"
+      max-attempts="2"
+      fail-on-error="false"
+      description="Distributing permissions to export file">
+      <configurations>
+        <configuration key="source-tags">export</configuration>
+        <configuration key="target-tags">publish</configuration>
+      </configurations>
+    </operation>
+
     <!-- Cleanup the working file repository -->
  
     <operation

@@ -100,6 +100,7 @@
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-db</module>
+        <module>modules/matterhorn-distribution-service-acl</module>
         <module>modules/matterhorn-distribution-service-api</module>
         <module>modules/matterhorn-distribution-service-download</module>
         <module>modules/matterhorn-distribution-service-streaming</module>

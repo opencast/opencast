@@ -177,6 +177,7 @@
               OSGI-INF/operations/cli.xml,
               OSGI-INF/operations/cleanup.xml,
               OSGI-INF/operations/compose.xml,
+              OSGI-INF/operations/distribute-acl.xml,
               OSGI-INF/operations/distribute-download.xml,
               OSGI-INF/operations/distribute-streaming.xml,
               OSGI-INF/operations/download-dvd.xml,

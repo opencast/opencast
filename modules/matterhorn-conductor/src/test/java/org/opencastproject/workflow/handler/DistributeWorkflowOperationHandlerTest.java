@@ -142,17 +142,6 @@ public class DistributeWorkflowOperationHandlerTest {
     }
     
     @Override
-    public Job distributeWithAclXml(MediaPackage mediapackage, String elementId)
-            throws DistributionException, MediaPackageException {
-      try {
-        return serviceRegistry.createJob(JOB_TYPE, "distributeWithAcl",
-                Arrays.asList(new String[] { MediaPackageParser.getAsXml(mediapackage), elementId}));
-      } catch (ServiceRegistryException e) {
-        throw new DistributionException(e);
-      }
-    }
-    
-    @Override
     public Job retract(MediaPackage mediapackage, String elementId) throws DistributionException {
       try {
         return serviceRegistry.createJob(JOB_TYPE, "retract",

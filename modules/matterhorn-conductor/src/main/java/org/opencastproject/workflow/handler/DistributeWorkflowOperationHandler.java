@@ -23,7 +23,6 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
@@ -138,14 +137,8 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
 
       Map<String, Job> jobs = new HashMap<String, Job>(elementIds.size());
       try {
-        Attachment[] acl = mediaPackage.getAttachments(new MediaPackageElementFlavor("text", "acl"));
         for (String elementId : elementIds) {
-          if (acl == null || acl.length <= 0) {
-            jobs.put(elementId, distributionService.distribute(mediaPackage, elementId));
-          } else {
-            jobs.put(elementId, distributionService.distributeWithAclXml(mediaPackage, elementId));
-          }
-          
+          jobs.put(elementId, distributionService.distribute(mediaPackage, elementId));
         }
       } catch (DistributionException e) {
         throw new WorkflowOperationException(e);
