@@ -72,6 +72,11 @@ li#titleNote {padding:0 0 4px 0;}
 #recordingsTable tr td, #seriesTable tr td, #captureTable tr td, #statsTable tr td {color: black;}
 #bulkHeader {height:13px !important;}
 
+/* page: seriesTable */
+#seriesTable th div { position: relative; padding: 2px;}
+#seriesTable th div.sort-icon {position: absolute; right: 5px; top: 0.1em; padding: 0px;}
+#seriesTable th.sortable {cursor: pointer;}
+
 #holdActionPanelIframe { border: medium none; width: 100%; height:400px;}
 .recordings-bulk-action { border: 1px solid #CCCCCC; padding: 20px; width: 840px; display: none; }
 #refreshControlsContainer, #perPageContainer { text-align: center; float: left; margin: 20px 10px 0 0; padding: 2px 5px;}
