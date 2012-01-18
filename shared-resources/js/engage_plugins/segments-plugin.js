@@ -28,7 +28,7 @@ Opencast.segments_Plugin = (function ()
                                 'onmouseover="Opencast.segments_ui.hoverSegment(${parseInt(s.hoverSegmentIndex)}, ${parseInt(s.index)})" ' +
                                 'onmouseout="Opencast.segments_ui.hoverOutSegment(${parseInt(s.index)})">' +
                                     '<a href="javascript:Opencast.Watch.seekSegment(${parseInt(s.time) / 1000})">' +
-                                        '<img width="111" alt="Slide ${parseInt(s.index) + 1} of ${segment.length}" ' +
+                                        '<img alt="Slide ${parseInt(s.index) + 1} of ${segment.length}" ' +
                                             'src="${s.previews.preview.$}">' +
                                     '</a>' +
                             '</div>' +
