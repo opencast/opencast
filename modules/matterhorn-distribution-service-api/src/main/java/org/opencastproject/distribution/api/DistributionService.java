@@ -46,6 +46,22 @@ public interface DistributionService {
   Job distribute(MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException;
 
   /**
+   * Distribute the elementIds from a media package with an XML file that contains the ACL.
+   * 
+   * @param mediapackage
+   *          The media package
+   * @param elementId
+   *          The element in the media package to distribute
+   * 
+   * @return The job
+   * @throws DistributionException
+   *           if there was a problem distributing the media
+   * @throws MediaPackageException
+   *           if there was a problem with the mediapackage element
+   */
+  Job distributeWithAclXml(MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException;
+  
+  /**
    * Retract all media and metadata associated with this media package from the distribution channel.
    * 
    * @param mediaPackage

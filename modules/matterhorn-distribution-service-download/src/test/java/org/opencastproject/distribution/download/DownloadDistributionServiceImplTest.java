@@ -125,6 +125,7 @@ public class DownloadDistributionServiceImplTest {
     jobBarrier.waitForJobs();
 
     File mpDir = new File(distributionRoot, mp.getIdentifier().compact());
+
     Assert.assertTrue(mpDir.exists());
     File mediaDir = new File(mpDir, "track-1");
     File metadataDir = new File(mpDir, "catalog-1");

@@ -23,6 +23,7 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.identifier.IdBuilder;
 import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
 import org.opencastproject.util.NotFoundException;
@@ -40,12 +41,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,6 +60,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperationHandlerBase {
+  private static final String EXPORT_ACL_KEY = "org.opencastproject.workflow.config.gstreamer.acl";
   public static final String DEFAULT_GSTREAMER_LOCATION = "/usr/bin/gst-launch";
   public static final String CONFIG_GSTREAMER_LOCATION_KEY  = "org.opencastproject.export.gstreamerpath";
   /** The location of the gstreamer binary for running commands. **/
@@ -241,10 +245,49 @@ public class GStreamerWorkflowOperationHandler extends ResumableWorkflowOperatio
       mediapackage.add(t);
     }
 
+    addAclStringToMediaPackageAsXml(workflowInstance.getMediaPackage(), totalProperties.getProperty(EXPORT_ACL_KEY));
     //TODO:  Once we are actually calling a service please change the zero in the line below to the correct job.getQueueTime
     WorkflowOperationResult result = createResult(mediaPackage, Action.CONTINUE, 0);
     logger.debug("Compose operation completed");
     return result;
+  }
+  
+  /**
+   * Creates an XML document with the access control list that will allow users to view exported videos.
+   * 
+   * @param mediaPackage
+   *          The media package to add the acl xml to.
+   * @param acl
+   *          The acl in proper xml that will be added to the media package.
+   */
+  private void addAclStringToMediaPackageAsXml(MediaPackage mediaPackage, String acl) {
+    if (mediaPackage == null) {
+      logger.warn("While trying to add acl XML to a media package, that media package was null.");
+    }
+
+    if (StringUtils.trimToNull(acl) == null) {
+      logger.warn("There was no acl to add to the media package so it will be skipped.");
+    }
+    
+    if (mediaPackage != null && StringUtils.trimToNull(acl) != null) {
+      String identifier = mediaPackage.getIdentifier().toString();
+      String extension = ".acl";
+      InputStream inputStream;
+      try {
+        inputStream = new ByteArrayInputStream(acl.getBytes("UTF-8"));
+        URI aclDestination = workspace.put(mediaPackage.getIdentifier().compact(),
+                "attachment-" + (mediaPackage.getAttachments().length + 1), identifier + extension, inputStream);
+        Attachment attachment = AttachmentImpl.fromURI(aclDestination);
+        MediaPackageElementFlavor flavor = new MediaPackageElementFlavor("text", "acl",
+                "The access control list for a given export file.");
+        attachment.setFlavor(flavor);
+        mediaPackage.add(attachment);
+      } catch (UnsupportedEncodingException e) {
+        logger.warn("Unable to create acl \"" + acl + "\" because the encoding was not supported. ", e);
+      } catch (IOException e) {
+        logger.warn("Unable to create acl \"" + acl + "\" due to an IOException. ", e);
+      }
+    }
   }
 
   @Override

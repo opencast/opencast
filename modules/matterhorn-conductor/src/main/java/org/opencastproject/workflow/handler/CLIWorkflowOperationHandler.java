@@ -86,7 +86,6 @@ public class CLIWorkflowOperationHandler implements WorkflowOperationHandler {
     
     // MediaPackage from previous workflow operations
     MediaPackage srcPackage = workflowInstance.getMediaPackage();
-    
     // Modified media package from our external cli operation, if any
     MediaPackage resultPackage = null;
     // Executable attempting to be invoked

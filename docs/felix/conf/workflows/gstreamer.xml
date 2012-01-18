@@ -7,33 +7,6 @@
     along with their associated metadata, to the distribution channels.
   </description>
 
-  <configuration_panel>
-  <![CDATA[
-    <fieldset>
-      <legend>Distribution</legend>
-      <ul class="oc-ui-form-list">
-        <!-- field: License -->
-        <li class="ui-helper-clearfix">
-          <label class="scheduler-label" for="gstreamer configField" id="gstreamerLabel"><span id="i18n_gstreamer_label">GStreamer Command</span>:</label>
-          <input type="text" class="oc-ui-form-field" id="gstreamer" name="gstreamer" maxlength="255" style="width:300px;"/>
-        </li>
-      </ul>
-    </fieldset>
-    <script type="text/javascript">
-      var ocWorkflowPanel = ocWorkflowPanel || {};
-      ocWorkflowPanel.registerComponents = function(components){
-        components['org.opencastproject.workflow.config.gstreamer'] = new ocAdmin.Component(
-          ['gstreamer'],
-          {key: 'org.opencastproject.workflow.config.gstreamer'});
-          
-      }
-      ocWorkflowPanel.setComponentValues = function(values, components){
-        components['org.opencastproject.workflow.config.gstreamer'].setValue(values['org.opencastproject.workflow.config.gstreamer']);
-      }
-    </script>
-  ]]>
-  </configuration_panel>
-
   <operations>
     <!-- inspect the media -->
     
@@ -84,7 +57,7 @@
       id="gstreamer"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="Running gstreamer pipeline">
+      description="Running gstreamer pipeline to create export media">
     </operation>  
 
     <!-- Distribute to download server -->

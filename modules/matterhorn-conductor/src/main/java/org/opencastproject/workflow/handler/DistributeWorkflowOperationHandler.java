@@ -23,6 +23,7 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
@@ -75,7 +76,7 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
             "Distribute any mediapackage elements with one of these (comma separated) tags.  If a source-tag "
                     + "starts with a '-', mediapackage elements with this tag will be excluded from distribution.");
     CONFIG_OPTIONS.put("target-tags",
-            "Apple these (comma separated) tags to any mediapackage elements produced as a result of distribution");
+            "Apply these (comma separated) tags to any mediapackage elements produced as a result of distribution");
   }
 
   /**
@@ -105,11 +106,12 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
       // Check which tags have been configured
       String sourceTags = workflowInstance.getCurrentOperation().getConfiguration("source-tags");
       String targetTags = workflowInstance.getCurrentOperation().getConfiguration("target-tags");
+      
       if (StringUtils.trimToNull(sourceTags) == null) {
         logger.warn("No tags have been specified");
         return createResult(mediaPackage, Action.CONTINUE);
       }
-
+      
       // Look for elements matching the tag
       Set<String> elementIds = new HashSet<String>();
       MediaPackageElement[] elts = mediaPackage.getElementsByTags(asList(sourceTags));
@@ -136,8 +138,14 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
 
       Map<String, Job> jobs = new HashMap<String, Job>(elementIds.size());
       try {
+        Attachment[] acl = mediaPackage.getAttachments(new MediaPackageElementFlavor("text", "acl"));
         for (String elementId : elementIds) {
-          jobs.put(elementId, distributionService.distribute(mediaPackage, elementId));
+          if (acl == null || acl.length <= 0) {
+            jobs.put(elementId, distributionService.distribute(mediaPackage, elementId));
+          } else {
+            jobs.put(elementId, distributionService.distributeWithAclXml(mediaPackage, elementId));
+          }
+          
         }
       } catch (DistributionException e) {
         throw new WorkflowOperationException(e);

@@ -20,12 +20,13 @@ import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
-import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -65,7 +66,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /** List of available operations on jobs */
   private enum Operation {
-    Distribute, Retract
+    Distribute, DistributeWithAcl, Retract
   };
 
   /** Default distribution directory */
@@ -163,7 +164,23 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    */
   protected MediaPackageElement distribute(Job job, MediaPackage mediapackage, String elementId)
           throws DistributionException, MediaPackageException {
+    return distributeElement(mediapackage, elementId);
+  }
 
+  /**
+   * Distribute a Mediapackage element to the download distribution service.
+   * 
+   * @param mediapackage
+   *          The media package that contains the element to distribute.
+   * @param elementId
+   *          The id of the element that should be distributed contained within the media package.
+   * @return A reference to the MediaPackageElement that has been distributed.
+   * @throws DistributionException
+   *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
+   *           cannot be copied or another unexpected exception occurs.
+   */
+  public MediaPackageElement distributeElement(MediaPackage mediapackage, String elementId) 
+          throws DistributionException {
     if (mediapackage == null)
       throw new IllegalArgumentException("Mediapackage must be specified");
     if (elementId == null)
@@ -175,15 +192,11 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     // Make sure the element exists
     if (mediapackage.getElementById(elementId) == null)
       throw new IllegalStateException("No element " + elementId + " found in mediapackage");
-    
+
     try {
-      // The streaming server only supports tracks
-      if (!(element instanceof Track)) {
-        return null;
-      }
-      File sourceFile;
+      File source;
       try {
-        sourceFile = workspace.get(element.getURI());
+        source = workspace.get(element.getURI());
       } catch (NotFoundException e) {
         throw new DistributionException("Unable to find " + element.getURI() + " in the workspace", e);
       } catch (IOException e) {
@@ -200,9 +213,9 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       logger.info("Distributing {} to {}", elementId, destination);
 
       try {
-        FileSupport.copy(sourceFile, destination);
+        FileSupport.copy(source, destination);
       } catch (IOException e) {
-        throw new DistributionException("Unable to copy " + sourceFile + " to " + destination, e);
+        throw new DistributionException("Unable to copy " + source + " to " + destination, e);
       }
 
       // Create a representation of the distributed file in the mediapackage
@@ -226,7 +239,87 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       }
     }
   }
+  
+  /* (non-Javadoc)
+   * @see org.opencastproject.distribution.api.DistributionService#distributeWithAclXml(org.opencastproject.mediapackage.MediaPackage, java.lang.String, java.lang.String)
+   */
+  @Override
+  public Job distributeWithAclXml(MediaPackage mediapackage, String elementId) throws DistributionException,
+          MediaPackageException {
+    if (mediapackage == null)
+      throw new MediaPackageException("Mediapackage must be specified");
+    if (elementId == null)
+      throw new MediaPackageException("Element ID must be specified");
 
+    try {
+      return serviceRegistry.createJob(JOB_TYPE, Operation.DistributeWithAcl.toString(),
+              Arrays.asList(MediaPackageParser.getAsXml(mediapackage), elementId));
+    } catch (ServiceRegistryException e) {
+      throw new DistributionException("Unable to create a job", e);
+    }
+  }
+  
+  /**
+   * Distributes a MediaPackageElement and an ACL in an XML document to control it to the download distribution service.
+   * 
+   * @param job
+   *          The job trying to distribute a MediaPackageElement and an XML document with an ACL.
+   * @param mediaPackage
+   *          The MediaPackage containing the MediaPackageElement
+   * @param elementId
+   *          The unique id of the MediaPackageElement to distribute.
+   * @return Returns a reference to the distributed MediaPackageElement.
+   */
+  protected MediaPackageElement distributeWithAclXml(Job job, MediaPackage mediaPackage, String elementId)
+          throws DistributionException {
+    if (mediaPackage == null)
+      throw new IllegalArgumentException("Mediapackage must be specified");
+    if (elementId == null)
+      throw new IllegalArgumentException("Element ID must be specified");
+
+    try {
+      Attachment[] aclAttachments = mediaPackage.getAttachments(new MediaPackageElementFlavor("text", "acl"));
+      if (aclAttachments.length > 0) {
+        Attachment acl = aclAttachments[0];
+        if (acl != null) {
+          File aclSourceFile;
+          try {
+            aclSourceFile = workspace.get(acl.getURI());
+          } catch (NotFoundException e) {
+            throw new DistributionException("Unable to find " + acl.getURI() + " in the workspace", e);
+          } catch (IOException e) {
+            throw new DistributionException("Error loading " + acl.getURI() + " from the workspace", e);
+          }
+
+          File destination = new File(PathSupport.concat(new String[] { distributionDirectory.getAbsolutePath(),
+                  mediaPackage.getIdentifier().compact(), elementId, elementId + ".acl" }));
+
+          // Put the file in place
+          try {
+            FileUtils.forceMkdir(destination.getParentFile());
+          } catch (IOException e) {
+            throw new DistributionException("Unable to create " + destination.getParentFile(), e);
+          }
+          logger.info("Distributing {} to {}", elementId, destination);
+
+          try {
+            FileSupport.copy(aclSourceFile, destination);
+          } catch (IOException e) {
+            throw new DistributionException("Unable to copy " + aclSourceFile + " to " + destination, e);
+          }
+        }
+      }
+      return distributeElement(mediaPackage, elementId);
+    } catch (Exception e) {
+      logger.warn("Error distributing " + elementId, e);
+      if (e instanceof DistributionException) {
+        throw (DistributionException) e;
+      } else {
+        throw new DistributionException(e);
+      }
+    }
+  }
+  
   /**
    * {@inheritDoc}
    * 
@@ -398,6 +491,9 @@ public class StreamingDistributionService extends AbstractJobProducer implements
         case Distribute:
           MediaPackageElement distributedElement = distribute(job, mediapackage, elementId);
           return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
+        case DistributeWithAcl:
+          MediaPackageElement distributedAclElement = distributeWithAclXml(job, mediapackage, elementId);
+          return (distributedAclElement != null) ? MediaPackageElementParser.getAsXml(distributedAclElement) : null;
         case Retract:
           MediaPackageElement retractedElement = retract(job, mediapackage, elementId);
           return (retractedElement != null) ? MediaPackageElementParser.getAsXml(retractedElement) : null;
@@ -502,5 +598,4 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   protected OrganizationDirectoryService getOrganizationDirectoryService() {
     return organizationDirectoryService;
   }
-
 }
