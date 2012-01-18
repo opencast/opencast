@@ -227,8 +227,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Fires the workflow listeners on workflow updates.
    */
-  protected void fireListeners(final WorkflowInstance oldWorkflowInstance, final WorkflowInstance newWorkflowInstance)
-          throws WorkflowParsingException {
+  protected void fireListeners(final WorkflowInstance oldWorkflowInstance, final WorkflowInstance newWorkflowInstance) {
     final User currentUser = securityService.getUser();
     final Organization currentOrganization = securityService.getOrganization();
     for (final WorkflowListener listener : listeners) {
@@ -283,7 +282,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   public List<WorkflowDefinition> listAvailableWorkflowDefinitions() {
     List<WorkflowDefinition> list = new ArrayList<WorkflowDefinition>();
     for (Entry<String, WorkflowDefinition> entry : workflowDefinitions.entrySet()) {
-      list.add((WorkflowDefinition) entry.getValue());
+      list.add(entry.getValue());
     }
     Collections.sort(list, new Comparator<WorkflowDefinition>() {
       public int compare(WorkflowDefinition o1, WorkflowDefinition o2) {
@@ -557,7 +556,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   protected WorkflowInstance updateConfiguration(WorkflowInstance instance, Map<String, String> properties) {
     try {
       String xml = replaceVariables(WorkflowParser.toXml(instance), properties);
-      WorkflowInstanceImpl workflow = (WorkflowInstanceImpl) WorkflowParser.parseWorkflowInstance(xml);
+      WorkflowInstanceImpl workflow = WorkflowParser.parseWorkflowInstance(xml);
       return workflow;
     } catch (Exception e) {
       throw new IllegalStateException("Unable to replace workflow instance variables", e);
@@ -827,7 +826,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    */
   public WorkflowInstance stop(long workflowInstanceId) throws WorkflowDatabaseException, WorkflowParsingException,
           NotFoundException, UnauthorizedException {
-    WorkflowInstanceImpl instance = (WorkflowInstanceImpl) getWorkflowById(workflowInstanceId);
+    WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
     instance.setState(STOPPED);
     update(instance);
     return instance;
@@ -865,7 +864,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    */
   public WorkflowInstance suspend(long workflowInstanceId) throws WorkflowDatabaseException, WorkflowParsingException,
           NotFoundException, UnauthorizedException {
-    WorkflowInstanceImpl instance = (WorkflowInstanceImpl) getWorkflowById(workflowInstanceId);
+    WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
     instance.setState(PAUSED);
     update(instance);
     return instance;
@@ -1219,7 +1218,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    *           if updating the workflow fails
    */
   protected WorkflowInstance handleOperationResult(WorkflowInstance workflow, WorkflowOperationResult result)
-          throws WorkflowDatabaseException, WorkflowParsingException {
+          throws WorkflowDatabaseException {
 
     // Get the operation and its handler
     WorkflowOperationInstanceImpl currentOperation = (WorkflowOperationInstanceImpl) workflow.getCurrentOperation();
@@ -1268,8 +1267,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
           String url = resumableHandler.getHoldStateUserInterfaceURL(workflow);
           if (url != null) {
             String holdActionTitle = resumableHandler.getHoldActionTitle();
-            ((WorkflowOperationInstanceImpl) currentOperation).setHoldActionTitle(holdActionTitle);
-            ((WorkflowOperationInstanceImpl) currentOperation).setHoldStateUserInterfaceUrl(url);
+            currentOperation.setHoldActionTitle(holdActionTitle);
+            currentOperation.setHoldStateUserInterfaceUrl(url);
           }
         } catch (WorkflowOperationException e) {
           logger.warn("unable to replace workflow ID in the hold state URL", e);
@@ -1707,7 +1706,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
     String maxConfiguration = StringUtils.trimToNull((String) properties.get(MAX_CONCURRENT_CONFIG_KEY));
     if (maxConfiguration != null) {

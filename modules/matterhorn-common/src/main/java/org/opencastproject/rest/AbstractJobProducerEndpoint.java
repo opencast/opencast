@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 import javax.ws.rs.FormParam;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
@@ -65,6 +66,12 @@ public abstract class AbstractJobProducerEndpoint {
       logger.debug("Service {} refused to accept job {}", service, job);
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
     }
+  }
+  
+  @OPTIONS
+  @Path("/dispatch")
+  public Response checkHeartbeat() {
+    return Response.ok().build();
   }
 
   /**

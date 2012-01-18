@@ -309,9 +309,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
           boolean dispatchable) throws ServiceRegistryException {
     if (StringUtils.isBlank(host)) {
       throw new IllegalArgumentException("Host can't be null");
-    } if (StringUtils.isBlank(serviceType)) {
+    }
+    if (StringUtils.isBlank(serviceType)) {
       throw new IllegalArgumentException("Service type can't be null");
-    } if (StringUtils.isBlank(operation)) {
+    }
+    if (StringUtils.isBlank(operation)) {
       throw new IllegalArgumentException("Operation can't be null");
     }
 
@@ -727,7 +729,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
    */
   @Override
   public void unRegisterService(String serviceType, String baseUrl) throws ServiceRegistryException {
-    logger.debug("Unregistering Service " + serviceType + "@" + baseUrl);
+    logger.info("Unregistering Service " + serviceType + "@" + baseUrl);
     // TODO: create methods that accept an entity manager, so we can execute multiple queries using the same em and tx
     setOnlineStatus(serviceType, baseUrl, null, false, null);
 
@@ -744,9 +746,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
       List<JobJpaImpl> unregisteredJobs = query.getResultList();
       for (JobJpaImpl job : unregisteredJobs) {
         if (job.isDispatchable()) {
+          logger.info("Rescheduling lost job {}", job);
           job.setStatus(Status.QUEUED);
           job.setProcessorServiceRegistration(null);
         } else {
+          logger.info("Marking lost job {} as failed", job);
           job.setStatus(Status.FAILED);
         }
         em.merge(job);
@@ -979,13 +983,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
    * 
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceStatistics()
    */
+  @SuppressWarnings("rawtypes")
   @Override
   public List<ServiceStatistics> getServiceStatistics() throws ServiceRegistryException {
     EntityManager em = emf.createEntityManager();
     try {
       Query query = em.createNamedQuery("ServiceRegistration.statistics");
       Map<ServiceRegistration, JaxbServiceStatistics> statsMap = new HashMap<ServiceRegistration, JaxbServiceStatistics>();
-      @SuppressWarnings("unchecked")
       List queryResults = query.getResultList();
       for (Object result : queryResults) {
         Object[] oa = (Object[]) result;
@@ -1004,19 +1008,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
         // the status will be null if there are no jobs at all associated with this service registration
         if (status != null) {
           switch (status) {
-            case RUNNING:
-              stats.setRunningJobs(count.intValue());
-              break;
-            case QUEUED:
-            case DISPATCHING:
-              stats.setQueuedJobs(count.intValue());
-              break;
-            case FINISHED:
-              stats.setMeanRunTime(meanRunTime.longValue());
-              stats.setMeanQueueTime(meanQueueTime.longValue());
-              break;
-            default:
-              break;
+          case RUNNING:
+            stats.setRunningJobs(count.intValue());
+            break;
+          case QUEUED:
+          case DISPATCHING:
+            stats.setQueuedJobs(count.intValue());
+            break;
+          case FINISHED:
+            stats.setMeanRunTime(meanRunTime.longValue());
+            stats.setMeanQueueTime(meanQueueTime.longValue());
+            break;
+          default:
+            break;
           }
         }
       }
@@ -1473,6 +1477,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
    */
   class JobProducerHearbeat implements Runnable {
 
+    /** List of service registrations that have been found unresponsive last time we checked */
+    private List<ServiceRegistration> unresponsive = new ArrayList<ServiceRegistration>();
+
     /**
      * {@inheritDoc}
      * 
@@ -1480,46 +1487,86 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
      */
     @Override
     public void run() {
+
       logger.debug("Checking for unresponsive services");
       int unresponsiveCount = 0;
       List<ServiceRegistration> serviceRegistrations = getServiceRegistrations();
-      for (ServiceRegistration registration : serviceRegistrations) {
+
+      for (ServiceRegistration service : serviceRegistrations) {
+        if (!service.isJobProducer())
+          continue;
+        if (service.isInMaintenanceMode())
+          continue;
+
         // We think this service is online and available. Prove it.
-        if (registration.isOnline() && !registration.isInMaintenanceMode() && registration.isJobProducer()) {
-          String[] urlParts = new String[] { registration.getHost(), registration.getPath(), "dispatch" };
-          String serviceUrl = UrlSupport.concat(urlParts);
-          HttpOptions options = new HttpOptions(serviceUrl);
-          HttpResponse response = null;
+        String[] urlParts = new String[] { service.getHost(), service.getPath(), "dispatch" };
+        String serviceUrl = UrlSupport.concat(urlParts);
+        HttpOptions options = new HttpOptions(serviceUrl);
+        HttpResponse response = null;
+        try {
           try {
-            try {
-              response = client.execute(options);
-              if (response != null && response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+            response = client.execute(options);
+            if (response != null) {
+              switch (response.getStatusLine().getStatusCode()) {
+              case HttpStatus.SC_OK:
                 // this service is reachable, continue checking other services
-                logger.trace("Service " + registration.toString() + " is fine and responsive " + response.getStatusLine());
+                logger.trace("Service " + service.toString() + " is responsive: " + response.getStatusLine());
+                if (!service.isOnline()) {
+                  try {
+                    setOnlineStatus(service.getServiceType(), service.getHost(), service.getPath(),
+                            true, true);
+                    logger.info("Service {} is back online", service);
+                  } catch (ServiceRegistryException e) {
+                    logger.warn("Error setting online status for {}", service);
+                  }
+                }
+                unresponsive.remove(service);
                 continue;
-              } else if (response != null && response.getStatusLine().getStatusCode() == HttpStatus.SC_SERVICE_UNAVAILABLE) {
+              case HttpStatus.SC_SERVICE_UNAVAILABLE:
                 // this service appears overloaded.
-                logger.info("Service " + registration.toString() + " appears overloaded but will not be unregistered and had status line " + response.getStatusLine());
+                logger.warn("Service {} appears overloaded but will not be unregistered: {}", service.toString(),
+                        response.getStatusLine());
+                unresponsive.remove(service);
                 continue;
-              } else {
-                logger.debug("Service " + registration.toString() + " is broken " + response.getStatusLine());
+              case HttpStatus.SC_FORBIDDEN:
+                // this service can't be reached due to authentication issues
+                unresponsive.remove(service);
+                logger.info("Service {} denies authentication: {}", service.toString(), response.getStatusLine());
+                continue;
+              default:
+                if (!service.isOnline())
+                  continue;
+                logger.warn("Service {} is not working as expected: {}", service.toString(), response.getStatusLine());
                 unresponsiveCount++;
               }
-            } catch (TrustedHttpClientException e) {
-              // We can not reach this host. Update the registration to indicate that the service is offline.
-              logger.warn("Unable to reach {} : {}", registration, e);
+            } else {
+              logger.warn("Service {} does not respond: {}", service.toString());
+              unresponsiveCount++;
             }
-            try {
-              unRegisterService(registration.getServiceType(), registration.getHost());
-              logger.warn("Set {} to offline, since it is not accessible from this host", registration);
-            } catch (ServiceRegistryException e) {
-              logger.warn("Unable to unregister unreachable service: {} : {}", registration, e);
-            }
-          } finally {
-            client.close(response);
+          } catch (TrustedHttpClientException e) {
+            // We can not reach this host. Update the registration to indicate that the service is offline.
+            logger.warn("Unable to reach {} : {}", service, e);
           }
+
+          // If we get here, the service did not respond as expected
+          try {
+            if (unresponsive.contains(service)) {
+              unRegisterService(service.getServiceType(), service.getHost());
+              unresponsive.remove(service);
+              logger.warn("Marking {} as offline",
+                      service);
+            } else {
+              unresponsive.add(service);
+              logger.warn("Added {} to the watch list", service);
+            }
+          } catch (ServiceRegistryException e) {
+            logger.warn("Unable to unregister unreachable service: {} : {}", service, e);
+          }
+        } finally {
+          client.close(response);
         }
       }
+
       logger.debug("Finished checking for unresponsive services. Found {} to be unresponsive.", unresponsiveCount);
     }
   }
