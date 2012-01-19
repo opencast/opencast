@@ -15,6 +15,7 @@
  */
 package org.opencastproject.kernel.security;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -50,7 +51,7 @@ public class LtiLaunchAuthenticationHandler implements
   public static final String LTI_USER_ID_PARAM = "user_id";
   
   /** The http request paramater containing the Consumer GUI **/
-  public static final String LTI_CONSUMER_GUI = "tool_consumer_instance_guid";
+  public static final String LTI_CONSUMER_GUID = "tool_consumer_instance_guid";
   
   /** LTI field containing a comma delimeted list of roles */
   public static final String ROLES = "roles";
@@ -59,7 +60,7 @@ public class LtiLaunchAuthenticationHandler implements
   public static final String CONTEXT_ID = "context_id";
   
   /** The prefix for LTI user ids   */
-  public static final String LTI_USER_ID_PREFIX = "BLTI";
+  public static final String LTI_USER_ID_PREFIX = "lti";
   
   public static final String LTI_ID_DELIMITER = ":";
 
@@ -88,11 +89,24 @@ public class LtiLaunchAuthenticationHandler implements
           OAuthAccessProviderToken authToken) {
     // The User ID must be provided by the LTI consumer
     String userIdFromConsumer = request.getParameter(LTI_USER_ID_PARAM);
-    //We need to construct a complex ID to avoid confusion
-    //TODO if this is a trusted consumer we won't want to do this
-    userIdFromConsumer = LTI_USER_ID_PREFIX + LTI_ID_DELIMITER + request.getParameter(LTI_CONSUMER_GUI) + LTI_ID_DELIMITER + userIdFromConsumer;
+    if (StringUtils.isBlank(userIdFromConsumer)) {
+      logger.warn("Received authentication request without user id ({})", LTI_USER_ID_PARAM);
+      return null;
+    }
+
+    // Get the comser guid if provided
+    String consumerGUID = request.getParameter(LTI_CONSUMER_GUID);
+
+    // We need to construct a complex ID to avoid confusion
+    // TODO if this is a trusted consumer we won't want to do this
+    StringBuffer userId = new StringBuffer(LTI_USER_ID_PREFIX);
+    if (StringUtils.isNotBlank(consumerGUID))
+      userId.append(LTI_ID_DELIMITER).append(consumerGUID);
+    userId.append(LTI_ID_DELIMITER).append(userIdFromConsumer);
+    
+    userIdFromConsumer = userId.toString();
     if (logger.isDebugEnabled()) {
-      logger.debug("got userId: " + userIdFromConsumer);
+      logger.debug("LTI user id is : {}", userIdFromConsumer);
     }
     
     UserDetails userDetails = null;
@@ -109,11 +123,13 @@ public class LtiLaunchAuthenticationHandler implements
       String roles = request.getParameter(ROLES);
       String context = request.getParameter(CONTEXT_ID);
       //Roles could be a list
-      List<String> roleList = Arrays.asList(roles.split(","));
-      for (int i = 0; i < roleList.size(); i++) {
-        String role = context + "_" + roleList.get(i);
-        logger.debug("adding role: {}", role);
-        userAuthorities.add(new GrantedAuthorityImpl(role));
+      if (roles != null) {
+        List<String> roleList = Arrays.asList(roles.split(","));
+        for (int i = 0; i < roleList.size(); i++) {
+          String role = context + "_" + roleList.get(i);
+          logger.debug("adding role: {}", role);
+          userAuthorities.add(new GrantedAuthorityImpl(role));
+        }
       }
       
       userDetails = new User(userIdFromConsumer, "oauth", true, true, true, true, userAuthorities);

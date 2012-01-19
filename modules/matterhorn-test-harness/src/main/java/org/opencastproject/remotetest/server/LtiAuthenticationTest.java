@@ -56,11 +56,15 @@ public class LtiAuthenticationTest {
   public static final String CONSUMER_KEY = "consumerkey";
 
   public static final String CONSUMER_SECRET = "consumersecret";
-  
+
+  public static final String LTI_USER_PREFIX = "lti:";
+
   public static final String LTI_CONSUMER_USER = "admin";
 
   public static final String LTI_CONSUMER_CONTEXT = "a sample course";
-  
+
+  public static final String LTI_CONSUMER_GUID = "sample-uuid";
+
   private DefaultHttpClient httpClient;
   private OAuthClient oauthClient;
 
@@ -100,6 +104,7 @@ public class LtiAuthenticationTest {
     // Add some LTI parameters
     oauthMessage.addParameter("user_id", LTI_CONSUMER_USER);
     oauthMessage.addParameter("context_id", LTI_CONSUMER_CONTEXT);
+    oauthMessage.addParameter("consumer_gui", LTI_CONSUMER_GUID);
 
     // Sign the request
     OAuthConsumer consumer = new OAuthConsumer(null, CONSUMER_KEY, CONSUMER_SECRET, null);
@@ -124,7 +129,7 @@ public class LtiAuthenticationTest {
     JSONObject meJson = (JSONObject) new JSONParser().parse(me);
     
     // Ensure that the "current user" was set by the LTI consumer
-    Assert.assertEquals(LTI_CONSUMER_USER, meJson.get("username"));
+    Assert.assertEquals(LTI_USER_PREFIX + LTI_CONSUMER_USER, meJson.get("username"));
     
     // Send a GET request to "/lti" using this cookie
     get = new HttpGet(Main.BASE_URL + "/lti");
@@ -216,7 +221,7 @@ public class LtiAuthenticationTest {
     JSONObject meJson = (JSONObject) new JSONParser().parse(me);
     
     // Ensure that the "current user" was set by the LTI consumer
-    Assert.assertEquals(unknownUserId, meJson.get("username"));
+    Assert.assertEquals(LTI_USER_PREFIX + unknownUserId, meJson.get("username"));
   }
 
 }
