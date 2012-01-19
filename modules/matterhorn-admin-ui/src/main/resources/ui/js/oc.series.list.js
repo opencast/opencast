@@ -23,9 +23,15 @@ ocSeriesList.Configuration = new (function(){
   this.total = 10;
   this.startPage = 0;  
   this.lastPage = 0;
-  this.sort = 'TITLE_ASC';  
+  this.sort = 'TITLE';  
   this.edit = 'true';
 });
+
+ocSeriesList.SortColumns = [
+  {0: 'TITLE', 1: 'TITLE_DESC'},
+  {0: 'CREATOR', 1: 'CREATOR_DESC'},
+  {0: 'CONTRIBUTOR', 1: 'CONTRIBUTOR_DESC'}
+];
 
 ocSeriesList.init = function(){
   $('#addHeader').jqotesubtpl('templates/series_list-header.tpl', {});
@@ -135,20 +141,8 @@ ocSeriesList.buildSeriesView = function(data) {
   {
     $.cookie('direction', 0) //standard is ASC
   }
-  sorting = [[$.cookie('column'), $.cookie('direction')]];
   ocSeriesList.views.totalCount = ocSeriesList.Configuration.total;
   $('#seriesTableContainer').jqotesubtpl("templates/series_list-table.tpl", ocSeriesList.views);
-  $('#seriesTable').tablesorter({
-    cssHeader: 'oc-ui-sortable',
-    cssAsc: 'oc-ui-sortable-Ascending',
-    cssDesc: 'oc-ui-sortable-Descending' ,
-    headers: {
-      3: {
-        sorter: false
-      }
-    },
-    sortList: sorting
-  });
   $('#seriesTable th').click(function(){
     var index = $(this).parent().children().index($(this));
     if(index != 3)
@@ -158,6 +152,8 @@ ocSeriesList.buildSeriesView = function(data) {
         $.cookie('direction', $.cookie('direction') == 0 ? 1 : 0);
       }
       $.cookie('column', index)
+      ocSeriesList.Configuration.sort = ocSeriesList.SortColumns[$.cookie('column')][$.cookie('direction')];
+      ocSeriesList.askForSeries();
     }
   });
 }

@@ -452,7 +452,7 @@
       id="archive"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="Archived">
+      description="Archiving">
     </operation>
  
     <!-- Publish to engage search index -->

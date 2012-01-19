@@ -42,6 +42,7 @@
     <script type="text/javascript" src="js/oc.inspect.js"></script>
     <script type="text/javascript" src="js/oc.security.js"></script>
     <script type="text/javascript" src="js/oc.episode.js"></script>
+    <script type="text/javascript" src="js/oc.users.js"></script>
 
     <!-- define all possible tabs here -->
     <script type="text/x-jqote-template" id="tabs-template">
@@ -57,6 +58,9 @@
         </li>
         <li>
           <a href="#agents_status" title="Capture Agents" id="i18n_tab_agent">Capture Agents</a>
+        </li>
+        <li>
+          <a href="#users" title="Users" id="i18n_tab_users">Users</a>
         </li>
         <li>
           <a href="#statistics" title="Statistics" id="i18n_tab_statistics">Statistics</a>
@@ -141,7 +145,7 @@
             "/episode": {
               init: function() {
                 document.title = "Episode" + matterhorn;
-                ocArchive.init();
+                opencast.episode.Archive.init();
               },
               tab: "i18n_tab_episode"
             },
@@ -157,6 +161,13 @@
               },
               tab: "i18n_tab_recording"
             },
+            "/users": {
+                init: function() {
+                    document.title = "Users" + matterhorn;
+                    ocUsers.init();
+                  },
+                tab: "i18n_tab_users"
+              },
             "/inspect": {
               init: function() {
                 Opencast.WorkflowInspect.initInspect();

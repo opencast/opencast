@@ -1381,16 +1381,29 @@ Opencast.Player = (function ()
      * @description Set the embed Player.
      * @param String width, String height
      */
-    function embedIFrame(width, height)
+    function embedIFrame(width, height, dontLog)
     {
         var iFrameText = '';
         var advancedUrl = window.location.href;
         var embedUrl = advancedUrl.replace(/watch.html/g, "embed.html");
+	if($('#oc_embed-costum-hide-controls-checkbox').is(':checked'))
+	{
+	    embedUrl += "&hideControls=false";
+	}
         $('#oc_embed-costum-width-textinput').val(width);
         $('#oc_embed-costum-height-textinput').val(height);
         iFrameText = '<iframe src="' + embedUrl + '" style="border:0px #FFFFFF none;" name="Opencast Matterhorn - Media Player" scrolling="no" frameborder="0" marginheight="0px" marginwidth="0px" width="' + width + '" height="' + height + '"></iframe>';
         $('#oc_embed-textarea').val(iFrameText);
-	addEvent(Opencast.logging.GENERATE_EMBED + width + 'x' + height);
+	if(!dontLog)
+	{
+	    addEvent(Opencast.logging.GENERATE_EMBED + width + 'x' + height);
+	}
+	var w = width;
+	var h = height;
+	$('#oc_embed-costum-hide-controls-checkbox').unbind('click');
+	$('#oc_embed-costum-hide-controls-checkbox').bind('click', function() {
+	    Opencast.Player.embedIFrame(w, h, true);
+	});
     }
 
     /**

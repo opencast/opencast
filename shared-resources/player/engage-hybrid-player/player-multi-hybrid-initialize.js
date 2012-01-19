@@ -53,7 +53,7 @@ Opencast.Initialize = (function ()
         segmentBackwardDelay = 200,
         segmentTimeoutForward, segmentTimeoutBackward, segmentForwardClickedCounter = 0,
         segmentBackwardClickedCounter = 0,
-        timeout = 200,
+        timeout = 800,
         closetimer = 0,
         ddmenuitem = 0,
         dropdownActive = false,
@@ -888,7 +888,8 @@ Opencast.Initialize = (function ()
         {
             var videoQuality = $('#oc_video-quality-options').val();
             $.log("Request to set video quality to " + videoQuality + ", changing the URL...");
-            newLoc = $.getCleanedURLAdvanced(false, true, videoQuality, true);
+            var loc = window.location;
+            var newLoc = $.getCleanedURLAdvanced(false, true, videoQuality, true);
             // change URL if new parameter
             if (loc != newLoc)
             {

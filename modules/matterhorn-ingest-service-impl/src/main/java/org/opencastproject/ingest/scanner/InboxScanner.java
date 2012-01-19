@@ -22,7 +22,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.workspace.api.Workspace;
+import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -60,8 +60,8 @@ public class InboxScanner implements ArtifactInstaller, ManagedService {
   /** The configuration key to use for determining the workflow definition to use for ingest */
   public static final String WORKFLOW_DEFINITION = "workflow.definition";
 
-  /** The workspace */
-  protected Workspace workspace = null;
+  /** The working file repository, we deliberately don't use the Workspace! */
+  protected WorkingFileRepository wfr = null;
 
   /** The ingest service */
   protected IngestService ingestService = null;
@@ -133,7 +133,7 @@ public class InboxScanner implements ArtifactInstaller, ManagedService {
             FileInputStream in = null;
             try {
               in = new FileInputStream(artifact);
-              workspace.putInCollection("inbox", artifact.getName(), in);
+              wfr.putInCollection("inbox", artifact.getName(), in);
               logger.info("Ingested '{}' as an inbox file", artifact.getAbsolutePath());
             } catch (IOException e) {
               logger.warn("Unable to process inbox file '{}', {}", artifact.getAbsolutePath(), e);
@@ -187,7 +187,6 @@ public class InboxScanner implements ArtifactInstaller, ManagedService {
    * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
-  @SuppressWarnings("unchecked")
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
 
@@ -222,7 +221,7 @@ public class InboxScanner implements ArtifactInstaller, ManagedService {
       workflowDefinition = workflowConfig;
     }
   }
-  
+
   /**
    * Sets the ingest service
    * 
@@ -239,8 +238,8 @@ public class InboxScanner implements ArtifactInstaller, ManagedService {
    * @param workspace
    *          an instance of the workspace
    */
-  public void setWorkspace(Workspace workspace) {
-    this.workspace = workspace;
+  public void setWorkingFileRepository(WorkingFileRepository workingFileRepository) {
+    this.wfr = workingFileRepository;
   }
 
   /**

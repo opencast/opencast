@@ -292,9 +292,47 @@ public class SearchServiceImplTest {
     SearchResult episodeMetadataResult = service.getByQuery(new SearchQuery().withText("Vegetation"));
     SearchResult seriesMetadataResult = service.getByQuery(new SearchQuery().withText("Atmospheric Science"));
 
-    assertTrue(episodeMetadataResult.getItems().length == 1);
-    assertTrue(seriesMetadataResult.getItems().length == 1);
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("Atmospheric")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("atmospheric")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("atmospheric science")).size());
+    assertEquals(1, episodeMetadataResult.getItems().length);
+    assertEquals(1, seriesMetadataResult.getItems().length);
   }
+
+  @Test
+  public void testSearchForPartialStrings() throws Exception {
+    MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
+    service.add(mediaPackage);
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("Atmo")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("Atmos")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("Atmosp")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("Atmosph")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("Atmosphe")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("Atmospher")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("Atmospheri")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("Atmospheric")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("atmospheri")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("tmospheric")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("tmospheri")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("Vegetatio")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("vege")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("egetatio")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("egetation")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("lecture")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("lectur")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("ecture")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("ectur")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("Science")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("Scienc")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("ience")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("cienc")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("ducti")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("Institute")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("nstitute")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("nstitut")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("Institut")).size());
+  }
+
 
   /**
    * Adds a simple media package that has a dublin core for the episode only.

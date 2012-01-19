@@ -25,6 +25,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -40,7 +41,7 @@ import javax.xml.bind.annotation.XmlType;
  * A JAXB-annotated implementation of {@link UserAction}
  */
 @Entity(name = "UserAction")
-@Table(name = "USER_ACTION")
+@Table(name = "user_action")
 @NamedQueries({
         @NamedQuery(name = "findUserActions", query = "SELECT a FROM UserAction a"),
         @NamedQuery(name = "countSessionsGroupByMediapackage", query = "SELECT a.mediapackageId, COUNT(distinct a.sessionId), SUM(a.length) FROM UserAction a GROUP BY a.mediapackageId"),
@@ -65,49 +66,56 @@ import javax.xml.bind.annotation.XmlType;
 public class UserActionImpl implements UserAction {
 
   @Id
-  @Column(name = "ID")
+  @Column(name = "id")
   @GeneratedValue(strategy = GenerationType.AUTO)
   @XmlElement(name = "id")
   private Long id;
 
-  @Column(name = "MEDIA_PACKAGE_ID", length = 128)
+  @Lob
+  //@Index
+  @Column(name = "mediapackage_id", length = 65535)
   @XmlElement(name = "mediapackageId")
   private String mediapackageId;
 
-  @Column(name = "USER_ID")
+  @Lob
+  //@Index
+  @Column(name = "user_id", length = 65535)
   @XmlElement(name = "userId")
   private String userId;
 
-  @Column(name = "USER_IP")
+  @Lob
+  @Column(name = "user_ip", length = 65535)
   @XmlElement(name = "userIp")
   private String userIp;
 
-  @Column(name = "SESSION_ID")
+  @Lob
+  @Column(name = "session_id", length = 65535)
   @XmlElement(name = "sessionId")
   private String sessionId;
 
-  @Column(name = "INPOINT")
+  @Column(name = "inpoint")
   @XmlElement(name = "inpoint")
   private int inpoint;
 
-  @Column(name = "OUTPOINT")
+  @Column(name = "outpoint")
   @XmlElement(name = "outpoint")
   private int outpoint;
 
-  @Column(name = "LENGTH")
+  @Column(name = "length")
   @XmlElement(name = "length")
   private int length;
 
-  @Column(name = "TYPE")
+  @Lob
+  @Column(name = "type", length = 65535)
   @XmlElement(name = "type")
   private String type;
 
-  @Column(name = "IS_PLAYING")
+  @Column(name = "is_playing")
   @XmlElement(name = "isPlaying")
   private boolean isPlaying;
 
   @Basic(optional = false)
-  @Column(name = "CREATED")
+  @Column(name = "created")
   @Temporal(TemporalType.TIMESTAMP)
   @XmlElement(name = "created")
   private Date created = new Date();

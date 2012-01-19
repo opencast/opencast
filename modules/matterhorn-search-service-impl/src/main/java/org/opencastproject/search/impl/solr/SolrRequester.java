@@ -505,6 +505,14 @@ public class SolrRequester {
     sb.append(uq);
     sb.append(") ");
 
+    // see http://wiki.apache.org/lucene-java/LuceneFAQ#Are_Wildcard.2C_Prefix.2C_and_Fuzzy_queries_case_sensitive.3F
+    // for an explanation why .toLowerCase() is used here. This behaviour is tracked in SOLR-219.
+    // It's also important not to stem when using wildcard queries. Please adjust the schema.xml accordingly.
+    sb.append(Schema.FULLTEXT);
+    sb.append(":(*");
+    sb.append(uq.toLowerCase());
+    sb.append("*) ");
+
     sb.append(")");
 
     return sb;
@@ -562,6 +570,19 @@ public class SolrRequester {
       sb.append(")");
     }
 
+    String solrSeriesIdRequest = StringUtils.trimToNull(q.getSeriesId());
+    if (solrSeriesIdRequest != null) {
+      String cleanSolrSeriesIdRequest = SolrUtils.clean(solrSeriesIdRequest);
+      if (sb.length() > 0) {
+        sb.append(" AND ");
+      }
+      sb.append("(");
+      sb.append(Schema.DC_IS_PART_OF);
+      sb.append(":");
+      sb.append(cleanSolrSeriesIdRequest);
+      sb.append(")");
+    }
+    
     String solrTextRequest = StringUtils.trimToNull(q.getText());
     if (solrTextRequest != null) {
       String cleanSolrTextRequest = SolrUtils.clean(q.getText());

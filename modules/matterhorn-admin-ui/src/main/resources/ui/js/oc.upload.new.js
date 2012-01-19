@@ -279,7 +279,7 @@ ocUpload.UI = (function() {
       var total = (message.total / ocUpload.MEGABYTE).toFixed(2) + ' MB';
       var received = (message.received / ocUpload.MEGABYTE).toFixed(2) + ' MB';
   
-      $progress.find('.progress-label-top').text('Uploading ' + message.filename);
+      $progress.find('.progress-label-top').text('Uploading ' + message.filename.replace("C:\\fakepath\\", ""));
       $progress.find('.progressbar-indicator').css('width', percentage);
       $progress.find('.progressbar-label > span').text(percentage);
       $progress.find('.progress-label-left').text(received + ' received');
@@ -348,7 +348,7 @@ ocUpload.UI = (function() {
         $('.field-filename').each(function() { //print file names
             var file = data['files'].shift();
             if(file) {
-                $(this).children('.fieldValue').text(file);
+                $(this).children('.fieldValue').text(file.replace("C:\\fakepath\\", ""));
             } else {
                 $(this).hide();
             }
@@ -550,14 +550,19 @@ ocUpload.Ingest = (function() {
     var $uploader = track.payload;
     var filename = $uploader.contents().find('.file-selector').val();
 
-    ocUtils.log('Uploading ' + filename + ' (' + track.id + ')');
-    ocUpload.UI.setProgress("Uploading " + filename);
+    ocUtils.log('Uploading ' + filename.replace("C:\\fakepath\\", "") + ' (' + track.id + ')');
+    ocUpload.UI.setProgress("Uploading " + filename.replace("C:\\fakepath\\", ""));
 
+    var checkBox = $('input.file-source-select:checked');
+    var checkBoxId = $(checkBox).attr('id');
+    
     // set flavor and mediapackage in upload form before submit
     $uploader.contents().find('#flavor').val(track.flavor);
     $uploader.contents().find('#mediapackage').val(MediaPackage.document);
     $uploader.contents().find('#uploadForm').submit();
-    ocUpload.Listener.startProgressUpdate(track.id);
+    
+    if(checkBoxId == 'fileSourceSingleA')
+    	ocUpload.Listener.startProgressUpdate(track.id);
   }
 
   this.trackDone = function(jobId) {

@@ -44,6 +44,7 @@ DEBUG_SUSPEND="n"
 ##
 
 FELIX_OPTS="-Dfelix.home=$FELIX"
+FELIX_WORK="-Dfelix.work=$FELIX/work"
 MAVEN_ARG="-DM2_REPO=$M2_REPOSITORY"
 FELIX_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$FELIX/load"
 PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX/conf"
@@ -109,7 +110,7 @@ case "$1" in
 
 # starting felix
 
-    su -c "java -Dgosh.args='--noshutdown -c noop=true' $DEBUG_OPTS $FELIX_OPTS $GRAPHICS_OPTS $TEMP_OPTS $MAVEN_ARG $JAVA_OPTS $FELIX_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS $UTIL_LOGGING_OPTS $CXF_OPTS -jar $FELIX/bin/felix.jar $FELIX_CACHE 2>&1 > /dev/null &" $MATTERHORN_USER
+    su -c "java -Dgosh.args='--noshutdown -c noop=true' $DEBUG_OPTS $FELIX_OPTS $GRAPHICS_OPTS $TEMP_OPTS $FELIX_WORK $MAVEN_ARG $JAVA_OPTS $FELIX_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS $UTIL_LOGGING_OPTS $CXF_OPTS -jar $FELIX/bin/felix.jar $FELIX_CACHE 2>&1 > /dev/null &" $MATTERHORN_USER
     echo "done." 
     ;;    
   stop)

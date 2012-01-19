@@ -28,6 +28,7 @@ public class SearchQuery {
   protected boolean sortByCreationDate = false;
   protected boolean sortByPublicationDate = false;
   protected String id;
+  protected String seriesId;
   protected String text;
   protected String query;
   protected int limit = -1;
@@ -70,6 +71,11 @@ public class SearchQuery {
     this.text = text;
     return this;
   }
+  
+  public SearchQuery withSeriesId(String seriesId) {
+    this.seriesId = seriesId;
+    return this;
+  }
 
   public String getId() {
     return id;
@@ -91,6 +97,10 @@ public class SearchQuery {
     return text;
   }
 
+  public String getSeriesId() {
+    return seriesId;
+  }
+  
   public boolean isIncludeEpisodes() {
     return includeEpisode;
   }

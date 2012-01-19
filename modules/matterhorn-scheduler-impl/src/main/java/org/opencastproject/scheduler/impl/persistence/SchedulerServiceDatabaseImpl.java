@@ -213,7 +213,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
   @Override
   public DublinCoreCatalog[] getAllEvents() throws SchedulerServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
-    Query query = em.createQuery("SELECT e FROM EventEntity e");
+    Query query = em.createNamedQuery("Event.findAll");
     List<EventEntity> eventEntities = null;
     try {
       eventEntities = (List<EventEntity>) query.getResultList();

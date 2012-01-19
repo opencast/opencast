@@ -32,8 +32,10 @@ import javax.persistence.Table;
  * 
  */
 @Entity(name = "SeriesEntity")
-@Table(name = "SERIES")
+@Table(name = "series")
 @NamedQueries({
+        @NamedQuery(name = "Series.findAll", query = "select s from SeriesEntity s"),
+        @NamedQuery(name = "Series.getCount", query = "select COUNT(s) from SeriesEntity s"),
         @NamedQuery(name = "seriesById", query = "select s from SeriesEntity as s where s.seriesId=:seriesId and s.organization=:organization"),
         @NamedQuery(name = "allSeriesInOrg", query = "select s from SeriesEntity as s where s.organization=:organization") })
 public class SeriesEntity {
@@ -41,22 +43,22 @@ public class SeriesEntity {
   /** Series ID, primary key */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "SERIES_ID", length = 128)
+  @Column(name = "series_id", length = 128)
   protected String seriesId;
 
   /** Series ID, primary key */
   @Id
-  @Column(name = "ORG_ID", length = 128)
+  @Column(name = "organization_id", length = 128)
   protected String organization;
 
   /** Serialized Dublin core */
   @Lob
-  @Column(name = "DUBLIN_CORE", length = 65535)
+  @Column(name = "dublin_core", length = 65535)
   protected String dublinCoreXML;
 
   /** Serialized access control */
   @Lob
-  @Column(name = "ACCESS_CONTROL", length = 65535)
+  @Column(name = "access_control", length = 65535)
   protected String accessControl;
 
   /**

@@ -65,7 +65,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @Entity(name = "Job")
 @Access(AccessType.PROPERTY)
-@Table(name = "JOB")
+@Table(name = "job")
 @NamedQueries({
         // Job queries
         @NamedQuery(name = "Job", query = "SELECT j FROM Job j "
@@ -121,10 +121,8 @@ public class JobJpaImpl extends JaxbJob {
   /** The job context, to be created after loading by JPA */
   protected JaxbJobContext context = null;
 
-  @JoinColumn(name = "root_id", referencedColumnName = "id", updatable = false)
   protected JobJpaImpl rootJob = null;
 
-  @JoinColumn(name = "parent_id", referencedColumnName = "id", updatable = false)
   protected JobJpaImpl parentJob = null;
 
   /** Default constructor needed by jaxb and jpa */
@@ -161,6 +159,7 @@ public class JobJpaImpl extends JaxbJob {
    */
   @Id
   @GeneratedValue
+  @Column(name = "id")
   @XmlAttribute
   @Override
   public long getId() {
@@ -168,14 +167,16 @@ public class JobJpaImpl extends JaxbJob {
   }
 
   @Override
-  @Column(name = "creator", nullable = false)
+  @Lob
+  @Column(name = "creator", nullable = false, length = 65535)
   @XmlElement(name = "creator")
   public String getCreator() {
     return creator;
   }
 
   @Override
-  @Column(name = "organization", nullable = false)
+  @Lob
+  @Column(name = "organization", nullable = false, length = 65535)
   @XmlElement(name = "organization")
   public String getOrganization() {
     return organization;
@@ -206,7 +207,7 @@ public class JobJpaImpl extends JaxbJob {
    * 
    * @see org.opencastproject.job.api.Job#getStatus()
    */
-  @Column
+  @Column(name = "status")
   @XmlAttribute
   @Override
   public Status getStatus() {
@@ -230,7 +231,8 @@ public class JobJpaImpl extends JaxbJob {
    * 
    * @see org.opencastproject.job.api.JaxbJob#getOperation()
    */
-  @Column(name = "operation")
+  @Lob
+  @Column(name = "operation", length = 65535)
   @XmlAttribute
   @Override
   public String getOperation() {
@@ -244,10 +246,10 @@ public class JobJpaImpl extends JaxbJob {
    */
   @Lob
   @Column(name = "argument", length = 2147483647)
-  @OrderColumn(name = "listindex")
+  @OrderColumn(name = "list_index")
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "JOB_ARG", joinColumns = @JoinColumn(name = "ID", referencedColumnName = "ID"), uniqueConstraints = @UniqueConstraint(columnNames = {
-          "ID", "LISTINDEX" }))
+  @CollectionTable(name = "job_arguments", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"), uniqueConstraints = @UniqueConstraint(columnNames = {
+          "id", "list_index" }))
   @XmlElement(name = "arg")
   @XmlElementWrapper(name = "args")
   @Override
@@ -284,7 +286,7 @@ public class JobJpaImpl extends JaxbJob {
    * 
    * @see org.opencastproject.job.api.Job#getDateCompleted()
    */
-  @Column
+  @Column(name = "date_completed")
   @Temporal(TemporalType.TIMESTAMP)
   @XmlElement
   @Override
@@ -297,7 +299,7 @@ public class JobJpaImpl extends JaxbJob {
    * 
    * @see org.opencastproject.job.api.Job#getDateCreated()
    */
-  @Column
+  @Column(name = "date_created")
   @Temporal(TemporalType.TIMESTAMP)
   @XmlElement
   @Override
@@ -310,7 +312,7 @@ public class JobJpaImpl extends JaxbJob {
    * 
    * @see org.opencastproject.job.api.Job#getDateStarted()
    */
-  @Column
+  @Column(name = "date_started")
   @Temporal(TemporalType.TIMESTAMP)
   @XmlElement
   @Override
@@ -321,7 +323,7 @@ public class JobJpaImpl extends JaxbJob {
   /**
    * @return the queueTime
    */
-  @Column
+  @Column(name = "queue_time")
   @XmlElement
   @Override
   public Long getQueueTime() {
@@ -331,7 +333,7 @@ public class JobJpaImpl extends JaxbJob {
   /**
    * @return the runTime
    */
-  @Column
+  @Column(name = "run_time")
   @XmlElement
   @Override
   public Long getRunTime() {
@@ -344,7 +346,7 @@ public class JobJpaImpl extends JaxbJob {
    * @see org.opencastproject.job.api.JaxbJob#getPayload()
    */
   @Lob
-  @Column(name = "PAYLOAD", length = 2147483647)
+  @Column(name = "payload", length = 65535)
   @XmlElement
   @Override
   public String getPayload() {
@@ -361,7 +363,7 @@ public class JobJpaImpl extends JaxbJob {
     super.setPayload(payload);
   }
 
-  @Column
+  @Column(name = "is_dispatchable")
   @XmlAttribute
   @Override
   public boolean isDispatchable() {
@@ -377,7 +379,7 @@ public class JobJpaImpl extends JaxbJob {
    * @return the serviceRegistration where this job was created
    */
   @ManyToOne
-  @JoinColumn(name = "creator_svc")
+  @JoinColumn(name = "creator_service")
   public ServiceRegistrationJpaImpl getCreatorServiceRegistration() {
     return creatorServiceRegistration;
   }
@@ -487,6 +489,7 @@ public class JobJpaImpl extends JaxbJob {
   /**
    * @return the parentJob
    */
+  @JoinColumn(name = "parent_id", referencedColumnName = "id", updatable = false)
   public JobJpaImpl getParentJob() {
     return parentJob;
   }
@@ -502,6 +505,7 @@ public class JobJpaImpl extends JaxbJob {
   /**
    * @return the rootJob
    */
+  @JoinColumn(name = "root_id", referencedColumnName = "id", updatable = false)
   public JobJpaImpl getRootJob() {
     return rootJob;
   }

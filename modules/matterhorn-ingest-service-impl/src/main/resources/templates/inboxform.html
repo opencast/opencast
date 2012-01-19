@@ -4,9 +4,11 @@
     <title>Inbox file select</title>
     <meta http-equiv="cache-control" content="no-cache">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <script type="text/javascript" src="../../admin/jquery/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="../../admin/jquery/jquery-1.6.4.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function() {
+    	var uuid = generateUUID();
+    	$('#jobId').val(uuid);
         $.getJSON('../../files/list/inbox.json', function(data) {   // get list of files in collection inbox from working file repository
           for (i in data) {
             var elm = document.createElement('option');
@@ -19,35 +21,71 @@
           parent.ocUpload.UI.formFieldChanged();
         });
       });
-
-      /** Move selected file to inbox and add track to mediapackage xml
-       *
+      
+      function generateUUID() {
+          var uuid = (function () {
+              var i,
+                  c = "89ab",
+                  u = [];
+              for (i = 0; i < 36; i += 1) {
+                  u[i] = (Math.random() * 16 | 0).toString(16);
+              }
+              u[8] = u[13] = u[18] = u[23] = "-";
+              u[14] = "4";
+              u[19] = c.charAt(Math.random() * 4 | 0);
+              return u.join("");
+          })();
+          return {
+              toString: function () {
+                  return uuid;
+              },
+              valueOf: function () {
+                  return uuid;
+              }
+          };
+      }
+      
+      /** 
+       * Move selected file to inbox and add track to mediapackage xml
        **/
       function submit() {
-        var TRACK_ID = 'source-track';
+        var trackUrl;
         var file = $('#file').val();
-        var flavor = $('#flavor').val();
-        var mp = $('#mediapackage').val();
-        var mpId = $(mp.documentElement).attr('id');
+        var trackId = $('#jobId').val();
+        var mpString = $('#mediapackage').val();
+        var mp = $.parseXML(mpString);
+        var mpId = $(mp).find('ns2\\:mediapackage').attr('id');
+     	
         $.ajax({
-          url : '../../files/move/inbox/' + file + '/' + mpId + '/' + TRACK_ID + "/" + file,
-          type : 'POST',
-          dataType : 'text',
-          success : function(data) {
-            var track = mp.createElement('track');
-            track = $(track).attr('type',flavor).attr('id', TRACK_ID);
-            var url = $(mp.createElement('url')).text(data);
-            track = $(track).append(url);
-            $(mp.documentElement).find('media').append(track);
-            $('#mp').val(parent.ocUtils.xmlToString(mp));
-            parent.ocUpload.Listener.uploadComplete($('#jobId').val());
-          }
+        	url : '../../files/move/inbox/' + file + '/' + mpId + '/' + trackId + '/' + file,
+          	type : 'POST',
+          	async: false,
+          	dataType : 'text',
+          	success : function(url) {
+			  	trackUrl = url;
+        	}
         });
+        
+        $.ajax({
+        	url : '../../ingest/addTrack',
+          	type : 'POST',
+          	dataType : 'xml',
+          	data: {
+        		flavor: $('#flavor').val(),
+        		url: trackUrl,
+        		mediaPackage: mpString
+          	},
+          	success : function(mp) {
+				$('#mp').val(parent.ocUtils.xmlToString(mp));
+        		parent.ocUpload.Listener.uploadComplete(trackId);
+        	}
+        });
+        
       }
     </script>
   </head>
   <body style="margin:0;padding:0;border:0;outline:0;vertical-align:baseline;background:transparent;">
-    <input type="hidden" name="jobId" id="jobId" class="track-id" value="{jobId}" />
+    <input type="hidden" name="jobId" id="jobId" class="track-id" />
     <input type="hidden" id="mediapackage" value=""/>
     <form name="uploadForm" id="uploadForm" action="javascript: submit();">
       <input type="hidden" name="flavor" id="flavor" value="">

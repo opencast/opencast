@@ -36,7 +36,7 @@
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-capture-admin-service-api</module>
         <module>modules/matterhorn-capture-admin-service-impl</module>
-	<module>modules/matterhorn-cas</module>
+		<module>modules/matterhorn-cas</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-conductor</module>
         <module>modules/matterhorn-db</module>
@@ -57,6 +57,7 @@
         <module>modules/matterhorn-scheduler-impl</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
+		<module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-solr</module>
         <module>modules/matterhorn-userdirectory-ldap</module>
         <module>modules/matterhorn-webconsole</module>
@@ -224,6 +225,7 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
+		<module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
         <module>modules/matterhorn-textextractor-tesseract</module>
@@ -252,6 +254,7 @@
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
+		<module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-remote</module>
         <module>modules/matterhorn-videosegmenter-api</module>
@@ -336,7 +339,7 @@
     <profile>
       <id>capture</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -389,6 +392,44 @@
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
+      <modules>
+        <module>modules/matterhorn-test-harness</module>
+      </modules>
+
+	  <build>
+	    <plugins>
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-antrun-plugin</artifactId>
+	        <executions>
+	          <execution>
+			    <id>integration-tests</id>
+			    <phase>validate</phase>
+			    <goals>
+			      <goal>run</goal>
+			    </goals>
+			    <configuration>
+			      <target if="harness">
+					<java classname="org.opencastproject.remotetest.Main" fork="true">
+					  <classpath>
+					    <pathelement path="modules/matterhorn-test-harness/target/matterhorn-test-harness-${project.version}-jar-with-dependencies.jar"/>
+					  </classpath>
+					  <arg value="--with${harness}" />
+					</java>
+			      </target>
+			    </configuration>
+			  </execution>
+			</executions>
+	      </plugin>
+        </plugins>
+	  </build>
+    </profile>
+
+    <profile>
+      <id>test-performance</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
       <build>
         <plugins>
           <plugin>
@@ -427,17 +468,7 @@
     </profile>
 
     <profile>
-      <id>integrationtests</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-test-harness</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>loadtest</id>
+      <id>test-load</id>
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
@@ -458,12 +489,12 @@
     <defaultGoal>install</defaultGoal>
     <testResources>
       <!-- Add a log4j configuration file to the test resources -->
-      <testResource>
+<!--      <testResource>
         <directory>${matterhorn.basedir}/docs/log4j</directory>
         <includes>
           <include>log4j.properties</include>
         </includes>
-      </testResource>
+      </testResource>-->
       <!-- Re-add the test resources as defined by the project -->
       <testResource>
         <directory>${project.basedir}/src/test/resources</directory>
@@ -894,7 +925,7 @@
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>javax.persistence</artifactId>
-        <version>2.0.2</version>
+        <version>2.0.0</version>
       </dependency>
 
       <!-- CXF -->
@@ -1666,6 +1697,11 @@
       <releases>
         <enabled>false</enabled>
       </releases>
+    </repository>
+    <repository>
+      <id>eclipselink</id>
+      <name>Eclipselink Repo</name>
+      <url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
     </repository>
     <!-- these are here as a backup in case the matterhorn nexus repository is down -->
     <!-- <repository> <id>com.springsource.repository.bundles.release</id> <name>SpringSource Enterprise Bundle Repository 

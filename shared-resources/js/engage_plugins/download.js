@@ -32,7 +32,7 @@ Opencast.download = (function() {
 
         $.ajax(
             {
-            url: Opencast.engage.getSearchServiceEpisodeJsonURL(),
+            url: Opencast.Watch.getDescriptionEpisodeURL(),
             data: "id=" + Opencast.Player.getMediaPackageId(),
             dataType: 'json',
             success: function(data)
@@ -59,24 +59,25 @@ Opencast.download = (function() {
                         ];
 
                         for( i = 0; i < media.length; i+=1 ){
+                            if ( media[i]["tags"]["tag"].indexOf('engage') === -1 ){
+                                media_href = media[i].url;
+                                media_type = media[i].type;
+                                media_type = (media_type === 'presenter/delivery') ? "Presenter " : "Presentation ";
+                                media_resolution = media[i].video ? media[i].video.resolution : " ";
+                                media_description = " ";
 
-                            media_href = media[i].url;
-                            media_type = media[i].type;
-                            media_type = (media_type === 'presenter/delivery') ? "Presenter " : "Presentation ";
-                            media_resolution = media[i].video ? media[i].video.resolution : " ";
-                            media_description = " ";
-
-                            for( j = 0; j < DISPLAY_DESCRIPTION.length; j+=1 ){
-                                if (DISPLAY_DESCRIPTION[j][0] === media_resolution){
-                                    media_description = DISPLAY_DESCRIPTION[j][1];
+                                for( j = 0; j < DISPLAY_DESCRIPTION.length; j+=1 ){
+                                    if (DISPLAY_DESCRIPTION[j][0] === media_resolution){
+                                        media_description = DISPLAY_DESCRIPTION[j][1];
+                                    }
                                 }
-                            }
 
-                            media_format = media_href.split(".");
-                            // get size of media
-                            media_size = Opencast.download.getMediaSize(media_href);
-                            media_size = media_size + "MB"
-                            myHTML += " <a href="+ media_href + ">" +  media_type + " - " + media_description  + " [ File extension : <em>"+  media_format[media_format.length - 1] +"</em> ] " + media_size + "</a></br>";
+                                media_format = media_href.split(".");
+                                // get size of media
+                                media_size = Opencast.download.getMediaSize(media_href);
+                                media_size = media_size > 0 ? media_size + "MB" : "";
+                                myHTML += " <a href="+ media_href + ">" +  media_type + " - " + media_description  + " [ File extension : <em>"+  media_format[media_format.length - 1] +"</em> ] " + media_size + "</a></br>";
+                            }
                         }
 
                         return myHTML;

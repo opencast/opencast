@@ -162,7 +162,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    * @see org.opencastproject.distribution.api.DistributionService#distribute(String, MediaPackageElement)
    */
   protected MediaPackageElement distribute(Job job, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
 
     if (mediapackage == null)
       throw new IllegalArgumentException("Mediapackage must be specified");
@@ -200,7 +200,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       logger.info("Distributing {} to {}", elementId, destination);
 
       try {
-        FileSupport.copy(sourceFile, destination);
+        FileSupport.link(sourceFile, destination);
       } catch (IOException e) {
         throw new DistributionException("Unable to copy " + sourceFile + " to " + destination, e);
       }

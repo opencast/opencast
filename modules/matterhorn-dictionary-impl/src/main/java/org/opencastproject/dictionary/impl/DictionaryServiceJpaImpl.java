@@ -49,8 +49,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
   protected PersistenceProvider persistenceProvider;
 
   /** The properties used to generate an entity manager factory */
-  @SuppressWarnings("unchecked")
-  protected Map persistenceProperties;
+  protected Map<String, Object> persistenceProperties;
 
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
@@ -71,8 +70,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * @param persistenceProperties
    *          the persistenceProperties to set
    */
-  @SuppressWarnings("unchecked")
-  public void setPersistenceProperties(Map persistenceProperties) {
+  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
     this.persistenceProperties = persistenceProperties;
   }
 
@@ -100,7 +98,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
     text = Word.fixCase(text);
     EntityManager em = emf.createEntityManager();
     try {
-      Query query = em.createQuery("SELECT w FROM Word w where w.text = :text and w.language = :language");
+      Query query = em.createNamedQuery("Word.get");
       query.setParameter("text", text);
       query.setParameter("language", language);
       try {
@@ -238,7 +236,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
     EntityTransaction tx = em.getTransaction();
     try {
       tx.begin();
-      Query q = em.createQuery("DELETE from Word w where w.language = :language");
+      Query q = em.createNamedQuery("Word.deleteLanguage");
       q.setParameter("language", language);
       int totalDeleted = q.executeUpdate();
       tx.commit();
@@ -263,7 +261,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
     text = Word.fixCase(text);
     EntityManager em = emf.createEntityManager();
     try {
-      Query query = em.createQuery("SELECT w FROM Word w where w.text = :text");
+      Query query = em.createNamedQuery("Word.wordsFromText");
       query.setParameter("text", text);
       return (Word[]) query.getResultList().toArray(new Word[0]);
     } finally {
@@ -338,7 +336,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
   public String[] getLanguages() {
     EntityManager em = emf.createEntityManager();
     try {
-      Query q = em.createQuery("SELECT DISTINCT w.language from Word w");
+      Query q = em.createNamedQuery("Word.languageCount");
       return (String[]) q.getResultList().toArray(new String[0]);
     } finally {
       em.close();
@@ -356,7 +354,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
     text = Word.fixCase(text);
     EntityManager em = emf.createEntityManager();
     try {
-      Query q = em.createQuery("SELECT DISTINCT w.language from Word w where w.text = :text");
+      Query q = em.createNamedQuery("Word.wordByLanguage");
       q.setParameter("text", text);
       return (String[]) q.getResultList().toArray(new String[0]);
     } finally {
@@ -483,8 +481,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
     EntityTransaction tx = em.getTransaction();
     try {
       tx.begin();
-      Query q = em
-              .createQuery("UPDATE Word w set w.stopWord = true where w.weight > :threshold and w.language = :language");
+      Query q = em.createNamedQuery("Word.updateStopWords");
       q.setParameter("threshold", threshold);
       q.setParameter("language", language);
       int numUpdatedRows = q.executeUpdate();

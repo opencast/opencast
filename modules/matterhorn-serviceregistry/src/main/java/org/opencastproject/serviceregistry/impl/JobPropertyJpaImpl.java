@@ -18,6 +18,7 @@ package org.opencastproject.serviceregistry.impl;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 /**
@@ -33,10 +34,11 @@ public class JobPropertyJpaImpl {
   protected JobJpaImpl rootJob;
 
   @Id
-  @Column
+  @Column(name = "key")
   protected String key;
 
-  @Column
+  @Lob
+  @Column(name = "value", length = 65535)
   protected String value;
 
   /**

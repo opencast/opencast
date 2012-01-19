@@ -9,8 +9,8 @@
   </service>
   <reference name="ingest" interface="org.opencastproject.ingest.api.IngestService"
     cardinality="1..1" policy="static" bind="setIngestService" />
-  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
-    cardinality="1..1" policy="static" bind="setWorkspace" />
+  <reference name="working-file-repository" interface="org.opencastproject.workingfilerepository.api.WorkingFileRepository"
+    cardinality="1..1" policy="static" bind="setWorkingFileRepository" />
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
     cardinality="1..1" policy="static" bind="setSecurityService" />
   <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"

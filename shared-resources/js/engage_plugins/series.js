@@ -213,7 +213,7 @@ Opencast.Series = (function ()
                             success: function (data)
                             {
                                 $.log("Series AJAX call #2: Requesting data succeeded");
-                                if((data['search-results'] != null) && (data['search-results'].result != null))
+                                if (data && data['search-results'] && data['search-results'].result && (data['search-results'].result.length > 1))
                                 {
                                     if (data['search-results'].result.length > 1)
                                     {

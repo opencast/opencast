@@ -144,7 +144,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
    * @see org.opencastproject.distribution.api.DistributionService#distribute(String, MediaPackageElement)
    */
   protected MediaPackageElement distribute(Job job, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
 
     if (mediapackage == null)
       throw new IllegalArgumentException("Mediapackage must be specified");
@@ -178,7 +178,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
       logger.info("Distributing {} to {}", elementId, destination);
 
       try {
-        FileSupport.copy(sourceFile, destination);
+        FileSupport.link(sourceFile, destination);
       } catch (IOException e) {
         throw new DistributionException("Unable to copy " + sourceFile + " to " + destination, e);
       }
@@ -253,7 +253,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
     // Find the element that has been created as part of the distribution process
     String mediaPackageId = mediapackage.getIdentifier().compact();
     URI distributedURI = null;
-    MediaPackageElement distributedElement = null; 
+    MediaPackageElement distributedElement = null;
     try {
       distributedURI = getDistributionUri(mediaPackageId, element);
       for (MediaPackageElement e : mediapackage.getElements()) {
@@ -269,7 +269,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
     // Has this element been distributed?
     if (distributedElement == null)
       return null;
-        
+
     String mediapackageId = mediapackage.getIdentifier().compact();
     try {
 
@@ -320,14 +320,14 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
       MediaPackage mediapackage = MediaPackageParser.getFromXml(arguments.get(0));
       String elementId = arguments.get(1);
       switch (op) {
-        case Distribute:
-          MediaPackageElement distributedElement = distribute(job, mediapackage, elementId);
-          return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
-        case Retract:
-          MediaPackageElement retractedElement = retract(job, mediapackage, elementId);
-          return (retractedElement != null) ? MediaPackageElementParser.getAsXml(retractedElement) : null;
-        default:
-          throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
+      case Distribute:
+        MediaPackageElement distributedElement = distribute(job, mediapackage, elementId);
+        return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
+      case Retract:
+        MediaPackageElement retractedElement = retract(job, mediapackage, elementId);
+        return (retractedElement != null) ? MediaPackageElementParser.getAsXml(retractedElement) : null;
+      default:
+        throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
       }
     } catch (IllegalArgumentException e) {
       throw new ServiceRegistryException("This service can't handle operations of type '" + op + "'", e);

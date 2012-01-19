@@ -16,11 +16,19 @@
 
 package org.opencastproject.oaipmh.harvester;
 
-import org.apache.commons.lang.ArrayUtils;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.oaipmh.util.PersistenceEnv;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
+import org.apache.commons.lang.ArrayUtils;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Id;
@@ -31,17 +39,12 @@ import javax.persistence.Query;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import java.util.Date;
-import java.util.List;
-
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 /**
  * Persists the last harvested time of a url.
  */
 @Entity
-@Table(name = "LAST_HARVESTED")
+@Table(name = "last_harvested")
 @NamedQueries({
     @NamedQuery(name = "findLastHarvested",
         query = "SELECT a.timestamp FROM LastHarvested a WHERE a.url = :url"),
@@ -51,8 +54,10 @@ import static org.opencastproject.util.data.Option.some;
 public class LastHarvested {
 
   @Id
+  @Column(name = "url")
   private String url;
 
+  @Column(name = "timestamp")
   @Temporal(TemporalType.TIMESTAMP)
   private Date timestamp;
 

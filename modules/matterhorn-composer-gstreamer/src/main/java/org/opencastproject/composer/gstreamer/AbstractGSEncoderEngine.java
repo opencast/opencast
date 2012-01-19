@@ -29,12 +29,16 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.activation.MimetypesFileTypeMap;
 
 /**
@@ -108,10 +112,63 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
   public File trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
           throws EncoderException {
 
-    properties.put("trim.start", Long.toString(start));
-    properties.put("trim.duration", Long.toString(duration));
+    if (properties == null) {
+      properties = new Hashtable<String, String>();
+    }
+    properties.put("trim.start", Long.toString(start * 1000000L));
+    properties.put("trim.duration", Long.toString(duration * 1000000L));
 
     return process(null, mediaSource, format, properties);
+  }
+  
+  /**
+   * Substitutes template values from template with actual values from properties.
+   * 
+   * @param template
+   *          String that represents template
+   * @param properties
+   *          Map that contains substitution for template values in template
+   * @param cleanup
+   *          if template values that were not matched should be removed
+   * @return String built from template
+   */
+  protected String substituteTemplateValues(String template, Map<String, String> properties, boolean cleanup) {
+
+    StringBuffer buffer = new StringBuffer();
+    Pattern pattern = Pattern.compile("#\\{\\S+?\\}");
+    Matcher matcher = pattern.matcher(template);
+    while (matcher.find()) {
+      String match = template.substring(matcher.start() + 2, matcher.end() - 1);
+      if (properties.containsKey(match)) {
+        matcher.appendReplacement(buffer, properties.get(match));
+      }
+    }
+    matcher.appendTail(buffer);
+
+    String processedTemplate = buffer.toString();
+
+    if (cleanup) {
+      // remove all property matches
+      buffer = new StringBuffer();
+      Pattern ppattern = Pattern.compile("\\S+?=#\\{\\S+?\\}");
+      matcher = ppattern.matcher(processedTemplate);
+      while (matcher.find()) {
+        matcher.appendReplacement(buffer, "");
+      }
+      matcher.appendTail(buffer);
+      processedTemplate = buffer.toString();
+
+      // remove all other templates
+      buffer = new StringBuffer();
+      matcher = pattern.matcher(processedTemplate);
+      while (matcher.find()) {
+        matcher.appendReplacement(buffer, "");
+      }
+      matcher.appendTail(buffer);
+      processedTemplate = buffer.toString();
+    }
+
+    return processedTemplate;
   }
 
   /**
@@ -146,11 +203,17 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
       if (audioSource != null) {
         String audioInput = FilenameUtils.normalize(audioSource.getAbsolutePath());
         params.put("in.audio.path", audioInput);
+        params.put("in.audio.name", FilenameUtils.getBaseName(audioInput));
+        params.put("in.audio.suffix", FilenameUtils.getExtension(audioInput));
+        params.put("in.audio.filename", FilenameUtils.getName(audioInput));
         params.put("in.audio.mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(audioInput));
       }
       if (videoSource != null) {
         String videoInput = FilenameUtils.normalize(videoSource.getAbsolutePath());
         params.put("in.video.path", videoInput);
+        params.put("in.video.name", FilenameUtils.getBaseName(videoInput));
+        params.put("in.video.suffix", FilenameUtils.getExtension(videoInput));
+        params.put("in.video.filename", FilenameUtils.getName(videoInput));
         params.put("in.video.mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(videoInput));
       }
       File parentFile;
@@ -161,11 +224,17 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
       }
       String outDir = parentFile.getAbsoluteFile().getParent();
       String outFileName = FilenameUtils.getBaseName(parentFile.getName());
-      String outSuffix = profile.getSuffix();
+      String outSuffix = substituteTemplateValues(profile.getSuffix(), params, false);
 
       if (new File(outDir, outFileName + outSuffix).exists()) {
-        outFileName += "_reencode";
+        outFileName += "_" + UUID.randomUUID().toString();
       }
+      
+      params.put("out.dir", outDir);
+      params.put("out.name", outFileName);
+      params.put("out.suffix", outSuffix);
+      
+      
       File encodedFile = new File(outDir, outFileName + outSuffix);
       params.put("out.file.path", encodedFile.getAbsolutePath());
 

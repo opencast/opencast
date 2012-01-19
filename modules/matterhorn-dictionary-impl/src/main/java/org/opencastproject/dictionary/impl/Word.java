@@ -20,35 +20,47 @@ import java.util.Locale;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
  * A word that exists in a particular language.
  */
 @Entity
-@Table(name = "DICTIONARY")
+@Table(name = "dictionary")
+@NamedQueries({
+  @NamedQuery(name = "Word.get", query = "SELECT w FROM Word w where w.text = :text and w.language = :language"),
+  @NamedQuery(name = "Word.deleteLanguage", query = "DELETE from Word w where w.language = :language"),
+  @NamedQuery(name = "Word.wordsFromText", query = "SELECT w FROM Word w where w.text = :text"),
+  @NamedQuery(name = "Word.languageCount", query = "SELECT DISTINCT w.language from Word w"),
+  @NamedQuery(name = "Word.wordByLanguage", query = "SELECT DISTINCT w.language from Word w where w.text = :text"),
+  @NamedQuery(name = "Word.updateStopWords", query = "UPDATE Word w set w.stopWord = true where w.weight > :threshold and w.language = :language")
+})
 public class Word {
 
   /** The text of the word itself */
   @Id
-  @Column
+  //@Index
+  @Column(name = "text")
   protected String text;
 
   /** The language in which this word appears */
   @Id
-  @Column
+  //@Index
+  @Column(name = "language")
   protected String language;
 
   /** Whether this is a stop word (a word that appears so frequently in a language that it is not useful in searches) */
-  @Column
+  @Column(name = "stop_word")
   protected boolean stopWord;
 
   /** The number of occurrences of this word divided by the total number of words loaded for this language */
-  @Column
+  @Column(name = "weight")
   protected double weight;
 
   /** The number of times this word was found while loading the text corpus for a language */
-  @Column
+  @Column(name = "count")
   protected long count;
 
   /** The default, no-arg constructor used by JPA to construct a new object before populating its fields */

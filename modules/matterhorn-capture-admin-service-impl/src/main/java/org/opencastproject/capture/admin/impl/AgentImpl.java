@@ -36,6 +36,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.PostLoad;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -44,7 +46,11 @@ import javax.persistence.Transient;
  * An in-memory construct to represent the state of a capture agent, and when it was last heard from.
  */
 @Entity
-@Table(name = "CAPTURE_AGENT_STATE")
+@Table(name = "capture_agent_state")
+@NamedQueries({
+  @NamedQuery(name = "Agent.get", query = "select a from AgentImpl a where a.name = :id and a.organization = :org"),
+  @NamedQuery(name = "Agent.byOrganization", query = "SELECT a FROM AgentImpl a where a.organization = :org")
+})
 public class AgentImpl implements Agent {
 
   private static final Logger log = LoggerFactory.getLogger(AgentImpl.class);
@@ -53,46 +59,47 @@ public class AgentImpl implements Agent {
    * The name of the agent.
    */
   @Id
-  @Column(name = "ID")
+  @Column(name = "id")
   protected String name;
 
   /**
    * The state of the agent. This should be defined from the constants in AgentState.
    */
-  @Column(name = "STATE", nullable = false)
+  @Lob
+  @Column(name = "state", nullable = false, length = 65535)
   protected String state;
 
   /**
    * The URL of the agent. This is determined from the referer header parameter when the agent is registered.
-   * 
    */
-  @Column(name = "URL")
+  @Lob
+  @Column(name = "url", length = 65535)
   protected String url;
 
   @Id
-  @Column(name = "ORG")
+  @Column(name = "organization")
   protected String organization;
 
   /**
    * The time at which the agent last checked in with this service. Note that this is an absolute timestamp (ie,
    * milliseconds since 1970) rather than a relative timestamp (ie, it's been 3000 ms since it last checked in).
    */
-  @Column(name = "LAST_HEARD_FROM", nullable = false)
+  @Column(name = "last_heard_from", nullable = false)
   protected Long lastHeardFrom;
 
   /** The roles allowed to schedule this agent */
   @ElementCollection
-  @Column(name = "ROLE")
-  @CollectionTable(name = "CAPTURE_AGENT_ROLE", joinColumns = { @JoinColumn(name = "ID", referencedColumnName = "ID"),
-          @JoinColumn(name = "ORG", referencedColumnName = "ORG") })
+  @Column(name = "role")
+  @CollectionTable(name = "capture_agent_role", joinColumns = { @JoinColumn(name = "id", referencedColumnName = "id"),
+          @JoinColumn(name = "organization", referencedColumnName = "organization") })
   protected Set<String> schedulerRoles = new HashSet<String>();
 
   /**
    * The capabilities the agent has Capabilities are the devices this agent can record from, with a friendly name
    * associated to determine their nature (e.g. PRESENTER --> dev/video0)
    */
-  @Column(name = "CONFIGURATION", nullable = true, length = 65535)
   @Lob
+  @Column(name = "configuration", nullable = true, length = 65535)
   protected String configurationString;
 
   // Private var to store the caps as a properties object.

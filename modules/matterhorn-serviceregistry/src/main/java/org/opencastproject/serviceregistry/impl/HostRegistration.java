@@ -28,7 +28,7 @@ import javax.persistence.UniqueConstraint;
  * A record of a host providing Matterhorn services.
  */
 @Entity(name = "HostRegistration")
-@Table(name = "HOST_REGISTRATION", uniqueConstraints = @UniqueConstraint(columnNames = "HOST"))
+@Table(name = "host_registration", uniqueConstraints = @UniqueConstraint(columnNames = "host"))
 @NamedQueries({
         @NamedQuery(name = "HostRegistration.cores", query = "SELECT sum(hr.maxJobs) FROM HostRegistration hr"),
         @NamedQuery(name = "HostRegistration.byHostName", query = "SELECT hr from HostRegistration hr where hr.baseUrl = :host") })
@@ -59,27 +59,29 @@ public class HostRegistration {
 
   /** The primary key identifying this host */
   @Id
-  @Column
+  @Column(name = "id")
   @GeneratedValue
   protected Long id;
 
-  /** The base URL for this host */
-  @Column(name = "HOST", nullable = false)
+  /** The base URL for this host.
+   *  The length was chosen this short because MySQL complains when trying to create an index larger than this
+   */
+  @Column(name = "host", nullable = false, length = 255)
   protected String baseUrl;
 
   /**
    * The maximum number of concurrent jobs this host can run. Typically, this is the number of cores available to the
    * JVM.
    */
-  @Column(name = "MAX_JOBS", nullable = false)
+  @Column(name = "max_jobs", nullable = false)
   protected int maxJobs;
 
   /** Whether this host is available */
-  @Column(name = "ONLINE", nullable = false)
+  @Column(name = "online", nullable = false)
   protected boolean online;
 
   /** Whether this host is in maintenance mode */
-  @Column(name = "MAINTENANCE", nullable = false)
+  @Column(name = "maintenance", nullable = false)
   protected boolean maintenanceMode;
 
   /**

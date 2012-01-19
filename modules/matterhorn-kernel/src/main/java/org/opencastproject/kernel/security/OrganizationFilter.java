@@ -15,6 +15,8 @@
  */
 package org.opencastproject.kernel.security;
 
+import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
+
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -33,6 +36,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Inspects request URLs and sets the organization for the request.
@@ -86,14 +90,28 @@ public class OrganizationFilter implements Filter {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
           ServletException {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
+    HttpServletResponse httpResponse = (HttpServletResponse) response;
     URL url = new URL(httpRequest.getRequestURL().toString());
-    Organization org = null;
+    Organization org = null;    
     try {
-      org = organizationDirectory.getOrganization(url);
-      securityService.setOrganization(org);
-      chain.doFilter(request, response);
-    } catch (NotFoundException e) {
-      logger.warn("No organization is mapped to handle {}", url);
+      try {
+        org = organizationDirectory.getOrganization(url);
+      } catch (NotFoundException e) {
+        logger.trace("No organization mapped to {}", url);
+        List<Organization> orgs = organizationDirectory.getOrganizations();
+        if (orgs.size() == 1 && DEFAULT_ORGANIZATION_ID.equals(orgs.get(0).getId())) {
+          logger.trace("Defaulting organization to {}", DEFAULT_ORGANIZATION_ID);
+          org = orgs.get(0);
+        } else {
+          logger.warn("No organization is mapped to handle {}", url);
+        }
+      }
+      if (org != null) {
+        securityService.setOrganization(org);
+        chain.doFilter(request, response);
+      } else {
+        httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "No organization is mapped to handle " + url);
+      }
     } finally {
       securityService.setOrganization(null);
       securityService.setUser(null);

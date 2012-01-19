@@ -892,26 +892,14 @@ ocRecordings = new (function() {
   this.removeRecording = function(id, title) {
     if(confirm('Are you sure you wish to delete ' + title + '?')){
       $.ajax({
-        url: '/recordings/'+id,
+        url: '/recordings/' + id,
         type: 'DELETE',
         dataType: 'text',
         error: function(XHR,status,e){
           alert('Could not remove Recording ' + title);
         },
         success: function(){
-          $.ajax({
-            url: WORKFLOW_URL + '/stop',
-            type: 'POST',
-            data: {
-              id: id
-            },
-            error: function(XHR,status,e){
-              alert('Could not stop Processing.');
-            },
-            success: function(){
-              ocRecordings.reload();
-            }
-          });
+          ocRecordings.reload();
         }
       });
     }
@@ -1372,7 +1360,7 @@ ocRecordings = new (function() {
             data = $.parseJSON(data);
             ENGAGE_URL = data.engage;
           }
-          links.push('<a href="' + ENGAGE_URL + '/engage/ui/watch.html?id=' + mpId + '" title="Go to Matterhorn Media Module Watch page to view this recording">Play</a>');
+          links.push('<a target="_blank" href="' + ENGAGE_URL + '/engage/ui/watch.html?id=' + mpId + '" title="Go to Matterhorn Media Module Watch page to view this recording">Play</a>');
         }
 
       } else if (action == 'delete') {

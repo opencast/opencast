@@ -21,6 +21,7 @@ import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -30,15 +31,17 @@ import javax.persistence.Table;
  * 
  */
 @Entity
-@Table(name = "UPLOAD")
+@Table(name = "upload")
 // FIXME @NamedQueries necessary with only one NamedQuery
 @NamedQueries({ @NamedQuery(name = "UploadJob.getByID", query = "SELECT o FROM UploadJob o WHERE o.id = :id") })
 public class UploadJob {
 
   @Id
+  @Column(name = "id")
   private String id;
 
-  @Column(name = "filename", nullable = false)
+  @Lob
+  @Column(name = "filename", nullable = false, length = 65535)
   private String filename = "";
 
   @Column(name = "total", nullable = false)

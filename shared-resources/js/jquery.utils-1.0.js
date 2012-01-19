@@ -366,7 +366,7 @@
         if(withTime)
         {
             // add time to link "open in advanced player"
-            var seconds = parseInt(getTimeInMilliseconds(Opencast.Player.getCurrentTime())) / 1000;
+            var seconds = parseInt($.getTimeInMilliseconds(Opencast.Player.getCurrentTime())) / 1000;
         }
         // parse URL string -- modified version of $.parseURL-module
         var vars = [],

@@ -407,6 +407,15 @@
       </configurations>
     </operation>
  
+    <!-- Archive the current state of the mediapackage -->
+
+    <operation
+      id="archive"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Archiving">
+    </operation>
+
     <!-- Publish to engage search index -->
  
     <operation

@@ -50,8 +50,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
@@ -149,6 +147,7 @@ public class GStreamerEncoderEngine extends AbstractGSEncoderEngine {
 
     Pipeline pipeline;
     try {
+      logger.info("create pipeline: {}", new String[] { pipelineDefinition });
       pipeline = Pipeline.launch(pipelineDefinition);
     } catch (Throwable t) {
       logger.warn("Could not create pipeline from definition \"{}\": {}", pipelineDefinition, t.getMessage());
@@ -222,57 +221,7 @@ public class GStreamerEncoderEngine extends AbstractGSEncoderEngine {
       throw new EncoderException("Error occurred in processing pipeline: " + errorMessage);
     }
   }
-
-  /**
-   * Substitutes template values from template with actual values from properties.
-   * 
-   * @param template
-   *          String that represents template
-   * @param properties
-   *          Map that contains substitution for template values in template
-   * @param cleanup
-   *          if template values that were not matched should be removed
-   * @return String built from template
-   */
-  private String substituteTemplateValues(String template, Map<String, String> properties, boolean cleanup) {
-
-    StringBuffer buffer = new StringBuffer();
-    Pattern pattern = Pattern.compile("#\\{\\S+?\\}");
-    Matcher matcher = pattern.matcher(template);
-    while (matcher.find()) {
-      String match = template.substring(matcher.start() + 2, matcher.end() - 1);
-      if (properties.containsKey(match)) {
-        matcher.appendReplacement(buffer, properties.get(match));
-      }
-    }
-    matcher.appendTail(buffer);
-
-    String processedTemplate = buffer.toString();
-
-    if (cleanup) {
-      // remove all property matches
-      buffer = new StringBuffer();
-      Pattern ppattern = Pattern.compile("\\S+?=#\\{\\S+?\\}");
-      matcher = ppattern.matcher(processedTemplate);
-      while (matcher.find()) {
-        matcher.appendReplacement(buffer, "");
-      }
-      matcher.appendTail(buffer);
-      processedTemplate = buffer.toString();
-
-      // remove all other templates
-      buffer = new StringBuffer();
-      matcher = pattern.matcher(processedTemplate);
-      while (matcher.find()) {
-        matcher.appendReplacement(buffer, "");
-      }
-      matcher.appendTail(buffer);
-      processedTemplate = buffer.toString();
-    }
-
-    return processedTemplate;
-  }
-
+  
   /**
    * Install various listeners to Pipeline, such as: ERROR, WARNING, INFO, STATE_CHANGED and EOS.
    * 

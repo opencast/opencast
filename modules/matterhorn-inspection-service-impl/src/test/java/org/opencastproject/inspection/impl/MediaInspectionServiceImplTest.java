@@ -75,10 +75,11 @@ public class MediaInspectionServiceImplTest {
       p = new ProcessBuilder(MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT, f.getAbsolutePath()).start();
       stdout = new StreamHelper(p.getInputStream());
       stderr = new StreamHelper(p.getErrorStream());
-      if (p.waitFor() != 0)
-        throw new IllegalStateException();
+      int exitCode = p.waitFor(); 
+      if (exitCode != 0 && exitCode != 141)
+        throw new IllegalStateException("process returned " + exitCode);
     } catch (Throwable t) {
-      logger.warn("Skipping media inspection tests due to unsatisifed mediainfo installation");
+      logger.warn("Skipping media inspection tests due to unsatisifed mediainfo installation: " + t.getMessage());
       mediainfoInstalled = false;
     } finally {
       IoSupport.closeQuietly(stdout);

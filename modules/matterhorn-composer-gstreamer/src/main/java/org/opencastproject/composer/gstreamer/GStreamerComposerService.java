@@ -681,6 +681,12 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
   protected Track captions(Job job, Track mediaTrack, Catalog[] captions) throws EncoderException, EmbedderException {
     throw new NotImplementedException("Adding captions not implemented in gstreamer composer");
   }
+  
+  @Override
+  public Job watermark(Track mediaTrack, String watermark, String profileId) {
+    // TODO: implement me
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
 
   /**
    * Deletes any valid file in the list.

@@ -881,7 +881,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
       throw new SchedulerServiceDatabaseException(e);
     }
     if (response.getResults().isEmpty()) {
-      logger.info("No events scheduled for {}", filter);
+      logger.debug("No events scheduled for {}", filter);
       return null;
     }
 

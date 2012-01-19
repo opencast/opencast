@@ -22,34 +22,36 @@
     <script type="text/javascript" src="js/engage-ui.js">
     </script>
     <script type="text/javascript">
-      $(document).ready(function ()
-      {
-          var page = Opencast.pager.getCurrentPageID();
-          var searchQuery = Opencast.pager.getCurrentSearchQuery();
-          var restEndpoint = "../../search/episode.xml?";
-
-          var keywordString = "";
-
-          if (searchQuery != null && searchQuery != "")
-          {
-              restEndpoint = restEndpoint + "q=" + searchQuery + "&";
-
-              // replace all occurences of + by a space
-              searchQuery = searchQuery.replace(/\+/g, " ");
-
-              keywordString = " for “" + unescape(searchQuery) + "”";
-
-              $('#searchField').attr("value", unescape(searchQuery));
-
-          }
-
-          //check whether a user is logged in and show logout link 
-          $.ajax(
-          {
-              url: '/info/me.json',
-              type: 'GET',
-              dataType: 'json',
-              success: function (data)
+      $(document).ready(function(){
+            
+        var page = Opencast.pager.getCurrentPageID();
+        var searchQuery = Opencast.pager.getCurrentSearchQuery();
+        var restEndpoint = "../../search/episode.xml?";
+                
+        var keywordString = "";
+                
+        if (searchQuery != null && searchQuery != "") {
+          restEndpoint = restEndpoint + "q=" + searchQuery + "&";
+                    
+          // replace all occurences of + by a space
+          searchQuery = searchQuery.replace(/\+/g, " ");
+                    
+          keywordString = " for “" + unescape(searchQuery) + "”";
+                    
+          $('#searchField').attr("value", unescape(searchQuery));
+                    
+        }
+        
+        if ($.getURLParameter('series') != "" && $.getURLParameter('series') != null) {
+          restEndpoint += "sid=" + $.getURLParameter('series') + "&";
+        }
+        
+        //check whether a user is logged in and show logout link 
+        $.ajax({
+          url: '/info/me.json',
+          type: 'GET',
+          dataType: 'json',
+          success: function(data)
               {
                   if (data.username != "anonymous")
                   {

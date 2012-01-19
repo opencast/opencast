@@ -681,9 +681,9 @@ public class SolrRequester {
 //    if (!EpisodeQuery.Sort.DATE_CREATED.equals(q.getSort())) {
 //      query.addSortField(getSortField(EpisodeQuery.Sort.DATE_CREATED), ORDER.desc);
 //    }
-      query.addSortField(Schema.DC_CREATED, ORDER.desc);
-      // If the dublin core field dc:created has not been filled in...
-      query.addSortField(Schema.OC_MODIFIED, ORDER.desc);
+    query.addSortField(Schema.DC_CREATED, ORDER.desc);
+    // If the dublin core field dc:created has not been filled in...
+    query.addSortField(Schema.OC_MODIFIED, ORDER.desc);
 
     query.setFields("* score");
     return query;
