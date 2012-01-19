@@ -54,6 +54,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,9 +103,17 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   public MediaInspectionServiceImpl() {
     super(JOB_TYPE);
   }
-
-  public void activate() {
-    analyzerConfig.put(MediaInfoAnalyzer.MEDIAINFO_BINARY_CONFIG, MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT);
+  
+  public void activate(ComponentContext cc) {
+    // Configure mediainfo
+    String path = (String) cc.getBundleContext().getProperty(MediaInfoAnalyzer.MEDIAINFO_BINARY_CONFIG);
+    if (path == null) {
+      logger.debug("DEFAULT " + MediaInfoAnalyzer.MEDIAINFO_BINARY_CONFIG + ": " + MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT);
+      analyzerConfig.put(MediaInfoAnalyzer.MEDIAINFO_BINARY_CONFIG, MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT);
+    } else {
+      analyzerConfig.put(MediaInfoAnalyzer.MEDIAINFO_BINARY_CONFIG, path);
+      logger.debug("Mediainfo config binary: {}", path);
+    }
   }
 
   /**
