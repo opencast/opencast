@@ -89,6 +89,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
   /** Configuration key for the dispatch interval in miliseconds */
   protected static final String OPT_DISPATCHINTERVAL = "org.opencastproject.serviceregistry.dispatchinterval";
 
+  /** Configuration key for the interval to check whether the hosts in the service registry are still alive. **/
+  protected static final String OPT_HEARTBEATINTERVAL = "org.opencastproject.serviceregistry.heartbeat.interval";
+  
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
 
@@ -98,6 +101,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
   /** Default delay between job dispatching attempts, in milliseconds */
   static final long DEFAULT_DISPATCH_PERIOD = 5000;
 
+  /** Default delay between checking if hosts are still alive in minutes **/
+  static final long DEFAULT_HEART_BEAT = 1;
+  
   /** The JPA provider */
   protected PersistenceProvider persistenceProvider;
 
@@ -129,7 +135,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
   protected OrganizationDirectoryService organizationDirectoryService = null;
 
   protected Map<String, Object> persistenceProperties;
-
+  
   /**
    * A static list of statuses that influence how load balancing is calculated
    */
@@ -233,8 +239,33 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
       scheduledExecutor.scheduleWithFixedDelay(new JobDispatcher(), dispatchInterval, dispatchInterval,
               TimeUnit.MILLISECONDS);
 
+    
+    long heartbeatInterval = DEFAULT_HEART_BEAT;
+    if (cc != null) {
+      String heartbeatIntervalString = StringUtils.trimToNull(cc.getBundleContext().getProperty(OPT_HEARTBEATINTERVAL));
+      if (heartbeatIntervalString != null) {
+        try {
+          heartbeatInterval = Long.parseLong(heartbeatIntervalString);
+        } catch (Exception e) {
+          logger.warn("Heartbeat interval '{}' is malformed, setting to {}", heartbeatIntervalString,
+                  DEFAULT_HEART_BEAT);
+          heartbeatInterval = DEFAULT_HEART_BEAT;
+        }
+        if (heartbeatInterval == 0) {
+          logger.info("Heartbeat disabled");
+        } else if (heartbeatInterval < 0) {
+          logger.warn("Heartbeat interval {} minutes too low, adjusting to {}", heartbeatInterval, DEFAULT_HEART_BEAT);
+          heartbeatInterval = DEFAULT_HEART_BEAT;
+        } else {
+          logger.info("Dispatch interval set to {} minutes", heartbeatInterval);
+        }
+      }
+    }
+    
     // Schedule the service heartbeat
-    scheduledExecutor.scheduleWithFixedDelay(new JobProducerHearbeat(), 1, 1, TimeUnit.MINUTES);
+    if (heartbeatInterval > 0) {
+      scheduledExecutor.scheduleWithFixedDelay(new JobProducerHearbeat(), heartbeatInterval, heartbeatInterval, TimeUnit.MINUTES);
+    }
   }
 
   public void deactivate() {
