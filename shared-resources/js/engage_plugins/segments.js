@@ -393,39 +393,12 @@ Opencast.segments = (function ()
         if (cashe && Opencast.segments_Plugin.createSegmentsFromCashe())
         {
             $.log("Cashing segments plugin: yes");
-            // Request JSONP data -- senseless but otherwise weirdly no correct css parsing?!
-            $.ajax(
-            {
-                url: Opencast.Watch.getSegmentsURL(),
-                data: 'id=' + mediaPackageId,
-                dataType: 'jsonp',
-                jsonp: 'jsonp',
-                success: function (data)
-                {
-                    $.log("Segments AJAX call: Requesting data succeeded");
-                    // Hide the loading Image
-                    $('#segments-loading').hide();
-                    $('#oc_slides').show();
-                    $('#oc_slides').css('display', 'block');
-                    $('#slider').show();
-                    // Sets slider container width after panels are displayed
-                    sizeSliderContainer();
-                },
-                // If no data comes back
-                error: function (xhr, ajaxOptions, thrownError)
-                {
-                    $.log("Segments Ajax call: Requesting data failed");
-                    Opencast.Player.addEvent(Opencast.logging.SEGMENTS_AJAX_FAILED);
-                    $('#scrollcontainer').html('No Slides available');
-                    $('#scrollcontainer').hide();
-                }
-            });
+            loadAndDisplaySegments();
         }
         else
         {
-            cashe = true;
             $.log("Cashing segments plugin: no");
-            // Request JSONP data // TODO: Remove Ajax, we're getting the data from segments_ui -- senseless but otherwise weirdly no correct css parsing?!
+            // Request JSONP data
             $.ajax(
             {
                 url: Opencast.Watch.getSegmentsURL(),
@@ -435,40 +408,73 @@ Opencast.segments = (function ()
                 success: function (data)
                 {
                     $.log("Segments AJAX call: Requesting data succeeded");
-                    // get rid of every '@' in the JSON data
-                    // data = $.parseJSON(JSON.stringify(data).replace(/@/g, ''));
                     if ((data === undefined) || (data['search-results'] === undefined) || (data['search-results'].result === undefined) || (data['search-results'].result.segments === undefined))
                     {
-                        $.log("Segments AJAX call: Data not available");
-                        $('#scrollcontainer').html('No Slides available');
-                        $('#scrollcontainer').hide();
-                    }
-                    else
-                    {
-                        $.log("Segments AJAX call: Data available");
-                        imgURLs = Opencast.segments_ui.getImgURLArray();
-                        newSegments = Opencast.segments_ui.getSegments();
-                        
-                        // Create Trimpath Template
-                        Opencast.segments_Plugin.addAsPlugin($('#scrollcontainer'), newSegments);
-                        // Hide the loading Image
-                        $('#segments-loading').hide();
-                        $('#oc_slides').show();
-                        $('#oc_slides').css('display', 'block');
-                        $('#slider').show();
-                        // Sets slider container width after panels are displayed
-                        sizeSliderContainer();
-                    }
+			$.log("Segments AJAX call: Data not available");
+			displayNoSlidesAvailable();
+                    } else
+		    {
+			$.log("Segments AJAX call: Data available");
+			cashe = true;
+			imgURLs = Opencast.segments_ui.getImgURLArray();
+			newSegments = Opencast.segments_ui.getSegments();
+			
+			// create trimpath template
+			Opencast.segments_Plugin.addAsPlugin($('#scrollcontainer'), newSegments);
+			// display slides
+			loadAndDisplaySegments();
+		    }
                 },
                 // If no data comes back
                 error: function (xhr, ajaxOptions, thrownError)
                 {
-                    $.log("Segments Ajax call: Requesting data failed");
-                    $('#scrollcontainer').html('No Slides available');
-                    $('#scrollcontainer').hide();
+		    displayNoSlidesAvailable();
                 }
             });
         }
+    }
+
+    /**
+     * @memberOf Opencast.segments
+     * @description loads and displays segment previews in the segments tab
+     */
+    function loadAndDisplaySegments()
+    {
+        $.ajax(
+            {
+                url: Opencast.Watch.getSegmentsURL(),
+                data: 'id=' + mediaPackageId,
+                dataType: 'jsonp',
+                jsonp: 'jsonp',
+                success: function (data)
+                {
+		    displaySlides();
+                },
+                // if no data comes back
+                error: function (xhr, ajaxOptions, thrownError)
+                {
+		    displayNoSlidesAvailable();
+                }
+            });
+    }
+
+    function displaySlides()
+    {
+        // hide the loading image
+        $('#segments-loading').hide();
+        $('#oc_slides').show();
+        $('#oc_slides').css('display', 'block');
+        $('#slider').show();
+        // sets slider container width after panels are displayed
+        sizeSliderContainer();
+    }
+
+    function displayNoSlidesAvailable()
+    {
+        $.log("Segments Ajax call: Requesting data failed");
+        Opencast.Player.addEvent(Opencast.logging.SEGMENTS_AJAX_FAILED);
+        $('#scrollcontainer').html('No Slides available');
+        $('#scrollcontainer').hide();
     }
     
     /**
