@@ -147,7 +147,7 @@ public class GStreamerEncoderEngine extends AbstractGSEncoderEngine {
 
     Pipeline pipeline;
     try {
-      logger.info("create pipeline: {}", new String[] { pipelineDefinition });
+      logger.debug("processing pipeline: {}", new String[] { pipelineDefinition });
       pipeline = Pipeline.launch(pipelineDefinition);
     } catch (Throwable t) {
       logger.warn("Could not create pipeline from definition \"{}\": {}", pipelineDefinition, t.getMessage());
@@ -200,7 +200,6 @@ public class GStreamerEncoderEngine extends AbstractGSEncoderEngine {
         throw new EncoderException("Failed to set " + startPosition + " as new start position");
       }
     }
-    //
 
     gspipeline.getPipeline().play();
     synchronized (gspipeline.getMonitorObject().getMonitorLock()) {
