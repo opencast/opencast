@@ -397,7 +397,6 @@ Opencast.segments = (function ()
         }
         else
         {
-            cashe = true;
             $.log("Cashing segments plugin: no");
             // Request JSONP data
             $.ajax(
@@ -413,15 +412,18 @@ Opencast.segments = (function ()
                     {
 			$.log("Segments AJAX call: Data not available");
 			displayNoSlidesAvailable();
-                    }
-                    $.log("Segments AJAX call: Data available");
-                    imgURLs = Opencast.segments_ui.getImgURLArray();
-                    newSegments = Opencast.segments_ui.getSegments();
-                    
-                    // create trimpath template
-                    Opencast.segments_Plugin.addAsPlugin($('#scrollcontainer'), newSegments);
-		    // display slides
-		    loadAndDisplaySegments();
+                    } else
+		    {
+			$.log("Segments AJAX call: Data available");
+			cashe = true;
+			imgURLs = Opencast.segments_ui.getImgURLArray();
+			newSegments = Opencast.segments_ui.getSegments();
+			
+			// create trimpath template
+			Opencast.segments_Plugin.addAsPlugin($('#scrollcontainer'), newSegments);
+			// display slides
+			loadAndDisplaySegments();
+		    }
                 },
                 // If no data comes back
                 error: function (xhr, ajaxOptions, thrownError)
