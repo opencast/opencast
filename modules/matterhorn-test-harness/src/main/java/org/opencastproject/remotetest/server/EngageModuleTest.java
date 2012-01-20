@@ -91,7 +91,7 @@ public class EngageModuleTest {
 
   @Test
   public void testJQuery() throws Exception {
-    HttpGet get = new HttpGet(ENGAGE_BASE_URL + "/jquery/jquery-1.4.2.min.js");
+    HttpGet get = new HttpGet(ENGAGE_BASE_URL + "/jquery/jquery-1.7.min.js");
     HttpResponse response = client.execute(get);
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
   }
