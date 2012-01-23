@@ -365,7 +365,7 @@ public class SchedulerRestService {
   public Response deleteEvent(@PathParam("id") long eventId) {
     try {
       service.removeEvent(eventId);
-      return Response.status(Response.Status.NO_CONTENT).build();
+      return Response.status(Response.Status.OK).build();
     } catch (NotFoundException e) {
       logger.warn("Event with id '{}' does not exist.", eventId);
       return Response.status(Status.NOT_FOUND).build();
