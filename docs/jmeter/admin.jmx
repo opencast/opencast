@@ -599,7 +599,7 @@
               <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
             </HTTPSampler>
             <hashTree/>
-            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-ui-1.8.6.custom.min.js" enabled="true">
+            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-ui.js" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments"/>
               </elementProp>
@@ -609,7 +609,7 @@
               <stringProp name="HTTPSampler.response_timeout"></stringProp>
               <stringProp name="HTTPSampler.protocol">http</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/admin/jquery/jquery-ui-1.8.6.custom.min.js</stringProp>
+              <stringProp name="HTTPSampler.path">/admin/jquery/jquery-ui.js</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -699,7 +699,7 @@
               <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
             </HTTPSampler>
             <hashTree/>
-            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-1.4.2.min.js" enabled="true">
+            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery.js" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments"/>
               </elementProp>
@@ -709,7 +709,7 @@
               <stringProp name="HTTPSampler.response_timeout"></stringProp>
               <stringProp name="HTTPSampler.protocol">http</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/admin/jquery/jquery-1.4.2.min.js</stringProp>
+              <stringProp name="HTTPSampler.path">/admin/jquery/jquery.js</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1256,7 +1256,7 @@
                   <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
                 </HTTPSampler>
                 <hashTree/>
-                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-1.4.2.min.js" enabled="true">
+                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery.js" enabled="true">
                   <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                     <collectionProp name="Arguments.arguments"/>
                   </elementProp>
@@ -1266,7 +1266,7 @@
                   <stringProp name="HTTPSampler.response_timeout"></stringProp>
                   <stringProp name="HTTPSampler.protocol">http</stringProp>
                   <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                  <stringProp name="HTTPSampler.path">/admin/jquery/jquery-1.4.2.min.js</stringProp>
+                  <stringProp name="HTTPSampler.path">/admin/jquery/jquery.js</stringProp>
                   <stringProp name="HTTPSampler.method">GET</stringProp>
                   <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                   <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1416,7 +1416,7 @@
                   <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
                 </HTTPSampler>
                 <hashTree/>
-                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-ui-1.8.5.custom.min.js" enabled="true">
+                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-ui.js" enabled="true">
                   <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                     <collectionProp name="Arguments.arguments"/>
                   </elementProp>
@@ -1426,7 +1426,7 @@
                   <stringProp name="HTTPSampler.response_timeout"></stringProp>
                   <stringProp name="HTTPSampler.protocol">http</stringProp>
                   <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                  <stringProp name="HTTPSampler.path">/admin/jquery/jquery-ui-1.8.5.custom.min.js</stringProp>
+                  <stringProp name="HTTPSampler.path">/admin/jquery/jquery-ui.js</stringProp>
                   <stringProp name="HTTPSampler.method">GET</stringProp>
                   <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                   <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1627,7 +1627,7 @@
                   <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
                 </HTTPSampler>
                 <hashTree/>
-                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-ui-1.8.5.custom.min.js" enabled="true">
+                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-ui.js" enabled="true">
                   <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                     <collectionProp name="Arguments.arguments"/>
                   </elementProp>
@@ -1637,7 +1637,7 @@
                   <stringProp name="HTTPSampler.response_timeout"></stringProp>
                   <stringProp name="HTTPSampler.protocol">http</stringProp>
                   <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                  <stringProp name="HTTPSampler.path">/admin/jquery/jquery-ui-1.8.5.custom.min.js</stringProp>
+                  <stringProp name="HTTPSampler.path">/admin/jquery/jquery-ui.js</stringProp>
                   <stringProp name="HTTPSampler.method">GET</stringProp>
                   <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                   <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1687,7 +1687,7 @@
                   <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
                 </HTTPSampler>
                 <hashTree/>
-                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-1.4.2.min.js" enabled="true">
+                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery.js" enabled="true">
                   <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                     <collectionProp name="Arguments.arguments"/>
                   </elementProp>
@@ -1697,7 +1697,7 @@
                   <stringProp name="HTTPSampler.response_timeout"></stringProp>
                   <stringProp name="HTTPSampler.protocol">http</stringProp>
                   <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                  <stringProp name="HTTPSampler.path">/admin/jquery/jquery-1.4.2.min.js</stringProp>
+                  <stringProp name="HTTPSampler.path">/admin/jquery/jquery.js</stringProp>
                   <stringProp name="HTTPSampler.method">GET</stringProp>
                   <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                   <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2271,7 +2271,7 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler>
               <hashTree/>
-              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-1.4.2.min.js" enabled="true">
+              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery.js" enabled="true">
                 <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                   <collectionProp name="Arguments.arguments"/>
                 </elementProp>
@@ -2281,7 +2281,7 @@
                 <stringProp name="HTTPSampler.response_timeout"></stringProp>
                 <stringProp name="HTTPSampler.protocol">http</stringProp>
                 <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                <stringProp name="HTTPSampler.path">/admin/jquery/jquery-1.4.2.min.js</stringProp>
+                <stringProp name="HTTPSampler.path">/admin/jquery/jquery.js</stringProp>
                 <stringProp name="HTTPSampler.method">GET</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2291,7 +2291,7 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler>
               <hashTree/>
-              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-ui-1.8.1.custom.min.js" enabled="true">
+              <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-ui.js" enabled="true">
                 <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                   <collectionProp name="Arguments.arguments"/>
                 </elementProp>
@@ -2301,7 +2301,7 @@
                 <stringProp name="HTTPSampler.response_timeout"></stringProp>
                 <stringProp name="HTTPSampler.protocol">http</stringProp>
                 <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                <stringProp name="HTTPSampler.path">/admin/jquery/jquery-ui-1.8.1.custom.min.js</stringProp>
+                <stringProp name="HTTPSampler.path">/admin/jquery/jquery-ui.js</stringProp>
                 <stringProp name="HTTPSampler.method">GET</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2626,7 +2626,7 @@
                   <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
                 </HTTPSampler>
                 <hashTree/>
-                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-1.4.2.min.js" enabled="true">
+                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery.js" enabled="true">
                   <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                     <collectionProp name="Arguments.arguments"/>
                   </elementProp>
@@ -2636,7 +2636,7 @@
                   <stringProp name="HTTPSampler.response_timeout"></stringProp>
                   <stringProp name="HTTPSampler.protocol">http</stringProp>
                   <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                  <stringProp name="HTTPSampler.path">/admin/jquery/jquery-1.4.2.min.js</stringProp>
+                  <stringProp name="HTTPSampler.path">/admin/jquery/jquery.js</stringProp>
                   <stringProp name="HTTPSampler.method">GET</stringProp>
                   <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                   <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -2746,7 +2746,7 @@
                   <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
                 </HTTPSampler>
                 <hashTree/>
-                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-ui-1.8.5.custom.min.js" enabled="true">
+                <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery.js" enabled="true">
                   <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                     <collectionProp name="Arguments.arguments"/>
                   </elementProp>
@@ -2756,7 +2756,7 @@
                   <stringProp name="HTTPSampler.response_timeout"></stringProp>
                   <stringProp name="HTTPSampler.protocol">http</stringProp>
                   <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                  <stringProp name="HTTPSampler.path">/admin/jquery/jquery-ui-1.8.5.custom.min.js</stringProp>
+                  <stringProp name="HTTPSampler.path">/admin/jquery/jquery.js</stringProp>
                   <stringProp name="HTTPSampler.method">GET</stringProp>
                   <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                   <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -3592,7 +3592,7 @@
             <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
           </HTTPSampler>
           <hashTree/>
-          <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery-1.4.2.min.js" enabled="true">
+          <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/admin/jquery/jquery.js" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>
@@ -3602,7 +3602,7 @@
             <stringProp name="HTTPSampler.response_timeout"></stringProp>
             <stringProp name="HTTPSampler.protocol">http</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/admin/jquery/jquery-1.4.2.min.js</stringProp>
+            <stringProp name="HTTPSampler.path">/admin/jquery/jquery.js</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
