@@ -158,7 +158,8 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   public void unregisterService(JobProducer localService) throws ServiceRegistryException {
     List<ServiceRegistrationInMemoryImpl> servicesOnHost = services.get(LOCALHOST);
     if (servicesOnHost != null) {
-      servicesOnHost.remove(localService);
+      ServiceRegistrationInMemoryImpl s = (ServiceRegistrationInMemoryImpl)localService;
+      servicesOnHost.remove(s);
     }
   }
 
