@@ -175,7 +175,7 @@ ocRecordings = new (function() {
           ocRecordings.render(data);
           if(ocRecordings.Configuration.state == 'bulkedit' || ocRecordings.Configuration.state == 'bulkdelete')
           {
-              $('.bulkSelect').show();
+            $('.bulkSelect').show();
           }
         }
       });
@@ -1173,6 +1173,9 @@ ocRecordings = new (function() {
                 if(xhr.status == 500) {
                   failed++;
                   $('#deleteErrorMessage').text('Failed to delete ' + failed + ' recordings.');
+                } else if (xhr.status == 200) {
+                  progress = progress + progressChunk;
+                  $('#deleteProgress').progressbar('value', progress);
                 } else {
                   $.ajax({
                     url: WORKFLOW_URL + '/stop',
@@ -1192,45 +1195,7 @@ ocRecordings = new (function() {
                 }
               }
             });
-            var toid = setInterval(function(){
-              var id = eventIdList.pop();
-              if(typeof id === 'undefined'){
-                clearInterval(toid);
-                ocUtils.log(progress);
-                $('#deleteProgress').progressbar('value', ++progress);
-                if(failed > 0) {
-                  $('#deleteError').show();
-                }
-                return;
-              }
-              $.ajax({
-                url: '/scheduler/'+id,
-                type: 'DELETE',
-                complete: function(xhr, status) {
-                  if(xhr.status == 500) {
-                    failed++;
-                    $('#deleteErrorMessage').text('Failed to delete ' + failed + ' recordings.');
-                  } else {
-                    $.ajax({
-                      url: WORKFLOW_URL + '/stop',
-                      type: 'POST',
-                      data: {
-                        id: id
-                      },
-                      error: function(XHR,status,e){
-                        failed++;
-                        $('#deleteErrorMessage').text('Could not stop Processing ' + failed + ' recordings.');
-                      },
-                      success: function(){
-                        progress = progress + progressChunk;
-                        $('#deleteProgress').progressbar('value', progress);
-                      }
-                    });
-                  }
-                }
-              });
-            }, 250);
-          });
+          }, 250);
         }
       }
     }
