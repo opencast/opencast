@@ -158,7 +158,7 @@ ocRecordings = new (function() {
       }
       // filtering if specified
       if (ocRecordings.Configuration.filterText != '') {
-        params.push(ocRecordings.Configuration.filterField + '=' + encodeURI(ocRecordings.Configuration.filterText));
+        params.push(ocRecordings.Configuration.filterField + '=' + encodeURI(ocRecordings.Configuration.filterText).replace('#','%23'));
       }
       // paging
       params.push('count=' + ocRecordings.Configuration.pageSize);
