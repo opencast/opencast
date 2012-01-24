@@ -313,9 +313,6 @@ var ocScheduler = (function() {
           modal: true,
           resizable: false,
           draggable: false,
-          close: function(){ 
-            document.location = RECORDINGS_URL;
-          },
           create: function (event, ui)
           {
             $('.ui-dialog-titlebar-close').hide();
@@ -521,6 +518,7 @@ var ocScheduler = (function() {
     if(status == "success") {
       //document.location = RECORDINGS_URL + "?" + window.location.hash.split('?')[1];
       $('#content').load('complete_scheduling.html', function() {
+        $('#submitModal').dialog('close');
         $('#back_to_recordings').attr('href', RECORDINGS_URL + "?" + window.location.hash.split('?')[1]);
         for (var i in sched.catalogs) {
           data = sched.catalogs[i].components;

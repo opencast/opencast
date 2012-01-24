@@ -246,8 +246,6 @@ Opencast.search = (function ()
             success: function (data)
             {
                 $.log("Search AJAX call: Requesting data succeeded");
-                // get rid of every '@' in the JSON data
-                // dataStor = $.parseJSON(JSON.stringify(data).replace(/@/g, ''));
                 dataStor = data;
                 var segmentsAvailable = true;
                 if ((dataStor === undefined) || (dataStor['search-results'] === undefined) || (dataStor['search-results'].result === undefined))

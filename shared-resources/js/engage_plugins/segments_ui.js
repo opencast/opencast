@@ -226,8 +226,6 @@ Opencast.segments_ui = (function ()
                     if (segmentsAvailable)
                     {
                         $.log("Segments available");
-                        // get rid of every '@' in the JSON data
-                        // data = $.parseJSON(JSON.stringify(data).replace(/@/g, ''));
                         data['search-results'].result.segments.currentTime = $.getTimeInMilliseconds(Opencast.Player.getCurrentTime());
                         // Get the complete Track Duration // TODO: handle more clever
                         var complDur = 0;

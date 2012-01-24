@@ -104,8 +104,6 @@ Opencast.Series = (function ()
             success: function (data)
             {
                 $.log("Series AJAX call: Requesting data succeeded");
-                // get rid of every '@' in the JSON data
-                data = $.parseJSON(JSON.stringify(data).replace(/@/g, ''));
                 data = createDataForPlugin(data);
                 data['search-results'].currentPage = 1;
                 //add as a plugin
