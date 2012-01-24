@@ -397,11 +397,11 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#hashCollectionElement(java.lang.String,
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getCollectionElementDigest(java.lang.String,
    *      java.lang.String)
    */
   @Override
-  public String hashCollectionElement(String collectionId, String fileName) throws IOException {
+  public String getCollectionElementDigest(String collectionId, String fileName) throws IOException {
     String url = UrlSupport.concat(new String[] { "collection", collectionId, fileName });
     HttpHead head = new HttpHead(url);
     HttpResponse response = null;
@@ -428,11 +428,11 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#hashMediaPackageElement(java.lang.String,
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getMediaPackageElementDigest(java.lang.String,
    *      java.lang.String)
    */
   @Override
-  public String hashMediaPackageElement(String mediaPackageID, String mediaPackageElementID) throws IOException {
+  public String getMediaPackageElementDigest(String mediaPackageID, String mediaPackageElementID) throws IOException {
     String url = UrlSupport.concat(new String[] { mediaPackageID, mediaPackageElementID });
     HttpHead head = new HttpHead(url);
     HttpResponse response = null;

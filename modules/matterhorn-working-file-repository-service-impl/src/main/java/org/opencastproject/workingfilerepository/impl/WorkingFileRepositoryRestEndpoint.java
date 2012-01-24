@@ -32,6 +32,7 @@ import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.tika.metadata.HttpHeaders;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -185,23 +186,28 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   public Response restGet(@PathParam("mediaPackageID") String mediaPackageID,
           @PathParam("mediaPackageElementID") String mediaPackageElementID,
           @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException {
-    String contentType = null;
+
+    String md5 = null;
     InputStream in = null;
+
+    // Check the If-None-Match header first
     try {
-      String md5 = this.hashMediaPackageElement(mediaPackageID, mediaPackageElementID);
-      if (md5.equals(ifNoneMatch)) {
-        IOUtils.closeQuietly(in);
-        return Response.notModified().build();
+      md5 = getMediaPackageElementDigest(mediaPackageID, mediaPackageElementID);
+      if (StringUtils.isNotBlank(ifNoneMatch) && md5.equals(ifNoneMatch)) {
+        return Response.notModified(md5).build();
       }
+    } catch (IOException e) {
+      logger.warn("Error reading digest of {}/{}", new Object[] { mediaPackageElementID, mediaPackageElementID });
+    }
+
+    String contentType = null;
+    try {
       in = this.get(mediaPackageID, mediaPackageElementID);
       contentType = extractContentType(in);
       return Response.ok(this.get(mediaPackageID, mediaPackageElementID)).header("Content-Type", contentType).build();
     } catch (IllegalStateException e) {
       IOUtils.closeQuietly(in);
       throw new NotFoundException();
-    } catch (IOException e) {
-      IOUtils.closeQuietly(in);
-      return Response.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
     } finally {
       IOUtils.closeQuietly(in);
     }
@@ -241,14 +247,24 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   public Response restGet(@PathParam("mediaPackageID") String mediaPackageID,
           @PathParam("mediaPackageElementID") String mediaPackageElementID, @PathParam("fileName") String fileName,
           @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException {
+
+    String md5 = null;
     InputStream in = null;
+
+    // Check the If-None-Match header first
     try {
-      in = get(mediaPackageID, mediaPackageElementID);
-      String md5 = this.hashMediaPackageElement(mediaPackageID, mediaPackageElementID);
-      if (md5.equals(ifNoneMatch)) {
-        IOUtils.closeQuietly(in);
+      md5 = getMediaPackageElementDigest(mediaPackageID, mediaPackageElementID);
+      if (StringUtils.isNotBlank(ifNoneMatch) && md5.equals(ifNoneMatch)) {
         return Response.notModified(md5).build();
       }
+    } catch (IOException e) {
+      logger.warn("Error reading digest of {}/{}/{}", new Object[] { mediaPackageElementID, mediaPackageElementID,
+              fileName });
+    }
+
+    // No If-Non-Match header provided, or the file changed in the meantime
+    try {
+      in = get(mediaPackageID, mediaPackageElementID);
       String contentType = mimeMap.getContentType(fileName);
       int contentLength = 0;
       contentLength = in.available();
