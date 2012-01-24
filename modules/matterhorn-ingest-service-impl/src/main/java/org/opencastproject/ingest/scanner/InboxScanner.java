@@ -79,10 +79,10 @@ public class InboxScanner implements ArtifactInstaller, ManagedService {
   protected OrganizationDirectoryService organizationDirectoryService = null;
 
   /** The user to run as during ingest */
-  protected User user = null;
+  protected String userId = null;
 
   /** The user's organization */
-  protected Organization organization = null;
+  protected String organizationId = null;
 
   /** The workflow definition ID to use during ingest */
   protected String workflowDefinition = null;
@@ -111,9 +111,32 @@ public class InboxScanner implements ArtifactInstaller, ManagedService {
   protected Runnable getInstallRunnable(final File artifact) {
     return new Runnable() {
       public void run() {
+
+        // Make sure we have an organization
+        Organization inboxOrganization = null;
         try {
-          securityService.setOrganization(organization);
-          securityService.setUser(user);
+          inboxOrganization = organizationDirectoryService.getOrganization(organizationId);
+        } catch (NotFoundException e) {
+          logger.warn("Inbox organization '{}' not found", organizationId);
+          return;
+        }
+
+        // Make sure we have a user
+        User inboxUser = null;
+        try {
+          securityService.setOrganization(inboxOrganization);
+          inboxUser = userDirectoryService.loadUser(userId);
+          if (inboxUser == null) {
+            logger.warn("Inbox user '{}' not found", userId);
+            return;
+          }
+        } finally {
+          securityService.setOrganization(null);
+        }
+
+        try {
+          securityService.setOrganization(inboxOrganization);
+          securityService.setUser(inboxUser);
           boolean mediaPackageIngestSuccess = false;
           if ("zip".equals(FilenameUtils.getExtension(artifact.getName()))) {
             FileInputStream in = null;
@@ -187,33 +210,19 @@ public class InboxScanner implements ArtifactInstaller, ManagedService {
    * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
+  @SuppressWarnings("rawtypes")
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
 
     // Set the organization first
-    String organizationConfig = (String) properties.get(USER_ORG);
-    if (StringUtils.isBlank(organizationConfig)) {
+    organizationId = (String) properties.get(USER_ORG);
+    if (StringUtils.isBlank(organizationId))
       throw new ConfigurationException(USER_ORG, USER_ORG + " must be specified");
-    }
-    try {
-      organization = organizationDirectoryService.getOrganization(organizationConfig);
-    } catch (NotFoundException e) {
-      throw new ConfigurationException(USER_ORG, "Organization '" + organizationConfig + "' does not exist");
-    }
 
     // Now that we have the organization to run as, we can load the user
-    String userNameConfig = (String) properties.get(USER_NAME);
-    if (StringUtils.isBlank(userNameConfig)) {
+    userId = (String) properties.get(USER_NAME);
+    if (StringUtils.isBlank(userId))
       throw new ConfigurationException(USER_NAME, USER_NAME + " must be specified");
-    }
-
-    Organization originalOrg = securityService.getOrganization();
-    try {
-      securityService.setOrganization(organization);
-      user = userDirectoryService.loadUser(userNameConfig);
-    } finally {
-      securityService.setOrganization(originalOrg);
-    }
 
     // Now load the workflow definition ID
     String workflowConfig = (String) properties.get(WORKFLOW_DEFINITION);
