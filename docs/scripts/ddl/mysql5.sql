@@ -79,7 +79,7 @@ CREATE TABLE job (
 	queue_time BIGINT,
 	creator_service BIGINT,
 	parent_id BIGINT,
-	processor_svc BIGINT,
+	processor_service BIGINT,
 	root_id BIGINT,
 	PRIMARY KEY (
 	id)
