@@ -41,8 +41,8 @@ public class JobBarrier {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(JobBarrier.class);
 
-  /** Default polling interval is 1 second */
-  protected static final long DEFAULT_POLLING_INTERVAL = 1000L;
+  /** Default polling interval is 5 seconds */
+  protected static final long DEFAULT_POLLING_INTERVAL = 5000L;
 
   /** The service registry used to do the polling */
   protected ServiceRegistry serviceRegistry = null;
@@ -224,10 +224,21 @@ public class JobBarrier {
         boolean failedOrDeleted = false;
         Map<Job, Job.Status> status = new HashMap<Job, Job.Status>();
 
+        long time = System.currentTimeMillis();
+
+        // Wait a little..
+        try {
+          long timeToSleep = Math.min(pollingInterval, Math.abs(endTime - time));
+          Thread.sleep(timeToSleep);
+        } catch (InterruptedException e) {
+          logger.debug("Job polling thread was interrupted");
+          return;
+        }
+
         // Look at all jobs and make sure all of them have reached the expected status
         for (Job job : jobs) {
 
-          // Don't aks what we already know
+          // Don't ask if we already know
           if (status.containsKey(job))
             continue;
 
@@ -252,6 +263,8 @@ public class JobBarrier {
               case RUNNING:
                 logger.trace("Job {} is still in the works", JobBarrier.this);
                 allDone = false;
+                if (workTime == 0 || endTime < time)
+                  continue;
                 break;
               default:
                 logger.error("Unhandled job status '{}' found", jobStatus);
@@ -280,20 +293,9 @@ public class JobBarrier {
 
         }
 
-        long time = System.currentTimeMillis();
-
         // Are we done already?
         if (allDone || failedOrDeleted || endTime >= time) {
           updateAndNotify(status);
-          return;
-        }
-
-        // Wait a little..
-        try {
-          long timeToSleep = Math.min(pollingInterval, Math.abs(endTime - time));
-          Thread.sleep(timeToSleep);
-        } catch (InterruptedException e) {
-          logger.debug("Job polling thread was interrupted");
           return;
         }
 

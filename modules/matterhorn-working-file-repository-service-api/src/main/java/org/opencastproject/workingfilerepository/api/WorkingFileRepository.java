@@ -82,7 +82,7 @@ public interface WorkingFileRepository {
    * @throws IOException
    *           if there is a problem reading or hashing the data
    */
-  String hashMediaPackageElement(String mediaPackageID, String mediaPackageElementID) throws IOException;
+  String getMediaPackageElementDigest(String mediaPackageID, String mediaPackageElementID) throws IOException;
 
   /**
    * Get the URL for a file stored under the given collection.
@@ -177,7 +177,7 @@ public interface WorkingFileRepository {
    * @throws IOException
    *           if there is a problem reading or hashing the data
    */
-  String hashCollectionElement(String collectionId, String fileName) throws NotFoundException, IOException;
+  String getCollectionElementDigest(String collectionId, String fileName) throws NotFoundException, IOException;
 
   /**
    * Removes a file from a collection

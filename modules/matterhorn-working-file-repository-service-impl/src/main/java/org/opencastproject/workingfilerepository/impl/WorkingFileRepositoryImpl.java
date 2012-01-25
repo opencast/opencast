@@ -48,6 +48,7 @@ import java.net.URISyntaxException;
  */
 public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMappable {
 
+  /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(WorkingFileRepositoryImpl.class);
 
   /** The extension we use for the md5 hash calculated from the file contents */
@@ -63,16 +64,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   /** The remote service manager */
   protected ServiceRegistry remoteServiceManager;
 
-  /**
-   * Sets the remote service manager.
-   * 
-   * @param remoteServiceManager
-   */
-  public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
-    this.remoteServiceManager = remoteServiceManager;
-  }
-
-  /* The root directory for storing files */
+  /** The root directory for storing files */
   protected String rootDirectory = null;
 
   /** The Base URL for this server */
@@ -123,6 +115,11 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     logger.info(getDiskSpace());
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#delete(java.lang.String, java.lang.String)
+   */
   public void delete(String mediaPackageID, String mediaPackageElementID) {
     checkPathSafe(mediaPackageID);
     checkPathSafe(mediaPackageElementID);
@@ -141,13 +138,17 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#get(java.lang.String, java.lang.String)
+   */
   public InputStream get(String mediaPackageID, String mediaPackageElementID) throws NotFoundException {
     checkPathSafe(mediaPackageID);
     checkPathSafe(mediaPackageElementID);
     File f = getFile(mediaPackageID, mediaPackageElementID);
-    if (f == null) {
+    if (f == null)
       throw new NotFoundException("Unable to locate " + f + " in the working file repository");
-    }
     logger.debug("Attempting to read file {}", f.getAbsolutePath());
     try {
       return new FileInputStream(f);
@@ -171,6 +172,11 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getURI(java.lang.String, java.lang.String)
+   */
   public URI getURI(String mediaPackageID, String mediaPackageElementID) {
     return getURI(mediaPackageID, mediaPackageElementID, null);
   }
@@ -212,7 +218,14 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
 
   }
 
-  public URI put(String mediaPackageID, String mediaPackageElementID, String filename, InputStream in) {
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#put(java.lang.String, java.lang.String,
+   *      java.lang.String, java.io.InputStream)
+   */
+  public URI put(String mediaPackageID, String mediaPackageElementID, String filename, InputStream in)
+          throws IOException {
     checkPathSafe(mediaPackageID);
     checkPathSafe(mediaPackageElementID);
     File f = null;
@@ -246,24 +259,23 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       }
       out = new FileOutputStream(f);
       IOUtils.copy(in, out);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
     } finally {
       IOUtils.closeQuietly(out);
       IOUtils.closeQuietly(in);
     }
-    addMd5(f);
+    createMd5(f);
     return getURI(mediaPackageID, mediaPackageElementID, filename);
   }
 
   /**
-   * Creates a file containing the md5 hash for the contents of a source file
+   * Creates a file containing the md5 hash for the contents of a source file.
    * 
    * @param f
-   *          The source file containing the data to hash
+   *          the source file containing the data to hash
+   * @throws IOException
+   *           if the hash cannot be created
    */
-  protected File addMd5(File f) {
-    // Create an md5 file
+  protected File createMd5(File f) throws IOException {
     FileInputStream md5In = null;
     try {
       md5In = new FileInputStream(f);
@@ -272,8 +284,6 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       File md5File = getMd5File(f);
       FileUtils.writeStringToFile(md5File, md5);
       return md5File;
-    } catch (IOException e) {
-      throw new RuntimeException(e);
     } finally {
       IOUtils.closeQuietly(md5In);
     }
@@ -287,7 +297,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    *          The source file
    * @return The md5 file
    */
-  protected File getMd5File(File f) {
+  private File getMd5File(File f) {
     return new File(f.getParent(), f.getName() + MD5_EXTENSION);
   }
 
@@ -310,6 +320,15 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     }
   }
 
+  /**
+   * Returns the file to the media package element.
+   * 
+   * @param mediaPackageID
+   *          the media package identifier
+   * @param mediaPackageElementID
+   *          the media package element identifier
+   * @return the file or <code>null</code> if no such element exists
+   */
   private File getFile(String mediaPackageID, String mediaPackageElementID) {
     File directory = getElementDirectory(mediaPackageID, mediaPackageElementID);
 
@@ -419,7 +438,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    *      java.lang.String, java.io.InputStream)
    */
   @Override
-  public URI putInCollection(String collectionId, String fileName, InputStream in) {
+  public URI putInCollection(String collectionId, String fileName, InputStream in) throws IOException {
     checkPathSafe(collectionId);
     checkPathSafe(fileName);
     File f = new File(PathSupport.concat(new String[] { rootDirectory, COLLECTION_PATH_PREFIX, collectionId,
@@ -446,7 +465,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       IOUtils.closeQuietly(out);
       IOUtils.closeQuietly(in);
     }
-    addMd5(f);
+    createMd5(f);
     return getCollectionURI(collectionId, fileName);
   }
 
@@ -474,7 +493,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     }
     File destFile = new File(destDir, toFileName);
     FileSupport.copy(source, destFile);
-    addMd5(destFile);
+    createMd5(destFile);
     return getURI(toMediaPackage, toMediaPackageElement, toFileName);
   }
 
@@ -508,7 +527,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
 
     try {
       FileUtils.moveFile(source, dest);
-      addMd5(dest);
+      createMd5(dest);
       if (!sourceMd5.delete()) {
         throw new IllegalStateException("Unable to delete " + sourceMd5.getAbsolutePath());
       }
@@ -565,23 +584,23 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#hashMediaPackageElement(java.lang.String,
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getMediaPackageElementDigest(java.lang.String,
    *      java.lang.String)
    */
   @Override
-  public String hashMediaPackageElement(String mediaPackageID, String mediaPackageElementID) throws IOException {
-    return md5(getFile(mediaPackageID, mediaPackageElementID));
+  public String getMediaPackageElementDigest(String mediaPackageID, String mediaPackageElementID) throws IOException {
+    return getFileDigest(getFile(mediaPackageID, mediaPackageElementID));
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#hashCollectionElement(java.lang.String,
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getCollectionElementDigest(java.lang.String,
    *      java.lang.String)
    */
   @Override
-  public String hashCollectionElement(String collectionId, String fileName) throws IOException {
-    return md5(getFileFromCollection(collectionId, fileName));
+  public String getCollectionElementDigest(String collectionId, String fileName) throws IOException {
+    return getFileDigest(getFileFromCollection(collectionId, fileName));
   }
 
   /**
@@ -591,32 +610,65 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    *          the source file
    * @return the md5 hash
    */
-  protected String md5(File file) throws IOException {
-    if (file == null) {
+  private String getFileDigest(File file) throws IOException {
+    if (file == null)
       throw new IllegalArgumentException("File must not be null");
-    }
-    if (!file.exists() || !file.isFile()) {
+    if (!file.exists() || !file.isFile())
       throw new IllegalArgumentException("File " + file.getAbsolutePath() + " can not be read");
+
+    // Check if there is a precalculated md5 hash
+    File md5HashFile = getMd5File(file);
+    if (file.exists()) {
+      logger.trace("Reading precalculated hash for {} from {}", file, md5HashFile.getName());
+      return FileUtils.readFileToString(md5HashFile, "utf-8");
     }
+
+    // Calculate the md5 hash
     InputStream in = null;
+    String md5 = null;
     try {
       in = new FileInputStream(file);
-      return DigestUtils.md5Hex(in);
+      md5 = DigestUtils.md5Hex(in);
     } finally {
       IOUtils.closeQuietly(in);
     }
+
+    // Write the md5 hash to disk for later reference
+    try {
+      FileUtils.writeStringToFile(md5HashFile, md5, "utf-8");
+    } catch (IOException e) {
+      logger.warn("Error storing cached md5 checksum at {}", md5HashFile);
+      throw e;
+    }
+
+    return md5;
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getTotalSpace()
+   */
   public long getTotalSpace() {
     File f = new File(rootDirectory);
     return f.getTotalSpace();
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getUsableSpace()
+   */
   public long getUsableSpace() {
     File f = new File(rootDirectory);
     return f.getUsableSpace();
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getDiskSpace()
+   */
   public String getDiskSpace() {
     int usable = Math.round(getUsableSpace() / 1024 / 1024 / 1024);
     int total = Math.round(getTotalSpace() / 1024 / 1024 / 1024);
@@ -652,6 +704,15 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   @Override
   public URI getBaseUri() {
     return serviceUrl;
+  }
+
+  /**
+   * Sets the remote service manager.
+   * 
+   * @param remoteServiceManager
+   */
+  public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
+    this.remoteServiceManager = remoteServiceManager;
   }
 
 }
