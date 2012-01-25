@@ -38,7 +38,7 @@ CREATE TABLE capture_agent_state (
 
 CREATE TABLE dictionary (
 	text VARCHAR(255) NOT NULL,
-	language VARCHAR(255) NOT NULL,
+	language VARCHAR(5) NOT NULL,
 	weight DOUBLE,
 	count BIGINT,
 	stop_word TINYINT(1) default 0,

@@ -48,7 +48,7 @@ public class Word {
   /** The language in which this word appears */
   @Id
   //@Index
-  @Column(name = "language")
+  @Column(name = "language", length = 5)
   protected String language;
 
   /** Whether this is a stop word (a word that appears so frequently in a language that it is not useful in searches) */
