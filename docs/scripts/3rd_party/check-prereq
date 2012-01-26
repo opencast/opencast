@@ -5,13 +5,21 @@ source "${HOME3P}/utilx"
 [ $? -ne 0 ] && exit 1
 #
 install_rpms() {
-  name=`echo "$1" | awk '{sub("-[0-9.]+.*",""); print $0}'`
-  name_ver=`echo "$1" | awk '{sub("\\\.(i386|x86_64|noarch)\\\.rpm$",""); print $0}'`
+  name=`echo "$1" | awk '{sub("-[0-9.]+.*", "", $1); print $1; exit 0}'`
+  name_ver=`echo "$1" | awk '{
+    sub("\\\.(i386|i686|x86_64|noarch)\\\.rpm$", "", $1); print $1; exit 0}'`
   case `os` in
     CentOS | RHEL )
-      installed=`rpm -q "$name"`
+      installed=`rpm -q --last "$name" | awk '{
+        sub("\\\.(i386|i686|x86_64|noarch)$", "", $1); print $1; exit 0}'`
       if [ ! "$installed" = "$name_ver" ]; then
-        sudox rpm -iv --force "$@"
+        # Convert file names in "$@" to full path
+        IFS='
+'
+        rpms=(`fullpath "$@"`)
+        unset IFS
+        # If you want to use force install, define RPM_FORCE=--force
+        sudox rpm -iv $RPM_FORCE "${rpms[@]}"
         [ $? -ne 0 ] && return 1
       fi
       ;;
@@ -28,11 +36,199 @@ install_rpms() {
       ;;
     openSUSE )
       ;;
+    SLES )
+      ;;
     Amazon )
       ;;
     MacOS )
       ;;
   esac
+  return 0
+}
+#
+enable_epel() {
+  cd "$HOME3P"
+  [ $? -ne 0 ] && return 1
+  mkdir -p packages
+  [ $? -ne 0 ] && return 1
+  cd packages
+  [ $? -ne 0 ] && return 1
+  #
+  case `os_ver` in
+    5.* ) V=5 ;;
+    6.* ) V=6 ;;
+    * ) V="" ;;
+  esac
+  rpms=""
+  URLS=`getmcfg epel${V}_url:`
+  rpms=`getmcfg epel${V}_pkgs:`
+  for rpm in $rpms; do
+    if [ ! -s "$rpm" ]; then
+      copypkg "$rpm"
+      if [ $? -ne 0 ]; then
+        ok=1
+        for URL in $URLS; do
+          wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+          ok=$?
+          [ $ok -eq 0 ] && break
+        done
+        if [ $ok -ne 0 ]; then
+          rm -f "$rpm"
+          return 1
+        fi
+      fi
+    fi
+  done
+  install_rpms $rpms
+  [ $? -ne 0 ] && return 1
+  return 0
+}
+#
+enable_atomic() {
+  cd "$HOME3P"
+  [ $? -ne 0 ] && return 1
+  mkdir -p packages
+  [ $? -ne 0 ] && return 1
+  cd packages
+  [ $? -ne 0 ] && return 1
+  #
+  case `os_ver` in
+    5.* ) V=5 ;;
+    6.* ) V=6 ;;
+    * ) V="" ;;
+  esac
+  rpms=""
+  URLS=`getmcfg atomic${V}_url:`
+  rpms=`getmcfg atomic${V}_pkgs:`
+  for rpm in $rpms; do
+    if [ ! -s "$rpm" ]; then
+      copypkg "$rpm"
+      if [ $? -ne 0 ]; then
+        ok=1
+        for URL in $URLS; do
+          wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+          ok=$?
+          [ $ok -eq 0 ] && break
+        done
+        if [ $ok -ne 0 ]; then
+          rm -f "$rpm"
+          return 1
+        fi
+      fi
+    fi
+  done
+  install_rpms $rpms
+  [ $? -ne 0 ] && return 1
+  return 0
+}
+#
+enable_rpmforge() {
+  cd "$HOME3P"
+  [ $? -ne 0 ] && return 1
+  mkdir -p packages
+  [ $? -ne 0 ] && return 1
+  cd packages
+  [ $? -ne 0 ] && return 1
+  #
+  case `os_ver` in
+    5.* ) V=5 ;;
+    6.* ) V=6 ;;
+    * ) V="" ;;
+  esac
+  rpms=""
+  case `arch` in
+    i386 )
+      URLS=`getmcfg rpmforge${V}_x86_url:`
+      rpms=`getmcfg rpmforge${V}_x86_pkgs:`
+      ;;
+    x86_64 )
+      URLS=`getmcfg rpmforge${V}_x64_url:`
+      rpms=`getmcfg rpmforge${V}_x64_pkgs:`
+      ;;
+  esac
+  for rpm in $rpms; do
+    if [ ! -s "$rpm" ]; then
+      copypkg "$rpm"
+      if [ $? -ne 0 ]; then
+        ok=1
+        for URL in $URLS; do
+          wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+          ok=$?
+          [ $ok -eq 0 ] && break
+        done
+        if [ $ok -ne 0 ]; then
+          rm -f "$rpm"
+          return 1
+        fi
+      fi
+    fi
+  done
+  install_rpms $rpms
+  [ $? -ne 0 ] && return 1
+  return 0
+}
+#
+enable_rpmfusion() {
+  cd "$HOME3P"
+  [ $? -ne 0 ] && return 1
+  mkdir -p packages
+  [ $? -ne 0 ] && return 1
+  cd packages
+  [ $? -ne 0 ] && return 1
+  #
+  case `os_ver` in
+    5.* ) V=5 ;;
+    6.* ) V=6 ;;
+    * ) V="" ;;
+  esac
+  #
+  # First enable access to the free repository
+  rpms=""
+  URLS=`getmcfg rpmfusion-free${V}_url:`
+  rpms=`getmcfg rpmfusion-free${V}_pkgs:`
+  for rpm in $rpms; do
+    if [ ! -s "$rpm" ]; then
+      copypkg "$rpm"
+      if [ $? -ne 0 ]; then
+        ok=1
+        for URL in $URLS; do
+          wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+          ok=$?
+          [ $ok -eq 0 ] && break
+        done
+        if [ $ok -ne 0 ]; then
+          rm -f "$rpm"
+          return 1
+        fi
+      fi
+    fi
+  done
+  install_rpms $rpms
+  [ $? -ne 0 ] && return 1
+  #
+  # Then enable access to the nonfree repositories
+  rpms=""
+  URLS=`getmcfg rpmfusion-nonfree${V}_url:`
+  rpms=`getmcfg rpmfusion-nonfree${V}_pkgs:`
+  for rpm in $rpms; do
+    if [ ! -s "$rpm" ]; then
+      copypkg "$rpm"
+      if [ $? -ne 0 ]; then
+        ok=1
+        for URL in $URLS; do
+          wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+          ok=$?
+          [ $ok -eq 0 ] && break
+        done
+        if [ $ok -ne 0 ]; then
+          rm -f "$rpm"
+          return 1
+        fi
+      fi
+    fi
+  done
+  install_rpms $rpms
+  [ $? -ne 0 ] && return 1
   return 0
 }
 #
@@ -46,280 +242,326 @@ install_prog() {
   #
   case `os` in
     CentOS | RHEL )
+      case `os_ver` in
+        5.* ) V=5 ;;
+        6.* ) V=6 ;;
+        * ) V="" ;;
+      esac
       rpms=""; upd_rpms=""
       case "$1" in
         wget ) # wget is missing, get it with java wget
+          prog="$1"
           case `arch` in
             i386 )
-              URLS=`getmcfg wget_x86_url:`
-              rpms=`getmcfg wget_x86_pkgs:`
+              URLS=`getmcfg wget${V}_x86_url:`
+              rpms=`getmcfg wget${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg wget_x64_url:`
-              rpms=`getmcfg wget_x64_pkgs:`
+              URLS=`getmcfg wget${V}_x64_url:`
+              rpms=`getmcfg wget${V}_x64_pkgs:`
               ;;
           esac
           #
-          for rpm in $rpms; do
-            if [ ! -s "$rpm" ]; then
-              copypkg "$rpm"
-              if [ $? -ne 0 ]; then
-                if [ ! -s wget.class ]; then
-                  javac -d . ../wget.java
-                  [ $? -ne 0 ] && return 1
+          yumx -y install $prog
+          if [ $? -ne 0 ]; then
+            for rpm in $rpms; do
+              if [ ! -s "$rpm" ]; then
+                copypkg "$rpm"
+                if [ $? -ne 0 ]; then
+                  if [ ! -s wget.class ]; then
+                    javac -d . ../wget.java
+                    [ $? -ne 0 ] && return 1
+                  fi
+                  ok=1
+                  for URL in $URLS; do
+                    java wget "$URL/$rpm" > "$rpm"
+                    ok=$?
+                    [ $ok -eq 0 ] && break
+                  done
+                  [ $ok -ne 0 ] && return 1
                 fi
-                ok=1
-                for URL in $URLS; do
-                  java wget "$URL/$rpm" > "$rpm"
-                  ok=$?
-                  [ $ok -eq 0 ] && break
-                done
-                [ $ok -ne 0 ] && return 1
               fi
-            fi
-          done
+            done
+            install_rpms $rpms $upd_rpms
+            [ $? -ne 0 ] && return 1
+          fi
+          return 0
           ;;
         zip )
+          prog="$1"
           case `arch` in
             i386 )
-              URLS=`getmcfg zip_x86_url:`
-              rpms=`getmcfg zip_x86_pkgs:`
+              URLS=`getmcfg zip${V}_x86_url:`
+              rpms=`getmcfg zip${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg zip_x64_url:`
-              rpms=`getmcfg zip_x64_pkgs:`
+              URLS=`getmcfg zip${V}_x64_url:`
+              rpms=`getmcfg zip${V}_x64_pkgs:`
               ;;
           esac
           ;;
         unzip )
+          prog="$1"
           case `arch` in
             i386 )
-              URLS=`getmcfg unzip_x86_url:`
-              rpms=`getmcfg unzip_x86_pkgs:`
+              URLS=`getmcfg unzip${V}_x86_url:`
+              rpms=`getmcfg unzip${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg unzip_x64_url:`
-              rpms=`getmcfg unzip_x64_pkgs:`
+              URLS=`getmcfg unzip${V}_x64_url:`
+              rpms=`getmcfg unzip${V}_x64_pkgs:`
               ;;
           esac
           ;;
         xz )
+          prog="$1"
           case `arch` in
             i386 )
-              URLS=`getmcfg xz_x86_url:`
-              rpms=`getmcfg xz_x86_pkgs:`
+              URLS=`getmcfg xz${V}_x86_url:`
+              rpms=`getmcfg xz${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg xz_x64_url:`
-              rpms=`getmcfg xz_x64_pkgs:`
+              URLS=`getmcfg xz${V}_x64_url:`
+              rpms=`getmcfg xz${V}_x64_pkgs:`
               ;;
           esac
           ;;
         gcc )
+          prog="$1"
           case `arch` in
             i386 )
-              URLS=`getmcfg gcc_x86_url:`
-              rpms=`getmcfg gcc_x86_pkgs:`
-              #UPD_URLS=`getmcfg gcc_x86_upd_url:`
-              #upd_rpms=`getmcfg gcc_x86_upd_pkgs:`
+              URLS=`getmcfg gcc${V}_x86_url:`
+              rpms=`getmcfg gcc${V}_x86_pkgs:`
+              #UPD_URLS=`getmcfg gcc${V}_x86_upd_url:`
+              #upd_rpms=`getmcfg gcc${V}_x86_upd_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg gcc_x64_url:`
-              rpms=`getmcfg gcc_x64_pkgs:`
-              #UPD_URLS=`getmcfg gcc_x64_upd_url:`
-              #upd_rpms=`getmcfg gcc_x64_upd_pkgs:`
+              URLS=`getmcfg gcc${V}_x64_url:`
+              rpms=`getmcfg gcc${V}_x64_pkgs:`
+              #UPD_URLS=`getmcfg gcc${V}_x64_upd_url:`
+              #upd_rpms=`getmcfg gcc${V}_x64_upd_pkgs:`
               ;;
           esac
           ;;
         g++ )
+          prog=gcc-c++
           case `arch` in
             i386 )
-              URLS=`getmcfg gpp_x86_url:`
-              rpms=`getmcfg gpp_x86_pkgs:`
-              #UPD_URLS=`getmcfg gpp_x86_upd_url:`
-              #upd_rpms=`getmcfg gpp_x86_upd_pkgs:`
+              URLS=`getmcfg gpp${V}_x86_url:`
+              rpms=`getmcfg gpp${V}_x86_pkgs:`
+              #UPD_URLS=`getmcfg gpp${V}_x86_upd_url:`
+              #upd_rpms=`getmcfg gpp${V}_x86_upd_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg gpp_x64_url:`
-              rpms=`getmcfg gpp_x64_pkgs:`
-              #UPD_URLS=`getmcfg gpp_x64_upd_url:`
-              #upd_rpms=`getmcfg gpp_x64_upd_pkgs:`
+              URLS=`getmcfg gpp${V}_x64_url:`
+              rpms=`getmcfg gpp${V}_x64_pkgs:`
+              #UPD_URLS=`getmcfg gpp${V}_x64_upd_url:`
+              #upd_rpms=`getmcfg gpp${V}_x64_upd_pkgs:`
               ;;
           esac
           ;;
         yacc )
+          #prog="flex bison"
+          prog=byacc
           case `arch` in
             i386 )
-              URLS=`getmcfg yacc_x86_url:`
-              rpms=`getmcfg yacc_x86_pkgs:`
+              URLS=`getmcfg yacc${V}_x86_url:`
+              rpms=`getmcfg yacc${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg yacc_x64_url:`
-              rpms=`getmcfg yacc_x64_pkgs:`
+              URLS=`getmcfg yacc${V}_x64_url:`
+              rpms=`getmcfg yacc${V}_x64_pkgs:`
               ;;
           esac
           ;;
         perl-dbi )
+          prog=perl-DBI
           case `arch` in
             i386 )
-              URLS=`getmcfg perl-dbi_x86_url:`
-              rpms=`getmcfg perl-dbi_x86_pkgs:`
+              URLS=`getmcfg perl-dbi${V}_x86_url:`
+              rpms=`getmcfg perl-dbi${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg perl-dbi_x64_url:`
-              rpms=`getmcfg perl-dbi_x64_pkgs:`
+              URLS=`getmcfg perl-dbi${V}_x64_url:`
+              rpms=`getmcfg perl-dbi${V}_x64_pkgs:`
               ;;
           esac
           ;;
-        git ) 
+        git )
+          prog="$1"
           case `arch` in
             i386 )
-              URLS=`getmcfg git_x86_url:`
-              rpms=`getmcfg git_x86_pkgs:`
+              URLS=`getmcfg git${V}_x86_url:`
+              rpms=`getmcfg git${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg git_x64_url:`
-              rpms=`getmcfg git_x64_pkgs:`
+              URLS=`getmcfg git${V}_x64_url:`
+              rpms=`getmcfg git${V}_x64_pkgs:`
               ;;
           esac
           ;;
-        jam ) 
+        jam )
+          prog="$1"
           case `arch` in
             i386 )
-              URLS=`getmcfg jam_x86_url:`
-              rpms=`getmcfg jam_x86_pkgs:`
+              URLS=`getmcfg jam${V}_x86_url:`
+              rpms=`getmcfg jam${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg jam_x64_url:`
-              rpms=`getmcfg jam_x64_pkgs:`
+              URLS=`getmcfg jam${V}_x64_url:`
+              rpms=`getmcfg jam${V}_x64_pkgs:`
               ;;
           esac
           ;;
-        yasm ) 
+        yasm )
+          prog="$1"
           case `arch` in
             i386 )
-              URLS=`getmcfg yasm_x86_url:`
-              rpms=`getmcfg yasm_x86_pkgs:`
+              URLS=`getmcfg yasm${V}_x86_url:`
+              rpms=`getmcfg yasm${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg yasm_x64_url:`
-              rpms=`getmcfg yasm_x64_pkgs:`
+              URLS=`getmcfg yasm${V}_x64_url:`
+              rpms=`getmcfg yasm${V}_x64_pkgs:`
               ;;
           esac
           ;;
         ImageMagick )
+          prog="$1"
           case `arch` in
             i386 )
-              URLS=`getmcfg ImageMagick_x86_url:`
-              rpms=`getmcfg ImageMagick_x86_pkgs:`
+              URLS=`getmcfg ImageMagick${V}_x86_url:`
+              rpms=`getmcfg ImageMagick${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg ImageMagick_x64_url:`
-              rpms=`getmcfg ImageMagick_x64_pkgs:`
+              URLS=`getmcfg ImageMagick${V}_x64_url:`
+              rpms=`getmcfg ImageMagick${V}_x64_pkgs:`
               ;;
           esac
           ;;
         automake )
+          prog="$1"
           case `arch` in
             i386 )
-              URLS=`getmcfg automake_x86_url:`
-              rpms=`getmcfg automake_x86_pkgs:`
+              URLS=`getmcfg automake${V}_x86_url:`
+              rpms=`getmcfg automake${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg automake_x64_url:`
-              rpms=`getmcfg automake_x64_pkgs:`
+              URLS=`getmcfg automake${V}_x64_url:`
+              rpms=`getmcfg automake${V}_x64_pkgs:`
               ;;
           esac
           ;;
         gsl-devel )
+          prog="$1"
           case `arch` in
             i386 )
-              URLS=`getmcfg gsl-devel_x86_url:`
-              rpms=`getmcfg gsl-devel_x86_pkgs:`
+              URLS=`getmcfg gsl-devel${V}_x86_url:`
+              rpms=`getmcfg gsl-devel${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg gsl-devel_x64_url:`
-              rpms=`getmcfg gsl-devel_x64_pkgs:`
+              URLS=`getmcfg gsl-devel${V}_x64_url:`
+              rpms=`getmcfg gsl-devel${V}_x64_pkgs:`
               ;;
           esac
           ;;
         desktop-file-utils )
+          prog="$1"
           case `arch` in
             i386 )
-              URLS=`getmcfg desktop-file-utils_x86_url:`
-              rpms=`getmcfg desktop-file-utils_x86_pkgs:`
+              URLS=`getmcfg desktop-file-utils${V}_x86_url:`
+              rpms=`getmcfg desktop-file-utils${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg desktop-file-utils_x64_url:`
-              rpms=`getmcfg desktop-file-utils_x64_pkgs:`
+              URLS=`getmcfg desktop-file-utils${V}_x64_url:`
+              rpms=`getmcfg desktop-file-utils${V}_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        rpmlint )
+          prog="$1"
+          case `arch` in
+            i386 )
+              URLS=`getmcfg rpmlint${V}_x86_url:`
+              rpms=`getmcfg rpmlint${V}_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg rpmlint${V}_x64_url:`
+              rpms=`getmcfg rpmlint${V}_x64_pkgs:`
               ;;
           esac
           ;;
         gmp )
+          prog="$1"
           case `arch` in
             i386 )
-              URLS=`getmcfg gmp_x86_url:`
-              rpms=`getmcfg gmp_x86_pkgs:`
+              URLS=`getmcfg gmp${V}_x86_url:`
+              rpms=`getmcfg gmp${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg gmp_x64_url:`
-              rpms=`getmcfg gmp_x64_pkgs:`
+              URLS=`getmcfg gmp${V}_x64_url:`
+              rpms=`getmcfg gmp${V}_x64_pkgs:`
               ;;
           esac
           ;;
         zlib-devel )
+          prog="$1"
           case `arch` in
             i386 )
-              URLS=`getmcfg zlib-devel_x86_url:`
-              rpms=`getmcfg zlib-devel_x86_pkgs:`
+              URLS=`getmcfg zlib-devel${V}_x86_url:`
+              rpms=`getmcfg zlib-devel${V}_x86_pkgs:`
               ;;
             x86_64 )
-              URLS=`getmcfg zlib-devel_x64_url:`
-              rpms=`getmcfg zlib-devel_x64_pkgs:`
+              URLS=`getmcfg zlib-devel${V}_x64_url:`
+              rpms=`getmcfg zlib-devel${V}_x64_pkgs:`
               ;;
           esac
           ;;
         * )
-          echo "Don't know how to install $1 on `os`" 1>&2
-          return 1
+          prog="$1"
+          #echo "Don't know how to install $1 on `os`" 1>&2
+          #return 1
           ;;
       esac
-      for rpm in $rpms; do
-        if [ ! -s "$rpm" ]; then
-          copypkg "$rpm"
-          if [ $? -ne 0 ]; then
-            ok=1
-            for URL in $URLS; do
-              wget -t 5 -4 -O "$rpm" "$URL/$rpm"
-              ok=$?
-              [ $ok -eq 0 ] && break
-            done
-            if [ $ok -ne 0 ]; then
-              rm -f "$rpm"
-              return 1
+      yumx -y install $prog
+      if [ $? -ne 0 ]; then
+        for rpm in $rpms; do
+          if [ ! -s "$rpm" ]; then
+            copypkg "$rpm"
+            if [ $? -ne 0 ]; then
+              ok=1
+              for URL in $URLS; do
+                wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+                ok=$?
+                [ $ok -eq 0 ] && break
+              done
+              if [ $ok -ne 0 ]; then
+                rm -f "$rpm"
+                return 1
+              fi
             fi
           fi
-        fi
-      done
-      for upd_rpm in $upd_rpms; do
-        if [ ! -s "$upd_rpm" ]; then
-          copypkg "$upd_rpm"
-          if [ $? -ne 0 ]; then
-            ok=1
-            for UPD_URL in $UPD_URLS; do
-              wget -t 5 -4 -O "$upd_rpm" "$UPD_URL/$upd_rpm"
-              ok=$?
-              [ $ok -eq 0 ] && break
-            done
-            if [ $ok -ne 0 ]; then
-              rm -f "$upd_rpm"
-              return 1
+        done
+        for upd_rpm in $upd_rpms; do
+          if [ ! -s "$upd_rpm" ]; then
+            copypkg "$upd_rpm"
+            if [ $? -ne 0 ]; then
+              ok=1
+              for UPD_URL in $UPD_URLS; do
+                wget -t 5 -4 -O "$upd_rpm" "$UPD_URL/$upd_rpm"
+                ok=$?
+                [ $ok -eq 0 ] && break
+              done
+              if [ $ok -ne 0 ]; then
+                rm -f "$upd_rpm"
+                return 1
+              fi
             fi
           fi
-        fi
-      done
-      install_rpms $rpms $upd_rpms
-      [ $? -ne 0 ] && return 1
+        done
+        install_rpms $rpms $upd_rpms
+        [ $? -ne 0 ] && return 1
+      fi
       ;;
     Ubuntu )
       case "$1" in
@@ -341,6 +583,8 @@ install_prog() {
     Debian )
       ;;
     openSUSE )
+      ;;
+    SLES )
       ;;
     Amazon )
       ;;
@@ -412,9 +656,9 @@ install_macports() {
 #
 macports_version() {
   port version | awk '{ n = split($2, a, "."); v = 0;
-    if (n == 1) { v = a[1] * 100; }
-    else if (n == 2) { v = a[1] * 100 + a[2] * 10; }
-    else if (n == 3) { v = a[1] * 100 + a[2] * 10 + a[3]; }
+    if (n == 1) { v = a[1] * 10000; }
+    else if (n == 2) { v = a[1] * 10000 + a[2] * 100; }
+    else if (n == 3) { v = a[1] * 10000 + a[2] * 100 + a[3]; }
     print v }'
   [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && return 1
   return 0
@@ -485,7 +729,7 @@ preinstall_scons() {
   [ $? -ne 0 ] && return 1
   #
   case `os` in
-    CentOS | RHEL | Ubuntu | Debian | openSUSE | Amazon )
+    CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | Amazon )
       download .
       [ $? -ne 0 ] && return 1
       ./linux-compile
@@ -500,6 +744,11 @@ preinstall_scons() {
 check_prereq() {
   case `os` in
     CentOS | RHEL )
+      chkrepo epel      || enable_epel         || return 1
+      chkrepo atomic    || enable_atomic       || return 1
+      chkrepo rpmforge  || enable_rpmforge     || return 1
+      chkrepo rpmfusion || enable_rpmfusion    || return 1
+      #
       chkprog wget    || install_prog wget     || return 1
       chkprog zip     || install_prog zip      || return 1
       chkprog unzip   || install_prog unzip    || return 1
@@ -526,6 +775,8 @@ check_prereq() {
       #
       # desktop-file-utils is needed by some versions of rpmlint
       chkprog desktop-file-install || install_prog desktop-file-utils || return 1
+      # rpmlint is needed for mingw32 compiler
+      chkprog rpmlint || install_prog rpmlint || return 1
       #
       # libgmp is missing on some systems and is needed by mingw32-gcc
       chklib gmp || install_prog gmp || return 1
@@ -580,11 +831,13 @@ check_prereq() {
       ;;
     openSUSE )
       ;;
+    SLES )
+      ;;
     Amazon )
       ;;
     MacOS )
       chkprog port  || install_macports   || return 1
-      if [ `macports_version` -lt 192 ]; then
+      if [ `macports_version` -lt 10902 ]; then
         echo "Mac ports version is too old - should be at least 1.9.2 or greater" 1>&2
         return 1
       fi
@@ -626,102 +879,139 @@ install_mingw32() {
   [ $? -ne 0 ] && return 1
   #
   case `os` in
-    CentOS | RHEL | Ubuntu )
-      rpms=""
-      case `arch` in
-        i386 )
-          URLS=`getmcfg mingw32-gcc_x86_url:`
-          rpms=`getmcfg mingw32-gcc_x86_pkgs:`
-          ;;
-        x86_64 )
-          URLS=`getmcfg mingw32-gcc_x64_url:`
-          rpms=`getmcfg mingw32-gcc_x64_pkgs:`
-          ;;
+    CentOS | RHEL )
+      case `os_ver` in
+        5.* ) V=5 ;;
+        6.* ) V=6 ;;
+        * ) V="" ;;
       esac
-      for rpm in $rpms; do
-        if [ ! -s "$rpm" ]; then
-          copypkg "$rpm"
-          if [ $? -ne 0 ]; then
-            ok=1
-            for URL in $URLS; do
-              wget -t 5 -4 -O "$rpm" "$URL/$rpm"
-              ok=$?
-              [ $ok -eq 0 ] && break
-            done
-            if [ $ok -ne 0 ]; then
-              rm -f "$rpm"
-              return 1
-            fi
-          fi
-        fi
-      done
-      install_rpms $rpms
-      [ $? -ne 0 ] && return 1
       #
-      rpms=""
-      case `arch` in
-        i386 )
-          URLS=`getmcfg mingw32-gpp_x86_url:`
-          rpms=`getmcfg mingw32-gpp_x86_pkgs:`
-          ;;
-        x86_64 )
-          URLS=`getmcfg mingw32-gpp_x64_url:`
-          rpms=`getmcfg mingw32-gpp_x64_pkgs:`
-          ;;
-      esac
-      for rpm in $rpms; do
-        if [ ! -s "$rpm" ]; then
-          copypkg "$rpm"
-          if [ $? -ne 0 ]; then
-            ok=1
-            for URL in $URLS; do
-              wget -t 5 -4 -O "$rpm" "$URL/$rpm"
-              ok=$?
-              [ $ok -eq 0 ] && break
-            done
-            if [ $ok -ne 0 ]; then
-              rm -f "$rpm"
-              return 1
+      chkprog $MINGW32-gcc
+      if [ $? -ne 0 ]; then
+        rpms=""
+        prog=mingw32-gcc
+        case `arch` in
+          i386 )
+            URLS=`getmcfg mingw32-gcc${V}_x86_url:`
+            rpms=`getmcfg mingw32-gcc${V}_x86_pkgs:`
+            ;;
+          x86_64 )
+            URLS=`getmcfg mingw32-gcc${V}_x64_url:`
+            rpms=`getmcfg mingw32-gcc${V}_x64_pkgs:`
+            ;;
+        esac
+        # don't use yum for now, because it always fails
+        fail yumx -y install $prog
+        if [ $? -ne 0 ]; then
+          for rpm in $rpms; do
+            if [ ! -s "$rpm" ]; then
+              copypkg "$rpm"
+              if [ $? -ne 0 ]; then
+                ok=1
+                for URL in $URLS; do
+                  wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+                  ok=$?
+                  [ $ok -eq 0 ] && break
+                done
+                if [ $ok -ne 0 ]; then
+                  rm -f "$rpm"
+                  return 1
+                fi
+              fi
             fi
-          fi
+          done
+          install_rpms $rpms
+          [ $? -ne 0 ] && return 1
         fi
-      done
-      install_rpms $rpms
-      [ $? -ne 0 ] && return 1
+      fi
       #
-      URLS=`getmcfg mingw32-w32api_src_url:`
-      pkgs=`getmcfg mingw32-w32api_src_pkgs:`
-      for pkg in $pkgs; do
-        if [ ! -s "$pkg" -a ! -s "${pkg%.lzma}" ]; then
-          copypkg "$pkg"
-          if [ $? -ne 0 ]; then
-            ok=1
-            for URL in $URLS; do
-              wget -t 5 -4 -O "$pkg" "$URL/$pkg"
-              ok=$?
-              [ $ok -eq 0 ] && break
-            done
-            if [ $ok -ne 0 ]; then
-              rm -f "$pkg"
-              return 1
+      chkprog $MINGW32-c++
+      if [ $? -ne 0 ]; then
+        rpms=""
+        prog=mingw32-gcc-c++
+        case `arch` in
+          i386 )
+            URLS=`getmcfg mingw32-gpp${V}_x86_url:`
+            rpms=`getmcfg mingw32-gpp${V}_x86_pkgs:`
+            ;;
+          x86_64 )
+            URLS=`getmcfg mingw32-gpp${V}_x64_url:`
+            rpms=`getmcfg mingw32-gpp${V}_x64_pkgs:`
+            ;;
+        esac
+        # don't use yum for now, because it always fails
+        fail yumx -y install $prog
+        if [ $? -ne 0 ]; then
+          for rpm in $rpms; do
+            if [ ! -s "$rpm" ]; then
+              copypkg "$rpm"
+              if [ $? -ne 0 ]; then
+                ok=1
+                for URL in $URLS; do
+                  wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+                  ok=$?
+                  [ $ok -eq 0 ] && break
+                done
+                if [ $ok -ne 0 ]; then
+                  rm -f "$rpm"
+                  return 1
+                fi
+              fi
+            fi
+          done
+          install_rpms $rpms
+          [ $? -ne 0 ] && return 1
+        fi
+      fi
+      #
+      VER=`grep W32API_VERSION $MINGW32_PREFIX/include/w32api.h | awk '{
+        n = split($3, a, "."); v = 0;
+        if (n == 1) { v = a[1] * 10000; }
+        else if (n == 2) { v = a[1] * 10000 + a[2] * 100; }
+        else if (n == 3) { v = a[1] * 10000 + a[2] * 100 + a[3]; }
+        print v }'`
+      # Latest version of w32api is 3.17 (= 31700)
+      if [ $VER -lt 31700 ]; then
+        pkgs=""
+        URLS=`getmcfg mingw32-w32api_src_url:`
+        pkgs=`getmcfg mingw32-w32api_src_pkgs:`
+        for pkg in $pkgs; do
+          if [ ! -s "$pkg" -a ! -s "${pkg%.lzma}" ]; then
+            copypkg "$pkg"
+            if [ $? -ne 0 ]; then
+              ok=1
+              for URL in $URLS; do
+                wget -t 5 -4 -O "$pkg" "$URL/$pkg"
+                ok=$?
+                [ $ok -eq 0 ] && break
+              done
+              if [ $ok -ne 0 ]; then
+                rm -f "$pkg"
+                return 1
+              fi
             fi
           fi
+          # There can be only one!
+          break
+        done
+        if [ ! -s "${pkg%.lzma}" ]; then
+          xz -d "$pkg"
+          [ $? -ne 0 ] && return 1
         fi
-        # There can be only one!
-        break
-      done
-      if [ ! -s "${pkg%.lzma}" ]; then
-        xz -d "$pkg"
+        cd $MINGW32_PREFIX
+        [ $? -ne 0 ] && return 1
+        sudox tar -xvf "${HOME3P}/packages/${pkg%.lzma}"
         [ $? -ne 0 ] && return 1
       fi
-      cd $MINGW32_PREFIX
-      [ $? -ne 0 ] && return 1
-      sudox tar -xvf "${HOME3P}/packages/${pkg%.lzma}"
-      [ $? -ne 0 ] && return 1
+      ;;
+    Ubuntu )
+      # Temporarily removed
       ;;
     Debian )
       ;;
     openSUSE )
+      ;;
+    SLES )
       ;;
     Amazon )
       ;;
@@ -740,7 +1030,7 @@ fix_libs() {
   [ $? -ne 0 ] && return 1
   #
   case `os` in
-    CentOS | RHEL | Ubuntu | Debian | openSUSE | Amazon )
+    CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | Amazon )
       #
       # Install patchelf 0.5
       #
@@ -883,6 +1173,8 @@ EOF
       ;;
     openSUSE )
       ;;
+    SLES )
+      ;;
     Amazon )
       ;;
     MacOS )
@@ -892,7 +1184,7 @@ EOF
 }
 #
 case `os` in
-  CentOS | RHEL | Ubuntu | Debian | openSUSE | Amazon | MacOS )
+  CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | Amazon | MacOS )
     ;;
   * )
     echo "Unsupported operating system: `os`" 1>&2
@@ -912,6 +1204,7 @@ esac
 # Main repositories
 export CENTOS_MIRROR=`getmcfg CENTOS_MIRROR:`
 export EPEL_MIRROR=`getmcfg EPEL_MIRROR:`
+export ATOMIC_MIRROR=`getmcfg ATOMIC_MIRROR:`
 export RPMFORGE_MIRROR=`getmcfg RPMFORGE_MIRROR:`
 export GNU_MIRROR=`getmcfg GNU_MIRROR:`
 export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`

@@ -12,6 +12,7 @@ source "${HOME3P}/utilx"
 # Main repositories
 export CENTOS_MIRROR=`getmcfg CENTOS_MIRROR:`
 export EPEL_MIRROR=`getmcfg EPEL_MIRROR:`
+export ATOMIC_MIRROR=`getmcfg ATOMIC_MIRROR:`
 export RPMFORGE_MIRROR=`getmcfg RPMFORGE_MIRROR:`
 export GNU_MIRROR=`getmcfg GNU_MIRROR:`
 export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`
@@ -89,7 +90,7 @@ END {
       for (jj = 1; jj <= m; jj++) {
         for (kk = 1; kk <= n; kk++) {
           if (jj > 1) { printf("mirror-") }
-          print a[jj] "/" b[kk] 
+          print a[jj] "/" b[kk]
         }
       }
     }
@@ -140,6 +141,8 @@ for config in `find "${HOME3P}" -name config.txt`; do
   [ -n "$URL2" ] && fetch "$URL2" "$NOTFOUND"
   URL3=`getcfgx URL3: "$config"`
   [ -n "$URL3" ] && fetch "$URL3" "$NOTFOUND"
+  URL4=`getcfgx URL4: "$config"`
+  [ -n "$URL4" ] && fetch "$URL4" "$NOTFOUND"
 done
 #
 if [ -s "$NOTFOUND" ]; then
