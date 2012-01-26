@@ -20,9 +20,9 @@ export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`
 getcfgx() {
   set +x
   CFG=`awk '
-/^[     ]*'$1'/ {
-  sub("^[       ]*'$1'[         ]*", "");
-  sub("[        ]*$", "");
+/^[ 	]*'$1'/ {
+  sub("^[ 	]*'$1'[ 	]*", "");
+  sub("[ 	]*$", "");
   print $0
 }' $2`
   if [ $? -ne 0 ]; then
@@ -133,16 +133,13 @@ done
 # 2. Check all other configs
 #
 for config in `find "${HOME3P}" -name config.txt`; do
-  URL=`getcfgx URL: "$config"`
-  [ -n "$URL" ] && fetch "$URL" "$NOTFOUND"
-  URL1=`getcfgx URL1: "$config"`
-  [ -n "$URL1" ] && fetch "$URL1" "$NOTFOUND"
-  URL2=`getcfgx URL2: "$config"`
-  [ -n "$URL2" ] && fetch "$URL2" "$NOTFOUND"
-  URL3=`getcfgx URL3: "$config"`
-  [ -n "$URL3" ] && fetch "$URL3" "$NOTFOUND"
-  URL4=`getcfgx URL4: "$config"`
-  [ -n "$URL4" ] && fetch "$URL4" "$NOTFOUND"
+  for ii in "" 1 2 3; do
+    for pkg in `getcfgx PKG${ii}: "$config"`; do
+      for URL in `getcfgx URL${ii}: "$config"`; do
+        fetch "$URL/$pkg" "$NOTFOUND"
+      done
+    done
+  done
 done
 #
 if [ -s "$NOTFOUND" ]; then
