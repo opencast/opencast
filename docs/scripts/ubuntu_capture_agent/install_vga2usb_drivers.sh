@@ -26,7 +26,7 @@ if [[ -z "$(lsmod | grep -e "^vga2usb")" ]]; then
 		# Gets the complete list of drivers in the page compatible with the current kernel
 		# It makes no sense presenting others which are not compatible
         # Don't filter by 'architecture' --it's to strict and sometimes the suitable drivers may no pass the filter (MH-5033)
-	    drivers=( $(grep "vga2usb" $FILE_NAME | sed 's#^.*<a\s*href="\(.*\)".*>.*</a>.*$#\1#' | grep "$kernel_base") )
+	    drivers=( $(grep "file=vga2usb" $FILE_NAME | tr "=" "\n" | tr "\"" "\n" | grep "vga2usb" | grep "$kernel_base") ) 
         break;
 	fi
 
