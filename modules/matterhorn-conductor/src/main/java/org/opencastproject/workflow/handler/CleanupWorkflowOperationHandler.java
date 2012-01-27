@@ -111,7 +111,7 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
     Set<URI> urisToDelete = new HashSet<URI>();
     Set<URI> urisToKeep = new HashSet<URI>();
     for (MediaPackageElement element : mediaPackage.getElements()) {
-      if (!element.getURI().toString().startsWith(baseUrl)) {
+      if (element.getURI() == null || !element.getURI().toString().startsWith(baseUrl)) {
         continue;
       }
       // remove the element if it doesn't match the flavors to preserve
