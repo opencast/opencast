@@ -174,7 +174,7 @@ ALTER TABLE job ADD CONSTRAINT FK_job_parent_id FOREIGN KEY (
 	id
 );
 
-ALTER TABLE job ADD CONSTRAINT FK_job_processor_svc FOREIGN KEY (
+ALTER TABLE job ADD CONSTRAINT FK_job_processor_service FOREIGN KEY (
 	processor_service) REFERENCES service_registration (
 	id
 );
