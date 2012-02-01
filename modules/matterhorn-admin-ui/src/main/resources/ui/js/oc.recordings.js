@@ -574,9 +574,7 @@ ocRecordings = new (function() {
   /** Make the page reload with the currently set configuration
    */
   this.reload = function() {
-    var url = document.location.href.split('?', 2)[0];
-    url += '?' + ocRecordings.buildURLparams();
-    document.location.href = "/admin/index.html#/recordings?" + ocRecordings.buildURLparams();
+    document.location.reload();
   }
   
   /** Returns the workflow with the specified id from the currently loaded
@@ -615,7 +613,6 @@ ocRecordings = new (function() {
 
   this.displayHoldUI = function(wfId) {
     var workflow = ocRecordings.getWorkflow(wfId);
-    location.hash = "#/hold";
     if (workflow) {
       var operation = workflow.operations.operation;  // ocRecordings.findFirstOperation(workflow, 'PAUSED');
       if (operation !== false && operation.holdurl !== undefined) {

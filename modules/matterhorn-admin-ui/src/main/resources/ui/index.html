@@ -264,18 +264,12 @@
               })
             })
             .change(function(event) {
-              if ($.address.path() == '/hold') {
-                path = $.address.value();
-              }
               if ($.address.value() != path) {
                 location.hash = "#" + $.address.value();
                 location.reload();
               }
             })
             .externalChange(function(event) {
-              if ($.address.path() == '/hold') {
-                path = $.address.value();
-              }
               if ($.address.value() != path) {
                 location.hash = "#" + $.address.value();
                 location.reload();

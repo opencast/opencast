@@ -82,7 +82,9 @@
        		    		             
       $(document).ready(function(){
         var id = postData.id;             
-
+        if(id == "") {
+          return;
+        }
         var recordDate = null;
         $('#recordDate').datepicker({
           showOn: 'both',
