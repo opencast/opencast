@@ -19,7 +19,7 @@ ocSeriesList.views.seriesView = {} || ocSeriesList.seriesView;
 
 ocSeriesList.Configuration = new (function(){
   //default configuration
-  this.count = 10;
+  this.count = $.cookie('series_count') == null ? 10 : $.cookie('series_count');
   this.total = 10;
   this.startPage = 0;  
   this.lastPage = 0;
@@ -35,10 +35,16 @@ ocSeriesList.SortColumns = [
 
 ocSeriesList.init = function(){
   $('#addHeader').jqotesubtpl('templates/series_list-header.tpl', {});
-  
+  if ($.cookie('series_count') != null) {
+    $('#pageSize').children()
+    .each(function() {
+      this.selected = (this.text == $.cookie('series_count'));
+    });
+  }
   $('#pageSize').change(function(event, ui)
   {
     ocSeriesList.Configuration.count = event.target.value;
+    $.cookie('series_count', ocSeriesList.Configuration.count);
     ocSeriesList.askForSeries();
   })
   

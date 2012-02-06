@@ -401,7 +401,7 @@ public class JobJpaImpl extends JaxbJob {
    * @return the processorServiceRegistration
    */
   @ManyToOne
-  @JoinColumn(name = "processor_svc")
+  @JoinColumn(name = "processor_service")
   public ServiceRegistrationJpaImpl getProcessorServiceRegistration() {
     return processorServiceRegistration;
   }

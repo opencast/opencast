@@ -32,6 +32,7 @@ import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.tika.metadata.HttpHeaders;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -44,6 +45,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -84,7 +86,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
    * @param cc
    *          OSGi component context
    */
-  public void activate(ComponentContext cc) {
+  public void activate(ComponentContext cc) throws IOException {
     super.activate(cc);
   }
 
@@ -118,10 +120,15 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestParameter(name = "mediaPackageID", description = "the mediapackage identifier", isRequired = true, type = STRING),
           @RestParameter(name = "mediaPackageElementID", description = "the mediapackage element identifier", isRequired = true, type = STRING),
           @RestParameter(name = "filename", description = "the filename", isRequired = true, type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "OK, file stored") })
-  public Response restPutURLEncoded(@PathParam("mediaPackageID") String mediaPackageID,
+  public Response restPutURLEncoded(@Context HttpServletRequest request,
+          @PathParam("mediaPackageID") String mediaPackageID,
           @PathParam("mediaPackageElementID") String mediaPackageElementID, @PathParam("filename") String filename,
           @FormParam("content") String content) throws Exception {
-    URI url = this.put(mediaPackageID, mediaPackageElementID, filename, IOUtils.toInputStream(content));
+    String encoding = request.getCharacterEncoding();
+    if (encoding == null)
+      encoding = "utf-8";
+
+    URI url = this.put(mediaPackageID, mediaPackageElementID, filename, IOUtils.toInputStream(content, encoding));
     return Response.ok(url.toString()).build();
   }
 
@@ -184,24 +191,29 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGet(@PathParam("mediaPackageID") String mediaPackageID,
           @PathParam("mediaPackageElementID") String mediaPackageElementID,
-          @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException {
-    String contentType = null;
+          @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException, IOException {
+
+    String md5 = null;
     InputStream in = null;
+
+    // Check the If-None-Match header first
     try {
-      String md5 = this.hashMediaPackageElement(mediaPackageID, mediaPackageElementID);
-      if (md5.equals(ifNoneMatch)) {
-        IOUtils.closeQuietly(in);
-        return Response.notModified().build();
+      md5 = getMediaPackageElementDigest(mediaPackageID, mediaPackageElementID);
+      if (StringUtils.isNotBlank(ifNoneMatch) && md5.equals(ifNoneMatch)) {
+        return Response.notModified(md5).build();
       }
-      in = this.get(mediaPackageID, mediaPackageElementID);
+    } catch (IOException e) {
+      logger.warn("Error reading digest of {}/{}", new Object[] { mediaPackageElementID, mediaPackageElementID });
+    }
+
+    String contentType = null;
+    try {
+      in = get(mediaPackageID, mediaPackageElementID);
       contentType = extractContentType(in);
-      return Response.ok(this.get(mediaPackageID, mediaPackageElementID)).header("Content-Type", contentType).build();
+      return Response.ok(get(mediaPackageID, mediaPackageElementID)).header("Content-Type", contentType).build();
     } catch (IllegalStateException e) {
       IOUtils.closeQuietly(in);
       throw new NotFoundException();
-    } catch (IOException e) {
-      IOUtils.closeQuietly(in);
-      return Response.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR).build();
     } finally {
       IOUtils.closeQuietly(in);
     }
@@ -241,14 +253,24 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   public Response restGet(@PathParam("mediaPackageID") String mediaPackageID,
           @PathParam("mediaPackageElementID") String mediaPackageElementID, @PathParam("fileName") String fileName,
           @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException {
+
+    String md5 = null;
     InputStream in = null;
+
+    // Check the If-None-Match header first
     try {
-      in = get(mediaPackageID, mediaPackageElementID);
-      String md5 = this.hashMediaPackageElement(mediaPackageID, mediaPackageElementID);
-      if (md5.equals(ifNoneMatch)) {
-        IOUtils.closeQuietly(in);
+      md5 = getMediaPackageElementDigest(mediaPackageID, mediaPackageElementID);
+      if (StringUtils.isNotBlank(ifNoneMatch) && md5.equals(ifNoneMatch)) {
         return Response.notModified(md5).build();
       }
+    } catch (IOException e) {
+      logger.warn("Error reading digest of {}/{}/{}", new Object[] { mediaPackageElementID, mediaPackageElementID,
+              fileName });
+    }
+
+    // No If-Non-Match header provided, or the file changed in the meantime
+    try {
+      in = get(mediaPackageID, mediaPackageElementID);
       String contentType = mimeMap.getContentType(fileName);
       int contentLength = 0;
       contentLength = in.available();
@@ -273,8 +295,13 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_OK, description = "File returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGetFromCollection(@PathParam("collectionId") String collectionId,
-          @PathParam("fileName") String fileName) throws NotFoundException {
-    InputStream in = super.getFromCollection(collectionId, fileName);
+          @PathParam("fileName") String fileName) throws NotFoundException, IOException {
+    InputStream in;
+    try {
+      in = super.getFromCollection(collectionId, fileName);
+    } catch (FileNotFoundException e) {
+      throw new NotFoundException(e);
+    }
     String contentType = mimeMap.getContentType(fileName);
     int contentLength = 0;
     try {

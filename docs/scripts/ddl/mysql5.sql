@@ -38,7 +38,7 @@ CREATE TABLE capture_agent_state (
 
 CREATE TABLE dictionary (
 	text VARCHAR(255) NOT NULL,
-	language VARCHAR(255) NOT NULL,
+	language VARCHAR(5) NOT NULL,
 	weight DOUBLE,
 	count BIGINT,
 	stop_word TINYINT(1) default 0,
@@ -79,7 +79,7 @@ CREATE TABLE job (
 	queue_time BIGINT,
 	creator_service BIGINT,
 	parent_id BIGINT,
-	processor_svc BIGINT,
+	processor_service BIGINT,
 	root_id BIGINT,
 	PRIMARY KEY (
 	id)
@@ -174,8 +174,8 @@ ALTER TABLE job ADD CONSTRAINT FK_job_parent_id FOREIGN KEY (
 	id
 );
 
-ALTER TABLE job ADD CONSTRAINT FK_job_processor_svc FOREIGN KEY (
-	processor_svc) REFERENCES service_registration (
+ALTER TABLE job ADD CONSTRAINT FK_job_processor_service FOREIGN KEY (
+	processor_service) REFERENCES service_registration (
 	id
 );
 

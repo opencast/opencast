@@ -366,13 +366,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
       JobJpaImpl job = new JobJpaImpl(currentUser, currentOrganization, creatingService, operation, arguments, payload,
               dispatchable);
 
-      creatingService.creatorJobs.add(job);
-
       // if this job is not dispatchable, it must be handled by the host that has created it
       if (dispatchable) {
         job.setStatus(Status.QUEUED);
       } else {
-        creatingService.processorJobs.add(job);
+        job.setProcessingHost(creatingService.getHost());
       }
 
       em.persist(job);
@@ -394,22 +392,21 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
    * 
    * @return the new job
    */
-  protected JobJpaImpl createJob(ServiceRegistrationJpaImpl serviceRegistration, String operation,
-          List<String> arguments, String payload, boolean dispatchable) {
+  protected JobJpaImpl createJob(ServiceRegistrationJpaImpl creatingService, String operation, List<String> arguments,
+          String payload, boolean dispatchable) {
     User currentUser = securityService.getUser();
     Organization currentOrganization = securityService.getOrganization();
     EntityManager em = emf.createEntityManager();
     EntityTransaction tx = em.getTransaction();
     try {
       tx.begin();
-      JobJpaImpl job = new JobJpaImpl(currentUser, currentOrganization, serviceRegistration, operation, arguments,
-              payload, dispatchable);
-      serviceRegistration.creatorJobs.add(job);
+      JobJpaImpl job = new JobJpaImpl(currentUser, currentOrganization, creatingService, operation, arguments, payload,
+              dispatchable);
       // if this job is not dispatchable, it must be handled by the host that has created it
       if (dispatchable) {
         job.setStatus(Status.QUEUED);
       } else {
-        serviceRegistration.processorJobs.add(job);
+        job.setProcessingHost(creatingService.getHost());
       }
       em.persist(job);
       tx.commit();
@@ -1014,7 +1011,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
    * 
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceStatistics()
    */
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public List<ServiceStatistics> getServiceStatistics() throws ServiceRegistryException {
     EntityManager em = emf.createEntityManager();
@@ -1055,6 +1052,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
           }
         }
       }
+
+      // Make sure we also include the services that have no processing history so far
+      List<ServiceRegistration> services = em.createNamedQuery("ServiceRegistration.getAll").getResultList();
+      for (ServiceRegistration s : services) {
+        if (!statsMap.containsKey(s))
+          statsMap.put(s, new JaxbServiceStatistics((ServiceRegistrationJpaImpl) s));
+      }
+
       List<ServiceStatistics> stats = new ArrayList<ServiceStatistics>(statsMap.values());
       Collections.sort(stats, new Comparator<ServiceStatistics>() {
         @Override
@@ -1065,6 +1070,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
           return typeComparison == 0 ? reg1.getHost().compareTo(reg2.getHost()) : typeComparison;
         }
       });
+
       return stats;
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
@@ -1102,9 +1108,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
    *          if true, the map will include only hosts that are online and have non-maintenance mode services
    * @return the map of hosts to job counts
    */
+  @SuppressWarnings("unchecked")
   protected Map<String, Integer> getHostLoads(EntityManager em, boolean activeOnly) {
-    Query q = em.createNamedQuery("ServiceRegistration.hostload");
+
+    // Initialize the list of hosts
+    List<ServiceRegistration> services = em.createNamedQuery("ServiceRegistration.getAll").getResultList();
     Map<String, Integer> loadByHost = new HashMap<String, Integer>();
+    for (ServiceRegistration s : services) {
+      if (!loadByHost.containsKey(s.getHost()))
+        loadByHost.put(s.getHost(), 0);
+    }
+
+    // Find all jobs that are currently running on any given host
+    Query q = em.createNamedQuery("ServiceRegistration.hostload");
 
     // Accumulate the numbers for relevant job statuses per host
     for (Object result : q.getResultList()) {
@@ -1130,6 +1146,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
         loadByHost.put(service.getHost(), count);
       }
     }
+
     return loadByHost;
   }
 
@@ -1458,21 +1475,27 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
       try {
         List<Job> jobsToDispatch = getDispatchableJobs(em);
         Map<String, Integer> hostLoads = getHostLoads(em, true);
-        List<ServiceRegistration> serviceRegistrations = getServiceRegistrations();
+        List<ServiceRegistration> serviceRegistrations = getServiceRegistrations(em);
 
         for (Job job : jobsToDispatch) {
+
+          // Set the job's user and organization prior to dispatching
           String creator = job.getCreator();
           String creatorOrganization = job.getOrganization();
           Organization organization = organizationDirectoryService.getOrganization(creatorOrganization);
           securityService.setOrganization(organization);
           User user = userDirectoryService.loadUser(creator);
-          if (user == null)
-            throw new IllegalStateException("Creator '" + creator + "' is not available");
-          if (organization == null)
-            throw new IllegalStateException("Organization '" + organization + "' is not available");
+          if (user == null) {
+            logger.warn("Unable to dispatch job {}: creator '{}' is not available", job.getId(), creator);
+            continue;
+          } else if (organization == null) {
+            logger.warn("Unable to dispatch job {}: organization '{}' is not available", job.getId(), organization);
+            continue;
+          }
+          securityService.setUser(user);
+
+          // Start dispatching
           try {
-            securityService.setUser(user);
-            securityService.setOrganization(organization);
             String hostAcceptingJob = dispatchJob(em, job,
                     filterAndSortServiceRegistrations(serviceRegistrations, job.getJobType(), hostLoads));
             if (hostAcceptingJob == null) {
@@ -1542,19 +1565,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
               case HttpStatus.SC_OK:
                 // this service is reachable, continue checking other services
                 logger.trace("Service " + service.toString() + " is responsive: " + response.getStatusLine());
-                if (!service.isOnline()) {
+                if (unresponsive.remove(service)) {
+                  logger.info("Service {} is still online", service);
+                } else if (!service.isOnline()) {
                   try {
-                    setOnlineStatus(service.getServiceType(), service.getHost(), service.getPath(),
-                            true, true);
+                    setOnlineStatus(service.getServiceType(), service.getHost(), service.getPath(), true, true);
                     logger.info("Service {} is back online", service);
                   } catch (ServiceRegistryException e) {
                     logger.warn("Error setting online status for {}", service);
                   }
                 }
-                unresponsive.remove(service);
                 continue;
               case HttpStatus.SC_SERVICE_UNAVAILABLE:
-                // this service appears overloaded.
+                // this service appears to be overloaded.
                 logger.warn("Service {} appears overloaded but will not be unregistered: {}", service.toString(),
                         response.getStatusLine());
                 unresponsive.remove(service);
@@ -1575,7 +1598,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
               unresponsiveCount++;
             }
           } catch (TrustedHttpClientException e) {
-            // We can not reach this host. Update the registration to indicate that the service is offline.
+            if (!service.isOnline())
+              continue;
+            unresponsiveCount++;
             logger.warn("Unable to reach {} : {}", service, e);
           }
 
@@ -1584,8 +1609,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry {
             if (unresponsive.contains(service)) {
               unRegisterService(service.getServiceType(), service.getHost());
               unresponsive.remove(service);
-              logger.warn("Marking {} as offline",
-                      service);
+              logger.warn("Marking {} as offline", service);
             } else {
               unresponsive.add(service);
               logger.warn("Added {} to the watch list", service);

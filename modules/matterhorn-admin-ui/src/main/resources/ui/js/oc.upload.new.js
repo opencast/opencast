@@ -51,7 +51,7 @@ var ocUpload = (function() {
     $('#series').autocomplete({
       source: function(request, response) {
         $.ajax({
-          url: ocUpload.SERIES_SEARCH_URL + '?q=' + request.term,
+          url: ocUpload.SERIES_SEARCH_URL + '?q=' + request.term + '&edit=true',
           dataType: 'json',
           type: 'GET',
           success: function(data) {

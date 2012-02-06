@@ -20,8 +20,6 @@ import org.opencastproject.serviceregistry.api.JaxbServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -33,7 +31,6 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -54,14 +51,14 @@ import javax.xml.bind.annotation.XmlType;
 @Access(AccessType.PROPERTY)
 @Table(name = "service_registration", uniqueConstraints = @UniqueConstraint(columnNames = { "host_registration", "service_type" }))
 @NamedQueries({
-        @NamedQuery(name = "ServiceRegistration.statistics", query = "SELECT sr, job.status, "
+        @NamedQuery(name = "ServiceRegistration.statistics", query = "SELECT job.processorServiceRegistration as serviceRegistration, job.status, "
                 + "count(job.status) as numJobs, " + "avg(job.queueTime) as meanQueue, "
-                + "avg(job.runTime) as meanRun FROM ServiceRegistration sr LEFT OUTER JOIN sr.processorJobs job "
-                + "group by sr, job.status"),
-        @NamedQuery(name = "ServiceRegistration.hostload", query = "SELECT sr, job.status, count(job.status) as numJobs "
-                + "FROM ServiceRegistration sr LEFT OUTER JOIN sr.processorJobs job "
-                + "WHERE sr.online=true and sr.hostRegistration.maintenanceMode=false "
-                + "GROUP BY sr, job.status"),
+                + "avg(job.runTime) as meanRun FROM Job job "
+                + "group by job.processorServiceRegistration, job.status"),
+        @NamedQuery(name = "ServiceRegistration.hostload", query = "SELECT job.processorServiceRegistration as serviceRegistration, job.status, count(job.status) as numJobs "
+                + "FROM Job job "
+                + "WHERE job.processorServiceRegistration.online=true and job.processorServiceRegistration.hostRegistration.maintenanceMode=false "
+                + "GROUP BY job.processorServiceRegistration, job.status"),
         @NamedQuery(name = "ServiceRegistration.getRegistration", query = "SELECT r from ServiceRegistration r "
                 + "where r.hostRegistration.baseUrl = :host and r.serviceType = :serviceType"),
         @NamedQuery(name = "ServiceRegistration.getAll", query = "SELECT rh FROM ServiceRegistration rh"),
@@ -75,16 +72,10 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
   private static final Logger logger = LoggerFactory.getLogger(ServiceRegistrationJpaImpl.class);
 
   /** The primary key */
-  protected Long id;
-
-  /** The set of jobs created with this service registration */
-  protected Set<JobJpaImpl> creatorJobs;
-
-  /** The set of jobs running on this service registration */
-  protected Set<JobJpaImpl> processorJobs;
+  private Long id;
 
   /** The host that provides this service */
-  protected HostRegistration hostRegistration;
+  private HostRegistration hostRegistration;
 
   /**
    * Creates a new service registration which is online
@@ -173,24 +164,6 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
   @Override
   public boolean isJobProducer() {
     return super.isJobProducer();
-  }
-
-  @OneToMany(mappedBy = "creatorServiceRegistration")
-  public Set<JobJpaImpl> getCreatorJobs() {
-    return creatorJobs;
-  }
-
-  public void setCreatorJobs(Set<JobJpaImpl> creatorJobs) {
-    this.creatorJobs = creatorJobs;
-  }
-
-  @OneToMany(mappedBy = "processorServiceRegistration")
-  public Set<JobJpaImpl> getProcessorJobs() {
-    return processorJobs;
-  }
-
-  public void setProcessorJobs(Set<JobJpaImpl> processorJobs) {
-    this.processorJobs = processorJobs;
   }
 
   /**
