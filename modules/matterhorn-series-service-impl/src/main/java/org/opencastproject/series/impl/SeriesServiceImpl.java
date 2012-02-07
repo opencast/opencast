@@ -15,20 +15,6 @@
  */
 package org.opencastproject.series.impl;
 
-import static org.opencastproject.event.EventAdminConstants.ID;
-import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
-import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
-import static org.opencastproject.event.EventAdminConstants.SERIES_TOPIC;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.util.RequireUtil.notNull;
-
-import java.io.IOException;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.UUID;
-
 import org.apache.commons.lang.StringUtils;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -49,6 +35,19 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.UUID;
+
+import static org.opencastproject.event.EventAdminConstants.ID;
+import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
+import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
+import static org.opencastproject.event.EventAdminConstants.SERIES_TOPIC;
+import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.util.RequireUtil.notNull;
 
 /**
  * Implements {@link SeriesService}. Uses {@link SeriesServiceDatabase} for permanent storage and
@@ -301,11 +300,7 @@ public class SeriesServiceImpl implements SeriesService {
   @Override
   public DublinCoreCatalogList getSeries(SeriesQuery query) throws SeriesException {
     try {
-      List<DublinCoreCatalog> result = index.search(query);
-      DublinCoreCatalogList dcList = new DublinCoreCatalogList();
-      dcList.setCatalogCount(getSeriesCount());
-      dcList.setCatalogList(result);
-      return dcList;
+      return index.search(query);
     } catch (SeriesServiceDatabaseException e) {
       logger.error("Failed to execute search query: {}", e.getMessage());
       throw new SeriesException(e);

@@ -41,79 +41,49 @@ import javax.xml.transform.stream.StreamResult;
 public class DublinCoreCatalogList {
 
   /** Array storing Dublin cores */
-  private List<DublinCoreCatalog> catalogList;
-  private int totalCatalogCount = 1;
-
-  /** Default no-arg constructor initialized with an empty catalog list */
-  public DublinCoreCatalogList() {
-    catalogList = new LinkedList<DublinCoreCatalog>();
-  }
+  private List<DublinCoreCatalog> catalogList = new LinkedList<DublinCoreCatalog>();
+  private long totalCatalogCount = 0;
 
   /**
    * Initialize with the given catalog list.
    * 
    * @param catalogs
    *          the catalogs to initialize this list with.
+   * @param totalCount
+   *          the total count of catalogs that match the creating query of this list
+   *          must be &gt;= catalogs.size
    */
-  public DublinCoreCatalogList(List<DublinCoreCatalog> catalogs) {
-    this();
+  public DublinCoreCatalogList(List<DublinCoreCatalog> catalogs, long totalCount) {
+    if (totalCount < catalogs.size())
+      throw new IllegalArgumentException("total count is less than the number of catalogs passed");
     catalogList.addAll(catalogs);
-    totalCatalogCount = catalogs.size();
+    totalCatalogCount = totalCount;
   }
 
   /**
-   * Returns list of DUblin Core currently stored
+   * Returns list of Dublin Core currently stored
    * 
    * @return List of {@link DublinCoreCatalog}s
    */
   public List<DublinCoreCatalog> getCatalogList() {
-    if (catalogList == null) {
-      return new LinkedList<DublinCoreCatalog>();
-    }
     return new LinkedList<DublinCoreCatalog>(catalogList);
   }
 
   /**
-   * Sets Dublin core catalog list.
-   * 
-   * @param catalogList
-   *          List of {@link DublinCoreCatalog}s
-   */
-  public void setCatalogList(List<DublinCoreCatalog> catalogList) {
-    this.catalogList = catalogList;
-    totalCatalogCount = catalogList.size();
-  }
-
-  /**
-   * Adds one Dublin core to the list.
-   * 
-   * @param catalog
-   *          {@link DublinCoreCatalog} to be added
-   */
-  public void addCatalog(DublinCoreCatalog catalog) {
-    if (catalog != null) {
-      catalogList.add(catalog);
-      totalCatalogCount = totalCatalogCount + 1;
-    }
-  }
-  
-  /**
-   * Get the total number of catalogs 
+   * Get the total number of catalogs matching the creating query. Is &gt;= {@link #size()}.
    * 
    * @return int totalCatalogCount
    */
   
-  public int getCatalogCount() {
+  public long getTotalCount() {
     return totalCatalogCount;
   }
-  
+
   /**
-   * Set the total number of catalogs
-   * 
-   * @param total
+   * Return the number of contained catalogs.
    */
-  public void setCatalogCount(int total) {
-    totalCatalogCount = total;
+  public long size() {
+    return catalogList.size();
   }
 
   /**
@@ -124,9 +94,6 @@ public class DublinCoreCatalogList {
    *           if serialization cannot be properly performed
    */
   public String getResultsAsXML() throws IOException {
-    if (catalogList == null)
-      catalogList = new LinkedList<DublinCoreCatalog>();
-
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       DocumentBuilder builder = factory.newDocumentBuilder();
@@ -158,10 +125,6 @@ public class DublinCoreCatalogList {
    */
   @SuppressWarnings("unchecked")
   public String getResultsAsJson() {
-    if (catalogList == null) {
-      catalogList = new LinkedList<DublinCoreCatalog>();
-    }
-
     JSONObject jsonObj = new JSONObject();
     JSONArray jsonArray = new JSONArray();
     for (DublinCoreCatalog catalog : catalogList) {

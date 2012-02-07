@@ -837,10 +837,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   @Override
   public DublinCoreCatalogList search(SchedulerQuery query) throws SchedulerException {
     try {
-      List<DublinCoreCatalog> resultList = index.search(query);
-      DublinCoreCatalogList dcList = new DublinCoreCatalogList();
-      dcList.setCatalogList(resultList);
-      return dcList;
+      return index.search(query);
     } catch (SchedulerServiceDatabaseException e) {
       logger.error("Could not execute query: {}", e.getMessage());
       throw new SchedulerException(e);
@@ -858,10 +855,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
           throws SchedulerException {
     SchedulerQuery q = new SchedulerQuery().setSpatial(captureDeviceID).setEndsFrom(startDate).setStartsTo(endDate);
     try {
-      List<DublinCoreCatalog> result = index.search(q);
-      DublinCoreCatalogList dcList = new DublinCoreCatalogList();
-      dcList.setCatalogList(result);
-      return dcList;
+      return index.search(q);
     } catch (SchedulerServiceDatabaseException e) {
       logger.error("Could not complete search after conflicting events for device '{}': {}", captureDeviceID,
               e.getMessage());
@@ -902,9 +896,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       events.addAll(filterEvents);
     }
 
-    DublinCoreCatalogList dcList = new DublinCoreCatalogList();
-    dcList.setCatalogList(events);
-    return dcList;
+    return new DublinCoreCatalogList(events, events.size());
   }
 
   /*
@@ -917,7 +909,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
     List<DublinCoreCatalog> eventList;
     try {
-      eventList = index.search(filter);
+      eventList = index.search(filter).getCatalogList();
     } catch (SchedulerServiceDatabaseException e) {
       logger.error("Failed to retrieve events for capture agent '{}'", filter);
       throw new SchedulerException(e);

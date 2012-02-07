@@ -18,6 +18,7 @@ package org.opencastproject.scheduler.impl.solr;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
@@ -85,7 +86,7 @@ public class SchedulerServiceSolrIndexTest {
 
     // SchedulerQuery q = new SchedulerQuery().setSpatial("Device one").setStartsTo(new Date());
     SchedulerQuery q = new SchedulerQuery().setSpatial("Device one").setStartsFrom(new Date());
-    List<DublinCoreCatalog> result = index.search(q);
+    DublinCoreCatalogList result = index.search(q);
     Assert.assertEquals(1, result.size());
 
     index.delete("1");
@@ -113,7 +114,7 @@ public class SchedulerServiceSolrIndexTest {
             !beforeIndexing.after(lastModified) && !afterIndexing.before(lastModified));
 
     SchedulerQuery q = new SchedulerQuery().setSpatial("Device one").setStartsFrom(new Date());
-    Assert.assertTrue("There should be no results", index.search(q).isEmpty());
+    Assert.assertTrue("There should be no results", index.search(q).getCatalogList().isEmpty());
 
     start = new Date(System.currentTimeMillis() + 60000);
     dc.set(DublinCore.PROPERTY_TEMPORAL, EncodingSchemeUtils.encodePeriod(new DCMIPeriod(start, end), Precision.Second));
@@ -127,7 +128,7 @@ public class SchedulerServiceSolrIndexTest {
             !beforeIndexing.after(lastModified) && !afterIndexing.before(lastModified));
 
     q = new SchedulerQuery().setSpatial("Device one").setStartsFrom(new Date());
-    Assert.assertTrue(!index.search(q).isEmpty());
+    Assert.assertTrue(!index.search(q).getCatalogList().isEmpty());
   }
 
   @Test
@@ -229,7 +230,7 @@ public class SchedulerServiceSolrIndexTest {
     Date conflictEnd = df.parse("03/01/2011 17:00:00");
     SchedulerQuery q = new SchedulerQuery().setSpatial("Device one").setEndsFrom(conflictStart)
             .setStartsTo(conflictEnd);
-    List<DublinCoreCatalog> result = index.search(q);
+    List<DublinCoreCatalog> result = index.search(q).getCatalogList();
     Assert.assertTrue("Incorrect number of conflicting events: " + result.size(), result.size() == 2);
   }
 
