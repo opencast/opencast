@@ -19,14 +19,14 @@ CREATE TABLE annotation (
 );
 
 CREATE TABLE capture_agent_role (
-	id VARCHAR(255) NOT NULL,
-	organization VARCHAR(255) NOT NULL,
+	id VARCHAR(128) NOT NULL,
+	organization VARCHAR(128) NOT NULL,
 	role VARCHAR(255)
 );
 
 CREATE TABLE capture_agent_state (
-	organization VARCHAR(255) NOT NULL,
-	id VARCHAR(255) NOT NULL,
+	organization VARCHAR(128) NOT NULL,
+	id VARCHAR(128) NOT NULL,
 	configuration TEXT(65535),
 	state TEXT(65535) NOT NULL,
 	last_heard_from BIGINT NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE job (
 	date_completed DATETIME,
 	operation TEXT(65535),
 	is_dispatchable TINYINT(1) default 0,
-	organization TEXT(65535) NOT NULL,
+	organization TEXT(128) NOT NULL,
 	date_created DATETIME,
 	queue_time BIGINT,
 	creator_service BIGINT,
@@ -86,14 +86,14 @@ CREATE TABLE job (
 );
 
 CREATE TABLE matterhorn_role (
-	username VARCHAR(255) NOT NULL,
-	organization VARCHAR(255) NOT NULL,
+	username VARCHAR(128) NOT NULL,
+	organization VARCHAR(128) NOT NULL,
 	role TEXT(65535)
 );
 
 CREATE TABLE matterhorn_user (
-	username VARCHAR(255) NOT NULL,
-	organization VARCHAR(255) NOT NULL,
+	username VARCHAR(128) NOT NULL,
+	organization VARCHAR(128) NOT NULL,
 	password TEXT(65535),
 	PRIMARY KEY (
 	username,
@@ -127,8 +127,8 @@ CREATE TABLE series (
 
 CREATE TABLE service_registration (
 	id BIGINT NOT NULL,
-	job_producer TINYINT(1) default 0 NOT NULL,
 	path TEXT(65535) NOT NULL,
+	job_producer TINYINT(1) default 0 NOT NULL,
 	service_type VARCHAR(255) NOT NULL,
 	online TINYINT(1) default 0 NOT NULL,
 	host_registration BIGINT,
