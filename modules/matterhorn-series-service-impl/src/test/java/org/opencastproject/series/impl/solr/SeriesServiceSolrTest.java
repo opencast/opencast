@@ -17,6 +17,7 @@ package org.opencastproject.series.impl.solr;
 
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -124,7 +125,7 @@ public class SeriesServiceSolrTest {
     index.index(secondCatalog);
 
     SeriesQuery q = new SeriesQuery().setSeriesTitle("cat");
-    List<DublinCoreCatalog> result = index.search(q);
+    DublinCoreCatalogList result = index.search(q);
     Assert.assertTrue("Only one title contains 'cat'", result.size() == 1);
 
     q = new SeriesQuery().setSeriesTitle("dog");
@@ -160,7 +161,7 @@ public class SeriesServiceSolrTest {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     SeriesQuery q = new SeriesQuery().setCreatedFrom(sdf.parse("2007-05-02")).setCreatedTo(sdf.parse("2007-05-06"));
-    List<DublinCoreCatalog> result = index.search(q);
+    DublinCoreCatalogList result = index.search(q);
     Assert.assertTrue("Two series satisfy time range", result.size() == 2);
   }
   

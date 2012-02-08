@@ -30,6 +30,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
@@ -766,11 +767,9 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see org.opencastproject.workflow.SeriesServiceIndex.WorkflowServiceIndex#getWorkflowInstances(org.opencastproject.workflow.api.WorkflowQuery)
    */
   @Override
-  public List<DublinCoreCatalog> search(SeriesQuery query) throws SeriesServiceDatabaseException {
+  public DublinCoreCatalogList search(SeriesQuery query) throws SeriesServiceDatabaseException {
     int count = query.getCount() > 0 ? (int) query.getCount() : 20; // default to 20 items if not specified
     int startPage = query.getStartPage() > 0 ? (int) query.getStartPage() : 0; // default to page zero
 
@@ -804,17 +803,15 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
         DublinCoreCatalog item = parseDublinCore((String) doc.get(SolrFields.XML_KEY));
         result.add(item);
       }
+      return new DublinCoreCatalogList(result, response.getResults().getNumFound());
     } catch (Exception e) {
       logger.error("Could not retrieve results: {}", e.getMessage());
       throw new SeriesServiceDatabaseException(e);
     }
-    return result;
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see org.opencastproject.workflow.SeriesServiceIndex.WorkflowServiceIndex#remove(long)
    */
   @Override
   public void delete(final String id) throws SeriesServiceDatabaseException {

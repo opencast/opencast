@@ -16,11 +16,11 @@
 package org.opencastproject.scheduler.impl;
 
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.scheduler.api.SchedulerQuery;
 import org.opencastproject.util.NotFoundException;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -82,7 +82,7 @@ public interface SchedulerServiceIndex {
    * @throws SchedulerServiceDatabaseException
    *           if query cannot be performed
    */
-  List<DublinCoreCatalog> search(SchedulerQuery query) throws SchedulerServiceDatabaseException;
+  DublinCoreCatalogList search(SchedulerQuery query) throws SchedulerServiceDatabaseException;
 
   /**
    * Removes event from index.
