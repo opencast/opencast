@@ -46,7 +46,7 @@ public class JpaUser {
   private static final long serialVersionUID = -6693877536928844019L;
 
   @Id
-  @Column(name = "username")
+  @Column(name = "username", length = 128)
   protected String username;
 
   @Lob
@@ -54,7 +54,7 @@ public class JpaUser {
   protected String password;
 
   @Id
-  @Column(name = "organization")
+  @Column(name = "organization", length = 128)
   protected String organization;
 
   @ElementCollection

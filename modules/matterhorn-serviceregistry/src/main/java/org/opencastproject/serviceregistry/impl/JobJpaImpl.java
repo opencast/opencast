@@ -176,7 +176,7 @@ public class JobJpaImpl extends JaxbJob {
 
   @Override
   @Lob
-  @Column(name = "organization", nullable = false, length = 65535)
+  @Column(name = "organization", nullable = false, length = 128)
   @XmlElement(name = "organization")
   public String getOrganization() {
     return organization;

@@ -59,7 +59,7 @@ public class AgentImpl implements Agent {
    * The name of the agent.
    */
   @Id
-  @Column(name = "id")
+  @Column(name = "id", length = 128)
   protected String name;
 
   /**
@@ -77,7 +77,7 @@ public class AgentImpl implements Agent {
   protected String url;
 
   @Id
-  @Column(name = "organization")
+  @Column(name = "organization", length = 128)
   protected String organization;
 
   /**
