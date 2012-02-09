@@ -16,11 +16,10 @@
 package org.opencastproject.series.impl;
 
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.util.NotFoundException;
-
-import java.util.List;
 
 /**
  * Defines methods for indexing, retrieving and searching through index.
@@ -106,7 +105,7 @@ public interface SeriesServiceIndex {
    * @throws SeriesServiceDatabaseException
    *           if query cannot be executed
    */
-  List<DublinCoreCatalog> search(SeriesQuery query) throws SeriesServiceDatabaseException;
+  DublinCoreCatalogList search(SeriesQuery query) throws SeriesServiceDatabaseException;
 
   /**
    * Returns number of series in search index, across all organizations.

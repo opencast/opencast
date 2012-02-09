@@ -18,6 +18,7 @@ package org.opencastproject.scheduler.impl.solr;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
@@ -604,8 +605,6 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
    *          The {@link StringBuilder} containing the query
    * @param key
    *          the key for this search parameter
-   * @param value
-   *          the value for this search parameter
    * @return the appended {@link StringBuilder}
    */
   private StringBuilder append(StringBuilder sb, String key, Date startDate, Date endDate) {
@@ -741,7 +740,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
    * org.opencastproject.scheduler.impl.SchedulerServiceIndex#search(org.opencastproject.scheduler.api.SchedulerQuery)
    */
   @Override
-  public List<DublinCoreCatalog> search(SchedulerQuery query) throws SchedulerServiceDatabaseException {
+  public DublinCoreCatalogList search(SchedulerQuery query) throws SchedulerServiceDatabaseException {
     SolrQuery solrQuery = new SolrQuery();
     if (query == null) {
       query = new SchedulerQuery();
@@ -772,10 +771,10 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
         DublinCoreCatalog dc = parseDublinCore((String) doc.get(SolrFields.XML_KEY));
         resultList.add(dc);
       }
+      return new DublinCoreCatalogList(resultList, response.getResults().getNumFound());
     } catch (Exception e) {
       throw new SchedulerServiceDatabaseException(e);
     }
-    return resultList;
   }
 
   /*

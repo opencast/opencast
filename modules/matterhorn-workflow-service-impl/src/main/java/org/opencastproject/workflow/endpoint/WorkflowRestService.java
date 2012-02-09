@@ -333,8 +333,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       JSONObject op = new JSONObject();
       op.put("name", operationDefinition.getId());
       op.put("description", operationDefinition.getDescription());
-      op.put("exception_handler_workflow", operationDefinition.getExceptionHandlingWorkflow());
-      op.put("fail_on_error", operationDefinition.isFailWorkflowOnException());
+      op.put("exception-handler-workflow", operationDefinition.getExceptionHandlingWorkflow());
+      op.put("fail-on-error", operationDefinition.isFailWorkflowOnException());
       opList.add(op);
     }
     json.put("operations", opList);
