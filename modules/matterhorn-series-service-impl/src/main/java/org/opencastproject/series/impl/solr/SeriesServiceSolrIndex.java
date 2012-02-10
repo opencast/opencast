@@ -303,7 +303,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
    * org.opencastproject.series.impl.SeriesServiceIndex#index(org.opencastproject.metadata.dublincore.DublinCoreCatalog)
    */
   @Override
-  public void index(DublinCoreCatalog dc) throws SeriesServiceDatabaseException {
+  public void updateIndex(DublinCoreCatalog dc) throws SeriesServiceDatabaseException {
 
     final SolrInputDocument doc = createDocument(dc);
 
@@ -340,7 +340,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
    * org.opencastproject.security.api.AccessControlList)
    */
   @Override
-  public void index(String seriesId, AccessControlList accessControl) throws NotFoundException,
+  public void updateSecurityPolicy(String seriesId, AccessControlList accessControl) throws NotFoundException,
           SeriesServiceDatabaseException {
     if (accessControl == null) {
       logger.warn("Access control parameter is null: skipping update for series '{}'", seriesId);

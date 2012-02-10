@@ -444,9 +444,9 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       doc.addField(SUBJECT_KEY, buf.toString());
     }
 
-    User workflowCreator = instance.getCreator(); 
-    doc.addField(WORKFLOW_CREATOR_KEY, workflowCreator.getUserName()); 
-    doc.addField(ORG_KEY, workflowCreator.getOrganization()); 
+    User workflowCreator = instance.getCreator();
+    doc.addField(WORKFLOW_CREATOR_KEY, workflowCreator.getUserName());
+    doc.addField(ORG_KEY, workflowCreator.getOrganization());
 
     try {
       AccessControlList acl = authorizationService.getAccessControlList(mp);
@@ -475,24 +475,25 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     List<String> writes = new ArrayList<String>();
     permissions.put(WRITE_PERMISSION, writes);
 
-    // The organization admins can read and write
     String adminRole = securityService.getOrganization().getAdminRole();
-    reads.add(adminRole);
-    writes.add(adminRole);
 
-    if (!acl.getEntries().isEmpty()) {
-      for (AccessControlEntry entry : acl.getEntries()) {
-        if (!entry.isAllow()) {
-          logger.warn("Workflow service does not support denial via ACL, ignoring {}", entry);
-          continue;
-        }
-        List<String> actionPermissions = permissions.get(entry.getAction());
-        if (actionPermissions == null) {
-          actionPermissions = new ArrayList<String>();
-          permissions.put(entry.getAction(), actionPermissions);
-        }
-        actionPermissions.add(entry.getRole());
+    // The admin user can read and write
+    if (adminRole != null) {
+      reads.add(adminRole);
+      writes.add(adminRole);
+    }
+
+    for (AccessControlEntry entry : acl.getEntries()) {
+      if (!entry.isAllow()) {
+        logger.warn("Workflow service does not support denial via ACL, ignoring {}", entry);
+        continue;
       }
+      List<String> actionPermissions = permissions.get(entry.getAction());
+      if (actionPermissions == null) {
+        actionPermissions = new ArrayList<String>();
+        permissions.put(entry.getAction(), actionPermissions);
+      }
+      actionPermissions.add(entry.getRole());
     }
 
     // Write the permissions to the solr document
@@ -571,7 +572,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       solrQuery.setFacetMinCount(0);
       solrQuery.setFacet(true);
       QueryResponse response = solrServer.query(solrQuery);
-      
+
       FacetField templateFacet = response.getFacetField(WORKFLOW_DEFINITION_KEY);
       FacetField operationFacet = response.getFacetField(OPERATION_KEY);
 
@@ -807,7 +808,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
     // Limit the results to only those workflow instances the current user can read
     appendSolrAuthFragment(sb);
-    
+
     logger.debug(sb.toString());
 
     return sb.toString();
