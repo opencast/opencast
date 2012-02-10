@@ -12,6 +12,7 @@ var ocUpload = (function() {
   this.UPLOAD_PROGRESS_INTERVAL = 2000;
   this.KILOBYTE = 1024;
   this.MEGABYTE = 1024 * 1024;
+  this.ANOYMOUS_URL = "/info/me.json";
 
   /** $(document).ready()
    *
@@ -580,15 +581,31 @@ ocUpload.Ingest = (function() {
 
   function createSeries(name) {
     var id = false;
-    var seriesXml = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn"><dcterms:title xmlns="">' + name + '</dcterms:title></dublincore>'
+    var seriesXml = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn"><dcterms:title xmlns="">' + name + '</dcterms:title></dublincore>';
+    var anonymous_role = 'anonymous';
+    
     ocUpload.UI.setProgress("Creating Series " + name);
+    $.ajax({
+        url: ocUpload.ANOYMOUS_URL,
+        type: 'GET',
+        dataType: 'json',
+        async: false,
+        error: function () {
+          if (ocUtils !== undefined) {
+            ocUtils.log("Could not retrieve anonymous role " + ocUpload.ANOYMOUS_URL);
+          }
+        },
+        success: function(data) {
+        	anonymous_role = data.org.anonymousRole;
+        }
+    });
     $.ajax({
       async: false,
       type: 'POST',
       url: ocUpload.SERIES_URL,
       data: {
         series: seriesXml,
-        acl: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:acl xmlns:ns2="org.opencastproject.security"><ace><role>anonymous</role><action>read</action><allow>true</allow></ace></ns2:acl>'
+        acl: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:acl xmlns:ns2="org.opencastproject.security"><ace><role>' + anonymous_role + '</role><action>read</action><allow>true</allow></ace></ns2:acl>'
       },
       dataType : 'xml',
       error: function() {
