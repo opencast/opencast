@@ -18,7 +18,6 @@ package org.opencastproject.event.handler;
 import static org.opencastproject.event.EventAdminConstants.ID;
 import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
 import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
-import static org.opencastproject.event.EventAdminConstants.SERIES_TOPIC;
 import static org.opencastproject.job.api.Job.Status.FINISHED;
 import static org.opencastproject.mediapackage.MediaPackageElementParser.getFromXml;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY;
@@ -30,8 +29,13 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobBarrier.Result;
 import org.opencastproject.mediapackage.Attachment;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
@@ -47,10 +51,14 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.series.api.SeriesException;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
@@ -75,6 +83,9 @@ public class SeriesUpdatedEventHandler implements EventHandler {
   /** The distribution service */
   protected DistributionService distributionService = null;
 
+  /** The series service */
+  protected SeriesService seriesService = null;
+
   /** The search service */
   protected SearchService searchService = null;
 
@@ -86,6 +97,12 @@ public class SeriesUpdatedEventHandler implements EventHandler {
 
   /** The organization directory */
   protected OrganizationDirectoryService organizationDirectoryService = null;
+
+  /** Dublin core catalog service */
+  protected DublinCoreCatalogService dublinCoreService = null;
+  
+  /** The workspace */
+  protected Workspace workspace = null;
 
   /** The system account to use for running asynchronous events */
   protected String systemAccount = null;
@@ -110,6 +127,30 @@ public class SeriesUpdatedEventHandler implements EventHandler {
    */
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
+  }
+
+  /**
+   * @param workspace
+   *          the workspace to set
+   */
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
+  }
+
+  /**
+   * @param seriesService
+   *          the series service to set
+   */
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
+  }
+
+  /**
+   * @param dublinCoreService
+   *          the dublin core service to set
+   */
+  public void setDublinCoreCatalogService(DublinCoreCatalogService dublinCoreService) {
+    this.dublinCoreService = dublinCoreService;
   }
 
   /**
@@ -161,78 +202,96 @@ public class SeriesUpdatedEventHandler implements EventHandler {
   public void handleEvent(final Event event) {
     logger.debug("Queuing {}", event);
 
+    // A series or its ACL has been updated. Find any mediapackages with that series, and update them.
     executor.execute(new Runnable() {
       @Override
       public void run() {
         logger.debug("Handling {}", event);
         String seriesId = (String) event.getProperty(ID);
 
-        if (SERIES_TOPIC.equals(event.getTopic()) || SERIES_ACL_TOPIC.equals(event.getTopic())) {
-          // A series or its ACL has been updated. Find any mediapackages with that series, and update them.
+        // We must be an administrative user to make this query
+        try {
+          DefaultOrganization defaultOrg = new DefaultOrganization();
+          securityService.setOrganization(defaultOrg);
+          securityService.setUser(new User(systemAccount, defaultOrg.getId(), new String[] { GLOBAL_ADMIN_ROLE }));
 
-          // We must be an administrative user to make this query
-          try {
-            DefaultOrganization defaultOrg = new DefaultOrganization();
-            securityService.setOrganization(defaultOrg);
-            securityService.setUser(new User(systemAccount, defaultOrg.getId(), new String[] { GLOBAL_ADMIN_ROLE }));
+          SearchQuery q = new SearchQuery().withId(seriesId);
+          SearchResult result = searchService.getForAdministrativeRead(q);
 
-            SearchQuery q = new SearchQuery().withId(seriesId);
-            SearchResult result = searchService.getForAdministrativeRead(q);
+          for (SearchResultItem item : result.getItems()) {
+            MediaPackage mp = item.getMediaPackage();
+            Organization org = organizationDirectoryService.getOrganization(item.getOrganization());
+            securityService.setOrganization(org);
 
-            for (SearchResultItem item : result.getItems()) {
-              MediaPackage mp = item.getMediaPackage();
-              Organization org = organizationDirectoryService.getOrganization(item.getOrganization());
-              securityService.setOrganization(org);
-              if (SERIES_ACL_TOPIC.equals(event.getTopic())) {
+            // If the security policy has been updated, make sure to distribute that change
+            // to the distribution channels as well
+            if (SERIES_ACL_TOPIC.equals(event.getTopic())) {
 
-                // Remove the original xacml policy attachments
-                Attachment[] originalXacmlAttachments = mp.getAttachments(XACML_POLICY);
-                if (originalXacmlAttachments.length > 0) {
-                  for (Attachment xacml : originalXacmlAttachments) {
-                    mp.remove(xacml);
-                  }
+              // Remove the original xacml policy attachments
+              Attachment[] originalXacmlAttachments = mp.getAttachments(XACML_POLICY);
+              if (originalXacmlAttachments.length > 0) {
+                for (Attachment xacml : originalXacmlAttachments) {
+                  mp.remove(xacml);
                 }
-
-                // Build a new XACML file for this mediapackage
-                AccessControlList acl = AccessControlParser.parseAcl((String) event.getProperty(PAYLOAD));
-                authorizationService.setAccessControl(mp, acl);
-                Attachment fileRepoCopy = mp.getAttachments(XACML_POLICY)[0];
-
-                // Distribute the updated XACML file
-                Job distributionJob = distributionService.distribute(mp, fileRepoCopy.getIdentifier());
-                JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
-                Result jobResult = barrier.waitForJobs();
-                if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
-                  mp.remove(fileRepoCopy);
-                  mp.add(getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload()));
-                }
-
               }
-              // Update the search index with the modified mediapackage
-              searchService.add(mp);
+
+              // Build a new XACML file for this mediapackage
+              AccessControlList acl = AccessControlParser.parseAcl((String) event.getProperty(PAYLOAD));
+              authorizationService.setAccessControl(mp, acl);
+              Attachment fileRepoCopy = mp.getAttachments(XACML_POLICY)[0];
+
+              // Distribute the updated XACML file
+              Job distributionJob = distributionService.distribute(mp, fileRepoCopy.getIdentifier());
+              JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
+              Result jobResult = barrier.waitForJobs();
+              if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
+                mp.remove(fileRepoCopy);
+                mp.add(getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload()));
+              }
             }
-          } catch (SearchException e) {
-            logger.warn("Unable to find mediapackages in search: ", e.getMessage());
-          } catch (UnauthorizedException e) {
-            logger.warn(e.getMessage());
-          } catch (MediaPackageException e) {
-            logger.warn(e.getMessage());
-          } catch (ServiceRegistryException e) {
-            logger.warn(e.getMessage());
-          } catch (NotFoundException e) {
-            logger.warn(e.getMessage());
-          } catch (IOException e) {
-            logger.warn(e.getMessage());
-          } catch (AccessControlParsingException e) {
-            logger.warn(e.getMessage());
-          } catch (DistributionException e) {
-            logger.warn(e.getMessage());
-          } finally {
-            securityService.setOrganization(null);
-            securityService.setUser(null);
+
+            // Update the series dublin core
+            DublinCoreCatalog seriesDublinCore = seriesService.getSeries(seriesId);
+            mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
+            
+            // Update the series dublin core
+            Catalog[] seriesCatalogs = mp.getCatalogs(MediaPackageElements.SERIES);
+            if (seriesCatalogs.length == 1) {
+              Catalog c = seriesCatalogs[0];
+              String filename = FilenameUtils.getName(c.getURI().toString());
+              workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename, dublinCoreService.serialize(seriesDublinCore));
+
+              // Distribute the updated series dc
+              Job distributionJob = distributionService.distribute(mp, c.getIdentifier());
+              JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
+              barrier.waitForJobs();
+            }
+
+            // Update the search index with the modified mediapackage
+            searchService.add(mp);
           }
-        } else {
-          logger.debug("Skipping event on topic {}, since this is of no concern to search", event.getTopic());
+
+        } catch (SearchException e) {
+          logger.warn("Unable to find mediapackages in search: ", e.getMessage());
+        } catch (UnauthorizedException e) {
+          logger.warn(e.getMessage());
+        } catch (MediaPackageException e) {
+          logger.warn(e.getMessage());
+        } catch (ServiceRegistryException e) {
+          logger.warn(e.getMessage());
+        } catch (NotFoundException e) {
+          logger.warn(e.getMessage());
+        } catch (IOException e) {
+          logger.warn(e.getMessage());
+        } catch (AccessControlParsingException e) {
+          logger.warn(e.getMessage());
+        } catch (DistributionException e) {
+          logger.warn(e.getMessage());
+        } catch (SeriesException e) {
+          logger.warn(e.getMessage());
+        } finally {
+          securityService.setOrganization(null);
+          securityService.setUser(null);
         }
       }
     });
