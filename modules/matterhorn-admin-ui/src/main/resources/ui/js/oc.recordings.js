@@ -574,7 +574,7 @@ ocRecordings = new (function() {
   /** Make the page reload with the currently set configuration
    */
   this.reload = function() {
-    document.location.reload();
+    document.location.href = "/admin/index.html#/recordings?" + ocRecordings.buildURLparams();
   }
   
   /** Returns the workflow with the specified id from the currently loaded
