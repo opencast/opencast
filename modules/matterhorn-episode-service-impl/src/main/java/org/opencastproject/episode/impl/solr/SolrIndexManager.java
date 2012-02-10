@@ -16,15 +16,10 @@
 
 package org.opencastproject.episode.impl.solr;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.params.SolrParams;
-import org.apache.solr.servlet.SolrRequestParsers;
+import static org.opencastproject.episode.api.EpisodeService.READ_PERMISSION;
+import static org.opencastproject.episode.api.EpisodeService.WRITE_PERMISSION;
+import static org.opencastproject.util.RequireUtil.notNull;
+
 import org.opencastproject.episode.api.SearchResultItem.SearchResultItemType;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
@@ -71,6 +66,16 @@ import org.opencastproject.util.data.CollectionUtil;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.SolrParams;
+import org.apache.solr.servlet.SolrRequestParsers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,10 +96,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import static org.opencastproject.episode.api.EpisodeService.READ_PERMISSION;
-import static org.opencastproject.episode.api.EpisodeService.WRITE_PERMISSION;
-import static org.opencastproject.util.RequireUtil.notNull;
 
 /**
  * Utility class used to manage the search index.
@@ -254,8 +255,8 @@ public class SolrIndexManager {
       QueryResponse solrResponse = null;
       try {
         SolrQuery query = new SolrQuery(Schema.ID + ":" + id);
-//                + " AND -" + Schema.OC_DELETED + ":[* TO *]"
-//                + " AND " + Schema.OC_LOCKED + ":" + (!locked));
+        // + " AND -" + Schema.OC_DELETED + ":[* TO *]"
+        // + " AND " + Schema.OC_LOCKED + ":" + (!locked));
         solrResponse = solrServer.query(query);
       } catch (Exception e) {
         throw new SolrServerException(e);
@@ -646,33 +647,25 @@ public class SolrIndexManager {
       writes.add(adminRole);
     }
 
-    if (acl.getEntries().isEmpty()) {
-      // if no access control is specified, we let the anonymous roles read the mediapackage
-      if (anonymousRole != null) {
-        reads.add(anonymousRole);
+    for (AccessControlEntry entry : acl.getEntries()) {
+      if (!entry.isAllow()) {
+        logger.warn("Search service does not support denial via ACL, ignoring {}", entry);
+        continue;
       }
-      permissions.put(READ_PERMISSION, reads);
-    } else {
-      for (AccessControlEntry entry : acl.getEntries()) {
-        if (!entry.isAllow()) {
-          logger.warn("Search service does not support denial via ACL, ignoring {}", entry);
-          continue;
-        }
-        List<String> actionPermissions = permissions.get(entry.getAction());
-        /*MH-8353 a series could have a permission defined we don't know how
-         * to handle -DH
-        */
-        if (actionPermissions == null) {
-        	logger.warn("Search service doesn't know how to handle action: " + entry.getAction());
-        	continue;
-        }
-        if (acl == null) {
-        	actionPermissions = new ArrayList<String>();
-        	permissions.put(entry.getAction(), actionPermissions);
-        }
-        actionPermissions.add(entry.getRole());
+      List<String> actionPermissions = permissions.get(entry.getAction());
+      /*
+       * MH-8353 a series could have a permission defined we don't know how to handle -DH
+       */
+      if (actionPermissions == null) {
+        logger.warn("Search service doesn't know how to handle action: " + entry.getAction());
+        continue;
+      }
+      if (acl == null) {
+        actionPermissions = new ArrayList<String>();
+        permissions.put(entry.getAction(), actionPermissions);
+      }
+      actionPermissions.add(entry.getRole());
 
-      }
     }
 
     // Write the permissions to the solr document

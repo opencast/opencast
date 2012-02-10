@@ -182,10 +182,6 @@ public final class SearchServiceImpl implements SearchService {
             return setupSolr(solrServerUrl);
           } catch (MalformedURLException e) {
             throw connectError(solrServerUrlConfig, e);
-          } catch (SolrServerException e) {
-            throw connectError(solrServerUrlConfig, e);
-          } catch (IOException e) {
-            throw connectError(solrServerUrlConfig, e);
           }
         } else if (cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT) != null) {
           String solrRoot = cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT);
@@ -236,8 +232,6 @@ public final class SearchServiceImpl implements SearchService {
       throw new IllegalStateException("Can not read the mediapackages from jobs in the service registry", e);
     } catch (SolrServerException e) {
       throw new IllegalStateException("Can not read the solr index", e);
-    } catch (UnauthorizedException e) {
-      throw new IllegalStateException("Operation not permitted", e);
     }
   }
 
@@ -296,7 +290,7 @@ public final class SearchServiceImpl implements SearchService {
    * @param url
    *          the url of the remote solr server
    */
-  static SolrServer setupSolr(URL url) throws IOException, SolrServerException {
+  static SolrServer setupSolr(URL url) {
     logger.info("Connecting to solr search index at {}", url);
     return SolrServerFactory.newRemoteInstance(url);
   }
@@ -442,8 +436,7 @@ public final class SearchServiceImpl implements SearchService {
   }
 
   // FIXME: this should use paging. It is a work in progress...
-  protected void populateIndex() throws ServiceRegistryException, MediaPackageException, SolrServerException,
-          UnauthorizedException {
+  protected void populateIndex() throws ServiceRegistryException, MediaPackageException {
     List<Job> jobs = serviceRegistry.getJobs(JOB_TYPE, Status.FINISHED);
     Organization originalOrg = securityService.getOrganization();
     for (Job job : jobs) {
@@ -456,6 +449,8 @@ public final class SearchServiceImpl implements SearchService {
         indexManager.add(mediaPackage, acl);
       } catch (NotFoundException e) {
         logger.warn("{} is not a registered organization", orgId);
+      } catch (Exception e) {
+        logger.warn("Error adding mediapackage {} to index: {}", mediaPackage, e.getMessage());
       } finally {
         securityService.setOrganization(originalOrg);
       }

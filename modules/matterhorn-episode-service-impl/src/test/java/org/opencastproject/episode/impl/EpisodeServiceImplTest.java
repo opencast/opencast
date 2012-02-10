@@ -16,16 +16,23 @@
 
 package org.opencastproject.episode.impl;
 
-import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.solr.client.solrj.SolrServer;
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ADMIN;
+import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ANONYMOUS;
+import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
+import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_NAME;
+import static org.opencastproject.util.UrlSupport.DEFAULT_BASE_URL;
+
+import org.opencastproject.episode.api.EpisodeQuery;
+import org.opencastproject.episode.api.EpisodeService;
+import org.opencastproject.episode.api.SearchResult;
+import org.opencastproject.episode.api.SearchResultItem;
+import org.opencastproject.episode.impl.solr.SolrIndexManager;
+import org.opencastproject.episode.impl.solr.SolrRequester;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -39,12 +46,6 @@ import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
-import org.opencastproject.episode.api.EpisodeQuery;
-import org.opencastproject.episode.api.SearchResult;
-import org.opencastproject.episode.api.SearchResultItem;
-import org.opencastproject.episode.api.EpisodeService;
-import org.opencastproject.episode.impl.solr.SolrIndexManager;
-import org.opencastproject.episode.impl.solr.SolrRequester;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
@@ -59,6 +60,18 @@ import org.opencastproject.series.impl.solr.SeriesServiceSolrIndex;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workspace.api.Workspace;
 
+import junit.framework.Assert;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.solr.client.solrj.SolrServer;
+import org.easymock.EasyMock;
+import org.easymock.IAnswer;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,17 +81,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ADMIN;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ANONYMOUS;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_NAME;
-import static org.opencastproject.util.UrlSupport.DEFAULT_BASE_URL;
 
 /**
  * Tests the functionality of the search service.
@@ -179,10 +181,10 @@ public class EpisodeServiceImplTest {
     service.setServiceRegistry(serviceRegistry);
     SolrServer solrServer = EpisodeServiceImpl.setupSolr(new File(solrRoot));
     service.testSetup(solrServer, new SolrRequester(solrServer, securityService), new SolrIndexManager(solrServer,
-        workspace, Arrays.asList(mdService), seriesService, mpeg7CatalogService, securityService));
+            workspace, Arrays.asList(mdService), seriesService, mpeg7CatalogService, securityService));
 
     // acl
-    acl = new AccessControlList();
+    acl = new AccessControlList(new AccessControlEntry("ROLE_ANONYMOUS", "read", true));
     authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     EasyMock.expect(authorizationService.getAccessControlList((MediaPackage) EasyMock.anyObject())).andReturn(acl)
             .anyTimes();
@@ -232,8 +234,8 @@ public class EpisodeServiceImplTest {
     MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
 
     // Make sure our mocked ACL has the read and write permission
-    acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
+    acl.getEntries().add(
+            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
     acl.getEntries().add(
             new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
 
@@ -266,10 +268,10 @@ public class EpisodeServiceImplTest {
     MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
 
     // Make sure our mocked ACL has the read and write permission
-    acl.getEntries()
-        .add(new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
     acl.getEntries().add(
-        new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
+            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
+    acl.getEntries().add(
+            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
 
     // Add the media package to the episode service
     service.add(mediaPackage);
@@ -337,8 +339,8 @@ public class EpisodeServiceImplTest {
     MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
 
     // Make sure our mocked ACL has the read and write permission
-    acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
+    acl.getEntries().add(
+            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
     acl.getEntries().add(
             new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
 
@@ -385,8 +387,8 @@ public class EpisodeServiceImplTest {
     }
 
     // Make sure our mocked ACL has the read and write permission
-    acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
+    acl.getEntries().add(
+            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
     acl.getEntries().add(
             new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
 
@@ -409,8 +411,8 @@ public class EpisodeServiceImplTest {
     MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
 
     // Make sure our mocked ACL has the read and write permission
-    acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
+    acl.getEntries().add(
+            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
     acl.getEntries().add(
             new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
 
@@ -473,8 +475,8 @@ public class EpisodeServiceImplTest {
     }
 
     // Make sure our mocked ACL has the read and write permission
-    acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
+    acl.getEntries().add(
+            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
     acl.getEntries().add(
             new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
 
