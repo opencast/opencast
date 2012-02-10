@@ -505,6 +505,14 @@ public class SolrRequester {
     sb.append(uq);
     sb.append(") ");
 
+    // see http://wiki.apache.org/lucene-java/LuceneFAQ#Are_Wildcard.2C_Prefix.2C_and_Fuzzy_queries_case_sensitive.3F
+    // for an explanation why .toLowerCase() is used here. This behaviour is tracked in SOLR-219.
+    // It's also important not to stem when using wildcard queries. Please adjust the schema.xml accordingly.
+    sb.append(Schema.FULLTEXT);
+    sb.append(":(*");
+    sb.append(uq.toLowerCase());
+    sb.append("*) ");
+
     sb.append(")");
 
     return sb;
