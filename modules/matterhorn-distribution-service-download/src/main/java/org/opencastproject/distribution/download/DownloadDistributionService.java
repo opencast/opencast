@@ -178,7 +178,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
       logger.info("Distributing {} to {}", elementId, destination);
 
       try {
-        FileSupport.link(sourceFile, destination);
+        FileSupport.link(sourceFile, destination, true);
       } catch (IOException e) {
         throw new DistributionException("Unable to copy " + sourceFile + " to " + destination, e);
       }
