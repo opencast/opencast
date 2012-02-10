@@ -130,6 +130,14 @@ public class SeriesUpdatedEventHandler implements EventHandler {
   }
 
   /**
+   * @param workspace
+   *          the workspace to set
+   */
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
+  }
+
+  /**
    * @param seriesService
    *          the series service to set
    */
