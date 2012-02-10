@@ -101,12 +101,19 @@ public class SearchServiceImplTest {
   /** The authorization service */
   private AuthorizationService authorizationService = null;
 
+  /** Student role */
+  private static final String ROLE_STUDENT = "ROLE_STUDENT";
+
+  /** Other student role */
+  private static final String ROLE_OTHER_STUDENT = "ROLE_OTHER_STUDENT";
+
   /** A user with permissions. */
-  private final User userWithPermissions = new User("sample", "opencastproject.org", new String[] { "ROLE_STUDENT",
-          "ROLE_OTHERSTUDENT", new DefaultOrganization().getAnonymousRole() });
+  private final User userWithPermissions = new User("sample", "opencastproject.org", new String[] { ROLE_STUDENT,
+          ROLE_OTHER_STUDENT, new DefaultOrganization().getAnonymousRole() });
 
   /** A user without permissions. */
-  private final User userWithoutPermissions = new User("sample", "opencastproject.org", new String[] { "ROLE_NOTHING" });
+  private final User userWithoutPermissions = new User("sample", "opencastproject.org", new String[] { "ROLE_NOTHING",
+          new DefaultOrganization().getAnonymousRole() });
 
   private final Organization defaultOrganization = new DefaultOrganization();
   private final User defaultUser = userWithPermissions;
@@ -234,9 +241,9 @@ public class SearchServiceImplTest {
 
     // Make sure our mocked ACL has the read and write permission
     acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.READ_PERMISSION, true));
+            .add(new AccessControlEntry(ROLE_STUDENT, SearchService.READ_PERMISSION, true));
     acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.WRITE_PERMISSION, true));
+            new AccessControlEntry(ROLE_STUDENT, SearchService.WRITE_PERMISSION, true));
 
     // Add the media package to the search index
     service.add(mediaPackage);
@@ -251,7 +258,7 @@ public class SearchServiceImplTest {
     acl.getEntries().clear();
     acl.getEntries().add(new AccessControlEntry("ROLE_UNKNOWN", SearchService.READ_PERMISSION, true));
     acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.WRITE_PERMISSION, true));
+            new AccessControlEntry(ROLE_STUDENT, SearchService.WRITE_PERMISSION, true));
 
     // Add the media package to the search index
     service.add(mediaPackage);
@@ -334,7 +341,6 @@ public class SearchServiceImplTest {
     assertEquals(1, service.getByQuery(new SearchQuery().withText("Institut")).size());
   }
 
-
   /**
    * Adds a simple media package that has a dublin core for the episode only.
    */
@@ -344,9 +350,9 @@ public class SearchServiceImplTest {
 
     // Make sure our mocked ACL has the read and write permission
     acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.READ_PERMISSION, true));
+            .add(new AccessControlEntry(ROLE_STUDENT, SearchService.READ_PERMISSION, true));
     acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.WRITE_PERMISSION, true));
+            new AccessControlEntry(ROLE_STUDENT, SearchService.WRITE_PERMISSION, true));
 
     // Add the media package to the search index
     service.add(mediaPackage);
@@ -398,9 +404,9 @@ public class SearchServiceImplTest {
 
     // Make sure our mocked ACL has the read and write permission
     acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.READ_PERMISSION, true));
+            .add(new AccessControlEntry(ROLE_STUDENT, SearchService.READ_PERMISSION, true));
     acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.WRITE_PERMISSION, true));
+            new AccessControlEntry(ROLE_STUDENT, SearchService.WRITE_PERMISSION, true));
 
     // Add the media package to the search index
     service.add(mediaPackage);
@@ -424,9 +430,9 @@ public class SearchServiceImplTest {
 
     // Make sure our mocked ACL has the read and write permission
     acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.READ_PERMISSION, true));
+            .add(new AccessControlEntry(ROLE_STUDENT, SearchService.READ_PERMISSION, true));
     acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.WRITE_PERMISSION, true));
+            new AccessControlEntry(ROLE_STUDENT, SearchService.WRITE_PERMISSION, true));
 
     // Add the media package to the search index
     service.add(mediaPackage);
@@ -490,9 +496,9 @@ public class SearchServiceImplTest {
 
     // Make sure our mocked ACL has the read and write permission
     acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.READ_PERMISSION, true));
+            .add(new AccessControlEntry(ROLE_STUDENT, SearchService.READ_PERMISSION, true));
     acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.WRITE_PERMISSION, true));
+            new AccessControlEntry(ROLE_STUDENT, SearchService.WRITE_PERMISSION, true));
 
     // Add the media package to the search index
     service.add(mediaPackage);
