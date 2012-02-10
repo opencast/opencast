@@ -653,6 +653,7 @@ public class SolrRequester {
       sb.append(" AND ").append(Schema.OC_ORGANIZATION).append(":").append(securityService.getOrganization().getId());
       User user = securityService.getUser();
       String[] roles = user.getRoles();
+      boolean userHasAnonymousRole = false;
       if (roles.length > 0) {
         sb.append(" AND (");
         StringBuilder roleList = new StringBuilder();
@@ -660,7 +661,16 @@ public class SolrRequester {
           if (roleList.length() > 0)
             roleList.append(" OR ");
           roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":").append(role);
+          if (role.equalsIgnoreCase(securityService.getOrganization().getAnonymousRole())) {
+            userHasAnonymousRole = true;
+          }
         }
+        if (!userHasAnonymousRole) {
+          if (roleList.length() > 0)
+            roleList.append(" OR ");
+          roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":").append(securityService.getOrganization().getAnonymousRole());
+        }
+
         sb.append(roleList.toString());
         sb.append(")");
       }
