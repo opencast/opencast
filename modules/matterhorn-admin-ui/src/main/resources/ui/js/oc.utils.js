@@ -324,7 +324,7 @@ ocUtils.exists = function(obj) {
 };
 
 ocUtils.contains = function(array, value) {
-  return array.indexOf(value) >= 0;
+  return $.inArray(value, array) >= 0;
 }
 
 ocUtils.getDCJSONParam = function(dcJSON, param, namespace) {
