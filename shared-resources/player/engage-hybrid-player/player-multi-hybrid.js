@@ -1462,7 +1462,7 @@ Opencast.Player = (function ()
     {
         var playheadString = $("#oc_edit-time").attr("value");
         var durationString = $("#oc_duration").text();
-        playheadString = playheadString.replace(/[-\/]/g, ':');
+        playheadString = playheadString.replace(/[-\/\.]/g, ':');
         playheadString = playheadString.replace(/[^0-9:]/g, '');
         playheadString = playheadString.replace(/ +/g, ' ');
         var playheadArray = playheadString.split(':');
@@ -1477,7 +1477,7 @@ Opencast.Player = (function ()
             var durationSeconds = parseInt(durationArray[2], 10);
             if (playheadHour > 99 || playheadMinutes > 59 || playheadSeconds > 59)
             {
-                addAlert('Wrong time enter like this: HH:MM:SS');
+                addAlert('Wrong time enter like this: HH:MM:SS or HH.MM.SS');
                 $("#oc_edit-time").addClass("oc_edit-time-error");
             }
             else
@@ -1486,7 +1486,7 @@ Opencast.Player = (function ()
                 durationSeconds = (durationHour * 60 * 60) + (durationMinutes * 60) + (durationSeconds);
                 if (isNaN(newPlayhead) || newPlayhead > durationSeconds)
                 {
-                    addAlert('Wrong time enter like this: HH:MM:SS');
+                    addAlert('Wrong time enter like this: HH:MM:SS or HH.MM.SS');
                     $("#oc_edit-time").addClass("oc_edit-time-error");
                     //addEvent('BAD-EDIT-TIME');
                 }
@@ -1500,7 +1500,7 @@ Opencast.Player = (function ()
         }
         catch (exception)
         {
-            addAlert('Wrong time enter like this: HH:MM:SS');
+            addAlert('Wrong time enter like this: HH:MM:SS or HH.MM.SS');
             $("#oc_edit-time").addClass("oc_edit-time-error");
             //addEvent('EDIT-TIME-EXCEPTION');
         }
