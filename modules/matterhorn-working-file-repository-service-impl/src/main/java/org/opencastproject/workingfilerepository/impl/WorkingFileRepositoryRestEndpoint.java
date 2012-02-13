@@ -45,6 +45,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -85,7 +86,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
    * @param cc
    *          OSGi component context
    */
-  public void activate(ComponentContext cc) {
+  public void activate(ComponentContext cc) throws IOException {
     super.activate(cc);
   }
 
@@ -119,10 +120,15 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestParameter(name = "mediaPackageID", description = "the mediapackage identifier", isRequired = true, type = STRING),
           @RestParameter(name = "mediaPackageElementID", description = "the mediapackage element identifier", isRequired = true, type = STRING),
           @RestParameter(name = "filename", description = "the filename", isRequired = true, type = FILE) }, reponses = { @RestResponse(responseCode = SC_OK, description = "OK, file stored") })
-  public Response restPutURLEncoded(@PathParam("mediaPackageID") String mediaPackageID,
+  public Response restPutURLEncoded(@Context HttpServletRequest request,
+          @PathParam("mediaPackageID") String mediaPackageID,
           @PathParam("mediaPackageElementID") String mediaPackageElementID, @PathParam("filename") String filename,
           @FormParam("content") String content) throws Exception {
-    URI url = this.put(mediaPackageID, mediaPackageElementID, filename, IOUtils.toInputStream(content));
+    String encoding = request.getCharacterEncoding();
+    if (encoding == null)
+      encoding = "utf-8";
+
+    URI url = this.put(mediaPackageID, mediaPackageElementID, filename, IOUtils.toInputStream(content, encoding));
     return Response.ok(url.toString()).build();
   }
 
@@ -185,7 +191,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGet(@PathParam("mediaPackageID") String mediaPackageID,
           @PathParam("mediaPackageElementID") String mediaPackageElementID,
-          @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException {
+          @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException, IOException {
 
     String md5 = null;
     InputStream in = null;
@@ -202,9 +208,9 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
 
     String contentType = null;
     try {
-      in = this.get(mediaPackageID, mediaPackageElementID);
+      in = get(mediaPackageID, mediaPackageElementID);
       contentType = extractContentType(in);
-      return Response.ok(this.get(mediaPackageID, mediaPackageElementID)).header("Content-Type", contentType).build();
+      return Response.ok(get(mediaPackageID, mediaPackageElementID)).header("Content-Type", contentType).build();
     } catch (IllegalStateException e) {
       IOUtils.closeQuietly(in);
       throw new NotFoundException();
@@ -289,8 +295,13 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_OK, description = "File returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGetFromCollection(@PathParam("collectionId") String collectionId,
-          @PathParam("fileName") String fileName) throws NotFoundException {
-    InputStream in = super.getFromCollection(collectionId, fileName);
+          @PathParam("fileName") String fileName) throws NotFoundException, IOException {
+    InputStream in;
+    try {
+      in = super.getFromCollection(collectionId, fileName);
+    } catch (FileNotFoundException e) {
+      throw new NotFoundException(e);
+    }
     String contentType = mimeMap.getContentType(fileName);
     int contentLength = 0;
     try {

@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -76,7 +75,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   /**
    * Activate the component
    */
-  public void activate(ComponentContext cc) {
+  public void activate(ComponentContext cc) throws IOException {
     if (rootDirectory != null)
       return; // If the root directory was set, respect that setting
 
@@ -111,7 +110,14 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     } else {
       rootDirectory = cc.getBundleContext().getProperty("org.opencastproject.file.repo.path");
     }
-    createRootDirectory();
+
+    try {
+      createRootDirectory();
+    } catch (IOException e) {
+      logger.error("Unable to create the working file repository root directory at {}", rootDirectory);
+      throw e;
+    }
+
     logger.info(getDiskSpace());
   }
 
@@ -143,18 +149,14 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * 
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#get(java.lang.String, java.lang.String)
    */
-  public InputStream get(String mediaPackageID, String mediaPackageElementID) throws NotFoundException {
+  public InputStream get(String mediaPackageID, String mediaPackageElementID) throws NotFoundException, IOException {
     checkPathSafe(mediaPackageID);
     checkPathSafe(mediaPackageElementID);
     File f = getFile(mediaPackageID, mediaPackageElementID);
     if (f == null)
       throw new NotFoundException("Unable to locate " + f + " in the working file repository");
     logger.debug("Attempting to read file {}", f.getAbsolutePath());
-    try {
-      return new FileInputStream(f);
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
-    }
+    return new FileInputStream(f);
   }
 
   /**
@@ -241,12 +243,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
         }
       }
     } else {
-      try {
-        logger.debug("Attempting to create a new directory at {}", dir.getAbsolutePath());
-        FileUtils.forceMkdir(dir);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+      logger.debug("Attempting to create a new directory at {}", dir.getAbsolutePath());
+      FileUtils.forceMkdir(dir);
     }
     f = new File(dir, PathSupport.toSafeName(filename));
     logger.debug("Attempting to write a file to {}", f.getAbsolutePath());
@@ -259,11 +257,14 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       }
       out = new FileOutputStream(f);
       IOUtils.copy(in, out);
+      createMd5(f);
+    } catch (IOException e) {
+      FileUtils.deleteDirectory(dir);
+      throw e;
     } finally {
       IOUtils.closeQuietly(out);
       IOUtils.closeQuietly(in);
     }
-    createMd5(f);
     return getURI(mediaPackageID, mediaPackageElementID, filename);
   }
 
@@ -277,13 +278,17 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    */
   protected File createMd5(File f) throws IOException {
     FileInputStream md5In = null;
+    File md5File = null;
     try {
       md5In = new FileInputStream(f);
       String md5 = DigestUtils.md5Hex(md5In);
       IOUtils.closeQuietly(md5In);
-      File md5File = getMd5File(f);
+      md5File = getMd5File(f);
       FileUtils.writeStringToFile(md5File, md5);
       return md5File;
+    } catch (IOException e) {
+      FileUtils.deleteQuietly(md5File);
+      throw e;
     } finally {
       IOUtils.closeQuietly(md5In);
     }
@@ -383,15 +388,10 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     return collectionDir;
   }
 
-  void createRootDirectory() {
+  void createRootDirectory() throws IOException {
     File f = new File(rootDirectory);
-    if (!f.exists()) {
-      try {
-        FileUtils.forceMkdir(f);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    }
+    if (!f.exists())
+      FileUtils.forceMkdir(f);
   }
 
   /**
@@ -417,22 +417,21 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    *      java.lang.String)
    */
   @Override
-  public InputStream getFromCollection(String collectionId, String fileName) throws NotFoundException {
+  public InputStream getFromCollection(String collectionId, String fileName) throws NotFoundException, IOException {
     checkPathSafe(collectionId);
     File f = getFileFromCollection(collectionId, fileName);
     if (f == null || !f.isFile()) {
       throw new NotFoundException("Unable to locate " + f + " in the working file repository");
     }
     logger.debug("Attempting to read file {}", f.getAbsolutePath());
-    try {
-      return new FileInputStream(f);
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
-    }
+    return new FileInputStream(f);
   }
 
   /**
    * {@inheritDoc}
+   * 
+   * @throws IOException
+   *           if the hash can't be created
    * 
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#putInCollection(java.lang.String,
    *      java.lang.String, java.io.InputStream)
@@ -459,13 +458,14 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       }
       out = new FileOutputStream(f);
       IOUtils.copy(in, out);
+      createMd5(f);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      FileUtils.deleteQuietly(f);
+      throw e;
     } finally {
       IOUtils.closeQuietly(out);
       IOUtils.closeQuietly(in);
     }
-    createMd5(f);
     return getCollectionURI(collectionId, fileName);
   }
 
@@ -491,9 +491,14 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
                 + "' : " + e);
       }
     }
-    File destFile = new File(destDir, toFileName);
-    FileSupport.copy(source, destFile);
-    createMd5(destFile);
+    File destFile;
+    try {
+      destFile = new File(destDir, toFileName);
+      FileSupport.link(source, destFile);
+      createMd5(destFile);
+    } catch (Exception e) {
+      FileUtils.deleteDirectory(destDir);
+    }
     return getURI(toMediaPackage, toMediaPackageElement, toFileName);
   }
 
@@ -527,11 +532,11 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
 
     try {
       FileUtils.moveFile(source, dest);
+      if (!sourceMd5.delete())
+        throw new IOException("Unable to delete " + sourceMd5.getAbsolutePath());
       createMd5(dest);
-      if (!sourceMd5.delete()) {
-        throw new IllegalStateException("Unable to delete " + sourceMd5.getAbsolutePath());
-      }
     } catch (IOException e) {
+      FileUtils.deleteDirectory(destDir);
       throw new IllegalStateException("unable to copy file" + e);
     }
     return getURI(toMediaPackage, toMediaPackageElement, dest.getName());
