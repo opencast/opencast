@@ -63,22 +63,28 @@ var ocViewSeries = (function(){
       $.get(SERIES_URL2 + "/" + seriesId + "/acl.json", function (data)
       {
         var roles = {};
-        $.each(data.acl.ace, function(key, value)
-        {
-          if(!$.isArray(roles[value.role]) && value.role != anonymous_role)
-          {
-            roles[value.role] = [];
-          }
-          if(value.action != "contribute" && value.role != anonymous_role)
-          {
-            roles[value.role].push(trans[value.action]);
-          }
-          
-          if(value.role == anonymous_role)
-          {
+        if(!$.isArray(data.acl.ace)) {
+          if(data.acl.ace.role == anonymous_role && data.acl.ace.action == "read" && data.acl.ace.allow == true) {
             roles["Public"] = ["View"];
           }
-        });
+        } else {
+          $.each(data.acl.ace, function(key, value)
+          {
+            if(!$.isArray(roles[value.role]) && value.role != anonymous_role)
+            {
+              roles[value.role] = [];
+            }
+            if(value.action != "contribute" && value.role != anonymous_role)
+            {
+              roles[value.role].push(trans[value.action]);
+            }
+          
+            if(value.role == anonymous_role)
+            {
+              roles["Public"] = ["View"];
+            }
+          });
+        }
         
         if(roles["Public"] == undefined)
         {
