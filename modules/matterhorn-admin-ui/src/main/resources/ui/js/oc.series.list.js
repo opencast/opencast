@@ -66,6 +66,7 @@ ocSeriesList.askForSeries = function()
     {
       ocSeriesList.buildSeriesView(data);
       ocSeriesList.Configuration.total = data.totalCount;
+      ocSeriesList.Configuration.lastPage = Math.floor(ocSeriesList.Configuration.total / ocSeriesList.Configuration.count)
       if(ocSeriesList.Configuration.startPage == 0) {
         $('#prevText').show();
         $('#prevButtons').hide();
@@ -85,11 +86,11 @@ ocSeriesList.askForSeries = function()
         $('#nextText').hide();
         $('#nextButtons').show();
       } else {
-        $('#prevText').show();
-        $('#prevButtons').hide();
+        $('#prevText').hide();
+        $('#prevButtons').show();
 
-        $('#nextText').show();
-        $('#nextButtons').hide();  
+        $('#nextText').hide();
+        $('#nextButtons').show();  
       }
     }
   });

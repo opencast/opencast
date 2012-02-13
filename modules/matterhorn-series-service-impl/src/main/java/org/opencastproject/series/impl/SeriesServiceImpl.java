@@ -15,7 +15,14 @@
  */
 package org.opencastproject.series.impl;
 
-import org.apache.commons.lang.StringUtils;
+import static org.opencastproject.event.EventAdminConstants.ID;
+import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
+import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
+import static org.opencastproject.event.EventAdminConstants.SERIES_TOPIC;
+import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.util.RequireUtil.notNull;
+
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
@@ -29,6 +36,8 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
+
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.event.Event;
@@ -40,14 +49,6 @@ import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.UUID;
-
-import static org.opencastproject.event.EventAdminConstants.ID;
-import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
-import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
-import static org.opencastproject.event.EventAdminConstants.SERIES_TOPIC;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.util.RequireUtil.notNull;
 
 /**
  * Implements {@link SeriesService}. Uses {@link SeriesServiceDatabase} for permanent storage and
@@ -148,11 +149,11 @@ public class SeriesServiceImpl implements SeriesService {
           logger.info("The series index is empty. Populating it now with {} series",
                   Integer.valueOf(databaseSeries.length));
           for (DublinCoreCatalog series : databaseSeries) {
-            index.index(series);
+            index.updateIndex(series);
             String id = series.getFirst(DublinCore.PROPERTY_IDENTIFIER);
             AccessControlList acl = persistence.getAccessControlList(id);
             if (acl != null) {
-              index.index(id, acl);
+              index.updateSecurityPolicy(id, acl);
             }
           }
           logger.info("Finished populating series search index");
@@ -192,11 +193,25 @@ public class SeriesServiceImpl implements SeriesService {
       throw new SeriesException(e1);
     }
 
+    AccessControlList acl = null;
     try {
-      index.index(dc);
+      acl = persistence.getAccessControlList(identifier);
+    } catch (SeriesServiceDatabaseException e) {
+      throw new SeriesException(e);
+    } catch (NotFoundException e) {
+      // in case of a new series, this is expected
+    }
+
+    try {
+      index.updateIndex(dc);
+      if (acl != null) {
+        index.updateSecurityPolicy(identifier, acl);
+      }
     } catch (SeriesServiceDatabaseException e) {
       logger.error("Unable to index series {}: {}", dc.getFirst(DublinCore.PROPERTY_IDENTIFIER), e.getMessage());
       throw new SeriesException(e);
+    } catch (NotFoundException e) {
+      // Not possible since this series has just been added
     }
 
     String xml = null;
@@ -236,7 +251,7 @@ public class SeriesServiceImpl implements SeriesService {
     }
 
     try {
-      index.index(seriesID, accessControl);
+      index.updateSecurityPolicy(seriesID, accessControl);
     } catch (Exception e) {
       logger.error("Could not update series {} with access control rules: {}", seriesID, e.getMessage());
       throw new SeriesException(e);
@@ -337,7 +352,7 @@ public class SeriesServiceImpl implements SeriesService {
       throw new SeriesException(e);
     }
   }
-  
+
   public int getSeriesCount() throws SeriesException {
     try {
       return persistence.countSeries();

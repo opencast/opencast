@@ -18,6 +18,7 @@ package org.opencastproject.workflow.handler;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.search.api.SearchService;
@@ -81,8 +82,14 @@ public class PublishWorkflowOperationHandler extends AbstractWorkflowOperationHa
           throws MediaPackageException {
     MediaPackage mp = (MediaPackage) current.clone();
 
-    List<MediaPackageElement> keep = Arrays.asList(current.getElementsByTags(tags));
+    List<MediaPackageElement> keep = new ArrayList<MediaPackageElement>();
 
+    // Keep those elements that have been identified in the tags
+    keep.addAll(Arrays.asList(current.getElementsByTags(tags)));
+
+    // Explicitly keep all security policies
+    keep.addAll(Arrays.asList(mp.getAttachments(MediaPackageElements.XACML_POLICY)));
+    
     // Mark everything that is set for removal
     List<MediaPackageElement> removals = new ArrayList<MediaPackageElement>();
     for (MediaPackageElement element : mp.getElements()) {

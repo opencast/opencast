@@ -26,27 +26,6 @@ import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZ
 import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_NAME;
 import static org.opencastproject.util.UrlSupport.DEFAULT_BASE_URL;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import junit.framework.Assert;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.solr.client.solrj.SolrServer;
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -80,6 +59,28 @@ import org.opencastproject.series.impl.solr.SeriesServiceSolrIndex;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workspace.api.Workspace;
 
+import junit.framework.Assert;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.solr.client.solrj.SolrServer;
+import org.easymock.EasyMock;
+import org.easymock.IAnswer;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 /**
  * Tests the functionality of the search service.
  * 
@@ -100,12 +101,19 @@ public class SearchServiceImplTest {
   /** The authorization service */
   private AuthorizationService authorizationService = null;
 
+  /** Student role */
+  private static final String ROLE_STUDENT = "ROLE_STUDENT";
+
+  /** Other student role */
+  private static final String ROLE_OTHER_STUDENT = "ROLE_OTHER_STUDENT";
+
   /** A user with permissions. */
-  private final User userWithPermissions = new User("sample", "opencastproject.org", new String[] { "ROLE_STUDENT",
-          "ROLE_OTHERSTUDENT", new DefaultOrganization().getAnonymousRole() });
+  private final User userWithPermissions = new User("sample", "opencastproject.org", new String[] { ROLE_STUDENT,
+          ROLE_OTHER_STUDENT, new DefaultOrganization().getAnonymousRole() });
 
   /** A user without permissions. */
-  private final User userWithoutPermissions = new User("sample", "opencastproject.org", new String[] { "ROLE_NOTHING" });
+  private final User userWithoutPermissions = new User("sample", "opencastproject.org", new String[] { "ROLE_NOTHING",
+          new DefaultOrganization().getAnonymousRole() });
 
   private final Organization defaultOrganization = new DefaultOrganization();
   private final User defaultUser = userWithPermissions;
@@ -182,7 +190,7 @@ public class SearchServiceImplTest {
             workspace, Arrays.asList(mdService), seriesService, mpeg7CatalogService, securityService));
 
     // acl
-    acl = new AccessControlList();
+    acl = new AccessControlList(new AccessControlEntry("ROLE_ANONYMOUS", "read", true));
     authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     EasyMock.expect(authorizationService.getAccessControlList((MediaPackage) EasyMock.anyObject())).andReturn(acl)
             .anyTimes();
@@ -233,9 +241,9 @@ public class SearchServiceImplTest {
 
     // Make sure our mocked ACL has the read and write permission
     acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.READ_PERMISSION, true));
+            .add(new AccessControlEntry(ROLE_STUDENT, SearchService.READ_PERMISSION, true));
     acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.WRITE_PERMISSION, true));
+            new AccessControlEntry(ROLE_STUDENT, SearchService.WRITE_PERMISSION, true));
 
     // Add the media package to the search index
     service.add(mediaPackage);
@@ -250,7 +258,7 @@ public class SearchServiceImplTest {
     acl.getEntries().clear();
     acl.getEntries().add(new AccessControlEntry("ROLE_UNKNOWN", SearchService.READ_PERMISSION, true));
     acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.WRITE_PERMISSION, true));
+            new AccessControlEntry(ROLE_STUDENT, SearchService.WRITE_PERMISSION, true));
 
     // Add the media package to the search index
     service.add(mediaPackage);
@@ -333,7 +341,6 @@ public class SearchServiceImplTest {
     assertEquals(1, service.getByQuery(new SearchQuery().withText("Institut")).size());
   }
 
-
   /**
    * Adds a simple media package that has a dublin core for the episode only.
    */
@@ -343,9 +350,9 @@ public class SearchServiceImplTest {
 
     // Make sure our mocked ACL has the read and write permission
     acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.READ_PERMISSION, true));
+            .add(new AccessControlEntry(ROLE_STUDENT, SearchService.READ_PERMISSION, true));
     acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.WRITE_PERMISSION, true));
+            new AccessControlEntry(ROLE_STUDENT, SearchService.WRITE_PERMISSION, true));
 
     // Add the media package to the search index
     service.add(mediaPackage);
@@ -397,9 +404,9 @@ public class SearchServiceImplTest {
 
     // Make sure our mocked ACL has the read and write permission
     acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.READ_PERMISSION, true));
+            .add(new AccessControlEntry(ROLE_STUDENT, SearchService.READ_PERMISSION, true));
     acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.WRITE_PERMISSION, true));
+            new AccessControlEntry(ROLE_STUDENT, SearchService.WRITE_PERMISSION, true));
 
     // Add the media package to the search index
     service.add(mediaPackage);
@@ -423,9 +430,9 @@ public class SearchServiceImplTest {
 
     // Make sure our mocked ACL has the read and write permission
     acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.READ_PERMISSION, true));
+            .add(new AccessControlEntry(ROLE_STUDENT, SearchService.READ_PERMISSION, true));
     acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.WRITE_PERMISSION, true));
+            new AccessControlEntry(ROLE_STUDENT, SearchService.WRITE_PERMISSION, true));
 
     // Add the media package to the search index
     service.add(mediaPackage);
@@ -489,9 +496,9 @@ public class SearchServiceImplTest {
 
     // Make sure our mocked ACL has the read and write permission
     acl.getEntries()
-            .add(new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.READ_PERMISSION, true));
+            .add(new AccessControlEntry(ROLE_STUDENT, SearchService.READ_PERMISSION, true));
     acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], SearchService.WRITE_PERMISSION, true));
+            new AccessControlEntry(ROLE_STUDENT, SearchService.WRITE_PERMISSION, true));
 
     // Add the media package to the search index
     service.add(mediaPackage);

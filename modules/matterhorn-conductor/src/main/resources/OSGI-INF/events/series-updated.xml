@@ -13,6 +13,8 @@
     </service>
   <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
     cardinality="1..1" policy="static" bind="setServiceRegistry" />
+  <reference name="seriesService" interface="org.opencastproject.series.api.SeriesService"
+    cardinality="1..1" policy="static" bind="setSeriesService" />
   <reference name="searchService" interface="org.opencastproject.search.api.SearchService"
     cardinality="1..1" policy="static" bind="setSearchService" />
   <reference name="distributionService" interface="org.opencastproject.distribution.api.DistributionService"
@@ -22,5 +24,9 @@
   <reference name="authorizationService" interface="org.opencastproject.security.api.AuthorizationService"
     cardinality="1..1" policy="static" bind="setAuthorizationService" />
   <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />    
+    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+  <reference name="catalogService" interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
+    cardinality="1..1" policy="static" bind="setDublinCoreCatalogService" />    
+  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+    cardinality="1..1" policy="static" bind="setWorkspace" />    
 </scr:component>

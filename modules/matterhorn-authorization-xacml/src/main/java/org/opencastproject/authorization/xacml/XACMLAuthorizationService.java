@@ -31,6 +31,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jboss.security.xacml.core.JBossPDP;
 import org.jboss.security.xacml.core.model.context.AttributeType;
 import org.jboss.security.xacml.core.model.context.RequestType;
@@ -75,6 +76,8 @@ public class XACMLAuthorizationService implements AuthorizationService {
   /** The default element ID for XACML attachments */
   public static final String XACML_ELEMENT_ID = "security-policy";
 
+  public static final String READ_PERMISSION = "read";
+
   /** The workspace */
   protected Workspace workspace;
 
@@ -99,6 +102,14 @@ public class XACMLAuthorizationService implements AuthorizationService {
       URI xacmlUri = null;
       if (xacmlAttachments.length == 0) {
         logger.debug("No XACML attachment found in {}", mediapackage);
+
+        // TODO: We need a configuration option for open vs. closed by default
+        if (StringUtils.isBlank(mediapackage.getSeries())) {
+          // Right now, rights management is based on series. Here we make sure that
+          // objects not belonging to a series are world readable
+          String anonymousRole = securityService.getOrganization().getAnonymousRole();
+          acl.add(new AccessControlEntry(anonymousRole, READ_PERMISSION, true));
+        }
         return accessControlList;
       } else if (xacmlAttachments.length > 1) {
         // try to find the source policy. Some may be copies sent to distribution channels.

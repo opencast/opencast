@@ -22,13 +22,11 @@ var Opencast = Opencast || {};
 Opencast.Description_Plugin = (function ()
 {
     // The Template to process
-    var template =  '<div style="float: left;">' +
+    var template =  '<div>' +
                         'Date:&nbsp;<span style="color:grey;">${result.dcCreated}</span><br />' +
                         'Contributor:&nbsp;<span style="color:grey;">${result.dcContributor}</span><br />' +
                         'Language:&nbsp;<span style="color:grey;">${result.dcLanguage}</span><br />' +
                         'Views:&nbsp;<span style="color:grey;">${result.dcViews}</span><br />' +
-                    '</div>' +
-                    '<div style="float: right; margin-right: 300px;">' +
                         // 'See related Videos: <span style="color:grey;"></span><br />' +
                         'Series:&nbsp;<span style="color:grey;">${result.dcSeriesTitle}</span><br />' +
                         'Presenter:&nbsp;' +

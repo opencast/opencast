@@ -44,7 +44,7 @@ public interface SeriesServiceIndex {
    * @throws SeriesServiceDatabaseException
    *           if indexing fails and synchronous indexing is enabled
    */
-  void index(DublinCoreCatalog dublinCore) throws SeriesServiceDatabaseException;
+  void updateIndex(DublinCoreCatalog dublinCore) throws SeriesServiceDatabaseException;
 
   /**
    * Index access control for existing series entry.
@@ -58,7 +58,7 @@ public interface SeriesServiceIndex {
    * @throws SeriesServiceDatabaseException
    *           if exception occurred and synchronous indexing is enabled
    */
-  void index(String seriesId, AccessControlList accessControl) throws NotFoundException, SeriesServiceDatabaseException;
+  void updateSecurityPolicy(String seriesId, AccessControlList accessControl) throws NotFoundException, SeriesServiceDatabaseException;
 
   /**
    * Removes series from index.
