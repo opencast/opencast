@@ -141,8 +141,6 @@ export MAVEN_OPTS='-Xms256m -Xmx960m -XX:PermSize=64m -XX:MaxPermSize=256m'
 export GEN_PROPS=$FELIX_HOME/conf/config.properties
 # Path under FELIX_HOME where the default multi-tenancy configuration is located
 export TENANCY_DEFAULT_PROPS=$FELIX_HOME/load/org.opencastproject.organization-mh_default_org.cfg
-# Path under FELIX_HOME where the demo multi-tenancy configuration is located
-export TENANCY_PROPS=$FELIX_HOME/load/org.opencastproject.organization-tenant1.cfg
 # Path under FELIX_HOME where the capture agent properties are
 export CAPTURE_PROPS=$FELIX_HOME/conf/services/org.opencastproject.capture.impl.ConfigurationManager.properties
 # Directory UNDER FELIX HOME where the felix filex will be deployed
