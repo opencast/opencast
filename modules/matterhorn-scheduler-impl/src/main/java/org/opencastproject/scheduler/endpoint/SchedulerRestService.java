@@ -764,51 +764,16 @@ public class SchedulerRestService {
           @RestParameter(name = "start", description = "Start time of conflicting period, in milliseconds", isRequired = false, type = Type.STRING),
           @RestParameter(name = "end", description = "End time of conflicting period, in milliseconds", isRequired = false, type = Type.STRING),
           @RestParameter(name = "duration", description = "If recurrence rule is specified duration of each conflicting period, in milliseconds", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "rrule", description = "Rule for recurrent conflicting, specified as: \"FREQ=WEEKLY;BYDAY=day(s);BYHOUR=hour;BYMINUTE=minute\". FREQ is required. BYDAY may include one or more (separated by commas) of the following: SU,MO,TU,WE,TH,FR,SA.", isRequired = false, type = Type.STRING) }, reponses = {
+          @RestParameter(name = "rrule", description = "Rule for recurrent conflicting, specified as: \"FREQ=WEEKLY;BYDAY=day(s);BYHOUR=hour;BYMINUTE=minute\". FREQ is required. BYDAY may include one or more (separated by commas) of the following: SU,MO,TU,WE,TH,FR,SA.", isRequired = false, type = Type.STRING),
+          @RestParameter(name = "rrule", description = "The timezone of the capture device", isRequired = false, type = Type.STRING) },
+          reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Found conflicting events, returned in body of response"),
           @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters") })
   public Response getConflictingEventsXml(@QueryParam("device") String device, @QueryParam("start") String startDate,
-          @QueryParam("end") String endDate, @QueryParam("duration") String duration, @QueryParam("rrule") String rrule) {
-    if (StringUtils.isEmpty(device) || startDate == null || endDate == null) {
-      logger.warn("Either device, start date, end date or duration were not specified");
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-    if (StringUtils.isNotEmpty(rrule) && duration == null) {
-      logger.warn("If checking recurrence, must include duration.");
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-    Long startDateAsLong;
-    Long endDateAsLong;
-    Long durationAsLong;
-    try {
-      startDateAsLong = Long.parseLong(startDate);
-      endDateAsLong = Long.parseLong(endDate);
-      durationAsLong = Long.parseLong(duration);
-    } catch (NumberFormatException e) {
-      logger.warn("Invalid number parameter: {}", e.getMessage());
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-
-    try {
-      DublinCoreCatalogList events = null;
-      if (StringUtils.isNotEmpty(rrule)) {
-        events = service.findConflictingEvents(device, rrule, new Date(startDateAsLong), new Date(endDateAsLong),
-                durationAsLong);
-      } else {
-        events = service.findConflictingEvents(device, new Date(startDateAsLong), new Date(endDateAsLong));
-      }
-      if (!events.getCatalogList().isEmpty()) {
-        return Response.ok(events.getResultsAsXML()).build();
-      } else {
-        return Response.noContent().type("").build();
-      }
-    } catch (Exception e) {
-      logger.error(
-              "Unable to find conflicting events for " + device + ", " + startDate.toString() + ", "
-                      + endDate.toString() + ", " + String.valueOf(duration) + ":", e.getMessage());
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
+          @QueryParam("end") String endDate, @QueryParam("duration") String duration, @QueryParam("rrule") String rrule,
+          @QueryParam("timezone") String timezone) {
+    return getConflictingEvents(device, startDate, endDate, duration, rrule, timezone, false);
   }
 
   /**
@@ -825,7 +790,9 @@ public class SchedulerRestService {
    *          start and end date)
    * @param rrule
    *          recurrence rule for conflict
-   * @return An XML with the list of conflicting events
+   * @param timezone
+   *          The timezone of the capture device
+   * @return A JSON object with the list of conflicting events
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
@@ -835,12 +802,19 @@ public class SchedulerRestService {
           @RestParameter(name = "start", description = "Start time of conflicting period, in milliseconds", isRequired = false, type = Type.STRING),
           @RestParameter(name = "end", description = "End time of conflicting period, in milliseconds", isRequired = false, type = Type.STRING),
           @RestParameter(name = "duration", description = "If recurrence rule is specified duration of each conflicting period, in milliseconds", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "rrule", description = "Rule for recurrent conflicting, specified as: \"FREQ=WEEKLY;BYDAY=day(s);BYHOUR=hour;BYMINUTE=minute\". FREQ is required. BYDAY may include one or more (separated by commas) of the following: SU,MO,TU,WE,TH,FR,SA.", isRequired = false, type = Type.STRING) }, reponses = {
+          @RestParameter(name = "rrule", description = "Rule for recurrent conflicting, specified as: \"FREQ=WEEKLY;BYDAY=day(s);BYHOUR=hour;BYMINUTE=minute\". FREQ is required. BYDAY may include one or more (separated by commas) of the following: SU,MO,TU,WE,TH,FR,SA.", isRequired = false, type = Type.STRING),
+          @RestParameter(name = "rrule", description = "The timezone of the capture device", isRequired = false, type = Type.STRING) },
+          reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Found conflicting events, returned in body of response"),
           @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters") })
   public Response getConflictingEventsJSON(@QueryParam("device") String device, @QueryParam("start") String startDate,
-          @QueryParam("end") String endDate, @QueryParam("duration") String duration, @QueryParam("rrule") String rrule) {
+          @QueryParam("end") String endDate, @QueryParam("duration") String duration, @QueryParam("rrule") String rrule,
+          @QueryParam("timezone") String timezone) {
+    return getConflictingEvents(device, startDate, endDate, duration, rrule, timezone, true);
+  }
+  
+  private Response getConflictingEvents(String device, String startDate, String endDate, String duration, String rrule, String timezone, boolean asJson) {
     if (StringUtils.isEmpty(device) || startDate == null || endDate == null) {
       logger.warn("Either device, start date, end date or duration were not specified");
       return Response.status(Status.BAD_REQUEST).build();
@@ -867,12 +841,16 @@ public class SchedulerRestService {
       DublinCoreCatalogList events = null;
       if (StringUtils.isNotEmpty(rrule)) {
         events = service.findConflictingEvents(device, rrule, new Date(startDateAsLong), new Date(endDateAsLong),
-                durationAsLong);
+                durationAsLong, timezone);
       } else {
         events = service.findConflictingEvents(device, new Date(startDateAsLong), new Date(endDateAsLong));
       }
       if (!events.getCatalogList().isEmpty()) {
-        return Response.ok(events.getResultsAsJson()).build();
+        if (asJson) {
+          return Response.ok(events.getResultsAsJson()).build();
+        } else {
+          return Response.ok(events.getResultsAsXML()).build();
+        }
       } else {
         return Response.noContent().type("").build();
       }

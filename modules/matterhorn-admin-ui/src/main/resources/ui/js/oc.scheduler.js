@@ -28,13 +28,14 @@ var ocScheduler = (function() {
   var EDIT_MODE         = 2;
   var SINGLE_EVENT      = 3;
   var MULTIPLE_EVENTS   = 4;
-  var SUBMIT_MODE        = 5;
+  var SUBMIT_MODE       = 5;
   
   sched.mode              = CREATE_MODE;
   sched.type              = SINGLE_EVENT;
   sched.selectedInputs    = '';
   sched.conflictingEvents = false;
   sched.tzDiff            = 0;
+  sched.timezone          = '';
   sched.components        = null; //contains components used to make other components like temporal but aren't used in a catalog directly.
   
   // Catalogs
@@ -282,7 +283,7 @@ var ocScheduler = (function() {
     var error = false;
     
     hideUserMessages();
-    
+    sched.checkForConflictingEvents();
     if(ocScheduler.conflictingEvents) {
       $('#missingFieldsContainer').show();
       $('#errorConflict').show();
@@ -375,6 +376,8 @@ var ocScheduler = (function() {
               }else{
                 ocUtils.log("Couldn't parse TZ");
               }
+            } else if(s == 'capture.device.timezone') {
+              sched.timezone = $(i).text();
             }
           });
           if(devNames.length > 0) {
@@ -387,6 +390,7 @@ var ocScheduler = (function() {
             $('#inputList').html('Agent defaults will be used.');
             delete sched.dublinCore.components.agentTimeZone;
           }
+          sched.checkForConflictingEvents();
         });
     } else {
       // no valid agent, change time to local form what ever it was before.
@@ -565,11 +569,20 @@ var ocScheduler = (function() {
         data.end = sched.components.recurrenceEnd.getValue();
         data.duration = sched.components.recurrenceDuration.getValue();
         data.rrule = sched.dublinCore.components.recurrence.getValue();
+        if(sched.timezone == ''){
+          return false;
+        }
+        data.timezone = sched.timezone;
       } else {
         return false;
       }
     }
-    $.get(SCHEDULER_URL + "/conflicts.json", data, function(data) {
+    $.ajax({
+      url: SCHEDULER_URL + "/conflicts.json",
+      async: false,
+      data: data,
+      type: 'get',
+      success: function(data) {
       var events = [];
       data = data.catalogs
       if (data != '') {
@@ -587,7 +600,7 @@ var ocScheduler = (function() {
           $('#errorConflict').show();
         }
       }
-    });
+    }});
   }
 
   sched.registerCatalogs = function registerCatalogs() {
