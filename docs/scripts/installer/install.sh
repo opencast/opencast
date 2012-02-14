@@ -44,7 +44,7 @@ export BRANCHES_URL=$SVN_URL/branches
 export TAGS_URL=$SVN_URL/tags
 
 # Default URL from where scripts and java source will be dowloaded
-export SRC_DEFAULT=$BRANCHES_URL/1.3.x
+export SRC_DEFAULT=$TRUNK_URL
 
 # File containing the rules to be applied by udev to the configured devices -- not a pun!
 export DEV_RULES=/etc/udev/rules.d/matterhorn.rules
@@ -136,7 +136,7 @@ export MAVEN_URL="http://www.apache.org/dist//maven/binaries/$MAVEN_FILENAME"
 # Subdir under the user home where FELIX_HOME is
 export MAVEN_HOME=/usr/local/bin/maven
 # Memory settings for maven to build matterhorn
-export MAVEN_OPTS='-Xms256m -Xmx960m -XX:PermSize=64m -XX:MaxPermSize=256m'
+export MAVEN_OPTS='-Xms512m -Xmx960m -XX:PermSize=128m -XX:MaxPermSize=512m'
 # Path under FELIX_HOME where the general matterhorn configuration
 export GEN_PROPS=$FELIX_HOME/conf/config.properties
 # Path under FELIX_HOME where the default multi-tenancy configuration is located
