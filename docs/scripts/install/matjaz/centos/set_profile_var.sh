@@ -14,6 +14,11 @@ if [ -z "$VAR_VALUE" ]; then
   exit 2
 fi
 #
+if [ ! -f ~/.profile ]; then
+  touch ~/.profile
+  [ $? -ne 0 ] && exit 1
+fi
+#
 awk -v var="$VAR_NAME" -v value="$VAR_VALUE" 'BEGIN {
   found_var = 0; found_exp_var = 0; found_exp = 0; err = 0;
 } {

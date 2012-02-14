@@ -79,7 +79,7 @@ v4l-conf
 ivtv-utils
 curl
 maven2
-sun-java6-jdk
+openjdk-6-jdk
 subversion
 wget
 openssh-server
@@ -130,7 +130,7 @@ export FELIX_URL=http://archive.apache.org/dist/felix/$FELIX_FILENAME
 # Subdir under the user home where FELIX_HOME is
 export FELIX_HOME=$OC_DIR/felix
 # Name of the file containing the maven 3 files
-export MAVEN_FILENAME="apache-maven-3.0.3-bin.tar.gz"
+export MAVEN_FILENAME="apache-maven-3.0.4-bin.tar.gz"
 # URL where the previous file can be fetched
 export MAVEN_URL="http://www.apache.org/dist//maven/binaries/$MAVEN_FILENAME"
 # Subdir under the user home where FELIX_HOME is
@@ -141,8 +141,6 @@ export MAVEN_OPTS='-Xms256m -Xmx960m -XX:PermSize=64m -XX:MaxPermSize=256m'
 export GEN_PROPS=$FELIX_HOME/conf/config.properties
 # Path under FELIX_HOME where the default multi-tenancy configuration is located
 export TENANCY_DEFAULT_PROPS=$FELIX_HOME/load/org.opencastproject.organization-mh_default_org.cfg
-# Path under FELIX_HOME where the demo multi-tenancy configuration is located
-export TENANCY_PROPS=$FELIX_HOME/load/org.opencastproject.organization-tenant1.cfg
 # Path under FELIX_HOME where the capture agent properties are
 export CAPTURE_PROPS=$FELIX_HOME/conf/services/org.opencastproject.capture.impl.ConfigurationManager.properties
 # Directory UNDER FELIX HOME where the felix filex will be deployed
@@ -375,7 +373,7 @@ else
   fi
 fi
 
-choose -t "What kind of Matterhorn server do you want to install?" -? "Matterhorn can be build with different profiles." -o list -- "All-in-One installation" "Admin modules" "Worker modules" "Engage/Player modules" "Capture Agent modules" profile
+choose -t "What kind of Matterhorn server do you want to install?" -? "Matterhorn can be build with different profiles." -o list -- "All-in-One installation" "Admin modules" "Worker modules" "Engage/Player modules" profile
 case "$profile" in
         0) MATTERHORN_PROFILE="all"
         ;;
@@ -384,8 +382,6 @@ case "$profile" in
         2) MATTERHORN_PROFILE="work"
         ;;
         3) MATTERHORN_PROFILE="engage"
-        ;;
-        4) MATTERHORN_PROFILE="capture"
         ;;
 esac
 
@@ -414,15 +410,6 @@ if [[ "$?" -ne 0 ]]; then
     exit 1
 fi
 
-# Install the vga2usb driver
-if [ "$LINUX_DIST" == "Ubuntu" ] && [ $MATTERHORN_PROFILE == "capture" ]; then
-  ${INSTALL_VGA2USB}
-  if [[ "$?" -ne 0 ]]; then
-      echo "Error installing the vga2usb driver."
-      exit 1
-  fi
-fi
-
 unset source_ok
 while [[ ! "$source_ok" ]] ; do 
     # Set up the matterhorn code --doesn't build yet!
@@ -433,15 +420,6 @@ while [[ ! "$source_ok" ]] ; do
     fi
     source_ok=true
 
-
-    if [ "$LINUX_DIST" == "Ubuntu" ] && [ "$MATTERHORN_PROFILE" == "capture" ]; then    
-      # Setup properties of the devices
-      ${SETUP_DEVICES}
-      if [[ "$?" -ne 0 ]]; then
-	  echo "Error setting up the capture devices. Contact matterhorn-users@opencastproject.org for assistance."
-	  exit 1
-      fi
-    fi
     
     # Set up user environment
     ${SETUP_ENVIRONMENT}
@@ -450,9 +428,7 @@ while [[ ! "$source_ok" ]] ; do
 	exit 1
     fi
 	
-    if [ "$MATTERHORN_PROFILE" != "capture" ]; then
-      yesno -d no "Do you want to build the third party tools after matterhorn has been build? This can take up to an hour depending on your computer and your internet-connection" build_3rdparty
-    fi
+    yesno -d no "Do you want to build the third party tools after matterhorn has been build? This can take up to an hour depending on your computer and your internet-connection" build_3rdparty
 
     # Build matterhorn
     echo -e "\n\nProceeding to build the matterhorn source. This may take a long time. Press any key to continue...\n\n"
@@ -461,9 +437,6 @@ while [[ ! "$source_ok" ]] ; do
     unset build_ok
     while [[ ! "$build_ok" ]]; do
 	cd $SOURCE
-	if [ "$MATTERHORN_PROFILE" == "capture" ]; then
-	  PROFILE="-Pcapture,serviceregistry-stub"
-	fi 
 	if [ "$MATTERHORN_PROFILE" == "work" ]; then
 	  PROFILE="-Pworker,ingest,$WORKSPACE_VERSION"
 	fi

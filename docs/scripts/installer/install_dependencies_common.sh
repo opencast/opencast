@@ -44,36 +44,6 @@ while [[ true ]]; do
     fi
 done
 
-# Setup jv4linfo
-if [[ ! -e "$JV4LINFO_PATH/$JV4LINFO_LIB" ]]; then
-    mkdir -p $JV4LINFO_DIR
-    cd $JV4LINFO_DIR
-
-    echo -n "Installing jv4linfo... "
-    if [[ ! -e "$JV4LINFO_JAR" ]]; then
-	wget -q $JV4LINFO_URL/$JV4LINFO_JAR
-    fi
-    jar xf $JV4LINFO_JAR
-    cd jv4linfo/src
-    # The ant build script has a hardcoded path to the openjdk, this sed line will
-    # switch it to be whatever is defined in JAVA_HOME
-    sed -i '74i\\t<arg value="-fPIC"/>' build.xml
-    sed -i "s#\"/usr/lib/jvm/java-6-openjdk/include\"#\"$JAVA_HOME/include\"#g" build.xml
-    
-    ant -lib ${JAVA_HOME}/lib &> /dev/null
-    if [[ "$?" -ne 0 ]]; then
-	echo "Error building libjv4linfo.so"
-	exit 1
-    fi
-    cp ../lib/$JV4LINFO_LIB $JV4LINFO_PATH
-    
-    cd $WORKING_DIR
-    
-echo "Done"
-else
-    echo "libjv4linfo.so already installed"
-fi
-
 # Setup ntdp
 echo 
 ask -d "$DEFAULT_NTP_SERVER" "Which NTP server would you like to use?" server

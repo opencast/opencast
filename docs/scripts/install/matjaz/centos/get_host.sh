@@ -14,4 +14,5 @@ awk '{
   else print $0;
 }' "$FILE"
 [ $? -ne 0 ] && exit 1
+#
 exit 0

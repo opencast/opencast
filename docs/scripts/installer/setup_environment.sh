@@ -97,8 +97,6 @@ if [[ "$config" ]]; then
     # Configure Tenancy fileservice
     sed -i "s#^${TENANT_SERVER_KEY//./\\.}=.*\$#${TENANT_SERVER_KEY}=$url#" "$TENANCY_DEFAULT_PROPS"
     sed -i "s#^${TENANT_PORT_KEY//./\\.}=.*\$#${TENANT_PORT_KEY}=$port#" "$TENANCY_DEFAULT_PROPS"
-    sed -i "s#^${TENANT_SERVER_KEY//./\\.}=.*\$#${TENANT_SERVER_KEY}=$url#" "$TENANCY_DEFAULT_PROPS"
-    sed -i "s#^${TENANT_PORT_KEY//./\\.}=.*\$#${TENANT_PORT_KEY}=$port#" "$TENANCY_PROPS"
 fi
 
 # Prompt for the distributed servers if needed

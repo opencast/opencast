@@ -1,5 +1,5 @@
-URL: http://openfst.cs.nyu.edu/twiki/pub/FST/FstDownload
-PKG: openfst-1.2.3.tar.gz
-SHA: 64551d89605b109957fd863b921c2c92e80c3ba9
-DIR: openfst-1.2.3
+URL: http://pkgs.fedoraproject.org/repo/pkgs/openfst/openfst-1.2.8.tar.gz/c9ee659947315d8f4eb6d6227779b3a9 http://openfst.cs.nyu.edu/twiki/pub/FST/FstDownload
+PKG: openfst-1.2.8.tar.gz
+SHA: 17c33d547eec5b3d4fa2571ba228984df7939f9b
+DIR: openfst-1.2.8
 PCP: pc-fst.zip
