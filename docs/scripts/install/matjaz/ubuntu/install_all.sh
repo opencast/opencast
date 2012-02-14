@@ -1,6 +1,7 @@
 #!/bin/bash
 set -x
 #
+MH_VER=1.3.0
 HWD=`cd "${0%/*}" 2>/dev/null; echo $PWD`
 #
 # Ubuntu Matterhon installation
@@ -36,11 +37,12 @@ sudo mkdir -p /opt/matterhorn
 sudo chown `id -u`:`id -g` /opt/matterhorn
 [ $? -ne 0 ] && exit 1
 #
-svn co http://opencast.jira.com/svn/MH/tags/1.2.0 /opt/matterhorn/1.2.0
+#svn co http://opencast.jira.com/svn/MH/tags/$MH_VER /opt/matterhorn/$MH_VER
+svn co http://opencast.jira.com/svn/MH/branches/1.3.x /opt/matterhorn/$MH_VER
 [ $? -ne 0 ] && exit 1
 rm -fr /opt/matterhorn/trunk
 [ $? -ne 0 ] && exit 1
-ln -s /opt/matterhorn/1.2.0 /opt/matterhorn/trunk
+ln -s /opt/matterhorn/$MH_VER /opt/matterhorn/trunk
 [ $? -ne 0 ] && exit 1
 #
 # Install felix
@@ -56,7 +58,7 @@ mv felix-framework-3.0.9 /opt/matterhorn/felix
 #
 mkdir -p /opt/matterhorn/felix/load
 [ $? -ne 0 ] && exit 1
-cp -rf /opt/matterhorn/1.2.0/docs/felix/* /opt/matterhorn/felix
+cp -rf /opt/matterhorn/${MH_VER}/docs/felix/* /opt/matterhorn/felix
 [ $? -ne 0 ] && exit 1
 cp /opt/matterhorn/felix/conf/config.properties /opt/matterhorn/felix/conf/config.properties.org
 [ $? -ne 0 ] && exit 1
@@ -74,10 +76,17 @@ if [ ! -d /var/opencast ]; then
   [ $? -ne 0 ] && exit 1
 fi
 #
-cd /opt/matterhorn/1.2.0/docs/scripts/3rd_party
+cd /opt/matterhorn/${MH_VER}/docs/scripts/3rd_party
 [ $? -ne 0 ] && exit 1
 time ./do-all 2>&1 | tee /var/opencast/do-all.log
 [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+#
+# Install gstreamer for demo capture agent
+#
+sudo apt-get -y install gstreamer0.10-plugins-base
+[ $? -ne 0 ] && exit 1
+sudo apt-get -y install gstreamer0.10-plugins-good
+[ $? -ne 0 ] && exit 1
 #
 # Compile matterhorn
 #

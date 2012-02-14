@@ -8,7 +8,7 @@ OLD_HOST=$1
 NEW_HOST=$2
 [ -z "$NEW_HOST" ] && NEW_HOST=localhost
 #
-FILE=/opt/matterhorn/felix/conf/config.properties
+FILE=/opt/matterhorn/felix/load/org.opencastproject.capture.agent-demo.cfg
 sed \
 -e 's/'$OLD_HOST':/'$NEW_HOST':/g' \
 -e 's/'$OLD_HOST'\//'$NEW_HOST'\//g' \
@@ -16,4 +16,5 @@ sed \
 [ $? -ne 0 ] && exit 1
 cp $TMPFILE "$FILE"
 [ $? -ne 0 ] && exit 1
+#
 exit 0

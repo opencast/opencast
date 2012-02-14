@@ -8,11 +8,11 @@ install_java_centos() {
   #
   case `./arch.sh` in
     i386 )
-      PKG=jdk-6u27-linux-i586-rpm.bin
+      PKG=jdk-6u30-linux-i586-rpm.bin
       ARCH=i386
       ;;
     x86_64 )
-      PKG=jdk-6u27-linux-x64-rpm.bin
+      PKG=jdk-6u30-linux-x64-rpm.bin
       ARCH=amd64
       ;;
     * ) 
@@ -27,7 +27,7 @@ install_java_centos() {
   fi
   #
   if [ ! -s $PKG ]; then
-    wget -t 5 -4 http://oracleotn.rd.llnwd.net/otn-pub/java/jdk/6u27-b07/$PKG -O $PKG
+    wget -t 5 -4 http://download.oracle.com/otn-pub/java/jdk/6u30-b12/$PKG -O $PKG
     [ $? -ne 0 ] && return 1
   fi
   chmod +x $PKG

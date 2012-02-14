@@ -30,4 +30,5 @@ awk -v var="$VAR_NAME" -v value="$VAR_VALUE" '{
 [ $? -ne 0 ] && exit 1
 cp $TMPFILE "$FILE"
 [ $? -ne 0 ] && exit 1
+#
 exit 0
