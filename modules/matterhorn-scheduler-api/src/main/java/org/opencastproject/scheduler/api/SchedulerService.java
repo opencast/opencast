@@ -202,7 +202,7 @@ public interface SchedulerService {
    *           if exception occurred
    */
   DublinCoreCatalogList findConflictingEvents(String captureDeviceID, String rrule, Date startDate, Date endDate,
-          long duration) throws SchedulerException;
+          long duration, String timezone) throws SchedulerException;
 
   /**
    * Generates calendar for specified capture agent.

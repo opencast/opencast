@@ -725,7 +725,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     
     Date start = temporal.getStart();
     Date end   = temporal.getEnd();
-    Long duration = (end.getTime() % (60 * 60 * 1000)) - (start.getTime() % (60 * 60 * 1000));
+    Long duration = 0L;
     
     TimeZone tz = null; // Create timezone based on CA's reported TZ.
     if (template.hasValue(DublinCoreCatalogImpl.PROPERTY_AGENT_TIMEZONE)) {
@@ -740,12 +740,15 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     if (tz.inDaylightTime(start) && !tz.inDaylightTime(end)) {
       seed.setTime(start.getTime() + 3600000);
       period.setTime(end.getTime());
+      duration = (end.getTime() % (60 * 60 * 1000)) - (start.getTime() % (60 * 60 * 1000) + 3600000);
     } else if (!tz.inDaylightTime(start) && tz.inDaylightTime(end)) {
       seed.setTime(start.getTime());
       period.setTime(end.getTime() + 3600000);
+      duration = (end.getTime() % (60 * 60 * 1000) + 3600000) - (start.getTime() % (60 * 60 * 1000));
     } else {
       seed.setTime(start.getTime());
       period.setTime(end.getTime());
+      duration = (end.getTime() % (60 * 60 * 1000)) - (start.getTime() % (60 * 60 * 1000));
     }
     DateList dates = recur.getDates(seed, period, Value.DATE_TIME);
     logger.debug("DateList: {}", dates);
@@ -871,7 +874,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    */
   @Override
   public DublinCoreCatalogList findConflictingEvents(String captureDeviceID, String rrule, Date startDate,
-          Date endDate, long duration) throws SchedulerException {
+          Date endDate, long duration, String timezone) throws SchedulerException {
     RRule rule;
     try {
       rule = new RRule(rrule);
@@ -881,18 +884,38 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       throw new SchedulerException(e);
     }
     Recur recur = rule.getRecur();
-    DateTime start = new DateTime(startDate.getTime());
-    start.setUtc(true);
-    DateTime end = new DateTime(endDate.getTime());
-    end.setUtc(true);
-    DateList dates = recur.getDates(start, end, Value.DATE_TIME);
+    TimeZone tz = TimeZone.getTimeZone(timezone);
+    DateTime seed = new DateTime(true);
+    DateTime period = new DateTime(true);
+    if (tz.inDaylightTime(startDate) && !tz.inDaylightTime(endDate)) {
+      seed.setTime(startDate.getTime() + 3600000);
+      period.setTime(endDate.getTime());
+    } else if (!tz.inDaylightTime(startDate) && tz.inDaylightTime(endDate)) {
+      seed.setTime(startDate.getTime());
+      period.setTime(endDate.getTime() + 3600000);
+    } else {
+      seed.setTime(startDate.getTime());
+      period.setTime(endDate.getTime());
+    }
+    DateList dates = recur.getDates(seed, period, Value.DATE_TIME);
     List<DublinCoreCatalog> events = new ArrayList<DublinCoreCatalog>();
 
-    for (Object d : dates) {
-      Date filterStart = (Date) d;
+    for (Object date : dates) {
+      //Date filterStart = (Date) d;
+      Date d = (Date) date;
+      // Adjust for DST, if start of event
+      if (tz.inDaylightTime(seed)) { // Event starts in DST
+        if (!tz.inDaylightTime(d)) { // Date not in DST?
+          d.setTime(d.getTime() + tz.getDSTSavings()); // Ajust for Fall back one hour
+        }
+      } else { // Event doesn't start in DST
+        if (tz.inDaylightTime(d)) {
+          d.setTime(d.getTime() - tz.getDSTSavings()); // Adjust for Spring forward one hour
+        }
+      }
       // TODO optimize: create only one query and execute it
-      List<DublinCoreCatalog> filterEvents = findConflictingEvents(captureDeviceID, filterStart,
-              new Date(filterStart.getTime() + duration)).getCatalogList();
+      List<DublinCoreCatalog> filterEvents = findConflictingEvents(captureDeviceID, d,
+              new Date(d.getTime() + duration)).getCatalogList();
       events.addAll(filterEvents);
     }
 
