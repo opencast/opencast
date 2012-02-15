@@ -98,19 +98,26 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
           String userDn, String password, String roleAttributesGlob, int cacheSize, int cacheExpiration) {
     // CHECKSTYLE:ON
     this.organization = organization;
+    logger.debug("Creating LdapUserProvider instance with pid=" + pid + ", and organization=" + organization + ", to LDAP server at url:  " + url);
 
     DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(url);
     if (StringUtils.isNotBlank(userDn)) {
       contextSource.setPassword(password);
       contextSource.setUserDn(userDn);
+      // Required so that authentication will actually be used
+      contextSource.setAnonymousReadOnly(false);      
+    } else {
+      // No password set so try to connect anonymously. 
+      contextSource.setAnonymousReadOnly(true);  
     }
-    contextSource.setAnonymousReadOnly(true);
+    
     try {
       contextSource.afterPropertiesSet();
     } catch (Exception e) {
       throw new org.opencastproject.util.ConfigurationException("Unable to create a spring context source", e);
     }
     FilterBasedLdapUserSearch userSearch = new FilterBasedLdapUserSearch(searchBase, searchFilter, contextSource);
+    userSearch.setReturningAttributes(roleAttributesGlob.split(","));
     this.delegate = new LdapUserDetailsService(userSearch);
 
     if (StringUtils.isNotBlank(roleAttributesGlob)) {
@@ -171,6 +178,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
    */
   @Override
   public User loadUser(String userName) {
+    logger.debug("LdapUserProvider is loading user " + userName);
     requests.incrementAndGet();
     try {
       Object user = cache.get(userName);
@@ -215,7 +223,8 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
         int i = 0;
         roles = new String[authorities.size()];
         for (GrantedAuthority authority : authorities) {
-          roles[i++] = authority.getAuthority();
+          String role = authority.getAuthority();
+          roles[i++] = role;
         }
       }
       User user =  new User(userDetails.getUsername(), getOrganization(), roles);
