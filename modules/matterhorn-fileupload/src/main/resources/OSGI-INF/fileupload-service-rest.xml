@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.fileupload.rest.FileUploadRestService" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.fileupload.rest.FileUploadRestService" />
+  <property name="service.description" value="File Upload REST Endpoint" />
+  <property name="opencast.service.type" value="org.opencastproject.fileupload" />
+  <property name="opencast.service.path" value="/upload" />
+  <service>
+    <provide interface="org.opencastproject.fileupload.rest.FileUploadRestService" />
+  </service>
+  <reference name="fileupload-service" interface="org.opencastproject.fileupload.api.FileUploadService"
+    cardinality="1..1" policy="static" bind="setFileUploadService" unbind="unsetFileUploadService"/>
+</scr:component>
