@@ -115,9 +115,9 @@ CREATE TABLE "job_arguments" (
 --
 CREATE TABLE "job_context" (
   "root_job" bigint NOT NULL,
-  "key" text NOT NULL,
+  "key_entry" character varying(255) NOT NULL,
   "value" text,
-  CONSTRAINT "UNQ_job_context_0" UNIQUE ("root_job", "key")
+  CONSTRAINT "UNQ_job_context_0" UNIQUE ("root_job", "key_entry")
 );
 
 --
