@@ -53,19 +53,30 @@ public interface WorkingFileRepository {
    * Store the data stream under the given media package and element IDs with filename as name of the file.
    * 
    * @param mediaPackageID
+   *          the media package identifier
    * @param mediaPackageElementID
+   *          the media package element identifier
    * @param filename
+   *          the file name to use
    * @param in
+   *          the input stream
    * @return The URL to access this file
+   * @throws IOException
+   *           if the input stream cannot be accessed or the element cannot be written to the repository
+   * @throws IllegalArgumentException
+   *           if a <code>URI</code> cannot be created from the arguments
    */
-  URI put(String mediaPackageID, String mediaPackageElementID, String filename, InputStream in) throws IOException;
+  URI put(String mediaPackageID, String mediaPackageElementID, String filename, InputStream in) throws IOException,
+          IllegalArgumentException;
 
   /**
    * Stream the file stored under the given media package and element IDs.
    * 
    * @param mediaPackageID
+   *          the media package identifier
    * @param mediaPackageElementID
-   * @return the data
+   *          the media package element identifier
+   * @return the media package element contents
    * @throws IOException
    *           if there is a problem reading the data
    * @throws NotFoundException
@@ -74,66 +85,70 @@ public interface WorkingFileRepository {
   InputStream get(String mediaPackageID, String mediaPackageElementID) throws IOException, NotFoundException;
 
   /**
-   * Gets the md5 hash of a file stored under the given media package and element IDs.
-   * 
-   * @param mediaPackageID
-   * @param mediaPackageElementID
-   * @return the md5 hash of the data
-   * @throws IOException
-   *           if there is a problem reading or hashing the data
-   */
-  String getMediaPackageElementDigest(String mediaPackageID, String mediaPackageElementID) throws IOException;
-
-  /**
    * Get the URL for a file stored under the given collection.
    * 
    * @param collectionID
-   *          the collection id
+   *          the collection identifier
    * @param fileName
    *          the file name
    * @return the file's uri
+   * @throws IllegalArgumentException
+   *           if a <code>URI</code> cannot be created from the arguments
    */
-  URI getCollectionURI(String collectionID, String fileName);
+  URI getCollectionURI(String collectionID, String fileName) throws IllegalArgumentException;
 
   /**
    * Get the URL for a file stored under the given media package and element IDs. This may be called for mediapackages,
    * elements, or files that have not yet been stored in the repository.
    * 
    * @param mediaPackageID
+   *          the media package identifier
    * @param mediaPackageElementID
+   *          the media package element identifier
    * @return the URI to this resource
+   * @throws IllegalArgumentException
+   *           if a <code>URI</code> cannot be created from the arguments
    */
-  URI getURI(String mediaPackageID, String mediaPackageElementID);
+  URI getURI(String mediaPackageID, String mediaPackageElementID) throws IllegalArgumentException;
 
   /**
    * Get the URL for a file stored under the given media package and element IDs. This may be called for mediapackages,
    * elements, or files that have not yet been stored in the repository.
    * 
    * @param mediaPackageID
+   *          the media package identifier
    * @param mediaPackageElementID
+   *          the media package element identifier
    * @param fileName
+   *          the file name
    * @return the URI to this resource
+   * @throws IllegalArgumentException
+   *           if a <code>URI</code> cannot be created from the arguments
    */
-  URI getURI(String mediaPackageID, String mediaPackageElementID, String fileName);
+  URI getURI(String mediaPackageID, String mediaPackageElementID, String fileName) throws IllegalArgumentException;
 
   /**
    * Delete the file stored at the given media package and element IDs.
    * 
    * @param mediaPackageID
+   *          the media package identifier
    * @param mediaPackageElementID
+   *          the media package element identifier
+   * @throws IOException
+   *           if the element cannot be deleted
    */
-  void delete(String mediaPackageID, String mediaPackageElementID) throws NotFoundException, IOException;
+  boolean delete(String mediaPackageID, String mediaPackageElementID) throws IOException;
 
   /**
    * Gets the number of files in a collection.
    * 
-   * @param id
+   * @param collectionId
    *          the collection identifier
    * @return the number of files in a collection
-   * @throws IllegalArgumentException
+   * @throws NotFoundException
    *           if the collection does not exist
    */
-  long getCollectionSize(String id);
+  long getCollectionSize(String collectionId) throws NotFoundException;
 
   /**
    * Puts a file into a collection, overwriting the existing file if present.
@@ -145,6 +160,8 @@ public interface WorkingFileRepository {
    * @param in
    *          the data to store
    * @return The URI identifying the file
+   * @throws IOException
+   *           if the input stream cannot be accessed or the file cannot be written to the repository
    */
   URI putInCollection(String collectionId, String fileName, InputStream in) throws IOException;
 
@@ -154,8 +171,10 @@ public interface WorkingFileRepository {
    * @param collectionId
    *          the collection identifier
    * @return the URIs for each member of the collection
+   * @throws NotFoundException
+   *           if the collectionId does not exist
    */
-  URI[] getCollectionContents(String collectionId) throws IOException;
+  URI[] getCollectionContents(String collectionId) throws NotFoundException;
 
   /**
    * Gets data from a collection
@@ -169,25 +188,15 @@ public interface WorkingFileRepository {
   InputStream getFromCollection(String collectionId, String fileName) throws NotFoundException, IOException;
 
   /**
-   * Gets the md5 hash of a file stored under the given media package and element IDs.
-   * 
-   * @param collectionId
-   * @param fileName
-   * @return the md5 hash of this resource
-   * @throws IOException
-   *           if there is a problem reading or hashing the data
-   */
-  String getCollectionElementDigest(String collectionId, String fileName) throws NotFoundException, IOException;
-
-  /**
    * Removes a file from a collection
    * 
    * @param collectionId
    *          the collection identifier
    * @param fileName
    *          the filename to remove
+   * @return <code>true</code> if the file existed and was removed
    */
-  void deleteFromCollection(String collectionId, String fileName) throws NotFoundException, IOException;
+  boolean deleteFromCollection(String collectionId, String fileName) throws IOException;
 
   /**
    * Moves a file from a collection into a mediapackage

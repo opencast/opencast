@@ -20,12 +20,10 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ContentBody;
@@ -113,17 +111,15 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#delete(java.lang.String, java.lang.String)
    */
   @Override
-  public void delete(String mediaPackageID, String mediaPackageElementID) {
+  public boolean delete(String mediaPackageID, String mediaPackageElementID) {
     String urlSuffix = UrlSupport.concat(new String[] { mediaPackageID, mediaPackageElementID });
-    HttpPost post = new HttpPost(urlSuffix);
+    HttpDelete del = new HttpDelete(urlSuffix);
     HttpResponse response = null;
     try {
-      response = getResponse(post, HttpStatus.SC_NO_CONTENT);
-      if (response == null) {
-        throw new RuntimeException();
-      } else {
-        logger.info("deleted mediapackage element {}/{}", mediaPackageID, mediaPackageElementID);
-      }
+      response = getResponse(del, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND);
+      if (response == null)
+        throw new RuntimeException("Error removing file");
+      return HttpStatus.SC_OK == response.getStatusLine().getStatusCode();
     } finally {
       closeConnection(response);
     }
@@ -186,7 +182,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getCollectionSize(java.lang.String)
    */
   @Override
-  public long getCollectionSize(String id) {
+  public long getCollectionSize(String id) throws NotFoundException {
     return getCollectionContents(id).length;
   }
 
@@ -380,77 +376,16 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
    *      java.lang.String)
    */
   @Override
-  public void deleteFromCollection(String collectionId, String fileName) {
+  public boolean deleteFromCollection(String collectionId, String fileName) {
     String url = UrlSupport.concat(new String[] { "collection", collectionId, fileName });
     System.out.println("");
     HttpDelete del = new HttpDelete(url);
     HttpResponse response = null;
     try {
-      response = getResponse(del, HttpStatus.SC_NO_CONTENT);
+      response = getResponse(del, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND);
       if (response == null)
         throw new RuntimeException("Error removing file");
-    } finally {
-      closeConnection(response);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getCollectionElementDigest(java.lang.String,
-   *      java.lang.String)
-   */
-  @Override
-  public String getCollectionElementDigest(String collectionId, String fileName) throws IOException {
-    String url = UrlSupport.concat(new String[] { "collection", collectionId, fileName });
-    HttpHead head = new HttpHead(url);
-    HttpResponse response = null;
-    try {
-      response = getResponse(head, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND);
-      if (response == null) {
-        throw new RuntimeException();
-      }
-      if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
-        return null;
-      } else {
-        Header[] etags = response.getHeaders("ETag");
-        if (etags.length != 1)
-          throw new IllegalStateException("File repository is not returning etags");
-        return etags[0].getValue();
-      }
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    } finally {
-      closeConnection(response);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getMediaPackageElementDigest(java.lang.String,
-   *      java.lang.String)
-   */
-  @Override
-  public String getMediaPackageElementDigest(String mediaPackageID, String mediaPackageElementID) throws IOException {
-    String url = UrlSupport.concat(new String[] { mediaPackageID, mediaPackageElementID });
-    HttpHead head = new HttpHead(url);
-    HttpResponse response = null;
-    try {
-      response = getResponse(head, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND);
-      if (response == null) {
-        throw new RuntimeException();
-      }
-      if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
-        return null;
-      } else {
-        Header[] etags = response.getHeaders("ETag");
-        if (etags.length != 1)
-          throw new IllegalStateException("File repository is not returning etags");
-        return etags[0].getValue();
-      }
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+      return HttpStatus.SC_OK == response.getStatusLine().getStatusCode();
     } finally {
       closeConnection(response);
     }
