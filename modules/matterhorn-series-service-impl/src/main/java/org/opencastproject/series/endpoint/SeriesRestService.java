@@ -30,6 +30,30 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.rest.RestConstants;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
+import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.series.api.SeriesException;
+import org.opencastproject.series.api.SeriesQuery;
+import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.SolrUtils;
+import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.doc.rest.RestParameter;
+import org.opencastproject.util.doc.rest.RestQuery;
+import org.opencastproject.util.doc.rest.RestResponse;
+import org.opencastproject.util.doc.rest.RestService;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,29 +72,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
-import org.opencastproject.rest.RestConstants;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AccessControlParser;
-import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.series.api.SeriesException;
-import org.opencastproject.series.api.SeriesQuery;
-import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
-import org.opencastproject.util.SolrUtils;
-import org.opencastproject.util.doc.rest.RestParameter;
-import org.opencastproject.util.doc.rest.RestQuery;
-import org.opencastproject.util.doc.rest.RestResponse;
-import org.opencastproject.util.doc.rest.RestService;
-import org.osgi.service.component.ComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * REST endpoint for Series Service.
@@ -283,8 +284,8 @@ public class SeriesRestService {
       String serializedSeries = serializeDublinCore(newSeries);
       logger.debug("Created series {} ", id);
       return Response.status(CREATED)
-              .header("Location", PathSupport.concat(new String[] { this.serverUrl, this.serviceUrl, id + ".xml" }))
-              .header("Location", PathSupport.concat(new String[] { this.serverUrl, this.serviceUrl, id + ".json" }))
+              .header("Location", UrlSupport.concat(new String[] { this.serverUrl, this.serviceUrl, id + ".xml" }))
+              .header("Location", UrlSupport.concat(new String[] { this.serverUrl, this.serviceUrl, id + ".json" }))
               .entity(serializedSeries).build();
     } catch (Exception e) {
       logger.warn("Could not add/update series: {}", e.getMessage());
