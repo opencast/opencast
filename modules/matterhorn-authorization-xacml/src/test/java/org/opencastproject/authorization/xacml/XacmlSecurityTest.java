@@ -214,7 +214,7 @@ public class XacmlSecurityTest {
      * @see org.opencastproject.workspace.api.Workspace#getCollectionContents(java.lang.String)
      */
     @Override
-    public URI[] getCollectionContents(String collectionId) throws IOException {
+    public URI[] getCollectionContents(String collectionId) throws NotFoundException {
       // TODO Auto-generated method stub
       return null;
     }

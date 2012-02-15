@@ -33,6 +33,7 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpStatus;
 import org.apache.tika.metadata.HttpHeaders;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -156,12 +157,16 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   @Path(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX + "{mediaPackageID}/{mediaPackageElementID}")
   @RestQuery(name = "delete", description = "Remove the file from the working repository under /mediaPackageID/mediaPackageElementID", returnDescription = "No content", pathParameters = {
           @RestParameter(name = "mediaPackageID", description = "the mediapackage identifier", isRequired = true, type = STRING),
-          @RestParameter(name = "mediaPackageElementID", description = "the mediapackage element identifier", isRequired = true, type = STRING) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "File deleted") })
+          @RestParameter(name = "mediaPackageElementID", description = "the mediapackage element identifier", isRequired = true, type = STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "File deleted"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "File did not exist") })
   public Response restDelete(@PathParam("mediaPackageID") String mediaPackageID,
           @PathParam("mediaPackageElementID") String mediaPackageElementID) {
     try {
-      this.delete(mediaPackageID, mediaPackageElementID);
-      return Response.noContent().build();
+      if (delete(mediaPackageID, mediaPackageElementID))
+        return Response.ok().build();
+      else
+        return Response.status(HttpStatus.SC_NOT_FOUND).build();
     } catch (Exception e) {
       return Response.serverError().entity(e.getMessage()).build();
     }

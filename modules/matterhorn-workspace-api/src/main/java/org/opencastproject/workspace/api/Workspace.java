@@ -59,8 +59,11 @@ public interface Workspace {
    * @param in
    * @throws IOException
    *           if writing the data to the workspace fails
+   * @throws IllegalArgumentException
+   *           if a URI cannot be created using the arguments provided
    */
-  URI put(String mediaPackageID, String mediaPackageElementID, String fileName, InputStream in) throws IOException;
+  URI put(String mediaPackageID, String mediaPackageElementID, String fileName, InputStream in) throws IOException,
+          IllegalArgumentException;
 
   /**
    * Stores the data stream in the given collection, overwriting any data with the same collection id and file name.
@@ -74,8 +77,11 @@ public interface Workspace {
    * @return the URI of the stored data
    * @throws IOException
    *           if writing the data to the workspace fails
+   * @throws IllegalArgumentException
+   *           if a URI cannot be created using the arguments provided
    */
-  URI putInCollection(String collectionId, String fileName, InputStream in) throws IOException;
+  URI putInCollection(String collectionId, String fileName, InputStream in) throws IOException,
+          IllegalArgumentException;
 
   /**
    * Gets the URIs of the members of this collection
@@ -83,10 +89,12 @@ public interface Workspace {
    * @param collectionId
    *          the collection identifier
    * @return the URIs for each member of the collection
-   * @throws IOException
-   *           if reading the collection contents fails
+   * @throws NotFoundException
+   *           if the collection cannot be found
+   * @throws IllegalArgumentException
+   *           if a URI cannot be created using the arguments provided
    */
-  URI[] getCollectionContents(String collectionId) throws IOException;
+  URI[] getCollectionContents(String collectionId) throws NotFoundException, IllegalArgumentException;
 
   /**
    * Delete the file stored at the given uri.
@@ -132,23 +140,32 @@ public interface Workspace {
    * yet stored.
    * 
    * @deprecated Please use {@link #getURI(String, String, String)} instead
-   * @param mediaPackageID the mediapackage identifier
-   * @param mediaPackageElementID the element identifier
+   * @param mediaPackageID
+   *          the mediapackage identifier
+   * @param mediaPackageElementID
+   *          the element identifier
    * @return the URI to the file
+   * @throws IllegalArgumentException
+   *           if a URI cannot be created using the arguments provided
    */
-  URI getURI(String mediaPackageID, String mediaPackageElementID);
+  URI getURI(String mediaPackageID, String mediaPackageElementID) throws IllegalArgumentException;
 
   /**
    * Get the URL for a file stored under the given media package and element IDs. MediaPackages may reference elements
    * that are not yet stored in the working file repository, so this method will return a URI even if the file is not
    * yet stored.
    * 
-   * @param mediaPackageID the mediapackage identifier
-   * @param mediaPackageElementID the element identifier
-   * @param filename the filename
+   * @param mediaPackageID
+   *          the mediapackage identifier
+   * @param mediaPackageElementID
+   *          the element identifier
+   * @param filename
+   *          the filename
    * @return the URI to the file
+   * @throws IllegalArgumentException
+   *           if a URI cannot be created using the arguments provided
    */
-  URI getURI(String mediaPackageID, String mediaPackageElementID, String filename);
+  URI getURI(String mediaPackageID, String mediaPackageElementID, String filename) throws IllegalArgumentException;
 
   /**
    * Get the URL for a file stored under the given collection.
@@ -158,8 +175,10 @@ public interface Workspace {
    * @param fileName
    *          the file name
    * @return the file's uri
+   * @throws IllegalArgumentException
+   *           if a URI cannot be created using the arguments provided
    */
-  URI getCollectionURI(String collectionID, String fileName);
+  URI getCollectionURI(String collectionID, String fileName) throws IllegalArgumentException;
 
   /**
    * Moves a file from a collection into a mediapackage
@@ -173,9 +192,15 @@ public interface Workspace {
    * @param toFileName
    *          the name of the resulting file
    * @return the URI pointing to the file's new location
+   * @throws NotFoundException
+   *           if the element identified by <code>collectionURI</code> cannot be found
+   * @throws IOException
+   *           if either the original element cannot be read or it cannot be moved to the new location
+   * @throws IllegalArgumentException
+   *           if a URI cannot be created using the arguments provided
    */
   URI moveTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
-          throws NotFoundException, IOException;
+          throws NotFoundException, IOException, IllegalArgumentException;
 
   /**
    * Copies a file from a collection into a mediapackage
@@ -189,8 +214,14 @@ public interface Workspace {
    * @param toFileName
    *          the name of the resulting file
    * @return the URI pointing to the file's new location
+   * @throws NotFoundException
+   *           if the element identified by <code>collectionURI</code> cannot be found
+   * @throws IOException
+   *           if either the original element cannot be read or the copy cannot be written to the new location
+   * @throws IllegalArgumentException
+   *           if a URI cannot be created using the arguments provided
    */
   URI copyTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
-    throws NotFoundException, IOException;
+          throws NotFoundException, IOException, IllegalArgumentException;
 
 }
