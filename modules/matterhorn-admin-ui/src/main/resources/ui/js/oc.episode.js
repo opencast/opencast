@@ -71,7 +71,7 @@ opencast.episode = (function() {
       title: json.dcTitle,
       seriesTitle: json.mediapackage.seriestitle,
       creators: _.pluck(A(json.mediapackage.creators), "creator").join(", "),
-      date: ocUtils.fromUTCDateStringToFormattedTime(json.mediapackage.start),
+      date: json.mediapackage.start ? ocUtils.fromUTCDateStringToFormattedTime(json.mediapackage.start) : "?",
       // the name of the workflow that is currently being applied to this episode
       workflow: "",
       media: _(A(json.mediapackage.media.track)).chain()
