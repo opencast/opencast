@@ -84,12 +84,6 @@ subversion
 wget
 openssh-server
 gcc
-gstreamer0.10-alsa
-gstreamer0.10-plugins-base
-gstreamer0.10-plugins-good
-gstreamer0.10-plugins-ugly
-gstreamer0.10-plugins-ugly-multiverse
-gstreamer0.10-ffmpeg
 ntp
 acpid"
 
