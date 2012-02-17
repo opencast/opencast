@@ -820,10 +820,6 @@ Opencast.Initialize = (function ()
 	    Opencast.Player.addEvent(Opencast.logging.EMAIL);
             Opencast.Player.doToggleShare();
         });
-        $('#oc_btn-email').click(function ()
-        {
-            Opencast.Player.doToggleShareTime();
-        });
         $('#oc_time-chooser').click(function ()
         {
             Opencast.Player.doToggleTimeLayer();

@@ -63,6 +63,7 @@ Opencast.logging = (function ()
       SHOW_ANNOTATIONS = "SHOW_ANNOTATIONS",
       SHOW_DESCRIPTION = "SHOW_DESCRIPTION",  //The description tab was activated
       SHOW_EMBED = "SHOW_EMBED",  //The embed generation dialog was shown
+      SHOW_VIDEO_AT_CURRENT_TIME = "SHOW_VIDEO_AT_CURRENT_TIME",  //The video at curent time-share-link was shown
       SHOW_NOTES = "SHOW_NOTES",
       SHOW_SEGMENTS = "SHOW_SEGMENTS",  //The segments tab was activated
       SHOW_SHARE = "SHOW_SHARE",  //The share option dialog was shown
@@ -129,6 +130,7 @@ Opencast.logging = (function ()
       SHOW_ANNOTATIONS: SHOW_ANNOTATIONS,
       SHOW_DESCRIPTION: SHOW_DESCRIPTION,
       SHOW_EMBED: SHOW_EMBED,
+      SHOW_VIDEO_AT_CURRENT_TIME: SHOW_VIDEO_AT_CURRENT_TIME,
       SHOW_NOTES: SHOW_NOTES,
       SHOW_SEGMENTS: SHOW_SEGMENTS,
       SHOW_SHARE: SHOW_SHARE,

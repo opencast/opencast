@@ -662,7 +662,9 @@ Opencast.Player = (function ()
         }
         else
         {
-            showShareTime();
+	    hideShare();
+	    showShareTime();
+	    addEvent(Opencast.logging.SHOW_VIDEO_AT_CURRENT_TIME);
         }
         // Opencast.Initialize.doResize();
     }
