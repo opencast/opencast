@@ -26,6 +26,7 @@ public class EpisodeQuery {
   private boolean includeLocked = false;
   private String id;
   private String text;
+  private String seriesId;
   private String seriesTitle;
   private String creator;
   private String contributor;
@@ -75,6 +76,11 @@ public class EpisodeQuery {
     return this;
   }
 
+  public EpisodeQuery withSeriesId(String seriesId) {
+    this.seriesId = seriesId;
+    return this;
+  }
+
   public EpisodeQuery withSeriesTitle(String seriesTitle) {
     this.seriesTitle = seriesTitle;
     return this;
@@ -103,6 +109,10 @@ public class EpisodeQuery {
   public EpisodeQuery withTitle(String title) {
     this.title = title;
     return this;
+  }
+
+  public String getSeriesId() {
+    return seriesId;
   }
 
   public String getSeriesTitle() {

@@ -579,6 +579,7 @@ public class SolrRequester {
     append(sb, Schema.DC_LANGUAGE, q.getLanguage());
     appendFuzzy(sb, Schema.DC_LICENSE_SUM, q.getLicense());
     appendFuzzy(sb, Schema.DC_TITLE_SUM, q.getTitle());
+    append(sb, Schema.DC_IS_PART_OF, q.getSeriesId());
 
     if (q.getElementTags() != null && q.getElementTags().length > 0) {
       if (sb.length() > 0)

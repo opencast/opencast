@@ -508,9 +508,18 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       }
     }
 
+    // Get the current user
     User currentUser = securityService.getUser();
+    if (currentUser == null)
+      throw new SecurityException("Current user is unknown");
+
+    // Get the current organization
+    Organization organization = securityService.getOrganization();
+    if (organization == null)
+      throw new SecurityException("Current organization is unknown");
+    
     WorkflowInstance workflowInstance = new WorkflowInstanceImpl(workflowDefinition, sourceMediaPackage,
-            parentWorkflowId, currentUser, properties);
+            parentWorkflowId, currentUser, organization, properties);
     workflowInstance = updateConfiguration(workflowInstance, properties);
 
     // Create and configure the workflow instance
@@ -768,36 +777,36 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
       Job job = null;
       switch (workflow.getState()) {
-        case FAILED:
+      case FAILED:
+        update(workflow);
+        break;
+      case FAILING:
+      case RUNNING:
+        try {
+          job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
+                  Arrays.asList(Long.toString(workflow.getId())), null, false);
+          currentOperation.setId(job.getId());
           update(workflow);
-          break;
-        case FAILING:
-        case RUNNING:
-          try {
-            job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
-                    Arrays.asList(Long.toString(workflow.getId())), null, false);
-            currentOperation.setId(job.getId());
-            update(workflow);
-            job.setStatus(Status.QUEUED);
-            job.setDispatchable(true);
-            serviceRegistry.updateJob(job);
-          } catch (ServiceRegistryException e) {
-            throw new WorkflowDatabaseException(e);
-          } catch (NotFoundException e) {
-            // this should be impossible
-            throw new IllegalStateException("Unable to find a job that was just created");
-          }
-          break;
-        case PAUSED:
-        case STOPPED:
-        case SUCCEEDED:
-          update(workflow);
-          break;
-        case INSTANTIATED:
-          update(workflow);
-          throw new IllegalStateException("Impossible workflow state found during processing");
-        default:
-          throw new IllegalStateException("Unkown workflow state found during processing");
+          job.setStatus(Status.QUEUED);
+          job.setDispatchable(true);
+          serviceRegistry.updateJob(job);
+        } catch (ServiceRegistryException e) {
+          throw new WorkflowDatabaseException(e);
+        } catch (NotFoundException e) {
+          // this should be impossible
+          throw new IllegalStateException("Unable to find a job that was just created");
+        }
+        break;
+      case PAUSED:
+      case STOPPED:
+      case SUCCEEDED:
+        update(workflow);
+        break;
+      case INSTANTIATED:
+        update(workflow);
+        throw new IllegalStateException("Impossible workflow state found during processing");
+      default:
+        throw new IllegalStateException("Unkown workflow state found during processing");
       }
 
     }
@@ -831,7 +840,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     update(instance);
     return instance;
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -841,7 +850,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
           UnauthorizedException, WorkflowParsingException {
     WorkflowQuery query = new WorkflowQuery();
     query.withId(Long.toString(workflowInstanceId));
-    WorkflowSet workflows = index.getWorkflowInstances(query);
+    WorkflowSet workflows = index.getWorkflowInstances(query, READ_PERMISSION, false);
     if (workflows.size() == 1) {
       WorkflowInstance[] w = workflows.getItems();
       try {
@@ -1049,29 +1058,29 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
       // Synchronize workflow and job state
       switch (workflowState) {
-        case FAILED:
-          job.setStatus(Status.FAILED);
-          break;
-        case FAILING:
-          break;
-        case INSTANTIATED:
-          job.setDispatchable(true);
-          job.setStatus(Status.QUEUED);
-          break;
-        case PAUSED:
-          job.setStatus(Status.PAUSED);
-          break;
-        case RUNNING:
-          job.setStatus(Status.RUNNING);
-          break;
-        case STOPPED:
-          job.setStatus(Status.DELETED);
-          break;
-        case SUCCEEDED:
-          job.setStatus(Status.FINISHED);
-          break;
-        default:
-          throw new IllegalStateException("Found a workflow state that is not handled");
+      case FAILED:
+        job.setStatus(Status.FAILED);
+        break;
+      case FAILING:
+        break;
+      case INSTANTIATED:
+        job.setDispatchable(true);
+        job.setStatus(Status.QUEUED);
+        break;
+      case PAUSED:
+        job.setStatus(Status.PAUSED);
+        break;
+      case RUNNING:
+        job.setStatus(Status.RUNNING);
+        break;
+      case STOPPED:
+        job.setStatus(Status.DELETED);
+        break;
+      case SUCCEEDED:
+        job.setStatus(Status.FINISHED);
+        break;
+      default:
+        throw new IllegalStateException("Found a workflow state that is not handled");
       }
 
       index(workflowInstance);
@@ -1145,7 +1154,21 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstances(org.opencastproject.workflow.api.WorkflowQuery)
    */
   public WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
-    return index.getWorkflowInstances(query);
+    return index.getWorkflowInstances(query, READ_PERMISSION, true);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesForAdministrativeRead(org.opencastproject.workflow.api.WorkflowQuery)
+   */
+  public WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery query) throws WorkflowDatabaseException,
+          UnauthorizedException {
+    User user = securityService.getUser();
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE)) {
+      throw new UnauthorizedException(user, getClass().getName() + ".getForAdministrativeRead");
+    }
+    return index.getWorkflowInstances(query, READ_PERMISSION, false);
   }
 
   /**
@@ -1250,38 +1273,38 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
     // Adjust the operation state
     switch (action) {
-      case CONTINUE:
-        currentOperation.setState(OperationState.SUCCEEDED);
-        break;
-      case PAUSE:
-        if (!(handler instanceof ResumableWorkflowOperationHandler)) {
-          throw new IllegalStateException("Operation " + currentOperation.getTemplate() + " is not resumable");
+    case CONTINUE:
+      currentOperation.setState(OperationState.SUCCEEDED);
+      break;
+    case PAUSE:
+      if (!(handler instanceof ResumableWorkflowOperationHandler)) {
+        throw new IllegalStateException("Operation " + currentOperation.getTemplate() + " is not resumable");
+      }
+
+      // Set abortable and continuable to default values
+      currentOperation.setContinuable(result.allowsContinue());
+      currentOperation.setAbortable(result.allowsAbort());
+
+      ResumableWorkflowOperationHandler resumableHandler = (ResumableWorkflowOperationHandler) handler;
+      try {
+        String url = resumableHandler.getHoldStateUserInterfaceURL(workflow);
+        if (url != null) {
+          String holdActionTitle = resumableHandler.getHoldActionTitle();
+          currentOperation.setHoldActionTitle(holdActionTitle);
+          currentOperation.setHoldStateUserInterfaceUrl(url);
         }
+      } catch (WorkflowOperationException e) {
+        logger.warn("unable to replace workflow ID in the hold state URL", e);
+      }
 
-        // Set abortable and continuable to default values
-        currentOperation.setContinuable(result.allowsContinue());
-        currentOperation.setAbortable(result.allowsAbort());
-
-        ResumableWorkflowOperationHandler resumableHandler = (ResumableWorkflowOperationHandler) handler;
-        try {
-          String url = resumableHandler.getHoldStateUserInterfaceURL(workflow);
-          if (url != null) {
-            String holdActionTitle = resumableHandler.getHoldActionTitle();
-            currentOperation.setHoldActionTitle(holdActionTitle);
-            currentOperation.setHoldStateUserInterfaceUrl(url);
-          }
-        } catch (WorkflowOperationException e) {
-          logger.warn("unable to replace workflow ID in the hold state URL", e);
-        }
-
-        workflow.setState(PAUSED);
-        currentOperation.setState(OperationState.PAUSED);
-        break;
-      case SKIP:
-        currentOperation.setState(OperationState.SKIPPED);
-        break;
-      default:
-        throw new IllegalStateException("Unknown action '" + action + "' returned");
+      workflow.setState(PAUSED);
+      currentOperation.setState(OperationState.PAUSED);
+      break;
+    case SKIP:
+      currentOperation.setState(OperationState.SKIPPED);
+      break;
+    default:
+      throw new IllegalStateException("Unknown action '" + action + "' returned");
     }
 
     return workflow;
@@ -1476,37 +1499,37 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       try {
         op = Operation.valueOf(operation);
         switch (op) {
-          case START_WORKFLOW:
-            workflowInstance = WorkflowParser.parseWorkflowInstance(job.getPayload());
-            logger.debug("Starting new workflow {}", workflowInstance);
-            runWorkflow(workflowInstance);
-            break;
-          case RESUME:
-            workflowInstance = getWorkflowById(Long.parseLong(arguments.get(0)));
-            wfo = workflowInstance.getCurrentOperation();
-            Map<String, String> properties = null;
-            if (arguments.size() > 1) {
-              Properties props = new Properties();
-              props.load(IOUtils.toInputStream(arguments.get(arguments.size() - 1)));
-              properties = new HashMap<String, String>();
-              for (Entry<Object, Object> entry : props.entrySet()) {
-                properties.put(entry.getKey().toString(), entry.getValue().toString());
-              }
+        case START_WORKFLOW:
+          workflowInstance = WorkflowParser.parseWorkflowInstance(job.getPayload());
+          logger.debug("Starting new workflow {}", workflowInstance);
+          runWorkflow(workflowInstance);
+          break;
+        case RESUME:
+          workflowInstance = getWorkflowById(Long.parseLong(arguments.get(0)));
+          wfo = workflowInstance.getCurrentOperation();
+          Map<String, String> properties = null;
+          if (arguments.size() > 1) {
+            Properties props = new Properties();
+            props.load(IOUtils.toInputStream(arguments.get(arguments.size() - 1)));
+            properties = new HashMap<String, String>();
+            for (Entry<Object, Object> entry : props.entrySet()) {
+              properties.put(entry.getKey().toString(), entry.getValue().toString());
             }
-            logger.debug("Resuming {} at {}", workflowInstance, workflowInstance.getCurrentOperation());
-            workflowInstance.setState(RUNNING);
-            update(workflowInstance);
-            wfo = runWorkflowOperation(workflowInstance, properties);
-            break;
-          case START_OPERATION:
-            workflowInstance = getWorkflowById(Long.parseLong(arguments.get(0)));
-            wfo = workflowInstance.getCurrentOperation();
-            logger.debug("Running {} {}", workflowInstance, wfo);
-            wfo = runWorkflowOperation(workflowInstance, null);
-            updateOperationJob(job.getId(), wfo.getState());
-            break;
-          default:
-            throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
+          }
+          logger.debug("Resuming {} at {}", workflowInstance, workflowInstance.getCurrentOperation());
+          workflowInstance.setState(RUNNING);
+          update(workflowInstance);
+          wfo = runWorkflowOperation(workflowInstance, properties);
+          break;
+        case START_OPERATION:
+          workflowInstance = getWorkflowById(Long.parseLong(arguments.get(0)));
+          wfo = workflowInstance.getCurrentOperation();
+          logger.debug("Running {} {}", workflowInstance, wfo);
+          wfo = runWorkflowOperation(workflowInstance, null);
+          updateOperationJob(job.getId(), wfo.getState());
+          break;
+        default:
+          throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
         }
       } catch (IllegalArgumentException e) {
         throw new ServiceRegistryException("This service can't handle operations of type '" + op + "'", e);
@@ -1552,19 +1575,19 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       return null;
     Job job = serviceRegistry.getJob(jobId);
     switch (state) {
-      case FAILED:
-        job.setStatus(Status.FAILED);
-        break;
-      case PAUSED:
-        job.setStatus(Status.PAUSED);
-        job.setOperation(Operation.RESUME.toString());
-        break;
-      case SKIPPED:
-      case SUCCEEDED:
-        job.setStatus(Status.FINISHED);
-        break;
-      default:
-        throw new IllegalStateException("Unexpected state '" + state + "' found");
+    case FAILED:
+      job.setStatus(Status.FAILED);
+      break;
+    case PAUSED:
+      job.setStatus(Status.PAUSED);
+      job.setOperation(Operation.RESUME.toString());
+      break;
+    case SKIPPED:
+    case SUCCEEDED:
+      job.setStatus(Status.FINISHED);
+      break;
+    default:
+      throw new IllegalStateException("Unexpected state '" + state + "' found");
     }
     return serviceRegistry.updateJob(job);
   }

@@ -69,12 +69,14 @@ public interface WorkflowServiceIndex {
    * 
    * @param query
    *          the query to use in the search for workflow instances
+   * @param action TODO
+   * @param applyPermissions TODO
    * 
    * @return the set of matching workflow instances
    * @throws WorkflowDatabaseException
    *           if there is a problem retrieving the workflow instances from persistence
    */
-  WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException;
+  WorkflowSet getWorkflowInstances(WorkflowQuery query, String action, boolean applyPermissions) throws WorkflowDatabaseException;
 
   /**
    * Returns the workflow statistics.
