@@ -44,10 +44,10 @@ import javax.persistence.TemporalType;
  * Persists the last harvested time of a url.
  */
 @Entity
-@Table(name = "last_harvested")
+@Table(name = "oaipmh_harvesting")
 @NamedQueries({
     @NamedQuery(name = "findLastHarvested",
-        query = "SELECT a.timestamp FROM LastHarvested a WHERE a.url = :url"),
+        query = "SELECT a.lastHarvested FROM LastHarvested a WHERE a.url = :url"),
     @NamedQuery(name = "findAll",
         query = "SELECT a FROM LastHarvested a")
 })
@@ -57,9 +57,9 @@ public class LastHarvested {
   @Column(name = "url")
   private String url;
 
-  @Column(name = "timestamp")
+  @Column(name = "last_harvested")
   @Temporal(TemporalType.TIMESTAMP)
-  private Date timestamp;
+  private Date lastHarvested;
 
   /**
    * JPA constructor.
@@ -69,7 +69,7 @@ public class LastHarvested {
 
   public LastHarvested(String url, Date timestamp) {
     this.url = url;
-    this.timestamp = timestamp;
+    this.lastHarvested = timestamp;
   }
 
   public String getUrl() {
@@ -77,7 +77,7 @@ public class LastHarvested {
   }
 
   public Date getTimestamp() {
-    return timestamp;
+    return lastHarvested;
   }
 
   public static Option<Date> getLastHarvestDate(PersistenceEnv penv, final String url) {
