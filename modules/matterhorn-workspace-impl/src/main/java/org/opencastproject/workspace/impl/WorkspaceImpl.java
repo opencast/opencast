@@ -184,7 +184,8 @@ public class WorkspaceImpl implements Workspace {
     File f = getWorkspaceFile(uri, false);
 
     // Does the file exist and is it up to date?
-    Long workspaceFileLastModified = new Long(0); //make sure this is not null, otherwise the requested file can not be copied
+    Long workspaceFileLastModified = new Long(0); // make sure this is not null, otherwise the requested file can not be
+                                                  // copied
     if (f.isFile()) {
       workspaceFileLastModified = new Long(f.lastModified());
     }
@@ -267,14 +268,19 @@ public class WorkspaceImpl implements Workspace {
    * @param file
    *          the source file
    * @return the md5 hash
+   * @throws IOException
+   *           if the file cannot be accessed
+   * @throws IllegalArgumentException
+   *           if <code>file</code> is <code>null</code>
+   * @throws IllegalStateException
+   *           if <code>file</code> does not exist or is not a regular file
    */
-  protected String md5(File file) throws IOException {
-    if (file == null) {
+  protected String md5(File file) throws IOException, IllegalArgumentException, IllegalStateException {
+    if (file == null)
       throw new IllegalArgumentException("File must not be null");
-    }
-    if (!file.exists() || !file.isFile()) {
+    if (!file.isFile())
       throw new IllegalArgumentException("File " + file.getAbsolutePath() + " can not be read");
-    }
+
     InputStream in = null;
     try {
       in = new FileInputStream(file);
@@ -350,13 +356,9 @@ public class WorkspaceImpl implements Workspace {
     // Determine the target location in the workspace
     File workspaceFile = null;
     FileOutputStream out = null;
-    try {
-      synchronized (wsRoot) {
-        workspaceFile = getWorkspaceFile(uri, true);
-        FileUtils.touch(workspaceFile);
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    synchronized (wsRoot) {
+      workspaceFile = getWorkspaceFile(uri, true);
+      FileUtils.touch(workspaceFile);
     }
 
     // Try hard linking first and fall back to tee-ing to both the working file repository and the workspace
@@ -398,14 +400,10 @@ public class WorkspaceImpl implements Workspace {
     InputStream tee = null;
     File tempFile = null;
     FileOutputStream out = null;
-    try {
-      synchronized (wsRoot) {
-        tempFile = getWorkspaceFile(uri, true);
-        FileUtils.touch(tempFile);
-        out = new FileOutputStream(tempFile);
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    synchronized (wsRoot) {
+      tempFile = getWorkspaceFile(uri, true);
+      FileUtils.touch(tempFile);
+      out = new FileOutputStream(tempFile);
     }
 
     // Try hard linking first and fall back to tee-ing to both the working file repository and the workspace
@@ -457,7 +455,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.workspace.api.Workspace#getURI(java.lang.String, java.lang.String, java.lang.String)
    */
   public URI getURI(String mediaPackageID, String mediaPackageElementID, String filename) {
@@ -531,7 +529,7 @@ public class WorkspaceImpl implements Workspace {
    * @see org.opencastproject.workspace.api.Workspace#getCollectionContents(java.lang.String)
    */
   @Override
-  public URI[] getCollectionContents(String collectionId) throws IOException {
+  public URI[] getCollectionContents(String collectionId) throws NotFoundException {
     return wfr.getCollectionContents(collectionId);
   }
 

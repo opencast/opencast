@@ -34,7 +34,7 @@ public class JobPropertyJpaImpl {
   protected JobJpaImpl rootJob;
 
   @Id
-  @Column(name = "key")
+  @Column(name = "key_entry", length = 255)
   protected String key;
 
   @Lob

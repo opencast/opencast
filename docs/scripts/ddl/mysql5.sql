@@ -57,6 +57,12 @@ CREATE TABLE host_registration (
 	id)
 );
 
+CREATE TABLE job_context (
+  root_job BIGINT NOT NULL,
+  key_entry VARCHAR(255) NOT NULL,
+  value TEXT(65535)
+);
+
 CREATE TABLE job_arguments (
 	id BIGINT NOT NULL,
 	argument TEXT(2147483647),
@@ -79,8 +85,8 @@ CREATE TABLE job (
 	queue_time BIGINT,
 	creator_service BIGINT,
 	parent_id BIGINT,
-	processor_service BIGINT,
 	root_id BIGINT,
+	processor_service BIGINT,
 	PRIMARY KEY (
 	id)
 );
@@ -187,6 +193,11 @@ ALTER TABLE job ADD CONSTRAINT FK_job_root_id FOREIGN KEY (
 ALTER TABLE job_arguments ADD CONSTRAINT UNQ_job_arguments_0 UNIQUE (
 	id,
 	list_index
+);
+
+ALTER TABLE job_context ADD CONSTRAINT UNQ_job_context_0 UNIQUE (
+	root_job,
+	key_entry
 );
 
 ALTER TABLE service_registration ADD CONSTRAINT FK_service_registration_host_registration FOREIGN KEY (

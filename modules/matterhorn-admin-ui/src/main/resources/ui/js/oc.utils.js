@@ -157,13 +157,13 @@ ocUtils.fromUTCDateString = function(UTCDate) {
     var dateTime = UTCDate.slice(0,-1).split("T");
     var ymd = dateTime[0].split("-");
     var hms = dateTime[1].split(":");
+    date.setUTCFullYear(parseInt(ymd[0], 10));
+    date.setUTCMonth(parseInt(ymd[1], 10) - 1);
     date.setUTCMilliseconds(0);
     date.setUTCSeconds(parseInt(hms[2], 10));
     date.setUTCMinutes(parseInt(hms[1], 10));
     date.setUTCHours(parseInt(hms[0], 10));
     date.setUTCDate(parseInt(ymd[2], 10));
-    date.setUTCMonth(parseInt(ymd[1], 10) - 1);
-    date.setUTCFullYear(parseInt(ymd[0], 10));
   }
   return date;
 }

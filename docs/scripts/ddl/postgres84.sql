@@ -109,7 +109,16 @@ CREATE TABLE "job_arguments" (
   "list_index" bigint DEFAULT NULL,
   CONSTRAINT "UNQ_job_arguments_0" UNIQUE ("id", "list_index")
 );
-CREATE INDEX "IX_job_arguments_UNQ_job_arguments_0" on "job_arguments" ("id", "list_index");
+
+--
+-- Table: job_context
+--
+CREATE TABLE "job_context" (
+  "root_job" bigint NOT NULL,
+  "key_entry" character varying(255) NOT NULL,
+  "value" text,
+  CONSTRAINT "UNQ_job_context_0" UNIQUE ("root_job", "key_entry")
+);
 
 --
 -- Table: matterhorn_role

@@ -84,6 +84,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
    *          the OSGI bundle context
    */
   public LdapUserProviderFactory(BundleContext bundleContext) {
+    logger.debug("Creating LdapUserProviderFactory");
     providerRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
     this.bundleContext = bundleContext;
   }
@@ -105,7 +106,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
    */
   @Override
   public void updated(String pid, Dictionary properties) throws ConfigurationException {
-
+    logger.debug("Updating LdapUserProviderFactory");
     String organization = (String) properties.get(ORGANIZATION_KEY);
     if (StringUtils.isBlank(organization))
       throw new ConfigurationException(ORGANIZATION_KEY, "is not set");
@@ -123,13 +124,14 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     String roleAttributesGlob = (String) properties.get(ROLE_ATTRIBUTES_KEY);
 
     int cacheSize = 1000;
-    Integer configuredCacheSize = (Integer) properties.get(CACHE_SIZE);
+    logger.debug("Using cache size " + properties.get(CACHE_SIZE) + " for " + LdapUserProviderFactory.class.getName());
+    Integer configuredCacheSize = Integer.parseInt((String) properties.get(CACHE_SIZE));
     if (configuredCacheSize != null) {
       cacheSize = configuredCacheSize.intValue();
     }
 
     int cacheExpiration = 1;
-    Integer configuredCacheExpiration = (Integer) properties.get(CACHE_EXPIRATION);
+    Integer configuredCacheExpiration = Integer.parseInt((String) properties.get(CACHE_EXPIRATION));
     if (configuredCacheExpiration != null) {
       cacheExpiration = configuredCacheExpiration.intValue();
     }
