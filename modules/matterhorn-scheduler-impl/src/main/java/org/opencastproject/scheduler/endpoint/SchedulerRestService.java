@@ -877,12 +877,24 @@ public class SchedulerRestService {
   @Path("calendars")
   @RestQuery(name = "getcalendar", description = "Returns iCalendar for specified set of events", returnDescription = "ICalendar for events", restParameters = {
           @RestParameter(name = "agentid", description = "Filter events by capture agent", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "seriesid", description = "Filter events by series", isRequired = false, type = Type.STRING) }, reponses = {
+          @RestParameter(name = "seriesid", description = "Filter events by series", isRequired = false, type = Type.STRING),
+          @RestParameter(name = "cutoff", description = "A cutoff date at which the number of events returned in the calendar are limited.", isRequired = false, type = Type.STRING) },
+          reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "Events were not modified since last request"),
           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Events were modified, new calendar is in the body") })
-  public Response getCalendar(@QueryParam("agentid") String captureAgentId, @QueryParam("seriesid") String seriesId,
+  public Response getCalendar(@QueryParam("agentid") String captureAgentId, @QueryParam("seriesid") String seriesId, @QueryParam("cutoff") String cutoff,
           @Context HttpServletRequest request) {
     SchedulerQuery filter = new SchedulerQuery().setSpatial(captureAgentId).setSeriesId(seriesId);
+    
+    if (StringUtils.isNotEmpty(cutoff)) {
+      try {
+        Date endDate = new Date(Long.valueOf(cutoff));
+        filter = new SchedulerQuery().setSpatial(captureAgentId).setSeriesId(seriesId).setEndsFrom(new Date(System.currentTimeMillis())).setStartsTo(endDate);
+      } catch (NumberFormatException e) {
+        return Response.status(Status.BAD_REQUEST).build();
+      }
+    }
+    
     try { // If the etag matches the if-not-modified header,return a 304
       Date lastModified = service.getScheduleLastModified(filter);
       if (lastModified == null) {
