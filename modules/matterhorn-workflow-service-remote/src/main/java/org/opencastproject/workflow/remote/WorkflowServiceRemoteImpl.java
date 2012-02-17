@@ -221,6 +221,17 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   /**
    * {@inheritDoc}
    * 
+   * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesForAdministrativeRead(org.opencastproject.workflow.api.WorkflowQuery)
+   */
+  @Override
+  public WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery q) throws WorkflowDatabaseException,
+          UnauthorizedException {
+    return getWorkflowInstances(q);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see org.opencastproject.workflow.api.WorkflowService#getStatistics()
    */
   @Override

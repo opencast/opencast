@@ -311,6 +311,7 @@ public class EpisodeRestService {
           @RestParameter(name = "creator", isRequired = false, description = "Filter results by the mediapackage's creator", type = STRING),
           @RestParameter(name = "contributor", isRequired = false, description = "Filter results by the mediapackage's contributor", type = STRING),
           @RestParameter(name = "language", isRequired = false, description = "Filter results by mediapackage's language.", type = STRING),
+          @RestParameter(name = "series", isRequired = false, description = "Filter results by mediapackage's series identifier.", type = STRING),
           @RestParameter(name = "license", isRequired = false, description = "Filter results by mediapackage's license.", type = STRING),
           @RestParameter(name = "title", isRequired = false, description = "Filter results by mediapackage's title.", type = STRING),
           @RestParameter(defaultValue = "false", description = "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".", isRequired = false, name = "episodes", type = RestParameter.Type.STRING),
@@ -331,6 +332,7 @@ public class EpisodeRestService {
                              @QueryParam("creator") String creator,
                              @QueryParam("contributor") String contributor,
                              @QueryParam("language") String language,
+                             @QueryParam("series") String series,
                              @QueryParam("license") String license,
                              @QueryParam("title") String title,
                              @QueryParam("tag") String[] tags,
@@ -364,6 +366,7 @@ public class EpisodeRestService {
         .withCreator(creator)
         .withContributor(contributor)
         .withLanguage(language)
+        .withSeriesId(series)
         .withLicense(license)
         .withTitle(title);
 
