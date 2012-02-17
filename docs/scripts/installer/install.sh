@@ -425,13 +425,13 @@ while [[ ! "$source_ok" ]] ; do
     while [[ ! "$build_ok" ]]; do
 	cd $SOURCE
 	if [ "$MATTERHORN_PROFILE" == "work" ]; then
-	  PROFILE="-Pworker,ingest,$WORKSPACE_VERSION"
+	  PROFILE="-Pworker,ingest,serviceregistry,$WORKSPACE_VERSION"
 	fi
 	if [ "$MATTERHORN_PROFILE" == "admin" ]; then
-	  PROFILE="-Padmin,dist-stub,engage-stub,worker-stub,workspace"
+	  PROFILE="-Padmin,dist-stub,engage-stub,worker-stub,workspace,serviceregistry"
 	fi
 	if [ "$MATTERHORN_PROFILE" == "engage" ]; then
-	  PROFILE="-Pengage,dist,$WORKSPACE_VERSION"
+	  PROFILE="-Pengage,dist,serviceregistry,$WORKSPACE_VERSION"
 	fi
 	su $USERNAME -c "mvn clean install $PROFILE -DdeployTo=${HOME}/${OC_DIR##*/}/${FELIX_HOME##*/}/${DEPLOY_DIR}"
 	if [[ "$?" -ne 0 ]]; then
