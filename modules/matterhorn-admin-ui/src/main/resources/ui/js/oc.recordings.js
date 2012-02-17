@@ -574,7 +574,12 @@ ocRecordings = new (function() {
   /** Make the page reload with the currently set configuration
    */
   this.reload = function() {
-    document.location.href = "/admin/index.html#/recordings?" + ocRecordings.buildURLparams();
+    if($('#holdActionUI').attr('src') == undefined) {
+      document.location.href = "/admin/index.html#/recordings?" + ocRecordings.buildURLparams();
+    } else {
+      document.location.reload();
+    }
+    
   }
   
   /** Returns the workflow with the specified id from the currently loaded
