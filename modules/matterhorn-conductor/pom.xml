@@ -16,6 +16,11 @@
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
+   	<dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-workflow-service-api</artifactId>
@@ -84,6 +89,11 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-mpeg7</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-speech-recognition-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -190,7 +200,8 @@
               OSGI-INF/operations/segmentpreviews.xml,
               OSGI-INF/operations/trim.xml,
               OSGI-INF/operations/zip.xml,
-              OSGI-INF/operations/watermark.xml
+              OSGI-INF/operations/watermark.xml,
+              OSGI-INF/operations/speech-recognition.xml
               <!-- OSGI-INF/operations/distribute-itunesu.xml, OSGI-INF/operations/distribute-youtube.xml, -->
             </Service-Component>
           </instructions>
