@@ -93,13 +93,6 @@ export CENTOS_PKG_LIST="ant ant-nodeps ntp curl openssh-server subversion gcc"
 # yum Package to install the JDK under CentOS
 export JAVA_CENTOS="java-1.6.0-devel"
 
-# Packages that require the user approval to be installed (Please note the quotation mark at the end!!!)
-# There should be one package per line, but several packages may be included if they need to be treated 'as a block'
-# Those lines ending with a "+" will be interpreted as required by the system. If the user choose not to install them, the installation will exit.
-export BAD_PKG_LIST="gstreamer0.10-plugins-bad gstreamer0.10-plugins-bad-multiverse +"
-# Reasons why each of the "bad" packages should be installed (one per line, in the same order as the bad packages)
-export BAD_PKG_REASON="Provide support for h264 and mpeg2 codecs, which are patent-encumbered. Temporarily required for a basic system"
-
 # This is a backup file to preserve the list of installed packages in case something fails and the script is re-launched
 # The name should start with a '.' so that it is a hidden file and it is not erased with the rest of the files when a new execution starts
 export PKG_BACKUP=$WORKING_DIR/.installed_pkgs
@@ -144,7 +137,7 @@ export DEPLOY_DIR=matterhorn
 export JAVA_PREFIX=/usr/lib/jvm
 # A regexp to filter the right jvm directory from among all the installed ones
 # The chosen JAVA_HOME will be $JAVA_PREFIX/`ls $JAVA_PREFIX | grep $JAVA_PATTERN`
-export JAVA_PATTERN=java-6-sun                                           
+export JAVA_PATTERN=java-6-openjdk                                           
                                                                          
 # Path to the maven2 repository, under the user home
 export M2_SUFFIX=.m2/repository
