@@ -37,9 +37,16 @@ public abstract class OaiPmhResponse {
 
   public OaiPmhResponse(Document doc) {
     this.doc = doc;
+    this.xpath = createXPath();
+  }
+
+  /**
+   * Create an XPath object suitable for processing OAI-PMH response documents.
+   */
+  public static XPath createXPath() {
     XPath xPath = XPathFactory.newInstance().newXPath();
     xPath.setNamespaceContext(OaiPmhNamespaceContext.getContext());
-    this.xpath = xPath;
+    return xPath;
   }
 
   /**
@@ -64,8 +71,7 @@ public abstract class OaiPmhResponse {
   }
 
   /**
-   * Evaluate the xpath expression against the contained document.
-   * The expression must return a string (text).
+   * Evaluate the xpath expression against the contained document. The expression must return a string (text).
    */
   protected String xpathString(String expr) {
     try {
@@ -76,20 +82,26 @@ public abstract class OaiPmhResponse {
   }
 
   /**
-   * Evaluate the xpath expression against the contained document.
-   * The expression must return a node.
+   * Evaluate the xpath expression against the contained document. The expression must return a node.
    */
   protected Node xpathNode(String expr) {
+    return xpathNode(xpath, doc, expr);
+  }
+
+  public static Node xpathNode(XPath xpath, Node context, String expr) {
+    if (expr.startsWith("/"))
+      throw new IllegalArgumentException("an xpath expression that evaluates relative to a given context node "
+              + "must not be absolute, i.e. start with a '/'. In this case the expression is evaluated against the"
+              + "whole document which might not be wanted.");
     try {
-      return (Node) xpath.evaluate(expr, doc, XPathConstants.NODE);
+      return (Node) xpath.evaluate(expr, context, XPathConstants.NODE);
     } catch (XPathExpressionException e) {
       throw new RuntimeException("malformed xpath expression " + expr, e);
     }
   }
 
   /**
-   * Evaluate the xpath expression against the contained document.
-   * The expression must return a node list.
+   * Evaluate the xpath expression against the contained document. The expression must return a node list.
    */
   protected NodeList xpathNodeList(String expr) {
     try {
