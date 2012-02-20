@@ -47,7 +47,7 @@ public class FileUploadJob {
   private String id;                        // this jobs identifier
   @XmlAttribute()
   private JobState state = JobState.READY;  // this jobs state
-  @XmlElement(name = "payaload")
+  @XmlElement(name = "payload")
   private Payload payload;                  // information about this jobs payload
   @XmlElement(name = "chunksize")
   private int chunksize = -1;               // size of the chunks that are tranfered
