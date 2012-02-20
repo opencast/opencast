@@ -153,7 +153,7 @@ for (( i=0; i < ${#noinst[@]}; i++ )); do
 done
 
 # Set up java-6-sun as the default alternative
-echo -n "Setting up java-6-sun as the default jvm... "
+echo -n "Setting up java-6-openjdk as the default jvm... "
 update-java-alternatives -s $JAVA_PATTERN 2> /dev/null
 echo "Done"
 

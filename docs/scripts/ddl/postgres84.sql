@@ -204,4 +204,11 @@ CREATE TABLE "user_action" (
   PRIMARY KEY ("id")
 );
 
+CREATE TABLE "oaipmh_harvesting" (
+	"url" text NOT NULL,
+	"last_harvested" timestamp DEFAULT NULL,
+	PRIMARY KEY (url)
+);
+
+
 INSERT INTO sequence (seq_name, seq_count) values ('SEQ_GEN',0);

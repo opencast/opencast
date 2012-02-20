@@ -15,6 +15,8 @@
  */
 package org.opencastproject.workflow.impl;
 
+import static org.opencastproject.workflow.api.WorkflowService.READ_PERMISSION;
+
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
@@ -62,6 +64,7 @@ public class WorkflowServiceSolrIndexTest {
     WorkflowInstanceImpl workflow = new WorkflowInstanceImpl();
     workflow.setId(123);
     workflow.setCreator(securityService.getUser());
+    workflow.setOrganization(securityService.getOrganization());
     workflow.setState(WorkflowState.INSTANTIATED);
     workflow.setMediaPackage(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
     job.setPayload(WorkflowParser.toXml(workflow));
@@ -100,7 +103,7 @@ public class WorkflowServiceSolrIndexTest {
   @Test
   public void testBuildSimpleQuery() throws Exception {
     WorkflowQuery q = new WorkflowQuery().withMediaPackage("123").withSeriesId("series1");
-    String solrQuery = dao.buildSolrQueryString(q);
+    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
     String expected = "oc_org:mh_default_org AND mediapackageid:123 AND seriesid:series1 AND oc_org:"
             + DEFAULT_ORG_ADMIN.getOrganization() + " AND (oc_creator:" + DEFAULT_ORG_ADMIN.getUserName()
             + " OR oc_acl_read:ROLE_ADMIN)";
@@ -114,7 +117,7 @@ public class WorkflowServiceSolrIndexTest {
   public void testBuildMultiStateQuery() throws Exception {
     WorkflowQuery q = new WorkflowQuery().withSeriesId("series1").withState(WorkflowState.RUNNING)
             .withState(WorkflowState.PAUSED);
-    String solrQuery = dao.buildSolrQueryString(q);
+    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
     String expected = "oc_org:mh_default_org AND seriesid:series1 AND (state:running OR state:paused) AND oc_org:"
             + DEFAULT_ORG_ADMIN.getOrganization() + " AND (oc_creator:" + DEFAULT_ORG_ADMIN.getUserName()
             + " OR oc_acl_read:ROLE_ADMIN)";
@@ -128,7 +131,7 @@ public class WorkflowServiceSolrIndexTest {
   public void testBuildNegativeStatesQuery() throws Exception {
     WorkflowQuery q = new WorkflowQuery().withSeriesId("series1").withoutState(WorkflowState.RUNNING)
             .withoutState(WorkflowState.PAUSED);
-    String solrQuery = dao.buildSolrQueryString(q);
+    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
     String expected = "oc_org:mh_default_org AND seriesid:series1 AND (-state:running AND -state:paused AND *:*)"
             + " AND oc_org:" + DEFAULT_ORG_ADMIN.getOrganization() + " AND (oc_creator:"
             + DEFAULT_ORG_ADMIN.getUserName() + " OR oc_acl_read:ROLE_ADMIN)";
@@ -141,7 +144,7 @@ public class WorkflowServiceSolrIndexTest {
   @Test
   public void testBuildNegativeStateQuery() throws Exception {
     WorkflowQuery q = new WorkflowQuery().withSeriesId("series1").withoutState(WorkflowState.RUNNING);
-    String solrQuery = dao.buildSolrQueryString(q);
+    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
     String expected = "oc_org:mh_default_org AND seriesid:series1 AND (-state:running AND *:*) AND oc_org:"
             + DEFAULT_ORG_ADMIN.getOrganization() + " AND (oc_creator:" + DEFAULT_ORG_ADMIN.getUserName()
             + " OR oc_acl_read:ROLE_ADMIN)";

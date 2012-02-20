@@ -120,6 +120,20 @@ public interface WorkflowService {
   WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException;
 
   /**
+   * Finds workflow instances based on the specified query for administrative access.
+   * 
+   * @param query
+   *          The query parameters
+   * @return The {@link WorkflowSet} containing the workflow instances matching the query parameters
+   * @throws WorkflowDatabaseException
+   *           if there is a problem accessing the workflow instances from persistence
+   * @throws UnauthorizedException
+   *           if the user does not own an administrative role
+   */
+  WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery q) throws WorkflowDatabaseException,
+          UnauthorizedException;
+
+  /**
    * Creates a new workflow instance and starts the workflow.
    * 
    * @param workflowDefinition
@@ -224,7 +238,7 @@ public interface WorkflowService {
    */
   WorkflowInstance stop(long workflowInstanceId) throws WorkflowDatabaseException, NotFoundException,
           WorkflowParsingException, UnauthorizedException;
-  
+
   /**
    * Permenantly removes a workflow instance.
    * 
@@ -233,7 +247,8 @@ public interface WorkflowService {
    * @throws NotFoundException
    * @throws UnauthorizedException
    */
-  void remove(long workflowInstanceId) throws WorkflowDatabaseException, WorkflowParsingException, NotFoundException, UnauthorizedException;
+  void remove(long workflowInstanceId) throws WorkflowDatabaseException, WorkflowParsingException, NotFoundException,
+          UnauthorizedException;
 
   /**
    * Temporarily suspends a started workflow instance.

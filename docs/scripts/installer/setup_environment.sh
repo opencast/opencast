@@ -115,8 +115,8 @@ if [ $MATTERHORN_PROFILE != "all" ]; then
   sed -i "s#^${ADMIN_SERVER_KEY//./\\.}=.*\$#${ADMIN_SERVER_KEY}=$admin_server#" "$GEN_PROPS"
 
   # Admin Server
-  ask -a -d $url "What is the URL of your admin server? " engage_url
-  ask -a -d $port "On which port is your admin server running?" engage_port
+  ask -a -d $url "What is the URL of your engage server? " engage_url
+  ask -a -d $port "On which port is your engage server running?" engage_port
   if [ $engage_port = "80" ]; then
       engage_port=""
   else
@@ -190,7 +190,7 @@ if [ $database ]; then
     sed -i "s/#.*${DATABASE_URL_KEY//./\\.}=.*/${DATABASE_URL_KEY}=${db_url_prefix//\//\\/}${db_url//./\\.}/" "$GEN_PROPS"
     ask -a -d "matterhorn" "Database user name?" db_user
     sed -i "s/#.*${DATABASE_USER_KEY//./\\.}=.*/${DATABASE_USER_KEY}=$db_user/" "$GEN_PROPS"
-    ask -a -d "opencast" "Database user name?" db_password
+    ask -a -d "opencast" "Database password?" db_password
     sed -i "s/#.*${DATABASE_PASSWORD_KEY//./\\.}=.*/${DATABASE_PASSWORD_KEY}=$db_password/" "$GEN_PROPS"
   fi
 
