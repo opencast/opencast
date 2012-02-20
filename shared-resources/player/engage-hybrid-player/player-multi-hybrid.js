@@ -74,7 +74,6 @@ Opencast.Player = (function ()
         displVidSizeControl = false,
         shareDisplayed = false,
         timeLayerDisplayed = false,
-        shortcutTabReturnId = '',
         downloadTabReturnId = '',
         embedDialogDisplayed = false,
         shareTimeDialogDisplayed = false,
@@ -87,7 +86,7 @@ Opencast.Player = (function ()
         
         
     /*************************************************************/
-	/* getter
+    /* getter
     /*************************************************************/
     
     /**
@@ -182,7 +181,7 @@ Opencast.Player = (function ()
     }
 
     /*************************************************************/
-	/* setter
+    /* setter
     /*************************************************************/
 
     /**
@@ -598,18 +597,17 @@ Opencast.Player = (function ()
      */
     function doToggleNotes()
     {
-        if ($("#oc_btn-notes").attr("title") === NOTES)
+	var tmp = $("#oc_btn-notes").attr("title") === NOTES;
+	hideAll();
+        if (tmp)
         {
             showNotes();
-            Opencast.Description.hideDescription();
             setShowSections(true);
 	    addEvent(Opencast.logging.SHOW_NOTES);
-        }
-        else
-        {
-            hideNotes();
-            setShowSections(false);
-        }
+        } else
+	{
+            addEvent(Opencast.logging.HIDE_NOTES);
+	}
     }
 
     /**
@@ -618,18 +616,17 @@ Opencast.Player = (function ()
      */
     function doToggleTranscript()
     {
-        if ($("#oc_btn-transcript").attr("title") === TRANSCRIPT)
+	var tmp = $("#oc_btn-transcript").attr("title") === TRANSCRIPT;
+	hideAll();
+        if (tmp)
         {
             showTranscript();
-            hideSlideText();
             setShowSections(true);
 	    addEvent(Opencast.logging.SHOW_TRANSCRIPT);
-        }
-        else
-        {
-            hideTranscript();
-            setShowSections(false);
-        }
+        } else
+	{
+	    addEvent(Opencast.logging.HIDE_TRANSCRIPT);
+	}
     }
 
     /**
@@ -638,16 +635,16 @@ Opencast.Player = (function ()
      */
     function doToggleEmbed()
     {
-        if (embedDialogDisplayed)
-        {
-            hideEmbed();
-        }
-        else
+	var tmp = embedDialogDisplayed;
+	hideAll();
+        if (!tmp)
         {
             showEmbed();
 	    addEvent(Opencast.logging.SHOW_EMBED);
-        }
-        // Opencast.Initialize.doResize();
+        } else
+	{
+	    addEvent(Opencast.logging.HIDE_EMBED);
+	}
     }
 
     /**
@@ -656,17 +653,16 @@ Opencast.Player = (function ()
      */
     function doToggleShareTime()
     {
-        if (shareTimeDialogDisplayed)
+	var tmp = shareTimeDialogDisplayed;
+	hideAll();
+        if (!tmp)
         {
-            hideShareTime();
-        }
-        else
-        {
-	    hideShare();
 	    showShareTime();
 	    addEvent(Opencast.logging.SHOW_VIDEO_AT_CURRENT_TIME);
-        }
-        // Opencast.Initialize.doResize();
+        } else
+	{
+	    addEvent(Opencast.logging.HIDE_VIDEO_AT_CURRENT_TIME);
+	}
     }
     
     /**
@@ -675,17 +671,16 @@ Opencast.Player = (function ()
      */
     function doToggleShare(e)
     {
-        if (shareDisplayed)
-        {
-            hideShare();
-            $('#oc_share-button').focus();
-        }
-        else
+	var tmp = shareDisplayed;
+	hideAll();
+        if (!tmp)
         {
             showShare();
-            $('#oc_share-layer').focus();
 	    addEvent(Opencast.logging.SHOW_SHARE);
-        }
+        } else
+	{
+	    addEvent(Opencast.logging.HIDE_SHARE);
+	}
         if (e !== undefined)
         {
             e.preventDefault();
@@ -698,15 +693,16 @@ Opencast.Player = (function ()
      */
     function doToggleTimeLayer()
     {
-        if (timeLayerDisplayed)
-        {
-            hideTimeLayer();
-        }
-        else
+	var tmp = timeLayerDisplayed;
+	hideAll();
+        if (!tmp)
         {
             showTimeLayer();
 	    addEvent(Opencast.logging.SHOW_TIME_LAYER);
-        }
+        } else
+	{
+	    addEvent(Opencast.logging.HIDE_TIME_LAYER);
+	}
     }
 
     /**
@@ -715,25 +711,20 @@ Opencast.Player = (function ()
      */
     function doToggleShortcuts(e, who)
     {
-        if ($('#oc_shortcuts').dialog('isOpen'))
-        {
-            hideShortcuts();
-        }
-        else
+	var tmp = $('#oc_shortcuts').dialog('isOpen');
+	hideAll();
+        if (!tmp)
         {
             showShortcuts();
 	    addEvent(Opencast.logging.SHOW_SHORTCUTS);
-        }
-        if (who !== undefined)
-        {
-            //set jump back point for tab navigation
-            shortcutTabReturnId = who;
-        }
+        } else
+	{
+	    addEvent(Opencast.logging.HIDE_SHORTCUTS);
+	}
         if (e !== undefined)
         {
             e.preventDefault();
         }
-        return false;
     }
 
     /**
@@ -742,15 +733,16 @@ Opencast.Player = (function ()
      */
     function doToggleDownloads(e, who)
     {
-        if ($('#oc_downloads').dialog('isOpen'))
-        {
-            hideDownloads();
-        }
-        else
+	var tmp = $('#oc_downloads').dialog('isOpen');
+	hideAll();
+        if (!tmp)
         {
             showDownloads();
-            addEvent('SHOW-DOWNLOADS');
-        }
+            addEvent(Opencast.logging.SHOW_DOWNLOADS);
+        } else
+	{
+            addEvent(Opencast.logging.HIDE_DOWNLOADS);
+	}
         if (who !== undefined)
         {
             //set jump back point for tab navigation
@@ -760,7 +752,6 @@ Opencast.Player = (function ()
         {
             e.preventDefault();
         }
-        return false;
     }
 
     /**
@@ -773,10 +764,12 @@ Opencast.Player = (function ()
         if (getCurrentPlayPauseState() === PAUSING)
         {
             doPlay();
+            addEvent(Opencast.logging.PLAY);
         }
         else
         {
             doPause();
+            addEvent(Opencast.logging.PAUSE);
         }
     }
 
@@ -789,11 +782,21 @@ Opencast.Player = (function ()
         FLASH_MUTE = Videodisplay.mute();
         if (!FLASH_MUTE) {
 	    addEvent(Opencast.logging.MUTE);
-            addEvent('MUTE');
         } else {
 	    addEvent(Opencast.logging.UNMUTE);
         }
         Opencast.ariaSpinbutton.toggleMute();
+    }
+
+    /**
+     * @memberOf Opencast.Player
+     * @description Toggle between closed captions on or off.
+     * @param Boolean cc
+     */
+    function doToogleClosedCaptions()
+    {
+        Videodisplay.closedCaptions();
+	addEvent(Opencast.logging.CLOSED_CAPTIONS);
     }
 
     /**
@@ -810,7 +813,6 @@ Opencast.Player = (function ()
             {
                 FLASH_PLAYERSTATE = playing;
                 setCurrentPlayPauseState(PLAYING);
-                addEvent(Opencast.logging.PLAY);
             }
             else
             {
@@ -831,7 +833,6 @@ Opencast.Player = (function ()
             setCurrentPlayPauseState(PAUSING);
             FLASH_PLAYERSTATE = Videodisplay.pause();
 	    setShareTimeLink();
-            addEvent(Opencast.logging.PAUSE);
         }
     }
     
@@ -897,19 +898,8 @@ Opencast.Player = (function ()
         Videodisplay.seek(ms);
     }
 
-    /**
-     * @memberOf Opencast.Player
-     * @description Toggle between closed captions on or off.
-     * @param Boolean cc
-     */
-    function doToogleClosedCaptions()
-    {
-        Videodisplay.closedCaptions();
-	addEvent(Opencast.logging.CLOSED_CAPTIONS);
-    }
-
     /*************************************************************/
-	/* show
+    /* show
     /*************************************************************/
 
     /**
@@ -963,11 +953,10 @@ Opencast.Player = (function ()
      */
     function showEmbed()
     {
-        hideShare();
         $('#oc_embed').dialog('open');
         $('#oc_embed').bind('dialogclose', function ()
         {
-            Opencast.Player.hideEmbed();
+            hideEmbed();
         });
         embedDialogDisplayed = true;
     }
@@ -978,7 +967,6 @@ Opencast.Player = (function ()
      */
     function showShareTime()
     {
-        hideShareTime();
 	setShareTimeLink();
         $('#oc_share-time').dialog('open');
         $('#oc_share-time').bind('dialogclose', function ()
@@ -989,8 +977,99 @@ Opencast.Player = (function ()
     }
 
     /*************************************************************/
-	/* hide
+    /* hide
     /*************************************************************/
+
+    /**
+     * @memberOf Opencast.Player
+     * @description Hides every layer
+     */
+    function hideAll()
+    {
+	hideShare();
+        hideShareTime();
+        hideNotes();
+        hideTranscript();
+        setShowSections(false);
+        hideEmbed();
+        hideShortcuts();
+        hideDownloads();
+	hideTimeLayer();
+    }
+
+    /**
+     * @memberOf Opencast.Player
+     * @description Hides the share overlay
+     */
+    function hideShare(e)
+    {
+        $('#oc_share-layer').attr(
+        {
+            'aria-hidden': 'true',
+            'tabindex': '-1'
+        });
+        $('#oc_share-layer').hide();
+        shareDisplayed = false;
+
+        $('#oc_share-button').focus();
+    }
+
+    /**
+     * @memberOf Opencast.Player
+     * @description Hide the share time dialog
+     */
+    function hideShareTime()
+    {
+	$('#oc_share-time').unbind('dialogclose');
+	$('#oc_share-time').dialog('close');
+        shareTimeDialogDisplayed = false;
+
+        $('#oc_share-button').focus();
+    }
+
+    /**
+     * @memberOf Opencast.Player
+     * @description Hide the notes
+     */
+    function hideNotes()
+    {
+        $("#oc_notes").attr("className", "oc_DisplayNone");
+        $("#oc_btn-notes").attr(
+        {
+            title: NOTES
+        });
+        $("#oc_btn-notes").html(NOTES);
+        $("#oc_btn-notes").attr('aria-pressed', 'false');
+    }
+
+    /**
+     * @memberOf Opencast.Player
+     * @description Hide the transcript
+     */
+    function hideTranscript()
+    {
+        $("#oc_transcript").attr("className", "oc_DisplayNone");
+        $("#oc_btn-transcript").attr(
+        {
+            alt: TRANSCRIPT,
+            title: TRANSCRIPT,
+            value: TRANSCRIPT
+        });
+        $("#oc_btn-transcript").attr('aria-pressed', 'false');
+    }
+
+    /**
+     * @memberOf Opencast.Player
+     * @description Hide the embed
+     */
+    function hideEmbed()
+    {
+	$('#oc_embed').unbind('dialogclose');
+        $('#oc_embed').dialog('close');
+        embedDialogDisplayed = false;
+
+        $('#oc_share-button').focus();
+    }
 
     /**
      * @memberOf Opencast.Player
@@ -998,11 +1077,10 @@ Opencast.Player = (function ()
      */
     function hideShortcuts()
     {
-        if (shortcutTabReturnId !== undefined)
-        {
-            $('#' + shortcutTabReturnId).focus();
-        }
+	$('#oc_shortcuts').unbind('dialogclose');
         $('#oc_shortcuts').dialog('close');
+
+        $('#oc_shortcut-button').focus();
     }
 
     /**
@@ -1015,46 +1093,30 @@ Opencast.Player = (function ()
         {
             $('#' + downloadTabReturnId).focus();
         }
+	$('#oc_downloads').unbind('dialogclose');
         $('#oc_downloads').dialog('close');
+
+        $('#oc_download-button').focus();
     }
 
     /**
      * @memberOf Opencast.Player
-     * @description Hides the share overlay
+     * @description Hides the time layer
      */
-    function hideShare(e)
+    function hideTimeLayer()
     {
-        $('#oc_share-layer').hide();
-        $('#oc_share-layer').attr(
+        $('#oc_time-chooser-layer').attr(
         {
             'aria-hidden': 'true',
             'tabindex': '-1'
         });
-        shareDisplayed = false;
-    }
-
-    /**
-     * @memberOf Opencast.Player
-     * @description Hide the embed
-     */
-    function hideEmbed()
-    {
-        $('#oc_share-button').focus();
-        embedDialogDisplayed = false;
-    }
-
-    /**
-     * @memberOf Opencast.Player
-     * @description Hide the share time dialog
-     */
-    function hideShareTime()
-    {
-        $('#oc_share-button').focus();
-        shareTimeDialogDisplayed = false;
+        $('#oc_time-chooser-layer').hide();
+        $('#oc_time-chooser').focus();
+        timeLayerDisplayed = false;
     }
 
     /*************************************************************/
-	/* video size control
+    /* video size control
     /*************************************************************/
 
     /**
@@ -1181,7 +1243,7 @@ Opencast.Player = (function ()
     }
 
     /*************************************************************/
-	/* alert
+    /* alert
     /*************************************************************/
 
     /**
@@ -1215,7 +1277,7 @@ Opencast.Player = (function ()
     }
 
     /*************************************************************/
-	/* sound
+    /* sound
     /*************************************************************/
 
     /**
@@ -1279,7 +1341,7 @@ Opencast.Player = (function ()
     }
 
     /*************************************************************/
-	/* play/pause
+    /* play/pause
     /*************************************************************/
 
     /**
@@ -1326,7 +1388,7 @@ Opencast.Player = (function ()
     }
 
     /*************************************************************/
-	/* misc
+    /* misc
     /*************************************************************/
 
     /**
@@ -1479,7 +1541,7 @@ Opencast.Player = (function ()
             var durationSeconds = parseInt(durationArray[2], 10);
             if (playheadHour > 99 || playheadMinutes > 59 || playheadSeconds > 59)
             {
-                addAlert('Wrong time enter like this: HH:MM:SS or HH.MM.SS');
+                addAlert('Wrong time format, enter like this: HH:MM:SS or HH.MM.SS');
                 $("#oc_edit-time").addClass("oc_edit-time-error");
             }
             else
@@ -1488,9 +1550,8 @@ Opencast.Player = (function ()
                 durationSeconds = (durationHour * 60 * 60) + (durationMinutes * 60) + (durationSeconds);
                 if (isNaN(newPlayhead) || newPlayhead > durationSeconds)
                 {
-                    addAlert('Wrong time enter like this: HH:MM:SS or HH.MM.SS');
+                    addAlert('Wrong time format, enter like this: HH:MM:SS or HH.MM.SS');
                     $("#oc_edit-time").addClass("oc_edit-time-error");
-                    //addEvent('BAD-EDIT-TIME');
                 }
                 else
                 {
@@ -1502,9 +1563,8 @@ Opencast.Player = (function ()
         }
         catch (exception)
         {
-            addAlert('Wrong time enter like this: HH:MM:SS or HH.MM.SS');
+            addAlert('Wrong time format, enter like this: HH:MM:SS or HH.MM.SS');
             $("#oc_edit-time").addClass("oc_edit-time-error");
-            //addEvent('EDIT-TIME-EXCEPTION');
         }
     }
 
@@ -1533,7 +1593,7 @@ Opencast.Player = (function ()
     }
 
     /*************************************************************/
-	/* non-public
+    /* non-public
     /*************************************************************/
 
     /**
@@ -1693,23 +1753,6 @@ Opencast.Player = (function ()
         });
         $("#oc_btn-notes").html(NOTESHIDE);
         $("#oc_btn-notes").attr('aria-pressed', 'true');
-	addEvent(Opencast.logging.SHOW_NOTES);
-    }
-
-    /**
-     * @memberOf Opencast.Player
-     * @description Hide the notes
-     */
-    function hideNotes()
-    {
-        $("#oc_notes").attr("className", "oc_DisplayNone");
-        $("#oc_btn-notes").attr(
-        {
-            title: NOTES
-        });
-        $("#oc_btn-notes").html(NOTES);
-        $("#oc_btn-notes").attr('aria-pressed', 'false');
-        addEvent(Opencast.logging.HIDE_NOTES);
     }
 
     /**
@@ -1726,24 +1769,6 @@ Opencast.Player = (function ()
             value: TRANSCRIPTHIDE
         });
         $("#oc_btn-transcript").attr('aria-pressed', 'true');
-        addEvent(Opencast.logging.SHOW_TRANSCRIPT);
-    }
-
-    /**
-     * @memberOf Opencast.Player
-     * @description Hide the transcript
-     */
-    function hideTranscript()
-    {
-        $("#oc_transcript").attr("className", "oc_DisplayNone");
-        $("#oc_btn-transcript").attr(
-        {
-            alt: TRANSCRIPT,
-            title: TRANSCRIPT,
-            value: TRANSCRIPT
-        });
-        $("#oc_btn-transcript").attr('aria-pressed', 'false');
-        addEvent(Opencast.logging.HIDE_TRANSCRIPT);
     }
 
     /**
@@ -1766,24 +1791,6 @@ Opencast.Player = (function ()
         });
         $('#oc_time-chooser-layer').focus();
         timeLayerDisplayed = true;
-        addEvent(Opencast.logging.SHOW_TIME_LAYER);
-    }
-
-    /**
-     * @memberOf Opencast.Player
-     * @description Hides the time layer
-     */
-    function hideTimeLayer()
-    {
-        $('#oc_time-chooser-layer').attr(
-        {
-            'aria-hidden': 'true',
-            'tabindex': '-1'
-        });
-        $('#oc_time-chooser-layer').hide();
-        $('#oc_time-chooser').focus();
-        timeLayerDisplayed = false;
-        addEvent(Opencast.logging.HIDE_TIME_LAYER);
     }
 
     /**
@@ -1875,6 +1882,7 @@ Opencast.Player = (function ()
         setVideoSizeList: setVideoSizeList,
 	setShareTimeLink: setShareTimeLink,
         // do
+	hideAll: hideAll,
         doToggleNotes: doToggleNotes,
         doToggleTranscript: doToggleTranscript,
         doToggleEmbed: doToggleEmbed,

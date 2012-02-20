@@ -36,9 +36,14 @@ Opencast.logging = (function ()
       FOOTPRINT = "FOOTPRINT",  //The normal footprint event
       GENERATE_EMBED = "GENERATE_EMBED-", //An embed link has been generated for the size after the dash
       HEARTBEAT = "HEARTBEAT",  //The heartbeat fires every n second, currently 30
+      HIDE_SHARE = "HIDE_SHARE",
+      HIDE_SHORTCUTS = "HIDE_SHORTCUTS",
+      HIDE_DOWNLOADS = "HIDE_DOWNLOADS",
       HIDE_NOTES = "HIDE_NOTES",
       HIDE_TIME_LAYER = "HIDE_TIME_LAYER",
       HIDE_TRANSCRIPT = "HIDE_TRANSCRIPT",
+      HIDE_EMBED = "HIDE_EMBED",
+      HIDE_VIDEO_AT_CURRENT_TIME = "HIDE_VIDEO_AT_CURRENT_TIME";
       MUTE = "MUTE",  //The sound has been muted
       NORMAL_DETAILED_LOGGING_AJAX_FAILED = "NORMAL_DETAILED_LOGGING_AJAX_FAILED",  //The call to turn on the detailed logging has failed in the normal player
       NORMAL_SEARCH_AJAX_FAILED = "NORMAL_SEARCH_AJAX_FAILED",
@@ -71,6 +76,7 @@ Opencast.logging = (function ()
       SHOW_TEXT_SEGMENTS = "SHOW_TEXT_SEGMENTS",  //The segment text tab was activated
       SHOW_TIME_LAYER = "SHOW_TIME_LAYER",
       SHOW_TRANSCRIPT = "SHOW_TRANSCRIPT",
+      SHOW_DOWNLOADS = "SHOW_DOWNLOADS",
       SKIP_BACKWARD = "SKIP_BACKWARD",  //The last-slide button was pressed
       SKIP_FORWARD = "SKIP_FORWARD",  //The next-slide button was pressed
       UNMUTE = "UNMUTE",  //The sound has been unmuted
@@ -103,7 +109,12 @@ Opencast.logging = (function ()
       FOOTPRINT: FOOTPRINT,
       GENERATE_EMBED: GENERATE_EMBED,
       HEARTBEAT: HEARTBEAT,
+      HIDE_VIDEO_AT_CURRENT_TIME: HIDE_VIDEO_AT_CURRENT_TIME,
+      HIDE_EMBED: HIDE_EMBED,
       HIDE_NOTES: HIDE_NOTES,
+      HIDE_SHARE: HIDE_SHARE,
+      HIDE_DOWNLOADS: HIDE_DOWNLOADS,
+      HIDE_SHORTCUTS: HIDE_SHORTCUTS,
       HIDE_TIME_LAYER: HIDE_TIME_LAYER,
       HIDE_TRANSCRIPT: HIDE_TRANSCRIPT,
       MUTE: MUTE,
