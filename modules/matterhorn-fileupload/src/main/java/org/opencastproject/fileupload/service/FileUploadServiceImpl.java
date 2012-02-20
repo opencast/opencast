@@ -104,7 +104,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     try {
       File jobDir = getJobDir(job.getId());       // create working dir
       FileUtils.forceMkdir(jobDir);
-      ensureExists(getPayloadFile(job.getId())); // create empty payload file
+      ensureExists(getPayloadFile(job.getId()));  // create empty payload file
       storeJob(job);                              // create job file
     
     } catch (FileUploadException e) {
@@ -211,7 +211,7 @@ public class FileUploadServiceImpl implements FileUploadService {
   public void acceptChunk(FileUploadJob job, long chunk, InputStream content) throws FileUploadException {
     // job ready to recieve data?
     if (isLocked(job.getId())) {
-      throw new FileUploadException("Job is locked. Seems like concurrent upload to this job is in progress.");
+      throw new FileUploadException("Job is locked. Seems like a concurrent upload to this job is in progress.");
     } else {
       lock(job);
     }
@@ -240,7 +240,6 @@ public class FileUploadServiceImpl implements FileUploadService {
       out = new FileOutputStream(chunkFile, false);
       IOUtils.copy(content, out);
     } catch (Exception e) {
-      deleteChunkFile(job.getId());
       unlock(job);
       throw new FileUploadException("Failed to store chunk data!", e);
     } finally {
@@ -289,7 +288,6 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     // update job
     job.getCurrentChunk().incrementNumber();
-    Payload payload = job.getPayload();
     if (chunk == job.getChunksTotal()-1) {    // upload is complete
       log.info("Upload job completed: {}", job.getId());
       finalizeJob(job);

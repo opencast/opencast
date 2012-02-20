@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.fileupload.service;
+package org.opencastproject.fileupload.rest;
 
 import org.apache.commons.fileupload.ProgressListener;
 import org.opencastproject.fileupload.api.job.FileUploadJob;

@@ -34,7 +34,6 @@ import org.apache.commons.fileupload.util.Streams;
 import org.opencastproject.fileupload.api.FileUploadService;
 import org.opencastproject.fileupload.api.exception.FileUploadException;
 import org.opencastproject.fileupload.api.job.FileUploadJob;
-import org.opencastproject.fileupload.service.UploadProgressListener;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -167,7 +166,7 @@ public class FileUploadRestService {
       if (!ServletFileUpload.isMultipartContent(request)) {
         throw new FileUploadException("Request is not of type multipart/form-data");
       }
-      if (uploadService.hasJob(jobId)) {    // testing for existence of job here already so we can generate a 404
+      if (uploadService.hasJob(jobId)) {    // testing for existence of job here already so we can generate a 404 early
         long chunkNum = 0;
         FileUploadJob job = uploadService.getJob(jobId);
         ServletFileUpload upload = new ServletFileUpload();
