@@ -22,6 +22,7 @@
     <script type="text/javascript" src="jquery/plugins/jARIA.js"></script>
     <script type="text/javascript" src="jquery/plugins/jquery.cookie.js"></script>
     <script type="text/javascript" src="jquery/jquery-ui.js"></script>
+    <script type="text/javascript" src="js/init-watch.js"></script>
     <script type="text/javascript" src="engage-hybrid-player/player-multi-hybrid-scubber.js"></script>
     <script type="text/javascript" src="engage-hybrid-player/player-multi-hybrid.js"></script>
     <script type="text/javascript" src="engage-hybrid-player/aria/js/ariaSpinbutton.js"></script>
@@ -53,45 +54,6 @@
     <script type="text/javascript" src="engage-hybrid-player/player-multi-hybrid-initialize.js"></script>
     <script type="text/javascript" src="trimpath/trimpath-template-1.0.38.js"></script>
     <script type="text/javascript" src="js/watch.js"></script>
-    <script type="text/javascript">
-      $(document).ready( function() {
-        //check whether a user is logged in and show logout link
-        $.ajax({
-          url: '/info/me.json',
-          type: 'GET',
-          dataType: 'json',
-          success: function(data)
-          {
-            if(data.username != "anonymous")
-            {
-              $('#logout').show();
-            }
-          }
-        });
-      });
-
-      $(function hideDisabledLinks(){
-          $.ajax({
-            url: '/info/me.json',
-            type: 'GET',
-            dataType: 'json',
-            success: function(data){
-                var download_enabled;
-
-                if (data.org.properties["engageui.link_download.enable"]){
-                   download_enabled = data.org.properties["engageui.link_download.enable"];
-                   if(download_enabled !== "true"){
-                       $("#oc_download-button").detach();
-                  }
-                }
-                else
-                {
-                      $("#oc_download-button").detach();
-                }
-             }
-          });
-      });
-    </script>
   </head>
   <body>
     <div id="skip">
