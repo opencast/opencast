@@ -15,6 +15,7 @@
  */
 package org.opencastproject.fileupload.rest;
 
+import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -100,7 +101,7 @@ public class FileUploadRestService {
           @FormParam(REQUESTFIELD_CHUNKSIZE) int chunksize) {
     try {
       if (filename == null || filename.trim().length() == 0) {
-        filename = "unknown";
+        filename = "john.doe";
       }
       if (filesize < 1) {
         filesize = -1;
@@ -191,6 +192,34 @@ public class FileUploadRestService {
       }
     } catch (FileUploadException e) {
       return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+    } catch (Exception e) {
+      return Response.serverError().entity(buildUnexpectedErrorMessage(e)).build();
+    }
+  }
+  
+  @GET
+  @Produces(MediaType.APPLICATION_OCTET_STREAM)
+  @Path("job/{jobID}/{filename}")
+  @RestQuery(name = "payload", description = "Returns the payload of the upload job.", pathParameters = {
+    @RestParameter(description = "The ID of the upload job to retrieve the file from", isRequired = false, name = "jobID", type = RestParameter.Type.STRING),
+    @RestParameter(description = "The name of the payload file", isRequired = false, name = "filename", type = RestParameter.Type.STRING)},
+  reponses = {
+    @RestResponse(description = "the job and file have been found.", responseCode = HttpServletResponse.SC_OK),
+    @RestResponse(description = "the job or file were not found.", responseCode = HttpServletResponse.SC_NOT_FOUND)
+  }, returnDescription = "The payload of the upload job")
+  public Response getPayload(@PathParam("jobID") String id, @PathParam("filename") String filename) {
+    try {
+      if (uploadService.hasJob(id)) {
+        FileUploadJob job = uploadService.getJob(id);
+//        if (job.getPayload().getFilename().equals(filename)) {
+        InputStream payload = uploadService.getPayload(job);
+        return Response.ok(payload).build();                    // TODO use AutoDetectParser to guess Content-Type header
+//        } else {
+//          return Response.status(Response.Status.NOT_FOUND).build();
+//        }
+      } else {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
     } catch (Exception e) {
       return Response.serverError().entity(buildUnexpectedErrorMessage(e)).build();
     }

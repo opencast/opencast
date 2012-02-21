@@ -73,5 +73,12 @@ public interface FileUploadService {
    * @throws FileUploadException 
    */
   void acceptChunk(FileUploadJob job, long chunk, InputStream content) throws FileUploadException;
-
+  
+  /** Returns an <code>InputStream</code> containing the data from the payload.
+   * 
+   * @param job job to retrieve payload data from
+   * @return InputStream the payload data
+   * @throws FileUploadException 
+   */
+  InputStream getPayload(FileUploadJob job) throws FileUploadException;
 }

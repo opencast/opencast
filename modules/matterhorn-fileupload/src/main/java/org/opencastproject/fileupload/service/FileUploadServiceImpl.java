@@ -17,6 +17,7 @@ package org.opencastproject.fileupload.service;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -295,6 +296,28 @@ public class FileUploadServiceImpl implements FileUploadService {
     } else {                                  // upload still in-complete
       unlock(job);
       storeJob(job);
+    }
+  }
+  
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.fileupload.api.FileUploadService#getPayload(org.opencastproject.fileupload.api.job.FileUploadJob job)
+   */
+  @Override
+  public InputStream getPayload(FileUploadJob job) throws FileUploadException {
+    // job ready to recieve data?
+    if (isLocked(job.getId())) {
+      throw new FileUploadException("Job is locked. Download is only permitted while no upload to this job is in progress.");
+    } else {
+      lock(job);
+    }
+    
+    try {
+      FileInputStream payload = new FileInputStream(getPayloadFile(job.getId()));
+      return payload;
+    } catch (FileNotFoundException e) {
+      throw new FileUploadException("Failed to retrieve file from job " + job.getId());
     }
   }
 
