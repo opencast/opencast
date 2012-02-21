@@ -31,8 +31,6 @@ public class Payload {
 
   @XmlElement(name = "filename")
   String filename;                    // name of the uploaded file
-  @XmlElement(name = "url")
-  private String url;                 // the URL to download the payload
   @XmlElement(name = "totalsize")
   long totalsize;                     // size of the file
   @XmlElement(name = "currentsize")
@@ -64,13 +62,5 @@ public class Payload {
 
   public void setCurrentSize(long size) {
     this.currentsize = size;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
   }
 }
