@@ -69,8 +69,7 @@ ocUtils.xmlToString = function(doc) {
 }
 
 ocUtils.isChunkedUploadCompliable = function() {
-  return false;
-  //return window.File && window.FileReader && window.FileList && window.Blob && window.FormData != undefined;
+  return window.File && window.FileReader && window.FileList && window.Blob && window.FormData != undefined;
 }
 
 ocUtils.createDoc = function(rootEl, rootNS){
