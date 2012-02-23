@@ -87,7 +87,7 @@ body {
 }
 
 #loading-init {
-    background-image: url("../img/squares.gif");
+    background-image: url("../img/misc/squares.gif");
     background-repeat: no-repeat;
     background-position: bottom center;
     display:block;

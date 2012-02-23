@@ -2,7 +2,7 @@
   <div id="stage" class="ui-widget">
     <div id="progressIndicator" class="layout-float-left ui-helper-hidden">
       <label for="editProgress" style="margin-left: 50px;">Editing in progress</label><br />
-      <img src="img/loading.gif" alt="editing in progress" title="Editing in progress" />
+      <img src="img/misc/loading.gif" alt="editing in progress" title="Editing in progress" />
     </div>
   </div>
   <div id="uploadContainer">

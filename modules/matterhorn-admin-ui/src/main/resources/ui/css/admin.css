@@ -42,9 +42,9 @@ li#titleNote {padding:0 0 4px 0;}
 .icon-help {        background-image: url(../img/icons/help.png); background-position: 0 0; vertical-align: top; }
 .icon-bullet {      background-image: url(../img/icons/bullet-arrow.png);  background-position: 0 0; }
 .inline-icon { display: inline-block; }
-.loadingAnimation { background-image:url(../img/loading.gif); background-position: center; background-repeat:no-repeat; height:40px; width:100%; }
+.loadingAnimation { background-image:url(../img/misc/loading.gif); background-position: center; background-repeat:no-repeat; height:40px; width:100%; }
 /*.progressbar {
-  background-image:url(../img/loading.gif); background-position: center; background-repeat:no-repeat; height:40px; width:240px; }*/
+  background-image:url(../img/misc/loading.gif); background-position: center; background-repeat:no-repeat; height:40px; width:240px; }*/
 
 
 

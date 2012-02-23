@@ -383,7 +383,7 @@ Opencast.segments = (function ()
         $('#oc_btn-slides').html(SEGMENTS_HIDE);
         $("#oc_btn-slides").attr('aria-pressed', 'true');
         // Will be overwritten if the Template is ready
-        $('#scrollcontainer').html('<img src="img/squares.gif" />');
+        $('#scrollcontainer').html('<img src="img/misc/squares.gif" />');
         // Show a loading Image
         $('#oc_slides').show();
         $('#oc_slides').css('display', 'block');

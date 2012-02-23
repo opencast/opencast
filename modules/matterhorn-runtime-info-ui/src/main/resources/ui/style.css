@@ -3,7 +3,7 @@
 }
 
 body {
-	background: url("img/body.gif") repeat scroll 0 0 #EDEDED;
+	background: url("img/misc/body.gif") repeat scroll 0 0 #EDEDED;
 	margin: 20px 0;
 	font-family: "Lucida Grande", "Lucida Sans Unicode", sans-serif;
 	line-height:1.3em;/*18px*/

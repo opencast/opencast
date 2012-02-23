@@ -15,7 +15,7 @@
 }
 
 .loadingImage {
-    background-image: url("../img/squares.gif");
+    background-image: url("../img/misc/squares.gif");
     background-repeat: no-repeat;
     background-position: center;
     width: 100%;
@@ -30,7 +30,7 @@ input.ui-button {
 /* IDs */
 
 #matterhorn-main-logo {
-    background-image: url("../img/Matterhorn_80x56.gif");
+    background-image: url("../img/mh_logos/Matterhorn_80x56.gif");
     background-repeat: no-repeat;
     background-position: center;
     display:block;
@@ -117,7 +117,7 @@ input.ui-button {
 }
 
 #matterhorn-init-logo {
-    background-image: url("../img/MatterhornLogo_loading.png");
+    background-image: url("../img/mh_logos/MatterhornLogo_loading.png");
     background-repeat: no-repeat;
     background-position: bottom center;
     display:block;
@@ -140,7 +140,7 @@ input.ui-button {
 }
 
 #loading-init {
-    background-image: url("../img/squares.gif");
+    background-image: url("../img/misc/squares.gif");
     background-repeat: no-repeat;
     background-position: bottom center;
     display:block;
