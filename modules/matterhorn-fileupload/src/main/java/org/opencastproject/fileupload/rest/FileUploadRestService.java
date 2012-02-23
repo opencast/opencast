@@ -44,15 +44,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** REST endpoint for large file uploads.
- * 
- * FIXME the UploadListener counts the bytes of the whole request -> count only bytes of the filedata field
  *
  */
 @Path("/")
 @RestService(name = "fileupload", title = "Big File Upload Service",
 notes = {
   "All paths above are relative to the REST endpoint base (something like http://your.server/upload)",
-  "When posting chunk data the field holding the actual data MUST be the LAST FIELD transmitted in the request otherwise the endpoint doesn't get the chunk metadata and fails."
+  "When posting chunk data the field holding the actual data MUST be the LAST FIELD transmitted in the request otherwise the endpoint doesn't get the chunk metadata and fails.",
+  "It is also possible to upload a file as a single chunk (ie as an ordinary HTML form submit): The upload job then must be created with filesize and chunksize set to -1. When uploading, chunk-number must be 0."
 },
 abstractText = "This service provides a facility to upload files that exceed the 2 GB boundry imposed by most browsers through chunked uploads via HTTP.")
 public class FileUploadRestService {
@@ -171,8 +170,6 @@ public class FileUploadRestService {
         long chunkNum = 0;
         FileUploadJob job = uploadService.getJob(jobId);
         ServletFileUpload upload = new ServletFileUpload();
-        UploadProgressListener listener = new UploadProgressListener(job);
-        upload.setProgressListener(listener);
         for (FileItemIterator iter = upload.getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
           if (item.isFormField()) {

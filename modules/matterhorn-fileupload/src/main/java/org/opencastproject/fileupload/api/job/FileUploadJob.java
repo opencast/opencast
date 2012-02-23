@@ -64,7 +64,9 @@ public class FileUploadJob {
   public FileUploadJob(String filename, long filesize, int chunksize) {
     this.id = UUID.randomUUID().toString();
     this.chunksize = chunksize;
-    if (chunksize != -1) {
+    if (chunksize == -1) {
+      chunksTotal = 1;
+    } else {
       chunksTotal = filesize / chunksize;
       if (filesize % chunksize != 0) {
         chunksTotal++;

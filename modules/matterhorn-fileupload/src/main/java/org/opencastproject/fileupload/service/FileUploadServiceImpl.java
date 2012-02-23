@@ -31,6 +31,7 @@ import org.apache.commons.io.IOUtils;
 import org.opencastproject.fileupload.api.FileUploadHandler;
 import org.opencastproject.fileupload.api.FileUploadService;
 import org.opencastproject.fileupload.api.exception.FileUploadException;
+import org.opencastproject.fileupload.api.job.Chunk;
 import org.opencastproject.fileupload.api.job.FileUploadJob;
 import org.opencastproject.fileupload.api.job.Payload;
 import org.osgi.service.component.ComponentContext;
@@ -40,7 +41,6 @@ import org.slf4j.LoggerFactory;
 /** A service for big file uploads via HTTP.
  * 
  * TODO make it possible to register n upload handlers instead of just one
- * TODO make compatible with ordinary HTML uploads (old method from /ingest/addElementMonitored)
  *
  */
 public class FileUploadServiceImpl implements FileUploadService {
@@ -50,12 +50,14 @@ public class FileUploadServiceImpl implements FileUploadService {
   final String FILENAME_DATAFILE = "payload.part";
   final String FILENAME_CHUNKFILE = "chunk.part";
   final String FILENAME_JOBFILE = "job.xml";
+  final int READ_BUFFER_LENGTH = 512;
   private static final Logger log = LoggerFactory.getLogger(FileUploadServiceImpl.class);
   private Marshaller jobMarshaller;
   private Unmarshaller jobUnmarshaller;
   private File workRoot;
   private FileUploadHandler uploadHandler;
   private HashMap<String, FileUploadJob> jobCache = new HashMap<String, FileUploadJob>();
+  private byte[] readBuffer = new byte[READ_BUFFER_LENGTH];
 
   // <editor-fold defaultstate="collapsed" desc="OSGi Service Stuff" >
   protected void activate(ComponentContext cc) throws Exception {
@@ -235,15 +237,30 @@ public class FileUploadServiceImpl implements FileUploadService {
     }
 
     // write chunk to temp file
+    job.getCurrentChunk().incrementNumber();
     File chunkFile = ensureExists(getChunkFile(job.getId()));
     OutputStream out = null;
     try {
       out = new FileOutputStream(chunkFile, false);
-      IOUtils.copy(content, out);
+      int bytesRead = 0;
+      long bytesReadTotal = 0l;
+      Chunk currentChunk = job.getCurrentChunk();           // implemented copy manually (instead of using IOUtils.copy()) so we can count the number of bytes
+      do {
+        bytesRead = content.read(readBuffer);
+        if (bytesRead > 0) {
+          out.write(readBuffer, 0, bytesRead);
+          bytesReadTotal += bytesRead;
+          currentChunk.setRecieved(bytesReadTotal);
+        }
+      } while (bytesRead != -1);
+      if (job.getPayload().getTotalSize() == -1 && job.getChunksTotal() == 1) { // set totalSize in case of ordinary from submit
+        job.getPayload().setTotalSize(bytesReadTotal);
+      }
     } catch (Exception e) {
       unlock(job);
       throw new FileUploadException("Failed to store chunk data!", e);
     } finally {
+      IOUtils.closeQuietly(content);
       IOUtils.closeQuietly(out);
     }
     
@@ -252,11 +269,12 @@ public class FileUploadServiceImpl implements FileUploadService {
     long supposedSize;
     if (chunk == job.getChunksTotal()-1) {
       supposedSize = job.getPayload().getTotalSize() % job.getChunksize();
-      supposedSize = supposedSize == 0 ? job.getChunksize() : supposedSize;   // a not so nice workaround for the rare case that file size is a multiple of chunk size
+      supposedSize = supposedSize == 0 ? job.getChunksize() : supposedSize;     // a not so nice workaround for the rare case that file size is a multiple of chunk size
     } else {
       supposedSize = job.getChunksize();
     }
-    if (actualSize == supposedSize || supposedSize == -1) {         
+    if (actualSize == supposedSize
+            || (job.getChunksTotal() == 1 && job.getChunksize() == -1)) {         
       
       // append chunk to payload file
       FileInputStream in = null;
@@ -288,7 +306,6 @@ public class FileUploadServiceImpl implements FileUploadService {
     }
 
     // update job
-    job.getCurrentChunk().incrementNumber();
     if (chunk == job.getChunksTotal()-1) {    // upload is complete
       log.info("Upload job completed: {}", job.getId());
       finalizeJob(job);
@@ -306,7 +323,7 @@ public class FileUploadServiceImpl implements FileUploadService {
    */
   @Override
   public InputStream getPayload(FileUploadJob job) throws FileUploadException {
-    // job ready to recieve data?
+    // job not locked?
     if (isLocked(job.getId())) {
       throw new FileUploadException("Job is locked. Download is only permitted while no upload to this job is in progress.");
     } else {
