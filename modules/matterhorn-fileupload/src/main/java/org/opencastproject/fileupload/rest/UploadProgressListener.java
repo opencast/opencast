@@ -39,6 +39,10 @@ public class UploadProgressListener implements ProgressListener {
    */
   @Override
   public void update(long rec, long total, int i) {
+    //update size if we upload in one package
+    if(job.getChunksTotal() == 1) {
+      job.getPayload().setTotalSize(total);
+    }
     job.getCurrentChunk().setRecieved(rec);
   }
 }

@@ -55,6 +55,10 @@ public class Payload {
   public long getTotalSize() {
     return totalsize;
   }
+  
+  public void setTotalSize(long totalsize) {
+    this.totalsize = totalsize;
+  }
 
   public long getCurrentSize() {
     return currentsize;

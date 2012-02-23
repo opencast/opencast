@@ -246,7 +246,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     } finally {
       IOUtils.closeQuietly(out);
     }
-
+    
     // check if chunk has right size
     long actualSize = chunkFile.length();
     long supposedSize;
@@ -256,7 +256,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     } else {
       supposedSize = job.getChunksize();
     }
-    if (actualSize == supposedSize) {         
+    if (actualSize == supposedSize || supposedSize == -1) {         
       
       // append chunk to payload file
       FileInputStream in = null;
