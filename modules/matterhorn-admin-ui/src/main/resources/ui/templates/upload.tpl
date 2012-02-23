@@ -239,7 +239,7 @@
               <!-- field: Media File -->
               <li class="ui-helper-clearfix">
                 <label class="scheduler-label"><span class="color-red">* </span><span id="i18n_upload_file">Media File</span>:</label>
-                <iframe class="uploadForm-container" frameborder="0" scrolling="no" src="../ingest/filechooser-local.html" class="uploadForm-container"></iframe>
+                <iframe class="uploadForm-container" frameborder="0" scrolling="no" src="upload.html" class="uploadForm-container"></iframe>
 
               </li>
               <li class="ui-helper-clearfix">

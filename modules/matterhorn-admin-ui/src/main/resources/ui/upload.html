@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>AJAX file upload</title>
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="jquery/jquery.js"></script>
+    <script type="text/javascript" src="js/oc.utils.js"></script>
+    <script type="text/javascript">
+      
+      var INFO_URL = "/info/me.json";
+      var CREATE_NEW_JOB_URL = "/upload/newjob";
+      var UPLOAD_URL = "/upload/job/"
+      //upload chunks of 1MB
+      var CHUNKSIZE = 1024 * 1024;
+      
+      $(document).ready(function() {
+        
+        $.ajax({
+          url: INFO_URL,
+          dataType: 'json',
+          success: function(data) {
+            CHUNKSIZE = data.org.properties['adminui.chunksize'] * 1024;
+          }
+        });
+        
+        $('#file').change(function(evt)
+        {
+          var filesize = -1;
+          var chunksize = -1;
+          var filename = $('.file-selector').val();
+          filename = filename.replace("C:\\fakepath\\", "");
+          if (ocUtils.isChunkedUploadCompliable()) {
+            var files = evt.target.files;
+            var file = files[0];
+            filesize = file.size;
+            chunksize = CHUNKSIZE;
+          } else {
+            
+          }
+          
+          $.ajax({
+            url: CREATE_NEW_JOB_URL,
+            data: {
+              filename : filename,
+              filesize : filesize,
+              chunksize: chunksize
+            },
+            success: function(job_id) {
+              $('.track-id').val(job_id);
+              $('#uploadForm').attr('action', UPLOAD_URL + job_id);
+            }
+          })
+          
+        });
+        
+      });
+      
+    </script>
+  </head>
+  <body style="margin:0;padding:0;border:0;outline:0;vertical-align:baseline;background: transparent">
+  <input type="hidden" name="jobId" class="track-id" value="" />
+  <form id="uploadForm" name="uploadForm" method="POST" action="" enctype="multipart/form-data">
+    <input id="flavor" type="hidden" name="flavor" value="">
+    <input type="hidden" id="filesize" name="filesize" value="-1">
+    <input type="hidden" id="chunksize" name="chunksize" value="-1">
+    <input id="mediapackage" type="hidden" name="mediaPackage" value="">
+    <input type="file" name="filedata" id="file" class="file-selector" onchange="parent.ocUpload.UI.formFieldChanged();">
+  </form>
+</body>
+</html>
