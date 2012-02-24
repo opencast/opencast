@@ -51,6 +51,7 @@
       function submit() {
         var trackUrl;
         var file = $('#file').val();
+        var flavor = $('#flavor').val();
         var trackId = $('#jobId').val();
         var mpString = $('#mediapackage').val();
         var mp = $.parseXML(mpString);
@@ -62,22 +63,14 @@
           	async: false,
           	dataType : 'text',
           	success : function(url) {
-			  	trackUrl = url;
-        	}
-        });
-        
-        $.ajax({
-        	url : '../../ingest/addTrack',
-          	type : 'POST',
-          	dataType : 'xml',
-          	data: {
-        		flavor: $('#flavor').val(),
-        		url: trackUrl,
-        		mediaPackage: mpString
-          	},
-          	success : function(mp) {
+			  	trackUrl = url;			  	
+			  	var trackxml = mp.createElement('track');
+				trackxml = $(trackxml).attr('type',flavor).attr('id', trackId);
+				var urlxml = $(mp.createElement('url')).text(trackUrl);
+				trackxml = $(trackxml).append(urlxml);
+				$(mp.documentElement).find('media').append(trackxml);
 				$('#mp').val(parent.ocUtils.xmlToString(mp));
-        		parent.ocUpload.Listener.uploadComplete(trackId);
+				parent.ocUpload.Listener.uploadComplete(trackId);
         	}
         });
         
