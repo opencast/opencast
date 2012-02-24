@@ -7,4 +7,6 @@
   <service>
     <provide interface="org.opencastproject.fileupload.api.FileUploadService" />
   </service>
+  <reference name="workflowService" interface="org.opencastproject.workingfilerepository.api.WorkingFileRepository"
+    cardinality="1..1" policy="static" bind="setWorkingFileRepository" />
 </scr:component>

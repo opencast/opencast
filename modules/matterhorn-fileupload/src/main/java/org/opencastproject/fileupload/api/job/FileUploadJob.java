@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
 /** A Class representing the information about an upload job.
  * 
@@ -35,6 +37,7 @@ public class FileUploadJob {
 
   @XmlEnum
   public enum JobState {          // states an upload job can be in
+
     @XmlEnumValue("READY")
     READY,
     @XmlEnumValue("INPROGRESS")
@@ -42,7 +45,6 @@ public class FileUploadJob {
     @XmlEnumValue("COMPLETE")
     COMPLETE
   }
-  
   @XmlAttribute()
   private String id;                        // this jobs identifier
   @XmlAttribute()
@@ -58,10 +60,10 @@ public class FileUploadJob {
 
   public FileUploadJob() {
     this.id = UUID.randomUUID().toString();
-    this.payload = new Payload("unknown", -1);
+    this.payload = new Payload("unknown", -1, null, null);
   }
 
-  public FileUploadJob(String filename, long filesize, int chunksize) {
+  public FileUploadJob(String filename, long filesize, int chunksize, MediaPackage mp, MediaPackageElementFlavor flavor) {
     this.id = UUID.randomUUID().toString();
     this.chunksize = chunksize;
     if (chunksize == -1) {
@@ -72,7 +74,7 @@ public class FileUploadJob {
         chunksTotal++;
       }
     }
-    this.payload = new Payload(filename, filesize);
+    this.payload = new Payload(filename, filesize, mp, flavor);
   }
 
   public String getId() {

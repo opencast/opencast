@@ -22,7 +22,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.HashMap;
+import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -34,6 +36,11 @@ import org.opencastproject.fileupload.api.exception.FileUploadException;
 import org.opencastproject.fileupload.api.job.Chunk;
 import org.opencastproject.fileupload.api.job.FileUploadJob;
 import org.opencastproject.fileupload.api.job.Payload;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement.Type;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.util.PathSupport;
+import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +65,8 @@ public class FileUploadServiceImpl implements FileUploadService {
   private FileUploadHandler uploadHandler;
   private HashMap<String, FileUploadJob> jobCache = new HashMap<String, FileUploadJob>();
   private byte[] readBuffer = new byte[READ_BUFFER_LENGTH];
+  private String rootDirectory;
+  private WorkingFileRepository repository;
 
   // <editor-fold defaultstate="collapsed" desc="OSGi Service Stuff" >
   protected void activate(ComponentContext cc) throws Exception {
@@ -71,13 +80,24 @@ public class FileUploadServiceImpl implements FileUploadService {
     } else {
       throw new RuntimeException("Storage directory must be defined with framework property " + PROPKEY_STORAGE_DIR);
     }
-    
+
     // set up de-/serialization
     ClassLoader cl = FileUploadJob.class.getClassLoader();
     JAXBContext jctx = JAXBContext.newInstance("org.opencastproject.fileupload.api.job", cl);
     jobMarshaller = jctx.createMarshaller();
     jobUnmarshaller = jctx.createUnmarshaller();
-    
+
+    // root directory
+    if (cc.getBundleContext().getProperty("org.opencastproject.file.repo.path") == null) {
+      String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
+      if (storageDir == null) {
+        throw new IllegalStateException("Storage directory must be set");
+      }
+      rootDirectory = storageDir + File.separator + "opencast" + File.separator + "workingfilerepo";
+    } else {
+      rootDirectory = cc.getBundleContext().getProperty("org.opencastproject.file.repo.path");
+    }
+
     log.info("File Upload Service activated. Storage directory is {}", workRoot.getAbsolutePath());
   }
 
@@ -101,28 +121,22 @@ public class FileUploadServiceImpl implements FileUploadService {
    * @see org.opencastproject.fileupload.api.FileUploadService#createJob(String filename, long filesize, int chunksize)
    */
   @Override
-  public FileUploadJob createJob(String filename, long filesize, int chunksize) throws FileUploadException {
-    FileUploadJob job = new FileUploadJob(filename, filesize, chunksize);
+  public FileUploadJob createJob(String filename, long filesize, int chunksize, MediaPackage mp, MediaPackageElementFlavor flavor) throws FileUploadException {
+    FileUploadJob job = new FileUploadJob(filename, filesize, chunksize, mp, flavor);
 
     try {
       File jobDir = getJobDir(job.getId());       // create working dir
       FileUtils.forceMkdir(jobDir);
       ensureExists(getPayloadFile(job.getId()));  // create empty payload file
       storeJob(job);                              // create job file
-    
+
     } catch (FileUploadException e) {
-      String message = new StringBuilder()
-              .append("Could not create job file in ")
-              .append(workRoot.getAbsolutePath()).append(": ")
-              .append(e.getMessage()).toString();
+      String message = new StringBuilder().append("Could not create job file in ").append(workRoot.getAbsolutePath()).append(": ").append(e.getMessage()).toString();
       log.error(message, e);
       throw new FileUploadException(message, e);
-      
+
     } catch (IOException e) {
-      String message = new StringBuilder()
-              .append("Could not create upload job directory in ")
-              .append(workRoot.getAbsolutePath()).append(": ")
-              .append(e.getMessage()).toString();
+      String message = new StringBuilder().append("Could not create upload job directory in ").append(workRoot.getAbsolutePath()).append(": ").append(e.getMessage()).toString();
       log.error(message, e);
       throw new FileUploadException(message, e);
     }
@@ -190,7 +204,7 @@ public class FileUploadServiceImpl implements FileUploadService {
    * {@inheritDoc}
    * 
    * @see org.opencastproject.fileupload.api.FileUploadService#deleteJob(String id)
-   */  
+   */
   @Override
   public void deleteJob(String id) throws FileUploadException {
     try {
@@ -218,20 +232,17 @@ public class FileUploadServiceImpl implements FileUploadService {
     } else {
       lock(job);
     }
-    
+
     // job already completed?
     if (job.getState().equals(FileUploadJob.JobState.COMPLETE)) {
       unlock(job);
       throw new FileUploadException("Job is already complete!");
     }
-    
+
     // right chunk offered?
     int supposedChunk = job.getCurrentChunk().getNumber() + 1;
     if (chunk != supposedChunk) {
-      StringBuilder sb = new StringBuilder()
-              .append("Wrong chunk number! Awaiting #")
-              .append(supposedChunk).append(" but #")
-              .append(Long.toString(chunk)).append(" was offered.");
+      StringBuilder sb = new StringBuilder().append("Wrong chunk number! Awaiting #").append(supposedChunk).append(" but #").append(Long.toString(chunk)).append(" was offered.");
       unlock(job);
       throw new FileUploadException(sb.toString());
     }
@@ -263,19 +274,19 @@ public class FileUploadServiceImpl implements FileUploadService {
       IOUtils.closeQuietly(content);
       IOUtils.closeQuietly(out);
     }
-    
-    // check if chunk has right size
+
+    // check if chunk has right size<
     long actualSize = chunkFile.length();
     long supposedSize;
-    if (chunk == job.getChunksTotal()-1) {
+    if (chunk == job.getChunksTotal() - 1) {
       supposedSize = job.getPayload().getTotalSize() % job.getChunksize();
       supposedSize = supposedSize == 0 ? job.getChunksize() : supposedSize;     // a not so nice workaround for the rare case that file size is a multiple of chunk size
     } else {
       supposedSize = job.getChunksize();
     }
     if (actualSize == supposedSize
-            || (job.getChunksTotal() == 1 && job.getChunksize() == -1)) {         
-      
+            || (job.getChunksTotal() == 1 && job.getChunksize() == -1)) {
+
       // append chunk to payload file
       FileInputStream in = null;
       try {
@@ -285,28 +296,26 @@ public class FileUploadServiceImpl implements FileUploadService {
         IOUtils.copy(in, out);
         Payload payload = job.getPayload();
         payload.setCurrentSize(payload.getCurrentSize() + actualSize);
-      
+
       } catch (IOException e) {
         log.error("Failed to append chunk data.", e);
         unlock(job);
         throw new FileUploadException("Could not append chunk data", e);
-      
+
       } finally {
         IOUtils.closeQuietly(in);
         IOUtils.closeQuietly(out);
         deleteChunkFile(job.getId());
       }
-      
+
     } else {
-      StringBuilder sb = new StringBuilder()
-              .append("Chunk has wrong size. Awaited: ").append(supposedSize)
-              .append(" bytes, recieved: ").append(actualSize).append(" bytes.");
+      StringBuilder sb = new StringBuilder().append("Chunk has wrong size. Awaited: ").append(supposedSize).append(" bytes, recieved: ").append(actualSize).append(" bytes.");
       unlock(job);
       throw new FileUploadException(sb.toString());
     }
 
     // update job
-    if (chunk == job.getChunksTotal()-1) {    // upload is complete
+    if (chunk == job.getChunksTotal() - 1) {    // upload is complete
       log.info("Upload job completed: {}", job.getId());
       finalizeJob(job);
       notifyUploadHandler(job);
@@ -315,7 +324,7 @@ public class FileUploadServiceImpl implements FileUploadService {
       storeJob(job);
     }
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -329,7 +338,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     } else {
       lock(job);
     }
-    
+
     try {
       FileInputStream payload = new FileInputStream(getPayloadFile(job.getId()));
       return payload;
@@ -346,7 +355,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     job.setState(FileUploadJob.JobState.INPROGRESS);
     jobCache.put(job.getId(), job);
   }
-  
+
   /** Returns true if the job with the given ID is currently locked.
    * 
    * @param id ID of the job in question
@@ -355,7 +364,7 @@ public class FileUploadServiceImpl implements FileUploadService {
   private boolean isLocked(String id) {
     return jobCache.containsKey(id);
   }
-  
+
   /** Unlocks an upload job.
    * 
    * @param job job to unlock
@@ -365,7 +374,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     jobCache.remove(job.getId());
     job.setState(FileUploadJob.JobState.READY);
   }
-  
+
   /** Unlocks an finalizes an upload job. 
    * 
    * @param job job to finalize
@@ -373,10 +382,36 @@ public class FileUploadServiceImpl implements FileUploadService {
    */
   private void finalizeJob(FileUploadJob job) throws FileUploadException {
     job.setState(FileUploadJob.JobState.COMPLETE);
+    MediaPackage mp = job.getPayload().getMediaPackage();
+    if (mp != null) {
+      File source = getPayloadFile(job.getId());
+      File destDir = new File(
+              PathSupport.concat(
+              new String[]{rootDirectory, MEDIAPACKAGE_PATH_PREFIX, mp.getIdentifier().toString(), job.getId()}));
+      if (!destDir.exists()) {
+        try {
+          FileUtils.forceMkdir(destDir);
+          log.debug("created dir in mediapackage " + mp.getIdentifier());
+        } catch (IOException e) {
+          throw new IllegalStateException("Can not create track directory" + destDir);
+        }
+      }
+      try {
+        File dest = new File(PathSupport.concat(destDir.getAbsolutePath(), job.getPayload().getFilename()));
+
+        log.info("moving file " + job.getId());
+
+        FileUtils.moveFile(source, dest);
+        URI uri = repository.getURI(mp.getIdentifier().toString(), job.getId(), job.getPayload().getFilename());
+        mp.add(uri, Type.Track, job.getPayload().getFlavor());
+      } catch (IOException e) {
+        log.error(e.getLocalizedMessage(), e);
+      }
+    }
     storeJob(job);
     jobCache.remove(job.getId());
   }
-  
+
   /** Notifies the registered UploadHandler that an upload has been finished.
    * 
    * TODO extend so that more than one UploadHandler can be notified.
@@ -400,7 +435,7 @@ public class FileUploadServiceImpl implements FileUploadService {
       }
     }
   }
-      
+
   /** Deletes the chunk file from workspace.
    * 
    * @param id ID of the job of which the chunk file should be deleted
@@ -415,13 +450,13 @@ public class FileUploadServiceImpl implements FileUploadService {
       log.warn("Could not delete chunk file " + chunkFile.getAbsolutePath());
     }
   }
-  
+
   /** Ensures the existence of a given file.
    * 
    * @param file 
    * @return File existing file 
    * @throws IllegalStateException 
-   */ 
+   */
   private File ensureExists(File file) throws IllegalStateException {
     if (!file.exists()) {
       try {
@@ -432,15 +467,14 @@ public class FileUploadServiceImpl implements FileUploadService {
     }
     return file;
   }
-  
+
   /** Returns the directory for a given job ID.
    * 
    * @param id ID for which a directory name should be generated
    * @return File job directory
    */
   private File getJobDir(String id) {
-    StringBuilder sb = new StringBuilder()
-            .append(workRoot.getAbsolutePath()).append(File.separator).append(id);
+    StringBuilder sb = new StringBuilder().append(workRoot.getAbsolutePath()).append(File.separator).append(id);
     return new File(sb.toString());
   }
 
@@ -450,34 +484,41 @@ public class FileUploadServiceImpl implements FileUploadService {
    * @return File job file
    */
   private File getJobFile(String id) {
-    StringBuilder sb = new StringBuilder()
-            .append(workRoot.getAbsolutePath()).append(File.separator).append(id)
-            .append(File.separator).append(FILENAME_JOBFILE);
+    StringBuilder sb = new StringBuilder().append(workRoot.getAbsolutePath()).append(File.separator).append(id).append(File.separator).append(FILENAME_JOBFILE);
     return new File(sb.toString());
   }
-  
+
   /** Returns the chunk file for a given job ID.
    * 
    * @param id ID for which a chunk file name should be generated
    * @return File chunk file
    */
   private File getChunkFile(String id) {
-    StringBuilder sb = new StringBuilder()
-            .append(workRoot.getAbsolutePath()).append(File.separator).append(id)
-            .append(File.separator).append(FILENAME_CHUNKFILE);
+    StringBuilder sb = new StringBuilder().append(workRoot.getAbsolutePath()).append(File.separator).append(id).append(File.separator).append(FILENAME_CHUNKFILE);
     return new File(sb.toString());
   }
-  
+
   /** Returns the payload file for a given job ID.
    * 
    * @param id ID for which a payload file name should be generated
    * @return File job file
    */
   private File getPayloadFile(String id) {
-    StringBuilder sb = new StringBuilder()
-            .append(workRoot.getAbsolutePath()).append(File.separator).append(id)
-            .append(File.separator).append(FILENAME_DATAFILE);
+    StringBuilder sb = new StringBuilder().append(workRoot.getAbsolutePath()).append(File.separator).append(id).append(File.separator).append(FILENAME_DATAFILE);
     return new File(sb.toString());
   }
 
+  public void setWorkingFileRepository(WorkingFileRepository repository) {
+    this.repository = repository;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setMediapackage(String id, MediaPackage mp) throws FileUploadException {
+    FileUploadJob job = getJob(id);
+    job.getPayload().setMediaPackage(mp);
+    storeJob(job);
+  }
 }

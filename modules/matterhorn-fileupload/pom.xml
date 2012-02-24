@@ -61,6 +61,11 @@
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-working-file-repository-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -73,6 +78,10 @@
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
             <Export-Package> org.opencastproject.fileupload.api;version=${project.version} </Export-Package>
+            <Import-Package>
+              org.opencastproject.workingfilerepository.api;version=${project.version},
+              *;resolution:=optional
+            </Import-Package>
             <Service-Component>
               OSGI-INF/fileupload-service.xml,
               OSGI-INF/fileupload-service-rest.xml

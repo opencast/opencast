@@ -20,6 +20,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
 /** A class representing the information about the payload of an upload job.
  * 
@@ -35,17 +37,25 @@ public class Payload {
   long totalsize;                     // size of the file
   @XmlElement(name = "currentsize")
   long currentsize;                   // number of bytes that have already been (successfully) recieved
+  @XmlElement(name = "mediapackage")
+  MediaPackage mediapackage;          // the mediapackage this UploadJob should belong to
+  @XmlElement(name = "flavor")
+  MediaPackageElementFlavor flavor;
 
   public Payload() {
     this.filename = "unknown";
     this.totalsize = -1;
     this.currentsize = 0;
+    this.mediapackage = null;
+    this.flavor = null;
   }
 
-  public Payload(String filename, long size) {
+  public Payload(String filename, long size, MediaPackage mp, MediaPackageElementFlavor flavor) {
     this.filename = filename;
     this.totalsize = size;
     this.currentsize = 0;
+    this.mediapackage = mp;
+    this.flavor = flavor;
   }
 
   public String getFilename() {
@@ -66,5 +76,21 @@ public class Payload {
 
   public void setCurrentSize(long size) {
     this.currentsize = size;
+  }
+  
+  public MediaPackage getMediaPackage() {
+    return this.mediapackage;
+  }
+  
+  public void setMediaPackage(MediaPackage mp) {
+    this.mediapackage = mp;
+  }
+  
+  public MediaPackageElementFlavor getFlavor() {
+    return this.flavor;
+  }
+  
+  public void setFlavor(MediaPackageElementFlavor flavor) {
+    this.flavor = flavor;
   }
 }

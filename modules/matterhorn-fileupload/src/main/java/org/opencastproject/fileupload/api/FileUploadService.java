@@ -18,12 +18,16 @@ package org.opencastproject.fileupload.api;
 import org.opencastproject.fileupload.api.job.FileUploadJob;
 import org.opencastproject.fileupload.api.exception.FileUploadException;
 import java.io.InputStream;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
 /** Interface for a Service that manages upload jobs and recieves and handles 
  *  file parts.
  * 
  */
 public interface FileUploadService {
+  
+  public static final String MEDIAPACKAGE_PATH_PREFIX = "/mediapackage/";
 
   /** Returns true is a job with the given ID exists.
    * 
@@ -37,10 +41,11 @@ public interface FileUploadService {
    * @param filename name of the file to be uploaded
    * @param fileSize size of the file
    * @param chunkSize size of the file parts that will be uploaded
+   * @param mp the mediapackage this file should belong to
    * @return FileUploadJob the job object
    * @throws FileUploadException 
    */
-  FileUploadJob createJob(String filename, long fileSize, int chunkSize) throws FileUploadException;
+  FileUploadJob createJob(String filename, long fileSize, int chunkSize, MediaPackage mp, MediaPackageElementFlavor flavor) throws FileUploadException;
   
   /** Returns the upload job with the given ID, throws <code>FileUploadException</code>
    *  if the job can not be found.
@@ -81,4 +86,11 @@ public interface FileUploadService {
    * @throws FileUploadException 
    */
   InputStream getPayload(FileUploadJob job) throws FileUploadException;
+  
+  /** Set the mediapackage to a Job
+   * 
+   * @param id the id of the job
+   * @param mp the mediapackage to set
+   */
+  void setMediapackage(String id, MediaPackage mp) throws FileUploadException;
 }

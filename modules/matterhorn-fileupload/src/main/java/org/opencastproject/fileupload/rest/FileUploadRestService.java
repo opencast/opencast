@@ -35,6 +35,9 @@ import org.apache.commons.fileupload.util.Streams;
 import org.opencastproject.fileupload.api.FileUploadService;
 import org.opencastproject.fileupload.api.exception.FileUploadException;
 import org.opencastproject.fileupload.api.job.FileUploadJob;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -62,8 +65,15 @@ public class FileUploadRestService {
   final String REQUESTFIELD_DATA = "filedata";
   final String REQUESTFIELD_CHUNKSIZE = "chunksize";
   final String REQUESTFIELD_CHUNKNUM = "chunknumber";
+  final String REQUESTFIELD_MEDIAPACKAGE = "mediapackage";
+  final String REQUESTFIELD_FLAVOR = "flavor";
   private static final Logger log = LoggerFactory.getLogger(FileUploadRestService.class);
   private FileUploadService uploadService;
+  private MediaPackageBuilderFactory factory = null;
+
+  public FileUploadRestService() {
+    factory = MediaPackageBuilderFactory.newInstance();
+  }
 
   // <editor-fold defaultstate="collapsed" desc="OSGi Service Stuff" >
   protected void setFileUploadService(FileUploadService service) {
@@ -89,7 +99,9 @@ public class FileUploadRestService {
   @RestQuery(name = "newjob", description = "Creates a new upload job and returns the jobs ID.", restParameters = {
     @RestParameter(description = "The name of the file that will be uploaded", isRequired = false, name = REQUESTFIELD_FILENAME, type = RestParameter.Type.STRING),
     @RestParameter(description = "The size of the file that will be uploaded", isRequired = false, name = REQUESTFIELD_FILESIZE, type = RestParameter.Type.STRING),
-    @RestParameter(description = "The size of the chunks that will be uploaded", isRequired = false, name = REQUESTFIELD_CHUNKSIZE, type = RestParameter.Type.STRING)},
+    @RestParameter(description = "The size of the chunks that will be uploaded", isRequired = false, name = REQUESTFIELD_CHUNKSIZE, type = RestParameter.Type.STRING),
+    @RestParameter(description = "The flavor of this track", isRequired = false, name = REQUESTFIELD_FLAVOR, type = RestParameter.Type.STRING),
+    @RestParameter(description = "The mediapackage the file should belong to", isRequired = false, name = REQUESTFIELD_MEDIAPACKAGE, type = RestParameter.Type.TEXT)},
   reponses = {
     @RestResponse(description = "job was successfully created", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "upload service gave an error", responseCode = HttpServletResponse.SC_NO_CONTENT)
@@ -97,7 +109,9 @@ public class FileUploadRestService {
   public Response getNewJob(
           @FormParam(REQUESTFIELD_FILENAME) String filename,
           @FormParam(REQUESTFIELD_FILESIZE) long filesize,
-          @FormParam(REQUESTFIELD_CHUNKSIZE) int chunksize) {
+          @FormParam(REQUESTFIELD_CHUNKSIZE) int chunksize,
+          @FormParam(REQUESTFIELD_MEDIAPACKAGE) String mediapackage,
+          @FormParam(REQUESTFIELD_FLAVOR) String flav) {
     try {
       if (filename == null || filename.trim().length() == 0) {
         filename = "john.doe";
@@ -108,12 +122,24 @@ public class FileUploadRestService {
       if (chunksize < 1) {
         chunksize = -1;
       }
-      FileUploadJob job = uploadService.createJob(filename, filesize, chunksize);
+      MediaPackage mp = null;
+      if (mediapackage != null && !mediapackage.equals("")) {
+        mp = factory.newMediaPackageBuilder().loadFromXml(mediapackage);
+      }
+
+      MediaPackageElementFlavor flavor = null;
+      if (flav != null && !flav.equals("")) {
+        flavor = new MediaPackageElementFlavor(flav.split("/")[0], flav.split("/")[1]);
+      }
+
+      FileUploadJob job = uploadService.createJob(filename, filesize, chunksize, mp, flavor);
       log.info("New upload job created: {}", job.getId());
       return Response.ok(job.getId()).build();
     } catch (FileUploadException e) {
+      log.error(e.getMessage(), e);
       return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
     } catch (Exception e) {
+      log.error(e.getMessage(), e);
       return Response.serverError().entity(buildUnexpectedErrorMessage(e)).build();
     }
   }
@@ -122,10 +148,10 @@ public class FileUploadRestService {
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   @Path("job/{jobID}.{format:xml|json}")
   @RestQuery(name = "job", description = "Returns the XML or the JSON representation of an upload job.",
-    pathParameters = {
-      @RestParameter(description = "The ID of the upload job", isRequired = false, name = "jobID", type = RestParameter.Type.STRING),
-      @RestParameter(description = "The output format (json or xml) of the response body.", isRequired = true, name = "format", type = RestParameter.Type.STRING)
-    },
+  pathParameters = {
+    @RestParameter(description = "The ID of the upload job", isRequired = false, name = "jobID", type = RestParameter.Type.STRING),
+    @RestParameter(description = "The output format (json or xml) of the response body.", isRequired = true, name = "format", type = RestParameter.Type.STRING)
+  },
   reponses = {
     @RestResponse(description = "the job was successfully retrieved.", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "the job was not found.", responseCode = HttpServletResponse.SC_NOT_FOUND)
@@ -142,6 +168,7 @@ public class FileUploadRestService {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
     } catch (Exception e) {
+      log.error(e.getMessage(), e);
       return Response.serverError().entity(buildUnexpectedErrorMessage(e)).build();
     }
   }
@@ -188,12 +215,14 @@ public class FileUploadRestService {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
     } catch (FileUploadException e) {
+      log.error(e.getMessage(), e);
       return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
     } catch (Exception e) {
+      log.error(e.getMessage(), e);
       return Response.serverError().entity(buildUnexpectedErrorMessage(e)).build();
     }
   }
-  
+
   @GET
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   @Path("job/{jobID}/{filename}")
@@ -218,6 +247,7 @@ public class FileUploadRestService {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
     } catch (Exception e) {
+      log.error(e.getMessage(), e);
       return Response.serverError().entity(buildUnexpectedErrorMessage(e)).build();
     }
   }
@@ -241,6 +271,55 @@ public class FileUploadRestService {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
     } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      return Response.serverError().entity(buildUnexpectedErrorMessage(e)).build();
+    }
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_XML)
+  @Path("mediapackage/{jobID}")
+  @RestQuery(name = "mediapackage", description = "Returns the Mediapackage", pathParameters = {
+    @RestParameter(description = "The ID of the upload job to get the Mediapackage from", isRequired = false, name = "jobID", type = RestParameter.Type.STRING)},
+  reponses = {
+    @RestResponse(description = "the mediapackage was found and returned.", responseCode = HttpServletResponse.SC_OK),
+    @RestResponse(description = "the mediapackage was not found.", responseCode = HttpServletResponse.SC_NOT_FOUND)
+  }, returnDescription = "The Mediapackage as XML")
+  public Response getMediapackage(@PathParam("jobID") String id) {
+    try {
+      if (uploadService.hasJob(id) && uploadService.getJob(id).getPayload().getMediaPackage() != null) {
+        return Response.ok().entity(uploadService.getJob(id).getPayload().getMediaPackage()).build();
+      } else {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      return Response.serverError().entity(buildUnexpectedErrorMessage(e)).build();
+    }
+  }
+
+  @POST
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("mediapackage/{jobID}")
+  @RestQuery(name = "mediapackage", description = "SET the Mediapackage", pathParameters = {
+    @RestParameter(description = "The ID of the upload job to set the Mediapackage to", isRequired = false, name = "jobID", type = RestParameter.Type.STRING),
+    @RestParameter(description = "The Mediapackage", isRequired = false, name = "mediapackage", type = RestParameter.Type.TEXT)},
+  reponses = {
+    @RestResponse(description = "the mediapackage was set.", responseCode = HttpServletResponse.SC_OK),
+    @RestResponse(description = "the job was not found.", responseCode = HttpServletResponse.SC_NOT_FOUND)
+  }, returnDescription = "A success message that starts with OK")
+  public Response setMediapackage(@PathParam("jobID") String id,
+          @FormParam(REQUESTFIELD_MEDIAPACKAGE) String mediapackage) {
+    try {
+      if (uploadService.hasJob(id)) {
+        MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mediapackage);
+        uploadService.setMediapackage(id, mp);
+        return Response.ok().build();
+      } else {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
       return Response.serverError().entity(buildUnexpectedErrorMessage(e)).build();
     }
   }
