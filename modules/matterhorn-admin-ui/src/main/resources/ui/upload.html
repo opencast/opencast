@@ -38,13 +38,13 @@
           } else {
             
           }
-          
           $.ajax({
             url: CREATE_NEW_JOB_URL,
             data: {
               filename : filename,
               filesize : filesize,
-              chunksize: chunksize
+              chunksize: chunksize,
+              flavor   : ocUtils.getURLParam('flavor')
             },
             success: function(job_id) {
               $('.track-id').val(job_id);

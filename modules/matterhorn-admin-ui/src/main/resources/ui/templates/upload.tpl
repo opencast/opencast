@@ -239,7 +239,7 @@
               <!-- field: Media File -->
               <li class="ui-helper-clearfix">
                 <label class="scheduler-label"><span class="color-red">* </span><span id="i18n_upload_file">Media File</span>:</label>
-                <iframe class="uploadForm-container" frameborder="0" scrolling="no" src="upload.html" class="uploadForm-container"></iframe>
+                <iframe class="uploadForm-container" frameborder="0" scrolling="no" src="upload.html?flavor=presenter/source" class="uploadForm-container"></iframe>
 
               </li>
               <li class="ui-helper-clearfix">
@@ -286,7 +286,7 @@
                 <!-- field: Media File -->
                 <li class="ui-helper-clearfix" id="regularFileChooser">
                   <label class="scheduler-label"><span class="i18n_upload_file">Media File</span>:</label>
-                  <iframe class="uploadForm-container" frameborder="0" scrolling="no" src="../ingest/filechooser-local.html" class="uploadForm-container"></iframe>
+                  <iframe class="uploadForm-container" frameborder="0" scrolling="no" src="upload.html?flavor=presentation/source" class="uploadForm-container"></iframe>
 
                   <input type="hidden" class="track-flavor" value="presentation/source">
                 </li>
@@ -312,7 +312,7 @@
                 <!-- field: Media File -->
                 <li class="ui-helper-clearfix" id="regularFileChooserMultiPresenter">
                   <label class="scheduler-label"><span class="i18n_upload_file">Media File</span>:</label>
-                  <iframe class="uploadForm-container" frameborder="0" scrolling="no" src="../ingest/filechooser-local.html" class="uploadForm-container"></iframe>
+                  <iframe class="uploadForm-container" frameborder="0" scrolling="no" src="upload.html?flavor=presenter/source" class="uploadForm-container"></iframe>
                   <input type="hidden" class="track-flavor" value="presenter/source">
 
                 </li>
@@ -338,7 +338,7 @@
                 <!-- field: Media File -->
                 <li class="ui-helper-clearfix" id="regularFileChooserAudioOnly">
                   <label class="scheduler-label"><span class="i18n_upload_file">Media File</span>:</label>
-                  <iframe class="uploadForm-container" frameborder="0" scrolling="no" src="../ingest/filechooser-local.html" class="uploadForm-container"></iframe>
+                  <iframe class="uploadForm-container" frameborder="0" scrolling="no" src="upload.html?flavor=presenter-audio/source" class="uploadForm-container"></iframe>
                   <input type="hidden" class="track-flavor" value="presenter-audio/source">
                 </li>
               </ul>

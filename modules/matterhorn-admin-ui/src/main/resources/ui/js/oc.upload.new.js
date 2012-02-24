@@ -14,6 +14,7 @@ var ocUpload = (function() {
   this.UPLOAD_CHUNK_URL = '/upload/job/';
   this.UPLOAD_GET_PAYLOAD = '/upload/job/';
   this.UPLOAD_COMPLETE = 'COMPLETE';
+  this.UPLOAD_MEDIAPACKAGE = '/upload/mediapackage/';
   this.UPLOAD_PROGRESS_INTERVAL = 2000;
   this.CHUNKSIZE = 1024 * 1024;
   this.INFO_URL = "/info/me.json";
@@ -587,6 +588,24 @@ ocUpload.Ingest = (function() {
     // set flavor and mediapackage in upload form before submit
     $uploader.contents().find('#flavor').val(track.flavor);
     $uploader.contents().find('#mediapackage').val(MediaPackage.document);
+    
+    //upload mediapackage to upload service
+    $.ajax({
+      url  : ocUpload.UPLOAD_MEDIAPACKAGE + track.id,
+      async: false,
+      type : 'POST',
+      data : {
+        mediapackage : MediaPackage.document
+      },
+      success : function(e, status, jqXHR) {
+        if(jqXHR.status == 404) {
+          ocUpload.UI.showFailure("Could not upload Mediapackage to UploadJob");
+        }
+      },
+      error: function() {
+        ocUpload.UI.showFailure("Could not upload Mediapackage to UploadJob");
+      }
+    })
     if(ocUtils.isChunkedUploadCompliable()) {
       ocUtils.log("Uploading via Chunked upload")
       var file = $uploader.contents().find('.file-selector')[0].files[0];
@@ -628,8 +647,14 @@ ocUpload.Ingest = (function() {
       type: 'POST',
       cache: false,
       contentType: false,
-      success: function (e) {
-        nextPart(file, ++chunk, jobId, start + ocUpload.CHUNKSIZE, end + ocUpload.CHUNKSIZE);
+      success: function (e, status, jqHBX) {
+        if(jqHBX.status == 404) {
+          ocUpload.UI.showFailure("Could not upload chunk #" + chunk + " to UploadJob because job wasn't found");
+        } else if(jqHBX.status == 400) {
+          ocUpload.UI.showFailure("Could not upload chunk #" + chunk + " to UploadJob because a malformed uploadrequest");
+        } else {
+          nextPart(file, ++chunk, jobId, start + ocUpload.CHUNKSIZE, end + ocUpload.CHUNKSIZE);
+        }
       }
     });
   }
@@ -643,28 +668,18 @@ ocUpload.Ingest = (function() {
     });
     $uploader = track.payload;
     
-    var filename = $uploader.contents().find('.file-selector').val();
-    if(filename == undefined) {
-      filename = $uploader.contents().children().first().find('filename').text();
-    }
-    filename = filename.replace("C:\\fakepath\\", "");
-    var url = "http://" + document.location.host;
-    url += ocUpload.UPLOAD_GET_PAYLOAD + track.id + "/" + filename;
-    
     $.ajax({
-      url: ocUpload.INGEST_ADD_TRACK,
+      url: ocUpload.UPLOAD_MEDIAPACKAGE + track.id,
       async: false,
-      dataType: 'text',
-      type: 'POST',
-      data: {
-        url: url,
-        flavor: track.flavor,
-        mediaPackage: MediaPackage.document
-      },
-      success: function(data) {
-        MediaPackage.document = data;
-        track.done = true;
-        proceed();
+      dataType : 'text',
+      success: function(data, status, jqHBX) {
+        if(jqHBX.status == 200) {
+          MediaPackage.document = data;
+          track.done = true;
+          proceed();
+        } else {
+          ocUpload.UI.showFailure("Could not retrieve new mediapackage");
+        }
       }
     });
   }
