@@ -45,7 +45,7 @@ var ocUpload = (function() {
 
     $('#recordDate').datepicker({
       showOn: 'both',
-      buttonImage: 'img/icons/calendar.gif',
+      buttonImage: '/admin/img/icons/calendar.gif',
       buttonImageOnly: true,
       dateFormat: 'yy-mm-dd'
     });

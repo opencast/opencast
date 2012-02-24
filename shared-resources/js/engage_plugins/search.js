@@ -25,7 +25,7 @@ Opencast.search = (function ()
     var dataStor,
         staticInputElem,
         mediaPackageId,
-        staticImg = $('#segment0').css('background'), // 'url("../../img/jquery/ui-bg_flat_75_fde7ce_40x100.png") repeat-x scroll 50% 50% #FDE7CE',
+        staticImg = $('#segment0').css('background'), // 'url("/engage/ui/img/jquery/ui-bg_flat_75_fde7ce_40x100.png") repeat-x scroll 50% 50% #FDE7CE',
         SEARCH = 'Search this Recording',
         colorFirst = '#C0C0C0',
         colorSecond = '#ADD8E6',

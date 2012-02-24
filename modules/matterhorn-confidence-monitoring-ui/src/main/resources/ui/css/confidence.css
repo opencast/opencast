@@ -119,5 +119,5 @@ body {
   height: 480px;
   width: 40px;
   display: inline-block;
-  background-image: url('../img/meter.gif');
+  background-image: url('/admin/img/cog.png');
 }

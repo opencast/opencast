@@ -3,7 +3,7 @@
 }
 
 body {
-	background: #EDEDED url(img/misc/body.gif);
+	background: #EDEDED url(/engage/ui/img/misc/body.gif);
 	margin: 20px 0;
 	font-family: helvetica, verdana, arial, sans-serif;
 	line-height:1.3em;/*18px*/

@@ -38,8 +38,8 @@ public class OrganizationParsingTest {
             + "<ns2:organization id=\"mh_default_org\" xmlns:ns2=\"http://org.opencastproject.security\">"
             + "<name>Opencast Project</name><serverName>http://localhost:8080</serverName><serverPort>80</serverPort>"
             + "<adminRole>ROLE_ADMIN</adminRole><anonymousRole>ANONYMOUS</anonymousRole><properties>"
-            + "<property key=\"logo_small\">/img/mh_logos/OpencastLogo.png</property>"
-            + "<property key=\"logo_large\">/img/mh_logos/MatterhornLogo_large.png</property>"
+            + "<property key=\"logo_small\">/admin//img/mh_logos/OpencastLogo.png</property>"
+            + "<property key=\"logo_large\">/admin//img/mh_logos/MatterhornLogo_large.png</property>"
             + "</properties></ns2:organization>";
 
     assertEquals("Organization XML not formed as expected", expectedOutput, writer.toString());

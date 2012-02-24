@@ -38,7 +38,7 @@ input:hover
 
 .oc_btn-skip-backward
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      0 -30px;
   width:                    16px;
   height:                   15px;
@@ -47,7 +47,7 @@ input:hover
 
 .oc_btn-skip-backward-over
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -30px -30px;
   width:                    16px;
   height:                   15px;
@@ -56,7 +56,7 @@ input:hover
 
 .oc_btn-skip-backward-clicked
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -60px -30px;
   width:                    16px;
   height:                   15px;
@@ -65,7 +65,7 @@ input:hover
 
 .oc_btn-rewind
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      0 -60px;
   width:                    21px;
   height:                   14px;
@@ -74,7 +74,7 @@ input:hover
 
 .oc_btn-rewind-over
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -30px -60px;
   width:                    21px;
   height:                   14px;
@@ -83,7 +83,7 @@ input:hover
 
 .oc_btn-rewind-clicked
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -60px -60px;
   width:                    21px;
   height:                   14px;
@@ -92,7 +92,7 @@ input:hover
 
 .oc_btn-play
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      0px -210px;
   width:                    16px;
   height:                   21px;
@@ -101,7 +101,7 @@ input:hover
 
 .oc_btn-play-clicked
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -60px -210px;
   width:                    16px;
   height:                   21px;
@@ -110,7 +110,7 @@ input:hover
 
 .oc_btn-play-over
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -30px -210px;
   width:                    16px;
   height:                   21px;
@@ -119,7 +119,7 @@ input:hover
 
 .oc_btn-pause
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      0px -90px;
   width:                    16px;
   height:                   21px;
@@ -128,7 +128,7 @@ input:hover
 
 .oc_btn-pause-clicked
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -60px -90px;
   width:                    16px;
   height:                   21px;
@@ -137,7 +137,7 @@ input:hover
 
 .oc_btn-pause-over
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -30px -90px;
   width:                    16px;
   height:                   21px;
@@ -146,7 +146,7 @@ input:hover
 
 .oc_btn-fast-forward
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      0px -120px;
   width:                    21px;
   height:                   14px;
@@ -155,7 +155,7 @@ input:hover
 
 .oc_btn-fast-forward-over
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -30px -120px;
   width:                    21px;
   height:                   14px;
@@ -164,7 +164,7 @@ input:hover
 
 .oc_btn-fast-forward-clicked
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -60px -120px;
   width:                    21px;
   height:                   14px;
@@ -173,7 +173,7 @@ input:hover
 
 .oc_btn-skip-forward
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      0px -150px;
   width:                    16px;
   height:                   15px;
@@ -182,7 +182,7 @@ input:hover
 
 .oc_btn-skip-forward-over
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -30px -150px;
   width:                    16px;
   height:                   15px;
@@ -191,7 +191,7 @@ input:hover
 
 .oc_btn-skip-forward-clicked
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -60px -150px;
   width:                    16px;
   height:                   15px;
@@ -200,7 +200,7 @@ input:hover
 
 .oc_btn-volume-high
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -0px -240px;
   width:                    18px;
   height:                   18px;
@@ -208,7 +208,7 @@ input:hover
 
 .oc_btn-volume-mute
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -90px -240px;
   width:                    18px;
   height:                   18px;
@@ -216,7 +216,7 @@ input:hover
 
 .oc_btn-volume-low
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -30px -240px;
   width:                    18px;
   height:                   18px;
@@ -224,7 +224,7 @@ input:hover
 
 .oc_btn-volume-none
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -90px -240px;
   width:                    18px;
   height:                   18px;
@@ -232,7 +232,7 @@ input:hover
 
 .oc_btn-cc-off
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -0px -182px;
   width:                    22px;
   height:                   17px;
@@ -240,7 +240,7 @@ input:hover
 
 .oc_btn-cc-over
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -30px -182px;
   width:                    22px;
   height:                   17px;
@@ -248,7 +248,7 @@ input:hover
 
 .oc_btn-cc-on
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -60px -182px;
   width:                    22px;
   height:                   17px;
@@ -262,7 +262,7 @@ input:hover
 
 .oc_btn-singleDisplay-presenter
 {
-  background:               url("../img/oc_icons_2.png") no-repeat -300px -305px transparent;
+  background:               url("/engage/ui/img/oc_icons_2.png") no-repeat -300px -305px transparent;
   width:                   60px;
   height:                 19px;
   margin-top: 5px;
@@ -270,7 +270,7 @@ input:hover
 }
 .oc_btn-singleDisplay-presentation
 {
-  background:               url("../img/oc_icons_2.png") no-repeat -240px -305px transparent;
+  background:               url("/engage/ui/img/oc_icons_2.png") no-repeat -240px -305px transparent;
   width:                   60px;
   height:					19px;
   margin-top: 5px;
@@ -280,7 +280,7 @@ input:hover
 
 .oc_btn-bigLeftDisplay
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -120px -330px;
   width:                    44px;
   height:					19px;
@@ -289,7 +289,7 @@ input:hover
 
 .oc_btn-centerDisplay
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -0px -330px;
   width:                    44px;
   height:					19px;
@@ -298,7 +298,7 @@ input:hover
 
 .oc_btn-bigRightDisplay
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -64px -330px;
   width:                    40px;
   height:					19px;
@@ -307,7 +307,7 @@ input:hover
 
 .oc_btn-audioDisplay
 {
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      0px -240px;
   width:                    18px;
   height:					19px;
@@ -379,7 +379,7 @@ input:hover
 
 #oc_draggable-embed 
 { 
-  background:               transparent url("../img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/oc_icons.png");
   background-position:      -60px -360px;
   height:                   19px;
   width:                    9px;
@@ -392,5 +392,5 @@ input:hover
 
 .oc_btn-close { position: absolute; top: -5px; right: -5px; padding: 0px; width: 20px!important; height: 20px!important;}
 #oc_volume-container { padding: 0px; margin: 0px; overflow: hidden; background: transparent; border: none; float: left; }
-#oc_volume-back { position: relative; left: 0px; background:  url("../img/oc_icons.png") no-repeat -100px -30px transparent; width: 28px; height: 15px;}
-#oc_volume-front { padding: 0px; margin: 0px; background:  url("../img/oc_icons.png") no-repeat -100px -45px transparent; width: 28px; height: 15px; position: absolute; top: 0px; left: 0px;}
+#oc_volume-back { position: relative; left: 0px; background:  url("/engage/ui/img/oc_icons.png") no-repeat -100px -30px transparent; width: 28px; height: 15px;}
+#oc_volume-front { padding: 0px; margin: 0px; background:  url("/engage/ui/img/oc_icons.png") no-repeat -100px -45px transparent; width: 28px; height: 15px; position: absolute; top: 0px; left: 0px;}

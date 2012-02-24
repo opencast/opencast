@@ -43,7 +43,7 @@ body {
 }
 
 .icon-error {
-    background-image: url(../img/icons/exclamation.png);
+    background-image: url(/engage/ui/img/icons/exclamation.png);
 }
 /* End: No Javascript activated Error Box */
 
