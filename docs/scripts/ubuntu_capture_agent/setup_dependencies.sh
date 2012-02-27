@@ -26,7 +26,6 @@ case "$ISSUE" in
     "$UBUNTU_11_10" )
       echo "Using Configuration of Ubuntu 11.10 for packages"
       PACKAGE_LIST_FILE=$UBUNTU_11_10_PACKAGES_FILE
-      echo "In Ubuntu 11.10 we cannot install java automatically for you due to licensing issues. Please install java from oracle's website."
       ;;
     * )
       echo "Using Default Configuration of packages"
