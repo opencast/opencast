@@ -84,7 +84,7 @@ maven2
 ntp
 openssh-server
 subversion
-sun-java6-jdk
+openjdk-6-jdk
 v4l-conf
 wget"
 
