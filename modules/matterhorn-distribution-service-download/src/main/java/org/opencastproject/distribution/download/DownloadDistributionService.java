@@ -61,7 +61,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
   /** List of available operations on jobs */
   private enum Operation {
     Distribute, Retract
-  };
+  }
 
   /** Receipt type */
   public static final String JOB_TYPE = "org.opencastproject.distribution.download";
@@ -115,12 +115,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
     logger.info("Download distribution directory is {}", distributionDirectory);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.distribution.api.DistributionService#distribute(org.opencastproject.mediapackage.MediaPackage,
-   *      java.lang.String)
-   */
+  @Override
   public Job distribute(MediaPackage mediapackage, String elementId) throws DistributionException,
           MediaPackageException {
 
@@ -141,7 +136,9 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
    * Distributes the mediapackage's element to the location that is returned by the concrete implementation. In
    * addition, a representation of the distributed element is added to the mediapackage.
    * 
-   * @see org.opencastproject.distribution.api.DistributionService#distribute(String, MediaPackageElement)
+   * @see org.opencastproject.distribution.api.DistributionService#distribute(org.opencastproject.mediapackage.MediaPackage, String)
+   * @throws org.opencastproject.distribution.api.DistributionException
+   *          in case of an error
    */
   protected MediaPackageElement distribute(Job job, MediaPackage mediapackage, String elementId)
           throws DistributionException {
@@ -205,12 +202,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
     }
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.distribution.api.DistributionService#retract(org.opencastproject.mediapackage.MediaPackage,
-   *      java.lang.String)
-   */
+  @Override
   public Job retract(MediaPackage mediaPackage, String elementId) throws DistributionException {
     if (mediaPackage == null)
       throw new IllegalArgumentException("Mediapackage must be specified");
@@ -227,7 +219,11 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
   }
 
   /**
-   * Retracts the mediapackage with the given identifier from the distribution channel.
+   * Retract a media package element from the distribution channel. The retracted element
+   * must not necessarily be the one given as parameter <code>elementId</code>. Instead, the
+   * element's distribution URI will be calculated and then in turn be
+   * matched against each element of the package. This way you are able to retract elements
+   * by providing the "original" element here.
    * 
    * @param job
    *          the associated job
@@ -236,6 +232,8 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
    * @param elementId
    *          the element identifier
    * @return the retracted element or <code>null</code> if the element was not retracted
+   * @throws org.opencastproject.distribution.api.DistributionException
+   *          in case of an error
    */
   protected MediaPackageElement retract(Job job, MediaPackage mediapackage, String elementId)
           throws DistributionException {
@@ -370,7 +368,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
   protected URI getDistributionUri(String mediaPackageId, MediaPackageElement element) throws URISyntaxException {
     String elementId = element.getIdentifier();
     String fileName = FilenameUtils.getName(element.getURI().toString());
-    String destinationURI = UrlSupport.concat(new String[] { serviceUrl, mediaPackageId, elementId, fileName });
+    String destinationURI = UrlSupport.concat(serviceUrl, mediaPackageId, elementId, fileName);
     return new URI(destinationURI);
   }
 
