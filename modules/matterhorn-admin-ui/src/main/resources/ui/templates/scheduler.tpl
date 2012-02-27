@@ -27,7 +27,7 @@
           <span class="ui-icon ui-icon-carat-1-e"></span>You must choose at least one <a href="javascript:document.getElementById('inputList').focus();">input</a>.
         </li>
         <li id="errorRecurStartEnd" class="ui-state-error-text multiple-error">
-          <span class="ui-icon ui-icon-carat-1-e"></span>Please choose an end date that occurs after the start date.
+          <span class="ui-icon ui-icon-carat-1-e"></span>Please choose an <a href="javascript:$('#recurEnd')[0].focus()">end date</a> that occurs after the start date.
         </li>
         <li id="errorRecurrence" class="ui-state-error-text multiple-error">
           <span class="ui-icon ui-icon-carat-1-e"></span>You must select at least one day of the week.

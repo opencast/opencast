@@ -860,7 +860,7 @@ Opencast.Initialize = (function ()
         if (coverUrl === null)
         {
             var coverType;
-            coverUrl = '/engage/ui/engage-hybrid-player/img/MatterhornEmbedLogo.png';
+            coverUrl = '/engage/ui/img/mh_logos/MatterhornEmbedLogo.png';
             $.ajax(
             {
                 type: 'GET',

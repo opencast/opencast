@@ -30,12 +30,12 @@ public interface DistributionService {
   String JOB_TYPE_PREFIX = "org.opencastproject.distribution.";
 
   /**
-   * Distribute the elementIds from a media package.
+   * Distribute a media package element.
    * 
    * @param mediapackage
-   *          The media package
+   *          the media package
    * @param elementId
-   *          The element in the media package to distribute
+   *          the element in the media package to distribute
    * 
    * @return The job
    * @throws DistributionException
@@ -46,12 +46,12 @@ public interface DistributionService {
   Job distribute(MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException;
 
   /**
-   * Retract all media and metadata associated with this media package from the distribution channel.
+   * Retract a media package element from the distribution channel.
    * 
    * @param mediaPackage
    *          the media package
    * @param elementId
-   *          The media package element to retract
+   *          the media package element to retract
    * @throws DistributionException
    *           if there was a problem retracting the mediapackage
    */

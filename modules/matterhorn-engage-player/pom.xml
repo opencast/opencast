@@ -11,79 +11,93 @@
 		<groupId>org.opencastproject</groupId>
 		<artifactId>base</artifactId>
 		<version>1.4-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
+		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
 	<properties>
 		<sourceFile>Videodisplay.mxml</sourceFile>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
+		<matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
+		<checkstyle.skip>false</checkstyle.skip>
 	</properties>
 
 	<repositories>
 		<repository>
-			<id>opencast</id>
-			<url>http://repository.opencastproject.org/nexus/content/groups/public</url>
-		</repository>
-		<repository>
-			<id>sonatype-flex</id>
-			<url>http://repository.sonatype.org/service/local/repositories/flex/content</url>
+			<id>flex-mojos-repository</id>
+			<url>http://repository.sonatype.org/content/groups/flexgroup</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
-			<id>opencast</id>
-			<url>http://repository.opencastproject.org/nexus/content/groups/public</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>sonatype-flexmojos-snapshots</id>
-			<url>http://repository.sonatype.org/service/local/repositories/flexmojos-snapshots/content</url>
+			<id>flex-mojos-repository</id>
+			<url>http://repository.sonatype.org/content/groups/flexgroup</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
 
-	<!--
-		mvn install
-		Deploys all required files to shared-resources/player 
-		(Only files needed for the matterhorn-engage-ui module)
-	-->
+	<!-- mvn install Deploys all required files to shared-resources/player (Only 
+		files needed for the matterhorn-engage-ui module) -->
 	<build>
 		<sourceDirectory>src/main/flex</sourceDirectory>
-		<!--<testSourceDirectory>src/test/flex</testSourceDirectory>-->
+		<!--<testSourceDirectory>src/test/flex</testSourceDirectory> -->
 		<plugins>
 			<plugin>
 				<groupId>org.sonatype.flexmojos</groupId>
 				<artifactId>flexmojos-maven-plugin</artifactId>
-				<dependencies>
-					<dependency>
-						<groupId>com.adobe.flex</groupId>
-						<artifactId>compiler</artifactId>
-						<version>3.6.0.16321</version>
-						<type>pom</type>
-					</dependency>
-				</dependencies>
-				<version>3.7.1</version>
+				<version>4.0-RC2</version>
 				<extensions>true</extensions>
 				<configuration>
 					<targetPlayer>10.0.0</targetPlayer>
 					<accessible>true</accessible>
 					<headlessServer>true</headlessServer>
-					<output>../../shared-resources/player/Videodisplay.swf</output>
-					<!--
-						<coverageViewerPath>/Applications/CoverageViewer.app</coverageViewerPath>
-					-->
+					<!-- <output>../../shared-resources/player/Videodisplay.swf</output> 
+						<coverageViewerPath>/Applications/CoverageViewer.app</coverageViewerPath> -->
 					<sourcePaths>
-					 <path>${basedir}/src/main/flex</path> 
-					</sourcePaths> 
+						<path>${basedir}/src/main/flex</path>
+					</sourcePaths>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-installed</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>${project.artifactId}</artifactId>
+									<version>${project.version}</version>
+									<type>${project.packaging}</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>../../shared-resources/player/</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
 
-	<!-- mvn -P uitests test, run JsTestDriver javascript browser tests + FlexUnit test in FlashPlayer 
-	example: mvn -P uitests test -DflashPlayer.command=/Users/ket/dev/debugger/FlashPlayerDebugger.app/Contents/MacOS/FlashPlayerDebugger
-	 -->
+	<!-- mvn -P uitests test, run JsTestDriver javascript browser tests + FlexUnit 
+		test in FlashPlayer example: mvn -P uitests test -DflashPlayer.command=/Users/ket/dev/debugger/FlashPlayerDebugger.app/Contents/MacOS/FlashPlayerDebugger -->
 	<profiles>
 		<profile>
 			<id>uitests</id>
@@ -125,11 +139,8 @@
 			</build>
 		</profile>
 
-		<!--
-			mvn -P testlocal
-			Creates a standalone version of the player component with mockdata
-			Can be used on a standard webserver
-		-->
+		<!-- mvn -P testlocal Creates a standalone version of the player component 
+			with mockdata Can be used on a standard webserver -->
 		<profile>
 			<id>testlocal</id>
 			<build>
@@ -154,8 +165,8 @@
 							<showWarnings>false</showWarnings>
 							<output>${project.build.directory}/hybrid-player/Videodisplay.swf</output>
 							<sourcePaths>
-					 		<path>${basedir}/src/main/flex</path> 
-							</sourcePaths> 
+								<path>${basedir}/src/main/flex</path>
+							</sourcePaths>
 						</configuration>
 					</plugin>
 					<plugin>
@@ -240,7 +251,7 @@
 							<footer>Opencast Matterhorn</footer>
 							<configFile>
 								${basedir}/asdoc-config.xml
-                    </configFile>
+							</configFile>
 						</configuration>
 					</reportSet>
 				</reportSets>
@@ -284,15 +295,8 @@
 		<dependency>
 			<groupId>com.adobe.flex.framework</groupId>
 			<artifactId>flex-framework</artifactId>
-			<version>3.6.0.16321</version>
+			<version>4.5.1.21328</version>
 			<type>pom</type>
-			<exclusions> 
-        <!-- make sure to exclude the default 'playerglobal' transitive dependency -->
-        <exclusion> 
-          <groupId>com.adobe.flex.framework</groupId> 
-          <artifactId>playerglobal</artifactId> 
-        </exclusion> 
-      </exclusions>   
 		</dependency>
 		<dependency>
 			<groupId>com.adobe.flex.framework</groupId>

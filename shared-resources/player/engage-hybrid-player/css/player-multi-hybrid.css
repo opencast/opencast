@@ -103,7 +103,7 @@ color: #000;
 #oc_lecturer-search-field
 {
   padding:                  0.5em 2px 0.5em 25px;
-  background:               url("../icons/magnifier.png") no-repeat scroll 2px 0.4em transparent;
+  background:               url("/engage/ui/img/icons/magnifier.png") no-repeat scroll 2px 0.4em transparent;
   float:                    left;
   color:                    #000000;
   margin: 4px 5px 0 0;
@@ -135,7 +135,7 @@ color: #000;
 
 #oc_btn-search
 {
-  background: #A72123 url("/engage/ui/img/oc_icons_2.png") no-repeat -242px -35px;
+  background: #A72123 url("/engage/ui/img/engage_player/oc_icons_2.png") no-repeat -242px -35px;
   margin-left: -20px;
   vertical-align: middle;
   height: 20px;
@@ -145,7 +145,7 @@ color: #000;
 
 #oc_btn-lecturer-search
 {
-  background: #A72123 url("/engage/ui/img/oc_icons_2.png") no-repeat -242px -35px;
+  background: #A72123 url("/engage/ui/img/engage_player/oc_icons_2.png") no-repeat -242px -35px;
   margin-left: -20px;
   vertical-align: middle;
   height: 20px;
@@ -186,14 +186,14 @@ color: #000;
 #oc_video-player-controls
 {
   height:                   44px;
-  background:               url("/engage/ui/img/player_controll_bg.png") repeat-x 0 0 #000;
+  background:               url("/engage/ui/img/engage_player/player_control_bg.png") repeat-x 0 0 #000;
   display:                  none;
 /*
   width:                    100%;
 */
 /*
   background-position:      0 0px;
-  background-image:         url("/engage/ui/img/oc_icons.png");
+  background-image:         url("/engage/ui/img/engage_player/oc_icons.png");
 */
 }
 
@@ -339,7 +339,7 @@ color: #000;
 
 .oc_slider-volume-Thumb
 {
-  background:               transparent url("/engage/ui/img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
   background-position:      -30px -270px;
   margin:                   0px;
   padding:                  0px;
@@ -367,7 +367,7 @@ color: #000;
 
 .oc-slider-volume-Thumb
 {
-  background:               transparent url("/engage/ui/img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
   background-position:      -30px -270px;
   margin:                   0px;
   padding:                  0px;
@@ -659,7 +659,7 @@ option:hover
 
 .scrubber-button
 {
-  background:               transparent url("/engage/ui/img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
   background-position:      -60px -360px;
   height:                   19px;
   width:                    9px;
@@ -672,7 +672,7 @@ option:hover
 
 #draggable
 {
-  background:               transparent url("/engage/ui/img/oc_icons.png");
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
   background-position:      -60px -360px;
   height:                   19px;
   width:                    9px;
