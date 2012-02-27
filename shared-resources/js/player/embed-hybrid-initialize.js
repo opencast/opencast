@@ -541,7 +541,7 @@ Opencast.Initialize = (function ()
             $('#oc_image').hide();
             $('#oc_controlbar-embed').hide();
             $('#oc_video-player-controls').show();
-            //$('#oc_flash-player').html('<script type="text/javascript" src="engage-hybrid-player/player-multi-hybrid-flash.js"></script>');
+            //$('#oc_flash-player').html('<script type="text/javascript" src="/engage/ui/js/player/player-multi-hybrid-flash.js"></script>');
             window.location = window.location + "&play=true";
         });
         $('#oc_btn-volume').click(function ()
@@ -561,7 +561,7 @@ Opencast.Initialize = (function ()
             $('#oc_image').hide();
             $('#oc_controlbar-embed').hide();
             $('#oc_video-player-controls').show();
-            //$('#oc_flash-player').html('<script type="text/javascript" src="engage-hybrid-player/player-multi-hybrid-flash.js"></script>');
+            //$('#oc_flash-player').html('<script type="text/javascript" src="/engage/ui/js/player/player-multi-hybrid-flash.js"></script>');
             window.location = window.location + "&play=true";
         });
         $('#oc-link-advanced-player').click(function ()
