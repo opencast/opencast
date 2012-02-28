@@ -203,7 +203,6 @@
 											<includes>
 												<include>css/</include>
 												<include>img/</include>
-												<include>jquery/</include>
 												<include>xsl/</include>
 												<include>js/</include>
 											</includes>

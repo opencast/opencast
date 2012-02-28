@@ -109,8 +109,7 @@
                 <resource>
                   <directory>../../shared-resources/</directory>
                   <includes>
-                     <include>jquery/**</include>
-                     <include>trimpath/**</include>
+                     <include>js/jquery/**</include>
                   </includes>                  
                   <filtering>false</filtering>
                 </resource>
