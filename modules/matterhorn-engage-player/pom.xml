@@ -204,6 +204,7 @@
 												<include>css/</include>
 												<include>img/</include>
 												<include>xsl/</include>
+												<include>json/</include>
 												<include>js/</include>
 											</includes>
 										</resource>
