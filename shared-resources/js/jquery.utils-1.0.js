@@ -537,12 +537,13 @@
     }
     
     /**
-     * @description create date in format MM/DD/YYYY
-     * @param timeDate Time and Date
+     * @description Returns date string in format MM/DD/YYYY
+     * @param timeDate Time and Date string
      */
     $.getLocaleDate = function(timeDate)
     {
-        return timeDate.substring(0, 10);
+        timeDate = (typeof timeDate === 'string') ? timeDate.substring(0, 10) : "n.a.";
+        return timeDate;
     }
     
     /**
