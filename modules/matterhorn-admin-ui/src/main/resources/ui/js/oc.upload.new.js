@@ -28,12 +28,12 @@ var ocUpload = (function() {
     $('#workflowSelector').change(ocUpload.UI.selectWorkflowDefinition);
     $('#submitButton').button().click(startUpload);
     $('#cancelButton').button().click(backToRecordings);
-    
-    var initializerDate;
-    initializerDate = new Date();  
 
-    $('#startTimeHour').val(initializerDate.getHours()); 
-    $('#startTimeMin').val(initializerDate.getMinutes()); 
+    var initializerDate;
+    initializerDate = new Date();
+
+    $('#startTimeHour').val(initializerDate.getHours());
+    $('#startTimeMin').val(initializerDate.getMinutes());
 
     $('#recordDate').datepicker({
       showOn: 'both',
@@ -41,7 +41,7 @@ var ocUpload = (function() {
       buttonImageOnly: true,
       dateFormat: 'yy-mm-dd'
     });
-    $('#recordDate').datepicker('setDate', initializerDate);  
+    $('#recordDate').datepicker('setDate', initializerDate);
 
     ocUpload.UI.loadWorkflowDefinitions();
     initSeriesAutocomplete();
@@ -80,7 +80,7 @@ var ocUpload = (function() {
               return(a==b)?0:(a>b)?1:-1;
             });
             response(series_list);
-          }, 
+          },
           error: function() {
             ocUtils.log('could not retrieve series_data');
           }
@@ -88,6 +88,29 @@ var ocUpload = (function() {
       },
       select: function(event, ui){
         $('#ispartof').val(ui.item.id);
+      },
+      change: function(event, ui){
+          if($('#ispartof').val() === '' && $('#series').val() !== ''){
+              ocUtils.log("Searching for series in series endpoint");
+              $.ajax({
+                  url : ocUpload.SERIES_SEARCH_URL + '?seriesTitle=' + $('#series').val(),
+                  type : 'get',
+                  dataType : 'json',
+                  success : function(data) {
+                      var DUBLIN_CORE_NS_URI  = 'http://purl.org/dc/terms/',
+                          series_input = $('#series').val(),
+                          series_list = data["catalogs"],
+                          series_title,
+                          series_id;
+
+                          if(series_list.length !== 0){
+                              series_title = series_list[0][DUBLIN_CORE_NS_URI]["title"] ? series_list[0][DUBLIN_CORE_NS_URI]["title"][0].value : "";
+                              series_id = series_list[0][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[0][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
+                              $('#ispartof').val(series_id);
+                          }
+                  }
+              });
+          }
       },
       search: function(){
         $('#ispartof').val('');
@@ -97,13 +120,13 @@ var ocUpload = (function() {
 
   this.checkRequiredFields = function() {
     ocUtils.log('Checking for missing inputs');
-    var missing = [];                 
+    var missing = [];
 
     if ($.trim($('#titleField').val()) == '') {
       ocUtils.log('Missing input: title');
       missing.push('title');
     }
-    
+
     if ($.trim($('#recordDate').val()) == '') {
       ocUtils.log('Missing input: recordDate');
       missing.push('recordDate');
@@ -127,7 +150,7 @@ var ocUpload = (function() {
   function startUpload() {
     var missingFields = ocUpload.checkRequiredFields();
     ocUpload.UI.collectFormData();
-    
+
     if (missingFields === false) {
       ocUpload.Ingest.begin();
     } else {
@@ -148,7 +171,7 @@ var ocUpload = (function() {
  *
  */
 ocUpload.UI = (function() {
-  
+
   /**
    * collected form data
    */
@@ -199,7 +222,7 @@ ocUpload.UI = (function() {
         ocUtils.log('Loaded workflow definitions: ' + defs.join(', '));
       }
     });
-    $('.workflowConfigContainer').load(ocUpload.WORKFLOW_PANEL_URL + ocUpload.DEFAULT_WORKFLOW_DEFINITION); 
+    $('.workflowConfigContainer').load(ocUpload.WORKFLOW_PANEL_URL + ocUpload.DEFAULT_WORKFLOW_DEFINITION);
   }
 
   this.toggleUnfoldable = function() {
@@ -279,7 +302,7 @@ ocUpload.UI = (function() {
       var percentage = ((message.received / message.total) * 100).toFixed(1) + '%';
       var total = (message.total / ocUpload.MEGABYTE).toFixed(2) + ' MB';
       var received = (message.received / ocUpload.MEGABYTE).toFixed(2) + ' MB';
-  
+
       $progress.find('.progress-label-top').text('Uploading ' + message.filename.replace("C:\\fakepath\\", ""));
       $progress.find('.progressbar-indicator').css('width', percentage);
       $progress.find('.progressbar-label > span').text(percentage);
@@ -305,18 +328,18 @@ ocUpload.UI = (function() {
     //ocUpload.backToRecordings();
     window.location = '/admin/index.html#/recordings?' + window.location.hash.split('?')[1];;
   }
-  
+
   /**
    * collects metadata to show in sucess screen
-   * 
+   *
    * @return array metadata
-   */ 
+   */
   this.collectFormData = function() {
       ocUtils.log("Collecting metadata");
-      
+
       var metadata = new Array;
       metadata['files'] = new Array();
-      
+
       $('.oc-ui-form-field').each( function() { //collect text input
           metadata[$(this).attr('name')] = $(this).val();
       });
@@ -325,11 +348,11 @@ ocUpload.UI = (function() {
           if(file != undefined) {
               metadata['files'].push(file);
           }
-          
+
       });
       this.metadata = metadata;
   }
-  
+
   /**
    * loads success screen template and fills with data
    */
@@ -358,8 +381,8 @@ ocUpload.UI = (function() {
         //$('#heading-metadata').text('Your recording with the following information has been resubmitted');
       });
   }
-  
-  
+
+
 
   return this;
 })();
@@ -397,7 +420,7 @@ ocUpload.Ingest = (function() {
   this.begin = function() {
     ocUpload.UI.showProgressDialog();
     ocUpload.UI.setProgress("Constructing Media Package...");
-    
+
     // enqueue Episode Dublin Core
     MediaPackage.elements.push(
       new MediaPackageElement('episodeDC', ELEMENT_TYPE.CATALOG, 'dublincore/episode', createDublinCoreDocument()));
@@ -556,12 +579,12 @@ ocUpload.Ingest = (function() {
 
     var checkBox = $('input.file-source-select:checked');
     var checkBoxId = $(checkBox).attr('id');
-    
+
     // set flavor and mediapackage in upload form before submit
     $uploader.contents().find('#flavor').val(track.flavor);
     $uploader.contents().find('#mediapackage').val(MediaPackage.document);
     $uploader.contents().find('#uploadForm').submit();
-    
+
     if(checkBoxId == 'fileSourceSingleA')
     	ocUpload.Listener.startProgressUpdate(track.id);
   }
@@ -583,7 +606,7 @@ ocUpload.Ingest = (function() {
     var id = false;
     var seriesXml = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn"><dcterms:title xmlns="">' + name + '</dcterms:title></dublincore>';
     var anonymous_role = 'anonymous';
-    
+
     ocUpload.UI.setProgress("Creating Series " + name);
     $.ajax({
         url: ocUpload.ANOYMOUS_URL,
@@ -656,7 +679,7 @@ ocUpload.Ingest = (function() {
 })();
 
 /** @namespace Listener for Upload Events
- * 
+ *
  */
 ocUpload.Listener = (function() {
 
