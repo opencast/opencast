@@ -127,17 +127,18 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#delete(java.lang.String, java.lang.String)
    */
   public boolean delete(String mediaPackageID, String mediaPackageElementID) throws IOException {
-    checkPathSafe(mediaPackageID);
-    checkPathSafe(mediaPackageElementID);
-    File f = getFile(mediaPackageID, mediaPackageElementID);
-    if (f == null) {
+    File f;
+    try {
+      f = getFile(mediaPackageID, mediaPackageElementID);
+      
+      File parentDirectory = f.getParentFile();
+      logger.debug("Attempting to delete {}", parentDirectory.getAbsolutePath());
+      FileUtils.forceDelete(parentDirectory);
+      return true;      
+    } catch (NotFoundException e) {
       logger.info("Unable to delete non existing object {}/{}", mediaPackageID, mediaPackageElementID);
       return false;
     }
-    File parentDirectory = f.getParentFile();
-    logger.debug("Attempting to delete {}", parentDirectory.getAbsolutePath());
-    FileUtils.forceDelete(parentDirectory);
-    return true;
   }
 
   /**
@@ -146,11 +147,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#get(java.lang.String, java.lang.String)
    */
   public InputStream get(String mediaPackageID, String mediaPackageElementID) throws NotFoundException, IOException {
-    checkPathSafe(mediaPackageID);
-    checkPathSafe(mediaPackageElementID);
     File f = getFile(mediaPackageID, mediaPackageElementID);
-    if (f == null)
-      throw new NotFoundException("Unable to locate " + f + " in the working file repository");
     logger.debug("Attempting to read file {}", f.getAbsolutePath());
     return new FileInputStream(f);
   }
@@ -331,23 +328,29 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * @return the file or <code>null</code> if no such element exists
    * @throws IllegalStateException
    *           if more than one matching elements were found
+   * @throws NotFoundException 
+   *           if the file cannot be found in the Working File Repository
    */
-  private File getFile(String mediaPackageID, String mediaPackageElementID) throws IllegalStateException {
+  protected File getFile(String mediaPackageID, String mediaPackageElementID) throws IllegalStateException, NotFoundException {
+    
+    checkPathSafe(mediaPackageID);
+    checkPathSafe(mediaPackageElementID);
+    
     File directory = getElementDirectory(mediaPackageID, mediaPackageElementID);
 
     File[] md5Files = directory.listFiles(MD5_FINAME_FILTER);
     if (md5Files == null) {
       logger.debug("Element directory {} does not exist", directory);
-      return null;
+      throw new NotFoundException("Element directory " + directory + " does not exist");
     } else if (md5Files.length == 0) {
       logger.debug("There are no complete files in the element directory {}", directory.getAbsolutePath());
-      return null;
+      throw new NotFoundException("There are no complete files in the element directory " + directory.getAbsolutePath());
     } else if (md5Files.length == 1) {
       File f = getSourceFile(md5Files[0]);
       if (f.exists())
         return f;
       else
-        return null;
+        throw new NotFoundException("Unable to locate " + f + " in the working file repository"); 
     } else {
       logger.error("Integrity error: Element directory {} contains more than one element", mediaPackageID + "/"
               + mediaPackageElementID);
@@ -367,7 +370,10 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * @throws NotFoundException
    *           if either the collection or the file don't exist
    */
-  private File getFileFromCollection(String collectionId, String fileName) throws NotFoundException {
+  protected File getFileFromCollection(String collectionId, String fileName) throws NotFoundException, IllegalArgumentException {
+    
+    checkPathSafe(collectionId);
+    
     File directory = null;
     try {
       directory = getCollectionDirectory(collectionId, false);
@@ -452,7 +458,6 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    */
   @Override
   public InputStream getFromCollection(String collectionId, String fileName) throws NotFoundException, IOException {
-    checkPathSafe(collectionId);
     File f = getFileFromCollection(collectionId, fileName);
     if (f == null || !f.isFile()) {
       throw new NotFoundException("Unable to locate " + f + " in the working file repository");
@@ -558,8 +563,10 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       }
     }
 
-    File dest = getFile(toMediaPackage, toMediaPackageElement);
-    if (dest == null) {
+    File dest = null;
+    try {
+      dest = getFile(toMediaPackage, toMediaPackageElement);
+    } catch (NotFoundException e) {
       dest = new File(getElementDirectory(toMediaPackage, toMediaPackageElement), toFileName);
     }
 
