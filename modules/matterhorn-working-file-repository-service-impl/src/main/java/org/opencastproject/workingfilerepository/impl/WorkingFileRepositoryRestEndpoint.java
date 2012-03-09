@@ -46,7 +46,8 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -213,9 +214,11 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
 
     String contentType = null;
     try {
-      in = get(mediaPackageID, mediaPackageElementID);
+      File theFile = getFile(mediaPackageID, mediaPackageElementID);
+      in = new FileInputStream(theFile);
       contentType = extractContentType(in);
-      return Response.ok(get(mediaPackageID, mediaPackageElementID)).header("Content-Type", contentType).build();
+      return Response.ok(get(mediaPackageID, mediaPackageElementID)).header("Content-Type", contentType)
+              .header("Content-Length", theFile.length()).build();
     } catch (IllegalStateException e) {
       IOUtils.closeQuietly(in);
       throw new NotFoundException();
@@ -260,7 +263,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException {
 
     String md5 = null;
-    InputStream in = null;
+    File in = null;
 
     // Check the If-None-Match header first
     try {
@@ -275,21 +278,14 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
 
     // No If-Non-Match header provided, or the file changed in the meantime
     try {
-      in = get(mediaPackageID, mediaPackageElementID);
+      in = getFile(mediaPackageID, mediaPackageElementID);
       String contentType = mimeMap.getContentType(fileName);
-      int contentLength = 0;
-      contentLength = in.available();
-      return Response.ok().header("Content-disposition", "attachment; filename=" + fileName)
-              .header("Content-Type", contentType).header("Content-length", contentLength).tag(md5).entity(in).build();
+      long contentLength = in.length();
+      return Response.ok(in).header("Content-disposition", "attachment; filename=" + fileName)
+              .header("Content-Type", contentType).header("Content-length", contentLength).tag(md5).build();
     } catch (IllegalStateException e) {
-      IOUtils.closeQuietly(in);
-      throw new NotFoundException();
-    } catch (IOException e) {
-      IOUtils.closeQuietly(in);
-      logger.info("unable to get the content length for {}/{}/{}", new Object[] { mediaPackageElementID,
-              mediaPackageElementID, fileName });
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-    }
+    } 
   }
 
   @GET
@@ -301,21 +297,13 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGetFromCollection(@PathParam("collectionId") String collectionId,
           @PathParam("fileName") String fileName) throws NotFoundException, IOException {
-    InputStream in;
-    try {
-      in = super.getFromCollection(collectionId, fileName);
-    } catch (FileNotFoundException e) {
-      throw new NotFoundException(e);
-    }
+    
+    File in = getFileFromCollection(collectionId, fileName);
     String contentType = mimeMap.getContentType(fileName);
-    int contentLength = 0;
-    try {
-      contentLength = in.available();
-    } catch (IOException e) {
-      logger.info("unable to get the content length for collection/{}/{}", new Object[] { collectionId, fileName });
-    }
-    return Response.ok().header("Content-disposition", "attachment; filename=" + fileName)
-            .header("Content-Type", contentType).header("Content-length", contentLength).entity(in).build();
+    long contentLength = in.length();
+        
+    return Response.ok(in).header("Content-disposition", "attachment; filename=" + fileName)
+            .header("Content-Type", contentType).header("Content-length", contentLength).build();
   }
 
   @GET

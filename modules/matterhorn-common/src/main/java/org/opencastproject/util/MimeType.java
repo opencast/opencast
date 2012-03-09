@@ -102,8 +102,8 @@ public final class MimeType implements Cloneable, Comparable<MimeType>, Serializ
     this.subtype = subtype.trim().toLowerCase().replaceAll("/", "");
     this.suffixes = new ArrayList<String>();
     if (suffix != null) {
-      suffix = suffix.trim().toLowerCase().replaceAll("/", "");
-      addSuffix(suffix);
+      this.suffix = suffix.trim().toLowerCase().replaceAll("/", "");
+      addSuffix(this.suffix);
     }
   }
 

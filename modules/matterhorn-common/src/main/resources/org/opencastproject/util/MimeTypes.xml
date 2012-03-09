@@ -384,4 +384,24 @@
     <Description>Flash video</Description>
     <Extensions>flv</Extensions>
   </MimeType>
+  <MimeType>
+    <Type>video/ogg</Type>
+    <Description>Ogg video</Description>
+    <Extensions>ogg,oga,ogv,ogx</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>audio/ogg</Type>
+    <Description>Ogg audio</Description>
+    <Extensions>ogg,oga,ogv,ogx</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>application/ogg</Type>
+    <Description>Ogg file</Description>
+    <Extensions>ogg,oga,ogv,ogx</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>video/webm</Type>
+    <Description>WebM video</Description>
+    <Extensions>webm</Extensions>
+  </MimeType>
 </MimeTypes>

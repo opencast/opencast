@@ -335,7 +335,7 @@ Opencast.segments_ui = (function ()
                     data['search-results'].result.mediapackage.media.isVideo = isVideo;
                     data['search-results'].result.mediapackage.media.rtmpAvailable = rtmpAvailable;
                     // Check if any Media.tracks are available
-                    if ((data['search-results'].result.mediapackage.media !== undefined) && (data['search-results'].result.mediapackage.media.track.length > 0))
+                    if ((data['search-results'].result.mediapackage.media !== undefined) && (data['search-results'].result.mediapackage.media !== "") && (data['search-results'].result.mediapackage.media.track.length > 0))
                     {
                         $.log("Media tracks available");
                         // Set whether prefer streaming of progressive

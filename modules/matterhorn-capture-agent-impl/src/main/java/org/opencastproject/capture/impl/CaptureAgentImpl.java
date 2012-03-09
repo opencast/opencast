@@ -106,7 +106,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.opencastproject.capture.impl.monitoring.ConfidenceMonitorImpl;
 
 /**
  * Implementation of the Capture Agent: using gstreamer, generates several Pipelines to store several tracks from a
@@ -880,23 +879,23 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
    */
   protected void setAgentState(String state) {
     // ConfidenceMonitorImp shoud be an singelton service and allways active
-    if (confidence && ConfidenceMonitorImpl.getInstance() != null) {
-      if (state.equalsIgnoreCase(AgentState.CAPTURING)) {
-        ConfidenceMonitorImpl.getInstance().stopMonitoring();
-        logger.info("Confidence monitoring has been shut down.");
-        // Gst.deinit();
-      } else if (state.equalsIgnoreCase(AgentState.IDLE)) {
-        
-        try {
-          if (ConfidenceMonitorImpl.getInstance().startMonitoring()) {
-            logger.info("Confidence monitoring started.");
-          }
-          // TODO: What if the pipeline crashes out? We just run without it?
-        } catch (Exception e) {
-          logger.warn("Confidence monitoring not started: {}", e);
-        }
-      }
-    }
+//    if (confidence && ConfidenceMonitorImpl.getInstance() != null) {
+//      if (state.equalsIgnoreCase(AgentState.CAPTURING)) {
+//        ConfidenceMonitorImpl.getInstance().stopMonitoring();
+//        logger.info("Confidence monitoring has been shut down.");
+//        // Gst.deinit();
+//      } else if (state.equalsIgnoreCase(AgentState.IDLE)) {
+//        
+//        try {
+//          if (ConfidenceMonitorImpl.getInstance().startMonitoring()) {
+//            logger.info("Confidence monitoring started.");
+//          }
+//          // TODO: What if the pipeline crashes out? We just run without it?
+//        } catch (Exception e) {
+//          logger.warn("Confidence monitoring not started: {}", e);
+//        }
+//      }
+//    }
 
     agentState = state;
   }

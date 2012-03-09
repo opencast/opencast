@@ -72,7 +72,7 @@ Opencast.download = (function() {
                                 }
 
                                 media_format = media_href.split(".");
-                                myHTML += " <a href="+ media_href + ">" +  media_type + " - " + media_description  + " [ File extension : <em>"+  media_format[media_format.length - 1] +"</em> ] " + "</a></br>";
+                                myHTML += " <a href="+ media_href + ">" +  media_type + " - " + media_description  + " [ File extension : <em>"+  media_format[media_format.length - 1] +"</em> ] " + "</a><br>";
                             }
                         }
 
@@ -91,11 +91,11 @@ Opencast.download = (function() {
                 $('#oc_client_downloads').append("<div id=\"oc_download_video\"></div>");
                 (video_files.length > 0 && video_markup !== "") ?  $('div#oc_download_video').html(video_markup) : $('div#oc_download_video').html("No video files available for download.");
 
-                $('#oc_client_downloads').append("</br><span><b>Audio Files</b></span><br>");
+                $('#oc_client_downloads').append("<br><span><b>Audio Files</b></span><br>");
                 $('#oc_client_downloads').append("<div id=\"oc_download_audio\"></div>");
                 (audio_files.length > 0 && audio_markup !== "") ? $('div#oc_download_audio').html(audio_markup) : $('div#oc_download_audio').html("No audio files available for download.");
 
-                $('#oc_client_downloads').append("</br><span><b>Please Note :<b></span><br>");
+                $('#oc_client_downloads').append("<br><span><b>Please Note :</b></span><br>");
                 $('#oc_client_downloads').append("<span>Some files may not download automatically, you may need to \"Right click\" the download link and select \"Save Link As..\" to save the file. In some browsers where the \"Right click\" is disabled - e.g. Firefox 8 on Mac OS X - you may have to press ALT and then click the download link to prompt a download.</span><br>");
 
             },

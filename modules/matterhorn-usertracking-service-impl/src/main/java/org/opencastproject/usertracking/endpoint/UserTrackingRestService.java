@@ -283,8 +283,16 @@ public class UserTrackingRestService {
     a.setOutpoint(out);
     a.setType(type);
     a.setIsPlaying(Boolean.valueOf(isPlaying));
-    a.setUserIp(request.getRemoteAddr());
-
+    
+    //MH-8616 the connection might be via a proxy
+    String clientIP = request.getHeader("X-FORWARDED-FOR");
+    
+    if (clientIP == null) {
+      clientIP = request.getRemoteAddr();
+    }
+    logger.info("got client ip: {0}", clientIP);
+    a.setUserIp(clientIP);
+    
     try {
       if ("FOOTPRINT".equals(type)) {
         a = (UserActionImpl) usertrackingService.addUserFootprint(a);
