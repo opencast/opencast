@@ -15,6 +15,14 @@
  */
 package org.opencastproject.scheduler.impl;
 
+import net.fortuna.ical4j.model.DateList;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.ValidationException;
+import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.property.RRule;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -40,16 +48,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowService;
-
-import net.fortuna.ical4j.model.DateList;
-import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Recur;
-import net.fortuna.ical4j.model.ValidationException;
-import net.fortuna.ical4j.model.parameter.Value;
-import net.fortuna.ical4j.model.property.RRule;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -119,8 +117,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /**
    * OSGi callback for setting Series Service.
-   * 
-   * @param seriesService
    */
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
@@ -128,8 +124,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /**
    * OSGi callback for setting Workflow Service.
-   * 
-   * @param workflowService
    */
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
@@ -137,8 +131,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /**
    * OSGi callback to set Persistence Service.
-   * 
-   * @param persistence
    */
   public void setPersistence(SchedulerServiceDatabase persistence) {
     this.persistence = persistence;
@@ -146,8 +138,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /**
    * OSGi callback to set indexer.
-   * 
-   * @param index
    */
   public void setIndex(SchedulerServiceIndex index) {
     this.index = index;
@@ -160,7 +150,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * 
    * @param cc
    *          ComponentContext
-   * @throws Exception
    */
   public void activate(ComponentContext cc) throws Exception {
     logger.info("Activating Scheduler Service");
@@ -696,16 +685,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * 
    * @param template
    *          {@link DublinCoreCatalog} used as template
-   * @param rrule
-   *          recurrence pattern
-   * @param start
-   *          date when series of event will start
-   * @param end
-   *          date when series of event will end
-   * @param duration
-   *          duration of each even in milliseconds
-   * @param timeZone
-   *          time zone in which event will take place
    * @return list of {@link DublinCoreCatalog}s
    * @throws ParseException
    *           if recurrence pattern cannot be parsed
