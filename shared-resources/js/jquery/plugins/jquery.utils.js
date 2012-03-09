@@ -542,7 +542,8 @@
      */
     $.getLocaleDate = function(timeDate)
     {
-        return timeDate.substring(0, 10);
+        timeDate = (typeof timeDate === 'string') ? timeDate.substring(0, 10) : "n.a.";
+        return timeDate;
     }
     
     /**
@@ -586,37 +587,6 @@
     $.enableLogging = function(logEnabled)
     {
         loggingEnabled = logEnabled||false;
-    }
-    
-    /**
-     * @description Returns whether logging is enabled or not
-     * @param true for logging is enabled, false else
-     */
-    $.loggingEnabled = function()
-    {
-        return loggingEnabled;
-    }
-    
-    /**
-     * @description Logs given arguments -- uses console.log; does NOT check loggingEnabled
-     * @param any arguments console.log-valid
-     * @return true if window.console exists and arguments had been logged, false else
-     */
-    $.logX = function()
-    {
-        if(window.console)
-        {
-            try
-            {
-                window.console && console.log.apply(console, Array.prototype.slice.call(arguments));
-            }
-            catch(err)
-            {
-                console.log(err);
-            }
-            return true;
-        }
-        return false;
     }
     
     /**
