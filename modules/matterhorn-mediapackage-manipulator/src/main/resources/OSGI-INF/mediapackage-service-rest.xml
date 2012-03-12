@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.manipulator.rest.MediapackageRestService" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.manipulator.rest.MediapackageRestService" />
+  <property name="service.description" value="Mediapackage Manipulator REST Endpoint" />
+  <property name="opencast.service.type" value="org.opencastproject.manipulator" />
+  <property name="opencast.service.path" value="/mediapackage" />
+  <service>
+    <provide interface="org.opencastproject.manipulator.rest.MediapackageRestService" />
+  </service>
+</scr:component>
