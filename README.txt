@@ -4,7 +4,7 @@
 
 For the impatient, experienced, and brave, here's the short version:
 
-1) Install felix version 3.0.1 or later
+1) Install felix version 3.2.2
 2) Copy the directories under docs/felix/ to your felix installation
 3) Install the 3rd party tools by executing $FELIX/docs/scripts/3rd_party/menu3p as root
 4) Run "mvn install -DdeployTo=$FELIX/matterhorn".  You may need to increate the memory available to maven
