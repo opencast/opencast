@@ -618,7 +618,7 @@
               <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
             </HTTPSampler>
             <hashTree/>
-            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/engage/ui/jquery/plugins/jwysiwyg/jquery.wysiwyg.css" enabled="true">
+            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/engage/ui/css/player/jquery.wysiwyg.css" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments"/>
               </elementProp>
@@ -628,7 +628,7 @@
               <stringProp name="HTTPSampler.response_timeout"></stringProp>
               <stringProp name="HTTPSampler.protocol">http</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/engage/ui/jquery/plugins/jwysiwyg/jquery.wysiwyg.css</stringProp>
+              <stringProp name="HTTPSampler.path">/engage/ui/css/player/jquery.wysiwyg.css</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1198,7 +1198,7 @@
               <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
             </HTTPSampler>
             <hashTree/>
-            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/engage/ui/jquery/plugins/jwysiwyg/jquery.wysiwyg.js" enabled="true">
+            <HTTPSampler guiclass="HttpTestSampleGui" testclass="HTTPSampler" testname="/engage/ui/jquery/plugins/jquery.wysiwyg.js" enabled="true">
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                 <collectionProp name="Arguments.arguments"/>
               </elementProp>
@@ -1208,7 +1208,7 @@
               <stringProp name="HTTPSampler.response_timeout"></stringProp>
               <stringProp name="HTTPSampler.protocol">http</stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/engage/ui/jquery/plugins/jwysiwyg/jquery.wysiwyg.js</stringProp>
+              <stringProp name="HTTPSampler.path">/engage/ui/jquery/plugins/jquery.wysiwyg.js</stringProp>
               <stringProp name="HTTPSampler.method">GET</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
