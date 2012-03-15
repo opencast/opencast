@@ -4,23 +4,18 @@
   <head>
     <title>Search Media | Opencast Matterhorn</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="shortcut icon" href="img/favicon.ico">
+    <link rel="shortcut icon" href="/engage/ui/img/favicon.ico">
     <!-- styles -->
-    <link rel="stylesheet" type="text/css" href="engage-hybrid-player/css/opencast-reset.css" />
-    <link rel="stylesheet" type="text/css" href="css/oc.search.browse.css" />
-    <link rel="stylesheet" type="text/css" href="css/oc.pager.css" />
-    <link rel="stylesheet" type="text/css" href="css/shared.css">
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/player-multi-hybrid/opencast-reset.css" />
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/oc.search.browse.css" />
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/oc.pager.css" />
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/player/shared.css">
     <!-- scripts -->
-    <script type="text/javascript" src="jquery/jquery-1.4.2.min.js">
-    </script>
-    <script type="text/javascript" src="jquery/plugins/jquery.xslt.js">
-    </script>
-    <script type="text/javascript" src="js/jquery.utils-1.0.js">
-    </script>
-    <script type="text/javascript" src="js/oc-pager.js">
-    </script>
-    <script type="text/javascript" src="js/engage-ui.js">
-    </script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/jquery.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.utils.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.xslt.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/oc-pager.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage-ui.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
             
@@ -52,81 +47,95 @@
           type: 'GET',
           dataType: 'json',
           success: function(data)
+              {
+                  if (data.username != "anonymous")
+                  {
+                      $('#logout').show();
+                  }
+              }
+          });
+
+          restEndpoint = restEndpoint + "limit=10";
+
+          restEndpoint = restEndpoint + "&offset=" + (page - 1) * 10;
+
+          restEndpoint = restEndpoint + "&_=" + new Date().getTime(); // workaround for IE ajax caching problem
+          $('#stage').xslt(restEndpoint, "xsl/episodes.xsl", function ()
           {
-            if(data.username != "anonymous")
-            {
-                $('#logout').show();
-            }
+              Opencast.pager.renderPager();
+              var total = $('#oc-episodes-total').html();
+              var toIndex = parseInt($('#oc-episodes-limit').html()) + (page - 1) * 10;
+              var fromIndex = Math.min(parseInt($('#oc-episodes-offset').html()) + 1, toIndex);
+
+              if (total > 0)
+              {
+                  $('.title').text("Results " + fromIndex + "-" + toIndex + " of " + total + keywordString).html();
+
+                  $('.timeDate').each(function ()
+                  {
+                      var timeDate = $(this).text();
+                      if (timeDate)
+                      {
+                          //JavaScript parseInt(string, radix)
+                          var sd = new Date();
+                          sd.setFullYear(parseInt(timeDate.substring(0, 4), 10));
+                          sd.setMonth(parseInt(timeDate.substring(5, 7), 10) - 1);
+                          sd.setDate(parseInt(timeDate.substring(8, 10), 10));
+                          sd.setHours(parseInt(timeDate.substring(11, 13), 10));
+                          sd.setMinutes(parseInt(timeDate.substring(14, 16), 10));
+                          sd.setSeconds(parseInt(timeDate.substring(17, 19), 10));
+                          $(this).html(sd.toLocaleString());
+                      }
+                      else
+                      {
+                          $(this).html("n.a.");
+                      }
+                  });
+                  $(".thumb").each(function (index)
+                  {
+                      var src = $(this).attr("src");
+                      if (src === undefined || src === "")
+                      {
+                          $(this).attr("src", "/engage/ui/img/misc/thumbnail.png");
+                      }
+                  });
+                  $(".search-item").each(function (index)
+                  {
+                      if (index % 2 == 1)
+                      {
+                          $(this).css('background-color', '#F7FBFC');
+                      }
+                      else
+                      {
+                          $(this).css('background-color', '#EFF7F9');
+                      }
+                  });
+              }
+              else
+              {
+                  if (Opencast.pager.getCurrentSearchQuery() != null)
+                  {
+                      $('.title').text('No recordings found for : "' + searchQuery + '"');
+                  }
+                  else
+                  {
+                      $('.title').text("No recordings published yet.");
+
+                  }
+              }
+
+          });
+
+          if (searchQuery != null && searchQuery != "")
+          {
+              $('#rsslink').attr("href", "/feeds/rss/2.0/custom/" + searchQuery);
+              $('#atomlink').attr("href", "/feeds/atom/0.3/custom/" + searchQuery);
           }
-        });
-                
-        restEndpoint = restEndpoint + "limit=10";
-                
-        restEndpoint = restEndpoint + "&offset=" + (page - 1) * 10;
-                
-        restEndpoint = restEndpoint + "&_=" + new Date().getTime(); // workaround for IE ajax caching problem
-        $('#stage').xslt(restEndpoint, "xsl/episodes.xsl", function(){
-          Opencast.pager.renderPager();
-                    
-          var total = $('#oc-episodes-total').html();
-          var toIndex = parseInt($('#oc-episodes-limit').html()) + (page - 1) * 10;
-          var fromIndex = Math.min(parseInt($('#oc-episodes-offset').html()) + 1, toIndex);
-                    
-          if (total > 0) {
-            $('.title').text("Results " + fromIndex + "-" + toIndex + " of " + total + keywordString).html();
-                        
-            $('.timeDate').each(function(){
-              var timeDate = $(this).text();
-              if (timeDate) {
-                //JavaScript parseInt(string, radix)
-                var sd = new Date();
-                sd.setFullYear(parseInt(timeDate.substring(0, 4), 10));
-                sd.setMonth(parseInt(timeDate.substring(5, 7), 10) - 1);
-                sd.setDate(parseInt(timeDate.substring(8, 10), 10));
-                sd.setHours(parseInt(timeDate.substring(11, 13), 10));
-                sd.setMinutes(parseInt(timeDate.substring(14, 16), 10));
-                sd.setSeconds(parseInt(timeDate.substring(17, 19), 10));
-                $(this).html(sd.toLocaleString());
-              }
-              else {
-                $(this).html("n.a.");
-              }
-            });
-            $(".thumb").each(function(index){
-              var src = $(this).attr("src");
-              if (src === undefined || src === "") {
-                $(this).attr("src", "img/thumbnail.png");
-              }
-            });
-            $(".search-item").each(function(index){
-              if (index % 2 == 1) {
-                $(this).css('background-color', '#F7FBFC');
-              }
-              else {
-                $(this).css('background-color', '#EFF7F9');
-              }
-            });
+          else
+          {
+              $('#rsslink').attr("href", "/feeds/rss/2.0/latest");
+              $('#atomlink').attr("href", "/feeds/atom/0.3/latest");
           }
-          else {
-            if (Opencast.pager.getCurrentSearchQuery() != null) {
-              $('.title').text('No recordings found for : "' + searchQuery + '"');
-            }
-            else {
-              $('.title').text("No recordings published yet.");
-                            
-            }
-          }
-                    
-        });
-                
-        if (searchQuery != null && searchQuery != "") {
-          $('#rsslink').attr("href", "/feeds/rss/2.0/custom/" + searchQuery);
-          $('#atomlink').attr("href", "/feeds/atom/0.3/custom/" + searchQuery);
-        }
-        else {
-          $('#rsslink').attr("href", "/feeds/rss/2.0/latest");
-          $('#atomlink').attr("href", "/feeds/atom/0.3/latest");
-        }
       });
     </script>
   </head>
@@ -141,10 +150,10 @@
     <!-- LOGO -->
     <div id="header">
       <div id="logotitle">
-        <a href="/welcome.html" title="Back to Opencast Matterhorn Welcome page"><img src="img/MatterhornLogo.png" alt="Matterhorn Home Page" title="Matterhorn Home Page" width="104" height="72" align="left"></a><h1>Media Module</h1>
+        <a href="/welcome.html" title="Back to Opencast Matterhorn Welcome page"><img src="/engage/ui/img/mh_logos/MatterhornLogo.png" alt="Matterhorn Home Page" title="Matterhorn Home Page" width="104" height="72" align="left"></a><h1>Media Module</h1>
       </div>
       <div id="oclogo">
-        <a href="http://www.opencastproject.org"><img src="img/OpencastLogo.png" width="143" height="38" alt="Opencast Community Project" title="Opencast Community Project"></a>
+        <a href="http://www.opencastproject.org"><img src="/engage/ui/img/mh_logos/OpencastLogo.png" width="143" height="38" alt="Opencast Community Project" title="Opencast Community Project"></a>
       </div>
     </div><hr style="clear:both;border-style: none none solid none;height:1px; color:#CCCCCC;padding-top: 10px; margin-right:20px;margin-left:20px;">
 

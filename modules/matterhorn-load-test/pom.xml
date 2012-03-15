@@ -108,7 +108,7 @@
               <outputDirectory>${basedir}/target/classes/ui/jquery</outputDirectory>
               <resources>
                 <resource>
-                  <directory>../../shared-resources/jquery/</directory>
+                  <directory>../../shared-resources/js/jquery/</directory>
                   <includes>
                     <include> **/* </include>
                   </includes>

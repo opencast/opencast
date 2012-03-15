@@ -18,19 +18,19 @@ var ocUtils = ocUtils || {};
 ocUtils.templateRoot = "jst/";
 
 ocUtils.formatInt = function(value){
-   var groupingSeparator= ',',       
-       formatted = '';
+  var groupingSeparator= ',',       
+  formatted = '';
 
-   if (typeof value == 'number') value += '';	
-   var count=0, i=value.length;  
-   while (i--) {
-      if (count !== 0 && count % 3 === 0) {
-	   formatted = groupingSeparator + formatted;    
-      }
-      formatted = value.substr(i, 1) + formatted;
-      count++;
-   }    
-   return formatted;
+  if (typeof value == 'number') value += '';	
+  var count=0, i=value.length;  
+  while (i--) {
+    if (count !== 0 && count % 3 === 0) {
+      formatted = groupingSeparator + formatted;    
+    }
+    formatted = value.substr(i, 1) + formatted;
+    count++;
+  }    
+  return formatted;
 }
 
 ocUtils.internationalize = function(obj, prefix){
@@ -66,6 +66,10 @@ ocUtils.xmlToString = function(doc) {
   } else {
     return '';
   }
+}
+
+ocUtils.isChunkedUploadCompliable = function() {
+  return window.File && window.FileReader && window.FileList && window.Blob && window.FormData != undefined;
 }
 
 ocUtils.createDoc = function(rootEl, rootNS){
@@ -223,8 +227,8 @@ ocUtils.fromUTCDateStringToFormattedTime = function(UTCDate, duration) {
  *
  */
 ocUtils.toISODate = function(date, utc) {
-//align date format
-var date = new Date(date);
+  //align date format
+  var date = new Date(date);
   var out;
   if(typeof utc == 'undefined') {
     utc = true;

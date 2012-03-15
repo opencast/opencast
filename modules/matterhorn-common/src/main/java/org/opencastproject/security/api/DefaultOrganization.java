@@ -35,8 +35,8 @@ public class DefaultOrganization extends Organization {
 
   static {
     Map<String, String> map = new HashMap<String, String>();
-    map.put("logo_large", "/img/MatterhornLogo_large.png");
-    map.put("logo_small", "/img/OpencastLogo.png");
+    map.put("logo_large", "/admin/img/mh_logos/MatterhornLogo_large.png");
+    map.put("logo_small", "/admin/img/mh_logos/OpencastLogo.png");
     DEFAULT_PROPERTIES = Collections.unmodifiableMap(map);
   }
 

@@ -27,24 +27,24 @@ li#titleNote {padding:0 0 4px 0;}
 
 /* Icons */
 .icon { width:16px; height:16px; background-repeat: none; background-position: center center; float: left; }
-.icon-check {       background-image: url(../img/icons/tick.png); }
-.icon-error {       background-image: url(../img/icons/exclamation.png); }
-.icon-info {        background-image: url(../img/icons/information.png); }
-.icon-running {     background-image: url(../img/icons/cog.png); }
-.icon-add {         background-image: url(../img/icons/add.png); margin-right: 10px; }
-.icon-delete {      background-image: url(../img/icons/delete.png); }
-.icon-idle 	{   background-image: url(../img/icons/cup.png); margin: 0px 10px; }
-.icon-capturing {   background-image: url(../img/icons/camera.png); }
-.icon-online {	    background-image: url(../img/icons/available.png); }
-.icon-offline {     background-image: url(../img/icons/offline.png); margin: 0px 10px; }
-.icon-arrow-right { background-image: url(../img/icons/arrow-right.png); background-position: 0 0;}
-.icon-arrow-down {  background-image: url(../img/icons/arrow-down.png); background-position: 0 0; }
-.icon-help {        background-image: url(../img/icons/help.png); background-position: 0 0; vertical-align: top; }
-.icon-bullet {      background-image: url(../img/icons/bullet-arrow.png);  background-position: 0 0; }
+.icon-check {       background-image: url(/admin/img/icons/tick.png); }
+.icon-error {       background-image: url(/admin/img/icons/exclamation.png); }
+.icon-info {        background-image: url(/admin/img/icons/information.png); }
+.icon-running {     background-image: url(/admin/img/icons/cog.png); }
+.icon-add {         background-image: url(/admin/img/icons/add.png); margin-right: 10px; }
+.icon-delete {      background-image: url(/admin/img/icons/delete.png); }
+.icon-idle 	{   background-image: url(/admin/img/icons/cup.png); margin: 0px 10px; }
+.icon-capturing {   background-image: url(/admin/img/icons/camera.png); }
+.icon-online {	    background-image: url(/admin/img/icons/available.png); }
+.icon-offline {     background-image: url(/admin/img/icons/offline.png); margin: 0px 10px; }
+.icon-arrow-right { background-image: url(/admin/img/icons/arrow-right.png); background-position: 0 0;}
+.icon-arrow-down {  background-image: url(/admin/img/icons/arrow-down.png); background-position: 0 0; }
+.icon-help {        background-image: url(/admin/img/icons/help.png); background-position: 0 0; vertical-align: top; }
+.icon-bullet {      background-image: url(/admin/img/icons/bullet-arrow.png);  background-position: 0 0; }
 .inline-icon { display: inline-block; }
-.loadingAnimation { background-image:url(../img/loading.gif); background-position: center; background-repeat:no-repeat; height:40px; width:100%; }
+.loadingAnimation { background-image:url(/admin/img/misc/loading.gif); background-position: center; background-repeat:no-repeat; height:40px; width:100%; }
 /*.progressbar {
-  background-image:url(../img/loading.gif); background-position: center; background-repeat:no-repeat; height:40px; width:240px; }*/
+  background-image:url(/admin/img/misc/loading.gif); background-position: center; background-repeat:no-repeat; height:40px; width:240px; }*/
 
 
 
@@ -97,7 +97,7 @@ li#titleNote {padding:0 0 4px 0;}
 ul.propnav { list-style: none; padding: 0 20px; margin: 0; float: left;}
 ul.propnav li { float: left; margin-right: 10px; position: relative; }
 ul.propnav li:hover { background:#CCCCCC; float: left; position: relative; }
-ul.propnav li span.subnav { width: 17px; height: 35px; float: left; background: url("../img/icons/arrow-down.png") no-repeat center center; }
+ul.propnav li span.subnav { width: 17px; height: 35px; float: left; background: url("/admin/img/icons/arrow-down.png") no-repeat center center; }
 ul.propnav li ul.itemnav { background-color : white; width : 400px; list-style: none; position: absolute; left: 0; top: 30px; margin: 0; padding: 0; display: none; float: left; border: 1px solid #111;  z-index:1; }
 ul.propnav li ul.itemnav li{ height : 2em; width : inherit; margin: 0; padding: 0; border-bottom: 1px solid #444; clear: both; }
 ul.propnav li span.device { float:left; padding: 10px 5px; display:block; }
@@ -142,9 +142,9 @@ ul.itemnav li span.dev-prop-val { text-align:left; width:70%;}
 
 /* tables */
 .oc-ui-sortable div, .oc-ui-sortable-Ascending div, .oc-ui-sortable-Descending div
-{ cursor:pointer; background: url(../../img/icons/bg.gif) no-repeat center right transparent;}
-.oc-ui-sortable-Ascending div { background-image:url(../../img/icons/asc.gif); }
-.oc-ui-sortable-Descending div { background-image:url(../../img/icons/desc.gif); }
+{ cursor:pointer; background: url(/admin/img/icons/bg.gif) no-repeat center right transparent;}
+.oc-ui-sortable-Ascending div { background-image:url(/admin/img/icons/asc.gif); }
+.oc-ui-sortable-Descending div { background-image:url(/admin/img/icons/desc.gif); }
 table#agentsTable, table#seriesTable, table#captureTable
 { margin-top: 30px;}
 table#agentsTable td, table#seriesTable td, table#recordingsTable td, table#statsTable td, table#captureTable td

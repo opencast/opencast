@@ -3,7 +3,7 @@
 }
 
 body {
-	background: url("img/body.gif") repeat scroll 0 0 #EDEDED;
+	background: url("/admin/img/misc/body.gif") repeat scroll 0 0 #EDEDED;
 	margin: 20px 0;
 	font-family: "Lucida Grande", "Lucida Sans Unicode", sans-serif;
 	line-height:1.3em;/*18px*/
@@ -203,17 +203,17 @@ a:hover {
 	text-decoration: underline;
 	}
 #topbanner ul {
-	list-style-image:url(img/bullet_orange.png);
+	list-style-image:url(/admin/img/bullet_orange.png);
 	padding-left: 16px;
 	color:#A72123;
 }
 #middlebanner ul
 #middlebanner2 ul {
-	/*list-style-image:url(img/bullet_white.png);*/
+	/*list-style-image:url(/admin/img/bullet_white.png);*/
 	padding: 0 0 16px 16px;
 }
 #bottombanner ul {
-	list-style-image:url(img/icons/bullet-arrow.png);
+	list-style-image:url(/admin/img/icons/bullet-arrow.png);
 	padding: 0 0 16px 16px;
 	margin-bottom:0
 }

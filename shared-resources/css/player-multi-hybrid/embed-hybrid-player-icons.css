@@ -1,0 +1,396 @@
+/**
+ *  Copyright 2009 The Regents of the University of California
+ *  Licensed under the Educational Community License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance
+ *  with the License. You may obtain a copy of the License at
+ *
+ *  http://www.osedu.org/licenses/ECL-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an "AS IS"
+ *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ *  or implied. See the License for the specific language governing
+ *  permissions and limitations under the License.
+ *
+ */
+ 
+input
+{
+  margin:                   0;
+  border:                   0 none;
+  onfocus:                  none;  
+  overflow:                 hidden;
+  background:               #2B2B2B;
+  color:                    #FFFFFF;
+}
+
+#oc_video-controls input
+{
+  margin-left:              2px;
+  margin-right:             2px;
+}
+
+input:hover
+{
+  cursor:                   pointer;
+  cursor:                   hand;
+}
+
+.oc_btn-skip-backward
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      0 -30px;
+  width:                    16px;
+  height:                   15px;
+  margin-top:               3px;
+}
+
+.oc_btn-skip-backward-over
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -30px -30px;
+  width:                    16px;
+  height:                   15px;
+  margin-top:               3px;
+}
+
+.oc_btn-skip-backward-clicked
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -60px -30px;
+  width:                    16px;
+  height:                   15px;
+  margin-top:               3px;
+}
+
+.oc_btn-rewind
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      0 -60px;
+  width:                    21px;
+  height:                   14px;
+  margin-top:               4px;
+}
+
+.oc_btn-rewind-over
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -30px -60px;
+  width:                    21px;
+  height:                   14px;
+  margin-top:               4px;
+}
+
+.oc_btn-rewind-clicked
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -60px -60px;
+  width:                    21px;
+  height:                   14px;
+  margin-top:               4px;
+}
+
+.oc_btn-play
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      0px -210px;
+  width:                    16px;
+  height:                   21px;
+  margin-top:               2px;
+}
+
+.oc_btn-play-clicked
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -60px -210px;
+  width:                    16px;
+  height:                   21px;
+  margin-top:               2px;
+}
+
+.oc_btn-play-over
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -30px -210px;
+  width:                    16px;
+  height:                   21px;
+  margin-top:               2px;
+}
+
+.oc_btn-pause
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      0px -90px;
+  width:                    16px;
+  height:                   21px;
+  margin-top:               2px;
+}
+
+.oc_btn-pause-clicked
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -60px -90px;
+  width:                    16px;
+  height:                   21px;
+  margin-top:               2px;
+}
+
+.oc_btn-pause-over
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -30px -90px;
+  width:                    16px;
+  height:                   21px;
+  margin-top:               2px;
+}
+
+.oc_btn-fast-forward
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      0px -120px;
+  width:                    21px;
+  height:                   14px;
+  margin-top:               4px;
+}
+
+.oc_btn-fast-forward-over
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -30px -120px;
+  width:                    21px;
+  height:                   14px;
+  margin-top:               4px;
+}
+
+.oc_btn-fast-forward-clicked
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -60px -120px;
+  width:                    21px;
+  height:                   14px;
+  margin-top:               4px;
+}
+
+.oc_btn-skip-forward
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      0px -150px;
+  width:                    16px;
+  height:                   15px;
+  margin-top:               4px;
+}
+
+.oc_btn-skip-forward-over
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -30px -150px;
+  width:                    16px;
+  height:                   15px;
+  margin-top:               4px;
+}
+
+.oc_btn-skip-forward-clicked
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -60px -150px;
+  width:                    16px;
+  height:                   15px;
+  margin-top:               4px;
+}
+
+.oc_btn-volume-high
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -0px -240px;
+  width:                    18px;
+  height:                   18px;
+}
+
+.oc_btn-volume-mute
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -90px -240px;
+  width:                    18px;
+  height:                   18px;
+}
+
+.oc_btn-volume-low
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -30px -240px;
+  width:                    18px;
+  height:                   18px;
+}
+
+.oc_btn-volume-none
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -90px -240px;
+  width:                    18px;
+  height:                   18px;
+}
+
+.oc_btn-cc-off
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -0px -182px;
+  width:                    22px;
+  height:                   17px;
+}
+
+.oc_btn-cc-over
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -30px -182px;
+  width:                    22px;
+  height:                   17px;
+}
+
+.oc_btn-cc-on
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -60px -182px;
+  width:                    22px;
+  height:                   17px;
+}
+
+#oc_btn-dropdown
+{
+  height:					19px;
+  margin-right:             5px;
+}
+
+.oc_btn-singleDisplay-presenter
+{
+  background:               url("/engage/ui/img/engage_player/oc_icons_2.png") no-repeat -300px -305px transparent;
+  width:                   60px;
+  height:                 19px;
+  margin-top: 5px;
+
+}
+.oc_btn-singleDisplay-presentation
+{
+  background:               url("/engage/ui/img/engage_player/oc_icons_2.png") no-repeat -240px -305px transparent;
+  width:                   60px;
+  height:					19px;
+  margin-top: 5px;
+
+}
+#oc_video-size-controls .oc_btn-singleDisplay-presentation, #oc_video-size-controls .oc_btn-singleDisplay-presenter { margin: 0px; } 
+
+.oc_btn-bigLeftDisplay
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -120px -330px;
+  width:                    44px;
+  height:					19px;
+
+}
+
+.oc_btn-centerDisplay
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -0px -330px;
+  width:                    44px;
+  height:					19px;
+
+}
+
+.oc_btn-bigRightDisplay
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -64px -330px;
+  width:                    40px;
+  height:					19px;
+
+}
+
+.oc_btn-audioDisplay
+{
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      0px -240px;
+  width:                    18px;
+  height:					19px;
+
+}
+
+.oc_embed-720x545
+{
+  width:                    80px;
+  height:                   45px;
+}
+
+.oc_embed-640x500
+{
+  width:                    70px;
+  height:                   40px;
+}
+
+.oc_embed-560x455
+{
+  width:                    60px;
+  height:                   34px;
+}
+
+.oc_embed-480x410
+{
+  width:                    50px;
+  height:                   29px;
+}
+
+.oc_embed-720x680
+{
+  width:                    80px;
+  height:                   60px;
+}
+
+.oc_embed-640x620
+{
+  width:                    70px;
+  height:                   53px;
+}
+
+.oc_embed-560x560
+{
+  width:                    60px;
+  height:                   45px;
+}
+
+.oc_embed-480x500
+{
+  width:                    50px;
+  height:                   38px;
+}
+
+#oc_embed-sections input
+{
+  font-size:                0.8em;
+}
+
+#oc_embed-sections input:hover
+{
+  background-color:         #FA6E23;
+}
+
+.oc_boomarkPoint
+{
+    display: inline;
+}
+
+#oc_draggable-embed 
+{ 
+  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background-position:      -60px -360px;
+  height:                   19px;
+  width:                    9px;
+  margin-top:               -3px;
+  z-index:                  20;
+  position:                 relative; 
+
+  
+}
+
+.oc_btn-close { position: absolute; top: -5px; right: -5px; padding: 0px; width: 20px!important; height: 20px!important;}
+#oc_volume-container { padding: 0px; margin: 0px; overflow: hidden; background: transparent; border: none; float: left; }
+#oc_volume-back { position: relative; left: 0px; background:  url("/engage/ui/img/engage_player/oc_icons.png") no-repeat -100px -30px transparent; width: 28px; height: 15px;}
+#oc_volume-front { padding: 0px; margin: 0px; background:  url("/engage/ui/img/engage_player/oc_icons.png") no-repeat -100px -45px transparent; width: 28px; height: 15px; position: absolute; top: 0px; left: 0px;}

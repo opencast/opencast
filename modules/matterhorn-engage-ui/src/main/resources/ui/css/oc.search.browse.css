@@ -167,7 +167,7 @@ span.title {
 #searchField {
   width: 200px;
   background-color: #E3E3D7;
-  background-image: url('../img/icons/magnifier.png');
+  background-image: url('/engage/ui/img/icons/magnifier.png');
   background-repeat: no-repeat;
   border: 1px solid #000000;
   padding-left: 20px;

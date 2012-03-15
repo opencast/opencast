@@ -4,11 +4,10 @@
     <title id="i18n_window_title"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- styles -->
-    <link rel="stylesheet" type="text/css" href="css/confidence.css">
+    <link rel="stylesheet" type="text/css" href="admin/css/confidence.css">
     <!-- scripts -->
-    <script type="text/javascript" src="jquery/jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
-    <script type="text/javascript" src="js/confidence.js"></script>
+    <script type="text/javascript" src="/admin/js/jquery/jquery.js"></script>
+    <script type="text/javascript" src="/admin/js/confidence.js"></script>
     <script type="text/javascript">
       $(document).ready(Monitor.init);
     </script>
@@ -30,7 +29,7 @@
             <ul id="video_devices" class="device_tab"></ul>
           </div>
           <div id="preview_area">
-            <img height="480" width="720" src="img/plug.png" id="snapshot">
+            <img height="480" width="720" src="/admin/img/mh_logos/MatterhornLogo_large.png" id="snapshot">
           </div>
         </div>
         <div id="audio_preview">
@@ -39,10 +38,10 @@
           </div>
           <div id="preview_area">
               <div id="left_channel" class="audio_meter">
-                <img id="left_mask" class="meter_mask" src="img/mask.png">
+                <img id="left_mask" class="meter_mask" src="/admin/img/television.png">
               </div>
               <div id="dbValue" style="position: relative;"></div>
-              <!-- <div id="right_channel" class="audio_meter" style="display: none;"><img id="right_mask" class="meter_mask" src="img/mask.png"></img></div> -->
+              <!-- <div id="right_channel" class="audio_meter" style="display: none;"><img id="right_mask" class="meter_mask" src="/admin/img/mask.png"></img></div> -->
           </div>
         </div>
       </div>

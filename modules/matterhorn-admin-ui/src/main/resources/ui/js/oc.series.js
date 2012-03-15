@@ -89,7 +89,7 @@ ocSeries.init = function(){
   privilegeRow += '<td><input type="text" class="role_search"/></td>';
   privilegeRow += '<td class="privilege_edit"><input type="checkbox" name="priv_view" class="privilege_edit" /></td>';
   privilegeRow += '<td class="privilege_edit"><input type="checkbox" name="priv_edit" class="privilege_edit" /></td>';
-  privilegeRow += '<td class="privilege_edit"><img src="/img/icons/delete.png" alt="delete" title="Delete Role"></td>';
+  privilegeRow += '<td class="privilege_edit"><img src="/admin/img/icons/delete.png" alt="delete" title="Delete Role"></td>';
   privilegeRow += '</tr>';
   var $row;
   

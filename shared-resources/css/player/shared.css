@@ -1,0 +1,118 @@
+body {
+	padding-top: 20px;
+}
+
+/* Classes */
+
+.play-progress {
+    width: 0%;
+}
+
+/* Start: No Javascript activated Error Box */
+.noJSAlert-outer {
+    background-color: #FFFFFF;
+    border:1px solid red;
+    width:530px;
+    margin:20px;
+    color: #000000;
+}
+
+.noJSAlert-inner-up {
+    text-align: left;
+    background:red;
+    color:white;
+    padding-top:2px;
+    padding-bottom:2px;
+}
+
+.noJSAlert-inner-down {
+    padding:10px;
+}
+
+.noJSAlert-inner-image {
+    margin-left:5px;
+    margin-right:5px;
+}
+
+.icon {
+    width:16px;
+    height:16px;
+    background-repeat: none;
+    background-position: center center;
+    float: left;
+}
+
+.icon-error {
+    background-image: url(/engage/ui/img/icons/exclamation.png);
+}
+/* End: No Javascript activated Error Box */
+
+/* IDs */
+
+/* Start: Header */
+#pageHeader {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	line-height: 20px;
+	font-size: 0.8em;
+	color: #FFF;
+	background-color: #A72123;
+	text-align:left;
+}
+
+#header a {
+  text-decoration: none;
+}
+
+#pageHeader div {
+	display: inline-block;
+	width: 200px;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+#skip {
+	position: absolute;
+	width: 80%;
+	top: -300px;
+	left: -2000px;
+}
+
+#skip a {
+	position: absolute;
+	top: 0;
+}
+
+#header {
+    position:relative;
+    height: 80px;
+}
+
+#header h1 {
+    padding: 4px 0 0 140px;
+    margin-bottom:20px
+}
+
+#oclogo {
+    position:absolute;
+    right: 0;
+    top: 16px;
+}
+
+#logotitle {
+	position: absolute;
+	top: 16px;
+}
+/* End: Header */
+
+/* Misc */
+
+#draggable {
+    left: 0%;
+}
+
+#analytics-and-annotations {
+    height: 25px;
+}

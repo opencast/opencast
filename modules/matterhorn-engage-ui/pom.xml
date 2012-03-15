@@ -109,8 +109,7 @@
                 <resource>
                   <directory>../../shared-resources/</directory>
                   <includes>
-                     <include>jquery/**</include>
-                     <include>trimpath/**</include>
+                     <include>js/jquery/**</include>
                   </includes>                  
                   <filtering>false</filtering>
                 </resource>
@@ -185,6 +184,25 @@
               <resources>
                 <resource>
                   <directory>../../shared-resources/xsl/</directory>
+                  <includes>
+                    <include> **/** </include>
+                  </includes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-json</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/ui/json</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../../shared-resources/json/</directory>
                   <includes>
                     <include> **/** </include>
                   </includes>

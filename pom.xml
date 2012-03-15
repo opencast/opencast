@@ -5,7 +5,7 @@
   <artifactId>base</artifactId>
   <packaging>pom</packaging>
   <version>1.4-SNAPSHOT</version>
-  <name>matterhorn</name>
+  <name>MH-8232 </name>
   <description>The Opencast Project's Matterhorn software is a media capture, processing, and distribution system</description>
   <url>http://opencastproject.org</url>
   <inceptionYear>2009</inceptionYear>
@@ -41,6 +41,7 @@
         <module>modules/matterhorn-conductor</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
+        <module>modules/matterhorn-fileupload</module>
         <module>modules/matterhorn-episode-service-api</module>
         <module>modules/matterhorn-episode-service-impl</module>
         <module>modules/matterhorn-ingest-service-api</module>
@@ -48,6 +49,7 @@
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-lti</module>
+        <module>modules/matterhorn-mediapackage-manipulator</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-metadata</module>
         <module>modules/matterhorn-mpeg7</module>

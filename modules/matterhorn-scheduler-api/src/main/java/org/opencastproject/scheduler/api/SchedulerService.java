@@ -61,6 +61,16 @@ public interface SchedulerService {
    * 
    * @param eventCatalog
    *          template {@link DublinCoreCatalog} used to create events
+   * @param recPattern
+   *          pattern of recurrence
+   * @param beginning
+   *          start date of event series
+   * @param end
+   *          end date of event series
+   * @param duration
+   *          duration of each event in milliseconds
+   * @param timeZone
+   *          time zone in which event will take place or null if local time zone should be used
    * @return array of events IDs that were created
    * @throws SchedulerException
    *           if events cannot be created
@@ -117,8 +127,6 @@ public interface SchedulerService {
    *           if exception occurred
    * @throws NotFoundException
    *           if event with specified ID cannot be found
-   * @throws UnauthorizedException
-   *           if the caller is not authorized to take this action
    */
   void removeEvent(long eventID) throws SchedulerException, NotFoundException, UnauthorizedException;
 

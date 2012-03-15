@@ -3,52 +3,49 @@
     <head>
         <title>Opencast Matterhorn - Media Player</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <link rel="shortcut icon" href="img/favicon.ico" />
+        <link rel="shortcut icon" href="/engage/ui/img/favicon.ico" />
         <!-- CSS includes -->
-        <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.8.6.custom.css" />
-        <link rel="stylesheet" type="text/css" href="css/jquery-ui-orange-custom.css" />
-        <link rel="stylesheet" type="text/css" href="css/shared.css" />
-        <link rel="stylesheet" type="text/css" href="engage-hybrid-player/css/embed-hybrid-player.css" />
-        <link rel="stylesheet" type="text/css" href="engage-hybrid-player/css/embed-hybrid-player-icons.css" />
-        <link rel="stylesheet" type="text/css" href="engage-hybrid-player/css/opencast-reset.css" />
-        <link rel="stylesheet" type="text/css" href="jquery/plugins/jwysiwyg/jquery.wysiwyg.css" />
-        <link rel="stylesheet" type="text/css" href="css/oc.segments.css" />
-        <link rel="stylesheet" type="text/css" href="css/embed.css" />
+        <link rel="stylesheet" type="text/css" href="/engage/ui/css/jquery-ui/jquery-ui.css" />
+        <link rel="stylesheet" type="text/css" href="/engage/ui/css/jquery-ui/jquery-ui-custom.css" />
+        <link rel="stylesheet" type="text/css" href="/engage/ui/css/player/shared.css" />
+        <link rel="stylesheet" type="text/css" href="/engage/ui/css/player-multi-hybrid/embed-hybrid-player.css" />
+        <link rel="stylesheet" type="text/css" href="/engage/ui/css/player-multi-hybrid/embed-hybrid-player-icons.css" />
+        <link rel="stylesheet" type="text/css" href="/engage/ui/css/player-multi-hybrid/opencast-reset.css" />
+        <link rel="stylesheet" type="text/css" href="/engage/ui/jquery/plugins/jwysiwyg/jquery.wysiwyg.css" />
+        <link rel="stylesheet" type="text/css" href="/engage/ui/css/oc.segments.css" />
+        <link rel="stylesheet" type="text/css" href="/engage/ui/css/player/embed.css" />
         <!-- Javascript includes -->
-        <script type="text/javascript" src="jquery/jquery-1.4.2.min.js"></script>
-        <script type="text/javascript" src="jquery/plugins/jquery.xslt.js"></script>
-        <script type="text/javascript" src="jquery/plugins/jquery.hotkeys-0.7.9.js"></script>
-        <script type="text/javascript" src="jquery/plugins/jARIA.js"></script>
-        <script type="text/javascript" src="jquery/jquery-ui-1.8.1.custom.min.js"></script>
-        <script type="text/javascript" src="jquery/plugins/jwysiwyg/jquery.wysiwyg.js"></script>
-        <script type="text/javascript" src="jquery/plugins/jquery.client.js"></script>
-        <script type="text/javascript" src="jquery/plugins/jquery.cookie.js"></script>
-        <script type="text/javascript" src="js/engage-ui.js"></script>
-        <script type="text/javascript" src="js/jquery.timers-1.2.js"></script>
-        <script type="text/javascript" src="js/engage_plugins/json2.js"></script>
-	<script type="text/javascript" src="js/engage_plugins/download.js"></script>
-        <script type="text/javascript" src="js/jquery.utils-1.0.js"></script>
-        <script type="text/javascript" src="js/engage_plugins/description.js"></script>
-        <script type="text/javascript" src="js/engage_plugins/description-plugin.js"></script>
-        <script type="text/javascript" src="js/engage_plugins/segments_ui.js"></script>
-        <script type="text/javascript" src="js/engage_plugins/segments_ui-plugin.js"></script>
-        <script type="text/javascript" src="js/engage_plugins/segments_ui_slider-plugin.js"></script>
-        <script type="text/javascript" src="js/engage_plugins/segments.js"></script>
-        <script type="text/javascript" src="js/engage_plugins/segments-plugin.js"></script>
-        <script type="text/javascript" src="js/engage_plugins/segments_text.js"></script>
-        <script type="text/javascript" src="js/engage_plugins/segments_text-plugin.js"></script>
-        <script type="text/javascript" src="js/engage_plugins/series-plugin.js"></script>
-        <script type="text/javascript" src="js/engage_plugins/series.js"></script>
-    	<script type="text/javascript" src="js/engage_plugins/logging.js"></script>
-        <script type="text/javascript" src="js/engage_plugins/embedControlHide.js"></script>
-        <script type="text/javascript" src="trimpath/trimpath-template-1.0.38.js"></script>
-        <script type="text/javascript" src="engage-hybrid-player/embed-hybrid-initialize.js"></script>
-        <script type="text/javascript" src="engage-hybrid-player/bridge/lib/FABridge.js"></script>
-        <script type="text/javascript" src="engage-hybrid-player/bridge/Videodisplay.js"></script>
-        <script type="text/javascript" src="engage-hybrid-player/player-multi-hybrid-scubber.js"></script>
-        <script type="text/javascript" src="engage-hybrid-player/player-multi-hybrid.js"></script>
-        <script type="text/javascript" src="engage-hybrid-player/aria/js/ariaSpinbutton.js"></script>
-        <script type="text/javascript" src="js/watch.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/jquery/jquery.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jARIA.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/jquery/jquery-ui.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jwysiwyg/jquery.wysiwyg.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.client.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.cookie.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/engage-ui.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.timers-1.2.js"></script>
+	<script type="text/javascript" src="/engage/ui/js/engage_plugins/download.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.utils.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/engage_plugins/description.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/engage_plugins/description-plugin.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/engage_plugins/segments_ui.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/engage_plugins/segments_ui-plugin.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/engage_plugins/segments_ui_slider-plugin.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/engage_plugins/segments.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/engage_plugins/segments-plugin.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/engage_plugins/segments_text.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/engage_plugins/segments_text-plugin.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/engage_plugins/series-plugin.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/engage_plugins/series.js"></script>
+    	<script type="text/javascript" src="/engage/ui/js/engage_plugins/logging.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/engage_plugins/embedControlHide.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/ext/trimpath.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/player/embed-hybrid-initialize.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/bridge/lib/FABridge.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/bridge/Videodisplay.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/player/player-multi-hybrid-scubber.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/player/player-multi-hybrid.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/player/ariaSpinbutton.js"></script>
+        <script type="text/javascript" src="/engage/ui/js/player/watch.js"></script>
     </head>
     <body>
         <!-- If no Javascript is activated -->
@@ -73,7 +70,7 @@
         
         <div id="oc_body">
             <a id="oc-link-advanced-player" href="#" target="_blank" title="View Advanced Player" title="Open Engage Player">
-				<img alt="Open Engage Player" src="/img/MatterhornLogo_42x30.png" height="30px" width="42px" />
+				<img alt="Open Engage Player" src="/engage/ui/img/mh_logos/MatterhornLogo_42x30.png" height="30px" width="42px" />
 			</a>
             <div id="oc_flash-player-loading">
                 <!-- START: Hide when no Javascript is activated -->
@@ -89,7 +86,7 @@
             <!-- END #oc_flash-player-loading -->
         
             <div id="oc_flash-player">
-                <script type="text/javascript" src="engage-hybrid-player/player-multi-hybrid-flash.js"></script>
+                <script type="text/javascript" src="/engage/ui/js/player/player-multi-hybrid-flash.js"></script>
             </div>
             
             <div id="oc_controlbar-embed">
@@ -167,7 +164,7 @@
                                     <div class="progress-list">
                                         <span class="load-progress" value="0"></span>
                                         <span id="play-progress" class="play-progress" value="0"></span>
-                                        <span id="scubber-channel" class="scrubber-channel"><input id="scrubber" type="submit" type="image" src="img/space.png" class="scrubber-button" role="slider"/>
+                                        <span id="scubber-channel" class="scrubber-channel"><input id="scrubber" type="submit" type="image" src="/engage/ui/img/misc/space.png" class="scrubber-button" role="slider"/>
                                             <div id="draggable" class="ui-widget-content"></div>
                                         </span>
                                     </div>

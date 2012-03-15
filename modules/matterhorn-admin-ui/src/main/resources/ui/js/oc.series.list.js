@@ -148,6 +148,7 @@ ocSeriesList.buildSeriesView = function(data) {
   {
     $.cookie('direction', 0) //standard is ASC
   }
+  ocSeriesList.views.totalCount = ocSeriesList.Configuration.total;
   $('#seriesTableContainer').jqotesubtpl("templates/series_list-table.tpl", ocSeriesList.views);
   $('#seriesTable th').click(function(){
     var index = $(this).parent().children().index($(this));

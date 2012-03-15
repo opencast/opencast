@@ -207,14 +207,14 @@ var ocScheduler = (function() {
     $('#startTimeHour').val(initializerDate.getHours());
     $('#startDate').datepicker({
       showOn: 'both',
-      buttonImage: 'img/icons/calendar.gif',
+      buttonImage: '/admin/img/icons/calendar.gif',
       buttonImageOnly: true,
       dateFormat: 'yy-mm-dd'
     });
     $('#startDate').datepicker('setDate', initializerDate);
     $('#endDate').datepicker({
       showOn: 'both',
-      buttonImage: 'img/icons/calendar.gif',
+      buttonImage: '/admin/img/icons/calendar.gif',
       buttonImageOnly: true,
       dateFormat: 'yy-mm-dd'
     });
@@ -224,14 +224,14 @@ var ocScheduler = (function() {
     //multiple recording specific elements
     $('#recurStart').datepicker({
       showOn: 'both',
-      buttonImage: 'img/icons/calendar.gif',
+      buttonImage: '/admin/img/icons/calendar.gif',
       buttonImageOnly: true,
       dateFormat: 'yy-mm-dd'
     });
 
     $('#recurEnd').datepicker({
       showOn: 'both',
-      buttonImage: 'img/icons/calendar.gif',
+      buttonImage: '/admin/img/icons/calendar.gif',
       buttonImageOnly: true,
       dateFormat: 'yy-mm-dd'
     });

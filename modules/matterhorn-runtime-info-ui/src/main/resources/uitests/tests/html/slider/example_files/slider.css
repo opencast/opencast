@@ -3,7 +3,7 @@
 	position: relative;
 	width: 300px;
 	height: 15px;
-	background: url(img/bg.png) 50% 50% repeat-x;
+	background: url(/admin/img/icons/bg.gif) 50% 50% repeat-x;
 }
 .slider img {
 	position: absolute;
@@ -18,9 +18,9 @@
 }
 .slider .left {
 	left: 0px;
-	background: url(img/left.png) 0px 1px no-repeat;
+	background: url(/admin/img/icons/arrow-down.png) 0px 1px no-repeat;
 }
 .slider .right {
 	right: 0px;
-	background: url(img/right.png) 0px 1px no-repeat;
+	background: url(/admin/icons/arrow-right.png) 0px 1px no-repeat;
 }

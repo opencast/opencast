@@ -16,12 +16,6 @@
 package org.opencastproject.scheduler.endpoint;
 
 //import org.opencastproject.metadata.dublincore.DublinCore;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
@@ -39,9 +33,24 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,14 +70,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Properties;
 
 
 /**
@@ -134,7 +135,7 @@ public class SchedulerRestService {
   /**
    * Gets a XML with the Dublin Core metadata for the specified event.
    * 
-   * @param eventId
+   * @param eventID
    *          The unique ID of the event.
    * @return Dublin Core XML for the event
    */
@@ -161,7 +162,7 @@ public class SchedulerRestService {
   /**
    * Gets a Dublin Core metadata for the specified event as JSON.
    * 
-   * @param eventId
+   * @param eventID
    *          The unique ID of the event.
    * @return Dublin Core JSON for the event
    */
@@ -187,7 +188,7 @@ public class SchedulerRestService {
   /**
    * Gets java Properties file with technical metadata for the specified event.
    * 
-   * @param eventId
+   * @param eventID
    *          The unique ID of the event.
    * @return Java Properties File with the metadata for the event
    */
@@ -212,14 +213,23 @@ public class SchedulerRestService {
   }
 
   /**
-   * Creates new event(s) based on parameters. All times and dates are in milliseconds.
+   * Creates new event(s) based on parameters. ALl times and dates are in milliseconds.
    * 
-   * @param catalogs
-   *          a map with the following possible keys
-   *          <ul>
-   *            <li><code>dublincore</code> -> DublinCore describing the event to be scheduled</li>
-   *            <li><code>agentparameters</code> -> map with config properties for the capture agent</li>
-   *          </ul>
+   * @param event
+   *          serialized Dublin Core for event
+   * @param properties
+   *          Capture agent properties (optional)
+   * @param recurrence
+   *          recurrence pattern (optionally)
+   * @param start
+   *          start of event, used if recurrence is specified (if null is sent, current time will be asumed)
+   * @param end
+   *          end of event, required for recurrent events
+   * @param duration
+   *          duration of each event, required for recurrent events
+   * @param agentTimeZone
+   *          time zone of the agent if it's different than scheduler's
+   * @return
    */
   @POST
   @Path("")
@@ -342,7 +352,7 @@ public class SchedulerRestService {
    * 
    * Removes the specified event from the database. Returns true if the event was found and could be removed.
    * 
-   * @param eventId
+   * @param eventID
    *          The unique ID of the event.
    * @return true if the event was found and could be deleted.
    */
@@ -369,14 +379,12 @@ public class SchedulerRestService {
    * Updates an existing event in the database. The event-id has to be stored in the database already. Will return OK,
    * if the event was found and could be updated.
    * 
-   * @param eventId
+   * @param eventID
    *          id of event to be updated
-   * @param catalogs
-   *          a map with the following possible keys
-   *          <ul>
-   *            <li><code>dublincore</code> -> DublinCore describing the event to be scheduled</li>
-   *            <li><code>agentparameters</code> -> map with config properties for the capture agent</li>
-   *          </ul>
+   * 
+   * @param event
+   *          serialized DC representing event
+   * @return
    */
   @PUT
   @Path("{id:[0-9]+}")
@@ -386,13 +394,13 @@ public class SchedulerRestService {
           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
           @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
           @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Data is missing or invalid") })
-  public Response updateEvent(@PathParam("id") String eventId, MultivaluedMap<String,String> catalogs) {
+  public Response updateEvent(@PathParam("id") String eventID, MultivaluedMap<String,String> catalogs) {
 
     Long id;
     try {
-      id = Long.parseLong(eventId);
+      id = Long.parseLong(eventID);
     } catch (Exception e) {
-      logger.warn("Invalid eventId (non-numerical): {}", eventId);
+      logger.warn("Invalid eventID (non-numerical): {}", eventID);
       return Response.status(Status.BAD_REQUEST).build();
     }
 
@@ -484,6 +492,7 @@ public class SchedulerRestService {
    *          by device
    * @param sort
    *          sort parameter
+   * @return
    */
   @GET
   @Produces(MediaType.TEXT_XML)
@@ -578,6 +587,7 @@ public class SchedulerRestService {
    *          by device
    * @param sort
    *          sort parameter
+   * @return
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
@@ -672,6 +682,7 @@ public class SchedulerRestService {
    *          by device
    * @param sort
    *          sort parameter
+   * @return
    */
   // CHECKSTYLE:OFF
   private DublinCoreCatalogList getEvents(String text, String eventId, String eventTitle, String seriesId,
@@ -854,7 +865,7 @@ public class SchedulerRestService {
   /**
    * Gets the iCalendar with all (even old) events for the specified filter.
    * 
-   * @param captureAgentId
+   * @param captureAgentID
    *          The ID that specifies the capture agent.
    * @param seriesId
    *          The ID that specifies series.

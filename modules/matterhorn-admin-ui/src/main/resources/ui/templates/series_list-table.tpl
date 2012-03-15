@@ -1,4 +1,5 @@
 <div>
+  <span style="margin-top: 20px; float: left;"><%= data[j].totalCount %> Series</span>
   <table id="seriesTable" width="100%" style="float:left;">
     <thead>
       <tr>

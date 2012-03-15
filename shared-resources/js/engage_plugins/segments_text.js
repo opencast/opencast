@@ -81,8 +81,6 @@ Opencast.segments_text = (function ()
                 success: function (data)
                 {
                     $.log("Segments Text AJAX call: Requesting data succeeded");
-                    // get rid of every '@' in the JSON data
-                    // data = $.parseJSON(JSON.stringify(data).replace(/@/g, ''));
                     if ((data === undefined) || (data['search-results'] === undefined) || (data['search-results'].result === undefined) || (data['search-results'].result.segments === undefined))
                     {
                         $.log("Segments Text AJAX call: Data not available");

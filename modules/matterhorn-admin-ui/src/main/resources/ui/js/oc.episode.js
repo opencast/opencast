@@ -23,34 +23,34 @@ opencast.episode = (function() {
    *  @return jqXHR
    */
   function getAllActiveWorkflows() {
-    return $6.getJSON("../workflow/instances.json?compact=true&state=-SUCCEEDED&state=-FAILED");
+    return $.getJSON("../workflow/instances.json?compact=true&state=-SUCCEEDED&state=-FAILED");
   }
 
   /** @param id -- the media package id
    *  @return jqXHR containing raw json
    */
   function queryWorkflowsOfMediaPackage(id) {
-    return $6.getJSON("../workflow/instances.json", { mp:id, startPage:0, count:999999, compact:false });
+    return $.getJSON("../workflow/instances.json", { mp:id, startPage:0, count:999999, compact:false });
   }
 
   /** @param id -- the media package id
    *  @return jqXHR containing raw json
    */
   function queryMediaPackage(id) {
-    return $6.getJSON("../episode/episode.json", { id:id })
+    return $.getJSON("../episode/episode.json", { id:id })
   }
 
   /** @param params -- parameter object for the episode rest endpoint
    *  @return jqXHR containing raw json
    */
   function getEpisodes(params) {
-    return $6.getJSON("../episode/episode.json", params);
+    return $.getJSON("../episode/episode.json", params);
   }
 
   /** @return jqXHR containing raw json
    */
   function getAvailableWorkflowDefinitions() {
-    return $6.getJSON("../workflow/definitions.json");
+    return $.getJSON("../workflow/definitions.json");
   }
 
   // --
@@ -233,14 +233,14 @@ opencast.episode = (function() {
           })(),
           // initialize episode selection checkboxes
           (function () {
-            $6("body")
+            $("body")
                     .delegate(".selectEpisode", "change", function () {
                       check(this, $(this).is(":checked"));
                       showSelectedEpisodesCount();
                     })
                     .delegate("#selectAllEpisodes", "change", function () {
                       var checked = $(this).is(":checked");
-                      $6(".selectEpisode").each(function () {
+                      $(".selectEpisode").each(function () {
                         check(this, checked);
                       });
                       showSelectedEpisodesCount();
@@ -312,7 +312,7 @@ opencast.episode = (function() {
                 function (a) {
                   return selectedEpisodes[a]
                 }).value().length;
-        $6("#selectedEpisodesCount").html(c + " episode(s) selected");
+        $("#selectedEpisodesCount").html(c + " episode(s) selected");
       }
 
       /** Create a state object from the current URL.
@@ -362,7 +362,7 @@ opencast.episode = (function() {
       }
 
       // this var holds the actual refresh function and gets initialized lazily
-      var _theRefreshFunc = function () {return $6.Deferred()};
+      var _theRefreshFunc = function () {return $.Deferred()};
 
       function refresh() {
         return _theRefreshFunc();
@@ -411,7 +411,7 @@ opencast.episode = (function() {
                     }
                   })());
           // issue the ajax request
-          return $6.Deferred(function (d) {
+          return $.Deferred(function (d) {
             getEpisodes(params).success(function (data) {
               console.log("success");
               // ensure rendering has finished before any further functions apply
@@ -422,7 +422,7 @@ opencast.episode = (function() {
           });
         } else {
           // return an empty deferred
-          return $6.Deferred();
+          return $.Deferred();
         }
       }
 
@@ -599,7 +599,7 @@ opencast.episode = (function() {
        */
       function applyWorkflow(workflowDefinitionId, mediaPackageId) {
         var mids = _.isArray(mediaPackageId) ? mediaPackageId : [mediaPackageId];
-        $6.ajax({
+        $.ajax({
           type: "POST",
           url: "../episode/applyworkflow",
           data: {
@@ -697,7 +697,7 @@ opencast.episode = (function() {
         var mpId = ocUtils.getURLParam("id");
         // load header and inject it
         $("#addHeader").jqotesubtpl("templates/episode-detail-header.tpl", {});
-        $6.when(queryWorkflowsOfMediaPackage(mpId),
+        $.when(queryWorkflowsOfMediaPackage(mpId),
                 queryMediaPackage(mpId))
           .done(function (ajaxWorkflow, ajaxMpSearchResult) {
                   // both args are arrays where [0] contains the response data

@@ -91,14 +91,14 @@ public class EngageModuleTest {
 
   @Test
   public void testJQuery() throws Exception {
-    HttpGet get = new HttpGet(ENGAGE_BASE_URL + "/jquery/jquery-1.4.2.min.js");
+    HttpGet get = new HttpGet(ENGAGE_BASE_URL + "/js/jquery/jquery.js");
     HttpResponse response = client.execute(get);
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
   }
 
   @Test
   public void testJQueryXSLT() throws Exception {
-    HttpGet get = new HttpGet(ENGAGE_BASE_URL + "/jquery/plugins/jquery.xslt.js");
+    HttpGet get = new HttpGet(ENGAGE_BASE_URL + "/js/jquery/plugins/jquery.xslt.js");
     HttpResponse response = client.execute(get);
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
   }
@@ -112,14 +112,14 @@ public class EngageModuleTest {
 
   @Test
   public void testFABridge() throws Exception {
-    HttpGet get = new HttpGet(ENGAGE_BASE_URL + "/engage-hybrid-player/bridge/lib/FABridge.js");
+    HttpGet get = new HttpGet(ENGAGE_BASE_URL + "/js/bridge/lib/FABridge.js");
     HttpResponse response = client.execute(get);
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
   }
 
   @Test
   public void testVideodisplay() throws Exception {
-    HttpGet get = new HttpGet(ENGAGE_BASE_URL + "/engage-hybrid-player/bridge/Videodisplay.js");
+    HttpGet get = new HttpGet(ENGAGE_BASE_URL + "/js/bridge/Videodisplay.js");
     HttpResponse response = client.execute(get);
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
   }
