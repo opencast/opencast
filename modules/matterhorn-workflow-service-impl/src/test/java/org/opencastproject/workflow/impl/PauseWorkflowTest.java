@@ -24,6 +24,7 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -105,7 +106,12 @@ public class PauseWorkflowTest {
       }
     };
 
-    securityService = new SecurityServiceStub();
+    // security service
+    securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getUser()).andReturn(SecurityServiceStub.DEFAULT_ORG_ADMIN).anyTimes();
+    EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
+    EasyMock.replay(securityService);
+
     service.setSecurityService(securityService);
 
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
@@ -114,7 +120,8 @@ public class PauseWorkflowTest {
     service.setAuthorizationService(authzService);
 
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
-    EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(DEFAULT_ORG_ADMIN).anyTimes();
+    EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(DEFAULT_ORG_ADMIN)
+            .anyTimes();
     EasyMock.replay(userDirectoryService);
     service.setUserDirectoryService(userDirectoryService);
 

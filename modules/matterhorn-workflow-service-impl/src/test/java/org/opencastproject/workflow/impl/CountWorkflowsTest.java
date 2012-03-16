@@ -111,7 +111,12 @@ public class CountWorkflowsTest {
       }
     };
 
-    securityService = new SecurityServiceStub();
+    // security service
+    securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getUser()).andReturn(SecurityServiceStub.DEFAULT_ORG_ADMIN).anyTimes();
+    EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
+    EasyMock.replay(securityService);
+
     service.setSecurityService(securityService);
 
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
@@ -120,7 +125,8 @@ public class CountWorkflowsTest {
     service.setAuthorizationService(authzService);
 
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
-    EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(DEFAULT_ORG_ADMIN).anyTimes();
+    EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(DEFAULT_ORG_ADMIN)
+            .anyTimes();
     EasyMock.replay(userDirectoryService);
     service.setUserDirectoryService(userDirectoryService);
 

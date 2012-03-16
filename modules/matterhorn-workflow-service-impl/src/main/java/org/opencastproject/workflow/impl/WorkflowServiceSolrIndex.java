@@ -15,7 +15,6 @@
  */
 package org.opencastproject.workflow.impl;
 
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.workflow.api.WorkflowService.READ_PERMISSION;
 import static org.opencastproject.workflow.api.WorkflowService.WRITE_PERMISSION;
@@ -26,7 +25,8 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
-import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -175,6 +175,9 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   /** The authorization service */
   private AuthorizationService authorizationService = null;
 
+  /** The organization directory */
+  private OrganizationDirectoryService orgDirectory;
+
   /** The security service */
   private SecurityService securityService = null;
 
@@ -218,13 +221,15 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       logger.debug("Workflows will be added to the search index asynchronously");
       indexingExecutor = Executors.newSingleThreadExecutor();
     }
+    activate();
+  }
+
+  private long count() throws WorkflowDatabaseException {
     try {
-      securityService.setOrganization(new DefaultOrganization());
-      securityService.setUser(new User("workflowadmin", DEFAULT_ORGANIZATION_ID, new String[] { GLOBAL_ADMIN_ROLE }));
-      activate();
-    } finally {
-      securityService.setUser(null);
-      securityService.setOrganization(null);
+      QueryResponse response = solrServer.query(new SolrQuery("*:*"));
+      return response.getResults().getNumFound();
+    } catch (SolrServerException e) {
+      throw new WorkflowDatabaseException(e);
     }
   }
 
@@ -248,7 +253,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     // If the solr is empty, add all of the existing workflows
     long instancesInSolr = 0;
     try {
-      instancesInSolr = countWorkflowInstances(null, null);
+      instancesInSolr = count();
     } catch (WorkflowDatabaseException e) {
       throw new IllegalStateException(e);
     }
@@ -261,7 +266,14 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
           logger.info("The workflow search index is empty.  Populating it now with {} workflows.",
                   instancesInServiceRegistry);
           for (Job job : serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null)) {
+            if (job.getPayload() == null)
+              continue;
             WorkflowInstance instance = WorkflowParser.parseWorkflowInstance(job.getPayload());
+
+            Organization organization = orgDirectory.getOrganization(job.getOrganization());
+            securityService.setOrganization(organization);
+            securityService.setUser(new User(organization.getName(), organization.getId(), new String[] { organization
+                    .getAdminRole() }));
             index(instance);
           }
           logger.info("Finished populating the workflow search index with {} workflows.", instancesInServiceRegistry);
@@ -269,6 +281,9 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       } catch (Exception e) {
         logger.warn("Unable to index workflow instances: {}", e);
         throw new ServiceException(e.getMessage());
+      } finally {
+        securityService.setUser(null);
+        securityService.setOrganization(null);
       }
     }
   }
@@ -625,43 +640,43 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
                 templateTotal += stateValue.getCount();
                 total += stateValue.getCount();
                 switch (state) {
-                case FAILED:
-                  operationReport.setFailed(stateValue.getCount());
-                  templateFailed += stateValue.getCount();
-                  failed += stateValue.getCount();
-                  break;
-                case FAILING:
-                  operationReport.setFailing(stateValue.getCount());
-                  templateFailing += stateValue.getCount();
-                  failing += stateValue.getCount();
-                  break;
-                case INSTANTIATED:
-                  operationReport.setInstantiated(stateValue.getCount());
-                  templateInstantiated += stateValue.getCount();
-                  instantiated += stateValue.getCount();
-                  break;
-                case PAUSED:
-                  operationReport.setPaused(stateValue.getCount());
-                  templatePaused += stateValue.getCount();
-                  paused += stateValue.getCount();
-                  break;
-                case RUNNING:
-                  operationReport.setRunning(stateValue.getCount());
-                  templateRunning += stateValue.getCount();
-                  running += stateValue.getCount();
-                  break;
-                case STOPPED:
-                  operationReport.setStopped(stateValue.getCount());
-                  templateStopped += stateValue.getCount();
-                  stopped += stateValue.getCount();
-                  break;
-                case SUCCEEDED:
-                  operationReport.setFinished(stateValue.getCount());
-                  templateSucceeded += stateValue.getCount();
-                  succeeded += stateValue.getCount();
-                  break;
-                default:
-                  throw new IllegalStateException("State '" + state + "' is not handled");
+                  case FAILED:
+                    operationReport.setFailed(stateValue.getCount());
+                    templateFailed += stateValue.getCount();
+                    failed += stateValue.getCount();
+                    break;
+                  case FAILING:
+                    operationReport.setFailing(stateValue.getCount());
+                    templateFailing += stateValue.getCount();
+                    failing += stateValue.getCount();
+                    break;
+                  case INSTANTIATED:
+                    operationReport.setInstantiated(stateValue.getCount());
+                    templateInstantiated += stateValue.getCount();
+                    instantiated += stateValue.getCount();
+                    break;
+                  case PAUSED:
+                    operationReport.setPaused(stateValue.getCount());
+                    templatePaused += stateValue.getCount();
+                    paused += stateValue.getCount();
+                    break;
+                  case RUNNING:
+                    operationReport.setRunning(stateValue.getCount());
+                    templateRunning += stateValue.getCount();
+                    running += stateValue.getCount();
+                    break;
+                  case STOPPED:
+                    operationReport.setStopped(stateValue.getCount());
+                    templateStopped += stateValue.getCount();
+                    stopped += stateValue.getCount();
+                    break;
+                  case SUCCEEDED:
+                    operationReport.setFinished(stateValue.getCount());
+                    templateSucceeded += stateValue.getCount();
+                    succeeded += stateValue.getCount();
+                    break;
+                  default:
+                    throw new IllegalStateException("State '" + state + "' is not handled");
                 }
               }
 
@@ -852,30 +867,30 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    */
   protected String getSortField(Sort sort) {
     switch (sort) {
-    case TITLE:
-      return TITLE_KEY;
-    case CONTRIBUTOR:
-      return CONTRIBUTOR_KEY;
-    case DATE_CREATED:
-      return CREATED_KEY;
-    case CREATOR:
-      return CREATOR_KEY;
-    case LANGUAGE:
-      return LANGUAGE_KEY;
-    case LICENSE:
-      return LICENSE_KEY;
-    case MEDIA_PACKAGE_ID:
-      return MEDIAPACKAGE_KEY;
-    case SERIES_ID:
-      return SERIES_ID_KEY;
-    case SERIES_TITLE:
-      return SERIES_TITLE_KEY;
-    case SUBJECT:
-      return SUBJECT_KEY;
-    case WORKFLOW_DEFINITION_ID:
-      return WORKFLOW_DEFINITION_KEY;
-    default:
-      throw new IllegalArgumentException("No mapping found between sort field and index");
+      case TITLE:
+        return TITLE_KEY;
+      case CONTRIBUTOR:
+        return CONTRIBUTOR_KEY;
+      case DATE_CREATED:
+        return CREATED_KEY;
+      case CREATOR:
+        return CREATOR_KEY;
+      case LANGUAGE:
+        return LANGUAGE_KEY;
+      case LICENSE:
+        return LICENSE_KEY;
+      case MEDIA_PACKAGE_ID:
+        return MEDIAPACKAGE_KEY;
+      case SERIES_ID:
+        return SERIES_ID_KEY;
+      case SERIES_TITLE:
+        return SERIES_TITLE_KEY;
+      case SUBJECT:
+        return SUBJECT_KEY;
+      case WORKFLOW_DEFINITION_ID:
+        return WORKFLOW_DEFINITION_KEY;
+      default:
+        throw new IllegalArgumentException("No mapping found between sort field and index");
     }
   }
 
@@ -1036,6 +1051,16 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    */
   protected void setServiceRegistry(ServiceRegistry registry) {
     this.serviceRegistry = registry;
+  }
+
+  /**
+   * Callback for setting the organization directory service.
+   * 
+   * @param orgDirectory
+   *          the organization directory service
+   */
+  protected void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
+    this.orgDirectory = orgDirectory;
   }
 
   /**

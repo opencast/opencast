@@ -31,6 +31,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityConstants;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -65,17 +66,36 @@ public class WorkflowServiceImplAuthzTest {
   private User globalAdmin = null;
 
   protected Map<String, User> users = null;
+  private Responder<User> userResponder;
+  private Responder<Organization> organizationResponder;
 
   private WorkflowServiceImpl service = null;
   private WorkflowServiceSolrIndex dao = null;
   private Workspace workspace = null;
   private ServiceRegistryInMemoryImpl serviceRegistry = null;
-  private SecurityServiceStub securityService = null;
+  private SecurityService securityService = null;
 
   private File sRoot = null;
 
   protected static final String getStorageRoot() {
     return "." + File.separator + "target" + File.separator + System.currentTimeMillis();
+  }
+
+  private static class Responder<A> implements IAnswer<A> {
+    private A response;
+
+    Responder(A response) {
+      this.response = response;
+    }
+
+    public void setResponse(A response) {
+      this.response = response;
+    }
+
+    @Override
+    public A answer() throws Throwable {
+      return response;
+    }
   }
 
   @Before
@@ -137,8 +157,14 @@ public class WorkflowServiceImplAuthzTest {
     EasyMock.replay(userDirectoryService);
     service.setUserDirectoryService(userDirectoryService);
 
-    // Security Service
-    securityService = new SecurityServiceStub();
+    // security service
+    userResponder = new Responder<User>(DEFAULT_ORG_ADMIN);
+    organizationResponder = new Responder<Organization>(defaultOrganization);
+    securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getUser()).andAnswer(userResponder).anyTimes();
+    EasyMock.expect(securityService.getOrganization()).andAnswer(organizationResponder).anyTimes();
+    EasyMock.replay(securityService);
+
     service.setSecurityService(securityService);
 
     // Authorization Service
@@ -195,7 +221,7 @@ public class WorkflowServiceImplAuthzTest {
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
 
     // As an instructor, create a workflow. We don't care if it passes or fails. We just care about access to it.
-    securityService.setUser(instructor1);
+    userResponder.setResponse(instructor1);
     WorkflowInstance workflow = service.start(def, mp);
     service.suspend(workflow.getId());
 
@@ -208,7 +234,7 @@ public class WorkflowServiceImplAuthzTest {
     }
 
     // Ensure the organization admin can access that workflow
-    securityService.setUser(DEFAULT_ORG_ADMIN);
+    userResponder.setResponse(DEFAULT_ORG_ADMIN);
     try {
       service.getWorkflowById(workflow.getId());
       assertEquals(1, service.countWorkflowInstances());
@@ -217,7 +243,7 @@ public class WorkflowServiceImplAuthzTest {
     }
 
     // Ensure the global admin can access that workflow
-    securityService.setUser(globalAdmin);
+    userResponder.setResponse(globalAdmin);
     try {
       service.getWorkflowById(workflow.getId());
       assertEquals(1, service.countWorkflowInstances());
@@ -227,7 +253,7 @@ public class WorkflowServiceImplAuthzTest {
 
     // Ensure the other instructor from this organization can also see the workflow, since this is specified in the
     // security policy
-    securityService.setUser(instructor2);
+    userResponder.setResponse(instructor2);
     try {
       service.getWorkflowById(workflow.getId());
       assertEquals(1, service.countWorkflowInstances());
@@ -235,9 +261,11 @@ public class WorkflowServiceImplAuthzTest {
       fail(e.getMessage());
     }
 
+    // TODO change to answer show in episode or series how to do it. Cool stuff
+
     // Ensure the instructor from a different org can not see the workflow, even though they share the same role
-    securityService.setOrganization(otherOrganization);
-    securityService.setUser(instructorFromDifferentOrg);
+    organizationResponder.setResponse(otherOrganization);
+    userResponder.setResponse(instructorFromDifferentOrg);
     try {
       service.getWorkflowById(workflow.getId());
       fail();
@@ -265,7 +293,7 @@ public class WorkflowServiceImplAuthzTest {
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
 
     // As an instructor, create a workflow
-    securityService.setUser(instructor1);
+    userResponder.setResponse(instructor1);
     WorkflowInstance workflow = service.start(def, mp);
     service.suspend(workflow.getId());
 
@@ -278,7 +306,7 @@ public class WorkflowServiceImplAuthzTest {
     }
 
     // Ensure the organization admin can access that workflow
-    securityService.setUser(DEFAULT_ORG_ADMIN);
+    userResponder.setResponse(DEFAULT_ORG_ADMIN);
     try {
       service.getWorkflowById(workflow.getId());
       assertEquals(1, service.countWorkflowInstances());
@@ -287,7 +315,7 @@ public class WorkflowServiceImplAuthzTest {
     }
 
     // Ensure the global admin can access that workflow
-    securityService.setUser(globalAdmin);
+    userResponder.setResponse(globalAdmin);
     try {
       service.getWorkflowById(workflow.getId());
       assertEquals(1, service.countWorkflowInstances());
@@ -296,7 +324,7 @@ public class WorkflowServiceImplAuthzTest {
     }
 
     // Ensure the other instructor can not see the workflow, since there is no security policy granting access
-    securityService.setUser(instructor2);
+    userResponder.setResponse(instructor2);
     try {
       service.getWorkflowById(workflow.getId());
       fail();
@@ -306,8 +334,8 @@ public class WorkflowServiceImplAuthzTest {
     assertEquals(0, service.countWorkflowInstances());
 
     // Ensure the instructor from a different org can not see the workflow, even though they share a role
-    securityService.setOrganization(otherOrganization);
-    securityService.setUser(instructorFromDifferentOrg);
+    organizationResponder.setResponse(otherOrganization);
+    userResponder.setResponse(instructorFromDifferentOrg);
     try {
       service.getWorkflowById(workflow.getId());
       fail();
