@@ -17,28 +17,37 @@
 	 *
 	 */
 -->
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
-				width="100%"
-				height="100%"
-				layout="absolute"
-				preinitialize="{ onPreinitialize(); }"
-				applicationComplete="{ onApplicationComplete(event) }"
-				addedToStage="onAddedToStage()"
-				xmlns:view="org.opencast.engage.videodisplay.view.*"
-				xmlns:br="bridge.*"
-				currentState="{model.mediaState}"
-				verticalScrollPolicy="off"
-				horizontalScrollPolicy="off"
-				xmlns:business="org.opencast.engage.videodisplay.business.*"
-				frameRate="30">
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:view="org.opencast.engage.videodisplay.view.*"
+			   xmlns:br="bridge.*"
+			   xmlns:business="org.opencast.engage.videodisplay.business.*"
+			   xmlns:comp="comp.*"
+			   width="100%"
+			   height="100%"
+			   addedToStage="onAddedToStage()"
+			   applicationComplete="{ onApplicationComplete(event) }"
+			   currentState="{model.mediaState}"
+			   frameRate="30"
+			   preinitialize="{ onPreinitialize(); }"
+			   backgroundColor="#fde7ce"
+			   >
+	
+	<fx:Style source="style/Videodisplay.css"/>
+	
+	<fx:Declarations>
+		<br:FABridge/>
+	</fx:Declarations>
+	
 
-	<mx:Style source="style/Videodisplay.css"/>
-
-	<mx:Script>
+	<fx:Script>
 		<![CDATA[
 			import flash.display.StageDisplayState;
 			import mx.collections.ArrayCollection;
 			import bridge.ExternalFunction;
+			import mx.core.FlexGlobals;
+			import spark.components.Application;
 			import org.opencast.engage.videodisplay.business.FlexAjaxBridge;
 			import org.opencast.engage.videodisplay.business.VideodisplayBean;
 			import org.opencast.engage.videodisplay.control.event.ClosedCaptionsEvent;
@@ -78,8 +87,8 @@
 				if (event.fullScreen)
 				{
 					model.fullscreenMode=true;
-					StyleManager.getStyleDeclaration("Application").setStyle('backgroundAlpha', '100');
-					StyleManager.getStyleDeclaration("Application").setStyle('backgroundColor', 'Black');
+					FlexGlobals.topLevelApplication.setStyle("backgroundAlpha", 100); 
+					FlexGlobals.topLevelApplication.setStyle("backgroundColor", 0x000000); 
 				}
 				else
 				{
@@ -87,7 +96,7 @@
 					model.multiMediaContainerLeft=model.multiMediaContainerLeftNormalscreen;
 					model.multiMediaContainerRight=model.multiMediaContainerRightNormalscreen;
 					model.multiMediaContainerBottom=0;
-					StyleManager.getStyleDeclaration("Application").setStyle('backgroundAlpha', '0');
+					FlexGlobals.topLevelApplication.setStyle("backgroundAlpha", 0); 
 				}
 			}
 
@@ -111,8 +120,8 @@
 			private function onApplicationComplete(event:Event):void
 			{
 				/* Set up full screen handler. */
-				Application.application.stage.addEventListener(FullScreenEvent.FULL_SCREEN, fullScreenHandler);
-				StyleManager.getStyleDeclaration("Application").setStyle('backgroundAlpha', '0');
+				FlexGlobals.topLevelApplication.stage.addEventListener(FullScreenEvent.FULL_SCREEN, fullScreenHandler);
+			//	FlexGlobals.topLevelApplication.styleManager.getStyleDeclaration("Application").setStyle('backgroundAlpha', '0');
 			}
 
 			/**
@@ -144,60 +153,19 @@
 				flexAjaxBridge.reportKeyUp(event);
 			}
 		]]>
-	</mx:Script>
+	</fx:Script>
 
-	<mx:states>
+	<s:states>
+		<s:State name="media"></s:State>
+		<s:State name="audio"></s:State>
+		<s:State name="error"></s:State>
+	</s:states>
 
-		<mx:State name="media">
 
-			<mx:SetProperty target="{ bx_media }"
-							name="visible"
-							value="true"/>
+	<view:AudioView id="bx_audio" visible="false" click="{ playPause() }" includeInLayout="false" visible.audio="true" includeInLayout.audio="true"/>
+	<view:MediaView id="bx_media" visible="false" currentState="{ model.videoState }" includeInLayout="false" visible.media="true" includeInLayout.media="true"/>	
+	<view:ErrorView id="bx_error" visible="false" includeInLayout="false" visible.error="true" includeInLayout.error="true"/>
 
-			<mx:SetProperty target="{ bx_media }"
-							name="includeInLayout"
-							value="true"/>
-		</mx:State>
-
-		<mx:State name="audio">
-
-			<mx:SetProperty target="{ bx_audio }"
-							name="visible"
-							value="true"/>
-
-			<mx:SetProperty target="{ bx_audio }"
-							name="includeInLayout"
-							value="true"/>
-		</mx:State>
-
-		<mx:State name="error">
-
-			<mx:SetProperty target="{ bx_error }"
-							name="visible"
-							value="true"/>
-
-			<mx:SetProperty target="{ bx_error }"
-							name="includeInLayout"
-							value="true"/>
-		</mx:State>
-	</mx:states>
-
-	<br:FABridge/>
-
-	<view:AudioView id="bx_audio"
-					visible="false"
-					includeInLayout="false"
-					click="{ playPause() }"/>
-
-	<view:MediaView id="bx_media"
-					visible="false"
-					includeInLayout="false"
-					currentState="{ model.videoState }"/>
-
-	<view:ErrorView id="bx_error"
-					visible="false"
-					includeInLayout="false"/>
 	<!--<mx:Style source="Icon_set.css"/>-->
 
-
-</mx:Application>
+</s:Application>

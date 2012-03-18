@@ -16,7 +16,7 @@
 package org.opencast.engage.videodisplay.control.command
 {
 	import flash.external.ExternalInterface;
-	import mx.core.Application;
+	import mx.core.FlexGlobals;
 	import bridge.ExternalFunction;
 	import org.opencast.engage.videodisplay.control.event.InitMediaPlayerEvent;
 	import org.opencast.engage.videodisplay.control.util.OpencastMediaPlayer;
@@ -119,7 +119,7 @@ package org.opencast.engage.videodisplay.control.command
 						model.mediaPlayer.setSingleMediaElement(mediaElementAudio);
 						var position:int=event.mediaURLOne.lastIndexOf('/');
 						model.audioURL=event.mediaURLOne.substring(position + 1);
-						Application.application.bx_audio.startVisualization();
+						FlexGlobals.topLevelApplication.bx_audio.startVisualization();
 						model.mediaState=MediaState.AUDIO;
 						break;
 

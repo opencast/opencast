@@ -20,12 +20,12 @@
 <mx:Canvas width="100%"
 		   height="100%"
 		   xmlns:players="com.adobe.strobe.players.*"
-		   xmlns:mx="http://www.adobe.com/2006/mxml"
+		   xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:s="library://ns.adobe.com/flex/spark"
 		   xmlns:view="org.opencast.engage.videodisplay.view.*"
 		   resize="{ resizeVideodisplay() }"
 		   xmlns:osmf="com.osmf.*">
 
-	<mx:Script>
+	<fx:Script>
 		<![CDATA[
 			import mx.core.Application;
 			import mx.core.Container;
@@ -59,7 +59,7 @@
 				Swiz.dispatchEvent(new ResizeVideodisplayEvent());
 			}
 		]]>
-	</mx:Script>
+	</fx:Script>
 
 	<osmf:MediaContainerUIComponent id="mediaContainerUIComponent"
 									addedToStage="initPlayer()"

@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009"
+		  xmlns:s="library://ns.adobe.com/flex/spark"
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  creationComplete="startTimer();" mouseOver="{this.NavigationVisible = true}"
+		  rollOut="{this.NavigationVisible = false}" rollOver="{this.NavigationVisible = true}">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<mx:Fade id="fadeOut" alphaFrom="1.0" alphaTo="0.0" duration="400"/>
+		<mx:Fade id="fadeIn" alphaFrom="0.0" alphaTo="1.0" duration="200"/>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.external.ExternalInterface;
+			import mx.core.Application;
+			import mx.core.FlexGlobals;
+			import bridge.ExternalFunction;
+			import org.opencast.engage.videodisplay.control.event.ClosedCaptionsEvent;
+			import org.opencast.engage.videodisplay.control.event.VideoControlEvent;
+			import org.opencast.engage.videodisplay.model.VideodisplayModel;
+			import org.opencast.engage.videodisplay.state.PlayerState;
+			import org.opencast.engage.videodisplay.state.SoundState;
+			import org.osmf.layout.VerticalAlign;
+			import org.swizframework.Swiz;
+			
+			[Autowire]
+			[Bindable]
+			public var model:VideodisplayModel;
+			
+			[Bindable]
+			private var NavigationVisible:Boolean=true;
+			
+			[Bindable]
+			private var controlsVisible:Boolean=false;
+			
+			private var fastForwardTimer:Timer=new Timer(400, 1);
+			
+			[Bindable]
+			private var mouseDownBool:Boolean=false;
+			
+			[Bindable]
+			private var mouseUpBool:Boolean=false;
+			
+			[Bindable]
+			private var mute:Boolean=false;
+			
+			private var rewindTimer:Timer=new Timer(400, 1);
+			
+			private var startDragValue:Number=0;
+			
+			/**
+			 * onTimerComplete
+			 * When the timer ist complete and the controlVisible ist false, the navigation ist unvisible.
+			 * @eventType event:TimerEvent
+			 */
+			public function onTimerComplete(event:TimerEvent):void
+			{
+				if (controlsVisible == false)
+				{
+					this.NavigationVisible=false;
+				}
+			}
+			
+			/**
+			 * changeVolume
+			 * When the volume slider is moving, update the sound of the video to new volume slider position.
+			 * Call external function SETVOLUMESLIDER, update the html volume slider.
+			 */
+			private function changeVolume():void
+			{
+				model.mediaPlayer.setVolume(hs_volume.value);
+				ExternalInterface.call(ExternalFunction.SETVOLUMESLIDER, Math.round(100 * hs_volume.value));
+			}
+			
+			/**
+			 * jumpBack
+			 * Jump back in the video
+			 * */
+			private function jumpBack():void
+			{
+				if (!rewindTimer.running)
+				{
+					if (!model.mediaPlayer.seeking())
+					{
+						if (model.currentPlayhead - model.rewindTime <= 0)
+						{
+							model.mediaPlayer.seek(0);
+						}
+						else
+						{
+							model.mediaPlayer.seek(model.currentPlayhead - model.rewindTime);
+						}
+					}
+					rewindTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onRewindTimerComplete);
+					rewindTimer.start();
+				}
+				
+				if (model.rewindTime < (model.currentDuration * 0.1))
+				{
+					model.rewindTime=model.rewindTime + model.rewindTime;
+				}
+			}
+			
+			/**
+			 * jumpForward
+			 * Jump forward in the video.
+			 */
+			private function jumpForward():void
+			{
+				if (!fastForwardTimer.running)
+				{
+					if (!model.mediaPlayer.seeking())
+					{
+						if (model.currentPlayhead + model.fastForwardTime >= model.currentDuration)
+						{
+							model.mediaPlayer.seek(model.currentDuration - 2);
+						}
+						else
+						{
+							model.mediaPlayer.seek(model.currentPlayhead + model.fastForwardTime);
+						}
+						
+					}
+					fastForwardTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onFastForwardTimerComplete);
+					fastForwardTimer.start();
+				}
+				
+				if (model.fastForwardTime < (model.currentDuration * 0.1))
+				{
+					model.fastForwardTime=model.fastForwardTime + model.fastForwardTime;
+				}
+			}
+			
+			/**
+			 * normalscreen
+			 * Set the flash into the normal modus.
+			 */
+			private function normalscreen():void
+			{
+				FlexGlobals.topLevelApplication.stage.displayState=StageDisplayState.NORMAL;
+			}
+			
+			/**
+			 * onFastForwardTimerComplete
+			 * Stop the fast forward timer and jump forward in the video.
+			 * */
+			private function onFastForwardTimerComplete(event:TimerEvent):void
+			{
+				fastForwardTimer.stop();
+				jumpForward();
+				
+			}
+			
+			/**
+			 * onRewindTimerComplete
+			 * Stop the rewind timer and jump back in the video.
+			 * eventType TimerEvent event
+			 */
+			private function onRewindTimerComplete(event:TimerEvent):void
+			{
+				rewindTimer.stop();
+				jumpBack();
+				
+			}
+			
+			/**
+			 * onSeek
+			 * When the seek slider is moving, update video to new seek slider position.
+			 */
+			private function onSeek():void
+			{
+				if (model.fullscreenMode == true)
+				{
+					var t:Number=hs_seek.value * 100 / model.currentDuration;
+					
+					if (model.progress < t && model.mediaType == model.HTML)
+					{
+						model.currentPlayhead=startDragValue;
+						hs_seek.value=startDragValue;
+					}
+					else
+					{
+						startDragValue=hs_seek.value;
+					}
+					
+					if (model.startPlay == false)
+					{
+						model.startSeek=hs_seek.value;
+					}
+					model.mediaPlayer.seek(hs_seek.value);
+					model.currentPlayhead=hs_seek.value;
+				}
+			}
+			
+			/**
+			 * seekDataTipFunc
+			 * Generate the string for the tool tip of the Seek Slider.
+			 * @param String val
+			 * @return String value
+			 */
+			private function seekDataTipFunc(val:String):String
+			{
+				var value:int=int(val);
+				return model.timeCode.getTC(value);
+			}
+			
+			
+			/**
+			 * startTimer
+			 * Starts a timer to hide the navigation elements.
+			 */
+			private function startTimer():void
+			{
+				var timer:Timer=new Timer(2000, 8);
+				timer.addEventListener(TimerEvent.TIMER_COMPLETE, onTimerComplete);
+				timer.start();
+			}
+			
+			
+			
+			/**
+			 * thumbDrag
+			 * When the user drag the seek slider.
+			 * */
+			private function thumbDrag():void
+			{
+				model.fullscreenThumbDrag=true;
+				startDragValue=hs_seek.value;
+			}
+			
+			/**
+			 * toggleMute
+			 * Call external function MUTE, toggle between mute and unmute the video.
+			 */
+			private function toggleMute():void
+			{
+				ExternalInterface.call(ExternalFunction.MUTE, '');
+				
+				if (mute == false)
+				{
+					mute=true;
+				}
+				else
+				{
+					mute=false;
+				}
+			}
+			
+			/**
+			 * volumeDataTipFunc
+			 * Generate the string for the tool tip of the volume slider.
+			 * @param String val
+			 * @return String value
+			 */
+			private function volumeDataTipFunc(val:String):String
+			{
+				var vol:Number=new Number(val);
+				var value:String='';
+				
+				if (vol * 100 < 1)
+				{
+					vol=0;
+					value='Volume 0 %';
+					return value;
+				}
+				value='Volume ' + (vol * 100).toFixed(0) + ' %';
+				
+				return value;
+			}
+		]]>
+	</fx:Script>
+<s:VGroup visible="{this.NavigationVisible}" hideEffect="{fadeOut}" mouseOver="{this.NavigationVisible = true; controlsVisible = true}"
+		 showEffect="{fadeIn}">
+	<s:HGroup id="button_group" >
+		<s:Label id="lb_currentTime" text="{ model.timeCode.getTC(model.currentPlayhead) }"
+				 styleName="videocontrollerLabel"
+				 textAlign="center"
+				 toolTip="Current Time {model.timeCode.getTC(model.currentPlayhead) } "/>
+		<s:Label text="of" styleName="videocontrollerLabel"/>
+		<s:Label id="lb_durationTime" text="{ model.timeCode.getTC(model.currentDuration) }"
+				 styleName="videocontrollerLabel"
+				 textAlign="center"
+				 toolTip="Duration {model.timeCode.getTC(model.currentDuration) } "/>
+		<s:Spacer width="20" />
+		<s:Button id="btn_skipBackward" label="Skip Back" buttonMode="{ model.slideLength != 0 ? true : false }"
+				  click="{ExternalInterface.call( ExternalFunction.SKIPBACKWARD, '' )}"
+				  enabled="{ model.slideLength != 0 ? true : false }"
+				  styleName="{ model.slideLength != 0 ? 'skipbackward' : 'skipbackwarddisabled' }"
+				  toolTip="{ model.slideLength != 0 ? 'Jump To The Previous Slide' : ''}"
+				  useHandCursor="{ model.slideLength != 0 ? true : false }"/>
+		<s:Button id="btn_rewind" label="Rewind" buttonMode="true" mouseDown="{ jumpBack() }"
+				  mouseUp="{ rewindTimer.stop(); model.rewindTime = 10; }"
+				  styleName="backward" toolTip="Jump Back" useHandCursor="true"/>
+		<s:Button id="btn_playpause" label="Play/Pause" buttonMode="true"
+				  click="{ ExternalInterface.call( ExternalFunction.PLAYPAUSE, '' ) }"
+				  styleName="{ model.currentPlayerState == PlayerState.PAUSED ? 'play' : 'pause' }"
+				  toolTip="{ model.currentPlayerState == PlayerState.PAUSED ? 'Play' : 'Pause' }"
+				  useHandCursor="true"/>
+		<s:Button id="btn_fastforward" label="Forward" buttonMode="true" mouseDown="{ jumpForward() }"
+				  mouseUp="{ fastForwardTimer.stop(); model.fastForwardTime = 10 }"
+				  styleName="forward" toolTip="Jump Forward" useHandCursor="true"/>
+		<s:Button id="btn_skipforward" label="Skip For" buttonMode="{ model.slideLength != 0 ? true : false }"
+				  click="{ExternalInterface.call( ExternalFunction.SKIPFORWARD, '' )}"
+				  enabled="{ model.slideLength != 0 ? true : false }"
+				  styleName="{ model.slideLength != 0 ? 'skipforward' : 'skipforwarddisabled' }"
+				  toolTip="{ model.slideLength != 0 ? 'Jump To The Next Slide' : ''}"
+				  useHandCursor="{ model.slideLength != 0 ? true : false }"/>
+		<s:Button id="btn_volume" label="Volume" buttonMode="true" click="{ toggleMute() }"
+				  styleName="{ model.soundState}"
+				  toolTip="{ model.soundState == SoundState.VOLUMEMAX ? 'Volume Maximum' : model.soundState == SoundState.VOLUMEMED ? 'Volume Medium' : model.soundState == SoundState.VOLUMEMIN ? 'Volume Minimum' : model.soundState == SoundState.VOLUMEMUTE ? 'Volume Mute' : ''}"
+				  useHandCursor="true"/>
+		<s:HSlider id="hs_volume" width="58" buttonMode="true"
+				   change="{ changeVolume() }"
+				   dataTipFormatFunction="volumeDataTipFunc" maximum="1"
+				   styleName="HSliderVolume" useHandCursor="true"
+				   value="{ model.playerVolume }"/>
+		<s:Button id="btn_captions" width="48" label="CC"  buttonMode="{ model.captionsURL == '' ? false : true }"
+				  click="{ Swiz.dispatchEvent( new ClosedCaptionsEvent() ) }"
+				  enabled="{  model.captionsURL == '' ? false : true }"
+				  styleName="{ model.captionsURL == '' ? 'ccdisabled' : model.ccButtonBoolean == true ? 'cc' :  mute == true ? 'cc' :  'ccOn' }"
+				  toolTip="{ model.captionsURL == '' ? 'No Closed Captions' : model.ccBoolean == true ? 'Closed Captions On' : 'Closed Captions Off' }"
+				  useHandCursor="{ model.captionsURL == '' ? false : true }"/>
+		<s:Button id="btn_fullscreen" label="Fullscreen" buttonMode="true" click="{ normalscreen() }" styleName="fullscreen"
+				  toolTip="Close Fullscrenn" useHandCursor="true"/>
+	</s:HGroup>
+	<s:HGroup>
+		<s:HSlider id="hs_seek" width="{button_group.width}" change="{ onSeek() }"
+				   dataTipFormatFunction="seekDataTipFunc" maximum="{ model.currentDuration }"
+				   styleName="HSliderSeek" thumbDrag="{ thumbDrag() }"
+				   thumbRelease="{ model.fullscreenThumbDrag = false }"
+				   toolTip="Current Time {model.timeCode.getTC(model.currentPlayhead) } "
+				   value="{ model.currentPlayhead }"/>
+	</s:HGroup>
+</s:VGroup>
+</s:VGroup>

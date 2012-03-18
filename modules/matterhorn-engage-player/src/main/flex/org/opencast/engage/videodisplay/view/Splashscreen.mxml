@@ -17,18 +17,23 @@
 	 *
 	 */
 -->
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
-		   backgroundAlpha="1.0"
-		   currentState="{model.currentPlayerState}"
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009"
+		   xmlns:mx="library://ns.adobe.com/flex/mx"
+		   xmlns:s="library://ns.adobe.com/flex/spark"
 		   xmlns:view="org.opencast.engage.videodisplay.view.*"
-		   verticalScrollPolicy="off"
-		   horizontalScrollPolicy="off">
+		   backgroundAlpha="1.0" currentState="{model.currentPlayerState}"
+		   horizontalScrollPolicy="off" verticalScrollPolicy="off">
 
-	<mx:Script>
+	<fx:Script>
 		<![CDATA[
-			import mx.core.Application;
-			import mx.skins.halo.ApplicationBackground;
 			import bridge.ExternalFunction;
+			
+			
+			import mx.core.Application;
+			import mx.core.FlexGlobals;
+			import mx.skins.halo.ApplicationBackground;
+			import mx.core.IUIComponent;
+			
 			import org.opencast.engage.videodisplay.control.event.SetVolumeEvent;
 			import org.opencast.engage.videodisplay.control.event.VideoControlEvent;
 			import org.opencast.engage.videodisplay.model.VideodisplayModel;
@@ -53,15 +58,15 @@
 			 */
 			private function fullscreen():void
 			{
-				Application.application.stage.displayState=StageDisplayState.FULL_SCREEN;
+				FlexGlobals.topLevelApplication.stage.displayState=StageDisplayState.FULL_SCREEN;
 
 				model.fullscreenMode=true;
 
 				model.multiMediaContainerLeftNormalscreen=model.multiMediaContainerLeft;
 				model.multiMediaContainerRightNormalscreen=model.multiMediaContainerRight;
 
-				var flashWidth:int=Application.application.width - 10;
-				var flashHeight:int=Application.application.height - 10;
+				var flashWidth:int=FlexGlobals.topLevelApplication.width - 10;
+				var flashHeight:int=FlexGlobals.topLevelApplication.height - 10;
 				var newMediaOneHeight:Number=0;
 				var newMediaOneWidth:Number=0;
 				var newMediaTwoHeight:Number=0;
@@ -133,33 +138,15 @@
 				if (this.currentState == PlayerState.PLAYING)
 				{
 					pauseButton_up.visible=false;
+					fullscreen_btn.alpha=0;
 				}
 				else
 				{
 					if (model.videoState != VideoState.COVER)
 					{
 						playButton_up.visible=false;
+						fullscreen_btn.alpha=0;
 					}
-				}
-			}
-
-			/**
-			 * play
-			 * Play the media file by calling the html
-			 */
-			private function play():void
-			{
-				if (model.startPlaySingle == true)
-				{
-					ExternalInterface.call(ExternalFunction.PLAYPAUSE, '');
-				}
-				/*else if (model.startPlayOne == true && model.startPlayTwo == true)
-				   {
-				   ExternalInterface.call(ExternalFunction.PLAYPAUSE, '');
-				 }*/
-				else if (model.startPlayOne == true)
-				{
-					ExternalInterface.call(ExternalFunction.PLAYPAUSE, '');
 				}
 			}
 
@@ -172,137 +159,139 @@
 				if (this.currentState == PlayerState.PLAYING)
 				{
 					pauseButton_up.visible=true;
+					//fullscreen_btn.visible=true;
 				}
 				else
 				{
 					playButton_up.visible=true;
+					//fullscreen_btn.visible=true;
 				}
 			}
+			
+			/**
+			 * hideButton fullscreen
+			 */
+			private function hideButton_fullscreen():void
+			{
+					fullscreen_btn.alpha=0;
+			}
+			
+			/**
+			 * showButton fullscreen
+			 */
+			private function showButton_fullscreen():void
+			{
+					fullscreen_btn.alpha=1;
+			}
+			
+			/**
+			 * play
+			 * Play the media file by calling the html
+			 */
+			private function play():void
+			{
+				if (model.startPlaySingle == true)
+				{
+					ExternalInterface.call(ExternalFunction.PLAYPAUSE, '');
+				}
+					/*else if (model.startPlayOne == true && model.startPlayTwo == true)
+					{
+					ExternalInterface.call(ExternalFunction.PLAYPAUSE, '');
+					}*/
+				else if (model.startPlayOne == true)
+				{
+					ExternalInterface.call(ExternalFunction.PLAYPAUSE, '');
+				}
+			}
+			
+			
 		]]>
-	</mx:Script>
-
+	</fx:Script>
+<!--23.02.2012
 	<mx:states>
-
 		<mx:State name="{PlayerState.PLAYING}">
-
-			<mx:SetProperty target="{playButton_up}"
-							name="visible"
-							value="false"/>
-
-			<mx:SetProperty target="{pauseButton_up}"
-							name="visible"
-							value="false"/>
+			<mx:SetProperty name="visible" target="{playButton_up}" value="false"/>
+			<mx:SetProperty name="visible" target="{pauseButton_up}" value="false"/>
 		</mx:State>
-
 		<mx:State name="{PlayerState.PAUSED}">
-
-			<mx:SetProperty target="{playButton_up}"
-							name="visible"
-							value="true"/>
-
-			<mx:SetProperty target="{pauseButton_up}"
-							name="visible"
-							value="false"/>
+			<mx:SetProperty name="visible" target="{playButton_up}" value="true"/>
+			<mx:SetProperty name="visible" target="{pauseButton_up}" value="false"/>
 		</mx:State>
+	</mx:states>
+	-->
+	
+	<mx:states>
+		<s:State name="playing"></s:State>
+		<s:State name="paused"></s:State>
 	</mx:states>
 
 	<mx:transitions>
 
-		<mx:Transition id="fadeOut"
-					   fromState="{PlayerState.PLAYING}"
-					   toState="{PlayerState.PAUSED}">
-
+		<mx:Transition id="fadeOut" fromState="{PlayerState.PLAYING}" toState="{PlayerState.PAUSED}">
 			<mx:Parallel target="{curtain}"/>
 		</mx:Transition>
 
-		<mx:Transition id="fadeIn"
-					   fromState="{PlayerState.PAUSED}"
-					   toState="{PlayerState.PLAYING}">
-
+		<mx:Transition id="fadeIn" fromState="{PlayerState.PAUSED}" toState="{PlayerState.PLAYING}">
 			<mx:Parallel target="{curtain}"/>
 		</mx:Transition>
 	</mx:transitions>
+	
+		
+	<mx:Canvas id="curtain" width="60" height="60" backgroundAlpha="0" backgroundColor="#000000"
+			   horizontalCenter="0" horizontalScrollPolicy="off" rollOut="{ hideButton(); }"
+			   rollOver="{ showButton(); }" verticalCenter="0" verticalScrollPolicy="off"/>
 
-	<mx:Canvas id="curtain"
-			   backgroundColor="#000000"
-			   backgroundAlpha="0.0"
-			   width="60"
-			   height="60"
-			   horizontalCenter="0"
-			   verticalCenter="0"
-			   rollOver="{ showButton(); }"
-			   rollOut="{ hideButton(); }"
-			   verticalScrollPolicy="off"
-			   horizontalScrollPolicy="off"/>
-
-	<mx:Button id="playButton_up"
+	<mx:Button id="playButton_up" visible="false" width="{this.width/10}"
+			   height="{playButton_up.width}" buttonMode="true"
 			   click="{ ExternalInterface.call( ExternalFunction.PLAYPAUSE, '' ) }"
-			   width="{this.width/10}"
-			   height="{playButton_up.width}"
-			   styleName="PlayBig"
-			   visible="false"
-			   verticalCenter="0"
-			   horizontalCenter="0"
-			   buttonMode="true"
-			   rollOver="{ showButton(); }"
-			   rollOut="{ hideButton(); }"
-			   toolTip="Play"/>
+			   horizontalCenter="0" rollOut="{ hideButton(); }" rollOver="{ showButton(); }"
+			   styleName="PlayBig" toolTip="Play" verticalCenter="0"
+			   visible.paused="true"
+			   visible.playing="false"/>
 
-	<mx:Button id="pauseButton_up"
+	<mx:Button id="pauseButton_up" visible="false" width="{this.width/10}"
+			   height="{pauseButton_up.width}" buttonMode="true"
 			   click="{ ExternalInterface.call( ExternalFunction.PLAYPAUSE, '' ) }"
-			   width="{this.width/10}"
-			   height="{pauseButton_up.width}"
-			   styleName="PauseBig"
-			   visible="false"
-			   verticalCenter="0"
-			   horizontalCenter="0"
-			   buttonMode="true"
-			   rollOver="{ showButton(); }"
-			   rollOut="{ hideButton(); }"
-			   toolTip="Pause"/>
+			   horizontalCenter="0" rollOut="{ hideButton(); }" rollOver="{ showButton(); }"
+			   styleName="PauseBig" toolTip="Pause" verticalCenter="0"
+			   visible.paused="false"
+			   visible.playing="false"/>
 
-	<mx:VBox width="100%"
-			 height="100%">
+	<mx:VBox width="100%" height="100%">
 
-		<mx:HBox width="100%"
-				 horizontalAlign="right">
+		<mx:HBox width="100%" horizontalAlign="right">
 
-			<mx:Button styleName="btnfullscreen"
-					   visible="{!model.fullscreenMode}"
-					   includeInLayout="{!model.fullscreenMode}"
+			<!--<mx:Button visible="{!model.fullscreenMode}" click="{ fullscreen() }"
+					   includeInLayout="{!model.fullscreenMode}" styleName="btnfullscreen"
+					   toolTip="Fullscreen" />-->
+			<mx:Button id="fullscreen_btn" visible="true" width="30" height="30" buttonMode="true"
 					   click="{ fullscreen() }"
-					   toolTip="Fullscreen"/>
+					   icon="@Embed(source='../../../../../style/fullscreen.png')"
+					   rollOut="hideButton_fullscreen()" rollOver="showButton_fullscreen()"
+					   skin="{null}" toolTip="Fullscreen mode"/>
 		</mx:HBox>
 
 		<mx:Spacer height="100%"/>
 
-		<mx:VBox width="100%"
-				 verticalScrollPolicy="off"
-				 horizontalScrollPolicy="off"
-				 verticalGap="0">
+		<mx:VBox width="100%" horizontalScrollPolicy="off" verticalGap="0" verticalScrollPolicy="off">
 
-			<view:CaptionsView id="captionsView"
-							   width="100%"
-							   horizontalAlign="center"
-							   bottom="5"/>
+			<view:CaptionsView id="captionsView" bottom="5" width="100%" horizontalAlign="center"/>
 
-			<view:FullscreenVideoControlsView id="fullscreenVideoControlsView"
-											  width="100%"
-											  height="100%"
-											  visible="{model.fullscreenMode}"
-											  includeInLayout="{model.fullscreenMode}"/>
+			<!--<view:FullscreenVideoControlsView id="fullscreenVideoControlsView"
+											  visible="{model.fullscreenMode}" width="100%"
+											  height="100%" includeInLayout="{model.fullscreenMode}"/>-->
+			<view:FullscreenControls id="fullscreenVideoControlsView"
+									 visible="{model.fullscreenMode}"
+									 includeInLayout="{model.fullscreenMode}"
+									 bottom="15" horizontalAlign="center" width="100%"
+									/>
 		</mx:VBox>
 	</mx:VBox>
 
-	<mx:HBox width="100%"
-			 height="100%"
-			 horizontalAlign="center"
-			 verticalAlign="middle">
+	<mx:HBox width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
 
-		<mx:SWFLoader source="@Embed(source='../../../../../style/oc_logo_loader.swf')"
+		<mx:SWFLoader visible="{ model.loader }" autoLoad="true" includeInLayout="{ model.loader }"
 					  scaleContent="true"
-					  autoLoad="true"
-					  visible="{ model.loader }"
-					  includeInLayout="{ model.loader }"/>
+					  source="@Embed(source='../../../../../style/oc_logo_loader.swf')"/>
 	</mx:HBox>
 </mx:Canvas>

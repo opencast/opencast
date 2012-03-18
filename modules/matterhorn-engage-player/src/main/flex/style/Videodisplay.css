@@ -1,16 +1,27 @@
-Button.btnfullscreen
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace s "library://ns.adobe.com/flex/spark";
+
+
+s|Button#btn_playpause
 {
 	font-size: 0; 
-	skin: Embed(skinClass="Button_fullscreenlarge_skin");
+	/*icon:  url('http://whereareouricons');*/
 }
 
-Button.FullscreenOut
+
+mx|Button.btnfullscreen
 {
 	font-size: 0; 
-	skin: Embed(skinClass="Button_fullscreenlarge_skin");
+/*	skin: Embed(skinClass="Button_fullscreenlarge_skin");*/
 }
 
-Button.PlayBig
+mx|Button.FullscreenOut
+{
+	font-size: 0; 
+/*	skin: Embed(skinClass="Button_fullscreenlarge_skin");*/
+}
+
+mx|Button.PlayBig
 {
  	font-size: 0; 
  	upSkin: Embed(source='Buttons_Main_Large.swf', symbol='btn_play');
@@ -23,7 +34,7 @@ Button.PlayBig
   	selectedDisabledSkin: Embed(source='Buttons_Main_Large.swf', symbol='btn_play');  
 }
 
-Button.PauseBig
+mx|Button.PauseBig
 {
   	font-size: 0;
   	upSkin: Embed(source='Buttons_Main_Large.swf', symbol='btn_pause');
@@ -36,77 +47,77 @@ Button.PauseBig
   	selectedDisabledSkin: Embed(source='Buttons_Main_Large.swf', symbol='btn_pause');  
 }
 
-Button.audiomax
+mx|Button.audiomax
 {
-	skin: Embed(skinClass="Button_audiomax_skin");
+/*	skin: Embed(skinClass="Button_audiomax_skin");*/
 }
-Button.audiomed
+mx|Button.audiomed
 {
-	skin: Embed(skinClass="Button_audiomed_skin");
+/*	skin: Embed(skinClass="Button_audiomed_skin");*/
 }
-Button.audiomin
+mx|Button.audiomin
 {
-	skin: Embed(skinClass="Button_audiomin_skin");
+/*	skin: Embed(skinClass="Button_audiomin_skin");*/
 }
-Button.audioof
+mx|Button.audioof
 {
-	skin: Embed(skinClass="Button_audioof_skin");
+/*	skin: Embed(skinClass="Button_audioof_skin");*/
 }
-Button.backward
+mx|Button.backward
 {
-	skin: Embed(skinClass="Button_backward_skin");
+	/*skin: Embed(skinClass="Button_backward_skin");*/
 }
-Button.forward
+mx|Button.forward
 {
-	skin: Embed(skinClass="Button_forward_skin");
+	/*skin: Embed(skinClass="Button_forward_skin");*/
 }
-Button.fullscreen
+mx|Button.fullscreen
 {
-	skin: Embed(skinClass="Button_fullscreen_skin");
+/*	skin: Embed(skinClass="Button_fullscreen_skin");*/
 }
-Button.pause
+mx|Button.pause
 {
-	skin: Embed(skinClass="Button_pause_skin");
+/*	skin: Embed(skinClass="Button_pause_skin");*/
 }
-Button.play
+mx|Button.play
 {
-	skin: Embed(skinClass="Button_play_skin");
+	/*skin: Embed(skinClass="Button_play_skin");*/
 }
-Button.scrubber
+mx|Button.scrubber
 {
-	skin: Embed(skinClass="Button_scrubber_skin");
+/*	skin: Embed(skinClass="Button_scrubber_skin");*/
 }
-Button.skipbackward
+mx|Button.skipbackward
 {
-	skin: Embed(skinClass="Button_skipbackward_skin");
-}
-
-Button.skipbackwarddisabled
-{
-	skin: Embed(skinClass="Button_skipbackwarddisabled_skin");
+	/*skin: Embed(skinClass="Button_skipbackward_skin");*/
 }
 
-Button.skipforward
+mx|Button.skipbackwarddisabled
 {
-	skin: Embed(skinClass="Button_skipforward_skin");
+/*	skin: Embed(skinClass="Button_skipbackwarddisabled_skin");*/
 }
-Button.skipforwarddisabled
+
+mx|Button.skipforward
 {
-	skin: Embed(skinClass="Button_skipforwarddisabled_skin");
+/*	skin: Embed(skinClass="Button_skipforward_skin");*/
 }
-Button.cc
+mx|Button.skipforwarddisabled
 {
-	skin: Embed(skinClass="Button_cc_skin");
+	/*skin: Embed(skinClass="Button_skipforwarddisabled_skin");*/
 }
-Button.ccdisabled
+mx|Button.cc
 {
-	skin: Embed(skinClass="Button_ccdisabled_skin");
+	/*skin: Embed(skinClass="Button_cc_skin");*/
+}
+mx|Button.ccdisabled
+{
+	/*skin: Embed(skinClass="Button_ccdisabled_skin");*/
 }
 .HSliderSeek
 {
-    thumb-skin: Embed(skinClass="Slider_thumbSkin");
-   	trackSkin: Embed(skinClass="Slider_trackSkin");
-    track-highlight-skin: Embed(skinClass="Slider_trackHighlightSkin");
+  /*  thumb-skin: Embed(skinClass="Slider_thumbSkin");*/
+  /* 	trackSkin: Embed(skinClass="Slider_trackSkin");*/
+  /*  track-highlight-skin: Embed(skinClass="Slider_trackHighlightSkin");*/
     showTrackHighlight:true;
     themeColor: #f88b00;
 }

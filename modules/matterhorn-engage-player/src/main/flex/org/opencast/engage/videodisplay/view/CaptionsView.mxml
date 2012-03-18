@@ -17,12 +17,12 @@
 	 *
 	 */
 -->
-<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
+<mx:VBox xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:s="library://ns.adobe.com/flex/spark"
 		 creationComplete="{ onCreationComplete() }"
 		 verticalScrollPolicy="off"
 		 horizontalScrollPolicy="off">
 
-	<mx:Script>
+	<fx:Script>
 		<![CDATA[
 			import mx.events.ValidationResultEvent;
 			import org.opencast.engage.videodisplay.control.event.SetVolumeEvent;
@@ -51,7 +51,7 @@
 			private function onCreationComplete():void
 			{
 				var myfilters:Array=[];
-				var dropShadow:DropShadowFilter=new DropShadowFilter();
+				/*var dropShadow:DropShadowFilter=new DropShadowFilter();
 				dropShadow.distance=0;
 				dropShadow.angle=25;
 				dropShadow.alpha=1.0;
@@ -59,11 +59,11 @@
 				dropShadow.blurY=3;
 				dropShadow.strength=2;
 				dropShadow.quality=3;
-				myfilters.push(dropShadow);
+				myfilters.push(dropShadow);*/
 				txt_captions.filters=myfilters;
 			}
 		]]>
-	</mx:Script>
+	</fx:Script>
 
 	<mx:VBox backgroundColor="#999999"
 			 backgroundAlpha="0.8"

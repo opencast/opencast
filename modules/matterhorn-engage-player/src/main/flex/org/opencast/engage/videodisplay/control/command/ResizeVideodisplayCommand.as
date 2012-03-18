@@ -15,7 +15,7 @@
  */
 package org.opencast.engage.videodisplay.control.command
 {
-	import mx.core.Application;
+	import mx.core.FlexGlobals;
 	import org.opencast.engage.videodisplay.control.event.ResizeVideodisplayEvent;
 	import org.opencast.engage.videodisplay.model.VideodisplayModel;
 	import org.swizframework.Swiz;
@@ -45,12 +45,12 @@ package org.opencast.engage.videodisplay.control.command
 		{
 			if (model.mediaContainer != null)
 			{
-				model.mediaContainer.height=Application.application.height;
-				model.mediaContainer.width=Application.application.width;
+				model.mediaContainer.height=FlexGlobals.topLevelApplication.height;
+				model.mediaContainer.width=FlexGlobals.topLevelApplication.width;
 			}
 
 			var divisor:int=50;
-			var fontSize:int=Application.application.width / divisor;
+			var fontSize:int=FlexGlobals.topLevelApplication.width / divisor;
 
 			if (fontSize > 16)
 			{

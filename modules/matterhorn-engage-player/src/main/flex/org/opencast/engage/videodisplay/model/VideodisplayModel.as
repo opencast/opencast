@@ -17,7 +17,7 @@ package org.opencast.engage.videodisplay.model
 {
 	import mx.collections.ArrayCollection;
 	import mx.controls.ProgressBar;
-	import mx.core.Application;
+	import mx.core.FlexGlobals;
 
 	import org.opencast.engage.videodisplay.control.util.OpencastMediaPlayer;
 	import org.opencast.engage.videodisplay.control.util.TimeCode;
@@ -198,13 +198,13 @@ package org.opencast.engage.videodisplay.model
 		public var mediaContainer:MediaContainer;
 
 		// mediaContainerLeftWidth
-		public var mediaContainerLeftWidth:int=(Application.application.width - 10) / 2;
+		public var mediaContainerLeftWidth:int=(FlexGlobals.topLevelApplication.width - 10) / 2;
 
 		// mediaContainerOne
 		public var mediaContainerOne:MediaContainer;
 
 		// mediaContainerRightWidth
-		public var mediaContainerRightWidth:int=(Application.application.width - 10) / 2;
+		public var mediaContainerRightWidth:int=(FlexGlobals.topLevelApplication.width - 10) / 2;
 
 		// mediaContainerTwo
 		public var mediaContainerTwo:MediaContainer;

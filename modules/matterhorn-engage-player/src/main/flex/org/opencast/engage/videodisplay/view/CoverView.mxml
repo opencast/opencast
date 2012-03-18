@@ -17,7 +17,7 @@
 	 *
 	 */
 -->
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:s="library://ns.adobe.com/flex/spark"
 		   xmlns:view="org.opencast.engage.videodisplay.view.*"
 		   top="0"
 		   bottom="0"
@@ -27,9 +27,10 @@
 		   height="100%"
 		   resize="{ onResize() }">
 
-	<mx:Script>
+	<fx:Script>
 		<![CDATA[
 			import mx.core.Application;
+			import mx.core.FlexGlobals;
 			import org.opencast.engage.videodisplay.model.VideodisplayModel;
 			import org.opencast.engage.videodisplay.state.CoverState;
 			import org.swizframework.Swiz;
@@ -48,43 +49,27 @@
 				{
 					if (model.coverState == CoverState.ONECOVER)
 					{
-						img_coverSingle.x=((Application.application.width - 10) / 2) - img_coverSingle.contentWidth / 2;
+						img_coverSingle.x=((FlexGlobals.topLevelApplication.width - 10) / 2) - img_coverSingle.contentWidth / 2;
 					}
 				}
 			}
 		]]>
-	</mx:Script>
+	</fx:Script>
+
 
 	<mx:states>
-
-		<mx:State name="onecover">
-
-			<mx:SetProperty target="{ bx_onecover }"
-							name="visible"
-							value="true"/>
-
-			<mx:SetProperty target="{ bx_onecover }"
-							name="includeInLayout"
-							value="true"/>
-		</mx:State>
-
-		<mx:State name="twocovers">
-
-			<mx:SetProperty target="{ bx_twocovers }"
-							name="visible"
-							value="true"/>
-
-			<mx:SetProperty target="{ bx_twocovers }"
-							name="includeInLayout"
-							value="true"/>
-		</mx:State>
+		<s:State name="onecover"></s:State>
+		<s:State name="twocovers"></s:State>
 	</mx:states>
 
+	
 	<mx:Canvas id="bx_onecover"
 			   width="100%"
 			   height="100%"
 			   visible="false"
-			   includeInLayout="false">
+			   includeInLayout="false"
+			   visible.onecover="true"
+			   includeInLayout.onecover="true">
 
 		<mx:Image id="img_coverSingle"
 				  width="100%"
@@ -94,7 +79,9 @@
 				  scaleContent="true"
 				  updateComplete="{ onResize() }"
 				  visible="{ model.coverURLSingle != '' ? true : false }"
-				  includeInLayout="{ model.coverURLSingle != '' ? true : false }"/>
+				  includeInLayout="{ model.coverURLSingle != '' ? true : false }"
+				  visible.twocovers="true"
+				  includeInLayout.twocovers="true"/>
 	</mx:Canvas>
 
 	<mx:HBox id="bx_twocovers"

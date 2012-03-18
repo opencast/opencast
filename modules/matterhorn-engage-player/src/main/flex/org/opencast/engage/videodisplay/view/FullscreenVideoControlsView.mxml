@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
 	 /**
 	 *  Copyright 2009 The Regents of the University of California
@@ -17,24 +16,20 @@
 	 *
 	 */
 -->
-<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
+<mx:VBox xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
 		 xmlns:view="org.opencast.engage.videodisplay.view.*"
-		 horizontalAlign="center"
-		 horizontalGap="0"
-		 verticalGap="0"
-		 width="70%"
-		 height="100%"
-		 backgroundColor="0x000000"
-		 backgroundAlpha="1.0"
-		 rollOver="{this.NavigationVisible = true}"
-		 rollOut="{this.NavigationVisible = false}"
-		 mouseOver="{this.NavigationVisible = true}"
-		 creationComplete="startTimer();">
+		 width="70%" height="100%" backgroundAlpha="1.0" backgroundColor="0x000000"
+		 creationComplete="startTimer();" horizontalAlign="center" horizontalGap="0"
+		 mouseOver="{this.NavigationVisible = true}" rollOut="{this.NavigationVisible = false}"
+		 rollOver="{this.NavigationVisible = true}" verticalGap="0">
 
-	<mx:Script>
+	<fx:Script>
 		<![CDATA[
 			import flash.external.ExternalInterface;
 			import mx.core.Application;
+			import mx.core.FlexGlobals;
 			import bridge.ExternalFunction;
 			import org.opencast.engage.videodisplay.control.event.ClosedCaptionsEvent;
 			import org.opencast.engage.videodisplay.control.event.VideoControlEvent;
@@ -158,7 +153,7 @@
 			 */
 			private function normalscreen():void
 			{
-				Application.application.stage.displayState=StageDisplayState.NORMAL;
+				FlexGlobals.topLevelApplication.stage.displayState=StageDisplayState.NORMAL;
 			}
 
 			/**
@@ -289,163 +284,108 @@
 				return value;
 			}
 		]]>
-	</mx:Script>
+	</fx:Script>
 
-	<mx:Fade id="fadeOut"
-			 duration="400"
-			 alphaFrom="1.0"
-			 alphaTo="0.0"/>
-
-	<mx:Fade id="fadeIn"
-			 duration="200"
-			 alphaFrom="0.0"
-			 alphaTo="1.0"/>
-
-	<mx:Canvas width="750"
-			   height="80"
+	<fx:Declarations>
+	<mx:Fade id="fadeOut" alphaFrom="1.0" alphaTo="0.0" duration="400"/>
+	<mx:Fade id="fadeIn" alphaFrom="0.0" alphaTo="1.0" duration="200"/>
+	</fx:Declarations>
+	
+	<mx:Canvas visible="{this.NavigationVisible}" width="750" height="80" hideEffect="{fadeOut}"
 			   horizontalCenter="0"
-			   visible="{this.NavigationVisible}"
-			   hideEffect="{fadeOut}"
-			   showEffect="{fadeIn}"
-			   mouseOver="{this.NavigationVisible = true; controlsVisible = true}">
+			   mouseOver="{this.NavigationVisible = true; controlsVisible = true}"
+			   showEffect="{fadeIn}">
 
-		<mx:VBox width="100%"
-				 height="80"
-				 horizontalAlign="center"
-				 verticalAlign="top"
-				 verticalGap="0"
-				 horizontalGap="0">
+		<mx:VBox width="100%" height="80" horizontalAlign="center" horizontalGap="0"
+				 verticalAlign="top" verticalGap="0">
 
-			<mx:HBox width="100%"
-					 height="100%"
-					 horizontalAlign="center"
-					 horizontalGap="0"
-					 verticalGap="0"
-					 verticalAlign="bottom">
+			<mx:HBox width="100%" height="100%" horizontalAlign="center" horizontalGap="0"
+					 verticalAlign="bottom" verticalGap="0">
 
-				<mx:HBox height="40"
-						 horizontalAlign="center"
-						 verticalAlign="middle"
-						 verticalGap="0"
-						 horizontalGap="0"
-						 styleName="controlsBackground">
+				<mx:HBox height="40" horizontalAlign="center" horizontalGap="0"
+						 styleName="controlsBackground" verticalAlign="middle" verticalGap="0">
 
-					<mx:Label id="lb_currentTime"
-							  textAlign="center"
+					<mx:Label id="lb_currentTime" styleName="videocontrollerLabel"
 							  text="{ model.timeCode.getTC(model.currentPlayhead) }"
-							  styleName="videocontrollerLabel"
+							  textAlign="center"
 							  toolTip="Current Time {model.timeCode.getTC(model.currentPlayhead) } "/>
 
-					<mx:Label textAlign="center"
-							  text="of"
-							  styleName="videocontrollerLabel"/>
+					<mx:Label styleName="videocontrollerLabel" text="of" textAlign="center"/>
 
-					<mx:Label id="lb_durationTime"
-							  textAlign="center"
+					<mx:Label id="lb_durationTime" styleName="videocontrollerLabel"
 							  text="{ model.timeCode.getTC(model.currentDuration) }"
-							  styleName="videocontrollerLabel"
+							  textAlign="center"
 							  toolTip="Duration {model.timeCode.getTC(model.currentDuration) } "/>
 					<mx:Spacer width="20"/>
 				</mx:HBox>
 
-				<mx:HBox horizontalAlign="center"
-						 verticalAlign="middle"
-						 styleName="controlsBackground">
+				<mx:HBox horizontalAlign="center" styleName="controlsBackground"
+						 verticalAlign="middle">
 
 					<mx:Button id="btn_skipBackward"
-							   toolTip="{ model.slideLength != 0 ? 'Jump To The Previous Slide' : ''}"
-							   useHandCursor="{ model.slideLength != 0 ? true : false }"
 							   buttonMode="{ model.slideLength != 0 ? true : false }"
+							   click="{ExternalInterface.call( ExternalFunction.SKIPBACKWARD, '' )}"
 							   enabled="{ model.slideLength != 0 ? true : false }"
 							   styleName="{ model.slideLength != 0 ? 'skipbackward' : 'skipbackwarddisabled' }"
-							   click="{ExternalInterface.call( ExternalFunction.SKIPBACKWARD, '' )}"/>
+							   toolTip="{ model.slideLength != 0 ? 'Jump To The Previous Slide' : ''}"
+							   useHandCursor="{ model.slideLength != 0 ? true : false }"/>
 					<mx:Spacer width="3"/>
-					<mx:Button id="btn_rewind"
-							   toolTip="Jump Back"
-							   useHandCursor="true"
-							   buttonMode="true"
-							   styleName="backward"
-							   mouseDown="{ jumpBack() }"
-							   mouseUp="{ rewindTimer.stop(); model.rewindTime = 10; }"/>
+					<mx:Button id="btn_rewind" buttonMode="true" mouseDown="{ jumpBack() }"
+							   mouseUp="{ rewindTimer.stop(); model.rewindTime = 10; }"
+							   styleName="backward" toolTip="Jump Back" useHandCursor="true"/>
 					<mx:Spacer width="3"/>
-					<mx:Button id="btn_playpause"
-							   toolTip="{ model.currentPlayerState == PlayerState.PAUSED ? 'Play' : 'Pause' }"
-							   useHandCursor="true"
-							   buttonMode="true"
+					<mx:Button id="btn_playpause" buttonMode="true"
+							   click="{ ExternalInterface.call( ExternalFunction.PLAYPAUSE, '' ) }"
 							   styleName="{ model.currentPlayerState == PlayerState.PAUSED ? 'play' : 'pause' }"
-							   click="{ ExternalInterface.call( ExternalFunction.PLAYPAUSE, '' ) }"/>
+							   toolTip="{ model.currentPlayerState == PlayerState.PAUSED ? 'Play' : 'Pause' }"
+							   useHandCursor="true"/>
 					<mx:Spacer width="3"/>
-					<mx:Button id="btn_fastforward"
-							   toolTip="Jump Forward"
-							   useHandCursor="true"
-							   buttonMode="true"
-							   styleName="forward"
-							   mouseDown="{ jumpForward() }"
-							   mouseUp="{ fastForwardTimer.stop(); model.fastForwardTime = 10 }"/>
+					<mx:Button id="btn_fastforward" buttonMode="true" mouseDown="{ jumpForward() }"
+							   mouseUp="{ fastForwardTimer.stop(); model.fastForwardTime = 10 }"
+							   styleName="forward" toolTip="Jump Forward" useHandCursor="true"/>
 					<mx:Spacer width="3"/>
 					<mx:Button id="btn_skipforward"
-							   toolTip="{ model.slideLength != 0 ? 'Jump To The Next Slide' : ''}"
-							   useHandCursor="{ model.slideLength != 0 ? true : false }"
 							   buttonMode="{ model.slideLength != 0 ? true : false }"
+							   click="{ExternalInterface.call( ExternalFunction.SKIPFORWARD, '' )}"
 							   enabled="{ model.slideLength != 0 ? true : false }"
 							   styleName="{ model.slideLength != 0 ? 'skipforward' : 'skipforwarddisabled' }"
-							   click="{ExternalInterface.call( ExternalFunction.SKIPFORWARD, '' )}"/>
+							   toolTip="{ model.slideLength != 0 ? 'Jump To The Next Slide' : ''}"
+							   useHandCursor="{ model.slideLength != 0 ? true : false }"/>
 					<mx:Spacer width="3"/>
 
-					<mx:Button useHandCursor="true"
-							   buttonMode="true"
-							   id="btn_volume"
-							   toolTip="{ model.soundState == SoundState.VOLUMEMAX ? 'Volume Maximum' : model.soundState == SoundState.VOLUMEMED ? 'Volume Medium' : model.soundState == SoundState.VOLUMEMIN ? 'Volume Minimum' : model.soundState == SoundState.VOLUMEMUTE ? 'Volume Mute' : ''}"
+					<mx:Button id="btn_volume" buttonMode="true" click="{ toggleMute() }"
 							   styleName="{ model.soundState}"
-							   click="{ toggleMute() }"/>
+							   toolTip="{ model.soundState == SoundState.VOLUMEMAX ? 'Volume Maximum' : model.soundState == SoundState.VOLUMEMED ? 'Volume Medium' : model.soundState == SoundState.VOLUMEMIN ? 'Volume Minimum' : model.soundState == SoundState.VOLUMEMUTE ? 'Volume Mute' : ''}"
+							   useHandCursor="true"/>
 
-					<mx:HSlider useHandCursor="true"
-								buttonMode="true"
-								id="hs_volume"
-								width="58"
-								maximum="1"
+					<mx:HSlider id="hs_volume" width="58" buttonMode="true"
 								change="{ changeVolume() }"
-								value="{ model.playerVolume }"
-								styleName="HSliderVolume"
-								dataTipFormatFunction="volumeDataTipFunc"/>
-					<mx:Button width="48"
-							   useHandCursor="{ model.captionsURL == '' ? false : true }"
-							   buttonMode="{ model.captionsURL == '' ? false : true }"
-							   toolTip="{ model.captionsURL == '' ? 'No Closed Captions' : model.ccBoolean == true ? 'Closed Captions On' : 'Closed Captions Off' }"
-							   styleName="{ model.captionsURL == '' ? 'ccdisabled' : model.ccButtonBoolean == true ? 'cc' :  mute == true ? 'cc' :  'ccOn' }"
+								dataTipFormatFunction="volumeDataTipFunc" maximum="1"
+								styleName="HSliderVolume" useHandCursor="true"
+								value="{ model.playerVolume }"/>
+					<mx:Button width="48" buttonMode="{ model.captionsURL == '' ? false : true }"
 							   click="{ Swiz.dispatchEvent( new ClosedCaptionsEvent() ) }"
-							   enabled="{  model.captionsURL == '' ? false : true }"/>
+							   enabled="{  model.captionsURL == '' ? false : true }"
+							   styleName="{ model.captionsURL == '' ? 'ccdisabled' : model.ccButtonBoolean == true ? 'cc' :  mute == true ? 'cc' :  'ccOn' }"
+							   toolTip="{ model.captionsURL == '' ? 'No Closed Captions' : model.ccBoolean == true ? 'Closed Captions On' : 'Closed Captions Off' }"
+							   useHandCursor="{ model.captionsURL == '' ? false : true }"/>
 
-					<mx:Button useHandCursor="true"
-							   buttonMode="true"
-							   toolTip="Close Fullscrenn"
-							   styleName="fullscreen"
-							   click="{ normalscreen() }"/>
+					<mx:Button buttonMode="true" click="{ normalscreen() }" styleName="fullscreen"
+							   toolTip="Close Fullscrenn" useHandCursor="true"/>
 				</mx:HBox>
 			</mx:HBox>
 
 			<mx:Canvas>
-
-				<mx:Canvas height="9"
-						   width="{model.progressFullscreen}"
-						   backgroundColor="#dfe938c"
-						   toolTip="Progress"
-						   top="3"
-						   left="6"/>
-
+				<mx:Canvas left="6" top="3" width="{model.progressFullscreen}" height="9"
+						   backgroundColor="#dfe938c" toolTip="Progress"/>
 				<mx:Canvas>
-
-					<mx:HSlider id="hs_seek"
-								width="587"
-								maximum="{ model.currentDuration }"
-								value="{ model.currentPlayhead }"
-								change="{ onSeek() }"
-								toolTip="Current Time {model.timeCode.getTC(model.currentPlayhead) } "
+					<mx:HSlider id="hs_seek" left="0" width="587" change="{ onSeek() }"
 								dataTipFormatFunction="seekDataTipFunc"
-								styleName="HSliderSeek"
+								maximum="{ model.currentDuration }" styleName="HSliderSeek"
 								thumbDrag="{ thumbDrag() }"
 								thumbRelease="{ model.fullscreenThumbDrag = false }"
-								left="0"/>
+								toolTip="Current Time {model.timeCode.getTC(model.currentPlayhead) } "
+								value="{ model.currentPlayhead }"/>
 				</mx:Canvas>
 			</mx:Canvas>
 		</mx:VBox>

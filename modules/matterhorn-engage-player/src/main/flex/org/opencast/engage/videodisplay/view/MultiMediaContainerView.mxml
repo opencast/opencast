@@ -20,12 +20,12 @@
 <mx:Canvas width="100%"
 		   height="100%"
 		   xmlns:players="com.adobe.strobe.players.*"
-		   xmlns:mx="http://www.adobe.com/2006/mxml"
+		   xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:s="library://ns.adobe.com/flex/spark"
 		   xmlns:view="org.opencast.engage.videodisplay.view.*"
 		   resize="{ resizeVideodisplay() }"
 		   xmlns:osmf="com.osmf.*">
 
-	<mx:Script>
+	<fx:Script>
 		<![CDATA[
 			import mx.core.Application;
 			import mx.core.Container;
@@ -83,33 +83,51 @@
 				mediaContainerRightUIComponent.percentWidth=percentTwo;
 				mediaContainerRightUIComponent.percentHeight=100;
 
-				if (model.previewPlayer == true)
-				{
-					model.layoutMetadataTwo.horizontalAlign=HorizontalAlign.CENTER;
-					model.layoutMetadataOne.horizontalAlign=HorizontalAlign.CENTER;
-				}
+				//23.2.2012 entfernt
+				//if (model.previewPlayer == true)
+				//{
+					//model.layoutMetadataTwo.horizontalAlign=HorizontalAlign.CENTER;
+					//model.layoutMetadataOne.horizontalAlign=HorizontalAlign.CENTER;
+				//}
 			}
 		]]>
-	</mx:Script>
+	</fx:Script>
 
 	<mx:states>
 
-		<mx:State name="onlyleft"
+		<s:State name="onlyleft"
 				  enterState="{setMediaContainers(100,0)}"/>
 
-		<mx:State name="bigleft"
+		<s:State name="bigleft"
 				  enterState="{setMediaContainers(100,50)}"/>
 
-		<mx:State name="center"
+		<s:State name="center"
 				  enterState="{setMediaContainers(100,100)}"/>
 
-		<mx:State name="bigright"
+		<s:State name="bigright"
 				  enterState="{setMediaContainers(50,100)}"/>
 
-		<mx:State name="onlyright"
+		<s:State name="onlyright"
 				  enterState="{setMediaContainers(0,100)}"/>
 	</mx:states>
 
+	<!--<mx:states>
+		
+		<s:State name="onlyleft"/>
+		
+		<s:State name="bigleft"
+				 />
+		
+		<s:State name="center"
+				 />
+		
+		<s:State name="bigright"
+				 />
+		
+		<s:State name="onlyright"
+				 />
+	</mx:states>
+-->
 	<!--
 		 <mx:HBox
 		 id="hb_media"
