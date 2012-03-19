@@ -64,8 +64,7 @@ sudo mkdir -p /opt/matterhorn
 sudo chown `id -u`:`id -g` /opt/matterhorn
 [ $? -ne 0 ] && exit 1
 #
-#svn co http://opencast.jira.com/svn/MH/tags/$MH_VER /opt/matterhorn/$MH_VER
-svn co http://opencast.jira.com/svn/MH/branches/1.3.x /opt/matterhorn/$MH_VER
+svn co http://opencast.jira.com/svn/MH/tags/$MH_VER /opt/matterhorn/$MH_VER
 [ $? -ne 0 ] && exit 1
 rm -fr /opt/matterhorn/trunk
 [ $? -ne 0 ] && exit 1
