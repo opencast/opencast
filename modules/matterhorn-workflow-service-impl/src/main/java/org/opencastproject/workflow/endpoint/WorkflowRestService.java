@@ -92,6 +92,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 
 /**
  * A REST endpoint for the {@link WorkflowService}
@@ -102,28 +103,20 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /** The default number of results returned */
   private static final int DEFAULT_LIMIT = 20;
-
   /** The maximum number of results returned */
   private static final int MAX_LIMIT = 100;
-
   /** The constant used to negate a querystring parameter. This is only supported on some parameters. */
   public static final String NEGATE_PREFIX = "-";
-
   /** The constant used to switch the direction of the sorting querystring parameter. */
   public static final String DESCENDING_SUFFIX = "_DESC";
-
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(WorkflowRestService.class);
-
   /** The default server URL */
   protected String serverUrl = UrlSupport.DEFAULT_BASE_URL;
-
   /** The default service URL */
   protected String serviceUrl = serverUrl + "/workflow";
-
   /** The workflow service instance */
   private WorkflowService service;
-
   /** The service registry */
   protected ServiceRegistry serviceRegistry = null;
 
@@ -229,10 +222,11 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_PLAIN)
   @Path("/count")
   @RestQuery(name = "count", description = "Returns the number of workflow instances in a specific state and operation", returnDescription = "Returns the number of workflow instances in a specific state and operation", restParameters = {
-          @RestParameter(name = "state", isRequired = false, description = "The workflow state", type = STRING),
-          @RestParameter(name = "operation", isRequired = false, description = "The current operation", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The number of workflow instances.") })
+    @RestParameter(name = "state", isRequired = false, description = "The workflow state", type = STRING),
+    @RestParameter(name = "operation", isRequired = false, description = "The current operation", type = STRING) }, reponses = {
+    @RestResponse(responseCode = SC_OK, description = "The number of workflow instances.") })
   public Response getCount(@QueryParam("state") WorkflowInstance.WorkflowState state,
-          @QueryParam("operation") String operation) {
+                           @QueryParam("operation") String operation) {
     try {
       Long count = service.countWorkflowInstances(state, operation);
       return Response.ok(count).build();
@@ -244,7 +238,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("/statistics.xml")
-  @RestQuery(name = "statisticsasxml", description = "Returns the workflow statistics as XML", returnDescription = "An XML representation of the workflow statistics.", reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow statistics.") })
+  @RestQuery(name = "statisticsasxml", description = "Returns the workflow statistics as XML", returnDescription = "An XML representation of the workflow statistics.", reponses = {
+    @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow statistics.") })
   public WorkflowStatistics getStatisticsAsXml() throws WorkflowDatabaseException {
     return service.getStatistics();
   }
@@ -252,14 +247,17 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/statistics.json")
-  @RestQuery(name = "statisticsasjson", description = "Returns the workflow statistics as JSON", returnDescription = "A JSON representation of the workflow statistics.", reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow statistics.") })
+  @RestQuery(name = "statisticsasjson", description = "Returns the workflow statistics as JSON", returnDescription = "A JSON representation of the workflow statistics.", reponses = {
+    @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow statistics.") })
   public WorkflowStatistics getStatisticsAsJson() throws WorkflowDatabaseException {
     return getStatisticsAsXml();
   }
 
   @GET
   @Path("definitions.{output:.*}")
-  @RestQuery(name = "definitions", description = "List all available workflow definitions", returnDescription = "Returns the workflow definitions", pathParameters = { @RestParameter(name = "output", isRequired = true, description = "The output format (XML or JSON)", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The workflow definitions.") })
+  @RestQuery(name = "definitions", description = "List all available workflow definitions", returnDescription = "Returns the workflow definitions", pathParameters = {
+    @RestParameter(name = "output", isRequired = true, description = "The output format (XML or JSON)", type = STRING) }, reponses = {
+    @RestResponse(responseCode = SC_OK, description = "The workflow definitions.") })
   @SuppressWarnings("unchecked")
   public Response getWorkflowDefinitions(@PathParam("output") String output) throws Exception {
     List<WorkflowDefinition> list = service.listAvailableWorkflowDefinitions();
@@ -279,7 +277,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("definition/{id}.json")
-  @RestQuery(name = "definitionasjson", description = "Returns a single workflow definition", returnDescription = "Returns a JSON representation of the workflow definition with the specified identifier", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow definition identifier", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The workflow definition.") })
+  @RestQuery(name = "definitionasjson", description = "Returns a single workflow definition", returnDescription = "Returns a JSON representation of the workflow definition with the specified identifier", pathParameters = {
+    @RestParameter(name = "id", isRequired = true, description = "The workflow definition identifier", type = STRING) }, reponses = {
+    @RestResponse(responseCode = SC_OK, description = "The workflow definition.") })
   public Response getWorkflowDefinitionAsJson(@PathParam("id") String workflowDefinitionId) throws NotFoundException {
     WorkflowDefinition def = null;
     try {
@@ -293,7 +293,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("definition/{id}.xml")
-  @RestQuery(name = "definitionasxml", description = "Returns a single workflow definition", returnDescription = "Returns an XML representation of the workflow definition with the specified identifier", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow definition identifier", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The workflow definition.") })
+  @RestQuery(name = "definitionasxml", description = "Returns a single workflow definition", returnDescription = "Returns an XML representation of the workflow definition with the specified identifier", pathParameters = {
+    @RestParameter(name = "id", isRequired = true, description = "The workflow definition identifier", type = STRING) }, reponses = {
+    @RestResponse(responseCode = SC_OK, description = "The workflow definition.") })
   public Response getWorkflowDefinitionAsXml(@PathParam("id") String workflowDefinitionId) throws NotFoundException {
     return getWorkflowDefinitionAsJson(workflowDefinitionId);
   }
@@ -307,7 +309,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.TEXT_HTML)
   @Path("configurationPanel")
-  @RestQuery(name = "configpanel", description = "Get the configuration panel for a specific workflow", returnDescription = "The HTML workflow configuration panel", restParameters = { @RestParameter(name = "definitionId", isRequired = false, description = "The workflow definition identifier", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The workflow configuration panel.") })
+  @RestQuery(name = "configpanel", description = "Get the configuration panel for a specific workflow", returnDescription = "The HTML workflow configuration panel", restParameters = {
+    @RestParameter(name = "definitionId", isRequired = false, description = "The workflow definition identifier", type = STRING) }, reponses = {
+    @RestResponse(responseCode = SC_OK, description = "The workflow configuration panel.") })
   public Response getConfigurationPanel(@QueryParam("definitionId") String definitionId) throws NotFoundException {
     WorkflowDefinition def = null;
     try {
@@ -345,42 +349,43 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @Path("instances.xml")
   @RestQuery(name = "workflowsasxml", description = "List all workflow instances matching the query parameters", returnDescription = "An XML representation of the set of workflows matching these query parameters", restParameters = {
-          @RestParameter(name = "state", isRequired = false, description = "Filter results by workflows' current state", type = STRING),
-          @RestParameter(name = "q", isRequired = false, description = "Filter results by free text query", type = STRING),
-          @RestParameter(name = "seriesId", isRequired = false, description = "Filter results by series identifier", type = STRING),
-          @RestParameter(name = "seriesTitle", isRequired = false, description = "Filter results by series title", type = STRING),
-          @RestParameter(name = "creator", isRequired = false, description = "Filter results by the mediapackage's creator", type = STRING),
-          @RestParameter(name = "contributor", isRequired = false, description = "Filter results by the mediapackage's contributor", type = STRING),
-          @RestParameter(name = "fromdate", isRequired = false, description = "Filter results by workflow start date.", type = STRING),
-          @RestParameter(name = "todate", isRequired = false, description = "Filter results by workflow start date.", type = STRING),
-          @RestParameter(name = "language", isRequired = false, description = "Filter results by mediapackage's language.", type = STRING),
-          @RestParameter(name = "license", isRequired = false, description = "Filter results by mediapackage's license.", type = STRING),
-          @RestParameter(name = "title", isRequired = false, description = "Filter results by mediapackage's title.", type = STRING),
-          @RestParameter(name = "subject", isRequired = false, description = "Filter results by mediapackage's subject.", type = STRING),
-          @RestParameter(name = "workflowdefinition", isRequired = false, description = "Filter results by workflow definition.", type = STRING),
-          @RestParameter(name = "mp", isRequired = false, description = "Filter results by mediapackage identifier.", type = STRING),
-          @RestParameter(name = "op", isRequired = false, description = "Filter results by workflows' current operation.", type = STRING),
-          @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
-                  + "of the following: DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, "
-                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING),
-          @RestParameter(name = "startPage", isRequired = false, description = "The paging offset", type = STRING),
-          @RestParameter(name = "count", isRequired = false, description = "The number of results to return.", type = STRING),
-          @RestParameter(name = "compact", isRequired = false, description = "Whether to return a compact version of "
-                  + "the workflow instance, with mediapackage elements, workflow and workflow operation configurations and "
-                  + "non-current operations removed.", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow set.") })
+    @RestParameter(name = "state", isRequired = false, description = "Filter results by workflows' current state", type = STRING),
+    @RestParameter(name = "q", isRequired = false, description = "Filter results by free text query", type = STRING),
+    @RestParameter(name = "seriesId", isRequired = false, description = "Filter results by series identifier", type = STRING),
+    @RestParameter(name = "seriesTitle", isRequired = false, description = "Filter results by series title", type = STRING),
+    @RestParameter(name = "creator", isRequired = false, description = "Filter results by the mediapackage's creator", type = STRING),
+    @RestParameter(name = "contributor", isRequired = false, description = "Filter results by the mediapackage's contributor", type = STRING),
+    @RestParameter(name = "fromdate", isRequired = false, description = "Filter results by workflow start date.", type = STRING),
+    @RestParameter(name = "todate", isRequired = false, description = "Filter results by workflow start date.", type = STRING),
+    @RestParameter(name = "language", isRequired = false, description = "Filter results by mediapackage's language.", type = STRING),
+    @RestParameter(name = "license", isRequired = false, description = "Filter results by mediapackage's license.", type = STRING),
+    @RestParameter(name = "title", isRequired = false, description = "Filter results by mediapackage's title.", type = STRING),
+    @RestParameter(name = "subject", isRequired = false, description = "Filter results by mediapackage's subject.", type = STRING),
+    @RestParameter(name = "workflowdefinition", isRequired = false, description = "Filter results by workflow definition.", type = STRING),
+    @RestParameter(name = "mp", isRequired = false, description = "Filter results by mediapackage identifier.", type = STRING),
+    @RestParameter(name = "op", isRequired = false, description = "Filter results by workflows' current operation.", type = STRING),
+    @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
+    + "of the following: DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, "
+    + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING),
+    @RestParameter(name = "startPage", isRequired = false, description = "The paging offset", type = STRING),
+    @RestParameter(name = "count", isRequired = false, description = "The number of results to return.", type = STRING),
+    @RestParameter(name = "compact", isRequired = false, description = "Whether to return a compact version of "
+    + "the workflow instance, with mediapackage elements, workflow and workflow operation configurations and "
+    + "non-current operations removed.", type = STRING) }, reponses = {
+    @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow set.") })
   // CHECKSTYLE:OFF
   // The number of method parameters is too large for checkstyle's taste, but we need to handle many potential query
   // parameters. CXF provides a bean approach to accepting many parameters, but it is not part of the JAX-RS spec.
   // So for now, we disable checkstyle here.
   public Response getWorkflowsAsXml(@QueryParam("state") List<String> states, @QueryParam("q") String text,
-          @QueryParam("seriesId") String seriesId, @QueryParam("seriesTitle") String seriesTitle,
-          @QueryParam("creator") String creator, @QueryParam("contributor") String contributor,
-          @QueryParam("fromdate") String fromDate, @QueryParam("todate") String toDate,
-          @QueryParam("language") String language, @QueryParam("license") String license,
-          @QueryParam("title") String title, @QueryParam("subject") String subject,
-          @QueryParam("workflowdefinition") String workflowDefinitionId, @QueryParam("mp") String mediapackageId,
-          @QueryParam("op") List<String> currentOperations, @QueryParam("sort") String sort,
-          @QueryParam("startPage") int startPage, @QueryParam("count") int count, @QueryParam("compact") boolean compact)
+                                    @QueryParam("seriesId") String seriesId, @QueryParam("seriesTitle") String seriesTitle,
+                                    @QueryParam("creator") String creator, @QueryParam("contributor") String contributor,
+                                    @QueryParam("fromdate") String fromDate, @QueryParam("todate") String toDate,
+                                    @QueryParam("language") String language, @QueryParam("license") String license,
+                                    @QueryParam("title") String title, @QueryParam("subject") String subject,
+                                    @QueryParam("workflowdefinition") String workflowDefinitionId, @QueryParam("mp") String mediapackageId,
+                                    @QueryParam("op") List<String> currentOperations, @QueryParam("sort") String sort,
+                                    @QueryParam("startPage") int startPage, @QueryParam("count") int count, @QueryParam("compact") boolean compact)
           throws Exception {
     // CHECKSTYLE:ON
     if (count < 1 || count > MAX_LIMIT) {
@@ -395,8 +400,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     if (states != null && states.size() > 0) {
       try {
         for (String state : states) {
-          if (StringUtils.isBlank(state))
+          if (StringUtils.isBlank(state)) {
             continue;
+          }
           if (state.startsWith(NEGATE_PREFIX)) {
             q.withoutState(WorkflowState.valueOf(state.substring(1).toUpperCase()));
           } else {
@@ -423,8 +429,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
     if (currentOperations != null && currentOperations.size() > 0) {
       for (String op : currentOperations) {
-        if (StringUtils.isBlank(op))
+        if (StringUtils.isBlank(op)) {
           continue;
+        }
         if (op.startsWith(NEGATE_PREFIX)) {
           q.withoutCurrentOperation(op.substring(1));
         } else {
@@ -490,38 +497,39 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("instances.json")
   @RestQuery(name = "workflowsasjson", description = "List all workflow instances matching the query parameters", returnDescription = "A JSON representation of the set of workflows matching these query parameters", restParameters = {
-          @RestParameter(name = "state", isRequired = false, description = "Filter results by workflows' current state", type = STRING),
-          @RestParameter(name = "q", isRequired = false, description = "Filter results by free text query", type = STRING),
-          @RestParameter(name = "seriesId", isRequired = false, description = "Filter results by series identifier", type = STRING),
-          @RestParameter(name = "seriesTitle", isRequired = false, description = "Filter results by series title", type = STRING),
-          @RestParameter(name = "creator", isRequired = false, description = "Filter results by the mediapackage's creator", type = STRING),
-          @RestParameter(name = "contributor", isRequired = false, description = "Filter results by the mediapackage's contributor", type = STRING),
-          @RestParameter(name = "fromdate", isRequired = false, description = "Filter results by workflow start date.", type = STRING),
-          @RestParameter(name = "todate", isRequired = false, description = "Filter results by workflow start date.", type = STRING),
-          @RestParameter(name = "language", isRequired = false, description = "Filter results by mediapackage's language.", type = STRING),
-          @RestParameter(name = "license", isRequired = false, description = "Filter results by mediapackage's license.", type = STRING),
-          @RestParameter(name = "title", isRequired = false, description = "Filter results by mediapackage's title.", type = STRING),
-          @RestParameter(name = "subject", isRequired = false, description = "Filter results by mediapackage's subject.", type = STRING),
-          @RestParameter(name = "workflowdefinition", isRequired = false, description = "Filter results by workflow definition.", type = STRING),
-          @RestParameter(name = "mp", isRequired = false, description = "Filter results by mediapackage identifier.", type = STRING),
-          @RestParameter(name = "op", isRequired = false, description = "Filter results by workflows' current operation.", type = STRING),
-          @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
-                  + "of the following: DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, "
-                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING),
-          @RestParameter(name = "startPage", isRequired = false, description = "The paging offset", type = STRING),
-          @RestParameter(name = "count", isRequired = false, description = "The number of results to return.", type = STRING),
-          @RestParameter(name = "compact", isRequired = false, description = "Whether to return a compact version of "
-                  + "the workflow instance, with mediapackage elements, workflow and workflow operation configurations and "
-                  + "non-current operations removed.", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow set.") })
+    @RestParameter(name = "state", isRequired = false, description = "Filter results by workflows' current state", type = STRING),
+    @RestParameter(name = "q", isRequired = false, description = "Filter results by free text query", type = STRING),
+    @RestParameter(name = "seriesId", isRequired = false, description = "Filter results by series identifier", type = STRING),
+    @RestParameter(name = "seriesTitle", isRequired = false, description = "Filter results by series title", type = STRING),
+    @RestParameter(name = "creator", isRequired = false, description = "Filter results by the mediapackage's creator", type = STRING),
+    @RestParameter(name = "contributor", isRequired = false, description = "Filter results by the mediapackage's contributor", type = STRING),
+    @RestParameter(name = "fromdate", isRequired = false, description = "Filter results by workflow start date.", type = STRING),
+    @RestParameter(name = "todate", isRequired = false, description = "Filter results by workflow start date.", type = STRING),
+    @RestParameter(name = "language", isRequired = false, description = "Filter results by mediapackage's language.", type = STRING),
+    @RestParameter(name = "license", isRequired = false, description = "Filter results by mediapackage's license.", type = STRING),
+    @RestParameter(name = "title", isRequired = false, description = "Filter results by mediapackage's title.", type = STRING),
+    @RestParameter(name = "subject", isRequired = false, description = "Filter results by mediapackage's subject.", type = STRING),
+    @RestParameter(name = "workflowdefinition", isRequired = false, description = "Filter results by workflow definition.", type = STRING),
+    @RestParameter(name = "mp", isRequired = false, description = "Filter results by mediapackage identifier.", type = STRING),
+    @RestParameter(name = "op", isRequired = false, description = "Filter results by workflows' current operation.", type = STRING),
+    @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
+    + "of the following: DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, "
+    + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING),
+    @RestParameter(name = "startPage", isRequired = false, description = "The paging offset", type = STRING),
+    @RestParameter(name = "count", isRequired = false, description = "The number of results to return.", type = STRING),
+    @RestParameter(name = "compact", isRequired = false, description = "Whether to return a compact version of "
+    + "the workflow instance, with mediapackage elements, workflow and workflow operation configurations and "
+    + "non-current operations removed.", type = STRING) }, reponses = {
+    @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow set.") })
   public Response getWorkflowsAsJson(@QueryParam("state") List<String> states, @QueryParam("q") String text,
-          @QueryParam("seriesid") String seriesId, @QueryParam("seriestitle") String seriesTitle,
-          @QueryParam("creator") String creator, @QueryParam("contributor") String contributor,
-          @QueryParam("fromdate") String fromDate, @QueryParam("todate") String toDate,
-          @QueryParam("language") String language, @QueryParam("license") String license,
-          @QueryParam("title") String title, @QueryParam("subject") String subject,
-          @QueryParam("workflowdefinition") String workflowDefinitionId, @QueryParam("mp") String mediapackageId,
-          @QueryParam("op") List<String> currentOperations, @QueryParam("sort") String sort,
-          @QueryParam("startPage") int startPage, @QueryParam("count") int count, @QueryParam("compact") boolean compact)
+                                     @QueryParam("seriesid") String seriesId, @QueryParam("seriestitle") String seriesTitle,
+                                     @QueryParam("creator") String creator, @QueryParam("contributor") String contributor,
+                                     @QueryParam("fromdate") String fromDate, @QueryParam("todate") String toDate,
+                                     @QueryParam("language") String language, @QueryParam("license") String license,
+                                     @QueryParam("title") String title, @QueryParam("subject") String subject,
+                                     @QueryParam("workflowdefinition") String workflowDefinitionId, @QueryParam("mp") String mediapackageId,
+                                     @QueryParam("op") List<String> currentOperations, @QueryParam("sort") String sort,
+                                     @QueryParam("startPage") int startPage, @QueryParam("count") int count, @QueryParam("compact") boolean compact)
           throws Exception {
     // CHECKSTYLE:ON
     return getWorkflowsAsXml(states, text, seriesId, seriesTitle, creator, contributor, fromDate, toDate, language,
@@ -532,9 +540,10 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("instance/{id}.xml")
-  @RestQuery(name = "workflowasxml", description = "Get a specific workflow instance.", returnDescription = "An XML representation of a workflow instance", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists.") })
+  @RestQuery(name = "workflowasxml", description = "Get a specific workflow instance.", returnDescription = "An XML representation of a workflow instance", pathParameters = {
+    @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
+    @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow instance."),
+    @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists.") })
   public WorkflowInstance getWorkflowAsXml(@PathParam("id") long id) throws WorkflowDatabaseException,
           NotFoundException, UnauthorizedException {
     return service.getWorkflowById(id);
@@ -543,9 +552,10 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("instance/{id}.json")
-  @RestQuery(name = "workflowasjson", description = "Get a specific workflow instance.", returnDescription = "A JSON representation of a workflow instance", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists.") })
+  @RestQuery(name = "workflowasjson", description = "Get a specific workflow instance.", returnDescription = "A JSON representation of a workflow instance", pathParameters = {
+    @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
+    @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow instance."),
+    @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists.") })
   public WorkflowInstance getWorkflowAsJson(@PathParam("id") long id) throws WorkflowDatabaseException,
           NotFoundException, UnauthorizedException {
     return getWorkflowAsXml(id);
@@ -555,17 +565,20 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Path("start")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "start", description = "Start a new workflow instance.", returnDescription = "An XML representation of the new workflow instance", restParameters = {
-          @RestParameter(name = "definition", isRequired = true, description = "The XML representation of a workflow definition", type = TEXT, defaultValue = "${this.sampleWorkflowDefinition}", jaxbClass = WorkflowDefinitionImpl.class),
-          @RestParameter(name = "mediapackage", isRequired = true, description = "The XML representation of a mediapackage", type = TEXT, defaultValue = "${this.sampleMediaPackage}", jaxbClass = MediaPackageImpl.class),
-          @RestParameter(name = "parent", isRequired = false, description = "An optional parent workflow instance identifier", type = STRING),
-          @RestParameter(name = "properties", isRequired = false, description = "An optional set of key=value\\n properties", type = TEXT) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the new workflow instance.") })
+    @RestParameter(name = "definition", isRequired = true, description = "The XML representation of a workflow definition", type = TEXT, defaultValue = "${this.sampleWorkflowDefinition}", jaxbClass = WorkflowDefinitionImpl.class),
+    @RestParameter(name = "mediapackage", isRequired = true, description = "The XML representation of a mediapackage", type = TEXT, defaultValue = "${this.sampleMediaPackage}", jaxbClass = MediaPackageImpl.class),
+    @RestParameter(name = "parent", isRequired = false, description = "An optional parent workflow instance identifier", type = STRING),
+    @RestParameter(name = "properties", isRequired = false, description = "An optional set of key=value\\n properties", type = TEXT) }, reponses = {
+    @RestResponse(responseCode = SC_OK, description = "An XML representation of the new workflow instance.") })
   public WorkflowInstanceImpl start(@FormParam("definition") String workflowDefinitionXml,
-          @FormParam("mediapackage") MediaPackageImpl mp, @FormParam("parent") String parentWorkflowId,
-          @FormParam("properties") LocalHashMap localMap) {
-    if (mp == null)
+                                    @FormParam("mediapackage") MediaPackageImpl mp, @FormParam("parent") String parentWorkflowId,
+                                    @FormParam("properties") LocalHashMap localMap) {
+    if (mp == null) {
       throw new WebApplicationException(Status.BAD_REQUEST);
-    if (StringUtils.isBlank(workflowDefinitionXml))
+    }
+    if (StringUtils.isBlank(workflowDefinitionXml)) {
       throw new WebApplicationException(Status.BAD_REQUEST);
+    }
     WorkflowDefinition workflowDefinition;
     try {
       workflowDefinition = WorkflowParser.parseWorkflowDefinition(workflowDefinitionXml);
@@ -573,10 +586,11 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       throw new WebApplicationException(e);
     }
     Map<String, String> properties = null;
-    if (localMap != null)
+    if (localMap != null) {
       properties = localMap.getMap();
-    else
+    } else {
       properties = new HashMap<String, String>();
+    }
     Long parentIdAsLong = null;
     if (StringUtils.isNotEmpty(parentWorkflowId)) {
       try {
@@ -597,9 +611,10 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("stop")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "stop", description = "Stops a workflow instance.", returnDescription = "An XML representation of the stopped workflow instance", restParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "An XML representation of the stopped workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No running workflow instance with that identifier exists.") })
+  @RestQuery(name = "stop", description = "Stops a workflow instance.", returnDescription = "An XML representation of the stopped workflow instance", restParameters = {
+    @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
+    @RestResponse(responseCode = SC_OK, description = "An XML representation of the stopped workflow instance."),
+    @RestResponse(responseCode = SC_NOT_FOUND, description = "No running workflow instance with that identifier exists.") })
   public WorkflowInstance stop(@FormParam("id") long workflowInstanceId) throws WorkflowException, NotFoundException,
           UnauthorizedException {
     return service.stop(workflowInstanceId);
@@ -609,27 +624,28 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Path("remove/{id}")
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(name = "remove", description = "Danger! Permenantly removes a workflow instance. This does not remove associated jobs, and there are potential harmful effects by removing a workflow. In most circumstances, /stop is what you should use.",
-          returnDescription = "HTTP 204 No Content",
-          pathParameters = {
-            @RestParameter(name = "id", isRequired = true,
-            description = "The workflow instance identifier", type = STRING)
-          },
-          reponses = {
-            @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT , description = "No Conent."),
-            @RestResponse(responseCode = SC_NOT_FOUND, description = "No running workflow instance with that identifier exists.")
-          })
+  returnDescription = "HTTP 204 No Content",
+  pathParameters = {
+    @RestParameter(name = "id", isRequired = true,
+    description = "The workflow instance identifier", type = STRING)
+  },
+  reponses = {
+    @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No Conent."),
+    @RestResponse(responseCode = SC_NOT_FOUND, description = "No running workflow instance with that identifier exists.")
+  })
   public Response remove(@PathParam("id") long workflowInstanceId) throws WorkflowException, NotFoundException,
           UnauthorizedException {
     service.remove(workflowInstanceId);
     return Response.noContent().build();
   }
-  
+
   @POST
   @Path("suspend")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "suspend", description = "Suspends a workflow instance.", returnDescription = "An XML representation of the suspended workflow instance", restParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "An XML representation of the suspended workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No running workflow instance with that identifier exists.") })
+  @RestQuery(name = "suspend", description = "Suspends a workflow instance.", returnDescription = "An XML representation of the suspended workflow instance", restParameters = {
+    @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
+    @RestResponse(responseCode = SC_OK, description = "An XML representation of the suspended workflow instance."),
+    @RestResponse(responseCode = SC_NOT_FOUND, description = "No running workflow instance with that identifier exists.") })
   public Response suspend(@FormParam("id") long workflowInstanceId) throws NotFoundException, UnauthorizedException {
     try {
       WorkflowInstance workflow = service.suspend(workflowInstanceId);
@@ -642,9 +658,10 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("resume")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "resume", description = "Resumes a suspended workflow instance.", returnDescription = "An XML representation of the resumed workflow instance", restParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "An XML representation of the resumed workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists.") })
+  @RestQuery(name = "resume", description = "Resumes a suspended workflow instance.", returnDescription = "An XML representation of the resumed workflow instance", restParameters = {
+    @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
+    @RestResponse(responseCode = SC_OK, description = "An XML representation of the resumed workflow instance."),
+    @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists.") })
   public Response resume(@FormParam("id") long workflowInstanceId, @FormParam("properties") LocalHashMap properties)
           throws NotFoundException, UnauthorizedException {
     Map<String, String> map;
@@ -664,11 +681,17 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("replaceAndresume")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "replaceAndresume", description = "Replaces a suspended workflow instance with an updated version, and resumes the workflow.", returnDescription = "An XML representation of the updated and resumed workflow instance", restParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "An XML representation of the updated and resumed workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists.") })
+  @RestQuery(name = "replaceAndresume", description = "Replaces a suspended workflow instance with an updated version, and resumes the workflow.", returnDescription = "An XML representation of the updated and resumed workflow instance",
+  restParameters = {
+    @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING),
+    @RestParameter(name = "mediapackage", isRequired = false, description = "The new Mediapackage", type = TEXT),
+    @RestParameter(name = "properties", isRequired = false, description = "Properties", type = TEXT) },
+  reponses = {
+    @RestResponse(responseCode = SC_OK, description = "An XML representation of the updated and resumed workflow instance."),
+    @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists.") })
   public Response resume(@FormParam("id") long workflowInstanceId,
-          @FormParam("mediapackage") MediaPackageImpl mediaPackage, @FormParam("properties") LocalHashMap properties)
+                         @FormParam("mediapackage") String mediaPackage,
+                         @FormParam("properties") LocalHashMap properties)
           throws NotFoundException, UnauthorizedException {
     Map<String, String> map;
     if (properties == null) {
@@ -679,19 +702,26 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     try {
       WorkflowInstance workflow = service.getWorkflowById(workflowInstanceId);
       if (mediaPackage != null) {
-        workflow.setMediaPackage(mediaPackage);
+        MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(mediaPackage);
+        workflow.setMediaPackage(mp);
         service.update(workflow);
       }
       service.resume(workflowInstanceId, map);
       return Response.ok(workflow).build();
     } catch (WorkflowException e) {
+      logger.error(e.getMessage(), e);
+      throw new WebApplicationException(e);
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
       throw new WebApplicationException(e);
     }
   }
 
   @POST
   @Path("update")
-  @RestQuery(name = "update", description = "Updates a workflow instance.", returnDescription = "No content.", restParameters = { @RestParameter(name = "workflow", isRequired = true, description = "The XML representation of the workflow instance.", type = TEXT) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "Workflow instance updated.") })
+  @RestQuery(name = "update", description = "Updates a workflow instance.", returnDescription = "No content.", restParameters = {
+    @RestParameter(name = "workflow", isRequired = true, description = "The XML representation of the workflow instance.", type = TEXT) }, reponses = {
+    @RestResponse(responseCode = SC_NO_CONTENT, description = "Workflow instance updated.") })
   public Response update(@FormParam("workflow") String workflowInstance) throws NotFoundException,
           UnauthorizedException {
     try {
@@ -706,7 +736,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Path("handlers.json")
   @SuppressWarnings("unchecked")
-  @RestQuery(name = "handlers", description = "List all registered workflow operation handlers (implementations).", returnDescription = "A JSON representation of the registered workflow operation handlers.", reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the registered workflow operation handlers") })
+  @RestQuery(name = "handlers", description = "List all registered workflow operation handlers (implementations).", returnDescription = "A JSON representation of the registered workflow operation handlers.", reponses = {
+    @RestResponse(responseCode = SC_OK, description = "A JSON representation of the registered workflow operation handlers") })
   public Response getOperationHandlers() {
     JSONArray jsonArray = new JSONArray();
     for (HandlerRegistration reg : ((WorkflowServiceImpl) service).getRegisteredHandlers()) {
@@ -726,7 +757,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   @PUT
   @Path("/definition")
-  @RestQuery(name = "updatedefinition", description = "Updates a workflow definition.", returnDescription = "A location headers containing the URL to the updated workflow definition.", restParameters = { @RestParameter(name = "workflowDefinition", isRequired = true, description = "The XML representation of the updated workflow definition.", type = TEXT) }, reponses = { @RestResponse(responseCode = SC_CREATED, description = "Workflow definition updated.") })
+  @RestQuery(name = "updatedefinition", description = "Updates a workflow definition.", returnDescription = "A location headers containing the URL to the updated workflow definition.", restParameters = {
+    @RestParameter(name = "workflowDefinition", isRequired = true, description = "The XML representation of the updated workflow definition.", type = TEXT) }, reponses = {
+    @RestResponse(responseCode = SC_CREATED, description = "Workflow definition updated.") })
   public Response registerWorkflowDefinition(@FormParam("workflowDefinition") WorkflowDefinitionImpl workflowDefinition) {
     if (workflowDefinition == null) {
       return Response.status(Status.BAD_REQUEST).build();
@@ -737,10 +770,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     } catch (NotFoundException notFoundException) {
       try {
         service.registerWorkflowDefinition(workflowDefinition);
-        return Response
-                .created(
-                        new URI(UrlSupport.concat(new String[] { serverUrl, "definition",
-                                workflowDefinition.getId() + ".xml" }))).build();
+        return Response.created(
+                new URI(UrlSupport.concat(new String[]{ serverUrl, "definition",
+                  workflowDefinition.getId() + ".xml" }))).build();
       } catch (WorkflowDatabaseException e) {
         return Response.status(Status.INTERNAL_SERVER_ERROR).build();
       } catch (URISyntaxException e) {
@@ -753,7 +785,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   @DELETE
   @Path("/definition/{id}")
-  @RestQuery(name = "deletedefinition", description = "Deletes a workflow definition.", returnDescription = "No content.", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow definition identifier.", type = STRING) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "Workflow definition deleted.") })
+  @RestQuery(name = "deletedefinition", description = "Deletes a workflow definition.", returnDescription = "No content.", pathParameters = {
+    @RestParameter(name = "id", isRequired = true, description = "The workflow definition identifier.", type = STRING) }, reponses = {
+    @RestResponse(responseCode = SC_NO_CONTENT, description = "Workflow definition deleted.") })
   public Response unregisterWorkflowDefinition(@PathParam("id") String workflowDefinitionId) throws NotFoundException {
     try {
       service.unregisterWorkflowDefinition(workflowDefinitionId);
@@ -798,10 +832,10 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
    */
   @Override
   public JobProducer getService() {
-    if (service instanceof JobProducer)
+    if (service instanceof JobProducer) {
       return (JobProducer) service;
-    else
+    } else {
       return null;
+    }
   }
-
 }
