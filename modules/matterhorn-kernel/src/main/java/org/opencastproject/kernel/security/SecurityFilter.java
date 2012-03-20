@@ -111,6 +111,7 @@ public final class SecurityFilter implements Filter {
     Filter filter = orgSecurityFilters.get(org.getId());
     if (filter == null) {
       ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+      return;
     }
     filter.doFilter(request, response, chain);
   }
