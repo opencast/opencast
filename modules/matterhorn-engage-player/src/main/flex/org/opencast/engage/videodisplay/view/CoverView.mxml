@@ -66,10 +66,10 @@
 	<mx:Canvas id="bx_onecover"
 			   width="100%"
 			   height="100%"
-			   visible="false"
-			   includeInLayout="false"
 			   visible.onecover="true"
-			   includeInLayout.onecover="true">
+			   includeInLayout.onecover="true"
+			   visible.twocovers="false"
+			   includeInLayout.twocovers="false">
 
 		<mx:Image id="img_coverSingle"
 				  width="100%"
@@ -88,8 +88,10 @@
 			 width="100%"
 			 height="100%"
 			 horizontalGap="0"
-			 visible="false"
-			 includeInLayout="false"
+			 visible.twocovers="true"
+			 includeInLayout.twocovers="true"
+			 visible.onecover="false"
+			 includeInLayout.onecover="false"
 			 verticalAlign="bottom">
 
 		<mx:Image id="img_coverOne"
