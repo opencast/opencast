@@ -26,6 +26,6 @@ public enum ConsumerType {
   VIDEO_FILE_SINK, //Places video data into a file.
   AUDIO_MONITORING_SINK,  // Get rms values from audio stream
   VIDEO_MONITORING_SINK,  // Grab a frame (at specific interval) as a jpeg for confidence monitoring
-  RTCP_VIDEO_SINK,        // Create an video network stream (RTP)
+  RTP_SINK,        // Create a network stream (RTP)
   XVIMAGE_SINK // Only available on Linux. Shows Producer data in real time.
 }

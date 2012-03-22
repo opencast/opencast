@@ -84,8 +84,8 @@ public final class ConsumerFactory {
       return new AudioMonitoringConsumer(captureDevice, properties);
     else if (consumerType == ConsumerType.VIDEO_MONITORING_SINK)
       return new VideoMonitoringConsumer(captureDevice, properties);
-    else if (consumerType == ConsumerType.RTCP_VIDEO_SINK)
-      return new RTPVideoSinkConsumer(captureDevice, properties);
+    else if (consumerType == ConsumerType.RTP_SINK)
+      return new RTPSinkConsumer(captureDevice, properties);
     else {
       throw new NoConsumerFoundException("No valid SinkBin found for device " + consumerType);
     }

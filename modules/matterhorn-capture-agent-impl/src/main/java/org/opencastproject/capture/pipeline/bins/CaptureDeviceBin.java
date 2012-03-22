@@ -86,7 +86,7 @@ public class CaptureDeviceBin {
     if (!confidenceOnly) {
       // pass if captureagent should capture
       createConsumers(this.captureDevice, properties);
-      createRTCPVideoSinkConsumer(captureDevice, properties);
+      createRTPSinkConsumer(captureDevice, properties);
     }
     
     createMontoringConsumer(this.captureDevice, properties);
@@ -235,7 +235,7 @@ public class CaptureDeviceBin {
   }
   
   /**
-   * Creates a RTP Consumer for this Producer that will stream videodata over the network.
+   * Creates an RTP Consumer that will stream audio and/or video-data over the network as RTP and RTCP Stream.
    * 
    * @param captureDevice
    *          The details of the capture device.
@@ -254,26 +254,20 @@ public class CaptureDeviceBin {
    * @throws NoProducerFoundException
    *           Thrown if the captureDevice.getName returns a ConsumerType that unrecognized.
    * **/
-  private void createRTCPVideoSinkConsumer(CaptureDevice captureDevice, Properties properties) 
+  private void createRTPSinkConsumer(CaptureDevice captureDevice, Properties properties)
           throws NoConsumerFoundException, UnableToLinkGStreamerElementsException,
           UnableToCreateGhostPadsForBinException, UnableToSetElementPropertyBecauseElementWasNullException,
           CaptureDeviceNullPointerException, UnableToCreateElementException {
     
-    ConsumerBin consumerBin;
+    ConsumerBin consumerBin = null;
     String prefix = CaptureParameters.CAPTURE_DEVICE_PREFIX + captureDevice.getFriendlyName();
     
-    if (producerBin.isVideoDevice() 
-            && properties.containsKey(prefix + CaptureParameters.CAPTURE_RTP_CONSUMER_RTP_PORT)
-            && properties.containsKey(prefix + CaptureParameters.CAPTURE_RTP_CONSUMER_RTCP_PORT_IN)
-            && properties.containsKey(prefix + CaptureParameters.CAPTURE_RTP_CONSUMER_RTCP_PORT_OUT)) {
-            
-      logger.info("Create an RTP Video Consumer (host: {}, RTP port: {}, RTCP port out: {}, RTCP  port in: {})", new Object[] {
-              properties.getProperty(prefix + CaptureParameters.CAPTURE_RTP_CONSUMER_HOST, "localhost"),
-              properties.getProperty(prefix + CaptureParameters.CAPTURE_RTP_CONSUMER_RTP_PORT),
-              properties.getProperty(prefix + CaptureParameters.CAPTURE_RTP_CONSUMER_RTCP_PORT_OUT),
-              properties.getProperty(prefix + CaptureParameters.CAPTURE_RTP_CONSUMER_RTCP_PORT_IN)});
+    if (properties.containsKey(prefix + CaptureParameters.CAPTURE_RTP_AUDIO_CONSUMER_RTP_PORT)
+            || properties.containsKey(prefix + CaptureParameters.CAPTURE_RTP_VIDEO_CONSUMER_RTP_PORT)) {
+      
+      logger.info("Create a {} RTP consumer!", captureDevice.getFriendlyName());
               
-      consumerBin = ConsumerFactory.getInstance().getSink(ConsumerType.RTCP_VIDEO_SINK, captureDevice, properties);
+      consumerBin = ConsumerFactory.getInstance().getSink(ConsumerType.RTP_SINK, captureDevice, properties);
       consumerBins.add(consumerBin);
     }
   }

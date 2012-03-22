@@ -267,35 +267,41 @@ public interface CaptureParameters {
    * tries to start a second capture while the first is still in progress.
    */
   String CAPTURE_SCHEDULE_INTEREVENT_BUFFERTIME = "capture.schedule.event.buffertime";
-    
+     
   /**
    * Host, where to send the RTP stream (default: 127.0.0.1).
    */
   String CAPTURE_RTP_CONSUMER_HOST = ".rtpConsumer.host";
   /**
-   * Port, where to send RTP stream. Schould be set for each device.
+   * Port, where to send audio RTP stream. Schould be set for each device.
    */
-  String CAPTURE_RTP_CONSUMER_RTP_PORT = ".rtpConsumer.rtpPort";
+  String CAPTURE_RTP_AUDIO_CONSUMER_RTP_PORT = ".rtpConsumer.audio.rtpPort";
   /**
-   * Port, where to send RTCP Messages. Schould be set for each device.
-   */
-  String CAPTURE_RTP_CONSUMER_RTCP_PORT_OUT = ".rtpConsumer.rtcpPort.out";
-  /**
-   * Port, where to listen for RTCP Messages. Schould be set for each device.
-   */
-  String CAPTURE_RTP_CONSUMER_RTCP_PORT_IN = ".rtpConsumer.rtcpPort.in";
-  /**
-   * Encoder property can be used to choose a different encoder (default: x264enc) 
+   * Encoder property can be used to choose a different audio encoder (default: faac) 
    * or set encoder-properties (by adding .propertyName=value).
    */
-  String CAPTURE_RTP_CONSUMER_ENCODER = ".rtpConsumer.encoder";
+  String CAPTURE_RTP_AUDIO_CONSUMER_ENCODER = ".rtpConsumer.audio.encoder";
   /**
-   * payloader propery can be used to choose a different payloader (default: rtph264pay)
+   * payloader propery can be used to choose a different audio payloader (default: rtph264pay)
    * or set payloader-properties (by adding .propertyName=value).
    */
-  String CAPTURE_RTP_CONSUMER_PAYLOADER = ".rtpConsumer.payloader";
+  String CAPTURE_RTP_AUDIO_CONSUMER_PAYLOADER = ".rtpConsumer.audio.payloader";
+  /**
+   * Port, where to send video RTP stream. Schould be set for each device.
+   */
+  String CAPTURE_RTP_VIDEO_CONSUMER_RTP_PORT = ".rtpConsumer.video.rtpPort";
+  /**
+   * Encoder property can be used to choose a different video encoder (default: x264enc) 
+   * or set encoder-properties (by adding .propertyName=value).
+   */
+  String CAPTURE_RTP_VIDEO_CONSUMER_ENCODER = ".rtpConsumer.video.encoder";
+  /**
+   * payloader propery can be used to choose a different video payloader (default: rtph264pay)
+   * or set payloader-properties (by adding .propertyName=value).
+   */
+  String CAPTURE_RTP_VIDEO_CONSUMER_PAYLOADER = ".rtpConsumer.video.payloader";
   /**
    * The framerate in frames per second to force on the RTP video stream.
    */
-  String CAPTURE_RTP_CONSUMER_FRAMERATE = ".rtpConsumer.framerate";
+  String CAPTURE_RTP_VIDEO_CONSUMER_FRAMERATE = ".rtpConsumer.video.framerate";
 }

@@ -47,6 +47,7 @@ public interface GStreamerProperties {
   String QUANTIZER = "quantizer";
 
   /** Caps Properties **/
+  String AUDIO_X_RAW_INT = "audio/x-raw-int";
   String VIDEO_X_RAW_YUV = "video/x-raw-yuv";
   String FRAMERATE = "framerate";
   String CAPS = "caps";

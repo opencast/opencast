@@ -41,6 +41,7 @@ public interface GStreamerElements {
   String XVIMAGESINK = "xvimagesink";
 
   /** Source Module: gst-plugins-good **/
+  String DEINTERLACE = "deinterlace";
   String DV1394SRC = "dv1394src";
   String DVDEC = "dvdec";
   String DVDEMUX = "dvdemux";
@@ -49,6 +50,10 @@ public interface GStreamerElements {
   String PULSESRC = "pulsesrc";
   String RTPBIN = "gstrtpbin";
   String RTPH264PAY = "rtph264pay";
+  String RTPMP4APAY = "rtpmp4apay";
+  String RTPMP4GPAY = "rtpmp4gpay";
+  String RTPMPAPAY = "rtpmpapay";
+  String RTPMPVPAY = "rtpmpvpay";
   String UDPSINK = "udpsink";
   String UDPSRC = "udpsrc";
   String V4L2SRC = "v4l2src";
@@ -57,6 +62,7 @@ public interface GStreamerElements {
   String FAAC = "faac";
   String INPUT_SELECTOR = "input-selector";
   String MP4MUX = "mp4mux";
+  String MPEG2ENC = "mpeg2enc";
   String MPEGPSDEMUX = "mpegpsdemux";
   String MPEGPSMUX = "mpegpsmux";
   String MPEGVIDEOPARSE = "mpegvideoparse";
@@ -67,6 +73,7 @@ public interface GStreamerElements {
   String X264ENC = "x264enc";
 
   /** Source Module: gst-ffmpeg **/
+  String FFDEINTERLACE = "ffdeinterlace";
   String FFENC_MPEG2VIDEO = "ffenc_mpeg2video";
   String FFVIDEOSCALE = "ffvideoscale";
 }
