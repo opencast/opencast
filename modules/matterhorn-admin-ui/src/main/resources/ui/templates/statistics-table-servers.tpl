@@ -1,6 +1,7 @@
 <div>
   <% $.each(data[j].serversView, function(key, server) { %>
   <h2><img src=<% if (server.online) { %><% if (server.maintenance) { %>"/admin/img/icons/maintenance.png" title="Maintenance Mode"<% } else { %>"/admin/img/icons/available.png" title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/> <%= server.host %></h2>
+  <input class="server-maintenance" value="<%= server.online %>" name="<%= server.host %>" type="checkbox" <% if (server.maintenance) { %> checked="checked" <% } %>> Maintenance</input>
   <table id="statsTable" class="ui-widget" cellspacing="0" width="100%">
     <thead>
       <tr>

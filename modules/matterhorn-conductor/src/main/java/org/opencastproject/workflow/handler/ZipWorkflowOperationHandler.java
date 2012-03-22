@@ -88,7 +88,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   protected File tempStorageDir = null;
 
   /** The configuration properties */
-  protected SortedMap<String, String> configurationOptions = null;
+  protected SortedMap<String, String> configurationOptions = null; 
 
   /**
    * The workspace to use in retrieving and storing files.

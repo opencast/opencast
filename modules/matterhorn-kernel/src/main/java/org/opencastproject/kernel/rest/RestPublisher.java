@@ -367,6 +367,7 @@ public class RestPublisher implements RestConstants {
 
         // We use the newly added bundle's context to register this service, so when that bundle shuts down, it brings
         // down this servlet with it
+        logger.debug("Registering servlet with alias {}", alias);
         bundle.getBundleContext().registerService(Servlet.class.getName(), servlet, props);
       }
 

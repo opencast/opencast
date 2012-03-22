@@ -65,6 +65,13 @@ public interface WorkflowOperationDefinition extends Configurable {
   String getSkipCondition();
 
   /**
+   * Return the retry strategy
+   * 
+   * @return the retry strategy
+   */
+  RetryStrategy getRetryStrategy();
+
+  /**
    * Returns the number of attempts the workflow service will make to execute this operation.
    * 
    * @return the maximum number of retries before failing

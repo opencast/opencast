@@ -58,6 +58,7 @@ public class JaxbJobContext implements JobContext {
   public JaxbJobContext(JobContext jobContext) {
     this.id = jobContext.getId();
     this.properties = new HashMap<String, String>();
+    // TODO NULL CHECK
     if (jobContext.getProperties() != null) {
       this.properties.putAll(jobContext.getProperties());
     }

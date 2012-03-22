@@ -15,46 +15,82 @@
  */
 package org.opencastproject.distribution.youtube;
 
-import org.opencastproject.deliver.schedule.Schedule;
-import org.opencastproject.deliver.schedule.Task;
-import org.opencastproject.deliver.store.InvalidKeyException;
-import org.opencastproject.deliver.youtube.YouTubeConfiguration;
-import org.opencastproject.deliver.youtube.YouTubeDeliveryAction;
-import org.opencastproject.deliver.youtube.YouTubeRemoveAction;
+import static org.opencastproject.mediapackage.MediaPackageElements.YOUTUBE;
+import static org.opencastproject.mediapackage.Track.TYPE;
+
+import org.opencastproject.deliver.youtube.YoutubeConfiguration;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.Track;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.util.NotFoundException;
+import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.gdata.client.media.MediaService;
+import com.google.gdata.client.youtube.YouTubeService;
+import com.google.gdata.data.PlainTextConstruct;
+import com.google.gdata.data.media.MediaFileSource;
+import com.google.gdata.data.media.mediarss.MediaCategory;
+import com.google.gdata.data.media.mediarss.MediaDescription;
+import com.google.gdata.data.media.mediarss.MediaKeywords;
+import com.google.gdata.data.media.mediarss.MediaTitle;
+import com.google.gdata.data.youtube.PlaylistEntry;
+import com.google.gdata.data.youtube.PlaylistLinkEntry;
+import com.google.gdata.data.youtube.PlaylistLinkFeed;
+import com.google.gdata.data.youtube.VideoEntry;
+import com.google.gdata.data.youtube.VideoFeed;
+import com.google.gdata.data.youtube.YouTubeMediaGroup;
+import com.google.gdata.data.youtube.YouTubeNamespace;
+import com.google.gdata.data.youtube.YtPublicationState;
+import com.google.gdata.util.ServiceException;
+
 import org.apache.commons.lang.StringUtils;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Distributes media to a Youtube play list.
  */
-public class YoutubeDistributionService extends AbstractJobProducer implements DistributionService {
+public class YoutubeDistributionService extends AbstractJobProducer implements DistributionService, ManagedService {
 
   /** Receipt type */
   public static final String JOB_TYPE = "org.opencastproject.distribution.youtube";
+
+  /** Time to wait between polling for status (milliseconds.) */
+  private static final long POLL_MILLISECONDS = 30L * 1000L;
+
+  /** Base URL of playlists FIXME: Should be read in from properties file */
+  private static final String PLAYLIST_URL = "http://gdata.youtube.com/feeds/api/users/{username}/playlists";
+
+  /** Base URL of video entries FIXME: Should be read in from properties file */
+  private static final String VIDEO_ENTRY_URL = "http://uploads.gdata.youtube.com/feeds/api/users/default/uploads";
+
+  /** Base URL of feed entries */
+  private static final String VIDEO_FEED_URL = "http://gdata.youtube.com/feeds/api/users/{username}/uploads";
 
   /** logger instance */
   private static final Logger logger = LoggerFactory.getLogger(YoutubeDistributionService.class);
@@ -67,35 +103,32 @@ public class YoutubeDistributionService extends AbstractJobProducer implements D
   /** workspace instance */
   protected Workspace workspace = null;
 
+  /** workflow service instance */
+  protected WorkflowService workflowService = null;
+
   /** The remote service registry */
   protected ServiceRegistry serviceRegistry = null;
 
   /** Youtube configuration instance */
-  private static YouTubeConfiguration config = null;
+  protected static YoutubeConfiguration config = null;
 
-  /** playlist ID */
-  private static String destination = null;
+  /** The organization directoary service */
+  private OrganizationDirectoryService organizationDirectoryService;
 
-  /** URL for uploading */
-  private static final String uploadURL = "http://uploads.gdata.youtube.com/feeds/api/users/default/uploads";
+  /** The user directory service */
+  private UserDirectoryService userDirectoryService;
 
-  /** category of the video - default to "Education" */
-  private static final String category = "Education";
+  /** The security service */
+  private SecurityService securityService;
 
-  /** prefix of the URL generated by gdata API */
-  private static final String gdataURLPrefix = "http://gdata.youtube.com/feeds/api/users/utubedelivery/uploads/";
+  /**
+   * The default playlist to distribute to, in case there is not enough information in the mediapackage to find a
+   * playlist
+   */
+  private String defaultPlaylist;
 
-  /** prefix of the Youtube URL */
-  private static final String youtubeURLPrefix = "http://www.youtube.com/watch?v=";
-
-  /** only one scheduler instance for this service */
-  private static Schedule schedule = null;
-
-  /** context strategy for the distribution service */
-  YoutubeDistributionContextStrategy contextStrategy = null;
-
-  /** The executor service used to queue and run jobs */
-  private ExecutorService executor = null;
+  /** chunk youtube upload */
+  private boolean isDefaultChunked = true;
 
   /**
    * Creates a new instance of the youtube distribution service.
@@ -107,95 +140,96 @@ public class YoutubeDistributionService extends AbstractJobProducer implements D
   /**
    * Called when service activates. Defined in OSGi resource file.
    */
-  public void activate(ComponentContext cc) {
-    String username = cc.getBundleContext().getProperty("youtube.username"); // "utubedelivery"
-    String password = cc.getBundleContext().getProperty("youtube.password"); // "utubedelivery"
-    String clientid = cc.getBundleContext().getProperty("youtube.clientid"); // "abcde"
-    String developerkey = cc.getBundleContext().getProperty("youtube.developerkey");
-    // "AI39si7bx2AbnOM6RM8J7mdrljfZCzisYzDkqvIqEjV3zjbqQIr6-u_bg3R0MLAVVXLqKjSsxu4ReytWFn7ylIlDk6OC7pdXpQ"
-
-    config = YouTubeConfiguration.getInstance();
-    // client ID may not be necessary
-    config.setClientId(clientid);
-    config.setDeveloperKey(developerkey);
-    config.setUploadUrl(uploadURL);
-    config.setUserId(username);
-    config.setPassword(password);
-    config.setCategory(category);
-
-    // create context strategy
-    contextStrategy = new YoutubeDistributionContextStrategy();
-    // default destination
-    destination = cc.getBundleContext().getProperty("youtube.playlist"); // "B8B47104C2C1663B"
-
-    // create the scheduler using file system store
-    String directory_name = cc.getBundleContext().getProperty("youtube.task");
-    if (directory_name == null || directory_name.equals("")) {
-      directory_name = "/tmp/youtube";
-    }
-    logger.info("Task file directory: {}", directory_name);
-    File data_directory = new File(directory_name);
-    data_directory.mkdirs();
-    try {
-      schedule = new Schedule(data_directory);
-    } catch (InvalidKeyException e) {
-      throw new IllegalStateException(e);
-    }
-
-    int threads = 1;
-    String threadsConfig = StringUtils.trimToNull(cc.getBundleContext().getProperty(
-            "org.opencastproject.distribution.youtube.threads"));
-    if (threadsConfig != null) {
-      try {
-        threads = Integer.parseInt(threadsConfig);
-      } catch (NumberFormatException e) {
-        logger.warn("Youtube distribution threads configuration is malformed: '{}'", threadsConfig);
-      }
-    }
-    executor = Executors.newFixedThreadPool(threads);
-  }
-
-  /**
-   * Called when service deactivates. Defined in OSGi resource file.
-   */
-  public void deactivate() {
-    // shutdown the scheduler
-    schedule.shutdown();
-    executor.shutdown();
-  }
-
-  /**
-   * Gets task name given the media package ID and the track ID.
-   * 
-   * @param mediaPackge
-   *          ID of the package
-   * @param track
-   *          ID of the track
-   * @return task identifier
-   */
-  private String getTaskID(String mediaPackage, String track) {
-    // use "YOUTUBE" + media package identifier + track identifier as task identifier
-    return "YOUTUBE-" + mediaPackage.replaceAll("\\.", "-") + "-" + track;
+  public synchronized void activate(ComponentContext cc) {
+    config = YoutubeConfiguration.getInstance();
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.distribution.api.DistributionService#distribute(java.lang.String,
-   *      org.opencastproject.mediapackage.MediaPackageElement)
+   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @Override
-  public Job distribute(String mediaPackageId, MediaPackageElement element) throws DistributionException,
+  public synchronized void updated(Dictionary properties) throws ConfigurationException {
+    logger.info("Update method from managed service");
+
+    String username = StringUtils.trimToNull((String) properties
+            .get("org.opencastproject.distribution.youtube.username"));
+    String password = StringUtils.trimToNull((String) properties
+            .get("org.opencastproject.distribution.youtube.password"));
+    String clientid = StringUtils.trimToNull((String) properties
+            .get("org.opencastproject.distribution.youtube.clientid"));
+    String developerkey = StringUtils.trimToNull((String) properties
+            .get("org.opencastproject.distribution.youtube.developerkey"));
+    String category = StringUtils.trimToNull((String) properties
+            .get("org.opencastproject.distribution.youtube.category"));
+    String keywords = StringUtils.trimToNull((String) properties
+            .get("org.opencastproject.distribution.youtube.keywords"));
+
+    String privacy = StringUtils
+            .trimToNull((String) properties.get("org.opencastproject.distribution.youtube.private"));
+
+    String isChunked = StringUtils.trimToNull((String) properties
+            .get("org.opencastproject.distribution.youtube.chunked"));
+
+    defaultPlaylist = StringUtils.trimToNull((String) properties
+            .get("org.opencastproject.distribution.youtube.default.playlist"));
+
+    // Setup configuration from properties
+    if (StringUtils.isBlank(clientid))
+      throw new IllegalArgumentException("Youtube clientid must be specified");
+    if (StringUtils.isBlank(developerkey))
+      throw new IllegalArgumentException("Youtube developerkey must be specified");
+    if (StringUtils.isBlank(username))
+      throw new IllegalArgumentException("Youtube username must be specified");
+    if (StringUtils.isBlank(password))
+      throw new IllegalArgumentException("Youtube password must be specified");
+    if (StringUtils.isBlank(category))
+      throw new IllegalArgumentException("Youtube category must be specified");
+    if (StringUtils.isBlank(keywords))
+      throw new IllegalArgumentException("Youtube keywords must be specified");
+    if (StringUtils.isBlank(privacy))
+      throw new IllegalArgumentException("Youtube privacy must be specified");
+
+    String uploadUrl = VIDEO_ENTRY_URL.replaceAll("\\{username\\}", username);
+
+    config.setClientId(clientid);
+    config.setDeveloperKey(developerkey);
+    config.setUserId(username);
+    config.setUploadUrl(uploadUrl);
+    config.setPassword(password);
+    config.setKeywords(keywords);
+    config.setCategory(category);
+    config.setVideoPrivate(Boolean.getBoolean(privacy));
+
+    if (StringUtils.isNotBlank(isChunked))
+      isDefaultChunked = Boolean.getBoolean(isChunked);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.distribution.api.DistributionService#distribute(MediaPackage, String)
+   */
+  @Override
+  public Job distribute(MediaPackage mediapackage, String elementId) throws DistributionException,
           MediaPackageException {
 
-    if (mediaPackageId == null)
-      throw new MediaPackageException("Mediapackage ID must be specified");
+    if (mediapackage == null)
+      throw new MediaPackageException("Mediapackage must be specified");
+    if (elementId == null)
+      throw new MediaPackageException("Element ID must be specified");
+    MediaPackageElement element = mediapackage.getElementById(elementId);
     if (element == null)
-      throw new MediaPackageException("Mediapackage element must be specified");
+      throw new IllegalStateException("Mediapackage does not contain element " + elementId);
+    if (!Track.TYPE.equals(element.getElementType())) {
+      logger.info("Ignoring media package element {}", element);
+      return null;
+    }
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Distribute.toString(),
-              Arrays.asList(mediaPackageId, MediaPackageElementParser.getAsXml(element)));
+              Arrays.asList(MediaPackageParser.getAsXml(mediapackage), elementId));
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -217,112 +251,168 @@ public class YoutubeDistributionService extends AbstractJobProducer implements D
    * @throws MediaPackageException
    *           if the mediapackage is in an inconsistent state
    */
-  private MediaPackageElement distribute(Job job, String mediaPackageId, MediaPackageElement element)
-          throws DistributionException, MediaPackageException {
+  private MediaPackageElement distribute(Job job, String mediaPackageId, MediaPackage mediaPackage)
+          throws DistributionException {
 
     if (mediaPackageId == null)
       throw new IllegalArgumentException("Mediapackage ID must be specified");
+    if (mediaPackage == null)
+      throw new IllegalArgumentException("Mediapackage must be specified");
+    MediaPackageElement element = mediaPackage.getElementById(mediaPackageId);
     if (element == null)
       throw new IllegalArgumentException("Mediapackage element must be specified");
     if (element.getIdentifier() == null)
       throw new IllegalArgumentException("Mediapackage element must have an identifier");
+    if (element.getMimeType().toString().matches("text/xml"))
+      throw new IllegalArgumentException("Mediapackage element cannot be XML");
 
     try {
-      File sourceFile;
-      try {
-        sourceFile = workspace.get(element.getURI());
-      } catch (NotFoundException e) {
-        throw new DistributionException("Unable to find " + element.getURI() + " in the workspace", e);
-      } catch (IOException e) {
-        throw new DistributionException("Error loading " + element.getURI() + " from the workspace", e);
+      // create context strategy for distribution
+      // MediaPackage mp = getMediaPackageFromId(mediaPackageId);
+      YoutubeDistributionContextStrategy contextStrategy = new YoutubeDistributionContextStrategy(mediaPackage,
+              workspace);
+
+      // Initialise the YT service for distribution of the mediapackage element
+      YouTubeService ytService = new YouTubeService(config.getClientId(), config.getDeveloperKey());
+
+      logger.debug("set youtube user credentails and authenticate");
+      ytService.setUserCredentials(config.getUserId(), config.getPassword());
+      if (!isDefaultChunked)
+        ytService.setChunkedMediaUpload(MediaService.NO_CHUNKED_MEDIA_REQUEST);
+
+      // generate the VideoEntry to upload
+      VideoEntry newEntry = new VideoEntry();
+      YouTubeMediaGroup mg = newEntry.getOrCreateMediaGroup();
+      mg.setTitle(new MediaTitle());
+      String episodeName = contextStrategy.getEpisodeName(mediaPackageId);
+      if (episodeName == null) {
+        episodeName = "unknown";
       }
+      logger.debug("youtube episode name '{}' for media package element {}", episodeName, mediaPackageId);
+      mg.getTitle().setPlainTextContent(episodeName);
+      mg.addCategory(new MediaCategory(YouTubeNamespace.CATEGORY_SCHEME, config.getCategory()));
+      mg.setKeywords(new MediaKeywords());
+      String[] keywords = contextStrategy.getEpisodeKeywords(mediaPackageId);
+      logger.debug("youtube keywords '{}' for media element {}", Arrays.toString(keywords), mediaPackageId);
+      Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
 
-      // get task name
-      String name = getTaskID(mediaPackageId, element.getIdentifier());
-
-      // check if the file has already been delivered
-      Task savedTask;
-      try {
-        savedTask = schedule.getSavedTask(name);
-      } catch (InvalidKeyException e) {
-        throw new DistributionException(e);
-      }
-
-      if (savedTask != null && savedTask.getState() == Task.State.COMPLETE) {
-        // has been successfully delivered
-        // remove the media
-        remove(name);
-      }
-
-      YouTubeDeliveryAction act = new YouTubeDeliveryAction();
-      act.setName(name);
-      act.setTitle(sourceFile.getName());
-      // CHNAGE ME: set metadata elements here
-      act.setTags(new String[] { "whatever" });
-      act.setAbstract("Opencast Distribution Service - Youtube");
-      act.setMediaPath(sourceFile.getAbsolutePath());
-
-      // get playlist ID from context strategy
-      String contextDestination = contextStrategy.getContextName(mediaPackageId);
-      if (contextDestination != null) {
-        // use the destination from context strategy
-        destination = contextDestination;
-      }
-
-      // deliver to a play list
-      act.setDestination(destination); // FIXME: replace this with a playlist based on the episode's series
-
-      logger.info("Delivering from {}", sourceFile.getAbsolutePath());
-
-      // start the scheduler
-      try {
-        schedule.start(act);
-      } catch (InvalidKeyException e) {
-        throw new DistributionException(e);
-      }
-
-      MediaPackageElement distributedElement = null;
-
-      while (true) {
-        Task task;
-        try {
-          task = schedule.getTask(name);
-        } catch (InvalidKeyException e) {
-          throw new DistributionException(e);
-        }
-
-        synchronized (task) {
-          Task.State state = task.getState();
-          if (state == Task.State.INITIAL || state == Task.State.ACTIVE) {
-            try {
-              Thread.sleep(1000L);
-            } catch (Exception e) {
-              throw new RuntimeException(e);
+      if (keywords.length == 0) {
+        mg.getKeywords().addKeyword("none");
+      } else {
+        for (String word : keywords) {
+          List<String> matchList = new ArrayList<String>();
+          Matcher regexMatcher = regex.matcher(word);
+          while (regexMatcher.find()) {
+            if (regexMatcher.group(1) != null) {
+              // Add double-quoted string without the quotes
+              matchList.add(regexMatcher.group(1));
+            } else if (regexMatcher.group(2) != null) {
+              // Add single-quoted string without the quotes
+              matchList.add(regexMatcher.group(2));
+            } else {
+              // Add unquoted word
+              matchList.add(regexMatcher.group());
             }
-            // still running
-            continue;
-          } else if (state == Task.State.COMPLETE) {
-            logger.info("Succeeded delivering from {}", sourceFile.getAbsolutePath());
-            String videoURL = act.getEntryUrl();
-            // convert the entry URL to a user-oriented URL
-            videoURL = videoURL.replace("?client=" + config.getClientId(), "");
-            videoURL = videoURL.replace(gdataURLPrefix, youtubeURLPrefix);
-            URI newTrackUri;
-            try {
-              newTrackUri = new URI(videoURL);
-            } catch (URISyntaxException e) {
-              throw new DistributionException("Distributed element produces an invalid URI", e);
-            }
-            distributedElement = MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-                    .elementFromURI(newTrackUri, element.getElementType(), element.getFlavor());
-            distributedElement.setIdentifier(element.getIdentifier() + "-dist");
-
-            return distributedElement;
-          } else if (state == Task.State.FAILED) {
-            throw new DistributionException("Failed delivering " + sourceFile.getAbsolutePath());
+          }
+          for (String item : matchList) {
+            mg.getKeywords().addKeyword(item);
           }
         }
-      } // end of schedule loop
+      }
+      // Add default keywords
+      for (String item : config.getKeywords().split(", ")) {
+        mg.getKeywords().addKeyword(item);
+      }
+
+      mg.setDescription(new MediaDescription());
+      String episodeDescription = contextStrategy.getEpisodeDescription(mediaPackageId);
+      if (episodeDescription == null) {
+        episodeDescription = "unknown";
+      }
+      logger.debug("youtube episode description '{}' for media package element {}", episodeDescription, mediaPackageId);
+      mg.getDescription().setPlainTextContent(episodeDescription);
+      mg.setPrivate(config.isVideoPrivate());
+
+      // attach raw media file to video entry
+      MediaFileSource ms = new MediaFileSource(workspace.get(element.getURI()), element.getMimeType().toString());
+      newEntry.setMediaSource(ms);
+
+      // begin the upload to YouTube
+      String videoUrl = null;
+      VideoEntry uploadedEntry = null;
+      try {
+        uploadedEntry = ytService.insert(new URL(VIDEO_ENTRY_URL), newEntry);
+        videoUrl = uploadedEntry.getSelfLink().getHref();
+      } catch (ServiceException e) {
+        logger.error("Failed to upload to YouTube: {}", e.getMessage());
+        throw new DistributionException(e);
+      }
+
+      // monitor the publication process before returning
+      while (true) {
+        VideoEntry checkedEntry = ytService.getEntry(new URL(videoUrl), VideoEntry.class);
+
+        // if entry is not a draft it has been successfully delivered
+        if (!checkedEntry.isDraft())
+          break;
+
+        // check the publication status
+        YtPublicationState pubState = checkedEntry.getPublicationState();
+        if (pubState.getState() != YtPublicationState.State.PROCESSING) {
+          logger.error("Video distribution to YouTube failed in state: {}", pubState.getDescription());
+          throw new DistributionException("Video distribution to YouTube failed in state: " + pubState.getDescription());
+        }
+        Thread.sleep(POLL_MILLISECONDS);
+      }
+
+      // insert the video into the proper yt playlist mapped from the context strategy
+      boolean playlistExists = false;
+      PlaylistLinkEntry playlist = null;
+      String playlistName = contextStrategy.getContextName(mediaPackageId);
+      String playlistDescription = contextStrategy.getContextDescription(mediaPackageId);
+
+      if (playlistName == null) {
+        playlistName = defaultPlaylist;
+      }
+      logger.debug("youtube playlist name '{}' for media package element {}", playlistName, mediaPackageId);
+      logger.debug("youtube playlist description '{}' for media package element {}", playlistDescription,
+              mediaPackageId);
+
+      String feedUrl = PLAYLIST_URL.replaceAll("\\{username\\}", config.getUserId());
+
+      while (feedUrl != null) {
+        PlaylistLinkFeed playlistFeed = ytService.getFeed(new URL(feedUrl), PlaylistLinkFeed.class);
+        for (PlaylistLinkEntry entry : playlistFeed.getEntries()) {
+          if (entry.getTitle().getPlainText().matches(playlistName)) {
+            logger.info("Playlist {} exists", playlistName);
+            playlist = entry;
+            playlistExists = true;
+            break;
+          }
+        }
+        if (playlistExists || playlistFeed.getNextLink() == null)
+          break;
+        feedUrl = playlistFeed.getNextLink().getHref();
+      }
+
+      // create playlist if it doesn't exist
+      if (!playlistExists) {
+        logger.info("Creating playlist {}", playlistName);
+        playlist = new PlaylistLinkEntry();
+        playlist.setTitle(new PlainTextConstruct(playlistName));
+        playlist.setSummary(new PlainTextConstruct(playlistDescription));
+
+        playlist = ytService.insert(new URL(feedUrl), playlist);
+      }
+      // add video to the playlist
+      String playlistUrl = playlist.getFeedUrl();
+      VideoEntry videoToAdd = ytService.getEntry(new URL(videoUrl), VideoEntry.class);
+      PlaylistEntry playlistEntry = new PlaylistEntry(videoToAdd);
+      ytService.insert(new URL(playlistUrl), playlistEntry);
+
+      logger.info("Upload succeeded. URL of video: {}", videoUrl);
+      return MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
+              .elementFromURI(new URI(uploadedEntry.getMediaGroup().getPlayer().getUrl()), TYPE, YOUTUBE);
 
     } catch (Exception e) {
       logger.warn("Error distributing " + element, e);
@@ -337,16 +427,20 @@ public class YoutubeDistributionService extends AbstractJobProducer implements D
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.distribution.api.DistributionService#retract(java.lang.String)
+   * @see org.opencastproject.distribution.api.DistributionService#retract(org.opencastproject.mediapackage.MediaPackage,
+   *      java.lang.String)
    */
-  @Override
-  public Job retract(String mediaPackageId) throws DistributionException {
-
-    if (mediaPackageId == null)
-      throw new IllegalArgumentException("Mediapackage ID must be specified");
+  public Job retract(MediaPackage mediaPackage, String elementId) throws DistributionException {
+    if (mediaPackage == null)
+      throw new IllegalArgumentException("Mediapackage must be specified");
+    if (elementId == null)
+      throw new IllegalArgumentException("Element ID must be specified");
 
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(), Arrays.asList(mediaPackageId));
+      List<String> arguments = new ArrayList<String>();
+      arguments.add(MediaPackageParser.getAsXml(mediaPackage));
+      arguments.add(elementId);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(), arguments);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -362,54 +456,33 @@ public class YoutubeDistributionService extends AbstractJobProducer implements D
    * @throws DistributionException
    *           if retract did not work
    */
-  private void retract(Job job, String mediapackageId) throws DistributionException {
-    throw new DistributionException("Retract from YouTube has not been implemented");
-  }
-
-  /**
-   * Removes the media delivered by the given task.
-   * 
-   * @param name
-   *          task identifier
-   */
-  private void remove(String name) throws DistributionException {
-    logger.info("Publish task: {}", name);
-
-    YouTubeRemoveAction ract = new YouTubeRemoveAction();
-    ract.setName(name + "_r");
-    ract.setPublishTask(name);
+  private void retract(Job job, String mediaPackageId, MediaPackage mediaPackage) throws DistributionException {
+    logger.info("Trying to remove media from package: {}", mediaPackageId);
     try {
-      schedule.start(ract);
-    } catch (InvalidKeyException e) {
+      // Initialise the YT service for distribution of the mediapackage element
+      YouTubeService ytService = new YouTubeService(config.getClientId(), config.getDeveloperKey());
+      ytService.setUserCredentials(config.getUserId(), config.getPassword());
+      // create context strategy for distribution
+      YoutubeDistributionContextStrategy contextStrategy = new YoutubeDistributionContextStrategy(mediaPackage,
+              workspace);
+      String episodeName = contextStrategy.getEpisodeName(mediaPackageId);
+      if (episodeName == null) {
+        logger.error("Unable to retract a recording with no episode name");
+      } else {
+        VideoFeed videoFeed = ytService.getFeed(
+                new URL(VIDEO_FEED_URL.replaceAll("\\{username\\}", config.getUserId())), VideoFeed.class);
+        for (VideoEntry videoEntry : videoFeed.getEntries()) {
+          logger.info("Video title: {}", videoEntry.getTitle().getPlainText());
+          if (videoEntry.getTitle().getPlainText().matches(episodeName)) {
+            logger.info("Removing video with id: {}", videoEntry.getId());
+            videoEntry.delete();
+          }
+        }
+      }
+    } catch (Exception e) {
+      logger.error("Failure retracting YouTube media", e);
       throw new DistributionException(e);
     }
-
-    while (true) {
-      Task rTask;
-      try {
-        rTask = schedule.getTask(name + "_r");
-      } catch (InvalidKeyException e) {
-        throw new DistributionException(e);
-      }
-      synchronized (rTask) {
-        Task.State state = rTask.getState();
-        if (state == Task.State.INITIAL || state == Task.State.ACTIVE) {
-          try {
-            Thread.sleep(1000L);
-          } catch (Exception e) {
-            throw new RuntimeException(e);
-          }
-          // still running
-          continue;
-        } else if (state == Task.State.COMPLETE) {
-          logger.info("Succeeded retracting media");
-          break;
-        } else if (state == Task.State.FAILED) {
-          // fail to remove
-          throw new DistributionException("Failed to remove media");
-        }
-      } // end of synchronized
-    } // end of schedule loop
   }
 
   /**
@@ -423,14 +496,14 @@ public class YoutubeDistributionService extends AbstractJobProducer implements D
     try {
       op = Operation.valueOf(job.getOperation());
       List<String> arguments = job.getArguments();
-      String mediapackageId = arguments.get(0);
+      MediaPackage mediapackage = MediaPackageParser.getFromXml(arguments.get(0));
+      String elementId = arguments.get(1);
       switch (op) {
         case Distribute:
-          MediaPackageElement sourceElement = MediaPackageElementParser.getFromXml(arguments.get(1));
-          MediaPackageElement distributedElement = distribute(job, mediapackageId, sourceElement);
-          return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
+          MediaPackageElement distributedElement = distribute(job, elementId, mediapackage);
+          return (distributedElement == null) ? null : MediaPackageElementParser.getAsXml(distributedElement);
         case Retract:
-          retract(job, mediapackageId);
+          retract(job, elementId, mediapackage);
           return null;
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + job.getOperation() + "'");
@@ -442,6 +515,16 @@ public class YoutubeDistributionService extends AbstractJobProducer implements D
     } catch (Exception e) {
       throw new ServiceRegistryException("Error handling operation '" + op + "'");
     }
+  }
+
+  /**
+   * Callback for the OSGi environment to set the workflow service
+   * 
+   * @param service
+   *          instance of the workflow service
+   */
+  protected void setWorkflowService(WorkflowService service) {
+    this.workflowService = service;
   }
 
   /**
@@ -463,14 +546,75 @@ public class YoutubeDistributionService extends AbstractJobProducer implements D
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
-  
+
   /**
    * {@inheritDoc}
+   * 
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
   protected ServiceRegistry getServiceRegistry() {
     return serviceRegistry;
+  }
+
+  /**
+   * Callback for setting the security service.
+   * 
+   * @param securityService
+   *          the securityService to set
+   */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
+  /**
+   * Callback for setting the user directory service.
+   * 
+   * @param userDirectoryService
+   *          the userDirectoryService to set
+   */
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    this.userDirectoryService = userDirectoryService;
+  }
+
+  /**
+   * Sets a reference to the organization directory service.
+   * 
+   * @param organizationDirectory
+   *          the organization directory
+   */
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
+    this.organizationDirectoryService = organizationDirectory;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
+   */
+  @Override
+  protected SecurityService getSecurityService() {
+    return securityService;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
+   */
+  @Override
+  protected UserDirectoryService getUserDirectoryService() {
+    return userDirectoryService;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
+   */
+  @Override
+  protected OrganizationDirectoryService getOrganizationDirectoryService() {
+    return organizationDirectoryService;
   }
 
 }

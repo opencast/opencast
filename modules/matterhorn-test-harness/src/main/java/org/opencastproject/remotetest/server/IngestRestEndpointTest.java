@@ -27,6 +27,9 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.junit.After;
@@ -38,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,21 +87,38 @@ public class IngestRestEndpointTest {
     mp = postCall("/ingest/ingest", null, null, mp);
   }
 
+  @Test
+  public void testUploadClient() throws Exception {
+    InputStream is = getClass().getResourceAsStream("/mp-test.zip");
+    InputStreamBody fileContent = new InputStreamBody(is, "mp-test.zip");
+
+    // create emptiy MediaPackage
+    HttpPost postStart = new HttpPost(BASE_URL + "/ingest/addZippedMediaPackage");
+
+    MultipartEntity mpEntity = new MultipartEntity();
+    mpEntity.addPart("workflowDefinitionId", new StringBody("full"));
+    mpEntity.addPart("userfile", fileContent);
+    postStart.setEntity(mpEntity);
+
+    HttpResponse response = client.execute(postStart);
+    Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+  }
+
   protected String postCall(String method, String mediaFile, String flavor, String mediaPackage)
           throws ClientProtocolException, IOException {
     HttpPost post = new HttpPost(BASE_URL + method);
     List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-    if(mediaFile != null) {
+    if (mediaFile != null) {
       URL url = getClass().getClassLoader().getResource(mediaFile);
       formParams.add(new BasicNameValuePair("url", url.toString()));
     }
-    if(flavor != null) {
+    if (flavor != null) {
       formParams.add(new BasicNameValuePair("flavor", flavor));
     }
     formParams.add(new BasicNameValuePair("mediaPackage", mediaPackage));
     post.setEntity(new UrlEncodedFormEntity(formParams, "UTF-8"));
     HttpResponse response = client.execute(post);
-    
+
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
     return EntityUtils.toString(response.getEntity());
   }

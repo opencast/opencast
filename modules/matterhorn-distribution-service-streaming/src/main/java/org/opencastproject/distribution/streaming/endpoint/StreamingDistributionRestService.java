@@ -123,7 +123,7 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       job = service.retract(mediapackage, elementId);
     } catch (Exception e) {
-      logger.warn("Unable to retract mediapackage '{}' from download channel: {}", new Object[] { mediaPackageXml, e });
+      logger.warn("Unable to retract mediapackage '{}' from streaming channel: {}", new Object[] { mediaPackageXml, e });
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
     return Response.ok(new JaxbJob(job)).build();

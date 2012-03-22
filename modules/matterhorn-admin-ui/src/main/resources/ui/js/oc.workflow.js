@@ -35,7 +35,7 @@ ocWorkflow.loadDefinitions = function(selector, container) {
         if (data.workflow_definitions[i].id != 'error') {
           var option = document.createElement("option");
           option.setAttribute("value", data.workflow_definitions[i].id);
-          option.innerHTML = data.workflow_definitions[i].title;
+          option.innerHTML = data.workflow_definitions[i].title || data.workflow_definitions[i].id;
           if (data.workflow_definitions[i].id == "full") {
             option.setAttribute("selected", "true");
           }

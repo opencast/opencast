@@ -1,0 +1,20 @@
+<definition>
+
+  <id>none_integrationtest</id>
+  <title>Test none retry strategy</title>
+  <description>
+    A simple workflow that test the none retry strategy.
+  </description>
+  <operations>
+  
+    <!-- Failing operation with none as retry strategy -->
+    <operation
+      id="inspect"
+      retry-strategy="none"
+      fail-on-error="true"
+      description="Inspecting the media package">
+    </operation>
+    
+  </operations>
+
+</definition>

@@ -50,6 +50,7 @@
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-lti</module>
         <module>modules/matterhorn-mediapackage-manipulator</module>
+        <module>modules/matterhorn-mediapackage-ui</module> fy
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-metadata</module>
         <module>modules/matterhorn-mpeg7</module>
@@ -82,6 +83,7 @@
         <module>modules/matterhorn-ingest-service-impl</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
+        <module>modules/matterhorn-mediapackage-ui</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
@@ -106,8 +108,7 @@
         <module>modules/matterhorn-distribution-service-api</module>
         <module>modules/matterhorn-distribution-service-download</module>
         <module>modules/matterhorn-distribution-service-streaming</module>
-        <!-- <module>modules/matterhorn-distribution-service-common</module> <module>modules/matterhorn-distribution-service-itunesu</module> 
-          <module>modules/matterhorn-distribution-service-youtube</module> -->
+        <module>modules/matterhorn-distribution-service-youtube</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
@@ -132,7 +133,7 @@
         <module>modules/matterhorn-distribution-service-api</module>
         <module>modules/matterhorn-distribution-service-download-remote</module>
         <module>modules/matterhorn-distribution-service-streaming-remote</module>
-        <!-- <module>modules/matterhorn-distribution-service-itunesu-remote</module> <module>modules/matterhorn-distribution-service-youtube-remote</module> -->
+        <module>modules/matterhorn-distribution-service-youtube-remote</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
@@ -188,7 +189,7 @@
         <module>modules/matterhorn-distribution-service-api</module>
         <module>modules/matterhorn-distribution-service-download-remote</module>
         <module>modules/matterhorn-distribution-service-streaming-remote</module>
-        <!-- <module>modules/matterhorn-distribution-service-itunesu-remote</module> <module>modules/matterhorn-distribution-service-youtube-remote</module> -->
+        <module>modules/matterhorn-distribution-service-youtube-remote</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
@@ -231,7 +232,9 @@
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
         <module>modules/matterhorn-textextractor-tesseract</module>
-        <!-- <module>modules/matterhorn-textextractor-ocropus</module> -->
+        <!--
+        <module>modules/matterhorn-textextractor-ocropus</module>
+        -->
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-impl</module>
         <module>modules/matterhorn-webconsole</module>

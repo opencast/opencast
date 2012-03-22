@@ -179,6 +179,24 @@ public abstract class Option<A> implements Iterable<A> {
     B none();
   }
 
+  public abstract static class EffectMatch<A> implements Match<A, Void> {
+    @Override
+    public final Void some(A a) {
+      someE(a);
+      return null;
+    }
+
+    @Override
+    public final Void none() {
+      noneE();
+      return null;
+    }
+    
+    public abstract void someE(A a);
+
+    public abstract void noneE();
+  }
+
   /**
    * Safe decomposition of the option type.
    */

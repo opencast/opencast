@@ -24,6 +24,7 @@ import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * The episode service is Matterhorn's media package archive. It also supports batch reprocessing
@@ -103,6 +104,23 @@ public interface EpisodeService {
   WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, EpisodeQuery q) throws EpisodeServiceException, UnauthorizedException;
 
   /**
+   * Process all media packages found by query <code>q</code> with workflow <code>workflowDefinition</code> and
+   * workflow properties <code>properties</code>.
+   *
+   * @param workflowDefinition
+   *          the workflow to apply to all found media packages
+   * @param q
+   *          the query
+   * @param properties
+   *          properties to configure the workflow
+   * @return a list of started workflows todo should report about failed workflow starts
+   * @throws EpisodeServiceException
+   * @throws UnauthorizedException
+   */
+  WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, EpisodeQuery q, Map<String, String> properties)
+          throws EpisodeServiceException, UnauthorizedException;
+
+  /**
    * Process all media packages with workflow <code>workflowDefinition</code>.
    *
    * @param mediaPackageIds
@@ -113,10 +131,28 @@ public interface EpisodeService {
    * @throws EpisodeServiceException
    * @throws UnauthorizedException
    */
-  WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, List<String> mediaPackageIds) throws EpisodeServiceException, UnauthorizedException;
+  WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, List<String> mediaPackageIds)
+          throws EpisodeServiceException, UnauthorizedException;
 
   /**
-   * Process all media packages with workflow <code>workflowDefinition</code>.
+   * Process all media packages with workflow <code>workflowDefinition</code> and
+   * workflow properties <code>properties</code>.
+   *
+   * @param mediaPackageIds
+   *          list of media package ids
+   * @param workflowDefinition
+   *          the workflow to apply to all found media packages
+   * @param properties
+   *          properties to configure the workflow
+   * @return a list of started workflows todo should report about failed workflow starts
+   * @throws EpisodeServiceException
+   * @throws UnauthorizedException
+   */
+  WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, List<String> mediaPackageIds, Map<String, String> properties)
+          throws EpisodeServiceException, UnauthorizedException;
+
+  /**
+   * Process all media packages with workflow identified by <code>workflowDefinitionId</code>.
    *
    * @param mediaPackageIds
    *          list of media package ids
@@ -127,6 +163,23 @@ public interface EpisodeService {
    * @throws UnauthorizedException
    */
   WorkflowInstance[] applyWorkflow(String workflowDefinitionId, List<String> mediaPackageIds) throws EpisodeServiceException, UnauthorizedException;
+
+  /**
+   * Process all media packages with workflow identified by <code>workflowDefinitionId</code> and
+   * workflow properties <code>properties</code>.
+   *
+   * @param mediaPackageIds
+   *          list of media package ids
+   * @param workflowDefinitionId
+   *          the workflow to apply to all found media packages
+   * @param properties
+   *          properties to configure the workflow
+   * @return a list of started workflows todo should report about failed workflow starts
+   * @throws EpisodeServiceException
+   * @throws UnauthorizedException
+   */
+  WorkflowInstance[] applyWorkflow(String workflowDefinitionId, List<String> mediaPackageIds, Map<String, String> properties)
+          throws EpisodeServiceException, UnauthorizedException;
 
   /**
    * Find search results based on the specified query object

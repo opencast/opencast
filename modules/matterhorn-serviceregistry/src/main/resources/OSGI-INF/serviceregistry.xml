@@ -4,6 +4,7 @@
   <implementation class="org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl" />
   <property name="service.description" value="Service registry" />
   <service>
+  	<provide interface="org.osgi.service.cm.ManagedService" />
     <provide interface="org.opencastproject.serviceregistry.api.ServiceRegistry" />
   </service>
   <reference name="persistence" interface="javax.persistence.spi.PersistenceProvider"

@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>MediaPackage Editor prototype</title>
+<script type="text/javascript" src="jquery/jquery-1.6.4.min.js"></script>
+<script type="text/javascript" src="scripts/jquery.mpeditor.js"></script>
+<script type="text/javascript" src="scripts/jquery.tmpl.min.js"></script>
+<script type="text/javascript" src="scripts/jquery.boundinput.js"></script>
+<script type="text/javascript" src="jquery/jquery-ui-1.8.6.custom.min.js"></script>
+<script type="text/javascript" src="scripts/jquery.validate.min.js"></script>
+<script type="text/javascript" src="scripts/mediaPackage.js"></script>
+<link rel="stylesheet" type="text/css" href="css/jquery-ui-1.8.6.custom.css">
+<link rel="stylesheet" type="text/css" href="style/admin.css">
+<link rel="stylesheet" type="text/css" href="style/upload.css">
+<link rel="stylesheet" type="text/css" href="css/jquery-ui-opencast-admin/jquery-ui-opencast-admin.css">
+<link rel="stylesheet" type="text/css" href="style/mediapackageeditor.css">
+</head>
+<body>
+
+<script type="text/javascript">
+jQuery(function($){
+	
+	var mpe = $("#MediaPackageEditor").mediaPackageEditor({
+		additionalDC: {
+			enable: true,
+			required: true
+		},
+		// Catalogs available for the plugin
+		catalogs: {
+			youtube: {
+				flavor: "catalog/youtube",
+				required: true
+			},
+			itunes: {
+				flavor: "catalog/itunes"
+			}
+		},
+        edition: {
+        	readOnly: true
+        },
+		addCatalog: function(mp, catalog, catalogDCXML) {
+			catalog.id = "test-id";
+			catalog.url = "http://www.blablabla.ch/mp.xml";
+			console.log('Add: MediaPackage: ' + mp);
+			console.log('Add: Catalog Flavor: ' + catalog.flavor);
+			console.log('Add: Catalog DC XML: ' + catalogDCXML);
+			return true;
+		},
+		changeCatalog: function(mp, catalog, catalogDCXML) {
+			console.log('Change: MediaPackage: ' + mp);
+			console.log('Change: Catalog Flavor: ' + catalog.flavor);
+			console.log('Change: Catalog DC XML: ' + catalogDCXML);
+			return true;
+		},
+		deleteCatalog: function(catalog) {
+			var mp = this.getMediaPackage();
+			console.log('Delete: MediaPackage: ' + mp);
+			console.log('Delete: Catalog Flavor: ' + catalog.flavor);
+			return true;
+		}
+	});
+	
+});
+</script>
+
+<div class="info">
+<h2>Code Snippet for jQuery plugin</h2>
+<pre>
+var mpe = $("#MediaPackageEditor").mediaPackageEditor({
+	additionalDC: {
+		enable: true,
+		required: true
+	},
+	// Catalogs available for the plugin
+	catalogs: {
+		youtube: {
+			flavor: "catalog/youtube",
+			required: true
+		},
+		itunes: {
+			flavor: "catalog/itunes"
+		}
+	},
+       edition: {
+       	readOnly: true
+       },
+	addCatalog: function(mp, catalog, catalogDCXML) {
+		catalog.id = "test-id";
+		catalog.url = "http://www.blablabla.ch/mp.xml";
+		console.log('Add: MediaPackage: ' + mp);
+		console.log('Add: Catalog Flavor: ' + catalog.flavor);
+		console.log('Add: Catalog DC XML: ' + catalogDCXML);
+		return true;
+	},
+	changeCatalog: function(mp, catalog, catalogDCXML) {
+		console.log('Change: MediaPackage: ' + mp);
+		console.log('Change: Catalog Flavor: ' + catalog.flavor);
+		console.log('Change: Catalog DC XML: ' + catalogDCXML);
+		return true;
+	},
+	deleteCatalog: function(catalog) {
+		var mp = this.getMediaPackage();
+		console.log('Delete: MediaPackage: ' + mp);
+		console.log('Delete: Catalog Flavor: ' + catalog.flavor);
+		return true;
+	}
+});</pre>
+</div>
+
+<div class="separation">Read Only</div>
+
+<div id="MediaPackageEditor">TEST</div>
+
+</body>
+</html>

@@ -115,4 +115,7 @@ public interface MediaPackageElements {
   MediaPackageElementFlavor CAPTION_DFXP_FLAVOR = new MediaPackageElementFlavor("caption", "dfxp",
           "DFXP Captions catalog");
 
+  /** Track delivered to youtube */
+  MediaPackageElementFlavor YOUTUBE = new MediaPackageElementFlavor("youtube", "watchpage");
+
 }

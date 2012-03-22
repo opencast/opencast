@@ -109,6 +109,7 @@ CREATE TABLE "job_arguments" (
   "list_index" bigint DEFAULT NULL,
   CONSTRAINT "UNQ_job_arguments_0" UNIQUE ("id", "list_index")
 );
+CREATE INDEX "IX_job_arguments_UNQ_job_arguments_0" on "job_arguments" ("id", "list_index");
 
 --
 -- Table: job_context

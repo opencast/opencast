@@ -231,5 +231,7 @@ for inspect
 #episodesTable tr {height: 30px;}
 #episodesTable tr td {color: black;}
 #episodesTable .sortable {cursor: pointer;}
+#awf-config-container legend {padding: 0 5px;}
+#awf-config-container fieldset {padding: 10px;}
 
 .role-label {width: 200px; display: inline-block; text-align: right; margin-right: 10px; padding: 2px;}

@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>MediaPackage Editor prototype</title>
+<script type="text/javascript" src="jquery/jquery-1.6.4.min.js"></script>
+<script type="text/javascript" src="scripts/jquery.mpeditor.js"></script>
+<script type="text/javascript" src="scripts/jquery.tmpl.min.js"></script>
+<script type="text/javascript" src="scripts/jquery.boundinput.js"></script>
+<script type="text/javascript" src="jquery/jquery-ui-1.8.6.custom.min.js"></script>
+<script type="text/javascript" src="scripts/jquery.validate.min.js"></script>
+<script type="text/javascript" src="scripts/mediaPackage.js"></script>
+<link rel="stylesheet" type="text/css" href="css/jquery-ui-1.8.6.custom.css">
+<link rel="stylesheet" type="text/css" href="style/admin.css">
+<link rel="stylesheet" type="text/css" href="style/upload.css">
+<link rel="stylesheet" type="text/css" href="css/jquery-ui-opencast-admin/jquery-ui-opencast-admin.css">
+<link rel="stylesheet" type="text/css" href="style/mediapackageeditor.css">
+</head>
+<body>
+
+<script type="text/javascript">
+jQuery(function($){
+	
+	var mpe = $("#MediaPackageEditor").mediaPackageEditor({
+		
+		additionalDC: {
+			enable: false,
+			required: false
+		},
+		// Catalogs available for the plugin
+		catalogs: {
+			youtube: {
+				flavor: "catalog/youtube"
+			},
+			itunes: {
+				flavor: "catalog/itunes"
+			}
+		},
+		requirement: {
+			title: true,
+			creator: true
+		},
+		addCatalog: function(mp, catalog, catalogDCXML) {
+			catalog.id = "test-id";
+			catalog.url = "http://www.blablabla.ch/mp.xml";
+			console.log('Add: MediaPackage: ' + mp);
+			console.log('Add: Catalog Flavor: ' + catalog.flavor);
+			console.log('Add: Catalog DC XML: ' + catalogDCXML);
+			return true;
+		},
+		changeCatalog: function(mp, catalog, catalogDCXML) {
+			console.log('Change: MediaPackage: ' + mp);
+			console.log('Change: Catalog Flavor: ' + catalog.flavor);
+			console.log('Change: Catalog DC XML: ' + catalogDCXML);
+			return true;
+		},
+		deleteCatalog: function(catalog) {
+			var mp = this.getMediaPackage();
+			console.log('Delete: MediaPackage: ' + mp);
+			console.log('Delete: Catalog Flavor: ' + catalog.flavor);
+			return true;
+		}
+	});
+	
+	$('button#submitButton').click(function(event) {
+		mpe.submit();
+	});
+	
+	$("#MediaPackageEditor").bind('succeeded', function(ev, mp) {
+		console.log('Successed');
+		console.log('MediaPackage: ' + mp);
+	});
+	
+});
+</script>
+
+<div class="info">
+<h2>Code Snippet for jQuery plugin</h2>
+<pre>
+var mpe = $("#MediaPackageEditor").mediaPackageEditor({
+	
+	additionalDC: {
+		enable: false,
+		required: false
+	},
+	// Catalogs available for the plugin
+	catalogs: {
+		youtube: {
+			flavor: "catalog/youtube"
+		},
+		itunes: {
+			flavor: "catalog/itunes"
+		}
+	},
+	requirement: {
+		title: true,
+		creator: true
+	},
+	addCatalog: function(mp, catalog, catalogDCXML) {
+		catalog.id = "test-id";
+		catalog.url = "http://www.blablabla.ch/mp.xml";
+		console.log('Add: MediaPackage: ' + mp);
+		console.log('Add: Catalog Flavor: ' + catalog.flavor);
+		console.log('Add: Catalog DC XML: ' + catalogDCXML);
+		return true;
+	},
+	changeCatalog: function(mp, catalog, catalogDCXML) {
+		console.log('Change: MediaPackage: ' + mp);
+		console.log('Change: Catalog Flavor: ' + catalog.flavor);
+		console.log('Change: Catalog DC XML: ' + catalogDCXML);
+		return true;
+	},
+	deleteCatalog: function(catalog) {
+		var mp = this.getMediaPackage();
+		console.log('Delete: MediaPackage: ' + mp);
+		console.log('Delete: Catalog Flavor: ' + catalog.flavor);
+		return true;
+	}
+});
+
+$('button#submitButton').click(function(event) {
+	mpe.submit();
+});
+
+$("#MediaPackageEditor").bind('succeeded', function(ev, mp) {
+	console.log('Successed');
+	console.log('MediaPackage: ' + mp);
+});</pre>
+</div>
+
+<div class="separation">Only youtube</div>
+
+<div id="MediaPackageEditor">TEST</div>
+<!-- submit/cancel controls -->
+<div class="form-box layout-centered ui-widget">
+  <div class="form-box-content ui-widget-content ui-corner-all">
+
+      <ul class="oc-ui-form-list">
+        <!-- submit / cancal button -->
+        <li class="ui-helper-clearfix">
+          <label class="scheduler-label">&nbsp;</label>
+          <button id="submitButton" type="button" class="mouseover-pointer control-button">Update</button>
+          <button id="cancelButton" type="button" class="mouseover-pointer control-button">Cancel</button>
+        </li>
+
+        <!-- * = required -->
+        <li class="ui-helper-clearfix">
+          <label class="scheduler-label">&nbsp;</label>
+          <span class="color-red">* </span><span id="i18n_required">Required</span>
+        </li>
+      </ul>
+  </div>
+</div>
+
+</body>
+</html>

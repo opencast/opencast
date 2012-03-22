@@ -28,8 +28,10 @@ public interface MediaPackageElementSelector<T extends MediaPackageElement> {
    * 
    * @param mediaPackage
    *          the media package
+   * @param withTagsAndFlavors
+   *          define if the elements must match with flavors and tags, or just one of these parameters
    * @return the selected element
    */
-  Collection<T> select(MediaPackage mediaPackage);
+  Collection<T> select(MediaPackage mediaPackage, boolean withTagsAndFlavors);
 
 }

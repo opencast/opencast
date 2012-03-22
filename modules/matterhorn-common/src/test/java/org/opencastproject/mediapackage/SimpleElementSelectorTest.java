@@ -91,18 +91,18 @@ public class SimpleElementSelectorTest {
 
   /**
    * Test method for
-   * {@link org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage)}
+   * {@link org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage, boolean)}
    * .
    */
   @Test
   public void testSelect() {
-    assertEquals(3, selector.select(mediaPackage).size());
+    assertEquals(3, selector.select(mediaPackage, true).size());
     selector.addTag(tag);
-    assertEquals(1, selector.select(mediaPackage).size());
-    assertEquals(presentationTrack, selector.select(mediaPackage).iterator().next());
+    assertEquals(1, selector.select(mediaPackage, true).size());
+    assertEquals(presentationTrack, selector.select(mediaPackage, true).iterator().next());
     selector.addTag("abc");
-    assertEquals(1, selector.select(mediaPackage).size());
-    assertEquals(presentationTrack, selector.select(mediaPackage).iterator().next());
+    assertEquals(1, selector.select(mediaPackage, true).size());
+    assertEquals(presentationTrack, selector.select(mediaPackage, true).iterator().next());
   }
 
   /**

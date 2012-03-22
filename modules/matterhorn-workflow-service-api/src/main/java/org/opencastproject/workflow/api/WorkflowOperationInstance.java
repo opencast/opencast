@@ -16,6 +16,7 @@
 package org.opencastproject.workflow.api;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -25,7 +26,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlJavaTypeAdapter(WorkflowOperationInstanceImpl.Adapter.class)
 public interface WorkflowOperationInstance extends Configurable {
   public enum OperationState {
-    INSTANTIATED, RUNNING, PAUSED, SUCCEEDED, FAILED, SKIPPED
+    INSTANTIATED, RUNNING, PAUSED, SUCCEEDED, FAILED, SKIPPED, RETRY
   }
 
   /**
@@ -154,6 +155,13 @@ public interface WorkflowOperationInstance extends Configurable {
   Boolean isAbortable();
 
   /**
+   * Return the strategy to use in case of operation failure
+   * 
+   * @return a strategy from {@link org.opencastproject.workflow.api.RetryStrategy}.
+   */
+  RetryStrategy getRetryStrategy();
+
+  /**
    * Returns the number of attempts the workflow service will make to execute this operation.
    * 
    * @return the maximum number of retries before failing
@@ -166,5 +174,35 @@ public interface WorkflowOperationInstance extends Configurable {
    * @return the number of previous attempts
    */
   int getFailedAttempts();
+
+  /**
+   * Sets the current execution host
+   * 
+   * @param executionHost
+   *          the execution host
+   */
+  void setExecutionHost(String executionHost);
+
+  /**
+   * Returns the current execution host
+   * 
+   * @return the execution host
+   */
+  String getExecutionHost();
+
+  /**
+   * Adds a failed job to the execution history
+   * 
+   * @param jobId
+   *          the failed job id
+   */
+  void addToExecutionHistory(long jobId);
+
+  /**
+   * Returns a list of failed job executions
+   * 
+   * @return the execution history
+   */
+  List<Long> getExecutionHistory();
 
 }

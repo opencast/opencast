@@ -338,17 +338,17 @@ public class IngestRestService {
           }
         }
         switch (type) {
-        case Attachment:
-          mp = ingestService.addAttachment(in, fileName, flavor, mp);
-          break;
-        case Catalog:
-          mp = ingestService.addCatalog(in, fileName, flavor, mp);
-          break;
-        case Track:
-          mp = ingestService.addTrack(in, fileName, flavor, mp);
-          break;
-        default:
-          throw new IllegalStateException("Type must be one of track, catalog, or attachment");
+          case Attachment:
+            mp = ingestService.addAttachment(in, fileName, flavor, mp);
+            break;
+          case Catalog:
+            mp = ingestService.addCatalog(in, fileName, flavor, mp);
+            break;
+          case Track:
+            mp = ingestService.addTrack(in, fileName, flavor, mp);
+            break;
+          default:
+            throw new IllegalStateException("Type must be one of track, catalog, or attachment");
         }
         // ingestService.ingest(mp);
         return Response.ok(MediaPackageParser.getAsXml(mp)).build();
@@ -543,7 +543,7 @@ public class IngestRestService {
     } finally {
       IOUtils.closeQuietly(zipInputStream);
       try {
-        workspace.delete(zipFileUri);
+        workspace.deleteFromCollection(COLLECTION_ID, zipFileName);
       } catch (NotFoundException nfe) {
         // That's fine, we failed somewhere on the way
         logger.debug("Error removing missing temporary ingest file " + COLLECTION_ID + "/" + zipFileName, nfe);

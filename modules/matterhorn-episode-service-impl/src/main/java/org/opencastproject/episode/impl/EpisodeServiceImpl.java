@@ -49,10 +49,11 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
+import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 import org.osgi.service.component.ComponentContext;
@@ -67,8 +68,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
 
 /**
  * A Solr-based {@link EpisodeService} implementation.
@@ -428,8 +432,11 @@ public final class EpisodeServiceImpl implements EpisodeService {
     }
   }
 
+  // -- applyWorkflow
+
   @Override
-  public WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, EpisodeQuery q) throws EpisodeServiceException, UnauthorizedException {
+  public WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, EpisodeQuery q) 
+          throws EpisodeServiceException, UnauthorizedException {
     // never include locked packages todo it's bad to manipulate the query object... immutability!
     q.includeLocked(false);
     SearchResult result = null;
@@ -438,23 +445,79 @@ public final class EpisodeServiceImpl implements EpisodeService {
     } catch (SolrServerException e) {
       throw new EpisodeServiceException(e);
     }
-    List<WorkflowInstance> workflows = new ArrayList<WorkflowInstance>(result.getItems().length);
-    for (SearchResultItem item : result.getItems()) {
-      MediaPackage mp = item.getMediaPackage();
-      try {
-        WorkflowInstance w = workflowService.start(workflowDefinition, mp);
-        workflows.add(w);
-      } catch (WorkflowDatabaseException e) {
-        logger.error("Error starting workflow", e);
-      } catch (WorkflowParsingException e) {
-        logger.error("Error starting workflow", e);
-      }
-    }
-    return workflows.toArray(new WorkflowInstance[0]);
+    List<WorkflowInstance> workflows = applyWorkflow(workflowDefinition, result.getItems(), NO_WORKFLOW_PROPS);
+    return workflows.toArray(new WorkflowInstance[workflows.size()]);
+  }    
+
+  @Override
+  public WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, List<String> mediaPackageIds) 
+          throws EpisodeServiceException, UnauthorizedException {
+    return applyWorkflow(workflowDefinition, mediaPackageIds, NO_WORKFLOW_PROPS);
   }
 
   @Override
-  public WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, List<String> mediaPackageIds) throws EpisodeServiceException, UnauthorizedException {
+  public WorkflowInstance[] applyWorkflow(String workflowDefinitionId, List<String> mediaPackageIds) 
+          throws EpisodeServiceException, UnauthorizedException {
+    return applyWorkflow(getWorkflowDefinition(workflowDefinitionId), mediaPackageIds, NO_WORKFLOW_PROPS);
+  }
+
+  @Override
+  public WorkflowInstance[] applyWorkflow(String workflowDefinitionId, List<String> mediaPackageIds, 
+                                          Map<String, String> properties) 
+          throws EpisodeServiceException, UnauthorizedException {
+    return applyWorkflow(getWorkflowDefinition(workflowDefinitionId),
+                         mediaPackageIds,
+                         some(properties));
+  }
+
+  @Override
+  public WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, EpisodeQuery q,
+          Map<String, String> properties) throws EpisodeServiceException, UnauthorizedException {
+    return applyWorkflow(workflowDefinition, q, some(properties));
+  }
+
+  @Override
+  public WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, List<String> mediaPackageIds,
+          Map<String, String> properties) throws EpisodeServiceException, UnauthorizedException {
+    return applyWorkflow(workflowDefinition, mediaPackageIds, some(properties));
+  }
+
+  // -- applyWorkflow helper
+
+  private static final Option<Map<String, String>> NO_WORKFLOW_PROPS = none();
+  
+  private WorkflowDefinition getWorkflowDefinition(String workflowDefinitionId) {
+    try {
+      return workflowService.getWorkflowDefinitionById(workflowDefinitionId);
+    } catch (WorkflowDatabaseException e) {
+      throw new EpisodeServiceException(e);
+    } catch (NotFoundException e) {
+      throw new EpisodeServiceException(e);
+    }
+  }
+
+  private WorkflowInstance[] applyWorkflow(
+          WorkflowDefinition workflowDefinition,
+          EpisodeQuery q,
+          Option<Map<String, String>> properties)
+          throws EpisodeServiceException, UnauthorizedException {
+    // never include locked packages todo it's bad to manipulate the query object... immutability!
+    q.includeLocked(false);
+    SearchResult result = null;
+    try {
+      result = solrRequester.getForRead(q);
+    } catch (SolrServerException e) {
+      throw new EpisodeServiceException(e);
+    }
+    List<WorkflowInstance> workflows = applyWorkflow(workflowDefinition, result.getItems(), properties);
+    return workflows.toArray(new WorkflowInstance[workflows.size()]);
+  }
+
+  private WorkflowInstance[] applyWorkflow(
+          final WorkflowDefinition workflowDefinition,
+          List<String> mediaPackageIds,
+          Option<Map<String, String>> properties)
+          throws EpisodeServiceException, UnauthorizedException {
     List<WorkflowInstance> workflows = new ArrayList<WorkflowInstance>();
     for (String id : mediaPackageIds) {
       SearchResultItem[] items = new SearchResultItem[0];
@@ -463,32 +526,43 @@ public final class EpisodeServiceImpl implements EpisodeService {
       } catch (SolrServerException e) {
         logger.error("Error accessing solr index", e);
       }
-      for (SearchResultItem item : items) {
-        try {
-          WorkflowInstance workflow = workflowService.start(workflowDefinition, item.getMediaPackage());
-          workflows.add(workflow);
-        } catch (WorkflowDatabaseException e) {
-          logger.error("Error starting workflow", e);
-        } catch (WorkflowParsingException e) {
-          logger.error("Error starting workflow", e);
-        }
-      }
+      workflows.addAll(applyWorkflow(workflowDefinition, items, properties));
     }
-    return workflows.toArray(new WorkflowInstance[0]);
+    return workflows.toArray(new WorkflowInstance[workflows.size()]);
   }
 
-  @Override
-  public WorkflowInstance[] applyWorkflow(String workflowDefinitionId, List<String> mediaPackageIds) throws EpisodeServiceException, UnauthorizedException {
-    final WorkflowDefinition workflowDefinition;
-    try {
-      workflowDefinition = workflowService.getWorkflowDefinitionById(workflowDefinitionId);
-    } catch (WorkflowDatabaseException e) {
-      throw new EpisodeServiceException(e);
-    } catch (NotFoundException e) {
-      throw new EpisodeServiceException(e);
+  private List<WorkflowInstance> applyWorkflow(
+          final WorkflowDefinition workflowDefinition,
+          SearchResultItem[] items,
+          Option<Map<String, String>> properties) {
+    final List<WorkflowInstance> workflows = new ArrayList<WorkflowInstance>(items.length);
+    for (final SearchResultItem item : items) {
+      properties.fold(new Option.EffectMatch<Map<String, String>>() {
+        @Override
+        public void someE(Map<String, String> p) {
+          try {
+            workflows.add(
+                    workflowService.start(workflowDefinition, item.getMediaPackage(), p));
+          } catch (WorkflowException e) {
+            logger.error("Error starting workflow", e);
+          }
+        }
+
+        @Override
+        public void noneE() {
+          try {
+            workflows.add(
+                    workflowService.start(workflowDefinition, item.getMediaPackage()));
+          } catch (WorkflowException e) {
+            logger.error("Error starting workflow", e);
+          }
+        }
+      });
     }
-    return applyWorkflow(workflowDefinition, mediaPackageIds);
+    return workflows;
   }
+
+  // --
 
   /**
    * Clears the complete solr index.

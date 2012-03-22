@@ -286,8 +286,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#setMaintenanceStatus(java.lang.String, boolean)
    */
   @Override
-  public void setMaintenanceStatus(String host, boolean maintenance) throws IllegalStateException,
-          ServiceRegistryException {
+  public void setMaintenanceStatus(String host, boolean maintenance) throws NotFoundException, ServiceRegistryException {
     String servicePath = "maintenance";
     HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, servicePath));
     try {
@@ -801,6 +800,11 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
       client.close(response);
     }
     throw new ServiceRegistryException("Unable to get service statistics (" + responseStatusCode + ")");
+  }
+
+  @Override
+  public void sanitize(String serviceType, String host) {
+    // TODO Auto-generated method stub
   }
 
 }

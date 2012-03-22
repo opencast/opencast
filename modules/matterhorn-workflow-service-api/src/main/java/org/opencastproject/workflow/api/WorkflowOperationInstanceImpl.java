@@ -15,8 +15,10 @@
  */
 package org.opencastproject.workflow.api;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -117,6 +119,17 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
   @XmlAttribute(name = "failed-attempts")
   protected int failedAttempts;
 
+  @XmlAttribute(name = "execution-host")
+  protected String executionHost;
+
+  @XmlElementWrapper(name = "execution-history")
+  @XmlElement(name = "execution-history-entry")
+  protected List<Long> executionHistory = new ArrayList<Long>();
+
+  @XmlJavaTypeAdapter(RetryStrategy.Adapter.class)
+  @XmlAttribute(name = "retry-strategy")
+  protected RetryStrategy retryStrategy;
+
   /** The position of this operation in the workflow instance */
   protected int position;
 
@@ -125,6 +138,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    */
   public WorkflowOperationInstanceImpl() {
     this.maxAttempts = 1;
+    this.retryStrategy = RetryStrategy.NONE;
   }
 
   /**
@@ -146,6 +160,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
     setExceptionHandlingWorkflow(def.getExceptionHandlingWorkflow());
     setExecutionCondition(def.getExecutionCondition());
     setSkipCondition(def.getSkipCondition());
+    setRetryStrategy(def.getRetryStrategy());
     Set<String> defConfigs = def.getConfigurationKeys();
     this.configurations = new TreeSet<WorkflowConfiguration>();
     if (defConfigs != null) {
@@ -153,10 +168,23 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
         configurations.add(new WorkflowConfigurationImpl(key, def.getConfiguration(key)));
       }
     }
+
+    switch (retryStrategy) {
+      case RETRY:
+        if (maxAttempts < 2)
+          maxAttempts = 2;
+        break;
+      case HOLD:
+        maxAttempts = -1;
+        break;
+      default:
+        // Nothing to do
+        break;
+    }
   }
 
   /**
-   * Constructs a new operaiton instance with the given id and initial state.
+   * Constructs a new operation instance with the given id and initial state.
    * 
    * @param id
    *          the operation id
@@ -555,21 +583,80 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getFailedAttempts()
    */
   @Override
   public int getFailedAttempts() {
     return failedAttempts;
   }
-  
+
   /**
-   * @param failedAttempts the failedAttempts to set
+   * @param failedAttempts
+   *          the failedAttempts to set
    */
   public void setFailedAttempts(int failedAttempts) {
     this.failedAttempts = failedAttempts;
   }
-  
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getRetryStrategy()
+   */
+  @Override
+  public RetryStrategy getRetryStrategy() {
+    return retryStrategy;
+  }
+
+  /**
+   * @param retryStrategy
+   *          the retry strategy
+   */
+  public void setRetryStrategy(RetryStrategy retryStrategy) {
+    this.retryStrategy = retryStrategy;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getExecutionHost()
+   */
+  @Override
+  public String getExecutionHost() {
+    return executionHost;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workflow.api.WorkflowOperationInstance#setExecutionHost(java.lang.String)
+   */
+  @Override
+  public void setExecutionHost(String executionHost) {
+    this.executionHost = executionHost;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getExecutionHistory()
+   */
+  @Override
+  public List<Long> getExecutionHistory() {
+    return executionHistory;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workflow.api.WorkflowOperationInstance#addToExecutionHistory(long)
+   */
+  @Override
+  public void addToExecutionHistory(long jobId) {
+    executionHistory.add(jobId);
+  }
+
   /**
    * {@inheritDoc}
    * 
@@ -592,4 +679,5 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
     }
     this.maxAttempts = maxAttempts;
   }
+
 }

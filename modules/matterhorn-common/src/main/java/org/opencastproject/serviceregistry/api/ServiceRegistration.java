@@ -15,6 +15,8 @@
  */
 package org.opencastproject.serviceregistry.api;
 
+import java.util.Date;
+
 /**
  * Manages clustered services and the Jobs they may create to enable asynchronous job handling.
  */
@@ -50,5 +52,40 @@ public interface ServiceRegistration {
    * maintenance mode when it comes back online
    */
   boolean isInMaintenanceMode();
+
+  /**
+   * Gets the last time the service has been declared online
+   * 
+   * @return the onlineFrom
+   */
+  Date getOnlineFrom();
+
+  /**
+   * Gets the current state of the service
+   * 
+   * @return current state
+   */
+  ServiceState getServiceState();
+
+  /**
+   * Gets the last date when state was changed
+   * 
+   * @return last date when state was changed
+   */
+  Date getStateChanged();
+
+  /**
+   * Gets the job signature which changed last time the service state to error.
+   * 
+   * @return the signature from error state trigger job
+   */
+  int getErrorStateTrigger();
+
+  /**
+   * Gets the job signature which changed last time the service state to warning
+   * 
+   * @return the signature from warning state trigger job
+   */
+  int getWarningStateTrigger();
 
 }

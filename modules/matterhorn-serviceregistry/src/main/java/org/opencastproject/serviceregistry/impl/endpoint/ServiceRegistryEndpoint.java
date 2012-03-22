@@ -18,6 +18,7 @@ package org.opencastproject.serviceregistry.impl.endpoint;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
@@ -116,6 +117,19 @@ public class ServiceRegistryEndpoint {
   }
 
   @POST
+  @Path("sanitize")
+  @RestQuery(name = "sanitize", description = "Sets the given service to NORMAL state", returnDescription = "No content", restParameters = {
+          @RestParameter(name = "serviceType", isRequired = true, description = "The service type identifier", type = Type.STRING, defaultValue = ""),
+          @RestParameter(name = "host", isRequired = true, description = "The host providing the service, including the http(s) protocol", type = Type.STRING, defaultValue = "") }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "The service was successfully sanitized"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No service of that type on that host is registered.") })
+  public Response sanitize(@FormParam("serviceType") String serviceType, @FormParam("host") String host)
+          throws NotFoundException {
+    serviceRegistry.sanitize(serviceType, host);
+    return Response.status(Status.NO_CONTENT).build();
+  }
+
+  @POST
   @Path("register")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "register", description = "Add a new service registration to the cluster.", returnDescription = "The service registration.", restParameters = {
@@ -136,7 +150,7 @@ public class ServiceRegistryEndpoint {
   @Path("unregister")
   @RestQuery(name = "unregister", description = "Removes a service registration.", returnDescription = "No content", restParameters = {
           @RestParameter(name = "serviceType", isRequired = true, description = "The service type identifier", type = Type.STRING),
-          @RestParameter(name = "host", isRequired = true, description = "The host providing the service, including the http(s) protocol", type = Type.STRING) }, reponses = { @RestResponse(responseCode = 204, description = "The service was unregistered successfully") })
+          @RestParameter(name = "host", isRequired = true, description = "The host providing the service, including the http(s) protocol", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "The service was unregistered successfully") })
   public Response unregister(@FormParam("serviceType") String serviceType, @FormParam("host") String host) {
     try {
       serviceRegistry.unRegisterService(serviceType, host);
@@ -150,7 +164,7 @@ public class ServiceRegistryEndpoint {
   @Path("registerhost")
   @RestQuery(name = "registerhost", description = "Add a new server to the cluster.", returnDescription = "No content.", restParameters = {
           @RestParameter(name = "host", isRequired = true, description = "The host name, including the http(s) protocol", type = Type.STRING),
-          @RestParameter(name = "maxJobs", isRequired = true, description = "The maximum number of concurrent jobs this host can run", type = Type.STRING) }, reponses = { @RestResponse(responseCode = 204, description = "The host was registered successfully") })
+          @RestParameter(name = "maxJobs", isRequired = true, description = "The maximum number of concurrent jobs this host can run", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was registered successfully") })
   public void register(@FormParam("host") String host, @FormParam("maxJobs") int maxJobs) {
     try {
       serviceRegistry.registerHost(host, maxJobs);
@@ -161,7 +175,7 @@ public class ServiceRegistryEndpoint {
 
   @POST
   @Path("unregisterhost")
-  @RestQuery(name = "unregisterhost", description = "Removes a server from the cluster.", returnDescription = "No content.", restParameters = { @RestParameter(name = "host", isRequired = true, description = "The host name, including the http(s) protocol", type = Type.STRING) }, reponses = { @RestResponse(responseCode = 204, description = "The host was removed successfully") })
+  @RestQuery(name = "unregisterhost", description = "Removes a server from the cluster.", returnDescription = "No content.", restParameters = { @RestParameter(name = "host", isRequired = true, description = "The host name, including the http(s) protocol", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was removed successfully") })
   public Response unregister(@FormParam("host") String host) {
     try {
       serviceRegistry.unregisterHost(host);
@@ -175,12 +189,13 @@ public class ServiceRegistryEndpoint {
   @Path("maintenance")
   @RestQuery(name = "maintenance", description = "Sets the maintenance status for a server in the cluster.", returnDescription = "No content.", restParameters = {
           @RestParameter(name = "host", isRequired = true, type = Type.STRING, description = "The host name, including the http(s) protocol"),
-          @RestParameter(name = "maintenance", isRequired = true, type = Type.BOOLEAN, description = "Whether this host should be put into maintenance mode (true) or not") }, reponses = { @RestResponse(responseCode = 204, description = "The host was registered successfully") })
-  public Response setMaintenanceMode(@FormParam("host") String host, @FormParam("maintenance") boolean maintenance) {
+          @RestParameter(name = "maintenance", isRequired = true, type = Type.BOOLEAN, description = "Whether this host should be put into maintenance mode (true) or not") }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was registered successfully") })
+  public Response setMaintenanceMode(@FormParam("host") String host, @FormParam("maintenance") boolean maintenance)
+          throws NotFoundException {
     try {
       serviceRegistry.setMaintenanceStatus(host, maintenance);
       return Response.status(Status.NO_CONTENT).build();
-    } catch (Exception e) {
+    } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }
   }
@@ -313,7 +328,7 @@ public class ServiceRegistryEndpoint {
   @PUT
   @Path("job/{id}.xml")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "updatejob", description = "Updates an existing job", returnDescription = "No content", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The job identifier") }, restParameters = { @RestParameter(name = "job", isRequired = true, type = Type.TEXT, description = "The updated job as XML") }, reponses = { @RestResponse(responseCode = 204, description = "Job updated.") })
+  @RestQuery(name = "updatejob", description = "Updates an existing job", returnDescription = "No content", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The job identifier") }, restParameters = { @RestParameter(name = "job", isRequired = true, type = Type.TEXT, description = "The updated job as XML") }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "Job updated.") })
   public Response updateJob(@PathParam("id") String id, @FormParam("job") String jobXml) throws NotFoundException {
     try {
       Job job = JobParser.parseJob(jobXml);

@@ -60,3 +60,20 @@
     </span>
   </div>
 </div>
+        
+<div id="mpe-window" title="Edit metadata">
+  <div id="mpe-errors" style="color:red"></div>
+  <div id="mpe-editor"></div>
+  <div class="ui-widget-content ui-corner-all" style="margin-top: 20px; text-align: right;">
+    <button id="mpe-submit">Submit</button>
+    <button id="mpe-cancel">Cancel</button>
+  </div>
+</div>
+        
+<div id="awf-window" title="Apply Workflow">
+  <div id="awf-config-container"></div>
+  <div>
+    <button id="awf-submit">Apply</button>
+    <button id="awf-cancel">Cancel</button>
+  </div>
+</div> 

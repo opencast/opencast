@@ -40,6 +40,13 @@ opencast.episode = (function() {
     return $.getJSON("../episode/episode.json", { id:id })
   }
 
+  /** @param id -- the media package id
+   *  @return jqXHR containing raw xml
+   */
+  function getMediaPackageXml(id) {
+    return $.get("../episode/episode.xml", { id:id });
+  }
+
   /** @param params -- parameter object for the episode rest endpoint
    *  @return jqXHR containing raw json
    */
@@ -51,6 +58,165 @@ opencast.episode = (function() {
    */
   function getAvailableWorkflowDefinitions() {
     return $.getJSON("../workflow/definitions.json");
+  }
+
+  /** Open the metadata editor with mediapackage xml.
+   *  @param mediapackageXml -- xml representation of the mediapackage
+   */
+  function openMetadataEditor(mediapackageXml) {
+    var mpe = $("#mpe-editor").mediaPackageEditor({
+              additionalDC: {
+                enable: true,
+                required: false
+              },
+              // Catalogs available for the plugin
+              catalogs: {
+                youtube: {
+                  flavor: "catalog/youtube"
+                }
+              },
+              requirement: {
+                title: true,
+                creator: true
+              },
+              
+              addCatalog: function(mp, catalog, catalogDCXML) {
+            	   var doc = $.parseXML(mp);
+	          	   var mpId = $(doc).find('mp\\:mediapackage').attr("id");
+            	   var uuid = generateUUID();
+            	  
+            	   var response = false;
+	          		$.ajax({
+	          			async: false,
+	          			url: "../files/mediapackage/"+mpId+"/"+uuid+"/dublincore.xml",
+	          			data: {
+	          				content : catalogDCXML
+	          			},
+	          			type: 'post',
+	          			success: function(url){
+	          				catalog.url = url;
+	          				catalog.id = uuid.toString();
+	          				response = true;
+	          			}
+	          			
+	          		});	
+	          		
+	          		return response;
+
+	          },
+	          changeCatalog: function(mp, catalog, catalogDCXML) {
+	        	    var doc = $.parseXML(mp);
+	          		var mpId = $(doc).find('mp\\:mediapackage').attr("id");
+         	  
+	          		var response = false;
+	         		$.ajax({
+	         			async: false,
+	         			url: "../files/mediapackage/"+mpId+"/"+catalog.id+"/dublincore.xml",
+	         			data: {
+	         				content : catalogDCXML
+	         			},
+	         			type: 'post',
+	         			success: function(url){
+	         				catalog.url = url;
+	         				response = true;
+	         			}
+	         			
+	         		});	
+	         		
+	         		return response;
+	          },
+	          deleteCatalog: function(catalog) {
+	          		var mp = this.getMediaPackage();
+	          		var doc = $.parseXML(mp);
+	          		var mpId = $(doc).find('mp\\:mediapackage').attr("id");
+	          		
+	          		var response = false;
+	          		$.ajax({
+	          			async: false,
+	          			url: "../files/mediapackage/"+mpId+"/"+catalog.id,
+	          			type: 'delete',
+	          			success: function(){
+	          				response = true;
+	          			}
+	          			
+	          		});	 
+	          		
+	          		return response;
+	          }
+            },
+            mediapackageXml);
+
+    var $window = openWindow($("#mpe-window"), {
+      close: function() {
+        $("#mpe-editor, #mpe-cancel, #mpe-submit").unbind();
+      }
+    });
+    $("#mpe-submit").click(function () {
+      $("div#mpe-errors").empty();
+      mpe.submit();
+    });
+    $("#mpe-cancel").click(function () {
+      $window.dialog("close");
+    });
+    
+	$("#mpe-editor").bind('succeeded', function(ev, mp) {
+ 		$.ajax({
+ 			async: false,
+ 			url: "../episode/add",
+ 			dataType: "text",
+ 			data: {
+ 				mediapackage : mp
+ 			},
+ 			type: 'post',
+ 			success: function(){
+ 			  $("#mpe-editor").unbind();
+ 			  $window.dialog("close");
+ 			},
+ 			error: function(request, errorText, thrownError){
+ 			  $("div#mpe-errors").append("Error during update: "+thrownError.message+" "+errorText+"("+thrownError.status + thrownError.statusText+")");
+ 			}
+ 		});	
+	});
+  }
+  
+  /**
+   * @return generated UUID for catalog
+   */
+  function generateUUID() {
+      var uuid = (function () {
+          var i,
+              c = "89ab",
+              u = [];
+          for (i = 0; i < 36; i += 1) {
+              u[i] = (Math.random() * 16 | 0).toString(16);
+          }
+          u[8] = u[13] = u[18] = u[23] = "-";
+          u[14] = "4";
+          u[19] = c.charAt(Math.random() * 4 | 0);
+          return u.join("");
+      })();
+      return {
+          toString: function () {
+              return uuid;
+          },
+          valueOf: function () {
+              return uuid;
+          }
+      };
+  }
+
+  /** Open a window using the jquery.dialog plugin.
+   *  @param opt -- [optional] options, as passed to .dialog("option")
+   *  @return $win
+   */
+  function openWindow($win, opt) {
+    $win.dialog("option", _.extend({
+      width: $(window).width() - 40,
+      height: $(window).height() - 40,
+      position: ["center", "center"],
+      show: "scale"
+    }, opt || {})).dialog("open");
+    return $win;
   }
 
   // --
@@ -297,7 +463,20 @@ opencast.episode = (function() {
                 showSelectedEpisodesCount();
               });
             });
-          })()
+          })(),
+          // attach edit handler
+          (function() {
+        	  $("#mpe-window").dialog({autoOpen: false});
+        	  $("#tableContainer").delegate(".edit", "click", function() {
+        		  var eid = $(this).attr("data-eid");
+        		  getMediaPackageXml(eid).done(function(xml) {
+        			  $(xml).find("mediapackage").each(function(_, mp) {
+        				  openMetadataEditor(mp);
+        			  });
+        		  });
+        		  return false;
+        	  })
+          }())
         ];
         // flatten and filter out undefined values, refresh and apply functions afterwards
         var f = _(applyAfterRefresh).chain().flatten().compact().value();

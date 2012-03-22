@@ -27,6 +27,7 @@
     <th class="ui-widget-header">Process</th>
     <th class="ui-widget-header">State</th>
     <th class="ui-widget-header"></th>
+    <th class="ui-widget-header"></th>
   </tr>
   </thead>
   <tbody>
@@ -42,12 +43,15 @@
         <td class="ui-state-active">
           <% if (e.workflow) { %>
             <span class="active-workflow"><%= e.workflow %></span>
-          <% } %>
+          <% } %>
         </td>
         <td class="ui-state-active">
           <% if (e.media.length == 0) { %>
             retracted
           <% } %>
+        </td>
+        <td class="ui-state-active">
+          <a href="#" class="edit" data-eid="<%= e.id %>">Edit</a>
         </td>
         <td class="ui-state-active" style="text-align: center">
           <a href="#/episodedetails?id=<%= e.id %>">Details</a>
@@ -61,6 +65,6 @@
       <tr>
         <td colspan="6" align="center">No Episodes found</td>
       </tr>
-    <% } %>
+    <% } %>
   </tbody>
 </table>

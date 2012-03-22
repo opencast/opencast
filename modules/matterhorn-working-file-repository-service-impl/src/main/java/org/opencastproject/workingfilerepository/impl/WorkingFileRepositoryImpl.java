@@ -130,11 +130,11 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     File f;
     try {
       f = getFile(mediaPackageID, mediaPackageElementID);
-      
+
       File parentDirectory = f.getParentFile();
       logger.debug("Attempting to delete {}", parentDirectory.getAbsolutePath());
       FileUtils.forceDelete(parentDirectory);
-      return true;      
+      return true;
     } catch (NotFoundException e) {
       logger.info("Unable to delete non existing object {}/{}", mediaPackageID, mediaPackageElementID);
       return false;
@@ -328,14 +328,13 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * @return the file or <code>null</code> if no such element exists
    * @throws IllegalStateException
    *           if more than one matching elements were found
-   * @throws NotFoundException 
+   * @throws NotFoundException
    *           if the file cannot be found in the Working File Repository
    */
-  protected File getFile(String mediaPackageID, String mediaPackageElementID) throws IllegalStateException, NotFoundException {
-    
+  protected File getFile(String mediaPackageID, String mediaPackageElementID) throws IllegalStateException,
+          NotFoundException {
     checkPathSafe(mediaPackageID);
     checkPathSafe(mediaPackageElementID);
-    
     File directory = getElementDirectory(mediaPackageID, mediaPackageElementID);
 
     File[] md5Files = directory.listFiles(MD5_FINAME_FILTER);
@@ -350,7 +349,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       if (f.exists())
         return f;
       else
-        throw new NotFoundException("Unable to locate " + f + " in the working file repository"); 
+        throw new NotFoundException("Unable to locate " + f + " in the working file repository");
     } else {
       logger.error("Integrity error: Element directory {} contains more than one element", mediaPackageID + "/"
               + mediaPackageElementID);
@@ -370,10 +369,10 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * @throws NotFoundException
    *           if either the collection or the file don't exist
    */
-  protected File getFileFromCollection(String collectionId, String fileName) throws NotFoundException, IllegalArgumentException {
-    
+  protected File getFileFromCollection(String collectionId, String fileName) throws NotFoundException,
+          IllegalArgumentException {
     checkPathSafe(collectionId);
-    
+
     File directory = null;
     try {
       directory = getCollectionDirectory(collectionId, false);

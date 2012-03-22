@@ -18,6 +18,7 @@ package org.opencastproject.serviceregistry.command;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.NotFoundException;
 
 /**
  * An interactive shell command for putting Maintainable services in and out of maintenance mode
@@ -40,6 +41,8 @@ public class MaintenanceCommand {
       }
     } catch (ServiceRegistryException e) {
       return "Error setting maintenance mode: " + e.getMessage() + "\n";
+    } catch (NotFoundException e) {
+      return "Error setting maintenance mode, host " + baseUrl + " not found";
     }
   }
 

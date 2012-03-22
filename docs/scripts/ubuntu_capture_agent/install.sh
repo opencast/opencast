@@ -32,7 +32,7 @@ export SVN_URL=http://opencast.jira.com/svn/MH
 # Extension for the SVN_URL to reach the trunk
 export TRUNK_URL=$SVN_URL/trunk
 # Extension for the SVN_URL to reach the branches
-export BRANCHES_URL=$SVN_URL/branches
+export BRANCHES_URL=$SVN_URL/branches/1.3.x
 # Extension for the SVN_URL to reach the tags
 export TAGS_URL=$SVN_URL/tags
 

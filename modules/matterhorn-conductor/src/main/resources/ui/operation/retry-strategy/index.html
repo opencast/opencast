@@ -1,0 +1,17 @@
+<html>
+	<head>
+	<script type="text/javascript">
+		function continueWorkflow(value){
+      		var postData = {
+      			retryStrategy: value
+      		};
+			parent.ocRecordings.continueWorkflow(postData);
+		}
+	</script>
+	</head>
+	
+	<body>
+	<button onclick="continueWorkflow('NONE')" type="button">None</button>
+	<button onclick="continueWorkflow('RETRY')" type="button">Retry</button>
+	</body>
+</html>

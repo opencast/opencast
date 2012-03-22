@@ -49,8 +49,8 @@ ocRecordings = new (function() {
   this.data = null;     // currently displayed recording data
   this.statistics = null;
 
-  var refreshing = false;      // indicates if JSONP requesting recording data is in progress
-  this.refreshingStats = false; // indicates if JSONP requesting statistics data is in progress
+  var refreshing = false;      // indicates if ajax requesting recording data is in progress
+  this.refreshingStats = false; // indicates if ajax requesting statistics data is in progress
   this.refreshInterval = null;
   this.statsInterval = null;
 
@@ -101,7 +101,7 @@ ocRecordings = new (function() {
     return this;
   })();
 
-  /** Initiate new JSONP call to workflow instances list endpoint
+  /** Initiate new ajax call to workflow instances list endpoint
    */
   function refresh() {
     if (!refreshing) {
@@ -163,13 +163,11 @@ ocRecordings = new (function() {
       // paging
       params.push('count=' + ocRecordings.Configuration.pageSize);
       params.push('startPage=' + ocRecordings.Configuration.page);
-      params.push('jsonp=?');
       var url = WORKFLOW_LIST_URL + '?' + params.join('&');
       $.ajax(
       {
         url: url,
-        dataType: 'jsonp',
-        jsonp: 'jsonp',
+        dataType: 'json',
         success: function (data)
         {
           ocRecordings.render(data);
@@ -188,8 +186,7 @@ ocRecordings = new (function() {
       $.ajax(
       {
         url: WORKFLOW_STATISTICS_URL,
-        dataType: 'jsonp',
-        jsonp: 'jsonp',
+        dataType: 'json',
         success: ocRecordings.updateStatistics
       });
     }
@@ -431,7 +428,7 @@ ocRecordings = new (function() {
     };
   }
 
-  /** JSONP callback for calls to the workflow instances list endpoint.
+  /** Ajax callback for calls to the workflow instances list endpoint.
    */
   this.render = function(data) {
     var template = 'tableTemplate';
@@ -1348,3 +1345,4 @@ ocRecordings = new (function() {
 
   return this;
 })();
+

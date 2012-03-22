@@ -221,7 +221,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#setMaintenanceStatus(java.lang.String, boolean)
    */
   @Override
-  public void setMaintenanceStatus(String host, boolean maintenance) throws ServiceRegistryException {
+  public void setMaintenanceStatus(String host, boolean maintenance) throws NotFoundException {
     List<ServiceRegistrationInMemoryImpl> servicesOnHost = services.get(host);
     if (servicesOnHost != null) {
       for (ServiceRegistrationInMemoryImpl r : servicesOnHost) {
@@ -659,4 +659,10 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
+
+  @Override
+  public void sanitize(String serviceType, String host) {
+    // TODO Auto-generated method stub
+  }
+
 }

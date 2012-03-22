@@ -136,6 +136,7 @@ final class WorkflowOperationWorker {
       WorkflowOperationResult result = null;
       switch (operation.getState()) {
         case INSTANTIATED:
+        case RETRY:
           result = start();
           break;
         case PAUSED:

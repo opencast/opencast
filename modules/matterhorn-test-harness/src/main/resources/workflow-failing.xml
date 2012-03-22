@@ -1,0 +1,47 @@
+<definition>
+
+  <id>test</id>
+  <title>Test retry strategies</title>
+  <description>
+    A simple workflow that test the retry strategies.
+  </description>
+  <operations>
+  
+    <!-- Test retry -->
+    <operation
+      id="failing"
+      retry-strategy="none"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Failing operation">
+    </operation>
+    
+    <!-- Test hold -->
+    <operation
+      id="failing"
+      retry-strategy="hold"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Failing operation">
+    </operation>
+    
+    <!-- Test none -->
+    <operation
+      id="failing"
+      retry-strategy="retry"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Failing operation">
+    </operation>
+    
+    <!-- Test none -->
+    <operation
+      id="failing"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Failing operation">
+    </operation>
+    
+  </operations>
+
+</definition>

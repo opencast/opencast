@@ -17,6 +17,7 @@ package org.opencastproject.serviceregistry.impl;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.JaxbJobContext;
+import org.opencastproject.job.api.Job;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 
@@ -43,6 +44,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PostLoad;
 import javax.persistence.PreUpdate;
@@ -82,6 +84,7 @@ import javax.xml.bind.annotation.XmlType;
                 + "where j.status = :status and j.processorServiceRegistration is not null and "
                 + "j.processorServiceRegistration.serviceType = :serviceType and "
                 + "j.processorServiceRegistration.hostRegistration.baseUrl = :host order by j.dateCreated"),
+
         // Job count queries
         @NamedQuery(name = "Job.count", query = "SELECT COUNT(j) FROM Job j "
                 + "where j.status = :status and j.creatorServiceRegistration.serviceType = :serviceType"),
@@ -98,9 +101,11 @@ import javax.xml.bind.annotation.XmlType;
                 + "where j.status = :status and j.operation = :operation "
                 + "and j.processorServiceRegistration is not null and "
                 + "j.processorServiceRegistration.serviceType = :serviceType and "
-                + "j.creatorServiceRegistration.hostRegistration.baseUrl = :host")
-
-})
+                + "j.creatorServiceRegistration.hostRegistration.baseUrl = :host"),
+        @NamedQuery(name = "Job.count.history.failed", query = "SELECT COUNT(j) FROM Job j "
+                + "WHERE j.status = org.opencastproject.job.api.Job$Status.FAILED AND j.processorServiceRegistration IS NOT NULL "
+                + "AND j.processorServiceRegistration.serviceType = :serviceType AND j.processorServiceRegistration.hostRegistration.baseUrl = :host "
+                + "AND j.dateCompleted >= j.processorServiceRegistration.stateChanged") })
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(name = "job", namespace = "http://job.opencastproject.org")
 @XmlRootElement(name = "job", namespace = "http://job.opencastproject.org")
@@ -125,16 +130,23 @@ public class JobJpaImpl extends JaxbJob {
 
   protected JobJpaImpl parentJob = null;
 
+  @OneToMany(mappedBy = "warningStateTrigger")
+  private List<ServiceRegistrationJpaImpl> servicesRegistration;
+
   /** Default constructor needed by jaxb and jpa */
   public JobJpaImpl() {
     super();
   }
 
+  public JobJpaImpl(Job job) {
+    super(job);
+  }
+
   /**
    * Constructor with everything needed for a newly instantiated job.
    */
-  public JobJpaImpl(User user, Organization organization, ServiceRegistrationJpaImpl creatorServiceRegistration, String operation, List<String> arguments,
-          String payload, boolean dispatchable) {
+  public JobJpaImpl(User user, Organization organization, ServiceRegistrationJpaImpl creatorServiceRegistration,
+          String operation, List<String> arguments, String payload, boolean dispatchable) {
     this();
     this.creator = user.getUserName();
     this.organization = organization.getId();
@@ -517,4 +529,20 @@ public class JobJpaImpl extends JaxbJob {
   public void setRootJob(JobJpaImpl rootJob) {
     this.rootJob = rootJob;
   }
+
+  /**
+   * @return the servicesRegistration
+   */
+  public List<ServiceRegistrationJpaImpl> getServicesRegistration() {
+    return servicesRegistration;
+  }
+
+  /**
+   * @param servicesRegistration
+   *          the servicesRegistration to set
+   */
+  public void setServicesRegistration(List<ServiceRegistrationJpaImpl> servicesRegistration) {
+    this.servicesRegistration = servicesRegistration;
+  }
+
 }

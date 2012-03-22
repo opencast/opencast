@@ -66,6 +66,7 @@
       }
     </script>
   ]]>
+
   </configuration_panel>
 
   <operations>
@@ -96,6 +97,7 @@
         <configuration key="source-flavor">multitrack/source</configuration>
         <configuration key="target-flavor">presenter/source</configuration>
         <configuration key="encoding-profile">epiphan.presenter</configuration>
+
       </configurations>
     </operation>
 
@@ -108,6 +110,7 @@
         <configuration key="source-flavor">multitrack/source</configuration>
         <configuration key="target-flavor">presentation/source</configuration>
         <configuration key="encoding-profile">epiphan.presentation</configuration>
+
       </configurations>
     </operation>
 
@@ -121,6 +124,7 @@
       <configurations>
         <configuration key="source-flavor">presenter/source</configuration>
         <configuration key="target-flavor">presenter/work</configuration>
+
         <configuration key="rewrite">false</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
       </configurations>
@@ -133,6 +137,7 @@
       description="Preparing presentation audio and video work version">
       <configurations>
         <configuration key="source-flavor">presentation/source</configuration>
+
         <configuration key="target-flavor">presentation/work</configuration>
         <configuration key="rewrite">false</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
@@ -180,6 +185,7 @@
         <configuration key="target-flavor-subtype">trimmed</configuration>
         <configuration key="encoding-profile">trim.work</configuration>
       </configurations>
+
     </operation>  
 
     <!-- encode to engage player preview images -->
@@ -194,6 +200,7 @@
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presenter/player+preview</configuration>
         <configuration key="target-tags">engage</configuration>
+
         <configuration key="encoding-profile">player-preview.http</configuration>
         <configuration key="time">1</configuration>
       </configurations>
@@ -205,6 +212,7 @@
       description="Encoding presentation (screen) to player preview image">
       <configurations>
         <configuration key="source-flavor">presentation/trimmed</configuration>
+
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presentation/player+preview</configuration>
         <configuration key="target-tags">engage</configuration>
@@ -224,6 +232,7 @@
         <configuration key="source-flavor">presenter/trimmed</configuration>
         <configuration key="target-flavor">presenter/delivery</configuration>
         <configuration key="target-tags">engage</configuration>
+
         <configuration key="encoding-profile">flash.http</configuration>
       </configurations>
     </operation>
@@ -235,6 +244,7 @@
       <configurations>
         <configuration key="source-flavor">presentation/trimmed</configuration>
         <configuration key="target-flavor">presentation/delivery</configuration>
+
         <configuration key="target-tags">engage</configuration>
         <configuration key="encoding-profile">flash-vga.http</configuration>
       </configurations>
@@ -246,6 +256,7 @@
       description="Encoding presenter (screen) to flash audio download">
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>
+
         <configuration key="target-flavor">presenter/delivery</configuration>
         <configuration key="target-tags">engage</configuration>
         <configuration key="encoding-profile">flash-audio.http</configuration>
@@ -261,6 +272,7 @@
       exception-handler-workflow="error"
       description="Extracting segments from presentation">
       <configurations>
+
         <configuration key="source-flavor">presentation/trimmed</configuration>
       </configurations>
     </operation>
@@ -274,6 +286,7 @@
       description="Encoding presenter (camera) to search result preview image">
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>
+
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presenter/search+preview</configuration>
         <configuration key="target-tags">engage</configuration>
@@ -281,6 +294,7 @@
         <configuration key="time">1</configuration>
       </configurations>
     </operation>
+
     <operation
       id="image"
       fail-on-error="true"
@@ -292,6 +306,7 @@
         <configuration key="target-flavor">presentation/search+preview</configuration>
         <configuration key="target-tags">engage</configuration>
         <configuration key="encoding-profile">search-cover.http</configuration>
+
         <configuration key="time">1</configuration>
       </configurations>
     </operation>
@@ -305,6 +320,7 @@
       description="Encoding presenter (camera) to mpeg4 audio download">
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>
+
         <configuration key="target-flavor">presenter/delivery</configuration>
         <configuration key="target-tags">rss, atom</configuration>
         <configuration key="encoding-profile">feed-m4a.http</configuration>
@@ -316,6 +332,7 @@
       exception-handler-workflow="error"
       description="Encoding presentation (screen) to mpeg4 audio download">
       <configurations>
+
         <configuration key="source-flavor">presentation/trimmed</configuration>
         <configuration key="target-flavor">presentation/delivery</configuration>
         <configuration key="target-tags">rss, atom</configuration>
@@ -327,6 +344,7 @@
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Encoding presenter (camera) to avi/mpeg4 download">
+
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>
         <configuration key="target-flavor">presenter/delivery</configuration>
@@ -334,6 +352,7 @@
         <configuration key="encoding-profile">feed-avi.http</configuration>
       </configurations>
     </operation>
+
     <operation
       id="compose"
       fail-on-error="true"
@@ -345,6 +364,7 @@
         <configuration key="target-tags">rss, atom</configuration>
         <configuration key="encoding-profile">feed-avi.http</configuration>
       </configurations>
+
     </operation>
     
     <!-- encode to feed preview images -->
@@ -358,6 +378,7 @@
         <configuration key="source-flavor">presenter/trimmed</configuration>
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presenter/feed+preview</configuration>
+
         <configuration key="target-tags">rss, atom</configuration>
         <configuration key="encoding-profile">feed-cover.http</configuration>
         <configuration key="time">1</configuration>
@@ -369,12 +390,14 @@
       exception-handler-workflow="error"
       description="Encoding presentation (screen) to feed preview image">
       <configurations>
+
         <configuration key="source-flavor">presentation/trimmed</configuration>
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presentation/feed+preview</configuration>
         <configuration key="target-tags">rss, atom</configuration>
         <configuration key="encoding-profile">feed-cover.http</configuration>
         <configuration key="time">1</configuration>
+
       </configurations>
     </operation>
 
@@ -389,6 +412,7 @@
         <configuration key="source-flavor">presentation/trimmed</configuration>
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presentation/segment+preview</configuration>
+
         <configuration key="reference-flavor">presentation/delivery</configuration>
         <configuration key="reference-tags">engage</configuration>
         <configuration key="target-tags">engage</configuration>
@@ -408,6 +432,7 @@
         <configuration key="source-tags"></configuration>
         <configuration key="target-tags">engage</configuration>
       </configurations>
+
     </operation>
 
     <!-- Apply ACL from series to the mediapackage -->
@@ -428,6 +453,7 @@
       exception-handler-workflow="error"
       description="Distributing to progressive downloads">
       <configurations>
+
         <configuration key="source-tags">engage,atom,rss,-publish</configuration>
         <configuration key="target-tags">publish</configuration>
       </configurations>
@@ -442,6 +468,7 @@
       description="Distributing to streaming server">
       <configurations>
         <configuration key="source-tags">engage,-publish</configuration>
+
         <configuration key="target-tags">publish</configuration>
       </configurations>
     </operation>
@@ -452,10 +479,11 @@
       id="archive"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="Archiving">
+      description="Archived">
     </operation>
  
     <!-- Publish to engage search index -->
+
  
     <operation
       id="publish"
@@ -474,6 +502,7 @@
       fail-on-error="false"
       description="Cleaning up">
       <configurations>
+
         <configuration key="preserve-flavors">*/source,dublincore/*</configuration>
       </configurations>
     </operation>

@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * See {@link WorkflowOperationDefinition}
@@ -61,11 +62,16 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
   @XmlAttribute(name = "max-attempts")
   protected int maxAttempts;
 
+  @XmlJavaTypeAdapter(RetryStrategy.Adapter.class)
+  @XmlAttribute(name = "retry-strategy")
+  protected RetryStrategy retryStrategy;
+
   /** A no-arg constructor is needed by JAXB */
   public WorkflowOperationDefinitionImpl() {
     super();
     this.maxAttempts = 1;
     this.failWorkflowOnException = true;
+    this.retryStrategy = RetryStrategy.NONE;
   }
 
   /**
@@ -222,6 +228,25 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
       }
     }
     return set;
+  }
+
+  /**
+   * 
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workflow.api.WorkflowOperationDefinition#getRetryStrategy()
+   */
+  @Override
+  public RetryStrategy getRetryStrategy() {
+    return retryStrategy;
+  }
+
+  /**
+   * @param retryStrategy
+   *          the retry strategy to set
+   */
+  public void setRetryStrategy(RetryStrategy retryStrategy) {
+    this.retryStrategy = retryStrategy;
   }
 
   /**

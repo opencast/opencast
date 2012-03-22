@@ -1,0 +1,23 @@
+<div class="form-box-head ui-widget-header ui-corner-top oc-ui-cursor unfoldable-header">
+  <div class="ui-icon unfoldable-icon ui-icon-triangle-1-e"></div>
+  <div id="i18n_youtube_title" class="collapse">Youtube</div>
+  <label for="enable_button">&nbsp;Disable</label><input type="checkbox" id="enable_button"/>
+  <div class="clear"></div>
+</div>
+
+<div class="form-box-content ui-widget-content ui-corner-bottom">
+  <ul class="oc-ui-form-list">
+    <li class="ui-helper-clearfix">
+      <label class="scheduler-label"><span class="redStar">* </span><span id="i18n_youtube_title">Youtube title</span>:</label>
+      <input id="title" class="oc-ui-form-field youtube-metadata-field title" name="title" value="${catalog.getValue('title')}" />
+    </li>
+    <li class="ui-helper-clearfix">
+      <label class="scheduler-label" for="description" id="descriptionLabel"><span id="i18n_desc_label">Description</span>:</label>
+      <textarea name="description" id="youtube_description" class="oc-ui-form-field youtube-metadata-field description" rows="5" cols="10">${catalog.getValue('description')}</textarea>
+    </li>
+    <li class="ui-helper-clearfix">
+      <label class="scheduler-label"><span id="i18n_youtube_tags">Tags</span>:</label>
+      <input id="tags" class="oc-ui-form-field youtube-metadata-field tags" name="tags" value="${catalog.getValue('tags')}" />
+    </li>
+  </ul>
+</div>

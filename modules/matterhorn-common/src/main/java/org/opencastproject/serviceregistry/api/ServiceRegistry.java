@@ -111,8 +111,10 @@ public interface ServiceRegistry {
    *          the new maintenance status for this service
    * @throws ServiceRegistryException
    *           if communication with the service registry fails
+   * @throws NotFoundException
+   *           if the host does not exist
    */
-  void setMaintenanceStatus(String host, boolean maintenance) throws ServiceRegistryException;
+  void setMaintenanceStatus(String host, boolean maintenance) throws ServiceRegistryException, NotFoundException;
 
   /**
    * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
@@ -352,5 +354,17 @@ public interface ServiceRegistry {
    *           if there is a problem accessing the service registry
    */
   SystemLoad getLoad() throws ServiceRegistryException;
+
+  /**
+   * Sets the given service to NORMAL state
+   * 
+   * @param serviceType
+   *          the service type
+   * @param host
+   *          the host
+   * @throws NotFoundException
+   *           if the service does not exist
+   */
+  void sanitize(String serviceType, String host) throws NotFoundException;
 
 }

@@ -38,8 +38,8 @@ public class PresentationFirstSelector extends FlavorPrioritySelector<Track> {
    * Creates a new presenter first selector.
    */
   public PresentationFirstSelector() {
-    addFlavor(MediaPackageElements.PRESENTER_SOURCE);
     addFlavor(MediaPackageElements.PRESENTATION_SOURCE);
+    addFlavor(MediaPackageElements.PRESENTER_SOURCE);
     addFlavor(MediaPackageElements.DOCUMENTS_SOURCE);
     addFlavor(MediaPackageElements.AUDIENCE_SOURCE);
   }

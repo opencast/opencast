@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>MediaPackage Editor prototype</title>
+<script type="text/javascript" src="../scripts/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="../scripts/jquery.mpeditor.js"></script>
+<script type="text/javascript" src="../scripts/jquery.boundinput.js"></script>
+<script type="text/javascript" src="../scripts/oc.utils.js"></script>
+<script type="text/javascript" src="../scripts/jquery.jqote2.js"></script>
+<script type="text/javascript" src="../scripts/jquery-ui-1.8.6.custom.min.js"></script>
+<script type="text/javascript" src="../scripts/jquery.validate.min.js"></script>
+<script type="text/javascript" src="qunit.js"></script>
+<link rel="stylesheet" type="text/css" href="../style/jquery-ui-1.8.6.custom.css">
+<link rel="stylesheet" type="text/css" href="../style/admin.css">
+<link rel="stylesheet" type="text/css" href="../style/upload.css">
+<link rel="stylesheet" type="text/css" href="../style/jquery-ui-opencast-admin.css">
+<link rel="stylesheet" type="text/css" href="qunit.css">
+<script type="text/javascript">
+jQuery(function($){
+	
+	
+	test("Basic plugin function", function() {
+		  var element = $("#MediaPackageEditor").mediaPackageEditor({
+			        views: {
+						youtube: false,
+						itunes: true
+					}    
+		  });
+		  
+			
+		  ok(element.html(), "MediaPackage Editor loaded" );
+		  
+		  equal(element.find('#youtube_tab').css('display'),"none", "The youtube tab must be hidden." );
+		  equal(element.find('#itunes_tab').css('display'),"block", "The itunes tab must be visible." );
+		  
+		  
+		  var itunesClass = ".itunes-metadata-field";
+		  var itunesMetada = getMetadataFromCatalogElement(itunesClass);
+		  
+		    for (key in itunesMetada) {
+		        if (itunesMetada[key] instanceof Array) {
+		            jQuery.each(itunesMetada[key], function(k,val) {
+		            	equal($("input"+itunesClass+"[name='"+key+"']").val(),val,"same value for "+key+" input")
+		            });
+		        } else {
+		            	equal($("input"+itunesClass+"[name='"+key+"']").val(),itunesMetada[key],"same value for "+key+" input")
+		        }
+		    }
+		  
+		  
+		  
+		});
+	
+	
+	
+	
+
+});
+
+
+</script>
+</head>
+<body>
+
+
+<h1 id="qunit-header">QUnit plugin MediaPackageEditor</h1>
+<h2 id="qunit-banner"></h2>
+<div id="qunit-testrunner-toolbar"></div>
+<h2 id="qunit-userAgent"></h2>
+<ol id="qunit-tests"></ol>
+<div id="qunit-fixture">test markup, will be hidden</div>
+
+
+
+<div id="MediaPackageEditor"></div>
+
+
+
+</body>
+</html>

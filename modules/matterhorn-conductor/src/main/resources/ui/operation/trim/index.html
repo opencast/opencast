@@ -59,6 +59,7 @@
     <script type="text/javascript" src="/admin/js/jquery/jquery.js"></script>
     <script type="text/javascript" src="/admin/js/jquery/jquery-ui.js"></script>    
     <script type="text/javascript" src="/admin/js/oc.utils.js"></script>
+    <script type="text/javascript" src="/admin/js/itunes_categories.js"></script>
     <script type="text/javascript">
       var PLAYER_URL = '/admin/embed.html';
             
@@ -84,19 +85,51 @@
       // Timeout of the Intervall Timer
       var timerTimeout = 1500;
       var timerSet = false; // -> temporary solution. clearInterval(timer) does not work properly
-       		    		             
+      
+      function initCategories() {
+    	  var options = '';
+    	  for ( var key in iTunesCategories) {
+    		  options += '<option value="' + key + '">'
+    		  + iTunesCategories[key]['name']
+    	  }
+    	  $('#categorySelector').html(options);
+      }
+    	  
+      function changedCategory() {
+    	  var categoryId = $('#categorySelector').val();
+    	  var options = '';
+
+    	  var category = iTunesCategories[categoryId];
+    	  options += '<option value="' + categoryId + '">-- Choose a Subcategory --</option>';
+    	  for ( var i = 0; i < category['subCategories'].length; i++) {
+    		  var sub = category['subCategories'][i];
+    		  options += '<option value="' + sub.value + '">' + sub.name
+    		  + '</option>';
+    	  }
+    	  $("#category").html(options);
+    	  changedSubCategory();
+      }
+
+      function changedSubCategory() {
+          var subject = $('#category option:selected').index() == 0 ? $('#categorySelector option:selected').text() : $('#category option:selected').text();
+    	  $("#meta-subject").val(subject);
+      }
+      
       $(document).ready(function(){
-        var id = postData.id;             
-        if(id == "") {
-          return;
-        }
+        var id = postData.id;
+        initCategories();
+        $('#categorySelector').change(function(){ changedCategory(); });
+        $('#category').change(function(){ changedSubCategory(); });
+          if(id == "") {
+            return;
+          }
         var recordDate = null;
         $('#recordDate').datepicker({
-          showOn: 'both',
-          buttonImage: '/admin/img/icons/calendar.gif',
-          buttonImageOnly: true,
-          dateFormat: 'yy-mm-dd'
-        });  		
+    		showOn: 'both',
+    		buttonImage: '/admin/img/icons/calendar.gif',
+    		buttonImageOnly: true,
+    		dateFormat: 'yy-mm-dd'
+  		});  		
 
         $('.oc-ui-form-field').change(function() {
           metadataChanged = true;
@@ -154,7 +187,7 @@
         // Event edit link clicked
         $('#edit-link').click(function(){
           //parent.Recordings.retryRecording(id);
-          parent.location.href = "/admin/index.html#/upload?retry=" + id;
+          parent.location.href = "/admin/upload.html?retry=" + id;
           return false;
         });
                 
@@ -233,27 +266,11 @@
               dataType: 'json',
               type: 'GET',
               success: function(data) {
+                data = data.catalogs;
                 var series_list = [];
                 $.each(data.catalogs, function(){
                   series_list.push({value: this['http://purl.org/dc/terms/']['title'][0].value,
-                    id: this['http://purl.org/dc/terms/']['identifier'][0].value});
-                });
-                series_list.sort(function stringComparison(a, b)	{
-                  a = a.value;
-                  a = a.toLowerCase();
-                  a = a.replace(/ä/g,"a");
-                  a = a.replace(/ö/g,"o");
-                  a = a.replace(/ü/g,"u");
-                  a = a.replace(/ß/g,"s");
-
-                  b = b.value;
-                  b = b.toLowerCase();
-                  b = b.replace(/ä/g,"a");
-                  b = b.replace(/ö/g,"o");
-                  b = b.replace(/ü/g,"u");
-                  b = b.replace(/ß/g,"s");
-
-                  return(a==b)?0:(a>b)?1:-1;
+                                    id: this['http://purl.org/dc/terms/']['identifier'][0].value});
                 });
                 response(series_list);
               }, 
@@ -269,7 +286,7 @@
             $('#ispartof').val('');
           }
         });
-
+                
         /**
          * Checks if In point is bigger than Out point and prints an Error Message if this is the case
          */
@@ -369,24 +386,35 @@
                   if ($(elm).text() != '') {
                     $('#meta-' + tagName).val($(elm).text());               
                     if ($('#info-' + tagName).length>0) $('#info-' + tagName)[0].innerHTML = $(elm).text();        
+                    if ( tagName === "category") {
+                      value = $(elm).text();
+                      $('#categorySelector').val(value.substr(0,3));
+                      changedCategory();
+                   	  if(value.length > 3) {
+                   	    $('#category').val(value);
+                   	    changedSubCategory();
+                   	  }
+                    }
                     if ( tagName === "created" ) {            
-                      $('#recordDate').datepicker('setDate',$(elm).text());
-                      $('#startTimeHour').val((new Date($(elm).text())).getHours()); 
-                      $('#startTimeMin').val((new Date($(elm).text())).getMinutes()); 
+                        $('#recordDate').datepicker('setDate',$(elm).text());
+                        $('#startTimeHour').val((new Date($(elm).text())).getHours()); 
+                        $('#startTimeMin').val((new Date($(elm).text())).getMinutes()); 
                     }
                   }                  
                 });
 
-                // save information that some metadata changed
+		// save information that some metadata changed
                 $('.dcMetaField').change(function() {
                   metadataChanged = true;
                 });
-
+                $('.ocMetaField').change(function() {
+                    metadataChanged = true;
+                  });
                 parent.ocRecordings.adjustHoldActionPanelHeight();
               }
             });
             
-            // get neccessary data to call the preview player
+ 	    // get neccessary data to call the preview player
             //var previewTag = $(data.documentElement).find("mediapackage > media > track > tags > tag:contains('engage')").first();
             /*if (previewTag != null) {
                      var videoUrl = $(previewTag).parent().parent().find('url').text();
@@ -450,7 +478,7 @@
           parent.ocRecordings.adjustHoldActionPanelHeight();
         });
 
-        // try to obtain URL of series service endpoint from service registry
+ 	// try to obtain URL of series service endpoint from service registry
         // on success enable series input field / init autocomplete on it
         // TODO: use JSONP here so we can call services provieded by other hosts in a distributed deployment
         var thisHost = window.location.protocol + '//' + window.location.host;
@@ -463,6 +491,16 @@
             if (data.services.service !== undefined) {  // so there should always be none or one instance returned (instead of  data.services beeing an array
               seriesServiceURL = data.services.service.host + data.services.service.path;
               $('#series').removeAttr('disabled');
+              $('#series').autocomplete({
+                source: seriesServiceURL + '/search',
+                select: function(event, ui){
+                  $('#ispartof').val(ui.item.id);
+                },
+                search: function(){
+                  $('#ispartof').val('');
+                }
+              });
+              
               // event handler: save information that series changed 
               $('#series').change(function() {
                 seriesChanged = true;
@@ -641,6 +679,94 @@
           }
         }
 
+if (seriesChanged) {
+          if ($('#series').val() == '') {
+            // remove series from mediapackage
+            ocUtils.log('Removing Series');
+            $(mediapackage.documentElement).find('series').remove();
+            $(mediapackage.documentElement).find('seriestitle').remove();
+            var $seriesCatalogRef = $(mediapackage.documentElement).find("metadata > catalog[type='dublincore/series']");
+            if ($seriesCatalogRef.length > 0) {
+              // delete series DC xml from working file repo
+              var seriesCatalogUrl = $seriesCatalogRef.find('url').text();
+              $.ajax({
+                url : seriesCatalogUrl,
+                type : 'delete',
+                error: function() {
+                  ocUtils.log('Failed to removed Series DC XML');
+                },
+                success: function() {
+                  ocUtils.log('Removed Series DC XML');
+                }
+              });
+              $seriesCatalogRef.remove();
+            }
+          } else {
+            // update/add series data to mediapackage
+            var seriesDcXml = '';
+            if ($('#ispartof').val() == '') {
+              // create series
+              ocUtils.log('Creating Series ' + $('#series').val());
+              seriesXml = '<series><additionalMetadata><metadata><key>title</key><value>' + $('#series').val() + '</value></metadata></additionalMetadata></series>';
+              $.ajax({
+                async: false,
+                type: 'PUT',
+                url: seriesServiceURL,
+                data: { series: seriesXml },
+                dataType : 'json',
+                success: function(data){
+                  $('#ispartof').val(data.series.id);
+                }
+              });
+            }
+            // get seriesDcXml
+            ocUtils.log('Getting DC catalog for series ' + $('#ispartof').val());
+            $.ajax({
+              url : seriesServiceURL + '/' + $('#ispartof').val() + '/dublincore',
+              type : 'get',
+              async : false,
+              dataType : 'xml',
+              error : function() {
+                ocUtils.log('Could not retrieve series DC catalog for series ' + $('#ispartof').val());
+              },
+              success : function(data) {
+                seriesDcXml = ocUtils.xmlToString(data);
+              }
+            });
+            
+            // find series dc ref in mediapackage
+            var seriesDcElm = $(mediapackage.documentElement).find("metadata > catalog[type='dublincore/series']");
+            var seriesDcFileId = '';        // MediaPackageElementId of series DC catalog
+            if (seriesDcElm.length == 0) {
+              var seriesDcElm = $('<catalog></catalog>',mediapackage.documentElement).attr('id', DEFAULT_SERIES_CATALOG_ID).attr('type', 'dublincore/series');
+              $('<mimetype></mimetype>',mediapackage.documentElement).text('text/xml').appendTo(seriesDcElm);
+              $('<url></url>',mediapackage.documentElement).appendTo(seriesDcElm);
+              $(mediapackage.documentElement).find('metadata').append(seriesDcElm);
+            }
+            // upload series dc xml
+            seriesDcFileId = seriesDcElm.attr('id');
+            var mediapackageId = $(mediapackage.documentElement).attr('id');
+            var url = '/files/mediapackage/' + mediapackageId + '/' + seriesDcFileId + '/dublincore.xml';
+            ocUtils.log('Saving Series DC Catalog to ' + url);
+            $.ajax({
+              url : url,
+              type : 'post',
+              async : false,
+              data: {content : seriesDcXml},
+              error: function() {
+                ocUtils.log('Failed to save DC metadata to ' + url);
+              },
+              success: function(data) {
+                ocUtils.log('Save DC metadata to ' + url);
+                seriesDcElm.find('url').text(data);
+              }
+            });
+            // finally update series in mediapackage instance
+            updateMPElement('seriestitle', $('#series').val());
+            updateMPElement('series', $('#ispartof').val());
+          }
+        }
+
         // If Input < Output
         if (trimFromData < trimToData) {
           var newduration = getTimeInMilliseconds(trimToData) - getTimeInMilliseconds(trimFromData);
@@ -672,13 +798,13 @@
         $('.dcMetaField').each(function(){
           var $field = $(this);
           var fieldname = $field.attr('name');
-          if (fieldname==='created') {
-            recordDate = $('#recordDate').datepicker('getDate').getTime() / 1000;  	// Get date in milliseconds, convert to seconds.      
-            recordDate += $('#startTimeHour').val() * 3600; // convert hour to seconds, add to date.      
-            recordDate += $('#startTimeMin').val() * 60; //convert minutes to seconds, add to date.		
-            recordDate = recordDate * 1000; //back to milliseconds
-            ocUtils.toISODate(recordDate); // = (new Date(recordDate)).format("isoUTCdateTime");
-          }
+	      if (fieldname==='created') {
+		    recordDate = $('#recordDate').datepicker('getDate').getTime() / 1000;  	// Get date in milliseconds, convert to seconds.      
+     		recordDate += $('#startTimeHour').val() * 3600; // convert hour to seconds, add to date.      
+	   	    recordDate += $('#startTimeMin').val() * 60; //convert minutes to seconds, add to date.		
+	  	    recordDate = recordDate * 1000; //back to milliseconds
+		    ocUtils.toISODate(recordDate); // = (new Date(recordDate)).format("isoUTCdateTime");
+	      }
           if ($field.val() != '') {
             var $dcelm = false;    //$(DCmetadata.documentElement).find('dcterms\\:' + $field.attr('name'));
             $(DCmetadata.documentElement).children().each(function(index, elm) {
@@ -695,6 +821,26 @@
             }
           }
         });
+        
+        $('.ocMetaField').each(function(){
+          var $field = $(this);
+          var fieldname = $field.attr('name');
+          if ($field.val() != '') {
+        	var $dcelm = false;    //$(DCmetadata.documentElement).find('dcterms\\:' + $field.attr('name'));
+            $(DCmetadata.documentElement).children().each(function(index, elm) {
+              if (elm.tagName == 'oc:' + fieldname) {
+                $dcelm = $(elm);
+              }
+            });
+            if ($dcelm !== false) {
+              ocUtils.log("updating " + $field.attr('name') + " to: " + $field.val());
+              $dcelm.text($field.val());
+            } else {
+              ocUtils.log("creating " + $field.attr('name') + " with value: " + $field.val());
+              $('<oc:' + $field.attr('name') + '>').text($field.val()).appendTo(DCmetadata.documentElement);
+            }
+          }
+        });
       }	
 		
       // Update the MediaPackage instances metadata fields (see org.opencastproject.mediapackage.MediaPackageImpl)
@@ -702,6 +848,8 @@
         updateMetadataField('title','title');        
         updateMetadataField('created','start');       
         updateMetadataField('language','language');
+        updateMetadataField('keywords','keywords');
+        updateMetadataField('rightsholder','rightsholder');
         updateMetadataField('license','license');
         updateMetadataField('subject','subject');
         updateMetadataGroupField('creator', 'creators', 'creator');
@@ -808,7 +956,7 @@
           <span id="files"></span>
         </div>
       </center>
-
+      
       <div class="form-box layout-centered ui-widget oc-ui-collapsible-widget" style="width:680px;">
         <div class="form-box-head ui-widget-header ui-corner-top oc-ui-cursor collapse-control2">
           <div id="additional_icon" class="ui-icon ui-icon-triangle-1-e"></div>
@@ -928,6 +1076,18 @@
                   <option value="59">59</option>
                 </select>
               </li>
+              
+              <li>
+               	<label class="scheduler-label" for="keywords" id="keywordsLabel" style="width:15%;"><span id="i18n_keywords_label">Keywords / Tags</span>:</label>
+               	<input type="text" id="meta-keywords" name="keywords" class="oc-ui-form-field ocMetaField"  maxlength="255"/>
+              </li>
+              <li>
+                <label class="scheduler-label" for="license" id="licenseLabel" style="width:15%;"><span id="i18n_license_label">License</span>:</label>
+                <select id="meta-license" name="license" class="oc-ui-form-field dcMetaField">
+                  <option value="All Rights Reserved">All Rights Reserved</option>
+                  <option value="Creative Commons 3.0: Attribution-NonCommercial-NoDerivs" selected="selected">Creative Commons 3.0: Attribution-NonCommercial-NoDerivs</option>
+                </select>
+              </li>
 
               <li class="additionalMeta">
                 <label class="scheduler-label" for="contributor" id="contributorLabel" style="width:15%;"><span id="i18n_dept_label">Contributor</span>:</label>
@@ -936,10 +1096,25 @@
               <li class="additionalMeta">
                 <label class="scheduler-label" for="subject" id="subjectLabel" style="width:15%;"><span id="i18n_sub_label">Subject</span>:</label>
                 <input type="text" class="oc-ui-form-field dcMetaField" name="subject" id="meta-subject" maxlength="255" />
+                
+                <select name="categorySelector" id="categorySelector" class="oc-ui-form-field"></select>
+              	<label class="scheduler-label" for="category" id="categoryLabel" style="width:15%;"><span id="i18n_cat_label"></span></label>
+              	<select name="category" id="category" class="oc-ui-form-field ocMetaField"></select>
               </li>
               <li class="additionalMeta">
                 <label class="scheduler-label" for="language" id="languageLabel" style="width:15%;"><span id="i18n_lang_label">Language</span>:</label>
+                <select id="meta-language"  name="language" class="oc-ui-form-field dcMetaField">
+	              <option value="en" selected="selected">English</option>
+	              <option value="fr">French</option>
+	              <option value="de">German</option>
+	              <option value="it">Italian</option>
+	              <option value="es">Spanish</option>
+	            </select>
                 <input type="text" class="oc-ui-form-field dcMetaField" name="language" id="meta-language" maxlength="255" />
+              </li>
+              <li class="additionalMeta">
+                <label class="scheduler-label" for="rightsholder" id="rightsholderLabel" style="width:15%;"><span id="i18n_rights_label">Copyright</span>:</label>
+                <input type="text" disabled=true class="oc-ui-form-field dcMetaField" name="rightsholder" id="rightsholder" maxlength="255" value="" />
               </li>
               <li class="additionalMeta">
                 <label class="scheduler-label" for="description" id="descriptionLabel" style="width:15%;"><span id="i18n_desc_label">Description</span>:</label>
@@ -951,6 +1126,7 @@
       </div>
 
       <div id="actions">
+        <!-- control buttons -->
         <label for="inPoint" style="padding-left: 10px">
           In point
         </label>

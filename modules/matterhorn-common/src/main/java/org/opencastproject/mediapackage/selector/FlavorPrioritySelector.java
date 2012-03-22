@@ -38,21 +38,25 @@ public class FlavorPrioritySelector<T extends MediaPackageElement> extends Abstr
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.mediapackage.MediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage)
+   * @see org.opencastproject.mediapackage.MediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage,
+   *      boolean)
    */
-  public Collection<T> select(MediaPackage mediaPackage) {
+  public Collection<T> select(MediaPackage mediaPackage, boolean withTagsAndFlavors) {
     Set<T> candidates = new HashSet<T>();
     Set<T> result = new HashSet<T>();
 
     // Have the super implementation match type, flavor and tags
-    candidates.addAll(super.select(mediaPackage));
+    candidates.addAll(super.select(mediaPackage, withTagsAndFlavors));
+
+    if (flavors.isEmpty())
+      return candidates;
 
     // Return the first element based on the flavor
-    result: for (MediaPackageElementFlavor flavor : flavors) {
+    buildResult: for (MediaPackageElementFlavor flavor : flavors) {
       for (T element : candidates) {
         if (flavor.equals(element.getFlavor())) {
           result.add(element);
-          break result;
+          break buildResult;
         }
       }
     }

@@ -100,10 +100,10 @@ public class AudioElementSelector extends AbstractMediaPackageElementSelector<Tr
    * Returns a track or a number of tracks from the media package that together contain audio and video. If no such
    * combination can be found, e. g. there is no audio or video at all, an empty array is returned.
    * 
-   * @see org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage)
+   * @see org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage, boolean)
    */
   @Override
-  public Collection<Track> select(MediaPackage mediaPackage) {
+  public Collection<Track> select(MediaPackage mediaPackage, boolean withTagsAndFlavors) {
     // instead of relying on the broken superclass, we'll inspect every track
     // Collection<Track> candidates = super.select(mediaPackage);
     Collection<Track> candidates = Arrays.asList(mediaPackage.getTracks());

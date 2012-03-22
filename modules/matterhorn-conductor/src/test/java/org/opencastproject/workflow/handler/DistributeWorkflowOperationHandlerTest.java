@@ -47,6 +47,7 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
+import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -100,16 +101,66 @@ public class DistributeWorkflowOperationHandlerTest {
   }
 
   @Test
-  public void testDistribute() throws Exception {
+  public void testDistributeWithTagsOnly() throws Exception {
     String sourceTags = "engage,atom,rss";
-    String targetTags = "engage,publish";
-    WorkflowInstance workflowInstance = getWorkflowInstance(sourceTags, targetTags);
+    WorkflowInstance workflowInstance = getWorkflowInstance(sourceTags, null, null, null);
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
     Assert.assertEquals("Resulting mediapackage has the wrong number of tracks", 3, result.getMediaPackage()
             .getTracks().length);
   }
 
-  private WorkflowInstance getWorkflowInstance(String sourceTags, String targetTags) {
+  @Test
+  public void testDistributeWithFlavorOnly() throws Exception {
+    WorkflowInstance workflowInstance = getWorkflowInstance(null, null, "presentation/source", null);
+    WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
+    Assert.assertEquals("Resulting mediapackage has the wrong number of tracks", 3, result.getMediaPackage()
+            .getTracks().length);
+  }
+
+  @Test
+  public void testDistributeWithFlavorAndTags() throws Exception {
+    String sourceTags = "engage,atom,rss";
+    WorkflowInstance workflowInstance = getWorkflowInstance(sourceTags, null, "presentation/source", null);
+    WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
+    Assert.assertEquals("Resulting mediapackage has the wrong number of tracks", 4, result.getMediaPackage()
+            .getTracks().length);
+  }
+
+  @Test
+  public void testDistributeWithPriority() throws Exception {
+    String targetTags = "xavier";
+    WorkflowInstance workflowInstance = getWorkflowInstance(null, targetTags, null,
+            "presentation/source,presenter/source");
+    WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
+    MediaPackageElement[] elementsByTag = result.getMediaPackage().getElementsByTag(targetTags);
+    Assert.assertEquals("Resulting mediapackage has the wrong number of tracks", 3, elementsByTag.length);
+    boolean presentationCheck = false;
+    boolean presenterCheck = false;
+    for (MediaPackageElement element : elementsByTag) {
+      if (element.getFlavor().eq("presentation/source"))
+        presentationCheck = true;
+      if (element.getFlavor().eq("presenter/source"))
+        presenterCheck = true;
+    }
+    Assert.assertTrue(presentationCheck);
+    Assert.assertFalse(presenterCheck);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testDistributeWithPriorityAndOther() throws Exception {
+    WorkflowInstance workflowInstance = getWorkflowInstance(null, null, "rss", "presentation/source");
+    operationHandler.start(workflowInstance, null);
+  }
+
+  @Test
+  public void testDistributeWithNoParameters() throws Exception {
+    WorkflowInstance workflowInstance = getWorkflowInstance(null, null, null, null);
+    WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
+    Assert.assertEquals(Action.CONTINUE, result.getAction());
+  }
+
+  private WorkflowInstance getWorkflowInstance(String sourceTags, String targetTags, String sourceFlavors,
+          String sourcePriorityFlavors) {
     // Add the mediapackage to a workflow instance
     WorkflowInstanceImpl workflowInstance = new WorkflowInstanceImpl();
     workflowInstance.setId(1);
@@ -118,6 +169,8 @@ public class DistributeWorkflowOperationHandlerTest {
     WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("op", OperationState.RUNNING);
 
     operation.setConfiguration("source-tags", sourceTags);
+    operation.setConfiguration("source-flavors", sourceFlavors);
+    operation.setConfiguration("source-priority-flavors", sourcePriorityFlavors);
     operation.setConfiguration("target-tags", targetTags);
 
     List<WorkflowOperationInstance> operationsList = new ArrayList<WorkflowOperationInstance>();

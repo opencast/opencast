@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.workflow.handler.FailingWorkflowOperationHandler">
+  <implementation class="org.opencastproject.workflow.handler.FailingWorkflowOperationHandler" />
+  <property name="service.description" value="Failing Workflow Operation Handler" />
+  <property name="workflow.operation" value="failing" />
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+</scr:component>

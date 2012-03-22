@@ -165,7 +165,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
   }
 
   /**
-   * Returns the audio track that has been selected by a call to {@link #select(MediaPackage)}, which might be
+   * Returns the audio track that has been selected by a call to {@link #select(MediaPackage, boolean)}, which might be
    * <code>null</code> if no audio is required or available.
    * 
    * @return the audio track
@@ -175,7 +175,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
   }
 
   /**
-   * Returns the video track that has been selected by a call to {@link #select(MediaPackage)}, which might be
+   * Returns the video track that has been selected by a call to {@link #select(MediaPackage, boolean)}, which might be
    * <code>null</code> if no video is required or available.
    * 
    * @return the video track
@@ -188,11 +188,11 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
    * Returns a track or a number of tracks from the media package that together contain audio and video. If no such
    * combination can be found, e. g. there is no audio or video at all, an empty array is returned.
    * 
-   * @see org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage)
+   * @see org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage, boolean)
    */
   @Override
-  public Collection<Track> select(MediaPackage mediaPackage) {
-    Collection<Track> candidates = super.select(mediaPackage);
+  public Collection<Track> select(MediaPackage mediaPackage, boolean withTagsAndFlavors) {
+    Collection<Track> candidates = super.select(mediaPackage, withTagsAndFlavors);
     Set<Track> result = new HashSet<Track>();
 
     boolean foundAudio = false;

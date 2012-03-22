@@ -43,12 +43,12 @@ public class TrackSelectorTest extends SimpleElementSelectorTest {
 
   /**
    * Test method for
-   * {@link org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage)}
+   * {@link org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage, boolean)}
    * .
    */
   @Test
   public void testSelect() {
-    assertEquals(2, selector.select(mediaPackage).size());
+    assertEquals(2, selector.select(mediaPackage, true).size());
   }
 
 }

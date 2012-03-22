@@ -16,16 +16,17 @@
 
 package org.opencastproject.episode.impl.solr;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import org.opencastproject.util.data.CollectionUtil;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
-import org.opencastproject.util.data.CollectionUtil;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * This class reflects the solr schema.xml. Note that all getters returning simple values may always return null. Please

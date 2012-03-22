@@ -137,7 +137,8 @@ public class JaxbJob implements Job {
     this.operation = job.getOperation();
     this.arguments = job.getArguments();
     this.status = job.getStatus();
-    this.context = new JaxbJobContext(job.getContext());
+    if (job.getContext() != null)
+      this.context = new JaxbJobContext(job.getContext());
     this.parentJobId = job.getParentJobId();
     this.rootJobId = job.getRootJobId();
     this.dispatchable = job.isDispatchable();
@@ -557,6 +558,20 @@ public class JaxbJob implements Job {
    */
   public void setOrganization(String organization) {
     this.organization = organization;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public int getSignature() {
+    if (arguments == null)
+      return jobType.hashCode();
+
+    return jobType.hashCode() + arguments.hashCode();
+
   }
 
   /**

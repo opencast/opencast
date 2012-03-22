@@ -232,4 +232,11 @@ public interface Job {
    */
   URI getUri();
 
+  /**
+   * Gets the job signature by calculating the hash code from the concatenation of the jobType + the job arguments
+   * 
+   * @return
+   */
+  int getSignature();
+
 }

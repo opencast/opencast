@@ -2,21 +2,21 @@
 
 #The name of the branch in SVN that we are looking to turn into a release
 #E.g. 1.0.x if we are doing a 1.0.x maintenance release
-BRANCH_NAME=1.0.x
+BRANCH_NAME=1.3.x
 
 #The version the POMs are in the development branch.  E.g. 1.0-SNAPSHOT
 #if we are doing a 1.0.x maintenance release 
-BRANCH_POM_VER=1.0-SNAPSHOT
+BRANCH_POM_VER=1.3-SNAPSHOT
 
 #The new version of our release as it will show up in the tags directory in
 #svn, e.g. 1.0.2 for a maintenance release on 1.0.2
-RELEASE_VER=1.0.2-rc2
+RELEASE_VER=1.3-rc5
 
 #The version we want the poms to be, usually the same as RELEASE_VER
 TAG_POM_VER=$RELEASE_VER
 
 #The jira ticket this work is being done under (must be open)
-JIRA_TICKET=MH-6865
+JIRA_TICKET=MH-8492
 
 #Scratch directory where work should be done in, should not already include a
 #subdirectory of $WORK_DIR/$JIRA_TICKET

@@ -1,6 +1,8 @@
 ocStatistics = new (function() {
 
   var SERVERS_STATS_URL = '/services/statistics.json';           // URL of server and services statistics endpoint
+  var SERVER_MAINTENANCE_URL = '/services/maintenance';           // URL of service registry endpoint maintenance method
+  var SERVICE_SANITIZE_URL = '/services/sanitize';           // URL of service registry endpoint sanitize method
 
   var STATISTICS_DELAY = 3000;     // time interval for statistics update
 
@@ -10,8 +12,8 @@ ocStatistics = new (function() {
 
   // components
 
-  var refreshing = false;      // indicates if JSONP requesting recording data is in progress
-  this.refreshingStats = false; // indicates if JSONP requesting statistics data is in progress
+  var refreshing = false;      // indicates if ajax requesting recording data is in progress
+  this.refreshingStats = false; // indicates if ajax requesting statistics data is in progress
 
   /**
    * The labels for the UI.  TODO: i18n
@@ -59,7 +61,7 @@ ocStatistics = new (function() {
     return this;
   })();
 
-  /** Initiate new JSONP call to workflow instances list endpoint
+  /** Initiate new ajax call to workflow instances list endpoint
    */
   function refresh() {
     if (!refreshing) {
@@ -68,8 +70,7 @@ ocStatistics = new (function() {
       $.ajax(
       {
         url: url,
-        dataType: 'jsonp',
-        jsonp: 'jsonp',
+        dataType: 'json',
         success: function (data)
         {
           ocStatistics.render(data);
@@ -78,7 +79,7 @@ ocStatistics = new (function() {
     }
   }
 
-  /** JSONP callback for calls to the workflow instances list endpoint.
+  /** Ajax callback for calls to the workflow instances list endpoint.
    */
   this.render = function(data) {
     refreshing = false;
@@ -86,6 +87,39 @@ ocStatistics = new (function() {
     ocStatistics.buildServersView(data);
     ocStatistics.buildServicesView(data);
     $("#tableContainer").jqotesubtpl("templates/statistics-table-" + state + ".tpl", ocStatistics);
+    $('a.service-sanitize').click(function(event) {
+    	event.stopPropagation();
+    	event.preventDefault();
+    	$.ajax({
+    		url: SERVICE_SANITIZE_URL,
+    		type: 'POST',
+    		dataType: 'text/xml',
+    		data: $(this).attr('href'),
+    		success: $.proxy(function (data, textStatus, jqXHR) {
+    			$(this).parent().html('NORMAL');
+    		}, this)
+    	});
+    });
+    $('input.server-maintenance').click(function(event) {
+    	var setToMaintenance = $(this).is(":checked");
+    	$.ajax({
+    		url: SERVER_MAINTENANCE_URL,
+    		type: 'POST',
+    		dataType: 'text/xml',
+    		data: 'host=' + $(this).attr('name') + '&maintenance=' + setToMaintenance,
+    		success: $.proxy(function (data, textStatus, jqXHR) {
+    			$.ajax({
+    				url: SERVERS_STATS_URL,
+    		        dataType: 'json',
+    		        success: function(data) {
+    		        	// TODO Adjust status indicator depending on online / offline status
+//		    			$(this).prev().find('img').attr('src', 'img/icons/maintenance.png');
+//		    			$(this).prev().find('img').attr('title', 'Maintenance Mode');
+    		        }
+    			});
+    		}, this)
+    	});
+    });
   }
 
   /** Make the page reload with the currently set configuration
@@ -182,6 +216,7 @@ ocStatistics = new (function() {
       var singleServer = {};
       service.servers.push(singleServer);
       singleServer.host = reg.host;
+      singleServer.type = reg.type;
 
       service.meanRunTimeTotal += parseInt(serviceInstance.meanruntime);
       service.meanQueueTimeTotal += parseInt(serviceInstance.meanqueuetime);
@@ -189,7 +224,8 @@ ocStatistics = new (function() {
       service.queuedTotal += parseInt(serviceInstance.queued);
 
       singleServer.online = reg.online;
-      singleServer.maintenance = reg.maintenace;
+      singleServer.state = reg.service_state;
+      singleServer.maintenance = reg.maintenance;
       singleServer.running = ocUtils.formatInt(serviceInstance.running);
       singleServer.queued = ocUtils.formatInt(serviceInstance.queued);
 
@@ -223,7 +259,7 @@ ocStatistics = new (function() {
       ocStatistics.Configuration.state = $(this).val();
       ocStatistics.reload();
     })
-
+    
     // set up ui update
     //window.setInterval(refresh, STATISTICS_DELAY);
 

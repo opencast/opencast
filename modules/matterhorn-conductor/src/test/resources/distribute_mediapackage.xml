@@ -15,7 +15,7 @@
 				<frameRate>2</frameRate>
 			</video>
 		</track>
-		<track id="track-2" type="presentation/source">
+		<track id="track-2" type="presenter/source">
 			<mimetype>video/quicktime</mimetype>
 			<url>media.mov</url>
 			<checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</checksum>

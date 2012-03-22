@@ -64,12 +64,12 @@ public class StreamElementSelector<S extends Stream> extends AbstractMediaPackag
    * type while optionally matching other requirements such as flavors and tags. If no such combination can be found, i.
    * g. there is no audio or video at all, an empty array is returned.
    * 
-   * @see org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage)
+   * @see org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage, boolean)
    */
   @SuppressWarnings("unchecked")
   @Override
-  public Collection<Track> select(MediaPackage mediaPackage) {
-    Collection<Track> candidates = super.select(mediaPackage);
+  public Collection<Track> select(MediaPackage mediaPackage, boolean withTagsAndFlavors) {
+    Collection<Track> candidates = super.select(mediaPackage, withTagsAndFlavors);
     List<Track> result = new ArrayList<Track>();
     for (Track t : candidates) {
       if (TrackSupport.byType(t.getStreams(), getParametrizedStreamType()).length > 0) {

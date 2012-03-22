@@ -285,7 +285,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
               .header("Content-Type", contentType).header("Content-length", contentLength).tag(md5).build();
     } catch (IllegalStateException e) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-    } 
+    }
   }
 
   @GET
@@ -297,11 +297,10 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGetFromCollection(@PathParam("collectionId") String collectionId,
           @PathParam("fileName") String fileName) throws NotFoundException, IOException {
-    
     File in = getFileFromCollection(collectionId, fileName);
     String contentType = mimeMap.getContentType(fileName);
     long contentLength = in.length();
-        
+
     return Response.ok(in).header("Content-disposition", "attachment; filename=" + fileName)
             .header("Content-Type", contentType).header("Content-length", contentLength).build();
   }

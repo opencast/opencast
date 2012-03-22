@@ -17,6 +17,7 @@ package org.opencastproject.workflow.api;
 
 import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.FAILED;
 import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.INSTANTIATED;
+import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.RETRY;
 import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.SKIPPED;
 import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.SUCCEEDED;
 
@@ -274,7 +275,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
     WorkflowOperationInstance currentOperation = null;
 
     // Handle newly instantiated workflows
-    if (INSTANTIATED.equals(operations.get(0).getState())) {
+    if (INSTANTIATED.equals(operations.get(0).getState()) || RETRY.equals(operations.get(0).getState())) {
       currentOperation = operations.get(0);
     } else {
       OperationState previousState = null;

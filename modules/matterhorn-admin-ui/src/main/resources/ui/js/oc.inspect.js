@@ -47,14 +47,13 @@ Opencast.WorkflowInspect = (function() {
 
   function requestWorkflow(id) {
     $.ajax({
-      url : this.WORKFLOW_INSTANCE_URL + id + ".json?jsonp=?",
-      dataType: 'jsonp',
-      jsonp: 'jsonp',
+      url : this.WORKFLOW_INSTANCE_URL + id + ".json",
+      dataType: 'json',
       success: Opencast.WorkflowInspect.rx
     });
   }
 
-  /** JSONP recieve function
+  /** Ajax recieve function
    *
    */
   this.rx = function(data) {
@@ -77,6 +76,12 @@ Opencast.WorkflowInspect = (function() {
     // Operations
     var ops = Opencast.RenderUtils.ensureArray(workflow.operations.operation);
     $.each(ops, function(index, op) {
+      // replace time in milli to date strings
+      $.each(op, function(ind, opItem) { 
+    	  if ( typeof(opItem) == "number" && opItem > 1000000000000) {
+    		  op[ind] = ocUtils.makeLocaleDateString(opItem);  } 
+        });
+    	
       if (op.configurations !== undefined && op.configurations.configuration !== undefined) {
         op.configurations = buildConfigObject(op.configurations.configuration);
       } else {
@@ -327,7 +332,13 @@ Opencast.WorkflowInspect = (function() {
       } else if (out[member.key] !== undefined) {
         out[member.key] = [out[member.key], member.value];
       } else {
-        out[member.key] = member['$'];
+    	val = member['$'];
+    	
+    	if ( (val.length == 13 && parseInt(val) != NaN) || (typeof(val) == "number" && val > 1000000000000)) {
+    		  out[member.key] = ocUtils.makeLocaleDateString(val);  } 
+    	else {
+    		out[member.key] = val;
+    	}
       }
     });
     return out;

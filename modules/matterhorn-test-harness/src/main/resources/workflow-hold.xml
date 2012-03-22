@@ -1,0 +1,20 @@
+<definition>
+
+  <id>hold_integrationtest</id>
+  <title>Test hold retry strategy</title>
+  <description>
+    A simple workflow that test the hold retry strategy.
+  </description>
+  <operations>
+  
+    <!-- Failing operation with hold as retry strategy -->
+    <operation
+      id="inspect"
+      retry-strategy="hold"
+      fail-on-error="true"
+      description="Inspecting the media package">
+    </operation>
+    
+  </operations>
+
+</definition>

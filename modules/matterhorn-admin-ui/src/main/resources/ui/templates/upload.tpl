@@ -393,6 +393,7 @@
           </ul>
         </div>
       </div>
+      
 
       <!-- submit/cancel controls -->
       <div class="form-box layout-centered ui-widget">

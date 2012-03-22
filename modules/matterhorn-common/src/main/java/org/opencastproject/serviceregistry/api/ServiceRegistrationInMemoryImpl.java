@@ -17,6 +17,8 @@ package org.opencastproject.serviceregistry.api;
 
 import org.opencastproject.job.api.JobProducer;
 
+import java.util.Date;
+
 /**
  * Simple implementation of a service registration.
  */
@@ -42,6 +44,11 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
 
   /** True if this service in in maintenance mode */
   protected boolean isInMaintenanceMode = true;
+
+  /** Date from the last time the service has been put online */
+  private Date onlineFrom;
+
+  private ServiceState serviceState;
 
   /**
    * Creates a new service registration. The service is initially online and not in maintenance mode.
@@ -151,6 +158,41 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
    */
   public JobProducer getService() {
     return service;
+  }
+
+  /**
+   * 
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistration#getOnlineFrom()
+   */
+  @Override
+  public Date getOnlineFrom() {
+    return onlineFrom;
+  }
+
+  @Override
+  public ServiceState getServiceState() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Date getStateChanged() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public int getErrorStateTrigger() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int getWarningStateTrigger() {
+    // TODO Auto-generated method stub
+    return 0;
   }
 
 }

@@ -124,6 +124,11 @@ CREATE TABLE service_registration (
 	job_producer TINYINT(1) default 0 NOT NULL,
 	service_type VARCHAR(255) NOT NULL,
 	online TINYINT(1) default 0 NOT NULL,
+	online_from DATETIME,
+	service_state VARCHAR(32) NOT NULL,
+	state_changed DATETIME,
+	warning_state_trigger BIGINT,
+	error_state_trigger BIGINT,
 	host_registration BIGINT,
 	PRIMARY KEY (id)
 );
