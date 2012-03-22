@@ -15,6 +15,9 @@
  */
 package org.opencastproject.kernel.security;
 
+
+
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +33,7 @@ import org.springframework.security.oauth.provider.ConsumerAuthentication;
 import org.springframework.security.oauth.provider.token.OAuthAccessProviderToken;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -43,6 +47,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class LtiLaunchAuthenticationHandler implements
         org.springframework.security.oauth.provider.OAuthAuthenticationHandler {
+
+  
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LtiLaunchAuthenticationHandler.class);
@@ -62,10 +68,18 @@ public class LtiLaunchAuthenticationHandler implements
   /** The prefix for LTI user ids   */
   public static final String LTI_USER_ID_PREFIX = "lti";
   
+  /** The delimiter to use in generated OAUTH id's **/
   public static final String LTI_ID_DELIMITER = ":";
 
+  /** The Matterhorn Role for OAUTH users **/
+  private static final String ROLE_OAUTH_USER = "ROLE_OAUTH_USER";
+  
   /** The user details service */
   protected UserDetailsService userDetailsService = null;
+  
+  
+  /** list of keys that will be highly */ 
+  protected List<String> highlyTrustedKeys = new ArrayList<String>();
 
   /**
    * Constructs a new LTI authentication handler, using the supplied user details service for performing user lookups.
@@ -78,6 +92,16 @@ public class LtiLaunchAuthenticationHandler implements
   }
 
   /**
+   * Full constructor for a LTI authentication handler that includes a list of highly trusted keys
+   * @param userDetailsService
+   * @param highlyTrustedkeys
+   */
+  public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService, List<String> highlyTrustedkeys) {
+    this.userDetailsService = userDetailsService;
+    this.highlyTrustedKeys = highlyTrustedkeys;
+  }
+  
+  /**
    * {@inheritDoc}
    * 
    * @see org.springframework.security.oauth.provider.OAuthAuthenticationHandler#createAuthentication(javax.servlet.http.HttpServletRequest,
@@ -89,6 +113,7 @@ public class LtiLaunchAuthenticationHandler implements
           OAuthAccessProviderToken authToken) {
     // The User ID must be provided by the LTI consumer
     String userIdFromConsumer = request.getParameter(LTI_USER_ID_PARAM);
+
     if (StringUtils.isBlank(userIdFromConsumer)) {
       logger.warn("Received authentication request without user id ({})", LTI_USER_ID_PARAM);
       return null;
@@ -96,15 +121,29 @@ public class LtiLaunchAuthenticationHandler implements
 
     // Get the comser guid if provided
     String consumerGUID = request.getParameter(LTI_CONSUMER_GUID);
+    //This is an optional field it could be blank
+    if (StringUtils.isBlank(consumerGUID)) {
+      consumerGUID = "UknownConcumer";
+    }
 
-    // We need to construct a complex ID to avoid confusion
-    // TODO if this is a trusted consumer we won't want to do this
-    StringBuffer userId = new StringBuffer(LTI_USER_ID_PREFIX);
-    if (StringUtils.isNotBlank(consumerGUID))
-      userId.append(LTI_ID_DELIMITER).append(consumerGUID);
-    userId.append(LTI_ID_DELIMITER).append(userIdFromConsumer);
+    //We need to construct a complex ID to avoid confusion
+    userIdFromConsumer = LTI_USER_ID_PREFIX + LTI_ID_DELIMITER + consumerGUID + LTI_ID_DELIMITER + userIdFromConsumer;
+       
+    //if this is a trusted consumer we trust their details
+    String oaAuthKey = request.getParameter("oauth_consumer_key");
+    if (highlyTrustedKeys.contains(oaAuthKey)) {
+      logger.debug("{} is a trusted key", oaAuthKey);
+      //If supplied we use the human readable name
+      String suppliedEid = request.getParameter("lis_person_sourcedid");
+      //This is an optional field it could be null
+      if (suppliedEid != null) {
+        userIdFromConsumer = suppliedEid; 
+      } else {
+        //if no eid is set we use the supplied ID
+        userIdFromConsumer = request.getParameter(LTI_USER_ID_PARAM);
+      }
+    }
     
-    userIdFromConsumer = userId.toString();
     if (logger.isDebugEnabled()) {
       logger.debug("LTI user id is : {}", userIdFromConsumer);
     }
@@ -118,8 +157,6 @@ public class LtiLaunchAuthenticationHandler implements
       // This user is known to the tool consumer, but not to Matterhorn. Create a user "on the fly"
       userAuthorities = new HashSet<GrantedAuthority>();
       // We should add the authorities passed in from the tool consumer?
-      userAuthorities.add(new GrantedAuthorityImpl("ROLE_USER"));
-      userAuthorities.add(new GrantedAuthorityImpl("ROLE_OAUTH_USER"));
       String roles = request.getParameter(ROLES);
       String context = request.getParameter(CONTEXT_ID);
       //Roles could be a list
@@ -131,6 +168,10 @@ public class LtiLaunchAuthenticationHandler implements
           userAuthorities.add(new GrantedAuthorityImpl(role));
         }
       }
+      //all users need the OATH ROLE
+      userAuthorities.add(new GrantedAuthorityImpl(ROLE_OAUTH_USER));
+      
+      logger.info("Returning user with {0} authoraties", userAuthorities.size());
       
       userDetails = new User(userIdFromConsumer, "oauth", true, true, true, true, userAuthorities);
     }
