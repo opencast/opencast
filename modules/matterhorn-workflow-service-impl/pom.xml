@@ -132,7 +132,7 @@
     <dependency>
     	<groupId>org.opencastproject</groupId>
     	<artifactId>matterhorn-conductor</artifactId>
-    	<version>1.3-SNAPSHOT</version>
+    	<version>${project.version}</version>
     	<type>bundle</type>
     	<scope>compile</scope>
     </dependency>
