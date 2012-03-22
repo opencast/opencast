@@ -50,7 +50,7 @@
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-lti</module>
         <module>modules/matterhorn-mediapackage-manipulator</module>
-        <module>modules/matterhorn-mediapackage-ui</module> fy
+        <module>modules/matterhorn-mediapackage-ui</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-metadata</module>
         <module>modules/matterhorn-mpeg7</module>
