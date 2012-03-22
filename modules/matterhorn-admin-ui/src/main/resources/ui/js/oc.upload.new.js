@@ -16,7 +16,7 @@ var ocUpload = (function() {
   this.UPLOAD_COMPLETE = 'COMPLETE';
   this.UPLOAD_MEDIAPACKAGE = '/upload/mediapackage/';
   this.UPLOAD_PROGRESS_INTERVAL = 2000;
-  this.CHUNKSIZE = 1024 * 1024;
+  this.CHUNKSIZE = 1024 * 1024 * 10;
   this.INFO_URL = "/info/me.json";
   this.KILOBYTE = 1024;
   this.MEGABYTE = 1024 * 1024;
@@ -58,7 +58,10 @@ var ocUpload = (function() {
       url: ocUpload.INFO_URL,
       dataType: 'json',
       success: function(data) {
-        ocUpload.CHUNKSIZE = data.org.properties['adminui.chunksize'] * 1024;
+        if(data.org.properties['adminui.chunksize'] != undefined) {
+          ocUpload.CHUNKSIZE = data.org.properties['adminui.chunksize'] * 1024;
+        }
+        
       }
     });
     
@@ -109,27 +112,27 @@ var ocUpload = (function() {
         $('#ispartof').val(ui.item.id);
       },
       change: function(event, ui){
-          if($('#ispartof').val() === '' && $('#series').val() !== ''){
-              ocUtils.log("Searching for series in series endpoint");
-              $.ajax({
-                  url : ocUpload.SERIES_SEARCH_URL + '?seriesTitle=' + $('#series').val(),
-                  type : 'get',
-                  dataType : 'json',
-                  success : function(data) {
-                      var DUBLIN_CORE_NS_URI  = 'http://purl.org/dc/terms/',
-                          series_input = $('#series').val(),
-                          series_list = data["catalogs"],
-                          series_title,
-                          series_id;
+        if($('#ispartof').val() === '' && $('#series').val() !== ''){
+          ocUtils.log("Searching for series in series endpoint");
+          $.ajax({
+            url : ocUpload.SERIES_SEARCH_URL + '?seriesTitle=' + $('#series').val(),
+            type : 'get',
+            dataType : 'json',
+            success : function(data) {
+              var DUBLIN_CORE_NS_URI  = 'http://purl.org/dc/terms/',
+              series_input = $('#series').val(),
+              series_list = data["catalogs"],
+              series_title,
+              series_id;
 
-                          if(series_list.length !== 0){
-                              series_title = series_list[0][DUBLIN_CORE_NS_URI]["title"] ? series_list[0][DUBLIN_CORE_NS_URI]["title"][0].value : "";
-                              series_id = series_list[0][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[0][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
-                              $('#ispartof').val(series_id);
-                          }
-                  }
-              });
-          }
+              if(series_list.length !== 0){
+                series_title = series_list[0][DUBLIN_CORE_NS_URI]["title"] ? series_list[0][DUBLIN_CORE_NS_URI]["title"][0].value : "";
+                series_id = series_list[0][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[0][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
+                $('#ispartof').val(series_id);
+              }
+            }
+          });
+        }
       },
       search: function(){
         $('#ispartof').val('');
@@ -536,8 +539,8 @@ ocUpload.Ingest = (function() {
 
   this.discardIngest = function() {
     if (MediaPackage.document !== null) {
-  // TODO call discardMediaPackage method
-  }
+    // TODO call discardMediaPackage method
+    }
   }
 
   function createMediaPackage() {

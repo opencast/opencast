@@ -11,8 +11,8 @@
       var INFO_URL = "/info/me.json";
       var CREATE_NEW_JOB_URL = "/upload/newjob";
       var UPLOAD_URL = "/upload/job/"
-      //upload chunks of 1MB
-      var CHUNKSIZE = 1024 * 1024;
+      //upload chunks of 10MB
+      var CHUNKSIZE = 1024 * 1024 * 10;
       
       $(document).ready(function() {
         
@@ -20,7 +20,9 @@
           url: INFO_URL,
           dataType: 'json',
           success: function(data) {
-            CHUNKSIZE = data.org.properties['adminui.chunksize'] * 1024;
+            if(data.org.properties['adminui.chunksize'] != undefined) {
+              CHUNKSIZE = data.org.properties['adminui.chunksize'] * 1024;
+            }
           }
         });
         
