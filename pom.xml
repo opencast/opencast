@@ -807,7 +807,7 @@
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-bundle</artifactId>
-        <version>0.7</version>
+        <version>1.0</version>
       </dependency>
 
       <dependency>
