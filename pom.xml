@@ -814,6 +814,12 @@
       </dependency>
 
       <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-core</artifactId>
+        <version>1.0</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-core</artifactId>
         <exclusions>
