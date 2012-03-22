@@ -126,6 +126,7 @@ function getUpdatedMediapackage(url, data) {
   $.ajax({
     url: MEDIAPACKAGE_REST_URL + url,
     data: data,
+    type: 'POST',
     async: false,
     dataType: "text",
     success: function(data) {

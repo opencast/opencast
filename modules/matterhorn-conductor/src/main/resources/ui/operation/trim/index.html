@@ -48,6 +48,16 @@
         margin-bottom: 8px;
       }
 
+      #trackForm table {
+        width: 90%;
+        margin: 0 auto;
+      }
+
+      #trackError {
+        color: red;
+        margin: 0 auto;
+      }
+
       .formField-list label {
         width: 30%;
         float: left;
@@ -60,8 +70,11 @@
     <script type="text/javascript" src="/admin/js/jquery/jquery-ui.js"></script>    
     <script type="text/javascript" src="/admin/js/oc.utils.js"></script>
     <script type="text/javascript" src="/admin/js/itunes_categories.js"></script>
+    <script type="text/javascript" src="/admin/js/oc.mediapackage.js"></script>
+    <script type="text/javascript" src="/admin/js/jquery.jqote2.js"></script>
     <script type="text/javascript">
       var PLAYER_URL = '/admin/embed.html';
+      var WORKFLOW_RESTSERVICE = '/workflow/instance/';
             
       var postData = {
         'id': parent.document.getElementById("holdWorkflowId").value
@@ -87,32 +100,32 @@
       var timerSet = false; // -> temporary solution. clearInterval(timer) does not work properly
       
       function initCategories() {
-    	  var options = '';
-    	  for ( var key in iTunesCategories) {
-    		  options += '<option value="' + key + '">'
-    		  + iTunesCategories[key]['name']
-    	  }
-    	  $('#categorySelector').html(options);
+        var options = '';
+        for ( var key in iTunesCategories) {
+          options += '<option value="' + key + '">'
+            + iTunesCategories[key]['name']
+        }
+        $('#categorySelector').html(options);
       }
     	  
       function changedCategory() {
-    	  var categoryId = $('#categorySelector').val();
-    	  var options = '';
+        var categoryId = $('#categorySelector').val();
+        var options = '';
 
-    	  var category = iTunesCategories[categoryId];
-    	  options += '<option value="' + categoryId + '">-- Choose a Subcategory --</option>';
-    	  for ( var i = 0; i < category['subCategories'].length; i++) {
-    		  var sub = category['subCategories'][i];
-    		  options += '<option value="' + sub.value + '">' + sub.name
-    		  + '</option>';
-    	  }
-    	  $("#category").html(options);
-    	  changedSubCategory();
+        var category = iTunesCategories[categoryId];
+        options += '<option value="' + categoryId + '">-- Choose a Subcategory --</option>';
+        for ( var i = 0; i < category['subCategories'].length; i++) {
+          var sub = category['subCategories'][i];
+          options += '<option value="' + sub.value + '">' + sub.name
+            + '</option>';
+        }
+        $("#category").html(options);
+        changedSubCategory();
       }
 
       function changedSubCategory() {
-          var subject = $('#category option:selected').index() == 0 ? $('#categorySelector option:selected').text() : $('#category option:selected').text();
-    	  $("#meta-subject").val(subject);
+        var subject = $('#category option:selected').index() == 0 ? $('#categorySelector option:selected').text() : $('#category option:selected').text();
+        $("#meta-subject").val(subject);
       }
       
       $(document).ready(function(){
@@ -120,16 +133,16 @@
         initCategories();
         $('#categorySelector').change(function(){ changedCategory(); });
         $('#category').change(function(){ changedSubCategory(); });
-          if(id == "") {
-            return;
-          }
+        if(id == "") {
+          return;
+        }
         var recordDate = null;
         $('#recordDate').datepicker({
-    		showOn: 'both',
-    		buttonImage: '/admin/img/icons/calendar.gif',
-    		buttonImageOnly: true,
-    		dateFormat: 'yy-mm-dd'
-  		});  		
+          showOn: 'both',
+          buttonImage: '/admin/img/icons/calendar.gif',
+          buttonImageOnly: true,
+          dateFormat: 'yy-mm-dd'
+        });  		
 
         $('.oc-ui-form-field').change(function() {
           metadataChanged = true;
@@ -148,6 +161,36 @@
             }
           }, timerTimeout);
         });
+        
+        //load tracks
+        var tracks = {};
+        tracks.tracks = [];
+        
+        $.ajax({
+          url: WORKFLOW_RESTSERVICE + id + ".json",
+          async:false,
+          success: function(data) {
+            data = data.workflow.mediapackage.media.track;
+            for(i = 0; i< data.length; i++) {
+              if(data[i].type.indexOf("work") != -1) {
+                tracks.tracks.push(data[i]);
+              }
+            }
+          }
+        });
+        
+        $('#trackForm').append($('#template').jqote(tracks));
+        
+        $('input[id^="chk"]').click(function(event) {
+          if($("input:checked").length == 0) {
+            $('#trackError').show();
+            $(event.currentTarget).prop("checked", true);
+          } else {
+            $('#trackError').hide();
+          }
+        });
+        
+        // loading tracks ready
                 
         /**
          * Tries to set the default Out point value
@@ -270,7 +313,7 @@
                 var series_list = [];
                 $.each(data.catalogs, function(){
                   series_list.push({value: this['http://purl.org/dc/terms/']['title'][0].value,
-                                    id: this['http://purl.org/dc/terms/']['identifier'][0].value});
+                    id: this['http://purl.org/dc/terms/']['identifier'][0].value});
                 });
                 response(series_list);
               }, 
@@ -390,31 +433,31 @@
                       value = $(elm).text();
                       $('#categorySelector').val(value.substr(0,3));
                       changedCategory();
-                   	  if(value.length > 3) {
-                   	    $('#category').val(value);
-                   	    changedSubCategory();
-                   	  }
+                      if(value.length > 3) {
+                        $('#category').val(value);
+                        changedSubCategory();
+                      }
                     }
                     if ( tagName === "created" ) {            
-                        $('#recordDate').datepicker('setDate',$(elm).text());
-                        $('#startTimeHour').val((new Date($(elm).text())).getHours()); 
-                        $('#startTimeMin').val((new Date($(elm).text())).getMinutes()); 
+                      $('#recordDate').datepicker('setDate',$(elm).text());
+                      $('#startTimeHour').val((new Date($(elm).text())).getHours()); 
+                      $('#startTimeMin').val((new Date($(elm).text())).getMinutes()); 
                     }
                   }                  
                 });
 
-		// save information that some metadata changed
+                // save information that some metadata changed
                 $('.dcMetaField').change(function() {
                   metadataChanged = true;
                 });
                 $('.ocMetaField').change(function() {
-                    metadataChanged = true;
-                  });
+                  metadataChanged = true;
+                });
                 parent.ocRecordings.adjustHoldActionPanelHeight();
               }
             });
             
- 	    // get neccessary data to call the preview player
+            // get neccessary data to call the preview player
             //var previewTag = $(data.documentElement).find("mediapackage > media > track > tags > tag:contains('engage')").first();
             /*if (previewTag != null) {
                      var videoUrl = $(previewTag).parent().parent().find('url').text();
@@ -478,7 +521,7 @@
           parent.ocRecordings.adjustHoldActionPanelHeight();
         });
 
- 	// try to obtain URL of series service endpoint from service registry
+        // try to obtain URL of series service endpoint from service registry
         // on success enable series input field / init autocomplete on it
         // TODO: use JSONP here so we can call services provieded by other hosts in a distributed deployment
         var thisHost = window.location.protocol + '//' + window.location.host;
@@ -679,7 +722,7 @@
           }
         }
 
-if (seriesChanged) {
+        if (seriesChanged) {
           if ($('#series').val() == '') {
             // remove series from mediapackage
             ocUtils.log('Removing Series');
@@ -773,9 +816,15 @@ if (seriesChanged) {
           postData['trimin'] = getTimeInMilliseconds(trimFromData);
           //postData['trimout'] = getTimeInMilliseconds(trimToData);
           postData['newduration'] = newduration;
-          if (metadataChanged || seriesChanged) {
+          var trackChanged = $('input:checkbox:not(:checked)').length != $('input:checkbox').length;
+          if (metadataChanged || seriesChanged || trackChanged) {
             var mp = ocUtils.xmlToString(mediapackage);
             mp = mp.replace(/ xmlns="http:\/\/www\.w3\.org\/1999\/xhtml"/g,'');     // no luck with $(element).removeAttr('xmlns');
+            $.each($('input:checkbox:not(:checked)'), function(key, value) {
+              var trackId = $(value).prop("id");
+              trackId = trackId.split('/')[1];
+              mp = ocMediapackage.removeTrack(mp, trackId);
+            });
             parent.ocRecordings.Hold.changedMediaPackage = mp;
             //alert(mp);
           }
@@ -798,13 +847,13 @@ if (seriesChanged) {
         $('.dcMetaField').each(function(){
           var $field = $(this);
           var fieldname = $field.attr('name');
-	      if (fieldname==='created') {
-		    recordDate = $('#recordDate').datepicker('getDate').getTime() / 1000;  	// Get date in milliseconds, convert to seconds.      
-     		recordDate += $('#startTimeHour').val() * 3600; // convert hour to seconds, add to date.      
-	   	    recordDate += $('#startTimeMin').val() * 60; //convert minutes to seconds, add to date.		
-	  	    recordDate = recordDate * 1000; //back to milliseconds
-		    ocUtils.toISODate(recordDate); // = (new Date(recordDate)).format("isoUTCdateTime");
-	      }
+          if (fieldname==='created') {
+            recordDate = $('#recordDate').datepicker('getDate').getTime() / 1000;  	// Get date in milliseconds, convert to seconds.      
+            recordDate += $('#startTimeHour').val() * 3600; // convert hour to seconds, add to date.      
+            recordDate += $('#startTimeMin').val() * 60; //convert minutes to seconds, add to date.		
+            recordDate = recordDate * 1000; //back to milliseconds
+            ocUtils.toISODate(recordDate); // = (new Date(recordDate)).format("isoUTCdateTime");
+          }
           if ($field.val() != '') {
             var $dcelm = false;    //$(DCmetadata.documentElement).find('dcterms\\:' + $field.attr('name'));
             $(DCmetadata.documentElement).children().each(function(index, elm) {
@@ -826,7 +875,7 @@ if (seriesChanged) {
           var $field = $(this);
           var fieldname = $field.attr('name');
           if ($field.val() != '') {
-        	var $dcelm = false;    //$(DCmetadata.documentElement).find('dcterms\\:' + $field.attr('name'));
+            var $dcelm = false;    //$(DCmetadata.documentElement).find('dcterms\\:' + $field.attr('name'));
             $(DCmetadata.documentElement).children().each(function(index, elm) {
               if (elm.tagName == 'oc:' + fieldname) {
                 $dcelm = $(elm);
@@ -956,7 +1005,7 @@ if (seriesChanged) {
           <span id="files"></span>
         </div>
       </center>
-      
+
       <div class="form-box layout-centered ui-widget oc-ui-collapsible-widget" style="width:680px;">
         <div class="form-box-head ui-widget-header ui-corner-top oc-ui-cursor collapse-control2">
           <div id="additional_icon" class="ui-icon ui-icon-triangle-1-e"></div>
@@ -1076,7 +1125,7 @@ if (seriesChanged) {
                   <option value="59">59</option>
                 </select>
               </li>
-              
+
               <li>
                	<label class="scheduler-label" for="keywords" id="keywordsLabel" style="width:15%;"><span id="i18n_keywords_label">Keywords / Tags</span>:</label>
                	<input type="text" id="meta-keywords" name="keywords" class="oc-ui-form-field ocMetaField"  maxlength="255"/>
@@ -1096,20 +1145,20 @@ if (seriesChanged) {
               <li class="additionalMeta">
                 <label class="scheduler-label" for="subject" id="subjectLabel" style="width:15%;"><span id="i18n_sub_label">Subject</span>:</label>
                 <input type="text" class="oc-ui-form-field dcMetaField" name="subject" id="meta-subject" maxlength="255" />
-                
+
                 <select name="categorySelector" id="categorySelector" class="oc-ui-form-field"></select>
-              	<label class="scheduler-label" for="category" id="categoryLabel" style="width:15%;"><span id="i18n_cat_label"></span></label>
-              	<select name="category" id="category" class="oc-ui-form-field ocMetaField"></select>
+                <label class="scheduler-label" for="category" id="categoryLabel" style="width:15%;"><span id="i18n_cat_label"></span></label>
+                <select name="category" id="category" class="oc-ui-form-field ocMetaField"></select>
               </li>
               <li class="additionalMeta">
                 <label class="scheduler-label" for="language" id="languageLabel" style="width:15%;"><span id="i18n_lang_label">Language</span>:</label>
                 <select id="meta-language"  name="language" class="oc-ui-form-field dcMetaField">
-	              <option value="en" selected="selected">English</option>
-	              <option value="fr">French</option>
-	              <option value="de">German</option>
-	              <option value="it">Italian</option>
-	              <option value="es">Spanish</option>
-	            </select>
+                  <option value="en" selected="selected">English</option>
+                  <option value="fr">French</option>
+                  <option value="de">German</option>
+                  <option value="it">Italian</option>
+                  <option value="es">Spanish</option>
+                </select>
                 <input type="text" class="oc-ui-form-field dcMetaField" name="language" id="meta-language" maxlength="255" />
               </li>
               <li class="additionalMeta">
@@ -1124,6 +1173,43 @@ if (seriesChanged) {
           </form>
         </div>
       </div>
+
+      <div class="form-box layout-centered ui-widget oc-ui-collapsible-widget" style="width:680px;">
+        <div class="form-box-head ui-widget-header ui-corner-top oc-ui-cursor collapse-control2">
+          <div id="additional_icon" class="ui-icon ui-icon-triangle-1-e"></div>
+          <div id="i18n_additional">Select Tracks</div>
+          <div class="clear"></div>
+        </div>
+        <div class="form-box-content ui-widget-content ui-corner-bottom collapsable">
+          <div class="ui-helper-hidden" id="trackError">
+            At least one track needs to be selected
+          </div>
+          <form action="" id="trackForm">
+
+          </form>
+        </div>
+      </div>
+
+      <script type="text/x-jqote-template" id="template">
+        <![CDATA[
+        <table border="1">
+          <thead>
+            <tr>
+              <th class="ui-widget-header">Track</th>
+              <th class="ui-widget-header">selected</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% $.each(data[j].tracks, function(key, track ) { %>
+            <tr>
+              <td><%= track.type %></td>
+              <td class="right"><input type="checkbox" checked="checked" id="chk/<%= track.id %>"/></td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+        ]]>
+      </script>
 
       <div id="actions">
         <!-- control buttons -->

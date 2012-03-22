@@ -17,7 +17,7 @@ package org.opencastproject.manipulator.rest;
 
 import java.net.URI;
 import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -65,7 +65,7 @@ public class MediapackageRestService {
   private static final String REQUESTFIELD_CREATOR = "creator";
   private static final String REQUESTFIELD_SUBJECT = "subject";
 
-  @GET
+  @POST
   @Path("addTrack")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(description = "Add a track to a mediapackage",
@@ -98,7 +98,7 @@ public class MediapackageRestService {
     }
   }
 
-  @GET
+  @POST
   @Path("removeTrack")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(description = "remove a track from the given Mediapackage",
@@ -124,7 +124,7 @@ public class MediapackageRestService {
     }
   }
 
-  @GET
+  @POST
   @Path("new")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(description = "create a new mediapackage",
@@ -144,7 +144,7 @@ public class MediapackageRestService {
     }
   }
 
-  @GET
+  @POST
   @Path("addContributor")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(description = "Adds a contributor to the given Mediapackage",
@@ -170,7 +170,7 @@ public class MediapackageRestService {
     }
   }
 
-  @GET
+  @POST
   @Path("removeContributor")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(description = "remove a contributor from the given Mediapackage",
@@ -199,7 +199,7 @@ public class MediapackageRestService {
     }
   }
 
-  @GET
+  @POST
   @Path("addAttachment")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(description = "Adds an attachment to the given Mediapackage",
@@ -240,7 +240,7 @@ public class MediapackageRestService {
     }
   }
 
-  @GET
+  @POST
   @Path("removeAttachment")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(description = "remove an attachment from the given Mediapackage",
@@ -269,7 +269,7 @@ public class MediapackageRestService {
     }
   }
 
-  @GET
+  @POST
   @Path("addCatalog")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(description = "add a catalog to the given Mediapackage",
@@ -301,7 +301,7 @@ public class MediapackageRestService {
     }
   }
 
-  @GET
+  @POST
   @Path("removeCatalog")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(description = "remove a catalog from the given Mediapackage",
@@ -331,7 +331,7 @@ public class MediapackageRestService {
     }
   }
 
-  @GET
+  @POST
   @Path("addCreator")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(description = "add a creator to the given Mediapackage",
@@ -362,7 +362,7 @@ public class MediapackageRestService {
     }
   }
 
-  @GET
+  @POST
   @Path("removeCreator")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(description = "remove a creator from the given Mediapackage",
@@ -393,7 +393,7 @@ public class MediapackageRestService {
     }
   }
 
-  @GET
+  @POST
   @Path("addSubject")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(description = "add a subject to the given Mediapackage",
@@ -424,7 +424,7 @@ public class MediapackageRestService {
     }
   }
 
-  @GET
+  @POST
   @Path("removeSubject")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(description = "remove a subject from the given Mediapackage",
