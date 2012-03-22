@@ -18,6 +18,8 @@ package org.opencastproject.kernel.security;
 
 
 
+import org.opencastproject.security.api.SecurityService;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,8 +170,10 @@ public class LtiLaunchAuthenticationHandler implements
           userAuthorities.add(new GrantedAuthorityImpl(role));
         }
       }
-      //all users need the OATH ROLE
+      //all users need the OATH ROLE, the user Role and the Anon Role
       userAuthorities.add(new GrantedAuthorityImpl(ROLE_OAUTH_USER));
+      userAuthorities.add(new GrantedAuthorityImpl("ROLE_USER"));
+      userAuthorities.add(new GrantedAuthorityImpl("ROLE_ANONYMOUS"));
       
       logger.info("Returning user with {0} authoraties", userAuthorities.size());
       
