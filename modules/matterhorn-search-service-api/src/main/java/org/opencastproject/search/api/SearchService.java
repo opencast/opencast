@@ -20,6 +20,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.NotFoundException;
 
 /**
  * Provides search capabilities, possibly to the engage tools, possibly to other services.
@@ -35,6 +36,12 @@ public interface SearchService {
    * to see a mediapackage in the search index.
    */
   String READ_PERMISSION = "read";
+
+  /**
+   * The {@link org.opencastproject.security.api.AccessControlEntry#getAction()} that allows a user in a particular role
+   * to contribute a mediapackage from the search index.
+   */
+  String CONTRIBUTE_PERMISSION = "contribute";
 
   /**
    * The {@link org.opencastproject.security.api.AccessControlEntry#getAction()} that allows a user in a particular role
@@ -70,7 +77,7 @@ public interface SearchService {
    * @throws UnauthorizedException
    *           if the current user is not authorized to remove this mediapackage from the search index
    */
-  boolean delete(String mediaPackageId) throws SearchException, UnauthorizedException;
+  boolean delete(String mediaPackageId) throws SearchException, UnauthorizedException, NotFoundException;
 
   /**
    * Find search results based on the specified query object

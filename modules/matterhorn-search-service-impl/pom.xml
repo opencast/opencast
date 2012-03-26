@@ -92,6 +92,10 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>javax.persistence</artifactId>
+    </dependency>
     <!-- Test-scoped dependencies -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -126,6 +130,36 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>org.eclipse.persistence.core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>org.eclipse.persistence.jpa</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>org.eclipse.persistence.asm</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>org.eclipse.persistence.antlr</artifactId>
+      <scope>test</scope>
+    </dependency> 
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>c3p0</groupId>
+      <artifactId>c3p0</artifactId>
+      <scope>test</scope>
+    </dependency>  
   </dependencies>
   <build>
     <plugins>
@@ -164,8 +198,10 @@
             <Service-Component>
               OSGI-INF/search-service.xml,
               OSGI-INF/search-service-rest.xml,
+              OSGI-INF/search-service-persistence.xml,
               OSGI-INF/feed-service.xml
             </Service-Component>
+            <JPA-PersistenceUnits>org.opencastproject.search.impl.persistence</JPA-PersistenceUnits>   
           </instructions>
         </configuration>
       </plugin>

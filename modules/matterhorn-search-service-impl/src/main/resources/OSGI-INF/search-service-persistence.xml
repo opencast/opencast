@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.search.impl.persistence.SearchServiceDatabaseImpl"
+  immediate="true" activate="activate" deactivate="deactivate">
+  <implementation
+    class="org.opencastproject.search.impl.persistence.SearchServiceDatabaseImpl" />
+  <property name="service.description" value="Search Service Persistence" />
+  <service>
+    <provide interface="org.opencastproject.search.impl.persistence.SearchServiceDatabase" />
+  </service>
+  <reference name="persistence" interface="javax.persistence.spi.PersistenceProvider"
+    cardinality="1..1" policy="static" bind="setPersistenceProvider" />    
+  <reference name="props" interface="java.util.Map"
+    cardinality="1..1" policy="static" target="(type=persistence)" bind="setPersistenceProperties" />
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+</scr:component>

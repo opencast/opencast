@@ -54,6 +54,7 @@ import org.opencastproject.metadata.mpeg7.Video;
 import org.opencastproject.metadata.mpeg7.VideoSegment;
 import org.opencastproject.metadata.mpeg7.VideoText;
 import org.opencastproject.search.api.SearchResultItem.SearchResultItemType;
+import org.opencastproject.search.impl.persistence.SearchServiceDatabaseException;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.SecurityService;
@@ -210,10 +211,12 @@ public class SolrIndexManager {
    * 
    * @param id
    *          identifier of the series or episode to delete
+   * @param deletionDate
+   *          the deletion date
    * @throws SolrServerException
    *           if an errors occurs while talking to solr
    */
-  public boolean delete(String id) throws SolrServerException {
+  public boolean delete(String id, Date deletionDate) throws SolrServerException {
     try {
       // Load the existing episode
       QueryResponse solrResponse = null;
@@ -226,7 +229,7 @@ public class SolrIndexManager {
 
       // Did we find the episode?
       if (solrResponse.getResults().size() == 0) {
-        logger.warn("Trying to delete non-existing (or already deleted) episode {} from the search index", id);
+        logger.warn("Trying to delete non-existing media package {} from the search index", id);
         return false;
       }
 
@@ -238,7 +241,7 @@ public class SolrIndexManager {
       }
 
       // Set the oc_deleted field to the current date, then update
-      Schema.setOcDeleted(inputDocument, new Date());
+      Schema.setOcDeleted(inputDocument, deletionDate);
       solrServer.add(inputDocument);
       solrServer.commit();
       return true;
@@ -257,33 +260,28 @@ public class SolrIndexManager {
    *          the media package to post
    * @param acl
    *          the access control list for this mediapackage
+   * @param now
+   *          current date
    * @throws SolrServerException
    *           if an errors occurs while talking to solr
-   * @throws MediaPackageException
    */
-  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl) throws SolrServerException,
-          UnauthorizedException, MediaPackageException {
-    SolrInputDocument episodeDocument = null;
-    SolrInputDocument seriesDocument = null;
+  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl, Date now) throws SolrServerException,
+          UnauthorizedException {
     try {
-      episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl);
-      seriesDocument = createSeriesInputDocument(sourceMediaPackage.getSeries(), acl);
-      if (seriesDocument != null) {
+      SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl);
+      Schema.setOcModified(episodeDocument, now);
+
+      SolrInputDocument seriesDocument = createSeriesInputDocument(sourceMediaPackage.getSeries(), acl);
+      if (seriesDocument != null)
         Schema.enrich(episodeDocument, seriesDocument);
+
+      // If neither an episode nor a series was contained, there is no point in trying to update
+      if (episodeDocument == null && seriesDocument == null) {
+        logger.warn("Neither episode nor series metadata found");
+        return false;
       }
-    } catch (Exception e) {
-      throw new SolrServerException(e);
-    }
 
-    // If neither an episode nor a series was contained, there is no point in
-    // trying to update
-    if (episodeDocument == null && seriesDocument == null) {
-      logger.warn("Neither episode nor series metadata found");
-      return false;
-    }
-
-    // Post everything to the search index
-    try {
+      // Post everything to the search index
       if (episodeDocument != null)
         solrServer.add(episodeDocument);
       if (seriesDocument != null)
@@ -291,6 +289,51 @@ public class SolrIndexManager {
       solrServer.commit();
       return true;
     } catch (Exception e) {
+      throw new SolrServerException(e);
+    }
+  }
+
+  /**
+   * Posts the media package to solr. Depending on what is referenced in the media package, the method might create one
+   * or two entries: one for the episode and one for the series that the episode belongs to.
+   * 
+   * This implementation of the search service removes all references to non "engage/download" media tracks
+   * 
+   * @param sourceMediaPackage
+   *          the media package to post
+   * @param acl
+   *          the access control list for this mediapackage
+   * @param deletionDate
+   *          the deletion date
+   * @param modificationDate
+   *          the modification date
+   * @return <code>true</code> if successfully added
+   * @throws SolrServerException
+   *           if an errors occurs while talking to solr
+   */
+  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl, Date deletionDate, Date modificationDate)
+          throws SolrServerException {
+    try {
+      SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl);
+
+      SolrInputDocument seriesDocument = createSeriesInputDocument(sourceMediaPackage.getSeries(), acl);
+      if (seriesDocument != null)
+        Schema.enrich(episodeDocument, seriesDocument);
+
+      Schema.setOcModified(episodeDocument, modificationDate);
+      if (deletionDate != null)
+        Schema.setOcDeleted(episodeDocument, deletionDate);
+
+      solrServer.add(episodeDocument);
+      solrServer.add(seriesDocument);
+      solrServer.commit();
+      return true;
+    } catch (Exception e) {
+      try {
+        solrServer.rollback();
+      } catch (IOException e1) {
+        throw new SolrServerException(e1);
+      }
       throw new SolrServerException(e);
     }
   }
@@ -318,7 +361,6 @@ public class SolrIndexManager {
     // OC specific fields
     Schema.setOcMediatype(doc, SearchResultItemType.AudioVisual.toString());
     Schema.setOrganization(doc, securityService.getOrganization().getId());
-    Schema.setOcModified(doc, new Date());
     Schema.setOcMediapackage(doc, MediaPackageParser.getAsXml(mediaPackage));
     Schema.setOcElementtags(doc, tags(mediaPackage));
     Schema.setOcElementflavors(doc, flavors(mediaPackage));
@@ -1202,5 +1244,21 @@ public class SolrIndexManager {
       }
     }
     return sb.toString();
+  }
+
+  /**
+   * Returns number of entries in search index, across all organizations.
+   * 
+   * @return number of entries in search index
+   * @throws SearchServiceDatabaseException
+   *           if count cannot be retrieved
+   */
+  public long count() throws SearchServiceDatabaseException {
+    try {
+      QueryResponse response = solrServer.query(new SolrQuery("*:*"));
+      return response.getResults().getNumFound();
+    } catch (SolrServerException e) {
+      throw new SearchServiceDatabaseException(e);
+    }
   }
 }

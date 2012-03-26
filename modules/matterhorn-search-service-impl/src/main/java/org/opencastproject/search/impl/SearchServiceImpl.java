@@ -29,6 +29,8 @@ import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.search.impl.persistence.SearchServiceDatabase;
+import org.opencastproject.search.impl.persistence.SearchServiceDatabaseException;
 import org.opencastproject.search.impl.solr.SolrIndexManager;
 import org.opencastproject.search.impl.solr.SolrRequester;
 import org.opencastproject.security.api.AccessControlList;
@@ -44,6 +46,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
@@ -52,6 +55,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +67,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -116,6 +122,9 @@ public final class SearchServiceImpl implements SearchService {
   /** The service registry */
   private ServiceRegistry serviceRegistry;
 
+  /** Persistent storage */
+  private SearchServiceDatabase persistence;
+
   /** Dynamic reference. */
   public void setStaticMetadataService(StaticMetadataService mdService) {
     this.mdServices.add(mdService);
@@ -131,6 +140,10 @@ public final class SearchServiceImpl implements SearchService {
 
   public void setMpeg7CatalogService(Mpeg7CatalogService mpeg7CatalogService) {
     this.mpeg7CatalogService = mpeg7CatalogService;
+  }
+
+  public void setPersistence(SearchServiceDatabase persistence) {
+    this.persistence = persistence;
   }
 
   public void setSeriesService(SeriesService seriesService) {
@@ -218,21 +231,7 @@ public final class SearchServiceImpl implements SearchService {
     indexManager = new SolrIndexManager(solrServer, workspace, mdServices, seriesService, mpeg7CatalogService,
             securityService);
 
-    // Populate the search index if it is empty
-    try {
-      if (solrRequester.getForAdministrativeRead(new SearchQuery()).getItems().length == 0
-              && serviceRegistry.count(JOB_TYPE, Status.FINISHED) > 0) {
-        populateIndex();
-      }
-    } catch (SearchException e) {
-      throw new IllegalStateException("Can not read the solr index", e);
-    } catch (ServiceRegistryException e) {
-      throw new IllegalStateException("Can not read jobs from the service registry", e);
-    } catch (MediaPackageException e) {
-      throw new IllegalStateException("Can not read the mediapackages from jobs in the service registry", e);
-    } catch (SolrServerException e) {
-      throw new IllegalStateException("Can not read the solr index", e);
-    }
+    populateIndex();
   }
 
   /**
@@ -343,9 +342,19 @@ public final class SearchServiceImpl implements SearchService {
     if (mediaPackage == null) {
       throw new IllegalArgumentException("Unable to add a null mediapackage");
     }
+    logger.debug("Attempting to add mediapackage {} to search index", mediaPackage.getIdentifier());
+    AccessControlList acl = authorizationService.getAccessControlList(mediaPackage);
+
+    Date now = new Date();
+
     try {
-      logger.debug("Attempting to add mediapackage {} to search index", mediaPackage.getIdentifier());
-      AccessControlList acl = authorizationService.getAccessControlList(mediaPackage);
+      persistence.storeMediaPackage(mediaPackage, acl, now);
+    } catch (SearchServiceDatabaseException e) {
+      logger.error("Could not store media package to search database {}: {}", mediaPackage.getIdentifier(), e);
+      throw new SearchException(e);
+    }
+
+    try {
       List<String> args = new ArrayList<String>();
       args.add(securityService.getOrganization().getId());
       Job job = serviceRegistry.createJob(JOB_TYPE, OPERATION_ADD, args, MediaPackageParser.getAsXml(mediaPackage),
@@ -356,7 +365,7 @@ public final class SearchServiceImpl implements SearchService {
       } catch (NotFoundException e) {
         throw new IllegalStateException(e); // should not be possible
       }
-      if (indexManager.add(mediaPackage, acl)) {
+      if (indexManager.add(mediaPackage, acl, now)) {
         logger.info("Added mediapackage {} to the search index", mediaPackage.getIdentifier());
       } else {
         logger.warn("Failed to add mediapackage {} to the search index", mediaPackage.getIdentifier());
@@ -371,7 +380,7 @@ public final class SearchServiceImpl implements SearchService {
    * 
    * @see org.opencastproject.search.api.SearchService#delete(java.lang.String)
    */
-  public boolean delete(String mediaPackageId) throws SearchException, UnauthorizedException {
+  public boolean delete(String mediaPackageId) throws SearchException, UnauthorizedException, NotFoundException {
     SearchResult result;
     try {
       result = solrRequester.getForWrite(new SearchQuery().withId(mediaPackageId));
@@ -382,7 +391,16 @@ public final class SearchServiceImpl implements SearchService {
         return false;
       }
       logger.info("Removing mediapackage {} from search index", mediaPackageId);
-      return indexManager.delete(mediaPackageId);
+
+      Date now = new Date();
+      try {
+        persistence.deleteMediaPackage(mediaPackageId, now);
+      } catch (SearchServiceDatabaseException e) {
+        logger.error("Could not delete media package with id {} from persistence storage", mediaPackageId);
+        throw new SearchException(e);
+      }
+
+      return indexManager.delete(mediaPackageId, now);
     } catch (SolrServerException e) {
       throw new SearchException(e);
     }
@@ -435,24 +453,39 @@ public final class SearchServiceImpl implements SearchService {
     }
   }
 
-  // FIXME: this should use paging. It is a work in progress...
-  protected void populateIndex() throws ServiceRegistryException, MediaPackageException {
-    List<Job> jobs = serviceRegistry.getJobs(JOB_TYPE, Status.FINISHED);
-    Organization originalOrg = securityService.getOrganization();
-    for (Job job : jobs) {
-      MediaPackage mediaPackage = MediaPackageParser.getFromXml(job.getPayload());
-      String orgId = job.getArguments().get(0);
+  protected void populateIndex() {
+    long instancesInSolr = 0L;
+    try {
+      instancesInSolr = indexManager.count();
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
+    if (instancesInSolr == 0L) {
       try {
-        Organization org = orgDirectory.getOrganization(orgId);
-        securityService.setOrganization(org);
-        AccessControlList acl = authorizationService.getAccessControlList(mediaPackage);
-        indexManager.add(mediaPackage, acl);
-      } catch (NotFoundException e) {
-        logger.warn("{} is not a registered organization", orgId);
+        Iterator<Tuple<MediaPackage, String>> mediaPackages = persistence.getAllMediaPackages();
+        while (mediaPackages.hasNext()) {
+          Tuple<MediaPackage, String> mediaPackage = mediaPackages.next();
+
+          String mediaPackageId = mediaPackage.getA().getIdentifier().toString();
+
+          Organization organization = orgDirectory.getOrganization(mediaPackage.getB());
+          securityService.setOrganization(organization);
+          securityService.setUser(new User(organization.getName(), organization.getId(), new String[] { organization
+                  .getAdminRole() }));
+
+          AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
+          Date modificationDate = persistence.getModificationDate(mediaPackageId);
+          Date deletionDate = persistence.getDeletionDate(mediaPackageId);
+
+          indexManager.add(mediaPackage.getA(), acl, deletionDate, modificationDate);
+        }
+        logger.info("Finished populating search index");
       } catch (Exception e) {
-        logger.warn("Error adding mediapackage {} to index: {}", mediaPackage, e.getMessage());
+        logger.warn("Unable to index search instances: {}", e);
+        throw new ServiceException(e.getMessage());
       } finally {
-        securityService.setOrganization(originalOrg);
+        securityService.setOrganization(null);
+        securityService.setUser(null);
       }
     }
   }

@@ -12,6 +12,8 @@
           policy="dynamic"
           bind="setStaticMetadataService"
           unbind="unsetStaticMetadataService"/>
+  <reference name="search-persistence" interface="org.opencastproject.search.impl.persistence.SearchServiceDatabase"
+	      cardinality="1..1" policy="static" bind="setPersistence" />    
   <reference name="mpeg7" interface="org.opencastproject.metadata.mpeg7.Mpeg7CatalogService"
           cardinality="1..1" policy="static" bind="setMpeg7CatalogService" />
   <reference name="series" interface="org.opencastproject.series.api.SeriesService"
