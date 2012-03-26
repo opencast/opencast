@@ -104,6 +104,16 @@ CREATE TABLE scheduled_event (
 	PRIMARY KEY (event_id)
 );
 
+CREATE TABLE search (
+  mediapackage_id VARCHAR(128) NOT NULL,
+  organization_id VARCHAR(128) DEFAULT NULL,
+  deletion_date DATETIME DEFAULT NULL,
+  access_control TEXT(65535),
+  mediapackage TEXT(65535),
+  modification_date DATETIME DEFAULT NULL,
+  PRIMARY KEY (mediapackage_id)
+);
+
 CREATE TABLE SEQUENCE (
 	SEQ_NAME VARCHAR(50) NOT NULL,
 	SEQ_COUNT DECIMAL(38),

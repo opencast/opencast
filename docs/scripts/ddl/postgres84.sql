@@ -151,6 +151,19 @@ CREATE TABLE "scheduled_event" (
 );
 
 --
+-- Table: search
+--
+CREATE TABLE "search" (
+  "mediapackage_id" character varying(128) NOT NULL,
+  "organization_id" character varying(128) DEFAULT NULL,
+  "deletion_date" timestamp DEFAULT NULL,
+  "access_control" text,
+  "mediapackage" text,
+  "modification_date" timestamp DEFAULT NULL,
+  PRIMARY KEY ("mediapackage_id")
+);
+
+--
 -- Table: series
 --
 CREATE TABLE "series" (
