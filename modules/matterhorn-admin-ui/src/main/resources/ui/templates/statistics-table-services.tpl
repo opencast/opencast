@@ -16,7 +16,7 @@
       <% $.each(service.servers, function (key, server) { %>
       <tr valign="top">
         <td class="ui-state-active"">
-            <img style="vertical-align:middle; margin-right:5px;" src=<% if (server.online) { %><% if(server.maintenance) { %>"/admin/img/icons/available.png" title="Maintenance Mode"<% } else { %> 	"admin/img/icons/available.png" title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/> <%= server.host %>
+            <img style="vertical-align:middle; margin-right:5px;" src=<% if (server.online) { %><% if(server.maintenance) { %>"/admin/img/icons/maintenance.png" title="Maintenance Mode"<% } else { %> "/admin/img/icons/available.png" title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/> <%= server.host %>
         </td>
         <td class="ui-state-active  center">
           <%= server.running %>

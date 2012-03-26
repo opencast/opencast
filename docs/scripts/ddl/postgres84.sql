@@ -170,6 +170,11 @@ CREATE TABLE "service_registration" (
   "job_producer" boolean NOT NULL,
   "service_type" character varying(255) NOT NULL,
   "online" boolean NOT NULL,
+  "online_from" timestamp,
+  "service_state" character varying(32) NOT NULL,
+  "state_changed" timestamp,
+  "warning_state_trigger" bigint,
+  "error_state_trigger" bigint,
   "host_registration" bigint DEFAULT NULL,
   PRIMARY KEY ("id"),
   CONSTRAINT "UNQ_service_registration_0" UNIQUE ("host_registration", "service_type")

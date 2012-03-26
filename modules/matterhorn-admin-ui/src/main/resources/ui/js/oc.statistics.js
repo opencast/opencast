@@ -93,9 +93,8 @@ ocStatistics = new (function() {
     	$.ajax({
     		url: SERVICE_SANITIZE_URL,
     		type: 'POST',
-    		dataType: 'text/xml',
     		data: $(this).attr('href'),
-    		success: $.proxy(function (data, textStatus, jqXHR) {
+    		success: $.proxy(function(data, textStatus, jqXHR) {
     			$(this).parent().html('NORMAL');
     		}, this)
     	});
