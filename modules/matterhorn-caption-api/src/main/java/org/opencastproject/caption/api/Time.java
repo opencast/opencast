@@ -17,7 +17,6 @@ package org.opencastproject.caption.api;
 
 /**
  * Time representation of single caption (start time, end time, duration,...).
- * 
  */
 public interface Time extends Comparable<Time> {
 
@@ -47,5 +46,6 @@ public interface Time extends Comparable<Time> {
    * 
    * @return milliseconds
    */
-  int getMiliseconds();
+  int getMilliseconds();
+
 }

@@ -111,7 +111,7 @@ public class MediaTimePointImpl implements MediaTimePoint {
     day = calendar.get(Calendar.DAY_OF_MONTH) - 1;
     month = calendar.get(Calendar.MONTH);
     year = calendar.get(Calendar.YEAR);
-    fractions = 0;
+    fractions = Math.round(milliseconds % 1000);
     fractionsPerSecond = 1000;
   }
 

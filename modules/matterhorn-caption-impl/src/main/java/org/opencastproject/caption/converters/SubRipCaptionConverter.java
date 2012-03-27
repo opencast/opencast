@@ -16,12 +16,10 @@
 package org.opencastproject.caption.converters;
 
 import org.opencastproject.caption.api.Caption;
-import org.opencastproject.caption.api.CaptionCollection;
 import org.opencastproject.caption.api.CaptionConverter;
 import org.opencastproject.caption.api.CaptionConverterException;
 import org.opencastproject.caption.api.IllegalTimeFormatException;
 import org.opencastproject.caption.api.Time;
-import org.opencastproject.caption.impl.CaptionCollectionImpl;
 import org.opencastproject.caption.impl.CaptionImpl;
 import org.opencastproject.caption.impl.TimeImpl;
 import org.opencastproject.caption.util.TimeUtil;
@@ -34,7 +32,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -58,9 +57,9 @@ public class SubRipCaptionConverter implements CaptionConverter {
    * @see org.opencastproject.caption.api.CaptionConverter#importCaption(java.io.InputStream, java.lang.String)
    */
   @Override
-  public CaptionCollection importCaption(InputStream in, String language) throws CaptionConverterException {
+  public List<Caption> importCaption(InputStream in, String language) throws CaptionConverterException {
 
-    CaptionCollection collection = new CaptionCollectionImpl();
+    List<Caption> collection = new ArrayList<Caption>();
 
     // initialize scanner object
     Scanner scanner = new Scanner(in, "UTF-8");
@@ -113,7 +112,7 @@ public class SubRipCaptionConverter implements CaptionConverter {
 
       // create caption object and add to caption collection
       Caption caption = new CaptionImpl(inTime, outTime, captionLines);
-      collection.addCaption(caption);
+      collection.add(caption);
     }
 
     return collection;
@@ -122,12 +121,10 @@ public class SubRipCaptionConverter implements CaptionConverter {
   /**
    * {@inheritDoc} Since srt does not store information about language, language parameter is ignored.
    * 
-   * @see org.opencastproject.caption.api.CaptionConverter#exportCaption(java.io.OutputStream,
-   *      org.opencastproject.caption.api.CaptionCollection, java.lang.String)
+   * @see org.opencastproject.caption.api.CaptionConverter#exportCaption(java.io.OutputStream, java.lang.String)
    */
   @Override
-  public void exportCaption(OutputStream outputStream, CaptionCollection captionCollection, String language)
-          throws IOException {
+  public void exportCaption(OutputStream outputStream, List<Caption> captions, String language) throws IOException {
 
     if (language != null) {
       logger.debug("SubRip format does not include language information. Ignoring language attribute.");
@@ -137,14 +134,11 @@ public class SubRipCaptionConverter implements CaptionConverter {
     OutputStreamWriter osw = new OutputStreamWriter(outputStream, "UTF-8");
     BufferedWriter bw = new BufferedWriter(osw);
 
-    Iterator<Caption> iter = captionCollection.getCollectionIterator();
     // initialize counter
     int counter = 1;
-
-    while (iter.hasNext()) {
-      Caption caption = iter.next();
-      String captionString = String.format("%2$d%1$s%3$s --> %4$s%1$s%5$s%1$s%1$s", LINE_ENDING, counter, TimeUtil
-              .exportToSrt(caption.getStartTime()), TimeUtil.exportToSrt(caption.getStopTime()),
+    for (Caption caption : captions) {
+      String captionString = String.format("%2$d%1$s%3$s --> %4$s%1$s%5$s%1$s%1$s", LINE_ENDING, counter,
+              TimeUtil.exportToSrt(caption.getStartTime()), TimeUtil.exportToSrt(caption.getStopTime()),
               createCaptionText(caption.getCaption()));
       bw.append(captionString);
       counter++;

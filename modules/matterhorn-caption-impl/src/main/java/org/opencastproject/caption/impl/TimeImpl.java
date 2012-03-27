@@ -20,14 +20,13 @@ import org.opencastproject.caption.api.Time;
 
 /**
  * Implementation of {@link Time}.
- * 
  */
 public class TimeImpl implements Time {
 
   private int hours;
   private int minutes;
   private int seconds;
-  private int miliseconds;
+  private int milliseconds;
 
   public TimeImpl(int h, int m, int s, int ms) throws IllegalTimeFormatException {
     this.setHours(h);
@@ -69,11 +68,11 @@ public class TimeImpl implements Time {
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.caption.api.Time#getMiliseconds()
+   * @see org.opencastproject.caption.api.Time#getMilliseconds()
    */
   @Override
-  public int getMiliseconds() {
-    return this.miliseconds;
+  public int getMilliseconds() {
+    return this.milliseconds;
   }
 
   /**
@@ -129,7 +128,7 @@ public class TimeImpl implements Time {
   private void setMilliseconds(int ms) throws IllegalTimeFormatException {
     if (ms < 0 || ms > 999)
       throw new IllegalTimeFormatException("Invalid milisecond time: " + ms);
-    this.miliseconds = ms;
+    this.milliseconds = ms;
   }
 
   /**
@@ -148,6 +147,6 @@ public class TimeImpl implements Time {
    * @return milliseconds
    */
   private static int getMilliseconds(Time time) {
-    return (time.getHours() * 3600 + time.getMinutes() * 60 + time.getSeconds()) * 1000 + time.getMiliseconds();
+    return (time.getHours() * 3600 + time.getMinutes() * 60 + time.getSeconds()) * 1000 + time.getMilliseconds();
   }
 }

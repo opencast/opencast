@@ -16,7 +16,7 @@
 
 package org.opencastproject.caption.converters;
 
-import org.opencastproject.caption.api.CaptionCollection;
+import org.opencastproject.caption.api.Caption;
 
 import junit.framework.Assert;
 
@@ -28,6 +28,7 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 
 /**
@@ -59,7 +60,7 @@ public class SubRipConverterTest {
   public void testImportAndExport() {
     try {
       // verify parsing and exporting without exceptions
-      CaptionCollection collection = format.importCaption(inputStream, null);
+    	List<Caption> collection = format.importCaption(inputStream, null);
       format.exportCaption(outputStream, collection, null);
       Assert.assertTrue(outputStream.toString("UTF-8").startsWith(expectedOutput));
     } catch (Exception e) {

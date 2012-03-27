@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.caption.converters.Mpeg7CaptionConverter" immediate="true">
+  <implementation class="org.opencastproject.caption.converters.Mpeg7CaptionConverter" />
+  <property name="service.description" value="Mpeg7 caption converter" />
+  <property name="caption.format" value="mpeg7" />
+  <service>
+    <provide interface="org.opencastproject.caption.api.CaptionConverter" />
+  </service>
+</scr:component>

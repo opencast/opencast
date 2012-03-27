@@ -27,6 +27,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-mpeg7</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-workspace-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -74,7 +79,6 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.0.1</version>
         <extensions>true</extensions>
         <configuration>
           <instructions>
@@ -95,11 +99,12 @@
             </Export-Package>
             <Private-Package>
               org.opencastproject.caption.util
-						</Private-Package>
+			</Private-Package>
             <Service-Component>
               OSGI-INF/caption-service.xml,
               OSGI-INF/converters/dfxp-caption-converter.xml,
-              OSGI-INF/converters/subrip-caption-converter.xml
+              OSGI-INF/converters/subrip-caption-converter.xml,
+              OSGI-INF/converters/mpeg7-caption-converter.xml
             </Service-Component>
           </instructions>
         </configuration>

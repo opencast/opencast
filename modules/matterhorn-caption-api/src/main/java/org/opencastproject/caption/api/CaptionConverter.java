@@ -18,25 +18,26 @@ package org.opencastproject.caption.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 /**
- * Imports captions to {@link CaptionCollection} and exports from {@link CaptionCollection} to String presentation.
+ * Imports caption catalogs to a list of caption objects and exports these objects to catalog presentations.
  */
 public interface CaptionConverter {
 
   /**
-   * Imports captions to {@link CaptionCollection}. If caption format is capable of containing more than one language,
-   * language parameter is used to define which captions are parsed.
+   * Imports captions to {@link List}. If caption format is capable of containing more than one language, language
+   * parameter is used to define which captions are parsed.
    * 
    * @param inputStream
    *          stream from where captions are read
    * @param language
    *          (optional) captions' language
-   * @return {@link CaptionCollection} collection of captions
+   * @return {@link List} List of captions
    * @throws IllegalCaptionFormatException
    *           if parser encounters an exception
    */
-  CaptionCollection importCaption(InputStream inputStream, String language) throws CaptionConverterException;
+  List<Caption> importCaption(InputStream inputStream, String language) throws CaptionConverterException;
 
   /**
    * Exports caption collection. Language parameter is used to set language of the captions for those caption format
@@ -44,15 +45,14 @@ public interface CaptionConverter {
    * 
    * @param outputStream
    *          stream to which captions are written
-   * @param captionCollection
+   * @param captions
    *          collection to be exported
    * @param language
    *          (optional) captions' language
    * @throws IOException
    *           if exception occurs writing to output stream
    */
-  void exportCaption(OutputStream outputStream, CaptionCollection captionCollection, String language)
-          throws IOException;
+  void exportCaption(OutputStream outputStream, List<Caption> captions, String language) throws IOException;
 
   /**
    * Reads captions and return information about language if such information is available. Returns empty list
@@ -72,4 +72,5 @@ public interface CaptionConverter {
    * @return caption format extension
    */
   String getExtension();
+
 }

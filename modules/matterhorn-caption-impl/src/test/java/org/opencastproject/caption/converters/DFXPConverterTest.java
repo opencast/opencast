@@ -16,7 +16,7 @@
 
 package org.opencastproject.caption.converters;
 
-import org.opencastproject.caption.api.CaptionCollection;
+import org.opencastproject.caption.api.Caption;
 
 import junit.framework.Assert;
 
@@ -28,6 +28,7 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * 
@@ -57,7 +58,7 @@ public class DFXPConverterTest {
   public void testDFXPConversion() {
     try {
       // verify conversion parsing and exporting without exception
-      CaptionCollection collection = dfxpConverter.importCaption(inputStream, "en");
+    	List<Caption> collection = dfxpConverter.importCaption(inputStream, "en");
       dfxpConverter.exportCaption(outputStream, collection, "en");
       Assert.assertTrue(outputStream.toString("UTF-8").startsWith(expectedOutput));
     } catch (Exception e) {

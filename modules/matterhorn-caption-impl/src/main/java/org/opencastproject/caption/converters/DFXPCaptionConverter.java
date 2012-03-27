@@ -16,12 +16,10 @@
 package org.opencastproject.caption.converters;
 
 import org.opencastproject.caption.api.Caption;
-import org.opencastproject.caption.api.CaptionCollection;
 import org.opencastproject.caption.api.CaptionConverter;
 import org.opencastproject.caption.api.CaptionConverterException;
 import org.opencastproject.caption.api.IllegalTimeFormatException;
 import org.opencastproject.caption.api.Time;
-import org.opencastproject.caption.impl.CaptionCollectionImpl;
 import org.opencastproject.caption.impl.CaptionImpl;
 import org.opencastproject.caption.impl.TimeImpl;
 import org.opencastproject.caption.util.TimeUtil;
@@ -41,7 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -76,10 +74,10 @@ public class DFXPCaptionConverter implements CaptionConverter {
    * @see org.opencastproject.caption.api.CaptionConverter#importCaption(java.io.InputStream, java.lang.String)
    */
   @Override
-  public CaptionCollection importCaption(InputStream in, String language) throws CaptionConverterException {
+  public List<Caption> importCaption(InputStream in, String language) throws CaptionConverterException {
 
     // create new collection
-    CaptionCollection collection = new CaptionCollectionImpl();
+    List<Caption> collection = new ArrayList<Caption>();
 
     Document doc;
     try {
@@ -140,7 +138,7 @@ public class DFXPCaptionConverter implements CaptionConverter {
             logger.warn("Caption with invalid time encountered. Skipping...");
             continue;
           }
-          collection.addCaption(caption);
+          collection.add(caption);
         } catch (IllegalTimeFormatException e) {
           logger.warn("Caption with invalid time format encountered. Skipping...");
         }
@@ -196,12 +194,9 @@ public class DFXPCaptionConverter implements CaptionConverter {
 
   /**
    * {@inheritDoc} DOM parser is used to parse template from which whole document is then constructed.
-   * 
-   * @see org.opencastproject.caption.api.CaptionConverter#exportCaption(org.opencastproject.caption.api.CaptionCollection)
    */
   @Override
-  public void exportCaption(OutputStream outputStream, CaptionCollection captionCollection, String language)
-          throws IOException {
+  public void exportCaption(OutputStream outputStream, List<Caption> captions, String language) throws IOException {
     // get document builder factory and parse template
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     Document doc = null;
@@ -233,9 +228,7 @@ public class DFXPCaptionConverter implements CaptionConverter {
     bodyNode.appendChild(divNode);
 
     // update document
-    Iterator<Caption> iterator = captionCollection.getCollectionIterator();
-    while (iterator.hasNext()) {
-      Caption caption = iterator.next();
+    for (Caption caption : captions) {
       Element newNode = doc.createElement("p");
       newNode.setAttribute("begin", TimeUtil.exportToDFXP(caption.getStartTime()));
       newNode.setAttribute("end", TimeUtil.exportToDFXP(caption.getStopTime()));

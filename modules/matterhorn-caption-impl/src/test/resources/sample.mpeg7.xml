@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Mpeg7 xmlns="urn:mpeg:mpeg7:schema:2001" xmlns:mpeg7="urn:mpeg7:schema:2001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance/">
+    <Description xsi:type="ContentEntityType">
+        <MultimediaContent xsi:type="AudioType">
+            <Audio id="captions">
+                <MediaTime>
+                    <MediaTimePoint>1970-00-00T00:00:00:0F1000</MediaTimePoint>
+                    <MediaDuration>PT0N1000F</MediaDuration>
+                </MediaTime>
+                <TemporalDecomposition criteria="temporal" gap="false" overlap="false">
+                    <AudioSegment id="segment-0">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:02:350F1000</MediaTimePoint>
+                            <MediaDuration>PT02S739N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>SO I HAVE A FEW WORDS OF WARNING WHICH</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-1">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:05:89F1000</MediaTimePoint>
+                            <MediaDuration>PT02S61N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>IS I DON'T ACTUALLY DO SPEAKING VERY</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-2">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:07:150F1000</MediaTimePoint>
+                            <MediaDuration>PT02S69N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>MUCH PARTLY BECAUSE I DON'T LIKE SPEAKING</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-3">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:09:219F1000</MediaTimePoint>
+                            <MediaDuration>PT02S81N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>PARTLY BECAUSE OVER THE LAST FEW YEARS</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-4">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:11:640F1000</MediaTimePoint>
+                            <MediaDuration>PT02S350N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>EVERYBODY ACTUALLY WANTS ME TO TALK ABOUT</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-5">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:14:210F1000</MediaTimePoint>
+                            <MediaDuration>PT02S649N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>NEBULA SUBMISSIONS FOR THE NEXT CENTURY</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-6">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:16:859F1000</MediaTimePoint>
+                            <MediaDuration>PT04S110N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>ABOUT LINUX AND I I'M A GEEK SO I ACTUALLY</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-7">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:20:969F1000</MediaTimePoint>
+                            <MediaDuration>PT02S991N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>PREFER TALKING OUR TECHNOLOGY SO THAT'S</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-8">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:23:960F1000</MediaTimePoint>
+                            <MediaDuration>PT01S740N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>WHY I'M NOT TALKING ABOUT THE KERNEL</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-9">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:25:700F1000</MediaTimePoint>
+                            <MediaDuration>PT02S760N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>BECAUSE IT'S JUST TOO BIG TO CRAM INTO</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-10">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:28:460F1000</MediaTimePoint>
+                            <MediaDuration>PT01S729N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>A ONE HOUR TALK ALTHOUGH APPARENTLY</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-11">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:31:39F1000</MediaTimePoint>
+                            <MediaDuration>PT02S381N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>ANDREW DID THAT UH TWO DAYS AGO</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-12">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:34:320F1000</MediaTimePoint>
+                            <MediaDuration>PT02S260N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>UH AND I MISS THAT TALKING ABOUT GET</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-13">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:36:609F1000</MediaTimePoint>
+                            <MediaDuration>PT01S591N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>TO WHICH IS THE SOURCE CONTROL MANAGEMENT</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-14">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:38:200F1000</MediaTimePoint>
+                            <MediaDuration>PT03S20N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>SYSTEM THAT WE USE FOR THE COLONEL AND</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-15">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:41:220F1000</MediaTimePoint>
+                            <MediaDuration>PT380N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>UH</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-16">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:42:740F1000</MediaTimePoint>
+                            <MediaDuration>PT129N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>I</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-17">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:43:70F1000</MediaTimePoint>
+                            <MediaDuration>PT219N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>OH</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-18">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:45:829F1000</MediaTimePoint>
+                            <MediaDuration>PT01S21N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>REALLY REALLY BAD</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-19">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:47:230F1000</MediaTimePoint>
+                            <MediaDuration>PT02S690N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>SLIDES WHICH MEANS THAT IF WE ACTUALLY</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-20">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:49:920F1000</MediaTimePoint>
+                            <MediaDuration>PT02S640N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>END UP FOLLOWING THESE SLIDES YOU WILL</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-21">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:52:560F1000</MediaTimePoint>
+                            <MediaDuration>PT02S909N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>BE BORED OUT OF YOUR MIND AND THE TALK</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-22">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:55:469F1000</MediaTimePoint>
+                            <MediaDuration>PT03S21N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>OR PROBABLY NOT BE VERY GOOD ANYWAY US</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-23">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:00:58:590F1000</MediaTimePoint>
+                            <MediaDuration>PT03S400N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>SO UH I AM THE KIND OF SPEAKER WHO REALLY</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                    <AudioSegment id="segment-24">
+                        <MediaTime>
+                            <MediaTimePoint>1970-00-00T00:01:01:990F1000</MediaTimePoint>
+                            <MediaDuration>PT01S430N1000F</MediaDuration>
+                        </MediaTime>
+                        <TextAnnotation confidence="0.0" relevance="0.0" xml:lang="en">
+                            <FreeTextAnnotation>ENJOYS GETTING QUESTIONS</FreeTextAnnotation>
+                        </TextAnnotation>
+                    </AudioSegment>
+                </TemporalDecomposition>
+            </Audio>
+        </MultimediaContent>
+    </Description>
+</Mpeg7>

@@ -107,11 +107,6 @@ public class TimeTest {
     } catch (IllegalTimeFormatException e) {
     }
     try {
-      TimeUtil.importSrt("00:00:00,01");
-      Assert.fail("Should fail for this time");
-    } catch (IllegalTimeFormatException e) {
-    }
-    try {
       TimeUtil.importSrt("00:00:0,001");
       Assert.fail("Should fail for this time");
     } catch (IllegalTimeFormatException e) {

@@ -26,7 +26,7 @@ import org.opencastproject.caption.impl.TimeImpl;
 public final class TimeUtil {
 
   // time format regular expressions
-  private static final String SRT_FORMAT = "[0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}";
+  private static final String SRT_FORMAT = "[0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{1,3}";
   private static final String DFXP_FORMAT_1 = "[0-9]{1,2}:[0-9]{2}:[0-9]{2}(.[0-9]+)?";
 
   // SRT time format functions
@@ -69,7 +69,7 @@ public final class TimeUtil {
    */
   public static String exportToSrt(Time time) {
     return String.format("%02d:%02d:%02d,%03d", time.getHours(), time.getMinutes(), time.getSeconds(),
-            time.getMiliseconds());
+            time.getMilliseconds());
   }
 
   // DFXP TT time format
@@ -120,6 +120,6 @@ public final class TimeUtil {
    */
   public static String exportToDFXP(Time time) {
     return String.format("%d:%02d:%02d.%03d", time.getHours(), time.getMinutes(), time.getSeconds(),
-            time.getMiliseconds());
+            time.getMilliseconds());
   }
 }
