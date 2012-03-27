@@ -14,7 +14,7 @@
     <!-- # URL SECURITY # -->
     <!-- ################ -->
     <sec:intercept-url pattern='/login.html' access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern="/admin/img/favicon.ico" filters="none" />
+    <sec:intercept-url pattern="/admin/img/**" filters="none" />
     <sec:intercept-url pattern="/favicon.ico" filters="none" />
     <sec:intercept-url pattern='/images/**' filters="none" />
     <sec:intercept-url pattern="/img/**" filters="none" />
