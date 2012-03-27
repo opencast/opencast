@@ -1521,6 +1521,17 @@
       </roles>
       <timezone>+2</timezone>
     </developer>
+ <developer>
+      <id>nbirnbaum</id>
+      <name>Nils H. Birnbaum</name>
+      <email>nbirnbau@uni-osnabrueck.de</email>
+      <organization>Universität Osnabrück</organization>
+      <organizationUrl>http://www.virtuos.uni-osnabrueck.de</organizationUrl>
+      <roles>
+        <role>Documentation and QA</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
 
   <contributors><!-- TODO? -->
