@@ -67,7 +67,7 @@ opencast.episode = (function() {
     var mpe = $("#mpe-editor").mediaPackageEditor({
               additionalDC: {
                 enable: true,
-                required: false
+                required: true
               },
               // Catalogs available for the plugin
               catalogs: {
@@ -211,9 +211,10 @@ opencast.episode = (function() {
    */
   function openWindow($win, opt) {
     $win.dialog("option", _.extend({
-      width: $(window).width() - 40,
-      height: $(window).height() - 40,
-      position: ["center", "center"],
+      width: 1000,
+      modal: true,
+      height: "auto",
+      position: ["center", 40],
       show: "scale"
     }, opt || {})).dialog("open");
     return $win;

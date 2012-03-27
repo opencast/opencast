@@ -4,38 +4,36 @@
   <table id="statsTable" class="ui-widget" cellspacing="0" width="100%">
     <thead>
       <tr>
-        <th id="sortService" width="25%" class="ui-widget-header">Host<span></span></th>    
+        <th id="sortService" width="40%" class="ui-widget-header">Host<span></span></th>
         <th id="sortJobsRunning" width="15%" class="ui-widget-header">Jobs Running<span></span></th>
         <th id="sortJobsQueued" width="15%" class="ui-widget-header">Jobs Queued<span></span></th>
         <th id="sortMeanRunTime" width="15%" class="ui-widget-header">Mean Run Time<span></span></th>
         <th id="sortMeanQueueTime" width="15%" class="ui-widget-header">Mean Queue Time<span></span></th>
-		<th id="sortStatus" width="15%" class="ui-widget-header">Status<span></spand></th>
       </tr>
     </thead>
     <tbody>
       <% $.each(service.servers, function (key, server) { %>
       <tr valign="top">
-        <td class="ui-state-active"">
-            <img style="vertical-align:middle; margin-right:5px;" src=<% if (server.online) { %><% if(server.maintenance) { %>"/admin/img/icons/maintenance.png" title="Maintenance Mode"<% } else { %> "/admin/img/icons/available.png" title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/> <%= server.host %>
+        <td class="ui-state-active">
+            <img style="vertical-align:middle; margin-right:5px;" src=<% if (server.online) { %><% if(server.maintenance) { %>"/admin/img/icons/maintenance.png" title="Maintenance Mode"<% } else { %> "/admin/img/icons/available.png" title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/>
+		  	<% if (server.state != "NORMAL") { %>
+		  	<img style="vertical-align:middle; margin-right:5px;" src=<% if (server.state == "WARNING") { %>"/admin/img/icons/lightbulb.png" title="Warning State" <% } else { %> "/admin/img/icons/exclamation.png" title="Error State" <% } %>/>
+		  	<a class="service-sanitize" title="Sanitize" style="vertical-align:middle; margin-right:5px;" href="host=<%= server.host %>&serviceType=<%= server.type %>">Sanitize</a>
+		  	<% } %>
+			<span style="vertical-align:middle;"><%= server.host %></span>
         </td>
-        <td class="ui-state-active  center">
+        <td class="ui-state-active center">
           <%= server.running %>
         </td>
-        <td class="ui-state-active  center">
+        <td class="ui-state-active center">
           <%= server.queued %>
         </td>
-        <td class="ui-state-active  center">
+        <td class="ui-state-active center">
           <%= server.meanRunTime %>
         </td>
-        <td class="ui-state-active  center">
+        <td class="ui-state-active center">
           <%= server.meanQueueTime %>
         </td>
-		<td class="ui-state-active center">
-		  <%= server.state %>
-		  <% if (server.state != "NORMAL") { %>
-		  <a class="service-sanitize" title="Sanitize" style="vertical-align:middle; margin-left:5px;" href="host=<%= server.host %>&serviceType=<%= server.type %>">Sanitize</a>
-		  <% } %>
-		</td>
       </tr>
       <% }); %>
       <tr>

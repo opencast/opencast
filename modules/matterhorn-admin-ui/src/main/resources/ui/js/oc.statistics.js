@@ -95,26 +95,38 @@ ocStatistics = new (function() {
     		type: 'POST',
     		data: $(this).attr('href'),
     		success: $.proxy(function(data, textStatus, jqXHR) {
-    			$(this).parent().html('NORMAL');
+    			$(this).prev().remove();
+    			$(this).remove();
     		}, this)
     	});
     });
     $('input.server-maintenance').click(function(event) {
     	var setToMaintenance = $(this).is(":checked");
+    	var hostName = $(this).attr('name');
     	$.ajax({
     		url: SERVER_MAINTENANCE_URL,
     		type: 'POST',
-    		dataType: 'text/xml',
-    		data: 'host=' + $(this).attr('name') + '&maintenance=' + setToMaintenance,
+    		data: 'host=' + hostName + '&maintenance=' + setToMaintenance,
     		success: $.proxy(function (data, textStatus, jqXHR) {
     			$.ajax({
-    				url: SERVERS_STATS_URL,
+    				url: '/services/services.json?&host=' + hostName,
     		        dataType: 'json',
-    		        success: function(data) {
-    		        	// TODO Adjust status indicator depending on online / offline status
-//		    			$(this).prev().find('img').attr('src', 'img/icons/maintenance.png');
-//		    			$(this).prev().find('img').attr('title', 'Maintenance Mode');
-    		        }
+    		        success: $.proxy(function(data) {
+    		        	var image = '/admin/img/icons/available.png';
+    		        	var title = 'Online';
+    		        	if(setToMaintenance) {
+    		        		image = '/admin/img/icons/maintenance.png';
+    		        		title = 'Maintenance Mode';
+    		        	}
+    		        	if(data.services.service != undefined && data.services.service.length > 0 && !data.services.service[0].online) {
+    		        		image = '/admin/img/icons/offline.png';
+    		        		title = 'Offline';
+    		        	}
+    		        	
+    		        	var img = $(this).prev().find('img');
+    		        	img.attr('src', image);
+    		        	img.attr('title', title);
+    		        }, this)
     			});
     		}, this)
     	});
@@ -175,6 +187,8 @@ ocStatistics = new (function() {
       singleService.queued = serviceInstance.queued;
       duration = ocUtils.getDuration(serviceInstance.meanqueuetime);
       singleService.meanQueueTime = duration.substring(duration.indexOf(':')+1);
+      singleService.state = reg.service_state;
+      singleService.type = reg.type;
     });
 
     $.each(ocStatistics.serversView,function(s,server){
