@@ -740,15 +740,15 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     if (tz.inDaylightTime(start) && !tz.inDaylightTime(end)) {
       seed.setTime(start.getTime() + 3600000);
       period.setTime(end.getTime());
-      duration = (end.getTime() % (60 * 60 * 1000)) - (start.getTime() % (60 * 60 * 1000) + 3600000);
+      duration = (end.getTime() - (start.getTime() + 3600000)) % (24 * 60 * 60 * 1000);
     } else if (!tz.inDaylightTime(start) && tz.inDaylightTime(end)) {
       seed.setTime(start.getTime());
       period.setTime(end.getTime() + 3600000);
-      duration = (end.getTime() % (60 * 60 * 1000) + 3600000) - (start.getTime() % (60 * 60 * 1000));
+      duration = ((end.getTime() + 3600000) - start.getTime()) % (24 * 60 * 60 * 1000);
     } else {
       seed.setTime(start.getTime());
       period.setTime(end.getTime());
-      duration = (end.getTime() % (60 * 60 * 1000)) - (start.getTime() % (60 * 60 * 1000));
+      duration = (end.getTime() - start.getTime()) % (24 * 60 * 60 * 1000);
     }
     DateList dates = recur.getDates(seed, period, Value.DATE_TIME);
     logger.debug("DateList: {}", dates);
