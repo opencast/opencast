@@ -756,10 +756,9 @@ opencast.episode = (function() {
         if (confirm("Start retraction of episode?")) {
           $.ajax({
             type: "POST",
-            url: "../episode/applyworkflow",
+            url: "../episode/apply/retract",
             data: {
-              id: mediaPackageId,
-              definitionId: "retract"
+              mediaPackageIds: mediaPackageId
             },
             complete: function(xhr) {
               if (xhr.status == 204) {
@@ -781,10 +780,9 @@ opencast.episode = (function() {
         var mids = _.isArray(mediaPackageId) ? mediaPackageId : [mediaPackageId];
         $.ajax({
           type: "POST",
-          url: "../episode/applyworkflow",
+          url: "../episode/apply/" + workflowDefinitionId,
           data: {
-            id: mids,
-            definitionId: workflowDefinitionId
+            mediaPackageIds: mids
           },
           // IMPORTANT! Must be true otherwise the id array gets serialized like this "id%5B%5D=1&id%5B%5D=2"
           // which the server does not understand
