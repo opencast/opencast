@@ -39,6 +39,8 @@ import java.util.Map;
  */
 public class RemoteBase {
 
+  private static final int TIMEOUT = 5000;
+
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(RemoteBase.class);
 
@@ -108,52 +110,67 @@ public class RemoteBase {
    * @return the response object, or null if we can not connect to any services
    */
   protected HttpResponse getResponse(HttpRequestBase httpRequest, Integer... expectedHttpStatus) {
-    List<ServiceRegistration> remoteServices = null;
-    try {
-      remoteServices = remoteServiceManager.getServiceRegistrationsByLoad(serviceType);
-    } catch (ServiceRegistryException e) {
-      logger.warn("Unable to obtain a list of remote services", e);
-      return null;
-    }
+    // Try forever
+    while (true) {
 
-    if (remoteServices.size() == 0) {
-      logger.warn("No services of type '{}' are currently available", serviceType);
-      return null;
-    }
+      List<ServiceRegistration> remoteServices = null;
 
-    Map<String, String> hostErrors = new HashMap<String, String>();
-    URI originalUri = httpRequest.getURI();
-    String uriSuffix = null;
-    if (originalUri != null && StringUtils.isNotBlank(originalUri.toString())) {
-      uriSuffix = originalUri.toString();
-    }
-
-    for (ServiceRegistration remoteService : remoteServices) {
-      HttpResponse response = null;
-      try {
-        String fullUrl = null;
-        if (uriSuffix == null) {
-          fullUrl = UrlSupport.concat(remoteService.getHost(), remoteService.getPath());
-        } else {
-          fullUrl = UrlSupport.concat(new String[] { remoteService.getHost(), remoteService.getPath(), uriSuffix });
+      // Find available services
+      while (remoteServices == null || remoteServices.size() == 0) {
+        try {
+          remoteServices = remoteServiceManager.getServiceRegistrationsByLoad(serviceType);
+        } catch (ServiceRegistryException e) {
+          logger.warn("Unable to obtain a list of remote services", e);
+          return null;
         }
-        URI uri = new URI(fullUrl);
-        httpRequest.setURI(uri);
-        response = client.execute(httpRequest);
-        StatusLine status = response.getStatusLine();
-        if (Arrays.asList(expectedHttpStatus).contains(status.getStatusCode())) {
-          return response;
-        } else {
-          hostErrors.put(httpRequest.getMethod() + " " + uri.toString(), status.toString());
+      }
+
+      Map<String, String> hostErrors = new HashMap<String, String>();
+      URI originalUri = httpRequest.getURI();
+      String uriSuffix = null;
+      if (originalUri != null && StringUtils.isNotBlank(originalUri.toString())) {
+        uriSuffix = originalUri.toString();
+      }
+
+      // Try each available service
+      for (ServiceRegistration remoteService : remoteServices) {
+        HttpResponse response = null;
+        try {
+          String fullUrl = null;
+          if (uriSuffix == null) {
+            fullUrl = UrlSupport.concat(remoteService.getHost(), remoteService.getPath());
+          } else {
+            fullUrl = UrlSupport.concat(new String[] { remoteService.getHost(), remoteService.getPath(), uriSuffix });
+          }
+          URI uri = new URI(fullUrl);
+          httpRequest.setURI(uri);
+          response = client.execute(httpRequest);
+          StatusLine status = response.getStatusLine();
+          if (Arrays.asList(expectedHttpStatus).contains(status.getStatusCode())) {
+            return response;
+          } else {
+            hostErrors.put(httpRequest.getMethod() + " " + uri.toString(), status.toString());
+            closeConnection(response);
+          }
+        } catch (Exception e) {
+          hostErrors.put(httpRequest.getMethod() + " " + remoteService + uriSuffix, e.getMessage());
           closeConnection(response);
         }
-      } catch (Exception e) {
-        hostErrors.put(httpRequest.getMethod() + " " + remoteService + uriSuffix, e.getMessage());
-        closeConnection(response);
       }
+
+      // Reset Original URI
+      httpRequest.setURI(originalUri);
+
+      // If none of them accepted the request, let's wait and retry
+      logger.warn("No service of type '{}' is currently readily available", serviceType);
+      try {
+        Thread.sleep(TIMEOUT);
+      } catch (InterruptedException e) {
+        logger.warn("Interrupted while waiting for remote service of type '{}'", serviceType);
+        return null;
+      }
+
     }
-    logger.warn(hostErrors.toString());
-    return null;
   }
 
   /**
