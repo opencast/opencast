@@ -42,6 +42,8 @@ public class FileUploadJob {
     READY,
     @XmlEnumValue("INPROGRESS")
     INPROGRESS,
+    @XmlEnumValue("FINALIZING")
+    FINALIZING,
     @XmlEnumValue("COMPLETE")
     COMPLETE
   }
@@ -107,5 +109,13 @@ public class FileUploadJob {
 
   public void setCurrentChunk(Chunk currentChunk) {
     this.currentChunk = currentChunk;
+  }
+  
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder()
+            .append("FileUploadJob(id=").append(this.id)
+            .append(", filename=").append(this.payload.filename).append(")");
+    return sb.toString();
   }
 }

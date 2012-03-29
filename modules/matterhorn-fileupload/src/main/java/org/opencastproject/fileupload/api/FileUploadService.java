@@ -92,5 +92,5 @@ public interface FileUploadService {
    * @param id the id of the job
    * @param mp the mediapackage to set
    */
-  void setMediapackage(String id, MediaPackage mp) throws FileUploadException;
+  void setMediaPackage(String id, MediaPackage mp) throws FileUploadException;
 }

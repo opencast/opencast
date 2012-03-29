@@ -63,7 +63,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-working-file-repository-service-api</artifactId>
+      <artifactId>matterhorn-workspace-api</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
@@ -79,7 +79,7 @@
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
             <Export-Package> org.opencastproject.fileupload.api;version=${project.version} </Export-Package>
             <Import-Package>
-              org.opencastproject.workingfilerepository.api;version=${project.version},
+               org.opencastproject.workspace.api;version=${project.version},
               *;resolution:=optional
             </Import-Package>
             <Service-Component>

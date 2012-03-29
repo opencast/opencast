@@ -133,7 +133,6 @@ public class FileUploadRestService {
       }
 
       FileUploadJob job = uploadService.createJob(filename, filesize, chunksize, mp, flavor);
-      log.info("New upload job created: {}", job.getId());
       return Response.ok(job.getId()).build();
     } catch (FileUploadException e) {
       log.error(e.getMessage(), e);
@@ -313,7 +312,7 @@ public class FileUploadRestService {
     try {
       if (uploadService.hasJob(id)) {
         MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mediapackage);
-        uploadService.setMediapackage(id, mp);
+        uploadService.setMediaPackage(id, mp);
         return Response.ok().build();
       } else {
         return Response.status(Response.Status.NOT_FOUND).build();

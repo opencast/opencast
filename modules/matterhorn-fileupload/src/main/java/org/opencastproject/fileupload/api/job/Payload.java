@@ -15,6 +15,7 @@
  */
 package org.opencastproject.fileupload.api.job;
 
+import java.net.URL;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -37,6 +38,8 @@ public class Payload {
   long totalsize;                     // size of the file
   @XmlElement(name = "currentsize")
   long currentsize;                   // number of bytes that have already been (successfully) recieved
+  @XmlElement(name = "url")
+  private URL url;                            // URL of the completely uploaded file
   @XmlElement(name = "mediapackage")
   MediaPackage mediapackage;          // the mediapackage this UploadJob should belong to
   @XmlElement(name = "flavor")
@@ -92,5 +95,13 @@ public class Payload {
   
   public void setFlavor(MediaPackageElementFlavor flavor) {
     this.flavor = flavor;
+  }
+
+  public URL getUrl() {
+    return url;
+  }
+
+  public void setUrl(URL url) {
+    this.url = url;
   }
 }
