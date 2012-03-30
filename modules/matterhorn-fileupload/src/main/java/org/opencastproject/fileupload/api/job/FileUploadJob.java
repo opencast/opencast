@@ -37,7 +37,6 @@ public class FileUploadJob {
 
   @XmlEnum
   public enum JobState {          // states an upload job can be in
-
     @XmlEnumValue("READY")
     READY,
     @XmlEnumValue("INPROGRESS")
@@ -47,6 +46,7 @@ public class FileUploadJob {
     @XmlEnumValue("COMPLETE")
     COMPLETE
   }
+  
   @XmlAttribute()
   private String id;                        // this jobs identifier
   @XmlAttribute()

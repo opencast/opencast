@@ -45,23 +45,26 @@ import org.slf4j.LoggerFactory;
 
 /** A service for big file uploads via HTTP.
  * 
- * TODO make it possible to register n upload handlers instead of just one
+ * FIXME when an upload job is created and never conducted or when a job is not
+ *       finished it will stay in the jobCache. jobCache must be cleaned from
+ *       'dead jobs'.
  *
  */
 public class FileUploadServiceImpl implements FileUploadService {
 
   final String PROPKEY_STORAGE_DIR = "org.opencastproject.storage.dir";
-  final String DIRNAME_WORK_ROOT = "fileupload";
+  final String DIRNAME_WORK_ROOT = "fileupload-tmp";
   final String UPLOAD_COLLECTION = "uploaded";
   final String FILENAME_DATAFILE = "payload.part";
   final String FILENAME_CHUNKFILE = "chunk.part";
   final String FILENAME_JOBFILE = "job.xml";
   final int READ_BUFFER_LENGTH = 512;
+  
   private static final Logger log = LoggerFactory.getLogger(FileUploadServiceImpl.class);
+  private File workRoot;
   private Workspace workspace;
   private Marshaller jobMarshaller;
   private Unmarshaller jobUnmarshaller;
-  private File workRoot;
   private HashMap<String, FileUploadJob> jobCache = new HashMap<String, FileUploadJob>();
   private byte[] readBuffer = new byte[READ_BUFFER_LENGTH];
   
@@ -273,7 +276,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     long supposedSize;
     if (chunkNumber == job.getChunksTotal() - 1) {
       supposedSize = job.getPayload().getTotalSize() % job.getChunksize();
-      supposedSize = supposedSize == 0 ? job.getChunksize() : supposedSize;     // a not so nice workaround for the rare case that file size is a multiple of chunk size
+      supposedSize = supposedSize == 0 ? job.getChunksize() : supposedSize;     // a not so nice workaround for the rare case that file size is a multiple of the chunk size
     } else {
       supposedSize = job.getChunksize();
     }
@@ -400,7 +403,7 @@ public class FileUploadServiceImpl implements FileUploadService {
   private URL putPayloadIntoCollection(FileUploadJob job) throws FileUploadException {
     try {
       log.debug("Attempting to put payload of job " + job.getId() + " into collection " + UPLOAD_COLLECTION);
-      URI uri = workspace.putInCollection(UPLOAD_COLLECTION, job.getId(),                 // storing file with jod id as name instead of original filename to avoid collisions (original filename can be obtained from upload job)
+      URI uri = workspace.putInCollection(UPLOAD_COLLECTION, job.getId(),       // storing file with jod id as name instead of original filename to avoid collisions (original filename can be obtained from upload job)
               new FileInputStream(getPayloadFile(job.getId())));
       return uri.toURL(); 
     } catch (Exception e) {

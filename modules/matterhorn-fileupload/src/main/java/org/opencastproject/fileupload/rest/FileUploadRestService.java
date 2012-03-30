@@ -159,8 +159,7 @@ public class FileUploadRestService {
           @PathParam("format") String format) {
     try {
       if (uploadService.hasJob(id)) {
-        FileUploadJob job = uploadService.getJob(id);
-        // Return the results using the requested format
+        FileUploadJob job = uploadService.getJob(id);                           // Return the results using the requested format
         final String type = "json".equals(format) ? MediaType.APPLICATION_JSON : MediaType.APPLICATION_XML;
         return Response.ok().entity(job).type(type).build();
       } else {
@@ -188,11 +187,10 @@ public class FileUploadRestService {
   }, returnDescription = "The XML representation of the updated upload job")
   public Response postPayload(@PathParam("jobID") String jobId, @Context HttpServletRequest request) {
     try {
-      // make sure request is "multipart/form-data"
-      if (!ServletFileUpload.isMultipartContent(request)) {
+      if (!ServletFileUpload.isMultipartContent(request)) {                     // make sure request is "multipart/form-data"
         throw new FileUploadException("Request is not of type multipart/form-data");
       }
-      if (uploadService.hasJob(jobId)) {    // testing for existence of job here already so we can generate a 404 early
+      if (uploadService.hasJob(jobId)) {                                        // testing for existence of job here already so we can generate a 404 early
         long chunkNum = 0;
         FileUploadJob job = uploadService.getJob(jobId);
         ServletFileUpload upload = new ServletFileUpload();
@@ -236,12 +234,8 @@ public class FileUploadRestService {
     try {
       if (uploadService.hasJob(id)) {
         FileUploadJob job = uploadService.getJob(id);
-//        if (job.getPayload().getFilename().equals(filename)) {
         InputStream payload = uploadService.getPayload(job);
-        return Response.ok(payload).build();                    // TODO use AutoDetectParser to guess Content-Type header
-//        } else {
-//          return Response.status(Response.Status.NOT_FOUND).build();
-//        }
+        return Response.ok(payload).build();                                    // TODO use AutoDetectParser to guess Content-Type header
       } else {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
