@@ -27,6 +27,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +43,9 @@ import java.util.Dictionary;
  */
 public class TesseractTextExtractor implements TextExtractor, ManagedService {
 
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(TesseractTextExtractor.class);
+  
   /** Default name of the tesseract binary */
   public static final String TESSERACT_BINARY_DEFAULT = "tesseract";
 
@@ -145,7 +152,19 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
   public void updated(Dictionary properties) throws ConfigurationException {
     String path = (String) properties.get(TESSERACT_BINARY_CONFIG_KEY);
     if (path != null) {
+      logger.info("Setting Tesseract path to {}", path);
       this.binary = path;
+    }
+  }
+  
+  public void activate(ComponentContext cc) {
+    // Configure ffmpeg
+    String path = (String) cc.getBundleContext().getProperty(TESSERACT_BINARY_CONFIG_KEY);
+    if (path == null) {
+      logger.debug("DEFAULT " + TESSERACT_BINARY_CONFIG_KEY + ": " + TESSERACT_BINARY_DEFAULT);
+    } else {
+      setBinary(path);
+      logger.info("Setting Tesseract path to binary from config: {}", path);
     }
   }
 }

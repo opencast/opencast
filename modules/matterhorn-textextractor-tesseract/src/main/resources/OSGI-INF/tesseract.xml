@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
-  <scr:component name="org.opencastproject.textextractor.tesseract.TesseractTextExtractor" immediate="true">
+  <scr:component name="org.opencastproject.textextractor.tesseract.TesseractTextExtractor" immediate="true" activate="activate">
     <implementation class="org.opencastproject.textextractor.tesseract.TesseractTextExtractor" />
     <property name="service.description" value="Tesseract Text Extractor" />
     <service>
