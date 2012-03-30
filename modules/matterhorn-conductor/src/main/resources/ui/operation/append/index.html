@@ -18,11 +18,24 @@
     	ocWorkflow.init($('#workflowSelector'), $('#workflowConfigContainer'));
       });
       
+      function getWorkflowConfiguration($container) {
+   	    var out = new Object();
+   	    $container.find('.configField').each( function(idx, elm) {
+   	      if ($(elm).is('[type=checkbox]')) {
+   	        if ($(elm).is(':checked')) {
+   	          out[$(elm).attr('id')] = $(elm).val();
+   	        }
+   	      } else {
+   	        out[$(elm).attr('id')] = $(elm).val();
+   	      }
+   	    });
+   	    return out;
+   	  }
+      
       function continueWorkflow() {
-//     	  if (components) {
-//     	    components['org.opencastproject.workflow.config.workflowSelector'] = new ocAdmin.Component(['workflowSelector'], {nodeKey: 'org.opencastproject.workflow.config.workflowSelector'});
-//     	  }
-    	  parent.ocRecordings.continueWorkflow(components);
+    	  var properties = getWorkflowConfiguration($('#workflowConfigContainer'));
+    	  properties['workflowSelector'] = $('#workflowSelector').val();
+    	  parent.ocRecordings.continueWorkflow(properties);
       }
     </script>
   </head>

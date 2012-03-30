@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Workflow operation handler that will add a number of workflow operations to the current workflow.
@@ -74,10 +75,12 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
   @Override
-  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     String workflowDefinitionId = workflowInstance.getConfiguration(OPT_WORKFLOW);
     if (append(workflowInstance, workflowDefinitionId))
       return createResult(Action.CONTINUE);
@@ -93,8 +96,12 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
    *      JobContext, java.util.Map)
    */
   @Override
-  public WorkflowOperationResult resume(WorkflowInstance workflowInstance, JobContext context, Map<String, String> properties) {
-    String workflowDefinitionId = workflowInstance.getConfiguration(OPT_WORKFLOW);
+  public WorkflowOperationResult resume(WorkflowInstance workflowInstance, JobContext context,
+          Map<String, String> properties) {
+    String workflowDefinitionId = properties.get(OPT_WORKFLOW);
+    for (Entry<String, String> entry : properties.entrySet()) {
+      workflowInstance.setConfiguration(entry.getKey(), entry.getValue());
+    }
     if (append(workflowInstance, workflowDefinitionId))
       return createResult(Action.CONTINUE);
     else
