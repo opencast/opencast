@@ -275,54 +275,6 @@ public class FileUploadRestService {
     }
   }
 
-  @GET
-  @Produces(MediaType.APPLICATION_XML)
-  @Path("mediapackage/{jobID}")
-  @RestQuery(name = "mediapackage", description = "Returns the Mediapackage", pathParameters = {
-    @RestParameter(description = "The ID of the upload job to get the Mediapackage from", isRequired = false, name = "jobID", type = RestParameter.Type.STRING)},
-  reponses = {
-    @RestResponse(description = "the mediapackage was found and returned.", responseCode = HttpServletResponse.SC_OK),
-    @RestResponse(description = "the mediapackage was not found.", responseCode = HttpServletResponse.SC_NOT_FOUND)
-  }, returnDescription = "The Mediapackage as XML")
-  public Response getMediapackage(@PathParam("jobID") String id) {
-    try {
-      if (uploadService.hasJob(id) && uploadService.getJob(id).getPayload().getMediaPackage() != null) {
-        return Response.ok().entity(uploadService.getJob(id).getPayload().getMediaPackage()).build();
-      } else {
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
-    } catch (Exception e) {
-      log.error(e.getMessage(), e);
-      return Response.serverError().entity(buildUnexpectedErrorMessage(e)).build();
-    }
-  }
-
-  @POST
-  @Produces(MediaType.TEXT_PLAIN)
-  @Path("mediapackage/{jobID}")
-  @RestQuery(name = "mediapackage", description = "SET the Mediapackage", pathParameters = {
-    @RestParameter(description = "The ID of the upload job to set the Mediapackage to", isRequired = false, name = "jobID", type = RestParameter.Type.STRING),
-    @RestParameter(description = "The Mediapackage", isRequired = false, name = "mediapackage", type = RestParameter.Type.TEXT)},
-  reponses = {
-    @RestResponse(description = "the mediapackage was set.", responseCode = HttpServletResponse.SC_OK),
-    @RestResponse(description = "the job was not found.", responseCode = HttpServletResponse.SC_NOT_FOUND)
-  }, returnDescription = "A success message that starts with OK")
-  public Response setMediapackage(@PathParam("jobID") String id,
-          @FormParam(REQUESTFIELD_MEDIAPACKAGE) String mediapackage) {
-    try {
-      if (uploadService.hasJob(id)) {
-        MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mediapackage);
-        uploadService.setMediaPackage(id, mp);
-        return Response.ok().build();
-      } else {
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
-    } catch (Exception e) {
-      log.error(e.getMessage(), e);
-      return Response.serverError().entity(buildUnexpectedErrorMessage(e)).build();
-    }
-  }
-
   /** Builds an error message in case of an unexpected error in an endpoint method,
    * includes the exception type and message if existing.
    *

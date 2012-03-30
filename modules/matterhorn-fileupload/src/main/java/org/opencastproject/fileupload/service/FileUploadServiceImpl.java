@@ -214,14 +214,13 @@ public class FileUploadServiceImpl implements FileUploadService {
    * @see org.opencastproject.fileupload.api.FileUploadService#acceptChunk(org.opencastproject.fileupload.api.job.FileUploadJob job, long chunk, InputStream content)
    */
   @Override
-  public void acceptChunk(FileUploadJob job, long chunk, InputStream content) throws FileUploadException {
+  public void acceptChunk(FileUploadJob job, long chunkNumber, InputStream content) throws FileUploadException {
     // job ready to recieve data?
     if (isLocked(job.getId())) {
       throw new FileUploadException("Job is locked. Seems like a concurrent upload to this job is in progress.");
     } else {
       lock(job);
     }
-    log.debug("Recieving chunk for job {}", job);
 
     // job already completed?
     if (job.getState().equals(FileUploadJob.JobState.COMPLETE)) {
@@ -231,15 +230,16 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     // right chunk offered?
     int supposedChunk = job.getCurrentChunk().getNumber() + 1;
-    if (chunk != supposedChunk) {
+    if (chunkNumber != supposedChunk) {
       StringBuilder sb = new StringBuilder()
               .append("Wrong chunk number! Awaiting #")
               .append(supposedChunk).append(" but #")
-              .append(Long.toString(chunk)).append(" was offered.");
+              .append(Long.toString(chunkNumber)).append(" was offered.");
       unlock(job);
       throw new FileUploadException(sb.toString());
     }
-
+    log.debug("Recieving chunk #" + chunkNumber + " of job {}", job);
+    
     // write chunk to temp file
     job.getCurrentChunk().incrementNumber();
     File chunkFile = ensureExists(getChunkFile(job.getId()));
@@ -271,7 +271,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     // check if chunk has right size
     long actualSize = chunkFile.length();
     long supposedSize;
-    if (chunk == job.getChunksTotal() - 1) {
+    if (chunkNumber == job.getChunksTotal() - 1) {
       supposedSize = job.getPayload().getTotalSize() % job.getChunksize();
       supposedSize = supposedSize == 0 ? job.getChunksize() : supposedSize;     // a not so nice workaround for the rare case that file size is a multiple of chunk size
     } else {
@@ -311,10 +311,10 @@ public class FileUploadServiceImpl implements FileUploadService {
     }
 
     // update job
-    if (chunk == job.getChunksTotal() - 1) {    // upload is complete
-      log.info("Upload job completed: {}", job.getId());
+    if (chunkNumber == job.getChunksTotal() - 1) {    // upload is complete
+      log.info("Upload job completed: {}", job);
       finalizeJob(job);
-    } else {                                  // upload still in-complete
+    } else {                                          // upload still in-complete
       unlock(job);
       storeJob(job);
     }
@@ -341,18 +341,6 @@ public class FileUploadServiceImpl implements FileUploadService {
       throw new FileUploadException("Failed to retrieve file from job " + job.getId());
     }
   }
-  
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.fileupload.api.FileUploadService#setMediapackage(String id, org.opencastproject.mediapackage.MediaPackage mp)
-   */
-  @Override
-  public void setMediaPackage(String id, MediaPackage mp) throws FileUploadException {
-    FileUploadJob job = getJob(id);
-    job.getPayload().setMediaPackage(mp);
-    storeJob(job);
-  }  
 
   /** Locks an upload job.
    * 
@@ -390,7 +378,7 @@ public class FileUploadServiceImpl implements FileUploadService {
   private void finalizeJob(FileUploadJob job) throws FileUploadException {
     job.setState(FileUploadJob.JobState.FINALIZING);
     
-    if (job.getPayload().getMediaPackage() == null) {             // do we have a target mediaPackge
+    if (job.getPayload().getMediaPackage() == null) {             // do we have a target mediaPackge ?
       job.getPayload().setUrl(putPayloadIntoMediaPackage(job));   // if so, add file to target MP
     } else {
       job.getPayload().setUrl(putPayloadIntoCollection(job));     // else put file into upload collection in WFR

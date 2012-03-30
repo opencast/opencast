@@ -27,8 +27,6 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
  */
 public interface FileUploadService {
   
-  public static final String MEDIAPACKAGE_PATH_PREFIX = "/mediapackage/";
-
   /** Returns true is a job with the given ID exists.
    * 
    * @param id ID of the job in question
@@ -87,10 +85,4 @@ public interface FileUploadService {
    */
   InputStream getPayload(FileUploadJob job) throws FileUploadException;
   
-  /** Set the mediapackage to a Job
-   * 
-   * @param id the id of the job
-   * @param mp the mediapackage to set
-   */
-  void setMediaPackage(String id, MediaPackage mp) throws FileUploadException;
 }
