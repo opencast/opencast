@@ -6,59 +6,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <script type="text/javascript" src="js/jquery/jquery.js"></script>
     <script type="text/javascript" src="js/oc.utils.js"></script>
-    <script type="text/javascript">
-      
-      var INFO_URL = "/info/me.json";
-      var CREATE_NEW_JOB_URL = "/upload/newjob";
-      var UPLOAD_URL = "/upload/job/"
-      //upload chunks of 10MB
-      var CHUNKSIZE = 1024 * 1024 * 10;
-      
-      $(document).ready(function() {
-        
-        $.ajax({
-          url: INFO_URL,
-          dataType: 'json',
-          success: function(data) {
-            if(data.org.properties['adminui.chunksize'] != undefined) {
-              CHUNKSIZE = data.org.properties['adminui.chunksize'] * 1024;
-            }
-          }
-        });
-        
-        $('#file').change(function(evt)
-        {
-          var filesize = -1;
-          var chunksize = -1;
-          var filename = $('.file-selector').val();
-          filename = filename.replace("C:\\fakepath\\", "");
-          if (ocUtils.isChunkedUploadCompliable()) {
-            var files = evt.target.files;
-            var file = files[0];
-            filesize = file.size;
-            chunksize = CHUNKSIZE;
-          } else {
-            
-          }
-          $.ajax({
-            url: CREATE_NEW_JOB_URL,
-            data: {
-              filename : filename,
-              filesize : filesize,
-              chunksize: chunksize,
-              flavor   : ocUtils.getURLParam('flavor')
-            },
-            success: function(job_id) {
-              $('.track-id').val(job_id);
-              $('#uploadForm').attr('action', UPLOAD_URL + job_id);
-            }
-          })
-          
-        });
-        
-      });
-      
-    </script>
   </head>
   <body style="margin:0;padding:0;border:0;outline:0;vertical-align:baseline;background: transparent">
   <input type="hidden" name="jobId" class="track-id" value="" />

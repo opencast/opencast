@@ -16,11 +16,13 @@ var ocUpload = (function() {
   this.UPLOAD_COMPLETE = 'COMPLETE';
   this.UPLOAD_MEDIAPACKAGE = '/upload/mediapackage/';
   this.UPLOAD_PROGRESS_INTERVAL = 2000;
-  this.CHUNKSIZE = 1024 * 1024 * 10;
+  this.CHUNKSIZE = 1024 * 1024 * 100;
   this.INFO_URL = "/info/me.json";
   this.KILOBYTE = 1024;
   this.MEGABYTE = 1024 * 1024;
   this.ANOYMOUS_URL = "/info/me.json";
+  this.CREATE_NEW_JOB_URL = "/upload/newjob";
+  this.UPLOAD_URL = "/upload/job/";
 
   /** $(document).ready()
    *
@@ -237,7 +239,7 @@ ocUpload.UI = (function() {
             .text(workflow.title);
             if (workflow.id == ocUpload.DEFAULT_WORKFLOW_DEFINITION) {
               $newOption.attr('selected', 'true');
-            }
+            }s
             $selector.append($newOption);
           }
         }
@@ -337,7 +339,7 @@ ocUpload.UI = (function() {
       $progress.find('.progress-label-right').text(total + ' total');
       
       if(message.payload.currentsize == message.payload.totalsize || message.state == ocUpload.UPLOAD_COMPLETE) {
-        ocUpload.Listener.uploadComplete(message.id);
+        ocUpload.Listener.uploadComplete(message.id, message.payload.url);
       }
     } else {
       $progress.find('.upload-label').text(' ');
@@ -614,24 +616,12 @@ ocUpload.Ingest = (function() {
     // set flavor and mediapackage in upload form before submit
     $uploader.contents().find('#flavor').val(track.flavor);
     $uploader.contents().find('#mediapackage').val(MediaPackage.document);
-
+    
+    track.id = createUploadJob($uploader);
+    track.flavor = ocUtils.getURLParam("flavor", $uploader.attr('src'));
+    
     //upload mediapackage to upload service
-    $.ajax({
-      url  : ocUpload.UPLOAD_MEDIAPACKAGE + track.id,
-      async: false,
-      type : 'POST',
-      data : {
-        mediapackage : MediaPackage.document
-      },
-      success : function(e, status, jqXHR) {
-        if(jqXHR.status == 404) {
-          ocUpload.UI.showFailure("Could not upload Mediapackage to UploadJob");
-        }
-      },
-      error: function() {
-        ocUpload.UI.showFailure("Could not upload Mediapackage to UploadJob");
-      }
-    })
+    
     if(ocUtils.isChunkedUploadCompliable()) {
       ocUtils.log("Uploading via Chunked upload")
       var file = $uploader.contents().find('.file-selector')[0].files[0];
@@ -643,6 +633,39 @@ ocUpload.Ingest = (function() {
     
     if(checkBoxId == 'fileSourceSingleA')
       ocUpload.Listener.startProgressUpdate(track.id);
+  }
+  
+  function createUploadJob($uploader) {
+    var filesize = -1;
+    var chunksize = -1;
+    var filename = $uploader.contents().find('.file-selector').val();
+    filename = filename.replace("C:\\fakepath\\", "");
+    
+    var track_id = "";
+    
+    if (ocUtils.isChunkedUploadCompliable()) {
+      var files = $uploader.contents().find('.file-selector')[0].files;
+      var file = files[0];
+      filesize = file.size;
+      chunksize = CHUNKSIZE;
+    }
+    $.ajax({
+      url: ocUpload.CREATE_NEW_JOB_URL,
+      async: false,
+      data: {
+        filename : filename,
+        filesize : filesize,
+        chunksize: chunksize,
+        flavor   : $uploader.parent().contents().find('#track-flavor').val(),
+        mediapackage : MediaPackage.document
+      },
+      success: function(job_id) {
+        track_id = job_id;
+        $uploader.contents().find('.track-id').val(job_id);
+        $uploader.contents().find('#uploadForm').attr('action', UPLOAD_URL + job_id);
+      }
+    });
+    return track_id;
   }
   
   function nextPart(file, chunk, jobId, start, end) {
@@ -685,7 +708,7 @@ ocUpload.Ingest = (function() {
     });
   }
   
-  this.trackDone = function(jobId) {
+  this.trackDone = function(jobId, trackUrl) {
     var track = null;
     $(MediaPackage.elements).each(function(index, element) {
       if (element.id == jobId) {
@@ -694,20 +717,25 @@ ocUpload.Ingest = (function() {
     });
     $uploader = track.payload;
     
-    $.ajax({
-      url: ocUpload.UPLOAD_MEDIAPACKAGE + track.id,
-      async: false,
-      dataType : 'text',
-      success: function(data, status, jqHBX) {
-        if(jqHBX.status == 200) {
-          MediaPackage.document = data;
-          track.done = true;
-          proceed();
-        } else {
-          ocUpload.UI.showFailure("Could not retrieve new mediapackage");
-        }
-      }
-    });
+    MediaPackage.document = ocMediapackage.addTrack(MediaPackage.document, trackUrl, track.flavor);
+    
+    track.done = true;
+    proceed();
+    
+  //    $.ajax({
+  //      url: ocUpload.UPLOAD_MEDIAPACKAGE + track.id,
+  //      async: false,
+  //      dataType : 'text',
+  //      success: function(data, status, jqHBX) {
+  //        if(jqHBX.status == 200) {
+  //          MediaPackage.document = data;
+  //          track.done = true;
+  //          proceed();
+  //        } else {
+  //          ocUpload.UI.showFailure("Could not retrieve new mediapackage");
+  //        }
+  //      }
+  //    });
   }
 
   function createSeries(name) {
@@ -797,11 +825,11 @@ ocUpload.Listener = (function() {
     inProgress : false
   }
 
-  this.uploadComplete = function(jobId) {
+  this.uploadComplete = function(jobId, trackUrl) {
     destroyUpdateInterval();
     ocUtils.log("Upload complete " + jobId);
     ocUpload.UI.setProgress('Upload successful');
-    ocUpload.Ingest.trackDone(jobId);
+    ocUpload.Ingest.trackDone(jobId, trackUrl);
   }
 
   this.uploadFailed = function(jobId) {
