@@ -44,7 +44,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpOptions;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.osgi.framework.BundleContext;
@@ -92,10 +92,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   protected static final String OPT_MAXLOAD = "org.opencastproject.server.maxload";
 
   /** Configuration key for the dispatch interval in miliseconds */
-  protected static final String OPT_DISPATCHINTERVAL = "org.opencastproject.serviceregistry.dispatchinterval";
+  protected static final String OPT_DISPATCHINTERVAL = "dispatchinterval";
 
-  /** Configuration key for the interval to check whether the hosts in the service registry are still alive. **/
-  protected static final String OPT_HEARTBEATINTERVAL = "org.opencastproject.serviceregistry.heartbeat.interval";
+  /** Configuration key for the interval to check whether the hosts in the service registry are still alive [sec] **/
+  protected static final String OPT_HEARTBEATINTERVAL = "heartbeat.interval";
 
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
@@ -115,8 +115,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Number of failed jobs on a service before to set it in error state */
   protected int maxAttemptsBeforeErrorState = MAX_FAILURE_BEFORE_ERROR_STATE;
 
-  /** Default delay between checking if hosts are still alive in minutes **/
-  static final long DEFAULT_HEART_BEAT = 1;
+  /** Default delay between checking if hosts are still alive in seconds **/
+  static final long DEFAULT_HEART_BEAT = 60;
 
   /** The JPA provider */
   protected PersistenceProvider persistenceProvider;
@@ -224,61 +224,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         logger.error("Invlid filter syntax: {}", e);
         throw new IllegalStateException(e);
       }
-    }
-
-    long dispatchInterval = DEFAULT_DISPATCH_PERIOD;
-    if (cc != null) {
-      String dispatchIntervalString = StringUtils.trimToNull(cc.getBundleContext().getProperty(OPT_DISPATCHINTERVAL));
-      if (dispatchIntervalString != null) {
-        try {
-          dispatchInterval = Long.parseLong(dispatchIntervalString);
-        } catch (Exception e) {
-          logger.warn("Dispatch interval '{}' is malformed, setting to {}", dispatchIntervalString,
-                  MIN_DISPATCH_INTERVAL);
-          dispatchInterval = MIN_DISPATCH_INTERVAL;
-        }
-        if (dispatchInterval == 0) {
-          logger.info("Dispatching disabled");
-        } else if (dispatchInterval < MIN_DISPATCH_INTERVAL) {
-          logger.warn("Dispatch interval {} ms too low, adjusting to {}", dispatchInterval, MIN_DISPATCH_INTERVAL);
-          dispatchInterval = MIN_DISPATCH_INTERVAL;
-        } else {
-          logger.info("Dispatch interval set to {} ms", dispatchInterval);
-        }
-      }
-    }
-
-    // Schedule the job dispatching.
-    if (dispatchInterval > 0)
-      scheduledExecutor.scheduleWithFixedDelay(new JobDispatcher(), dispatchInterval, dispatchInterval,
-              TimeUnit.MILLISECONDS);
-
-    long heartbeatInterval = DEFAULT_HEART_BEAT;
-    if (cc != null) {
-      String heartbeatIntervalString = StringUtils.trimToNull(cc.getBundleContext().getProperty(OPT_HEARTBEATINTERVAL));
-      if (heartbeatIntervalString != null) {
-        try {
-          heartbeatInterval = Long.parseLong(heartbeatIntervalString);
-        } catch (Exception e) {
-          logger.warn("Heartbeat interval '{}' is malformed, setting to {}", heartbeatIntervalString,
-                  DEFAULT_HEART_BEAT);
-          heartbeatInterval = DEFAULT_HEART_BEAT;
-        }
-        if (heartbeatInterval == 0) {
-          logger.info("Heartbeat disabled");
-        } else if (heartbeatInterval < 0) {
-          logger.warn("Heartbeat interval {} minutes too low, adjusting to {}", heartbeatInterval, DEFAULT_HEART_BEAT);
-          heartbeatInterval = DEFAULT_HEART_BEAT;
-        } else {
-          logger.info("Dispatch interval set to {} minutes", heartbeatInterval);
-        }
-      }
-    }
-
-    // Schedule the service heartbeat
-    if (heartbeatInterval > 0) {
-      scheduledExecutor.scheduleWithFixedDelay(new JobProducerHearbeat(), heartbeatInterval, heartbeatInterval,
-              TimeUnit.MINUTES);
     }
   }
 
@@ -454,6 +399,54 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                 MAX_ATTEMPTS_CONFIG_KEY);
       }
     }
+
+    long dispatchInterval = DEFAULT_DISPATCH_PERIOD;
+    String dispatchIntervalString = StringUtils.trimToNull((String) properties.get(OPT_DISPATCHINTERVAL));
+    if (StringUtils.isNotBlank(dispatchIntervalString)) {
+      try {
+        dispatchInterval = Long.parseLong(dispatchIntervalString);
+      } catch (Exception e) {
+        logger.warn("Dispatch interval '{}' is malformed, setting to {}", dispatchIntervalString, MIN_DISPATCH_INTERVAL);
+        dispatchInterval = MIN_DISPATCH_INTERVAL;
+      }
+      if (dispatchInterval == 0) {
+        logger.info("Dispatching disabled");
+      } else if (dispatchInterval < MIN_DISPATCH_INTERVAL) {
+        logger.warn("Dispatch interval {} ms too low, adjusting to {}", dispatchInterval, MIN_DISPATCH_INTERVAL);
+        dispatchInterval = MIN_DISPATCH_INTERVAL;
+      } else {
+        logger.info("Dispatch interval set to {} ms", dispatchInterval);
+      }
+    }
+
+    long heartbeatInterval = DEFAULT_HEART_BEAT;
+    String heartbeatIntervalString = StringUtils.trimToNull((String) properties.get(OPT_HEARTBEATINTERVAL));
+    if (StringUtils.isNotBlank(heartbeatIntervalString)) {
+      try {
+        heartbeatInterval = Long.parseLong(heartbeatIntervalString);
+      } catch (Exception e) {
+        logger.warn("Heartbeat interval '{}' is malformed, setting to {}", heartbeatIntervalString, DEFAULT_HEART_BEAT);
+        heartbeatInterval = DEFAULT_HEART_BEAT;
+      }
+      if (heartbeatInterval == 0) {
+        logger.info("Heartbeat disabled");
+      } else if (heartbeatInterval < 0) {
+        logger.warn("Heartbeat interval {} minutes too low, adjusting to {}", heartbeatInterval, DEFAULT_HEART_BEAT);
+        heartbeatInterval = DEFAULT_HEART_BEAT;
+      } else {
+        logger.info("Dispatch interval set to {} minutes", heartbeatInterval);
+      }
+    }
+
+    // Schedule the service heartbeat
+    if (heartbeatInterval > 0)
+      scheduledExecutor.scheduleWithFixedDelay(new JobProducerHearbeat(), heartbeatInterval, heartbeatInterval,
+              TimeUnit.SECONDS);
+
+    // Schedule the job dispatching.
+    if (dispatchInterval > 0)
+      scheduledExecutor.scheduleWithFixedDelay(new JobDispatcher(), dispatchInterval, dispatchInterval,
+              TimeUnit.MILLISECONDS);
   }
 
   /**
@@ -1907,7 +1900,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public void run() {
 
       logger.debug("Checking for unresponsive services");
-      int unresponsiveCount = 0;
       List<ServiceRegistration> serviceRegistrations = getServiceRegistrations();
 
       for (ServiceRegistration service : serviceRegistrations) {
@@ -1919,7 +1911,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         // We think this service is online and available. Prove it.
         String[] urlParts = new String[] { service.getHost(), service.getPath(), "dispatch" };
         String serviceUrl = UrlSupport.concat(urlParts);
-        HttpOptions options = new HttpOptions(serviceUrl);
+        HttpHead options = new HttpHead(serviceUrl);
         HttpResponse response = null;
         try {
           try {
@@ -1940,31 +1932,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                     }
                   }
                   continue;
-                case HttpStatus.SC_SERVICE_UNAVAILABLE:
-                  // this service appears to be overloaded.
-                  logger.warn("Service {} appears overloaded but will not be unregistered: {}", service.toString(),
-                          response.getStatusLine());
-                  unresponsive.remove(service);
-                  continue;
-                case HttpStatus.SC_FORBIDDEN:
-                  // this service can't be reached due to authentication issues
-                  unresponsive.remove(service);
-                  logger.info("Service {} denies authentication: {}", service.toString(), response.getStatusLine());
-                  continue;
                 default:
                   if (!service.isOnline())
                     continue;
                   logger.warn("Service {} is not working as expected: {}", service.toString(), response.getStatusLine());
-                  unresponsiveCount++;
               }
             } else {
               logger.warn("Service {} does not respond: {}", service.toString());
-              unresponsiveCount++;
             }
           } catch (TrustedHttpClientException e) {
             if (!service.isOnline())
               continue;
-            unresponsiveCount++;
             logger.warn("Unable to reach {} : {}", service, e);
           }
 
@@ -1986,7 +1964,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         }
       }
 
-      logger.debug("Finished checking for unresponsive services. Found {} to be unresponsive.", unresponsiveCount);
+      logger.debug("Finished checking for unresponsive services");
     }
 
   }
