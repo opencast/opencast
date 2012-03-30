@@ -379,9 +379,9 @@ public class FileUploadServiceImpl implements FileUploadService {
     job.setState(FileUploadJob.JobState.FINALIZING);
     
     if (job.getPayload().getMediaPackage() == null) {             // do we have a target mediaPackge ?
-      job.getPayload().setUrl(putPayloadIntoMediaPackage(job));   // if so, add file to target MP
+      job.getPayload().setUrl(putPayloadIntoCollection(job));     // if not, put file into upload collection in WFR
     } else {
-      job.getPayload().setUrl(putPayloadIntoCollection(job));     // else put file into upload collection in WFR
+      job.getPayload().setUrl(putPayloadIntoMediaPackage(job));   // else add file to target MP
     }
     deletePayloadFile(job.getId());
     
