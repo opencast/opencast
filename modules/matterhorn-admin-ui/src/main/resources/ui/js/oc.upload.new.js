@@ -239,7 +239,7 @@ ocUpload.UI = (function() {
             .text(workflow.title);
             if (workflow.id == ocUpload.DEFAULT_WORKFLOW_DEFINITION) {
               $newOption.attr('selected', 'true');
-            }s
+            }
             $selector.append($newOption);
           }
         }
