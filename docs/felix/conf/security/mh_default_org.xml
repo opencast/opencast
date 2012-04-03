@@ -55,6 +55,9 @@
     <!-- Enable access to the LTI sample tool -->
     <sec:intercept-url pattern="/ltisample/**" access="ROLE_OAUTH_USER" />
 
+    <!-- Enable access to the LTI tools -->
+    <sec:intercept-url pattern="/ltitools/**" access="ROLE_OAUTH_USER" />
+
     <!-- Everything else is for the admin users -->
     <sec:intercept-url pattern='/**' access='ROLE_ADMIN, ROLE_COURSE_ADMIN, ROLE_INSTRUCTOR' />
 
