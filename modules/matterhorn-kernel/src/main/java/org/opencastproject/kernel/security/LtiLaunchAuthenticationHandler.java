@@ -120,6 +120,7 @@ public class LtiLaunchAuthenticationHandler implements
       // We should add the authorities passed in from the tool consumer?
       userAuthorities.add(new GrantedAuthorityImpl("ROLE_USER"));
       userAuthorities.add(new GrantedAuthorityImpl("ROLE_OAUTH_USER"));
+      userAuthorities.add(new GrantedAuthorityImpl("ROLE_ANONYMOUS"));
       String roles = request.getParameter(ROLES);
       String context = request.getParameter(CONTEXT_ID);
       //Roles could be a list
