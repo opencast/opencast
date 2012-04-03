@@ -48,6 +48,173 @@
   </dependencies>
   <build>
     <plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.4.1</version>
+        <executions>
+          <execution>
+            <id>copy-player</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/tools/shared/</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../../shared-resources/player/</directory>
+                  <includes>
+                    <include>engage-hybrid-player/**</include>
+                    <include>style/**</include>
+                    <include>embed.html</include>
+                    <include>preview.xml</include>
+                    <include>playerProductInstall.swf/</include>
+                  </includes>                  
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+            <execution>
+            <id>copy-player2</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/tools/player/</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../../shared-resources/player/</directory>
+                  <includes>
+                    <include>Videodisplay.swf/</include>
+                  </includes>                  
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/tools/shared</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../../shared-resources/</directory>
+                  <includes>
+                     <include>jquery/**</include>
+                     <include>trimpath/**</include>
+                  </includes>                  
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-img</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/tools/shared/img</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../../shared-resources/img/</directory>
+                  <includes>
+                    <include> **/** </include>
+                  </includes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-css</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/tools/shared/css</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../../shared-resources/css/</directory>
+                  <includes>
+                    <include> **/** </include>
+                  </includes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-js</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/tools/shared/js</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../../shared-resources/js/</directory>
+                  <includes>
+                    <include> **/** </include> 
+                  </includes>
+                  <excludes>
+                  <exclude> servicedata.json </exclude>
+                  </excludes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-js2</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/tools/player/js</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../../shared-resources/js/</directory>
+                  <includes>
+                    <include> servicedata.json </include>
+                  </includes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-xsl</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/tools/shared/xsl</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../../shared-resources/xsl/</directory>
+                  <includes>
+                    <include> **/** </include>
+                  </includes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -60,16 +227,17 @@
               org.opencastproject.rest;version=${project.version},
               *;resolution:=optional
             </Import-Package>
-            <Private-Package>ltisample</Private-Package>
+            <Private-Package>tools.*</Private-Package>
             <Service-Component>
               OSGI-INF/opencast-lti.xml
             </Service-Component>
-            <Http-Alias>/ltisample</Http-Alias>
-            <Http-Classpath>/ltisample</Http-Classpath>
+            <Http-Alias>/ltitools</Http-Alias>
+            <Http-Classpath>/tools</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>
           </instructions>
         </configuration>
       </plugin>
+      
     </plugins>
   </build>
 </project>

@@ -17,10 +17,14 @@ package org.opencastproject.lti;
 
 import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -35,6 +39,11 @@ import javax.servlet.http.HttpSession;
  * produce JSON containing the LTI parameters passed during LTI launch.
  */
 public class LtiServlet extends HttpServlet {
+
+	private static final String LTI_CUSTOM_PREFIX = "custom_";
+
+  /** The logger */
+	private static final Logger logger = LoggerFactory.getLogger(LtiServlet.class);
 
   /** The serialization uid */
   private static final long serialVersionUID = 6138043870346176520L;
@@ -166,14 +175,73 @@ public class LtiServlet extends HttpServlet {
 
     // We must return a 200 for some oauth client libraries to accept this as a valid response
 
-    // The URL of the LTI tool. Currently, we don't have a real LTI tool, so make due with the sample
+    // The URL of the LTI tool. If no specific tool is passed we use the test tool
+    String toolReq = req.getParameter("custom_tool");
     String toolUrl = "/ltisample/";
+    if (toolReq != null) {
+      toolUrl = toolReq;
+      if (!(toolUrl.indexOf("/") == 0)) {
+        //if not supplied we assume this is a root path to the tool 
+        toolUrl = "/" + toolUrl;
+      }
+    }
 
+    String customParams = getCustomParams(req);
+    if (customParams != null) {
+      toolUrl = toolUrl + "?" + customParams; 
+    }
+    
     // Always set the session cookie
     resp.setHeader("Set-Cookie", "JSESSIONID=" + session.getId() + ";Path=/");
-
-    // TODO: Write client-side js to sent the user someplace useful
-    resp.getWriter().write("<a href=\"" + toolUrl + "\">continue...</a>");
+    
+    // The client can specify debug option by passing a value to test
+    String testString = req.getParameter("custom_test");
+    boolean test = false;
+    if (testString != null) {
+      logger.debug("test: {}", req.getParameter("custom_test"));
+      test = Boolean.valueOf(testString).booleanValue();
+    } 
+    
+    //we need to add the custom params to the outgoing request
+    
+    
+    // if in test mode display details where we go 
+    if (test) {
+      resp.getWriter().write("<html><body>Welcome to matterhorn lti, you are going to " + toolUrl + "<br>");
+      resp.getWriter().write("<a href=\"" + toolUrl + "\">continue...</a></body></html>");
+      //TODO we should probably print the paramaters.
+    } else {
+      logger.debug(toolUrl);
+      resp.sendRedirect(toolUrl);
+    }
+  }
+  
+  /**
+   * Get a list of custom params to pass to the tool 
+   * @param req
+   * @return 
+   */
+  @SuppressWarnings("unchecked")
+  protected String getCustomParams(HttpServletRequest req) {
+    Map<String, String> paramMap = req.getParameterMap();
+    StringBuilder builder = new StringBuilder();
+    Set<String> entries = paramMap.keySet();
+    Iterator<String> iterator = entries.iterator();
+    while (iterator.hasNext()) {
+      String key = iterator.next();
+      logger.debug("got key: " + key);
+      if (key.indexOf(LTI_CUSTOM_PREFIX) >= 0) {
+        String paramValue = req.getParameter(key);
+        //we need to remove the prefix _custom
+        String paramName = key.substring(LTI_CUSTOM_PREFIX.length());
+        logger.debug("Found custom var: " + paramName + ":" + paramValue);
+        builder.append(paramName + "=" + paramValue + "&");
+      }
+    }
+    
+    
+    return builder.toString();
+    
   }
 
   /**

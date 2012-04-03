@@ -1,0 +1,497 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en">
+  <head>
+    <title>Opencast Matterhorn - Media Player</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+    <link rel="shortcut icon" href="/engage/ui/img/favicon.ico"></link>
+    <!-- CSS includes -->
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/jquery-ui/jquery-ui.css"></link>
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/jquery-ui/jquery-ui-custom.css"></link>
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/player-multi-hybrid/player-multi-hybrid.css" ></link>
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/player-multi-hybrid/player-multi-hybrid-icons.css" ></link>
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/player/shared.css" ></link>
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/player-multi-hybrid/opencast-reset.css" ></link>
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/player/jquery.wysiwyg.css" ></link>
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/oc.segments.css" ></link>
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/player/watch.css" ></link>
+    <!-- Javascript includes -->
+    <script type="text/javascript" src="/engage/ui/js/jquery/jquery.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.utils.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/bridge/lib/FABridge.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/bridge/Videodisplay.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jARIA.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/jquery-ui.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/player/init-watch.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/player/player-multi-hybrid-scubber.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/player/player-multi-hybrid.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/player/ariaSpinbutton.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.wysiwyg.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.client.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.sparkline.min.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage-ui.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.timers-1.2.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/bookmarks.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/description.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/download.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/description-plugin.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/segments_ui.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/segments_ui-plugin.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/segments_ui_slider-plugin.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/segments.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/segments-plugin.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/segments_text.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/segments_text-plugin.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/search.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/search-plugin.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/analytics-plugin.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/analytics.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/annotation_chapter-plugin.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/annotation_chapter.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/series-plugin.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/series.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/logging.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/player/player-multi-hybrid-initialize.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/ext/trimpath.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/player/watch.js"></script>
+  </head>
+  <body>
+    <div id="skip">
+      <a href="#controls" tabindex="10">
+        Skip to player controls
+      </a>
+    </div>
+
+    <div id="skip">
+      <a id="oc_a11y-shortcut" href="#shortcuts" onclick="Opencast.Player.doToggleShortcuts(event, 'oc_a11y-shortcut');" tabindex="20">
+        Skip to Shortcuts
+      </a>
+    </div>
+
+    <div id="oc_player-head">
+      <div id="oc_title"></div>
+      <div id="oc_player-head-see-more" class="ui-helper-hidden">
+        <a href="javascript: " id="oc_see-more-button" title="click to see more of this series" role="button" aria-pressed="false">
+          <div>
+            See More
+          </div>
+        </a>
+      </div>
+      <div id="oc_player-head-right">
+        <a href="javascript: " id="oc_shortcut-button" title="click to show shortcuts" role="button" aria-pressed="false" tabindex="80">
+          <div>
+            Shortcuts
+          </div>
+        </a>
+        <a href="javascript: " id="oc_share-button" title="click to show share options" role="button" aria-pressed="false" tabindex="70">
+          <div>
+            Share
+          </div>
+        </a>
+        <a href="javascript: " id="oc_download-button" title="click to show downloads" role="button" aria-pressed="false" tabindex="60">
+          <div>
+            Download
+          </div>
+      </a>
+
+      </div>
+      <div class="clear"></div>
+    </div>
+    <!-- END #oc_player-head -->
+
+    <div id="oc_body" class="ui-widget ui-widget-content ui-corner-bottom">
+      <div id="oc_flash-player-loading">
+        <span id="matterhorn-init-logo"></span>
+        <!-- START: Hide when no Javascript is activated -->
+        <script type="text/javascript">
+          document.write('<span id="initializing">initializing</span>');
+          document.write('<span id="loading-init"></span>');
+        </script>
+        <!-- END: Hide when no Javascript is activated -->
+      </div>
+
+      <!-- If no Javascript is activated -->
+      <noscript>
+        <center>
+          <div class="noJSAlert-outer">
+            <div class="noJSAlert-inner-up">
+              <div class="icon icon-error noJSAlert-inner-image">&nbsp;</div>
+              JavaScript is disabled
+            </div>
+            <div class="noJSAlert-inner-down">
+              JavaScript is turned off in your web browser, so this site won't work properly! <br />
+              <strong>
+                Please turn JavaScript on to use this site, then refresh the page.
+              </strong>
+            </div>
+          </div>
+        </center>
+      </noscript>
+
+      <div id="oc_flash-player">
+        <script type="text/javascript" src="/engage/ui/js/player/player-multi-hybrid-flash.js"></script>
+      </div>
+
+      <!-- START: Hide when no Javascript is activated -->
+      <div id="oc_video-player-controls">
+        <div id="oc_video-time">
+          <div id="simpleEdit">
+            <input id="oc_current-time" class="oc_current-time handcursor ui-corner-all" type="text" name="Current Time" title="Current Time" value="00:00:00" />
+            <input id="oc_edit-time" class="oc_edit-time-hide handcursor ui-corner-all" type="text" maxlength="8" size="8" name="Edit Current Time HH:MM:SS" title="Edit Current Time HH:MM:SS" value="00:00:00" />
+            &nbsp;of&nbsp;
+            <span id="oc_duration" class="oc_duration" name="Duration" title="Duration">
+              Initializing
+            </span>&nbsp;
+            <span id="oc_video-cc">
+              <input id="oc_btn-cc" class="oc_btn-cc-off" type="checkbox" name="Closed Captions Off: Control + Alt + C" title="Closed Captions Off: Control + Alt + C" value="" />
+              <label for="oc_btn-cc" title="Closed Captions Off: Control + Alt + C">
+                Show Captions
+              </label>
+            </span>
+          </div>
+        </div>
+        <!-- END #oc_video-time -->
+        <div id="oc_video-controls">
+          <span id="skip">
+            <a name="controls"></a>
+            <h2>
+              Video Player Controls
+            </h2>
+          </span>
+          <input id="oc_btn-skip-backward" 
+		 class="oc_btn-skip-backward" 
+		 type="image" 
+		 role="button" 
+		 src="/engage/ui/img/misc/space.png" 
+		 name="Jump To The Previous Slide" 
+		 alt="Jump To The Previous Slide" 
+		 title="Jump To The Previous Slide" 
+		 value="Jump To The Previous Slide" 
+		 aria-labelledby="Jump To The Previous Slide" />
+          <input id="oc_btn-rewind" 
+		 class="oc_btn-rewind" 
+		 type="image" 
+		 role="button" 
+		 src="/engage/ui/img/misc/space.png" 
+		 name="Jump Back: Control + Alt + R" 
+		 alt="Jump Back: Control + Alt + R" 
+		 title="Jump Back: Control + Alt + R" 
+		 value="Jump Back: Control + Alt + R" 
+		 aria-labelledby="Jump Back: Control + Alt + R" />
+          <input id="oc_btn-play-pause" 
+		 class="oc_btn-play" 
+		 type="image" 
+		 role="button" 
+		 src="/engage/ui/img/misc/space.png" 
+		 name="Play: Control + Alt + P" 
+		 alt="Play: Control + Alt + P" 
+		 title="Play: Control + Alt + P" 
+		 value="Play: Control + Alt + P"
+		 aria-labelledby="Play: Control + Alt + P" />
+          <input id="oc_btn-fast-forward" 
+		 class="oc_btn-fast-forward" 
+		 type="image" 
+		 role="button" 
+		 src="/engage/ui/img/misc/space.png" 
+		 name="Jump Forward: Control + Alt + F" 
+		 alt="Jump Forward: Control + Alt + F" 
+		 title="Jump Forward: Control + Alt + F" 
+		 value="Jump Forward: Control + Alt + F" 
+		 aria-labelledby="Play: Control + Alt + P" />
+          <input id="oc_btn-skip-forward" 
+		 class="oc_btn-skip-forward" 
+		 type="image" src="/engage/ui/img/misc/space.png" 
+		 alt="Jump To The Next Slide" 
+		 title="Jump To The Next Slide" 
+		 value="Jump To The Next Slide" 
+		 role="button" 
+		 aria-labelledby="Jump To The Next Slide" />
+        </div>
+        <!-- END #oc_video-controls -->
+        <div id="oc_sound">
+          <span id="oc_volume-dropdown">
+            <input id="oc_btn-volume" class="oc_btn-volume-high handcursor" type="submit" name="Unmute: Control + Alt + M" alt="Unmute: Control + Alt + M" title="Unmute: Control + Alt + M" value="" />
+          </span>
+          <button id="oc_volume-container">
+            <div id="oc_volume-back">
+              <div id="oc_volume-front"></div>
+            </div>
+          </button>
+        </div>
+        <!-- END #oc_sound -->
+        <div id="oc_video-size-controls">
+          <span id="oc_video-size-dropdown">
+            <input id="oc_btn-dropdown" class="oc_btn-centerDisplay" type="submit" name="Video Size Controls" alt="Video Size Controls" title="Video Size Controls" value="" />
+          </span>
+        </div>
+        <!-- END #oc_video-size-controls -->
+      </div>
+      <!-- </script> -->
+      <!-- END: Hide when no Javascript is activated -->
+
+      <div id="oc_player_video-dropdown" class="ui-corner-all"></div>
+
+      <!-- segments_ui_slider + segments_ui -->
+      <div id="data">
+        <div id="oc_seek-slider">
+          <label id="skip" for="srubber">
+            Time Slider
+          </label>
+          <table id="scrubber-table">
+            <tbody>
+              <tr class="player-chrome">
+                <td class="progress-segment">
+                  <table class="segments" id="tableData1">
+                    <!-- data comes here -->
+                  </table>
+                  <div class="progress-list">
+                    <span class="load-progress" value="0"></span>
+                    <span id="play-progress" class="play-progress" value="0"></span>
+                    <span id="scubber-channel" class="scrubber-channel">
+                      <input id="scrubber" type="submit" type="image" src="/engage/ui/img/misc/space.png" class="scrubber-button" role="slider" />
+                      <div id="draggable" class="ui-widget-content"></div>
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- END #oc_seek-slider -->
+
+        <!-- Analytics and Annotations -->
+        <div id="analytics-and-annotations">
+          <span id="analytics" class="analytics">Loading..</span>
+          <span id="annotation" class="annotation">Annotation..</span>
+          <table class="segments" id="segmentstable1">
+            <!-- data comes here -->
+          </table>
+        </div>
+        <div id="segments_ui_slider_data1"></div>
+        <div id="segments_ui_slider_data2"></div>
+        <div id="segments_ui_slider_information"></div>
+        <div id="segments_ui-media1"></div>
+        <div id="data1"></div>
+        <div id="segments_ui-mediapackagesAttachments"></div>
+        <div id="data2"></div>
+        <div id="segments_ui-mediapackagesCatalog"></div>
+        <div id="segments-table2">
+          <table id="segmentstable2"></table>
+        </div>
+      </div>
+      <!-- END #data -->
+      <div id="oc_video-view">
+        <span id="oc_video-quality">
+          <strong>Quality:</strong>&nbsp;
+          <select id="oc_video-quality-options">
+            <option value="low">Low</option>
+            <option value="medium" selected="selected">Medium</option>
+            <option value="high">High</option>
+            <option value="hd">HD</option>
+          </select>
+        </span>
+        &nbsp;
+        <strong>View:</strong>
+        <input id="oc_checkbox-annotations" type="checkbox" name="show Annotations" title="show Annotations" />
+        <label id="oc_label-annotations" for="oc_checkbox-annotations">
+          Annotations
+        </label>
+        <input id="oc_checkbox-statistics" type="checkbox" name="show Statistics" title="show Statistics" />
+        <label id="oc_label-statistics" for="oc_checkbox-statistics">
+          Viewing Statistics
+        </label>
+        &nbsp;
+        <div class="clear"></div>
+      </div>
+      <!-- END #oc_video-view -->
+    </div>
+    <!-- END #oc_body -->
+
+    <!-- Tabs -->
+    <div id="oc_ui_tabs">
+      <div id="oc_tabs" class="oc_tabs-input">
+        <ul id="oc_tabs-head">
+          <li>
+            <a href="#oc_description" id="oc_btn-description" class="oc_btn-tabs handcursor" title="Description" aria-role="button">
+              Description
+            </a>
+          </li>
+          <li>
+            <a href="#oc_slides" id="oc_btn-slides" class="oc_btn-tabs handcursor" title="Segments" aria-role="button">
+              Segments
+            </a>
+          </li>
+          <li>
+            <a href="#oc_slidetext" id="oc_btn-slidetext" class="oc_btn-tabs handcursor" title="Segment Text" aria-role="button">
+              Segment Text
+            </a>
+          </li>
+          <li class="oc_lecturer-search-field-wrap ui-corner-top" id="search-textarea">
+            <label id="skip" for="oc_lecturer-search-field" class="oc_offScreen-hidden">
+              Search this recording
+            </label>
+            <input id="oc_lecturer-search-field" type="text" onkeyup="Opencast.search.showResult(this, this.value);" onfocus="$(this).trigger('click');Opencast.search.showResult(this, this.value);" size="30" value="Search this recording" />
+          </li>
+        </ul>
+      </div>
+      <!-- END #oc_tabs -->
+
+      <div id="oc_description" class="fl-fix">
+        <div id="description-loading" class="loadingImage"></div>
+        <div id="oc-description"></div>
+      </div>
+      <!-- END #oc_description -->
+
+      <div id="oc_slides" class="oc_DisplayBlock">
+        <div id="segments-holder" class="oc-segments-holder">
+          <div id="oc_segment-table" class="oc-segments">
+            <div id="oc-segments">
+              <div id="segments-loading" class="loadingImage">
+              </div>
+              <div id="slider">
+                <img alt="Scroll to previous slides" src="/engage/ui/img/engage_player/leftarrow.png" class="scrollButtons left" />
+                <div id="scroll" class="scroll">
+                  <div id="scrollcontainer" class="scrollContainer"></div>
+                </div>
+                <img alt="Scroll to subsequent slides" src="/engage/ui/img/engage_player/rightarrow.png" class="scrollButtons right" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END #oc_slides -->
+
+      <div id="oc_slidetext" class="fl-fix">
+        <div id="segments_text-loading" class="loadingImage"></div>
+        <div id="oc-segments_text"></div>
+      </div>
+      <div id="oc_search-segment" class="fl-fix">
+        <div id="search-loading" class="loadingImage"></div>
+        <div id="oc-search-result"></div>
+      </div>
+    </div>
+    <!-- END #oc_ui_tabs -->
+
+    <div class="clear"></div>
+
+    <div id="segment-tooltip" class="segment-tooltip"></div>
+
+    <!-- Shortcut dialog -->
+    <div id="oc_shortcuts" title="Shortcuts">
+      <span><a name="shortcuts"></a></span>
+      <div id="oc_client_shortcuts"></div>
+    </div>
+    <!-- END #oc_shortcuts -->
+
+    <!-- Download dialog -->
+    <div id="oc_downloads" title="Download Media Files">
+      <span id="skip"><a name="downloads"></a></span>
+      <div id="oc_client_downloads"></div>
+    </div>
+    <!-- END #oc_downloads -->
+
+    <!-- #share-button-layer dialog -->
+    <div id="oc_share-layer" class="ui-widget ui-widget-content ui-corner-all oc_popuplayer ui-helper-hidden" title="share this Video" tabindex="-1" role="dialog" aria-hidden="true">
+      <ul id="oc_share-list" class="oc_popuplayer-list">
+        <li>
+          <a href="javascript: " id="oc_btn-embed" class="handcursor" title="Embed" role="button">
+            Embed
+          </a>
+        </li>
+        <li>
+          <a href="javascript: " id="oc_btn-email" class="handcursor" title="Email" role="button">
+            Email
+          </a>
+        </li>
+        <li>
+          <a href="javascript: " id="oc_btn-share-time" class="handcursor" title="Share video URL at current time" role="button">
+            Video at current time
+          </a>
+        </li>
+      </ul>
+    </div>
+    <!-- END #oc_share-layer -->
+
+    <!-- #time-chooser-layer dialog -->
+    <div id="oc_time-chooser-layer" class="ui-widget ui-widget-content ui-corner-all oc_popuplayer ui-helper-hidden" title="change player time/ session time" tabindex="-1" role="dialog" aria-hidden="true">
+      <ul id="oc_time-chooser-list" class="oc_popuplayer-list">
+        <li>
+          <a href="javascript: " id="oc_btn-player-time" onclick="Opencast.Player.doToggleTimeLayer();" class="handcursor" title="View player time" role="button">
+            View player time
+          </a>
+        </li>
+        <li>
+          <a href="javascript: " id="oc_btn-session-time" onclick="Opencast.Player.doToggleTimeLayer();" class="handcursor" title="View session time" role="button">
+            View session time
+          </a>
+        </li>
+      </ul>
+      <button id="oc_btn-leave-session-time" class="oc_btn-close">
+        Leave time dialog
+      </button>
+    </div>
+    <!-- END #oc_time-chooser-layer -->
+
+    <!-- Embed Dialog -->
+    <div id="oc_embed" title="Embed">
+      <div id="oc_embed-left">
+        <input id="oc_embed-icon-one" class="oc_embed-icon" type="submit" name="" alt="" title="" value="" />
+        <input id="oc_embed-icon-two" class="oc_embed-icon" type="submit" name="" alt="" title="" value="" />
+        <input id="oc_embed-icon-three" class="oc_embed-icon" type="submit" name="" alt="" title="" value="" />
+        <input id="oc_embed-icon-four" class="oc_embed-icon" type="submit" name="" alt="" title="" value="" />
+        <input id="oc_embed-icon-five" class="oc_embed-icon" type="submit" name="" alt="" title="" value="" />
+      </div>
+      <div id="oc_embed-right">
+        <div id="oc_embed-custom-title">
+          Custom size:
+        </div>
+        <label for="oc_embed-costum-width-textinput" class="handcursor">
+          Width:
+        </label>
+	&nbsp;
+        <input id="oc_embed-costum-width-textinput" maxlength="4" type="text" name="Costum width min 300px" alt="Costum width min 300px" title="Costum width min 300px" value="" />
+        <div class="clear"></div>
+        <label for="oc_embed-costum-height-textinput" class="handcursor">
+          Height:
+        </label>
+	&nbsp;
+        <input id="oc_embed-costum-height-textinput" maxlength="4" type="text" name="" alt="" title="" value="" />
+
+        <div class="clear"></div>
+        <label for="oc_embed-costum-hide-controls-checkbox" class="handcursor">
+          Controls:
+        </label>
+		&nbsp;
+        <input id="oc_embed-costum-hide-controls-checkbox" type="checkbox" name="Display controls" alt="Display controls" title="Display controls" value="" />
+	<br />
+        <label for="oc_embed-costum-hide-controls-checkbox" class="handcursor">
+
+        <a href="javascript: " id="oc_btn-leave-session-time" onclick="$('#oc_embed').dialog('close');" class="handcursor ui-helper-hidden-accessible" title="Leave embed dialog" role="button">
+          Leave embed dialog
+        </a>
+      </div>
+
+      <div class="clear"></div>
+      <label for="oc_embed-textarea">
+        Choose your embed size. Copy the text and paste it in your html page.
+      </label>
+      <textarea id="oc_embed-textarea" class="oc_embed-textarea" rows="2" cols="1"></textarea>
+    </div>
+    <!-- END #oc_embed -->
+
+    <!-- Share video at current time Dialog -->
+    <div id="oc_share-time" title="Video at current time">
+      <div id="oc_share-time-text"></div>
+      <div>
+	<textarea id="oc_share-time-textfield" class="oc_embed-textarea" rows="1" cols="1"></textarea>
+      </div>
+      <div id="oc_share-time-tip">
+	Press the pause button in the player to get the exact time.
+      </div>
+    </div>
+    <!-- END #oc_share-time -->
+
+    <!-- Series dialog -->
+    <div id="oc_series" class="ui-widget ui-widget-content ui-corner-all oc_popuplayer ui-state-hover" title="see more of this series" tabindex="-1" role="dialog" aria-hidden="true"></div>
+  </body>
+</html>
