@@ -43,9 +43,11 @@
   
   <!-- Checks for Size Violations.                    -->
   <!-- See http://checkstyle.sf.net/config_sizes.html -->
+  <!--
   <module name="FileLength">
-    <property name="severity" value="error" />
+    <property name="severity" value="warning" />
   </module>
+  -->
 
   <module name="TreeWalker">
     <property name="cacheFile" value="${checkstyle.cache.file}" />
@@ -111,9 +113,11 @@
       <property name="severity" value="error" />
     </module>
     -->
+    <!--
     <module name="ParameterNumber">
       <property name="severity" value="error" />
     </module>
+    -->
 
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
