@@ -1005,7 +1005,124 @@ install_mingw32() {
       fi
       ;;
     Ubuntu )
+      #
       # Temporarily removed
+      #
+      ;;
+    Xbuntu )
+      case `os_ver` in
+        10.* ) V=5 ;;
+        11.* ) V=6 ;;
+        * ) V="" ;;
+      esac
+      #
+      chkprog $MINGW32-gcc
+      if [ $? -ne 0 ];  then
+        rpms=""
+        case `arch` in
+          i386 )
+            URLS=`getmcfg mingw32-gcc${V}_x86_url:`
+            rpms=`getmcfg mingw32-gcc${V}_x86_pkgs:`
+            ;;
+          x86_64 )
+            URLS=`getmcfg mingw32-gcc${V}_x64_url:`
+            rpms=`getmcfg mingw32-gcc${V}_x64_pkgs:`
+            ;;
+        esac
+        for rpm in $rpms; do
+          if [ ! -s "$rpm" ]; then
+            copypkg "$rpm"
+            if [ $? -ne 0 ]; then
+              ok=1
+              for URL in $URLS; do
+                wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+                ok=$?
+                [ $ok -eq 0 ] && break
+              done
+              if [ $ok -ne 0 ]; then
+                rm -f "$rpm"
+                return 1
+              fi
+            fi
+          fi
+        done
+        install_rpms $rpms
+        [ $? -ne 0 ] && return 1
+      fi
+      #
+      chkprog $MINGW32-c++
+      if [ $? -ne 0 ]; then
+        rpms=""
+        case `arch` in
+          i386 )
+            URLS=`getmcfg mingw32-gpp${V}_x86_url:`
+            rpms=`getmcfg mingw32-gpp${V}_x86_pkgs:`
+            ;;
+          x86_64 )
+            URLS=`getmcfg mingw32-gpp${V}_x64_url:`
+            rpms=`getmcfg mingw32-gpp${V}_x64_pkgs:`
+            ;;
+        esac
+        for rpm in $rpms; do
+          if [ ! -s "$rpm" ]; then
+            copypkg "$rpm"
+            if [ $? -ne 0 ]; then
+              ok=1
+              for URL in $URLS; do
+                wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+                ok=$?
+                [ $ok -eq 0 ] && break
+              done
+              if [ $ok -ne 0 ]; then
+                rm -f "$rpm"
+                return 1
+              fi
+            fi
+          fi
+        done
+        install_rpms $rpms
+        [ $? -ne 0 ] && return 1
+      fi
+      #
+      VER=`grep W32API_VERSION $MINGW32_PREFIX/include/w32api.h | awk '{
+        n = split($3, a, "."); v = 0;
+        if (n == 1) { v = a[1] * 10000; }
+        else if (n == 2) { v = a[1] * 10000 + a[2] * 100; }
+        else if (n == 3) { v = a[1] * 10000 + a[2] * 100 + a[3]; }
+        print v }'`
+      # Latest version of w32api is 3.17 (= 31700)
+      if [ $VER -lt 31700 ]; then
+        pkgs=""
+        URLS=`getmcfg mingw32-w32api_src_url:`
+        pkgs=`getmcfg mingw32-w32api_src_pkgs:`
+        for pkg in $pkgs; do
+          if [ ! -s "$pkg" -a ! -s "${pkg%.lzma}" ]; then
+            copypkg "$pkg"
+            if [ $? -ne 0 ]; then
+              ok=1
+              for URL in $URLS; do
+                wget -t 5 -4 -O "$pkg" "$URL/$pkg"
+                ok=$?
+                [ $ok -eq 0 ] && break
+              done
+              if [ $ok -ne 0 ]; then
+                rm -f "$pkg"
+                return 1
+              fi
+            fi
+          fi
+          # There can be only one!
+          break
+        done
+        if [ ! -s "${pkg%.lzma}" ]; then
+          xz -d "$pkg"
+          [ $? -ne 0 ] && return 1
+        fi
+        cd $MINGW32_PREFIX
+        [ $? -ne 0 ] && return 1
+        sudox tar -xvf "${HOME3P}/packages/${pkg%.lzma}"
+        [ $? -ne 0 ] && return 1
+      fi
       ;;
     Debian )
       ;;
@@ -1093,15 +1210,45 @@ EOF
       [ $? -ne 0 ] && return 1
       ;;
     Ubuntu )
+      #
+      # Temporarily removed
+      #
+      # Check & set /usr/local/lib in LD_LIBRARY_PATH
+      grep '/usr/local/lib' /etc/ld.so.conf.d/* >/dev/null
+      if [ $? -ne 0 ]; then
+        cat > local.conf << EOF
+/usr/local/lib
+EOF
+        [ $? -ne 0 ] && return 1
+        if [ -s /etc/ld.so.conf.d/local.conf ]; then
+          echo "File /etc/ld.so.conf.d/local.conf already exists" 1>&2
+          rm -f local.conf
+          return 1
+        fi
+        sudox cp local.conf /etc/ld.so.conf.d
+        [ $? -ne 0 ] && return 1
+        rm -f local.conf
+        [ $? -ne 0 ] && return 1
+      fi
+      sudox /sbin/ldconfig
+      [ $? -ne 0 ] && return 1
+      ;;
+    Xbuntu )
       if [ ! -d /usr/libx ]; then
+        case `os_ver` in
+          10.* ) V=5 ;;
+          11.* ) V=6 ;;
+          * ) V="" ;;
+        esac
+        rpms=""
         case `arch` in
           i386 )
-            URLS=`getmcfg gmp_x86_url:`
-            rpms=`getmcfg gmp_x86_pkgs:`
+            URLS=`getmcfg gmp${V}_x86_url:`
+            rpms=`getmcfg gmp${V}_x86_pkgs:`
             ;;
           x86_64 )
-            URLS=`getmcfg gmp_x64_url:`
-            rpms=`getmcfg gmp_x64_pkgs:`
+            URLS=`getmcfg gmp${V}_x64_url:`
+            rpms=`getmcfg gmp${V}_x64_pkgs:`
             ;;
         esac
         for rpm in $rpms; do
