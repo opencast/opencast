@@ -19,6 +19,8 @@ import org.opencastproject.capture.pipeline.PipelineTestHelpers;
 import org.opencastproject.capture.pipeline.bins.CaptureDevice;
 import org.opencastproject.capture.pipeline.bins.CaptureDeviceBinTest;
 import org.opencastproject.capture.pipeline.bins.GStreamerElementFactory;
+import org.opencastproject.capture.pipeline.bins.GStreamerElements;
+import org.opencastproject.capture.pipeline.bins.GStreamerProperties;
 import org.opencastproject.capture.pipeline.bins.UnableToCreateElementException;
 import org.opencastproject.capture.pipeline.bins.producers.ProducerFactory.ProducerType;
 
@@ -35,6 +37,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class VideoFilesinkConsumerTest {
@@ -97,6 +101,13 @@ public class VideoFilesinkConsumerTest {
     Assert.assertEquals(bitrate, sinkBin.encoder.get("bitrate").toString());
   }
 
+  private void checkX264EncoderProperties(ConsumerBin sinkBin, Map<String, String> map) {
+    for (String key : map.keySet()) {
+      Assert.assertEquals("x264enc property " + key + " was not set properly." + sinkBin.encoder.get(key).toString(),
+              map.get(key), sinkBin.encoder.get(key).toString());
+    }
+  }
+  
   private void checkMuxerProperties(ConsumerBin sinkBin, String muxer) {
     Assert.assertTrue("The muxer name " + sinkBin.muxer.getName() + " should match the muxer type " + muxer,
             sinkBin.muxer.getName().contains(muxer));
@@ -110,7 +121,7 @@ public class VideoFilesinkConsumerTest {
     captureDevice = PipelineTestHelpers.createCaptureDevice("/dev/video0", ProducerType.VIDEOTESTSRC, "Friendly Name",
             "/tmp/testpipe/test.mp2", captureDeviceProperties);
     VideoFilesinkConsumer videoFileSinkBin = createVideoFileSinkBinDontWantException(captureDeviceProperties);
-    checkEncoderProperties(videoFileSinkBin, VideoFilesinkConsumer.DEFAULT_ENCODER, "2000000");
+    checkEncoderProperties(videoFileSinkBin, VideoFilesinkConsumer.DEFAULT_ENCODER, VideoFilesinkConsumer.DEFAULT_BITRATE);
     checkMuxerProperties(videoFileSinkBin, VideoFilesinkConsumer.DEFAULT_MUXER);
   }
 
@@ -126,15 +137,67 @@ public class VideoFilesinkConsumerTest {
   }
 
   @Test
-  public void settingCodecButNotContainerResultsInCorrectCodecAndDefaultMuxer() {
-    if (!gstreamerInstalled || PipelineTestHelpers.testGstreamerElement(VideoFilesinkConsumer.DEFAULT_ENCODER)
-            || PipelineTestHelpers.testGstreamerElement(VideoFilesinkConsumer.DEFAULT_MUXER))
+  public void defaultBitrateForX264EncIsSet() {
+    if (!gstreamerInstalled && PipelineTestHelpers.testGstreamerElement(GStreamerElements.X264ENC)
+            && PipelineTestHelpers.testGstreamerElement(GStreamerElements.MP4MUX))
       return;
-    Properties captureDeviceProperties = createProperties("x264enc", "4096", null);
+    Properties captureDeviceProperties = createProperties(GStreamerElements.X264ENC, null, GStreamerElements.MP4MUX);
     captureDevice = PipelineTestHelpers.createCaptureDevice("/dev/video0", ProducerType.VIDEOTESTSRC, "Friendly Name",
             "/tmp/testpipe/test.mp2", captureDeviceProperties);
     VideoFilesinkConsumer videoFileSinkBin = createVideoFileSinkBinDontWantException(captureDeviceProperties);
-    checkEncoderProperties(videoFileSinkBin, "x264enc", "4096");
+    checkEncoderProperties(videoFileSinkBin, GStreamerElements.X264ENC, VideoFilesinkConsumer.DEFAULT_BITRATE_X264ENC);
+  }
+  
+  @Test
+  public void x264EncoderPropertiesCanBeSet() {
+    if (!gstreamerInstalled && PipelineTestHelpers.testGstreamerElement(GStreamerElements.X264ENC)
+            && PipelineTestHelpers.testGstreamerElement(GStreamerElements.MP4MUX))
+      return;
+    Properties captureDeviceProperties = createProperties(GStreamerElements.X264ENC,
+            VideoFilesinkConsumer.DEFAULT_BITRATE_X264ENC, GStreamerElements.MP4MUX);
+    HashMap<String, String> x264Properties = new HashMap<String, String>();
+    x264Properties.put(GStreamerProperties.INTERLACED, "true");
+    x264Properties.put(GStreamerProperties.NOISE_REDUCTION, "500");
+    x264Properties.put(GStreamerProperties.PASS, "5");
+    x264Properties.put(GStreamerProperties.QP_MIN, "20");
+    x264Properties.put(GStreamerProperties.QP_MAX, "23");
+    x264Properties.put(GStreamerProperties.QUANTIZER, "25");
+    x264Properties.put(GStreamerProperties.SPEED_PRESET, "4");
+    captureDeviceProperties.putAll(x264Properties);
+    captureDevice = PipelineTestHelpers.createCaptureDevice("/dev/video0", ProducerType.VIDEOTESTSRC, "Friendly Name",
+            "/tmp/testpipe/test.mp2", captureDeviceProperties);
+    VideoFilesinkConsumer videoFileSinkBin = createVideoFileSinkBinDontWantException(captureDeviceProperties);
+
+    checkX264EncoderProperties(videoFileSinkBin, x264Properties);
+  }
+  
+  @Test
+  public void x264EncoderProfileCanBeSet() {
+    if (!gstreamerInstalled && PipelineTestHelpers.testGstreamerElement(GStreamerElements.X264ENC)
+            && PipelineTestHelpers.testGstreamerElement(GStreamerElements.MP4MUX))
+      return;
+    Properties captureDeviceProperties = createProperties(GStreamerElements.X264ENC,
+            VideoFilesinkConsumer.DEFAULT_BITRATE_X264ENC, GStreamerElements.MP4MUX);
+    HashMap<String, String> x264Properties = new HashMap<String, String>();
+    x264Properties.put(GStreamerProperties.PROFILE, "3");
+    captureDeviceProperties.putAll(x264Properties);
+    captureDevice = PipelineTestHelpers.createCaptureDevice("/dev/video0", ProducerType.VIDEOTESTSRC, "Friendly Name",
+            "/tmp/testpipe/test.mp2", captureDeviceProperties);
+    VideoFilesinkConsumer videoFileSinkBin = createVideoFileSinkBinDontWantException(captureDeviceProperties);
+    checkX264EncoderProperties(videoFileSinkBin, x264Properties);
+  }
+  
+  
+  @Test
+  public void settingCodecButNotContainerResultsInCorrectCodecAndDefaultMuxer() {
+    if (!gstreamerInstalled && PipelineTestHelpers.testGstreamerElement(GStreamerElements.X264ENC)
+            && PipelineTestHelpers.testGstreamerElement(VideoFilesinkConsumer.DEFAULT_MUXER))
+      return;
+    Properties captureDeviceProperties = createProperties(GStreamerElements.X264ENC, "4096", null);
+    captureDevice = PipelineTestHelpers.createCaptureDevice("/dev/video0", ProducerType.VIDEOTESTSRC, "Friendly Name",
+            "/tmp/testpipe/test.mp2", captureDeviceProperties);
+    VideoFilesinkConsumer videoFileSinkBin = createVideoFileSinkBinDontWantException(captureDeviceProperties);
+    checkEncoderProperties(videoFileSinkBin, GStreamerElements.X264ENC, "4096");
     checkMuxerProperties(videoFileSinkBin, VideoFilesinkConsumer.DEFAULT_MUXER);
   }
 
@@ -146,7 +209,7 @@ public class VideoFilesinkConsumerTest {
     captureDevice = PipelineTestHelpers.createCaptureDevice("/dev/video0", ProducerType.VIDEOTESTSRC, "Friendly Name",
             "/tmp/testpipe/test.mp2", captureDeviceProperties);
     VideoFilesinkConsumer videoFileSinkBin = createVideoFileSinkBinDontWantException(captureDeviceProperties);
-    checkEncoderProperties(videoFileSinkBin, VideoFilesinkConsumer.DEFAULT_ENCODER, "2000000");
+    checkEncoderProperties(videoFileSinkBin, VideoFilesinkConsumer.DEFAULT_ENCODER, VideoFilesinkConsumer.DEFAULT_BITRATE);
     checkMuxerProperties(videoFileSinkBin, "mpegtsmux");
   }
 

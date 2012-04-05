@@ -35,6 +35,7 @@ public class VideoFilesinkConsumer extends ConsumerBin {
   public static final String DEFAULT_ENCODER = GStreamerElements.FFENC_MPEG2VIDEO;
   public static final String DEFAULT_MUXER = GStreamerElements.MPEGPSMUX;
   public static final String DEFAULT_BITRATE = "2000000";
+  public static final String DEFAULT_BITRATE_X264ENC = "2048";
   /**
    * Pass 0 is CBR (default), Pass 4 is constant quantizer, Pass 5 is constant quality Must set H.264 encoding to use
    * constant quantizer or else it will not start
@@ -113,18 +114,6 @@ public class VideoFilesinkConsumer extends ConsumerBin {
    *           installed this Exception is thrown.
    **/
   private void createMuxer() throws UnableToCreateElementException {
-
-    if (captureDeviceProperties.getCodec() != null
-            && captureDeviceProperties.getCodec().equalsIgnoreCase(GStreamerElements.X264ENC)) {
-      /**
-       * This user has specified to use H.264 encoding. We must set H.264 encoding to use constant quantizer or else it
-       * will not start. Pass 0 is CBR (default), Pass 4 is constant quantizer, Pass 5 is constant quality
-       **/
-      encoder.set(GStreamerProperties.PASS, DEFAULT_X264_PASS);
-      if (captureDevice.getProperties().contains(GStreamerProperties.QUANTIZER))
-        encoder.set(GStreamerProperties.QUANTIZER,
-                captureDevice.getProperties().getProperty(GStreamerProperties.QUANTIZER));
-    }
     if (captureDeviceProperties.getContainer() != null) {
       /** The user has specified a different container than H.264 **/
       logger.debug("{} setting muxing to: {}", captureDevice.getName(), captureDeviceProperties.getContainer());
@@ -190,14 +179,50 @@ public class VideoFilesinkConsumer extends ConsumerBin {
     if (encoder == null) {
       throw new UnableToSetElementPropertyBecauseElementWasNullException(encoder, captureDeviceProperties.getBitrate());
     }
+
     if (captureDeviceProperties.getBitrate() != null) {
       logger.debug("{} bitrate set to: {}", captureDevice.getName(), captureDeviceProperties.getBitrate());
       encoder.set(GStreamerProperties.BITRATE, captureDeviceProperties.getBitrate());
+    } else if (captureDeviceProperties.getCodec() != null
+            && captureDeviceProperties.getCodec().equalsIgnoreCase(GStreamerElements.X264ENC)) {
+      // x264enc has much lower bitrates than mpeg2 making the default mpeg2 bitrate outside 
+      // the range of the x264 encoder. 
+      encoder.set(GStreamerProperties.BITRATE, DEFAULT_BITRATE_X264ENC);
     } else {
       encoder.set(GStreamerProperties.BITRATE, DEFAULT_BITRATE);
     }
+   
+    if (captureDeviceProperties.getCodec() != null
+            && captureDeviceProperties.getCodec().equalsIgnoreCase(GStreamerElements.X264ENC)) {
+      setX264EncoderProperties();
+    }
+
   }
 
+  /** Check and set all of the unique properties for the x264enc gstreamer element. **/
+  private void setX264EncoderProperties() {
+    setEncoderProperty(GStreamerProperties.INTERLACED);
+    setEncoderProperty(GStreamerProperties.NOISE_REDUCTION);
+    setEncoderProperty(GStreamerProperties.PASS);
+    setEncoderProperty(GStreamerProperties.PROFILE);
+    setEncoderProperty(GStreamerProperties.QP_MIN);
+    setEncoderProperty(GStreamerProperties.QP_MAX);
+    setEncoderProperty(GStreamerProperties.QUANTIZER);
+    setEncoderProperty(GStreamerProperties.SPEED_PRESET);
+  }
+
+  /**
+   * Sets a property on the encoder using the capture agent device properties.
+   * 
+   * @param key
+   *          The name of the property to set.
+   **/
+  private void setEncoderProperty(String key) {
+    if (captureDevice.getProperties().containsKey(key)) {
+      encoder.set(key, captureDevice.getProperties().getProperty(key));
+    }
+  }
+  
   /**
    * Links the queue to the encoder to the muxer to the filesink.
    * 
