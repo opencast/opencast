@@ -34,7 +34,6 @@ import org.opencastproject.metadata.mpeg7.Mpeg7Catalog;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogImpl;
 import org.opencastproject.metadata.mpeg7.TemporalDecomposition;
 import org.opencastproject.metadata.mpeg7.TextAnnotation;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +46,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -172,14 +172,28 @@ public class Mpeg7CaptionConverter implements CaptionConverter {
       Time captionST = caption.getStartTime();
       Time captionET = caption.getStopTime();
 
-      long startTime = ((captionST.getHours() * 60 + captionST.getMinutes()) * 60 + captionST.getSeconds()) * 1000
-              + captionST.getMilliseconds();
-      long endTime = ((captionET.getHours() * 60 + captionET.getMinutes()) * 60 + captionET.getSeconds()) * 1000
-              + captionET.getMilliseconds();
+      // Calculate start time
+      Calendar startTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+      startTime.setTimeInMillis(0);
+      startTime.add(Calendar.HOUR_OF_DAY, captionST.getHours());
+      startTime.add(Calendar.MINUTE, captionST.getMinutes());
+      startTime.add(Calendar.SECOND, captionST.getSeconds());
+      startTime.add(Calendar.MILLISECOND, captionST.getMilliseconds());
 
-      long duration = endTime - startTime;
+      // Calculate end time
+      Calendar endTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+      endTime.setTimeInMillis(0);
+      endTime.add(Calendar.HOUR_OF_DAY, captionET.getHours());
+      endTime.add(Calendar.MINUTE, captionET.getMinutes());
+      endTime.add(Calendar.SECOND, captionET.getSeconds());
+      endTime.add(Calendar.MILLISECOND, captionET.getMilliseconds());
 
-      segment.setMediaTime(new MediaTimeImpl(startTime, duration));
+      long startTimeInMillis = startTime.getTimeInMillis();
+      long endTimeInMillis = endTime.getTimeInMillis();
+
+      long duration = endTimeInMillis - startTimeInMillis;
+
+      segment.setMediaTime(new MediaTimeImpl(startTimeInMillis, duration));
       TextAnnotation textAnnotation = segment.createTextAnnotation(0, 0, language);
 
       // Collect all the words in the segment

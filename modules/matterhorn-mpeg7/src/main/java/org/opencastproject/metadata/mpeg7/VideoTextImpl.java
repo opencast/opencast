@@ -20,11 +20,20 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.awt.Rectangle;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 /**
  * Default implementation of the video text element.
  */
 public class VideoTextImpl implements VideoText {
+
+  /**
+   * Number formatter, used to deal with relevance values in a locale
+   * independent way
+   */
+  private static DecimalFormatSymbols standardSymbols = new DecimalFormatSymbols(Locale.US);
 
   /** The video text type */
   protected Type type = Type.superimposed;
@@ -224,6 +233,9 @@ public class VideoTextImpl implements VideoText {
    */
   @Override
   public Node toXml(Document document) {
+    DecimalFormat format = new DecimalFormat();
+    format.setDecimalFormatSymbols(standardSymbols);
+
     Element videoText = document.createElement("VideoText");
     videoText.setAttribute("id", id);
     videoText.setAttribute("textType", type.toString());
@@ -249,12 +261,12 @@ public class VideoTextImpl implements VideoText {
       parameterTrajectory.appendChild(new MediaTimeImpl(new MediaTimePointImpl(), null).toXml(document));
       Element initialRegion = document.createElement("InitialRegion");
       parameterTrajectory.appendChild(initialRegion);
-  
+
       StringBuffer coordinates = new StringBuffer();
-      coordinates.append(boundary.getX()).append(" ");
-      coordinates.append(boundary.getY()).append(" ");
-      coordinates.append(boundary.getX() + boundary.getWidth()).append(" ");
-      coordinates.append(boundary.getY() + boundary.getHeight());
+      coordinates.append(format.format(boundary.getX())).append(" ");
+      coordinates.append(format.format(boundary.getY())).append(" ");
+      coordinates.append(format.format(boundary.getX() + boundary.getWidth())).append(" ");
+      coordinates.append(format.format(boundary.getY() + boundary.getHeight()));
   
       Element box = document.createElement("Box");
       box.setAttribute("dim", "2 2");

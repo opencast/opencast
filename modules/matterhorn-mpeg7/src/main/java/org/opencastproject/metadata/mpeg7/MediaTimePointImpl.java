@@ -22,6 +22,7 @@ import org.w3c.dom.Node;
 
 import java.util.Calendar;
 import java.util.Formatter;
+import java.util.TimeZone;
 
 /**
  * TODO: Comment me!
@@ -105,9 +106,10 @@ public class MediaTimePointImpl implements MediaTimePoint {
   public MediaTimePointImpl(long milliseconds) {
     Calendar calendar = Calendar.getInstance();
     calendar.setTimeInMillis(milliseconds);
+    calendar.setTimeZone(TimeZone.getTimeZone("UCT"));
     second = calendar.get(Calendar.SECOND);
     minute = calendar.get(Calendar.MINUTE);
-    hour = calendar.get(Calendar.HOUR_OF_DAY) - 1;
+    hour = calendar.get(Calendar.HOUR_OF_DAY);
     day = calendar.get(Calendar.DAY_OF_MONTH) - 1;
     month = calendar.get(Calendar.MONTH);
     year = calendar.get(Calendar.YEAR);

@@ -27,6 +27,10 @@ import java.awt.Rectangle;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -45,6 +49,12 @@ public class Mpeg7Parser extends DefaultHandler {
   enum ParserState {
     Document, MultimediaContent, Segment, VideoText
   };
+
+  /**
+   * Number formatter, used to deal with relevance values in a locale
+   * independent way
+   */
+  private static DecimalFormatSymbols standardSymbols = new DecimalFormatSymbols(Locale.US);
 
   /** The manifest */
   private Mpeg7CatalogImpl mpeg7Doc = null;
@@ -100,14 +110,18 @@ public class Mpeg7Parser extends DefaultHandler {
   /** Flag to check if this is not just an arbitrary xml document */
   private boolean isMpeg7 = false;
 
+  private DecimalFormat floatFormat = new DecimalFormat();
+
   /**
    * Creates a new parser for mpeg-7 files.
    */
   public Mpeg7Parser() {
+    floatFormat.setDecimalFormatSymbols(standardSymbols);
   }
 
   public Mpeg7Parser(Mpeg7CatalogImpl catalog) {
     this.mpeg7Doc = catalog;
+    floatFormat.setDecimalFormatSymbols(standardSymbols);
   }
 
   /**
@@ -199,12 +213,12 @@ public class Mpeg7Parser extends DefaultHandler {
       float confidence = -1.0f;
       float relevance = -1.0f;
       try {
-        confidence = Float.parseFloat(attributes.getValue("confidence"));
+        confidence = floatFormat.parse(attributes.getValue("confidence")).floatValue();
       } catch (Exception e) {
         confidence = -1.0f;
       }
       try {
-        relevance = Float.parseFloat(attributes.getValue("relevance"));
+        relevance = floatFormat.parse(attributes.getValue("relevance")).floatValue();
       } catch (Exception e) {
         relevance = -1.0f;
       }
@@ -337,7 +351,11 @@ public class Mpeg7Parser extends DefaultHandler {
         throw new IllegalStateException("Box coordinates '" + tagContent + "' is malformatted");
       int[] coordsL = new int[4];
       for (int i = 0; i < 4; i++)
-        coordsL[i] = (int) Float.parseFloat(coords[i]);
+        try {
+          coordsL[i] = (int) floatFormat.parse(coords[i]).floatValue();
+        } catch (ParseException e) {
+          throw new SAXException(e);
+        }
       videoText.setBoundary(new Rectangle(coordsL[0], coordsL[1], (coordsL[2] - coordsL[0]), coordsL[3] - coordsL[1]));
     }
 

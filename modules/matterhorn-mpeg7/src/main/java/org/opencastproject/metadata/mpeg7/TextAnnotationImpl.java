@@ -25,6 +25,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Implementation of text annotations.
@@ -32,7 +33,7 @@ import java.util.List;
 public class TextAnnotationImpl implements TextAnnotation {
 
   /** Number formatter, used to deal with relevance values in a locale independent way */
-  private static DecimalFormatSymbols standardSymbols = new DecimalFormatSymbols();
+  private static DecimalFormatSymbols standardSymbols = new DecimalFormatSymbols(Locale.US);
 
   /** Confidence value */
   protected float confidence = -1.0f;

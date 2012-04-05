@@ -16,6 +16,10 @@
 
 package org.opencastproject.caption.converters;
 
+import org.apache.commons.io.IOUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.opencastproject.caption.api.Caption;
 import org.opencastproject.caption.api.CaptionConverterException;
 import org.opencastproject.caption.api.IllegalTimeFormatException;
@@ -23,11 +27,6 @@ import org.opencastproject.caption.api.Time;
 import org.opencastproject.caption.impl.TimeImpl;
 
 import junit.framework.Assert;
-
-import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -73,6 +72,8 @@ public class Mpeg7ConverterTest {
       IOUtils.closeQuietly(inputStream);
 
       converter.exportCaption(outputStream, collection, LANGUAGE);
+
+      System.out.println(IOUtils.toString(outputStream.toByteArray()));
 
       inputStream = new ByteArrayInputStream(outputStream.toByteArray());
 
