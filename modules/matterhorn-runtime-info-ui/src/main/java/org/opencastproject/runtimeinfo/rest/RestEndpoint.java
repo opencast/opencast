@@ -15,6 +15,8 @@
  */
 package org.opencastproject.runtimeinfo.rest;
 
+import org.opencastproject.util.doc.DocData;
+
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;

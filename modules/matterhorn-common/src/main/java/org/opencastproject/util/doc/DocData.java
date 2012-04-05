@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.runtimeinfo.rest;
+package org.opencastproject.util.doc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

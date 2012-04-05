@@ -44,6 +44,7 @@
         <module>modules/matterhorn-fileupload</module>
         <module>modules/matterhorn-episode-service-api</module>
         <module>modules/matterhorn-episode-service-impl</module>
+        <module>modules/matterhorn-export-distribution-ui</module>
         <module>modules/matterhorn-ingest-service-api</module>
         <module>modules/matterhorn-ingest-service-impl</module>
         <module>modules/matterhorn-json</module>
@@ -66,6 +67,29 @@
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-workflow-service-impl</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>gstreamer-launch-service</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-gstreamer-service-api</module>
+        <module>modules/matterhorn-gstreamer-service-impl</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>export</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-gstreamer-service-api</module>
+        <module>modules/matterhorn-gstreamer-service-remote</module>
+        <module>modules/matterhorn-static</module>
       </modules>
     </profile>
 
@@ -105,11 +129,13 @@
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-db</module>
+        <module>modules/matterhorn-distribution-service-acl</module>
         <module>modules/matterhorn-distribution-service-api</module>
         <module>modules/matterhorn-distribution-service-download</module>
         <module>modules/matterhorn-distribution-service-streaming</module>
         <module>modules/matterhorn-distribution-service-youtube</module>
         <module>modules/matterhorn-dublincore</module>
+        <module>modules/matterhorn-export-distribution-ui</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -130,6 +156,7 @@
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-db</module>
+        <module>modules/matterhorn-distribution-service-acl-remote</module>
         <module>modules/matterhorn-distribution-service-api</module>
         <module>modules/matterhorn-distribution-service-download-remote</module>
         <module>modules/matterhorn-distribution-service-streaming-remote</module>

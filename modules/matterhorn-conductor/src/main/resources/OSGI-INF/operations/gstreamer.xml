@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.workflow.handler.ExportWorkflowOperationHandler" immediate="true"
+  activate="activate" deactivate="deactivate">
+  <implementation class="org.opencastproject.workflow.handler.ExportWorkflowOperationHandler" />
+  <property name="service.description" value="Export a file using a GStreamer pipe line." />
+  <property name="workflow.operation" value="export" />
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+  <reference cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace"
+    name="Workspace" policy="static" bind="setWorkspace"/>
+  <reference cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    name="Service Registry" policy="static" bind="setServiceRegistry"/>
+  <reference cardinality="1..1" interface="org.opencastproject.gstreamer.service.api.GStreamerService"
+    name="GStreamer Service" policy="static" bind="setGStreamerService"/>
+</scr:component>

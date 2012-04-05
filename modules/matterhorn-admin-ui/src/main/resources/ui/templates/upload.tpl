@@ -235,6 +235,7 @@
 
                 <input type="radio" class="file-source-select" name="fileSourceSingle" id="fileSourceSingleB" value="inbox">
                 <label for="fileSourceSingleB" class="lbl_radio">Designated inbox on server</label>
+                
               </li>
               <!-- field: Media File -->
               <li class="ui-helper-clearfix">

@@ -1,0 +1,99 @@
+<definition>
+
+  <id>export</id>
+  <title>Export to Downloadable Media</title>
+  <description>
+    A simple workflow that transcodes the media into distribution formats, then sends the resulting distribution files,
+    along with their associated metadata, to the distribution channels.
+  </description>
+
+  <operations>
+    <!-- inspect the media -->
+    
+    <operation
+      id="inspect"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Inspecting the media package">
+    </operation>
+
+    <!-- prepare audio/video tracks -->
+
+    <!-- Begin Epiphan MCA operations -->
+
+    <!-- This section is only relevant for the Epiphan MCA devices, however
+         it needs to be present for those to work.  Since it does not affect
+         normal CA ingests we will leave this in -->
+
+    <operation
+      id="compose"
+      fail-on-error="false"
+      exception-handler-workflow="error"
+      description="Splitting Media (if needed)">
+      <configurations>
+        <configuration key="source-flavor">multitrack/source</configuration>
+        <configuration key="target-flavor">presenter/source</configuration>
+        <configuration key="encoding-profile">epiphan.presenter</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="compose"
+      fail-on-error="false"
+      exception-handler-workflow="error"
+      description="Splitting Media (if needed)">
+      <configurations>
+        <configuration key="source-flavor">multitrack/source</configuration>
+        <configuration key="target-flavor">presentation/source</configuration>
+        <configuration key="encoding-profile">epiphan.presentation</configuration>
+      </configurations>
+    </operation>
+
+    <!-- End Epiphan MCA operations -->
+
+    <!-- hold for templating-->
+   
+    <operation
+      id="export"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Running gstreamer pipeline to create export media">
+    </operation>  
+
+    <!-- Distribute to download server -->
+    
+    <operation
+      id="distribute-download"
+      max-attempts="2"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Distributing to progressive downloads">
+      <configurations>
+        <configuration key="source-tags">export</configuration>
+        <configuration key="target-tags">publish</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="distribute-acl"
+      max-attempts="2"
+      fail-on-error="false"
+      description="Distributing permissions to export file">
+      <configurations>
+        <configuration key="source-tags">export</configuration>
+        <configuration key="target-tags">publish</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Cleanup the working file repository -->
+ 
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+      <configurations>
+        <configuration key="preserve-flavors">*/source,dublincore/*</configuration>
+      </configurations>
+    </operation>
+  </operations>
+</definition>

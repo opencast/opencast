@@ -25,7 +25,6 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
-import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -163,7 +162,23 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    */
   protected MediaPackageElement distribute(Job job, MediaPackage mediapackage, String elementId)
           throws DistributionException {
+    return distributeElement(mediapackage, elementId);
+  }
 
+  /**
+   * Distribute a Mediapackage element to the download distribution service.
+   * 
+   * @param mediapackage
+   *          The media package that contains the element to distribute.
+   * @param elementId
+   *          The id of the element that should be distributed contained within the media package.
+   * @return A reference to the MediaPackageElement that has been distributed.
+   * @throws DistributionException
+   *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
+   *           cannot be copied or another unexpected exception occurs.
+   */
+  public MediaPackageElement distributeElement(MediaPackage mediapackage, String elementId) 
+          throws DistributionException {
     if (mediapackage == null)
       throw new IllegalArgumentException("Mediapackage must be specified");
     if (elementId == null)
@@ -175,15 +190,11 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     // Make sure the element exists
     if (mediapackage.getElementById(elementId) == null)
       throw new IllegalStateException("No element " + elementId + " found in mediapackage");
-    
+
     try {
-      // The streaming server only supports tracks
-      if (!(element instanceof Track)) {
-        return null;
-      }
-      File sourceFile;
+      File source;
       try {
-        sourceFile = workspace.get(element.getURI());
+        source = workspace.get(element.getURI());
       } catch (NotFoundException e) {
         throw new DistributionException("Unable to find " + element.getURI() + " in the workspace", e);
       } catch (IOException e) {
@@ -200,9 +211,9 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       logger.info("Distributing {} to {}", elementId, destination);
 
       try {
-        FileSupport.link(sourceFile, destination, true);
+        FileSupport.link(source, destination, true);
       } catch (IOException e) {
-        throw new DistributionException("Unable to copy " + sourceFile + " to " + destination, e);
+        throw new DistributionException("Unable to copy " + source + " to " + destination, e);
       }
 
       // Create a representation of the distributed file in the mediapackage
@@ -226,7 +237,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       }
     }
   }
-
+  
   /**
    * {@inheritDoc}
    * 
@@ -502,5 +513,4 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   protected OrganizationDirectoryService getOrganizationDirectoryService() {
     return organizationDirectoryService;
   }
-
 }

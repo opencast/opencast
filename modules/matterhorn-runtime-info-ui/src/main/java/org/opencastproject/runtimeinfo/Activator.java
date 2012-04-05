@@ -18,8 +18,8 @@ package org.opencastproject.runtimeinfo;
 import static org.opencastproject.rest.RestConstants.SERVICES_FILTER;
 import static org.opencastproject.rest.RestConstants.SERVICE_PATH_PROPERTY;
 
-import org.opencastproject.runtimeinfo.rest.DocUtil;
 import org.opencastproject.runtimeinfo.rest.RestDocData;
+import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestService;
 

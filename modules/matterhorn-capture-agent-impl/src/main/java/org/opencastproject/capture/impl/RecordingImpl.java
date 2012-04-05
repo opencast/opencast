@@ -27,6 +27,7 @@ import org.opencastproject.mediapackage.MediaPackageImpl;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.util.ConfigurationException;
+import org.opencastproject.util.XProperties;
 
 import org.apache.commons.io.FileUtils;
 import org.osgi.framework.BundleContext;

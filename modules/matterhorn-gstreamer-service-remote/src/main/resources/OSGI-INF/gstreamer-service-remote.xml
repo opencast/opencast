@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.gstreamer.remote.GStreamerServiceRemoteImpl"
+  immediate="true">
+  <implementation
+    class="org.opencastproject.gstreamer.remote.GStreamerServiceRemoteImpl" />
+  <property name="service.description" value="GStreamer Remote Service Proxy" />
+  <service>
+    <provide interface="org.opencastproject.gstreamer.service.api.GStreamerService" />
+  </service>
+  <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
+    cardinality="1..1" policy="static" bind="setTrustedHttpClient" />
+  <reference name="remoteServiceManager" interface="org.opencastproject.serviceregistry.api.ServiceRegistry" cardinality="1..1" policy="static" bind="setRemoteServiceManager" />
+</scr:component>

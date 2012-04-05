@@ -20,6 +20,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
 import org.opencastproject.capture.CaptureParameters;
+import org.opencastproject.util.XProperties;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;

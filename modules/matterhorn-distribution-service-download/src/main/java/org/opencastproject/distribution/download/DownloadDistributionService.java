@@ -60,7 +60,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
 
   /** List of available operations on jobs */
   private enum Operation {
-    Distribute, Retract
+    Distribute, Retract 
   }
 
   /** Receipt type */
@@ -142,7 +142,23 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
    */
   protected MediaPackageElement distribute(Job job, MediaPackage mediapackage, String elementId)
           throws DistributionException {
+    return distributeElement(mediapackage, elementId);
+  }
 
+  /**
+   * Distribute a Mediapackage element to the download distribution service.
+   * 
+   * @param mediapackage
+   *          The media package that contains the element to distribute.
+   * @param elementId
+   *          The id of the element that should be distributed contained within the media package.
+   * @return A reference to the MediaPackageElement that has been distributed.
+   * @throws DistributionException
+   *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
+   *           cannot be copied or another unexpected exception occurs.
+   */
+  public MediaPackageElement distributeElement(MediaPackage mediapackage, String elementId) 
+          throws DistributionException {
     if (mediapackage == null)
       throw new IllegalArgumentException("Mediapackage must be specified");
     if (elementId == null)
@@ -156,9 +172,9 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
       throw new IllegalStateException("No element " + elementId + " found in mediapackage");
 
     try {
-      File sourceFile;
+      File source;
       try {
-        sourceFile = workspace.get(element.getURI());
+        source = workspace.get(element.getURI());
       } catch (NotFoundException e) {
         throw new DistributionException("Unable to find " + element.getURI() + " in the workspace", e);
       } catch (IOException e) {
@@ -175,9 +191,9 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
       logger.info("Distributing {} to {}", elementId, destination);
 
       try {
-        FileSupport.link(sourceFile, destination, true);
+        FileSupport.link(source, destination, true);
       } catch (IOException e) {
-        throw new DistributionException("Unable to copy " + sourceFile + " to " + destination, e);
+        throw new DistributionException("Unable to copy " + source + " to " + destination, e);
       }
 
       // Create a representation of the distributed file in the mediapackage
@@ -201,7 +217,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
       }
     }
   }
-
+  
   @Override
   public Job retract(MediaPackage mediaPackage, String elementId) throws DistributionException {
     if (mediaPackage == null)
@@ -282,7 +298,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
         logger.warn("Unable to delete element from {}", elementDir);
         return distributedElement;
       }
-
+      
       // Try to remove the file and - if possible - the parent folder
       FileUtils.forceDelete(elementDir.getParentFile());
       if (mediapackageDir.list().length == 0) {

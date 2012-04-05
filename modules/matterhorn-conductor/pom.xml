@@ -43,6 +43,16 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-gstreamer-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-series-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -183,11 +193,13 @@
               OSGI-INF/operations/cleanup.xml,
               OSGI-INF/operations/compose.xml,
               OSGI-INF/operations/coverart.xml,
+              OSGI-INF/operations/distribute-acl.xml,
               OSGI-INF/operations/distribute-download.xml,
               OSGI-INF/operations/distribute-streaming.xml,
               OSGI-INF/operations/download-dvd.xml,
               OSGI-INF/operations/embed.xml,
               OSGI-INF/operations/error-handler.xml,
+              OSGI-INF/operations/gstreamer.xml,
               OSGI-INF/operations/error-resolution.xml,
               OSGI-INF/operations/failing.xml,
               OSGI-INF/operations/image.xml,

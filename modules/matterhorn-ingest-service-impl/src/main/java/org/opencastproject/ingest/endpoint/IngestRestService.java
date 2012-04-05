@@ -705,6 +705,32 @@ public class IngestRestService {
     }
   }
 
+  @GET
+  @Path("filechooser-archive.html")
+  @Produces(MediaType.TEXT_HTML)
+  public Response createArchiveHtml(@QueryParam("elementType") String elementType) {
+    InputStream is = null;
+    elementType = (elementType == null) ? "track" : elementType;
+    try {
+      UploadJob job = createUploadJob();
+      is = getClass().getResourceAsStream("/templates/uploadform.html");
+      String html = IOUtils.toString(is, "UTF-8");
+      // String uploadURL = serverURL + "/ingest/addElementMonitored/" + job.getId();
+      String uploadURL = "/ingest/addZippedMediaPackage";
+      html = html.replaceAll("\\{uploadURL\\}", uploadURL);
+      html = html.replaceAll("\\{jobId\\}", job.getId());
+      html = html.replaceAll("\\{elementType\\}", elementType);
+      logger.debug("New upload job created: " + job.getId());
+      jobs.put(job.getId(), job);
+      return Response.ok(html).build();
+    } catch (Exception ex) {
+      logger.warn(ex.getMessage(), ex);
+      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    } finally {
+      IOUtils.closeQuietly(is);
+    }
+  }
+  
   /**
    * Add an elements to a MediaPackage and keeps track of the progress of the upload. Returns an HTML that triggers the
    * host sites UploadListener.uploadComplete javascript event Returns an HTML that triggers the host sites

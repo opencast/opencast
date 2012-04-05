@@ -15,6 +15,8 @@
  */
 package org.opencastproject.runtimeinfo.rest;
 
+import org.opencastproject.util.doc.DocData;
+
 /**
  * Represents one possible output format for a REST endpoint
  */

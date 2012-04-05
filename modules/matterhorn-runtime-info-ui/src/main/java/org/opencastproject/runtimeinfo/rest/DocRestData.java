@@ -15,6 +15,8 @@
  */
 package org.opencastproject.runtimeinfo.rest;
 
+import org.opencastproject.util.doc.DocData;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
