@@ -73,8 +73,6 @@ public class Mpeg7ConverterTest {
 
       converter.exportCaption(outputStream, collection, LANGUAGE);
 
-      System.out.println(IOUtils.toString(outputStream.toByteArray()));
-
       inputStream = new ByteArrayInputStream(outputStream.toByteArray());
 
       testImport(inputStream);
