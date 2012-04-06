@@ -277,11 +277,15 @@ ocUpload.UI = (function() {
   this.selectFileSource = function() {
     var location = $(this).val();
     var $container = $(this).parent().next('li').find('iframe');
-    $container.attr('src', '../ingest/filechooser-' + location + '.html');
+    if(location == "local") {
+      $container.attr('src', 'upload.html');
+    } else {
+      $container.attr('src', '../ingest/filechooser-' + location + '.html');
+    }
   }
 
   this.selectFlavor = function() {
-    var $flavorField = $(this).parent().find('.track-flavor');
+    var $flavorField = $(this).parent().prev().find('.track-flavor');
     if ($(this).is(':checked')) {
       $flavorField.val('presentation/source');
     } else {
@@ -618,7 +622,7 @@ ocUpload.Ingest = (function() {
     $uploader.contents().find('#mediapackage').val(MediaPackage.document);
     
     track.id = createUploadJob($uploader);
-    track.flavor = ocUtils.getURLParam("flavor", $uploader.attr('src'));
+    track.flavor = $uploader.parent().find('input.track-flavor').val();
     
     //upload mediapackage to upload service
     
@@ -656,7 +660,7 @@ ocUpload.Ingest = (function() {
         filename : filename,
         filesize : filesize,
         chunksize: chunksize,
-        flavor   : $uploader.parent().contents().find('#track-flavor').val(),
+        flavor   : $uploader.parent().find('input.track-flavor').val(),
         mediapackage : MediaPackage.document
       },
       success: function(job_id) {
@@ -721,21 +725,6 @@ ocUpload.Ingest = (function() {
     
     track.done = true;
     proceed();
-    
-  //    $.ajax({
-  //      url: ocUpload.UPLOAD_MEDIAPACKAGE + track.id,
-  //      async: false,
-  //      dataType : 'text',
-  //      success: function(data, status, jqHBX) {
-  //        if(jqHBX.status == 200) {
-  //          MediaPackage.document = data;
-  //          track.done = true;
-  //          proceed();
-  //        } else {
-  //          ocUpload.UI.showFailure("Could not retrieve new mediapackage");
-  //        }
-  //      }
-  //    });
   }
 
   function createSeries(name) {

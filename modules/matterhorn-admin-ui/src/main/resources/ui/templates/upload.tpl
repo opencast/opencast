@@ -241,12 +241,12 @@
               <li class="ui-helper-clearfix">
                 <label class="scheduler-label"><span class="color-red">* </span><span id="i18n_upload_file">Media File</span>:</label>
                 <iframe class="uploadForm-container" frameborder="0" scrolling="no" src="upload.html?flavor=presenter/source" class="uploadForm-container"></iframe>
-
+                <input type="hidden" class="track-flavor" value="presenter/source"/>
               </li>
               <li class="ui-helper-clearfix">
                 <label class="scheduler-label"><span id="i18n_upload_flavor">Media Characteristics</span>:</label>
                 <input type="checkbox" class="flavor-presentation-checkbox" id="containsSlides">
-                <input type="hidden" class="track-flavor" value="presenter/source">
+                
                 <label for="containsSlides" style="text-align: left; width: 300px;">
                   Contains discrete images/slides/scenes.
                 </label>
