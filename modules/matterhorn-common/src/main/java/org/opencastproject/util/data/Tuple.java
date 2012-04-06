@@ -16,6 +16,9 @@
 
 package org.opencastproject.util.data;
 
+/**
+ * A pair.
+ */
 public class Tuple<A, B> {
 
   private A a;

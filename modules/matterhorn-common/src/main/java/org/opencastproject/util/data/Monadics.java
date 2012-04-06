@@ -16,14 +16,17 @@
 
 package org.opencastproject.util.data;
 
-import java.util.AbstractCollection;
+import org.apache.commons.lang.ArrayUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static java.lang.StrictMath.min;
 import static java.util.Arrays.asList;
+import static org.opencastproject.util.data.Collections.iterator;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 
@@ -33,99 +36,145 @@ public final class Monadics {
   }
 
   // we need to define a separate interface for each container type
-  // since Java lacks higher-order polymorphism so we cannot
+  // since Java lacks higher-order polymorphism (higher-kinded type) so we cannot
   // abstract over the container type like this
   //
-  // interface Monadic<A, CC, CC<A>> {
-  //   <B> CC<B> map(Function<A, B> f);
-  //   CC<B> value();
+  // interface Monadic<A, M, M<A>> {
+  //   <B> M<B> map(Function<A, B> f);
   // }
 
-  public interface ListMonadic<A> {
+  /**
+   * The list monad.
+   */
+  public abstract static class ListMonadic<A> {
+    
+    private ListMonadic() {      
+    }
+    
     /**
-     * Apply <code>f</code> to each elements building a new list.
+     * Alias for {@link #fmap(Function) fmap}.
      */
-    <B> ListMonadic<B> map(Function<A, B> f);
+    public final <B> ListMonadic<B> map(Function<A, B> f) {
+      return fmap(f);
+    }
 
     /**
-     * Apply <code>f</code> to each elements concatenating the results into a new list.
-     * This is equal to monadic bind.
+     * Apply <code>f</code> to each elements building a new list. This is the list functor.
+     *
+     * @see #map(Function)
      */
-    <B, BB extends Collection<B>> ListMonadic<B> flatMap(Function<A, BB> f);
+    public abstract <B> ListMonadic<B> fmap(Function<A, B> f);
+
+    /**
+     * Alias for {@link #bind(Function)}.
+     */
+    public final <B, M extends Collection<B>> ListMonadic<B> flatMap(Function<A, M> f) {
+      return bind(f);
+    }
+
+    /**
+     * Monadic bind <code>m a -&gt; (a -&gt; m b) -&gt m b</code>.
+     * Apply <code>f</code> to each elements concatenating the results into a new list.
+     */
+    public abstract <B, M extends Collection<B>> ListMonadic<B> bind(Function<A, M> f);
 
     /**
      * Fold the list from left to right applying binary operator <code>f</code> starting with <code>zero</code>.
      */
-    <B> B foldl(B zero, Function2<B, A, B> f);
+    public abstract <B> B foldl(B zero, Function2<B, A, B> f);
 
     /**
      * Reduce the list from left to right applying binary operator <code>f</code>. The list must not be empty.
      */
-    A reducel(Function2<A, A, A> f);
+    public abstract A reducel(Function2<A, A, A> f);
 
     /**
      * Append <code>a</code> to the list.
      */
-    <AA extends Collection<A>> ListMonadic<A> concat(AA a);
+    public abstract <M extends Collection<A>> ListMonadic<A> concat(M a);
 
     /**
      * Retain all elements satisfying predicate <code>p</code>.
      */
-    ListMonadic<A> filter(Function<A, Boolean> p);
+    public abstract ListMonadic<A> filter(Function<A, Boolean> p);
 
     /**
      * Return the first element satisfying predicate <code>p</code>.
      */
-    Option<A> find(Function<A, Boolean> p);
+    public abstract Option<A> find(Function<A, Boolean> p);
 
     /**
      * Check if at least one element satisfies predicate <code>p</code>.
      */
-    boolean exists(Function<A, Boolean> p);
+    public abstract boolean exists(Function<A, Boolean> p);
 
     /**
      * Apply side effect <code>e</code> to each element.
      */
-    ListMonadic<A> each(Function<A, Void> e);
+    public abstract ListMonadic<A> each(Function<A, Void> e);
 
     /**
      * Apply side effect <code>e</code> to each element. Indexed version.
      */
-    ListMonadic<A> eachIndex(Function2<A, Integer, Void> e);
+    public abstract ListMonadic<A> eachIndex(Function2<A, Integer, Void> e);
 
     /**
      * Return the head of the list.
      */
-    Option<A> head();
+    public abstract Option<A> head();
+
+    /**
+     * Limit the list to the first <code>n</code> elements.
+     */
+    public abstract ListMonadic<A> take(int n);
 
     /**
      * Process the wrapped list en bloc.
      */
-    <B> ListMonadic<B> inspect(Function<List<A>, List<B>> f);
+    public abstract <B> ListMonadic<B> inspect(Function<List<A>, List<B>> f);
 
     /**
      * Unwrap.
      */
-    List<A> value();
+    public abstract List<A> value();
   }
 
-  public interface IteratorMonadic<A> {
+  /**
+   * The iterator monad.
+   */
+  public abstract static class IteratorMonadic<A> {
+    
+    private IteratorMonadic() {      
+    }
+    
     /**
-     * Apply <code>f</code> to each element building a new iterator.
+     * Alias for {@link #fmap(Function)}.
      */
-    <B> IteratorMonadic<B> map(Function<A, B> f);
+    public final <B> IteratorMonadic<B> map(Function<A, B> f) {
+      return fmap(f);
+    }
 
     /**
-     * Apply <code>f</code> to each element building a new iterator. The function
-     * also receives the element's index.
+     * Apply <code>f</code> to each element.
      */
-    <B> IteratorMonadic<B> mapIndex(Function2<A, Integer, B> f);
+    public abstract <B> IteratorMonadic<B> fmap(Function<A, B> f);
 
     /**
-     * Apply <code>f</code> to each elements concatenating the results.
-     * This is equal to monadic bind.
+     * Apply <code>f</code> to each element. The function also receives the element's index.
      */
-    <B> IteratorMonadic<B> flatMap(Function<A, Iterator<B>> f);
+    public abstract <B> IteratorMonadic<B> mapIndex(Function2<A, Integer, B> f);
+
+    /**
+     * Alias for {@link #bind(Function)}.
+     */
+    public final <B> IteratorMonadic<B> flatMap(Function<A, Iterator<B>> f) {
+      return bind(f);
+    }
+
+    /**
+     * Monadic bind. Apply <code>f</code> to each elements concatenating the results.
+     */
+    public abstract <B> IteratorMonadic<B> bind(Function<A, Iterator<B>> f);
 
 //    /**
 //     * Apply <code>f</code> to each elements concatenating the results into a new list.
@@ -135,80 +184,77 @@ public final class Monadics {
     /**
      * Fold the elements applying binary operator <code>f</code> starting with <code>zero</code>.
      */
-    <B> B fold(B zero, Function2<B, A, B> f);
+    public abstract <B> B fold(B zero, Function2<B, A, B> f);
 
     /**
      * Reduce the elements applying binary operator <code>f</code>. The iterator must not be empty.
      */
-    A reduce(Function2<A, A, A> f);
+    public abstract A reduce(Function2<A, A, A> f);
 
 //    /**
 //     * Append <code>a</code> to the list.
 //     */
-//    <AA extends Collection<A>> ListMonadic<A> concat(AA a);
+//    <M extends Collection<A>> ListMonadic<A> concat(M a);
 
     /**
      * Retain all elements satisfying predicate <code>p</code>.
      */
-    IteratorMonadic<A> filter(Function<A, Boolean> p);
+    public abstract IteratorMonadic<A> filter(Function<A, Boolean> p);
+
+    /**
+     * Limit iteration to the first <code>n</code> elements.
+     */
+    public abstract IteratorMonadic<A> take(int n);
 
     /**
      * Apply side effect <code>e</code> to each element.
      */
-    IteratorMonadic<A> each(Function<A, Void> e);
+    public abstract IteratorMonadic<A> each(Function<A, Void> e);
 
     /**
-     * Apply side effect <code>e</code> to each element. Indexed version.
+     * Apply side effect <code>e</code> to each element. Indexed version of {@link #each(Function)}.
      */
-    IteratorMonadic<A> eachIndex(Function2<A, Integer, Void> e);
+    public abstract IteratorMonadic<A> eachIndex(Function2<A, Integer, Void> e);
 
     /**
-     * Return the head of the iterator. <em>ATTENTION:</em> This method is not pure since it has the
+     * Return the head of the iterator. 
+     * <em>ATTENTION:</em> This method is not pure since it has the
      * side effect of taking and wrapping the next element of the wrapped iterator.
      */
-    Option<A> next();
+    public abstract Option<A> next();
 
     /**
-     * Unwrap.
+     * Return the wrapped iterator.
      */
-    Iterator<A> value();
+    public abstract Iterator<A> value();
 
     /**
      * Evaluate to a list.
      */
-    List<A> eval();
+    public abstract List<A> eval();
   }
-
-// todo implement constructor functions
-//  interface ArrayMonadic<A> {
-//    <B> ArrayMonadic<B> map(Function<A, B> f);
-//    <B> ArrayMonadic<B> flatMap(Function<A, Collection<B>> f);
-//    ArrayMonadic<A> filter(Function<A, Boolean> p);
-//    A[] value();
-//  }
 
   /**
    * Constructor function optimized for lists.
-   * This is monadic return.
    */
-  public static <A> ListMonadic<A> list(final List<A> as) {
+  public static <A> ListMonadic<A> mlist(final List<A> as) {
     return new ListMonadic<A>() {
       @Override
-      public <B> ListMonadic<B> map(Function<A, B> f) {
+      public <B> ListMonadic<B> fmap(Function<A, B> f) {
         List<B> target = new ArrayList<B>(as.size());
         for (A a : as) {
           target.add(f.apply(a));
         }
-        return list(target);
+        return mlist(target);
       }
 
       @Override
-      public <B, BB extends Collection<B>> ListMonadic<B> flatMap(Function<A, BB> f) {
+      public <B, M extends Collection<B>> ListMonadic<B> bind(Function<A, M> f) {
         List<B> target = new ArrayList<B>();
         for (A a : as) {
           target.addAll(f.apply(a));
         }
-        return list(target);
+        return mlist(target);
       }
 
       @Override
@@ -219,7 +265,7 @@ public final class Monadics {
             target.add(a);
           }
         }
-        return list(target);
+        return mlist(target);
       }
 
       @Override
@@ -268,16 +314,21 @@ public final class Monadics {
       }
 
       @Override
-      public <AA extends Collection<A>> ListMonadic<A> concat(AA aa) {
-        List<A> target = new ArrayList<A>(as.size() + aa.size());
+      public ListMonadic<A> take(int n) {
+        return mlist(as.subList(0, min(as.size(), n)));
+      }
+
+      @Override
+      public <M extends Collection<A>> ListMonadic<A> concat(M m) {
+        List<A> target = new ArrayList<A>(as.size() + m.size());
         target.addAll(as);
-        target.addAll(aa);
-        return list(target);
+        target.addAll(m);
+        return mlist(target);
       }
 
       @Override
       public <B> ListMonadic<B> inspect(Function<List<A>, List<B>> f) {
-        return list(f.apply(as));
+        return mlist(f.apply(as));
       }
 
       @Override
@@ -305,35 +356,26 @@ public final class Monadics {
   }
 
   /**
-   * Constructor function optimized for var args.
-   * This is monadic return.
-   */
-  public static <A> ListMonadic<A> listva(A... as) {
-    return list(as);
-  }
-
-  /**
    * Constructor function optimized for arrays.
-   * This is monadic return.
    */
-  public static <A> ListMonadic<A> list(final A[] as) {
+  public static <A> ListMonadic<A> mlist(final A... as) {
     return new ListMonadic<A>() {
       @Override
-      public <B> ListMonadic<B> map(Function<A, B> f) {
+      public <B> ListMonadic<B> fmap(Function<A, B> f) {
         List<B> target = new ArrayList<B>(as.length);
         for (A a : as) {
           target.add(f.apply(a));
         }
-        return list(target);
+        return mlist(target);
       }
 
       @Override
-      public <B, BB extends Collection<B>> ListMonadic<B> flatMap(Function<A, BB> f) {
+      public <B, BB extends Collection<B>> ListMonadic<B> bind(Function<A, BB> f) {
         List<B> target = new ArrayList<B>();
         for (A a : as) {
           target.addAll(f.apply(a));
         }
-        return list(target);
+        return mlist(target);
       }
 
       @Override
@@ -344,7 +386,7 @@ public final class Monadics {
             target.add(a);
           }
         }
-        return list(target);
+        return mlist(target);
       }
 
       @Override
@@ -393,18 +435,23 @@ public final class Monadics {
       }
 
       @Override
+      public ListMonadic<A> take(int n) {
+        return (ListMonadic<A>) mlist(ArrayUtils.subarray(as, 0, n));
+      }
+
+      @Override
       public <AA extends Collection<A>> ListMonadic<A> concat(AA aa) {
         List<A> target = new ArrayList<A>(as.length + aa.size());
         for (A a : as) {
           target.add(a);
         }
         target.addAll(aa);
-        return list(target);
+        return mlist(target);
       }
 
       @Override
       public <B> ListMonadic<B> inspect(Function<List<A>, List<B>> f) {
-        return list(f.apply(value()));
+        return mlist(f.apply(value()));
       }
 
       @Override
@@ -412,7 +459,7 @@ public final class Monadics {
         for (A a : as) {
           e.apply(a);
         }
-        return list(as);
+        return mlist(as);
       }
 
       @Override
@@ -433,28 +480,25 @@ public final class Monadics {
 
   /**
    * Constructor function optimized for iterators.
-   * - head
-   * - concat
-   * - inspect
    */
-  public static <A> ListMonadic<A> list(final Iterator<A> as) {
+  public static <A> ListMonadic<A> mlist(final Iterator<A> as) {
     return new ListMonadic<A>() {
       @Override
-      public <B> ListMonadic<B> map(Function<A, B> f) {
+      public <B> ListMonadic<B> fmap(Function<A, B> f) {
         List<B> target = new ArrayList<B>();
         while (as.hasNext()) {
           target.add(f.apply(as.next()));
         }
-        return list(target);
+        return mlist(target);
       }
 
       @Override
-      public <B, BB extends Collection<B>> ListMonadic<B> flatMap(Function<A, BB> f) {
+      public <B, BB extends Collection<B>> ListMonadic<B> bind(Function<A, BB> f) {
         List<B> target = new ArrayList<B>();
         while (as.hasNext()) {
           target.addAll(f.apply(as.next()));
         }
-        return list(target);
+        return mlist(target);
       }
 
       @Override
@@ -466,12 +510,12 @@ public final class Monadics {
             target.add(a);
           }
         }
-        return list(target);
+        return mlist(target);
       }
 
       @Override
       public Option<A> find(Function<A, Boolean> p) {
-        for (A a : forc(as)) {
+        for (A a : Collections.forc(as)) {
           if (p.apply(a))
             return some(a);
         }
@@ -480,7 +524,7 @@ public final class Monadics {
 
       @Override
       public boolean exists(Function<A, Boolean> p) {
-        for (A a : forc(as)) {
+        for (A a : Collections.forc(as)) {
           if (p.apply(a))
             return true;
         }
@@ -515,7 +559,29 @@ public final class Monadics {
       }
 
       @Override
-      public <AA extends Collection<A>> ListMonadic<A> concat(AA aa) {
+      public ListMonadic<A> take(final int n) {
+        return mlist(new Iter<A>() {
+          private int count = 0;
+
+          @Override
+          public boolean hasNext() {
+            return count < n && as.hasNext();
+          }
+
+          @Override
+          public A next() {
+            if (count < n) {
+              count++;
+              return as.next();
+            } else {
+              throw new NoSuchElementException();
+            }
+          }
+        });
+      }
+
+      @Override
+      public <M extends Collection<A>> ListMonadic<A> concat(M m) {
         throw new UnsupportedOperationException();
       }
 
@@ -543,21 +609,19 @@ public final class Monadics {
 
       @Override
       public List<A> value() {
-        return toList(as);
+        return Collections.list(as);
       }
     };
   }
 
-  // --
-
   /**
-   * Value constructor. This is monadic return.
+   * Constructor function optimized for iterators. 
    */
-  public static <A> IteratorMonadic<A> lazy(final Iterator<A> as) {
+  public static <A> IteratorMonadic<A> mlazy(final Iterator<A> as) {
     return new IteratorMonadic<A>() {
       @Override
-      public <B> IteratorMonadic<B> map(final Function<A, B> f) {
-        return lazy(new Iter<B>() {
+      public <B> IteratorMonadic<B> fmap(final Function<A, B> f) {
+        return mlazy(new Iter<B>() {
           @Override
           public boolean hasNext() {
             return as.hasNext();
@@ -572,7 +636,7 @@ public final class Monadics {
 
       @Override
       public <B> IteratorMonadic<B> mapIndex(final Function2<A, Integer, B> f) {
-        return lazy(new Iter<B>() {
+        return mlazy(new Iter<B>() {
           private int i = 0;
 
           @Override
@@ -588,56 +652,30 @@ public final class Monadics {
       }
 
       @Override
-      public <B> IteratorMonadic<B> flatMap(final Function<A, Iterator<B>> f) {
-        return lazy(new Iter<B>() {
+      public <B> IteratorMonadic<B> bind(final Function<A, Iterator<B>> f) {
+        return mlazy(new Iter<B>() {
           @Override
           public boolean hasNext() {
-            return apply().fold(new Option.Match<Iterator<B>, Boolean>() {
-              @Override
-              public Boolean some(Iterator<B> ignore) {
-                return true;
-              }
-
-              @Override
-              public Boolean none() {
-                return false;
-              }
-            });
+            return step.hasNext() || step().hasNext();
           }
 
           @Override
           public B next() {
-            return apply().fold(new Option.Match<Iterator<B>, B>() {
-              @Override
-              public B some(Iterator<B> bb) {
-                return bb.next();
-              }
-
-              @Override
-              public B none() {
-                throw new NoSuchElementException();
-              }
-            });
+            if (step.hasNext()) {
+              return step.next();
+            } else {
+              return step().next();
+            }
           }
 
-          private Option<Iterator<B>> current = some(Monadics.<B>emptyIter());
+          // iterator state management
+          private Iterator<B> step = Monadics.emptyIter();
 
-          private Option<Iterator<B>> apply() {
-            current = current.flatMap(new Function<Iterator<B>, Option<Iterator<B>>>() {
-              @Override
-              public Option<Iterator<B>> apply(Iterator<B> c) {
-                if (c.hasNext()) {
-                  return some(c);
-                } else {
-                  if (as.hasNext()) {
-                    return some(f.apply(as.next()));
-                  } else {
-                    return none();
-                  }
-                }
-              }
-            });
-            return current;
+          private Iterator<B> step() {
+            while (!step.hasNext() && as.hasNext()) {
+              step = f.apply(as.next());
+            }
+            return step;
           }
         });
       }
@@ -658,8 +696,30 @@ public final class Monadics {
       }
 
       @Override
+      public IteratorMonadic<A> take(final int n) {
+        return mlazy(new Iter<A>() {
+          private int count = 0;
+
+          @Override
+          public boolean hasNext() {
+            return count < n && as.hasNext();
+          }
+
+          @Override
+          public A next() {
+            if (count < n) {
+              count++;
+              return as.next();
+            } else {
+              throw new NoSuchElementException();
+            }
+          }
+        });
+      }
+
+      @Override
       public IteratorMonadic<A> each(final Function<A, Void> e) {
-        return lazy(new Iter<A>() {
+        return mlazy(new Iter<A>() {
           @Override
           public boolean hasNext() {
             return as.hasNext();
@@ -668,7 +728,7 @@ public final class Monadics {
           @Override
           public A next() {
             final A a = as.next();
-            e.apply(as.next());
+            e.apply(a);
             return a;
           }
         });
@@ -676,7 +736,7 @@ public final class Monadics {
 
       @Override
       public IteratorMonadic<A> eachIndex(final Function2<A, Integer, Void> e) {
-        return lazy(new Iter<A>() {
+        return mlazy(new Iter<A>() {
           private int i = 0;
 
           @Override
@@ -687,7 +747,7 @@ public final class Monadics {
           @Override
           public A next() {
             final A a = as.next();
-            e.apply(as.next(), i++);
+            e.apply(a, i++);
             return a;
           }
         });
@@ -705,54 +765,24 @@ public final class Monadics {
 
       @Override
       public List<A> eval() {
-        return toList(as);
+        return Collections.list(as);
       }
     };
-  }
-
-  public static <A> IteratorMonadic<A> lazy(final List<A> as) {
-    return lazy(as.iterator());
-  }
-
-  public static <A> Iterator<A> toIter(A... as) {
-    return asList(as).iterator();
   }
 
   /**
-   * Make an Iterator usable in a for comprehension like this:
-   * <pre>
-   *   Iterator&lt;A&gt; as = ...
-   *   for (A a : forc(as)) {
-   *     ...
-   *   }
-   * </pre>
+   * Constructor function optimized for lists.
    */
-  public static <A> Collection<A> forc(final Iterator<A> as) {
-    return new AbstractCollection<A>() {
-      @Override
-      public Iterator<A> iterator() {
-        return as;
-      }
-
-      @Override
-      public int size() {
-        return -1;
-      }
-    };
+  public static <A> IteratorMonadic<A> mlazy(final List<A> as) {
+    return mlazy(as.iterator());
   }
 
-  //
-  // Helper
-  //
-
-  public static <A> List<A> toList(Iterator<A> as) {
-    List<A> ass = new ArrayList<A>();
-    while (as.hasNext()) {
-      ass.add(as.next());
-    }
-    return ass;
+  /**
+   * Constructor function optimized for arrays.
+   */
+  public static <A> IteratorMonadic<A> mlazy(A... as) {
+    return mlazy(iterator(as));
   }
-
 
   private abstract static class Iter<A> implements Iterator<A> {
     @Override

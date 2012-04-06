@@ -16,6 +16,11 @@
 
 package org.opencastproject.util;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,12 +28,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
 
 /**
  * This class stores value and type of a generated checksum.
@@ -94,7 +93,7 @@ public final class Checksum implements Serializable {
    *          the digest
    * @return the digest hex representation
    */
-  private static String convertToHex(byte[] data) {
+  public static String convertToHex(byte[] data) {
     StringBuffer buf = new StringBuffer();
     for (int i = 0; i < data.length; i++) {
       int halfbyte = (data[i] >>> 4) & 0x0F;

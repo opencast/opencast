@@ -211,7 +211,7 @@
             <Service-Component>
               OSGI-INF/ingest-service.xml,
               OSGI-INF/ingest-service-rest.xml,
-              OSGI-INF/inbox-scanner.xml
+              OSGI-INF/inbox-scanner-service.xml
             </Service-Component>
             <JPA-PersistenceUnits>
               org.opencastproject.ingest.endpoint

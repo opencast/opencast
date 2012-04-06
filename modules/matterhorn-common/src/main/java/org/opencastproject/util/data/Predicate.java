@@ -19,5 +19,5 @@ package org.opencastproject.util.data;
 /**
  * A predicate function.
  */
-public interface Predicate<A> extends Function<A, Boolean> {
+public abstract class Predicate<A> extends Function<A, Boolean> {
 }

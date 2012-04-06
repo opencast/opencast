@@ -16,13 +16,12 @@
 
 package org.opencastproject.episode.impl.solr;
 
-import org.opencastproject.util.data.CollectionUtil;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
-
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
+import org.opencastproject.util.data.Collections;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -580,7 +579,7 @@ public final class Schema {
    * Helper to get the first element of the given list or a default value <code>dflt</code> if the list is empty.
    */
   public static <A> A getFirst(List<DField<A>> fs, A dflt) {
-    return CollectionUtil.head(fs).map(new Function<DField<A>, A>() {
+    return Collections.head(fs).map(new Function<DField<A>, A>() {
       @Override
       public A apply(DField<A> f) {
         return f.getValue();

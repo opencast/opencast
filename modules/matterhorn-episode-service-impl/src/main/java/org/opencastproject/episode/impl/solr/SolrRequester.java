@@ -25,9 +25,9 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.MediaSegment;
 import org.opencastproject.episode.api.MediaSegmentImpl;
-import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultImpl;
 import org.opencastproject.episode.api.SearchResultItem;
@@ -38,7 +38,6 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.SolrUtils;
-import org.opencastproject.util.data.CollectionUtil;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Predicate;
@@ -57,6 +56,8 @@ import java.util.regex.Pattern;
 
 import static org.opencastproject.episode.api.EpisodeService.READ_PERMISSION;
 import static org.opencastproject.episode.api.EpisodeService.WRITE_PERMISSION;
+import static org.opencastproject.util.data.Collections.filter;
+import static org.opencastproject.util.data.Collections.head;
 
 /**
  * Class implementing <code>LookupRequester</code> to provide connection to solr indexing facility.
@@ -183,7 +184,7 @@ public class SolrRequester {
         public String getDcTitle() {
           final List<DField<String>> titles = Schema.getDcTitle(doc);
           // try to return the first title without any language information first...
-          return CollectionUtil.head(CollectionUtil.filter(titles, new Predicate<DField<String>>() {
+          return head(filter(titles, new Predicate<DField<String>>() {
             @Override
             public Boolean apply(DField<String> f) {
               return f.getSuffix().equals(Schema.LANGUAGE_UNDEFINED);

@@ -16,32 +16,41 @@
 
 package org.opencastproject.util;
 
-import org.opencastproject.security.api.TrustedHttpClient;
-import org.opencastproject.security.api.TrustedHttpClientException;
-
 import de.schlichtherle.io.FileWriter;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.security.api.TrustedHttpClientException;
+import org.opencastproject.util.data.Either;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Function0;
+import org.opencastproject.util.data.Function2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import static org.opencastproject.util.data.Either.left;
+import static org.opencastproject.util.data.Either.right;
 
 /**
  * Contains operations concerning IO.
  */
 public final class IoSupport {
 
-  /** the logging facility provided by log4j */
+  /**
+   * the logging facility provided by log4j
+   */
   private static Logger logger = LoggerFactory.getLogger(IoSupport.class.getName());
 
   public static String getSystemTmpDir() {
@@ -61,9 +70,9 @@ public final class IoSupport {
 
   /**
    * Closes a <code>Closable</code> quietly so that no exceptions are thrown.
-   * 
+   *
    * @param s
-   *          maybe null
+   *         maybe null
    */
   public static boolean closeQuietly(final Closeable s) {
     if (s == null) {
@@ -79,9 +88,9 @@ public final class IoSupport {
 
   /**
    * Closes a <code>StreamHelper</code> quietly so that no exceptions are thrown.
-   * 
+   *
    * @param s
-   *          maybe null
+   *         maybe null
    */
   public static boolean closeQuietly(final StreamHelper s) {
     if (s == null) {
@@ -93,9 +102,9 @@ public final class IoSupport {
 
   /**
    * Closes the processes input, output and error streams.
-   * 
+   *
    * @param process
-   *          the process
+   *         the process
    * @return <code>true</code> if the streams were closed
    */
   public static boolean closeQuietly(final Process process) {
@@ -118,9 +127,9 @@ public final class IoSupport {
   /**
    * Extracts the content from the given input stream. This method is intended to faciliate handling of processes that
    * have error, input and output streams.
-   * 
+   *
    * @param is
-   *          the input stream
+   *         the input stream
    * @return the stream content
    */
   public static String getOutput(InputStream is) {
@@ -148,11 +157,11 @@ public final class IoSupport {
 
   /**
    * Writes the contents variable to the {@code URL}. Note that the URL must be a local {@code URL}.
-   * 
+   *
    * @param file
-   *          The {@code URL} of the local file you wish to write to.
+   *         The {@code URL} of the local file you wish to write to.
    * @param contents
-   *          The contents of the file you wish to create.
+   *         The contents of the file you wish to create.
    * @throws URISyntaxException
    */
   public static void writeUTF8File(URL file, String contents) throws IOException {
@@ -165,11 +174,11 @@ public final class IoSupport {
 
   /**
    * Writes the contents variable to the {@code File}.
-   * 
+   *
    * @param file
-   *          The {@code File} of the local file you wish to write to.
+   *         The {@code File} of the local file you wish to write to.
    * @param contents
-   *          The contents of the file you wish to create.
+   *         The contents of the file you wish to create.
    */
   public static void writeUTF8File(File file, String contents) throws IOException {
     writeUTF8File(file.getAbsolutePath(), contents);
@@ -177,11 +186,11 @@ public final class IoSupport {
 
   /**
    * Writes the contents variable to the {@code File} located at the filename.
-   * 
-   * @param file
-   *          The {@code File} of the local file you wish to write to.
+   *
+   * @param filename
+   *         The {@code File} of the local file you wish to write to.
    * @param contents
-   *          The contents of the file you wish to create.
+   *         The contents of the file you wish to create.
    */
   public static void writeUTF8File(String filename, String contents) throws IOException {
     FileWriter out = new FileWriter(filename);
@@ -191,9 +200,9 @@ public final class IoSupport {
 
   /**
    * Convenience method to read in a file from a local source.
-   * 
+   *
    * @param url
-   *          The {@code URL} to read the source data from.
+   *         The {@code URL} to read the source data from.
    * @return A String containing the source data or null in the case of an error.
    */
   public static String readFileFromURL(URL url) {
@@ -202,12 +211,12 @@ public final class IoSupport {
 
   /**
    * Convenience method to read in a file from either a remote or local source.
-   * 
+   *
    * @param url
-   *          The {@code URL} to read the source data from.
+   *         The {@code URL} to read the source data from.
    * @param trustedClient
-   *          The {@code TrustedHttpClient} which should be used to communicate with the remote server. This can be null
-   *          for local file reads.
+   *         The {@code TrustedHttpClient} which should be used to communicate with the remote server. This can be null
+   *         for local file reads.
    * @return A String containing the source data or null in the case of an error.
    */
   public static String readFileFromURL(URL url, TrustedHttpClient trustedClient) {
@@ -256,5 +265,78 @@ public final class IoSupport {
     }
 
     return sb.toString();
+  }
+
+  /**
+   * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
+   */
+  public static <A> A withStream(InputStream s, Function<InputStream, A> f) {
+    try {
+      return f.apply(s);
+    } finally {
+      IoSupport.closeQuietly(s);
+    }
+  }
+
+  /**
+   * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
+   *
+   * @param s
+   *          the stream creation function
+   * @param toErr
+   *          error handler transforming an exception into something else
+   * @param f
+   *          stream handler
+   */
+  public static <A, Err> Either<Err, A> withStream(Function0<InputStream> s, Function<Exception, Err> toErr,
+                                                   Function<InputStream, A> f) {
+    InputStream in = null;
+    try {
+      in = s.apply();
+      return right(f.apply(in));
+    } catch (Exception e) {
+      return left(toErr.apply(e));
+    } finally {
+      IoSupport.closeQuietly(in);
+    }
+  }
+
+  /**
+   * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
+   */
+  public static <A> A withStream(OutputStream s, Function<OutputStream, A> f) {
+    try {
+      return f.apply(s);
+    } finally {
+      IoSupport.closeQuietly(s);
+    }
+  }
+
+  /**
+   * Handle multiple streams inside <code>f</code> and ensure that they get closed properly.
+   */
+  public static <A> A withStreams(InputStream[] in, OutputStream[] out, Function2<InputStream[], OutputStream[], A> f) {
+    try {
+      return f.apply(in, out);
+    } finally {
+      for (Closeable a : in) {
+        IoSupport.closeQuietly(a);
+      }
+      for (Closeable a : out) {
+        IoSupport.closeQuietly(a);
+      }
+    }
+  }
+
+  /**
+   * Create a function that creates a {@link java.io.FileInputStream}.
+   */
+  public static Function0<InputStream> fileInputStream(final File a) {
+    return new Function0.X<InputStream>() {
+      @Override
+      public InputStream xapply() throws Exception {
+        return new FileInputStream(a);
+      }
+    };
   }
 }

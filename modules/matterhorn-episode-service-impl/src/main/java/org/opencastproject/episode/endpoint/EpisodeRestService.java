@@ -15,9 +15,7 @@
  */
 package org.opencastproject.episode.endpoint;
 
-import static org.opencastproject.util.data.Monadics.list;
-import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
-
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.api.EpisodeServiceException;
@@ -30,16 +28,9 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-
-import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,6 +46,13 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 /**
  * The REST endpoint
@@ -216,7 +214,7 @@ public class EpisodeRestService {
   @Path("apply/{wfDefId}")
   public Response applyWorkflow(@PathParam("wfDefId") String wfId, @FormParam("mediaPackageIds") List<String> mpIds,
           @Context HttpServletRequest req) throws UnauthorizedException {
-    Map<String, String> wfConf = list(((Map<String, String[]>) req.getParameterMap()).entrySet().iterator()).foldl(
+    Map<String, String> wfConf = mlist(((Map<String, String[]>) req.getParameterMap()).entrySet().iterator()).foldl(
             new HashMap<String, String>(),
             new Function2<Map<String, String>, Map.Entry<String, String[]>, Map<String, String>>() {
               @Override

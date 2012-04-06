@@ -1,0 +1,364 @@
+/**
+ *  Copyright 2009, 2010 The Regents of the University of California
+ *  Licensed under the Educational Community License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance
+ *  with the License. You may obtain a copy of the License at
+ *
+ *  http://www.osedu.org/licenses/ECL-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an "AS IS"
+ *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ *  or implied. See the License for the specific language governing
+ *  permissions and limitations under the License.
+ *
+ */
+
+package org.opencastproject.util.data;
+
+import org.junit.Test;
+import org.opencastproject.util.data.functions.Functions;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.util.data.Collections.array;
+import static org.opencastproject.util.data.Collections.iterator;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Collections.repeat;
+import static org.opencastproject.util.data.Monadics.IteratorMonadic;
+import static org.opencastproject.util.data.Monadics.mlist;
+
+public class MonadicsTest {
+
+  @Test
+  public void testMap() {
+    List<Integer> list = asList(1, 2, 3);
+    List<String> mapped = mlist(list).map(new Function<Integer, Integer>() {
+      @Override
+      public Integer apply(Integer a) {
+        return a * a;
+      }
+    }).map(new Function<Integer, String>() {
+      @Override
+      public String apply(Integer a) {
+        return a + " " + a;
+      }
+    }).value();
+    assertEquals("1 1", mapped.get(0));
+    assertEquals("4 4", mapped.get(1));
+    assertEquals("9 9", mapped.get(2));
+  }
+
+  @Test
+  public void testFlatMap() {
+    List<Integer> mapped = Monadics.mlist(new Integer[]{1, 2, 3}).flatMap(new Function<Integer, Collection<Integer>>() {
+      @Override
+      public Collection<Integer> apply(Integer a) {
+        return asList(a, a);
+      }
+    }).value();
+    assertEquals(6, mapped.size());
+    assertEquals(new Integer(1), mapped.get(0));
+    assertEquals(new Integer(2), mapped.get(2));
+    assertEquals(new Integer(3), mapped.get(4));
+  }
+
+  @Test
+  public void testFoldl() {
+    String fold = Monadics.mlist(new Integer[]{1, 2, 3}).foldl("", new Function2<String, Integer, String>() {
+      @Override
+      public String apply(String s, Integer a) {
+        return s + a + a;
+      }
+    });
+    assertEquals("112233", fold);
+  }
+
+  @Test
+  public void testReducel() {
+    String fold = Monadics.mlist(new String[]{"a", "b", "c"}).reducel(new Function2<String, String, String>() {
+      @Override
+      public String apply(String a, String b) {
+        return a + "," + b;
+      }
+    });
+    assertEquals("a,b,c", fold);
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testReducelError() {
+    Monadics.mlist(new String[]{}).reducel(new Function2<String, String, String>() {
+      @Override
+      public String apply(String a, String b) {
+        return a + "," + b;
+      }
+    });
+  }
+
+  @Test
+  public void testFlatten() {
+    List<Integer> mapped = mlist(list(list(1, 2), list(3, 4))).flatMap(Functions.<List<Integer>>identity()).value();
+  }
+  
+  @Test
+  public void testTakeArray() {
+    assertTrue(Monadics.mlist(array(1, 2, 3, 4, 5)).take(0).value().isEmpty());
+    assertEquals(3, Monadics.mlist(array(1, 2, 3, 4, 5)).take(3).value().size());
+    assertEquals(5, Monadics.mlist(array(1, 2, 3, 4, 5)).take(5).value().size());
+    assertEquals(5, Monadics.mlist(array(1, 2, 3, 4, 5)).take(10).value().size());
+  }
+
+  @Test
+  public void testTakeList() {
+    assertTrue(mlist(asList(1, 2, 3, 4, 5)).take(0).value().isEmpty());
+    assertEquals(3, mlist(asList(1, 2, 3, 4, 5)).take(3).value().size());
+    assertEquals(5, mlist(asList(1, 2, 3, 4, 5)).take(5).value().size());
+    assertEquals(5, mlist(asList(1, 2, 3, 4, 5)).take(10).value().size());
+  }
+
+  @Test
+  public void testTakeIterator() {
+    assertTrue(Monadics.mlist(asList(1, 2, 3, 4, 5).iterator()).take(0).value().isEmpty());
+    assertEquals(3, Monadics.mlist(asList(1, 2, 3, 4, 5).iterator()).take(3).value().size());
+    assertEquals(5, Monadics.mlist(asList(1, 2, 3, 4, 5).iterator()).take(5).value().size());
+    assertEquals(5, Monadics.mlist(asList(1, 2, 3, 4, 5).iterator()).take(10).value().size());
+  }
+
+  @Test
+  public void testLazyMap() {
+    final boolean[] applied = {false};
+    IteratorMonadic<Integer> im = Monadics.mlazy(asList(1, 2, 3, 4, 5))
+            .map(new Function<Integer, Integer>() {
+              @Override
+              public Integer apply(Integer i) {
+                applied[0] = true;
+                return i * i;
+              }
+            })
+            .map(new Function<Integer, Integer>() {
+              @Override
+              public Integer apply(Integer i) {
+                applied[0] = true;
+                return i + i;
+              }
+            });
+    assertFalse(applied[0]);
+    im.value();
+    assertFalse(applied[0]);
+    List<Integer> eval = im.eval();
+    assertTrue(applied[0]);
+    assertArrayEquals(new Integer[]{2, 8, 18, 32, 50}, eval.toArray(new Integer[]{}));
+    // test empty input
+    assertTrue(Collections.list(
+            Monadics.mlazy(Collections.<Integer>nil()).map(Functions.<Integer>identity()).value()
+    ).isEmpty());
+  }
+
+  @Test
+  public void testLazyMapIndex() {
+    List<Integer> eval = Monadics.mlazy(asList(1, 2, 3, 4, 5)).mapIndex(new Function2<Integer, Integer, Integer>() {
+      @Override
+      public Integer apply(Integer n, Integer i) {
+        return n + i;
+      }
+    }).eval();
+    assertArrayEquals(new Integer[]{1, 3, 5, 7, 9}, eval.toArray(new Integer[]{}));
+  }
+  
+  @Test
+  public void testLazyFlatMap() {
+    List<Integer> eval = Monadics.mlazy(asList(1, 2, 3))
+            .flatMap(new Function<Integer, Iterator<Integer>>() {
+              @Override
+              public Iterator<Integer> apply(Integer integer) {
+                if (integer >= 2) {
+                  return asList(1, 2, 3).iterator();
+                } else {
+                  return java.util.Collections.<Integer>emptyList().iterator();
+                }
+              }
+            })
+            .flatMap(new Function<Integer, Iterator<Integer>>() {
+              @Override
+              public Iterator<Integer> apply(Integer integer) {
+                return asList(integer * integer).iterator();
+              }
+            })
+            .eval();
+    assertArrayEquals(array(1, 4, 9, 1, 4, 9), array(eval));
+  }
+
+  @Test
+  public void testLazyFlatMap2() {
+    List<Integer> eval = Monadics.mlazy(asList(1, 2, 3))
+            .flatMap(new Function<Integer, Iterator<Integer>>() {
+              @Override
+              public Iterator<Integer> apply(Integer integer) {
+                if (integer != 2) {
+                  return asList(1, 2, 3).iterator();
+                } else {
+                  return java.util.Collections.<Integer>emptyList().iterator();
+                }
+              }
+            })
+            .flatMap(new Function<Integer, Iterator<Integer>>() {
+              @Override
+              public Iterator<Integer> apply(Integer integer) {
+                return asList(integer * integer).iterator();
+              }
+            })
+            .eval();
+    assertArrayEquals(array(1, 4, 9, 1, 4, 9), array(eval));
+  }
+
+  @Test
+  public void testLazyFlatMapDoubling() {
+    List<Integer> eval = Monadics.mlazy(asList(1, 2, 3, 4, 5)).flatMap(MonadicsTest.<Integer>twice()).eval();
+    assertArrayEquals(new Integer[]{1, 1, 2, 2, 3, 3, 4, 4, 5, 5}, eval.toArray(new Integer[]{}));
+  }
+
+  @Test
+  public void testLazyFlatMapKeepSize() {
+    List<Integer> eval = Monadics.mlazy(asList(1))
+            .flatMap(new Function<Integer, Iterator<Integer>>() {
+              @Override
+              public Iterator<Integer> apply(Integer integer) {
+                return Option.<Integer>some(2).iterator();
+              }
+            })
+            .eval();
+    assertArrayEquals(new Integer[]{2}, eval.toArray(new Integer[0]));
+  }
+
+  @Test
+  public void testLazyFlatMapTimes() {
+    List<Integer> eval = Monadics.mlazy(asList(1, 2, 3, 4)).flatMap(times).eval();
+    assertArrayEquals(new Integer[]{1, 2, 2, 3, 3, 3, 4, 4, 4, 4}, eval.toArray(new Integer[0]));
+  }
+
+  @Test
+  public void testLazyFlatMapEmptyInput() {
+    assertTrue(Monadics.mlazy(java.util.Collections.<Integer>emptyList()).flatMap(times).eval().isEmpty());
+  }
+
+  @Test
+  public void testLazyFlatMapEmptyOutput() {
+    // test empty output
+    List<Integer> eval = Monadics.mlazy(asList(1, 2, 3))
+            .flatMap(new Function<Integer, Iterator<Integer>>() {
+              @Override
+              public Iterator<Integer> apply(Integer integer) {
+                return Option.<Integer>none().iterator();
+              }
+            })
+            .eval();
+    assertTrue(eval.isEmpty());
+  }
+
+  @Test
+  public void testLazyFlatMapHasNext() {
+    Iterator<Integer> ints = Monadics.mlazy(asList(1, 2)).flatMap(MonadicsTest.<Integer>twice()).value();
+    // test correctness of hasNext()
+    assertTrue(ints.hasNext());
+    assertTrue(ints.hasNext());
+    assertTrue(ints.hasNext());
+    assertTrue(ints.hasNext());
+    assertTrue(ints.hasNext());
+  }
+
+  @Test
+  public void testLazyFlatMapMultiple() {
+    List<Integer> eval = Monadics.mlazy(asList(1, 2))
+            .flatMap(MonadicsTest.<Integer>twice())
+            .flatMap(MonadicsTest.<Integer>twice())
+            .eval();
+    assertArrayEquals(new Integer[]{1, 1, 1, 1, 2, 2, 2, 2}, eval.toArray(new Integer[]{}));
+  }
+
+  @Test
+  public void testLazyEachEmpty() {
+    final boolean[] run = {false};
+    Monadics.mlazy(java.util.Collections.emptyList())
+            .each(new Effect<Object>() {
+              @Override
+              public void run(Object o) {
+                run[0] = true;
+              }
+            })
+            .eval();
+    assertFalse(run[0]);
+  }
+
+  @Test
+  public void testLazyEach() {
+    final int[] sum = {0};
+    Monadics.mlazy(asList(1, 2, 3, 4, 5))
+            .each(new Effect<Integer>() {
+              @Override
+              public void run(Integer o) {
+                sum[0] += o;
+              }
+            })
+            .eval();
+    assertEquals(15, sum[0]);
+  }
+
+  @Test
+  public void testLazyEachIndexEmpty() {
+    final boolean[] run = {false};
+    Monadics.mlazy(java.util.Collections.emptyList())
+            .eachIndex(new Effect2<Object, Integer>() {
+              @Override
+              public void run(Object o, Integer i) {
+                run[0] = true;
+              }
+            })
+            .eval();
+    assertFalse(run[0]);
+  }
+
+  @Test
+  public void testLazyEachIndex() {
+    final int[] sum = {0};
+    Monadics.mlazy(asList(1, 2, 3, 4, 5))
+            .eachIndex(new Effect2<Integer, Integer>() {
+              @Override
+              public void run(Integer o, Integer i) {
+                sum[0] += (o * i);
+              }
+            })
+            .eval();
+    assertEquals(40, sum[0]);
+  }
+  
+  @Test
+  public void testLazyTake() {
+    assertTrue(Monadics.mlazy(asList(1, 2, 3, 4, 5)).take(0).eval().isEmpty());
+    assertEquals(3, Monadics.mlazy(asList(1, 2, 3, 4, 5)).take(3).eval().size());
+    assertEquals(5, Monadics.mlazy(asList(1, 2, 3, 4, 5)).take(5).eval().size());
+    assertEquals(5, Monadics.mlazy(asList(1, 2, 3, 4, 5)).take(10).eval().size());
+  }
+
+  private static <A> Function<A, Iterator<A>> twice() {
+    return new Function<A, Iterator<A>>() {
+      @Override
+      public Iterator<A> apply(A a) {
+        return iterator(a, a);
+      }
+    };
+  }
+
+  private static Function<Integer, Iterator<Integer>> times = new Function<Integer, Iterator<Integer>>() {
+    @Override
+    public Iterator<Integer> apply(Integer a) {
+      return repeat(a, a);
+    }
+  };
+}

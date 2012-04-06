@@ -16,9 +16,11 @@
 
 package org.opencastproject.metadata.dublincore;
 
-import static org.junit.Assert.assertEquals;
-import static org.opencastproject.metadata.dublincore.TestUtil.createDate;
-
+import junit.framework.Assert;
+import org.apache.commons.io.IOUtils;
+import org.easymock.EasyMock;
+import org.easymock.IAnswer;
+import org.junit.Test;
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
@@ -26,22 +28,18 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.metadata.api.MetadataValue;
 import org.opencastproject.metadata.api.MetadataValues;
 import org.opencastproject.metadata.api.StaticMetadata;
-import org.opencastproject.util.data.CollectionUtil;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Predicate;
 import org.opencastproject.workspace.api.Workspace;
-
-import junit.framework.Assert;
-
-import org.apache.commons.io.IOUtils;
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+
+import static org.junit.Assert.assertEquals;
+import static org.opencastproject.metadata.dublincore.TestUtil.createDate;
+import static org.opencastproject.util.data.Collections.find;
 
 public final class StaticMetadataServiceDublinCoreImplTest {
 
@@ -51,20 +49,17 @@ public final class StaticMetadataServiceDublinCoreImplTest {
     StaticMetadataServiceDublinCoreImpl ms = newStaticMetadataService();
     StaticMetadata md = ms.getMetadata(mp);
     assertEquals("Land and Vegetation: Key players on the Climate Scene",
-            CollectionUtil
-                    .find(md.getTitles(), new Predicate<MetadataValue<String>>() {
-                      @Override
-                      public Boolean apply(MetadataValue<String> v) {
-                        return v.getLanguage().equals(MetadataValues.LANGUAGE_UNDEFINED);
-                      }
-                    })
-                    .map(new Function<MetadataValue<String>, String>() {
-                      @Override
-                      public String apply(MetadataValue<String> v) {
-                        return v.getValue();
-                      }
-                    })
-                    .getOrElse(""));
+                 find(md.getTitles(), new Predicate<MetadataValue<String>>() {
+                   @Override
+                   public Boolean apply(MetadataValue<String> v) {
+                     return v.getLanguage().equals(MetadataValues.LANGUAGE_UNDEFINED);
+                   }
+                 }).map(new Function<MetadataValue<String>, String>() {
+                   @Override
+                   public String apply(MetadataValue<String> v) {
+                     return v.getValue();
+                   }
+                 }).getOrElse(""));
     assertEquals(createDate(2007, 12, 5, 0, 0, 0), md.getCreated().get());
   }
 

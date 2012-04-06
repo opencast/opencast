@@ -15,6 +15,7 @@
  */
 package org.opencastproject.metadata.dublincore;
 
+import org.apache.commons.io.IOUtils;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -23,14 +24,11 @@ import org.opencastproject.metadata.api.MetadataValue;
 import org.opencastproject.metadata.api.StaticMetadata;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.api.util.Interval;
-import org.opencastproject.util.data.CollectionUtil;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.NonEmptyList;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
 import org.opencastproject.workspace.api.Workspace;
-
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +39,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static org.opencastproject.util.data.Collections.find;
+import static org.opencastproject.util.data.Collections.head;
+import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Option.option;
 
 /**
  * This service provides {@link org.opencastproject.metadata.api.StaticMetadata} for a given mediapackage,
@@ -89,7 +92,7 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
   @Override
   public StaticMetadata getMetadata(final MediaPackage mp) {
     List<Catalog> dcs = Arrays.asList(mp.getCatalogs(DublinCoreCatalog.ANY_DUBLINCORE));
-    return CollectionUtil.find(dcs, flavorPredicate(MediaPackageElements.EPISODE))
+    return find(dcs, flavorPredicate(MediaPackageElements.EPISODE))
             .flatMap(loader)
             .map(new Function<DublinCoreCatalog, StaticMetadata>() {
               @Override
@@ -101,29 +104,29 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
 
   private static StaticMetadata newStaticMetadataFromEpisode(DublinCoreCatalog episode) {
     // Ensure that the mandatory properties are present
-    final Option<String> id = Option.wrap(episode.getFirst(DublinCore.PROPERTY_IDENTIFIER));
-    final Option<Date> created = Option.wrap(episode.getFirst(DublinCore.PROPERTY_CREATED)).map(new Function<String, Date>() {
+    final Option<String> id = option(episode.getFirst(DublinCore.PROPERTY_IDENTIFIER));
+    final Option<Date> created = option(episode.getFirst(DublinCore.PROPERTY_CREATED)).map(new Function<String, Date>() {
       @Override
       public Date apply(String a) {
         return EncodingSchemeUtils.decodeDate(a);
       }
     });
-    final Option<String> language = Option.wrap(episode.getFirst(DublinCore.PROPERTY_LANGUAGE));
-    final Option<Long> extent = CollectionUtil.head(episode.get(DublinCore.PROPERTY_EXTENT)).map(new Function<DublinCoreValue, Long>() {
+    final Option<String> language = option(episode.getFirst(DublinCore.PROPERTY_LANGUAGE));
+    final Option<Long> extent = head(episode.get(DublinCore.PROPERTY_EXTENT)).map(new Function<DublinCoreValue, Long>() {
       @Override
       public Long apply(DublinCoreValue a) {
         return EncodingSchemeUtils.decodeDuration(a);
       }
     });
-    final Option<String> type = Option.wrap(episode.getFirst(DublinCore.PROPERTY_TYPE));
+    final Option<String> type = option(episode.getFirst(DublinCore.PROPERTY_TYPE));
 
-    final Option<String> isPartOf = Option.wrap(episode.getFirst(DublinCore.PROPERTY_IS_PART_OF));
-    final Option<String> replaces = Option.wrap(episode.getFirst(DublinCore.PROPERTY_REPLACES));
-    final Option<Interval> available = CollectionUtil.head(episode.get(DublinCore.PROPERTY_AVAILABLE)).flatMap(
+    final Option<String> isPartOf = option(episode.getFirst(DublinCore.PROPERTY_IS_PART_OF));
+    final Option<String> replaces = option(episode.getFirst(DublinCore.PROPERTY_REPLACES));
+    final Option<Interval> available = head(episode.get(DublinCore.PROPERTY_AVAILABLE)).flatMap(
             new Function<DublinCoreValue, Option<Interval>>() {
               @Override
               public Option<Interval> apply(DublinCoreValue v) {
-                return Option.wrap(EncodingSchemeUtils.decodePeriod(v)).map(new Function<DCMIPeriod, Interval>() {
+                return option(EncodingSchemeUtils.decodePeriod(v)).map(new Function<DCMIPeriod, Interval>() {
                   @Override
                   public Interval apply(DCMIPeriod p) {
                     return Interval.fromValues(p.getStart(), p.getEnd());
@@ -131,27 +134,27 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
                 });
               }
             });
-    final NonEmptyList<MetadataValue<String>> titles = new NonEmptyList<MetadataValue<String>>(CollectionUtil.map(
+    final NonEmptyList<MetadataValue<String>> titles = new NonEmptyList<MetadataValue<String>>(map(
             episode.get(DublinCore.PROPERTY_TITLE), dc2mvString(DublinCore.PROPERTY_TITLE.getLocalName())));
-    final List<MetadataValue<String>> subjects = (List<MetadataValue<String>>) CollectionUtil.map(
+    final List<MetadataValue<String>> subjects = (List<MetadataValue<String>>) map(
             episode.get(DublinCore.PROPERTY_SUBJECT), dc2mvString(DublinCore.PROPERTY_SUBJECT.getLocalName()));
-    final List<MetadataValue<String>> creators = (List<MetadataValue<String>>) CollectionUtil.map(
+    final List<MetadataValue<String>> creators = (List<MetadataValue<String>>) map(
             episode.get(DublinCore.PROPERTY_CREATOR), dc2mvString(DublinCore.PROPERTY_CREATOR.getLocalName()));
-    final List<MetadataValue<String>> publishers = (List<MetadataValue<String>>) CollectionUtil.map(
+    final List<MetadataValue<String>> publishers = (List<MetadataValue<String>>) map(
             episode.get(DublinCore.PROPERTY_PUBLISHER), dc2mvString(DublinCore.PROPERTY_PUBLISHER.getLocalName()));
-    final List<MetadataValue<String>> contributors = (List<MetadataValue<String>>) CollectionUtil.map(
+    final List<MetadataValue<String>> contributors = (List<MetadataValue<String>>) map(
             episode.get(DublinCore.PROPERTY_CONTRIBUTOR), dc2mvString(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName()));
-    final List<MetadataValue<String>> description = (List<MetadataValue<String>>) CollectionUtil.map(
+    final List<MetadataValue<String>> description = (List<MetadataValue<String>>) map(
             episode.get(DublinCore.PROPERTY_DESCRIPTION), dc2mvString(DublinCore.PROPERTY_DESCRIPTION.getLocalName()));
-    final List<MetadataValue<String>> rightsHolders = (List<MetadataValue<String>>) CollectionUtil.map(
+    final List<MetadataValue<String>> rightsHolders = (List<MetadataValue<String>>) map(
             episode.get(DublinCore.PROPERTY_RIGHTS_HOLDER),
             dc2mvString(DublinCore.PROPERTY_RIGHTS_HOLDER.getLocalName()));
-    final List<MetadataValue<String>> spatials = (List<MetadataValue<String>>) CollectionUtil.map(
+    final List<MetadataValue<String>> spatials = (List<MetadataValue<String>>) map(
             episode.get(DublinCore.PROPERTY_SPATIAL), dc2mvString(DublinCore.PROPERTY_SPATIAL.getLocalName()));
-    final List<MetadataValue<String>> accessRights = (List<MetadataValue<String>>) CollectionUtil.map(
+    final List<MetadataValue<String>> accessRights = (List<MetadataValue<String>>) map(
             episode.get(DublinCore.PROPERTY_ACCESS_RIGHTS),
             dc2mvString(DublinCore.PROPERTY_ACCESS_RIGHTS.getLocalName()));
-    final List<MetadataValue<String>> licenses = (List<MetadataValue<String>>) CollectionUtil.map(
+    final List<MetadataValue<String>> licenses = (List<MetadataValue<String>>) map(
             episode.get(DublinCore.PROPERTY_LICENSE), dc2mvString(DublinCore.PROPERTY_LICENSE.getLocalName()));
 
     return new StaticMetadata() {

@@ -16,6 +16,9 @@
 
 package org.opencastproject.util.data;
 
+/**
+ * A 3-tuple.
+ */
 public class Tuple3<A, B, C> {
 
   private A a;
@@ -40,7 +43,7 @@ public class Tuple3<A, B, C> {
     return c;
   }
 
-  public static <A, B, C> Tuple3<A, B, C> tuple(A a, B b, C c) {
+  public static <A, B, C> Tuple3<A, B, C> tuple3(A a, B b, C c) {
     return new Tuple3<A, B, C>(a, b, c);
   }
 }

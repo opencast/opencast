@@ -537,25 +537,27 @@ public final class EpisodeServiceImpl implements EpisodeService {
           Option<Map<String, String>> properties) {
     final List<WorkflowInstance> workflows = new ArrayList<WorkflowInstance>(items.length);
     for (final SearchResultItem item : items) {
-      properties.fold(new Option.EffectMatch<Map<String, String>>() {
+      properties.fold(new Option.Match<Map<String, String>, Void>() {
         @Override
-        public void someE(Map<String, String> p) {
+        public Void some(Map<String, String> p) {
           try {
             workflows.add(
                     workflowService.start(workflowDefinition, item.getMediaPackage(), p));
           } catch (WorkflowException e) {
             logger.error("Error starting workflow", e);
           }
+          return null;
         }
 
         @Override
-        public void noneE() {
+        public Void none() {
           try {
             workflows.add(
                     workflowService.start(workflowDefinition, item.getMediaPackage()));
           } catch (WorkflowException e) {
             logger.error("Error starting workflow", e);
           }
+          return null;
         }
       });
     }

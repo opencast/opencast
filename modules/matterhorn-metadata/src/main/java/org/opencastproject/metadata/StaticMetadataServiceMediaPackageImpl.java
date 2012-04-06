@@ -15,11 +15,6 @@
  */
 package org.opencastproject.metadata;
 
-import static org.opencastproject.util.data.CollectionUtil.map;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.Option.wrap;
-
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.api.MetadataValue;
 import org.opencastproject.metadata.api.StaticMetadata;
@@ -29,7 +24,6 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.NonEmptyList;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +33,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
 
 /**
  * This service provides {@link org.opencastproject.metadata.api.StaticMetadata} for a given mediapackage, based
@@ -84,7 +83,7 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
     return new StaticMetadata() {
       @Override
       public Option<String> getId() {
-        return wrap(mp.getIdentifier().toString());
+        return option(mp.getIdentifier().toString());
       }
 
       @Override
@@ -104,7 +103,7 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
 
       @Override
       public Option<String> getIsPartOf() {
-        return wrap(mp.getSeries());
+        return option(mp.getSeries());
       }
 
       @Override

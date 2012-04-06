@@ -16,8 +16,6 @@
 
 package org.opencastproject.workflow.handler;
 
-import static org.opencastproject.util.data.Monadics.list;
-
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobContext;
@@ -35,12 +33,13 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.opencastproject.util.data.Monadics.mlist;
 
 /**
  * {@link org.opencastproject.workflow.api.WorkflowOperationHandler} to let a service like <a
@@ -66,7 +65,7 @@ public class SpeechRecognitionWorkflowOperationHandler extends AbstractWorkflowO
           throws WorkflowOperationException {
     // check media package for suitable audio track and submit it to the SpeechRecognitionService
 
-    ListMonadic<Track> mTracks = list(workflowInstance.getMediaPackage().getTracks()).filter(filterByFlavor);
+    ListMonadic<Track> mTracks = mlist(workflowInstance.getMediaPackage().getTracks()).filter(filterByFlavor);
     List<Track> tracks = mTracks.value();
 
     if (tracks.isEmpty()) {

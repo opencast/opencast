@@ -17,9 +17,10 @@
 package org.opencastproject.util.data;
 
 import org.junit.Test;
+import org.opencastproject.util.data.functions.Functions;
 
 import static org.junit.Assert.assertEquals;
-import static org.opencastproject.util.data.Functions.identity;
+import static org.opencastproject.util.data.functions.Functions.identity;
 
 public class FunctionsTest {
 
@@ -28,7 +29,7 @@ public class FunctionsTest {
     Integer one = 1;
     assertEquals(one, identity().apply(one));
     B b = new B();
-    A a = Functions.<A, B>identity().apply(b);
+    A a = Functions.<A>identity().apply(b);
     assertEquals(a, b);
   }
 

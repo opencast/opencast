@@ -15,6 +15,14 @@
  */
 package org.opencastproject.ingest.endpoint;
 
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import junit.framework.Assert;
+import org.apache.commons.fileupload.MockHttpServletRequest;
+import org.easymock.EasyMock;
+import org.eclipse.persistence.jpa.PersistenceProvider;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -22,25 +30,13 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.util.NotFoundException;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
-import junit.framework.Assert;
-
-import org.apache.commons.fileupload.MockHttpServletRequest;
-import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 public class IngestRestServiceTest {
   protected IngestRestService restService;

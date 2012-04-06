@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+        name="org.opencastproject.test.TestManagedServiceFactory"
+        immediate="true"
+        activate="activate"
+        deactivate="deactivate">
+  <implementation class="org.opencastproject.test.TestManagedServiceFactory"/>
+  <property name="service.pid" value="org.opencastproject.test.testmsfactory"/>
+  <property name="service.description" value="Testing ManagedServiceFactories"/>
+  <service>
+    <provide interface="org.osgi.service.cm.ManagedServiceFactory"/>
+    <provide interface="org.apache.felix.fileinstall.ArtifactInstaller"/>
+  </service>
+</scr:component>

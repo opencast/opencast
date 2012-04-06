@@ -19,15 +19,14 @@ package org.opencastproject.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class implements the mime type. Note that mime types should not be instantiated directly but be retreived from
@@ -102,8 +101,8 @@ public final class MimeType implements Cloneable, Comparable<MimeType>, Serializ
     this.subtype = subtype.trim().toLowerCase().replaceAll("/", "");
     this.suffixes = new ArrayList<String>();
     if (suffix != null) {
-      this.suffix = suffix.trim().toLowerCase().replaceAll("/", "");
-      addSuffix(this.suffix);
+      suffix = suffix.trim().toLowerCase().replaceAll("/", "");
+      addSuffix(suffix);
     }
   }
 
