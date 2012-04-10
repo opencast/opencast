@@ -1,5 +1,8 @@
 #!/bin/bash
 set -x
+VER=6
+UPD=31
+BLD=04
 #
 # Install java on CentOS
 #
@@ -8,11 +11,11 @@ install_java_centos() {
   #
   case `./arch.sh` in
     i386 )
-      PKG=jdk-6u31-linux-i586-rpm.bin
+      PKG=jdk-${VER}u${UPD}-linux-i586-rpm.bin
       ARCH=i386
       ;;
     x86_64 )
-      PKG=jdk-6u31-linux-x64-rpm.bin
+      PKG=jdk-${VER}u${UPD}-linux-x64-rpm.bin
       ARCH=amd64
       ;;
     * ) 
@@ -27,7 +30,7 @@ install_java_centos() {
   fi
   #
   if [ ! -s $PKG ]; then
-    wget -t 5 -4 http://download.oracle.com/otn-pub/java/jdk/6u31-b04/$PKG -O $PKG
+    wget -t 5 -4 --load-cookies java_cookie.txt http://download.oracle.com/otn-pub/java/jdk/${VER}u${UPD}-b${BLD}/$PKG -O $PKG
     [ $? -ne 0 ] && return 1
   fi
   chmod +x $PKG
@@ -35,7 +38,7 @@ install_java_centos() {
   sudo ./$PKG
   [ $? -ne 0 ] && return 1
   #
-  JDK=`\ls -d1 /usr/java/jdk*/jre/bin/java 2>/dev/null | awk 'END{print}'`
+  JDK=`\ls -d1 /usr/java/jdk*${UPD}/jre/bin/java 2>/dev/null | awk 'END{print}'`
   JDK="${JDK%/jre/bin/java}"
   #
   sudo /usr/sbin/alternatives --install /usr/bin/java java $JDK/jre/bin/java 30000
@@ -83,9 +86,11 @@ install_java_ubuntu() {
   #
   case `./arch.sh` in
     i386 )
+      PKG=jdk-${VER}u${UPD}-linux-i586.bin
       ARCH=i386
       ;;
     x86_64 )
+      PKG=jdk-${VER}u${UPD}-linux-x64.bin
       ARCH=amd64
       ;;
     * ) 
@@ -98,12 +103,20 @@ install_java_ubuntu() {
   sudo apt-get update
   [ $? -ne 0 ] && return 1
   #
-  sudo apt-get -y install sun-java6-jdk
+  if [ ! -s $PKG ]; then
+    wget -t 5 -4 --load-cookies java_cookie.txt http://download.oracle.com/otn-pub/java/jdk/${VER}u${UPD}-b${BLD}/$PKG -O $PKG
+    [ $? -ne 0 ] && return 1
+  fi
+  chmod +x $PKG
   [ $? -ne 0 ] && return 1
-  sudo apt-get -y install sun-java6-plugin
+  sudo ./$PKG
+  [ $? -ne 0 ] && return 1
+  sudo mkdir -p /usr/lib/jvm
+  [ $? -ne 0 ] && return 1
+  sudo mv jdk*${UPD} /usr/lib/jvm
   [ $? -ne 0 ] && return 1
   #
-  JDK=`\ls -d1 /usr/lib/jvm/java-6-sun-*/jre/bin/java 2>/dev/null | awk 'END{print}'`
+  JDK=`\ls -d1 /usr/lib/jvm/jdk*${UPD}/jre/bin/java 2>/dev/null | awk 'END{print}'`
   JDK="${JDK%/jre/bin/java}"
   #
   sudo update-alternatives --install /usr/bin/java java $JDK/jre/bin/java 30000
@@ -144,6 +157,29 @@ install_java_ubuntu() {
   return 0
 }
 #
+# Cookie is needed for downloading jdk from Oracle!
+#
+cat > java_cookie.b64 << 'EOF'
+H4sICPLRck8CA2phdmFfY29va2llLnR4dACFU12PojAUfS6/ookxM/sASBFl543xY7Obye5Gx2dT
+y1UZS8vSIvrvp3y5uoluQqD39txz4JzSwxMpDwkovJU5jmVKE6FwDpxqiLGWWOaUcXCYTB2rh9/3
+icJMCg1C45Se8QZwRlWFTYRBU7NZ0zn6pPE24YCpiHGhDGBzxuUOtGGZnWiacXjBdQPbJ2zbXNLY
+bodvSPZaZy+uW5al8/ddXA1sL0CXMj+4H/RI65sCN5alqKiU+xEf7HHh213H9oKBNyIjZ69TbvWs
+W0I0j96WM/R/3hY4QBqUXoJSiRSNhWgm6IZDbDkQA0+OkJ+vBd4XK8PfjnujYUjIIBwEKFqs1m/R
+z29otbTu44Nw/NUL/GGI1FrkyPN9Eo5IULF498cGBs0Y0nkBd773Amy2eMJAKOi8k3pv//i9QJQx
+yLStgBU5bCg7FFmb1WNt9afllVpUjvTJpKl3XG4o7/vTPgnIKEti8/SnBlXVgR+BsAvVrusHmVdB
+XC0VtMUlmW7zUe6dnK71vLqUrfq2EEybNKVgxobDMxzNIf9Ss45fGweiXQ6QmvZzmQgj4Cjg20Z3
+8vSPaU/NqP/aMEw7rUaaNGVTLKLp918Pww/8cOybw7LLyjWQIap+in5lzdxct8maxtUh7nfGXUy7
+NuyxWdYnXKcvDh0EAAA=
+EOF
+[ $? -ne 0 ] && exit 1
+base64 -d --ignore-garbage java_cookie.b64 > java_cookie.txt.gz
+[ $? -ne 0 ] && exit 1
+gzip -df java_cookie.txt.gz
+[ $? -ne 0 ] && exit 1
+rm -f java_cookie.b64
+[ $? -ne 0 ] && exit 1
+exit 0
+#
 case `./os.sh` in
   CentOS | RHEL )
     install_java_centos
@@ -161,8 +197,8 @@ case `./os.sh` in
     #
     JAVA_VERSION=`./java_version.sh`
     [ -z "$JAVA_VERSION" ] && exit 1
-    JAVA_VERSION=${JAVA_VERSION//_/.}
-    export JAVA_HOME="/usr/lib/jvm/java-6-sun-${JAVA_VERSION}"
+    #JAVA_VERSION=${JAVA_VERSION//_/.}
+    export JAVA_HOME="/usr/lib/jvm/jdk${JAVA_VERSION}"
     ./set_profile_var.sh "JAVA_HOME" "$JAVA_HOME"
     [ $? -ne 0 ] && exit 1
     ;;
