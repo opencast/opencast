@@ -1,4 +1,4 @@
-URL: http://www.ferzkopp.net/Software/SDL_gfx-2.0
+URL: http://www.ferzkopp.net/Software/SDL_gfx-2.0 ${USASK_MIRROR}
 PKG: SDL_gfx-2.0.22.tar.gz
 SHA: 6d384d8dbf7fe56e4dfef1aaa06a106f62ef91d1
 DIR: SDL_gfx-2.0.22

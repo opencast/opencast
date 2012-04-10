@@ -1,4 +1,4 @@
-URL: http://downloads.sourceforge.net/project/gnuwin32/regex/2.7
+URL: http://downloads.sourceforge.net/project/gnuwin32/regex/2.7 ${USASK_MIRROR}
 PKG: regex-2.7-src.zip
 SHA: 187457a50a8f8c59adeb52c116c6fb6e4a87f080
 DIR: regex-2.7

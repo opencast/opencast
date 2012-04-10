@@ -9,14 +9,6 @@ set -x
 source "${HOME3P}/utilx"
 [ $? -ne 0 ] && exit 1
 #
-# Main repositories
-export CENTOS_MIRROR=`getmcfg CENTOS_MIRROR:`
-export EPEL_MIRROR=`getmcfg EPEL_MIRROR:`
-export ATOMIC_MIRROR=`getmcfg ATOMIC_MIRROR:`
-export RPMFORGE_MIRROR=`getmcfg RPMFORGE_MIRROR:`
-export GNU_MIRROR=`getmcfg GNU_MIRROR:`
-export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`
-#
 getcfgx() {
   set +x
   CFG=`awk '

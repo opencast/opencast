@@ -1,4 +1,4 @@
-URL: http://downloads.xiph.org/releases/theora
+URL: http://downloads.xiph.org/releases/theora ${USASK_MIRROR}
 PKG: libtheora-1.1.1.tar.bz2
 SHA: 8dcaa8e61cd86eb1244467c0b64b9ddac04ae262
 DIR: libtheora-1.1.1

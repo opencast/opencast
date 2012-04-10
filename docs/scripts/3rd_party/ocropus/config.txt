@@ -1,4 +1,4 @@
-URL: http://ocropus.googlecode.com/files
+URL: http://ocropus.googlecode.com/files ${USASK_MIRROR}
 PKG: ocropus-0.4.tar.gz
 SHA: 5558218169d9667aa5947432356c80c59e13c090
 DIR: ocropus-0.4

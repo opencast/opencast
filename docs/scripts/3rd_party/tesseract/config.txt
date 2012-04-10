@@ -1,7 +1,7 @@
-URL1: http://tesseract-ocr.googlecode.com/files
+URL1: http://tesseract-ocr.googlecode.com/files ${USASK_MIRROR}
 PKG1: tesseract-3.00.tar.gz
 SHA1: 1d797cae3d0047d7be6c9b17d1973a9afcf6bd81
-URL2: http://tesseract-ocr.googlecode.com/files
+URL2: http://tesseract-ocr.googlecode.com/files ${USASK_MIRROR}
 PKG2: eng.traineddata.gz
 SHA2: bf72c6c4542d67ce1d6def9d4e8432c7e98a654b
 DIR: tesseract-3.00

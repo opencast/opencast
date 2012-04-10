@@ -2,6 +2,8 @@
 #
 # Print system info, define global variables and functions
 #
+XTRACE=`set -o | awk '/^xtrace/ {print $2}'`
+set +x
 case `uname` in
   Linux )
     [ -s /etc/issue ] && awk '{if (length($0) == 0) next; print $0; exit 0}' /etc/issue
@@ -585,7 +587,7 @@ fix_scons() {
 /usr/local/lib/scons-2.0.1/SCons/Tool/mingw.py
 /usr/local/lib/scons/SCons/Tool/mingw.py
 EOF
-  [ $? -ne 0 ] && exit 1
+  [ $? -ne 0 ] && return 1
   for file in `cat files.lst`; do
     if [ -s "$file" ]; then
       sudox cp "${HOME3P}/base_libs/scons/mingw.py" "$file"
@@ -596,3 +598,16 @@ EOF
   [ $? -ne 0 ] && return 1
   return 0
 }
+#
+# Main repositories
+#
+export CENTOS_MIRROR=`getmcfg CENTOS_MIRROR:`
+export EPEL_MIRROR=`getmcfg EPEL_MIRROR:`
+export ATOMIC_MIRROR=`getmcfg ATOMIC_MIRROR:`
+export RPMFORGE_MIRROR=`getmcfg RPMFORGE_MIRROR:`
+export GNU_MIRROR=`getmcfg GNU_MIRROR:`
+export USASK_MIRROR=`getmcfg USASK_MIRROR:`
+export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`
+#
+[ "$XTRACE" = "on" ] && set -x
+return 0

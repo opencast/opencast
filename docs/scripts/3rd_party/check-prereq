@@ -1348,14 +1348,6 @@ case `arch` in
     ;;
 esac
 #
-# Main repositories
-export CENTOS_MIRROR=`getmcfg CENTOS_MIRROR:`
-export EPEL_MIRROR=`getmcfg EPEL_MIRROR:`
-export ATOMIC_MIRROR=`getmcfg ATOMIC_MIRROR:`
-export RPMFORGE_MIRROR=`getmcfg RPMFORGE_MIRROR:`
-export GNU_MIRROR=`getmcfg GNU_MIRROR:`
-export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`
-#
 check_prereq    || exit 1
 install_mingw32 || exit 1
 fix_libs        || exit 1
