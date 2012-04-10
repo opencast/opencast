@@ -37,14 +37,27 @@ $(document).ready( function() {
                 $("#oc_title-bar-gallery-link").detach();
             }
 
-	    // no comments plugin support for IE 8
-	    if(($.browser.msie && (parseInt($.browser.version, 10) < 9)))
+	    // no comments plugin when disabled in config
+            var annotations_module_enabled = data.org.properties["engageui.annotations.enable"];
+	    if(annotations_module_enabled)
 	    {
-                // Disable and grey out "Comment" Tab
-                $("#oc_ui_tabs").tabs(
-                {
-                    disabled: [3]
-                });
+		annotations_module_enabled = (annotations_module_enabled == "true") ? true : false;
+	    }
+            if (!annotations_module_enabled)
+	    {
+                // Detach "Comment" Tab
+		$('#oc_btn-comments').detach();
+		$('#oc_btn-add-comment').detach();
+		$('#oc_checkbox-annotation-comment').detach();
+		$('#oc_label-annotation-comment').detach();
+	    }
+
+	    // no comments plugin support for IE 8
+            if (annotations_module_enabled && $.browser.msie && (parseInt($.browser.version, 10) < 9))
+	    {
+                // Detach "Comment" Tab
+		$('#oc_btn-comments').detach();
+		$('#oc_btn-add-comment').detach();
 		$('#oc_checkbox-annotation-comment').detach();
 		$('#oc_label-annotation-comment').detach();
 		$("#ie8comments-browser-version").html($.browser.version);
