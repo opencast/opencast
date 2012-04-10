@@ -1,0 +1,227 @@
+
+#oc_comment-list-wrapper,#oc-comments-list-header,#oc-comments-list-add-form,#oc_comments-list-loading,#oc-comments-list,#oc-comments-list-item-tooltip{
+    display:none;
+}
+
+#oc-comments-list-reply-textbox{
+    background-color: #FFFFFF;
+    border-style: solid;
+    border-color: grey;
+    height: 80px;
+    width:100%;
+    overflow: hidden;
+}
+
+#oc-comments-list-reply-namebox{
+    background-color: #FFFFFF;
+    border: 2px solid grey;
+    color: #282828; 
+    height: 15px;
+    width:150px;
+    margin-bottom: 5px;
+}
+
+#oc-comments-list-reply-addbox{
+    height: 150px;   
+    width:95%;
+    margin-left: 10px;
+}
+
+#oc-comments-list-reply-submit{
+    background: none repeat scroll 0 0 #282828;
+    border-width: 1px;
+    border-color: black;
+    border-radius: 15px 15px 15px 15px;
+    margin-top: 10px;
+    margin-left: 5px;
+    float: right;
+    text-align: center;
+    width: 90px;
+    height: 18px;
+}
+
+#oc-comments-list-reply-cancel{
+    background: none repeat scroll 0 0 #282828;
+    border-width: 1px;
+    border-color: black;
+    border-radius: 15px 15px 15px 15px;
+    margin-top: 10px;
+    margin-left: 5px;
+    float: right;
+    text-align: center;
+    width: 70px;
+    height: 18px;
+}
+
+#oc-comments-list-reply-cancel:hover{
+    background: none repeat scroll 0 0 rgba(255, 102, 0, 0.9);
+}
+
+#oc-comments-list-reply-submit:hover{
+    background: none repeat scroll 0 0 rgba(255, 102, 0, 0.9);
+}
+
+.oc-comment-list-left-reply-row{
+    float: left;
+    width: 60px;
+    margin-top: 10px;
+}
+
+.oc-comment-list-user-icon{
+    width: 50px;
+    height: 50px;
+}
+
+.oc-comment-list-user-icon-reply{
+	
+}
+
+.oc-comment-list-reply-form{
+	float: left;
+	margin-top:10px
+}
+
+.oc-comment-list-row{
+    height: 60px;
+    width: 100%;
+}
+
+.oc-comment-list-reply-row{
+    height: 80px;
+    width: 100%;
+}
+
+.oc-comment-list-row:hover{
+    background-color: #f1f6fc;
+}
+
+.oc-comment-list-left-row{
+    float: left;
+    width: 60px;
+}
+
+.oc-comment-list-right-row{
+	float: right;
+}
+
+.oc-comment-list-middle-row{
+	float: left;
+}
+
+.oc-comment-list-user-text{
+    color: blue;
+    float: left;
+}
+
+.oc-comment-list-value-text{
+    margin-left: 25px;
+    clear: both;
+    padding-top: 5px;
+}
+
+.oc-comment-list-type-text{
+    float:left;   
+    font-weight: bold;
+}
+
+.oc-comment-list-border{
+    border-top-style: solid;
+    border-top-width: 1px;
+    border-top-color: #FFFFFF;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #FFFFFF;       
+}
+
+.oc-comment-list-textspace{
+    float: left;
+    height: 5px;
+    width:8px;
+}
+.oc-comments-list-headingtext{
+    font-size: 1.2em;
+    margin-left: 5px;
+    margin-top: 20px;
+}
+
+.oc-comments-list-boldtext{
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.oc-comments-list-text{
+    margin-left: 10px;
+}
+
+#oc-comments-list-submit{
+    background: none repeat scroll 0 0 #282828;
+    border-width: 1px;
+    border-color: black;
+    border-radius: 15px 15px 15px 15px;
+    margin-top: 10px;
+    margin-left: 5px;
+    float: right;
+    text-align: center;
+    width: 120px;
+    height: 18px;
+}
+
+#oc-comments-list-submit-timed{
+    background: none repeat scroll 0 0 #282828;
+    border-width: 1px;
+    border-color: black;
+    border-radius: 15px 15px 15px 15px;
+    margin-top: 10px;
+    margin-left: 5px;
+    float: right;
+    text-align: center;
+    width: 180px;
+    height: 18px;
+}
+
+#oc-comments-list-submit-timed:hover{
+    background: none repeat scroll 0 0 rgba(255, 102, 0, 0.9);
+}
+
+#oc-comments-list-submit:hover{
+    background: none repeat scroll 0 0 rgba(255, 102, 0, 0.9);
+}
+
+#oc-comments-list-textbox{
+    background-color: #FFFFFF;
+    border-style: solid;
+    border-color: grey;
+    height: 120px;
+    width:100%;
+    overflow: hidden;
+}
+
+#oc-comments-list-namebox{
+    background-color: #FFFFFF;
+    border: 2px solid grey;
+    color: #282828; 
+    height: 15px;
+    width:150px;
+    margin-bottom: 5px;
+}
+
+#oc-comments-list-addbox{
+    height: 150px;   
+    width:95%;
+    margin-left: 10px;
+}
+
+#oc-comments-list-add-form{
+
+}
+
+#oc-comments-list-item-tooltip{
+    width: 100px;
+    height: 60px;
+    position:absolute;
+    border-style: solid;
+    border-color: grey;
+    background-color: white;
+    font-size: 0.7em;
+}
+

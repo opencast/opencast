@@ -1,0 +1,327 @@
+
+.oc-comment-Info-hover{
+    position:absolute;
+    width:140px;
+    height:80px;
+    margin-top:10px;
+    margin-left: -50px;   
+    border-radius: 7px 7px 7px 7px;
+    background: none repeat scroll 0 0 rgba(56, 56, 56, 0.95);
+    box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.3);
+    
+    
+}
+
+.oc-comment-Info-text{
+    padding-top: 15px;
+    color: #FFFFFF;
+
+    text-align: center;
+}
+
+.oc-comment-Info{ 
+    position:absolute;
+    display:none;
+	z-index: 11;
+
+    
+    /*border-style: solid;
+    border-width: 1px;
+    border-color: red;*/
+    
+}
+
+#oc-comment-scrubber-box{
+    display:none;    
+}
+
+#annotation_comment_holder{
+    width: 100%;
+    position: absolute;
+}
+
+
+.oc-comment-Info-time{
+    
+    color: #FF6600;
+    font-weight: bold;
+    
+}
+
+.oc-comment-arrow-down {
+        position: absolute;
+        top:125px;
+        width: 0;
+        height: 0;
+        margin-left:-10px;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 10px solid rgba(56, 56, 56, 0.95);
+}
+
+.oc-comment-scrubber-baloon{  
+    z-index:2;
+	height: 10px;
+	width: 10px;
+	position: absolute;
+	top: 8px;
+	cursor:pointer;
+	cursor:hand;
+	margin-left: -5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	/* fallback */ 
+	background-color: #000000; 
+	background-repeat: repeat-x; 
+	/* Safari 4-5, Chrome 1-9 */ 
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#636363), to(#000000)); 
+	/* Safari 5.1, Chrome 10+ */ 
+	background: -webkit-linear-gradient(top, #636363, #000000); 
+	/* Firefox 3.6+ */ 
+	background: -moz-linear-gradient(top, #636363, #000000); 
+	/* IE 10 */ 
+	background: -ms-linear-gradient(top, #636363, #000000); 
+	/* Opera 11.10+ */ 
+	background: -o-linear-gradient(top, #636363, #000000);
+}
+
+.oc-comment-scrubber-baloon.hover{
+	
+}
+
+.oc-comment-box{
+    margin-left: -50px;
+    margin-top: -10px;
+    position: absolute;
+    width: 350px;
+    max-height: 135px;
+    min-height: 135px;
+    border-radius: 7px 7px 7px 7px;
+    background: none repeat scroll 0 0 rgba(56, 56, 56, 0.95);
+    box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.3);
+}
+
+#oc-comment-info-value-wrapper{
+	width: 348px;
+	max-height:112px;
+	min-height:112px;
+	overflow:auto; 
+}
+
+.oc-comment-cm-textbox{
+    color:#FFFFFF;
+    font-size: 0.9em;
+    border-style: none;
+    /*height: 55px;*/
+    margin-left: 50px;
+    margin-top: 2px;
+    overflow: hidden;
+    /*width: 275px;*/
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.0);
+}
+
+.oc-comment-reply-textbox{
+    color:#FFFFFF;
+    border-style: none;
+    /*height: 55px;*/
+    margin-left: 100px;
+    margin-top: 2px;
+    overflow: hidden;
+    /*width: 275px;*/
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.0);
+}
+
+.oc-comment-textwrapper{
+    height: 55px;
+    margin-left: 10px;
+    margin-top: 2px;
+    width: 275px;
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.0);
+}
+
+.oc-comment-namebox{
+	color: white;
+	border-style: inset;
+	border-color: #CCCCCC;
+	border-width: 1px;
+	height: 16px;
+	margin-left: 10px;
+	margin-top: 1px;
+	width: 100px;
+	background: none repeat scroll 0 0 rgba(0, 0, 0, 0.0);
+	float: left;      
+}
+
+.oc-comment-submit{
+    background: url("/engage/ui/img/annotation/add_comment_small.png") no-repeat scroll 0px 0px transparent;
+    margin-left: 5px;
+    margin-top: 2px;
+    float: right;
+    width: 21px;
+    height: 15px;
+}
+
+.oc-comment-submit:hover{
+    background: url("/engage/ui/img/annotation/add_comment_small.png") no-repeat scroll -21px 0px transparent;
+}
+
+.oc-comment-cancel{   
+    background: url("/engage/ui/img/annotation/delete_comment.png") no-repeat scroll 0px 0px transparent;
+    margin-left: 10px;
+    margin-top: 2px;
+    float: right;
+    width: 21px;
+    height: 15px;
+}
+
+.oc-comment-cancel:hover{   
+	background: url("/engage/ui/img/annotation/delete_comment.png") no-repeat scroll -21px 0px transparent;
+}
+
+.oc-comment-exit{
+	cursor:pointer;
+	cursor:hand;
+}
+
+#oc-comment-add-textbox{
+	background: none repeat scroll 0 0 rgba(0, 0, 0, 0.0);
+	color: white;
+	border-style: none;
+	width: 260px;
+	height: 55px;
+	margin-left: 20px;
+	margin-top: 2px;
+}
+
+#oc-comment-add-reply-textbox {
+	background: none repeat scroll 0 0 rgba(0, 0, 0, 0.0);
+	color: white;
+	border-style: none;
+	width: 220px;
+	height: 55px;
+	margin-left: 100px;
+	margin-top: 2px;
+}
+
+.oc-comment-info-cm-btn{
+	width: 21px;
+	height: 15px;
+	margin-left: 10px;
+	margin-top: 2px;
+	float: right;
+}
+
+.oc-comment-info-cm-delbtn{
+	background: url("/engage/ui/img/annotation/delete_comment.png") no-repeat scroll 0px 0px transparent;
+}
+
+.oc-comment-info-cm-delbtn:hover{
+	background: url("/engage/ui/img/annotation/delete_comment.png") no-repeat scroll -21px 0px transparent;
+}
+
+.oc-comment-info-cm-repbtn{
+	background: url("/engage/ui/img/annotation/reply_comment.png") no-repeat scroll 0px 0px transparent;
+}
+
+.oc-comment-info-cm-repbtn:hover{
+	background: url("/engage/ui/img/annotation/reply_comment.png") no-repeat scroll -21px 0px transparent;
+}
+
+.oc-comment-info-cm-gotobtn{
+	background: url("/engage/ui/img/annotation/goto_comment.png") no-repeat scroll 0px 0px transparent;
+}
+
+.oc-comment-info-cm-gotobtn:hover{
+	background: url("/engage/ui/img/annotation/goto_comment.png") no-repeat scroll -21px 0px transparent;
+}
+
+.oc-comment-info-cm-btn.hover{
+	/*background: url("../img/add_comment.png") no-repeat scroll -25px 0px transparent;*/
+}
+
+.oc-comment-button-bar{
+    height: 20px;
+    margin-top: 3px;
+    width: 295px;
+}
+
+.oc-comment-info-cm-header{
+    background: none repeat scroll 0 0 rgba(45, 45, 45, 0.95);
+    margin-top: 4px;
+    height: 20px;	
+}
+
+.oc-comment-info-header-text{
+    color: #FFFFFF;
+    font-size: 0.8em;
+    font-weight: bold;
+    padding-left: 10px;
+    padding-top: 4px;
+    float: left;
+}
+
+
+.oc-comment-info-reply-header{
+    background: none repeat scroll 0 0 rgba(45, 45, 45, 0.95);
+    margin-left: 60px;
+    height: 20px;	
+}
+
+.oc-comment-header{
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    background: none repeat scroll 0 0 rgba(160, 26, 26, 0.95);
+    height: 20px;
+}
+
+.oc-comment-header-text{
+    color: #000000;
+    font-size: 0.9em;
+    padding-left: 10px;
+    padding-top: 3px; 
+}
+
+.oc-comment-footer{
+	height: 5px;
+}
+
+#oc_comment-control{
+
+}
+
+.oc_btn-add-comment{
+	height: 25px;
+	width: 25px;
+    margin-top: -24px;
+    margin-left: 155px;
+    background: url("/engage/ui/img/annotation/add_comment.png") no-repeat scroll 0px 0px transparent;
+}
+.oc_btn-add-comment:hover{
+	background: url("/engage/ui/img/annotation/add_comment.png") no-repeat scroll -25px 0px transparent;
+}
+
+#oc_dbclick-info{
+	display: none;
+	position: absolute;
+    font-size: 0.8em;
+    font-family: arial,helvetica,clean,sans-serif;
+    border-radius: 0px 7px 7px 0px;
+    color: #FFFFFF;
+    margin-left:10px;
+    height: 30px;
+    width: 95px;
+	background: rgba(56, 56, 56, 0.95);	
+}
+
+#oc_dbclick-info-text{
+	
+}
+
+#oc_dblick-info-arrow{
+	float:left;
+    margin-left:-10px;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    border-right: 10px solid rgba(56, 56, 56, 0.95);	
+}
+

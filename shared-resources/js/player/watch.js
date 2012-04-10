@@ -45,6 +45,7 @@ Opencast.Watch = (function ()
 
     var analyticsURL = "",
         annotationURL = "",
+        annotationCommentURL = "",
         descriptionEpisodeURL = "",
         descriptionStatsURL = "",
         searchURL = "",
@@ -72,6 +73,16 @@ Opencast.Watch = (function ()
     function getAnnotationURL()
     {
         return annotationURL;
+    }
+
+    /**
+     * @memberOf Opencast.Watch
+     * @description Returns a plugin URL
+     * @return a plugin URL
+     */
+    function getAnnotationCommentURL()
+    {
+        return annotationCommentURL;
     }
 
     /**
@@ -208,6 +219,7 @@ Opencast.Watch = (function ()
             $.log("Start parsing servicedata.json");
             analyticsURL = data.plugin_urls.analytics;
             annotationURL = data.plugin_urls.annotation;
+            annotationCommentURL = data.plugin_urls.annotationComment;
             descriptionEpisodeURL = data.plugin_urls.description.episode;
             descriptionStatsURL = data.plugin_urls.description.stats;
             searchURL = data.plugin_urls.search;
@@ -220,6 +232,7 @@ Opencast.Watch = (function ()
             $.log("Plugin URLs");
             $.log("Analytics URL: " + analyticsURL);
             $.log("Annotation URL: " + annotationURL);
+            $.log("Annotation Comments URL: " + annotationCommentURL);
             $.log("Description (Episode) URL: " + descriptionEpisodeURL);
             $.log("Description (Stats) URL: " + descriptionStatsURL);
             $.log("Search URL: " + searchURL);
@@ -266,6 +279,8 @@ Opencast.Watch = (function ()
                 // Set MediaPackage ID's in the Plugins
                 Opencast.Player.setMediaPackageId(mediaPackageId);
                 Opencast.Annotation_Chapter.setMediaPackageId(mediaPackageId);
+            	Opencast.Annotation_Comment.setMediaPackageId(mediaPackageId);
+            	Opencast.Annotation_Comment_List.setMediaPackageId(mediaPackageId);
                 Opencast.Analytics.setMediaPackageId(mediaPackageId);
                 Opencast.Series.setMediaPackageId(mediaPackageId);
                 Opencast.Description.setMediaPackageId(mediaPackageId);
@@ -339,10 +354,14 @@ Opencast.Watch = (function ()
             // set the title of the page
             document.title = $('#oc-title').html() + " | Opencast Matterhorn - Media Player";
             var dcExtent = parseInt($('#dc-extent').html());
+            Opencast.Description.initialize();
             Opencast.Analytics.setDuration(parseInt(parseInt(dcExtent) / 1000));
             Opencast.Analytics.initialize();
             Opencast.Annotation_Chapter.setDuration(parseInt(parseInt(dcExtent) / 1000));
             Opencast.Annotation_Chapter.initialize();
+	    	Opencast.Annotation_Comment.setDuration(parseInt(parseInt(dcExtent) / 1000));
+            Opencast.Annotation_Comment.initialize();
+            Opencast.Annotation_Comment_List.initialize();
             $('#oc_body').bind('resize', function ()
             {
                 Opencast.AnalyticsPlugin.resizePlugin();
@@ -785,7 +804,6 @@ Opencast.Watch = (function ()
         Opencast.Player.addEvent(Opencast.logging.SEEK_SEGMENT);
     }
 
-
     /**
      * @memberOf Opencast.Watch
      * @description Gets the OS-specific shortcuts of the client
@@ -822,6 +840,7 @@ Opencast.Watch = (function ()
     return {
         getAnalyticsURL: getAnalyticsURL,
         getAnnotationURL: getAnnotationURL,
+        getAnnotationCommentURL : getAnnotationCommentURL,
         getDescriptionEpisodeURL: getDescriptionEpisodeURL,
         getDescriptionStatsURL: getDescriptionStatsURL,
         getSearchURL: getSearchURL,

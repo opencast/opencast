@@ -37,6 +37,27 @@ $(document).ready( function() {
                 $("#oc_title-bar-gallery-link").detach();
             }
 
+	    // no comments plugin support for IE 8
+	    if(($.browser.msie && (parseInt($.browser.version, 10) < 9)))
+	    {
+                // Disable and grey out "Comment" Tab
+                $("#oc_ui_tabs").tabs(
+                {
+                    disabled: [3]
+                });
+		$('#oc_checkbox-annotation-comment').detach();
+		$('#oc_label-annotation-comment').detach();
+		$("#ie8comments-browser-version").html($.browser.version);
+		$("#ie8comments-close").click(function()
+					{
+					    $("#oc_ie8comments").hide();
+					});
+                $("#oc_ie8comments").show();
+	    } else
+	    {
+                $("#oc_ie8comments").detach();
+	    }
+
 	    // mh2go link
 	    var usingMobileBrowser = (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(navigator.userAgent.toLowerCase()));
 	    var mh2go_enabled = data.org.properties["engageui.link_mh2go.enable"];

@@ -1127,7 +1127,8 @@ Opencast.Player = (function ()
     {
         $("#oc_btn-dropdown").attr("className", "oc_btn-singleDisplay");
         setCurrentVideoSize(VIDEOSIZESINGLE);
-	addEvent(Opencast.logging.VIDEOSIZE_SINGLE);
+		addEvent(Opencast.logging.VIDEOSIZE_SINGLE);
+		$(document).trigger("changeVideoSize");
     }
 
     /**
@@ -1143,7 +1144,8 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-audioDisplay");
         setCurrentVideoSize(VIDEOSIZEAUDIO);
         Opencast.Initialize.doResize();
-	addEvent(Opencast.logging.VIDEOSIZE_AUDIO);
+		addEvent(Opencast.logging.VIDEOSIZE_AUDIO);
+		$(document).trigger("changeVideoSize");
     }
 
     /**
@@ -1156,7 +1158,8 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-singleDisplay-presenter");
         setCurrentVideoSize(VIDEOSIZEONLYLEFT);
         Opencast.Initialize.doResize();
-	addEvent(Opencast.logging.VIDEOSIZE_LEFT_ONLY);
+		addEvent(Opencast.logging.VIDEOSIZE_LEFT_ONLY);
+		$(document).trigger("changeVideoSize");
     }
 
     /**
@@ -1169,7 +1172,8 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-singleDisplay-presentation");
         setCurrentVideoSize(VIDEOSIZEONLYRIGHT);
         Opencast.Initialize.doResize();
-	addEvent(Opencast.logging.VIDEOSIZE_RIGHT_ONLY);
+		addEvent(Opencast.logging.VIDEOSIZE_RIGHT_ONLY);
+		$(document).trigger("changeVideoSize");
     }
 
     /**
@@ -1182,7 +1186,8 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-bigRightDisplay");
         setCurrentVideoSize(VIDEOSIZEBIGRIGHT);
         Opencast.Initialize.doResize();
-	addEvent(Opencast.logging.VIDEOSIZE_BIG_RIGHT);
+		addEvent(Opencast.logging.VIDEOSIZE_BIG_RIGHT);
+		$(document).trigger("changeVideoSize");
     }
 
     /**
@@ -1195,7 +1200,8 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-bigLeftDisplay");
         setCurrentVideoSize(VIDEOSIZEBIGLEFT);
         Opencast.Initialize.doResize();
-	addEvent(Opencast.logging.VIDEOSIZE_BIG_LEFT);
+		addEvent(Opencast.logging.VIDEOSIZE_BIG_LEFT);
+		$(document).trigger("changeVideoSize");
     }
 
     /**
@@ -1208,7 +1214,8 @@ Opencast.Player = (function ()
         $("#oc_btn-dropdown").attr("className", "oc_btn-centerDisplay");
         setCurrentVideoSize(VIDEOSIZEMULTI);
         Opencast.Initialize.doResize();
-	addEvent(Opencast.logging.VIDEOSIZE_MULTI);
+		addEvent(Opencast.logging.VIDEOSIZE_MULTI);
+		$(document).trigger("changeVideoSize");
     }
 
     /**
@@ -1240,6 +1247,7 @@ Opencast.Player = (function ()
             setCurrentVideoSize(VIDEOSIZEONLYRIGHT);
         }
         Opencast.Initialize.doResize();
+        $(document).trigger("changeVideoSize");
     }
 
     /*************************************************************/
@@ -1437,6 +1445,7 @@ Opencast.Player = (function ()
             $("#draggable").css("left", newPos);
             $("#scrubber").css("left", newPos);
             $("#play-progress").css("width", newPos);
+            $('#scrubber').trigger('changePosition');
         }
     }
 

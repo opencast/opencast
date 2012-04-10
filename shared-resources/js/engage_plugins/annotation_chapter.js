@@ -34,6 +34,9 @@ Opencast.Annotation_Chapter = (function ()
      */
     function initialize()
     {
+	var reg = Opencast.Plugin_Controller.registerPlugin(Opencast.Annotation_Chapter);
+	$.log("Opencast.Annotation_Chapter registered: " + reg);
+
         // Request JSONP data
         $.ajax(
         {
@@ -73,7 +76,7 @@ Opencast.Annotation_Chapter = (function ()
      * @memberOf Opencast.Annotation_Chapter
      * @description Show Annotation_Chapter
      */
-    function showAnnotation_Chapter()
+    function show()
     {
         Opencast.Player.addEvent(Opencast.logging.SHOW_ANNOTATIONS);
         // Request JSONP data
@@ -114,7 +117,7 @@ Opencast.Annotation_Chapter = (function ()
                         // If Analytics is visible: Hide it before changing
                         if (analyticsVisible)
                         {
-                            Opencast.Analytics.hideAnalytics();
+			    Opencast.Plugin_Controller.hide(Opencast.Analytics);
                         }
                         $('#segmentstable').css('segment-holder-empty', 'none');
                         $("#annotation").show();
@@ -123,7 +126,7 @@ Opencast.Annotation_Chapter = (function ()
                         // If Analytics was visible: Display it again
                         if (analyticsVisible)
                         {
-                            Opencast.Analytics.showAnalytics();
+			    Opencast.Plugin_Controller.show(Opencast.Analytics);
                         }
                     }
                 }
@@ -152,14 +155,14 @@ Opencast.Annotation_Chapter = (function ()
         $('#oc_checkbox-annotations').attr('disabled', true);
         $('#oc_checkbox-annotations').hide();
         $('#oc_label-annotations').hide();
-        hideAnnotation_Chapter();
+        hide();
     }
     
     /**
      * @memberOf Opencast.Annotation_Chapter
      * @description Hide the Annotation
      */
-    function hideAnnotation_Chapter()
+    function hide()
     {
         $("#annotation").hide();
         $('#segmentstable1').show();
@@ -171,15 +174,15 @@ Opencast.Annotation_Chapter = (function ()
      * @memberOf Opencast.Annotation_Chapter
      * @description Toggle Analytics
      */
-    function doToggleAnnotation_Chapter()
+    function doToggle()
     {
         if (!annotationChapterDisplayed)
         {
-            showAnnotation_Chapter();
+            show();
         }
         else
         {
-            hideAnnotation_Chapter();
+            hide();
         }
         return true;
     }
@@ -206,10 +209,10 @@ Opencast.Annotation_Chapter = (function ()
     
     return {
         initialize: initialize,
-        hideAnnotation_Chapter: hideAnnotation_Chapter,
-        showAnnotation_Chapter: showAnnotation_Chapter,
+        hide: hide,
+        show: show,
         setDuration: setDuration,
         setMediaPackageId: setMediaPackageId,
-        doToggleAnnotation_Chapter: doToggleAnnotation_Chapter
+        doToggle: doToggle
     };
 }());

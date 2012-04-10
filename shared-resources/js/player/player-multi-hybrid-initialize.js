@@ -384,6 +384,7 @@ Opencast.Initialize = (function ()
         $('#oc_video-size-controls').bind('mouseover', dropdownVideo_open);
         $('#oc_video-size-controls').bind('mouseout', dropdown_timer);
     }
+
     $(document).ready(function ()
     {
         keyboardListener();
@@ -761,7 +762,8 @@ Opencast.Initialize = (function ()
             }
             $('#oc_embed-costum-height-textinput').css('background-color', '#ffffff');
         }); /* initalise embed buttons */
-        $("#oc_embed-icon-one, #oc_embed-icon-two, #oc_embed-icon-three, #oc_embed-icon-four, #oc_embed-icon-five", "#oc_embed-left").button(); /* initalise search button */
+        $("#oc_embed-icon-one, #oc_embed-icon-two, #oc_embed-icon-three, #oc_embed-icon-four, #oc_embed-icon-five", "#oc_embed-left").button();
+	/* initalise search button */
         $("#oc_btn-search", "#oc_search").button();
         $("#oc_btn-cc", "#oc_video-time").button();
         $('#oc_btn-leave-share, #oc_btn-leave-session-time').button(
@@ -779,7 +781,8 @@ Opencast.Initialize = (function ()
         {
             selected: -1
         });
-        $("#oc_ui_tabs").tabs("option", "collapsible", true); /* handle select event for each tab */
+        $("#oc_ui_tabs").tabs("option", "collapsible", true);
+	/* handle select event for each tab */
         $("#oc_ui_tabs").tabs(
         {
             select: function (event, ui)
@@ -787,15 +790,18 @@ Opencast.Initialize = (function ()
                 switch (ui.index)
                 {
                 case 0:
-                    Opencast.Description.doToggleDescription();
+                    Opencast.Description.doToggle();
                     break;
                 case 1:
-                    Opencast.segments.doToggleSlides();
+                    Opencast.segments.doToggle();
                     break;
                 case 2:
-                    Opencast.segments_text.doToggleSegmentsText();
+                    Opencast.segments_text.doToggle();
                     break;
                 case 3:
+                    Opencast.Annotation_Comment_List.doToggle();
+                    break;
+                case 4:
                     // Have a look at the - (engage-ui) watch.html - search trigger-function
                     break;
                 }
@@ -830,11 +836,15 @@ Opencast.Initialize = (function ()
         });
         $('#oc_checkbox-statistics').click(function ()
         {
-            Opencast.Analytics.doToggleAnalytics();
+            Opencast.Analytics.doToggle();
         });
         $('#oc_checkbox-annotations').click(function ()
         {
-            Opencast.Annotation_Chapter.doToggleAnnotation_Chapter();
+            Opencast.Annotation_Chapter.doToggle();
+        });
+        $('#oc_checkbox-annotation-comment').click(function ()
+        {
+            Opencast.Annotation_Comment.doToggle();
         });
         //bind click events to show dialog
         $('#oc_shortcuts').dialog(
@@ -1158,6 +1168,8 @@ Opencast.Initialize = (function ()
         {
             newHeight = Math.round(newHeight);
             $('#oc_flash-player').css("height", newHeight + "px");
+            //Trigger Resize Event
+            $('#oc_flash-player').trigger('doResize');
         }
     }
 

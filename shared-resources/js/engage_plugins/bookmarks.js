@@ -30,6 +30,9 @@ Opencast.Bookmarks = (function ()
      */
     function initialize()
     {
+	var reg = Opencast.Plugin_Controller.registerPlugin(Opencast.Bookmarks);
+	$.log("Opencast.Bookmarks registered: " + reg);
+
         $('#oc_btn-addBookmark').click(function ()
         {
             var value = $('#oc_addBookmark').attr('value');
@@ -124,7 +127,7 @@ Opencast.Bookmarks = (function ()
      @memberOf Opencast.Bookmarks
      @description Show the bookmarks
      */
-    function showBookmarks()
+    function show()
     {
         $("#oc_bookmarks").attr("className", "oc_DisplayBlock-textleft");
         $("#oc_btn-bookmarks").attr(
@@ -141,7 +144,7 @@ Opencast.Bookmarks = (function ()
      @memberOf Opencast.Bookmarks
      @description Hide the bookmarks
      */
-    function hideBookmarks()
+    function hide()
     {
         $("#oc_bookmarks").attr("className", "oc_DisplayNone");
         $("#oc_btn-bookmarks").attr(
@@ -158,18 +161,18 @@ Opencast.Bookmarks = (function ()
      @memberOf Opencast.Player
      @description Toggle the bookmarks
      */
-    function doToggleBookmarks()
+    function doToggle()
     {
         if ($("#oc_btn-bookmarks").attr("title") === BOOKMARKS)
         {
-            showBookmarks();
+            show();
             hideEmbed();
             hideSlides();
             setShowSections(true);
         }
         else
         {
-            hideBookmarks();
+            hide();
             setShowSections(false);
         }
         // Opencast.Initialize.doResize();
@@ -247,9 +250,9 @@ Opencast.Bookmarks = (function ()
     
     return {
         initialize: initialize,
-        showBookmarks: showBookmarks,
-        hideBookmarks: hideBookmarks,
-        doToggleBookmarks: doToggleBookmarks,
+        show: show,
+        hide: hide,
+        doToggle: doToggle,
         addBookmark: addBookmark,
         removeBookmark: removeBookmark,
         playBookmark: playBookmark

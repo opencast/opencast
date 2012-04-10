@@ -589,7 +589,7 @@ Opencast.segments_ui = (function ()
             if(Opencast.search)
             {
                 Opencast.search.initialize();
-                if(Opencast.search.isOpen())
+                if(Opencast.search.isOpen)
                 {
                     Opencast.search.showResult(Opencast.search.getCurrentInputElement(), Opencast.search.getCurrentSearchString());
                 }

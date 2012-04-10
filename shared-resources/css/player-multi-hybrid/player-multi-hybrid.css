@@ -160,9 +160,9 @@ color: #000;
 
 #oc_body, #oc_ui_tabs, #oc_player-head
 {
-  min-width:                756px;
-  margin-left:              10%;
-  margin-right:             10%;
+  min-width:                955px;
+  margin-left:              3%;
+  margin-right:             3%;
   padding:                  5px;
   position:                 relative;
 }
