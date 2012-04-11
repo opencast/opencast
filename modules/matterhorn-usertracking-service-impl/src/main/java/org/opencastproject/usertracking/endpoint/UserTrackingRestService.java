@@ -290,7 +290,7 @@ public class UserTrackingRestService {
     if (clientIP == null) {
       clientIP = request.getRemoteAddr();
     }
-    logger.info("got client ip: {0}", clientIP);
+    logger.debug("Got client ip: {}", clientIP);
     a.setUserIp(clientIP);
     
     try {
