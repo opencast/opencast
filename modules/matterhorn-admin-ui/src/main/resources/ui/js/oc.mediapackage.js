@@ -34,6 +34,7 @@ ocMediapackage.removeCatalog = function(mediapackage, catalogId) {
 }
 
 ocMediapackage.addTrack = function(mediapackage, trackUri, flavor) {
+  ocUtils.log("Attempting to add track to MediaPackage: " + trackUri + " flavor=" + flavor);
   var data = {
     mediapackage: mediapackage,
     trackUri: trackUri,

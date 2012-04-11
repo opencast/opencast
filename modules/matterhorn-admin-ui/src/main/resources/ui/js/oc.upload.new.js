@@ -342,7 +342,7 @@ ocUpload.UI = (function() {
       $progress.find('.progress-label-left').text(received + ' received');
       $progress.find('.progress-label-right').text(total + ' total');
       
-      if(message.payload.currentsize == message.payload.totalsize || message.state == ocUpload.UPLOAD_COMPLETE) {
+      if(message.state == ocUpload.UPLOAD_COMPLETE) {
         ocUpload.Listener.uploadComplete(message.id, message.payload.url);
       }
     } else {
