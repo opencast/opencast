@@ -21,16 +21,16 @@ cat >&1 <<END
 ** VM IP: $MY_IP
 **
 ** Matterhorn is installed in:
-**    Home:    /usr/local/felix-framework-2.0.1
-**    Bundles: /usr/local/felix-framework-2.0.1/load
-**    Config:  /usr/local/felix-framework-2.0.1/conf
+**    Home:    /opt/matterhorn/felix
+**    Bundles: /opt/matterhorn/felix/matterhorn
+**    Config:  /opt/matterhorn/felix/conf
 **
 ** For further information, please visit
 **   http://www.opencastproject.org
 ********************************************
 
 For a complete list of 3rd party tools, please visit:
-  http://wiki.opencastproject.org/iconfluence/display/open/3rd+Party+Licensesi+and+Software
+  http://opencast.jira.com/wiki/display/MH/3rd+Party+Licenses+and+Software
 
 ** Install process may take 40-60 minutes, depending on computer configuration and network speed.
 
@@ -45,15 +45,6 @@ start_mh ()
   FELIX=felix
   FELIX_DIR=/opt/matterhorn/$FELIX
 
-  export OC=/opt/matterhorn
-  export FELIX_HOME=/opt/matterhorn/felix
-  export RED5_HOME=/opt/matterhorn/red5
-  export M2_REPO=/home/opencast/.m2/repository
-  export OC_URL=http://opencast.jira.com/svn/MH/trunk/
-  export FELIX_URL=http://apache.mirror.iweb.ca/felix/felix-framework-2.0.1.tar.gz
-  export JAVA_HOME=/usr/lib/jvm/java-6-sun
-  export MAVEN_OPTS="-Xms256m -Xmx512m -XX:PermSize=64m -XX:MaxPermSize=128m"
-
   cd $INST_DIR
   sudo update-rc.d matterhorn defaults
   sudo service matterhorn start
@@ -64,12 +55,10 @@ start_mh ()
   echo "**" | sudo tee -a $MOTD_FILE
   echo "** Matterhorn is installed in:" | sudo tee -a $MOTD_FILE
   echo "**    Home:    /opt/matterhorn/felix" | sudo tee -a $MOTD_FILE
-  echo "**    Bundles: /opt/matterhorn/felix/load" | sudo tee -a $MOTD_FILE
+  echo "**    Bundles: /opt/matterhorn/felix/matterhorn" | sudo tee -a $MOTD_FILE
   echo "**    Config:  /opt/matterhorn/felix/conf" | sudo tee -a $MOTD_FILE
   echo "********************************************" | sudo tee -a $MOTD_FILE
 
-  # remove matterhorn setup script
-  sudo mv /etc/profile.d/matterhorn_setup.sh /home/opencast/.
 }
 
 ############################### START HERE ###############################
@@ -81,7 +70,7 @@ MY_OS=`uname`
 # Wait for network connection
 for ntime in 1 2 3 4 5 6 7 8 9 10
 do
-  MY_IP=`ifconfig | grep "inet addr:" | grep -v 127.0.0.1 | awk '{print $2}' | cut -d':' -f2`
+  MY_IP=`sudo ifconfig | grep "inet addr:" | grep -v 127.0.0.1 | awk '{print $2}' | cut -d':' -f2`
   if [ ! -z $MY_IP ]; then
     break;
   fi
@@ -93,8 +82,7 @@ done
 if [ -z $MY_IP ]; then
   echo "** ERROR: Could not acquire IP address for this VM."
   echo "Edit file /etc/udev/rules.d/70-persistent-net.rules and remove all uncommented"
-  echo "lines, and restart the VM.  For more info see Functionality section of FAQ at"
-  echo "http://opencast.jira.com/wiki/display/MH/Release+0.5+FAQ"
+  echo "lines, and restart the VM."
 else
   cd /tmp
   rm -f index.html
@@ -135,6 +123,13 @@ else
   echo "**** Default keyboard is US; Do you want to reconfigure? [y/N]"
   read kbresp
 
+  # Reconfigure Keyboard?
+  if [ "$kbresp" = "y" ] || [ "$kbresp" = "Y" ]; then
+    sudo dpkg-reconfigure console-setup
+  else
+    echo "Keeping default keybord configuration."
+  fi
+
   # Need to get a server name, not just y/n
   ntpsrv=y
   while [ ${#ntpsrv} -gt 0 ] && [ ${#ntpsrv} -lt 8 ]
@@ -146,77 +141,38 @@ else
   echo "**** Do you want to change the timezone on this VM? [y/N]"
   read changetz
 
-  echo "**** Do you want to install 3rd party tools? [Y/n]"
-  read p3resp
-
-#  echo "**** Do you want to install OpenCaps? [y/N]"
-#  read opencaps
-#  if [ "$opencaps" = "y" ] || [ "$opencaps" = "Y" ]; then
-#    echo "**** Install OpenCaps as Matterhorn plugin only? [Y/n]"
-#    read opencapsminimal
-#  fi
-
-
-  # update felix config (url)
-  sed -i "s/http:\/\/localhost:8080/http:\/\/$MY_IP:8080/" $CONF_DIR/config.properties
-  sed -i "s/rtmp:\/\/localhost\/matterhorn-engage/rtmp:\/\/$MY_IP\/matterhorn-engage/" $CONF_DIR/config.properties
-  sed -i 's/\${org.opencastproject.storage.dir}\/streams/\/opt\/matterhorn\/red5\/webapps\/matterhorn\/streams/' $CONF_DIR/config.properties
-
-  # update capture properties
-  # sed -i "s/http:\/\/localhost:8080/http:\/\/$MY_IP:8080/" /opencast/config/capture.properties
-
-  # Reconfigure Keyboard?
-  if [ "$kbresp" = "y" ] || [ "$kbresp" = "Y" ]; then
-    sudo dpkg-reconfigure console-setup
-  else
-    echo "Keeping default keybord configuration."
-  fi
-  
-  echo "Installation wget, subversion and git."
-  sudo apt-get -y --force-yes install wget subversion git-core
-
   # Change Timezone?
   if [ "$changetz" = "y" ] || [ "$changetz" = "Y" ]; then
-    tzselect
+    sudo tzselect
   else
     echo "Timezone will NOT be changed."
   fi
 
+  echo "**** Do you want to install 3rd party tools? [Y/n]"
+  read p3resp
+
+  # update felix config (url)
+  sed -i "s/http:\/\/localhost:8080/http:\/\/$MY_IP:8080/" $CONF_DIR/config.properties
+
   # Install 3P tools?
   if [ "$p3resp" != "n" ] && [ "$p3resp" != "N" ]; then
-
-    if [ "$MY_OS" = "Darwin" ]; then
-      echo "Mac OS"
-      /opt/matterhorn/matterhorn_trunk/docs/scripts/3rd_party_tools/mac/preinstall_mac.sh
-    elif [ "$MY_OS" = "Linux" ]; then
-      if [ -f /usr/bin/apt-get ]; then
-        echo "Ubuntu"
-        /opt/matterhorn/matterhorn_trunk/docs/scripts/3rd_party_tools/linux/preinstall_debian.sh
-      else
-        echo "Redhat"
-        /opt/matterhorn/matterhorn_trunk/docs/scripts/3rd_party_tools/linux/preinstall_redhat.sh
-      fi
+    #cd to script directory, otherwise the 3rd party script fails...
+    cd /opt/matterhorn/matterhorn_source/docs/scripts/3rd_party/
+    ./do-all
+    if [ $? -ne 0 ]; then
+      echo "===================================================="
+      echo "3rd party tools failed to install correctly"
+      echo "These tools are required for the VM to function"
+      echo "Please check to make sure the VM has internet access"
+      echo " and rerun matterhorn_setup.sh"
+      echo "===================================================="
+      exit 1 
     fi
-
+    #cd to the home directory
+    cd 
   else
     echo "3rd party tools will NOT be installed."
   fi
-
-  # Install opencaps?
-  if [ "$opencaps" = "y" ] || [ "$opencaps" = "Y" ]; then
-    if [ "$opencapsminimal" = "n" ] || [ "$opencapsminimal" = "N" ]; then
-      /home/opencast/opencaps.sh
-    else
-      /home/opencast/opencaps_matterhorn_only.sh
-    fi
-  else
-    echo "opencaps will NOT be installed."
-  fi
-
-
-  # doing some additional setups
-  sudo update-java-alternatives -s java-6-sun
-  sudo chown -R 1000:1000 /home/opencast
 
   # ntp server?
   if [ ${#ntpsrv} -gt 7 ]; then
@@ -231,5 +187,7 @@ else
   start_mh
 
   echo "done."
+  rm -f `readlink -f $0`
+  exit 0
 fi
 
