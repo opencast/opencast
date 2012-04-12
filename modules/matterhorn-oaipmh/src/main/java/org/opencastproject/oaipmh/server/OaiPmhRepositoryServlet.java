@@ -40,7 +40,11 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 
-import static org.opencastproject.oaipmh.util.OsgiUtil.*;
+import static org.opencastproject.oaipmh.util.OsgiUtil.checkDictionary;
+import static org.opencastproject.oaipmh.util.OsgiUtil.getCfg;
+import static org.opencastproject.oaipmh.util.OsgiUtil.getCfgAsInt;
+import static org.opencastproject.oaipmh.util.OsgiUtil.getContextProperty;
+import static org.opencastproject.util.data.Option.option;
 
 /**
  * The OAI-PMH server. Backed by an OAI-PMH repository.
@@ -157,7 +161,7 @@ public final class OaiPmhRepositoryServlet extends HttpServlet implements Manage
 
       @Override
       public Option<ResumableQuery> getSavedQuery(String resumptionToken) {
-        return Option.wrap(((ResumableQuery) resumptionTokens.get(resumptionToken)));
+        return option(((ResumableQuery) resumptionTokens.get(resumptionToken)));
       }
 
       @Override

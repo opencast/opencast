@@ -20,20 +20,20 @@ import org.opencastproject.oaipmh.OaiPmhConstants;
 import org.opencastproject.oaipmh.util.XmlGen;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultItem;
-import org.opencastproject.util.data.CollectionUtil;
+import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import javax.xml.XMLConstants;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcSecond;
 import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 
 /**
@@ -54,12 +54,12 @@ public abstract class OaiXmlGen extends XmlGen {
    * Create the OAI-PMH tag.
    */
   Element oai(Node... nodes) {
-    List<Node> combined = CollectionUtil.merge(new ArrayList<Node>(),
-        _(
-            schemaLocation(OaiPmhConstants.OAI_2_0_SCHEMA_LOCATION),
-            $eTxt("responseDate", toUtcSecond(new Date()))
-        ),
-        Arrays.asList(nodes));
+    List<Node> combined = Collections.concat(
+            _(
+                    schemaLocation(OaiPmhConstants.OAI_2_0_SCHEMA_LOCATION),
+                    $eTxt("responseDate", toUtcSecond(new Date()))
+            ),
+            Arrays.asList(nodes));
     return $e("OAI-PMH",
         OaiPmhConstants.OAI_2_0_XML_NS,
         _(
@@ -72,9 +72,9 @@ public abstract class OaiXmlGen extends XmlGen {
    * Create the dublin core tag from single nodes.
    */
   Element dc(Node... nodes) {
-    List<Node> combined = CollectionUtil.merge(new ArrayList<Node>(),
-        _(schemaLocation(OaiPmhConstants.OAI_DC_SCHEMA_LOCATION)),
-        _(nodes));
+    List<Node> combined = Collections.concat(
+            _(schemaLocation(OaiPmhConstants.OAI_DC_SCHEMA_LOCATION)),
+            _(nodes));
     return $e("oai_dc:dc",
         OaiPmhConstants.OAI_DC_XML_NS,
         _(
@@ -175,7 +175,7 @@ public abstract class OaiXmlGen extends XmlGen {
     return $e("header",
         $eTxt("identifier", item.getId()),
         $eTxt("datestamp",
-            Option.wrap(item.getModified()).map(repository.toSupportedGranularity).getOrElse(Functions.defaultValue("", "created"))
+            option(item.getModified()).map(repository.toSupportedGranularity).getOrElse(Functions.defaultValue("", "created"))
             // todo output setSpec and deleted status
             // How to determine the media type?
             // There is a field oc_mediatype in the index but this one distinguishes
@@ -187,6 +187,6 @@ public abstract class OaiXmlGen extends XmlGen {
    * Merge two node arrays into a list.
    */
   protected List<Node> merge(Node[] a, Node... b) {
-    return CollectionUtil.merge(new ArrayList<Node>(), _(a), _(b));
+    return Collections.concat(_(a), _(b));
   }
 }

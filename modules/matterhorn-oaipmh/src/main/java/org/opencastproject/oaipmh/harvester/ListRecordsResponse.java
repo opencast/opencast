@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import static org.apache.commons.lang.StringUtils.trimToNull;
+import static org.opencastproject.util.data.Option.option;
 
 /**
  * The "ListRecords" response.
@@ -132,7 +133,7 @@ public class ListRecordsResponse extends OaiPmhResponse {
   }
 
   public Option<String> getResumptionToken() {
-    return Option.wrap(trimToNull(xpathString("/oai20:OAI-PMH/oai20:ListRecords/oai20:resumptionToken/text()")));
+    return option(trimToNull(xpathString("/oai20:OAI-PMH/oai20:ListRecords/oai20:resumptionToken/text()")));
   }
 
   //
