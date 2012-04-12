@@ -570,22 +570,26 @@ public class IngestRestService {
       MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
       WorkflowInstance workflow = null;
 
-      // a workflow defintion was specified
-      if (StringUtils.isNotBlank(workflowDefinition)) {
-        workflow = ingestService.ingest(mp, workflowDefinition, null, null);
-      }
-
       // a workflow instance has been specified
-      else if (StringUtils.isNotBlank(workflowInstance)) {
+      if (StringUtils.isNotBlank(workflowInstance)) {
         try {
           Long workflowInstanceId = Long.parseLong(workflowInstance);
-          workflow = ingestService.ingest(mp, null, null, workflowInstanceId);
+
+          // a workflow defintion was specified
+          if (StringUtils.isNotBlank(workflowDefinition)) {
+            workflow = ingestService.ingest(mp, workflowDefinition, null, workflowInstanceId);
+          } else {
+            workflow = ingestService.ingest(mp, null, null, workflowInstanceId);
+          }
         } catch (NumberFormatException e) {
           logger.warn("{} '{}' is not numeric", WORKFLOW_INSTANCE_ID_PARAM, workflowInstance);
           return Response.status(Status.BAD_REQUEST).build();
         }
       }
-
+      // a workflow definition was specified, but not a workflow id
+      else if (StringUtils.isNotBlank(workflowDefinition)) {
+        workflow = ingestService.ingest(mp, workflowDefinition, null, null);
+      }
       // nothing was specified, so we start a new workflow
       else {
         workflow = ingestService.ingest(mp);
