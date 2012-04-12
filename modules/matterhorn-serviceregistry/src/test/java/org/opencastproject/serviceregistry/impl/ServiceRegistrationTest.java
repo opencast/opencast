@@ -114,9 +114,12 @@ public class ServiceRegistrationTest {
 
   @Test
   public void testScenarioOneJobOneService() throws Exception {
-    JobJpaImpl jobTry1 = serviceRegistry.createJob(regType1Localhost, OPERATION_NAME_1, null, null, true);
-    JobJpaImpl jobTry2 = serviceRegistry.createJob(regType1Localhost, OPERATION_NAME_1, null, null, true);
-    JobJpaImpl jobTry3 = serviceRegistry.createJob(regType1Localhost, OPERATION_NAME_1, null, null, true);
+    JobJpaImpl jobTry1 = (JobJpaImpl) serviceRegistry.createJob(regType1Localhost.getHost(),
+            regType1Localhost.getServiceType(), OPERATION_NAME_1, null, null, true, null);
+    JobJpaImpl jobTry2 = (JobJpaImpl) serviceRegistry.createJob(regType1Localhost.getHost(),
+            regType1Localhost.getServiceType(), OPERATION_NAME_1, null, null, true, null);
+    JobJpaImpl jobTry3 = (JobJpaImpl) serviceRegistry.createJob(regType1Localhost.getHost(),
+            regType1Localhost.getServiceType(), OPERATION_NAME_1, null, null, true, null);
     ServiceRegistrationJpaImpl updatedService;
 
     // 1st try, failed on localhost
@@ -149,15 +152,22 @@ public class ServiceRegistrationTest {
 
   @Test
   public void testScenarioManyJobsManyServices() throws Exception {
-    JobJpaImpl job1Try1 = serviceRegistry.createJob(regType1Localhost, OPERATION_NAME_1, null, null, true);
-    JobJpaImpl job1Try2 = serviceRegistry.createJob(regType1Localhost, OPERATION_NAME_1, null, null, true);
-    JobJpaImpl job1Try3 = serviceRegistry.createJob(regType1Localhost, OPERATION_NAME_1, null, null, true);
-    JobJpaImpl job1Try4 = serviceRegistry.createJob(regType1Localhost, OPERATION_NAME_1, null, null, true);
+    JobJpaImpl job1Try1 = (JobJpaImpl) serviceRegistry.createJob(regType1Localhost.getHost(),
+            regType1Localhost.getServiceType(), OPERATION_NAME_1, null, null, true, null);
+    JobJpaImpl job1Try2 = (JobJpaImpl) serviceRegistry.createJob(regType1Localhost.getHost(),
+            regType1Localhost.getServiceType(), OPERATION_NAME_1, null, null, true, null);
+    JobJpaImpl job1Try3 = (JobJpaImpl) serviceRegistry.createJob(regType1Localhost.getHost(),
+            regType1Localhost.getServiceType(), OPERATION_NAME_1, null, null, true, null);
+    JobJpaImpl job1Try4 = (JobJpaImpl) serviceRegistry.createJob(regType1Localhost.getHost(),
+            regType1Localhost.getServiceType(), OPERATION_NAME_1, null, null, true, null);
     List<String> list = new ArrayList<String>();
     list.add("test");
-    JobJpaImpl job2Try1 = serviceRegistry.createJob(regType1Localhost, OPERATION_NAME_2, list, null, true);
-    JobJpaImpl job2Try2 = serviceRegistry.createJob(regType1Localhost, OPERATION_NAME_2, list, null, true);
-    JobJpaImpl job2Try3 = serviceRegistry.createJob(regType1Localhost, OPERATION_NAME_2, list, null, true);
+    JobJpaImpl job2Try1 = (JobJpaImpl) serviceRegistry.createJob(regType1Localhost.getHost(),
+            regType1Localhost.getServiceType(), OPERATION_NAME_2, list, null, true, null);
+    JobJpaImpl job2Try2 = (JobJpaImpl) serviceRegistry.createJob(regType1Localhost.getHost(),
+            regType1Localhost.getServiceType(), OPERATION_NAME_2, list, null, true, null);
+    JobJpaImpl job2Try3 = (JobJpaImpl) serviceRegistry.createJob(regType1Localhost.getHost(),
+            regType1Localhost.getServiceType(), OPERATION_NAME_2, list, null, true, null);
     serviceRegistry.maxAttemptsBeforeErrorState = 0;
     ServiceRegistrationJpaImpl updatedService1;
     ServiceRegistrationJpaImpl updatedService2;
@@ -261,10 +271,14 @@ public class ServiceRegistrationTest {
 
   @Test
   public void testScenarioOneJobManyServices() throws Exception {
-    JobJpaImpl jobTry1 = serviceRegistry.createJob(regType1Localhost, OPERATION_NAME_1, null, null, true);
-    JobJpaImpl jobTry2 = serviceRegistry.createJob(regType1Localhost, OPERATION_NAME_1, null, null, true);
-    JobJpaImpl jobTry3 = serviceRegistry.createJob(regType1Localhost, OPERATION_NAME_1, null, null, true);
-    JobJpaImpl jobTry4 = serviceRegistry.createJob(regType1Localhost, OPERATION_NAME_1, null, null, true);
+    JobJpaImpl jobTry1 = (JobJpaImpl) serviceRegistry.createJob(regType1Localhost.getHost(),
+            regType1Localhost.getServiceType(), OPERATION_NAME_1, null, null, true, null);
+    JobJpaImpl jobTry2 = (JobJpaImpl) serviceRegistry.createJob(regType1Localhost.getHost(),
+            regType1Localhost.getServiceType(), OPERATION_NAME_1, null, null, true, null);
+    JobJpaImpl jobTry3 = (JobJpaImpl) serviceRegistry.createJob(regType1Localhost.getHost(),
+            regType1Localhost.getServiceType(), OPERATION_NAME_1, null, null, true, null);
+    JobJpaImpl jobTry4 = (JobJpaImpl) serviceRegistry.createJob(regType1Localhost.getHost(),
+            regType1Localhost.getServiceType(), OPERATION_NAME_1, null, null, true, null);
     ServiceRegistrationJpaImpl updatedService1;
     ServiceRegistrationJpaImpl updatedService2;
     ServiceRegistrationJpaImpl updatedService3;

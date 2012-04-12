@@ -69,6 +69,16 @@ public class YoutubeDistributionRestService extends AbstractJobProducerEndpoint 
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
+   */
+  @Override
+  public ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
+  }
+
+  /**
    * Callback from OSGi to set a reference to the distribution service.
    * 
    * @param service

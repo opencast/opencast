@@ -27,7 +27,7 @@ public interface Job {
 
   /** The status of the job that this receipt represents */
   public static enum Status {
-    QUEUED, PAUSED, RUNNING, FINISHED, FAILED, DELETED, INSTANTIATED, DISPATCHING
+    QUEUED, PAUSED, RUNNING, FINISHED, FAILED, DELETED, INSTANTIATED, DISPATCHING, RESTART, CANCELED
   }
 
   /**

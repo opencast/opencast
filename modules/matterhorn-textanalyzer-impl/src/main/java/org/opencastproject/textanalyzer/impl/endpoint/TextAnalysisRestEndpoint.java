@@ -15,7 +15,6 @@
  */
 package org.opencastproject.textanalyzer.impl.endpoint;
 
-
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
@@ -48,8 +47,7 @@ import javax.ws.rs.core.Response.Status;
  * The REST endpoint for {@link MediaAnalysisService}s
  */
 @Path("")
-@RestService(name = "textanalysis", title = "Text Analysis Service", notes = {
-        "If you notice that this service is not working as expected, there might be a bug! "
+@RestService(name = "textanalysis", title = "Text Analysis Service", notes = { "If you notice that this service is not working as expected, there might be a bug! "
         + "You should file an error report with your server logs from the time when the error occurred: "
         + "<a href=\"http://opencast.jira.com\">Opencast Issue Tracker</a>" }, abstractText = "This service enables conversion from one caption format to another.")
 public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
@@ -70,19 +68,16 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
    *          OSGi component context
    */
   public void activate(ComponentContext cc) {
-    //String serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+    // String serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
   }
 
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path("")
-  @RestQuery(name = "analyze", description = "Submit a track for analysis.", restParameters = {
-          @RestParameter(description = "The image to analyze for text.", isRequired = true, name = "image", type = RestParameter.Type.FILE) },
-          reponses = {
+  @RestQuery(name = "analyze", description = "Submit a track for analysis.", restParameters = { @RestParameter(description = "The image to analyze for text.", isRequired = true, name = "image", type = RestParameter.Type.FILE) }, reponses = {
           @RestResponse(description = "OK, The receipt to use when polling for the resulting mpeg7 catalog.", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The argument cannot be parsed into a media package element.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "The service is unavailable at the moment.", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE)
-          }, returnDescription = "The receipt to use when polling for the resulting mpeg7 catalog.")
+          @RestResponse(description = "The service is unavailable at the moment.", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "The receipt to use when polling for the resulting mpeg7 catalog.")
   public Response analyze(@FormParam("image") String image) {
     if (service == null)
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
@@ -90,7 +85,7 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
       MediaPackageElement element = MediaPackageElementParser.getFromXml(image);
       if (!(element instanceof Attachment))
         throw new WebApplicationException(Status.BAD_REQUEST);
-      Job job = service.extract((Attachment)element);
+      Job job = service.extract((Attachment) element);
       return Response.ok(new JaxbJob(job)).build();
     } catch (Exception e) {
       logger.info(e.getMessage(), e);
@@ -98,7 +93,6 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
     }
   }
 
-  
   /**
    * Callback from the OSGi declarative services to set the service registry.
    * 
@@ -130,6 +124,16 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
       return (JobProducer) service;
     else
       return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
+   */
+  @Override
+  public ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
   }
 
 }

@@ -18,6 +18,7 @@ package org.opencastproject.rest;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.job.api.JobProducer;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 
 import org.slf4j.Logger;
@@ -57,8 +58,7 @@ public abstract class AbstractJobProducerEndpoint {
       throw new WebApplicationException(Status.BAD_REQUEST);
     }
 
-    // Try to execute the job. If, after one second, there is an execution exception, we know that the service refused
-    // to take the job.
+    // Try to execute the job.
     if (service.isReadyToAccept(job)) {
       service.acceptJob(job);
       return Response.noContent().build();
@@ -80,5 +80,12 @@ public abstract class AbstractJobProducerEndpoint {
    * @return the job producer
    */
   public abstract JobProducer getService();
+
+  /**
+   * 
+   * 
+   * @return
+   */
+  public abstract ServiceRegistry getServiceRegistry();
 
 }

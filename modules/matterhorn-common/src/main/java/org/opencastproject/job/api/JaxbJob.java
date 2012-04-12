@@ -78,10 +78,10 @@ public class JaxbJob implements Job {
   protected Date dateCompleted;
 
   /** The parent job identifier */
-  protected Long parentJobId;
+  protected Long parentJobId = -1L;
 
   /** The root job identifier */
-  protected Long rootJobId;
+  protected Long rootJobId = -1L;
 
   /** The job context */
   protected JaxbJobContext context;

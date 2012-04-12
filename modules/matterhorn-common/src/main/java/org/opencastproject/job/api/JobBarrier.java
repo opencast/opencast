@@ -17,6 +17,7 @@ package org.opencastproject.job.api;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
 
 import org.slf4j.Logger;
@@ -249,6 +250,8 @@ public class JobBarrier {
             Job processedJob = serviceRegistry.getJob(job.getId());
             Job.Status jobStatus = processedJob.getStatus();
             switch (jobStatus) {
+              case CANCELED:
+                throw new JobCanceledException(processedJob);
               case DELETED:
               case FAILED:
                 failedOrDeleted = true;
@@ -259,9 +262,10 @@ public class JobBarrier {
                 break;
               case PAUSED:
               case QUEUED:
+              case RESTART:
               case DISPATCHING:
               case RUNNING:
-                logger.trace("Job {} is still in the works", JobBarrier.this);
+                logger.trace("{} is still in the works", job);
                 allDone = false;
                 if (workTime == 0 || endTime < time)
                   continue;
@@ -282,8 +286,8 @@ public class JobBarrier {
             pollingException = e;
             break;
           } catch (ServiceRegistryException e) {
-            logger.warn("Error polling service registry {} for job {}: {}", new Object[] { serviceRegistry,
-                    JobBarrier.this, e.getMessage() });
+            logger.warn("Error polling service registry for the status of {}: {}", job, e.getMessage());
+            allDone = false;
           } catch (Throwable t) {
             logger.error("An unexpected error occured while waiting for jobs", t);
             pollingException = t;

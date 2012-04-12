@@ -142,4 +142,14 @@ public class AclDistributionRestService extends AbstractJobProducerEndpoint {
       return null;
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
+   */
+  @Override
+  public ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
+  }
+
 }

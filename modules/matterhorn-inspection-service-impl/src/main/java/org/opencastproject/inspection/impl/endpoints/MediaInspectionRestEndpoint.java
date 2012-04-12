@@ -165,6 +165,16 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
   }
 
   /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
+   */
+  @Override
+  public ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
+  }
+
+  /**
    * Checks if the service or services are available, if not it handles it by returning a 503 with a message
    * 
    * @param services
