@@ -5,7 +5,19 @@
        http://www.springframework.org/schema/osgi  
        http://www.springframework.org/schema/osgi/spring-osgi.xsd
        http://www.springframework.org/schema/security
-       http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+       http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+  <!-- ######################################## -->
+  <!-- # Open and unsecured url patterns      # -->
+  <!-- ######################################## -->
+
+  <sec:http pattern="/admin/img/**" security="none" />
+  <sec:http pattern="/favicon.ico" security="none" />
+  <sec:http pattern="/images/**" security="none" />
+  <sec:http pattern="/img/**" security="none" />
+  <sec:http pattern="/js/**" security="none" />
+  <sec:http pattern="/style.css" security="none" />
+  <sec:http pattern="/css/**" security="none" />
 
   <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast Matterhorn"
     entry-point-ref="matterhornEntryPoint">
@@ -14,13 +26,6 @@
     <!-- # URL SECURITY # -->
     <!-- ################ -->
     <sec:intercept-url pattern='/login.html' access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern="/admin/img/**" filters="none" />
-    <sec:intercept-url pattern="/favicon.ico" filters="none" />
-    <sec:intercept-url pattern='/images/**' filters="none" />
-    <sec:intercept-url pattern="/img/**" filters="none" />
-    <sec:intercept-url pattern="/js/**" filters="none" />
-    <sec:intercept-url pattern='/style.css' filters='none' />
-    <sec:intercept-url pattern="/css/**" filters="none" />
 
     <!-- Enable anonymous access to the /info/me.json resource -->
     <sec:intercept-url pattern='/info/me.json' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
@@ -71,9 +76,6 @@
 
     <!-- Enable and configure the failure URL for form-based logins -->
     <sec:form-login authentication-failure-url="/login.html?error" authentication-success-handler-ref="authSuccessHandler" />
-
-    <!-- Comment out to disable support for openID. OpenID URLs must be specified in the user detail service below -->
-    <sec:openid-login authentication-failure-url="/login.html?error" user-service-ref="userDetailsService" />
 
     <!-- Digest auth is used by capture agents and is used to enable transparent clustering of services -->
     <sec:custom-filter position="BASIC_AUTH_FILTER" ref="digestFilter" />

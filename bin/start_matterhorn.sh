@@ -5,8 +5,13 @@
 ##
 
 if [ -z "$FELIX_HOME" ]; then
-  echo "FELIX_HOME is not set"
-  exit 1
+  PWD=`pwd`
+  if [ -f "$PWD/bin/felix.jar" ]; then
+	export FELIX_HOME="$PWD"
+  else
+	echo "FELIX_HOME is not set"
+	exit 1
+  fi
 fi
 
 if [ ! -z "$M2_REPO" ]; then
@@ -34,10 +39,12 @@ DEBUG_OPTS="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=$DEBUG_PORT,
 ##
 
 MAVEN_ARG="-DM2_REPO=$M2_REPO"
-FELIX_OPTS="-Dfelix.home=$FELIX_HOME"
-FELIX_WORK="-Dfelix.work=$FELIX_HOME/work"
-FELIX_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$FELIX_HOME/load"
-PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX_HOME/conf"
+FELIX_WORK_DIR="$FELIX_HOME/work"
+FELIX_CONFIG_DIR="$FELIX_HOME/etc"
+FELIX_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$FELIX_CONFIG_DIR/load"
+FELIX_OPTS="-Dfelix.home=$FELIX_HOME -Dfelix.work=$FELIX_WORK_DIR"
+FELIX_CONFIG_OPTS="-Dfelix.config.properties=file:${FELIX_CONFIG_DIR}/config.properties -Dfelix.system.properties=file:${FELIX_CONFIG_DIR}/system.properties"
+PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX_CONFIG_DIR"
 MATTERHORN_LOGGING_OPTS="-Dopencast.logdir=$LOGDIR"
 PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN"
 ECLIPSELINK_LOGGING_OPTS="-Declipselink.logging.level=SEVERE"
@@ -58,7 +65,7 @@ then
 	fi
 fi
 
-FELIX_CACHE="$FELIX_HOME/felix-cache"
+FELIX_CACHE="$FELIX_WORK_DIR/felix-cache"
 
 # Make sure matterhorn bundles are reloaded
 if [ -d "$FELIX_CACHE" ]; then
@@ -71,4 +78,4 @@ fi
 
 # Finally start felix
 cd "$FELIX_HOME"
-java $DEBUG_OPTS $GRAPHICS_OPTS "$TEMP_OPTS" "$FELIX_OPTS" "$FELIX_WORK" $MAVEN_ARG $JAVA_OPTS "$FELIX_FILEINSTALL_OPTS" "$PAX_CONFMAN_OPTS" $PAX_LOGGING_OPTS $ECLIPSELINK_LOGGING_OPTS "$MATTERHORN_LOGGING_OPTS" "$UTIL_LOGGING_OPTS" -jar "$FELIX_HOME/bin/felix.jar" "$FELIX_CACHE"
+java $DEBUG_OPTS $GRAPHICS_OPTS "$TEMP_OPTS" $FELIX_OPTS $FELIX_CONFIG_OPTS $MAVEN_ARG $JAVA_OPTS "$FELIX_FILEINSTALL_OPTS" "$PAX_CONFMAN_OPTS" $PAX_LOGGING_OPTS $ECLIPSELINK_LOGGING_OPTS "$MATTERHORN_LOGGING_OPTS" "$UTIL_LOGGING_OPTS" -jar "$FELIX_HOME/bin/felix.jar" "$FELIX_CACHE"
