@@ -342,8 +342,12 @@ ocUpload.UI = (function() {
       $progress.find('.progress-label-left').text(received + ' received');
       $progress.find('.progress-label-right').text(total + ' total');
       
-      if(message.state == ocUpload.UPLOAD_COMPLETE) {
-        ocUpload.Listener.uploadComplete(message.id, message.payload.url);
+      if (message.payload.currentsize == message.payload.totalsize) {
+        if(message.state == ocUpload.UPLOAD_COMPLETE) {
+          ocUpload.Listener.uploadComplete(message.id, message.payload.url);
+        } else {
+          ocUpload.UI.setProgress('Processing upload, this may take some time.');
+        } 
       }
     } else {
       $progress.find('.upload-label').text(' ');
