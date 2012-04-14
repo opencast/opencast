@@ -83,11 +83,11 @@ public class FileUploadJob {
     return id;
   }
 
-  public JobState getState() {
+  public synchronized JobState getState() {
     return this.state;
   }
 
-  public void setState(JobState state) {
+  public synchronized void setState(JobState state) {
     this.state = state;
   }
 
