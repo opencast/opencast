@@ -252,7 +252,7 @@ Opencast.segments_ui = (function ()
                         $.each(data['search-results'].result.segments.segment, function (i, value)
                         {
                             // Save the image URL
-                            imgURLs[i] = data['search-results'].result.segments.segment[i].previews.preview.$;
+                            imgURLs[i] = data['search-results'].result.segments.segment[i].previews.preview;
                             var curr = data['search-results'].result.segments.segment[i];
                             var currDur = parseInt(curr.duration);
                             if(currDur > 0)
@@ -314,7 +314,7 @@ Opencast.segments_ui = (function ()
                                 newSegments[newSegmentsIndex] = data['search-results'].result.segments.segment[i];
                                 newSegments[newSegmentsIndex].hoverSegmentIndex = i;
                                 newSegments[newSegmentsIndex].index = newSegmentsIndex;
-                                newSegments[newSegmentsIndex].previews.preview.$ = data['search-results'].result.segments.segment[i].previews.preview.$;
+                                newSegments[newSegmentsIndex].previews.preview = data['search-results'].result.segments.segment[i].previews.preview;
                                 ++newSegmentsIndex;
                             }
                         });

@@ -279,7 +279,7 @@ Opencast.segments_ui_Plugin = (function ()
                                 '{if (parseInt(s.duration) > 0)}' +
                                     '<tr>' +
                                         '<td class="oc-segments-preview">' +
-                                            '${s.previews.preview.$}' +
+                                            '${s.previews.preview}' +
                                         '</td>' +
                                         '<td class="oc-segments-time">' +
                                             '<a class="oc_segments-time" ' +

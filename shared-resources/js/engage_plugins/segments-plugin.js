@@ -29,7 +29,7 @@ Opencast.segments_Plugin = (function ()
                                 'onmouseout="Opencast.segments_ui.hoverOutSegment(${parseInt(s.index)})">' +
                                     '<a href="javascript:Opencast.Watch.seekSegment(${parseInt(s.time) / 1000})">' +
                                         '<img alt="Slide ${parseInt(s.index) + 1} of ${segment.length}" ' +
-                                            'src="${s.previews.preview.$}">' +
+                                            'src="">' +
                                     '</a>' +
                             '</div>' +
                         '</div>' +

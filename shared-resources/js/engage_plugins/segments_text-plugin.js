@@ -28,7 +28,7 @@ Opencast.segments_text_Plugin = (function ()
                             // '{if s.durationIncludingSegment >= currentTime}' +
                                 '<tr>' +
                                     '<td width="15%" class="oc-segments-preview" style="cursor:pointer;cursor:hand;">' +
-                                        '<a onclick="Opencast.Watch.seekSegment(${Math.floor(parseInt(s.time) / 1000)})"><img width="111" alt="Slide ${parseInt(s.index) + 1} of ${segment.length}" src="${s.previews.preview.$}"></a>' +
+                                        '<a onclick="Opencast.Watch.seekSegment(${Math.floor(parseInt(s.time) / 1000)})"><img width="111" alt="Slide ${parseInt(s.index) + 1} of ${segment.length}" src=""></a>' +
                                     '</td>' +
                                     '<td width="85%" align="left" onclick="Opencast.Watch.seekSegment(${Math.floor(parseInt(s.time) / 1000)})" style="cursor:pointer;cursor:hand;">' +
                                         '&nbsp;<a class="segments-time"' +
