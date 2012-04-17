@@ -64,9 +64,9 @@ ocSeriesList.askForSeries = function()
     type: "GET",
     success: function(data)
     {
-      ocSeriesList.buildSeriesView(data);
       ocSeriesList.Configuration.total = data.totalCount;
       ocSeriesList.Configuration.lastPage = Math.floor(ocSeriesList.Configuration.total / ocSeriesList.Configuration.count)
+      ocSeriesList.buildSeriesView(data);
       if(ocSeriesList.Configuration.startPage == 0) {
         $('#prevText').show();
         $('#prevButtons').hide();
