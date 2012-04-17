@@ -766,7 +766,7 @@ ocUpload.Ingest = (function() {
       success: function(data){
         window.debug = data;
         //id = $('identifier', data).text();
-        id = $(data).find('[nodeName="dcterms:identifier"]').text();
+        id = $(ocUtils.xmlToString(data)).children().first().text()
       }
     });
     return id;
