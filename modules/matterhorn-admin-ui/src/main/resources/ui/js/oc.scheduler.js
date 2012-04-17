@@ -94,10 +94,10 @@ var ocScheduler = (function() {
       this.components.eventId = new ocAdmin.Component('eventId');
       $('#recordingType').hide();
       $('#agent').change(
-        function() {
-          $('#noticeContainer').hide();
-          $.get(CAPTURE_ADMIN_URL + '/agents/' + $('#agent option:selected').val() + ".json", this.checkAgentStatus);
-        });
+      function() {
+        $('#noticeContainer').hide();
+        $.get(CAPTURE_ADMIN_URL + '/agents/' + $('#agent option:selected').val() + ".json", this.checkAgentStatus);
+      });
     }
   };
 
@@ -128,12 +128,12 @@ var ocScheduler = (function() {
     });
 
     $('.oc-ui-collapsible-widget .form-box-head').click(
-      function() {
-        $(this).children('.ui-icon').toggleClass('ui-icon-triangle-1-e');
-        $(this).children('.ui-icon').toggleClass('ui-icon-triangle-1-s');
-        $(this).next().toggle();
-        return false;
-      });
+    function() {
+      $(this).children('.ui-icon').toggleClass('ui-icon-triangle-1-e');
+      $(this).children('.ui-icon').toggleClass('ui-icon-triangle-1-s');
+      $(this).next().toggle();
+      return false;
+    });
 
     $('#seriesSelect').autocomplete({
       source: function(request, response) {
@@ -165,26 +165,26 @@ var ocScheduler = (function() {
         $('#series').val(ui.item.id);
       },
       change: function(event, ui){
-          if($('#series').val() === '' && $('#seriesSelect').val() !== ''){
-              ocUtils.log("Searching for series in series endpoint");
-              $.ajax({
-                  url : SERIES_SEARCH_URL + '?seriesTitle=' + $('#series').val(),
-                  type : 'get',
-                  dataType : 'json',
-                  success : function(data) {
-                      var series_input = $('#seriesSelect').val(),
-                          series_list = data["catalogs"],
-                          series_title,
-                          series_id;
+        if($('#series').val() === '' && $('#seriesSelect').val() !== ''){
+          ocUtils.log("Searching for series in series endpoint");
+          $.ajax({
+            url : SERIES_SEARCH_URL + '?seriesTitle=' + $('#seriesSelect').val(),
+            type : 'get',
+            dataType : 'json',
+            success : function(data) {
+              var series_input = $('#seriesSelect').val(),
+              series_list = data["catalogs"],
+              series_title,
+              series_id;
 
-                          if(series_list.length !== 0){
-                              series_title = series_list[0][DUBLIN_CORE_NS_URI]["title"] ? series_list[0][DUBLIN_CORE_NS_URI]["title"][0].value : "";
-                              series_id = series_list[0][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[0][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
-                              $('#series').val(series_id);
-                          }
-                  }
-              });
-          }
+              if(series_list.length !== 0){
+                series_title = series_list[0][DUBLIN_CORE_NS_URI]["title"] ? series_list[0][DUBLIN_CORE_NS_URI]["title"][0].value : "";
+                series_id = series_list[0][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[0][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
+                $('#series').val(series_id);
+              }
+            }
+          });
+        }
       },
       search: function(){
         $('#series').val('');
@@ -381,40 +381,40 @@ var ocScheduler = (function() {
     });
     if(agent){
       $.get('/capture-admin/agents/' + agent + '/configuration.xml',
-        function(doc){
-          var devNames = [];
-          var capabilities = [];
-          $.each($('item', doc), function(a, i){
-            var s = $(i).attr('key');
-            if(s === 'capture.device.names'){
-              devNames = $(i).text().split(',');
-            } else if(s.indexOf('.src') != -1) {
-              var name = s.split('.');
-              capabilities.push(name[2]);
-            } else if(s == 'capture.device.timezone.offset') {
-              var agentTz = parseInt($(i).text());
-              if(agentTz !== 'NaN'){
-                sched.dublinCore.components.agentTimeZone.setValue(agentTz);
-                sched.handleAgentTZ(agentTz);
-              }else{
-                ocUtils.log("Couldn't parse TZ");
-              }
-            } else if(s == 'capture.device.timezone') {
-              sched.timezone = $(i).text();
+      function(doc){
+        var devNames = [];
+        var capabilities = [];
+        $.each($('item', doc), function(a, i){
+          var s = $(i).attr('key');
+          if(s === 'capture.device.names'){
+            devNames = $(i).text().split(',');
+          } else if(s.indexOf('.src') != -1) {
+            var name = s.split('.');
+            capabilities.push(name[2]);
+          } else if(s == 'capture.device.timezone.offset') {
+            var agentTz = parseInt($(i).text());
+            if(agentTz !== 'NaN'){
+              sched.dublinCore.components.agentTimeZone.setValue(agentTz);
+              sched.handleAgentTZ(agentTz);
+            }else{
+              ocUtils.log("Couldn't parse TZ");
             }
-          });
-          if(devNames.length > 0) {
-            capabilities = devNames;
+          } else if(s == 'capture.device.timezone') {
+            sched.timezone = $(i).text();
           }
-          if(capabilities.length){
-            sched.displayCapabilities(capabilities);
-          }else{
-            sched.tzDiff = 0; //No agent timezone could be found, assume local time.
-            $('#inputList').html('Agent defaults will be used.');
-            delete sched.dublinCore.components.agentTimeZone;
-          }
-          sched.checkForConflictingEvents();
         });
+        if(devNames.length > 0) {
+          capabilities = devNames;
+        }
+        if(capabilities.length){
+          sched.displayCapabilities(capabilities);
+        }else{
+          sched.tzDiff = 0; //No agent timezone could be found, assume local time.
+          $('#inputList').html('Agent defaults will be used.');
+          delete sched.dublinCore.components.agentTimeZone;
+        }
+        sched.checkForConflictingEvents();
+      });
     } else {
       // no valid agent, change time to local form what ever it was before.
       delete sched.dublinCore.components.agentTimeZone; //Being empty will end up defaulting to the server's Timezone.
@@ -496,9 +496,9 @@ var ocScheduler = (function() {
   };
 
   /**
- *  loadKnownAgents calls the capture-admin service to get a list of known agents.
- *  Calls handleAgentList to populate the dropdown.
- */
+   *  loadKnownAgents calls the capture-admin service to get a list of known agents.
+   *  Calls handleAgentList to populate the dropdown.
+   */
   sched.loadKnownAgents = function() {
     $(this.agentList).empty();
     $(this.agentList).append($('<option></option>').val('').html('Choose one:'));
@@ -506,15 +506,15 @@ var ocScheduler = (function() {
   };
 
   /**
- *  Popluates dropdown with known agents
- *
- *  @param {XML Document}
- */
+   *  Popluates dropdown with known agents
+   *
+   *  @param {XML Document}
+   */
   sched.handleAgentList = function(data) {
     $.each($('name', data),
-      function(i, agent) {
-        $(sched.agentList).append($('<option></option>').val($(agent).text()).html($(agent).text()));
-      });
+    function(i, agent) {
+      $(sched.agentList).append($('<option></option>').val($(agent).text()).html($(agent).text()));
+    });
     sched.loadEvent();
   };
 
@@ -606,24 +606,24 @@ var ocScheduler = (function() {
       data: data,
       type: 'get',
       success: function(data) {
-      var events = [];
-      data = data.catalogs
-      if (data != '') {
-        for (var i in data) {
-          var event = data[i];
-          curId = $('#eventId').val();
-          eid = ocUtils.getDCJSONParam(event, 'identifier');
-          if(sched.mode === CREATE_MODE || (sched.mode === EDIT_MODE && curId !== eid)) {
-            sched.conflictingEvents = true;
-            $('#conflictingEvents').append('<li><a href="index.html#/scheduler?eventId=' + eid + '&edit=true" target="_new">' + ocUtils.getDCJSONParam(event, 'title') + '</a></li>');
+        var events = [];
+        data = data.catalogs
+        if (data != '') {
+          for (var i in data) {
+            var event = data[i];
+            curId = $('#eventId').val();
+            eid = ocUtils.getDCJSONParam(event, 'identifier');
+            if(sched.mode === CREATE_MODE || (sched.mode === EDIT_MODE && curId !== eid)) {
+              sched.conflictingEvents = true;
+              $('#conflictingEvents').append('<li><a href="index.html#/scheduler?eventId=' + eid + '&edit=true" target="_new">' + ocUtils.getDCJSONParam(event, 'title') + '</a></li>');
+            }
+          }
+          if(sched.conflictingEvents) {
+            $('#missingFieldsContainer').show();
+            $('#errorConflict').show();
           }
         }
-        if(sched.conflictingEvents) {
-          $('#missingFieldsContainer').show();
-          $('#errorConflict').show();
-        }
-      }
-    }});
+      }});
   }
 
   sched.registerCatalogs = function registerCatalogs() {
@@ -651,6 +651,10 @@ var ocScheduler = (function() {
       errors: {
         missingRequired: new ocAdmin.Error('missingSeries', 'seriesLabel'),
         seriesError: new ocAdmin.Error('errorSeries')
+      },
+      fields: {
+        seriesSelect: $('#seriesSelect'),
+        series: $('#series')
       }
     },
     {
@@ -973,7 +977,7 @@ var ocScheduler = (function() {
         },
         validate: function() {
           if(this.fields.recurEnd.datepicker && this.fields.recurStart.datepicker &&    // ocScheduler.components.recurrenceDuration.validate() &&
-            this.fields.recurStartTimeHour && this.fields.recurStartTimeMin &&
+          this.fields.recurStartTimeHour && this.fields.recurStartTimeMin &&
             this.fields.recurEnd.datepicker('getDate') > this.fields.recurStart.datepicker('getDate')) {
             return [];
           }
@@ -1130,7 +1134,7 @@ var ocScheduler = (function() {
               this.fields.repeatSat[0].checked ){
               if(ocScheduler.components.recurrenceStart.validate() &&
                 // ocScheduler.components.recurrenceDuration.validate() &&
-                ocScheduler.components.recurrenceEnd.validate()) {
+              ocScheduler.components.recurrenceEnd.validate()) {
                 return [];
               }
             }
@@ -1171,7 +1175,7 @@ var ocScheduler = (function() {
           end += this.fields.recurDurationMin.val() * 60; // milliseconds per min
           end = end * 1000;
           return 'start=' + ocUtils.toISODate(new Date(start)) +
-          '; end=' + ocUtils.toISODate(new Date(end)) + '; scheme=W3C-DTF;';
+            '; end=' + ocUtils.toISODate(new Date(end)) + '; scheme=W3C-DTF;';
         },
         validate: function() {
           var startValid = ocScheduler.components.recurrenceStart.validate();
@@ -1230,7 +1234,7 @@ var ocScheduler = (function() {
           end = end * 1000;
           end += start;
           return 'start=' + ocUtils.toISODate(new Date(start)) +
-          '; end=' + ocUtils.toISODate(new Date(end)) + '; scheme=W3C-DTF;';
+            '; end=' + ocUtils.toISODate(new Date(end)) + '; scheme=W3C-DTF;';
         },
         setValue: function(val) {
           var temporal = parseDublinCoreTemporal(val);
@@ -1293,10 +1297,10 @@ var ocScheduler = (function() {
           now = new Date(now);
           if(this.fields.startDate && date && this.fields.startTimeHour && this.fields.startTimeMin) {
             startdatetime = new Date(date.getFullYear(),
-              date.getMonth(),
-              date.getDate(),
-              this.fields.startTimeHour.val(),
-              this.fields.startTimeMin.val());
+            date.getMonth(),
+            date.getDate(),
+            this.fields.startTimeHour.val(),
+            this.fields.startTimeMin.val());
             if(startdatetime.getTime() >= now.getTime()) {
               return [];
             }
@@ -1407,24 +1411,6 @@ var ocScheduler = (function() {
     if(typeof ocWorkflowPanel != 'undefined') {
       ocWorkflowPanel.registerComponents(ocScheduler.capture.components);
     }
-  }
-
-  function handleSeriesSearch(data, callback) {
-    var catalogs = data.catalogs;
-    var source = [];
-    for (var i in catalogs) {
-      var series = catalogs[i];
-      if (ocUtils.exists(series['http://purl.org/dc/terms/'])) {
-        series = series['http://purl.org/dc/terms/'];
-        var item = {
-          label: series.title[0].value + ' - ' + series.creator[0].value,
-          value: series.title[0].value,
-          id: series.identifier[0].value
-        }
-        source.push(item);
-      }
-    }
-    callback(source);
   }
 
   function parseDublinCoreTemporal(temporal) {
