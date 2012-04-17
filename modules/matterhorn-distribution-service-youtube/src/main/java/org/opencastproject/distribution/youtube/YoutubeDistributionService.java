@@ -112,7 +112,7 @@ public class YoutubeDistributionService extends AbstractJobProducer implements D
   /** Youtube configuration instance */
   protected static YoutubeConfiguration config = null;
 
-  /** The organization directoary service */
+  /** The organization directory service */
   private OrganizationDirectoryService organizationDirectoryService;
 
   /** The user directory service */

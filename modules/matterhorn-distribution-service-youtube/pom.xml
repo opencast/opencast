@@ -28,7 +28,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workflow-service-impl</artifactId>
+      <artifactId>matterhorn-workflow-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 	<dependency>
