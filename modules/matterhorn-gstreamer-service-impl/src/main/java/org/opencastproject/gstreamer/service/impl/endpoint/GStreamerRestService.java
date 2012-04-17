@@ -81,6 +81,11 @@ public class GStreamerRestService extends AbstractJobProducerEndpoint {
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
+  
+  @Override
+  public ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
+  }
 
   /**
    * Sets the gstreamer service
