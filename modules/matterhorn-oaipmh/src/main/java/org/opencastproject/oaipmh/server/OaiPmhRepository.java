@@ -46,9 +46,9 @@ import static org.opencastproject.oaipmh.OaiPmhUtil.toUtc;
 import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcDay;
 import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcSecond;
 import static org.opencastproject.oaipmh.server.Functions.isAfter;
-import static org.opencastproject.util.data.CollectionUtil.find;
-import static org.opencastproject.util.data.CollectionUtil.map;
-import static org.opencastproject.util.data.CollectionUtil.mkString;
+import static org.opencastproject.util.data.Collections.find;
+import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Collections.mkString;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 

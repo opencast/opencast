@@ -43,7 +43,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.opencastproject.util.data.CollectionUtil.flatMap;
+import static org.opencastproject.util.data.Collections.flatMap;
 
 /**
  * DOM based XML generation environment. Implement {@link #create()} to create the XML.

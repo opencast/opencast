@@ -27,6 +27,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import static org.apache.commons.lang.StringUtils.trimToNull;
+import static org.opencastproject.util.data.Option.option;
 
 /**
  * Base class for all OAI-PMH responses.
@@ -60,7 +61,7 @@ public abstract class OaiPmhResponse {
    * Get the error code if this is an error response.
    */
   public Option<String> getErrorCode() {
-    return Option.wrap(trimToNull(xpathString("/oai20:OAI-PMH/oai20:error/@code")));
+    return option(trimToNull(xpathString("/oai20:OAI-PMH/oai20:error/@code")));
   }
 
   /**

@@ -22,7 +22,7 @@ import org.opencastproject.util.data.Option;
 
 import static org.apache.commons.lang.StringUtils.trimToNull;
 import static org.opencastproject.util.data.Option.eq;
-import static org.opencastproject.util.data.Option.wrap;
+import static org.opencastproject.util.data.Option.option;
 
 /**
  * Helper to encapsulate HTTP parameter handling.
@@ -61,31 +61,31 @@ public abstract class Params {
   }
 
   Option<String> getVerb() {
-    return wrap(trimToNull(getParameter("verb")));
+    return option(trimToNull(getParameter("verb")));
   }
 
   Option<String> getIdentifier() {
-    return wrap(trimToNull(getParameter("identifier")));
+    return option(trimToNull(getParameter("identifier")));
   }
 
   Option<String> getMetadataPrefix() {
-    return wrap(trimToNull(getParameter("metadataPrefix")));
+    return option(trimToNull(getParameter("metadataPrefix")));
   }
 
   Option<String> getFrom() {
-    return wrap(trimToNull(getParameter("from")));
+    return option(trimToNull(getParameter("from")));
   }
 
   Option<String> getUntil() {
-    return wrap(trimToNull(getParameter("until")));
+    return option(trimToNull(getParameter("until")));
   }
 
   Option<String> getSet() {
-    return wrap(StringUtils.trimToNull(getParameter("set")));
+    return option(StringUtils.trimToNull(getParameter("set")));
   }
 
   Option<String> getResumptionToken() {
-    return wrap(trimToNull(getParameter("resumptionToken")));
+    return option(trimToNull(getParameter("resumptionToken")));
   }
 
   @Override
