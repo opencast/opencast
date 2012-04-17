@@ -140,8 +140,9 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   }
 
   public User loadUser(String userName, String organizationId) {
-    EntityManager em = emf.createEntityManager();
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
       Query q = em.createNamedQuery("user");
       q.setParameter("u", userName);
       q.setParameter("o", organizationId);
@@ -154,7 +155,8 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
       Set<String> roles = user.getRoles();
       return new User(userName, user.getPassword(), user.getOrganization(), roles.toArray(new String[roles.size()]));
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -182,9 +184,10 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     user = new JpaUser(user.getUsername(), encodedPassword, user.getOrganization(), user.getRoles());
 
     // Then save the user
-    EntityManager em = emf.createEntityManager();
+    EntityManager em = null;
     EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
       em.persist(user);
@@ -193,7 +196,8 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
       if (tx.isActive()) {
         tx.rollback();
       }
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -204,14 +208,16 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   @Override
   public String[] getRoles() {
-    EntityManager em = emf.createEntityManager();
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
       Query q = em.createNamedQuery("roles");
       @SuppressWarnings("unchecked")
       List<String> results = q.getResultList();
       return results.toArray(new String[results.size()]);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -236,8 +242,9 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     if (limit < 1) {
       limit = 100;
     }
-    EntityManager em = emf.createEntityManager();
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
       Query q = em.createNamedQuery("users").setMaxResults(limit).setFirstResult(offset);
       q.setParameter("o", securityService.getOrganization().getId());
       List<JpaUser> jpaUsers = q.getResultList();
@@ -249,7 +256,8 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
       }
       return jsonArray.toJSONString();
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -276,9 +284,10 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   @RestQuery(name = "roleupdate", description = "Updates a user's roles", returnDescription = "No content", restParameters = @RestParameter(name = "roles", type = TEXT, isRequired = true, description = "The user roles as a json array"), pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "The user roles have been updated.") })
   public Response updateUserFromJson(@PathParam("username") String username, @FormParam("roles") String roles) {
     JSONArray rolesArray = (JSONArray) JSONValue.parse(roles);
-    EntityManager em = emf.createEntityManager();
+    EntityManager em = null;
     EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
       // Find the existing user
@@ -302,6 +311,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
       if (tx.isActive()) {
         tx.rollback();
       }
+      if (em != null)
       em.close();
     }
   }

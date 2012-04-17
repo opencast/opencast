@@ -730,7 +730,7 @@ public class IngestRestService {
       IOUtils.closeQuietly(is);
     }
   }
-  
+
   /**
    * Add an elements to a MediaPackage and keeps track of the progress of the upload. Returns an HTML that triggers the
    * host sites UploadListener.uploadComplete javascript event Returns an HTML that triggers the host sites
@@ -751,8 +751,9 @@ public class IngestRestService {
     String fileName = null;
     MediaPackageElementFlavor flavor = null;
     String elementType = "track";
-    EntityManager em = emf.createEntityManager();
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
       try { // try to get UploadJob, responde 404 if not successful
         // job = em.find(UploadJob.class, jobId);
         if (jobs.containsKey(jobId)) {
@@ -813,10 +814,10 @@ public class IngestRestService {
       return buildUploadFailedRepsonse(job);
     } catch (Exception ex) {
       logger.error(ex.getMessage());
-      ex.printStackTrace();
       return buildUploadFailedRepsonse(job);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 

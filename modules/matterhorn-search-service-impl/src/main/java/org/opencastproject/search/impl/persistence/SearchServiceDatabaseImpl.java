@@ -126,9 +126,11 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   @Override
   public void deleteMediaPackage(String mediaPackageId, Date deletionDate) throws SearchServiceDatabaseException,
           NotFoundException {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
 
       SearchEntity searchEntity = getSearchEntity(mediaPackageId, em);
@@ -157,7 +159,8 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
       }
       throw new SearchServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -169,10 +172,11 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   @Override
   @SuppressWarnings("unchecked")
   public Iterator<Tuple<MediaPackage, String>> getAllMediaPackages() throws SearchServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    Query query = em.createNamedQuery("Search.findAll");
     List<SearchEntity> searchEntities = null;
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
+      Query query = em.createNamedQuery("Search.findAll");
       searchEntities = (List<SearchEntity>) query.getResultList();
     } catch (Exception e) {
       logger.error("Could not retrieve all episodes: {}", e.getMessage());
@@ -201,8 +205,9 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   @Override
   public AccessControlList getAccessControlList(String mediaPackageId) throws NotFoundException,
           SearchServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
       SearchEntity entity = getSearchEntity(mediaPackageId, em);
       if (entity == null) {
         throw new NotFoundException("Could not found media package with ID " + mediaPackageId);
@@ -233,9 +238,11 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
           throws SearchServiceDatabaseException, UnauthorizedException {
     String mediaPackageXML = MediaPackageParser.getAsXml(mediaPackage);
     String mediaPackageId = mediaPackage.getIdentifier().toString();
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       SearchEntity entity = getSearchEntity(mediaPackageId, em);
       if (entity == null) {
@@ -274,7 +281,8 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
       }
       throw new SearchServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -285,9 +293,11 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    */
   @Override
   public MediaPackage getMediaPackage(String mediaPackageId) throws NotFoundException, SearchServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       SearchEntity episodeEntity = getSearchEntity(mediaPackageId, em);
       if (episodeEntity == null)
@@ -315,7 +325,8 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
       }
       throw new SearchServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -326,9 +337,11 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    */
   @Override
   public Date getModificationDate(String mediaPackageId) throws NotFoundException, SearchServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       SearchEntity searchEntity = getSearchEntity(mediaPackageId, em);
       if (searchEntity == null)
@@ -352,7 +365,8 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
       }
       throw new SearchServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -363,9 +377,11 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    */
   @Override
   public Date getDeletionDate(String mediaPackageId) throws NotFoundException, SearchServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       SearchEntity searchEntity = getSearchEntity(mediaPackageId, em);
       if (searchEntity == null) {
@@ -390,7 +406,8 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
       }
       throw new SearchServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -401,9 +418,11 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    */
   @Override
   public String getOrganizationId(String mediaPackageId) throws NotFoundException, SearchServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       SearchEntity searchEntity = getSearchEntity(mediaPackageId, em);
       if (searchEntity == null)
@@ -427,7 +446,8 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
       }
       throw new SearchServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 

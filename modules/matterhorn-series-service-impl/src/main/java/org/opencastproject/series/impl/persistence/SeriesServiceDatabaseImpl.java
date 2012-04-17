@@ -173,9 +173,11 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    */
   @Override
   public void deleteSeries(String seriesId) throws SeriesServiceDatabaseException, NotFoundException {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       SeriesEntity entity = getSeriesEntity(seriesId, em);
       if (entity == null) {
@@ -202,7 +204,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       }
       throw new SeriesServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -214,10 +217,11 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   @SuppressWarnings("unchecked")
   @Override
   public DublinCoreCatalog[] getAllSeries() throws SeriesServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    Query query = em.createNamedQuery("Series.findAll");
     List<SeriesEntity> seriesEntities = null;
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
+      Query query = em.createNamedQuery("Series.findAll");
       seriesEntities = (List<SeriesEntity>) query.getResultList();
     } catch (Exception e) {
       logger.error("Could not retrieve all series: {}", e.getMessage());
@@ -246,8 +250,9 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   @Override
   public AccessControlList getAccessControlList(String seriesId) throws NotFoundException,
           SeriesServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
       SeriesEntity entity = getSeriesEntity(seriesId, em);
       if (entity == null) {
         throw new NotFoundException("Could not found series with ID " + seriesId);
@@ -263,7 +268,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       logger.error("Could not retrieve ACL for series '{}': {}", seriesId, e.getMessage());
       throw new SeriesServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -287,10 +293,12 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       logger.error("Could not serialize Dublin Core: {}", e1);
       throw new SeriesServiceDatabaseException(e1);
     }
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
     DublinCoreCatalog newSeries = null;
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       SeriesEntity entity = getSeriesEntity(seriesId, em);
       if (entity == null) {
@@ -325,7 +333,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       }
       throw new SeriesServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
 
   }
@@ -337,9 +346,11 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    */
   @Override
   public DublinCoreCatalog getSeries(String seriesId) throws NotFoundException, SeriesServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       SeriesEntity entity = getSeriesEntity(seriesId, em);
       if (entity == null) {
@@ -368,7 +379,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       }
       throw new SeriesServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -393,10 +405,12 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       logger.error("Could not serialize access control parameter: {}", e.getMessage());
       throw new SeriesServiceDatabaseException(e);
     }
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
     boolean updated = false;
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       SeriesEntity entity = getSeriesEntity(seriesId, em);
       if (entity == null) {
@@ -428,23 +442,27 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       }
       throw new SeriesServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
-  
+
   public int countSeries() throws SeriesServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    Query query = em.createNamedQuery("Series.getCount");
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
+      Query query = em.createNamedQuery("Series.getCount");
       Long total = (Long) query.getSingleResult();
       return total.intValue();
     } catch (Exception e) {
       logger.error("Could not find number of series.", e);
       throw new SeriesServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
+
   /**
    * Gets a series by its ID, using the current organizational context.
    * 

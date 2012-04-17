@@ -1654,84 +1654,91 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       return;
 
     EntityManager em = emf.createEntityManager();
+    try {
+      em = emf.createEntityManager();
 
-    // Job is finished with a failure
-    if (jpaJob.getStatus() == Status.FAILED) {
+      // Job is finished with a failure
+      if (jpaJob.getStatus() == Status.FAILED) {
 
-      // Services in WARNING or ERROR state triggered by current job
-      List<ServiceRegistrationJpaImpl> relatedWarningOrErrorServices = getRelatedWarningErrorServices(jpaJob);
+        // Services in WARNING or ERROR state triggered by current job
+        List<ServiceRegistrationJpaImpl> relatedWarningOrErrorServices = getRelatedWarningErrorServices(jpaJob);
 
-      // Before this job failed there was at least one job failed with this job signature on any service
-      if (relatedWarningOrErrorServices.size() > 0) {
+        // Before this job failed there was at least one job failed with this job signature on any service
+        if (relatedWarningOrErrorServices.size() > 0) {
 
-        for (ServiceRegistrationJpaImpl relatedService : relatedWarningOrErrorServices) {
-          // Skip current service from the list
-          if (currentService.equals(relatedService))
-            continue;
+          for (ServiceRegistrationJpaImpl relatedService : relatedWarningOrErrorServices) {
+            // Skip current service from the list
+            if (currentService.equals(relatedService))
+              continue;
 
-          // Reset the WARNING job to NORMAL
-          if (relatedService.getServiceState() == ServiceState.WARNING) {
-            logger.info("State reset to NORMAL for related service {} on host {}", relatedService.getServiceType(),
-                    relatedService.getHost());
-            relatedService.setServiceState(ServiceState.NORMAL, jpaJob.getSignature());
+            // Reset the WARNING job to NORMAL
+            if (relatedService.getServiceState() == ServiceState.WARNING) {
+              logger.info("State reset to NORMAL for related service {} on host {}", relatedService.getServiceType(),
+                      relatedService.getHost());
+              relatedService.setServiceState(ServiceState.NORMAL, jpaJob.getSignature());
+            }
+
+            // Reset the ERROR job to WARNING
+            else if (relatedService.getServiceState() == ServiceState.ERROR) {
+              logger.info("State reset to WARNING for related service {} on host {}", relatedService.getServiceType(),
+                      relatedService.getHost());
+              relatedService.setServiceState(ServiceState.WARNING, relatedService.getWarningStateTrigger());
+            }
+
+            updateServiceState(em, relatedService);
           }
 
-          // Reset the ERROR job to WARNING
-          else if (relatedService.getServiceState() == ServiceState.ERROR) {
-            logger.info("State reset to WARNING for related service {} on host {}", relatedService.getServiceType(),
-                    relatedService.getHost());
-            relatedService.setServiceState(ServiceState.WARNING, relatedService.getWarningStateTrigger());
+        }
+
+        // This is the first job with this signature failing on any service
+        else {
+
+          // Set the current service to WARNING state
+          if (currentService.getServiceState() == ServiceState.NORMAL) {
+            logger.info("State set to WARNING for current service {} on host {}", currentService.getServiceType(),
+                    currentService.getHost());
+            currentService.setServiceState(ServiceState.WARNING, jpaJob.getSignature());
+            updateServiceState(em, currentService);
           }
 
+          // The current service already is in WARNING state and max attempts is reached
+          else if (getHistorySize(currentService) >= maxAttemptsBeforeErrorState) {
+            logger.info("State set to ERROR for current service {} on host {}", currentService.getServiceType(),
+                    currentService.getHost());
+            currentService.setServiceState(ServiceState.ERROR, jpaJob.getSignature());
+            updateServiceState(em, currentService);
+          }
+        }
+
+      }
+
+      // Job is finished without failure
+      else if (jpaJob.getStatus() == Status.FINISHED) {
+
+        // If the service was in warning state reset to normal state
+        if (currentService.getServiceState() == ServiceState.WARNING) {
+          logger.info("State reset to NORMAL for current service {} on host {}", currentService.getServiceType(),
+                  currentService.getHost());
+          currentService.setServiceState(ServiceState.NORMAL);
+          updateServiceState(em, currentService);
+        }
+
+        // Services in WARNING state triggered by current job
+        List<ServiceRegistrationJpaImpl> relatedWarningServices = getRelatedWarningServices(jpaJob);
+
+        // Sets all related services to error state
+        for (ServiceRegistrationJpaImpl relatedService : relatedWarningServices) {
+          logger.info("State set to ERROR for related service {} on host {}", currentService.getServiceType(),
+                  currentService.getHost());
+          relatedService.setServiceState(ServiceState.ERROR, jpaJob.getSignature());
           updateServiceState(em, relatedService);
         }
 
       }
 
-      // This is the first job with this signature failing on any service
-      else {
-
-        // Set the current service to WARNING state
-        if (currentService.getServiceState() == ServiceState.NORMAL) {
-          logger.info("State set to WARNING for current service {} on host {}", currentService.getServiceType(),
-                  currentService.getHost());
-          currentService.setServiceState(ServiceState.WARNING, jpaJob.getSignature());
-          updateServiceState(em, currentService);
-        }
-
-        // The current service already is in WARNING state and max attempts is reached
-        else if (getHistorySize(currentService) >= maxAttemptsBeforeErrorState) {
-          logger.info("State set to ERROR for current service {} on host {}", currentService.getServiceType(),
-                  currentService.getHost());
-          currentService.setServiceState(ServiceState.ERROR, jpaJob.getSignature());
-          updateServiceState(em, currentService);
-        }
-      }
-
-    }
-
-    // Job is finished without failure
-    else if (jpaJob.getStatus() == Status.FINISHED) {
-
-      // If the service was in warning state reset to normal state
-      if (currentService.getServiceState() == ServiceState.WARNING) {
-        logger.info("State reset to NORMAL for current service {} on host {}", currentService.getServiceType(),
-                currentService.getHost());
-        currentService.setServiceState(ServiceState.NORMAL);
-        updateServiceState(em, currentService);
-      }
-
-      // Services in WARNING state triggered by current job
-      List<ServiceRegistrationJpaImpl> relatedWarningServices = getRelatedWarningServices(jpaJob);
-
-      // Sets all related services to error state
-      for (ServiceRegistrationJpaImpl relatedService : relatedWarningServices) {
-        logger.info("State set to ERROR for related service {} on host {}", currentService.getServiceType(),
-                currentService.getHost());
-        relatedService.setServiceState(ServiceState.ERROR, jpaJob.getSignature());
-        updateServiceState(em, relatedService);
-      }
-
+    } finally {
+      if (em != null)
+        em.close();
     }
 
   }
@@ -1743,14 +1750,20 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   @Override
   public void sanitize(String serviceType, String host) throws NotFoundException {
-    EntityManager em = emf.createEntityManager();
-    ServiceRegistrationJpaImpl service = getServiceRegistration(em, serviceType, host);
-    if (service == null)
-      throw new NotFoundException("");
-    logger.info("State reset to NORMAL for service {} on host {} through santize method", service.getServiceType(),
-            service.getHost());
-    service.setServiceState(ServiceState.NORMAL);
-    updateServiceState(em, service);
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      ServiceRegistrationJpaImpl service = getServiceRegistration(em, serviceType, host);
+      if (service == null)
+        throw new NotFoundException("");
+      logger.info("State reset to NORMAL for service {} on host {} through santize method", service.getServiceType(),
+              service.getHost());
+      service.setServiceState(ServiceState.NORMAL);
+      updateServiceState(em, service);
+    } finally {
+      if (em != null)
+        em.close();
+    }
   }
 
   /**
@@ -1768,11 +1781,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       throw new IllegalArgumentException("serviceRegistration must not be null!");
 
     Query query = null;
-    EntityManager em = emf.createEntityManager();
-
+    EntityManager em = null;
     logger.debug("Try to get the number of jobs who failed on the service {}", serviceRegistration.toString());
     try {
-
+      em = emf.createEntityManager();
       query = em.createNamedQuery("Job.count.history.failed");
       query.setParameter("serviceType", serviceRegistration.getServiceType());
       query.setParameter("host", serviceRegistration.getHost());
@@ -1781,7 +1793,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -1802,11 +1815,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       throw new IllegalArgumentException("job must not be null!");
 
     Query query = null;
-    EntityManager em = emf.createEntityManager();
-
+    EntityManager em = null;
     logger.debug("Try to get the services in WARNING state triggered by this job {} failed", job.getSignature());
-
     try {
+      em = emf.createEntityManager();
       // TODO: modify the query to avoid to go through the list here
       query = em.createNamedQuery("ServiceRegistration.relatedservices.warning");
       query.setParameter("serviceType", job.getJobType());
@@ -1826,7 +1838,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -1847,12 +1860,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       throw new IllegalArgumentException("job must not be null!");
 
     Query query = null;
-    EntityManager em = emf.createEntityManager();
-
+    EntityManager em = null;
     logger.debug("Try to get the services in WARNING or ERROR state triggered by this job {} failed",
             job.getSignature());
-
     try {
+      em = emf.createEntityManager();
+
       // TODO: modify the query to avoid to go through the list here
       query = em.createNamedQuery("ServiceRegistration.relatedservices.warning_error");
       query.setParameter("serviceType", job.getJobType());
@@ -1878,7 +1891,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -1937,14 +1951,16 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @Override
   public int getMaxConcurrentJobs() throws ServiceRegistryException {
     Query query = null;
-    EntityManager em = emf.createEntityManager();
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
       query = em.createNamedQuery("HostRegistration.cores");
       return ((Number) query.getSingleResult()).intValue();
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -1961,8 +1977,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
      */
     @Override
     public void run() {
-      EntityManager em = emf.createEntityManager();
+      EntityManager em = null;
       try {
+        em = emf.createEntityManager();
         List<Job> jobsToDispatch = getDispatchableJobs(em);
         Map<String, Integer> hostLoads = getHostLoads(em, true);
         List<ServiceRegistration> serviceRegistrations = getServiceRegistrations(em);
@@ -2011,7 +2028,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       } catch (Throwable t) {
         ServiceRegistryJpaImpl.logger.warn("Error dispatching jobs", t);
       } finally {
-        em.close();
+        if (em != null)
+          em.close();
       }
     }
   }

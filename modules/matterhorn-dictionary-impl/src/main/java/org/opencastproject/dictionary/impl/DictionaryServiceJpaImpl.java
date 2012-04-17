@@ -96,8 +96,9 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    */
   protected Word getWord(String text, String language) {
     text = Word.fixCase(text);
-    EntityManager em = emf.createEntityManager();
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
       Query query = em.createNamedQuery("Word.get");
       query.setParameter("text", text);
       query.setParameter("language", language);
@@ -107,7 +108,8 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
         return null;
       }
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -122,9 +124,11 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
     Word word = getWord(text, language);
     if (word == null) {
       word = new Word(text, language);
-      EntityManager em = emf.createEntityManager();
-      EntityTransaction tx = em.getTransaction();
+      EntityManager em = null;
+      EntityTransaction tx = null;
       try {
+        em = emf.createEntityManager();
+        tx = em.getTransaction();
         tx.begin();
         em.persist(word);
         tx.commit();
@@ -133,7 +137,8 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
         tx.rollback();
         throw e;
       } finally {
-        em.close();
+        if (em != null)
+          em.close();
       }
     }
   }
@@ -148,9 +153,11 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
   public void addWord(String text, String language, Integer count) {
     text = Word.fixCase(text);
     Word word = getWord(text, language);
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       if (word == null) {
         word = new Word(text, language, count);
@@ -166,7 +173,8 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
       tx.rollback();
       throw e;
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -180,9 +188,11 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
   public void addWord(String text, String language, Integer count, Double weight) {
     text = Word.fixCase(text);
     Word word = getWord(text, language);
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       if (word == null) {
         word = new Word(text, language, count, weight);
@@ -200,7 +210,8 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
       tx.rollback();
       throw e;
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -232,9 +243,11 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    */
   @Override
   public void clear(String language) {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       Query q = em.createNamedQuery("Word.deleteLanguage");
       q.setParameter("language", language);
@@ -245,7 +258,8 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
       tx.rollback();
       throw e;
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -259,13 +273,15 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
   @SuppressWarnings("unchecked")
   protected Word[] getWords(String text) {
     text = Word.fixCase(text);
-    EntityManager em = emf.createEntityManager();
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
       Query query = em.createNamedQuery("Word.wordsFromText");
       query.setParameter("text", text);
       return (Word[]) query.getResultList().toArray(new Word[0]);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -334,12 +350,14 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
   @SuppressWarnings("unchecked")
   @Override
   public String[] getLanguages() {
-    EntityManager em = emf.createEntityManager();
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
       Query q = em.createNamedQuery("Word.languageCount");
       return (String[]) q.getResultList().toArray(new String[0]);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -352,13 +370,15 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
   @Override
   public String[] getLanguages(String text) {
     text = Word.fixCase(text);
-    EntityManager em = emf.createEntityManager();
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
       Query q = em.createNamedQuery("Word.wordByLanguage");
       q.setParameter("text", text);
       return (String[]) q.getResultList().toArray(new String[0]);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -454,9 +474,11 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
     if (word == null) {
       word = new Word(text, language);
     }
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       word.stopWord = true;
       em.merge(word);
@@ -466,7 +488,8 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
       tx.rollback();
       throw e;
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -477,9 +500,11 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    */
   @Override
   public void parseStopWords(Double threshold, String language) {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       Query q = em.createNamedQuery("Word.updateStopWords");
       q.setParameter("threshold", threshold);
@@ -492,7 +517,8 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
       tx.rollback();
       throw e;
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 }
