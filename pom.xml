@@ -36,7 +36,6 @@
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-capture-admin-service-api</module>
         <module>modules/matterhorn-capture-admin-service-impl</module>
-		<module>modules/matterhorn-cas</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-conductor</module>
         <module>modules/matterhorn-db</module>
@@ -62,7 +61,7 @@
         <module>modules/matterhorn-scheduler-impl</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
-		<module>modules/matterhorn-speech-recognition-service-api</module>
+		    <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-solr</module>
         <module>modules/matterhorn-userdirectory-ldap</module>
         <module>modules/matterhorn-webconsole</module>
@@ -553,7 +552,7 @@
             <phase>install</phase>
             <configuration>
               <target if="deployTo">
-                <copy file="${project.build.directory}/${project.build.finalName}.jar" todir="${deployTo}"
+                <copy file="${project.build.directory}/${project.build.finalName}.jar" todir="${deployTo}/lib/matterhorn"
                   failonerror="false" />
               </target>
             </configuration>
