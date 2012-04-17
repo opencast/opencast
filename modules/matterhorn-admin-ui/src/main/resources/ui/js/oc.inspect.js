@@ -201,7 +201,7 @@ Opencast.WorkflowInspect = (function() {
       $('.unfoldable-content').hide('fast');
       if (!unfolded) {
         $content.show('fast');
-      }
+      }12119
     });
     renderWorkflowPerformance(workflow);
   }
@@ -333,6 +333,10 @@ Opencast.WorkflowInspect = (function() {
         out[member.key] = [out[member.key], member.value];
       } else {
     	val = member['$'];
+        
+        if(val == undefined) {
+          val = "";
+        }
     	
     	if ( (val.length == 13 && parseInt(val) != NaN) || (typeof(val) == "number" && val > 1000000000000)) {
     		  out[member.key] = ocUtils.makeLocaleDateString(val);  } 
