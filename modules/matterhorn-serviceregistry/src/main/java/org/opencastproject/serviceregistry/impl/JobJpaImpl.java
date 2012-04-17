@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -79,7 +80,7 @@ import javax.xml.bind.annotation.XmlType;
                 + "where j.status = :status order by j.dateCreated"),
         @NamedQuery(name = "Job.all", query = "SELECT j FROM Job j order by j.dateCreated"),
         @NamedQuery(name = "Job.dispatchable.status", query = "SELECT j FROM Job j where j.dispatchable = true and "
-                + "j.status=:status order by j.dateCreated"),
+                + "j.status in :statuses order by j.dateCreated"),
         @NamedQuery(name = "Job.processinghost.status", query = "SELECT j FROM Job j "
                 + "where j.status = :status and j.processorServiceRegistration is not null and "
                 + "j.processorServiceRegistration.serviceType = :serviceType and "
@@ -130,6 +131,8 @@ public class JobJpaImpl extends JaxbJob {
 
   protected JobJpaImpl parentJob = null;
 
+  protected List<JobJpaImpl> childrenJobs = null;
+
   @OneToMany(mappedBy = "warningStateTrigger")
   private List<ServiceRegistrationJpaImpl> servicesRegistration;
 
@@ -152,6 +155,7 @@ public class JobJpaImpl extends JaxbJob {
     this.organization = organization.getId();
     this.operation = operation;
     this.context = new JaxbJobContext();
+    this.childrenJobs = new ArrayList<JobJpaImpl>();
     if (arguments != null) {
       this.arguments = new ArrayList<String>(arguments);
     }
@@ -162,6 +166,16 @@ public class JobJpaImpl extends JaxbJob {
     setDispatchable(dispatchable);
     setStatus(Status.INSTANTIATED);
     this.creatorServiceRegistration = creatorServiceRegistration;
+  }
+
+  public JobJpaImpl(User user, Organization organization, ServiceRegistrationJpaImpl creatorServiceRegistration,
+          String operation, List<String> arguments, String payload, boolean dispatchable, JobJpaImpl rootJob,
+          JobJpaImpl parentJob) {
+    this(user, organization, creatorServiceRegistration, operation, arguments, payload, dispatchable);
+    super.setRootJobId(rootJob.getId());
+    super.setParentJobId(parentJob.getId());
+    this.rootJob = rootJob;
+    this.parentJob = parentJob;
   }
 
   /**
@@ -199,6 +213,16 @@ public class JobJpaImpl extends JaxbJob {
   @Override
   public URI getUri() {
     return super.getUri();
+  }
+
+  @OneToMany(mappedBy = "parentJob", fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.REFRESH,
+          CascadeType.MERGE })
+  public List<JobJpaImpl> getChildrenJobs() {
+    return childrenJobs;
+  }
+
+  public void setChildrenJobs(List<JobJpaImpl> jobs) {
+    this.childrenJobs = jobs;
   }
 
   /**
@@ -501,7 +525,7 @@ public class JobJpaImpl extends JaxbJob {
   /**
    * @return the parentJob
    */
-  @JoinColumn(name = "parent_id", referencedColumnName = "id", updatable = false)
+  @JoinColumn(name = "parent_id", referencedColumnName = "id", nullable = true)
   public JobJpaImpl getParentJob() {
     return parentJob;
   }
@@ -511,13 +535,17 @@ public class JobJpaImpl extends JaxbJob {
    *          the parentJob to set
    */
   public void setParentJob(JobJpaImpl parentJob) {
+    if (parentJob == null)
+      return;
+
+    super.setParentJobId(parentJob.getId());
     this.parentJob = parentJob;
   }
 
   /**
    * @return the rootJob
    */
-  @JoinColumn(name = "root_id", referencedColumnName = "id", updatable = false)
+  @JoinColumn(name = "root_id", referencedColumnName = "id", nullable = true)
   public JobJpaImpl getRootJob() {
     return rootJob;
   }
@@ -527,6 +555,10 @@ public class JobJpaImpl extends JaxbJob {
    *          the rootJob to set
    */
   public void setRootJob(JobJpaImpl rootJob) {
+    if (rootJob == null)
+      return;
+
+    super.setRootJobId(rootJob.getId());
     this.rootJob = rootJob;
   }
 

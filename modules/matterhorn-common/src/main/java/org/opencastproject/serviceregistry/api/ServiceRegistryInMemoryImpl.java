@@ -158,7 +158,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   public void unregisterService(JobProducer localService) throws ServiceRegistryException {
     List<ServiceRegistrationInMemoryImpl> servicesOnHost = services.get(LOCALHOST);
     if (servicesOnHost != null) {
-      ServiceRegistrationInMemoryImpl s = (ServiceRegistrationInMemoryImpl)localService;
+      ServiceRegistrationInMemoryImpl s = (ServiceRegistrationInMemoryImpl) localService;
       servicesOnHost.remove(s);
     }
   }
@@ -270,8 +270,19 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    *      java.util.List, String, boolean)
    */
   @Override
-  public Job createJob(String type, String operation, List<String> arguments, String payload, boolean enqueuImmediately)
+  public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable)
           throws ServiceRegistryException {
+    return createJob(type, operation, arguments, payload, queueable, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(String, String, List, String, boolean, Job)
+   */
+  @Override
+  public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable,
+          Job parentJob) throws ServiceRegistryException {
     if (getServiceRegistrationsByType(type).size() == 0)
       logger.warn("Service " + type + " not available");
 
@@ -286,10 +297,12 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
       job.setOperation(operation);
       job.setArguments(arguments);
       job.setPayload(payload);
-      if (enqueuImmediately)
+      if (queueable)
         job.setStatus(Status.QUEUED);
       else
         job.setStatus(Status.INSTANTIATED);
+      if (parentJob != null)
+        job.setParentJobId(parentJob.getId());
     }
 
     synchronized (jobs) {
@@ -663,6 +676,18 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   @Override
   public void sanitize(String serviceType, String host) {
     // TODO Auto-generated method stub
+  }
+
+  @Override
+  public Job getCurrentJob() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void setCurrentJob(Job job) {
+    // TODO Auto-generated method stub
+
   }
 
 }

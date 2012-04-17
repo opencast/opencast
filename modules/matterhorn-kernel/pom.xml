@@ -300,6 +300,7 @@
               OSGI-INF/jsonp.xml,
               OSGI-INF/organization-directory-service.xml,
               OSGI-INF/organization-filter.xml,
+              OSGI-INF/current-job-filter.xml,
               OSGI-INF/pingback.xml,
               OSGI-INF/rest.xml,
               OSGI-INF/security-service.xml,

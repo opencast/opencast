@@ -119,6 +119,11 @@ public interface ServiceRegistry {
   /**
    * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
    * {@link #createJob(String, String, List, String, boolean)} with an empty argument list.
+   * <p>
+   * Note that this job will be linked to the current job as its parent. Use
+   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
+   * need the link.
+   * </p>
    * 
    * @param type
    *          the type of service responsible for this job
@@ -133,6 +138,11 @@ public interface ServiceRegistry {
   /**
    * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
    * {@link #createJob(String, String, List, String, boolean)}.
+   * <p>
+   * Note that this job will be linked to the current job as its parent. Use
+   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
+   * need the link.
+   * </p>
    * 
    * @param type
    *          the type of service responsible for this job
@@ -149,6 +159,11 @@ public interface ServiceRegistry {
   /**
    * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
    * {@link #createJob(String, String, List, String, boolean)}. The job will carry the given payload from the beginning.
+   * <p>
+   * Note that this job will be linked to the current job as its parent. Use
+   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
+   * need the link.
+   * </p>
    * 
    * @param type
    *          the type of service responsible for this job
@@ -168,6 +183,11 @@ public interface ServiceRegistry {
    * Create and store a new job. If <code>enqueueImmediately</code> is true, the job will be in the
    * {@link Status#QUEUED} state and will be dispatched as soon as possible. Otherwise, it will be
    * {@link Status#INSTANTIATED}.
+   * <p>
+   * Note that this job will be linked to the current job as its parent. Use
+   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
+   * need the link.
+   * </p>
    * 
    * @param type
    *          the type of service responsible for this job
@@ -185,6 +205,31 @@ public interface ServiceRegistry {
    *           if there is a problem creating the job
    */
   Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable)
+          throws ServiceRegistryException;
+
+  /**
+   * Create and store a new job. If <code>enqueueImmediately</code> is true, the job will be in the
+   * {@link Status#QUEUED} state and will be dispatched as soon as possible. Otherwise, it will be
+   * {@link Status#INSTANTIATED}.
+   * 
+   * @param type
+   *          the type of service responsible for this job
+   * @param operation
+   *          the operation for this service to run
+   * @param arguments
+   *          the arguments to the operation
+   * @param payload
+   *          an optional initial payload
+   * @param queueable
+   *          whether the job can be enqueued for dispatch. If false, the job's initial state will be
+   *          {@link Status#INSTANTIATED} and will not be dispatched.
+   * @param parentJob
+   *          the parent job
+   * @return the job
+   * @throws ServiceRegistryException
+   *           if there is a problem creating the job
+   */
+  Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable, Job parentJob)
           throws ServiceRegistryException;
 
   /**
@@ -207,6 +252,21 @@ public interface ServiceRegistry {
    * @return the job or null
    */
   Job getJob(long id) throws NotFoundException, ServiceRegistryException;
+
+  /**
+   * Gets the current running job
+   * 
+   * @return the current job
+   */
+  Job getCurrentJob();
+
+  /**
+   * Sets the current running job
+   * 
+   * @param job
+   *          the current job
+   */
+  void setCurrentJob(Job job);
 
   /**
    * Gets the list of jobs that match the specified parameters.

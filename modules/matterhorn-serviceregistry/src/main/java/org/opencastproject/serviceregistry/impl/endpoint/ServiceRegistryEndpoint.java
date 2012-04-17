@@ -316,7 +316,7 @@ public class ServiceRegistryEndpoint {
             || Boolean.TRUE.toString().equalsIgnoreCase(request.getParameter("start"));
     try {
       Job job = ((ServiceRegistryJpaImpl) serviceRegistry).createJob(host, jobType, operation, arguments, payload,
-              start);
+              start, serviceRegistry.getCurrentJob());
       return Response.created(job.getUri()).entity(new JaxbJob(job)).build();
     } catch (IllegalArgumentException e) {
       throw new WebApplicationException(Status.BAD_REQUEST);

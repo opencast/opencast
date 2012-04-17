@@ -23,6 +23,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
 
 import org.slf4j.Logger;
@@ -93,7 +94,7 @@ public abstract class AbstractJobProducer implements JobProducer {
       } catch (NotFoundException e) {
         throw new IllegalStateException(e);
       }
-      executor.submit(new JobRunner(job));
+      executor.submit(new JobRunner(job, getServiceRegistry().getCurrentJob()));
       return true;
     } else {
       return false;
@@ -155,17 +156,23 @@ public abstract class AbstractJobProducer implements JobProducer {
    */
   class JobRunner implements Callable<Void> {
 
-    /** The job */
+    /** The job to dispatch */
     private final Job job;
+
+    /** The current job */
+    private final Job currentJob;
 
     /**
      * Constructs a new job runner
      * 
      * @param job
      *          the job to run
+     * @param currentJob
+     *          the current running job
      */
-    JobRunner(Job job) {
+    JobRunner(Job job, Job currentJob) {
       this.job = job;
+      this.currentJob = currentJob;
     }
 
     /**
@@ -178,6 +185,7 @@ public abstract class AbstractJobProducer implements JobProducer {
       SecurityService securityService = getSecurityService();
       Organization organization = getOrganizationDirectoryService().getOrganization(job.getOrganization());
       try {
+        getServiceRegistry().setCurrentJob(currentJob);
         securityService.setOrganization(organization);
         User user = getUserDirectoryService().loadUser(job.getCreator());
         securityService.setUser(user);
@@ -188,6 +196,8 @@ public abstract class AbstractJobProducer implements JobProducer {
         }
         job.setPayload(payload);
         job.setStatus(Status.FINISHED);
+      } catch (JobCanceledException e) {
+        logger.info(e.getMessage());
       } catch (Exception e) {
         job.setStatus(Status.FAILED);
         if (e instanceof ServiceRegistryException)
@@ -199,6 +209,7 @@ public abstract class AbstractJobProducer implements JobProducer {
         } catch (NotFoundException e) {
           throw new ServiceRegistryException(e);
         } finally {
+          getServiceRegistry().setCurrentJob(null);
           securityService.setUser(null);
           securityService.setOrganization(null);
         }

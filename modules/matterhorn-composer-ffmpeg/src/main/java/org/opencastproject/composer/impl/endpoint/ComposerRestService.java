@@ -78,17 +78,16 @@ import javax.xml.parsers.ParserConfigurationException;
 @RestService(name = "composer", title = "Composer", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is not working and "
-            + "is either restarting or has failed",
-        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In other words, there is a bug! " 
-            + "You should file an error report with your server logs from the time when the error occurred: " 
-            + "<a href=\"https://issues.opencastproject.org\">Opencast Issue Tracker</a>" }, 
-        abstractText = "This service creates and augments Matterhorn media packages that include media tracks, metadata catalogs and "
-            + "attachments.")
+                + "is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In other words, there is a bug! "
+                + "You should file an error report with your server logs from the time when the error occurred: "
+                + "<a href=\"https://issues.opencastproject.org\">Opencast Issue Tracker</a>" }, abstractText = "This service creates and augments Matterhorn media packages that include media tracks, metadata catalogs and "
+        + "attachments.")
 public class ComposerRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(ComposerRestService.class);
-  
+
   /** The rest documentation */
   protected String docs;
 
@@ -148,7 +147,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("encode")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "encode", description = "Starts an encoding process, based on the specified encoding profile ID and the track", pathParameters = { }, restParameters = {
+  @RestQuery(name = "encode", description = "Starts an encoding process, based on the specified encoding profile ID and the track", restParameters = {
           @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "flash.http") }, reponses = { @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response encode(@FormParam("sourceTrack") String sourceTrackAsXml, @FormParam("profileId") String profileId)
@@ -188,7 +187,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("trim")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "trim", description = "Starts a trimming process, based on the specified track, start time and duration in ms", pathParameters = { }, restParameters = {
+  @RestQuery(name = "trim", description = "Starts a trimming process, based on the specified track, start time and duration in ms", restParameters = {
           @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
           @RestParameter(description = "The encoding profile to use for trimming", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "trim.work"),
           @RestParameter(description = "The start time in milisecond", isRequired = true, name = "start", type = Type.STRING, defaultValue = "0"),
@@ -216,7 +215,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
     } else if (duration <= 0) {
       duration = (sourceTrack.getDuration() - start);
     } else if (start + duration > sourceTrack.getDuration()) {
-      duration = (sourceTrack.getDuration() - start);     
+      duration = (sourceTrack.getDuration() - start);
     }
 
     // Asynchronously encode the specified tracks
@@ -241,7 +240,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("mux")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "mux", description = "Starts an encoding process, which will mux the two tracks using the given encoding profile", pathParameters = { }, restParameters = {
+  @RestQuery(name = "mux", description = "Starts an encoding process, which will mux the two tracks using the given encoding profile", restParameters = {
           @RestParameter(description = "The track containing the audio stream", isRequired = true, name = "sourceAudioTrack", type = Type.TEXT, defaultValue = "${this.audioTrackDefault}"),
           @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceVideoTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "flash.http") }, reponses = { @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
@@ -288,7 +287,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("image")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "image", description = "Starts an image extraction process, based on the specified encoding profile ID and the source track", pathParameters = { }, restParameters = {
+  @RestQuery(name = "image", description = "Starts an image extraction process, based on the specified encoding profile ID and the source track", restParameters = {
           @RestParameter(description = "The number of seconds (many numbers can be specified, separated by comma) into the video to extract the image", isRequired = true, name = "time", type = Type.STRING, defaultValue = "1"),
           @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "player-preview.http") }, reponses = { @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
@@ -335,7 +334,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("convertimage")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "convertimage", description = "Starts an image conversion process, based on the specified encoding profile ID and the source image", pathParameters = { }, restParameters = {
+  @RestQuery(name = "convertimage", description = "Starts an image conversion process, based on the specified encoding profile ID and the source image", restParameters = {
           @RestParameter(description = "The original image", isRequired = true, name = "sourceImage", type = Type.TEXT, defaultValue = "${this.imageAttachmentDefault}"),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "image-conversion.http") }, reponses = { @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response convertImage(@FormParam("sourceImage") String sourceImageXml, @FormParam("profileId") String profileId)
@@ -375,7 +374,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("captions")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "captions", description = "Starts caption embedding process, based on the specified source track and captions", pathParameters = { }, restParameters = {
+  @RestQuery(name = "captions", description = "Starts caption embedding process, based on the specified source track and captions", restParameters = {
           @RestParameter(description = "QuickTime file containg video stream", isRequired = true, name = "mediaTrack", type = Type.TEXT, defaultValue = "${this.mediaTrackDefault}"),
           @RestParameter(description = "Catalog(s) containing captions in SRT format", isRequired = true, name = "captions", type = Type.TEXT, defaultValue = "${this.captionsCatalogsDefault}") }, reponses = { @RestResponse(description = "Result in an xml document containing resulting media file.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response captions(@FormParam("mediaTrack") String sourceTrackXml, @FormParam("captions") String captionsAsXml,
@@ -410,14 +409,14 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
-  
+
   /**
    * watermarks a track.
    * 
    * @param sourceTrack
    *          The source track
    * @param watermark
-   *          Filename of the watermark image (jpg, gif, png)         
+   *          Filename of the watermark image (jpg, gif, png)
    * @param profileId
    *          The profile to use in encoding this track
    * @return A response containing the job for this encoding job in the response body.
@@ -426,15 +425,16 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("watermark")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "watermark", description = "re-encodes a source track with a watermark branding, the position of the watermark can be specified in the profileId, the watermark can be provided as a parameter", pathParameters = { }, restParameters = {
+  @RestQuery(name = "watermark", description = "re-encodes a source track with a watermark branding, the position of the watermark can be specified in the profileId, the watermark can be provided as a parameter", restParameters = {
           @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
           @RestParameter(description = "The watermark image path", isRequired = true, name = "watermark", type = Type.STRING, defaultValue = "$FELIX_HOME/conf/branding/watermark.png"),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "watermark.branding") }, reponses = { @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
-  public Response watermark(@FormParam("sourceTrack") String sourceTrackAsXml, @FormParam("watermark") String watermark, @FormParam("profileId") String profileId)
-          throws Exception {
+  public Response watermark(@FormParam("sourceTrack") String sourceTrackAsXml,
+          @FormParam("watermark") String watermark, @FormParam("profileId") String profileId) throws Exception {
     // Ensure that the POST parameters are present
     if (sourceTrackAsXml == null || profileId == null || watermark == null) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack, watermark and profileId must not be null").build();
+      return Response.status(Response.Status.BAD_REQUEST)
+              .entity("sourceTrack, watermark and profileId must not be null").build();
     }
 
     // Deserialize the track
@@ -453,7 +453,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @GET
   @Path("profiles.xml")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "profiles", description = "Retrieve the encoding profiles", pathParameters = { }, restParameters = { }, reponses = { @RestResponse(description = "Results in an xml document describing the available encoding profiles", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(name = "profiles", description = "Retrieve the encoding profiles", reponses = { @RestResponse(description = "Results in an xml document describing the available encoding profiles", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public EncodingProfileList listProfiles() {
     List<EncodingProfileImpl> list = new ArrayList<EncodingProfileImpl>();
     for (EncodingProfile p : composerService.listProfiles()) {
@@ -461,11 +461,11 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
     }
     return new EncodingProfileList(list);
   }
-  
+
   @GET
   @Path("profile/{id}.xml")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "profilesID", description = "Retrieve an encoding profile", pathParameters = { @RestParameter(name = "id", description = "the profile ID", isRequired = false, type = RestParameter.Type.STRING) }, restParameters = { }, reponses = { @RestResponse(description = "Results in an xml document describing the requested encoding profile", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(name = "profilesID", description = "Retrieve an encoding profile", pathParameters = { @RestParameter(name = "id", description = "the profile ID", isRequired = false, type = RestParameter.Type.STRING) }, reponses = { @RestResponse(description = "Results in an xml document describing the requested encoding profile", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response getProfile(@PathParam("id") String profileId) throws NotFoundException {
     EncodingProfileImpl profile = (EncodingProfileImpl) composerService.getProfile(profileId);
     if (profile == null)
@@ -484,6 +484,16 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return (JobProducer) composerService;
     else
       return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
+   */
+  @Override
+  public ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
   }
 
   /**

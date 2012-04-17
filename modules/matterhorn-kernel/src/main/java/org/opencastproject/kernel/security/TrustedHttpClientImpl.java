@@ -15,6 +15,7 @@
  */
 package org.opencastproject.kernel.security;
 
+import static org.opencastproject.kernel.rest.CurrentJobFilter.CURRENT_JOB_HEADER;
 import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint.DIGEST_AUTH;
 import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER;
 
@@ -22,6 +23,7 @@ import org.opencastproject.kernel.http.api.HttpClient;
 import org.opencastproject.kernel.http.impl.HttpClientFactory;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
@@ -121,6 +123,8 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   /** The maximum amount of time in seconds to wait in addition to the RETRY_BASE_DELAY. */
   private int retryMaximumVariableTime = 300;
 
+  private ServiceRegistry serviceRegistry = null;
+
   public void activate(ComponentContext cc) {
     logger.debug("activate");
     user = cc.getBundleContext().getProperty(DIGEST_AUTH_USER_KEY);
@@ -142,6 +146,16 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     } catch (Exception e) {
       logger.warn("Unable to register {} as an mbean: {}", this, e);
     }
+  }
+
+  /**
+   * Sets the service registry.
+   * 
+   * @param serviceRegistry
+   *          the serviceRegistry to set
+   */
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
   }
 
   /**
@@ -193,12 +207,11 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
       result = Integer.parseInt(StringUtils.trimToNull(stringValue));
     } catch (Exception e) {
       if (cc != null && cc.getBundleContext() != null && cc.getBundleContext().getProperty(key) != null) {
-        logger.warn("Unable to get property with key " + key + " with value "
-                + cc.getBundleContext().getProperty(key) + " so using default of " + defaultValue + " because of "
-                + e.getMessage());
+        logger.warn("Unable to get property with key " + key + " with value " + cc.getBundleContext().getProperty(key)
+                + " so using default of " + defaultValue + " because of " + e.getMessage());
       } else {
-        logger.warn("Unable to get property with key " + key + " so using default of " + defaultValue
-                + " because of " + e.getMessage());
+        logger.warn("Unable to get property with key " + key + " so using default of " + defaultValue + " because of "
+                + e.getMessage());
       }
       result = defaultValue;
     }
@@ -237,7 +250,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     this.user = user;
     this.pass = pass;
   }
-  
+
   /** Creates a new HttpClient to use to make requests. */
   public HttpClient makeHttpClient() throws TrustedHttpClientException {
     if (httpClientFactory == null) {
@@ -246,7 +259,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     }
     return httpClientFactory.makeHttpClient();
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -263,7 +276,10 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     HttpClient httpClient = makeHttpClient();
     httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connectionTimeout);
     // Add the request header to elicit a digest auth response
-    httpUriRequest.addHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
+    httpUriRequest.setHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
+
+    if (serviceRegistry != null && serviceRegistry.getCurrentJob() != null)
+      httpUriRequest.setHeader(CURRENT_JOB_HEADER, Long.toString(serviceRegistry.getCurrentJob().getId()));
 
     if ("GET".equalsIgnoreCase(httpUriRequest.getMethod()) || "HEAD".equalsIgnoreCase(httpUriRequest.getMethod())) {
       // Set the user/pass
@@ -385,7 +401,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
       throw new IllegalStateException("Can not create a new " + httpUriRequest.getClass().getName());
     }
     digestRequest.setURI(httpUriRequest.getURI());
-    digestRequest.addHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
+    digestRequest.setHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
     String[] realmAndNonce = getRealmAndNonce(digestRequest);
 
     if (realmAndNonce != null) {
@@ -399,7 +415,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
       // Add the authentication header
       try {
-        httpUriRequest.addHeader(digestAuth.authenticate(creds, httpUriRequest));
+        httpUriRequest.setHeader(digestAuth.authenticate(creds, httpUriRequest));
       } catch (Exception e) {
         // close the http connection(s)
         httpClient.getConnectionManager().shutdown();
@@ -501,14 +517,14 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   }
 
   /**
-   * @return The minimum amount of time to wait in seconds after a nonce timeout before retrying. 
+   * @return The minimum amount of time to wait in seconds after a nonce timeout before retrying.
    */
   public int getRetryBaseDelay() {
     return retryBaseDelay;
   }
 
   /**
-   * @return The maximum amount of time to wait in seconds after a nonce timeout in addition to the base delay. 
+   * @return The maximum amount of time to wait in seconds after a nonce timeout in addition to the base delay.
    */
   public int getRetryMaximumVariableTime() {
     return retryMaximumVariableTime;
