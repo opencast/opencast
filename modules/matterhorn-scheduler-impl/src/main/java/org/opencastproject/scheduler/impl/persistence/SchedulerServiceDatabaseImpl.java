@@ -180,9 +180,11 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
    */
   @Override
   public void deleteEvent(long eventId) throws NotFoundException, SchedulerServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       EventEntity entity = em.find(EventEntity.class, eventId);
       if (entity == null) {
@@ -200,7 +202,8 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       logger.error("Could not delete series: {}", e.getMessage());
       throw new SchedulerServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -212,16 +215,19 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
   @SuppressWarnings("unchecked")
   @Override
   public DublinCoreCatalog[] getAllEvents() throws SchedulerServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    Query query = em.createNamedQuery("Event.findAll");
+    EntityManager em = null;
+    Query query = null;
     List<EventEntity> eventEntities = null;
     try {
+      em = emf.createEntityManager();
+      query = em.createNamedQuery("Event.findAll");
       eventEntities = (List<EventEntity>) query.getResultList();
     } catch (Exception e) {
       logger.error("Could not retrieve all events: {}", e.getMessage());
       throw new SchedulerServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
     List<DublinCoreCatalog> eventList = new LinkedList<DublinCoreCatalog>();
     try {
@@ -243,8 +249,9 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
    */
   @Override
   public Properties getEventMetadata(long eventId) throws NotFoundException, SchedulerServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
+    EntityManager em = null;
     try {
+      em = emf.createEntityManager();
       EventEntity entity = em.find(EventEntity.class, eventId);
       if (entity == null) {
         throw new NotFoundException("Could not found series with ID " + eventId);
@@ -260,7 +267,8 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       logger.error("Could not retrieve CA properties for event '{}': {}", eventId, e.getMessage());
       throw new SchedulerServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -284,9 +292,11 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       logger.error("Could not serialize Dublin Core: {}", e1);
       throw new SchedulerServiceDatabaseException(e1);
     }
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       EventEntity entity = em.find(EventEntity.class, eventId);
       if (entity == null) {
@@ -304,7 +314,8 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       logger.error("Could not store event: {}", e.getMessage());
       throw new SchedulerServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
 
   }
@@ -316,10 +327,11 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
    */
   @Override
   public void storeEvents(DublinCoreCatalog... events) throws SchedulerServiceDatabaseException {
-
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       for (DublinCoreCatalog event : events) {
         Long eventId = Long.parseLong(event.getFirst(DublinCore.PROPERTY_IDENTIFIER));
@@ -345,7 +357,8 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       logger.error("Could not store events: {}", e);
       throw new SchedulerServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 
@@ -368,9 +381,11 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       logger.error("Could not serialize properties: {}", e);
       throw new SchedulerServiceDatabaseException(e);
     }
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
+    EntityTransaction tx = null;
     try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
       tx.begin();
       EventEntity entity = em.find(EventEntity.class, eventId);
       if (entity == null) {
@@ -389,7 +404,8 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       logger.error("Could not store event metadata: {}", e.getMessage());
       throw new SchedulerServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
   }
 }

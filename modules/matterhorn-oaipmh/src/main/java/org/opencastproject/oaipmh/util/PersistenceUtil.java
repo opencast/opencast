@@ -35,11 +35,11 @@ public final class PersistenceUtil {
   }
 
   /**
-   * Create a new entity manager factory with the persistence unit name <code>emName</code>.
-   * A {@link PersistenceProvider} named <code>persistence</code> has to be registered as an OSGi service.
-   * If you want to configure the factory please also register a map containing all properties under
-   * the name <code>persistenceProps</code>. See {@link PersistenceProvider#createEntityManagerFactory(String, Map)}
-   * for more information about config maps.
+   * Create a new entity manager factory with the persistence unit name <code>emName</code>. A
+   * {@link PersistenceProvider} named <code>persistence</code> has to be registered as an OSGi service. If you want to
+   * configure the factory please also register a map containing all properties under the name
+   * <code>persistenceProps</code>. See {@link PersistenceProvider#createEntityManagerFactory(String, Map)} for more
+   * information about config maps.
    */
   public static EntityManagerFactory newEntityManagerFactory(ComponentContext cc, String emName) {
     PersistenceProvider persistenceProvider = (PersistenceProvider) cc.locateService("persistence");
@@ -52,16 +52,18 @@ public final class PersistenceUtil {
   /**
    * Create a new, concurrently usable persistence environment which uses JPA local transactions.
    * <p/>
-   * Please note that calling {@link PersistenceEnv#tx(Function)} always creates a <em>new</em> transaction.
-   * Transaction propagation is <em>not</em> supported.
+   * Please note that calling {@link PersistenceEnv#tx(Function)} always creates a <em>new</em> transaction. Transaction
+   * propagation is <em>not</em> supported.
    */
   public static PersistenceEnv newPersistenceEnvironment(final EntityManagerFactory emf) {
     return new PersistenceEnv() {
       @Override
       public <A> A tx(Function<EntityManager, A> transactional) {
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
+        EntityManager em = null;
+        EntityTransaction tx = null;
         try {
+          em = emf.createEntityManager();
+          tx = em.getTransaction();
           tx.begin();
           A ret = transactional.apply(em);
           tx.commit();
@@ -71,9 +73,10 @@ public final class PersistenceUtil {
             tx.rollback();
           }
           // propagate exception
-          throw(e);
+          throw (e);
         } finally {
-          em.close();
+          if (em != null)
+            em.close();
         }
       }
 
