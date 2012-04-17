@@ -114,6 +114,7 @@ Videodisplay = (function ()
       if (initialized())
       {
         var v = b_Videodisplay_root.play();
+	  v = b_Videodisplay_root.play();
         return v;
       }
     }
