@@ -198,7 +198,7 @@ public abstract class AbstractJobProducer implements JobProducer {
         job.setStatus(Status.FINISHED);
       } catch (JobCanceledException e) {
         logger.info(e.getMessage());
-      } catch (Exception e) {
+      } catch (Throwable e) {
         job.setStatus(Status.FAILED);
         if (e instanceof ServiceRegistryException)
           throw (ServiceRegistryException) e;
