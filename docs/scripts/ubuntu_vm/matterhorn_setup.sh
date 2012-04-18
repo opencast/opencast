@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Initialization
-INST_DIR=/home/opencast
-CONF_DIR=/opt/matterhorn/felix/conf
+CONF_DIR=/opt/matterhorn/felix/etc
 MOTD_FILE=/etc/motd.tail
 MY_OS=`uname -sr`
 
@@ -22,8 +21,8 @@ cat >&1 <<END
 **
 ** Matterhorn is installed in:
 **    Home:    /opt/matterhorn/felix
-**    Bundles: /opt/matterhorn/felix/matterhorn
-**    Config:  /opt/matterhorn/felix/conf
+**    Bundles: /opt/matterhorn/felix/lib/matterhorn
+**    Config:  /opt/matterhorn/felix/etc
 **
 ** For further information, please visit
 **   http://www.opencastproject.org
@@ -45,7 +44,7 @@ start_mh ()
   FELIX=felix
   FELIX_DIR=/opt/matterhorn/$FELIX
 
-  cd $INST_DIR
+  cd
   sudo update-rc.d matterhorn defaults
   sudo service matterhorn start
 
@@ -55,8 +54,8 @@ start_mh ()
   echo "**" | sudo tee -a $MOTD_FILE
   echo "** Matterhorn is installed in:" | sudo tee -a $MOTD_FILE
   echo "**    Home:    /opt/matterhorn/felix" | sudo tee -a $MOTD_FILE
-  echo "**    Bundles: /opt/matterhorn/felix/matterhorn" | sudo tee -a $MOTD_FILE
-  echo "**    Config:  /opt/matterhorn/felix/conf" | sudo tee -a $MOTD_FILE
+  echo "**    Bundles: /opt/matterhorn/felix/lib/matterhorn" | sudo tee -a $MOTD_FILE
+  echo "**    Config:  /opt/matterhorn/felix/etc" | sudo tee -a $MOTD_FILE
   echo "********************************************" | sudo tee -a $MOTD_FILE
 
 }

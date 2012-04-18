@@ -4,7 +4,7 @@
 #    UBUNTU_MIRROR=http://aifile.usask.ca/apt-mirror/mirror/archive.ubuntu.com/ubuntu/ ./buildvm.sh
 
 HOME=`pwd`
-MATTERHORN_SVN="http://opencast.jira.com/svn/MH/branches/1.4.x/"
+MATTERHORN_SVN="http://opencast.jira.com/svn/MH/trunk/"
 #check for existance of mirror URL
 if [ "$UBUNTU_MIRROR" = "" ];
   then
@@ -15,10 +15,6 @@ echo "Using ubuntu mirror at: $UBUNTU_MIRROR"
 USERNAME="opencast"
 PASSWORD="matterhorn"
 RELEASE="lucid"
-FELIX_ARCHIVE_URL="http://archive.apache.org/dist/felix/org.apache.felix.main.distribution-3.2.2.tar.gz"
-#NOTE:  THESE TWO MUST MATCH IN VERSION NUMBERS, OTHERWISE THINGS *WILL* BREAK
-#TODO:  Build the felix version from the felix url
-FELIX_VERSION="felix-framework-3.2.2"
 
 export M2=`pwd`/m2/
 export JAVA_HOME=`mvn --version | grep "Java home" | awk '{print $3}'`
@@ -54,7 +50,6 @@ if [ "$1" = "clean" ]; then
   sudo rm -rf vmbackup/
   sudo rm -rf m2/
   sudo rm -rf matterhorn_trunk/
-  sudo rm -rf felix-framework*
 fi
 sudo rm -rf ubuntu-vmw6/
 sudo rm -rf mnt
@@ -76,7 +71,7 @@ if [ ! -e vmbackup ]; then
   --addpkg acpid \
   --addpkg openjdk-6-jdk --addpkg gstreamer0.10-plugins* \
   --addpkg gstreamer0.10-ffmpeg --addpkg gstreamer-tools \
-  --addpkg wget --addpkg ntp --addpkg nano
+  --addpkg wget --addpkg ntp --addpkg nano --addpkg subversion
 
   echo "change the vm to use nat networking instead of bridged"
   sed -i 's/bridged/nat/g' ubuntu-vmw6/opencast.vmx
@@ -88,7 +83,7 @@ fi
 
 #mount the vm image
 mkdir mnt
-#Yay, *.vmdk.  The script now uses the random directory directory name as the output vmdk name...
+#Yay, *.vmdk.  The script now uses the random file name as the output vmdk name...
 sudo vmware-mount ubuntu-vmw6/*.vmdk 1 mnt
 if [ $? -ne 0 ]
  then
@@ -114,7 +109,7 @@ sudo mv sources.list mnt/etc/apt/sources.list
 
 sudo ln -s /opt/matterhorn/felix/bin/start_matterhorn.sh mnt/home/$USERNAME/startup.sh
 sudo ln -s /opt/matterhorn/felix/bin/shutdown_matterhorn.sh mnt/home/$USERNAME/shutdown.sh
-sudo ln -s /opt/matterhorn/felix/bin/matterhorn_init_d.sh mnt/etc/init.d/matterhorn
+sudo ln -s /opt/matterhorn/felix/docs/scripts/init/matterhorn_init_d.sh mnt/etc/init.d/matterhorn
 
 sudo mkdir mnt/opt/matterhorn
 
@@ -124,21 +119,6 @@ sudo sed -i "s'OC_URL=.*$'OC_URL=$MATTERHORN_SVN'" mnt/home/$USERNAME/matterhorn
 sudo echo "if [ -e /home/$USERNAME/matterhorn_setup.sh -a ! -e /home/$USERNAME/.matterhorn_setup.complete ]; then" >> mnt/home/$USERNAME/.bashrc
 sudo echo "  /home/$USERNAME/matterhorn_setup.sh && touch /home/$USERNAME/.matterhorn_setup.complete" >> mnt/home/$USERNAME/.bashrc
 sudo echo "fi" >> mnt/home/$USERNAME/.bashrc
-
-echo "============================"
-echo "==Installing Apache Felix==="
-echo "============================"
-
-if [ ! -e `basename $FELIX_ARCHIVE_URL` ]; then
-  wget $FELIX_ARCHIVE_URL
-fi 
-
-if [ ! -e $FELIX_VERSION ]; then
-  tar -xzf `basename $FELIX_ARCHIVE_URL`
-fi
-
-#copy felix files to vm
-sudo cp -r $FELIX_VERSION mnt/opt/matterhorn/felix
 
 echo "=========================="
 echo "=====Fetching Opencast===="
@@ -151,15 +131,16 @@ if [ -e matterhorn_source ]; then
   cd ..
 else
   svn co $MATTERHORN_SVN matterhorn_source
+  #Workaround until inbox is added by default
+  mkdir matterhorn_source/inbox
 fi
 
 sudo cp -r matterhorn_source mnt/opt/matterhorn/
+sudo ln -s /opt/matterhorn/matterhorn_source mnt/opt/matterhorn/felix
 
 #Nuke the existing config
-sudo rm -rf mnt/opt/matterhorn/felix/conf
-sudo svn co --force $MATTERHORN_SVN/docs/felix/ mnt/opt/matterhorn/felix/
-sudo sed -i "s/\$USER/$USERNAME/g" mnt/opt/matterhorn/felix/bin/matterhorn_init_d.sh
-sudo chown -R $USER:$USER mnt/opt/matterhorn/felix
+sudo sed -i "s/\$USER/$USERNAME/g" mnt/opt/matterhorn/matterhorn_source/docs/scripts/init/matterhorn_init_d.sh
+sudo chown -R $USER:$USER mnt/opt/matterhorn/matterhorn_source
 export OC_REV=`svn info matterhorn_source | awk /Revision/ | cut -d " " -f 2`
 
 echo "=========================="
@@ -169,7 +150,7 @@ echo "=========================="
 #get maven to update whatever dependancies we might have for opencast
 cd matterhorn_source
 export MAVEN_OPTS='-Xms256m -Xmx960m -XX:PermSize=64m -XX:MaxPermSize=150m'
-mvn install -fn -DskipTests -Dmaven.repo.local=$M2/repository -DdeployTo=$HOME/mnt/opt/matterhorn/felix/matterhorn -P admin,dist,engage,worker,workspace,serviceregistry,directory-db,capture,oaipmh,export,gstreamer-launch-service
+mvn install -U -DskipTests -Dmaven.repo.local=$M2/repository -DdeployTo=$HOME/mnt/opt/matterhorn/matterhorn_source -P admin,dist,engage,worker,workspace,serviceregistry,directory-db,capture,oaipmh,export,gstreamer-launch-service
 cd ..
 
 #copy the maven repo across
@@ -192,17 +173,12 @@ echo "export OC=/opt/matterhorn" >> mnt/home/$USERNAME/.bashrc
 echo "export MATTERHORN_HOME=/opt/matterhorn" >> mnt/home/$USERNAME/.bashrc
 echo "export FELIX_HOME=\$MATTERHORN_HOME/felix" >> mnt/home/$USERNAME/.bashrc
 echo "export M2_REPO=/home/$USERNAME/.m2/repository" >> mnt/home/$USERNAME/.bashrc
-echo "export OC_URL=http://opencast.jira.com/svn/MH/trunk/" >> mnt/home/$USERNAME/.bashrc
-echo "export FELIX_URL=$FELIX_ARCHIVE_URL" >> mnt/home/$USERNAME/.bashrc
-echo "export JAVA_HOME=/usr/lib/jvm/java-6-sun" >> mnt/home/$USERNAME/.bashrc
+echo "export OC_URL=$MATTERHORN_SVN" >> mnt/home/$USERNAME/.bashrc
+echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> mnt/home/$USERNAME/.bashrc
 echo "export MAVEN_OPTS=\"-Xms256m -Xmx512m -XX:PermSize=64m -XX:MaxPermSize=128m\"" >> mnt/home/$USERNAME/.bashrc
 
 #lets set opencast to own her files
 sudo chown -R 1000:1000 mnt/home/$USERNAME
-
-#Let's preseve the felix version in the directory name, and also provide a symlink for ease of use
-sudo mv mnt/opt/matterhorn/felix mnt/opt/matterhorn/$FELIX_VERSION
-ln -s /opt/matterhorn/$FELIX_VERSION mnt/opt/matterhorn/felix
 
 #unmount the vm disk image and cleanup
 sudo vmware-mount -d mnt
@@ -219,10 +195,15 @@ mv ubuntu-vmw6/*.vmdk ubuntu-vmw6/disk0.vmdk
 sed -i "s/ide0:0.fileName =.*/ide0:0.fileName = \"disk0.vmdk\"/" ubuntu-vmw6/opencast.vmx
 sudo chown -R `id -u`:`id -g` ubuntu-vmw6
 mv ubuntu-vmw6 opencast-$OC_REV
+echo "Console Username: $USERNAME" > opencast-$OC_REV/README
+echo "Console Password: $PASSWORD" >> opencast-$OC_REV/README
 zip -db -r -9 opencast-$OC_REV.zip opencast-$OC_REV
 7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on opencast-$OC_REV.7z opencast-$OC_REV
-rm -rf opencast-$OC_REV
 
-#copy it to the web
-#scp opencast-$OC_REV.zip cab938@aries:/var/www/opencast/unofficial-vms/
+echo "==========================================================="
+echo "================Compression Complete, signing=============="
+echo "=====This is optional, kill the process to skip signing===="
+echo "==========================================================="
 
+gpg --armor -b opencast-$OC_REV.zip
+gpg --armor -b opencast-$OC_REV.7z
