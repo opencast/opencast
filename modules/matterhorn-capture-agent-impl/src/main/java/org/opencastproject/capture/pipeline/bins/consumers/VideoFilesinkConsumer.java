@@ -15,6 +15,7 @@
  */
 package org.opencastproject.capture.pipeline.bins.consumers;
 
+import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.pipeline.bins.CaptureDevice;
 import org.opencastproject.capture.pipeline.bins.CaptureDeviceNullPointerException;
 import org.opencastproject.capture.pipeline.bins.GStreamerElementFactory;
@@ -218,8 +219,9 @@ public class VideoFilesinkConsumer extends ConsumerBin {
    *          The name of the property to set.
    **/
   private void setEncoderProperty(String key) {
-    if (captureDevice.getProperties().containsKey(key)) {
-      encoder.set(key, captureDevice.getProperties().getProperty(key));
+    String fullPropertiesKey = CaptureParameters.CAPTURE_DEVICE_PREFIX + captureDevice.getFriendlyName() + "." + key;
+    if (properties.containsKey(fullPropertiesKey)) {
+      encoder.set(key, properties.get(fullPropertiesKey));
     }
   }
   
