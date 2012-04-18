@@ -7,10 +7,10 @@
 if [ -z "$FELIX_HOME" ]; then
   PWD=`pwd`
   if [ -f "$PWD/bin/felix.jar" ]; then
-	export FELIX_HOME="$PWD"
+	  export FELIX_HOME="$PWD"
   else
-	echo "FELIX_HOME is not set"
-	exit 1
+	  echo "FELIX_HOME is not set"
+	  exit 1
   fi
 fi
 
@@ -39,18 +39,27 @@ DEBUG_OPTS="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=$DEBUG_PORT,
 ##
 
 MAVEN_ARG="-DM2_REPO=$M2_REPO"
-FELIX_WORK_DIR="$FELIX_HOME/work"
+
 FELIX_CONFIG_DIR="$FELIX_HOME/etc"
-FELIX_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$FELIX_CONFIG_DIR/load"
-FELIX_OPTS="-Dfelix.home=$FELIX_HOME -Dfelix.work=$FELIX_WORK_DIR"
+FELIX_WORK_DIR="$FELIX_HOME/work"
+
+FELIX="-Dfelix.home=$FELIX_HOME"
+FELIX_WORK="-Dfelix.work=$FELIX_WORK_DIR"
 FELIX_CONFIG_OPTS="-Dfelix.config.properties=file:${FELIX_CONFIG_DIR}/config.properties -Dfelix.system.properties=file:${FELIX_CONFIG_DIR}/system.properties"
+FELIX_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$FELIX_CONFIG_DIR/load"
+
+FELIX_OPTS="$FELIX $FELIX_WORK $FELIX_CONFIG_OPTS $FELIX_FILEINSTALL_OPTS"
+
 PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX_CONFIG_DIR"
-MATTERHORN_LOGGING_OPTS="-Dopencast.logdir=$LOGDIR"
+
 PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN"
+MATTERHORN_LOGGING_OPTS="-Dopencast.logdir=$LOGDIR"
 ECLIPSELINK_LOGGING_OPTS="-Declipselink.logging.level=SEVERE"
-UTIL_LOGGING_OPTS="-Djava.util.logging.config.file=$FELIX_HOME/conf/services/java.util.logging.properties"
+UTIL_LOGGING_OPTS="-Djava.util.logging.config.file=$FELIX_CONFIG_DIR/services/java.util.logging.properties"
+
+LOG_OPTS="$PAX_LOGGING_OPTS $MATTERHORN_LOGGING_OPTS $ECLIPSELINK_LOGGING_OPTS $UTIL_LOGGING_OPTS"
+
 GRAPHICS_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
-TEMP_OPTS="-Djava.io.tmpdir=/tmp"
 JAVA_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
 
 #!/bin/sh
@@ -78,4 +87,4 @@ fi
 
 # Finally start felix
 cd "$FELIX_HOME"
-java $DEBUG_OPTS $GRAPHICS_OPTS "$TEMP_OPTS" $FELIX_OPTS $FELIX_CONFIG_OPTS $MAVEN_ARG $JAVA_OPTS "$FELIX_FILEINSTALL_OPTS" "$PAX_CONFMAN_OPTS" $PAX_LOGGING_OPTS $ECLIPSELINK_LOGGING_OPTS "$MATTERHORN_LOGGING_OPTS" "$UTIL_LOGGING_OPTS" -jar "$FELIX_HOME/bin/felix.jar" "$FELIX_CACHE"
+java $DEBUG_OPTS $FELIX_OPTS $GRAPHICS_OPTS $MAVEN_ARG $JAVA_OPTS $PAX_CONFMAN_OPTS $LOG_OPTS -jar "$FELIX_HOME/bin/felix.jar" "$FELIX_CACHE"
