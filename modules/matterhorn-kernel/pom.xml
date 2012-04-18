@@ -135,6 +135,12 @@
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-bundle-jaxrs</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.apache.geronimo.javamail</groupId>
+      <artifactId>geronimo-javamail_1.4_provider</artifactId>
+      <version>1.8.3</version>
+	</dependency>
 
     <!-- Logging -->
 
@@ -187,14 +193,21 @@
             <Embed-Dependency>
               spring-security-oauth;inline=true,
               jboss-xacml;inline=true,
-              json-simple;inline=true
+              json-simple;inline=true,
+              geronimo-javamail_1.4_provider;inline=true
             </Embed-Dependency>
             <Private-Package>
               org.jboss.security.xacml.core,
-              org.jboss.security.xacml.core.model.policy
+              org.jboss.security.xacml.core.model.policy,
+              org.apache.geronimo.javamail,
             </Private-Package>
             <Import-Package>
               javax.activation,
+              javax.mail;version=1.4,
+              javax.mail.event;version=1.4,
+              javax.mail.internet;version=1.4,
+              javax.mail.search;version=1.4,
+              javax.mail.util;version=1.4,
               javax.servlet;version=2.5,
               javax.servlet.http;version=2.5,
               javax.xml.stream,
@@ -281,6 +294,7 @@
               org.opencastproject.kernel.http;version=${project.version},
               org.opencastproject.kernel.http.api;version=${project.version},
               org.opencastproject.kernel.http.impl;version=${project.version},
+              org.opencastproject.kernel.mail;version=${project.version},
               org.opencastproject.kernel.pingback;version=${project.version},
               org.opencastproject.kernel.rest;version=${project.version},
               org.opencastproject.kernel.security;version=${project.version},
@@ -304,6 +318,7 @@
               OSGI-INF/pingback.xml,
               OSGI-INF/rest.xml,
               OSGI-INF/security-service.xml,
+              OSGI-INF/smtp-service.xml,
               OSGI-INF/user-and-role-directory-service.xml,
               OSGI-INF/security-config-scanner.xml
             </Service-Component>
