@@ -1433,9 +1433,9 @@
     <developer>
       <id>twunden</id>
       <name>Tobias Wunden</name>
-      <email>tobias.wunden@id.ethz.ch</email>
-      <organization>ETH Zürich</organization>
-      <organizationUrl>http://www.ethz.ch</organizationUrl>
+      <email>tobias@entwinemedia.com</email>
+      <organization>Entwine</organization>
+      <organizationUrl>http://entwinemedia.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1543,7 +1543,8 @@
       <id>cedriessen</id>
       <name>Christoph Driessen</name>
       <email>christoph@entwinemedia.com</email>
-      <url>http://entwinemedia.com</url>
+      <organization>Entwine</organization>
+      <organizationUrl>http://entwinemedia.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1597,6 +1598,17 @@
       <id>lrohner</id>
       <name>Lukas Rohner</name>
       <email>lukas@entwinemedia.com</email>
+      <organization>Entwine</organization>
+      <organizationUrl>http://entwinemedia.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>xavier.butty</id>
+      <name>Xavier Butty</name>
+      <email>xavier@entwinemedia.com</email>
       <organization>Entwine</organization>
       <organizationUrl>http://entwinemedia.com</organizationUrl>
       <roles>
