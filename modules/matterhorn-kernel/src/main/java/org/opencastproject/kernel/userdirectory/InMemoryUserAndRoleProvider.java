@@ -122,4 +122,14 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
     return ALL_ORGANIZATIONS;
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
+   */
+  @Override
+  public String[] getRolesForUser(String userName) {
+    return new String[0];
+  }
+
 }

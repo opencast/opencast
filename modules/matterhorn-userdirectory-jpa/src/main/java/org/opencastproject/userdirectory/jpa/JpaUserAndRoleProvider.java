@@ -371,4 +371,14 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     return getClass().getName();
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
+   */
+  @Override
+  public String[] getRolesForUser(String userName) {
+    return new String[0];
+  }
+
 }
