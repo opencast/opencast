@@ -175,6 +175,13 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
         authorities.add(new GrantedAuthorityImpl(role));
       }
 
+      // Add additional roles from role providers
+      for (RoleProvider roleProvider : roleProviders) {
+        String[] rolesForUser = roleProvider.getRolesForUser(userName);
+        for (String role : rolesForUser)
+          authorities.add(new GrantedAuthorityImpl(role));
+      }
+
       authorities.add(new GrantedAuthorityImpl(securityService.getOrganization().getAnonymousRole()));
       String password = user.getPassword() == null ? "" : user.getPassword();
       return new org.springframework.security.core.userdetails.User(user.getUserName(), password, true, true, true,

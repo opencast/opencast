@@ -28,6 +28,15 @@ public interface RoleProvider {
   String[] getRoles();
 
   /**
+   * Returns the roles for this user or an empty array if no roles are applicable.
+   * 
+   * @param userName
+   *          the user id
+   * @return the set of roles
+   */
+  String[] getRolesForUser(String userName);
+
+  /**
    * Returns the identifier for the organization that is defining this set of roles.
    * 
    * @return the defining organization
