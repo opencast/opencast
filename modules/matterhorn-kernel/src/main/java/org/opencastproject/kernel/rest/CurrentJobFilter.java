@@ -76,19 +76,35 @@ public class CurrentJobFilter implements Filter {
           ServletException {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
     HttpServletResponse httpResponse = (HttpServletResponse) response;
+    try {
+      setCurrentJob(httpRequest, httpResponse);
+      chain.doFilter(httpRequest, httpResponse);
+    } finally {
+      serviceRegistry.setCurrentJob(null);
+    }
+  }
+
+  /**
+   * Sets the current job on the new thread
+   * 
+   * @param httpRequest
+   *          the HTTP request
+   * @param httpResponse
+   *          the HTTP response
+   * @throws IOException
+   *           if the error response was not able to be sent
+   */
+  private void setCurrentJob(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
     String currentJobId = httpRequest.getHeader(CURRENT_JOB_HEADER);
     try {
       if (StringUtils.isNotBlank(currentJobId)) {
         Job currentJob = serviceRegistry.getJob(Long.parseLong(currentJobId));
         serviceRegistry.setCurrentJob(currentJob);
       }
-      chain.doFilter(httpRequest, httpResponse);
     } catch (Exception e) {
       logger.error("Was not able to set the current job id {} to the service registry", currentJobId);
       httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
               "Was not able to set the current job id {} to the service registry" + currentJobId);
-    } finally {
-      serviceRegistry.setCurrentJob(null);
     }
   }
 
