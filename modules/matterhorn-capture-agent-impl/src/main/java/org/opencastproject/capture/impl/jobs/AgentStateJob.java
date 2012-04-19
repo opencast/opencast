@@ -16,6 +16,7 @@
 package org.opencastproject.capture.impl.jobs;
 
 import org.opencastproject.capture.CaptureParameters;
+import org.opencastproject.capture.admin.api.RecordingState;
 import org.opencastproject.capture.api.AgentRecording;
 import org.opencastproject.capture.api.StateService;
 import org.opencastproject.capture.impl.ConfigurationManager;
@@ -152,12 +153,18 @@ public class AgentStateJob implements Job {
 
     // For each recording being tracked by the system send an update
     Map<String, AgentRecording> recordings = state.getKnownRecordings();
+    
     for (Entry<String, AgentRecording> e : recordings.entrySet()) {
-      List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-      formParams.add(new BasicNameValuePair("state", e.getValue().getState()));
-      logger.debug("#" + statePushCount + " - Sending recording {}'s state: {}.", e.getKey(), e.getValue().getState());
-      String myURL = url + e.getKey();
-      send(formParams, myURL);
+      if (!RecordingState.WORKFLOW_IGNORE_STATES.contains(e.getValue().getState())) { 
+        List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+        formParams.add(new BasicNameValuePair("state", e.getValue().getState()));
+        logger.debug("#" + statePushCount + " - Sending recording {}'s state: {}.", e.getKey(), e.getValue().getState());
+        String myURL = url + e.getKey();
+        send(formParams, myURL);
+      } else {
+        logger.debug("#" + statePushCount + " - Skipping recording {}'s state: {}.", e.getKey(), e.getValue()
+                .getState());
+      }
     }
   }
 
