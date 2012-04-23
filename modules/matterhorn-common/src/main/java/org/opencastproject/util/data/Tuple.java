@@ -16,13 +16,14 @@
 
 package org.opencastproject.util.data;
 
-/**
- * A pair.
- */
-public class Tuple<A, B> {
+import static org.opencastproject.util.EqualsUtil.eqClasses;
+import static org.opencastproject.util.EqualsUtil.hash;
 
-  private A a;
-  private B b;
+/** A pair. */
+public final class Tuple<A, B> {
+
+  private final A a;
+  private final B b;
 
   public Tuple(A a, B b) {
     this.a = a;
@@ -35,6 +36,19 @@ public class Tuple<A, B> {
 
   public B getB() {
     return b;
+  }
+
+  @Override
+  public boolean equals(Object that) {
+    if (this == that) return true;
+    if (!eqClasses(this, that)) return false;
+    Tuple thatc = (Tuple) that;
+    return a.equals(thatc.a) && b.equals(thatc.b);
+  }
+
+  @Override
+  public int hashCode() {
+    return hash(a, b);
   }
 
   public static <A, B> Tuple<A, B> tuple(A a, B b) {

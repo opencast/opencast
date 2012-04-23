@@ -32,6 +32,8 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Set;
 
+import static org.opencastproject.util.data.Option.some;
+
 /**
  * This class provides functions to ease and secure the handling of collections by supporting a type safe
  * -- at least to the extent Java's type system allows -- immutable and more functional style. You'll
@@ -155,7 +157,7 @@ public final class Collections {
   /** Returns the first element in <code>as</code> that satisfies a predicate <code>p</code>. */
   public static <A> Option<A> find(Collection<A> as, Predicate<A> p) {
     for (A x : as) {
-      if (p.apply(x)) return Option.some(x);
+      if (p.apply(x)) return some(x);
     }
     return Option.none();
   }
@@ -171,7 +173,7 @@ public final class Collections {
   /** Return the head of list <code>as</code> or <code>none</code>. */
   public static <A> Option<A> head(List<A> as) {
     if (!as.isEmpty()) {
-      return Option.some(as.get(0));
+      return some(as.get(0));
     } else {
       return Option.none();
     }
@@ -180,7 +182,7 @@ public final class Collections {
   /** Return the head of array <code>as</code> or <code>none</code>. */
   public static <A> Option<A> head(A[] as) {
     if (as.length > 0) {
-      return Option.some(as[0]);
+      return some(as[0]);
     } else {
       return Option.none();
     }
@@ -236,7 +238,7 @@ public final class Collections {
     return x;
   }
 
-  /** Create a new array by prepending <code>a</code> to <code>as</code>: <code>[a, as0, as1, .. asn]</code>*/
+  /** Create a new array by prepending <code>a</code> to <code>as</code>: <code>[a, as0, as1, .. asn]</code> */
   public static <A> A[] cons(A a, A[] as) {
     A[] x = (A[]) Array.newInstance(a.getClass(), as.length + 1);
     x[0] = a;
@@ -244,7 +246,7 @@ public final class Collections {
     return x;
   }
 
-  /** Create a new array by appending <code>a</code> to <code>as</code>: <code>[as0, as1, .. asn, a]</code>.*/
+  /** Create a new array by appending <code>a</code> to <code>as</code>: <code>[as0, as1, .. asn, a]</code>. */
   public static <A> A[] append(A[] as, A a) {
     List<A> xs = new ArrayList<A>(as.length + 1);
     xs.add(a);
@@ -252,13 +254,20 @@ public final class Collections {
     return (A[]) xs.toArray(new Object[xs.size()]);
   }
 
-  /**
-   * Drain all elements of <code>as</code> into a list.
-   */
-  public static <A> List<A> list(Iterator<A> as) {
+  /** Drain all elements of <code>as</code> into a list. */
+  public static <A> List<A> toList(Iterator<A> as) {
     List<A> ax = new ArrayList<A>();
     while (as.hasNext()) {
       ax.add(as.next());
+    }
+    return ax;
+  }
+
+  /** Drain all elements of <code>as</code> into a list. */
+  public static <A> List<A> toList(Collection<A> as) {
+    List<A> ax = new ArrayList<A>();
+    for (A a : as) {
+      ax.add(a);
     }
     return ax;
   }
@@ -281,7 +290,7 @@ public final class Collections {
   }
 
   /** Create a set from a list. */
-  public static <A> Set<A> set(List<A> as) {
+  public static <A> Set<A> toSet(List<A> as) {
     Set<A> r = new HashSet<A>(as.size());
     for (A a : as) r.add(a);
     return r;
@@ -319,10 +328,8 @@ public final class Collections {
     return as;
   }
 
-  /**
-   * Create an array from a list.
-   */
-  public static <A> A[] array(List<A> a) {
+  /** Create an array from a list. */
+  public static <A> A[] toArray(List<A> a) {
     return (A[]) a.toArray(new Object[a.size()]);
   }
 
@@ -511,12 +518,38 @@ public final class Collections {
     };
   }
 
+  /** Create a function that checks if its argument is contained in <code>as</code>. */
+  public static <A> Function<A, Boolean> containedIn(final List<A> as) {
+    return new Function<A, Boolean>() {
+      @Override public Boolean apply(A a) {
+        return as.contains(a);
+      }
+    };
+  }
+
+  /** Curried version of {@link List#contains(Object)}. */
+  public static <A> Function<List<A>, Function<A, Boolean>> containedIn() {
+    return new Function<List<A>, Function<A, Boolean>>() {
+      @Override public Function<A, Boolean> apply(final List<A> as) {
+        return containedIn(as);
+      }
+    };
+  }
+
   public static <A> Function<Option<A>, A> getOrElse(final A a) {
     return new Function<Option<A>, A>() {
-      @Override
-      public A apply(Option<A> ao) {
+      @Override public A apply(Option<A> ao) {
         return ao.getOrElse(a);
       }
     };
+  }
+
+  /** Sequence a collection of collections by concatenating them all. */
+  public static <A, M1 extends Collection<A>, M2 extends Collection<M1>> List<A> sequence(M2 as) {
+    final List<A> target = new ArrayList<A>(as.size());
+    for (M1 a : as) {
+      target.addAll(a);
+    }
+    return target;
   }
 }

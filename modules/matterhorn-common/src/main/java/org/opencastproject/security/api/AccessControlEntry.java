@@ -114,7 +114,7 @@ public final class AccessControlEntry {
     StringBuilder sb = new StringBuilder(role).append(" is ");
     if (!allow)
       sb.append("not ");
-    sb.append("allowed ");
+    sb.append("allowed to ");
     sb.append(action);
     return sb.toString();
   }

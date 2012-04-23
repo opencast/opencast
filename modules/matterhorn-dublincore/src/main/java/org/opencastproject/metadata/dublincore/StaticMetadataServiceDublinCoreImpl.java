@@ -44,6 +44,7 @@ import static org.opencastproject.util.data.Collections.find;
 import static org.opencastproject.util.data.Collections.head;
 import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
 
 /**
  * This service provides {@link org.opencastproject.metadata.api.StaticMetadata} for a given mediapackage,
@@ -287,7 +288,7 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
     try {
       File f = workspace.get(catalog.getURI());
       in = new FileInputStream(f);
-      return Option.some((DublinCoreCatalog) new DublinCoreCatalogImpl(in));
+      return some((DublinCoreCatalog) new DublinCoreCatalogImpl(in));
     } catch (Exception e) {
       logger.warn("Unable to load metadata from catalog '{}'", catalog);
       return Option.none();

@@ -19,6 +19,7 @@ package org.opencastproject.metadata.dublincore;
 import org.opencastproject.mediapackage.EName;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -350,6 +351,11 @@ public interface DublinCore {
    * @return a list of values
    */
   List<DublinCoreValue> get(EName property);
+
+  /**
+   * Get all contained values grouped by property.
+   */
+  Map<EName, List<DublinCoreValue>> getValues();
 
   /**
    * Like {@link #get(EName, String)} but returns only the first value of the list. This method is intended to be a
