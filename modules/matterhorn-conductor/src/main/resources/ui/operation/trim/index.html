@@ -879,7 +879,7 @@
               $dcelm.text($field.val());
             } else {
               ocUtils.log("creating " + $field.attr('name') + " with value: " + $field.val());
-              $('<oc:' + $field.attr('name') + '>').text($field.val()).appendTo(DCmetadata.documentElement);
+              $('<dc:' + $field.attr('name') + '>').text($field.val()).appendTo(DCmetadata.documentElement);
             }
           }
         });
