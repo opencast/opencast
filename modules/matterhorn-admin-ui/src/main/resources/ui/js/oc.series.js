@@ -26,6 +26,7 @@ ocSeries.anonymous_role = "";
 var SERIES_SERVICE_URL = "/series";
 var SERIES_LIST_URL = "/admin/index.html#/series_list";
 var ANOYMOUS_URL = "/info/me.json";
+var DUBLINCORE_NS_URI     = 'http://purl.org/dc/terms/';
 var CREATE_MODE = 1;
 var EDIT_MODE   = 2;
 
@@ -57,12 +58,12 @@ ocSeries.init = function(){
   
   //Add folding action for hidden sections.
   $('.oc-ui-collapsible-widget .form-box-head').click(
-  function() {
-    $(this).children('.ui-icon').toggleClass('ui-icon-triangle-1-e');
-    $(this).children('.ui-icon').toggleClass('ui-icon-triangle-1-s');
-    $(this).next().toggle();
-    return false;
-  });
+    function() {
+      $(this).children('.ui-icon').toggleClass('ui-icon-triangle-1-e');
+      $(this).children('.ui-icon').toggleClass('ui-icon-triangle-1-s');
+      $(this).next().toggle();
+      return false;
+    });
     
   $('#additionalContentTabs').tabs();
   
@@ -252,57 +253,57 @@ ocSeries.loadSeries = function(data) {
 ocSeries.RegisterComponents = function(){
   //Core Metadata
   ocSeries.additionalComponents.title = new ocAdmin.Component(
-  ['title'],
-  {
-    label:'seriesLabel',
-    required:true
-  }
-);
+    ['title'],
+    {
+      label:'seriesLabel',
+      required:true
+    }
+    );
   
   ocSeries.additionalComponents.contributor = new ocAdmin.Component(
-  ['contributor'],
-  {
-    label:'contributorLabel'
-  }
-);
+    ['contributor'],
+    {
+      label:'contributorLabel'
+    }
+    );
   
   ocSeries.additionalComponents.creator = new ocAdmin.Component(
-  ['creator'],
-  {
-    label: 'creatorLabel'
-  }
-);
+    ['creator'],
+    {
+      label: 'creatorLabel'
+    }
+    );
   
   //Additional Metadata
   ocSeries.additionalComponents.subject = new ocAdmin.Component(
-  ['subject'],
-  {
-    label: 'subjectLabel'
-  }
-)
+    ['subject'],
+    {
+      label: 'subjectLabel'
+    }
+    )
   
   ocSeries.additionalComponents.language = new ocAdmin.Component(
-  ['language'],
-  {
-    label: 'languageLabel'
-  }
-)
+    ['language'],
+    {
+      label: 'languageLabel'
+    }
+    )
   
   ocSeries.additionalComponents.license = new ocAdmin.Component(
-  ['license'],
-  {
-    label: 'licenseLabel'
-  }
-)
+    ['license'],
+    {
+      label: 'licenseLabel'
+    }
+    )
   
   ocSeries.components.description = new ocAdmin.Component(
-  ['description'],
-  {
-    label: 'descriptionLabel'
-  }
-)
+    ['description'],
+    {
+      label: 'descriptionLabel'
+    }
+    )
   
-  /*
+/*
   //Extended Metadata
   ocAdmin.additionalComponents.type
   //ocAdmin.additionalComponents.subtype
@@ -373,6 +374,9 @@ ocSeries.createACLDocument = function() {
 }
 
 ocSeries.SubmitForm = function(){
+  if(ocSeries.checkFields()) {
+    return;
+  }
   var dcDoc = ocSeries.createDublinCoreDocument();
   var acl = ocSeries.createACLDocument();
   if(dcDoc && ocSeries.additionalComponents.title.validate()){
@@ -388,11 +392,54 @@ ocSeries.SubmitForm = function(){
   }
 }
 
+ocSeries.checkFields = function() {
+  var error = false;
+  if($('#title').val() == "") {
+    error = true;
+    $('#item-title').show();
+  } else {
+    $('#item-title').hide();
+  }
+  
+  if(!error) {
+    $.ajax({
+      url: SERIES_SERVICE_URL + "/series.json",
+      async: false,
+      data: {
+        seriesTitle: $('#title').val()
+      },
+      success: function(data) {
+        if(data.totalCount != 0) {
+          $.each(data.catalogs, function(key, value) {
+            if(value[DUBLINCORE_NS_URI].title[0].value == $('#title').val()) {
+              error = true;
+              $('#item-title-existing').show();
+            } else {
+              $('#item-title-existing').hide();
+            }
+          });
+        }
+      }
+    });
+  }
+  ocSeries.showMissingFieldsContainer(error);
+  
+  return error;
+}
+
+ocSeries.showMissingFieldsContainer = function(show) {
+  if(show) {
+    $('#missingFieldsContainer').show();
+  } else {
+    $('#missingFieldsContainer').hide();
+  }
+}
+
 ocSeries.SeriesSubmitComplete = function(xhr, status){
   if(xhr.status == 201 || xhr.status == 204){
     document.location = SERIES_LIST_URL;
   }
-  /*for(var k in ocSeries.components){
+/*for(var k in ocSeries.components){
     if(i18n[k]){
       $("#data-" + k).show();
       $("#data-" + k + " > .data-label").text(i18n[k].label + ":");
