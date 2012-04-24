@@ -73,6 +73,13 @@ public class CustomFeedService extends AbstractFeedService implements FeedGenera
           args[i - 1] = query[i];
         q = MessageFormat.format(solrQuery, args);
       }
+      
+      // Make sure there are no remaining arguments
+      if (q.matches(".*\\{[\\d]+\\}.*")) {
+        logger.warn("Feed has been called with an insufficient number of parameters");
+        return null;
+      }
+      
       return searchService.getByQuery(q, limit, offset);
     } catch (Exception e) {
       logger.error("Cannot retrieve result for aggregated feed", e);
