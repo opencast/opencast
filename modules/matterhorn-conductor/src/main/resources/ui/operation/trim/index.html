@@ -74,7 +74,9 @@
     <script type="text/javascript" src="/admin/js/jquery.jqote2.js"></script>
     <script type="text/javascript">
       var PLAYER_URL = '/admin/embed.html';
+      var DEFAULT_SERIES_CATALOG_ID = 'seriesCatalog';
       var WORKFLOW_RESTSERVICE = '/workflow/instance/';
+      var DUBLIN_CORE_NS_URI  = 'http://purl.org/dc/terms/';
             
       var postData = {
         'id': parent.document.getElementById("holdWorkflowId").value
@@ -270,66 +272,6 @@
           checkInOutPoint();
         });
         
-        ocUtils.log('Initializing autocomplete for series field')
-        $('#series').autocomplete({
-          source: function(request, response) {
-            $.ajax({
-              url: '/series/series.json',
-              data: {
-                q: request.term,
-                sort: 'TITLE'
-              },
-              success: function(data) {
-                data = data.catalogs;
-                var series_list = [];
-                $.each(data, function(){
-                  series_list.push({value: this['http://purl.org/dc/terms/']['title'][0].value,
-                    id: this['http://purl.org/dc/terms/']['identifier'][0].value});
-                });
-                response(series_list);
-              }, 
-              error: function() {
-                ocUtils.log('could not retrieve series_data');
-              }
-            });
-          },
-          select: function(event, ui){
-            $('#ispartof').val(ui.item.id);
-          },
-          search: function(){
-            $('#ispartof').val('');
-          }
-        });
-        
-        ocUtils.log('Initializing autocomplete for series field')
-        $('#series').autocomplete({
-          source: function(request, response) {
-            $.ajax({
-              url: '/series/series.json' + '?q=' + request.term,
-              dataType: 'json',
-              type: 'GET',
-              success: function(data) {
-                data = data.catalogs;
-                var series_list = [];
-                $.each(data.catalogs, function(){
-                  series_list.push({value: this['http://purl.org/dc/terms/']['title'][0].value,
-                    id: this['http://purl.org/dc/terms/']['identifier'][0].value});
-                });
-                response(series_list);
-              }, 
-              error: function() {
-                ocUtils.log('could not retrieve series_data');
-              }
-            });
-          },
-          select: function(event, ui){
-            $('#ispartof').val(ui.item.id);
-          },
-          search: function(){
-            $('#ispartof').val('');
-          }
-        });
-                
         /**
          * Checks if In point is bigger than Out point and prints an Error Message if this is the case
          */
@@ -534,15 +476,66 @@
             if (data.services.service !== undefined) {  // so there should always be none or one instance returned (instead of  data.services beeing an array
               seriesServiceURL = data.services.service.host + data.services.service.path;
               $('#series').removeAttr('disabled');
+              ocUtils.log('Initializing autocomplete for series field')
               $('#series').autocomplete({
-                source: seriesServiceURL + '/search',
+                source: function(request, response) {
+                  $.ajax({
+                    url: seriesServiceURL + '/series.json?q=' + request.term,
+                    dataType: 'json',
+                    type: 'GET',
+                    success: function(data) {
+                      var series_list = [];
+                      $.each(data.catalogs, function(){
+                        series_list.push({value: this[DUBLIN_CORE_NS_URI]['title'][0].value,
+                          id: this[DUBLIN_CORE_NS_URI]['identifier'][0].value});
+                      });
+                      response(series_list);
+                    }, 
+                    error: function() {
+                      ocUtils.log('could not retrieve series_data');
+                    }
+                  });
+                },
                 select: function(event, ui){
                   $('#ispartof').val(ui.item.id);
+                },
+                change: function(event, ui){
+                  if($('#ispartof').val() === '' && $('#series').val() !== ''){
+                    ocUtils.log("Searching for series in series endpoint");
+                    $.ajax({
+                      url : seriesServiceURL + '/series.json?seriesTitle=' + $('#series').val(),
+                      type : 'get',
+                      dataType : 'json',
+                      success : function(data) {
+                        var series_input = $('#series').val(),
+                        series_list = data["catalogs"],
+                        series_title,
+                        series_id;
+
+                        if(series_list.length !== 0){
+                          series_title = series_list[0][DUBLIN_CORE_NS_URI]["title"] ? series_list[0][DUBLIN_CORE_NS_URI]["title"][0].value : "";
+                          series_id = series_list[0][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[0][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
+                          $('#ispartof').val(series_id);
+                        }
+                      }
+                    });
+                  } else if($('#ispartof').val() === '' && $('#series').val() === '') {
+                    $('#ispartof').val('');
+                  }
                 },
                 search: function(){
                   $('#ispartof').val('');
                 }
               });
+              //              $('#series').autocomplete({
+              //                source: seriesServiceURL + '/search',
+              //                select: function(event, ui){
+              //                  $('#ispartof').val(ui.item.id);
+              //                },
+              //                search: function(){
+              //                  $('#ispartof').val('');
+              //                }
+              //              });
               
               // event handler: save information that series changed 
               $('#series').change(function() {
@@ -765,7 +758,7 @@
             // get seriesDcXml
             ocUtils.log('Getting DC catalog for series ' + $('#ispartof').val());
             $.ajax({
-              url : seriesServiceURL + '/' + $('#ispartof').val() + '/dublincore',
+              url : seriesServiceURL + '/' + $('#ispartof').val() + '.xml',
               type : 'get',
               async : false,
               dataType : 'xml',
@@ -886,7 +879,7 @@
               $dcelm.text($field.val());
             } else {
               ocUtils.log("creating " + $field.attr('name') + " with value: " + $field.val());
-              $('<oc:' + $field.attr('name') + '>').text($field.val()).appendTo(DCmetadata.documentElement);
+              $('<dc:' + $field.attr('name') + '>').text($field.val()).appendTo(DCmetadata.documentElement);
             }
           }
         });
