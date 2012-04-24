@@ -727,7 +727,7 @@ var ocScheduler = (function() {
             success: function(data){
               window.debug = data;
               creationSucceeded = true;
-              seriesId = $(data).find('[nodeName="dcterms:identifier"]').text();
+              seriesId = $(data).find('dcterms\\:identifier').text();
               $('#series').val(seriesId);
               seriesComponent.fields.series.val(seriesId);
             },
