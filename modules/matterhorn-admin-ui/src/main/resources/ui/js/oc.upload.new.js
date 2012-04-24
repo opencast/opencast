@@ -232,7 +232,9 @@ ocUpload.UI = (function() {
         for (i in data.workflow_definitions) {
           var $selector = $('#workflowSelector');
           var workflow = data.workflow_definitions[i];
-          if ( workflow.id != 'error' ) {
+          if ( workflow.id != 'error' &&
+                workflow.title != null &&
+                workflow.title != "") {
             defs.push(workflow.id);
             var $newOption = $('<option></option>')
             .attr('value', workflow.id)
