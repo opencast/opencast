@@ -138,7 +138,11 @@ ul.itemnav li span.dev-prop-val { text-align:left; width:70%;}
 #holdActionStage {margin:20px; padding:0 0 20px;}
 #holdActionUI {border:none; width:100%;}
 
-
+/* missing field container */
+#missingFieldsContainer {
+  width: 800px;
+  margin: 0 auto;
+}
 
 /* tables */
 .oc-ui-sortable div, .oc-ui-sortable-Ascending div, .oc-ui-sortable-Descending div

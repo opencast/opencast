@@ -2,6 +2,33 @@
   <div>
     <h2 style="text-align:center"><span id="i18n_page_title">Add Series</span></h2>
   </div>
+
+  <!-- missing fields notification -->
+
+  <div id="missingFieldsContainer" class="layout-page-header ui-helper-hidden">
+    <div class="layout-centered ui-state-error ui-corner-all scheduler-info-container">
+      <h3 style="position: relative; padding-left: 20px;">
+        <span class="ui-icon ui-icon-alert"></span> <b>Missing or invalid input</b>
+      </h3>
+
+      <ul>
+        <li id="item-title" class="missing-fields-item">
+          <span class="ui-icon ui-icon-carat-1-e"></span>
+          <span>
+            Please enter a <a href="javascript:document.getElementById('title').focus();">title</a> for the Series.
+          </span>
+        </li>
+        <li id="item-title-existing" class="missing-fields-item">
+
+          <span class="ui-icon ui-icon-carat-1-e"></span>
+          <span>
+            The <a href="javascript:document.getElementById('title').focus();">title</a> you have entered is already used by another Series. 
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
   <div class="form-box layout-centered ui-widget">
     <div class="form-box-content ui-widget-content ui-corner-all">
       <ul class="oc-ui-form-list">
