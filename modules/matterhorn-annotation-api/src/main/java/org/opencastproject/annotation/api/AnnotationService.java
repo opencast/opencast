@@ -32,6 +32,15 @@ public interface AnnotationService {
   Annotation addAnnotation(Annotation a);
 
   /**
+   * Remove a given annotation from database
+   * 
+   * @param a
+   *          The Annotation that will be removed from the database
+   * @return true if successfull removed, false else.
+   */
+  boolean removeAnnotation(Annotation a);
+
+  /**  
    * Gets an annotation by its identifier.
    * 
    * @param id

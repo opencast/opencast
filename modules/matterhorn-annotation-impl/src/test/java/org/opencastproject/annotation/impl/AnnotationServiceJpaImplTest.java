@@ -21,6 +21,7 @@ import org.opencastproject.annotation.api.Annotation;
 import org.opencastproject.annotation.api.AnnotationList;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.util.NotFoundException;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -98,6 +99,31 @@ public class AnnotationServiceJpaImplTest {
     Assert.assertEquals(a.getSessionId(), a1FromDb.getSessionId());
     Assert.assertEquals(a.getUserId(), a1FromDb.getUserId());
     Assert.assertEquals(a.getUserId(), annotationService.securityService.getUser().getUserName());
+  }
+
+  @Test
+  public void removeAnnotation() throws Exception {
+    // Add an annotation
+    AnnotationImpl a = new AnnotationImpl();
+    a.setInpoint(10);
+    a.setOutpoint(100);
+    a.setMediapackageId("mp123");
+    a.setSessionId("session123");
+    a.setType("ugc");
+    a.setValue("This is some user generated content");
+    annotationService.addAnnotation(a);
+  
+    //remove annotation
+    Assert.assertTrue(annotationService.removeAnnotation(a));  
+
+    //ensure that annotation was removed
+    Annotation a1FromDb = null;
+    try {
+      a1FromDb = annotationService.getAnnotation(a.getAnnotationId());
+    } catch (NotFoundException e) {
+
+    }
+    Assert.assertNull(a1FromDb);
   }
 
   @Test
