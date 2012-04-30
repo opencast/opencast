@@ -10,13 +10,14 @@ if [[ ! $INSTALL_RUN ]]; then
     exit 1
 fi
 
+# Copy startup scripts to the bin directory. 
+cp $FELIX_HOME/docs/scripts/init/matterhorn_init_d.sh $FELIX_HOME/bin/
 ACTUAL_SCRIPT=$FELIX_HOME/bin/matterhorn_init_d.sh
 
 ln -s $ACTUAL_SCRIPT $STARTUP_SCRIPT
 
 # Set up the init script variables
 sed -i "s#^MATTERHORN=.*\$#MATTERHORN=$OC_DIR#g" $ACTUAL_SCRIPT
-sed -i "s#^FELIX=.*\$#FELIX=$FELIX_HOME#g" $ACTUAL_SCRIPT
 sed -i "s#^MATTERHORN_USER=.*#MATTERHORN_USER=$USERNAME#g" $ACTUAL_SCRIPT
 sed -i "s#^CA=.*#CA=$CA_DIR#g" $ACTUAL_SCRIPT
 sed -i "s#^M2_REPOSITORY=.*#M2_REPOSITORY=$M2_REPO#g" $ACTUAL_SCRIPT

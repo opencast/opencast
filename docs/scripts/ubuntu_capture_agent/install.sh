@@ -17,8 +17,6 @@ export USERNAME=matterhorn
 export OC_DIR=/opt/matterhorn
 # Name for the directory where the matterhorn-related files will be stored
 export CA_DIR=$OC_DIR/capture-agent
-# Directory where the source code will be downloaded to
-export SOURCE=$CA_DIR/matterhorn-source
 # Location of the felix docs in the source code
 export FELIX_DOCS="docs/felix"
 
@@ -37,7 +35,7 @@ export BRANCHES_URL=$SVN_URL/branches/1.3.x
 export TAGS_URL=$SVN_URL/tags
 
 # Default URL from where scripts and java source will be dowloaded
-export SRC_DEFAULT=$BRANCHES_URL/1.2.x
+export SRC_DEFAULT=$TRUNK_URL
 
 # File containing the rules to be applied by udev to the configured devices -- not a pun!
 export DEV_RULES=/etc/udev/rules.d/matterhorn.rules
@@ -122,16 +120,15 @@ export DEFAULT_QUEUE_SIZE=512
 # URL to download the epiphan driver
 export EPIPHAN_URL=http://www.epiphan.com/downloads/linux
 
-# Name of the file containing the felix files
-export FELIX_FILENAME=org.apache.felix.main.distribution-2.0.4.tar.gz
-# URL where the previous file can be fetched
-export FELIX_URL=http://archive.apache.org/dist/felix/$FELIX_FILENAME
 # Subdir under the user home where FELIX_HOME is
 export FELIX_HOME=$OC_DIR/felix
+
+# The location of the configuration files. 
+export CONF_DIR=$FELIX_HOME/etc
 # Path under FELIX_HOME where the general matterhorn configuration
-export GEN_PROPS=$FELIX_HOME/conf/config.properties
+export GEN_PROPS=$CONF_DIR/config.properties
 # Path under FELIX_HOME where the capture agent properties are
-export CAPTURE_PROPS=$FELIX_HOME/conf/services/org.opencastproject.capture.impl.ConfigurationManager.properties
+export CAPTURE_PROPS=$CONF_DIR/services/org.opencastproject.capture.impl.ConfigurationManager.properties
 # Directory UNDER FELIX HOME where the felix filex will be deployed
 export DEPLOY_DIR=matterhorn
 
@@ -224,6 +221,7 @@ INSTALL_VGA2USB=./install_vga2usb_drivers.sh
 SETUP_DEVICES=./setup_devices.sh
 SETUP_DEPENDENCIES=./setup_dependencies.sh
 INSTALL_DEPENDENCIES=./install_dependencies.sh
+SETUP_DIRECTORY=./setup_directory.sh
 SETUP_SOURCE=./setup_source.sh
 SETUP_ENVIRONMENT=./setup_environment.sh
 SETUP_BOOT=./setup_boot.sh
@@ -233,7 +231,7 @@ export FUNCTIONS=./functions.sh
 export CLEANUP=./cleanup.sh
 
 SCRIPTS=( "$SETUP_USER" "$INSTALL_VGA2USB" "$SETUP_DEVICES" "$SETUP_DEPENDENCIES" "$INSTALL_DEPENDENCIES"\
-          "$SETUP_ENVIRONMENT" "$SETUP_SOURCE" "$SETUP_BOOT" "$CLEANUP" "$FUNCTIONS")
+          "$SETUP_ENVIRONMENT" "$SETUP_DIRECTORY" "$SETUP_SOURCE" "$SETUP_BOOT" "$CLEANUP" "$FUNCTIONS")
 SCRIPTS_EXT=docs/scripts/ubuntu_capture_agent
 
 # The subsidiary scripts will check for this variable to check they are being run from here
@@ -304,6 +302,9 @@ done
 # Choose/create the matterhorn user (WARNING: The initial perdiod (.) MUST be there so that the script can export several variables)
 . ${SETUP_USER}
 
+# Choose the directory to install the capture agent. 
+. ${SETUP_DIRECTORY}
+
 # Create the directory where all the capture-agent-related files will be stored
 mkdir -p $CA_DIR
 
@@ -354,8 +355,8 @@ while [[ ! "$source_ok" ]] ; do
     
     unset build_ok
     while [[ ! "$build_ok" ]]; do
-	cd $SOURCE
-	su $USERNAME -c "mvn clean install -Pcapture,serviceregistry-stub -DdeployTo=${HOME}/${OC_DIR##*/}/${FELIX_HOME##*/}/${DEPLOY_DIR}"
+	cd $FELIX_HOME
+	su $USERNAME -c "mvn clean install -Pcapture,serviceregistry-stub -DdeployTo=${FELIX_HOME} -DskipTests"
 	if [[ "$?" -ne 0 ]]; then
 	    echo
 	    choose -t "Error building the matterhorn code. What do you wish to do?" "Download another source" "Retry build" "Exit" src_opt

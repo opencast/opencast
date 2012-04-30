@@ -15,31 +15,22 @@ fi
 #Defines the regex we use in this script to determine if a URL is valid
 VALID_URL_REGEX='^http://[a-zA-Z0-9\._\-]+(:[0-9]*[0-9]*[0-9]*[0-9]*[0-9])?$'
 
-# Setup opencast storage directories
-# TODO: Uncomment the following lines -and remove the next two- once the correct defaults for the directories are set in the config files in svn
-## Read default from the config file
-#default_dir=$(grep "^org\.opencastproject\.storage\.dir=.*$" $GEN_PROPS | cut -d '=' -f 2)
-#ask -d "$default_dir" "Where would you like the matterhorn directories to be stored?" oc_dir
-#: ${oc_dir:=$OC_DIR}
-ask -d "$OC_DIR" "Where would you like the matterhorn directories to be stored?" oc_dir
-echo
-
 # Create the directories
-mkdir -p "$oc_dir"/cache
-mkdir -p "$oc_dir"/config
-mkdir -p "$oc_dir"/volatile
-mkdir -p "$oc_dir"/cache/captures
+mkdir -p "$OC_DIR"/cache
+mkdir -p "$OC_DIR"/config
+mkdir -p "$OC_DIR"/volatile
+mkdir -p "$OC_DIR"/cache/captures
 
 # Point the CA's fileservice at the right dir
-sed -i "s#/tmp/opencast#${oc_dir//#/\\#}#" $SOURCE/modules/matterhorn-capture-agent-impl/src/main/resources/OSGI-INF/capture-files.xml
+sed -i "s#/tmp/opencast#${OC_DIR//#/\\#}#" $FELIX_HOME/modules/matterhorn-capture-agent-impl/src/main/resources/OSGI-INF/capture-files.xml
 
 # Establish their permissions
-chown -R $USERNAME:$USERNAME "$oc_dir"
-chmod -R 770 "$oc_dir"
+chown -R $USERNAME:$USERNAME "$OC_DIR"
+chmod -R 770 "$OC_DIR"
 
 # Write the directory name to the agent's config file
 #                 this->_______<- escapes the dots in the property key, so that sed doesn't not interpret them as wildcards
-sed -i "s#^${STORAGE_KEY//./\\.}=.*\$#${STORAGE_KEY}=$oc_dir#" "$GEN_PROPS"
+sed -i "s#^${STORAGE_KEY//./\\.}=.*\$#${STORAGE_KEY}=$OC_DIR#" "$GEN_PROPS"
 
 # Define capture agent name by using the hostname
 unset agentName
@@ -94,7 +85,7 @@ echo -n "Setting up maven and felix enviroment for $USERNAME... "
 EXPORT_M2_REPO="export M2_REPO=${M2_REPO}"
 EXPORT_FELIX_HOME="export FELIX_HOME=${FELIX_HOME}"
 EXPORT_JAVA_HOME="export JAVA_HOME=${JAVA_HOME}"
-EXPORT_SOURCE_HOME="export MATTERHORN_SOURCE=${SOURCE}"
+EXPORT_SOURCE_HOME="export MATTERHORN_SOURCE=${FELIX_HOME}"
 ALIAS_DEPLOY_MACRO="alias deploy=\"mvn install -DdeployTo=$FELIX_HOME/matterhorn\""
 ALIAS_REDEPLOY_MACRO="alias redeploy=\"mvn clean && deploy\""
 
@@ -141,7 +132,7 @@ sed -i "s#^USER=.*\$#USER=$USERNAME#" "$CLEANUP"
 sed -i "s#^HOME=.*\$#HOME=$HOME#" "$CLEANUP"
 sed -i "s#^SRC_LIST=.*\$#SRC_LIST=$SRC_LIST#" "$CLEANUP"
 sed -i "s#^SRC_LIST_BKP=.*\$#SRC_LIST_BKP=$SRC_LIST_BKP#" "$CLEANUP"
-sed -i "s#^OC_DIR=.*\$#OC_DIR=$oc_dir#" "$CLEANUP"
+sed -i "s#^OC_DIR=.*\$#OC_DIR=$OC_DIR#" "$CLEANUP"
 sed -i "s#^CA_DIR=.*\$#CA_DIR=$CA_DIR#" "$CLEANUP"
 sed -i "s#^RULES_FILE=.*\$#RULES_FILE=$DEV_RULES#" "$CLEANUP"
 sed -i "s#^CA_DIR=.*\$#CA_DIR=$CA_DIR#" "$CLEANUP"
