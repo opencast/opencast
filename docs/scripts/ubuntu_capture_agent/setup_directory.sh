@@ -20,6 +20,3 @@ export FELIX_HOME="$oc_dir/felix"
 export CONF_DIR=$FELIX_HOME/etc
 export GEN_PROPS=$CONF_DIR/config.properties
 export CAPTURE_PROPS=$CONF_DIR/services/org.opencastproject.capture.impl.ConfigurationManager.properties
-
-echo "OC DIR: $OC_DIR"
-echo "Felix Home: $FELIX_HOME"
