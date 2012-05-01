@@ -207,3 +207,4 @@ echo "==========================================================="
 
 gpg --armor -b opencast-$OC_REV.zip
 gpg --armor -b opencast-$OC_REV.7z
+md5sum opencast-$OC_REV* > opencast-$OC_REV.md5
