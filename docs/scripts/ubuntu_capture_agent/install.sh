@@ -356,7 +356,7 @@ while [[ ! "$source_ok" ]] ; do
     unset build_ok
     while [[ ! "$build_ok" ]]; do
 	cd $FELIX_HOME
-	su $USERNAME -c "mvn clean install -Pcapture,serviceregistry-stub -DdeployTo=${FELIX_HOME} -DskipTests"
+	su $USERNAME -c "mvn clean install -Pcapture,serviceregistry-stub -DdeployTo=${FELIX_HOME}"
 	if [[ "$?" -ne 0 ]]; then
 	    echo
 	    choose -t "Error building the matterhorn code. What do you wish to do?" "Download another source" "Retry build" "Exit" src_opt
