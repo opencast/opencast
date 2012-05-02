@@ -406,7 +406,7 @@
               <li class="ui-helper-clearfix">
                 <label class="scheduler-label">&nbsp;</label>
                 <button id="submitButton" type="button" class="mouseover-pointer control-button">Upload</button>
-                <button id="cancelButton" type="button" class="mouseover-pointer control-button">Cancel</button>
+                <a id="cancelButton" title="Cancel" class="secondaryButton">Cancel</a>
               </li>
 
               <!-- * = required -->

@@ -120,8 +120,8 @@
         <ul class="oc-ui-form-list">
           <li>
             <label class="scheduler-label">&nbsp;</label>
-            <input type="button" value="Save" id="submitButton" />
-            <input type="button" value="Cancel" id="cancelButton" />
+            <input type="button" value="Save" id="submitButton" class="mouseover-pointer control-button" />
+            <a id="cancelButton" title="Cancel" class="secondaryButton">Cancel</a>
             <input type="hidden" id="id" />
           </li>
           <li>

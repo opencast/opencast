@@ -37,7 +37,7 @@ var ocUpload = (function() {
     $('.flavor-presentation-checkbox').change(ocUpload.UI.selectFlavor);
     $('#workflowSelector').change(ocUpload.UI.selectWorkflowDefinition);
     $('#submitButton').button().click(startUpload);
-    $('#cancelButton').button().click(backToRecordings);
+    $('#cancelButton').click(backToRecordings);
 
     var initializerDate;
     initializerDate = new Date();
