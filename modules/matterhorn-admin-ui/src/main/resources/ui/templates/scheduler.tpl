@@ -527,7 +527,7 @@
             <li>
               <label class="scheduler-label">&nbsp;</label>
               <input type="button" value="Schedule" id="submitButton" class="mouseover-pointer control-button" />
-              <input type="button" value="Cancel" id="cancelButton" class="mouseover-pointer control-button" />
+              <a id="cancelButton" title="Cancel" class="secondaryButton">Cancel</a>
               <input type="hidden" id="eventId" />
               <input type="hidden" id="recurrenceId" />
               <input type="hidden" id="recurrencePosition" />

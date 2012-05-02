@@ -198,7 +198,6 @@ var ocScheduler = (function() {
     });
 
     $('#submitButton').button();
-    $('#cancelButton').button();
 
     $('#submitButton').click(this.submitForm);
     $('#cancelButton').click(this.cancelForm);

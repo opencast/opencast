@@ -69,7 +69,7 @@ ocSeries.init = function(){
   
   ocSeries.RegisterComponents();
   //ocSeries.FormManager = new ocAdmin.Manager('series', '', ocSeries.components, ocSeries.additionalComponents);
-  $('#submitButton').click(ocSeries.SubmitForm);
+  $('#submitButton').button().click(ocSeries.SubmitForm);
   $('#cancelButton').click(function() {
     document.location = SERIES_LIST_URL;
   });

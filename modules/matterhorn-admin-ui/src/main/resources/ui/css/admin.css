@@ -239,3 +239,14 @@ for inspect
 #awf-config-container fieldset {padding: 10px;}
 
 .role-label {width: 200px; display: inline-block; text-align: right; margin-right: 10px; padding: 2px;}
+
+a.secondaryButton, a.secondaryButton:link, a.secondaryButton:visited {
+  margin-right: 16px;
+  cursor: pointer;
+  color: #2d8f8b;
+}
+
+a.secondaryButton:hover, a.secondaryButton:focus {
+  color: #2d8f8b;
+  text-decoration: underline;
+}
