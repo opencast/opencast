@@ -23,10 +23,12 @@ ocStatistics = new (function() {
     "org_opencastproject_textanalyzer"           : "Text analysis",
     "org_opencastproject_videosegmenter"         : "Video segmentation",
     "org_opencastproject_composer"               : "Encoding, image extraction, and trimming",
+    "org_opencastproject_distribution_acl"       : "Media distribution (Access Control Lists)",
     "org_opencastproject_distribution_download"  : "Media distribution (local downloads)",
     "org_opencastproject_distribution_streaming" : "Media distribution (local streaming)",
     "org_opencastproject_distribution_itunesu"   : "Media distribution (iTunes)",
     "org_opencastproject_distribution_youtube"   : "Media distribution (YouTube)",
+    "org_opencastproject_gstreamer"              : "GStreamer Launch Service",
     "org_opencastproject_inspection"             : "Media inspection",
     "org_opencastproject_workflow"               : "Workflow"
   };
