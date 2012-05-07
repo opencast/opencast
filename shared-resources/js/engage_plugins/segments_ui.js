@@ -92,7 +92,8 @@ Opencast.segments_ui = (function ()
         $("#segment" + slideNr).toggleClass("ui-corner-all");
         var imageHeight = 120;
         var nrOfSegments = segmentsNrs[segmentsNrs.length - 1]; // get length of new segments
-        $("#segment-tooltip").html('<img src="' + imgURLs[segmentId] + '" height="' + imageHeight + '" alt="Slide ' + (slideNr + 1) + ' of ' + nrOfSegments + '"/>');
+	var str_nr_of_slides = nrOfSegments ? "Slide " + (slideNr + 1) + " of " + nrOfSegments : "Slide " + (slideNr + 1);
+        $("#segment-tooltip").html('<img src="' + imgURLs[segmentId] + '" height="' + imageHeight + '" alt="' + str_nr_of_slides + '"/>');
         if (($("#segment" + slideNr).offset() != null) && ($("#segment" + slideNr).offset() != null) && ($("#segment" + slideNr).width() != null) && ($("#segment-tooltip").width() != null))
         {
             var eps = 4;
@@ -230,9 +231,9 @@ Opencast.segments_ui = (function ()
                         // Get the complete Track Duration // TODO: handle more clever
                         var complDur = 0;
                         $.each(data['search-results'].result.segments.segment, function (i, value)
-                        {
-                            complDur += parseInt(data['search-results'].result.segments.segment[i].duration);
-                        });
+                               {
+				   complDur += parseInt(data['search-results'].result.segments.segment[i].duration);
+                               });
                         var completeDuration = 0;
                         var length = data['search-results'].result.segments.segment.length;
                         
@@ -249,91 +250,105 @@ Opencast.segments_ui = (function ()
                         var hiddenSegmentsStr = '';
                         
                         // Filter segments with a too small duration
-                        $.each(data['search-results'].result.segments.segment, function (i, value)
-                        {
-                            // Save the image URL
-                            imgURLs[i] = data['search-results'].result.segments.segment[i].previews.preview.$;
-                            var curr = data['search-results'].result.segments.segment[i];
-                            var currDur = parseInt(curr.duration);
-                            if(currDur > 0)
+			if(data['search-results'].result &&
+			   data['search-results'].result.segments &&
+			   data['search-results'].result.segments.segment) {
+                            $.each(data['search-results'].result.segments.segment, function (i, value)
+				   {
+				       // Save the image URL
+				       if(data['search-results'].result.segments.segment[i] &&
+					  data['search-results'].result.segments.segment[i].previews &&
+					  data['search-results'].result.segments.segment[i].previews.preview && 
+					  data['search-results'].result.segments.segment[i].previews.preview.$) {
+					   imgURLs[i] = data['search-results'].result.segments.segment[i].previews.preview.$;
+					   var curr = data['search-results'].result.segments.segment[i];
+					   var currDur = parseInt(curr.duration);
+					   if(currDur > 0)
+					   {
+					       curr.completeDuration = complDur;
+					       // Set a Duration until the Beginning of this Segment
+					       curr.durationExcludingSegment = completeDuration;
+					       completeDuration += currDur;
+					       // Set a Duration until the End of this Segment
+					       curr.durationIncludingSegment = completeDuration;
+					       
+					       var timeToAdd = 0;
+					       
+					       segmentsNrs[i] = i - hiddenSegmentsNr;
+					       var currHid = 0;
+					       // loop through following segments
+					       for(var j = i + 1; j < length; ++j)
+					       {
+						   var currJ = data['search-results'].result.segments.segment[j];
+						   var currJDur = parseInt(currJ.duration);
+						   // if a following segment does not has the minimal length
+						   if(currJDur < minSegmentLen)
+						   {
+						       ++currHid;
+						       // map the old and new segment numbers
+						       segmentsNrs[j] = i - hiddenSegmentsNr;
+						       hiddenSegmentsStr += ' ' + j + ' ';
+						       // save duration
+						       timeToAdd += currJDur;
+						       // set duration to 0 for not displaying the segment
+						       currJ.duration = 0;
+						   } else
+						   {
+						       break;
+						   }
+					       }
+					       hiddenSegmentsNr += currHid;
+					       // if some following segment(s) didn't have the minimal length as well
+					       if(timeToAdd > 0)
+					       {
+						   // put the segments with the current segment together
+						   curr.duration = parseInt(curr.duration) + timeToAdd;
+						   curr.durationIncludingSegment = parseInt(curr.durationIncludingSegment) + timeToAdd;
+						   timeToAdd = 0;
+					       }
+					   }
+				       } else {
+					   imgURLs[i] = "";
+				       }
+				   });
+                            $.each(data['search-results'].result.segments.segment, function (i, value)
+				   {
+				       var dur = parseInt(data['search-results'].result.segments.segment[i].duration);
+				       if(dur > 0)
+				       {
+					   newSegments[newSegmentsIndex] = data['search-results'].result.segments.segment[i];
+					   newSegments[newSegmentsIndex].hoverSegmentIndex = i;
+					   newSegments[newSegmentsIndex].index = newSegmentsIndex;
+					   if(data['search-results'].result.segments.segment[i] &&
+					      data['search-results'].result.segments.segment[i].previews &&
+					      data['search-results'].result.segments.segment[i].previews.preview && 
+					      data['search-results'].result.segments.segment[i].previews.preview.$) {
+					       newSegments[newSegmentsIndex].previews.preview.$ = data['search-results'].result.segments.segment[i].previews.preview.$;
+					   } else {
+					       newSegments[newSegmentsIndex].previews = {};
+					       newSegments[newSegmentsIndex].previews.preview = {};
+					       newSegments[newSegmentsIndex].previews.preview.$ = "";
+					   }
+					   ++newSegmentsIndex;
+				       }
+				   });
+                            var oldLength = data['search-results'].result.segments.segment.length;
+                            data['search-results'].result.segments.segment = newSegments;
+                            retSegments = data['search-results'].result.segments;
+                            $.log("Removed " + (oldLength - newSegments.length) + "/" + oldLength + " Segments due to being too small in relation to the scrubber length:" + hiddenSegmentsStr);
+                            if(!$.browser.msie)
                             {
-                                curr.completeDuration = complDur;
-                                // Set a Duration until the Beginning of this Segment
-                                curr.durationExcludingSegment = completeDuration;
-                                completeDuration += currDur;
-                                // Set a Duration until the End of this Segment
-                                curr.durationIncludingSegment = completeDuration;
-                                
-                                var timeToAdd = 0;
-                                
-                                segmentsNrs[i] = i - hiddenSegmentsNr;
-                                var currHid = 0;
-                                // loop through following segments
-                                for(var j = i + 1; j < length; ++j)
-                                {
-                                    var currJ = data['search-results'].result.segments.segment[j];
-                                    var currJDur = parseInt(currJ.duration);
-                                    // if a following segment does not has the minimal length
-                                    if(currJDur < minSegmentLen)
-                                    {
-                                        ++currHid;
-                                        // map the old and new segment numbers
-                                        segmentsNrs[j] = i - hiddenSegmentsNr;
-                                        hiddenSegmentsStr += ' ' + j + ' ';
-                                        // save duration
-                                        timeToAdd += currJDur;
-                                        // set duration to 0 for not displaying the segment
-                                        currJ.duration = 0;
-                                    } else
-                                    {
-                                        break;
-                                    }
-                                }
-                                hiddenSegmentsNr += currHid;
-                                // if some following segment(s) didn't have the minimal length as well
-                                if(timeToAdd > 0)
-                                {
-                                    // put the segments with the current segment together
-                                    curr.duration = parseInt(curr.duration) + timeToAdd;
-                                    curr.durationIncludingSegment = parseInt(curr.durationIncludingSegment) + timeToAdd;
-                                    timeToAdd = 0;
-                                }
+				initResizeEnd();
                             }
-                        });
-                        /*
-                        $.each(segmentsNrs, function (i, value)
-                        {
-                            $.log("segmentsNrs[" + i + "] = " + segmentsNrs[i]);
-                        });
-                        */
-                        $.each(data['search-results'].result.segments.segment, function (i, value)
-                        {
-                            var dur = parseInt(data['search-results'].result.segments.segment[i].duration);
-                            if(dur > 0)
-                            {
-                                newSegments[newSegmentsIndex] = data['search-results'].result.segments.segment[i];
-                                newSegments[newSegmentsIndex].hoverSegmentIndex = i;
-                                newSegments[newSegmentsIndex].index = newSegmentsIndex;
-                                newSegments[newSegmentsIndex].previews.preview.$ = data['search-results'].result.segments.segment[i].previews.preview.$;
-                                ++newSegmentsIndex;
-                            }
-                        });
-                        var oldLength = data['search-results'].result.segments.segment.length;
-                        data['search-results'].result.segments.segment = newSegments;
-                        retSegments = data['search-results'].result.segments;
-                        $.log("Removed " + (oldLength - newSegments.length) + "/" + oldLength + " Segments due to being too small in relation to the scrubber length:" + hiddenSegmentsStr);
-                        if(!$.browser.msie)
-                        {
-                            initResizeEnd();
-                        }
+			}
                     } else
                     {
                         $.log("Segments not available");
                     }
                     // Set only default values for trimpath (if media is not available)
-                    data['search-results'].result.mediapackage.media.checkQuality = checkForQualities;
-                    data['search-results'].result.mediapackage.media.isVideo = isVideo;
-                    data['search-results'].result.mediapackage.media.rtmpAvailable = rtmpAvailable;
+		    data['search-results'].result.mediapackage.media.checkQuality = checkForQualities;
+		    data['search-results'].result.mediapackage.media.isVideo = isVideo;
+		    data['search-results'].result.mediapackage.media.rtmpAvailable = rtmpAvailable;
                     // Check if any Media.tracks are available
                     if ((data['search-results'].result.mediapackage.media !== undefined) && (data['search-results'].result.mediapackage.media !== "") && (data['search-results'].result.mediapackage.media.track.length > 0))
                     {
