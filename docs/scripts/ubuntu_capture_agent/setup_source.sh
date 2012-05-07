@@ -13,7 +13,7 @@ fi
 . ${FUNCTIONS}
 
 # Detect if the matterhorn source has been already checked out
-url=$(svn info $SOURCE 2> /dev/null | grep URL: | cut -d ' ' -f 2) 
+url=$(svn info $FELIX_HOME 2> /dev/null | grep URL: | cut -d ' ' -f 2) 
 if [[ "$url" ]]; then
     echo
     yesno -d yes "The source $url has been already checked out. Do you wish to keep it?" keep
@@ -27,9 +27,8 @@ if [[ -z "$keep" ]]; then
 	echo
 	ask -d "${SRC_DEFAULT}" "Enter the URL of the trunk, branch or tag you would like to download" url
 
-	rm -rf $SOURCE
 	echo -n "Attempting to download matterhorn source from $url... "
-	svn co --force $url $SOURCE
+	svn co --force $url $FELIX_HOME
 
 	if [[ $? -eq 0 ]]; then
 	    break
@@ -47,11 +46,5 @@ fi
 echo >> $LOG_FILE
 echo "# Source code URL" >> $LOG_FILE
 echo "$url" >> $LOG_FILE
-
-# Setup felix configuration
-echo -n "Applying matterhorn configuration files to felix... "
-cp -rf $SOURCE/$FELIX_DOCS/* ${FELIX_HOME}
-# Remove the .svn folders
-find ${FELIX_HOME} -name "\.svn" -exec rm -rf {} \; 2> /dev/null
 
 echo "Done"

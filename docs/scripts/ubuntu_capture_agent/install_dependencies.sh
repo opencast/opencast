@@ -184,37 +184,6 @@ echo >> $LOG_FILE
 echo "# Installed packages" >> $LOG_FILE
 [[ -e $PKG_BACKUP ]] && echo "$(cat $PKG_BACKUP)" >> $LOG_FILE
 
-# Setup felix
-echo -n "Downloading Felix... "
-while [[ true ]]; do 
-    if [[ ! -s ${FELIX_FILENAME} ]]; then
-	wget -q ${FELIX_URL}
-    fi
-    # On success, uncompress the felix files in their location
-    if [[ $? -eq 0 ]]; then
-	echo -n "Uncompressing... "
-	dir_name=$(tar tzf ${FELIX_FILENAME} | grep -om1 '^[^/]*')
-	tar xzf ${FELIX_FILENAME}
-	if [[ $? -eq 0 ]]; then
-	    rm -rf $FELIX_HOME
-	    mv ${dir_name%/} -T $FELIX_HOME
-	    mv $FELIX_FILENAME $CA_DIR
-	    #mkdir -p ${FELIX_HOME}/load
-	    echo "Done"
-	    break
-	fi
-    fi
-    # Else, ask for the actions to take
-    echo
-    yesno -d yes "Error retrieving the Felix files from the web. Retry?" retry
-    if [[ "$retry" ]]; then
-    	echo -n "Retrying... "
-    else
-    	echo "You must download Felix manually and install it under $OC_DIR, in order for matterhorn to work"
-	break
-    fi
-done
-
 # Setup jv4linfo
 if [[ ! -e "$JV4LINFO_PATH/$JV4LINFO_LIB" ]]; then
     mkdir -p $JV4LINFO_DIR
