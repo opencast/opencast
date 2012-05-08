@@ -111,6 +111,9 @@ Opencast.WorkflowInspect = (function() {
       if (mp.start) {
         out.info.start = mp.start;
       }
+      if (mp.duration) {
+        mp.duration = ocUtils.formatSeconds(mp.duration/ 1000)
+      }
 
       // Attachments
       mp.attachments = Opencast.RenderUtils.ensureArray(mp.attachments.attachment);
@@ -201,7 +204,7 @@ Opencast.WorkflowInspect = (function() {
       $('.unfoldable-content').hide('fast');
       if (!unfolded) {
         $content.show('fast');
-      }12119
+      }
     });
     renderWorkflowPerformance(workflow);
   }
