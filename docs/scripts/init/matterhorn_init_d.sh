@@ -18,7 +18,7 @@ set -e
 #eg:  /opt/matterhorn
 MATTERHORN=${MATTERHORN_HOME:-/opt/matterhorn}
 #eg:  /opt/matterhorn/felix, or $MATTERHORN/felix
-FELIX=${FELIX_HOME:-$MATTERHORN/felix}
+FELIX_HOME=${FELIX_HOME:-$MATTERHORN/felix}
 #eg:  /opt/matterhorn/capture-agent, or $MATTERHORN/capture-agent
 CA=${CA_DIR:-$MATTERHORN/capture-agent}
 #eg:  Commonly opencast or matterhorn.  Can also be your normal user if you are testing.
@@ -27,7 +27,7 @@ M2_REPOSITORY=${M2_REPO:-/home/$MATTERHORN_USER/.m2/repository}
 #Enable this if this machine is a CA.  This will enable capture device autoconfiguration.
 IS_CA=false
 
-LOGDIR=$FELIX/logs
+LOGDIR=$FELIX_HOME/logs
 
 PATH=$PATH:$FELIX
 
@@ -43,13 +43,27 @@ DEBUG_SUSPEND="n"
 # Only change the line below if you want to customize the server
 ##
 
-FELIX_OPTS="-Dfelix.home=$FELIX"
-FELIX_WORK="-Dfelix.work=$FELIX/work"
 MAVEN_ARG="-DM2_REPO=$M2_REPOSITORY"
-FELIX_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$FELIX/load"
-PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX/conf"
-PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN -Dopencast.logdir=$LOGDIR"
-UTIL_LOGGING_OPTS="-Djava.util.logging.config.file=$FELIX/conf/services/java.util.logging.properties"
+
+FELIX_CONFIG_DIR="$FELIX_HOME/etc"
+FELIX_WORK_DIR="$FELIX_HOME/work"
+
+FELIX="-Dfelix.home=$FELIX_HOME"
+FELIX_WORK="-Dfelix.work=$FELIX_WORK_DIR"
+FELIX_CONFIG_OPTS="-Dfelix.config.properties=file:${FELIX_CONFIG_DIR}/config.properties -Dfelix.system.properties=file:${FELIX_CONFIG_DIR}/system.properties"
+FELIX_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$FELIX_CONFIG_DIR/load"
+
+FELIX_OPTS="$FELIX $FELIX_WORK $FELIX_CONFIG_OPTS $FELIX_FILEINSTALL_OPTS"
+
+PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX_CONFIG_DIR"
+
+PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN"
+MATTERHORN_LOGGING_OPTS="-Dopencast.logdir=$LOGDIR"
+ECLIPSELINK_LOGGING_OPTS="-Declipselink.logging.level=SEVERE"
+UTIL_LOGGING_OPTS="-Djava.util.logging.config.file=$FELIX_CONFIG_DIR/services/java.util.logging.properties"
+
+LOG_OPTS="$PAX_LOGGING_OPTS $MATTERHORN_LOGGING_OPTS $ECLIPSELINK_LOGGING_OPTS $UTIL_LOGGING_OPTS"
+
 GRAPHICS_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
 JAVA_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
 
@@ -72,14 +86,13 @@ then
 	fi
 fi
 
-FELIX_CACHE="$FELIX/felix-cache"
+FELIX_CACHE="$FELIX_WORK_DIR/felix-cache"
 
 
 ###############################
 ### NO CHANGES NEEDED BELOW ###
 ###############################
 
- 
 case "$1" in
   start)
     echo -n "Starting Matterhorn as user $MATTERHORN_USER: " 
@@ -106,11 +119,11 @@ case "$1" in
       done
     fi
     
-    cd $FELIX
+    cd $FELIX_HOME
 
 # starting felix
 
-    su -c "java -Dgosh.args='--noshutdown -c noop=true' $DEBUG_OPTS $FELIX_OPTS $GRAPHICS_OPTS $TEMP_OPTS $FELIX_WORK $MAVEN_ARG $JAVA_OPTS $FELIX_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS $UTIL_LOGGING_OPTS $CXF_OPTS -jar $FELIX/bin/felix.jar $FELIX_CACHE 2>&1 > /dev/null &" $MATTERHORN_USER
+    su -c "java -Dgosh.args='--noshutdown -c noop=true' $DEBUG_OPTS $FELIX_OPTS $GRAPHICS_OPTS $TEMP_OPTS $MAVEN_ARG $JAVA_OPTS $PAX_CONFMAN_OPTS $LOG_OPTS -jar $FELIX_HOME/bin/felix.jar $FELIX_CACHE 2>&1 > /dev/null &" $MATTERHORN_USER
     echo "done." 
     ;;    
   stop)
