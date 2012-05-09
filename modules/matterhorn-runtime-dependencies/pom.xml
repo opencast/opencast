@@ -272,13 +272,13 @@
       <artifactId>org.apache.servicemix.bundles.xerces</artifactId>
       <version>2.9.1_3</version>
     </dependency>
-
-    <dependency>
-      <groupId>org.apache.servicemix.bundles</groupId>
-      <artifactId>org.apache.servicemix.bundles.javax.mail</artifactId>
-      <version>1.4.1_3</version>
-    </dependency>
     
+    <dependency>
+      <groupId>org.apache.geronimo.javamail</groupId>
+      <artifactId>geronimo-javamail_1.4_mail</artifactId>
+      <version>1.8.3</version>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.rome</artifactId>

@@ -21,6 +21,11 @@
       <artifactId>matterhorn-common</artifactId>
       <version>${project.version}</version>
     </dependency>
+   	<dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-kernel</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-workflow-service-api</artifactId>
@@ -154,6 +159,14 @@
     	<artifactId>jna</artifactId>
     	<version>3.2.4</version>
     </dependency>
+    <dependency>
+    	<groupId>org.apache.servicemix.bundles</groupId>
+    	<artifactId>
+    		org.apache.servicemix.bundles.javax.mail
+    	</artifactId>
+    	<version>1.4.1_5</version>
+    	<type>bundle</type>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -191,7 +204,9 @@
               OSGI-INF/operations/distribute-acl.xml,
               OSGI-INF/operations/distribute-download.xml,
               OSGI-INF/operations/distribute-streaming.xml,
+              OSGI-INF/operations/distribute-youtube.xml,
               OSGI-INF/operations/download-dvd.xml,
+              OSGI-INF/operations/email.xml,
               OSGI-INF/operations/embed.xml,
               OSGI-INF/operations/error-handler.xml,
               OSGI-INF/operations/gstreamer.xml,
@@ -208,11 +223,10 @@
               OSGI-INF/operations/searchindex-remove.xml,
               OSGI-INF/operations/schedule.xml,
               OSGI-INF/operations/segmentpreviews.xml,
+              OSGI-INF/operations/speech-recognition.xml,
               OSGI-INF/operations/trim.xml,
               OSGI-INF/operations/zip.xml,
               OSGI-INF/operations/watermark.xml,
-              OSGI-INF/operations/speech-recognition.xml,
-              OSGI-INF/operations/distribute-youtube.xml
               <!-- OSGI-INF/operations/distribute-itunesu.xml -->
             </Service-Component>
           </instructions>
