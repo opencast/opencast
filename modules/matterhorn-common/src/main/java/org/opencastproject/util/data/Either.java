@@ -117,7 +117,7 @@ public abstract class Either<A, B> {
 
           @Override
           public Option<A> toOption() {
-            return Option.some(left);
+            return some(left);
           }
 
           @Override

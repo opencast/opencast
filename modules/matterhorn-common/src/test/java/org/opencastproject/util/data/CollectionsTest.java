@@ -147,24 +147,24 @@ public class CollectionsTest {
   
   @Test
   public void testList() {
-    List<Integer> i1 = list(java.util.Collections.<Integer>emptyList().iterator());
+    List<Integer> i1 = Collections.toList(java.util.Collections.<Integer>emptyList().iterator());
     assertTrue(i1.isEmpty());
-    List<Integer> i2 = list(list(1, 2, 3).iterator());
+    List<Integer> i2 = Collections.toList(list(1, 2, 3).iterator());
     assertEquals(3, i2.size());
   }
   
   @Test
   public void testRepeat() {
-    assertTrue(list(repeat(1, 0)).isEmpty());
-    assertEquals(3, list(repeat(1, 3)).size());
+    assertTrue(Collections.toList(repeat(1, 0)).isEmpty());
+    assertEquals(3, Collections.toList(repeat(1, 3)).size());
   }
   
   @Test
   public void testJoin() {
-    assertArrayEquals(array(1, 2, 3, 4, 5, 6), array(list(join(list(1, 2, 3).iterator(), list(4, 5, 6).iterator()))));
-    assertArrayEquals(array(1, 2, 3), array(list(join(list(1, 2, 3).iterator(), java.util.Collections.<Integer>emptyList().iterator()))));
-    assertArrayEquals(array(1, 2, 3), array(list(join(java.util.Collections.<Integer>emptyList().iterator(), list(1, 2, 3).iterator()))));
-    assertEquals(0, array(list(join(java.util.Collections.emptyList().iterator(), java.util.Collections.emptyList().iterator()))).length);
+    assertArrayEquals(array(1, 2, 3, 4, 5, 6), Collections.toArray(Collections.toList(join(list(1, 2, 3).iterator(), list(4, 5, 6).iterator()))));
+    assertArrayEquals(array(1, 2, 3), Collections.toArray(Collections.toList(join(list(1, 2, 3).iterator(), java.util.Collections.<Integer>emptyList().iterator()))));
+    assertArrayEquals(array(1, 2, 3), Collections.toArray(Collections.toList(join(java.util.Collections.<Integer>emptyList().iterator(), list(1, 2, 3).iterator()))));
+    assertEquals(0, Collections.toArray(Collections.toList(join(java.util.Collections.emptyList().iterator(), java.util.Collections.emptyList().iterator()))).length);
   }
   
   @Test(expected = NoSuchElementException.class)

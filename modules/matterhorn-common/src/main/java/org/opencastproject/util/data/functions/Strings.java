@@ -21,14 +21,14 @@ import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Collections.nil;
+import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 
-/**
- * Functions for strings.
- */
+/** Functions for strings. */
 public final class Strings {
 
   private Strings() {
@@ -52,43 +52,50 @@ public final class Strings {
   public static Option<String> trimToNone(String a) {
     if (a != null) {
       String trimmed = a.trim();
-      return trimmed.length() > 0 ? Option.some(a) : Option.<String>none();
+      return trimmed.length() > 0 ? some(a) : Option.<String>none();
     } else {
-      return Option.none();
+      return none();
     }
   }
 
-  /**
-   * Convert a string into a long if possible.
-   */
+  /** Return <code>a.toString()</code> wrapped in a some if <code>a != null</code>, none otherwise. */
+  public static Option<String> asString(Object a) {
+    return a != null ? some(a.toString()) : Option.<String>none();
+  }
+
+  /** Return <code>a.toString()</code> wrapped in a some if <code>a != null</code>, none otherwise. */
+  public static final Function<Object, Option<String>> asString = new Function<Object, Option<String>>() {
+    @Override
+    public Option<String> apply(Object a) {
+      return asString(a);
+    }
+  };
+
+  /** Convert a string into a long if possible. */
   public static final Function<String, Option<Long>> toLong = new Function<String, Option<Long>>() {
     @Override
     public Option<Long> apply(String s) {
       try {
         return some(Long.parseLong(s));
       } catch (NumberFormatException e) {
-        return Option.none();
+        return none();
       }
     }
   };
 
-  /**
-   * Convert a string into an integer if possible.
-   */
+  /** Convert a string into an integer if possible. */
   public static final Function<String, Option<Integer>> toInt = new Function<String, Option<Integer>>() {
     @Override
     public Option<Integer> apply(String s) {
       try {
         return some(Integer.parseInt(s));
       } catch (NumberFormatException e) {
-        return Option.none();
+        return none();
       }
     }
   };
 
-  /**
-   * Convert a string into an integer if possible.
-   */
+  /** Convert a string into an integer if possible. */
   public static final Function<String, List<Integer>> toIntL = new Function<String, List<Integer>>() {
     @Override
     public List<Integer> apply(String s) {
@@ -97,6 +104,18 @@ public final class Strings {
       } catch (NumberFormatException e) {
         return nil();
       }
+    }
+  };
+
+  /**
+   * Convert a string into a boolean.
+   *
+   * @see Boolean#valueOf(String)
+   */
+  public static final Function<String, Boolean> toBool = new Function<String, Boolean>() {
+    @Override
+    public Boolean apply(String s) {
+      return Boolean.valueOf(s);
     }
   };
 
@@ -128,4 +147,18 @@ public final class Strings {
       }
     };
   }
+
+  /** Create a split function from a regex pattern. */
+  public static Function<String, String[]> split(final Pattern splitter) {
+    return new Function<String, String[]>() {
+      @Override public String[] apply(String s) {
+        return splitter.split(s);
+      }
+    };
+  }
+
+  /**
+   * Split function to split comma separated values. Regex = <code>\s*,\s*</code>.
+   */
+  public static final Function<String, String[]> csvSplit = split(Pattern.compile("\\s*,\\s*"));
 }

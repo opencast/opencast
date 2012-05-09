@@ -16,14 +16,15 @@
 
 package org.opencastproject.util.data;
 
-/**
- * A 3-tuple.
- */
-public class Tuple3<A, B, C> {
+import static org.opencastproject.util.EqualsUtil.eqClasses;
+import static org.opencastproject.util.EqualsUtil.hash;
 
-  private A a;
-  private B b;
-  private C c;
+/** A 3-tuple. */
+public final class Tuple3<A, B, C> {
+
+  private final A a;
+  private final B b;
+  private final C c;
 
   public Tuple3(A a, B b, C c) {
     this.a = a;
@@ -41,6 +42,19 @@ public class Tuple3<A, B, C> {
 
   public C getC() {
     return c;
+  }
+
+  @Override
+  public boolean equals(Object that) {
+    if (this == that) return true;
+    if (!eqClasses(this, that)) return false;
+    Tuple3 thatc = (Tuple3) that;
+    return a.equals(thatc.a) && b.equals(thatc.b) && c.equals(thatc.c);
+  }
+
+  @Override
+  public int hashCode() {
+    return hash(a, b, c);
   }
 
   public static <A, B, C> Tuple3<A, B, C> tuple3(A a, B b, C c) {

@@ -16,6 +16,44 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.easymock.EasyMock;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.opencastproject.mediapackage.Catalog;
+import org.opencastproject.mediapackage.EName;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.mediapackage.NamespaceBindingException;
+import org.opencastproject.metadata.api.MediaPackageMetadata;
+import org.opencastproject.util.FileSupport;
+import org.opencastproject.util.UnknownFileTypeException;
+import org.opencastproject.workspace.api.Workspace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.URI;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -36,45 +74,6 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_PUBLIS
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 import static org.opencastproject.metadata.dublincore.DublinCore.TERMS_NS_URI;
 import static org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl.PROPERTY_PROMOTED;
-
-import org.opencastproject.mediapackage.Catalog;
-import org.opencastproject.mediapackage.EName;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.mediapackage.NamespaceBindingException;
-import org.opencastproject.metadata.api.MediaPackageMetadata;
-import org.opencastproject.util.FileSupport;
-import org.opencastproject.util.UnknownFileTypeException;
-import org.opencastproject.workspace.api.Workspace;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.easymock.EasyMock;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URI;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 /**
  * Test class for the dublin core implementation.
@@ -445,6 +444,18 @@ public class DublinCoreTest {
 
     assertEquals("Mediapackage metadata title not extracted from DC properly",
             catalog.getFirst(DublinCore.PROPERTY_TITLE), metadata.getTitle());
+  }
+
+  // todo fix http://opencast.jira.com/browse/MH-8759 then remove @Ignore
+  @Ignore
+  @Test
+  public void testPreserveEncodingScheme() {
+    DublinCoreCatalog dc = DublinCoreCatalogImpl.newInstance();
+    DublinCoreValue val = new DublinCoreValue("http://www.opencastproject.org/license", "en", ENC_SCHEME_URI);
+    dc.add(PROPERTY_LICENSE, val);
+    assertEquals(1, dc.get(PROPERTY_LICENSE).size());
+    assertEquals(val, dc.get(PROPERTY_LICENSE).get(0));
+    assertEquals(ENC_SCHEME_URI, dc.get(PROPERTY_LICENSE).get(0).getEncodingScheme());
   }
 
 }

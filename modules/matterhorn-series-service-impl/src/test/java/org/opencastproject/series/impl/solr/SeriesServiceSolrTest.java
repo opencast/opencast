@@ -15,6 +15,13 @@
  */
 package org.opencastproject.series.impl.solr;
 
+import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
@@ -28,15 +35,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
-
-import junit.framework.Assert;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.InputStream;

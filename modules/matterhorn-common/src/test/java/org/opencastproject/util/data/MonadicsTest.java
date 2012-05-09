@@ -34,6 +34,7 @@ import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Collections.repeat;
 import static org.opencastproject.util.data.Monadics.IteratorMonadic;
 import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Tuple.tuple;
 
 public class MonadicsTest {
 
@@ -156,7 +157,7 @@ public class MonadicsTest {
     assertTrue(applied[0]);
     assertArrayEquals(new Integer[]{2, 8, 18, 32, 50}, eval.toArray(new Integer[]{}));
     // test empty input
-    assertTrue(Collections.list(
+    assertTrue(Collections.toList(
             Monadics.mlazy(Collections.<Integer>nil()).map(Functions.<Integer>identity()).value()
     ).isEmpty());
   }
@@ -192,7 +193,7 @@ public class MonadicsTest {
               }
             })
             .eval();
-    assertArrayEquals(array(1, 4, 9, 1, 4, 9), array(eval));
+    assertArrayEquals(array(1, 4, 9, 1, 4, 9), Collections.toArray(eval));
   }
 
   @Test
@@ -215,7 +216,7 @@ public class MonadicsTest {
               }
             })
             .eval();
-    assertArrayEquals(array(1, 4, 9, 1, 4, 9), array(eval));
+    assertArrayEquals(array(1, 4, 9, 1, 4, 9), Collections.toArray(eval));
   }
 
   @Test
@@ -344,6 +345,33 @@ public class MonadicsTest {
     assertEquals(3, Monadics.mlazy(asList(1, 2, 3, 4, 5)).take(3).eval().size());
     assertEquals(5, Monadics.mlazy(asList(1, 2, 3, 4, 5)).take(5).eval().size());
     assertEquals(5, Monadics.mlazy(asList(1, 2, 3, 4, 5)).take(10).eval().size());
+  }
+
+  @Test
+  public void testZip() {
+    {
+      List<Tuple<String, Integer>> r = mlist(new String[]{"a", "b", "c"}).zip(list(1, 2, 3, 4, 5)).value();
+      assertEquals(3, r.size());
+      assertEquals(tuple("b", 2), r.get(1));
+    }
+    {
+      List<Tuple<String, Integer>> r = mlist(new String[]{"a", "b", "c"}).zip(Collections.<Integer>nil()).value();
+      assertEquals(0, r.size());
+    }
+    {
+      List<Tuple<String, Integer>> r = mlist(list("a", "b", "c")).zip(list(1, 2)).value();
+      assertEquals(2, r.size());
+      assertEquals(tuple("b", 2), r.get(1));
+    }
+    {
+      List<Tuple<String, Integer>> r = mlist(list("a", "b", "c").iterator()).zip(list(1, 2)).value();
+      assertEquals(2, r.size());
+      assertEquals(tuple("b", 2), r.get(1));
+    }
+    {
+      List<Tuple<String, Integer>> r = mlist(Collections.<String>nil().iterator()).zip(list(1, 2)).value();
+      assertEquals(0, r.size());
+    }
   }
 
   private static <A> Function<A, Iterator<A>> twice() {

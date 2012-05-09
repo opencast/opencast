@@ -26,16 +26,12 @@ import java.util.List;
 
 import static org.opencastproject.util.data.Monadics.mlist;
 
-/**
- * General purpose functions, especially function transformations.
- */
+/** General purpose functions, especially function transformations. */
 public final class Functions {
   private Functions() {
   }
 
-  /**
-   * Function composition: <code>f . g = f (g x) = o(f, g)</code> 
-   */
+  /** Function composition: <code>f . g = f (g x) = o(f, g)</code> */
   public static <A, B, C> Function<A, C> o(final Function<B, C> f, final Function<A, B> g) {
     return new Function<A, C>() {
       @Override
@@ -45,9 +41,7 @@ public final class Functions {
     };
   }
 
-  /**
-   * <code>f . g . h</code> 
-   */
+  /** <code>f . g . h</code> */
   public static <A, B, C, D> Function<A, D> o(final Function<C, D> f, final Function<B, C> g, final Function<A, B> h) {
     return new Function<A, D>() {
       @Override
@@ -57,9 +51,7 @@ public final class Functions {
     };
   }
 
-  /**
-   * <code>f . g . h . i</code> 
-   */
+  /** <code>f . g . h . i</code> */
   public static <A, B, C, D, E> Function<A, E> o(final Function<D, E> f, final Function<C, D> g, final Function<B, C> h,
                                                  final Function<A, B> i) {
     return new Function<A, E>() {
@@ -70,9 +62,7 @@ public final class Functions {
     };
   }
 
-  /**
-   * Curry a function of arity 2.
-   */
+  /** Curry a function of arity 2. */
   public static <A, B, C> Function<B, C> curry(final Function2<A, B, C> f, final A a) {
     return new Function<B, C>() {
       @Override
@@ -82,9 +72,7 @@ public final class Functions {
     };
   }
 
-  /**
-   * Curry a function of arity 2.
-   */
+  /** Curry a function of arity 2. */
   public static <A, B, C> Function<A, Function<B, C>> curry(final Function2<A, B, C> f) {
     return new Function<A, Function<B, C>>() {
       @Override
@@ -99,9 +87,7 @@ public final class Functions {
     };
   }
 
-  /**
-   * Uncurry to a function of arity 2.
-   */
+  /** Uncurry to a function of arity 2. */
   public static <A, B, C> Function2<A, B, C> uncurry(final Function<A, Function<B, C>> f) {
     return new Function2<A, B, C>() {
       @Override
@@ -111,9 +97,7 @@ public final class Functions {
     };
   }
 
-  /**
-   * Curry a function of arity 1.
-   */
+  /** Curry a function of arity 1. */
   public static <A, B> Function0<B> curry(final Function<A, B> f, final A a) {
     return new Function0<B>() {
       @Override
@@ -123,9 +107,7 @@ public final class Functions {
     };
   }
 
-  /**
-   * Curry a function of arity 1.
-   */
+  /** Curry a function of arity 1. */
   public static <A, B> Function<A, Function0<B>> curry(final Function<A, B> f) {
     return new Function<A, Function0<B>>() {
       @Override
@@ -140,9 +122,7 @@ public final class Functions {
     };
   }
 
-  /**
-   * Noop function of arity 0.
-   */
+  /** Noop function of arity 0. */
   public static <A> Function0<A> noop() {
     return new Function0<A>() {
       @Override
@@ -152,9 +132,7 @@ public final class Functions {
     };
   }
 
-  /**
-   * Identity function.
-   */
+  /** Identity function. */
   public static <A> Function<A, A> identity() {
     return new Function<A, A>() {
       @Override
@@ -163,10 +141,8 @@ public final class Functions {
       }
     };
   }
-  
-  /**
-   * Constant function that always returns <code>a</code>.
-   */
+
+  /** Constant function that always returns <code>a</code>. */
   public static <A> Function0<A> constant(final A a) {
     return new Function0<A>() {
       @Override
@@ -176,9 +152,7 @@ public final class Functions {
     };
   }
 
-  /**
-   * Promote function <code>a -&gt; b</code> to an {@link Option}.
-   */
+  /** Promote function <code>a -&gt; b</code> to an {@link Option}. */
   public static <A, B> Function<Option<A>, Option<B>> liftOpt(final Function<A, B> f) {
     return new Function<Option<A>, Option<B>>() {
       @Override
@@ -188,9 +162,7 @@ public final class Functions {
     };
   }
 
-  /**
-   * Create a bound version of <code>f</code> for {@link Option}.
-   */
+  /** Create a bound version of <code>f</code> for {@link Option}. */
   public static <A, B> Function<Option<A>, Option<B>> bindOpt(final Function<A, Option<B>> f) {
     return new Function<Option<A>, Option<B>>() {
       @Override
@@ -200,9 +172,7 @@ public final class Functions {
     };
   }
 
-  /**
-   * Promote function <code>a -&gt; b</code> to a {@link List}.
-   */
+  /** Promote function <code>a -&gt; b</code> to a {@link List}. */
   public static <A, B> Function<List<A>, List<B>> liftList(final Function<A, B> f) {
     return new Function<List<A>, List<B>>() {
       @Override
@@ -212,9 +182,7 @@ public final class Functions {
     };
   }
 
-  /**
-   * Create a bound version of <code>f</code> for {@link List}.
-   */
+  /** Create a bound version of <code>f</code> for {@link List}. */
   public static <A, B> Function<List<A>, List<B>> bind(final Function<A, List<B>> f) {
     return new Function<List<A>, List<B>>() {
       @Override
@@ -223,7 +191,7 @@ public final class Functions {
       }
     };
   }
-  
+
   public static <A, B> List<B> bind(List<A> as, Function<A, List<B>> f) {
     List<B> target = new ArrayList<B>();
     for (A a : as) {
