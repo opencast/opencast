@@ -28,9 +28,18 @@ ocSeriesList.Configuration = new (function(){
 });
 
 ocSeriesList.SortColumns = [
-  {0: 'TITLE', 1: 'TITLE_DESC'},
-  {0: 'CREATOR', 1: 'CREATOR_DESC'},
-  {0: 'CONTRIBUTOR', 1: 'CONTRIBUTOR_DESC'}
+{
+  0: 'TITLE', 
+  1: 'TITLE_DESC'
+},
+{
+  0: 'CREATOR', 
+  1: 'CREATOR_DESC'
+},
+{
+  0: 'CONTRIBUTOR', 
+  1: 'CONTRIBUTOR_DESC'
+}
 ];
 
 ocSeriesList.init = function(){
@@ -43,7 +52,8 @@ ocSeriesList.init = function(){
   }
   $('#pageSize').change(function(event, ui)
   {
-    ocSeriesList.Configuration.count = event.target.value;
+    ocSeriesList.Configuration.startPage = 0;
+    ocSeriesList.Configuration.count = parseInt(event.target.value);
     $.cookie('series_count', ocSeriesList.Configuration.count);
     ocSeriesList.askForSeries();
   })
@@ -64,27 +74,27 @@ ocSeriesList.askForSeries = function()
     type: "GET",
     success: function(data)
     {
-      ocSeriesList.Configuration.total = data.totalCount;
+      ocSeriesList.Configuration.total = parseInt(data.totalCount);
       ocSeriesList.Configuration.lastPage = Math.floor(ocSeriesList.Configuration.total / ocSeriesList.Configuration.count)
       ocSeriesList.buildSeriesView(data);
-      if(ocSeriesList.Configuration.startPage == 0) {
+      if(ocSeriesList.Configuration.total <= ocSeriesList.Configuration.count){
+        $('#prevText').show();
+        $('#prevButtons').hide();
+
+        $('#nextText').show();
+        $('#nextButtons').hide();
+      } else if(ocSeriesList.Configuration.startPage == 0) {
         $('#prevText').show();
         $('#prevButtons').hide();
 
         $('#nextText').hide();
         $('#nextButtons').show();
-      } else if(ocSeriesList.Configuration.startPage == ocSeriesList.Configuration.lastPage) {
+      }else if(ocSeriesList.Configuration.startPage == ocSeriesList.Configuration.lastPage) {
         $('#nextText').show();
         $('#nextButtons').hide();
 
         $('#prevText').hide();
         $('#prevButtons').show();
-      } else if(ocSeriesList.Configuration.total == ocSeriesList.Configuration.count){
-        $('#prevText').hide();
-        $('#prevButtons').show();
-
-        $('#nextText').hide();
-        $('#nextButtons').show();
       } else {
         $('#prevText').hide();
         $('#prevButtons').show();
