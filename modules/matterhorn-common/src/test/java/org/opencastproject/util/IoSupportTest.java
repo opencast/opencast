@@ -16,10 +16,7 @@
 
 package org.opencastproject.util;
 
-import static org.junit.Assert.assertTrue;
-
 import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -32,6 +29,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test for the IoSupporTest class

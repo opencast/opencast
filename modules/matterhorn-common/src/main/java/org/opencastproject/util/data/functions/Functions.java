@@ -31,12 +31,20 @@ public final class Functions {
   private Functions() {
   }
 
-  /** Function composition: <code>f . g = f (g x) = o(f, g)</code> */
+  /** Function composition: <code>f . g = f(g(x)) = o(f, g)</code> */
   public static <A, B, C> Function<A, C> o(final Function<B, C> f, final Function<A, B> g) {
     return new Function<A, C>() {
-      @Override
-      public C apply(A a) {
+      @Override public C apply(A a) {
         return f.apply(g.apply(a));
+      }
+    };
+  }
+
+  /** Function composition: <code>f . g = f(g) = o(f, g)</code> */
+  public static <A, B> Function0<B> o(final Function<A, B> f, final Function0<A> g) {
+    return new Function0<B>() {
+      @Override public B apply() {
+        return f.apply(g.apply());
       }
     };
   }
@@ -44,8 +52,7 @@ public final class Functions {
   /** <code>f . g . h</code> */
   public static <A, B, C, D> Function<A, D> o(final Function<C, D> f, final Function<B, C> g, final Function<A, B> h) {
     return new Function<A, D>() {
-      @Override
-      public D apply(A a) {
+      @Override public D apply(A a) {
         return f.apply(g.apply(h.apply(a)));
       }
     };
@@ -55,9 +62,36 @@ public final class Functions {
   public static <A, B, C, D, E> Function<A, E> o(final Function<D, E> f, final Function<C, D> g, final Function<B, C> h,
                                                  final Function<A, B> i) {
     return new Function<A, E>() {
-      @Override
-      public E apply(A a) {
+      @Override public E apply(A a) {
         return f.apply(g.apply(h.apply(i.apply(a))));
+      }
+    };
+  }
+
+  /** Left to right compositon: <code>f then g = g(f(x))</code> */
+  public static <A, B, C> Function<A, C> then(final Function<A, B> f, final Function<B, C> g) {
+    return new Function<A, C>() {
+      @Override public C apply(A a) {
+        return g.apply(f.apply(a));
+      }
+    };
+  }
+
+  /** Left to right compositon: <code>f then g = g(f)</code> */
+  public static <A, B> Function0<B> then(final Function0<A> f, final Function<A, B> g) {
+    return new Function0<B>() {
+      @Override public B apply() {
+        return g.apply(f.apply());
+      }
+    };
+  }
+
+  /** Apply <code>f</code> and ignore its result, then apply <code>g</code>. */
+  public static <A, B> Function0<B> then(final Function0<A> f, final Function0<B> g) {
+    return new Function0<B>() {
+      @Override public B apply() {
+        f.apply();
+        return g.apply();
       }
     };
   }
@@ -140,6 +174,26 @@ public final class Functions {
         return a;
       }
     };
+  }
+
+  /**
+   * Identity function. The type is based on the type of the example object to save some nasty
+   * typing, e.g. <code>Function.&lt;Integer&gt;identity()</code> vs. <code>identity(0)</code>
+   * <p/>
+   * Please note that this constructor is only due to Java's insufficient type inference.
+   */
+  public static <A> Function<A, A> identity(A example) {
+    return identity();
+  }
+
+  /**
+   * Identity function.
+   *
+   * @param clazz
+   *         to describe the functions's type
+   */
+  public static <A> Function<A, A> identity(Class<A> clazz) {
+    return identity();
   }
 
   /** Constant function that always returns <code>a</code>. */

@@ -188,6 +188,16 @@ public final class Collections {
     }
   }
 
+  /** Return the last element of the list. */
+  public static <A> Option<A> last(List<A> as) {
+    return as.size() > 0 ? some(as.get(as.size() - 1)) : Option.<A>none();
+  }
+
+  /** Return the last element of the array. */
+  public static <A> Option<A> last(A[] as) {
+    return as.length > 0 ? some(as[as.length - 1]) : Option.<A>none();
+  }
+
   /**
    * Sort array <code>as</code> according to the natural ordering. Note that <code>as</code> gets
    * mutated!

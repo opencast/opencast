@@ -17,13 +17,17 @@
 package org.opencastproject.util;
 
 import org.apache.commons.lang.StringUtils;
+import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Strings;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 
 import java.util.Dictionary;
 
+import static org.opencastproject.util.data.Collections.mkString;
+import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 
 /** Contains general purpose OSGi utility functions. */
@@ -63,7 +67,7 @@ public final class OsgiUtil {
 
   /** Get a value from a dictionary. Return none if the key does either not exist or the value is blank. */
   public static Option<String> getOptCfg(Dictionary d, String key) {
-    return option(d.get(key)).bind(Strings.asString).bind(Strings.trimToNone);
+    return option(d.get(key)).bind(Strings.asString()).bind(Strings.trimToNone);
   }
 
   /**
@@ -78,5 +82,16 @@ public final class OsgiUtil {
     } catch (NumberFormatException e) {
       throw new ConfigurationException(key, "not an integer");
     }
+  }
+
+  /** Create a config info string suitable for logging purposes. */
+  public static String showConfig(Tuple<String, ?>... cfg) {
+    return "Config\n" + mkString(
+            mlist(cfg).map(new Function<Tuple<String, ?>, String>() {
+              @Override public String apply(Tuple<String, ?> t) {
+                return t.getA() + "=" + t.getB().toString();
+              }
+            }).value(),
+            "\n");
   }
 }

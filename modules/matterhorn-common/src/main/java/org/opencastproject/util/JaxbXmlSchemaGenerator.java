@@ -15,9 +15,6 @@
  */
 package org.opencastproject.util;
 
-import java.io.IOException;
-import java.io.StringWriter;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.SchemaOutputResolver;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -25,6 +22,8 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.StringWriter;
 
 /**
  * Provides utility methods for transforming a {@link JAXBContext} into an XML schema.

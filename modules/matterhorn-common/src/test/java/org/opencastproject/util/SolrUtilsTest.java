@@ -15,8 +15,6 @@
  */
 package org.opencastproject.util;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 
 import java.text.DateFormat;
@@ -24,6 +22,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test case for {@link SolrUtils}.

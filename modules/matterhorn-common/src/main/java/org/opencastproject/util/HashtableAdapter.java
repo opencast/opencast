@@ -15,9 +15,8 @@
  */
 package org.opencastproject.util;
 
-import java.util.Hashtable;
-
 import javax.xml.bind.annotation.adapters.XmlAdapter;
+import java.util.Hashtable;
 
 /**
  * Adapter class for JaxB to represent a Hashtable
