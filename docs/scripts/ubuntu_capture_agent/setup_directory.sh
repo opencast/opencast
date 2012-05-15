@@ -4,14 +4,13 @@
 # Setup the directory to install the CA #
 #########################################
 
-. ${FUNCTIONS}
+# Checks this script is being run from install.sh
+if [[ ! $INSTALL_RUN ]]; then
+    echo "You shouldn't run this script directly. Please use the install.sh instead"
+    exit 1
+fi
 
 # Setup opencast storage directories
-# TODO: Uncomment the following lines -and remove the next two- once the correct defaults for the directories are set in the config files in svn
-## Read default from the config file
-#default_dir=$(grep "^org\.opencastproject\.storage\.dir=.*$" $GEN_PROPS | cut -d '=' -f 2)
-#ask -d "$default_dir" "Where would you like the matterhorn directories to be stored?" oc_dir
-#: ${oc_dir:=$OC_DIR}
 ask -d "$OC_DIR" "Where would you like the matterhorn directories to be stored?" oc_dir
 echo
 
