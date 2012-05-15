@@ -71,23 +71,23 @@ $(document).ready( function() {
                 $("#oc_ie8comments").detach();
 	    }
 
-	    // mh2go link
+	    // mobile_redirect link
 	    var usingMobileBrowser = (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(navigator.userAgent.toLowerCase()));
-	    var mh2go_enabled = data.org.properties["engageui.link_mh2go.enable"];
-	    var mh2go_url = data.org.properties["engageui.link_mh2go.url"];
-	    if (usingMobileBrowser && mh2go_enabled && (mh2go_enabled == "true") && mh2go_url && (mh2go_url != ""))
+	    var mobile_redirect_enabled = data.org.properties["engageui.link_mobile_redirect.enable"];
+	    var mobile_redirect_url = data.org.properties["engageui.link_mobile_redirect.url"];
+	    if (usingMobileBrowser && mobile_redirect_enabled && (mobile_redirect_enabled == "true") && mobile_redirect_url && (mobile_redirect_url != ""))
 	    {
-		var mh2go_description = data.org.properties["engageui.link_mh2go.description"];
-		mh2go_description = (mh2go_description && (mh2go_description != "")) ? mh2go_description : mh2go_url;
-		$("#oc_mh2go-url").html('<a href="' + mh2go_url + '">' + mh2go_description + '</a>');
-		$("#mh2go-close").click(function()
+		var mobile_redirect_description = data.org.properties["engageui.link_mobile_redirect.description"];
+		mobile_redirect_description = (mobile_redirect_description && (mobile_redirect_description != "")) ? mobile_redirect_description : mobile_redirect_url;
+		$("#oc_mobile_redirect-url").html('<a href="' + mobile_redirect_url + '">' + mobile_redirect_description + '</a>');
+		$("#mobile_redirect-close").click(function()
 					{
-					    $("#oc_mh2go").hide();
+					    $("#oc_mobile_redirect").hide();
 					});
-                $("#oc_mh2go").show();
+                $("#oc_mobile_redirect").show();
 	    } else
 	    {
-                $("#oc_mh2go").detach();
+                $("#oc_mobile_redirect").detach();
 	    }
         }
     });
