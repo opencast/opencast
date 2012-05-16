@@ -16,4 +16,6 @@
     cardinality="1..1" policy="static" bind="setSecurityService" />
   <reference name="eventAdmin" interface="org.osgi.service.event.EventAdmin"
     cardinality="1..1" policy="static" bind="setEventAdmin" />
+  <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+    cardinality="1..1" policy="static" bind="setOrgDirectory" />
 </scr:component>

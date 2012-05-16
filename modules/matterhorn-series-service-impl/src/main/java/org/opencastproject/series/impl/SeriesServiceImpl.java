@@ -23,7 +23,8 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
-import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -34,6 +35,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.FunctionException;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Tuple;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.event.Event;
@@ -44,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -52,8 +55,6 @@ import static org.opencastproject.event.EventAdminConstants.ID;
 import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
 import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
 import static org.opencastproject.event.EventAdminConstants.SERIES_TOPIC;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.EqualsUtil.bothNotNull;
 import static org.opencastproject.util.EqualsUtil.eqListSorted;
 import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
@@ -78,6 +79,9 @@ public class SeriesServiceImpl implements SeriesService {
   /** The security service */
   protected SecurityService securityService;
 
+  /** The organization directory */
+  protected OrganizationDirectoryService orgDirectory;
+
   /** The OSGI event admin service */
   protected EventAdmin eventAdmin;
 
@@ -96,6 +100,11 @@ public class SeriesServiceImpl implements SeriesService {
     this.securityService = securityService;
   }
 
+  /** OSGi callback for setting the organization directory service. */
+  public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
+    this.orgDirectory = orgDirectory;
+  }
+
   /** OSGi callback for setting the event admin. */
   public void setEventAdmin(EventAdmin eventAdmin) {
     this.eventAdmin = eventAdmin;
@@ -109,34 +118,33 @@ public class SeriesServiceImpl implements SeriesService {
   public void activate(ComponentContext cc) throws Exception {
     logger.info("Activating Series Service");
 
-    try {
-      // Run as the superuser so we get all series, regardless of organization or role
-      securityService.setOrganization(new DefaultOrganization());
-      securityService.setUser(new User("seriesadmin", DEFAULT_ORGANIZATION_ID, new String[]{GLOBAL_ADMIN_ROLE}));
-      populateSolr();
-    } finally {
-      securityService.setOrganization(null);
-      securityService.setUser(null);
-    }
+    populateSolr();
   }
 
   /** If the solr index is empty, but there are series in the database, populate the solr index. */
   private void populateSolr() {
     long instancesInSolr = 0L;
     try {
-      instancesInSolr = this.index.count();
+      instancesInSolr = index.count();
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }
     if (instancesInSolr == 0L) {
       try {
-        DublinCoreCatalog[] databaseSeries = persistence.getAllSeries();
-        if (databaseSeries.length != 0) {
-          logger.info("The series index is empty. Populating it now with {} series",
-                      Integer.valueOf(databaseSeries.length));
-          for (DublinCoreCatalog series : databaseSeries) {
-            index.updateIndex(series);
-            String id = series.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+        Iterator<Tuple<DublinCoreCatalog, String>> databaseSeries = persistence.getAllSeries();
+        if (databaseSeries.hasNext()) {
+          logger.info("The series index is empty. Populating it now with series");
+          while (databaseSeries.hasNext()) {
+            Tuple<DublinCoreCatalog, String> series = databaseSeries.next();
+
+            // Run as the superuser so we get all series, regardless of organization or role
+            Organization organization = orgDirectory.getOrganization(series.getB());
+            securityService.setOrganization(organization);
+            securityService.setUser(new User(organization.getName(), organization.getId(), new String[] { organization
+                    .getAdminRole() }));
+
+            index.updateIndex(series.getA());
+            String id = series.getA().getFirst(DublinCore.PROPERTY_IDENTIFIER);
             AccessControlList acl = persistence.getAccessControlList(id);
             if (acl != null) {
               index.updateSecurityPolicy(id, acl);
@@ -147,6 +155,9 @@ public class SeriesServiceImpl implements SeriesService {
       } catch (Exception e) {
         logger.warn("Unable to index series instances: {}", e);
         throw new ServiceException(e.getMessage());
+      } finally {
+        securityService.setOrganization(null);
+        securityService.setUser(null);
       }
     }
   }
