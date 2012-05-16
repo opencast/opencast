@@ -119,7 +119,7 @@ ocSeries.init = function(){
     if(ui.item.value == 'No Match') {
       return false;
     }
-    if($(this).attr('id') == "") {
+    if($(this).attr('id') != "") {
       $row = $(privilegeRow);
       $row.find('[name|="priv_view"]').attr('checked', 'checked');
       $row.find('[name|="priv_view"]').attr('disabled', 'disabled');
