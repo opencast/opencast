@@ -39,7 +39,7 @@ while test $# -gt 0; do
       echo $exec_prefix
       ;;
     --version)
-      echo 1.2.14
+      echo 1.2.15
       ;;
     --cflags)
       echo -I${prefix}/include/SDL -D_GNU_SOURCE=1 -Dmain=SDL_main

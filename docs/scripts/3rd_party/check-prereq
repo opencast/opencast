@@ -812,6 +812,7 @@ check_prereq() {
       chkprog g++     || install_prog g++      || return 1
       chkprog yacc    || install_prog yacc     || return 1
       chkprog patch   || install_prog patch    || return 1
+      chkprog libtool || install_prog libtool  || return 1
       # this was reported as missing on some systems and is needed by git
       chkprog dbiprof || install_prog perl-dbi || return 1
       chkprog git     || install_prog git      || return 1
