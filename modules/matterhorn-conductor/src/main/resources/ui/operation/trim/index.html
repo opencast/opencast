@@ -360,7 +360,7 @@
                     $('#meta-' + tagName).val($(elm).text());               
                     if ($('#info-' + tagName).length>0) $('#info-' + tagName)[0].innerHTML = $(elm).text();        
                     if ( tagName === "created" ) {            
-                      $('#recordDate').datepicker('setDate',$(elm).text());
+                      $('#recordDate').datepicker('setDate',new Date($(elm).text()));
                       $('#startTimeHour').val((new Date($(elm).text())).getHours()); 
                       $('#startTimeMin').val((new Date($(elm).text())).getMinutes()); 
                     }
@@ -656,7 +656,7 @@
             recordDate += $('#startTimeHour').val() * 3600; // convert hour to seconds, add to date.      
             recordDate += $('#startTimeMin').val() * 60; //convert minutes to seconds, add to date.		
             recordDate = recordDate * 1000; //back to milliseconds
-            ocUtils.toISODate(recordDate); // = (new Date(recordDate)).format("isoUTCdateTime");
+            recordDate = ocUtils.toISODate(recordDate); // = (new Date(recordDate)).format("isoUTCdateTime");
           }
           if ($field.val() != '') {
             var $dcelm = false;    //$(DCmetadata.documentElement).find('dcterms\\:' + $field.attr('name'));
