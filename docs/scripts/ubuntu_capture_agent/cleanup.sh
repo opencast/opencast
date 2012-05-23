@@ -12,10 +12,10 @@ HOME=
 SRC_LIST=
 # Location for the backup file
 SRC_LIST_BKP=
-# Location of matterhorn files
-OC_DIR=
-# The directory where the capture agent files live
-CA_DIR=
+# Location of the matterhorn install
+MH_DIR=
+# The directory where the capture agent capture files live
+CA_FILES_DIR=
 # Path to the matterhorn startup script
 STARTUP_SCRIPT=
 # Path to the file specifying rules for the installed devices
@@ -37,6 +37,16 @@ done
 
 if [[ $(echo "${response:-no}" | grep -i '^no$') ]]; then
   exit 0
+fi
+
+# Double check to make sure they don't want to delete any captures they might have. 
+read -p "Do you want to delete any capture files you may have in $CA_FILES_DIR [yes/NO]? " response
+while [[ -z $(echo "$response" | grep -i '^yes$') && -z $(echo "${response:-no}" | grep -i '^no$') ]]; do
+    read -p "Please write yes or no [no]: " response
+done
+
+if [[ $(echo "${response:-yes}" | grep -i '^yes$') ]]; then
+  rm -rf $CA_FILES_DIR
 fi
 
 # Remove vga2usb driver
@@ -71,18 +81,13 @@ rm -f $RULES_FILE
 echo "Done"
 
 # Remove the capture storage directory
-echo -n "Deleting the matterhorn storage directory... "
-rm -rf $OC_DIR
+echo -n "Deleting the matterhorn install directory... "
+rm -rf $MH_DIR
 echo "Done"
 
 # Remove the jv4linfo library
 echo -n "Deleting the jv4linfo library... "
 rm -f /usr/lib/libjv4linfo.so
-echo "Done"
-
-# Remove the CA_DIR directory
-echo -n "Deleting the capture agent directory... "
-rm -rf $CA_DIR
 echo "Done"
 
 # Remove the user and their home directory

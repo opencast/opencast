@@ -132,10 +132,9 @@ sed -i "s#^USER=.*\$#USER=$USERNAME#" "$CLEANUP"
 sed -i "s#^HOME=.*\$#HOME=$HOME#" "$CLEANUP"
 sed -i "s#^SRC_LIST=.*\$#SRC_LIST=$SRC_LIST#" "$CLEANUP"
 sed -i "s#^SRC_LIST_BKP=.*\$#SRC_LIST_BKP=$SRC_LIST_BKP#" "$CLEANUP"
-sed -i "s#^OC_DIR=.*\$#OC_DIR=$OC_DIR#" "$CLEANUP"
-sed -i "s#^CA_DIR=.*\$#CA_DIR=$CA_DIR#" "$CLEANUP"
+sed -i "s#^MH_DIR=.*\$#MH_DIR=$FELIX_HOME#" "$CLEANUP"
+sed -i "s#^CA_FILES_DIR=.*\$#CA_FILES_DIR=$OC_DIR/cache#" "$CLEANUP"
 sed -i "s#^RULES_FILE=.*\$#RULES_FILE=$DEV_RULES#" "$CLEANUP"
-sed -i "s#^CA_DIR=.*\$#CA_DIR=$CA_DIR#" "$CLEANUP"
 sed -i "s#^STARTUP_SCRIPT=.*\$#STARTUP_SCRIPT=$STARTUP_SCRIPT#" "$CLEANUP"
 
 # Write the uninstalled package list to the cleanup.sh template
