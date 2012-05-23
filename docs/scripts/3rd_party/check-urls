@@ -125,7 +125,7 @@ done
 # 2. Check all other configs
 #
 for config in `find "${HOME3P}" -name config.txt`; do
-  for ii in "" 1 2 3; do
+  for ii in "" 1 2 3 4 5 6; do
     for pkg in `getcfgx PKG${ii}: "$config"`; do
       for URL in `getcfgx URL${ii}: "$config"`; do
         fetch "$URL/$pkg" "$NOTFOUND"

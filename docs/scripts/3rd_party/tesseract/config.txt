@@ -1,9 +1,21 @@
 URL1: http://tesseract-ocr.googlecode.com/files ${USASK_MIRROR}
-PKG1: tesseract-3.00.tar.gz
-SHA1: 1d797cae3d0047d7be6c9b17d1973a9afcf6bd81
+PKG1: tesseract-3.01.tar.gz
+SHA1: c0b605d7192b3071842fe535c82b89c65f2d9c67
 URL2: http://tesseract-ocr.googlecode.com/files ${USASK_MIRROR}
-PKG2: eng.traineddata.gz
-SHA2: bf72c6c4542d67ce1d6def9d4e8432c7e98a654b
-DIR: tesseract-3.00
+PKG2: tesseract-ocr-3.01.eng.tar.gz
+SHA2: f2d57eea524ead247612bd027375037c21e22463
+URL3: http://tesseract-ocr.googlecode.com/files ${USASK_MIRROR}
+PKG3: deu.traineddata.gz
+SHA3: c4b3ecde18ce9f114faba88cdfd0308f90801266
+URL4: http://tesseract-ocr.googlecode.com/files ${USASK_MIRROR}
+PKG4: fra.traineddata.gz
+SHA4: 8d698bb3b659e862b3274970a57b3214de76f1ff
+URL5: http://tesseract-ocr.googlecode.com/files ${USASK_MIRROR}
+PKG5: spa.traineddata.gz
+SHA5: 7b30950749e84891fdef5f89409c3cf1b6418cd3
+URL6: http://tesseract-ocr.googlecode.com/files ${USASK_MIRROR}
+PKG6: cat.traineddata.gz
+SHA6: 0301a9c81c1d646bd1b135ca89476fb63bd634f8
+DIR: tesseract-3.01
 PCP1: pc-tesseract.zip
 PCP2: tessdata.zip

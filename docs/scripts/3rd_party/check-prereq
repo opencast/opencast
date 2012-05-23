@@ -641,14 +641,22 @@ install_macports() {
     break
   done
   #
-  sudox hdiutil attach "$dmg"
-  [ $? -ne 0 ] && return 1
-  # mounted to /Volumes/MacPorts-${MPVER}
-  sudox installer -pkg "/Volumes/MacPorts-${MPVER}/MacPorts-${MPVER}.pkg" -target /
-  [ $? -ne 0 ] && return 1
-  # installed to /opt/local/bin/port
-  sudox hdiutil detach "/Volumes/MacPorts-${MPVER}"
-  [ $? -ne 0 ] && return 1
+  if [ "$dmg" != "${dmg%.dmg}" ]; then
+    sudox hdiutil attach "$dmg"
+    [ $? -ne 0 ] && return 1
+    # mounted to /Volumes/MacPorts-${MPVER}
+    sudox installer -pkg "/Volumes/MacPorts-${MPVER}/MacPorts-${MPVER}.pkg" -target /
+    [ $? -ne 0 ] && return 1
+    # installed to /opt/local/bin/port
+    sudox hdiutil detach "/Volumes/MacPorts-${MPVER}"
+    [ $? -ne 0 ] && return 1
+  elif [ "$dmg" != "${dmg%.pkg}" ]; then
+    sudox installer -pkg "$dmg" -target /
+    [ $? -ne 0 ] && return 1
+  else
+    echo "Unknown package format: $dmg" 1>&2
+    return 1
+  fi
 # sudox port -v selfupdate
 # [ $? -ne 0 -a $? -ne 25 ] && return 1
   return 0
@@ -695,29 +703,37 @@ install_git() {
     break
   done
   #
-  sudox hdiutil attach "$dmg"
-  [ $? -ne 0 ] && return 1
-  # mounted to /Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard
-  sudox installer -pkg "/Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard/git-1.6.5.1-UNIVERSALbinary-leopard.pkg" -target /
-  [ $? -ne 0 ] && return 1
+  if [ "$dmg" != "${dmg%.dmg}" ]; then
+    sudox hdiutil attach "$dmg"
+    [ $? -ne 0 ] && return 1
+    # mounted to /Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard
+    sudox installer -pkg "/Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard/git-1.6.5.1-UNIVERSALbinary-leopard.pkg" -target /
+    [ $? -ne 0 ] && return 1
+    sudox hdiutil detach "/Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard"
+    [ $? -ne 0 ] && return 1
+  elif [ "$dmg" != "${dmg%.pkg}" ]; then
+    sudox installer -pkg "$dmg" -target /
+    [ $? -ne 0 ] && return 1
+  else
+    echo "Unknown package format: $dmg" 1>&2
+    return 1
+  fi
   # installed to /usr/local/git/bin/git
-  sudox mkdir -p /usr/local/bin
+  sudox mkdir -p ${LOCAL_PREFIX}/bin
   [ $? -ne 0 ] && return 1
-  sudox ln -fs /usr/local/git/bin/git /usr/local/bin/git
+  sudox ln -fs /usr/local/git/bin/git ${LOCAL_PREFIX}/bin/git
   [ $? -ne 0 ] && return 1
-  sudox ln -fs /usr/local/git/bin/git-cvsserver /usr/local/bin/git-cvsserver
+  sudox ln -fs /usr/local/git/bin/git-cvsserver ${LOCAL_PREFIX}/bin/git-cvsserver
   [ $? -ne 0 ] && return 1
-  sudox ln -fs /usr/local/git/bin/git-receive-pack /usr/local/bin/git-receive-pack
+  sudox ln -fs /usr/local/git/bin/git-receive-pack ${LOCAL_PREFIX}/bin/git-receive-pack
   [ $? -ne 0 ] && return 1
-  sudox ln -fs /usr/local/git/bin/git-shell /usr/local/bin/git-shell
+  sudox ln -fs /usr/local/git/bin/git-shell ${LOCAL_PREFIX}/bin/git-shell
   [ $? -ne 0 ] && return 1
-  sudox ln -fs /usr/local/git/bin/git-upload-archive /usr/local/bin/git-upload-archive
+  sudox ln -fs /usr/local/git/bin/git-upload-archive ${LOCAL_PREFIX}/bin/git-upload-archive
   [ $? -ne 0 ] && return 1
-  sudox ln -fs /usr/local/git/bin/git-upload-pack /usr/local/bin/git-upload-pack
+  sudox ln -fs /usr/local/git/bin/git-upload-pack ${LOCAL_PREFIX}/bin/git-upload-pack
   [ $? -ne 0 ] && return 1
-  sudox ln -fs /usr/local/git/bin/gitk /usr/local/bin/gitk
-  [ $? -ne 0 ] && return 1
-  sudox hdiutil detach "/Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard"
+  sudox ln -fs /usr/local/git/bin/gitk ${LOCAL_PREFIX}/bin/gitk
   [ $? -ne 0 ] && return 1
 # sudox port -v selfupdate
 # [ $? -ne 0 -a $? -ne 25 ] && return 1

@@ -7,10 +7,14 @@ source "${HOME3P}/utilx"
 [ $? -ne 0 ] && exit 1
 #
 [ -f .done-linux ] && exit 0
-pkg1=`getcfg PKG1:`
-chkpkg "$pkg1" || exit 1
-pkg2=`getcfg PKG2:`
-chkpkg "$pkg2" || exit 1
+typeset -i ii=1
+for _pkg in pkg1 pkg2 pkg3 pkg4 pkg5 pkg6; do
+  eval $_pkg=`getcfg PKG$ii:`
+  chkpkg "${!_pkg}" || exit 1
+  chmod 644 "${!_pkg}"
+  [ $? -ne 0 ] && exit 1
+  let ii=ii+1
+done
 dir=`getcfg DIR:`
 [ -z "$dir" -o "$dir" = "/" ] && exit 1
 #
@@ -23,16 +27,25 @@ mv "$dir" "${dir}-linux"
 #
 cd "${dir}-linux/tessdata"
 [ $? -ne 0 ] && exit 1
-cp "../../$pkg2" .
+gzip -dc "../../$pkg2" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv tesseract-ocr/tessdata/* .
 [ $? -ne 0 ] && exit 1
-chmod 644 "$pkg2"
-[ $? -ne 0 ] && exit 1
-gzip -df "$pkg2"
+rm -fr tesseract-ocr
 [ $? -ne 0 ] && exit 1
 cd ..
 [ $? -ne 0 ] && exit 1
 #
-./configure LIBS=-lgif
+cp ../strngs.h ccutil
+[ $? -ne 0 ] && exit 1
+cp ../configure.ac .
+[ $? -ne 0 ] && exit 1
+#
+./autogen.sh
+[ $? -ne 0 ] && exit 1
+./configure \
+LDFLAGS='-L${LOCAL_PREFIX}/lib -Wl,-rpath,${LOCAL_PREFIX}/lib' \
+LIBS=-lgif
 [ $? -ne 0 ] && exit 1
 make
 [ $? -ne 0 ] && exit 1
@@ -45,12 +58,23 @@ sudox /sbin/ldconfig
 #
 OLDCD=`pwd`
 [ $? -ne 0 ] && exit 1
-sudox cp "../$pkg2" ${LOCAL_PREFIX}/share/tessdata
-[ $? -ne 0 ] && exit 1
+for _pkg in pkg2 pkg3 pkg4 pkg5 pkg6; do
+  sudox cp "../${!_pkg}" ${LOCAL_PREFIX}/share/tessdata
+  [ $? -ne 0 ] && exit 1
+done
 cd ${LOCAL_PREFIX}/share/tessdata
 [ $? -ne 0 ] && exit 1
-sudox gzip -df "$pkg2"
+cmd=`eval echo 'gzip -dc \"$pkg2\" \| tar -xv'`
+sudox bash -c "$cmd"
 [ $? -ne 0 ] && exit 1
+sudox mv tesseract-ocr/tessdata/* .
+[ $? -ne 0 ] && exit 1
+sudox rm -fr tesseract-ocr "$pkg2"
+[ $? -ne 0 ] && exit 1
+for _pkg in pkg3 pkg4 pkg5 pkg6; do
+  sudox gzip -df "${!_pkg}"
+  [ $? -ne 0 ] && exit 1
+done
 cd "$OLDCD"
 [ $? -ne 0 ] && exit 1
 #
