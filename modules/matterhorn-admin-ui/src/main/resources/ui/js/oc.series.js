@@ -246,6 +246,9 @@ ocSeries.loadSeries = function(data) {
   data = data['http://purl.org/dc/terms/']
   $("#id").val(data['identifier'][0].value);
   for(var key in data) {
+    if(key == "title") {
+      ocSeries.seriesTitle = data[key][0].value;
+    }
     $('#' + key).attr('value', data[key][0].value);
   }
 }
@@ -411,7 +414,8 @@ ocSeries.checkFields = function() {
       success: function(data) {
         if(data.totalCount != 0) {
           $.each(data.catalogs, function(key, value) {
-            if(value[DUBLINCORE_NS_URI].title[0].value == $('#title').val()) {
+            if(value[DUBLINCORE_NS_URI].title[0].value == $('#title').val() 
+              && ocSeries.seriesTitle != $('#title').val()) {
               error = true;
               $('#item-title-existing').show();
             } else {
