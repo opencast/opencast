@@ -118,8 +118,8 @@ ul.itemnav li span.dev-prop-val { text-align:left; width:70%;}
 #controlsTop span.ui-button-text, #searchBox { padding: 0.4em 1em; }
 
 /* upload confirm screen */
-#content-metadata .fieldValue { display: block; float: left; margin-left: 100px; font-weight: bold; }
-#content-metadata .formField-label { position: absolute; left: 0; top: 0; display: block; width: 90px; text-align: right;}
+#content-metadata .fieldValue { display: block; float: left; margin-left: 130px; font-weight: bold; }
+#content-metadata .formField-label { position: absolute; left: 0; top: 0; display: block; width: 120px; text-align: right;}
 #content-metadata li {position: relative; clear: both;}
 /* page: recordings css */
 #recordingsTable .foldable {cursor: pointer;}
