@@ -1,5 +1,5 @@
 URL: http://www.libsdl.org/release
-PKG: SDL-1.2.14.tar.gz
-SHA: ba625b4b404589b97e92d7acd165992debe576dd
-DIR: SDL-1.2.14
+PKG: SDL-1.2.15.tar.gz
+SHA: 0c5f193ced810b0d7ce3ab06d808cbb5eef03a2c
+DIR: SDL-1.2.15
 PCP: pc-sdl.zip

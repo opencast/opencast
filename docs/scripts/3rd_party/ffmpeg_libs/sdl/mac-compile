@@ -29,7 +29,7 @@ sudox make install
 [ $? -ne 0 ] && exit 1
 #
 #sudox cp ../SDL_main-1.2.10.h /usr/include/SDL/SDL_main.h
-sudox cp ../SDL_main-1.2.14.h ${LOCAL_PREFIX}/include/SDL/SDL_main.h
+sudox cp ../SDL_main-1.2.15.h ${LOCAL_PREFIX}/include/SDL/SDL_main.h
 [ $? -ne 0 ] && exit 1
 #
 touch ../.done-mac

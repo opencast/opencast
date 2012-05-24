@@ -52,11 +52,11 @@ OLDCD=`pwd`
 [ $? -ne 0 ] && exit 1
 cd ${LOCAL_PREFIX}/include/ffmpeg
 [ $? -ne 0 ] && exit 1
-sudox ln -s ../libavcodec/avcodec.h avcodec.h
+sudox ln -fs ../libavcodec/avcodec.h avcodec.h
 [ $? -ne 0 ] && exit 1
-sudox ln -s ../libavformat/avformat.h avformat.h
+sudox ln -fs ../libavformat/avformat.h avformat.h
 [ $? -ne 0 ] && exit 1
-sudox ln -s ../libavformat/avio.h avio.h
+sudox ln -fs ../libavformat/avio.h avio.h
 [ $? -ne 0 ] && exit 1
 cd "$OLDCD"
 [ $? -ne 0 ] && exit 1

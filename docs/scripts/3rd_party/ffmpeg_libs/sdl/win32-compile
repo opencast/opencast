@@ -43,19 +43,19 @@ sudox mkdir -p ${MINGW32_PREFIX}/include/SDL
 [ $? -ne 0 ] && exit 1
 sudox cp SDL/*.h ${MINGW32_PREFIX}/include/SDL
 [ $? -ne 0 ] && exit 1
-sudox cp build/libSDLmain.a build/.libs/libSDL.a ${MINGW32_PREFIX}/lib
+sudox cp build/.libs/libSDLmain.a build/.libs/libSDL.a ${MINGW32_PREFIX}/lib
 [ $? -ne 0 ] && exit 1
 sudox cp ../sdl-config ${MINGW32_PREFIX}/bin
 [ $? -ne 0 ] && exit 1
 sudox chmod 755 ${MINGW32_PREFIX}/bin/sdl-config
 [ $? -ne 0 ] && exit 1
 #
-sudox cp ../SDL_main-1.2.14.h ${MINGW32_PREFIX}/include/SDL/SDL_main.h
+sudox cp ../SDL_main-1.2.15.h ${MINGW32_PREFIX}/include/SDL/SDL_main.h
 [ $? -ne 0 ] && exit 1
 #
 zip "../$pcp" SDL/*.h
 [ $? -ne 0 ] && exit 1
-zip -j "../$pcp" build/libSDLmain.a build/.libs/SDL.dll build/.libs/libSDL.a build/.libs/libSDL.dll.a
+zip -j "../$pcp" build/.libs/libSDLmain.a build/.libs/libSDL.a build/.libs/libSDL.dll.a build/.libs/SDL.dll
 [ $? -ne 0 ] && exit 1
 #
 touch ../.done-win32

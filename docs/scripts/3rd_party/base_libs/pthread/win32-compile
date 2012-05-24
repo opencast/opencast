@@ -40,7 +40,7 @@ sudox cp pthread/*.h ${MINGW32_PREFIX}/include/pthread
 cd ${MINGW32_PREFIX}/include
 [ $? -ne 0 ] && exit 1
 for file in pthread/*.h; do
-  sudox ln -s "$file" "${file##*/}"
+  sudox ln -fs "$file" "${file##*/}"
   [ $? -ne 0 ] && exit 1
 done
 cd -
