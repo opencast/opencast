@@ -7,8 +7,38 @@ source "${HOME3P}/utilx"
 [ $? -ne 0 ] && exit 1
 #
 [ -f .done-ports ] && exit 0
+typeset -i ii=2
+for _pkg in pkg2 pkg3 pkg4 pkg5 pkg6; do
+  eval $_pkg=`getcfg PKG$ii:`
+  chkpkg "${!_pkg}" || exit 1
+  chmod 644 "${!_pkg}"
+  [ $? -ne 0 ] && exit 1
+  let ii=ii+1
+done
 #
 sudox port -f install tesseract || exit 1
+#
+OLDCD=`pwd`
+[ $? -ne 0 ] && exit 1
+for _pkg in pkg2 pkg3 pkg4 pkg5 pkg6; do
+  sudox cp "${!_pkg}" ${LOCAL_PREFIX}/share/tessdata
+  [ $? -ne 0 ] && exit 1
+done
+cd ${LOCAL_PREFIX}/share/tessdata
+[ $? -ne 0 ] && exit 1
+cmd=`eval echo 'gzip -dc \"$pkg2\" \| tar -xv'`
+sudox bash -c "$cmd"
+[ $? -ne 0 ] && exit 1
+sudox mv tesseract-ocr/tessdata/* .
+[ $? -ne 0 ] && exit 1
+sudox rm -fr tesseract-ocr "$pkg2"
+[ $? -ne 0 ] && exit 1
+for _pkg in pkg3 pkg4 pkg5 pkg6; do
+  sudox gzip -df "${!_pkg}"
+  [ $? -ne 0 ] && exit 1
+done
+cd "$OLDCD"
+[ $? -ne 0 ] && exit 1
 #
 touch .done-ports
 [ $? -ne 0 ] && exit 1

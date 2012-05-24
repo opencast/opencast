@@ -7,6 +7,8 @@ source "${HOME3P}/utilx"
 [ $? -ne 0 ] && exit 1
 #
 [ -f .done-linux ] && exit 0
+TMPFILE=`mktemp /tmp/${0##*/}.XXXXX`
+trap 'rm -f $TMPFILE' 0
 pkg=`getcfg PKG:`
 chkpkg "$pkg" || exit 1
 dir=`getcfg DIR:`
@@ -27,6 +29,16 @@ make
 [ $? -ne 0 ] && exit 1
 sudox make install
 [ $? -ne 0 ] && exit 1
+#
+sudox id -u > $TMPFILE
+[ $? -ne 0 ] && exit 1
+SU_USER=`cat $TMPFILE`
+sudox id -g > $TMPFILE
+[ $? -ne 0 ] && exit 1
+SU_GROUP=`cat $TMPFILE`
+sudox find ${LOCAL_PREFIX} -name '*vpx*' -exec chown ${SU_USER}:${SU_GROUP} {} \;
+[ $? -ne 0 ] && exit 1
+#
 sudox /sbin/ldconfig
 [ $? -ne 0 ] && exit 1
 #

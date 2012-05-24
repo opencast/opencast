@@ -1,5 +1,5 @@
 URL: http://www.leptonica.com/source
-PKG: leptonlib-1.66.tar.gz
-SHA: 515eac71f157c1a5877b3b0edaaf4fb0fca1bcb2
-DIR: leptonlib-1.66
+PKG: leptonica-1.68.tar.gz
+SHA: a50563ac091f4195a5a3b4579c4fcc674b81c316
+DIR: leptonica-1.68
 PCP: pc-leptonica.zip

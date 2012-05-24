@@ -123,10 +123,10 @@ zlib-devel_x64_url: ${CENTOS_MIRROR}/5/os/x86_64/CentOS
 zlib-devel_x64_pkgs: zlib-devel-1.2.3-4.el5.x86_64.rpm
 
 MacPorts_Snow_url: http://distfiles.macports.org/MacPorts
-MacPorts_Snow_pkgs: MacPorts-2.0.3-10.6-SnowLeopard.dmg
+MacPorts_Snow_pkgs: MacPorts-2.1.0-10.6-SnowLeopard.pkg
 
 MacPorts_Lion_url: http://distfiles.macports.org/MacPorts
-MacPorts_Lion_pkgs: MacPorts-2.0.3-10.7-Lion.dmg
+MacPorts_Lion_pkgs: MacPorts-2.1.0-10.7-Lion.pkg
 
 git_mac_url: http://git-osx-installer.googlecode.com/files
 git_mac_pkgs: git-1.6.5.1-UNIVERSALbinary-leopard.dmg

@@ -130,9 +130,9 @@ cd x
 [ $? -ne 0 ] && exit 1
 cp -r ../data/models ocropus
 [ $? -ne 0 ] && exit 1
-gzip -d ocropus/models/default.fst.gz
+gzip -df ocropus/models/default.fst.gz
 [ $? -ne 0 ] && exit 1
-gzip -d ocropus/models/ocr-dict-case.fst.gz
+gzip -df ocropus/models/ocr-dict-case.fst.gz
 [ $? -ne 0 ] && exit 1
 cp -r ../data/words ocropus
 [ $? -ne 0 ] && exit 1

@@ -363,7 +363,7 @@ download() {
     [ $? -ne 0 ] && return 1
   else
     if [ -f config.txt ]; then
-      for ii in "" 1 2 3; do
+      for ii in "" 1 2 3 4 5 6; do
         ppos=0
         for pkg in `getcfg PKG${ii}:`; do
           let ppos=ppos+1
@@ -420,20 +420,24 @@ cleanup() {
   else
     if [ -f config.txt ]; then
       pkg=`getcfg PKG:`
-      pkg1=`getcfg PKG1:`
-      pkg2=`getcfg PKG2:`
-      pkg3=`getcfg PKG3:`
+      typeset -i ii=1
+      for _pkg in pkg1 pkg2 pkg3 pkg4 pkg5 pkg6; do
+        eval $_pkg=`getcfg PKG$ii:`
+        let ii=ii+1
+      done
       dir=`getcfg DIR:`
       [ "$dir" = "/" ] && dir=""
       pcp=`getcfg PCP:`
-      pcp1=`getcfg PCP1:`
-      pcp2=`getcfg PCP2:`
-      pcp3=`getcfg PCP3:`
+      typeset -i ii=1
+      for _pcp in pcp1 pcp2 pcp3 pcp4 pcp5 pcp6; do
+        eval $_pcp=`getcfg PCP$ii:`
+        let ii=ii+1
+      done
       #
       rm -fr "$dir"
       #
       rm -fr "${dir}-win32"
-      rm -f "$pcp" "$pcp1" "$pcp2" "$pcp3"
+      rm -f "$pcp" "$pcp1" "$pcp2" "$pcp3" "$pcp4" "$pcp5" "$pcp6"
       rm -f .done-win32
       #
       rm -fr "${dir}-linux"
@@ -443,7 +447,7 @@ cleanup() {
       rm -f .done-mac
       #
       if [ "$2" = "all" ]; then
-        rm -f "$pkg" "$pkg1" "$pkg2" "$pkg3"
+        rm -f "$pkg" "$pkg1" "$pkg2" "$pkg3" "$pkg4" "$pkg5" "$pkg6"
       fi
     fi
   fi
