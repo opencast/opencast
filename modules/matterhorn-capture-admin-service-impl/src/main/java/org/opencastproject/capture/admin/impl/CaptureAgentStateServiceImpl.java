@@ -406,6 +406,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
         existing.setLastHeardFrom(agent.getLastHeardFrom());
         existing.setState(agent.getState());
         existing.setSchedulerRoles(agent.getSchedulerRoles());
+        existing.setUrl(agent.getUrl());
         em.merge(existing);
       }
       tx.commit();
