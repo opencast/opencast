@@ -4,7 +4,11 @@
 #    UBUNTU_MIRROR=http://aifile.usask.ca/apt-mirror/mirror/archive.ubuntu.com/ubuntu/ ./buildvm.sh
 
 HOME=`pwd`
-MATTERHORN_SVN="http://opencast.jira.com/svn/MH/branches/1.4.x/"
+if [ "$MATTERHORN_SVN" = "" ];
+  then
+  MATTERHORN_SVN="http://opencast.jira.com/svn/MH/branches/1.4.x"
+fi
+echo "Building VM with using this SVN url: $MATTERHORN_SVN"
 #check for existance of mirror URL
 if [ "$UBUNTU_MIRROR" = "" ];
   then
@@ -69,7 +73,7 @@ if [ ! -e vmbackup ]; then
   --name 'opencast' --user $USERNAME \
   --pass $PASSWORD --tmpfs=2000 \
   --addpkg acpid \
-  --addpkg openjdk-6-jdk --addpkg gstreamer0.10-plugins* \
+  --addpkg openjdk-6-jre --addpkg gstreamer0.10-plugins* \
   --addpkg gstreamer0.10-ffmpeg --addpkg gstreamer-tools \
   --addpkg wget --addpkg ntp --addpkg nano --addpkg subversion
 
@@ -131,8 +135,6 @@ if [ -e matterhorn_source ]; then
   cd ..
 else
   svn co $MATTERHORN_SVN matterhorn_source
-  #Workaround until inbox is added by default
-  mkdir matterhorn_source/inbox
 fi
 
 sudo cp -r matterhorn_source mnt/opt/matterhorn/
@@ -207,3 +209,5 @@ echo "==========================================================="
 
 gpg --armor -b opencast-$OC_REV.zip
 gpg --armor -b opencast-$OC_REV.7z
+md5sum opencast-$OC_REV* > opencast-$OC_REV.md5
+gpg --armor -b opencast-$OC_REV.md5
