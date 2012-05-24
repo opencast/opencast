@@ -41,7 +41,7 @@ BRANCH_URL=$SVN_URL/branches/$BRANCH_NAME
 
 #TODO: We should use an svn switch instead because while we are working on this
 #tag to get it ready people might think it has been released.
-echo "Creating new tag by copying " $TRUNK_URL " to " $BRANCH_URL "."
+echo "Creating new branch by copying $TRUNK_URL to $BRANCH_URL."
 svn copy $TRUNK_URL $BRANCH_URL -m "$JIRA_TICKET Creating $BRANCH_NAME Branch"
 
 echo "Creating scratch dir and checking out release sources"
