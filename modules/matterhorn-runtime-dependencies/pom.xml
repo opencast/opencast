@@ -577,6 +577,21 @@
               <goal>run</goal>
             </goals>
           </execution>
+          <execution>
+            <id>extract-to-felix</id>
+            <phase>install</phase>
+            <configuration>
+              <target if="unpackTo">
+                <copy todir="${unpackTo}/lib/ext" failonerror="false">
+                  <fileset dir="${project.build.directory}/dependency"
+                    includes="**/*" />
+                </copy>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
     </plugins>
