@@ -40,7 +40,7 @@ TAG_URL=$SVN_URL/tags/$RELEASE_VER
 
 #TODO: We should use an svn switch instead because while we are working on this
 #tag to get it ready people might think it has been released.
-echo "Creating new tag by copying " $BRANCH_URL " to " $TAG_URL "."
+echo "Creating new tag by copying $BRANCH_URL to $TAG_URL."
 svn copy $BRANCH_URL $TAG_URL -m "$JIRA_TICKET Creating $TAG_NAME Tag"
 
 echo "Creating scratch dir and checking out release sources"
