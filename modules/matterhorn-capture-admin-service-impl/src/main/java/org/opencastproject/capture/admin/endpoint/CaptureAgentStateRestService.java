@@ -274,7 +274,7 @@ public class CaptureAgentStateRestService {
   @Path("agents/{name}/configuration")
   @RestQuery(name = "setAgentStateConfiguration", description = "Set the configuration of a given capture agent, registering it if it does not exist", pathParameters = {
     @RestParameter(description = "The name of a given capture agent", isRequired = true, name = "name", type = Type.STRING) }, restParameters = {
-    @RestParameter(description = "An XML representation of the capabilities, as specified in http://java.sun.com/dtd/properties.dtd (friendly names as keys, device locations as their corresponding values)", type = Type.TEXT, isRequired = true, name = "Configuration") }, reponses = {
+    @RestParameter(description = "An XML representation of the capabilities, as specified in http://java.sun.com/dtd/properties.dtd (friendly names as keys, device locations as their corresponding values)", type = Type.TEXT, isRequired = true, name = "configuration") }, reponses = {
     @RestResponse(description = "{agentName} set to {state}", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "The configuration format is incorrect OR the agent name is blank or null", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response setConfiguration(@PathParam("name") String agentName, @FormParam("configuration") String configuration) {
