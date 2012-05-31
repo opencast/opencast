@@ -1,4 +1,4 @@
-URL: http://downloads.sourceforge.net/project/mediainfo/binary/mediainfo/0.7.35
+URL: http://downloads.sourceforge.net/project/mediainfo/binary/mediainfo/0.7.35 ${USASK_MIRROR}
 PKG: MediaInfo_CLI_0.7.35_GNU_FromSource.tar.bz2
 SHA: 29fa8e43805b74493a2f8ce253a122915e3287d2
 DIR: MediaInfo_CLI_GNU_FromSource

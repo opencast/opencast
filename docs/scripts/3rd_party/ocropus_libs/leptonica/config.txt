@@ -1,4 +1,4 @@
-URL: http://www.leptonica.com/source
+URL: http://www.leptonica.com/source ${USASK_MIRROR}
 PKG: leptonica-1.68.tar.gz
 SHA: a50563ac091f4195a5a3b4579c4fcc674b81c316
 DIR: leptonica-1.68

@@ -9,19 +9,12 @@ set -x
 source "${HOME3P}/utilx"
 [ $? -ne 0 ] && exit 1
 #
-# Main repositories
-export CENTOS_MIRROR=`getmcfg CENTOS_MIRROR:`
-export EPEL_MIRROR=`getmcfg EPEL_MIRROR:`
-export RPMFORGE_MIRROR=`getmcfg RPMFORGE_MIRROR:`
-export GNU_MIRROR=`getmcfg GNU_MIRROR:`
-export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`
-#
 getcfgx() {
   set +x
   CFG=`awk '
-/^[     ]*'$1'/ {
-  sub("^[       ]*'$1'[         ]*", "");
-  sub("[        ]*$", "");
+/^[ 	]*'$1'/ {
+  sub("^[ 	]*'$1'[ 	]*", "");
+  sub("[ 	]*$", "");
   print $0
 }' $2`
   if [ $? -ne 0 ]; then
@@ -89,7 +82,7 @@ END {
       for (jj = 1; jj <= m; jj++) {
         for (kk = 1; kk <= n; kk++) {
           if (jj > 1) { printf("mirror-") }
-          print a[jj] "/" b[kk] 
+          print a[jj] "/" b[kk]
         }
       }
     }

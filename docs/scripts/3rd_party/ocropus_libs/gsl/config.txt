@@ -1,4 +1,4 @@
-URL: http://downloads.sourceforge.net/project/gnuwin32/gsl/1.8
+URL: http://downloads.sourceforge.net/project/gnuwin32/gsl/1.8 ${USASK_MIRROR}
 PKG: gsl-1.8-src.zip
 SHA: 290c0c3ba228f6656268d613a5f7875f11c96063
 DIR: gsl-1.8

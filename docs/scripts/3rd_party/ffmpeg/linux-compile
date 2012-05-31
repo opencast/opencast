@@ -29,7 +29,7 @@ cd "${dir}-linux"
 --disable-ffserver \
 --extra-cflags='-I${LOCAL_PREFIX}/include' \
 --extra-ldflags='-L${LOCAL_PREFIX}/lib -Wl,-rpath,${LOCAL_PREFIX}/lib' \
---extra-libs='-lxvidcore' \
+--enable-libxvid --extra-libs='-lxvidcore' \
 --enable-libx264 --extra-libs='-lx264 -lpthread' \
 --enable-libmp3lame --extra-libs='-lmp3lame' \
 --enable-libfaac --extra-libs='-lfaac' \
