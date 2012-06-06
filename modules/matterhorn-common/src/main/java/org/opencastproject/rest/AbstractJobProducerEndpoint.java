@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 import javax.ws.rs.FormParam;
-import javax.ws.rs.HEAD;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
@@ -67,8 +67,8 @@ public abstract class AbstractJobProducerEndpoint {
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
     }
   }
-
-  @HEAD
+  
+  @OPTIONS
   @Path("/dispatch")
   public Response checkHeartbeat() {
     return Response.ok().build();
