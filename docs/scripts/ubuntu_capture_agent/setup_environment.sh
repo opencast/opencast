@@ -22,7 +22,7 @@ mkdir -p "$OC_DIR"/volatile
 mkdir -p "$OC_DIR"/cache/captures
 
 # Point the CA's fileservice at the right dir
-sed -i "s#/tmp/opencast#${OC_DIR//#/\\#}#" $FELIX_HOME/modules/matterhorn-capture-agent-impl/src/main/resources/OSGI-INF/capture-files.xml
+echo "filesystemDir=$OC_DIR/cache" >> $FELIX_HOME/etc/services/org.opencastproject.capture.impl.CaptureFiles.properties
 
 # Establish their permissions
 chown -R $USERNAME:$USERNAME "$OC_DIR"
