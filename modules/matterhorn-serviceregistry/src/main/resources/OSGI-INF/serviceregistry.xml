@@ -5,6 +5,7 @@
   <property name="service.description" value="Service registry" />
   <service>
     <provide interface="org.opencastproject.serviceregistry.api.ServiceRegistry" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
   <reference name="persistence" interface="javax.persistence.spi.PersistenceProvider"
     cardinality="1..1" policy="static" bind="setPersistenceProvider" />
