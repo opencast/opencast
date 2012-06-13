@@ -54,7 +54,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -74,6 +73,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -562,83 +562,100 @@ public class IngestRestService {
           @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) }, reponses = {
           @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
-  public Response ingest(@FormParam("mediaPackage") String mpx,
-          @FormParam(WORKFLOW_DEFINITION_ID_PARAM) String workflowDefinition,
-          @FormParam(WORKFLOW_INSTANCE_ID_PARAM) String workflowInstance) {
-    logger.debug("ingest(MediaPackage): {}", mpx);
+  public Response ingest(MultivaluedMap<String, String> formData) {
+    /**
+     * Note:  We use a MultivaluedMap here to ensure that we can get any arbitrary form parameters.  
+     * This is required to enable things like holding for trim or distributing to YouTube.
+     */
+    logger.debug("ingest(MediaPackage)");
     try {
-      MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
-      WorkflowInstance workflow = null;
-
-      // a workflow instance has been specified
-      if (StringUtils.isNotBlank(workflowInstance)) {
-        try {
-          Long workflowInstanceId = Long.parseLong(workflowInstance);
-
-          // a workflow defintion was specified
-          if (StringUtils.isNotBlank(workflowDefinition)) {
-            workflow = ingestService.ingest(mp, workflowDefinition, null, workflowInstanceId);
-          } else {
-            workflow = ingestService.ingest(mp, null, null, workflowInstanceId);
-          }
-        } catch (NumberFormatException e) {
-          logger.warn("{} '{}' is not numeric", WORKFLOW_INSTANCE_ID_PARAM, workflowInstance);
-          return Response.status(Status.BAD_REQUEST).build();
+      MediaPackage mp = null;
+      Map<String, String> wfConfig = new HashMap<String, String>();
+      for (String key : formData.keySet()) {
+        if (!"mediaPackage".equals(key)) {
+          wfConfig.put(key, formData.getFirst(key));
+        } else {
+          mp = factory.newMediaPackageBuilder().loadFromXml(formData.getFirst(key));
         }
       }
-      // a workflow definition was specified, but not a workflow id
-      else if (StringUtils.isNotBlank(workflowDefinition)) {
-        workflow = ingestService.ingest(mp, workflowDefinition, null, null);
-      }
-      // nothing was specified, so we start a new workflow
-      else {
-        workflow = ingestService.ingest(mp);
-      }
-      return Response.ok(WorkflowParser.toXml(workflow)).build();
+  
+      return ingest(mp, wfConfig);
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }
 
-  /*
-   * @POST
-   * 
-   * @Produces(MediaType.TEXT_HTML)
-   * 
-   * @Path("ingest/{wdID}") public Response ingest(@FormParam("mediaPackage") String mpx, @PathParam("wdID") String
-   * wdID) { logger.debug("ingest(MediaPackage, ID): {}, {}", mpx, wdID); try { MediaPackage mp =
-   * builder.loadFromXml(mpx); WorkflowInstance workflow = ingestService.ingest(mp, wdID); return
-   * Response.ok(WorkflowBuilder.toXml(workflow)).build(); } catch (Exception e) { logger.warn(e.getMessage(), e);
-   * return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build(); } }
-   */
   @POST
   @Produces(MediaType.TEXT_HTML)
   @Path("ingest/{wdID}")
   @SuppressWarnings("unchecked")
-  @RestQuery(name = "ingest", description = "Ingest the completed media package into the system, retrieving all URL-referenced files, and starting a specified workflow", pathParameters = { @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, restParameters = { @RestParameter(description = "The ID of the given media package", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, reponses = {
+  @RestQuery(name = "ingest", description = "Ingest the completed media package into the system, retrieving all URL-referenced files, and starting a specified workflow", pathParameters = {
+          @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, restParameters = { 
+          @RestParameter(description = "The ID of the given media package", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, reponses = {
           @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
-  public Response ingest(@PathParam("wdID") String wdID, @Context HttpServletRequest request) {
-    Map<String, String[]> params = request.getParameterMap();
-    HashMap<String, String> wfConfig = new HashMap<String, String>();
-    MediaPackage mp = null;
+  public Response ingest(@PathParam("wdID") String wdID, MultivaluedMap<String, String> formData) {
+    if (StringUtils.isBlank(wdID)) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+    
     try {
-      for (Iterator<String> i = params.keySet().iterator(); i.hasNext();) {
-        String key = i.next();
-        if ("MEDIAPACKAGE".equalsIgnoreCase(key)) {
-          mp = factory.newMediaPackageBuilder().loadFromXml(params.get(key)[0]);
+      MediaPackage mp = null;
+      Map<String, String> wfConfig = new HashMap<String, String>();
+      wfConfig.put(WORKFLOW_INSTANCE_ID_PARAM, wdID);
+      for (String key : formData.keySet()) {
+        if (!"mediapackage".equals(key)) {
+          wfConfig.put(key, formData.getFirst(key));
         } else {
-          wfConfig.put(key, params.get(key)[0]); // TODO how do we handle multiple values eg. resulting
-          // from checkboxes
+          mp = factory.newMediaPackageBuilder().loadFromXml(formData.getFirst(key));
         }
       }
-      if (mp != null) {
-        WorkflowInstance workflow = ingestService.ingest(mp, wdID, wfConfig);
-        return Response.ok(WorkflowParser.toXml(workflow)).build();
-      } else {
-        return Response.status(Status.BAD_REQUEST).build();
+
+      return ingest(mp, wfConfig);
+    } catch (Exception e) {
+      logger.warn(e.getMessage(), e);
+      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  private Response ingest(MediaPackage mp, Map<String,String> wfConfig) {
+    try {
+      String workflowInstance = wfConfig.get(WORKFLOW_INSTANCE_ID_PARAM);
+      String workflowDefinition = wfConfig.get(WORKFLOW_DEFINITION_ID_PARAM);
+
+      //Double check that the required params exist.
+      if (mp == null) {
+        return Response.status(Response.Status.BAD_REQUEST).build();
       }
+
+      WorkflowInstance workflow = null;
+
+      // a workflow instance has been specified
+      if (StringUtils.isNotBlank(workflowInstance)) {
+        Long workflowInstanceId = null;
+        try {
+          workflowInstanceId = Long.parseLong(workflowInstance);
+        } catch (NumberFormatException e) {
+          /* Eat the exception, we don't *really* care since the system will just make up a new ID if needed */
+        }
+
+        // a workflow defintion was specified
+        if (StringUtils.isNotBlank(workflowDefinition)) {
+          workflow = ingestService.ingest(mp, workflowDefinition, wfConfig, workflowInstanceId);
+        } else {
+          workflow = ingestService.ingest(mp, null, wfConfig, workflowInstanceId);
+        }
+      }
+      // a workflow definition was specified, but not a workflow id
+      else if (StringUtils.isNotBlank(workflowDefinition)) {
+        workflow = ingestService.ingest(mp, workflowDefinition, wfConfig, null);
+      }
+      // nothing was specified, so we start a new workflow
+      else {
+        workflow = ingestService.ingest(mp, null, wfConfig, null);
+      }
+      return Response.ok(WorkflowParser.toXml(workflow)).build();
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
