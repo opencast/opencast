@@ -181,7 +181,7 @@ public class EpiphanVGA2USBV4LSubPngBin extends EpiphanVGA2USBV4LSubAbstractBin 
     src.setCaps(Caps.fromString("image/png, framerate=(fraction)25/1"));
     capsFilter.setCaps(Caps.fromString(caps));
     sink.set(GStreamerProperties.EMIT_SIGNALS, "false");
-    sink.set(GStreamerProperties.DROP, "false");
+    sink.set(GStreamerProperties.DROP, "true");
     sink.set(GStreamerProperties.ASYNC, "true");
     sink.set(GStreamerProperties.MAX_BUFFERS, "5");
     sink.setCaps(Caps.fromString(caps));
