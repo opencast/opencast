@@ -139,7 +139,7 @@ public class EpiphanVGA2USBV4LSubTestSrcBin extends EpiphanVGA2USBV4LSubAbstract
     src.set(GStreamerProperties.DO_TIMESTAP, "false");
     capsFilter.setCaps(Caps.fromString(caps));
     sink.set(GStreamerProperties.EMIT_SIGNALS, "false");
-    sink.set(GStreamerProperties.DROP, "false");
+    sink.set(GStreamerProperties.DROP, "true");
     sink.set(GStreamerProperties.ASYNC, "true");
     sink.set(GStreamerProperties.MAX_BUFFERS, "5");
     sink.setCaps(Caps.fromString(caps));
