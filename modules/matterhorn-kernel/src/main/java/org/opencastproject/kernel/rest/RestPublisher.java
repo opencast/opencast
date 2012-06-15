@@ -412,8 +412,12 @@ public class RestPublisher implements RestConstants {
       String uri = (String) m.get(Message.REQUEST_URI);
       if (uri.endsWith("/docs")) {
         String[] pathSegments = uri.split("/");
+        String path = "";
+        for (int i = 1; i < pathSegments.length - 1; i++) {
+          path += "/" + pathSegments[i].replace("/", "");
+        }
         return Response.status(Status.MOVED_PERMANENTLY).type(MediaType.TEXT_PLAIN)
-                .header("Location", "/docs.html?path=/" + pathSegments[pathSegments.length - 2]).build();
+                .header("Location", "/docs.html?path=" + path).build();
       }
       return null;
     }
