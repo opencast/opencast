@@ -416,7 +416,11 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
         FileUtils.forceMkdir(collectionDir);
         logger.debug("Created collection directory " + collectionId);
       } catch (IOException e) {
-        throw new IllegalStateException("Can not create collection directory" + collectionDir);
+        //We check again to see if it already exists because this collection dir may live on a shared disk.
+        //Synchronizing does not help because the other instance is not in the same JVM.
+        if (!collectionDir.exists()) {
+          throw new IllegalStateException("Can not create collection directory" + collectionDir);
+        }
       }
     }
     return collectionDir;
