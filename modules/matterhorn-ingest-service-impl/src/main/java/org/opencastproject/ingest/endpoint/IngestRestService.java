@@ -605,7 +605,7 @@ public class IngestRestService {
       Map<String, String> wfConfig = new HashMap<String, String>();
       wfConfig.put(WORKFLOW_INSTANCE_ID_PARAM, wdID);
       for (String key : formData.keySet()) {
-        if (!"mediapackage".equals(key)) {
+        if (!"mediaPackage".equals(key)) {
           wfConfig.put(key, formData.getFirst(key));
         } else {
           mp = factory.newMediaPackageBuilder().loadFromXml(formData.getFirst(key));
@@ -637,7 +637,9 @@ public class IngestRestService {
         try {
           workflowInstanceId = Long.parseLong(workflowInstance);
         } catch (NumberFormatException e) {
-          /* Eat the exception, we don't *really* care since the system will just make up a new ID if needed */
+          /* Eat the exception, we don't *really* care since the system will just make up a new ID if needed.
+           * This may also be an unscheduled capture, which might not have a Long ID.
+           */
         }
 
         // a workflow defintion was specified
