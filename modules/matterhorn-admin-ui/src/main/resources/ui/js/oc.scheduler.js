@@ -90,6 +90,7 @@ var ocScheduler = (function() {
       this.mode = EDIT_MODE;
       document.title = i18n.window.edit + " " + i18n.window.prefix;
       $('#i18n_page_title').text(i18n.page.title.edit);
+      $('#submitButton').attr("value", "Update");
       $('#eventId').val(eventId);
       this.components.eventId = new ocAdmin.Component('eventId');
       $('#recordingType').hide();
