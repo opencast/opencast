@@ -105,6 +105,7 @@
             // Ask if a default Out Point has been set
             if (setOutPointDefaultValue()) {
               // Clear the Intervall
+              $('#continueBtn').button('enable');
               window.clearInterval(this.intervalTimer);
             }
           }, timerTimeout);
@@ -130,6 +131,8 @@
                 
         //create Buttons
         $('.ui-button').button();
+        //disable continue
+        $('#continueBtn').button('disable');
                 
         //hide some stuff we don't want to see
         window.parent.$('#uploadContainer').hide(0);
