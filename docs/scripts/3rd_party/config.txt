@@ -13,7 +13,7 @@ epel5_url: http://download.fedoraproject.org/pub/epel/5/i386 ${USASK_MIRROR}
 epel5_pkgs: epel-release-5-4.noarch.rpm
 
 epel6_url: http://download.fedoraproject.org/pub/epel/6/i386 ${USASK_MIRROR}
-epel6_pkgs: epel-release-6-5.noarch.rpm
+epel6_pkgs: epel-release-6-7.noarch.rpm
 
 atomic5_url: ${ATOMIC_MIRROR}/centos/5/i386/RPMS ${USASK_MIRROR}
 atomic5_pkgs: atomic-release-1.0-14.el5.art.noarch.rpm
