@@ -16,12 +16,10 @@
 
 package org.opencastproject.episode.impl;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.api.EpisodeServiceException;
@@ -56,6 +54,13 @@ import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,13 +75,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-
 /**
- * A Solr-based {@link EpisodeService} implementation.
- * todo use archive component
+ * A Solr-based {@link EpisodeService} implementation. todo use archive component
  */
 public final class EpisodeServiceImpl implements EpisodeService {
 
@@ -217,7 +217,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
           String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
           if (storageDir == null)
             throw new IllegalStateException("Storage dir must be set (org.opencastproject.storage.dir)");
-          String solrRoot = PathSupport.concat(storageDir, "archive");
+          String solrRoot = PathSupport.concat(storageDir, "archiveindex");
           try {
             return setupSolr(new File(solrRoot));
           } catch (IOException e) {
@@ -249,12 +249,12 @@ public final class EpisodeServiceImpl implements EpisodeService {
       throw new IllegalStateException("Can not read the solr index", e);
     } catch (ServiceRegistryException e) {
       throw new IllegalStateException("Can not read jobs from the service registry", e);
-//    } catch (MediaPackageException e) {
-//      throw new IllegalStateException("Can not read the mediapackages from jobs in the service registry", e);
+      // } catch (MediaPackageException e) {
+      // throw new IllegalStateException("Can not read the mediapackages from jobs in the service registry", e);
     } catch (SolrServerException e) {
       throw new IllegalStateException("Can not read the solr index", e);
-//    } catch (UnauthorizedException e) {
-//      throw new IllegalStateException("Operation not permitted", e);
+      // } catch (UnauthorizedException e) {
+      // throw new IllegalStateException("Operation not permitted", e);
     }
   }
 
@@ -355,8 +355,8 @@ public final class EpisodeServiceImpl implements EpisodeService {
    * 
    * @see org.opencastproject.episode.api.EpisodeService#add(org.opencastproject.mediapackage.MediaPackage)
    */
-  public void add(MediaPackage mediaPackage) throws EpisodeServiceException, MediaPackageException, IllegalArgumentException,
-          UnauthorizedException, ServiceRegistryException {
+  public void add(MediaPackage mediaPackage) throws EpisodeServiceException, MediaPackageException,
+          IllegalArgumentException, UnauthorizedException, ServiceRegistryException {
     User currentUser = securityService.getUser();
     String orgAdminRole = securityService.getOrganization().getAdminRole();
     if (!currentUser.hasRole(orgAdminRole) && !currentUser.hasRole(GLOBAL_ADMIN_ROLE)
@@ -420,9 +420,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
     try {
       result = solrRequester.getForWrite(new EpisodeQuery().withId(mediaPackageId));
       if (result.getItems().length == 0) {
-        logger.warn(
-            "Can not (un)lock mediapackage {}, which is not available for the current user",
-            mediaPackageId);
+        logger.warn("Can not (un)lock mediapackage {}, which is not available for the current user", mediaPackageId);
         return false;
       }
       logger.info("(Un)locking mediapackage {}", mediaPackageId);
@@ -435,7 +433,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
   // -- applyWorkflow
 
   @Override
-  public WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, EpisodeQuery q) 
+  public WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, EpisodeQuery q)
           throws EpisodeServiceException, UnauthorizedException {
     // never include locked packages todo it's bad to manipulate the query object... immutability!
     q.includeLocked(false);
@@ -447,27 +445,24 @@ public final class EpisodeServiceImpl implements EpisodeService {
     }
     List<WorkflowInstance> workflows = applyWorkflow(workflowDefinition, result.getItems(), NO_WORKFLOW_PROPS);
     return workflows.toArray(new WorkflowInstance[workflows.size()]);
-  }    
+  }
 
   @Override
-  public WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, List<String> mediaPackageIds) 
+  public WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, List<String> mediaPackageIds)
           throws EpisodeServiceException, UnauthorizedException {
     return applyWorkflow(workflowDefinition, mediaPackageIds, NO_WORKFLOW_PROPS);
   }
 
   @Override
-  public WorkflowInstance[] applyWorkflow(String workflowDefinitionId, List<String> mediaPackageIds) 
+  public WorkflowInstance[] applyWorkflow(String workflowDefinitionId, List<String> mediaPackageIds)
           throws EpisodeServiceException, UnauthorizedException {
     return applyWorkflow(getWorkflowDefinition(workflowDefinitionId), mediaPackageIds, NO_WORKFLOW_PROPS);
   }
 
   @Override
-  public WorkflowInstance[] applyWorkflow(String workflowDefinitionId, List<String> mediaPackageIds, 
-                                          Map<String, String> properties) 
-          throws EpisodeServiceException, UnauthorizedException {
-    return applyWorkflow(getWorkflowDefinition(workflowDefinitionId),
-                         mediaPackageIds,
-                         some(properties));
+  public WorkflowInstance[] applyWorkflow(String workflowDefinitionId, List<String> mediaPackageIds,
+          Map<String, String> properties) throws EpisodeServiceException, UnauthorizedException {
+    return applyWorkflow(getWorkflowDefinition(workflowDefinitionId), mediaPackageIds, some(properties));
   }
 
   @Override
@@ -485,7 +480,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
   // -- applyWorkflow helper
 
   private static final Option<Map<String, String>> NO_WORKFLOW_PROPS = none();
-  
+
   private WorkflowDefinition getWorkflowDefinition(String workflowDefinitionId) {
     try {
       return workflowService.getWorkflowDefinitionById(workflowDefinitionId);
@@ -496,11 +491,8 @@ public final class EpisodeServiceImpl implements EpisodeService {
     }
   }
 
-  private WorkflowInstance[] applyWorkflow(
-          WorkflowDefinition workflowDefinition,
-          EpisodeQuery q,
-          Option<Map<String, String>> properties)
-          throws EpisodeServiceException, UnauthorizedException {
+  private WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, EpisodeQuery q,
+          Option<Map<String, String>> properties) throws EpisodeServiceException, UnauthorizedException {
     // never include locked packages todo it's bad to manipulate the query object... immutability!
     q.includeLocked(false);
     SearchResult result = null;
@@ -513,11 +505,8 @@ public final class EpisodeServiceImpl implements EpisodeService {
     return workflows.toArray(new WorkflowInstance[workflows.size()]);
   }
 
-  private WorkflowInstance[] applyWorkflow(
-          final WorkflowDefinition workflowDefinition,
-          List<String> mediaPackageIds,
-          Option<Map<String, String>> properties)
-          throws EpisodeServiceException, UnauthorizedException {
+  private WorkflowInstance[] applyWorkflow(final WorkflowDefinition workflowDefinition, List<String> mediaPackageIds,
+          Option<Map<String, String>> properties) throws EpisodeServiceException, UnauthorizedException {
     List<WorkflowInstance> workflows = new ArrayList<WorkflowInstance>();
     for (String id : mediaPackageIds) {
       SearchResultItem[] items = new SearchResultItem[0];
@@ -531,9 +520,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
     return workflows.toArray(new WorkflowInstance[workflows.size()]);
   }
 
-  private List<WorkflowInstance> applyWorkflow(
-          final WorkflowDefinition workflowDefinition,
-          SearchResultItem[] items,
+  private List<WorkflowInstance> applyWorkflow(final WorkflowDefinition workflowDefinition, SearchResultItem[] items,
           Option<Map<String, String>> properties) {
     final List<WorkflowInstance> workflows = new ArrayList<WorkflowInstance>(items.length);
     for (final SearchResultItem item : items) {
@@ -541,8 +528,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
         @Override
         public Void some(Map<String, String> p) {
           try {
-            workflows.add(
-                    workflowService.start(workflowDefinition, item.getMediaPackage(), p));
+            workflows.add(workflowService.start(workflowDefinition, item.getMediaPackage(), p));
           } catch (WorkflowException e) {
             logger.error("Error starting workflow", e);
           }
@@ -552,8 +538,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
         @Override
         public Void none() {
           try {
-            workflows.add(
-                    workflowService.start(workflowDefinition, item.getMediaPackage()));
+            workflows.add(workflowService.start(workflowDefinition, item.getMediaPackage()));
           } catch (WorkflowException e) {
             logger.error("Error starting workflow", e);
           }
