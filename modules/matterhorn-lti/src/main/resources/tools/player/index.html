@@ -14,6 +14,8 @@
     <link rel="stylesheet" type="text/css" href="/engage/ui/css/player/jquery.wysiwyg.css" ></link>
     <link rel="stylesheet" type="text/css" href="/engage/ui/css/oc.segments.css" ></link>
     <link rel="stylesheet" type="text/css" href="/engage/ui/css/player/watch.css" ></link>
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/annotation/oc.comments.css">
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/annotation/oc.comment.list.css">
     <!-- Javascript includes -->
     <script type="text/javascript" src="/engage/ui/js/jquery/jquery.js"></script>
     <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.utils.js"></script>
@@ -22,6 +24,9 @@
     <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jARIA.js"></script>
     <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.cookie.js"></script>
     <script type="text/javascript" src="/engage/ui/js/jquery/jquery-ui.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.corners.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.identicon5.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.crypt.js"></script>
     <script type="text/javascript" src="/engage/ui/js/player/init-watch.js"></script>
     <script type="text/javascript" src="/engage/ui/js/player/player-multi-hybrid-scubber.js"></script>
     <script type="text/javascript" src="/engage/ui/js/player/player-multi-hybrid.js"></script>
@@ -31,6 +36,7 @@
     <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.sparkline.min.js"></script>
     <script type="text/javascript" src="/engage/ui/js/engage-ui.js"></script>
     <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.timers-1.2.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/plugin-controller.js"></script>
     <script type="text/javascript" src="/engage/ui/js/engage_plugins/bookmarks.js"></script>
     <script type="text/javascript" src="/engage/ui/js/engage_plugins/description.js"></script>
     <script type="text/javascript" src="/engage/ui/js/engage_plugins/download.js"></script>
@@ -48,6 +54,11 @@
     <script type="text/javascript" src="/engage/ui/js/engage_plugins/analytics.js"></script>
     <script type="text/javascript" src="/engage/ui/js/engage_plugins/annotation_chapter-plugin.js"></script>
     <script type="text/javascript" src="/engage/ui/js/engage_plugins/annotation_chapter.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/annotation/scrubber_comment-plugin.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/annotation/slide_comment-plugin.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/annotation/annotation_comment.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/annotation/annotation_comment_list.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/engage_plugins/annotation/annotation_comment_list-plugin.js"></script>
     <script type="text/javascript" src="/engage/ui/js/engage_plugins/series-plugin.js"></script>
     <script type="text/javascript" src="/engage/ui/js/engage_plugins/series.js"></script>
     <script type="text/javascript" src="/engage/ui/js/engage_plugins/logging.js"></script>
@@ -67,6 +78,41 @@
         Skip to Shortcuts
       </a>
     </div>
+
+
+    <div id="oc_ie8comments">
+      <center>
+	<div class="ie8comments-outer">
+          <div class="ie8comments-inner-up">
+            <div class="icon icon-information ie8comments-inner-image">&nbsp;</div>
+            No support for your browser
+	    <div id="ie8comments-close" class="icon-2 icon-close ie8comments-inner-image-2">&nbsp;</div>
+          </div>
+          <div class="ie8comments-inner-down">
+	    The comments feature is not available for Internet Explorer browsers with versions less than version 9.<br />
+	    You have the Internet Explorer <span id="ie8comments-browser-version"></span>, please update it.
+          </div>
+	</div>
+      </center>
+    </div>
+    <!-- END #oc_ie8comments -->
+    
+    <div id="oc_mobile_redirect">
+      <center>
+	<div class="mobile_redirect-outer">
+          <div class="mobile_redirect-inner-up">
+            <div class="icon icon-information mobile_redirect-inner-image">&nbsp;</div>
+            Mobile experience
+	    <div id="mobile_redirect-close" class="icon-2 icon-close mobile_redirect-inner-image-2">&nbsp;</div>
+          </div>
+          <div class="mobile_redirect-inner-down">
+	    For a better mobile experience there are also mobile phone apps for nearly every platform available.<br />
+	    <span id="oc_mobile_redirect-url">For more information have a look at <a href="http://opencast.org/matterhorn">http://opencast.org/matterhorn</a></span>
+          </div>
+	</div>
+      </center>
+    </div>
+    <!-- END #oc_mobile_redirect -->
 
     <div id="oc_player-head">
       <div id="oc_title"></div>
@@ -128,6 +174,8 @@
         </center>
       </noscript>
 
+	<div id="oc_slide-comments"></div>
+
       <div id="oc_flash-player">
         <script type="text/javascript" src="/engage/ui/js/player/player-multi-hybrid-flash.js"></script>
       </div>
@@ -148,6 +196,9 @@
                 Show Captions
               </label>
             </span>
+	        <div id="oc_comment-control">
+	        	<input id="oc_btn-add-comment" class="oc_btn-add-comment handcursor" type="image" src="/engage/ui/img/misc/space.png" name="Add Comment: Control + Alt + A" alt="Add Comment: Control + Alt + A" title="Add Comment: Control + Alt + A" value="Add Comment: Control + Alt + A" />
+	        </div>
           </div>
         </div>
         <!-- END #oc_video-time -->
@@ -261,11 +312,12 @@
 
         <!-- Analytics and Annotations -->
         <div id="analytics-and-annotations">
+          <div id="oc-comment-scrubber-box"></div>
           <span id="analytics" class="analytics">Loading..</span>
           <span id="annotation" class="annotation">Annotation..</span>
           <table class="segments" id="segmentstable1">
             <!-- data comes here -->
-          </table>
+          </table>         
         </div>
         <div id="segments_ui_slider_data1"></div>
         <div id="segments_ui_slider_data2"></div>
@@ -292,6 +344,10 @@
         </span>
         &nbsp;
         <strong>View:</strong>
+        <input id="oc_checkbox-annotation-comment" type="checkbox" name="show comments" title="show comments" />
+        <label id="oc_label-annotation-comment" for="oc_checkbox-annotation-comment">
+            Comments
+        </label>
         <input id="oc_checkbox-annotations" type="checkbox" name="show Annotations" title="show Annotations" />
         <label id="oc_label-annotations" for="oc_checkbox-annotations">
           Annotations
@@ -326,6 +382,11 @@
               Segment Text
             </a>
           </li>
+          <li>
+            <a href="#oc_comments" id="oc_btn-comments" class="oc_btn-tabs handcursor" title="Comments" aria-role="button">
+              Comments
+            </a>
+          </li>
           <li class="oc_lecturer-search-field-wrap ui-corner-top" id="search-textarea">
             <label id="skip" for="oc_lecturer-search-field" class="oc_offScreen-hidden">
               Search this recording
@@ -335,13 +396,15 @@
         </ul>
       </div>
       <!-- END #oc_tabs -->
-
+      
+      <!-- Description tab content -->
       <div id="oc_description" class="fl-fix">
         <div id="description-loading" class="loadingImage"></div>
         <div id="oc-description"></div>
       </div>
       <!-- END #oc_description -->
-
+      
+      <!-- Slides tab content -->
       <div id="oc_slides" class="oc_DisplayBlock">
         <div id="segments-holder" class="oc-segments-holder">
           <div id="oc_segment-table" class="oc-segments">
@@ -360,7 +423,8 @@
         </div>
       </div>
       <!-- END #oc_slides -->
-
+	
+      <!-- Slide text tab content -->
       <div id="oc_slidetext" class="fl-fix">
         <div id="segments_text-loading" class="loadingImage"></div>
         <div id="oc-segments_text"></div>
@@ -369,11 +433,41 @@
         <div id="search-loading" class="loadingImage"></div>
         <div id="oc-search-result"></div>
       </div>
+      <!-- END #oc_slidetext -->
+      
+      <!-- Comment tab content -->
+      <div id="oc_comments" class="fl-fix">
+	<div id="oc_comments-list-loading" class="loadingImage"></div>
+	<div id="oc-comments-list-add-form">
+	  <p class="oc-comments-list-headingtext">
+	    Add A New Comment
+	  </p>
+	  <p class="oc-comments-list-text">
+	    Use the comment checkbox to show/add timed and slide comments.
+	  </p>
+	  <div id="oc-comments-list-addbox">
+	    <div>
+	      <input id="oc-comments-list-namebox" name="Name" type="text" />
+	      <textarea id="oc-comments-list-textbox" ></textarea>
+	      <input id="oc-comments-list-submit" value="Add comment" role="button" type="button" />
+	      <input id="oc-comments-list-submit-timed" value="Add comment at 00:00:00" role="button" type="button" />
+	    </div>
+	  </div>
+	  <div id="oc-comments-list-header">
+	    <p id="oc-comments-list-header-top" class="oc-comments-list-headingtext"></p>
+	    <p id="oc-comments-list-header-bottom" class="oc-comments-list-boldtext"></p>
+	  </div>
+	  <div id="oc-comments-list">
+	  </div>
+	</div>
+      </div>
+      <!-- END #oc_comments-list-wrapper -->
+      
     </div>
     <!-- END #oc_ui_tabs -->
-
+    
     <div class="clear"></div>
-
+    
     <div id="segment-tooltip" class="segment-tooltip"></div>
 
     <!-- Shortcut dialog -->
@@ -493,5 +587,32 @@
 
     <!-- Series dialog -->
     <div id="oc_series" class="ui-widget ui-widget-content ui-corner-all oc_popuplayer ui-state-hover" title="see more of this series" tabindex="-1" role="dialog" aria-hidden="true"></div>
+
+    <!--  Comment dialogs -->       
+    <div id="comment-Info" class="oc-comment-Info">
+       <div id="cm-info-box" class="oc-comment-box">
+            <div id="oc-comment-info-header" class="oc-comment-header">
+                <span class="ui-icon ui-icon-closethick oc-comment-exit" unselectable="on" style="float:right;-moz-user-select: none;">X</span>
+                <div id="oc-comment-info-header-text" class="oc-comment-header-text"></div>                   
+            </div>
+            <div id="oc-comment-info-value-wrapper">
+
+            </div>
+            <div id="oc-comment-info-footer" class="oc-comment-footer">
+            </div>
+       </div>
+        
+        <div class="oc-comment-arrow-down"></div>
+        
+    </div>
+    
+	<div id="oc_dbclick-info">
+		<div id="oc_dblick-info-arrow"></div>
+		<p id="oc_dbclick-info-text">
+			double click to add comment
+		</p>
+	</div>        
+    <!--  END Comment dialogs -->
+    
   </body>
 </html>
