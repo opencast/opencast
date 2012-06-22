@@ -229,9 +229,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream, java.lang.String,
    *      java.util.Map, java.lang.Long)
    */
-  public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String wd, Map<String, String> workflowConfig,
-          Long workflowId) throws MediaPackageException, IOException, IngestException, NotFoundException,
-          UnauthorizedException {
+  @Override
+  public WorkflowInstance addZippedMediaPackage(InputStream zipStream,
+                                                String wd,
+                                                Map<String, String> workflowConfig,
+                                                Long workflowId)
+          throws MediaPackageException, IOException, IngestException, NotFoundException, UnauthorizedException {
     // Start a job synchronously. We can't keep the open input stream waiting around.
     Job job = null;
 

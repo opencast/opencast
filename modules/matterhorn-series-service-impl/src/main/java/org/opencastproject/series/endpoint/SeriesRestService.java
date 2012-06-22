@@ -144,6 +144,14 @@ public class SeriesRestService {
     serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
   }
 
+  public String getSeriesXmlUrl(String seriesId) {
+    return UrlSupport.concat(serverUrl, serviceUrl, seriesId + ".xml");
+  }
+
+  public String getSeriesJsonUrl(String seriesId) {
+    return UrlSupport.concat(serverUrl, serviceUrl, seriesId + ".json");
+  }
+
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("{seriesID:.+}.xml")
@@ -284,8 +292,8 @@ public class SeriesRestService {
       String serializedSeries = serializeDublinCore(newSeries);
       logger.debug("Created series {} ", id);
       return Response.status(CREATED)
-              .header("Location", UrlSupport.concat(new String[] { this.serverUrl, this.serviceUrl, id + ".xml" }))
-              .header("Location", UrlSupport.concat(new String[] { this.serverUrl, this.serviceUrl, id + ".json" }))
+              .header("Location", getSeriesXmlUrl(id))
+              .header("Location", getSeriesJsonUrl(id))
               .entity(serializedSeries).build();
     } catch (Exception e) {
       logger.warn("Could not add/update series: {}", e.getMessage());
