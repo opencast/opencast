@@ -209,7 +209,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
       if (storageDir == null)
         throw new IllegalStateException("Storage dir must be set (org.opencastproject.storage.dir)");
-      solrRoot = PathSupport.concat(storageDir, "workflow");
+      solrRoot = PathSupport.concat(storageDir, "workflowindex");
     }
     Object syncIndexingConfig = cc.getProperties().get("synchronousIndexing");
     if (syncIndexingConfig != null && (syncIndexingConfig instanceof Boolean)) {
