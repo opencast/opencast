@@ -21,11 +21,21 @@
       <artifactId>matterhorn-scheduler-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-     <dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-series-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>   
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-ingest-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-series-service-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-workflow-service-api</artifactId>
@@ -153,12 +163,6 @@
       <artifactId>cxf-bundle-jaxrs</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-series-service-impl</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency> 
   </dependencies>
   <build>
     <plugins>

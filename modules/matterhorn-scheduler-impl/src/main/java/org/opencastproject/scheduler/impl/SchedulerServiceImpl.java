@@ -15,9 +15,12 @@
  */
 package org.opencastproject.scheduler.impl;
 
+import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
@@ -33,6 +36,7 @@ import org.opencastproject.scheduler.api.SchedulerQuery.Sort;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.series.endpoint.SeriesRestService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
@@ -58,6 +62,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -99,6 +104,12 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   /** The series service */
   protected SeriesService seriesService;
 
+  /** The series rest service */
+  protected SeriesRestService seriesRestService;
+
+  /** The ingest service */
+  protected IngestService ingestService;
+
   /** The workflow service */
   protected WorkflowService workflowService;
 
@@ -124,6 +135,16 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    */
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
+  }
+
+  /** OSGi callback */
+  public void setSeriesRestService(SeriesRestService seriesRestService) {
+    this.seriesRestService = seriesRestService;
+  }
+
+  /** OSGi callback */
+  public void setIngestService(IngestService ingestService) {
+    this.ingestService = ingestService;
   }
 
   /**
@@ -324,36 +345,41 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * Populates MediaPackage with standard values from DublinCore such as: title, language, license, series id, creators,
    * contributors and subjects.
    * 
-   * @param mediapackage
+   * @param mp
    *          {@link MediaPackage} to be updated
-   * @param catalog
+   * @param dc
    *          {@link DublinCoreCatalog} for event
    */
-  private void populateMediapackageWithStandardDCFields(MediaPackage mediapackage, DublinCoreCatalog catalog) throws Exception {
-    mediapackage.setTitle(catalog.getFirst(DublinCore.PROPERTY_TITLE));
-    mediapackage.setLanguage(catalog.getFirst(DublinCore.PROPERTY_LANGUAGE));
-    mediapackage.setLicense(catalog.getFirst(DublinCore.PROPERTY_LICENSE));
-    mediapackage.setSeries(catalog.getFirst(DublinCore.PROPERTY_IS_PART_OF));
+  private void populateMediapackageWithStandardDCFields(MediaPackage mp, DublinCoreCatalog dc) throws Exception {
+    final String seriesId = dc.getFirst(DublinCore.PROPERTY_IS_PART_OF);
+    mp.setTitle(dc.getFirst(DublinCore.PROPERTY_TITLE));
+    mp.setLanguage(dc.getFirst(DublinCore.PROPERTY_LANGUAGE));
+    mp.setLicense(dc.getFirst(DublinCore.PROPERTY_LICENSE));
+    mp.setSeries(seriesId);
     
-    if (StringUtils.isNotEmpty(mediapackage.getSeries())) {
+    if (StringUtils.isNotEmpty(mp.getSeries())) {
       try {
-        DublinCoreCatalog s = seriesService.getSeries(catalog.getFirst(DublinCore.PROPERTY_IS_PART_OF));
-        mediapackage.setSeriesTitle(s.getFirst(DublinCore.PROPERTY_TITLE));
+        DublinCoreCatalog sdc = seriesService.getSeries(seriesId);
+        mp.setSeriesTitle(sdc.getFirst(DublinCore.PROPERTY_TITLE));
+        // add the series catalog
+        mp.add(new URI(seriesRestService.getSeriesXmlUrl(seriesId)), MediaPackageElement.Type.Catalog, MediaPackageElements.SERIES);
       } catch (Exception e) {
-        logger.error("Unable to find series: " + catalog.getFirst(DublinCore.PROPERTY_IS_PART_OF), e);
+        logger.error("Unable to find series: " + dc.getFirst(DublinCore.PROPERTY_IS_PART_OF), e);
         throw e;
       }
     }
     
-    for (DublinCoreValue value : catalog.get(DublinCore.PROPERTY_CREATOR)) {
-      mediapackage.addCreator(value.getValue());
+    for (DublinCoreValue value : dc.get(DublinCore.PROPERTY_CREATOR)) {
+      mp.addCreator(value.getValue());
     }
-    for (DublinCoreValue value : catalog.get(DublinCore.PROPERTY_CONTRIBUTOR)) {
-      mediapackage.addContributor(value.getValue());
+    for (DublinCoreValue value : dc.get(DublinCore.PROPERTY_CONTRIBUTOR)) {
+      mp.addContributor(value.getValue());
     }
-    for (DublinCoreValue value : catalog.get(DublinCore.PROPERTY_SUBJECT)) {
-      mediapackage.addSubject(value.getValue());
+    for (DublinCoreValue value : dc.get(DublinCore.PROPERTY_SUBJECT)) {
+      mp.addSubject(value.getValue());
     }
+    // add the episode catalog
+    ingestService.addCatalog(IOUtils.toInputStream(dc.toXmlString(), "UTF-8"), "dublincore.xml", MediaPackageElements.EPISODE, mp);
   }
 
   /**
@@ -696,16 +722,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * 
    * @param template
    *          {@link DublinCoreCatalog} used as template
-   * @param rrule
-   *          recurrence pattern
-   * @param start
-   *          date when series of event will start
-   * @param end
-   *          date when series of event will end
-   * @param duration
-   *          duration of each even in milliseconds
-   * @param timeZone
-   *          time zone in which event will take place
    * @return list of {@link DublinCoreCatalog}s
    * @throws ParseException
    *           if recurrence pattern cannot be parsed
