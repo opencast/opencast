@@ -15,7 +15,6 @@
  */
 package org.opencastproject.workflow.handler;
 
-import org.apache.commons.lang.StringUtils;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
@@ -27,15 +26,16 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
-import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
-import org.opencastproject.mediapackage.selector.TrackFlavorPrioritySelector;
-import org.opencastproject.mediapackage.selector.TrackSelector;
+import org.opencastproject.mediapackage.selector.SimpleElementSelector;
+import org.opencastproject.mediapackage.selector.SimpleFlavorPrioritySelector;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,14 +116,14 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
     String sourcePriorityFlavors = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
             "source-priority-flavors"));
 
-    AbstractMediaPackageElementSelector<Track> elementSelector;
+    AbstractMediaPackageElementSelector<MediaPackageElement> elementSelector;
 
     if (sourcePriorityFlavors != null) {
       if (sourceFlavors != null || sourceTags != null)
         throw new IllegalArgumentException(
                 "Source-flavors or source-tags can not be used in case of source-priority-flavors property");
 
-      elementSelector = new TrackFlavorPrioritySelector();
+      elementSelector = new SimpleFlavorPrioritySelector();
       for (String flavor : asList(sourcePriorityFlavors)) {
         elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
       }
@@ -133,7 +133,7 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
         logger.warn("No tags or flavors have been specified");
         return createResult(mediaPackage, Action.CONTINUE);
       }
-      elementSelector = new TrackSelector();
+      elementSelector = new SimpleElementSelector();
 
       if (sourceFlavors != null) {
         for (String flavor : asList(sourceFlavors)) {
@@ -152,9 +152,9 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
       Set<String> elementIds = new HashSet<String>();
 
       // Look for elements matching the tag
-      Collection<Track> tracks = elementSelector.select(mediaPackage, false);
-      for (Track track : tracks) {
-        elementIds.add(track.getIdentifier());
+      Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, false);
+      for (MediaPackageElement elem : elements) {
+        elementIds.add(elem.getIdentifier());
       }
 
       // Also distribute all of the metadata catalogs
@@ -162,18 +162,18 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
         elementIds.add(c.getIdentifier());
 
       // Also distribute the security configuration
-// -----
-// Stop distributing the security config for now since no one actually uses it.
-// This is done as a fix for MH-8515. I leave the code in place since it should
-// be reactivated as soon as this issues has been resolved cleanly. Please see
-// the ticket for further information [cedriessen]
-// -----
-//      Attachment[] securityAttachments = mediaPackage.getAttachments(MediaPackageElements.XACML_POLICY);
-//      if (securityAttachments != null && securityAttachments.length > 0) {
-//        for (Attachment a : securityAttachments) {
-//          elementIds.add(a.getIdentifier());
-//        }
-//      }
+      // -----
+      // Stop distributing the security config for now since no one actually uses it.
+      // This is done as a fix for MH-8515. I leave the code in place since it should
+      // be reactivated as soon as this issues has been resolved cleanly. Please see
+      // the ticket for further information [cedriessen]
+      // -----
+      // Attachment[] securityAttachments = mediaPackage.getAttachments(MediaPackageElements.XACML_POLICY);
+      // if (securityAttachments != null && securityAttachments.length > 0) {
+      // for (Attachment a : securityAttachments) {
+      // elementIds.add(a.getIdentifier());
+      // }
+      // }
 
       // Finally, push the elements to the distribution channel
       List<String> targetTagList = asList(targetTags);
