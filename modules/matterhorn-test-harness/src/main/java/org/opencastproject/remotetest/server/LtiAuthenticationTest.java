@@ -105,7 +105,8 @@ public class LtiAuthenticationTest {
     oauthMessage.addParameter("user_id", LTI_CONSUMER_USER);
     oauthMessage.addParameter("context_id", LTI_CONSUMER_CONTEXT);
     oauthMessage.addParameter("consumer_gui", LTI_CONSUMER_GUID);
-
+    oauthMessage.addParameter("custom_test", "true");
+    
     // Sign the request
     OAuthConsumer consumer = new OAuthConsumer(null, CONSUMER_KEY, CONSUMER_SECRET, null);
     OAuthAccessor accessor = new OAuthAccessor(consumer);
@@ -164,7 +165,8 @@ public class LtiAuthenticationTest {
     // Add some LTI parameters
     oauthMessage.addParameter("user_id", LTI_CONSUMER_USER);
     oauthMessage.addParameter("context_id", LTI_CONSUMER_CONTEXT);
-
+    oauthMessage.addParameter("custom_test", "true");
+    
     // Sign the request
     OAuthConsumer consumer = new OAuthConsumer(null, CONSUMER_KEY, "wrong secret", null);
     OAuthAccessor accessor = new OAuthAccessor(consumer);
@@ -197,7 +199,8 @@ public class LtiAuthenticationTest {
     // Add some LTI parameters
     oauthMessage.addParameter("user_id", unknownUserId);
     oauthMessage.addParameter("context_id", LTI_CONSUMER_CONTEXT);
-
+    oauthMessage.addParameter("custom_test", "true");
+    
     // Sign the request
     OAuthConsumer consumer = new OAuthConsumer(null, CONSUMER_KEY, CONSUMER_SECRET, null);
     OAuthAccessor accessor = new OAuthAccessor(consumer);
