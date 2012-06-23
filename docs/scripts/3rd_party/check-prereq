@@ -374,6 +374,32 @@ install_prog() {
               ;;
           esac
           ;;
+        patch )
+          prog="$1"
+          case `arch` in
+            i386 )
+              URLS=`getmcfg patch${V}_x86_url:`
+              rpms=`getmcfg patch${V}_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg patch${V}_x64_url:`
+              rpms=`getmcfg patch${V}_x64_pkgs:`
+              ;;
+          esac
+          ;;
+        libtool )
+          prog="$1"
+          case `arch` in
+            i386 )
+              URLS=`getmcfg libtool${V}_x86_url:`
+              rpms=`getmcfg libtool${V}_x86_pkgs:`
+              ;;
+            x86_64 )
+              URLS=`getmcfg libtool${V}_x64_url:`
+              rpms=`getmcfg libtool${V}_x64_pkgs:`
+              ;;
+          esac
+          ;;
         perl-dbi )
           prog=perl-DBI
           case `arch` in
@@ -772,6 +798,8 @@ check_prereq() {
       chkprog gcc     || install_prog gcc      || return 1
       chkprog g++     || install_prog g++      || return 1
       chkprog yacc    || install_prog yacc     || return 1
+      chkprog patch   || install_prog patch    || return 1
+      chkprog libtool || install_prog libtool  || return 1
       # this was reported as missing on some systems and is needed by git
       chkprog dbiprof || install_prog perl-dbi || return 1
       chkprog git     || install_prog git      || return 1
