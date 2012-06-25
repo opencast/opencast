@@ -133,7 +133,7 @@ public class DistributeWorkflowOperationHandlerTest {
             "presentation/source,presenter/source");
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
     MediaPackageElement[] elementsByTag = result.getMediaPackage().getElementsByTag(targetTags);
-    Assert.assertEquals("Resulting mediapackage has the wrong number of tracks", 3, elementsByTag.length);
+    Assert.assertEquals("Resulting mediapackage has the wrong number of tracks", 1, elementsByTag.length);
     boolean presentationCheck = false;
     boolean presenterCheck = false;
     for (MediaPackageElement element : elementsByTag) {
@@ -144,6 +144,15 @@ public class DistributeWorkflowOperationHandlerTest {
     }
     Assert.assertTrue(presentationCheck);
     Assert.assertFalse(presenterCheck);
+  }
+
+  @Test
+  public void testDistributeWithExcludeTag() throws Exception {
+    String sourceTags = "engage,atom,-rss";
+    WorkflowInstance workflowInstance = getWorkflowInstance(sourceTags, null, null, null);
+    WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
+    Assert.assertEquals("Resulting mediapackage has the wrong number of tracks", 3, result.getMediaPackage()
+            .getTracks().length);
   }
 
   @Test(expected = IllegalArgumentException.class)

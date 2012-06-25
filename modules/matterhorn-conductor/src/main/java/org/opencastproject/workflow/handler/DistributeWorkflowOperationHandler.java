@@ -19,7 +19,6 @@ import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
-import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -156,10 +155,6 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
       for (MediaPackageElement elem : elements) {
         elementIds.add(elem.getIdentifier());
       }
-
-      // Also distribute all of the metadata catalogs
-      for (Catalog c : mediaPackage.getCatalogs())
-        elementIds.add(c.getIdentifier());
 
       // Also distribute the security configuration
       // -----

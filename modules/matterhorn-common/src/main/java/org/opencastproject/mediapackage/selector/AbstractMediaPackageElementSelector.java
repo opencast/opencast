@@ -38,8 +38,17 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
   /** The tags */
   protected Set<String> tags = new HashSet<String>();
 
+  /** The tags to exclude */
+  protected Set<String> excludeTags = new HashSet<String>();
+
   /** The flavors */
   protected List<MediaPackageElementFlavor> flavors = new ArrayList<MediaPackageElementFlavor>();
+
+  /**
+   * The prefix indicating that a tag should be excluded from a search for elements using
+   * {@link MediaPackage#getElementsByTags(Collection)}
+   */
+  public static final String NEGATE_TAG_PREFIX = "-";
 
   /**
    * This base implementation will return those media package elements that match the type specified as the type
@@ -52,10 +61,15 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
   public Collection<T> select(MediaPackage mediaPackage, boolean withTagsAndFlavors) {
     Set<T> result = new HashSet<T>();
     Class type = getParametrizedType(result);
-    for (MediaPackageElement e : mediaPackage.getElements()) {
+    elementLoop: for (MediaPackageElement e : mediaPackage.getElements()) {
 
       // Does the type match?
       if (type.isAssignableFrom(e.getClass())) {
+
+        for (String tag : e.getTags()) {
+          if (excludeTags.contains(tag))
+            continue elementLoop;
+        }
 
         // Any of the flavors?
         boolean matchesFlavor = false;
@@ -65,6 +79,20 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
             break;
           }
         }
+
+        // boolean add = false;
+        // for (String elementTag : element.getTags()) {
+        // if (lose.contains(elementTag)) {
+        // add = false;
+        // break;
+        // } else if (keep.contains(elementTag)) {
+        // add = true;
+        // }
+        // }
+        // if (add) {
+        // result.add(element);
+        // }
+
         // If the elements selection is done by tags AND flavors
         if (withTagsAndFlavors && matchesFlavor && e.containsTag(tags))
           result.add((T) e);
@@ -246,7 +274,11 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
    *          the tag to include
    */
   public void addTag(String tag) {
-    tags.add(tag);
+    if (tag.startsWith(NEGATE_TAG_PREFIX)) {
+      excludeTags.add(tag.substring(NEGATE_TAG_PREFIX.length()));
+    } else {
+      tags.add(tag);
+    }
   }
 
   /**
