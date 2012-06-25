@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.workflow.handler.TagWorkflowOperationHandler" immediate="true">
+  <implementation class="org.opencastproject.workflow.handler.TagWorkflowOperationHandler" />
+  <property name="service.description" value="Tag Workflow Handler" />
+  <property name="workflow.operation" value="tag" />
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+</scr:component>
