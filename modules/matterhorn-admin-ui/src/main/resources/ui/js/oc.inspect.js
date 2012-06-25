@@ -106,6 +106,9 @@ Opencast.WorkflowInspect = (function() {
       if (mp.start) {
         out.info.start = mp.start;
       }
+      if (mp.duration) {
+        mp.duration = ocUtils.formatSeconds(mp.duration/ 1000)
+      }
 
       // Attachments
       mp.attachments = Opencast.RenderUtils.ensureArray(mp.attachments.attachment);
@@ -182,14 +185,14 @@ Opencast.WorkflowInspect = (function() {
     //    $target.append(result);
     $target.jqoteapptpl("templates/viewinfo-" + templateId + ".tpl", workflow);
     $target.tabs({
-//      select: function (event, ui) {
-//        if(ui.index == 3 && window.location.hash != '#performance')
-//        {
-//          window.location.hash = '#performance';
-//          window.location.reload();
-//        }
-//      }
-    });
+      //      select: function (event, ui) {
+      //        if(ui.index == 3 && window.location.hash != '#performance')
+      //        {
+      //          window.location.hash = '#performance';
+      //          window.location.reload();
+      //        }
+      //      }
+      });
     $('.unfoldable-tr').click(function() {
       var $content = $(this).find('.unfoldable-content');
       var unfolded = $content.is(':visible');
@@ -327,7 +330,18 @@ Opencast.WorkflowInspect = (function() {
       } else if (out[member.key] !== undefined) {
         out[member.key] = [out[member.key], member.value];
       } else {
-        out[member.key] = member['$'];
+        val = member['$'];
+        
+        if(val == undefined) {
+          val = "";
+        }
+    	
+        if ( (val.length == 13 && parseInt(val) != NaN) || (typeof(val) == "number" && val > 1000000000000)) {
+          out[member.key] = ocUtils.makeLocaleDateString(val);
+        } 
+        else {
+          out[member.key] = val;
+        }
       }
     });
     return out;
