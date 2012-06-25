@@ -66,25 +66,25 @@ ocSeriesList.askForSeries = function()
     {
       ocSeriesList.buildSeriesView(data);
       ocSeriesList.Configuration.total = data.totalCount;
-      ocSeriesList.Configuration.lastPage = Math.floor(ocSeriesList.Configuration.total / ocSeriesList.Configuration.count)
-      if(ocSeriesList.Configuration.startPage == 0) {
+      ocSeriesList.Configuration.lastPage = Math.ceil(ocSeriesList.Configuration.total / ocSeriesList.Configuration.count)
+      if(ocSeriesList.Configuration.total <= ocSeriesList.Configuration.count){
+        $('#prevText').show();
+        $('#prevButtons').hide();
+
+        $('#nextText').show();
+        $('#nextButtons').hide();
+      } else if(ocSeriesList.Configuration.startPage == 0) {
         $('#prevText').show();
         $('#prevButtons').hide();
 
         $('#nextText').hide();
         $('#nextButtons').show();
-      } else if(ocSeriesList.Configuration.startPage == ocSeriesList.Configuration.lastPage) {
+      }else if(ocSeriesList.Configuration.startPage == ocSeriesList.Configuration.lastPage) {
         $('#nextText').show();
         $('#nextButtons').hide();
 
         $('#prevText').hide();
         $('#prevButtons').show();
-      } else if(ocSeriesList.Configuration.total == ocSeriesList.Configuration.count){
-        $('#prevText').hide();
-        $('#prevButtons').show();
-
-        $('#nextText').hide();
-        $('#nextButtons').show();
       } else {
         $('#prevText').hide();
         $('#prevButtons').show();
@@ -92,6 +92,8 @@ ocSeriesList.askForSeries = function()
         $('#nextText').hide();
         $('#nextButtons').show();  
       }
+      $('#curPage').text(ocSeriesList.Configuration.startPage + 1);
+      $('#numPage').text(ocSeriesList.Configuration.lastPage);
     }
   });
 }

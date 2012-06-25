@@ -26,6 +26,11 @@
         <span>&laquo; first</span>
         <span>&lt;previous</span>
       </span>
+      <span>
+        <span id="curPage"></span>
+        <span> of </span>
+        <span id="numPage"></span>
+      </span>
       <span id="pageList"></span>
       <span id="nextButtons">
         <a class="nextPage" href="javascript:ocSeriesList.nextPage();" id="nextPage">next&gt;</a>
