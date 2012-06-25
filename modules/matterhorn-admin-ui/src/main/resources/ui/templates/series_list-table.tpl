@@ -2,10 +2,10 @@
   <table id="seriesTable" width="100%" style="float:left;">
     <thead>
       <tr>
-        <th width="25%" class="ui-widget-header sortable"><div>Title<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></th>
-    <th width="25%" class="ui-widget-header sortable"><div>Organizer<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></th>
-    <th width="25%" class="ui-widget-header sortable"><div>Contributor<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></th>                        
-    <th width="25%" class="ui-widget-header"><div>Action</div></th>
+        <th width="25%" class="ui-widget-header">Title</th>
+    <th width="25%" class="ui-widget-header">Organizer</th>
+    <th width="25%" class="ui-widget-header">Contributor</th>                        
+    <th width="25%" class="ui-widget-header">Action</th>
     </tr>
     </thead>
     <tbody>
