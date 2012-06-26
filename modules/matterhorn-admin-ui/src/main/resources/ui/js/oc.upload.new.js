@@ -491,7 +491,7 @@ ocUpload.Ingest = (function() {
     ocUpload.UI.setProgress('Starting Processing...');
 
     var workflowData = Workflow.properties;
-    workflowData['mediaPackage'] = MediaPackage.document;
+    workflowData['MEDIAPACKAGE'] = MediaPackage.document;
     $.ajax({
       url : ocUpload.INGEST_START_URL + '/' + Workflow.definition,
       async : true,

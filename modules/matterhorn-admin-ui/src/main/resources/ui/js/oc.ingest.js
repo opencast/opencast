@@ -145,7 +145,7 @@ ocIngest.startIngest = function(mediaPackage) {
   ocUtils.log("Starting Ingest on MediaPackage with Workflow " + $('#workflowSelector').val());
   ocUpload.setProgress('100%','starting Ingest',' ', ' ');
   var data = ocWorkflow.getConfiguration($('#workflowConfigContainer'));
-  data['mediaPackage'] = ocUtils.xmlToString(mediaPackage);
+  data['MEDIAPACKAGE'] = ocUtils.xmlToString(mediaPackage);
   $.ajax({
     url        : '../ingest/ingest/' + $('#workflowSelector').val(),
     type       : 'POST',
