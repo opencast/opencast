@@ -564,8 +564,8 @@ public class IngestRestService {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response ingest(MultivaluedMap<String, String> formData) {
     /**
-     * Note:  We use a MultivaluedMap here to ensure that we can get any arbitrary form parameters.  
-     * This is required to enable things like holding for trim or distributing to YouTube.
+     * Note: We use a MultivaluedMap here to ensure that we can get any arbitrary form parameters. This is required to
+     * enable things like holding for trim or distributing to YouTube.
      */
     logger.debug("ingest(MediaPackage)");
     try {
@@ -578,7 +578,7 @@ public class IngestRestService {
           mp = factory.newMediaPackageBuilder().loadFromXml(formData.getFirst(key));
         }
       }
-  
+
       return ingest(mp, wfConfig);
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
@@ -590,20 +590,18 @@ public class IngestRestService {
   @Produces(MediaType.TEXT_HTML)
   @Path("ingest/{wdID}")
   @SuppressWarnings("unchecked")
-  @RestQuery(name = "ingest", description = "Ingest the completed media package into the system, retrieving all URL-referenced files, and starting a specified workflow", pathParameters = {
-          @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, restParameters = { 
-          @RestParameter(description = "The ID of the given media package", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, reponses = {
+  @RestQuery(name = "ingest", description = "Ingest the completed media package into the system, retrieving all URL-referenced files, and starting a specified workflow", pathParameters = { @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, restParameters = { @RestParameter(description = "The ID of the given media package", isRequired = true, name = "MEDIAPACKAGE", type = RestParameter.Type.TEXT) }, reponses = {
           @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response ingest(@PathParam("wdID") String wdID, MultivaluedMap<String, String> formData) {
     if (StringUtils.isBlank(wdID)) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
-    
+
     try {
       MediaPackage mp = null;
       Map<String, String> wfConfig = new HashMap<String, String>();
-      wfConfig.put(WORKFLOW_INSTANCE_ID_PARAM, wdID);
+      wfConfig.put(WORKFLOW_DEFINITION_ID_PARAM, wdID);
       for (String key : formData.keySet()) {
         if (!"MEDIAPACKAGE".equals(key)) {
           wfConfig.put(key, formData.getFirst(key));
@@ -619,12 +617,12 @@ public class IngestRestService {
     }
   }
 
-  private Response ingest(MediaPackage mp, Map<String,String> wfConfig) {
+  private Response ingest(MediaPackage mp, Map<String, String> wfConfig) {
     try {
       String workflowInstance = wfConfig.get(WORKFLOW_INSTANCE_ID_PARAM);
       String workflowDefinition = wfConfig.get(WORKFLOW_DEFINITION_ID_PARAM);
 
-      //Double check that the required params exist.
+      // Double check that the required params exist.
       if (mp == null) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
@@ -637,8 +635,9 @@ public class IngestRestService {
         try {
           workflowInstanceId = Long.parseLong(workflowInstance);
         } catch (NumberFormatException e) {
-          /* Eat the exception, we don't *really* care since the system will just make up a new ID if needed.
-           * This may also be an unscheduled capture, which might not have a Long ID.
+          /*
+           * Eat the exception, we don't *really* care since the system will just make up a new ID if needed. This may
+           * also be an unscheduled capture, which might not have a Long ID.
            */
         }
 
