@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.opencastproject.kernel.security.SecurityServiceSpringImpl">
-  <implementation class="org.opencastproject.kernel.security.SecurityServiceSpringImpl" />
-  <property name="service.description" value="Provides username and role information for the current user" />
-  <service>
-    <provide interface="org.opencastproject.security.api.SecurityService" />
-  </service>
-</scr:component>

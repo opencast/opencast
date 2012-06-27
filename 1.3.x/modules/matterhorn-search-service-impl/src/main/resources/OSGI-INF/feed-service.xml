@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.feed.impl.FeedServlet" immediate="true">
-  <implementation class="org.opencastproject.feed.impl.FeedServlet" />
-  <property name="service.description" value="Feed Service" />
-  <reference name="http" interface="org.osgi.service.http.HttpService" cardinality="1..1" policy="static" bind="setHttpService"/>
-  <reference name="feed" interface="org.opencastproject.feed.api.FeedGenerator" cardinality="0..n" policy="dynamic" bind="addFeedGenerator" unbind="removeFeedGenerator"/>
-</scr:component>

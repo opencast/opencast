@@ -1,5 +1,0 @@
-URL: ftp://ftp.videolan.org/pub/videolan/x264/snapshots ${USASK_MIRROR}
-PKG: x264-snapshot-20110811-2245-stable.tar.bz2
-SHA: bbb3c57338a9607b32c110ebc80dafa920747f2e
-DIR: x264-snapshot-20110811-2245-stable
-PCP: pc-x264.zip
