@@ -1,0 +1,52 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-win32 ] && exit 0
+pkg=`getcfg PKG:`
+chkpkg "$pkg" || exit 1
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+pcp=`getcfg PCP:`
+[ -z "$pcp" ] && exit 1
+#
+rm -fr "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+gzip -dc "$pkg" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+cd "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+#
+./configure \
+--host=${MINGW32} \
+--disable-shared
+[ $? -ne 0 ] && exit 1
+make
+[ $? -ne 0 ] && exit 1
+#
+sudox cp jpeglib.h jmorecfg.h jerror.h jconfig.h ${MINGW32_PREFIX}/include
+[ $? -ne 0 ] && exit 1
+sudox cp .libs/libjpeg.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+#
+zip -j "../$pcp" jpeglib.h jmorecfg.h jerror.h jconfig.h
+[ $? -ne 0 ] && exit 1
+# For shared libs
+#zip -j "../$pcp" .libs/libjpeg-8.dll .libs/libjpeg.a .libs/libjpeg.dll.a
+#[ $? -ne 0 ] && exit 1
+#zip -j "../$pcp" .libs/cjpeg.exe .libs/djpeg.exe .libs/jpegtran.exe
+# For static libs
+zip -j "../$pcp" .libs/libjpeg.a
+[ $? -ne 0 ] && exit 1
+zip -j "../$pcp" cjpeg.exe djpeg.exe jpegtran.exe
+[ $? -ne 0 ] && exit 1
+#
+touch ../.done-win32
+[ $? -ne 0 ] && exit 1
+exit 0

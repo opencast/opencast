@@ -1,0 +1,22 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+compile jam     mac || exit 1
+compile scons   mac || exit 1
+compile yasm    mac || exit 1
+compile pthread mac || exit 1
+compile rand48  mac || exit 1
+#
+compile zlib    mac || exit 1
+compile jpeg    mac || exit 1
+# png depends on zlib
+compile png     mac || exit 1
+# tiff depends on pthread, zlib and jpeg
+compile tiff    mac || exit 1
+#
+exit 0

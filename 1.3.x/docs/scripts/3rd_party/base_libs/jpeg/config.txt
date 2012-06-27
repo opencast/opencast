@@ -1,0 +1,5 @@
+URL: http://www.ijg.org/files ${USASK_MIRROR}
+PKG: jpegsrc.v8b.tar.gz
+SHA: 15dc1939ea1a5b9d09baea11cceb13ca59e4f9df
+DIR: jpeg-8b
+PCP: pc-jpeg.zip

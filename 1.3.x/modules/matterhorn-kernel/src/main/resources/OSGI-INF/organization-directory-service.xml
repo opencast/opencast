@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+
+  <scr:component name="org.opencastproject.kernel.security.OrganizationDirectoryServiceImpl" activate="activate" immediate="true">
+    <implementation class="org.opencastproject.kernel.security.OrganizationDirectoryServiceImpl" />
+    <property name="service.pid" value="org.opencastproject.organization" />
+    <property name="service.description" value="Organization Directory Service" />
+    <service>
+      <provide interface="org.opencastproject.security.api.OrganizationDirectoryService" />
+      <provide interface="org.osgi.service.cm.ManagedServiceFactory" />
+    </service>
+    <reference name="configAdmin" interface="org.osgi.service.cm.ConfigurationAdmin"
+      cardinality="1..1" policy="static" bind="setConfigurationAdmin" />
+  </scr:component>
+
+  <scr:component name="org.opencastproject.kernel.security.OrganizationEndpoint" immediate="true">
+    <implementation class="org.opencastproject.kernel.security.OrganizationEndpoint" />
+    <property name="service.description" value="Organization listing REST endpoint" />
+    <property name="opencast.service.type" value="org.opencastproject.organization" />
+    <property name="opencast.service.path" value="/org" />
+    <property name="opencast.service.jobproducer" value="false" />
+    <service>
+      <provide interface="org.opencastproject.kernel.security.OrganizationEndpoint" />
+    </service>
+    <reference name="orgDirectoryService" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+      cardinality="1..1" policy="static" bind="setOrgDirectoryService" />
+  </scr:component>
+
+</scr:components>

@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <title>Download DVD Image</title>
+    
+
+
+    <link rel="stylesheet" type="text/css" href="/admin/css/jquery-ui-1.8.6.custom.css" />
+    <link rel="stylesheet" type="text/css" href="/admin/css/jquery-ui-opencast-admin/jquery-ui-opencast-admin.css" />
+    <link rel="stylesheet" type="text/css" href="/admin/css/admin.css">
+
+    <script type="text/javascript" src="/admin/jquery/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="/admin/jquery/jquery-ui-1.8.9.custom.min.js"></script>
+    <script type="text/javascript" src="/admin/js/oc.utils.js"></script>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var id = parent.document.getElementById("holdWorkflowId").value;
+        // get WorkflowInstance
+        $.ajax({
+          url : '../../../workflow/instance/' + id + '.xml',
+          dataType : 'xml',    // or XML..
+          success : function(data) {    // get neccessary data to make the link to the DVD image working
+            var elms = data.documentElement.getElementsByTagName('track');
+            for (i in elms) {
+              if ((elms[i].getAttribute != undefined) && (elms[i].getAttribute('type').match(/dvd/))) {
+                $('#dvd-image-link').attr('href', elms[i].getElementsByTagName('url')[0].firstChild.data);
+                $('#error').css('display','none');
+                $('#download').css("display","block");
+              }
+            }
+            parent.Recordings.adjustHoldActionPanelHeight();
+          }
+        });
+      });
+    </script>
+  </head>
+  <body style="padding:10px;">
+    <h1>Download DVD image</h1>
+    <div id="download" style="display:none;">
+      To download the DVD encoded recording click <a id="dvd-image-link" href="#">here</a>.
+    <p style="color:gray;">
+      The recording will remain on the server until you continue.
+    </p>
+    </div>
+    <div id="error">
+      Sorry, no DVD encoded track was found in this Media Package.
+    </div>
+    <div id="actions">
+         <!-- control buttons -->
+         <button title="Move on to next steps in processing this recording" style="margin-right: 16px; width: 160px;" onclick="parent.ocRecordings.continueWorkflow();" id="continueBtn" type="button" class="ui-button ui-corner-all">Continue processing</button>
+         <button onclick="$('#holdActionPanel-container',top.document).toggle();$('#recordings-table-container',top.document).toggle();$('#oc_recordingmenu' ,top.document).toggle();$('.paging-nav-container',top.document).toggle();$('#refresh-controls-container',top.document).toggle();$('#category-selector-container',top.document).parent().toggle();" title="Cancel" style="margin-right: 16px;" type="button">Cancel</button>
+     </div>
+  </body>
+</html>

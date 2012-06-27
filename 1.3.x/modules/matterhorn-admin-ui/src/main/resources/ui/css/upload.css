@@ -1,0 +1,21 @@
+/* 
+    Document   : ingest
+    Created on : Jan 5, 2010, 2:59:24 PM
+    Author     : wulff
+    Description:
+        style rules for the ingest ui
+*/
+
+/*body {font: 62.5% "Trebuchet MS", sans-serif; margin: 50px;}
+a {color:blue;}*/
+.container {margin-bottom: 10px;}
+.formField-list {margin-left:5px; margin-right:5px; padding:0px;}
+.formField-list li {margin-bottom: 4px;}
+.formField-label {width:165px !important; text-align:right; margin-right:1em; float:left;}
+.formField {width:440px !important;float:left;}
+.no-bullets {list-style-type: none;}
+.collapse-control {padding-left:18px;cursor:pointer;background:silver;}
+.collapse-control-closed {background-image:url(../img/icons/arrow-right.png);background-position:top left !important; background-repeat:no-repeat;}
+.collapse-control-open {background-image:url(../img/icons/arrow-down.png);background-position:top left !important; background-repeat:no-repeat;}
+.titlebar {background-color:silver !important; padding-left:8px;}
+.progressStage {display: none; background-color: white; width: 850px; padding-left: 20px; padding-right: 20px;}

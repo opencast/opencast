@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:mediapackage start="2011-03-07T17:33:14Z" id="f69c5e29-5a63-4cb3-b58a-7c5a00fdb8d9" duration="0" xmlns:ns2="http://mediapackage.opencastproject.org">
+<media>
+<track type="presentation/source" id="a4e14935-c916-46aa-a022-34bfc595ad33"><tags/><url>src/test/resources/split.mp4</url><duration>-1</duration>
+	<video id="video-1">
+	        <device />
+        <encoder ></encoder>
+        <bitrate>387969.0</bitrate>
+        <framerate>10</framerate>
+        <resolution>1792x1028</resolution>
+        <scantype type="Progressive" />
+        </video>
+	<mimetype>video/quicktime</mimetype>
+	</track>
+	</media><metadata><catalog type="dublincore/episode" id="322c5b29-f21a-4257-8e9b-5f9dc9877e80"><mimetype>text/xml</mimetype><tags/><url>dublinCore.xml</url></catalog></metadata><attachments/></ns2:mediapackage>
+	

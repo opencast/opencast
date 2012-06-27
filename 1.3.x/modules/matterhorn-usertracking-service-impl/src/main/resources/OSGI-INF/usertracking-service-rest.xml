@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.usertracking.endpoint.UserTrackingRestService"
+	immediate="true" activate="activate" deactivate="deactivate">
+	<implementation class="org.opencastproject.usertracking.endpoint.UserTrackingRestService" />
+	<property name="service.description" value="User Tracking REST Endpoint" />
+	<property name="opencast.service.type" value="org.opencastproject.usertracking" />
+	<property name="opencast.service.path" value="/usertracking" />
+	<service>
+		<provide interface="org.opencastproject.usertracking.endpoint.UserTrackingRestService" />
+	</service>
+	<reference name="service-impl"
+		interface="org.opencastproject.usertracking.api.UserTrackingService"
+		cardinality="1..1" policy="static" bind="setService" />
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+</scr:component>

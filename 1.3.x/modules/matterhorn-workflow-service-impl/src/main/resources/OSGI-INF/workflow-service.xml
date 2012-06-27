@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.opencastproject.workflow.impl.WorkflowServiceImpl"
+  immediate="true" activate="activate">
+  <implementation class="org.opencastproject.workflow.impl.WorkflowServiceImpl" />
+  <property name="service.description" value="Workflow Service" />
+  <service>
+    <provide interface="org.osgi.service.cm.ManagedService" />
+    <provide interface="org.opencastproject.workflow.api.WorkflowService" />
+    <provide interface="org.opencastproject.workflow.impl.WorkflowServiceImpl" />
+  </service>
+  <reference name="index" interface="org.opencastproject.workflow.impl.WorkflowServiceIndex" cardinality="1..1"
+    policy="static" bind="setDao" />
+  <reference name="metadata" interface="org.opencastproject.metadata.api.MediaPackageMetadataService"
+    cardinality="1..n" policy="dynamic" bind="addMetadataService" unbind="removeMetadataService" />
+  <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    cardinality="1..1" policy="static" bind="setServiceRegistry" />
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"
+    cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+  <reference name="security" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="authorization" interface="org.opencastproject.security.api.AuthorizationService"
+    cardinality="1..1" policy="static" bind="setAuthorizationService" />
+  <reference name="series" interface="org.opencastproject.series.api.SeriesService"
+    cardinality="1..1" policy="static" bind="setSeriesService" />
+  <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+</scr:component>

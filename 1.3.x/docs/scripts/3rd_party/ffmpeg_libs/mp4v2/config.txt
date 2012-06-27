@@ -1,0 +1,5 @@
+URL: http://mp4v2.googlecode.com/files ${USASK_MIRROR}
+PKG: mp4v2-trunk-r355.tar.bz2
+SHA: 18a10807c5a05e0361e77d126599f8717ad7c8f5
+DIR: mp4v2-trunk-r355
+PCP: pc-mp4v2.zip

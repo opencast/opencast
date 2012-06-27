@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Mpeg7 xmlns="urn:mpeg:mpeg7:schema:2001" xmlns:mpeg7="urn:mpeg:mpeg7:schema:2001"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Description xsi:type="ContentEntityType">
+    <MultimediaContent xsi:type="AudioType">
+      <Audio id="track-1">
+        <MediaLocator>
+          <MediaUri>file:tracks/audio.pcm</MediaUri>
+        </MediaLocator>
+        <MediaTime>
+          <MediaTimePoint>T00:00:00:0F25</MediaTimePoint>
+          <MediaDuration>PT01H30M</MediaDuration>
+        </MediaTime>
+      </Audio>
+    </MultimediaContent>
+    <MultimediaContent xsi:type="VideoType">
+      <Video id="track-2">
+        <MediaLocator>
+          <MediaUri>file:tracks/presentation.mp4</MediaUri>
+        </MediaLocator>
+        <MediaTime>
+          <MediaTimePoint>T00:00:00:0F25</MediaTimePoint>
+          <MediaDuration>PT01H30M</MediaDuration>
+        </MediaTime>
+        <TemporalDecomposition gap="false" overlap="false" criteria="temporal">
+          <VideoSegment id="track-2.segment-1">
+            <MediaTime>
+              <MediaRelTimePoint>T00:00:00:0F25</MediaRelTimePoint>
+              <MediaDuration>PT01H07M35S</MediaDuration>
+            </MediaTime>
+            <TextAnnotation confidence="0.37" relevance="0.75" xml:lang="en">
+              <KeywordAnnotation>
+                <Keyword>Armin</Keyword>
+              </KeywordAnnotation>
+              <FreeTextAnnotation>Hint Armin</FreeTextAnnotation>
+            </TextAnnotation>
+            <TextAnnotation confidence="0.5" relevance="0.66" xml:lang="de">
+              <KeywordAnnotation>
+                <Keyword>Olaf</Keyword>
+              </KeywordAnnotation>
+              <FreeTextAnnotation>Hint Olaf</FreeTextAnnotation>
+            </TextAnnotation>
+            <TextAnnotation confidence="1.0" relevance="0.50">
+              <KeywordAnnotation>
+                <Keyword>Géri</Keyword>
+                <Keyword>Robi</Keyword>
+                <Keyword>Tomy</Keyword>
+                <Keyword>Tobias</Keyword>
+                <Keyword>Jörg</Keyword>
+                <Keyword>Christoph</Keyword>
+                <Keyword>Francesco</Keyword>
+              </KeywordAnnotation>
+            </TextAnnotation>
+          </VideoSegment>
+          <VideoSegment id="track-2.segment-2">
+            <MediaTime>
+              <MediaRelTimePoint>T01:07:35,0F25</MediaRelTimePoint>
+              <MediaDuration>PT0H22M25S</MediaDuration>
+            </MediaTime>
+            <TextAnnotation confidence="1.0" relevance="1.0">
+              <KeywordAnnotation>
+                <Keyword>Hello</Keyword>
+              </KeywordAnnotation>
+              <FreeTextAnnotation>Hint Hello</FreeTextAnnotation>
+              <KeywordAnnotation>
+                <Keyword>World</Keyword>
+              </KeywordAnnotation>
+              <FreeTextAnnotation>Hint World</FreeTextAnnotation>
+            </TextAnnotation>
+          </VideoSegment>
+        </TemporalDecomposition>
+      </Video>
+    </MultimediaContent>
+    <MultimediaContent xsi:type="VideoType">
+      <Video id="track-3">
+        <MediaLocator>
+          <MediaUri>file:tracks/presenter.mpg</MediaUri>
+        </MediaLocator>
+        <MediaTime>
+          <MediaTimePoint>T00:00:00,0F25</MediaTimePoint>
+          <MediaDuration>PT01H30M</MediaDuration>
+        </MediaTime>
+      </Video>
+    </MultimediaContent>
+  </Description>
+</Mpeg7>

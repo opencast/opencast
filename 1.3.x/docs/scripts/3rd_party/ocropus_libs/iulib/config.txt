@@ -1,0 +1,5 @@
+URL: http://iulib.googlecode.com/files ${USASK_MIRROR}
+PKG: iulib-0.4.tgz
+SHA: 96a006f806a650886fdd59b1239f6e56d1a864c1
+DIR: iulib-0.4
+PCP: pc-iulib.zip

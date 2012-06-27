@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <title>Select Workflow</title>
+    <link rel="stylesheet" type="text/css" href="/admin/css/jquery-ui-1.8.6.custom.css" />
+    <link rel="stylesheet" type="text/css" href="/admin/css/jquery-ui-opencast-admin/jquery-ui-opencast-admin.css" />
+    <link rel="stylesheet" type="text/css" href="/admin/css/admin.css">
+    <script type="text/javascript" src="/admin/jquery/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="/admin/jquery/jquery-ui-1.8.9.custom.min.js"></script>
+    <script type="text/javascript" src="jquery/plugins/jquery.i18n.properties-min.js"></script>
+    <script type="text/javascript" src="/admin/js/oc.utils.js"></script>
+    <script type="text/javascript" src="/admin/js/oc.workflow.js"></script>
+    <script type="text/javascript" src="/admin/js/upload.helptexts.json"></script>
+    <script type="text/javascript" src="/admin/js/oc.upload.js"></script>
+    <script type="text/javascript" src="/admin/js/oc.uploadListener.js"></script>
+    <script type="text/javascript" src="/admin/js/oc.ingest.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+    	ocWorkflow.init($('#workflowSelector'), $('#workflowConfigContainer'));
+      });
+      
+      function continueWorkflow() {
+//     	  if (components) {
+//     	    components['org.opencastproject.workflow.config.workflowSelector'] = new ocAdmin.Component(['workflowSelector'], {nodeKey: 'org.opencastproject.workflow.config.workflowSelector'});
+//     	  }
+    	  parent.ocRecordings.continueWorkflow(components);
+      }
+    </script>
+  </head>
+  <body style="padding:10px;">
+    <h1>Select workflow</h1>
+    <!-- Processing Instructions -->
+    <div class="form-box layout-centered container ui-widget">
+        <div class="form-box-head ui-widget-header ui-corner-top"><b id="i18n_process_title">Processing</b></div>
+        <div class="form-box-content ui-widget-content ui-corner-bottom">
+            <ul class="oc-ui-form-list">
+                <li class="ui-helper-clearfix">
+                    <label class="scheduler-label"><span style="color: red;">* </span><span id="i18n_process_instr">Processing instructions</span>:</label>
+                    <select id="workflowSelector" name="workflowSelector" class="requiredField"></select>
+                </li>
+            </ul>
+            <div id="workflowConfigContainer"></div>
+        </div>
+    </div>
+    <div id="actions">
+      <input title="Start processing" style="margin-left: 65px; margin-right: 16px; width: 160px;" onclick="continueWorkflow()" id="continueBtn" type="button" class="ui-button ui-corner-all" value="Start processing" />
+      <a onclick="parent.ocRecordings.hideHoldActionUI()" title="Cancel" class="secondaryButton">Cancel</a>
+    </div>
+  </body>
+</html>

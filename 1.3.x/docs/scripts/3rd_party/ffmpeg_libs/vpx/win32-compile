@@ -1,0 +1,55 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-win32 ] && exit 0
+pkg=`getcfg PKG:`
+chkpkg "$pkg" || exit 1
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+pcp=`getcfg PCP:`
+[ -z "$pcp" ] && exit 1
+#
+rm -fr "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+bzip2 -dc "$pkg" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+cd "${dir}-win32"
+[ $? -ne 0 ] && exit 1
+#
+CROSS=${MINGW32}- ./configure \
+--target=x86-win32-gcc
+[ $? -ne 0 ] && exit 1
+make
+[ $? -ne 0 ] && exit 1
+#
+mv vpxdec vpxdec.exe
+[ $? -ne 0 ] && exit 1
+mv vpxenc vpxenc.exe
+[ $? -ne 0 ] && exit 1
+#
+sudox rm -fr ${MINGW32_PREFIX}/include/vpx
+[ $? -ne 0 ] && exit 1
+sudox mkdir -p ${MINGW32_PREFIX}/include/vpx
+[ $? -ne 0 ] && exit 1
+sudox cp vpx/*.h ${MINGW32_PREFIX}/include/vpx
+[ $? -ne 0 ] && exit 1
+sudox cp libvpx.a ${MINGW32_PREFIX}/lib
+[ $? -ne 0 ] && exit 1
+sudox cp vpx.pc ${MINGW32_PREFIX}/lib/pkgconfig
+[ $? -ne 0 ] && exit 1
+#
+zip "../$pcp" vpx/*.h
+[ $? -ne 0 ] && exit 1
+zip "../$pcp" libvpx.a vpxdec.exe vpxenc.exe
+[ $? -ne 0 ] && exit 1
+#
+touch ../.done-win32
+[ $? -ne 0 ] && exit 1
+exit 0

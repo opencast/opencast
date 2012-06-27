@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+  <bannerLeft>
+    <name>Opencast</name>
+    <href>http://www.opencastproject.org/</href>
+    <src>http://www.opencastproject.org/sites/all/themes/ad_blueprint/images/opencast_header.gif</src>
+  </bannerLeft>
+  <bannerRight>
+    <name>Matterhorn</name>
+    <href>http://www.opencastproject.org/project/matterhorn</href>
+    <src>http://www.opencastproject.org/sites/default/files/MatterhornLogo_smallweb.gif</src>
+  </bannerRight>
+  <body>
+    <links>
+      <item name="Opencast" href="http://www.opencastproject.org/" />
+      <item name="Matterhorn" href="http://www.opencastproject.org/project/matterhorn" />
+      <item name="Opencast Wiki" href="https://wiki.opencastproject.org/confluence/" />
+      <item name="Matterhorn Wiki" href="https://wiki.opencastproject.org/confluence/display/open" />
+    </links>
+    <menu inherit="top" />
+    <menu ref="parent" />
+    <menu ref="modules" />
+    <menu ref="reports" />
+  </body>
+</project>

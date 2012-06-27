@@ -1,0 +1,5 @@
+URL: http://www.libsdl.org/projects/SDL_image/release ${USASK_MIRROR}
+PKG: SDL_image-1.2.10.tar.gz
+SHA: 6bae71fdfd795c3dbf39f6c7c0cf8b212914ef97
+DIR: SDL_image-1.2.10
+PCP: pc-sdl_image.zip

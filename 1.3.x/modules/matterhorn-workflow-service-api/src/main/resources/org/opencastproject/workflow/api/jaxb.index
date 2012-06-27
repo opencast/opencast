@@ -1,0 +1,9 @@
+WorkflowConfigurationImpl
+WorkflowDefinitionImpl
+WorkflowDefinitionSet
+WorkflowInstanceImpl
+WorkflowOperationDefinitionImpl
+WorkflowOperationInstanceImpl
+WorkflowOperationResultImpl
+WorkflowSetImpl
+WorkflowStatistics

@@ -1,0 +1,5 @@
+URL: http://downloads.sourceforge.net/project/giflib/giflib-4.x/giflib-4.1.6 ${USASK_MIRROR}
+PKG: giflib-4.1.6.tar.gz
+SHA: 8649fa9c16f3300750f7089c79e652ddc750c832
+DIR: giflib-4.1.6
+PCP: pc-gif.zip

@@ -1,0 +1,219 @@
+@charset "utf-8";
+.style.css {
+}
+
+body {
+	background: url("img/body.gif") repeat scroll 0 0 #EDEDED;
+	margin: 20px 0;
+	font-family: "Lucida Grande", "Lucida Sans Unicode", sans-serif;
+	line-height:1.3em;/*18px*/
+	font-size:.7em;/*set regular font size*/
+	}
+
+#wrapper {
+	margin:0 auto;
+	padding: 0;
+	position:relative;
+	width:970px;
+	background-color:#FFFFFF;
+	border: 2px solid #2D8F8B;
+	-moz-border-radius: .7em;
+	-webkit-border-radius: .7em;
+	}
+	
+#topbanner {
+	padding: 20px 0;
+	}
+
+#topbanner {
+	width:100%;
+	display:inline-block;
+	position:relative;
+	}
+
+#middlebanner,
+#middlebanner2 {
+	background-color:#861B1D;
+	width:100%;
+	display:inline-block;
+	padding:20px 0 20px;
+	}
+
+#bottombanner {
+	width:100%;
+	display:inline-block;
+	background-color:#E8F0F0;
+	padding:20px 0 4px;
+	}
+
+
+#matterhornlogo {
+	float:left;
+	padding-left: 40px;
+	}
+
+#opencastlogo {
+	float: right;
+	}
+
+
+#promotext {
+	padding: 10px 0 0 330px;
+	font-size: 1.25em;
+	line-height: 1.25em;
+	}
+#promotext p {
+	color:#0E2E2D;
+	margin:10px 10px 10px 0;
+	}
+
+#promotext p.orange {
+	color:#F6921E;
+	font-style:italic;
+	font-weight:bold;
+	margin:2px 0;
+	}
+
+#promotext .twocolumnlist {
+	float:left;
+	}
+
+#middlebanner #col1m, 
+#middlebanner #col2m {
+	float:left;
+	width:425px;
+	padding-left: 42px;
+	}
+
+#middlebanner2 #col3m,
+#middlebanner2 #col4m {
+	float:left;
+	width:425px;
+	padding-left: 42px;
+	}
+
+#bottombanner #col1b,
+#bottombanner #col2b,
+#bottombanner #col3b {
+	float:left;
+	width: 297px;
+	padding-left:16px;
+	}
+
+#footer {
+	text-align:center;
+	border-top: 1px solid #ccc;
+	}
+
+h1 {
+	font-size: 2.2em;
+        line-height: 1.1em;
+	color:#A72123;
+	margin-left:330px;
+	}
+
+h2 {
+	color:#FFFFFF;
+	}
+
+#middlebanner h2,
+#middlebanner2 h2 {
+	font-size:1.9em;
+	margin-top:0;
+	}
+#bottombanner h2 {
+	font-size:1.6em;
+	margin-top:0;
+	color:#871B1D;
+	}
+
+#middlebanner p,
+#middlebanner ul,
+#middlebanner2 p,
+#middlebanner2 ul {
+	color:#CCCCCC;
+	}
+#middlebanner #col1m p,
+#middlebanner #col1m a,
+#middlebanner #col1m h2,
+#middlebanner #col1m ul {
+	margin-left:94px;
+	}
+#middlebanner #col2m p,
+#middlebanner #col2m a,
+#middlebanner #col2m h2,
+#middlebanner #col2m ul {
+	margin-left:110px;
+	}
+#middlebanner2 #col3m p,
+#middlebanner2 #col3m a,
+#middlebanner2 #col3m h2,
+#middlebanner2 #col3m ul {
+	margin-left:94px;
+	}
+#middlebanner2 #col4m p,
+#middlebanner2 #col4m a,
+#middlebanner2 #col4m h2,
+#middlebanner2 #col4m ul {
+	margin-left:110px;
+	}
+
+#bottombanner p,
+#bottombanner ul,
+#bottombanner a {
+	color:#0E2E2D;
+	}
+
+#middlebanner img,
+#middlebanner2 img {
+	position:absolute;
+	}
+	
+#middlebanner a.redbutton,
+#middlebanner2 a.redbutton {
+	border:2px solid #FFF;
+	background-color:#0E2E2D;
+	color:#FFF;
+	font-size:1.17em;
+	padding:6px 10px;
+	-moz-border-radius:8px; /* Firefox */ 
+	-webkit-border-radius:8px; /* Safari and chrome */ 
+	-khtml-border-radius:8px; /* Linux browsers */ 
+	border-radius:8px; /* CSS3 */ 
+	}
+#middlebanner a.redbutton:hover,
+#middlebanner2 a.redbutton:hover {
+	border:2px solid #F6921E;
+	background-color:#A72123;
+	color:#FFF;
+	text-decoration:none;
+	}
+.emphasis {
+	font-weight: bold;
+	font-style:italic;
+	color:#F6921E;
+	}
+	
+a, a:link, a:visited {
+	color: #871B1D;
+	text-decoration:none;
+	font-weight:bold;
+	}
+a:hover {
+	text-decoration: underline;
+	}
+#topbanner ul {
+	list-style-image:url(img/bullet_orange.png);
+	padding-left: 16px;
+	color:#A72123;
+}
+#middlebanner ul
+#middlebanner2 ul {
+	/*list-style-image:url(img/bullet_white.png);*/
+	padding: 0 0 16px 16px;
+}
+#bottombanner ul {
+	list-style-image:url(img/icons/bullet-arrow.png);
+	padding: 0 0 16px 16px;
+	margin-bottom:0
+}

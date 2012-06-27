@@ -1,0 +1,45 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-linux ] && exit 0
+TMPFILE=`mktemp /tmp/${0##*/}.XXXXX`
+trap 'rm -f $TMPFILE' 0
+pkg=`getcfg PKG:`
+chkpkg "$pkg" || exit 1
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+#
+rm -fr "$dir" "${dir}-linux"
+[ $? -ne 0 ] && exit 1
+gzip -dc "$pkg" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-linux"
+[ $? -ne 0 ] && exit 1
+cd "${dir}-linux/build/generic"
+[ $? -ne 0 ] && exit 1
+#
+# configure expects yasm 0.8.0 or greater, but checks only minor version
+sed -e 's/^minimum_yasm_minor_version=.*/minimum_yasm_minor_version=0/' \
+    -e 's/GCC_MAJOR=.*/GCC_MAJOR=`$CC --version | head -1 | cut -d '\'' '\'' -f 3 | cut -d '\''.'\'' -f 1`/' \
+    -e 's/GCC_MINOR=.*/GCC_MINOR=`$CC --version | head -1 | cut -d '\'' '\'' -f 3 | cut -d '\''.'\'' -f 1`/' \
+    configure > $TMPFILE
+[ $? -ne 0 ] && exit 1
+cp $TMPFILE configure
+[ $? -ne 0 ] && exit 1
+./configure
+[ $? -ne 0 ] && exit 1
+make
+[ $? -ne 0 ] && exit 1
+sudox make install
+[ $? -ne 0 ] && exit 1
+sudox /sbin/ldconfig
+[ $? -ne 0 ] && exit 1
+#
+touch ../../../.done-linux
+[ $? -ne 0 ] && exit 1
+exit 0

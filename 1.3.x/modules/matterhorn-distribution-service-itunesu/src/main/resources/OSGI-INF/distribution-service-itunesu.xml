@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.distribution.itunesu.DistributionService" immediate="true" activate="activate"
+  deactivate="deactivate">
+  <implementation class="org.opencastproject.distribution.itunesu.ITunesUDistributionService" />
+  <property name="service.description" value="Distribution Service (iTunes U)" />
+  <property name="distribution.channel" value="itunesu" />
+  <service>
+    <provide interface="org.opencastproject.distribution.itunesu.ITunesUDistributionService" />
+    <provide interface="org.opencastproject.distribution.api.DistributionService" />
+  </service>
+  <reference name="WORKSPACE" interface="org.opencastproject.workspace.api.Workspace"
+    cardinality="1..n" policy="static" bind="setWorkspace" />
+  <reference name="remoteServiceManager" interface="org.opencastproject.serviceregistry.api.ServiceRegistry" cardinality="1..1" policy="static" bind="setServiceRegistry" />
+</scr:component>

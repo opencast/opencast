@@ -1,0 +1,66 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-mac ] && exit 0
+pkg=`getcfg PKG:`
+chkpkg "$pkg" || exit 1
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+#
+rm -fr "$dir" "${dir}-mac"
+[ $? -ne 0 ] && exit 1
+gzip -dc "$pkg" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-mac"
+[ $? -ne 0 ] && exit 1
+cd "${dir}-mac"
+[ $? -ne 0 ] && exit 1
+#
+./configure \
+--enable-gpl \
+--enable-version3 \
+--enable-nonfree \
+--disable-ffplay \
+--disable-ffserver \
+--extra-cflags='-I${LOCAL_PREFIX}/include' \
+--extra-ldflags='-L${LOCAL_PREFIX}/lib -Wl,-rpath,${LOCAL_PREFIX}/lib' \
+--enable-libxvid --extra-libs='-lxvidcore' \
+--enable-libx264 --extra-libs='-lx264 -lpthread' \
+--enable-libmp3lame --extra-libs='-lmp3lame' \
+--enable-libfaac --extra-libs='-lfaac' \
+--enable-libvorbis --extra-libs='-lvorbis' \
+--enable-libtheora --extra-libs='-ltheora' \
+--enable-libvpx --extra-libs='-lvpx' \
+--enable-runtime-cpudetect
+[ $? -ne 0 ] && exit 1
+make
+[ $? -ne 0 ] && exit 1
+sudox make install
+[ $? -ne 0 ] && exit 1
+#
+sudox rm -fr ${LOCAL_PREFIX}/include/ffmpeg
+[ $? -ne 0 ] && exit 1
+sudox mkdir -p ${LOCAL_PREFIX}/include/ffmpeg
+[ $? -ne 0 ] && exit 1
+#
+OLDCD=`pwd`
+[ $? -ne 0 ] && exit 1
+cd ${LOCAL_PREFIX}/include/ffmpeg
+[ $? -ne 0 ] && exit 1
+sudox ln -fs ../libavcodec/avcodec.h avcodec.h
+[ $? -ne 0 ] && exit 1
+sudox ln -fs ../libavformat/avformat.h avformat.h
+[ $? -ne 0 ] && exit 1
+sudox ln -fs ../libavformat/avio.h avio.h
+[ $? -ne 0 ] && exit 1
+cd "$OLDCD"
+[ $? -ne 0 ] && exit 1
+#
+touch ../.done-mac
+[ $? -ne 0 ] && exit 1
+exit 0

@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>Ingest Service REST Documentation</title>
+  <style type="text/css">
+  /* styles for the page */
+  fieldset {
+     margin-top: 0.5em;
+     width: 90%;
+  }
+  table {
+     width: 100%;
+  }
+  .method_set_header {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    font-size: 1.4em;
+    font-weight: bold;
+  }
+  .method_header {
+     background-color: #FFC;
+  }
+  .method_header TH {
+        text-align: left;
+        padding: 0.3em;
+  }
+  .method TD {
+     padding-left: 0.3em;
+     padding-top: 0.1em;
+     vertical-align: top;
+  }
+  .method_odd {
+     background-color: #FFF;
+  }
+    .method_even {
+       background-color: #DDD;
+    }
+  </style>
+</head>
+<body>
+<h1>Ingest Service REST Documentation</h1>
+
+<fieldset>
+  <legend class="method_set_header">Thin Client</legend>
+  <table cellpadding="0px" cellspacing="0px">
+    <thead>
+      <tr class="method_header">
+        <th width="20%">NAME</th>
+        <th>VALUE and NOTES</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="method_odd method">
+        <td>Method / Path:</td>
+        <td><tt>GET /createMediaPackage</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Description:</td>
+        <td>Returns a new empty media package</td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Optional parameters:</td>
+        <td>
+          <tt>None</tt>
+        </td>
+      </tr>
+      <tr class="method_even method">
+        <td>Response formats:</td>
+        <td>
+          <a href="http://www.w3.org/XML/">xml</a> (<a href="@SERVER_URL@/definitions.xml">@SERVER_URL@/definitions.xml</a>)<br/>
+        </td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Status codes</td>
+        <td>
+          200: OK, valid request, results returned
+          <br />
+          400: Bad Request, invalid arguments in request, error message
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <table cellpadding="0px" cellspacing="0px">
+    <thead>
+      <tr class="method_header">
+        <th width="20%">NAME</th>
+        <th>VALUE and NOTES</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="method_odd method">
+        <td>Method / Path:</td>
+        <td><tt>POST /addTrack</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Description:</td>
+        <td>Adds a track to the given media package and returns the new grown media package</td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Required (path) parameters:</td>
+        <td><tt>None</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Required (form) parameters:</td>
+        <td><tt>String .. URL of the media to be added<br />
+        	String .. flavor of the media<br />
+        	MediapackageType .. XML representation of the media package (returned by createMediaPackage or any add*** method)</tt></td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Optional parameters:</td>
+        <td>
+          <tt>None</tt>
+        </td>
+      </tr>
+      <tr class="method_even method">
+        <td>Response formats:</td>
+        <td>
+          <a href="http://www.w3.org/XML/">xml</a> (<a href="@SERVER_URL@/definitions.xml">@SERVER_URL@/definitions.xml</a>)<br/>
+        </td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Status codes</td>
+        <td>
+          200: OK, valid request, results returned
+          <br />
+          400: Bad Request, invalid arguments in request, error message
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <table cellpadding="0px" cellspacing="0px">
+    <thead>
+      <tr class="method_header">
+        <th width="20%">NAME</th>
+        <th>VALUE and NOTES</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="method_odd method">
+        <td>Method / Path:</td>
+        <td><tt>POST /addTrack</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Description:</td>
+        <td>Adds a track to the given media package and returns the new grown media package</td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Required (path) parameters:</td>
+        <td><tt>None</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Required (form) parameters:</td>
+        <td><tt>InputStream .. media to be added<br />
+        	String .. flavor of the media<br />
+        	MediapackageType .. XML representation of the media package (returned by createMediaPackage or any add*** method)</tt></td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Optional parameters:</td>
+        <td>
+          <tt>None</tt>
+        </td>
+      </tr>
+      <tr class="method_even method">
+        <td>Response formats:</td>
+        <td>
+          <a href="http://www.w3.org/XML/">xml</a> (<a href="@SERVER_URL@/definitions.xml">@SERVER_URL@/definitions.xml</a>)<br/>
+        </td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Status codes</td>
+        <td>
+          200: OK, valid request, results returned
+          <br />
+          400: Bad Request, invalid arguments in request, error message
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table cellpadding="0px" cellspacing="0px">
+    <thead>
+      <tr class="method_header">
+        <th width="20%">NAME</th>
+        <th>VALUE and NOTES</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="method_odd method">
+        <td>Method / Path:</td>
+        <td><tt>POST /addCatalog</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Description:</td>
+        <td>Adds a catalog to the given media package and returns the new grown media package</td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Required (path) parameters:</td>
+        <td><tt>None</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Required (form) parameters:</td>
+        <td><tt>String .. URL of the media to be added<br />
+        	String .. flavor of the media<br />
+        	MediapackageType .. XML representation of the media package (returned by createMediaPackage or any add*** method)</tt></td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Optional parameters:</td>
+        <td>
+          <tt>None</tt>
+        </td>
+      </tr>
+      <tr class="method_even method">
+        <td>Response formats:</td>
+        <td>
+          <a href="http://www.w3.org/XML/">xml</a> (<a href="@SERVER_URL@/definitions.xml">@SERVER_URL@/definitions.xml</a>)<br/>
+        </td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Status codes</td>
+        <td>
+          200: OK, valid request, results returned
+          <br />
+          400: Bad Request, invalid arguments in request, error message
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <table cellpadding="0px" cellspacing="0px">
+    <thead>
+      <tr class="method_header">
+        <th width="20%">NAME</th>
+        <th>VALUE and NOTES</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="method_odd method">
+        <td>Method / Path:</td>
+        <td><tt>POST /addCatalog</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Description:</td>
+        <td>Adds a catalog to the given media package and returns the new grown media package</td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Required (path) parameters:</td>
+        <td><tt>None</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Required (form) parameters:</td>
+        <td><tt>InputStream .. media to be added<br />
+        	String .. flavor of the media<br />
+        	MediapackageType .. XML representation of the media package (returned by createMediaPackage or any add*** method)</tt></td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Optional parameters:</td>
+        <td>
+          <tt>None</tt>
+        </td>
+      </tr>
+      <tr class="method_even method">
+        <td>Response formats:</td>
+        <td>
+          <a href="http://www.w3.org/XML/">xml</a> (<a href="@SERVER_URL@/definitions.xml">@SERVER_URL@/definitions.xml</a>)<br/>
+        </td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Status codes</td>
+        <td>
+          200: OK, valid request, results returned
+          <br />
+          400: Bad Request, invalid arguments in request, error message
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <table cellpadding="0px" cellspacing="0px">
+    <thead>
+      <tr class="method_header">
+        <th width="20%">NAME</th>
+        <th>VALUE and NOTES</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="method_odd method">
+        <td>Method / Path:</td>
+        <td><tt>POST /addAttachment</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Description:</td>
+        <td>Adds an attachment to the given media package and returns the new grown media package</td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Required (path) parameters:</td>
+        <td><tt>None</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Required (form) parameters:</td>
+        <td><tt>String .. URL of the media to be added<br />
+        	String .. flavor of the media<br />
+        	MediapackageType .. XML representation of the media package (returned by createMediaPackage or any add*** method)</tt></td>      
+      </tr>
+      <tr class="method_odd method">
+        <td>Optional parameters:</td>
+        <td>
+          <tt>None</tt>
+        </td>
+      </tr>
+      <tr class="method_even method">
+        <td>Response formats:</td>
+        <td>
+          <a href="http://www.w3.org/XML/">xml</a> (<a href="@SERVER_URL@/definitions.xml">@SERVER_URL@/definitions.xml</a>)<br/>
+        </td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Status codes</td>
+        <td>
+          200: OK, valid request, results returned
+          <br />
+          400: Bad Request, invalid arguments in request, error message
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <table cellpadding="0px" cellspacing="0px">
+    <thead>
+      <tr class="method_header">
+        <th width="20%">NAME</th>
+        <th>VALUE and NOTES</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="method_odd method">
+        <td>Method / Path:</td>
+        <td><tt>POST /addAttachment</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Description:</td>
+        <td>Adds an attachment to the given media package and returns the new grown media package</td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Required (path) parameters:</td>
+        <td><tt>None</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Required (form) parameters:</td>
+        <td><tt>InputStream .. media to be added<br />
+        	String .. flavor of the media<br />
+        	MediapackageType .. XML representation of the media package (returned by createMediaPackage or any add*** method)</tt></td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Optional parameters:</td>
+        <td>
+          <tt>None</tt>
+        </td>
+      </tr>
+      <tr class="method_even method">
+        <td>Response formats:</td>
+        <td>
+          <a href="http://www.w3.org/XML/">xml</a> (<a href="@SERVER_URL@/definitions.xml">@SERVER_URL@/definitions.xml</a>)<br/>
+        </td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Status codes</td>
+        <td>
+          200: OK, valid request, results returned
+          <br />
+          400: Bad Request, invalid arguments in request, error message
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table cellpadding="0px" cellspacing="0px">
+    <thead>
+      <tr class="method_header">
+        <th width="20%">NAME</th>
+        <th>VALUE and NOTES</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="method_odd method">
+        <td>Method / Path:</td>
+        <td><tt>POST /addMediaPackage</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Description:</td>
+        <td>Adds a new media package. A dublicore catalog is created from the names and values of text input fields. Tracks get added from form file field.</td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Required (path) parameters:</td>
+        <td><tt>None</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Required (form) parameters:</td>
+        <td><tt>None</tt></td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Optional parameters:</td>
+        <td>
+          <tt>creator, format, contributor, coverage, promoted, type, extent, isPartOf, license, available, advertised, created, source, abstract, temporal, relation, description, subject, isReferencedBy, language, rightsHolder, publisher, accessRights, spatial, isReplacedBy, date, identifier, replaces, rights, title</tt>
+        </td>
+      </tr>
+      <tr class="method_even method">
+        <td>Response formats:</td>
+        <td>
+          <a href="http://www.w3.org/XML/">xml</a> (<a href="@SERVER_URL@/definitions.xml">@SERVER_URL@/definitions.xml</a>)<br/>
+        </td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Status codes</td>
+        <td>
+          200: OK, valid request, results returned
+          <br />
+          400: Bad Request, invalid arguments in request, error message
+        </td>
+      </tr>
+      <tr class="method_even method">
+        <td>Example:</td>
+        <td><table>
+    <form id="meta" name="meta" action="addMediaPackage" method="POST" enctype="multipart/form-data" accept-charset="UTF-8" >
+ 	    <tr><td>publisher:</td><td><input type="text" name="publisher" id="publisher" /></td></tr>
+	    <tr><td>title:</td><td><input type="text" name="title" id="title" /></td></tr>
+	    <tr><td>contributor:</td><td><input type="text" name="contributor" id="contributor" /></td></tr>
+	    <tr><td>description:</td><td><input type="text" name="description" id="description" /></td></tr>
+      <tr><td>language:</td><td><input type="text" name="language" id="language" />
+      <tr><td>flavor:</td><td><input type="text" name="flavor" id="flavor" value="presentation/source"></input>
+    	<tr><td>track:</td><td><input type="file" name="track" id="track" /></td></tr>
+	    <tr><td><input type="submit" id="submit" value="Submit"/>
+    </form>
+    </table></td>
+      </tr>
+    </tbody>
+  </table>
+</fieldset>
+  
+  
+<fieldset>
+  <legend class="method_set_header">Thick Client</legend>
+   <table cellpadding="0px" cellspacing="0px">
+    <thead>
+      <tr class="method_header">
+        <th width="20%">NAME</th>
+        <th>VALUE and NOTES</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="method_odd method">
+        <td>Method / Path:</td>
+        <td><tt>POST /addZippedMediaPackage</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Description:</td>
+        <td>Client must collect all the media, catalogs and attachments, create a MediaPackage as a manifest.xml and submit everything as a compressed file.</td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Required (path) parameters:</td>
+        <td><tt>InputStream .. Compressed media package, containing manifest.xml and all the media</tt></td>
+      </tr>
+      <tr class="method_even method">
+        <td>Required (form) parameters:</td>
+        <td><tt>None</tt></td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Optional parameters:</td>
+        <td>
+          <tt>None</tt>
+        </td>
+      </tr>
+      <tr class="method_even method">
+        <td>Response formats:</td>
+        <td>
+          <a href="http://www.w3.org/XML/">xml</a> (<a href="@SERVER_URL@/definitions.xml">@SERVER_URL@/definitions.xml</a>)<br/>
+        </td>
+      </tr>
+      <tr class="method_odd method">
+        <td>Status codes</td>
+        <td>
+          200: OK, valid request, results returned
+          <br />
+          400: Bad Request, invalid arguments in request, error message
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</fieldset>
+
+
+  </body>
+</html>

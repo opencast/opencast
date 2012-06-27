@@ -1,0 +1,5 @@
+URL: http://downloads.sourceforge.net/project/lame/lame/3.98.4 ${USASK_MIRROR}
+PKG: lame-3.98.4.tar.gz
+SHA: eb29c7c937b9b7330ca979dfabc25ab2a31b9db2
+DIR: lame-3.98.4
+PCP: pc-lame.zip

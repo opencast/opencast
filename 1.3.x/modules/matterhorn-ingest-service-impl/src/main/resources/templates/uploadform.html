@@ -1,0 +1,17 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>AJAX file upload</title>
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body style="margin:0;padding:0;border:0;outline:0;vertical-align:baseline;background: transparent">
+    <input type="hidden" name="jobId" class="track-id" value="{jobId}" />
+    <form id="uploadForm" name="uploadForm" method="POST" action="{uploadURL}" enctype="multipart/form-data">
+      <input id="flavor" type="hidden" name="flavor" value="">
+      <input id="mediapackage" type="hidden" name="mediaPackage" value="">
+      <input type="hidden" name="elementType" value="{elementType}">
+      <input type="file" name="file" class="file-selector" onchange="parent.ocUpload.UI.formFieldChanged();">
+    </form>
+  </body>
+</html>

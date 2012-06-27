@@ -1,0 +1,8 @@
+URL1: http://octave.svn.sourceforge.net/svnroot/octave/trunk/octave-forge/admin/Windows/mingw32/glob ${USASK_MIRROR}
+PKG1: glob-1.0.tar.bz2
+SHA1: 6dc726adb2382fd48be0e027a54ca2e2358955a7
+URL2: http://octave.svn.sourceforge.net/svnroot/octave/trunk/octave-forge/admin/Windows/mingw32/glob ${USASK_MIRROR}
+PKG2: glob-1.0-4.patch
+SHA2: b2053beb0859c8b9e22f18b77d413d6827d6e06b
+DIR: glob-1.0
+PCP: pc-glob.zip

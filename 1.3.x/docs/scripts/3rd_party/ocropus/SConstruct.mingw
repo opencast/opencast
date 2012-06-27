@@ -1,0 +1,230 @@
+# -*- python -*-
+# vi: ft=python
+
+# Copyright 2008 Deutsches Forschungszentrum fuer Kuenstliche Intelligenz 
+# or its licensors, as applicable.
+# 
+# You may not use this file except under the terms of the accompanying license.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License"); you
+# may not use this file except in compliance with the License. You may
+# obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# 
+# Project: OCRopus - the open source document analysis and OCR system
+# File: SConstruct
+# Purpose: building OCRopus
+# Responsible: tmb
+# Reviewer: 
+# Primary Repository: http://ocropus.googlecode.com/svn/trunk/
+# Web Sites: www.iupr.org, www.dfki.de
+
+# IMPORTANT
+# 
+# The official build system for OCRopus is autoconf.
+# However, OCRopus should build with this build file on Ubuntu.
+# If OCRopus doesn't build with this build file on Ubuntu,
+# chances are that some file or file name violates the coding
+# conventions or that there are new, unexpected external library
+# dependencies.
+#
+# Please do not make significant modifications to this file
+# without talking to tmb first.
+
+print
+print "**********************************************"
+print "*** SConstruct is unsupported.             ***"
+print "*** The official build system is autoconf. ***"
+print "**********************************************"
+print
+
+EnsureSConsVersion(0,98,1)
+from SCons.Script import *
+import os,sys,string,re
+from glob import glob
+
+################################################################
+### ocropus source files
+################################################################
+
+os.system("./generate_version_cc.sh ./version.cc")
+
+sources = glob("ocr-*/*.cc") + ["version.cc"]
+exclude = r'.*/(main|test|bigtest)-.*\.cc'
+sources = [f for f in sources if not re.search(exclude,f)]
+headers = glob("include/*.h") + glob("ocr-utils/*.h")
+
+################################################################
+### command line options
+################################################################
+
+opts = Variables('custom.py')
+opts.Add('opt', 'Compiler flags for optimization/debugging', "-O3")
+opts.Add('warn', 'Compiler flags for warnings',
+         "-Wall -Wno-sign-compare -Wno-write-strings"+
+         " -D__warn_unused_result__=__far__"+
+         " -D_BACKWARD_BACKWARD_WARNING_H=1")
+### path options
+opts.Add(PathVariable('prefix', 'The installation root for OCRopus ', "/usr/i686-pc-mingw32/sys-root/mingw"))
+opts.Add(PathVariable('iulib', 'The installation root of iulib', "/usr/i686-pc-mingw32/sys-root/mingw"))
+opts.Add(PathVariable('leptonica', 'The installation root of leptonica', "/usr/i686-pc-mingw32/sys-root/mingw"))
+
+### configuration options
+### optional build steps
+opts.Add(BoolVariable('test', "Run some tests after the build", "no"))
+opts.Add(BoolVariable('style', 'Check style', "no"))
+
+env = Environment(options=opts)
+env.Append(CXXFLAGS=["-g","-fPIC"])
+env.Append(CXXFLAGS=env["opt"])
+env.Append(CXXFLAGS=env["warn"])
+Help(opts.GenerateHelpText(env))
+conf = Configure(env)
+
+if "-DUNSAFE" in env["opt"]:
+    print "WARNING: do not compile with -DUNSAFE except for benchmarking or profiling"
+if re.search(r'-O[234]',env["opt"]):
+    print "NOTE: compile with high optimization only for production use"
+else:
+    print "NOTE: compiling for development (slower but safer)"
+
+env.Tool('mingw')
+env.Append(CPPDEFINES=['__MSW32__'])  # required for tesseract
+
+################################################################
+### libraries
+################################################################
+
+### iulib
+
+env.Append(LIBPATH=["${iulib}/lib"])
+env.Append(CPPPATH=["${iulib}/include"])
+assert conf.CheckHeader("colib/colib.h",language="C++")
+assert conf.CheckLibWithHeader("iulib","iulib/iulib.h","C++");
+
+### OpenFST
+
+sources = [s for s in sources if not "fstxx" in s]
+env.Append(CPPDEFINES=['HAVE_FST'])
+env.Append(LIBS="dl")
+
+### Leptonica
+
+env.Append(CPPPATH='${leptonica}/include/liblept')
+env.Append(LIBS=["lept"])
+env.Append(CPPDEFINES=['HAVE_LEPTONICA'])
+#if conf.CheckLibWithHeader('lept', ['stdlib.h', 'stdio.h', 'leptonica/allheaders.h'], 'C'):
+#    # This happens if you install it with apt-get install libleptonica-dev.
+#    env.Append(CPPPATH=['/usr/include/leptonica',
+#                        '/usr/local/include/leptonica',
+#                        '${leptonica}/include/leptonica'])
+#elif conf.CheckLibWithHeader('lept', ['stdlib.h', 'stdio.h', 'liblept/allheaders.h'], 'C'):
+#    # This happens if you install from a tarball.
+#    env.Append(CPPPATH=['/usr/include/liblept',
+#                        '/usr/local/include/liblept',
+#                        '${leptonica}/include/liblept'])
+#else:
+#    # And this probably doesn't happen unless you manually specify the path.
+#    assert conf.CheckLibWithHeader('lept', ['stdlib.h', 'stdio.h', 'allheaders.h'], 'C')
+
+### SDL
+
+env.Append(LIBS=["mingw32","SDLmain","SDL","SDL_gfx","winmm","gdi32"])
+env.Append(CPPDEFINES=['SDL_CONSOLE'])
+#assert conf.CheckLibWithHeader('SDL', 'SDL/SDL.h', 'C')
+#assert conf.CheckLibWithHeader('SDL_gfx', 'SDL/SDL_gfxPrimitives.h', 'C')
+
+### TIFF, JPEG, PNG
+
+assert conf.CheckLib('tiff')
+assert conf.CheckLib('jpeg')
+assert conf.CheckLib('png')
+assert conf.CheckLib('gif')
+
+### gsl
+
+env.Append(LIBS=["gsl","gslcblas","rand48","glob","z"])
+
+#if re.search("-O3",env["opt"]):
+#    env.Append(LINKFLAGS=["-fopenmp"])
+#    env.Append(CXXFLAGS=["-fopenmp"])
+
+#env.Append(LINKFLAGS="-mwindows")
+
+conf.Finish()
+
+################################################################
+### main targets
+################################################################
+
+env.Append(CPPPATH=["include","ocr-utils"])
+
+#env.Append(CPPPATH=glob("ocr-*"))
+env.Append(LIBPATH=['.'])
+
+libocropus = env.StaticLibrary('libocropus.a',sources)
+env.Prepend(LIBS=[File("libocropus.a")])
+
+################################################################
+### install
+################################################################
+
+prefix = "${prefix}"
+incdir = prefix+"/include/ocropus"
+libdir = prefix+"/lib"
+datadir = prefix+"/share/ocropus"
+bindir = prefix+"/bin"
+scriptsdir = datadir + '/scripts'
+
+env.Install(libdir,libocropus)
+env.Install(datadir + '/models', glob('data/models/*'))
+env.Install(datadir + '/words', glob('data/words/*'))
+for header in headers: env.Install(incdir,header)
+for file in glob('data/models/*.gz'):
+    base = re.sub(r'\.gz$','',file)
+    base = re.sub(r'^[./]*data/','',base)
+    base = datadir+"/"+base
+    env.Command(base,file,"gunzip -9v < %s > %s" % (file,base))
+    env.Alias('install',base)
+
+env.Alias('install',bindir)
+env.Alias('install',libdir)
+env.Alias('install',incdir)
+env.Alias('install',datadir)
+
+################################################################
+### commands
+################################################################
+
+for cmd in glob("commands/*.cc"): 
+    env.Program(cmd)
+    env.Install(bindir,re.sub('.cc$','',cmd))
+
+################################################################
+### unit tests
+################################################################
+
+
+if env["test"]:
+    test_builder = Builder(action='$SOURCE && touch $TARGET',
+        suffix = '.passed',
+        src_suffix = '')
+    env.Append(BUILDERS={'Test':test_builder})
+    for cmd in Glob("*/test-*.cc")+Glob("*/test*/test-*.cc"):
+        cmd = str(cmd)
+        env.Program(cmd)
+        print cmd
+        cmd = re.sub('.cc$','',cmd)
+        env.Test(cmd)
+
+################################################################
+### style checking
+################################################################
+
+if env["style"]:
+    os.system("utilities/check-style -f ocr-*")

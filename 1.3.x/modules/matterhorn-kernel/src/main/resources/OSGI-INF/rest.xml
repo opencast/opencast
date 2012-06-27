@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+
+  <scr:component name="org.opencastproject.kernel.rest.RestPublisher" activate="activate" deactivate="deactivate" immediate="true">
+    <implementation class="org.opencastproject.kernel.rest.RestPublisher" />
+    <property name="service.description" value="Opencast REST Endpoint Publisher" />
+  </scr:component>
+
+</scr:components>

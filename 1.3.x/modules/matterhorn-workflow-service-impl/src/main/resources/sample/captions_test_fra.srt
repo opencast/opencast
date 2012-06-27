@@ -1,0 +1,13 @@
+1
+00:00:07,123 --> 00:00:12,987
+Première diapositive,
+les essais sous-titres qt.
+
+2
+00:00:14,456 --> 00:00:18,453
+deuxième diapositive.
+
+3
+00:00:21,654 --> 00:00:25,123
+Dernière diapositive,
+fin des essais légende.

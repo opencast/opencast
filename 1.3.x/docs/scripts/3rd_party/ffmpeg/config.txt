@@ -1,0 +1,6 @@
+URL: http://ffmpeg.org/releases ${USASK_MIRROR}
+PKG: ffmpeg-0.8.2.tar.gz
+SHA: 95e3c07f51a977ea0a0214516caed5ad3956d876
+DIR: ffmpeg-0.8.2
+PCP1: pc-ffmpeg.zip
+PCP2: _ffmpeg.zip

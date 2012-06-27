@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>QUnit Test Suite</title>
+    <link rel="stylesheet" href="qunit/qunit.css" type="text/css" media="screen">
+
+    <!-- Library dependencies -->
+    <script type="text/javascript" src="../../../target/classes/ui/jquery/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="../../../target/classes/ui/jquery/jquery-ui-1.8.1.custom.min.js"></script>
+    <!-- Production code -->
+    <script type="text/javascript" src="../../../src/main/resources/ui/js/oc.utils.js"></script>
+    <script type="text/javascript" src="../../../src/main/resources/ui/js/oc.ingest.js"></script>
+    <script type="text/javascript" src="../../../src/main/resources/ui/js/scheduler.js"></script>
+    <script type="text/javascript" src="../../../src/main/resources/ui/js/upload.helptexts.json"></script>
+    <script type="text/javascript" src="../../../src/main/resources/ui/js/upload.js"></script>
+    <!-- Test suite -->
+    <script type="text/javascript" src="qunit/qunit.js"></script>
+    <script type="text/javascript" src="scheduler-test.js"></script>
+    <script type="text/javascript" src="ingest-ui-test.js"></script>
+    <script type="text/javascript" src="help-test.js"></script>
+    <script type="text/javascript" src="DCXML-test.js"></script>
+  </head>
+  <body>
+    <h1 id="qunit-header">QUnit Test Suite</h1>
+    <h2 id="qunit-banner"></h2>
+    <div id="qunit-testrunner-toolbar"></div>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
+
+    <!-- Markup for test -->
+    <!-- <div id="main"> -->
+
+    <!-- Markup for scheudler test -->
+    <input type="text" id="textbox" value="some text here" />
+    <input type="checkbox" id="checkbox" checked="checked" value="true" />
+    
+    <!-- Markup for missing fields notification test -->
+    <div id="container-missingFields" style="display:none;">
+      <span id="notification-track" style="display:none;">Test field missing</span>
+    </div>
+    <span id="label-track" class="fl-label">Test label:</span>
+    <input type="text" id="track" class="requiredField" value="">
+    <span id="test-help-icon" class="helpIcon" title="Click for help">&nbsp;</span>
+
+    <!-- markup for upload progress test -->
+    <div id="gray-out">
+      &nbsp;
+    </div>
+    <div id="progress-stage" style="display:none;">
+      <div id="label-filename">
+        &nbsp;
+      </div>
+      <div id="progressbar">
+        <div id="progressbar-indicator" style="width:0%;">&nbsp;</div>
+        <div id="progressbar-label">Initializing upload...</div>
+      </div>
+      <div id="label-filesize">&nbsp</div>
+      <div id="label-bytestrasfered">&nbsp;</div>
+    </div>
+
+    <!-- Markup for the popup help box test -->
+    <div id="helpBox" class="helpbox" style="display:none;">
+      <img src="img/lightbulb.png" alt="help" >
+      <div id="helpTitle" style="display:inline;font-weight:bold; margin-left:10px;"></div>
+      <div id="helpText" style="padding-left:7px; padding-right:7px; white-space:normal;"></div>
+    </div>
+    <!-- </div> -->
+
+  </body>
+</html>

@@ -1,0 +1,5 @@
+URL: file://home/matjaz/3rd_party/repository ${USASK_MIRROR}
+PKG: rand48-1.0.zip
+SHA: 41750fce2c6c07b2706bb155eff749502a8a7dc5
+DIR: rand48-1.0
+PCP: pc-rand48.zip

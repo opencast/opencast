@@ -1,0 +1,83 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-linux ] && exit 0
+typeset -i ii=1
+for _pkg in pkg1 pkg2 pkg3 pkg4 pkg5 pkg6; do
+  eval $_pkg=`getcfg PKG$ii:`
+  chkpkg "${!_pkg}" || exit 1
+  chmod 644 "${!_pkg}"
+  [ $? -ne 0 ] && exit 1
+  let ii=ii+1
+done
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+#
+rm -fr "$dir" "${dir}-linux"
+[ $? -ne 0 ] && exit 1
+gzip -dc "$pkg1" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-linux"
+[ $? -ne 0 ] && exit 1
+#
+cd "${dir}-linux/tessdata"
+[ $? -ne 0 ] && exit 1
+gzip -dc "../../$pkg2" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv tesseract-ocr/tessdata/* .
+[ $? -ne 0 ] && exit 1
+rm -fr tesseract-ocr
+[ $? -ne 0 ] && exit 1
+cd ..
+[ $? -ne 0 ] && exit 1
+#
+cp ../strngs.h ccutil
+[ $? -ne 0 ] && exit 1
+cp ../configure.ac .
+[ $? -ne 0 ] && exit 1
+#
+./autogen.sh
+[ $? -ne 0 ] && exit 1
+./configure \
+LDFLAGS='-L${LOCAL_PREFIX}/lib -Wl,-rpath,${LOCAL_PREFIX}/lib' \
+LIBS=-lgif
+[ $? -ne 0 ] && exit 1
+make
+[ $? -ne 0 ] && exit 1
+#
+sudox make install
+[ $? -ne 0 ] && exit 1
+# Needed for tesseract's shared libs
+sudox /sbin/ldconfig
+[ $? -ne 0 ] && exit 1
+#
+OLDCD=`pwd`
+[ $? -ne 0 ] && exit 1
+for _pkg in pkg2 pkg3 pkg4 pkg5 pkg6; do
+  sudox cp "../${!_pkg}" ${LOCAL_PREFIX}/share/tessdata
+  [ $? -ne 0 ] && exit 1
+done
+cd ${LOCAL_PREFIX}/share/tessdata
+[ $? -ne 0 ] && exit 1
+cmd=`eval echo 'gzip -dc \"$pkg2\" \| tar -xv'`
+sudox bash -c "$cmd"
+[ $? -ne 0 ] && exit 1
+sudox mv tesseract-ocr/tessdata/* .
+[ $? -ne 0 ] && exit 1
+sudox rm -fr tesseract-ocr "$pkg2"
+[ $? -ne 0 ] && exit 1
+for _pkg in pkg3 pkg4 pkg5 pkg6; do
+  sudox gzip -df "${!_pkg}"
+  [ $? -ne 0 ] && exit 1
+done
+cd "$OLDCD"
+[ $? -ne 0 ] && exit 1
+#
+touch ../.done-linux
+[ $? -ne 0 ] && exit 1
+exit 0

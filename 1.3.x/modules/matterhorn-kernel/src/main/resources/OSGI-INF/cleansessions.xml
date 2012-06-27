@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+
+  <scr:component name="org.opencastproject.kernel.rest.CleanSessionsFilter" immediate="true">
+    <implementation class="org.opencastproject.kernel.rest.CleanSessionsFilter" />
+    <property name="service.description" value="Clean Digest Sessions and Set Max Inactive Interval Filter" />
+    <property name="contextId" value="opencast.httpcontext" />
+    <!-- This filter must have the highest service.ranking value to ensure that it is run last to invalidate sessions. -->
+    <property name="service.ranking" value="10" />
+    <property name="pattern" value=".*" />
+    <service>
+      <provide interface="javax.servlet.Filter" />
+    </service>
+  </scr:component>
+
+</scr:components>

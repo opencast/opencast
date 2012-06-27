@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" initialize="load()" xmlns:ns1="*" horizontalAlign="center" verticalAlign="middle">
+<mx:Script>
+	<![CDATA[
+		private var s:Sound = new Sound();
+		private var channel:SoundChannel;
+		private var playing:Boolean = false;
+		private var stopped:Boolean = false;
+		
+		public function load():void{
+			Status.text = "Started Successfully!";
+			try{
+				/** TODO Fix audio streaming so that it detects it automatically and disables it if not in use.**/
+				/*var req:URLRequest = new URLRequest("http://akm220.usask.ca:10000/arts134.mp3");
+				var context:SoundLoaderContext = new SoundLoaderContext(5000, false);
+				s.load(req, context); */
+			} catch (exception:IOErrorEvent){
+				Play.visible = false;
+				Stop.visible = false;
+			}
+			AudioLevel.start("http://akm220.usask.ca:8080/confidence/audio/audio/");
+		}
+		
+		public function play():void{
+			if(!playing){
+				channel = s.play();
+				playing = true;
+				stopped = false;
+			}
+			Status.text = "Playing";	
+		}
+		
+		public function stop():void{
+			if(!stopped){
+				channel.stop();
+				playing = false;
+				stopped = true;
+			}
+			Status.text = "Stopped";
+		}
+	]]>
+</mx:Script>
+	<ns1:AudioLevelRequest id="AudioLevel">
+	</ns1:AudioLevelRequest>
+		<mx:Text id="AudioLevelResponse"/>
+		<mx:Text text="This should be the status." id="Status" visible="false"/>
+		<mx:HBox>
+		<mx:Button label="Play" id="Play" click="play()" visible="false"/>
+		<mx:Button label="Stop" id="Stop" click="stop()" visible="false"/>
+		</mx:HBox>
+</mx:VBox>
