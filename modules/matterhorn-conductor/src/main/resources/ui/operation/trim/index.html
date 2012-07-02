@@ -65,6 +65,7 @@
       var mediapackage = null;
       var DCmetadata = null;
       var metadataChanged = false;
+      var seriesId = 0;
       var seriesChanged = false;
       var seriesServiceURL = false;
 
@@ -192,37 +193,6 @@
         $('#series').autocomplete({
           source: function(request, response) {
             $.ajax({
-              url: '/series/series.json',
-              data: {
-                q: request.term,
-                sort: 'TITLE'
-              },
-              success: function(data) {
-                data = data.catalogs;
-                var series_list = [];
-                $.each(data, function(){
-                  series_list.push({value: this['http://purl.org/dc/terms/']['title'][0].value,
-                    id: this['http://purl.org/dc/terms/']['identifier'][0].value});
-                });
-                response(series_list);
-              }, 
-              error: function() {
-                ocUtils.log('could not retrieve series_data');
-              }
-            });
-          },
-          select: function(event, ui){
-            $('#ispartof').val(ui.item.id);
-          },
-          search: function(){
-            $('#ispartof').val('');
-          }
-        });
-        
-        ocUtils.log('Initializing autocomplete for series field')
-        $('#series').autocomplete({
-          source: function(request, response) {
-            $.ajax({
               url: '/series/series.json' + '?q=' + request.term,
               dataType: 'json',
               type: 'GET',
@@ -258,6 +228,9 @@
           },
           select: function(event, ui){
             $('#ispartof').val(ui.item.id);
+            if(ui.item.id != seriesId) {
+              seriesChanged = true;
+            }
           },
           search: function(){
             $('#ispartof').val('');
@@ -343,6 +316,7 @@
             var seriesid =  $(data.documentElement).find("mediapackage > series").text();
             if (seriesid != '') {
               $('#ispartof').val(seriesid);
+              seriesId = seriesid;
               $('#series').val($(data.documentElement).find("mediapackage > seriestitle").text());
               $('#info-series')[0].innerHTML = $(data.documentElement).find("mediapackage > seriestitle").text();
             }
@@ -457,9 +431,6 @@
               seriesServiceURL = data.services.service.host + data.services.service.path;
               $('#series').removeAttr('disabled');
               // event handler: save information that series changed 
-              $('#series').change(function() {
-                seriesChanged = true;
-              });
             }
           }
         });
@@ -691,7 +662,9 @@
 
         // update series
         if ($('#series').val() != '') {
+          ocUtils.log("updating series data");
           if ($('#ispartof').val() == '') {
+            ocUtils.log("creating new series")
             createSeriesFromText();
           }
           updateMPElement('seriestitle', $('#series').val());
@@ -712,8 +685,8 @@
             acl: acl
           },
           success: function(data) {
-              id = data.getElementsByTagName('dcterms:identifier')[0].textContent;
-              $('#ispartof').val(id);
+            id = data.getElementsByTagName('dcterms:identifier')[0].textContent;
+            $('#ispartof').val(id);
           }
         });
       }
