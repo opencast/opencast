@@ -660,6 +660,7 @@ ocUpload.Ingest = (function() {
       chunksize = CHUNKSIZE;
     }
     $.ajax({
+      type: 'POST',
       url: ocUpload.CREATE_NEW_JOB_URL,
       async: false,
       data: {

@@ -15,21 +15,6 @@
  */
 package org.opencastproject.remotetest;
 
-import org.opencastproject.remotetest.server.CaptureAdminRestEndpointTest;
-import org.opencastproject.remotetest.server.ComposerRestEndpointTest;
-import org.opencastproject.remotetest.server.DistributionDownloadRestEndpointTest;
-import org.opencastproject.remotetest.server.EngageModuleTest;
-import org.opencastproject.remotetest.server.IngestRestEndpointTest;
-import org.opencastproject.remotetest.server.IngestZipTest;
-import org.opencastproject.remotetest.server.LtiAuthenticationTest;
-import org.opencastproject.remotetest.server.MaintenanceModeTest;
-import org.opencastproject.remotetest.server.MultiPartTest;
-import org.opencastproject.remotetest.server.OaiPmhServerTest;
-import org.opencastproject.remotetest.server.PreProcessingWorkflowTest;
-import org.opencastproject.remotetest.server.ScheduledCaptureTest;
-import org.opencastproject.remotetest.server.UnscheduledCaptureTest;
-import org.opencastproject.remotetest.server.UploadTest;
-import org.opencastproject.remotetest.server.WorkflowRestEndpointTest;
 import org.opencastproject.remotetest.server.WorkingFileRepoRestEndpointTest;
 
 import org.junit.runner.RunWith;
@@ -41,23 +26,23 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  WorkflowRestEndpointTest.class,
-  PreProcessingWorkflowTest.class,
+//  WorkflowRestEndpointTest.class,
+//  PreProcessingWorkflowTest.class,
   WorkingFileRepoRestEndpointTest.class,
-  DistributionDownloadRestEndpointTest.class,
-  IngestZipTest.class,
-  IngestRestEndpointTest.class,
-  ComposerRestEndpointTest.class,
-  CaptureAdminRestEndpointTest.class,
-  EngageModuleTest.class,
-  UploadTest.class,
-  MultiPartTest.class,
-  ScheduledCaptureTest.class,
-  UnscheduledCaptureTest.class,
-  UploadTest.class,
-  MaintenanceModeTest.class,
-  OaiPmhServerTest.class,
-  LtiAuthenticationTest.class
+//  DistributionDownloadRestEndpointTest.class,
+//  IngestZipTest.class,
+//  IngestRestEndpointTest.class,
+//  ComposerRestEndpointTest.class,
+//  CaptureAdminRestEndpointTest.class,
+//  EngageModuleTest.class,
+//  UploadTest.class,
+//  MultiPartTest.class,
+//  ScheduledCaptureTest.class,
+//  UnscheduledCaptureTest.class,
+//  UploadTest.class,
+//  MaintenanceModeTest.class,
+//  OaiPmhServerTest.class,
+//  LtiAuthenticationTest.class
 })
 
 public class ServerTests {

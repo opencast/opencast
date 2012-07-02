@@ -93,7 +93,7 @@ public class FileUploadRestService {
   }
   // </editor-fold>
 
-  @GET
+  @POST
   @Produces(MediaType.TEXT_PLAIN)
   @Path("newjob")
   @RestQuery(name = "newjob", description = "Creates a new upload job and returns the jobs ID.", restParameters = {
