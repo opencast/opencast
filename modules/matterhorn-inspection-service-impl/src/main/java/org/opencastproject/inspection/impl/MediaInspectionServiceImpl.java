@@ -103,12 +103,13 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   public MediaInspectionServiceImpl() {
     super(JOB_TYPE);
   }
-  
+
   public void activate(ComponentContext cc) {
     // Configure mediainfo
     String path = (String) cc.getBundleContext().getProperty(MediaInfoAnalyzer.MEDIAINFO_BINARY_CONFIG);
     if (path == null) {
-      logger.debug("DEFAULT " + MediaInfoAnalyzer.MEDIAINFO_BINARY_CONFIG + ": " + MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT);
+      logger.debug("DEFAULT " + MediaInfoAnalyzer.MEDIAINFO_BINARY_CONFIG + ": "
+              + MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT);
       analyzerConfig.put(MediaInfoAnalyzer.MEDIAINFO_BINARY_CONFIG, MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT);
     } else {
       analyzerConfig.put(MediaInfoAnalyzer.MEDIAINFO_BINARY_CONFIG, path);
@@ -257,6 +258,15 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
         // Mimetype
         try {
+          MimeType mimeType = MimeTypes.fromURL(file.toURI().toURL());
+
+          // The mimetype library doesn't know about audio/video metadata, so the type might be wrong.
+          if ("audio".equals(mimeType.getType()) && metadata.hasVideoStreamMetadata()) {
+            mimeType = MimeTypes.parseMimeType("video/" + mimeType.getSubtype());
+          } else if ("video".equals(mimeType.getType()) && !metadata.hasVideoStreamMetadata()) {
+            mimeType = MimeTypes.parseMimeType("audio/" + mimeType.getSubtype());
+          }
+
           track.setMimeType(MimeTypes.fromURL(file.toURI().toURL()));
         } catch (Exception e) {
           logger.info("Unable to find mimetype for {}", file.getAbsolutePath());
@@ -390,7 +400,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
         if (track.getMimeType() == null || override) {
           try {
             MimeType mimeType = MimeTypes.fromURI(track.getURI());
-            
+
             // The mimetype library doesn't know about audio/video metadata, so the type might be wrong.
             if ("audio".equals(mimeType.getType()) && metadata.hasVideoStreamMetadata()) {
               mimeType = MimeTypes.parseMimeType("video/" + mimeType.getSubtype());
@@ -616,7 +626,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
-  
+
   /**
    * Sets a reference to the organization directory service.
    * 
