@@ -825,85 +825,114 @@ Opencast.Annotation_Comment = (function ()
 				var slCount = 0;
 				var replyCount = 0;
 				$(data['annotations'].annotation).each(function (i)
-								       {
-									   //split data by <> [user]<>[text]<>[type]<>[xPos]<>[yPos]<>[segId]
-									   //OR split data by <> [user]<>[text]<>[type]<>[replyID]
-									   var dataArray = data['annotations'].annotation[i].value.split("<>");
-									   //found scrubber comment
-									   if(dataArray[2] === "scrubber"){
-                            						       comment = new ScrubberComment(
-                            							   dataArray[0], //username
-                            							   data['annotations'].annotation[i].annotationId, //ID
-                            							   dataArray[1], //text
-                            							   data['annotations'].annotation[i].inpoint //inpoint
-                            						       );                                                                                   
-									       scrubberArray[scCount] = comment;
-									       scCount++;
-									       //found slide comment on current slide
-									   }else if(dataArray[2] === "slide" && dataArray[5] == Opencast.segments.getCurrentSlideId()){
-                            						       var relPos = {x:dataArray[3],y:dataArray[4]};
-                            						       comment = new SlideComment(
-                            							   dataArray[0], //username
-                            							   data['annotations'].annotation[i].annotationId, //ID
-                            							   dataArray[1], //text
-                            							   dataArray[5], //slide nr
-                            							   relPos //relative position on the slide
-                            						       );              
-									       slideArray[slCount] = comment;
-									       slCount++;
-									       var slideFound = false;
-									       for (i in toMarkSlidesArray) {
-       										   if (toMarkSlidesArray[i] === dataArray[5]) {
-       										       slideFound = true;
-       										   }
-   									       }
-   									       if(slideFound === false){
-   										   toMarkSlidesArray[toMarkSlidesArray.length] = dataArray[5];
-   									       }
-   									       //found slide comment                               
-									   }else if(dataArray[2] === "slide"){
-									       var slideFound = false;
-									       for (i in toMarkSlidesArray) {
-       										   if (toMarkSlidesArray[i] === dataArray[5]) {
-       										       slideFound = true;
-       										   }
-   									       }
-   									       if(slideFound === false){
-   										   toMarkSlidesArray[toMarkSlidesArray.length] = dataArray[5];
-   									       }                             	
-									   }else if(dataArray[2] === "reply"){
-                            						       comment = new ReplyComment(
-                            							   dataArray[0], //username
-                            							   data['annotations'].annotation[i].annotationId, //ID
-                            							   dataArray[1], //text
-                            							   dataArray[3] //Reply ID
-                            						       );
-                            						       reply_map.addReplyToComment(comment);                           		
-									   }
-								       });                       
+                   {
+                   //split data by <> [user]<>[text]<>[type]<>[xPos]<>[yPos]<>[segId]
+                   //OR split data by <> [user]<>[text]<>[type]<>[replyID]
+                   var dataArray = data['annotations'].annotation[i].value.split("<>");
+                   //found scrubber comment
+                   if(dataArray[2] === "scrubber"){
+                                       comment = new ScrubberComment(
+                                       dataArray[0], //username
+                                       data['annotations'].annotation[i].annotationId, //ID
+                                       dataArray[1], //text
+                                       data['annotations'].annotation[i].inpoint //inpoint
+                                       );
+                       scrubberArray[scCount] = comment;
+                       scCount++;
+                   //found slide comment on current slide
+                   }else if(dataArray[2] === "slide" && dataArray[5] == Opencast.segments.getCurrentSlideId()){
+                                       var relPos = {x:dataArray[3],y:dataArray[4]};
+                                       comment = new SlideComment(
+                                       dataArray[0], //username
+                                       data['annotations'].annotation[i].annotationId, //ID
+                                       dataArray[1], //text
+                                       dataArray[5], //slide nr
+                                       relPos //relative position on the slide
+                                       );
+                       slideArray[slCount] = comment;
+                       slCount++;
+                       var slideFound = false;
+                       for (i in toMarkSlidesArray) {
+                           if (toMarkSlidesArray[i] === dataArray[5]) {
+                               slideFound = true;
+                           }
+                       }
+                       if(slideFound === false){
+                       toMarkSlidesArray[toMarkSlidesArray.length] = dataArray[5];
+                       }
+                       //found slide comment
+                   }else if(dataArray[2] === "slide"){
+                       var slideFound = false;
+                       for (i in toMarkSlidesArray) {
+                           if (toMarkSlidesArray[i] === dataArray[5]) {
+                               slideFound = true;
+                           }
+                       }
+                       if(slideFound === false){
+                       toMarkSlidesArray[toMarkSlidesArray.length] = dataArray[5];
+                       }
+                   }else if(dataArray[2] === "reply"){
+                                       comment = new ReplyComment(
+                                       dataArray[0], //username
+                                       data['annotations'].annotation[i].annotationId, //ID
+                                       dataArray[1], //text
+                                       dataArray[3] //Reply ID
+                                       );
+                                       reply_map.addReplyToComment(comment);
+                   }
+                   });
 			    }
 			    else if(data['annotations'].total != 0)
 			    {
-				//split data by <> [user]<>[text]<>[type]<>[xPos]<>[yPos]<>[segId]
-				var dataArray = data['annotations'].annotation.value.split("<>");
-				var comment = new Object();
-				comment.id = data['annotations'].annotation.annotationId;
-				comment.user = dataArray[0];
-				comment.text = dataArray[1];
-				if(dataArray[2] === "scrubber"){                              
-                                    comment.inpoint = data['annotations'].annotation.inpoint;
-                                    scrubberArray[0] = comment;
-				}else if(dataArray[2] === "slide" && dataArray[5] == Opencast.segments.getCurrentSlideId()){
-                                    comment.slideNr = dataArray[5];
-                                    comment.relPos = new Object();
-                                    comment.relPos.x = dataArray[3];
-                                    comment.relPos.y = dataArray[4];
-                                    comment.text = dataArray[1];
-                                    slideArray[0] = comment;
-                                    toMarkSlidesArray[0] = dataArray[5];                     
-				}else if(dataArray[2] === "slide"){
-                            	    toMarkSlidesArray[0] = dataArray[5];
-				}
+					var scCount = 0;
+					var slCount = 0;
+					var replyCount = 0;
+					   //split data by <> [user]<>[text]<>[type]<>[xPos]<>[yPos]<>[segId]
+					   //OR split data by <> [user]<>[text]<>[type]<>[replyID]
+					   var dataArray = data['annotations'].annotation.value.split("<>");
+					   //found scrubber comment
+					   if(dataArray[2] === "scrubber"){
+						               comment = new ScrubberComment(
+						               dataArray[0], //username
+						               data['annotations'].annotation.annotationId, //ID
+						               dataArray[1], //text
+						               data['annotations'].annotation.inpoint //inpoint
+						               );                                                                                   
+					       scrubberArray[scCount] = comment;
+					       scCount++;
+					       //found slide comment on current slide
+					   }else if(dataArray[2] === "slide" && dataArray[5] == Opencast.segments.getCurrentSlideId()){
+						               var relPos = {x:dataArray[3],y:dataArray[4]};
+						               comment = new SlideComment(
+						               dataArray[0], //username
+						               data['annotations'].annotation.annotationId, //ID
+						               dataArray[1], //text
+						               dataArray[5], //slide nr
+						               relPos //relative position on the slide
+						               );              
+					       slideArray[slCount] = comment;
+					       slCount++;
+					       var slideFound = false;
+					       for (i in toMarkSlidesArray) {
+						   if (toMarkSlidesArray[i] === dataArray[5]) {
+						       slideFound = true;
+						   }
+					       }
+					       if(slideFound === false){
+					       toMarkSlidesArray[toMarkSlidesArray.length] = dataArray[5];
+					       }
+					       //found slide comment                               
+					   }else if(dataArray[2] === "slide"){
+					       var slideFound = false;
+					       for (i in toMarkSlidesArray) {
+						   if (toMarkSlidesArray[i] === dataArray[5]) {
+						       slideFound = true;
+						   }
+					       }
+					       if(slideFound === false){
+					       toMarkSlidesArray[toMarkSlidesArray.length] = dataArray[5];
+					       }                                
+					   }
 			    }
 			    
 			    scrubberData.comment = scrubberArray;
