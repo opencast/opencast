@@ -43,7 +43,7 @@
         <td class="ui-state-active">
           <% if (e.workflow) { %>
             <span class="active-workflow"><%= e.workflow %></span>
-          <% } %>
+          <% } %>
         </td>
         <td class="ui-state-active">
           <% if (e.media.length == 0) { %>
@@ -65,6 +65,6 @@
       <tr>
         <td colspan="6" align="center">No Episodes found</td>
       </tr>
-    <% } %>
+    <% } %>
   </tbody>
 </table>

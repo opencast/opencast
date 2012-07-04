@@ -2,8 +2,8 @@
   <div id="searchBox" class="ui-state-hover"></div>
   <div class="clear"></div>
   <div>
-    <select id="selectWorkflow"></select>
-    <button id="applyWorkflow">Apply</button>
+    <select id="awf-select"></select>
+    <button id="awf-start">Apply</button>
   </div>  
   <div id="search-result"><span id="filterRecordingCount"></span></div>
 
