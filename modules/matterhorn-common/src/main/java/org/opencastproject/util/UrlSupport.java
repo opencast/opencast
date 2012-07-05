@@ -16,9 +16,16 @@
 
 package org.opencastproject.util;
 
+import org.opencastproject.util.data.Function2;
+
 import java.io.File;
+import java.net.URI;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeSet;
+
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.functions.Strings.asStringNull;
 
 /**
  * <code>UrlSupport</code> is a helper class to deal with urls.
@@ -114,6 +121,30 @@ public final class UrlSupport {
       }
     }
     return path;
+  }
+
+  /**
+   * Concatenates the urls with respect to leading and trailing slashes.
+   *
+   * @param parts
+   *          the parts to concat
+   * @return the concatenated url
+   */
+  public static String concat(List<String> parts) {
+    if (parts == null)
+      throw new IllegalArgumentException("Argument parts is null");
+    if (parts.size() == 0)
+      throw new IllegalArgumentException("Array parts is empty");
+    return mlist(parts).reducel(new Function2<String, String, String>() {
+      @Override public String apply(String s, String s1) {
+        return concat(s, s1);
+      }
+    });
+  }
+
+  /** Create a URI from the given parts. */
+  public static URI createUri(Object... parts) {
+    return URI.create(concat(mlist(parts).map(asStringNull()).value()));
   }
 
   /**

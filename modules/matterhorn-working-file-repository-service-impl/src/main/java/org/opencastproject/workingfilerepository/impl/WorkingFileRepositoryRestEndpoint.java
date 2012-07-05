@@ -15,19 +15,6 @@
  */
 package org.opencastproject.workingfilerepository.impl;
 
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.opencastproject.util.doc.rest.RestParameter.Type.FILE;
-import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
-
-import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.doc.rest.RestParameter;
-import org.opencastproject.util.doc.rest.RestQuery;
-import org.opencastproject.util.doc.rest.RestResponse;
-import org.opencastproject.util.doc.rest.RestService;
-import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
-
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -42,15 +29,16 @@ import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Function2;
+import org.opencastproject.util.doc.rest.RestParameter;
+import org.opencastproject.util.doc.rest.RestQuery;
+import org.opencastproject.util.doc.rest.RestResponse;
+import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
@@ -65,6 +53,21 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.opencastproject.util.IoSupport.withFile;
+import static org.opencastproject.util.RestUtil.fileResponse;
+import static org.opencastproject.util.RestUtil.streamResponse;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.FILE;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 @Path("/")
 @RestService(name = "filerepo", title = "Working File Repository", abstractText = "Stores and retrieves files for use during media processing.", notes = WorkingFileRepositoryRestEndpoint.NOTES)
@@ -195,35 +198,30 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestParameter(name = "mediaPackageElementID", description = "the mediapackage element identifier", isRequired = true, type = STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "File returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
-  public Response restGet(@PathParam("mediaPackageID") String mediaPackageID,
-          @PathParam("mediaPackageElementID") String mediaPackageElementID,
+  public Response restGet(@PathParam("mediaPackageID") final String mediaPackageID,
+          @PathParam("mediaPackageElementID") final String mediaPackageElementID,
           @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException, IOException {
-
-    String md5 = null;
-    InputStream in = null;
 
     // Check the If-None-Match header first
     try {
-      md5 = getMediaPackageElementDigest(mediaPackageID, mediaPackageElementID);
+      final String md5 = getMediaPackageElementDigest(mediaPackageID, mediaPackageElementID);
       if (StringUtils.isNotBlank(ifNoneMatch) && md5.equals(ifNoneMatch)) {
         return Response.notModified(md5).build();
       }
     } catch (IOException e) {
       logger.warn("Error reading digest of {}/{}", new Object[] { mediaPackageElementID, mediaPackageElementID });
     }
-
-    String contentType = null;
     try {
-      File theFile = getFile(mediaPackageID, mediaPackageElementID);
-      in = new FileInputStream(theFile);
-      contentType = extractContentType(in);
-      return Response.ok(get(mediaPackageID, mediaPackageElementID)).header("Content-Type", contentType)
-              .header("Content-Length", theFile.length()).build();
+      return withFile(getFile(mediaPackageID, mediaPackageElementID), new Function2.X<InputStream, File, Response>() {
+        @Override public Response xapply(InputStream in, File f) throws Exception {
+          return streamResponse(get(mediaPackageID, mediaPackageElementID),
+                                extractContentType(in),
+                                some(f.length()),
+                                none("")).build();
+        }
+      }).orError(new NotFoundException()).get();
     } catch (IllegalStateException e) {
-      IOUtils.closeQuietly(in);
       throw new NotFoundException();
-    } finally {
-      IOUtils.closeQuietly(in);
     }
   }
 
@@ -259,12 +257,10 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_OK, description = "File returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGet(@PathParam("mediaPackageID") String mediaPackageID,
-          @PathParam("mediaPackageElementID") String mediaPackageElementID, @PathParam("fileName") String fileName,
-          @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException {
-
+                          @PathParam("mediaPackageElementID") String mediaPackageElementID,
+                          @PathParam("fileName") String fileName,
+                          @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException {
     String md5 = null;
-    File in = null;
-
     // Check the If-None-Match header first
     try {
       md5 = getMediaPackageElementDigest(mediaPackageID, mediaPackageElementID);
@@ -278,11 +274,10 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
 
     // No If-Non-Match header provided, or the file changed in the meantime
     try {
-      in = getFile(mediaPackageID, mediaPackageElementID);
-      String contentType = mimeMap.getContentType(fileName);
-      long contentLength = in.length();
-      return Response.ok(in).header("Content-disposition", "attachment; filename=" + fileName)
-              .header("Content-Type", contentType).header("Content-length", contentLength).tag(md5).build();
+      return fileResponse(getFile(mediaPackageID, mediaPackageElementID),
+                          mimeMap.getContentType(fileName),
+                          some(fileName))
+              .tag(md5).build();
     } catch (IllegalStateException e) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
@@ -296,13 +291,10 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_OK, description = "File returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGetFromCollection(@PathParam("collectionId") String collectionId,
-          @PathParam("fileName") String fileName) throws NotFoundException, IOException {
-    File in = getFileFromCollection(collectionId, fileName);
-    String contentType = mimeMap.getContentType(fileName);
-    long contentLength = in.length();
-
-    return Response.ok(in).header("Content-disposition", "attachment; filename=" + fileName)
-            .header("Content-Type", contentType).header("Content-length", contentLength).build();
+                                        @PathParam("fileName") String fileName) throws NotFoundException, IOException {
+    return fileResponse(getFileFromCollection(collectionId, fileName),
+                        mimeMap.getContentType(fileName),
+                        some(fileName)).build();
   }
 
   @GET

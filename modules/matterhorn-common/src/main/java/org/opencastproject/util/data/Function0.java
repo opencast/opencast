@@ -16,6 +16,8 @@
 
 package org.opencastproject.util.data;
 
+import org.opencastproject.util.data.functions.Functions;
+
 /**
  * Function of arity 0, i.e. a constant function.
  *
@@ -27,6 +29,16 @@ public abstract class Function0<A> {
    * Apply function yielding a constant value. Don't be tempted to become impure!
    */
   public abstract A apply();
+
+  /** Apply this function, then pass the result to <code>f</code>. */
+  public <B> Function0<B> then(final Function<A, B> f) {
+    return Functions.then(Function0.this, f);
+  }
+
+  /** Apply this function and ignore its result, then apply <code>f</code>. */
+  public <B> Function0<B> then(final Function0<B> f) {
+    return Functions.then(Function0.this, f);
+  }
 
   /**
    * Version of {@link Function0} that allows for throwing a checked exception.

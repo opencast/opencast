@@ -56,24 +56,14 @@ public abstract class Function<A, B> {
    * Function composition. <code>g.o(f).apply(x) == g(f(x))</code>
    */
   public <C> Function<C, B> o(final Function<C, A> f) {
-    return new Function<C, B>() {
-      @Override
-      public B apply(C c) {
-        return Function.this.apply(f.apply(c));
-      }
-    };
+    return Functions.o(Function.this, f);
   }
 
   /**
    * Function composition. <code>g.o(f).apply() == g(f())</code>
    */
-  public <C> Function<C, B> o(final Function0<A> f) {
-    return new Function<C, B>() {
-      @Override
-      public B apply(C c) {
-        return Function.this.apply(f.apply());
-      }
-    };
+  public Function0<B> o(final Function0<A> f) {
+    return Functions.o(Function.this, f);
   }
 
   /**

@@ -17,7 +17,6 @@
 package org.opencastproject.util;
 
 import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;

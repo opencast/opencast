@@ -13,22 +13,26 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.util;
 
-import org.apache.commons.lang.StringUtils;
-import org.junit.Test;
-import org.opencastproject.job.api.JaxbJob;
+package org.opencastproject.util.persistence;
 
-import javax.xml.bind.JAXBContext;
+import org.opencastproject.util.data.Function;
 
-import static org.junit.Assert.assertNotNull;
+import javax.persistence.EntityManager;
 
-public class JaxbSchemaUtilTest {
+/**
+ * Persistence environment to perform a transaction.
+ * <p/>
+ * Copied from OAI-PMH module.
+ */
+public interface PersistenceEnv {
+  /**
+   * Run code inside a transaction.
+   */
+  <A> A tx(Function<EntityManager, A> transactional);
 
-  @Test
-  public void testSchemaGeneration() throws Exception {
-    JAXBContext jaxbContext = JAXBContext.newInstance(JaxbJob.class);
-    String generatedSchema = JaxbXmlSchemaGenerator.getXmlSchema(jaxbContext);
-    assertNotNull(StringUtils.trimToNull(generatedSchema.toString()));
-  }
+  /**
+   * Close the environment and free all associated resources.
+   */
+  void close();
 }

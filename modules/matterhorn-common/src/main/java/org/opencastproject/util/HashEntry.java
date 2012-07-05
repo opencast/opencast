@@ -15,14 +15,13 @@
  */
 package org.opencastproject.util;
 
-import java.util.Map.Entry;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.Map.Entry;
 
 /**
  * JaxB implementation of the entry of a Hashtable, so that the element can be serialized in the intendet way The Entry

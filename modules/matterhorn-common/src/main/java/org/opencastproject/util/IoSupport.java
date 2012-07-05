@@ -26,6 +26,7 @@ import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
+import org.opencastproject.util.data.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -42,6 +44,8 @@ import java.net.URL;
 
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
 
 /**
  * Contains operations concerning IO.
@@ -273,6 +277,23 @@ public final class IoSupport {
   public static <A> A withStream(InputStream s, Function<InputStream, A> f) {
     try {
       return f.apply(s);
+    } finally {
+      IoSupport.closeQuietly(s);
+    }
+  }
+
+  /**
+   * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
+   *
+   * @return none, if the file does not exist
+   */
+  public static <A> Option<A> withFile(File file, Function2<InputStream, File, A> f) {
+    InputStream s = null;
+    try {
+      s = new FileInputStream(file);
+      return some(f.apply(s, file));
+    } catch (FileNotFoundException ignore) {
+      return none();
     } finally {
       IoSupport.closeQuietly(s);
     }

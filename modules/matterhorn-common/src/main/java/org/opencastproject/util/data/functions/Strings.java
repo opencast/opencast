@@ -64,12 +64,24 @@ public final class Strings {
   }
 
   /** Return <code>a.toString()</code> wrapped in a some if <code>a != null</code>, none otherwise. */
-  public static final Function<Object, Option<String>> asString = new Function<Object, Option<String>>() {
-    @Override
-    public Option<String> apply(Object a) {
-      return asString(a);
-    }
-  };
+  public static <A> Function<A, Option<String>> asString() {
+    return new Function<A, Option<String>>() {
+      @Override
+      public Option<String> apply(A a) {
+        return asString(a);
+      }
+    };
+  }
+
+  /** Return <code>a.toString()</code> or <code>&lt;null&gt;</code> if argument is null.  */
+  public static <A> Function<A, String> asStringNull() {
+    return new Function<A, String>() {
+      @Override
+      public String apply(A a) {
+        return a != null ? a.toString() : "<null>";
+      }
+    };
+  }
 
   /** Convert a string into a long if possible. */
   public static final Function<String, Option<Long>> toLong = new Function<String, Option<Long>>() {

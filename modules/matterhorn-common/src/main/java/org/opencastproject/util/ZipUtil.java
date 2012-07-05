@@ -21,7 +21,6 @@ import de.schlichtherle.io.ArchiveWarningException;
 import de.schlichtherle.io.DefaultArchiveDetector;
 import de.schlichtherle.io.File;
 import de.schlichtherle.io.archive.zip.ZipDriver;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
