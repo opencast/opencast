@@ -18,19 +18,31 @@ package org.opencastproject.util;
 
 import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opencastproject.util.data.Either;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Function2;
+import org.opencastproject.util.data.Option;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.opencastproject.util.IoSupport.fileInputStream;
+import static org.opencastproject.util.IoSupport.withFile;
+import static org.opencastproject.util.IoSupport.withResource;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
 
 /**
  * Test for the IoSupporTest class
@@ -117,6 +129,52 @@ public class IoSupportTest {
         br.close();
     }
     Assert.assertEquals("File contents comparison", sampleText, sb.toString());
+  }
+
+  @Test(expected = IOException.class)
+  public void testWithResource() throws Exception {
+    final InputStream r = this.getClass().getResourceAsStream("/cover.png");
+    final String s = withResource(r, new Function<InputStream, String>() {
+      @Override public String apply(InputStream in) {
+        return "read";
+      }
+    });
+    assertEquals("read", s);
+    // this will throw an IOException
+    r.read();
+  }
+
+  @Test
+  public void testWithResourceLazy() {
+    final Function<Exception, String> errorHandler = new Function<Exception, String>() {
+      @Override public String apply(Exception e) {
+        return "error";
+      }
+    };
+    final Either<String, Integer> r = withResource(fileInputStream(new File("i-do-not-exist")), errorHandler, new Function<InputStream, Integer>() {
+      @Override public Integer apply(InputStream in) {
+        return 1;
+      }
+    });
+    assertEquals("error", r.left().value());
+  }
+
+  @Test
+  public void testWithFile() throws Exception {
+    final File f1 = new File(this.getClass().getResource("/dublincore.xml").toURI());
+    final Option<String> r1 = withFile(f1, new Function2.X<InputStream, File, String>() {
+      @Override public String xapply(InputStream in, File file) throws IOException {
+        return (String) IOUtils.readLines(in).get(0);
+      }
+    });
+    assertEquals(some("<?xml version=\"1.0\"?>"), r1);
+    final File f2 = new File("i-do-not-exist");
+    final Option<String> r2 = withFile(f2, new Function2.X<InputStream, File, String>() {
+      @Override public String xapply(InputStream in, File file) throws IOException {
+        return (String) IOUtils.readLines(in).get(0);
+      }
+    });
+    assertEquals(none(), r2);
   }
 
 }

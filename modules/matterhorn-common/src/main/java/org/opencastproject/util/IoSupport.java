@@ -273,12 +273,25 @@ public final class IoSupport {
 
   /**
    * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
+   *
+   * @deprecated use {@link #withResource(java.io.Closeable, org.opencastproject.util.data.Function)} instead
    */
   public static <A> A withStream(InputStream s, Function<InputStream, A> f) {
     try {
       return f.apply(s);
     } finally {
       IoSupport.closeQuietly(s);
+    }
+  }
+
+  /**
+   * Handle a closeable resource inside <code>f</code> and ensure it gets closed properly.
+   */
+  public static <A, B extends Closeable> A withResource(B b, Function<B, A> f) {
+    try {
+      return f.apply(b);
+    } finally {
+      IoSupport.closeQuietly(b);
     }
   }
 
@@ -308,6 +321,7 @@ public final class IoSupport {
    *          error handler transforming an exception into something else
    * @param f
    *          stream handler
+   * @deprecated use {@link #withResource(org.opencastproject.util.data.Function0, org.opencastproject.util.data.Function, org.opencastproject.util.data.Function)} instead
    */
   public static <A, Err> Either<Err, A> withStream(Function0<InputStream> s, Function<Exception, Err> toErr,
                                                    Function<InputStream, A> f) {
@@ -323,7 +337,33 @@ public final class IoSupport {
   }
 
   /**
+   * Handle a closeable resource inside <code>f</code> and ensure that <code>r</code> gets closed properly.
+   *
+   * @param r
+   *          resource creation function
+   * @param toErr
+   *          error handler transforming an exception into something else
+   * @param f
+   *          resource handler
+   */
+  public static <A, Err, B extends Closeable> Either<Err, A> withResource(Function0<B> r,
+                                                                          Function<Exception, Err> toErr,
+                                                                          Function<B, A> f) {
+    B b = null;
+    try {
+      b = r.apply();
+      return right(f.apply(b));
+    } catch (Exception e) {
+      return left(toErr.apply(e));
+    } finally {
+      IoSupport.closeQuietly(b);
+    }
+  }
+
+  /**
    * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
+   *
+   * @deprecated use {@link #withResource(java.io.Closeable, org.opencastproject.util.data.Function)} instead
    */
   public static <A> A withStream(OutputStream s, Function<OutputStream, A> f) {
     try {
