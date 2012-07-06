@@ -253,4 +253,20 @@ public final class Functions {
     }
     return target;
   }
+
+  private static <T extends Throwable, A> A castGeneric(Throwable t) throws T {
+    // The cast to T does not happen here but _after_ returning from the method at _assignment_ time
+    // But since there is no variable assignment. The Throwable is just thrown.
+    throw (T) t;
+  }
+
+  /**
+   * Throw a checked exception like a RuntimeException removing any needs to declare a throws clause.
+   * <p/>
+   * This technique has been described by James Iry at
+   * http://james-iry.blogspot.de/2010/08/on-removing-java-checked-exceptions-by.html
+   */
+  public static <A> A chuck(Throwable t) {
+    return Functions.<RuntimeException, A>castGeneric(t);
+  }
 }
