@@ -20,6 +20,7 @@ import org.opencastproject.util.data.functions.Functions;
 
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
+import static org.opencastproject.util.data.functions.Functions.chuck;
 
 /**
  * Function of arity 1.
@@ -76,14 +77,13 @@ public abstract class Function<A, B> {
       try {
         return xapply(a);
       } catch (Exception e) {
-        throw new FunctionException(e);
+        return chuck(e);
       }
     }
 
     /**
-     * Apply function to <code>a</code>.
-     * The application may throw an exception which gets transformed into a {@link FunctionException}.
-     * To change this behaviour override {@link #apply(Object)}.
+     * Apply function to <code>a</code>. Any thrown exception gets "chucked" so that you may
+     * catch them as is. See {@link Functions#chuck(Throwable)} for details.
      */
     protected abstract B xapply(A a) throws Exception;
   }

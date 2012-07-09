@@ -19,6 +19,8 @@ package org.opencastproject.util.data;
 import org.junit.Test;
 import org.opencastproject.util.data.functions.Functions;
 
+import java.io.IOException;
+
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.data.functions.Functions.identity;
 
@@ -37,5 +39,17 @@ public class FunctionsTest {
   }
 
   class B extends A {
+  }
+
+  // Note that the checked exception escapes the function application even though it is _not_ declared!
+  @Test(expected = IOException.class)
+  public void testCheckedException() {
+    new Function.X<String, String>() {
+      @Override protected String xapply(String s) throws IOException {
+        throw new IOException(s);
+      }
+      // CHECKSTYLE:OFF
+    }.apply("error");
+    // CHECKSTYLE:ON
   }
 }

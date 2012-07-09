@@ -18,6 +18,8 @@ package org.opencastproject.util.data;
 
 import org.opencastproject.util.data.functions.Functions;
 
+import static org.opencastproject.util.data.functions.Functions.chuck;
+
 /**
  * Function of arity 0, i.e. a constant function.
  *
@@ -50,14 +52,13 @@ public abstract class Function0<A> {
       try {
         return xapply();
       } catch (Exception e) {
-        throw new FunctionException(e);
+        return chuck(e);
       }
     }
 
     /**
-     * Apply function yielding a constant value. Don't be tempted to become impure!
-     * The application may throw an exception which gets transformed into a {@link FunctionException}.
-     * To change this behaviour also override {@link #apply()}.
+     * Apply function to <code>a</code>. Any thrown exception gets "chucked" so that you may
+     * catch them as is. See {@link Functions#chuck(Throwable)} for details.
      */
     public abstract A xapply() throws Exception;
   }
