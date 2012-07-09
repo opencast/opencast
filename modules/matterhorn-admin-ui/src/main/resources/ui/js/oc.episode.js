@@ -29,15 +29,15 @@ opencast.episode = (function() {
   /** @param id -- the media package id
    *  @return jqXHR containing raw json
    */
-  function queryWorkflowsOfMediaPackage(id) {
+  function getWorkflowsOfMediaPackage(id) {
     return $.getJSON("../workflow/instances.json", { mp:id, startPage:0, count:999999, compact:false });
   }
 
   /** @param id -- the media package id
    *  @return jqXHR containing raw json
    */
-  function queryMediaPackage(id) {
-    return $.getJSON("../episode/episode.json", { id:id })
+  function getMediaPackage(id) {
+    return $.getJSON("../episode/episode.json", { id:id });
   }
 
   /** @param id -- the media package id
@@ -67,7 +67,7 @@ opencast.episode = (function() {
     var mpe = $("#mpe-editor").mediaPackageEditor({
               additionalDC: {
                 enable: true,
-                required: true
+                required: false
               },
               // Catalogs available for the plugin
               catalogs: {
@@ -211,10 +211,9 @@ opencast.episode = (function() {
    */
   function openWindow($win, opt) {
     $win.dialog("option", _.extend({
-      width: 1000,
-      modal: true,
-      height: "auto",
-      position: ["center", 40],
+      width: $(window).width() - 40,
+      height: $(window).height() - 40,
+      position: ["center", "center"],
       show: "scale"
     }, opt || {})).dialog("open");
     return $win;
@@ -452,31 +451,32 @@ opencast.episode = (function() {
           })(),
           // apply workflow widget
           (function() {
-            var $selectWorkflow = $("#selectWorkflow");
-            getAvailableWorkflowDefinitions().done(function (json) {
-              var tmpl = _.template("<option value='<%= id %>'><%= title ? title : id %></option>");
-              var selectBoxes = _.map(json["workflow_definitions"], function (a) {
-                return tmpl(a);
-              }).join("");
-              $selectWorkflow.append(selectBoxes);
-              $("#applyWorkflow").click(function() {
-                applyWorkflowToSelectedEpisodes($selectWorkflow.val());
-                showSelectedEpisodesCount();
-              });
+            var $window = $("#awf-window").dialog({autoOpen: false});
+            var $selectWorkflow = $("#awf-select");
+            var $configContainer = $("#awf-config-container");
+            ocWorkflow.init($selectWorkflow, $configContainer);
+            $("#awf-start").click(function () {
+              openWindow($window, {height: 250});
             });
+            $("#awf-submit").click(function() {
+              applyWorkflowToSelectedEpisodes($selectWorkflow.val(), ocWorkflow.getConfiguration($configContainer));
+              showSelectedEpisodesCount();
+              $window.dialog("close");
+            });
+            $("#awf-cancel").click(function() { $window.dialog("close"); });
           })(),
           // attach edit handler
           (function() {
-        	  $("#mpe-window").dialog({autoOpen: false});
-        	  $("#tableContainer").delegate(".edit", "click", function() {
-        		  var eid = $(this).attr("data-eid");
-        		  getMediaPackageXml(eid).done(function(xml) {
-        			  $(xml).find("mediapackage").each(function(_, mp) {
-        				  openMetadataEditor(mp);
-        			  });
-        		  });
-        		  return false;
-        	  })
+            $("#mpe-window").dialog({autoOpen: false});
+            $("#tableContainer").delegate(".edit", "click", function() {
+              var eid = $(this).attr("data-eid");
+              getMediaPackageXml(eid).done(function(xml) {
+                $(xml).find("mediapackage").each(function(_, mp) {
+                  openMetadataEditor(mp);
+                });
+              });
+              return false;
+            })
           }())
         ];
         // flatten and filter out undefined values, refresh and apply functions afterwards
@@ -548,7 +548,7 @@ opencast.episode = (function() {
         return _theRefreshFunc();
       }
 
-      /** Initiate new JSONP call to workflow instances list endpoint
+      /** Initiate new ajax call to workflow instances list endpoint
        *  @return deferred object
        */
       function _refresh() {
@@ -616,7 +616,7 @@ opencast.episode = (function() {
         }
       }
 
-      /** JSONP callback for calls to the workflow instances list endpoint.
+      /** Callback for calls to the workflow instances list endpoint.
        *  @param pdata -- "parsed data"
        *    {
        *      raw: json,
@@ -756,9 +756,10 @@ opencast.episode = (function() {
         if (confirm("Start retraction of episode?")) {
           $.ajax({
             type: "POST",
-            url: "../episode/apply/retract",
+            url: "../episode/applyworkflow",
             data: {
-              mediaPackageIds: mediaPackageId
+              id: mediaPackageId,
+              definitionId: "retract"
             },
             complete: function(xhr) {
               if (xhr.status == 204) {
@@ -772,18 +773,16 @@ opencast.episode = (function() {
         }
       }
 
-      /**
-       * @param workflowDefinitionId -- id of the workflow to apply
-       * @param mediaPackageId -- String: Id of a single media package | Array: List of ids.
+      /** @param workflowDefinitionId -- id of the workflow to apply
+       *  @param workflowParams -- workflow parameter object
+       *  @param mediaPackageId -- String: Id of a single media package | Array: List of ids.
        */
-      function applyWorkflow(workflowDefinitionId, mediaPackageId) {
+      function applyWorkflow(workflowDefinitionId, workflowParams, mediaPackageId) {
         var mids = _.isArray(mediaPackageId) ? mediaPackageId : [mediaPackageId];
         $.ajax({
           type: "POST",
           url: "../episode/apply/" + workflowDefinitionId,
-          data: {
-            mediaPackageIds: mids
-          },
+          data: _.extend({}, workflowParams, {mediaPackageIds: mids}),
           // IMPORTANT! Must be true otherwise the id array gets serialized like this "id%5B%5D=1&id%5B%5D=2"
           // which the server does not understand
           traditional: true,
@@ -798,11 +797,11 @@ opencast.episode = (function() {
         });
       }
 
-      function applyWorkflowToSelectedEpisodes(workflowDefinitionId) {
+      function applyWorkflowToSelectedEpisodes(workflowDefinitionId, workflowParams) {
         var selected = _(selectedEpisodes).chain().keys().filter(function (a) {return selectedEpisodes[a]}).value();
         if (selected.length > 0) {
           selectedEpisodes = {};
-          applyWorkflow(workflowDefinitionId, selected);
+          applyWorkflow(workflowDefinitionId, workflowParams, selected);
         }
       }
 
@@ -875,8 +874,8 @@ opencast.episode = (function() {
         var mpId = ocUtils.getURLParam("id");
         // load header and inject it
         $("#addHeader").jqotesubtpl("templates/episode-detail-header.tpl", {});
-        $.when(queryWorkflowsOfMediaPackage(mpId),
-                queryMediaPackage(mpId))
+        $.when(getWorkflowsOfMediaPackage(mpId),
+                getMediaPackage(mpId))
           .done(function (ajaxWorkflow, ajaxMpSearchResult) {
                   // both args are arrays where [0] contains the response data
                   injectDetailOverview($("#tableContainer"), {
