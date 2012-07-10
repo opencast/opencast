@@ -34,10 +34,10 @@ export TRUNK_URL=$SVN_URL/trunk
 # Extension for the SVN_URL to reach the branches
 export BRANCHES_URL=$SVN_URL/branches/1.3.x
 # Extension for the SVN_URL to reach the tags
-export TAGS_URL=$SVN_URL/tags
+export TAGS_URL=$SVN_URL/tags/1.3.1
 
 # Default URL from where scripts and java source will be dowloaded
-export SRC_DEFAULT=$BRANCHES_URL
+export SRC_DEFAULT=$TAGS_URL
 
 # File containing the rules to be applied by udev to the configured devices -- not a pun!
 export DEV_RULES=/etc/udev/rules.d/matterhorn.rules
