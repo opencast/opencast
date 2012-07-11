@@ -159,7 +159,7 @@ public class TrackTest {
     String xml = "<track type=\"presentation/source\"><tags/><url>http://downloads.opencastproject.org/media/movie.m4v</url><duration>-1</duration></track>";
     inputStream = IOUtils.toInputStream(xml);
     try {
-      TrackImpl t2 = unmarshaller.unmarshal(new StreamSource(), TrackImpl.class).getValue();
+      TrackImpl t2 = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class).getValue();
       Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
     } finally {
       IoSupport.closeQuietly(inputStream);
