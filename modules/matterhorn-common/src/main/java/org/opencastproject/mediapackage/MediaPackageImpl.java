@@ -21,6 +21,7 @@ import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdBuilder;
 import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.IoSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -1429,6 +1430,8 @@ public final class MediaPackageImpl implements MediaPackage {
       return unmarshaller.unmarshal(source, MediaPackageImpl.class).getValue();
     } catch (JAXBException e) {
       throw new MediaPackageException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    } finally {
+      IoSupport.closeQuietly(xml);
     }
   }
 
