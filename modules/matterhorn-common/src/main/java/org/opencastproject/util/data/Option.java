@@ -16,6 +16,8 @@
 
 package org.opencastproject.util.data;
 
+import org.opencastproject.util.data.functions.Functions;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -49,6 +51,20 @@ public abstract class Option<A> implements Iterable<A> {
   public <B> Option<B> flatMap(Function<A, Option<B>> f) {
     return bind(f);
   }
+
+  /**
+   * If the contained type A is an Option this is identical to flatMap(identity()) which removes one level of
+   * option nesting.
+   * In all other cases this operation does nothing.
+   * <p/>
+   * Examples:
+   * <ul>
+   *   <li>some(1).flatten() == some(1)</li>
+   *   <li>some(some(1)).flatten() == some(1)</li>
+   *   <li>some(some(some(1))).flatten() == some(some(1))</li>
+   * </ul>
+   */
+  public abstract <A> Option<A> flatten();
 
   public abstract boolean isSome();
 
@@ -151,6 +167,18 @@ public abstract class Option<A> implements Iterable<A> {
         return f.apply(a);
       }
 
+      @Override public Option<A> flatten() {
+        if (a instanceof Option) {
+          return bind(new Function<A, Option<A>>() {
+            @Override public Option<A> apply(A a) {
+              return (Option<A>) a;
+            }
+          });
+        } else {
+          return this;
+        }
+      }
+
       @Override
       public boolean isSome() {
         return true;
@@ -240,6 +268,10 @@ public abstract class Option<A> implements Iterable<A> {
 
       @Override
       public <B> Option<B> bind(Function<A, Option<B>> f) {
+        return none();
+      }
+
+      @Override public <A> Option<A> flatten() {
         return none();
       }
 

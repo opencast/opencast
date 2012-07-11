@@ -23,6 +23,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opencastproject.util.data.Option.Match;
@@ -118,4 +119,24 @@ public class OptionTest {
     assertEquals(0, set.size());
   }
 
+  @Test
+  public void testFlatten() {
+    {
+      final Option<Option<Integer>> o = some(some(1));
+      assertEquals(some(1), o.flatten());
+    }
+    {
+      final Option<Integer> o = some(1);
+      assertEquals(some(1), o.flatten());
+    }
+    {
+      final Option<Integer> o = none();
+      assertEquals(none(), o.flatten());
+    }
+    {
+      final Option<Option<Option<Integer>>> o = some(some(some(1)));
+      assertEquals(some(some(1)), o.flatten());
+      assertNotSame(some(some(2)), o.flatten());
+    }
+  }
 }
