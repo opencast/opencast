@@ -138,5 +138,13 @@ public class OptionTest {
       assertEquals(some(some(1)), o.flatten());
       assertNotSame(some(some(2)), o.flatten());
     }
+    {
+      final Option<Option<Option<Integer>>> o = some(some(none(Integer.class)));
+      assertEquals(some(none()), o.flatten());
+    }
+    {
+      final Option<Option<Integer>> o = some(none(Integer.class));
+      assertEquals(none(), o.flatten());
+    }
   }
 }
