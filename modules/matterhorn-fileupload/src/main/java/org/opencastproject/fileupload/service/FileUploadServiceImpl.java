@@ -52,6 +52,7 @@ import javax.xml.bind.Unmarshaller;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.functions.Functions;
 
 /**
  * A service for big file uploads via HTTP.
@@ -402,17 +403,16 @@ public class FileUploadServiceImpl implements FileUploadService {
   /** Function that writes the given file to the uploaded collection.
    * 
    */
-  private Function2<InputStream, File, URI> putInCollection = new Function2<InputStream, File, URI>() {
+  private Function2<InputStream, File, Option<URI>> putInCollection = new Function2<InputStream, File, Option<URI>>() {
     
     @Override
-    public URI apply(InputStream is, File f) {
+    public Option<URI> apply(InputStream is, File f) {
       try {
         URI uri = workspace.putInCollection(UPLOAD_COLLECTION, f.getName(), is);    // storing file with jod id as name instead of original filename to avoid collisions (original filename can be obtained from upload job)
-        is.close();
-        return uri;
+        return Option.some(uri);
       } catch (IOException e) {
         log.error("Could not add file to collection.", e);
-        return null;
+        return Option.none();
       }
     }
   };
@@ -426,7 +426,7 @@ public class FileUploadServiceImpl implements FileUploadService {
    */
   private URL putPayloadIntoCollection(FileUploadJob job) throws FileUploadException {
       log.info("Moving payload of job " + job.getId() + " to collection " + UPLOAD_COLLECTION);
-      Option<URI> result = IoSupport.withFile(getPayloadFile(job.getId()), putInCollection);
+      Option<URI> result = IoSupport.withFile(getPayloadFile(job.getId()), putInCollection).flatMap(Functions.<Option<URI>>identity());
       if (result.isSome()) {
         try {
           return result.get().toURL();
