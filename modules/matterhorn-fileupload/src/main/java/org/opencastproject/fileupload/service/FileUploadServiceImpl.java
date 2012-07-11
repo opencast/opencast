@@ -39,6 +39,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
@@ -48,6 +49,9 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.data.Function2;
+import org.opencastproject.util.data.Option;
 
 /**
  * A service for big file uploads via HTTP.
@@ -58,7 +62,7 @@ public class FileUploadServiceImpl implements FileUploadService {
   final String PROPKEY_STORAGE_DIR = "org.opencastproject.storage.dir";
   final String DIRNAME_WORK_ROOT = "fileupload-tmp";
   final String UPLOAD_COLLECTION = "uploaded";
-  final String FILENAME_DATAFILE = "payload.part";
+  final String FILEEXT_DATAFILE = ".payload";
   final String FILENAME_CHUNKFILE = "chunk.part";
   final String FILENAME_JOBFILE = "job.xml";
   final int READ_BUFFER_LENGTH = 512;
@@ -394,6 +398,24 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     job.setState(FileUploadJob.JobState.COMPLETE);
   }
+  
+  /** Function that writes the given file to the uploaded collection.
+   * 
+   */
+  private Function2<InputStream, File, URI> putInCollection = new Function2<InputStream, File, URI>() {
+    
+    @Override
+    public URI apply(InputStream is, File f) {
+      try {
+        URI uri = workspace.putInCollection(UPLOAD_COLLECTION, f.getName(), is);    // storing file with jod id as name instead of original filename to avoid collisions (original filename can be obtained from upload job)
+        is.close();
+        return uri;
+      } catch (IOException e) {
+        log.error("Could not add file to collection.", e);
+        return null;
+      }
+    }
+  };
 
   /** Puts the payload of an upload job into the upload collection in the WFR 
    * and returns the URL to the file in the WFR.
@@ -403,14 +425,17 @@ public class FileUploadServiceImpl implements FileUploadService {
    * @throws FileUploadException 
    */
   private URL putPayloadIntoCollection(FileUploadJob job) throws FileUploadException {
-    try {
       log.info("Moving payload of job " + job.getId() + " to collection " + UPLOAD_COLLECTION);
-      URI uri = workspace.putInCollection(UPLOAD_COLLECTION, job.getId(), // storing file with jod id as name instead of original filename to avoid collisions (original filename can be obtained from upload job)
-              new FileInputStream(getPayloadFile(job.getId())));
-      return uri.toURL();
-    } catch (Exception e) {
-      throw new FileUploadException("Failed to put payload in collection.", e);
-    }
+      Option<URI> result = IoSupport.withFile(getPayloadFile(job.getId()), putInCollection);
+      if (result.isSome()) {
+        try {
+          return result.get().toURL();
+        } catch (MalformedURLException e) {
+          throw new FileUploadException("Unable to return URL of payloads final destination.", e);
+        }
+      } else {
+        throw new FileUploadException("Failed to put payload in collection.");
+      }
   }
 
   /**
@@ -530,7 +555,7 @@ public class FileUploadServiceImpl implements FileUploadService {
    * @return File job file
    */
   private File getPayloadFile(String id) {
-    StringBuilder sb = new StringBuilder().append(workRoot.getAbsolutePath()).append(File.separator).append(id).append(File.separator).append(FILENAME_DATAFILE);
+    StringBuilder sb = new StringBuilder().append(workRoot.getAbsolutePath()).append(File.separator).append(id).append(File.separator).append(id).append(FILEEXT_DATAFILE);
     return new File(sb.toString());
   }
 }
