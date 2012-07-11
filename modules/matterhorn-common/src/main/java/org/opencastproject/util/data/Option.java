@@ -16,8 +16,6 @@
 
 package org.opencastproject.util.data;
 
-import org.opencastproject.util.data.functions.Functions;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
