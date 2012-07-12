@@ -26,6 +26,7 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.elementbuilder.TrackBuilderPlugin;
+import org.opencastproject.util.IoSupport;
 
 import junit.framework.Assert;
 
@@ -35,6 +36,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URI;
 
@@ -145,14 +147,23 @@ public class TrackTest {
     StringWriter writer = new StringWriter();
     marshaller.marshal(track, writer);
     Unmarshaller unmarshaller = context.createUnmarshaller();
-    TrackImpl t1 = unmarshaller.unmarshal(new StreamSource(IOUtils.toInputStream(writer.toString(), "UTF-8")),
-            TrackImpl.class).getValue();
-    Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
+    InputStream inputStream = IOUtils.toInputStream(writer.toString(), "UTF-8");
+    try {
+      TrackImpl t1 = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class).getValue();
+      Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
+    } finally {
+      IoSupport.closeQuietly(inputStream);
+    }
 
     // Now again without namespaces
     String xml = "<track type=\"presentation/source\"><tags/><url>http://downloads.opencastproject.org/media/movie.m4v</url><duration>-1</duration></track>";
-    TrackImpl t2 = unmarshaller.unmarshal(new StreamSource(IOUtils.toInputStream(xml)), TrackImpl.class).getValue();
-    Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
+    inputStream = IOUtils.toInputStream(xml);
+    try {
+      TrackImpl t2 = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class).getValue();
+      Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
+    } finally {
+      IoSupport.closeQuietly(inputStream);
+    }
 
     // Get the xml from the object itself
     String xmlFromTrack = MediaPackageElementParser.getAsXml(track);

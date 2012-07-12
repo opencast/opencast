@@ -15,6 +15,8 @@
  */
 package org.opencastproject.workflow.api;
 
+import org.opencastproject.util.IoSupport;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -71,6 +73,8 @@ public final class WorkflowParser {
       return list;
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
+    } finally {
+      IoSupport.closeQuietly(in);
     }
   }
 
@@ -90,6 +94,8 @@ public final class WorkflowParser {
               WorkflowDefinitionImpl.class).getValue();
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
+    } finally {
+      IoSupport.closeQuietly(in);
     }
   }
 
@@ -129,6 +135,8 @@ public final class WorkflowParser {
       return workflow;
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
+    } finally {
+      IoSupport.closeQuietly(in);
     }
   }
 
@@ -166,6 +174,8 @@ public final class WorkflowParser {
       return stats;
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
+    } finally {
+      IoSupport.closeQuietly(in);
     }
   }
 
@@ -203,6 +213,8 @@ public final class WorkflowParser {
       return workflowSet;
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
+    } finally {
+      IoSupport.closeQuietly(in);
     }
   }
 
