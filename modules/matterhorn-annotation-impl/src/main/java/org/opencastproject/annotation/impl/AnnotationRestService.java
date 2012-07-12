@@ -15,8 +15,7 @@
  */
 package org.opencastproject.annotation.impl;
 
-import static javax.servlet.http.HttpServletResponse.SC_CREATED;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.*;
 
 import org.opencastproject.annotation.api.Annotation;
 import org.opencastproject.annotation.api.AnnotationService;
@@ -39,6 +38,7 @@ import java.net.URISyntaxException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -208,6 +208,27 @@ public class AnnotationRestService {
   @RestQuery(name = "annotationasjson", description = "Gets an annotation by its identifier", returnDescription = "A JSON representation of the user annotation.", pathParameters = { @RestParameter(name = "id", description = "The episode identifier", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the user annotation") })
   public AnnotationImpl getAnnotationAsJson(@PathParam("id") String idAsString) throws NotFoundException {
     return getAnnotationAsXml(idAsString);
+  }
+
+  @DELETE
+  @Path("{id}")
+  @RestQuery(name = "remove", description = "Remove an annotation", returnDescription = "Return status code", pathParameters = { @RestParameter(name = "id", description = "The annotation identifier", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "Annotation deleted."), @RestResponse(responseCode = SC_NO_CONTENT, description = "Annotation not found.") })
+  public Response removeAnnotation(@PathParam("id") String idAsString) throws NotFoundException {
+    Long id = null;
+    Annotation a; 
+    try {
+      id = Long.parseLong(idAsString);
+    } catch (NumberFormatException e) {
+        return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+    a = (AnnotationImpl) annotationService.getAnnotation(id);
+    boolean removed = annotationService.removeAnnotation(a);
+    if (removed) {    
+        return Response.status(Status.OK).build();
+    }
+    else {
+        return Response.status(Status.NO_CONTENT).build();
+    }
   }
 
 }
