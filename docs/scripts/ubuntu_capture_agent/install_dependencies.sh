@@ -47,7 +47,7 @@ while [[ true ]]; do
     echo "deb ${mirrors[1]:-$DEFAULT_SECURITY} ${DIST_NAME}-security main restricted universe multiverse" >> $SRC_LIST
     echo "deb ${mirrors[2]:-$DEFAULT_PARTNER} ${DIST_NAME} partner" >> $SRC_LIST
     
-    apt-get -qq update &> /dev/null
+    apt-get -qq update > /dev/null
     
     if [[ $? -eq 0 ]]; then
 	break
@@ -57,6 +57,13 @@ while [[ true ]]; do
 	unset mirrors
     fi
 done
+hasBrokenJDK=`grep 10.04 /etc/lsb-release`
+if [ -n "$hasBrokenJDK" ]; then
+	echo "Ubuntu 10.04 detected.  This version ships a JDK with a known issue.  Updating to use a newer JDK."
+	sudo apt-get install -qq --force-yes python-software-properties > /dev/null
+	sudo add-apt-repository ppa:openjdk/ppa > /dev/null
+	apt-get -qq update > /dev/null
+fi
 echo "Done"
 
 # Auto set selections when installing postfix and jdk packages
@@ -69,8 +76,6 @@ echo "Done"
 debconf-set-selections <<EOF
 postfix postfix/mailname string fax
 postfix postfix/main_mailer_type select Internet Site
-sun-java5-jdk shared/accepted-sun-dlj-v1-1 boolean true
-?sun-java6-jdk shared/accepted-sun-dlj-v1-1 boolean true
 EOF
 
 # Changes the default array delimiter: from 'space' to 'newline'
@@ -171,7 +176,7 @@ if ! $found_java ; then
     exit 1
 fi
 
-# Set up java-6-sun as the default alternative
+# Set up the default alternative
 echo -n "Setting up $JAVA_PATTERN as the default jvm... "
 update-java-alternatives -s $JAVA_PATTERN 2> /dev/null
 echo "Done"
