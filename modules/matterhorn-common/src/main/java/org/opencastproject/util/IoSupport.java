@@ -297,6 +297,10 @@ public final class IoSupport {
 
   /**
    * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
+   * <p/>
+   * <strong>Please note:</strong> The outcome of <code>f</code> is wrapped into a some. Therefore <code>f</code> is
+   * <em>not</em> allowed to return <code>null</code>. Use an <code>Option</code> instead and {@link org.opencastproject.util.data.Option#flatten() flatten}
+   * the overall result.
    *
    * @return none, if the file does not exist
    */
