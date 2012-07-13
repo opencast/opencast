@@ -93,17 +93,20 @@ public class IngestRestService {
   private static final String COLLECTION_ID = "ingest-temp";
 
   /** Key for the default workflow definition in config.properties */
-  private static final String DEFAULT_WORKFLOW_DEFINITION = "org.opencastproject.workflow.default.definition";
+  protected static final String DEFAULT_WORKFLOW_DEFINITION = "org.opencastproject.workflow.default.definition";
 
+  /** Key for the default maximum number of ingests in config.properties */
+  protected static final String MAX_INGESTS_KEY = "org.opencastproject.ingest.max.concurrent";
+  
   /** The http request parameter used to provide the workflow instance id */
-  private static final String WORKFLOW_INSTANCE_ID_PARAM = "workflowInstanceId";
+  protected static final String WORKFLOW_INSTANCE_ID_PARAM = "workflowInstanceId";
 
   /** The http request parameter used to provide the workflow definition id */
-  private static final String WORKFLOW_DEFINITION_ID_PARAM = "workflowDefinitionId";
+  protected static final String WORKFLOW_DEFINITION_ID_PARAM = "workflowDefinitionId";
 
   /** The default workflow definition */
   private String defaultWorkflowDefinitionId = null;
-
+  
   private MediaPackageBuilderFactory factory = null;
   private IngestService ingestService = null;
   private Workspace workspace = null;
@@ -113,10 +116,30 @@ public class IngestRestService {
   protected EntityManagerFactory emf = null;
   // For the progress bar -1 bug workaround, keeping UploadJobs in memory rather than saving them using JPA
   private HashMap<String, UploadJob> jobs;
-
+  // The number of ingests this service can handle concurrently. 
+  private int ingestLimit = 0;
+  // Whether this service has a limit for the number of ingests it can handle concurrently. 
+  private boolean ingestLimitEnabled = false;
+  
   public IngestRestService() {
     factory = MediaPackageBuilderFactory.newInstance();
     jobs = new HashMap<String, UploadJob>();
+  }
+
+  protected synchronized int getIngestLimit() {
+    return ingestLimit;
+  }
+
+  private synchronized void setIngestLimit(int ingestLimit) {
+    this.ingestLimit = ingestLimit;
+  }
+
+  protected synchronized boolean isIngestLimitEnabled() {
+    return ingestLimitEnabled;
+  }
+
+  private synchronized void setIngestLimitEnabled(boolean ingestLimitEnabled) {
+    this.ingestLimitEnabled = ingestLimitEnabled;
   }
 
   public void setIngestService(IngestService ingestService) {
@@ -152,8 +175,27 @@ public class IngestRestService {
     if (cc != null) {
       defaultWorkflowDefinitionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(
               DEFAULT_WORKFLOW_DEFINITION));
-      if (defaultWorkflowDefinitionId == null)
+      if (defaultWorkflowDefinitionId == null) {
         throw new IllegalStateException("Default workflow definition is null: " + DEFAULT_WORKFLOW_DEFINITION);
+      }
+
+      try {
+        ingestLimit = Integer.parseInt(StringUtils.trimToNull(cc.getBundleContext().getProperty(MAX_INGESTS_KEY)));
+        if (ingestLimit > 0) {
+          setIngestLimitEnabled(true);
+          logger.debug("Using an ingest limit of " + ingestLimit);
+        } else {
+          setIngestLimitEnabled(false);
+          ingestLimit = 0;
+          logger.debug("Ingest limit was 0 or less so the limit is disabled.");
+        }
+
+      } catch (NumberFormatException e) {
+        logger.warn("Max ingest property with key " + MAX_INGESTS_KEY
+                + " isn't defined so no ingest limit will be used.");
+        setIngestLimitEnabled(false);
+        ingestLimit = 0;
+      }
     }
   }
 
@@ -485,9 +527,24 @@ public class IngestRestService {
           @RestParameter(description = "The workflow definition ID to run on this mediapackage", isRequired = false, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING),
           @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) }, bodyParameter = @RestParameter(description = "The compressed (application/zip) media package file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
   public Response addZippedMediaPackage(@Context HttpServletRequest request) {
     logger.debug("addZippedMediaPackage(HttpRequest)");
+    if (!isIngestLimitEnabled() || getIngestLimit() > 0) {
+      return ingestZippedMediaPackage(request);
+    }
+    else {
+      logger.warn("Delaying ingest because we have exceeded the maximum number of ingests this server is setup to do concurrently.");
+      return Response.status(Status.SERVICE_UNAVAILABLE).build();
+    }
+  }
+
+  private Response ingestZippedMediaPackage(HttpServletRequest request) {
+    if (isIngestLimitEnabled()) {
+      setIngestLimit(getIngestLimit() - 1);
+      logger.debug("An ingest has started so remaining ingest limit is " + getIngestLimit());
+    }
     FileInputStream zipInputStream = null;
     String zipFileName = UUID.randomUUID().toString() + ".zip";
     URI zipFileUri = null;
@@ -549,6 +606,10 @@ public class IngestRestService {
         logger.debug("Error removing missing temporary ingest file " + COLLECTION_ID + "/" + zipFileName, nfe);
       } catch (IOException ioe) {
         logger.warn("Error removing temporary ingest file " + zipFileUri, ioe);
+      }
+      if (isIngestLimitEnabled()) {
+        setIngestLimit(getIngestLimit() + 1);
+        logger.debug("An ingest has finished so increased ingest limit to " + getIngestLimit());
       }
     }
   }
