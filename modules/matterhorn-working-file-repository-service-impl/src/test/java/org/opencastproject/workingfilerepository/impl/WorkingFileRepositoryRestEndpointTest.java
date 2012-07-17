@@ -23,6 +23,7 @@ import junit.framework.Assert;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.tika.parser.AutoDetectParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +46,7 @@ public class WorkingFileRepositoryRestEndpointTest {
     FileUtils.forceMkdir(new File(endpoint.rootDirectory));
     endpoint.serverUrl = UrlSupport.DEFAULT_BASE_URL;
     endpoint.serviceUrl = new URI("http://localhost/files");
+    endpoint.setTikaParser(new AutoDetectParser());
   }
 
   @After
@@ -87,7 +89,7 @@ public class WorkingFileRepositoryRestEndpointTest {
   @Test
   public void testExtractXmlContentType() throws Exception {
     String mediaPackageId = "mp";
-    String dc = "element1";    
+    String dc = "element1";
     InputStream in = null;
     InputStream responseIn = null;
     try {
@@ -132,11 +134,11 @@ public class WorkingFileRepositoryRestEndpointTest {
       String md5 = DigestUtils.md5Hex(in);
       Response response = endpoint.restGet(mediaPackageId, dc, md5);
       Assert.assertEquals(Response.Status.NOT_MODIFIED.getStatusCode(), response.getStatus());
-      responseIn = (InputStream)response.getEntity();
+      responseIn = (InputStream) response.getEntity();
       Assert.assertNull(responseIn);
       response = endpoint.restGet(mediaPackageId, dc, "foo");
       Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-      responseIn = (InputStream)response.getEntity();
+      responseIn = (InputStream) response.getEntity();
       Assert.assertNotNull(responseIn);
     } finally {
       IOUtils.closeQuietly(in);
