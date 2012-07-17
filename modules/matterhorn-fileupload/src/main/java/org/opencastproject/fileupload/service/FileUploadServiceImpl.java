@@ -15,6 +15,23 @@
  */
 package org.opencastproject.fileupload.service;
 
+import org.opencastproject.fileupload.api.FileUploadService;
+import org.opencastproject.fileupload.api.exception.FileUploadException;
+import org.opencastproject.fileupload.api.job.Chunk;
+import org.opencastproject.fileupload.api.job.FileUploadJob;
+import org.opencastproject.fileupload.api.job.Payload;
+import org.opencastproject.ingest.api.IngestService;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.Track;
+import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,27 +41,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.opencastproject.fileupload.api.FileUploadService;
-import org.opencastproject.fileupload.api.exception.FileUploadException;
-import org.opencastproject.fileupload.api.job.Chunk;
-import org.opencastproject.fileupload.api.job.FileUploadJob;
-import org.opencastproject.fileupload.api.job.Payload;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElement.Type;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.workspace.api.Workspace;
-import org.osgi.service.component.ComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-/** A service for big file uploads via HTTP.
- *
+/**
+ * A service for big file uploads via HTTP.
+ * 
  */
 public class FileUploadServiceImpl implements FileUploadService {
 
@@ -57,6 +64,7 @@ public class FileUploadServiceImpl implements FileUploadService {
   final int READ_BUFFER_LENGTH = 512;
   private static final Logger log = LoggerFactory.getLogger(FileUploadServiceImpl.class);
   private File workRoot;
+  private IngestService ingestService;
   private Workspace workspace;
   private Marshaller jobMarshaller;
   private Unmarshaller jobUnmarshaller;
@@ -92,6 +100,11 @@ public class FileUploadServiceImpl implements FileUploadService {
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
+
+  protected void setIngestService(IngestService ingestService) {
+    this.ingestService = ingestService;
+  }
+
   // </editor-fold>
 
   /**
@@ -400,24 +413,35 @@ public class FileUploadServiceImpl implements FileUploadService {
     }
   }
 
-  /** Puts the payload of an upload job into a MediaPackage in the WFR, adds the
-   * files as a track to the MediaPackage and returns the files URL in the WFR.
+  /**
+   * Puts the payload of an upload job into a MediaPackage in the WFR, adds the files as a track to the MediaPackage and
+   * returns the files URL in the WFR.
    * 
    * @param job
    * @return URL of the file in the WFR
-   * @throws FileUploadException 
+   * @throws FileUploadException
    */
   private URL putPayloadIntoMediaPackage(FileUploadJob job) throws FileUploadException {
+    MediaPackage mediaPackage = job.getPayload().getMediaPackage();
+    MediaPackageElementFlavor flavor = job.getPayload().getFlavor();
+    List<Track> excludeTracks = Arrays.asList(mediaPackage.getTracks(flavor));
+
+    FileInputStream fileInputStream = null;
     try {
-      MediaPackage mp = job.getPayload().getMediaPackage();
-      String elementId = "track-" + job.getId();
-      log.info("Moving payload of job " + job.getId() + " to MediaPackage " + mp.getIdentifier().toString());
-      URI uri = workspace.put(job.getPayload().getMediaPackage().getIdentifier().toString(),
-              elementId, job.getPayload().getFilename(), new FileInputStream(getPayloadFile(job.getId())));
-      mp.add(uri, Type.Track, job.getPayload().getFlavor());
-      return uri.toURL();
+      fileInputStream = new FileInputStream(getPayloadFile(job.getId()));
+      MediaPackage mp = ingestService.addTrack(fileInputStream, job.getPayload().getFilename(), job.getPayload()
+              .getFlavor(), mediaPackage);
+
+      List<Track> tracks = Arrays.asList(mp.getTracks(flavor));
+      tracks.removeAll(excludeTracks);
+      if (tracks.size() != 1)
+        throw new FileUploadException("Ingested track not found");
+
+      return tracks.get(0).getURI().toURL();
     } catch (Exception e) {
       throw new FileUploadException("Failed to add payload to MediaPackage.", e);
+    } finally {
+      IOUtils.closeQuietly(fileInputStream);
     }
   }
 
