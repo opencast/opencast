@@ -15,6 +15,25 @@
  */
 package org.opencastproject.workingfilerepository.impl;
 
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.opencastproject.util.IoSupport.withFile;
+import static org.opencastproject.util.RestUtil.fileResponse;
+import static org.opencastproject.util.RestUtil.streamResponse;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.FILE;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
+
+import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Function2;
+import org.opencastproject.util.doc.rest.RestParameter;
+import org.opencastproject.util.doc.rest.RestQuery;
+import org.opencastproject.util.doc.rest.RestResponse;
+import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
+
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -23,22 +42,19 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.tika.metadata.HttpHeaders;
 import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function2;
-import org.opencastproject.util.doc.rest.RestParameter;
-import org.opencastproject.util.doc.rest.RestQuery;
-import org.opencastproject.util.doc.rest.RestResponse;
-import org.opencastproject.util.doc.rest.RestService;
-import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
@@ -53,21 +69,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.opencastproject.util.IoSupport.withFile;
-import static org.opencastproject.util.RestUtil.fileResponse;
-import static org.opencastproject.util.RestUtil.streamResponse;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.doc.rest.RestParameter.Type.FILE;
-import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 @Path("/")
 @RestService(name = "filerepo", title = "Working File Repository", abstractText = "Stores and retrieves files for use during media processing.", notes = WorkingFileRepositoryRestEndpoint.NOTES)
@@ -85,6 +86,9 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   private final MimetypesFileTypeMap mimeMap = new MimetypesFileTypeMap(getClass().getClassLoader()
           .getResourceAsStream("mimetypes"));
 
+  /** The Apache Tika parser */
+  private Parser tikaParser;
+
   /**
    * Callback from OSGi that is called when this service is activated.
    * 
@@ -93,6 +97,15 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
    */
   public void activate(ComponentContext cc) throws IOException {
     super.activate(cc);
+  }
+
+  /**
+   * Sets the Apache Tika parser.
+   * 
+   * @param tikaParser
+   */
+  public void setTikaParser(Parser tikaParser) {
+    this.tikaParser = tikaParser;
   }
 
   @POST
@@ -213,11 +226,10 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
     }
     try {
       return withFile(getFile(mediaPackageID, mediaPackageElementID), new Function2.X<InputStream, File, Response>() {
-        @Override public Response xapply(InputStream in, File f) throws Exception {
-          return streamResponse(get(mediaPackageID, mediaPackageElementID),
-                                extractContentType(in),
-                                some(f.length()),
-                                none("")).build();
+        @Override
+        public Response xapply(InputStream in, File f) throws Exception {
+          return streamResponse(get(mediaPackageID, mediaPackageElementID), extractContentType(in), some(f.length()),
+                  none("")).build();
         }
       }).orError(new NotFoundException()).get();
     } catch (IllegalStateException e) {
@@ -238,9 +250,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       // Find the content type, based on the stream content
       BodyContentHandler contenthandler = new BodyContentHandler();
       Metadata metadata = new Metadata();
-      Parser parser = new AutoDetectParser();
       ParseContext context = new ParseContext();
-      parser.parse(in, contenthandler, metadata, context);
+      tikaParser.parse(in, contenthandler, metadata, context);
       return metadata.get(HttpHeaders.CONTENT_TYPE);
     } catch (Exception e) {
       logger.warn("Unable to extract mimetype from input stream, ", e);
@@ -257,9 +268,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_OK, description = "File returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGet(@PathParam("mediaPackageID") String mediaPackageID,
-                          @PathParam("mediaPackageElementID") String mediaPackageElementID,
-                          @PathParam("fileName") String fileName,
-                          @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException {
+          @PathParam("mediaPackageElementID") String mediaPackageElementID, @PathParam("fileName") String fileName,
+          @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException {
     String md5 = null;
     // Check the If-None-Match header first
     try {
@@ -274,10 +284,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
 
     // No If-Non-Match header provided, or the file changed in the meantime
     try {
-      return fileResponse(getFile(mediaPackageID, mediaPackageElementID),
-                          mimeMap.getContentType(fileName),
-                          some(fileName))
-              .tag(md5).build();
+      return fileResponse(getFile(mediaPackageID, mediaPackageElementID), mimeMap.getContentType(fileName),
+              some(fileName)).tag(md5).build();
     } catch (IllegalStateException e) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
@@ -291,10 +299,9 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_OK, description = "File returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGetFromCollection(@PathParam("collectionId") String collectionId,
-                                        @PathParam("fileName") String fileName) throws NotFoundException, IOException {
-    return fileResponse(getFileFromCollection(collectionId, fileName),
-                        mimeMap.getContentType(fileName),
-                        some(fileName)).build();
+          @PathParam("fileName") String fileName) throws NotFoundException, IOException {
+    return fileResponse(getFileFromCollection(collectionId, fileName), mimeMap.getContentType(fileName), some(fileName))
+            .build();
   }
 
   @GET
