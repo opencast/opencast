@@ -15,16 +15,6 @@
  */
 package org.opencastproject.series.impl.persistence;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mchange.v2.c3p0.DataSources;
-import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
@@ -36,10 +26,25 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.data.Tuple;
+
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.mchange.v2.c3p0.DataSources;
+
+import junit.framework.Assert;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.easymock.EasyMock;
+import org.eclipse.persistence.jpa.PersistenceProvider;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -131,11 +136,12 @@ public class SeriesServicePersistenceTest {
   @Test
   public void testRetrieving() throws Exception {
     seriesDatabase.storeSeries(testCatalog);
-    DublinCoreCatalog[] series = seriesDatabase.getAllSeries();
-    Assert.assertTrue("Exactly one series should be returned", series.length == 1);
+
+    Iterator<Tuple<DublinCoreCatalog, String>> series = seriesDatabase.getAllSeries();
+    Assert.assertTrue("Exactly one series should be returned", series.hasNext());
     seriesDatabase.deleteSeries(testCatalog.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER));
     series = seriesDatabase.getAllSeries();
-    Assert.assertTrue("Exactly zero series should be returned", series.length == 0);
+    Assert.assertFalse("Exactly zero series should be returned", series.hasNext());
   }
 
   @Test

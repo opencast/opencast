@@ -19,6 +19,9 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Tuple;
+
+import java.util.Iterator;
 
 /**
  * API that defines persistent storage of series.
@@ -71,11 +74,11 @@ public interface SeriesServiceDatabase {
   /**
    * Returns all series in persistent storage.
    * 
-   * @return {@link DublinCoreCatalog} array representing stored series
+   * @return {@link Tuple} array representing stored series
    * @throws SeriesServiceDatabaseException
    *           if exception occurs
    */
-  DublinCoreCatalog[] getAllSeries() throws SeriesServiceDatabaseException;
+  Iterator<Tuple<DublinCoreCatalog, String>> getAllSeries() throws SeriesServiceDatabaseException;
 
   /**
    * Retrieves ACL for series with given ID.
