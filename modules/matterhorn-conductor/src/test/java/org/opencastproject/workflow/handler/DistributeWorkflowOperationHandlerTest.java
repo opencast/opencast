@@ -101,6 +101,15 @@ public class DistributeWorkflowOperationHandlerTest {
   }
 
   @Test
+  public void testEmptyDistribute() throws Exception {
+    String sourceTags = "bla";
+    WorkflowInstance workflowInstance = getWorkflowInstance(sourceTags, null, null, null);
+    WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
+    Assert.assertEquals("Resulting mediapackage has the wrong number of tracks", 2, result.getMediaPackage()
+            .getTracks().length);
+  }
+
+  @Test
   public void testDistributeWithTagsOnly() throws Exception {
     String sourceTags = "engage,atom,rss";
     WorkflowInstance workflowInstance = getWorkflowInstance(sourceTags, null, null, null);

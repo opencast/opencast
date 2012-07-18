@@ -185,6 +185,11 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
         throw new WorkflowOperationException(e);
       }
 
+      if (jobs.size() < 1) {
+        logger.info("No mediapackage element was found for distribution");
+        return createResult(mediaPackage, Action.CONTINUE);
+      }
+
       // Wait until all distribution jobs have returned
       if (!waitForStatus(jobs.values().toArray(new Job[jobs.size()])).isSuccess()) {
         throw new WorkflowOperationException("One of the distribution jobs did not complete successfully");
