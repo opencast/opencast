@@ -77,6 +77,9 @@ public class RuntimeInfo {
   
   private static final String HTTPS = "https";
   private static final String HTTP = "http";
+
+  private static final int DEFAULT_HTTP_PORT = 8080;
+  private static final int DEFAULT_HTTPS_PORT = 8443;
   
   /** The rest publisher looks for any non-servlet with the 'opencast.service.path' property */
   public static final String SERVICE_FILTER = "(&(!(objectClass=javax.servlet.Servlet))("
@@ -137,9 +140,18 @@ public class RuntimeInfo {
       httpsEnable = false;
     else
       httpsEnable = Boolean.parseBoolean(httpsEnableStr);
+
+    String httpPortStr = bundleContext.getProperty(HTTP_PORT_PROPERTY);
+    if (httpPortStr == null)
+      httpPort = DEFAULT_HTTP_PORT;
+    else
+      httpPort = Integer.parseInt(httpPortStr);
     
-    httpPort = Integer.parseInt(bundleContext.getProperty(HTTP_PORT_PROPERTY));
-    httpsPort = Integer.parseInt(bundleContext.getProperty(HTTPS_PORT_PROPERTY));
+    String httpsPortStr = bundleContext.getProperty(HTTPS_PORT_PROPERTY);
+    if (httpsPortStr == null)
+      httpsPort = DEFAULT_HTTPS_PORT;
+    else
+      httpsPort = Integer.parseInt(httpsPortStr);
   }
 
   public void deactivate() {
@@ -154,8 +166,7 @@ public class RuntimeInfo {
   public String getRuntimeInfo(@Context HttpServletRequest request) throws MalformedURLException { 
 
     // Get request protocol 
-    StringBuffer url = request.getRequestURL();
-    boolean httpsRequest = HTTPS.equalsIgnoreCase(url.substring(0,5));
+    boolean httpsRequest = HTTPS.equalsIgnoreCase(request.getScheme());
     
     // Get default value for target page
     URL targetEngageBaseUrl;
