@@ -320,6 +320,16 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
   /**
    * {@inheritDoc}
    * 
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getUsedSpace()
+   */
+  @Override
+  public long getUsedSpace() {
+    return (Long) (getStorageReport().get("used"));
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#put(java.lang.String, java.lang.String,
    *      java.lang.String, java.io.InputStream)
    */

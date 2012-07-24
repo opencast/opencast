@@ -408,10 +408,12 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   public Response restGetTotalStorage() {
     long total = this.getTotalSpace();
     long usable = this.getUsableSpace();
+    long used = this.getUsedSpace();
     String summary = this.getDiskSpace();
     JSONObject json = new JSONObject();
     json.put("size", total);
     json.put("usable", usable);
+    json.put("used", used);
     json.put("summary", summary);
     return Response.ok(json.toJSONString()).build();
   }
