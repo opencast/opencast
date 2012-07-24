@@ -249,6 +249,13 @@ public interface WorkingFileRepository {
   long getUsableSpace();
 
   /**
+   * Gets the used space of storage in Bytes
+   * 
+   * @return Number of used bytes in storage
+   */
+  long getUsedSpace();
+
+  /**
    * A textual representation of available and total storage
    * 
    * @return Percentage and numeric values of used storage space

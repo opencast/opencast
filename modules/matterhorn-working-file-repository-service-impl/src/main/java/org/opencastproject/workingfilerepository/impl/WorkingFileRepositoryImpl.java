@@ -416,8 +416,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
         FileUtils.forceMkdir(collectionDir);
         logger.debug("Created collection directory " + collectionId);
       } catch (IOException e) {
-        //We check again to see if it already exists because this collection dir may live on a shared disk.
-        //Synchronizing does not help because the other instance is not in the same JVM.
+        // We check again to see if it already exists because this collection dir may live on a shared disk.
+        // Synchronizing does not help because the other instance is not in the same JVM.
         if (!collectionDir.exists()) {
           throw new IllegalStateException("Can not create collection directory" + collectionDir);
         }
@@ -727,6 +727,17 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   public long getUsableSpace() {
     File f = new File(rootDirectory);
     return f.getUsableSpace();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getUsedSpace()
+   */
+  @Override
+  public long getUsedSpace() {
+    File f = new File(rootDirectory);
+    return f.getTotalSpace() - f.getUsableSpace();
   }
 
   /**
