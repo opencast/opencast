@@ -74,7 +74,8 @@ public final class CaptureUtils {
     if (HttpStatus.SC_OK != response.getStatusLine().getStatusCode())
       throw new IllegalStateException("Capture agent '" + captureAgentId + "' is unexpectedly offline");
     String responseBody = EntityUtils.toString(response.getEntity());
-    return "capturing".equalsIgnoreCase((String) Utils.xpath(responseBody, "/state", XPathConstants.STRING));
+    return "capturing".equalsIgnoreCase((String) Utils.xpath(responseBody, "/*[local-name() = 'state']",
+            XPathConstants.STRING));
   }
 
   public static boolean recordingExists(String recordingId) throws Exception {
@@ -92,7 +93,8 @@ public final class CaptureUtils {
       throw new IllegalStateException("Recording '" + recordingId + "' not found");
     String responseBody = EntityUtils.toString(response.getEntity());
     Main.returnClient(client);
-    return state.equalsIgnoreCase((String) Utils.xpath(responseBody, "//state", XPathConstants.STRING));
+    return state.equalsIgnoreCase((String) Utils.xpath(responseBody, "//*[local-name() = 'state']",
+            XPathConstants.STRING));
   }
 
   public static void setState(String recordingId, String state) throws Exception {

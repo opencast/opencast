@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:mediapackage start="2011-03-07T17:33:14Z" id="f69c5e29-5a63-4cb3-b58a-7c5a00fdb8d9" duration="0" xmlns:ns2="http://mediapackage.opencastproject.org">
-<media>
-<track type="presentation/source" id="a4e14935-c916-46aa-a022-34bfc595ad33"><tags></tags><url>fake.flv</url><duration>-1</duration>
-	<video id="video-1">
-	        <device />
-        <encoder ></encoder>
-        <bitrate>387969.0</bitrate>
-        <framerate>10</framerate>
-        <resolution>1792x1028</resolution>
-        <scantype type="Progressive" />
-        </video>
-	<mimetype>video/flv</mimetype>
-	</track>
-	</media><metadata><catalog type="dublincore/episode" id="322c5b29-f21a-4257-8e9b-5f9dc9877e80"><mimetype>text/xml</mimetype><tags/><url>dublinCore.xml</url></catalog></metadata><attachments/></ns2:mediapackage>
+<ns2:media>
+<ns2:track type="presentation/source" id="a4e14935-c916-46aa-a022-34bfc595ad33"><ns2:tags></ns2:tags><ns2:url>fake.flv</ns2:url><ns2:duration>-1</ns2:duration>
+	<ns2:video id="video-1">
+	        <ns2:device />
+        <ns2:encoder ></ns2:encoder>
+        <ns2:bitrate>387969.0</ns2:bitrate>
+        <ns2:framerate>10</ns2:framerate>
+        <ns2:resolution>1792x1028</ns2:resolution>
+        <ns2:scantype type="Progressive" />
+        </ns2:video>
+	<ns2:mimetype>video/flv</ns2:mimetype>
+	</ns2:track>
+	</ns2:media><ns2:metadata><ns2:catalog type="dublincore/episode" id="322c5b29-f21a-4257-8e9b-5f9dc9877e80"><ns2:mimetype>text/xml</ns2:mimetype><ns2:tags/><ns2:url>dublinCore.xml</ns2:url></ns2:catalog></ns2:metadata><ns2:attachments/></ns2:mediapackage>
 	

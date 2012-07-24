@@ -760,7 +760,7 @@ ocUpload.Ingest = (function() {
       url: ocUpload.SERIES_URL,
       data: {
         series: seriesXml,
-        acl: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:acl xmlns:ns2="org.opencastproject.security"><ace><role>' + anonymous_role + '</role><action>read</action><allow>true</allow></ace></ns2:acl>'
+        acl: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="org.opencastproject.security"><ace><role>' + anonymous_role + '</role><action>read</action><allow>true</allow></ace></acl>'
       },
       dataType : 'xml',
       error: function() {

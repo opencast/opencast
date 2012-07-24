@@ -1,4 +1,4 @@
-<oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" id="10.0000/1" start="2007-12-05T13:40:00" duration="1004400000">
+<mediapackage xmlns="http://mediapackage.opencastproject.org" id="10.0000/1" start="2007-12-05T13:40:00" duration="1004400000">
   <metadata>
     <catalog id="catalog-1" type="dublincore/episode">
       <mimetype>text/xml</mimetype>
@@ -6,4 +6,4 @@
       <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
     </catalog>
   </metadata>
-</oc:mediapackage>
+</mediapackage>

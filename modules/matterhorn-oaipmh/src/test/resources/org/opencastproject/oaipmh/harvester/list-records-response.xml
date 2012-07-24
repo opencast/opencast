@@ -12,13 +12,13 @@
       </header>
       <metadata>
         <matterhorn:mediapackage xmlns:matterhorn="http://www.opencastproject.org/oai/matterhorn">
-          <ns2:mediapackage xmlns:ns2="http://mediapackage.opencastproject.org" duration="69080"
+          <mediapackage xmlns="http://mediapackage.opencastproject.org" duration="69080"
                             id="548adbd3-13ef-4189-9805-a3d83b4dc2a2" start="2011-07-03T22:00:00Z">
-            <title xmlns="">Freunde</title>
-            <creators xmlns="">
+            <title>Freunde</title>
+            <creators>
               <creator>ced</creator>
             </creators>
-            <media xmlns="">
+            <media>
               <track id="track-6" ref="track:a980b71a-f15a-42b5-84cc-6edce37e8b9e" type="presenter/delivery">
                 <mimetype>video/x-flv</mimetype>
                 <tags>
@@ -60,7 +60,7 @@
                 </video>
               </track>
             </media>
-            <metadata xmlns="">
+            <metadata>
               <catalog id="catalog-2" ref="catalog:40b2ec10-c0ba-44c0-a593-6bf2a5df715b" type="dublincore/episode">
                 <mimetype>text/xml</mimetype>
                 <tags>
@@ -71,7 +71,7 @@
                 </url>
               </catalog>
             </metadata>
-            <attachments xmlns="">
+            <attachments>
               <attachment id="attachment-4" ref="attachment:attachment-1" type="presenter/player+preview">
                 <mimetype>image/jpeg</mimetype>
                 <tags>
@@ -98,7 +98,7 @@
                 <url>http://localhost:8080/static/548adbd3-13ef-4189-9805-a3d83b4dc2a2/attachment-3/Freunde.jpg</url>
               </attachment>
             </attachments>
-          </ns2:mediapackage>
+          </mediapackage>
         </matterhorn:mediapackage>
       </metadata>
     </record>

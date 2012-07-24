@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 public class WorkflowConfigurationTest {
-  
+
   @Test
   public void testConfigurationSerialization() throws Exception {
     WorkflowOperationInstanceImpl op = new WorkflowOperationInstanceImpl("op", OperationState.RUNNING);
@@ -44,7 +44,7 @@ public class WorkflowConfigurationTest {
     ops.add(op);
     instance.setOperations(ops);
     String xml = WorkflowParser.toXml(instance);
-    Assert.assertTrue(xml.contains("<configurations><configuration key=\"this\">that</configuration></configurations>"));
+    Assert.assertTrue(xml.contains("configuration key=\"this\">that</"));
   }
 
 }

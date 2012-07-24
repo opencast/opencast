@@ -1,19 +1,19 @@
-<mediapackage id="971180f2-66bc-4b3c-a484-f65d664e15fd"
+<ns2:mediapackage xmlns:ns2="http://mediapackage.opencastproject.org" id="971180f2-66bc-4b3c-a484-f65d664e15fd"
 	duration="-1">
-	<media>
-		<track type="presentation/source" id="6b574c7b-bf85-4023-bc41-c3145fa189d6">
-			<tags />
-			<url>/av.mov
-			</url>
-			<duration>-1</duration>
-		</track>
-	</media>
-	<metadata>
-		<catalog type="dublincore/episode" id="c20cd01f-f50b-416f-a3fb-4502fcfae1b7">
-			<mimetype>text/xml</mimetype>
-			<tags />
-			<url>dublinCore.xml</url>
-		</catalog>
-	</metadata>
-	<attachments />
-</mediapackage>
+	<ns2:media>
+		<ns2:track type="presentation/source" id="6b574c7b-bf85-4023-bc41-c3145fa189d6">
+			<ns2:tags />
+			<ns2:url>/av.mov
+			</ns2:url>
+			<ns2:duration>-1</ns2:duration>
+		</ns2:track>
+	</ns2:media>
+	<ns2:metadata>
+		<ns2:catalog type="dublincore/episode" id="c20cd01f-f50b-416f-a3fb-4502fcfae1b7">
+			<ns2:mimetype>text/xml</ns2:mimetype>
+			<ns2:tags />
+			<ns2:url>dublinCore.xml</ns2:url>
+		</ns2:catalog>
+	</ns2:metadata>
+	<ns2:attachments />
+</ns2:mediapackage>

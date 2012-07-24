@@ -1,72 +1,72 @@
-<mediapackage id="597d0b42-5af6-450e-ac0b-c2cb619fc2be" start="2007-12-05T13:40:00" duration="1004400000">
-  <title>t1</title>
-  <seriestitle>s1</seriestitle>
-  <creators>
-    <creator>p1</creator>
-  </creators>
-  <contributors>
-    <contributor>sd1</contributor>
-  </contributors>
-  <subjects>
-    <subject>Ökologie</subject>
-  </subjects>
-  <license>cc</license>
-  <media>
-    <track id="track-1" type="presentation/source">
-      <mimetype>video/quicktime</mimetype>
-      <url>tracks/vonly.mov</url>
-      <checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</checksum>
-      <duration>1004400000</duration>
-      <video>
-        <device type="UFG03" version="30112007" vendor="Unigraf" />
-        <encoder type="H.264" version="7.4" vendor="Apple Inc" />
-        <resolution>640x480</resolution>
-        <scanType type="progressive" />
-        <bitrate>540520</bitrate>
-        <frameRate>2</frameRate>
-      </video>
-    </track>
-    <track id="track-2" type="presenter/source">
-      <mimetype>video/quicktime</mimetype>
-      <url>tracks/aonly.mov</url>
-      <checksum type="md5">950f9fa49caa8f1c5bbc36892f6fd062</checksum>
-      <duration>1004400000</duration>
-      <audio>
-        <device type="UFG03" version="30112007" vendor="Unigraf" />
-        <encoder type="AAC" version="7.4" vendor="Apple Inc" />
-        <channels>2</channels>
-        <bitdepth>16</bitdepth>
-        <samplingrate>44100</samplingrate>
-      </audio>
-    </track>
-  </media>
-  <metadata>
-    <catalog id="catalog-1" type="dublincore/episode">
-      <mimetype>text/xml</mimetype>
-      <url>metadata/dublincore.xml</url>
-      <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
-    </catalog>
-    <catalog id="catalog-2" type="dublincore/episode" ref="series:1">
-      <mimetype>text/xml</mimetype>
-      <url>metadata/series-dublincore.xml</url>
-      <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
-    </catalog>
-    <catalog id="catalog-3" type="metadata/mpeg-7" ref="track:track-1">
-      <mimetype>text/xml</mimetype>
-      <url>metadata/mpeg-7.xml</url>
-      <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
-    </catalog>
-  </metadata>
-  <attachments>
-    <attachment id="cover" type="cover/source">
-      <mimetype>image/png</mimetype>
-      <url>attachments/cover.png</url>
-      <checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</checksum>
-    </attachment>
-    <attachment id="slides" type="attachment/slides">
-      <mimetype>application/vnd.ms-powerpoint</mimetype>
-      <url>attachments/slides.ppt</url>
-      <checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</checksum>
-    </attachment>
-  </attachments>
-</mediapackage>
+<oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" id="597d0b42-5af6-450e-ac0b-c2cb619fc2be" start="2007-12-05T13:40:00" duration="1004400000">
+  <oc:title>t1</oc:title>
+  <oc:seriestitle>s1</oc:seriestitle>
+  <oc:creators>
+    <oc:creator>p1</oc:creator>
+  </oc:creators>
+  <oc:contributors>
+    <oc:contributor>sd1</oc:contributor>
+  </oc:contributors>
+  <oc:subjects>
+    <oc:subject>Ökologie</oc:subject>
+  </oc:subjects>
+  <oc:license>cc</oc:license>
+  <oc:media>
+    <oc:track id="track-1" type="presentation/source">
+      <oc:mimetype>video/quicktime</oc:mimetype>
+      <oc:url>tracks/vonly.mov</oc:url>
+      <oc:checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</oc:checksum>
+      <oc:duration>1004400000</oc:duration>
+      <oc:video>
+        <oc:device type="UFG03" version="30112007" vendor="Unigraf" />
+        <oc:encoder type="H.264" version="7.4" vendor="Apple Inc" />
+        <oc:resolution>640x480</oc:resolution>
+        <oc:scanType type="progressive" />
+        <oc:bitrate>540520</oc:bitrate>
+        <oc:frameRate>2</oc:frameRate>
+      </oc:video>
+    </oc:track>
+    <oc:track id="track-2" type="presenter/source">
+      <oc:mimetype>video/quicktime</oc:mimetype>
+      <oc:url>tracks/aonly.mov</oc:url>
+      <oc:checksum type="md5">950f9fa49caa8f1c5bbc36892f6fd062</oc:checksum>
+      <oc:duration>1004400000</oc:duration>
+      <oc:audio>
+        <oc:device type="UFG03" version="30112007" vendor="Unigraf" />
+        <oc:encoder type="AAC" version="7.4" vendor="Apple Inc" />
+        <oc:channels>2</oc:channels>
+        <oc:bitdepth>16</oc:bitdepth>
+        <oc:samplingrate>44100</oc:samplingrate>
+      </oc:audio>
+    </oc:track>
+  </oc:media>
+  <oc:metadata>
+    <oc:catalog id="catalog-1" type="dublincore/episode">
+      <oc:mimetype>text/xml</oc:mimetype>
+      <oc:url>metadata/dublincore.xml</oc:url>
+      <oc:checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</oc:checksum>
+    </oc:catalog>
+    <oc:catalog id="catalog-2" type="dublincore/episode" ref="series:1">
+      <oc:mimetype>text/xml</oc:mimetype>
+      <oc:url>metadata/series-dublincore.xml</oc:url>
+      <oc:checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</oc:checksum>
+    </oc:catalog>
+    <oc:catalog id="catalog-3" type="metadata/mpeg-7" ref="track:track-1">
+      <oc:mimetype>text/xml</oc:mimetype>
+      <oc:url>metadata/mpeg-7.xml</oc:url>
+      <oc:checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</oc:checksum>
+    </oc:catalog>
+  </oc:metadata>
+  <oc:attachments>
+    <oc:attachment id="cover" type="cover/source">
+      <oc:mimetype>image/png</oc:mimetype>
+      <oc:url>attachments/cover.png</oc:url>
+      <oc:checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</oc:checksum>
+    </oc:attachment>
+    <oc:attachment id="slides" type="attachment/slides">
+      <oc:mimetype>application/vnd.ms-powerpoint</oc:mimetype>
+      <oc:url>attachments/slides.ppt</oc:url>
+      <oc:checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</oc:checksum>
+    </oc:attachment>
+  </oc:attachments>
+</oc:mediapackage>

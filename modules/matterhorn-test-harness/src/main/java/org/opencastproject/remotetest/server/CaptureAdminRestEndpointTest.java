@@ -32,11 +32,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
@@ -45,7 +45,7 @@ import javax.xml.xpath.XPathFactory;
  */
 public class CaptureAdminRestEndpointTest {
   private TrustedHttpClient httpClient;
-  
+
   private static final Logger logger = LoggerFactory.getLogger(CaptureAdminRestEndpointTest.class);
 
   @BeforeClass
@@ -57,32 +57,33 @@ public class CaptureAdminRestEndpointTest {
   public void setUp() throws Exception {
     httpClient = Main.getClient();
   }
-  
+
   @After
   public void tearDown() throws Exception {
     Main.returnClient(httpClient);
   }
-  
+
   @Test
   public void testGetAgents() throws Exception {
     String endpoint = "/capture-admin/agents";
     HttpGet get = new HttpGet(BASE_URL + endpoint + ".xml");
     String xmlResponse = EntityUtils.toString(httpClient.execute(get).getEntity());
     Main.returnClient(httpClient);
-    
+
     // parse the xml and extract the running clients names
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    factory.setNamespaceAware(true); // don't forget this!
+    // factory.setNamespaceAware(true); // don't forget this!
     DocumentBuilder builder = factory.newDocumentBuilder();
     Document doc = builder.parse(IOUtils.toInputStream(xmlResponse, "UTF-8"));
-    Element agents =((Element)XPathFactory.newInstance().newXPath().compile("/*").evaluate(doc, XPathConstants.NODE));
-    NodeList agentList = agents.getChildNodes();
-    
+    XPath xPath = XPathFactory.newInstance().newXPath();
+    NodeList agents = (NodeList) xPath.compile("//*[local-name() = 'agent']").evaluate(doc, XPathConstants.NODESET);
+
     // validate the REST endpoint for each agent state is functional
-    for (int i = 0; i < agentList.getLength(); i++) {
+    for (int i = 0; i < agents.getLength(); i++) {
       try {
         httpClient = Main.getClient();
-        String agentName = ((Element) agentList.item(i)).getElementsByTagName("name").item(0).getTextContent();
+        String agentName = (String) xPath.evaluate("*[local-name() = 'name']/text()", agents.item(i),
+                XPathConstants.STRING);
         HttpGet agentGet = new HttpGet(BASE_URL + endpoint + "/" + agentName + ".xml");
         int agentResponse = httpClient.execute(agentGet).getStatusLine().getStatusCode();
         assertEquals(HttpStatus.SC_OK, agentResponse);
@@ -91,5 +92,4 @@ public class CaptureAdminRestEndpointTest {
       }
     }
   }
-  
 }

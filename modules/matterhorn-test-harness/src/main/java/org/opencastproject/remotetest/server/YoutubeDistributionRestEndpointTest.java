@@ -44,10 +44,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -170,24 +168,7 @@ public class YoutubeDistributionRestEndpointTest {
     DocumentBuilder builder = factory.newDocumentBuilder();
     Document doc = builder.parse(IOUtils.toInputStream(jobXML, "UTF-8"));
     XPath xPath = XPathFactory.newInstance().newXPath();
-    setNameSpaceContext(xPath, "http://job.opencastproject.org");
-    return (String) xPath.evaluate("/ns2:job/payload", doc, XPathConstants.STRING);
-  }
-
-  private void setNameSpaceContext(XPath xPath, final String namespace) {
-    xPath.setNamespaceContext(new NamespaceContext() {
-      public String getNamespaceURI(String prefix) {
-        return "ns2".equals(prefix) ? namespace : null;
-      }
-
-      public String getPrefix(String namespaceURI) {
-        return null; // we are not using this.
-      }
-
-      public Iterator<?> getPrefixes(String namespaceURI) {
-        return null; // we are not using this.
-      }
-    });
+    return (String) xPath.evaluate("/*[local-name() = 'job']/*[local-name() = 'payload']", doc, XPathConstants.STRING);
   }
 
   private String getYoutubeURL(String mediaPackageElementXML) throws Exception {
@@ -196,8 +177,7 @@ public class YoutubeDistributionRestEndpointTest {
     DocumentBuilder builder = factory.newDocumentBuilder();
     Document doc = builder.parse(IOUtils.toInputStream(mediaPackageElementXML, "UTF-8"));
     XPath xPath = XPathFactory.newInstance().newXPath();
-    setNameSpaceContext(xPath, "http://mediapackage.opencastproject.org");
-    return (String) xPath.evaluate("/ns2:track/url", doc, XPathConstants.STRING);
+    return (String) xPath.evaluate("/*[local-name() = 'track']/*[local-name() = 'url']", doc, XPathConstants.STRING);
   }
 
   private String getJobStatus(String jobXML) throws Exception {

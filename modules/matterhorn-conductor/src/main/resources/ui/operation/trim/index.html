@@ -890,7 +890,7 @@
       
       function createSeriesFromText() {
         var dcDoc = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn"><dcterms:title xmlns="">' + $('#series').val() + '</dcterms:title><dcterms:creator xmlns=""></dcterms:creator><dcterms:contributor xmlns=""></dcterms:contributor><dcterms:subject xmlns=""></dcterms:subject><dcterms:language xmlns=""></dcterms:language><dcterms:license xmlns=""></dcterms:license><dcterms:description xmlns=""></dcterms:description></dublincore>';
-        var acl = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:acl xmlns:ns2="org.opencastproject.security"></ns2:acl>';
+        var acl = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="org.opencastproject.security"></acl>';
         $.ajax({
           type: 'POST',
           url: '/series/',

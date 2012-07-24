@@ -1,68 +1,68 @@
 <oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" id="10.0000/1" start="2007-12-05T13:40:00" duration="10044">
-  <media>
-    <track id="track-1" type="presentation/source">
-      <mimetype>video/quicktime</mimetype>
-      <url>tracks/vonly.mov</url>
-      <checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</checksum>
-      <duration>10044</duration>
-      <video>
-        <device type="UFG03" version="30112007" vendor="Unigraf" />
-        <encoder type="H.264" version="7.4" vendor="Apple Inc" />
-        <resolution>640x480</resolution>
-        <scantype type="progressive" />
-        <bitrate>540520</bitrate>
-        <Framerate>2</Framerate>
-      </video>
-    </track>
-    <track id="track-2" type="presenter/source">
-      <mimetype>video/quicktime</mimetype>
-      <url>tracks/aonly.mov</url>
-      <checksum type="md5">950f9fa49caa8f1c5bbc36892f6fd062</checksum>
-      <duration>10044</duration>
-      <audio>
-        <device type="UFG03" version="30112007" vendor="Unigraf" />
-        <encoder type="AAC" version="7.4" vendor="Apple Inc" />
-        <channels>2</channels>
-        <bitdepth>16</bitdepth>
-        <samplingrate>44100</samplingrate>
-      </audio>
-    </track>
-    <track id="track-4" type="presenter/source">
-      <mimetype>video/quicktime</mimetype>
-      <url>tracks/aonly2.mov</url>
-      <checksum type="md5">950f9fa49caa8f1c5bbc36892f6fd062</checksum>
-      <duration>10044</duration>
-      <audio>
-        <device type="UFG03" version="30112007" vendor="Unigraf" />
-        <encoder type="AAC" version="7.4" vendor="Apple Inc" />
-        <channels>2</channels>
-        <bitdepth>16</bitdepth>
-        <samplingrate>44100</samplingrate>
-      </audio>
-    </track>
-  </media>
-  <metadata>
-    <catalog id="catalog-1" type="dublincore/episode">
-      <mimetype>text/xml</mimetype>
-      <url>dublincore/episode.xml</url>
-      <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
-    </catalog>
-    <catalog id="catalog-2" type="dublincore/episode" ref="series:1">
-      <mimetype>text/xml</mimetype>
-      <url>metadata/series-dublincore.xml</url>
-      <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
-    </catalog>
-    <catalog id="catalog-3" type="metadata/mpeg-7" ref="track:track-1">
-      <mimetype>text/xml</mimetype>
-      <url>metadata/mpeg-7.xml</url>
-      <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
-    </catalog>
-  </metadata>
-  <attachments>
-    <attachment id="cover" type="cover/source">
-      <mimetype>image/png</mimetype>
-      <url>attachments/cover.png</url>
-      <checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</checksum>
-    </attachment>
-  </attachments>
+  <oc:media>
+    <oc:track id="track-1" type="presentation/source">
+      <oc:mimetype>video/quicktime</oc:mimetype>
+      <oc:url>tracks/vonly.mov</oc:url>
+      <oc:checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</oc:checksum>
+      <oc:duration>10044</oc:duration>
+      <oc:video>
+        <oc:device type="UFG03" version="30112007" vendor="Unigraf" />
+        <oc:encoder type="H.264" version="7.4" vendor="Apple Inc" />
+        <oc:resolution>640x480</oc:resolution>
+        <oc:scantype type="progressive" />
+        <oc:bitrate>540520</oc:bitrate>
+        <oc:Framerate>2</oc:Framerate>
+      </oc:video>
+    </oc:track>
+    <oc:track id="track-2" type="presenter/source">
+      <oc:mimetype>video/quicktime</oc:mimetype>
+      <oc:url>tracks/aonly.mov</oc:url>
+      <oc:checksum type="md5">950f9fa49caa8f1c5bbc36892f6fd062</oc:checksum>
+      <oc:duration>10044</oc:duration>
+      <oc:audio>
+        <oc:device type="UFG03" version="30112007" vendor="Unigraf" />
+        <oc:encoder type="AAC" version="7.4" vendor="Apple Inc" />
+        <oc:channels>2</oc:channels>
+        <oc:bitdepth>16</oc:bitdepth>
+        <oc:samplingrate>44100</oc:samplingrate>
+      </oc:audio>
+    </oc:track>
+    <oc:track id="track-4" type="presenter/source">
+      <oc:mimetype>video/quicktime</oc:mimetype>
+      <oc:url>tracks/aonly2.mov</oc:url>
+      <oc:checksum type="md5">950f9fa49caa8f1c5bbc36892f6fd062</oc:checksum>
+      <oc:duration>10044</oc:duration>
+      <oc:audio>
+        <oc:device type="UFG03" version="30112007" vendor="Unigraf" />
+        <oc:encoder type="AAC" version="7.4" vendor="Apple Inc" />
+        <oc:channels>2</oc:channels>
+        <oc:bitdepth>16</oc:bitdepth>
+        <oc:samplingrate>44100</oc:samplingrate>
+      </oc:audio>
+    </oc:track>
+  </oc:media>
+  <oc:metadata>
+    <oc:catalog id="catalog-1" type="dublincore/episode">
+      <oc:mimetype>text/xml</oc:mimetype>
+      <oc:url>dublincore/episode.xml</oc:url>
+      <oc:checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</oc:checksum>
+    </oc:catalog>
+    <oc:catalog id="catalog-2" type="dublincore/episode" ref="series:1">
+      <oc:mimetype>text/xml</oc:mimetype>
+      <oc:url>metadata/series-dublincore.xml</oc:url>
+      <oc:checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</oc:checksum>
+    </oc:catalog>
+    <oc:catalog id="catalog-3" type="metadata/mpeg-7" ref="track:track-1">
+      <oc:mimetype>text/xml</oc:mimetype>
+      <oc:url>metadata/mpeg-7.xml</oc:url>
+      <oc:checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</oc:checksum>
+    </oc:catalog>
+  </oc:metadata>
+  <oc:attachments>
+    <oc:attachment id="cover" type="cover/source">
+      <oc:mimetype>image/png</oc:mimetype>
+      <oc:url>attachments/cover.png</oc:url>
+      <oc:checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</oc:checksum>
+    </oc:attachment>
+  </oc:attachments>
 </oc:mediapackage>

@@ -39,16 +39,16 @@ public class ReportImpl implements Report {
 
   @XmlAttribute(name = "from")
   protected Calendar from;
-  
+
   @XmlAttribute(name = "to")
   protected Calendar to;
-  
+
   @XmlAttribute(name = "views")
   protected int views;
-  
+
   @XmlAttribute(name = "played")
   protected long played;
-  
+
   @XmlAttribute(name = "total")
   protected int total;
 
@@ -58,11 +58,11 @@ public class ReportImpl implements Report {
   @XmlAttribute(name = "limit")
   protected int limit;
 
-  @XmlElement(name = "report-item", namespace = "http://usertracking.opencastproject.org")
+  @XmlElement(name = "report-item")
   protected List<ReportItemImpl> reportItems;
 
   public void add(ReportItem reportItem) {
-    reportItems.add((ReportItemImpl)reportItem);
+    reportItems.add((ReportItemImpl) reportItem);
   }
 
   /**

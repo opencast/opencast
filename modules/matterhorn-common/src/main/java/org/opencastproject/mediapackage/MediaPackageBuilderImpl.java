@@ -23,18 +23,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -100,19 +93,9 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
     if (serializer != null) {
       // FIXME This code runs if *any* serializer is present, regardless of the serializer implementation
       try {
-        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document xml = docBuilder.parse(is);
-
+        Document xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
         rewriteUrls(xml, serializer);
-
-        // Serialize the media package
-        DOMSource domSource = new DOMSource(xml);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        StreamResult result = new StreamResult(out);
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.transform(domSource, result);
-        InputStream in = new ByteArrayInputStream(out.toByteArray());
-        return MediaPackageImpl.valueOf(in);
+        return MediaPackageImpl.valueOf(xml);
       } catch (Exception e) {
         throw new MediaPackageException("Error deserializing paths in media package", e);
       }
@@ -171,9 +154,10 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
   /**
    * Rewrite the url elements using the serializer. Attention: This method modifies the given DOM!
    */
-  private static void rewriteUrls(Node xml, MediaPackageSerializer serializer) throws XPathExpressionException, URISyntaxException {
+  private static void rewriteUrls(Node xml, MediaPackageSerializer serializer) throws XPathExpressionException,
+          URISyntaxException {
     XPath xPath = XPathFactory.newInstance().newXPath();
-    NodeList nodes = (NodeList) xPath.evaluate("//url", xml, XPathConstants.NODESET);
+    NodeList nodes = (NodeList) xPath.evaluate("//*[local-name() = 'url']", xml, XPathConstants.NODESET);
     for (int i = 0; i < nodes.getLength(); i++) {
       Node uri = nodes.item(i).getFirstChild();
       if (uri != null)

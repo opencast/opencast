@@ -1,4 +1,4 @@
-<oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" id="10.0000/1" start="2007-12-05T13:40:00" duration="1004400000">
+<mediapackage xmlns="http://mediapackage.opencastproject.org" id="10.0000/1" start="2007-12-05T13:40:00" duration="1004400000">
   <media>
     <track id="track-1" type="presentation/source">
       <mimetype>video/quicktime</mimetype>
@@ -34,4 +34,4 @@
       <checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</checksum>
     </attachment>
   </attachments>
-</oc:mediapackage>
+</mediapackage>

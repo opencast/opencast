@@ -21,11 +21,13 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * A JAXB-annotated list of organizations.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "organizations", namespace = "org.opencastproject.security")
 @XmlRootElement(name = "organizations", namespace = "http://org.opencastproject.security")
 public class OrganizationList {
 

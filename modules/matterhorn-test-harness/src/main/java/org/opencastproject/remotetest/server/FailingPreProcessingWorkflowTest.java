@@ -110,7 +110,7 @@ public class FailingPreProcessingWorkflowTest {
     // Pretend to be the capture agent and report a failed capture
     CaptureUtils.setState(workflowId, "capture_error");
     Thread.sleep(TIMEOUT);
-    
+
     // Make sure both the scheduled operation and the workflow are in "failed" state
     assertTrue(WorkflowUtils.isWorkflowInState(workflowId, "FAILED"));
   }
@@ -153,7 +153,8 @@ public class FailingPreProcessingWorkflowTest {
     assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
     String responseBody = StringUtils.trimToNull(EntityUtils.toString(response.getEntity()));
     assertNotNull(responseBody);
-    String eventId = StringUtils.trimToNull((String) Utils.xpath(responseBody, "/event/@id", XPathConstants.STRING));
+    String eventId = StringUtils.trimToNull((String) Utils.xpath(responseBody, "/*[local-name() = 'event']/@id",
+            XPathConstants.STRING));
     assertNotNull("No event id found", eventId);
     return eventId;
   }

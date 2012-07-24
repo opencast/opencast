@@ -16,7 +16,18 @@
 
 package org.opencastproject.remotetest.server;
 
-import com.sun.net.httpserver.HttpsServer;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.remotetest.Main.BASE_URL;
+import static org.opencastproject.remotetest.util.Tuple.tuple;
+import static org.opencastproject.remotetest.util.Utils.xpath;
+import static org.opencastproject.remotetest.util.WorkflowUtils.countSucceededWorkflows;
+
+import org.opencastproject.remotetest.Main;
+import org.opencastproject.remotetest.util.TrustedHttpClient;
+import org.opencastproject.remotetest.util.Tuple;
+import org.opencastproject.remotetest.util.Utils;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -25,42 +36,24 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.HttpParams;
-import org.apache.http.util.EntityUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opencastproject.remotetest.Main;
-import org.opencastproject.remotetest.util.TrustedHttpClient;
-import org.opencastproject.remotetest.util.Tuple;
-import org.opencastproject.remotetest.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import javax.management.RuntimeErrorException;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.remotetest.Main.BASE_URL;
-import static org.opencastproject.remotetest.util.Tuple.tuple;
-import static org.opencastproject.remotetest.util.Utils.xpath;
-import static org.opencastproject.remotetest.util.WorkflowUtils.countSucceededWorkflows;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathConstants;
 
 public class EpisodeServiceTest {
   private static final Logger logger = LoggerFactory.getLogger(EpisodeServiceTest.class);
@@ -96,11 +89,11 @@ public class EpisodeServiceTest {
   public void testLockMediaPackage() throws Exception {
     // get a media package id
     Document r1 = doGetRequest("workflow/instances.xml", HttpStatus.SC_OK, tuple("startPage", 0), tuple("count", 1));
-    String id = (String) xpath(r1, "//mediapackage/@id", XPathConstants.STRING);
+    String id = (String) xpath(r1, "//*[local-name() = 'mediapackage']/@id", XPathConstants.STRING);
     //
-    Document r2 = doGetRequest("episode/episode.xml", HttpStatus.SC_OK,
-        tuple("id", id), tuple("limit", 0), tuple("offset", 0));
-    boolean locked = Boolean.parseBoolean((String) xpath(r2, "//ocLocked", XPathConstants.STRING));
+    Document r2 = doGetRequest("episode/episode.xml", HttpStatus.SC_OK, tuple("id", id), tuple("limit", 0),
+            tuple("offset", 0));
+    boolean locked = Boolean.parseBoolean((String) xpath(r2, "//*[local-name() = 'ocLocked']", XPathConstants.STRING));
     // un/lock this package
     if (locked) {
       doPostRequest("episode/unlock", HttpStatus.SC_NO_CONTENT, tuple("id", id));
@@ -108,9 +101,10 @@ public class EpisodeServiceTest {
       doPostRequest("episode/lock", HttpStatus.SC_NO_CONTENT, tuple("id", id));
     }
     // and test it
-    Document r3 = doGetRequest("episode/episode.xml", HttpStatus.SC_OK,
-        tuple("id", id), tuple("limit", 0), tuple("offset", 0));
-    boolean newLocked = Boolean.parseBoolean((String) xpath(r3, "//ocLocked", XPathConstants.STRING));
+    Document r3 = doGetRequest("episode/episode.xml", HttpStatus.SC_OK, tuple("id", id), tuple("limit", 0),
+            tuple("offset", 0));
+    boolean newLocked = Boolean
+            .parseBoolean((String) xpath(r3, "//*[local-name() = 'ocLocked']", XPathConstants.STRING));
     System.out.println(newLocked);
     assertEquals(!locked, newLocked);
   }
@@ -119,12 +113,11 @@ public class EpisodeServiceTest {
   public void testRetractMediaPackage() throws Exception {
     // get a media package id
     Document r1 = doGetRequest("workflow/instances.xml", HttpStatus.SC_OK, tuple("startPage", 0), tuple("count", 1));
-    String id = (String) xpath(r1, "//mediapackage/@id", XPathConstants.STRING);
+    String id = (String) xpath(r1, "//*[local-name() = 'mediapackage']/@id", XPathConstants.STRING);
     String retractWorkflow = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("retract.xml"), "UTF-8");
     System.out.println("Retracting media package " + id);
-    doPostRequest("episode/applyworkflow", HttpStatus.SC_NO_CONTENT,
-        tuple("definition", retractWorkflow),
-        tuple("id", id));
+    doPostRequest("episode/applyworkflow", HttpStatus.SC_NO_CONTENT, tuple("definition", retractWorkflow),
+            tuple("id", id));
   }
 
   //
@@ -135,9 +128,8 @@ public class EpisodeServiceTest {
       qparams.add(new BasicNameValuePair(p.getA(), p.getB().toString()));
     }
     String query = URLEncodedUtils.format(qparams, "UTF-8");
-    final String url = baseUrl
-        + (path.startsWith("/") ? path : "/" + path)
-        + (StringUtils.isNotEmpty(query) ? "?" + query : "");
+    final String url = baseUrl + (path.startsWith("/") ? path : "/" + path)
+            + (StringUtils.isNotEmpty(query) ? "?" + query : "");
 
     HttpGet get = new HttpGet(url);
     HttpResponse response = client.execute(get);
@@ -200,4 +192,3 @@ public class EpisodeServiceTest {
     }
   }
 }
-

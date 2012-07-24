@@ -62,7 +62,7 @@ public class UnscheduledCaptureTest {
   public void setUp() throws Exception {
     httpClient = Main.getClient();
   }
-  
+
   @After
   public void tearDown() throws Exception {
     Main.returnClient(httpClient);
@@ -76,13 +76,15 @@ public class UnscheduledCaptureTest {
     HttpResponse response = CaptureAdminResources.agents(httpClient);
     assertEquals("Response code (agents):", 200, response.getStatusLine().getStatusCode());
     Document xml = Utils.parseXml(response.getEntity().getContent());
-    assertTrue("Agent included? (agents):", Utils.xpathExists(xml, "//ns1:agent-state-update[name=\'" + CaptureResources.AGENT + "\']"));
+    assertTrue("Agent included? (agents):",
+            Utils.xpathExists(xml, "//*[local-name() = 'agent-state-update'][name=\'" + CaptureResources.AGENT + "\']"));
 
     // Agent Registered (Capture Admin Agent)
     response = CaptureAdminResources.agent(httpClient, CaptureResources.AGENT);
     assertEquals("Response code (agent):", 200, response.getStatusLine().getStatusCode());
     xml = Utils.parseXml(response.getEntity().getContent());
-    assertTrue("Agent included? (agent):", Utils.xpathExists(xml, "//ns2:agent-state-update[name=\'" + CaptureResources.AGENT + "\']"));
+    assertTrue("Agent included? (agent):",
+            Utils.xpathExists(xml, "//*[local-name() = 'agent-state-update'][name=\'" + CaptureResources.AGENT + "\']"));
 
     // Agent idle (State)
     response = StateResources.getState(httpClient);
@@ -132,7 +134,10 @@ public class UnscheduledCaptureTest {
       response = CaptureAdminResources.agents(httpClient);
       assertEquals("Response code (agents):", 200, response.getStatusLine().getStatusCode());
       xml = Utils.parseXml(response.getEntity().getContent());
-      if (Utils.xpath(xml, "//ns1:agent-state-update[name=\'" + CaptureResources.AGENT + "\']/state", XPathConstants.STRING).equals("capturing")) {
+      if (Utils.xpath(
+              xml,
+              "//*[local-name() = 'agent-state-update'][name=\'" + CaptureResources.AGENT
+                      + "\']/*[local-name() = 'state']", XPathConstants.STRING).equals("capturing")) {
         break;
       }
 
@@ -150,9 +155,11 @@ public class UnscheduledCaptureTest {
     // System.out.println("Recording Started: " + capturingRecordingCount);
 
     // Compare total recording count
-    assertEquals("Total recording count the same (schedule to capture):", (Long) initialRecordingCount.get("total") + 1, capturingRecordingCount.get("total"));
+    assertEquals("Total recording count the same (schedule to capture):",
+            (Long) initialRecordingCount.get("total") + 1, capturingRecordingCount.get("total"));
     // Compare capturing recording count
-    assertEquals("Capture recording count increased by one:", (Long) initialRecordingCount.get("capturing") + 1, capturingRecordingCount.get("capturing"));
+    assertEquals("Capture recording count increased by one:", (Long) initialRecordingCount.get("capturing") + 1,
+            capturingRecordingCount.get("capturing"));
 
     // Stop capture (Capture)
     response = CaptureResources.stopCapturePost(httpClient, recordingId);
@@ -187,7 +194,10 @@ public class UnscheduledCaptureTest {
       response = CaptureAdminResources.agents(httpClient);
       assertEquals("Response code (agents):", 200, response.getStatusLine().getStatusCode());
       xml = Utils.parseXml(response.getEntity().getContent());
-      if (Utils.xpath(xml, "//ns1:agent-state-update[name=\'" + CaptureResources.AGENT + "\']/state", XPathConstants.STRING).equals("idle")) {
+      if (Utils.xpath(
+              xml,
+              "//*[local-name() = 'agent-state-update'][name=\'" + CaptureResources.AGENT
+                      + "\']/*[local-name() = 'state']", XPathConstants.STRING).equals("idle")) {
         break;
       }
 
@@ -205,11 +215,14 @@ public class UnscheduledCaptureTest {
     System.out.println("Process Recording: " + processingRecordingCount);
 
     // Compare total recording count
-    assertEquals("Total recording count the same (capture to process):", (Long) capturingRecordingCount.get("total"), processingRecordingCount.get("total"));
+    assertEquals("Total recording count the same (capture to process):", (Long) capturingRecordingCount.get("total"),
+            processingRecordingCount.get("total"));
     // Compare capturing recording count
-    assertEquals("Capture recording count decreased by one:", (Long) capturingRecordingCount.get("capturing") - 1, processingRecordingCount.get("capturing"));
+    assertEquals("Capture recording count decreased by one:", (Long) capturingRecordingCount.get("capturing") - 1,
+            processingRecordingCount.get("capturing"));
     // Compare processing recording count
-    assertEquals("Process recording count increased by one:", (Long) capturingRecordingCount.get("processing") + 1, processingRecordingCount.get("processing"));
+    assertEquals("Process recording count increased by one:", (Long) capturingRecordingCount.get("processing") + 1,
+            processingRecordingCount.get("processing"));
 
     // TODO Confirm recording indexed
 
@@ -222,11 +235,14 @@ public class UnscheduledCaptureTest {
     System.out.println("Finished Recording: " + finishedRecordingCount);
 
     // Compare total recording count
-    assertEquals("Total recording count the same (process to finish):", (Long) processingRecordingCount.get("total"), finishedRecordingCount.get("total"));
+    assertEquals("Total recording count the same (process to finish):", (Long) processingRecordingCount.get("total"),
+            finishedRecordingCount.get("total"));
     // Compare processing recording count
-    assertEquals("Process recording count decreased by one:", (Long) processingRecordingCount.get("processing") - 1, finishedRecordingCount.get("processing"));
+    assertEquals("Process recording count decreased by one:", (Long) processingRecordingCount.get("processing") - 1,
+            finishedRecordingCount.get("processing"));
     // Compare finished recording count
-    assertEquals("Finished recording count increased by one:", (Long) processingRecordingCount.get("finished") + 1, finishedRecordingCount.get("finished"));
+    assertEquals("Finished recording count increased by one:", (Long) processingRecordingCount.get("finished") + 1,
+            finishedRecordingCount.get("finished"));
 
   }
 }

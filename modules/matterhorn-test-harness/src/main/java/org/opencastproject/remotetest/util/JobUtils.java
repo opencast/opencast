@@ -58,7 +58,7 @@ public final class JobUtils {
    */
   public static boolean isJobInState(String jobId, String state) throws IllegalStateException, Exception {
     String jobXml = getJobAsXml(jobId);
-    String currentState = (String) Utils.xpath(jobXml, "/ns2:job/@status", XPathConstants.STRING);
+    String currentState = (String) Utils.xpath(jobXml, "/*[local-name() = 'job']/@status", XPathConstants.STRING);
     return state.equalsIgnoreCase(currentState);
   }
 

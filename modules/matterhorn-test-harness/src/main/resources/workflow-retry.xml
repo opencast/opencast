@@ -1,4 +1,4 @@
-<definition>
+<definition xmlns="http://workflow.opencastproject.org">
 
   <id>retry_integrationtest</id>
   <title>Test retry retry strategy</title>

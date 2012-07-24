@@ -342,9 +342,7 @@ ocSeries.createDublinCoreDocument = function() {
 }
 
 ocSeries.createACLDocument = function() {
-  var aclDoc = ocUtils.createDoc('ns2:acl', 'org.opencastproject.security');
-  $(aclDoc.documentElement).attr('xmlns:ns2', 'org.opencastproject.security');
-  var out = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:acl xmlns:ns2="org.opencastproject.security">';
+  var out = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="org.opencastproject.security">';
   $('.role_search').each(function () {
     var $field = $(this);
     //check whether there is a value and entered value is a valid role
@@ -372,7 +370,7 @@ ocSeries.createACLDocument = function() {
     out += '<allow>true</allow>';
     out += '</ace>';
   }
-  out += '</ns2:acl>';
+  out += '</acl>';
   return out;
 }
 

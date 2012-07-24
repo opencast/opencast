@@ -23,10 +23,13 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
-/** ScheduledEventList is used by CaptureRestService to deliver the list of ScheduledEvents 
- * to the rest endpoint. **/
-@XmlRootElement(name = "events")
+/**
+ * ScheduledEventList is used by CaptureRestService to deliver the list of ScheduledEvents to the rest endpoint.
+ **/
+@XmlType(name = "events", namespace = "http://capture.opencastproject.org")
+@XmlRootElement(name = "events", namespace = "http://capture.opencastproject.org")
 public class ScheduledEventList {
 
   @XmlElement(name = "event")
@@ -48,7 +51,7 @@ public class ScheduledEventList {
     this.setEvents(eventList);
   }
 
-  /** Take a list of api ScheduledEvents and turn them into ScheduledEventImpls**/
+  /** Take a list of api ScheduledEvents and turn them into ScheduledEventImpls **/
   public void setEvents(List<ScheduledEvent> eventList) {
     if (eventList == null) {
       return;

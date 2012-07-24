@@ -1,50 +1,50 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:mediapackage start="2011-03-07T17:33:14Z" id="f69c5e29-5a63-4cb3-b58a-7c5a00fdb8d9" duration="65649" xmlns:ns2="http://mediapackage.opencastproject.org">
-	<title>Split handler test.</title>
-	<media>
-		<track id="original-video-id">
-			<mimetype>video/quicktime</mimetype>
-			<tags/>
-			<url>src/test/resources/split.mp4</url>
-			<checksum type="md5">e6c697c8c79a8ca057846bce0b17faa9</checksum>
-			<duration>-1</duration>
-<video id="video-1">
-<device/>
-<encoder/>
-<bitrate>387969.0</bitrate>
-<framerate>10.0</framerate>
-<resolution>1792x1028</resolution>
-<scantype type="Progressive"/>
-</video>
-	</track>
-<track id="right-split-track-id">
-<mimetype>video/quicktime</mimetype>
-<tags/>
-<url>tmp/split1_split.mp4</url>
-<checksum type="md5">fa083a7cdb1a1d62a85a8fa6d3c8e962</checksum><duration>-1</duration>
-<video id="video-1">
-<device/>
-<encoder/>
-<bitrate>387969.0</bitrate>
-<framerate>10.0</framerate>
-<resolution>1024x768</resolution>
-<scantype type="Progressive"/>
-</video>
-</track>
-<track id="left-split-track-id">
-<mimetype>video/quicktime</mimetype>
-<tags/>
-<url>tmp/split2_split.mp4</url>
-<duration>-1</duration>
-<video id="video-1">
-<device/>
-<encoder/>
-<bitrate>387969.0</bitrate>
-<framerate>10.0</framerate>
-<resolution>768x576</resolution>
-<scantype type="Progressive"/>
-</video>
-</track>
-</media>
+	<ns2:title>Split handler test.</ns2:title>
+	<ns2:media>
+		<ns2:track id="original-video-id">
+			<ns2:mimetype>video/quicktime</ns2:mimetype>
+			<ns2:tags/>
+			<ns2:url>src/test/resources/split.mp4</ns2:url>
+			<ns2:checksum type="md5">e6c697c8c79a8ca057846bce0b17faa9</ns2:checksum>
+			<ns2:duration>-1</ns2:duration>
+<ns2:video id="video-1">
+<ns2:device/>
+<ns2:encoder/>
+<ns2:bitrate>387969.0</ns2:bitrate>
+<ns2:framerate>10.0</ns2:framerate>
+<ns2:resolution>1792x1028</ns2:resolution>
+<ns2:scantype type="Progressive"/>
+</ns2:video>
+	</ns2:track>
+<ns2:track id="right-split-track-id">
+<ns2:mimetype>video/quicktime</ns2:mimetype>
+<ns2:tags/>
+<ns2:url>tmp/split1_split.mp4</ns2:url>
+<ns2:checksum type="md5">fa083a7cdb1a1d62a85a8fa6d3c8e962</ns2:checksum><ns2:duration>-1</ns2:duration>
+<ns2:video id="video-1">
+<ns2:device/>
+<ns2:encoder/>
+<ns2:bitrate>387969.0</ns2:bitrate>
+<ns2:framerate>10.0</ns2:framerate>
+<ns2:resolution>1024x768</ns2:resolution>
+<ns2:scantype type="Progressive"/>
+</ns2:video>
+</ns2:track>
+<ns2:track id="left-split-track-id">
+<ns2:mimetype>video/quicktime</ns2:mimetype>
+<ns2:tags/>
+<ns2:url>tmp/split2_split.mp4</ns2:url>
+<ns2:duration>-1</ns2:duration>
+<ns2:video id="video-1">
+<ns2:device/>
+<ns2:encoder/>
+<ns2:bitrate>387969.0</ns2:bitrate>
+<ns2:framerate>10.0</ns2:framerate>
+<ns2:resolution>768x576</ns2:resolution>
+<ns2:scantype type="Progressive"/>
+</ns2:video>
+</ns2:track>
+</ns2:media>
 	</ns2:mediapackage>
 	
