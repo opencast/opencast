@@ -25,6 +25,7 @@ MediaPackage = function(xmlMediaPackage){
 	this.start = '';
 	this.tracks = new Array();
 	this.xml = '';
+    $.xmlns["mp"] = "http://mediapackage.opencastproject.org";
 
 	/**
 	 * Parse the given xml string to fill the mediapackage instance
@@ -37,8 +38,8 @@ MediaPackage = function(xmlMediaPackage){
 		self.xml = xml;
 		
 		// Get all catalogs
-		$(self.xml).find('catalog').each(function(index,element){
-			var tmpCatalog = new Catalog($(element).find('url').text());
+		$(self.xml).find('mp|catalog').each(function(index,element){
+			var tmpCatalog = new Catalog($(element).find('mp|url').text());
 			if(checkValue($(element).attr('type')))
 				tmpCatalog.flavor = $(element).attr('type');
 			if(checkValue($(element).attr('ref')))
@@ -46,9 +47,9 @@ MediaPackage = function(xmlMediaPackage){
 			if(checkValue($(element).attr('id')))
 				tmpCatalog.id = $(element).attr('id');
 			if(checkValue($(element).find('mimetype').text()))
-				tmpCatalog.mimetype = $(element).find('mimetype').text();
+				tmpCatalog.mimetype = $(element).find('mp|mimetype').text();
 			tmpCatalog.xml = element;
-			$(element).find('tags').each(function(index,subElement){
+			$(element).find('mp|tags').each(function(index,subElement){
 			  if(checkValue($(subElement).text()))
 			    tmpCatalog.tags.push($(subElement).text());
 			});
@@ -85,22 +86,22 @@ MediaPackage = function(xmlMediaPackage){
 		}
 		
 		// Get all tracks
-		$(self.xml).find('track').each(function(index,element){
+		$(self.xml).find('mp|track').each(function(index,element){
 			var tmpTrack = new Track();
-			tmpTrack.url = $(element).find('url').text();
-			var checksum = $(element).find('checksum');
+			tmpTrack.url = $(element).find('mp|url').text();
+			var checksum = $(element).find('mp|checksum');
 			tmpTrack.checksum.value = checksum.text();
 			tmpTrack.checksum.type = checksum.attr('type');
-			tmpTrack.duration = $(element).find('duration').text();
-			tmpTrack.mimetype = $(element).find('mimetype').text();
+			tmpTrack.duration = $(element).find('mp|duration').text();
+			tmpTrack.mimetype = $(element).find('mp|mimetype').text();
 			tmpTrack.flavor = $(element).attr('type');
 			tmpTrack.ref = $(element).attr('ref');
 			tmpTrack.id = $(element).attr('id');
-			$(element).find('tags').each(function(index,subElement){
+			$(element).find('mp|tags').each(function(index,subElement){
 				tmpTrack.tags.push($(subElement).text());
 			});
 			
-			var audio = $(element).find('audio');
+			var audio = $(element).find('mp|audio');
 			if(audio.length!=0){
 				tmpTrack.audio['id'] = audio.attr('id');
 				tmpTrack.audio['bitrate'] = audio.find('bitrate').text();
@@ -119,14 +120,14 @@ MediaPackage = function(xmlMediaPackage){
 				});
 			}
 			
-			var video = $(element).find('video');
+			var video = $(element).find('mp|video');
 			if(video.length!=0){
 				tmpTrack.video['id'] = video.attr('id');
-				tmpTrack.video['bitrate'] = video.find('bitrate').text();
-				tmpTrack.video['framerate'] = video.find('framerate').text();
-				tmpTrack.video['resolution'] = video.find('resolution').text();
-				tmpTrack.video['scanType'] = video.find('scantype').attr('type');
-				tmpTrack.video['scanOrder'] = video.find('interlacing').attr('order');
+				tmpTrack.video['bitrate'] = video.find('mp|bitrate').text();
+				tmpTrack.video['framerate'] = video.find('mp|framerate').text();
+				tmpTrack.video['resolution'] = video.find('mp|resolution').text();
+				tmpTrack.video['scanType'] = video.find('mp|scantype').attr('type');
+				tmpTrack.video['scanOrder'] = video.find('mp|interlacing').attr('order');
 				
 				// Add device and encoder elements
 				$.each({1:'device', 2:'encoder'},function(index,value){
@@ -146,17 +147,17 @@ MediaPackage = function(xmlMediaPackage){
 		});
 		
 		//Get all attachement
-		$(self.xml).find('attachement').each(function(index,element){
+		$(self.xml).find('mp|attachement').each(function(index,element){
 			var tmpAttachement = new Attachement();
-			tmpAttachement.url = $(element).find('url').text();
-			var checksum = $(element).find('checksum');
+			tmpAttachement.url = $(element).find('mp|url').text();
+			var checksum = $(element).find('mp|checksum');
 			tmpAttachement.checksum.value = checksum.text();
 			tmpAttachement.checksum.type = checksum.attr('type');
-			tmpAttachement.mimetype = $(element).find('mimetype').text();
+			tmpAttachement.mimetype = $(element).find('mp|mimetype').text();
 			tmpAttachement.flavor = $(element).attr('type');
 			tmpAttachement.ref = $(element).attr('ref');
 			tmpAttachement.id = $(element).attr('id');
-			$(element).find('tags').each(function(index,subElement){
+			$(element).find('mp|tags').each(function(index,subElement){
 				tmpAttachement.tags.push($(subElement).text());
 			});
 			
@@ -167,8 +168,8 @@ MediaPackage = function(xmlMediaPackage){
 		// Get MediaPackage attributes
 		self.id = $(self.xml).attr('id');
 		self.duration = $(self.xml).attr('duration');
-		self.seriesTitle = $(self.xml).find('seriestitle').text();
-		self.seriesId = $(self.xml).find('series').text();
+		self.seriesTitle = $(self.xml).find('mp|seriestitle').text();
+		self.seriesId = $(self.xml).find('mp|series').text();
 	};
 	
 	/**
@@ -190,7 +191,7 @@ MediaPackage = function(xmlMediaPackage){
 	 * Generate an XML Document with the mediaPackage
 	 */
 	this.toXML = function(){
-		var doc = createDoc('mediapackage','http://mediapackage.opencastproject.org','mp');
+		var doc = createDoc('mediapackage','http://mediapackage.opencastproject.org');
 		
 		// Add MediaPackage attributes
 		if(checkValue(self.id))
