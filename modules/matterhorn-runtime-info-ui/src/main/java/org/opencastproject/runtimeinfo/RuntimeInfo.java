@@ -75,10 +75,7 @@ public class RuntimeInfo {
   private static final String ENGAGE_URL_PROPERTY = "org.opencastproject.admin.ui.url";
   private static final String SERVER_URL_PROPERTY = "org.opencastproject.server.url";
   
-  private static final String HTTPS = "https";
-  private static final String HTTP = "http";
-
-  private static final int DEFAULT_HTTP_PORT = 8080;
+  private static final int DEFAULT_HTTP_PORT = -1;
   private static final int DEFAULT_HTTPS_PORT = 8443;
   
   /** The rest publisher looks for any non-servlet with the 'opencast.service.path' property */
@@ -140,9 +137,9 @@ public class RuntimeInfo {
       httpsEnable = false;
     else
       httpsEnable = Boolean.parseBoolean(httpsEnableStr);
-
+    
     String httpPortStr = bundleContext.getProperty(HTTP_PORT_PROPERTY);
-    if (httpPortStr == null)
+    if (serverUrl == null)
       httpPort = DEFAULT_HTTP_PORT;
     else
       httpPort = Integer.parseInt(httpPortStr);
@@ -165,29 +162,13 @@ public class RuntimeInfo {
   @SuppressWarnings("unchecked")
   public String getRuntimeInfo(@Context HttpServletRequest request) throws MalformedURLException { 
 
-    // Get request protocol 
-    boolean httpsRequest = HTTPS.equalsIgnoreCase(request.getScheme());
-    
-    // Get default value for target page
-    URL targetEngageBaseUrl;
-    URL targetAdminBaseUrl;
-    String targetProtocol = serverUrl.getProtocol();
-    int targetPort = serverUrl.getPort();
-    
-    if (httpsRequest && httpsEnable) {
-      // HTTPS request
-      targetPort = httpsPort;
-      targetProtocol = HTTPS;
-    }
-    else if (httpEnable) {
-      // HTTP request
-      targetPort = httpPort;
-      targetProtocol = HTTP;
-    }
+    // Get request protocol and port   
+    String targetScheme = request.getScheme();
+    int targetPort = request.getLocalPort();
     
     // Create the target URL 
-    targetEngageBaseUrl = new URL(targetProtocol,engageBaseUrl.getHost(),targetPort,engageBaseUrl.getFile());
-    targetAdminBaseUrl = new URL(targetProtocol,adminBaseUrl.getHost(),targetPort,adminBaseUrl.getFile());
+    URL targetEngageBaseUrl = new URL(targetScheme,engageBaseUrl.getHost(),targetPort,engageBaseUrl.getFile());
+    URL targetAdminBaseUrl = new URL(targetScheme,adminBaseUrl.getHost(),targetPort,adminBaseUrl.getFile());
     
     JSONObject json = new JSONObject();
     json.put("engage", targetEngageBaseUrl.toString());
