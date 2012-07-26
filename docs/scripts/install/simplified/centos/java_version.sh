@@ -8,4 +8,5 @@ java -version 2>&1 | awk '{
   }
 }'
 [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+#
 exit 0

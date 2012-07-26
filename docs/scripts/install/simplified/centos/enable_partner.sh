@@ -9,6 +9,8 @@ sed \
 -e 's/^[ 	]*#[ 	]*\(.*maverick partner\)/\1/' \
 -e 's/^[ 	]*#[ 	]*\(.*natty partner\)/\1/' \
 -e 's/^[ 	]*#[ 	]*\(.*oneiric partner\)/\1/' \
+-e 's/^[ 	]*#[ 	]*\(.*precise partner\)/\1/' \
+-e 's/^[ 	]*#[ 	]*\(.*quantal partner\)/\1/' \
 "$FILE" > $TMPFILE
 [ $? -ne 0 ] && exit 1
 sudo cp $TMPFILE "$FILE"

@@ -1,7 +1,12 @@
 #!/bin/bash
 set -x
 #
-FILE=/opt/matterhorn/felix/conf/config.properties
+FILE="$1"
+if [ -z "$FILE" ]; then
+  echo "Config file name is required" 1>&2
+  exit 2
+fi
+#
 awk '{
   line = $0;
   sub("^[ 	]*", "", line); sub("[ 	]*$", "", line);

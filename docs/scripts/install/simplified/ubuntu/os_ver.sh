@@ -8,6 +8,7 @@ case `uname` in
   Linux )
     # CentOS, RHEL, Ubuntu, Debian, openSUSE, Amazon
     awk '{
+  if (length($0) == 0) next;
   sub("^[^0-9.]*", ""); sub("[^0-9.]*$", "");
   print $0;
   exit 0
@@ -26,4 +27,5 @@ case `uname` in
     exit 1
     ;;
 esac
+#
 exit 0

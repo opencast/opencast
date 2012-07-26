@@ -2,14 +2,16 @@
 #set -x
 #
 # os
-#  CentOS, RHEL, Ubuntu, Debian, openSUSE, Amazon, MacOS, <unknown>
+#  CentOS, RHEL, Ubuntu, Debian, openSUSE, SLES, Amazon, MacOS, <unknown>
 #
 case `uname` in
   Linux )
     # CentOS, RHEL, Ubuntu, Debian, openSUSE, Amazon
     awk '{
-  sub("Welcome to",""); # Appears in openSUSE
+  if (length($0) == 0) next;
+  sub("Welcome to",""); # Appears in openSUSE and SLES
   if (match($0, "Red Hat Enterprise Linux")) { print "RHEL"; }
+  else if (match($0, "SUSE Linux Enterprise Server")) { print "SLES"; }
   else { print $1; }
   exit 0
 }' /etc/issue
@@ -22,4 +24,5 @@ case `uname` in
     uname
     ;;
 esac
+#
 exit 0

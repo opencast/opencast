@@ -1,7 +1,7 @@
 #!/bin/bash
 TMPFILE=`mktemp /tmp/${0##*/}.XXXXX`
 trap 'rm -f $TMPFILE' 0
-set -x
+#set -x
 #
 VAR_NAME="$1"
 if [ -z "$VAR_NAME" ]; then
