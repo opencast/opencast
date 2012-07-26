@@ -12,15 +12,23 @@
   <![CDATA[
     <fieldset>
       <legend>Holds</legend>
-      <ul class="oc-ui-form-list">       
-          <li class="ui-helper-clearfix"><label class="scheduler-label">Processing should be paused to allow for:</label></li>        
-	  <label class="scheduler-label"></label>
-	  <span id="trimholdconfig">
-            <input type="checkbox" id="trimHold" name="trimHold" class="configField holdCheckbox" value="true">
-            <label for="trimHold" id="i18n_hold_for_trim">&nbsp;Review / Trim before encoding (with option to edit info)</label>
-	  </span>
+      <span>Processing should be paused to allow for:</span>
+      <ul class="oc-ui-checkbox-list">
+	<input id="videoPreview" name="videoPreview" type="checkbox" class="configField holdCheckbox" style="visibility:hidden" value="true"/>
+        <li class="ui-helper-clearfix">
+          <span id="trimholdconfig">
+            <input id="trimHold" name="trimHold" type="checkbox" class="configField holdCheckbox" value="true" />
+            <span id="i18n_hold_for_trim">&nbsp;Review / Trim before encoding (with option to edit info)</span>
+          </span>
+        </li>
+        <li class="ui-helper-clearfix">
+          <span id="captionconfig">
+            <input id="captionHold" name="captionHold" type="checkbox" class="configField holdCheckbox" value="true"/>
+            <span id="i18n_hold_for_caption">&nbsp;Captions file upload</span>
+          </span>
+        </li>
       </ul>
-    </fieldset>    
+    </fieldset>
     <fieldset>
       <legend>Distribution</legend>
       <ul class="oc-ui-form-list">
@@ -38,13 +46,22 @@
         </li>
         <!-- field: License -->
         <li class="ui-helper-clearfix">
-          <label class="scheduler-label" for="license" id="licenseLabel"><span id="i18n_license_label">License</span>:</label>
-          <input type="text" class="oc-ui-form-field configField" id="license" name="license" maxlength="255" style="width:300px;"/>
+          <label class="scheduler-label"><span id="i18n_license_label">License</span>:</label>
+          <input type="text" class="formField" id="license" name="license">
         </li>
       </ul>
     </fieldset>
     <script type="text/javascript">
       var ocWorkflowPanel = ocWorkflowPanel || {};
+      
+      var checkVideoPreview = function(){
+	var checkValue = trimHold.checked || captionHold.checked;
+	videoPreview.checked = checkValue;
+      }
+      
+      trimHold.addEventListener("click",checkVideoPreview,false);
+      captionHold.addEventListener("click",checkVideoPreview,false);
+      
       ocWorkflowPanel.registerComponents = function(components){
         /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
          * into the workflow. The component's nodeKey must match the components array key.
@@ -53,21 +70,31 @@
          */
         components['org.opencastproject.workflow.config.trimHold'] = new ocAdmin.Component(
           ['trimHold'],
-          {key: 'org.opencastproject.workflow.config.trimHold'});
+          {nodeKey: 'org.opencastproject.workflow.config.trimHold'},
+          {getValue: function(){ return this.fields.trimHold.is(":checked"); }
+          });
           
-        ocScheduler.dublinCore.components['license'] = new ocAdmin.Component(
-          ['license'],
-          {label: 'licenseLabel', key: 'license'});
+        components['org.opencastproject.workflow.config.captionHold'] = new ocAdmin.Component(
+          ['captionHold'],
+          {nodeKey: 'org.opencastproject.workflow.config.captionHold'},
+          {getValue: function(){ return this.fields.captionHold.is(":checked");}
+          });
+	  
+	components['org.opencastproject.workflow.config.videoPreview'] = new ocAdmin.Component(
+	  ['videoPreview'],
+	  {nodeKey: 'org.opencastproject.workflow.config.videoPreview'},
+	  {getValue: function(){ return this.fields.captionHold.is(":checked") || this.fields.trimHold.is(":checked");}
+	  });
           
           //etc...
       }
       ocWorkflowPanel.setComponentValues = function(values, components){
+        components['org.opencastproject.workflow.config.captionHold'].setValue(values['org.opencastproject.workflow.config.captionHold']);
         components['org.opencastproject.workflow.config.trimHold'].setValue(values['org.opencastproject.workflow.config.trimHold']);
-        components['license'].setValue(values['license']);
+	components['org.opencastproject.workflow.config.videoPreview'].setValue(values['org.opencastproject.workflow.config.videoPreview']);
       }
     </script>
   ]]>
-
   </configuration_panel>
 
   <operations>
@@ -149,7 +176,7 @@
 
     <operation
       id="compose"
-      if="${trimHold}"
+      if="${videoPreview}"
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Encoding presenter (camera) video for preview">
@@ -162,7 +189,7 @@
 
     <operation
       id="compose"
-      if="${trimHold}"
+      if="${videoPreview}"
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Encoding presentation (screen) for preview">
@@ -173,8 +200,7 @@
       </configurations>
     </operation>
 
-    <!-- hold to trim media-->
-   
+    <!-- hold to trim media--> 
     <operation
       id="trim"
       if="${trimHold}"
@@ -187,9 +213,18 @@
         <configuration key="encoding-profile">trim.work</configuration>
       </configurations>
 
-    </operation>  
+    </operation>
+    
+    <!-- hold for captions -->
+    <operation
+      id="caption"
+      if="${captionHold}"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Waiting for user to upload captions">
+    </operation>
 
-    <!-- encode to engage player preview images -->
+   <!-- encode to engage player preview images -->
  
     <operation
       id="image"

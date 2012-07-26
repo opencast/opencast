@@ -17,6 +17,7 @@ package org.opencastproject.workflow.handler;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -43,9 +44,15 @@ public class CaptionUploadWorkflowOperationHandler extends ResumableWorkflowOper
 
   /** The key used to find the configured caption flavor */
   private static final String FLAVOR_PROPERTY = "caption-flavor";
+  
+  /** The key used to find the configured targets tags */
+  private static final String TARGET_TAGS_PROPERTY = "target-tags";
+  
+  /** The key used to find the configured action in case of mediapackage containing captions */
+  private static final String OVERWRITE_CAPTIONS_PROPERTY = "overwriteCaption";
 
   /** The default caption flavor if none is configured */
-  private static final MediaPackageElementFlavor DEFAULT_FLAVOR = MediaPackageElements.CAPTION_DFXP_FLAVOR;
+  private static final MediaPackageElementFlavor DEFAULT_FLAVOR = MediaPackageElements.CAPTION_GENERAL;
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
@@ -82,11 +89,17 @@ public class CaptionUploadWorkflowOperationHandler extends ResumableWorkflowOper
    */
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
-    MediaPackageElementFlavor flavor = getFlavor(workflowInstance.getCurrentOperation());
-    if (!hasCaptions(workflowInstance.getMediaPackage(), flavor))
-      return createResult(Action.PAUSE);
-    else
+
+    boolean overwrite = Boolean.parseBoolean(workflowInstance.getConfiguration(OVERWRITE_CAPTIONS_PROPERTY));
+    
+    boolean hasCaption = false;
+    
+    MediaPackageElement[] captionsElements = workflowInstance.getMediaPackage().getElementsByFlavor(DEFAULT_FLAVOR);
+    
+    if (captionsElements.length > 0 && !overwrite)
       return createResult(Action.CONTINUE);
+    else
+      return createResult(Action.PAUSE);
   }
 
   /**
@@ -98,25 +111,36 @@ public class CaptionUploadWorkflowOperationHandler extends ResumableWorkflowOper
   @Override
   public WorkflowOperationResult resume(WorkflowInstance workflowInstance, JobContext context, Map<String, String> properties)
           throws WorkflowOperationException {
-    return super.resume(workflowInstance, context, properties);
-    // FIXME: enable this logic once the caption upload UI has been implemented
-    // MediaPackageElementFlavor flavor = getFlavor(workflowInstance.getCurrentOperation());
-    // boolean hasCaptions = hasCaptions(workflowInstance.getMediaPackage(), flavor);
-    // if (hasCaptions) {
-    // return WorkflowBuilder.buildWorkflowOperationResult(Action.CONTINUE);
-    // } else {
-    // // The user should have verified the existence of a caption file in, or if necessary added one to, the
-    // mediapackage
-    // logger.info("No DFXP caption file attached, keeping workflow {} in the hold state", workflowInstance);
-    // return WorkflowBuilder.buildWorkflowOperationResult(Action.PAUSE);
-    // }
+    
+     MediaPackageElementFlavor flavor = getFlavor(workflowInstance.getCurrentOperation());
+     
+     boolean hasCaptions = hasCaptions(workflowInstance.getMediaPackage(), flavor);
+     
+     if (hasCaptions) {
+         String tagsStr = workflowInstance.getCurrentOperation().getConfiguration(TARGET_TAGS_PROPERTY); 
+         
+          // Get all the targets-tags from the operation configuration
+          if (tagsStr != null) {
+            String[] tags = tagsStr.split(",");
+         
+            MediaPackageElement[] mpElements = workflowInstance.getMediaPackage().getElementsByFlavor(DEFAULT_FLAVOR);
+         
+            for (MediaPackageElement mpElement : mpElements)
+              for (String tag : tags)
+                mpElement.addTag(tag);
+          }        
+     } 
+    
+     
+    return createResult(Action.CONTINUE);  
   }
 
   protected boolean hasCaptions(MediaPackage mp, MediaPackageElementFlavor flavor) {
-    return mp.getElementsByFlavor(flavor).length > 0;
+    return (mp.getElementsByFlavor(flavor).length > 0) || (mp.getElementsByFlavor(DEFAULT_FLAVOR).length > 0);
   }
 
   protected MediaPackageElementFlavor getFlavor(WorkflowOperationInstance operation) throws WorkflowOperationException {
+    // Not properties not use for the moment, but will be when SRT,WebTT,etc will be supported
     String configuredFlavor = operation.getConfiguration(FLAVOR_PROPERTY);
     if (configuredFlavor == null) {
       return DEFAULT_FLAVOR;
