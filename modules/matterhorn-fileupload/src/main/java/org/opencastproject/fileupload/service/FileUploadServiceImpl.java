@@ -24,6 +24,10 @@ import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.data.Function2;
+import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.functions.Functions;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
@@ -42,6 +46,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -49,10 +54,6 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import org.opencastproject.util.IoSupport;
-import org.opencastproject.util.data.Function2;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.functions.Functions;
 
 /**
  * A service for big file uploads via HTTP.
@@ -457,7 +458,7 @@ public class FileUploadServiceImpl implements FileUploadService {
       MediaPackage mp = ingestService.addTrack(fileInputStream, job.getPayload().getFilename(), job.getPayload()
               .getFlavor(), mediaPackage);
 
-      List<Track> tracks = Arrays.asList(mp.getTracks(flavor));
+      List<Track> tracks = new ArrayList<Track>(Arrays.asList(mp.getTracks(flavor)));
       tracks.removeAll(excludeTracks);
       if (tracks.size() != 1)
         throw new FileUploadException("Ingested track not found");
