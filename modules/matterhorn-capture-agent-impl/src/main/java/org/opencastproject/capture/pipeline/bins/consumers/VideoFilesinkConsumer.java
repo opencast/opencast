@@ -33,15 +33,15 @@ import java.util.Properties;
 
 public class VideoFilesinkConsumer extends ConsumerBin {
 
-  public static final String DEFAULT_ENCODER = GStreamerElements.FFENC_MPEG2VIDEO;
-  public static final String DEFAULT_MUXER = GStreamerElements.MPEGPSMUX;
-  public static final String DEFAULT_BITRATE = "2000000";
-  public static final String DEFAULT_BITRATE_X264ENC = "2048";
+  public static final String DEFAULT_MUXER = GStreamerElements.MP4MUX;
+  public static final String DEFAULT_ENCODER = GStreamerElements.X264ENC;
+  public static final String DEFAULT_BITRATE = "2048";
+  public static final String DEFAULT_ENCODER_SPEED_PRESET = "1";
+  
   /**
-   * Pass 0 is CBR (default), Pass 4 is constant quantizer, Pass 5 is constant quality Must set H.264 encoding to use
-   * constant quantizer or else it will not start
+   * Pass 0 is CBR (default), Pass 4 is constant quantizer, Pass 5 is constant quality.
    **/
-  public static final String DEFAULT_X264_PASS = "4";
+  public static final String DEFAULT_X264_PASS = "5";
 
   /**
    * VideoFilesinkConsumer dumps the video source into a file. It is used when a Producer has the isVideoFlag set to
@@ -184,17 +184,12 @@ public class VideoFilesinkConsumer extends ConsumerBin {
     if (captureDeviceProperties.getBitrate() != null) {
       logger.debug("{} bitrate set to: {}", captureDevice.getName(), captureDeviceProperties.getBitrate());
       encoder.set(GStreamerProperties.BITRATE, captureDeviceProperties.getBitrate());
-    } else if (captureDeviceProperties.getCodec() != null
-            && captureDeviceProperties.getCodec().equalsIgnoreCase(GStreamerElements.X264ENC)) {
-      // x264enc has much lower bitrates than mpeg2 making the default mpeg2 bitrate outside 
-      // the range of the x264 encoder. 
-      encoder.set(GStreamerProperties.BITRATE, DEFAULT_BITRATE_X264ENC);
     } else {
       encoder.set(GStreamerProperties.BITRATE, DEFAULT_BITRATE);
     }
    
     if (captureDeviceProperties.getCodec() != null
-            && captureDeviceProperties.getCodec().equalsIgnoreCase(GStreamerElements.X264ENC)) {
+            && captureDeviceProperties.getCodec().equalsIgnoreCase(GStreamerElements.X264ENC) || StringUtils.trimToNull(captureDeviceProperties.getCodec()) == null) {
       setX264EncoderProperties();
     }
 
@@ -204,12 +199,12 @@ public class VideoFilesinkConsumer extends ConsumerBin {
   private void setX264EncoderProperties() {
     setEncoderProperty(GStreamerProperties.INTERLACED);
     setEncoderProperty(GStreamerProperties.NOISE_REDUCTION);
-    setEncoderProperty(GStreamerProperties.PASS);
+    setEncoderProperty(GStreamerProperties.PASS, DEFAULT_X264_PASS);
     setEncoderProperty(GStreamerProperties.PROFILE);
     setEncoderProperty(GStreamerProperties.QP_MIN);
     setEncoderProperty(GStreamerProperties.QP_MAX);
     setEncoderProperty(GStreamerProperties.QUANTIZER);
-    setEncoderProperty(GStreamerProperties.SPEED_PRESET);
+    setEncoderProperty(GStreamerProperties.SPEED_PRESET, DEFAULT_ENCODER_SPEED_PRESET);
   }
 
   /**
@@ -219,9 +214,21 @@ public class VideoFilesinkConsumer extends ConsumerBin {
    *          The name of the property to set.
    **/
   private void setEncoderProperty(String key) {
+	  setEncoderProperty(key, null);
+  }
+  
+  /**
+   * Sets a property on the encoder using the capture agent device properties with a possible default value. 
+   * 
+   * @param key
+   *          The name of the property to set.
+   **/
+  private void setEncoderProperty(String key, String defaultValue) {
     String fullPropertiesKey = CaptureParameters.CAPTURE_DEVICE_PREFIX + captureDevice.getFriendlyName() + "." + key;
     if (properties.containsKey(fullPropertiesKey)) {
       encoder.set(key, properties.get(fullPropertiesKey));
+    } else if (StringUtils.trimToNull(defaultValue) != null) {
+    	encoder.set(key, defaultValue);
     }
   }
   

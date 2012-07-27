@@ -134,23 +134,11 @@ public class VideoFilesinkConsumerTest {
   public void settingBitrateChangesCodecBitrate() {
     if (!gstreamerInstalled)
       return;
-    Properties captureDeviceProperties = createProperties(null, "32000000", null);
+    Properties captureDeviceProperties = createProperties(null, "1024", null);
     captureDevice = PipelineTestHelpers.createCaptureDevice("/dev/video0", ProducerType.VIDEOTESTSRC, "Friendly Name",
             "/tmp/testpipe/test.mp2", captureDeviceProperties);
     VideoFilesinkConsumer videoFileSinkBin = createVideoFileSinkBinDontWantException(captureDeviceProperties);
-    checkEncoderProperties(videoFileSinkBin, VideoFilesinkConsumer.DEFAULT_ENCODER, "32000000");
-  }
-
-  @Test
-  public void defaultBitrateForX264EncIsSet() {
-    if (!gstreamerInstalled && PipelineTestHelpers.testGstreamerElement(GStreamerElements.X264ENC)
-            && PipelineTestHelpers.testGstreamerElement(GStreamerElements.MP4MUX))
-      return;
-    Properties captureDeviceProperties = createProperties(GStreamerElements.X264ENC, null, GStreamerElements.MP4MUX);
-    captureDevice = PipelineTestHelpers.createCaptureDevice("/dev/video0", ProducerType.VIDEOTESTSRC, "Friendly Name",
-            "/tmp/testpipe/test.mp2", captureDeviceProperties);
-    VideoFilesinkConsumer videoFileSinkBin = createVideoFileSinkBinDontWantException(captureDeviceProperties);
-    checkEncoderProperties(videoFileSinkBin, GStreamerElements.X264ENC, VideoFilesinkConsumer.DEFAULT_BITRATE_X264ENC);
+    checkEncoderProperties(videoFileSinkBin, VideoFilesinkConsumer.DEFAULT_ENCODER, "1024");
   }
   
   @Test
@@ -162,7 +150,7 @@ public class VideoFilesinkConsumerTest {
       return;
     String friendlyName = "Friendly Name";
     Properties captureDeviceProperties = createProperties(GStreamerElements.X264ENC,
-            VideoFilesinkConsumer.DEFAULT_BITRATE_X264ENC, GStreamerElements.MP4MUX);
+            VideoFilesinkConsumer.DEFAULT_BITRATE, GStreamerElements.MP4MUX);
     HashMap<String, String> x264Properties = new HashMap<String, String>();
     x264Properties.put(CaptureParameters.CAPTURE_DEVICE_PREFIX + friendlyName + "." + GStreamerProperties.INTERLACED,
             "true");

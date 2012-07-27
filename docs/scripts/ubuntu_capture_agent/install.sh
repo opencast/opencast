@@ -107,7 +107,7 @@ export BAD_PKG_REASON="Provide support for h264 and mpeg2 codecs, which are pate
 # The name should start with a '.' so that it is a hidden file and it is not erased with the rest of the files when a new execution starts
 export PKG_BACKUP=$WORKING_DIR/.installed_pkgs
 # Default output file extension for a video capture device
-export DEFAULT_VIDEO_EXTENSION="mpg"
+export DEFAULT_VIDEO_EXTENSION="mp4"
 # Default output file extension for an audio device
 export DEFAULT_AUDIO_EXTENSION="mp2"
 # 1-based index default option for the device flavor
