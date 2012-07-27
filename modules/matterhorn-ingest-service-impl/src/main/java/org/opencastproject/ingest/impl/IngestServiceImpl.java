@@ -17,6 +17,7 @@ package org.opencastproject.ingest.impl;
 
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
+import org.opencastproject.ingest.impl.jmx.IngestStatistics;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -45,6 +46,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.ZipUtil;
+import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
@@ -65,6 +67,8 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
@@ -77,6 +81,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
+
+import javax.management.ObjectInstance;
 
 /**
  * Creates and augments Matterhorn MediaPackages. Stores media into the Working File Repository.
@@ -105,6 +111,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /** Ingest can only occur for a workflow currently in one of these operations. */
   public static final String[] PRE_PROCESSING_OPERATIONS = new String[] { "schedule", "capture", "ingest" };
+
+  /** The JMX business object for ingest statistics */
+  private IngestStatistics ingestStatistics = new IngestStatistics();
+
+  /** The JMX bean object instance */
+  private ObjectInstance registerMXBean;
 
   /** The workflow service */
   private WorkflowService workflowService;
@@ -163,6 +175,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     if (tempFolder == null)
       throw new IllegalStateException("Storage directory must be set (org.opencastproject.storage.dir)");
     tempFolder = PathSupport.concat(tempFolder, "ingest");
+
+    registerMXBean = JmxUtil.registerMXBean(ingestStatistics, "IngestStatistics");
+  }
+
+  /**
+   * Callback from OSGi on service deactivation.
+   */
+  public void deactivate() {
+    JmxUtil.unregisterMXBean(registerMXBean);
   }
 
   /**
@@ -230,11 +251,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *      java.util.Map, java.lang.Long)
    */
   @Override
-  public WorkflowInstance addZippedMediaPackage(InputStream zipStream,
-                                                String wd,
-                                                Map<String, String> workflowConfig,
-                                                Long workflowId)
-          throws MediaPackageException, IOException, IngestException, NotFoundException, UnauthorizedException {
+  public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String wd, Map<String, String> workflowConfig,
+          Long workflowId) throws MediaPackageException, IOException, IngestException, NotFoundException,
+          UnauthorizedException {
     // Start a job synchronously. We can't keep the open input stream waiting around.
     Job job = null;
 
@@ -671,6 +690,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     // If the workflow definition and instance ID are null, use the default, or throw if there is none
     if (workflowDefinitionID == null && workflowId == null) {
       if (this.defaultWorkflowDefinionId == null) {
+        ingestStatistics.failed();
         throw new IllegalStateException(
                 "Can not ingest a workflow without a workflow definition or an existing instance. No default definition is specified");
       } else {
@@ -696,6 +716,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       } catch (NotFoundException e) {
         logger.warn("Failed to find a workflow with id '{}'", workflowId);
       } catch (WorkflowDatabaseException e) {
+        ingestStatistics.failed();
         throw new IngestException(e);
       }
     }
@@ -703,6 +724,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       if (workflow == null) {
         WorkflowDefinition workflowDef = workflowService.getWorkflowDefinitionById(workflowDefinitionID);
+        ingestStatistics.successful();
         return workflowService.start(workflowDef, mp, properties);
       } else {
         // Ensure that we're in one of the pre-processing operations
@@ -713,11 +735,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         // status), we need to advance the workflow.
         WorkflowOperationInstance currentOperation = workflow.getCurrentOperation();
         if (currentOperation == null) {
+          ingestStatistics.failed();
           throw new IllegalStateException(workflow
                   + " has no current operation, so can not be resumed with a new mediapackage");
         }
         String currentOperationTemplate = currentOperation.getTemplate();
         if (!Arrays.asList(PRE_PROCESSING_OPERATIONS).contains(currentOperationTemplate)) {
+          ingestStatistics.failed();
           throw new IllegalStateException(workflow + " is already in operation " + currentOperationTemplate
                   + ", so we can not ingest");
         }
@@ -756,6 +780,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               job.setStatus(Status.FINISHED);
               serviceRegistry.updateJob(job);
             } catch (ServiceRegistryException e) {
+              ingestStatistics.failed();
               throw new IllegalStateException("Error updating job associated with skipped operation "
                       + currentOperation, e);
             }
@@ -773,10 +798,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         // resume the workflow
         workflowService.resume(workflowId.longValue(), properties);
 
+        ingestStatistics.successful();
+
         // Return the updated workflow instance
         return workflowService.getWorkflowById(workflowId.longValue());
       }
     } catch (WorkflowException e) {
+      ingestStatistics.failed();
       throw new IngestException(e);
     }
   }
@@ -814,9 +842,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       } else {
         in = uri.toURL().openStream();
       }
-      URI returnedUri = workspace.put(mp.getIdentifier().compact(), elementId,
-              FilenameUtils.getName(uri.toURL().toString()), in);
-      return returnedUri;
+      return addContentToRepo(mp, elementId, FilenameUtils.getName(uri.toURL().toString()), in);
     } finally {
       IOUtils.closeQuietly(in);
       httpClient.close(response);
@@ -824,7 +850,16 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   }
 
   private URI addContentToRepo(MediaPackage mp, String elementId, String filename, InputStream file) throws IOException {
-    return workspace.put(mp.getIdentifier().compact(), elementId, filename, file);
+    ProgressInputStream progressInputStream = new ProgressInputStream(file);
+    progressInputStream.addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        long totalNumBytesRead = (Long) evt.getNewValue();
+        long oldTotalNumBytesRead = (Long) evt.getOldValue();
+        ingestStatistics.add(totalNumBytesRead - oldTotalNumBytesRead);
+      }
+    });
+    return workspace.put(mp.getIdentifier().compact(), elementId, filename, progressInputStream);
   }
 
   private MediaPackage addContentToMediaPackage(MediaPackage mp, String elementId, URI uri,

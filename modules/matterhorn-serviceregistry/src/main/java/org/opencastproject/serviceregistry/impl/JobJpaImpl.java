@@ -43,6 +43,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -85,6 +87,9 @@ import javax.xml.bind.annotation.XmlType;
                 + "where j.status = :status and j.processorServiceRegistration is not null and "
                 + "j.processorServiceRegistration.serviceType = :serviceType and "
                 + "j.processorServiceRegistration.hostRegistration.baseUrl = :host order by j.dateCreated"),
+        @NamedQuery(name = "Job.root.children", query = "SELECT j FROM Job j WHERE j.rootJob.id = :id ORDER BY j.dateCreated"),
+        @NamedQuery(name = "Job.children", query = "SELECT j FROM Job j WHERE j.parentJob.id = :id ORDER BY j.dateCreated"),
+        @NamedQuery(name = "Job.avgOperation", query = "SELECT j.operation, AVG(j.runTime), AVG(j.queueTime) FROM Job j GROUP BY j.operation"),
 
         // Job count queries
         @NamedQuery(name = "Job.count", query = "SELECT COUNT(j) FROM Job j "
@@ -107,6 +112,9 @@ import javax.xml.bind.annotation.XmlType;
                 + "WHERE j.status = org.opencastproject.job.api.Job$Status.FAILED AND j.processorServiceRegistration IS NOT NULL "
                 + "AND j.processorServiceRegistration.serviceType = :serviceType AND j.processorServiceRegistration.hostRegistration.baseUrl = :host "
                 + "AND j.dateCompleted >= j.processorServiceRegistration.stateChanged") })
+@NamedNativeQueries({ @NamedNativeQuery(name = "Job.countPerHostService", query = "SELECT h.host, s.service_type, j.status, COUNT(*) FROM job j, service_registration s, host_registration h "
+        + "WHERE CASE WHEN j.processor_service IS NOT NULL THEN j.processor_service ELSE j.creator_service END = s.id "
+        + "AND s.host_registration = h.id GROUP BY s.service_type, j.status, h.host") })
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(name = "job", namespace = "http://job.opencastproject.org")
 @XmlRootElement(name = "job", namespace = "http://job.opencastproject.org")

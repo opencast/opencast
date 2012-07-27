@@ -59,8 +59,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -128,7 +130,9 @@ public class WorkflowOperationSkippingTest {
     service.setUserDirectoryService(userDirectoryService);
 
     Organization organization = new DefaultOrganization();
+    List<Organization> organizationList = Arrays.asList(new Organization[] { organization });
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
+    EasyMock.expect(organizationDirectoryService.getOrganizations()).andReturn(organizationList).anyTimes();
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
             .andReturn(organization).anyTimes();
     EasyMock.replay(organizationDirectoryService);
@@ -177,6 +181,7 @@ public class WorkflowOperationSkippingTest {
   @After
   public void tearDown() throws Exception {
     dao.deactivate();
+    service.deactivate();
   }
 
   @Test

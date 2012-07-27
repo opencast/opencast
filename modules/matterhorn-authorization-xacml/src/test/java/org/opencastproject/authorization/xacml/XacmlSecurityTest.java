@@ -309,5 +309,17 @@ public class XacmlSecurityTest {
       return file.toURI();
     }
 
+    @Override
+    public long getTotalSpace() {
+      // TODO Auto-generated method stub
+      return 0;
+    }
+
+    @Override
+    public long getUsableSpace() {
+      // TODO Auto-generated method stub
+      return 0;
+    }
+
   }
 }

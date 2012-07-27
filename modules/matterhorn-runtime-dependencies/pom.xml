@@ -543,6 +543,11 @@
       <artifactId>org.springframework.jdbc</artifactId>
       <version>${springsecurity.version}</version>
     </dependency>
+	<dependency>
+   	  <groupId>org.jolokia</groupId>
+      <artifactId>jolokia-osgi</artifactId>
+      <version>1.0.4</version>
+ 	</dependency>
 
   </dependencies>
 

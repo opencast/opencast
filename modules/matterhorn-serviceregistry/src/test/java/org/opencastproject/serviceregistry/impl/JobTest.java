@@ -177,6 +177,42 @@ public class JobTest {
   }
 
   @Test
+  public void testGetChildJobs() throws Exception {
+    Job rootJob = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, null);
+    Job job = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, rootJob);
+    Job job1 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job);
+    Job job3 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job);
+    Job job4 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job3);
+    Job job2 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job1);
+    Job job5 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job4);
+    serviceRegistry.updateJob(job);
+    serviceRegistry.updateJob(job1);
+    serviceRegistry.updateJob(job2);
+    serviceRegistry.updateJob(job3);
+    serviceRegistry.updateJob(job4);
+    serviceRegistry.updateJob(job5);
+
+    // Search children by root job
+    List<Job> jobs = serviceRegistry.getChildJobs(rootJob.getId());
+    Assert.assertEquals(6, jobs.size());
+    Assert.assertEquals(job, jobs.get(0));
+    Assert.assertEquals(job1, jobs.get(1));
+    Assert.assertEquals(job3, jobs.get(2));
+    Assert.assertEquals(job4, jobs.get(3));
+    Assert.assertEquals(job2, jobs.get(4));
+    Assert.assertEquals(job5, jobs.get(5));
+
+    // Search children
+    jobs = serviceRegistry.getChildJobs(job.getId());
+    Assert.assertEquals(5, jobs.size());
+    Assert.assertEquals(job1, jobs.get(0));
+    Assert.assertEquals(job3, jobs.get(1));
+    Assert.assertEquals(job4, jobs.get(2));
+    Assert.assertEquals(job2, jobs.get(3));
+    Assert.assertEquals(job5, jobs.get(4));
+  }
+
+  @Test
   public void testCount() throws Exception {
     // create a receipt on each service instance
     serviceRegistry.createJob(regType1Localhost.getHost(), regType1Localhost.getServiceType(), OPERATION_NAME, null,

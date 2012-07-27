@@ -25,6 +25,7 @@ import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -50,7 +51,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class PauseFinalOperationTest {
@@ -102,9 +105,10 @@ public class PauseFinalOperationTest {
     };
 
     // security service
+    DefaultOrganization defaultOrganization = new DefaultOrganization();
     securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(SecurityServiceStub.DEFAULT_ORG_ADMIN).anyTimes();
-    EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
+    EasyMock.expect(securityService.getOrganization()).andReturn(defaultOrganization).anyTimes();
     EasyMock.replay(securityService);
 
     service.setSecurityService(securityService);
@@ -120,7 +124,9 @@ public class PauseFinalOperationTest {
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
+    List<Organization> organizationList = Arrays.asList(new Organization[] { defaultOrganization });
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
+    EasyMock.expect(organizationDirectoryService.getOrganizations()).andReturn(organizationList).anyTimes();
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
             .andReturn(securityService.getOrganization()).anyTimes();
     EasyMock.replay(organizationDirectoryService);
@@ -155,6 +161,7 @@ public class PauseFinalOperationTest {
   @After
   public void tearDown() throws Exception {
     dao.deactivate();
+    service.deactivate();
   }
 
   @Test()

@@ -90,7 +90,13 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Private-Package> org.opencastproject.workspace.impl </Private-Package>
+            <Import-Package>
+              *;resolution:=optional
+            </Import-Package>
+            <Private-Package>
+              org.opencastproject.workspace.impl;version=${project.version},
+              org.opencastproject.workspace.impl.jmx;version=${project.version}
+            </Private-Package>
             <Service-Component>
               OSGI-INF/workspace.xml
             </Service-Component>
