@@ -16,21 +16,25 @@
 
 package org.opencastproject.episode.impl;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ADMIN;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ANONYMOUS;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_NAME;
-import static org.opencastproject.util.UrlSupport.DEFAULT_BASE_URL;
-
+import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.solr.client.solrj.SolrServer;
+import org.easymock.EasyMock;
+import org.easymock.IAnswer;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultItem;
+import org.opencastproject.episode.api.Version;
+import org.opencastproject.episode.impl.elementstore.DeletionSelector;
+import org.opencastproject.episode.impl.elementstore.ElementStore;
+import org.opencastproject.episode.impl.persistence.AbstractEpisodeServiceDatabase;
+import org.opencastproject.episode.impl.persistence.EpisodeServiceDatabase;
 import org.opencastproject.episode.impl.solr.SolrIndexManager;
 import org.opencastproject.episode.impl.solr.SolrRequester;
 import org.opencastproject.job.api.JaxbJob;
@@ -58,22 +62,13 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.series.impl.SeriesServiceImpl;
 import org.opencastproject.series.impl.solr.SeriesServiceSolrIndex;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.solr.SolrServerFactory;
+import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.persistence.PersistenceEnv;
+import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workspace.api.Workspace;
 
-import junit.framework.Assert;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.solr.client.solrj.SolrServer;
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -81,6 +76,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ADMIN;
+import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ANONYMOUS;
+import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
+import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_NAME;
+import static org.opencastproject.util.UrlSupport.DEFAULT_BASE_URL;
+import static org.opencastproject.util.data.VCell.cell;
 
 /**
  * Tests the functionality of the search service.
@@ -99,9 +106,6 @@ public class EpisodeServiceImplTest {
   /** The access control list returned by the mocked authorization service */
   private AccessControlList acl = null;
 
-  /** The authorization service */
-  private AuthorizationService authorizationService = null;
-
   /** A user with permissions. */
   private final User userWithPermissions = new User("sample", "opencastproject.org", new String[] { "ROLE_STUDENT",
           "ROLE_OTHERSTUDENT", new DefaultOrganization().getAnonymousRole() });
@@ -112,8 +116,12 @@ public class EpisodeServiceImplTest {
   private final Organization defaultOrganization = new DefaultOrganization();
   private final User defaultUser = userWithPermissions;
 
+  private SolrServer solrServer;
   private Responder<User> userResponder;
   private Responder<Organization> organizationResponder;
+  private EpisodeServiceDatabase episodeDatabase;
+  private PersistenceEnv penv;
+  private String storage;
 
   private static class Responder<A> implements IAnswer<A> {
     private A response;
@@ -159,39 +167,85 @@ public class EpisodeServiceImplTest {
             .andReturn(new ArrayList<Job>()).anyTimes();
     EasyMock.replay(serviceRegistry);
 
+    ElementStore elementStore = EasyMock.createNiceMock(ElementStore.class);
+    EasyMock.expect(elementStore.delete(EasyMock.<DeletionSelector>anyObject()))
+            .andReturn(true).once();
+    EasyMock.replay(elementStore);
+
     // mpeg7 service
     Mpeg7CatalogService mpeg7CatalogService = new Mpeg7CatalogService();
 
     // security service
     userResponder = new Responder<User>(defaultUser);
     organizationResponder = new Responder<Organization>(defaultOrganization);
-    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    final SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andAnswer(userResponder).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andAnswer(organizationResponder).anyTimes();
     EasyMock.replay(securityService);
 
-    // episode service
-    service = new EpisodeServiceImpl();
-    StaticMetadataService mdService = newStaticMetadataService(workspace);
-    SeriesService seriesService = newSeriesService();
-    service.setStaticMetadataService(mdService);
-    service.setWorkspace(workspace);
-    service.setMpeg7CatalogService(mpeg7CatalogService);
-    service.setSecurityService(securityService);
-    service.setServiceRegistry(serviceRegistry);
-    SolrServer solrServer = EpisodeServiceImpl.setupSolr(new File(solrRoot));
-    service.testSetup(solrServer, new SolrRequester(solrServer, securityService), new SolrIndexManager(solrServer,
-            workspace, Arrays.asList(mdService), seriesService, mpeg7CatalogService, securityService));
+    long currentTime = System.currentTimeMillis();
+    storage = PathSupport.concat("target", "db" + currentTime + ".h2.db");
+
+    // Persistence storage
+    penv = PersistenceUtil.newTestPersistenceEnv("org.opencastproject.episode.impl.persistence");
+    episodeDatabase = new AbstractEpisodeServiceDatabase() {
+      @Override protected PersistenceEnv getPenv() {
+        return penv;
+      }
+
+      @Override protected SecurityService getSecurityService() {
+        return securityService;
+      }
+    };
 
     // acl
-    acl = new AccessControlList(new AccessControlEntry("ROLE_ANONYMOUS", "read", true));
-    authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
+    String anonymousRole = securityService.getOrganization().getAnonymousRole();
+    acl = new AccessControlList(new AccessControlEntry(anonymousRole, "read", true));
+    /* The authorization service */
+    AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     EasyMock.expect(authorizationService.getAccessControlList((MediaPackage) EasyMock.anyObject())).andReturn(acl)
             .anyTimes();
     EasyMock.expect(
             authorizationService.hasPermission((MediaPackage) EasyMock.anyObject(), (String) EasyMock.anyObject()))
             .andReturn(true).anyTimes();
-    service.setAuthorizationService(authorizationService);
+
+//    ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
+//
+//    EasyMock.expect(
+//            serviceRegistry.createJob((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+//                                      (List<String>) EasyMock.anyObject(), (String) EasyMock.anyObject(), EasyMock.anyBoolean()))
+//            .andReturn(new JaxbJob()).anyTimes();
+//    EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(new JaxbJob()).anyTimes();
+//    EasyMock.expect(serviceRegistry.getJobs((String) EasyMock.anyObject(), (Status) EasyMock.anyObject()))
+//            .andReturn(jobs).anyTimes();
+//    EasyMock.replay(serviceRegistry);
+//
+//    service.setServiceRegistry(serviceRegistry);
+
+    OrganizationDirectoryService orgDirectory = EasyMock.createNiceMock(OrganizationDirectoryService.class);
+    EasyMock.expect(orgDirectory.getOrganization((String) EasyMock.anyObject())).andReturn(new DefaultOrganization())
+            .anyTimes();
+    EasyMock.replay(orgDirectory);
+
+    // episode service
+    solrServer = EpisodeServicePublisher.setupSolr(new File(solrRoot));
+    StaticMetadataService mdService = newStaticMetadataService(workspace);
+    SeriesService seriesService = newSeriesService();
+    service = new EpisodeServiceImpl(new SolrRequester(solrServer, securityService),
+                                     new SolrIndexManager(solrServer,
+                                                          workspace,
+                                                          cell(Arrays.asList(mdService)),
+                                                          seriesService,
+                                                          mpeg7CatalogService,
+                                                          securityService),
+                                     securityService,
+                                     authorizationService,
+                                     orgDirectory,
+                                     serviceRegistry,
+                                     null,
+                                     null,
+                                     episodeDatabase,
+                                     elementStore);
     EasyMock.replay(authorizationService);
   }
 
@@ -208,13 +262,13 @@ public class EpisodeServiceImplTest {
   }
 
   @After
-  public void tearDown() {
-    service.deactivate();
-    try {
-      FileUtils.deleteDirectory(new File(solrRoot));
-    } catch (IOException e) {
-      fail("Error on cleanup");
-    }
+  public void tearDown() throws Exception {
+    penv.close();
+    FileUtils.deleteQuietly(new File(storage));
+    episodeDatabase = null;
+    SolrServerFactory.shutdown(solrServer);
+    FileUtils.deleteDirectory(new File(solrRoot));
+    service = null;
   }
 
   /**
@@ -222,7 +276,7 @@ public class EpisodeServiceImplTest {
    */
   @Test
   public void testEmptySearchIndex() {
-    SearchResult result = service.getByQuery(new EpisodeQuery().withId("foo"));
+    SearchResult result = service.find(new EpisodeQuery().withId("foo"));
     assertEquals(0, result.size());
   }
 
@@ -245,9 +299,16 @@ public class EpisodeServiceImplTest {
     // Make sure it's properly indexed and returned for authorized users
     EpisodeQuery q = new EpisodeQuery();
     q.withId("10.0000/1");
-    SearchResult result = service.getByQuery(q);
+    SearchResult result = service.find(q);
     assertEquals(1, result.size());
-    assertTrue(result.getItems()[0].getOcLocked());
+    assertFalse(result.getItems().get(0).getOcLocked());
+
+    service.delete(mediaPackage.getIdentifier().toString());
+
+    q = new EpisodeQuery();
+    q.withId("10.0000/1");
+    result = service.find(q);
+    assertEquals(0, result.size());
 
     acl.getEntries().clear();
     acl.getEntries().add(new AccessControlEntry("ROLE_UNKNOWN", EpisodeService.READ_PERMISSION, true));
@@ -260,42 +321,42 @@ public class EpisodeServiceImplTest {
     // This mediapackage should not be readable by the current user (due to the lack of role ROLE_UNKNOWN)
     q = new EpisodeQuery();
     q.withId("10.0000/1");
-    assertEquals(0, service.getByQuery(q).size());
+    assertEquals(0, service.find(q).size());
   }
 
-  @Test
-  public void testLockMediaPackage() throws Exception {
-    MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
-
-    // Make sure our mocked ACL has the read and write permission
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
-
-    // Add the media package to the episode service
-    service.add(mediaPackage);
-
-    // lock it
-    service.lock("10.0000/1", true);
-    {
-      EpisodeQuery q = new EpisodeQuery();
-      q.withId("10.0000/1");
-      SearchResult result = service.getByQuery(q);
-      assertEquals(1, result.size());
-      assertTrue(result.getItems()[0].getOcLocked());
-    }
-
-    // then unlock
-    service.lock("10.0000/1", false);
-    {
-      EpisodeQuery q = new EpisodeQuery();
-      q.withId("10.0000/1");
-      SearchResult result = service.getByQuery(q);
-      assertEquals(1, result.size());
-      assertFalse(result.getItems()[0].getOcLocked());
-    }
-  }
+//  @Test
+//  public void testLockMediaPackage() throws Exception {
+//    MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
+//
+//    // Make sure our mocked ACL has the read and write permission
+//    acl.getEntries().add(
+//            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
+//    acl.getEntries().add(
+//            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
+//
+//    // Add the media package to the episode service
+//    service.add(mediaPackage);
+//
+//    // lock it
+//    service.lock("10.0000/1", true);
+//    {
+//      EpisodeQuery q = new EpisodeQuery();
+//      q.withId("10.0000/1");
+//      SearchResult result = service.find(q);
+//      assertEquals(1, result.size());
+//      assertTrue(result.getItems().get(0).getOcLocked());
+//    }
+//
+//    // then unlock
+//    service.lock("10.0000/1", false);
+//    {
+//      EpisodeQuery q = new EpisodeQuery();
+//      q.withId("10.0000/1");
+//      SearchResult result = service.find(q);
+//      assertEquals(1, result.size());
+//      assertFalse(result.getItems().get(0).getOcLocked());
+//    }
+//  }
 
   private MediaPackage getMediaPackage(String path) throws MediaPackageException {
     MediaPackageBuilderFactory builderFactory = MediaPackageBuilderFactory.newInstance();
@@ -324,11 +385,11 @@ public class EpisodeServiceImplTest {
     MediaPackage mediaPackage = getMediaPackage("/manifest-full.xml");
     service.add(mediaPackage);
 
-    SearchResult episodeMetadataResult = service.getByQuery(new EpisodeQuery().withText("Vegetation"));
-    SearchResult seriesMetadataResult = service.getByQuery(new EpisodeQuery().withText("Atmospheric Science"));
+    SearchResult episodeMetadataResult = service.find(new EpisodeQuery().withText("Vegetation"));
+    SearchResult seriesMetadataResult = service.find(new EpisodeQuery().withText("Atmospheric Science"));
 
-    assertEquals(1, episodeMetadataResult.getItems().length);
-    assertEquals(1, seriesMetadataResult.getItems().length);
+    assertEquals(1, episodeMetadataResult.getItems().size());
+    assertEquals(1, seriesMetadataResult.getItems().size());
   }
 
   /**
@@ -350,20 +411,48 @@ public class EpisodeServiceImplTest {
     // Make sure it's properly indexed and returned
     EpisodeQuery q = new EpisodeQuery();
     q.withId("10.0000/1");
-    assertEquals(1, service.getByQuery(q).size());
+    assertEquals(1, service.find(q).size());
 
     q = new EpisodeQuery();
 
-    assertEquals(1, service.getByQuery(q).size());
+    assertEquals(1, service.find(q).size());
 
     // Test for various fields
     q = new EpisodeQuery();
     q.withId("10.0000/1");
-    SearchResult result = service.getByQuery(q);
+    SearchResult result = service.find(q);
     assertEquals(1, result.getTotalSize());
-    SearchResultItem resultItem = result.getItems()[0];
+    SearchResultItem resultItem = result.getItems().get(0);
     assertNotNull(resultItem.getMediaPackage());
     assertEquals(1, resultItem.getMediaPackage().getCatalogs().length);
+  }
+
+  /**
+   * Adds a simple media package that has a dublin core for the episode only.
+   */
+  @Test
+  public void testGetOnlyLastVersion() throws Exception {
+    MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
+
+    // Make sure our mocked ACL has the read and write permission
+    acl.getEntries().add(
+            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
+    acl.getEntries().add(
+            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
+
+    // Add the media package to the search index
+    service.add(mediaPackage);
+    service.add(mediaPackage);
+
+    // Make sure it's properly indexed and returned
+    EpisodeQuery q = new EpisodeQuery().withId("10.0000/1");
+
+    assertEquals(2, service.find(q).size());
+
+    q = new EpisodeQuery().withId("10.0000/1").withOnlyLastVersion();
+
+    SearchResult byQuery = service.find(q);
+    assertEquals(1, byQuery.size());
   }
 
   /**
@@ -398,9 +487,29 @@ public class EpisodeServiceImplTest {
     // Make sure it's properly indexed and returned
     EpisodeQuery q = new EpisodeQuery();
     q.withId("10.0000/2");
-    assertEquals(1, service.getByQuery(q).size());
+    assertEquals(1, service.find(q).size());
     q.withId(null); // Clear the ID requirement
-    assertEquals(1, service.getByQuery(q).size());
+    assertEquals(1, service.find(q).size());
+  }
+
+  @Test
+  public void testDelete() throws Exception {
+    final MediaPackage mp1 = getMediaPackage("/manifest-simple.xml");
+    final MediaPackage mp2 = getMediaPackage("/manifest-full.xml");
+    final String mpId = mp1.getIdentifier().toString();
+    // Make sure our mocked ACL has the read and write permission
+    acl.getEntries().add(
+            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
+    acl.getEntries().add(
+            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
+    // add both media packages
+    service.add(mp1);
+    service.add(mp2);
+    assertTrue(service.delete(mpId));
+    assertEquals(1L, service.find(new EpisodeQuery().withId(mpId).includeDeleted(true)).getTotalSize());
+    assertEquals(2L, service.find(new EpisodeQuery().includeDeleted(true)).getTotalSize());
+    assertEquals(1L, service.find(new EpisodeQuery().includeDeleted(false).withDeletedSince(new Date(0L))).getTotalSize());
+    assertEquals(1L, service.find(new EpisodeQuery()).getTotalSize());
   }
 
   /**
@@ -440,13 +549,13 @@ public class EpisodeServiceImplTest {
 
     EpisodeQuery q = new EpisodeQuery();
     q.withId("10.0000/1");
-    assertEquals(0, service.getByQuery(q).size());
+    assertEquals(0, service.find(q).size());
     q.withId(null); // Clear the ID requirement
-    assertEquals(0, service.getByQuery(q).size());
+    assertEquals(0, service.find(q).size());
 
     q = new EpisodeQuery();
     q.withDeletedSince(deletedDate);
-    assertEquals(1, service.getByQuery(q).size());
+    assertEquals(1, service.find(q).size());
   }
 
   /**
@@ -486,9 +595,9 @@ public class EpisodeServiceImplTest {
     // Make sure it's properly indexed and returned
     EpisodeQuery q = new EpisodeQuery();
 
-    SearchResult result = service.getByQuery(q);
+    SearchResult result = service.find(q);
     assertEquals(1, result.size());
-    assertEquals("foobar-serie", result.getItems()[0].getId());
+    assertEquals("foobar-serie", result.getItems().get(0).getId());
   }
 
   @SuppressWarnings("unchecked")
@@ -502,6 +611,7 @@ public class EpisodeServiceImplTest {
     for (long i = 0; i < 10; i++) {
       MediaPackage mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
       mediaPackage.setIdentifier(IdBuilderFactory.newInstance().newIdBuilder().createNew());
+      episodeDatabase.storeEpisode(mediaPackage, acl, new Date(), Version.version(i + 1));
       String payload = MediaPackageParser.getAsXml(mediaPackage);
       JaxbJob job = new JaxbJob();
       job.setId(i);
@@ -510,32 +620,13 @@ public class EpisodeServiceImplTest {
       job.setStatus(Status.FINISHED);
       jobs.add(job);
     }
-    ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
-
-    EasyMock.expect(
-            serviceRegistry.createJob((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (List<String>) EasyMock.anyObject(), (String) EasyMock.anyObject(), EasyMock.anyBoolean()))
-            .andReturn(new JaxbJob()).anyTimes();
-    EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(new JaxbJob()).anyTimes();
-    EasyMock.expect(serviceRegistry.getJobs((String) EasyMock.anyObject(), (Status) EasyMock.anyObject()))
-            .andReturn(jobs).anyTimes();
-    EasyMock.replay(serviceRegistry);
-
-    service.setServiceRegistry(serviceRegistry);
-
-    OrganizationDirectoryService orgDirectory = EasyMock.createNiceMock(OrganizationDirectoryService.class);
-    EasyMock.expect(orgDirectory.getOrganization((String) EasyMock.anyObject())).andReturn(new DefaultOrganization())
-            .anyTimes();
-    EasyMock.replay(orgDirectory);
-
-    service.setOrgDirectory(orgDirectory);
 
     // We should have nothing in the search index
-    assertEquals(0, service.getByQuery(new EpisodeQuery()).size());
+    assertEquals(0, service.find(new EpisodeQuery()).size());
 
     service.populateIndex();
 
     // This time we should have 10 results
-    assertEquals(10, service.getByQuery(new EpisodeQuery()).size());
+    assertEquals(10, service.find(new EpisodeQuery()).size());
   }
 }

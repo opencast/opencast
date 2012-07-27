@@ -18,7 +18,6 @@ package org.opencastproject.episode.impl.solr;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -26,12 +25,13 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.opencastproject.episode.api.EpisodeQuery;
+import org.opencastproject.episode.api.JaxbMediaSegment;
+import org.opencastproject.episode.api.JaxbSearchResult;
+import org.opencastproject.episode.api.JaxbSearchResultItem;
 import org.opencastproject.episode.api.MediaSegment;
-import org.opencastproject.episode.api.MediaSegmentImpl;
 import org.opencastproject.episode.api.SearchResult;
-import org.opencastproject.episode.api.SearchResultImpl;
 import org.opencastproject.episode.api.SearchResultItem;
-import org.opencastproject.episode.api.SearchResultItemImpl;
+import org.opencastproject.episode.api.Version;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -40,6 +40,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,7 @@ import static org.opencastproject.episode.api.EpisodeService.READ_PERMISSION;
 import static org.opencastproject.episode.api.EpisodeService.WRITE_PERMISSION;
 import static org.opencastproject.util.data.Collections.filter;
 import static org.opencastproject.util.data.Collections.head;
+import static org.opencastproject.util.data.Option.option;
 
 /**
  * Class implementing <code>LookupRequester</code> to provide connection to solr indexing facility.
@@ -81,9 +83,9 @@ public class SolrRequester {
 
   /**
    * Creates a new requester for solr that will be using the given connection object to query the search index.
-   * 
+   *
    * @param connection
-   *          the solr connection
+   *         the solr connection
    */
   public SolrRequester(SolrServer connection, SecurityService securityService) {
     if (connection == null)
@@ -93,34 +95,15 @@ public class SolrRequester {
   }
 
   /**
-   * Returns the search results for a solr query string with read access for the current user.
-   * 
-   * @param q
-   *          the query
-   * @param limit
-   *          the limit
-   * @param offset
-   *          the offset
-   * @return the search results
-   * @throws SolrServerException
-   */
-  public SearchResult getByQuery(String q, int limit, int offset) throws SolrServerException {
-    EpisodeQuery q1 = new EpisodeQuery();
-    q1.withQuery(q).withLimit(limit).withOffset(offset);
-    return getForRead(q1);
-  }
-
-  /**
    * Creates a search result from a given solr response.
-   * 
+   *
    * @param query
-   *          The solr query.
+   *         The solr query.
    * @return The search result.
    * @throws SolrServerException
-   *           if the solr server is not working as expected
+   *         if the solr server is not working as expected
    */
   private SearchResult createSearchResult(final SolrQuery query) throws SolrServerException {
-
     // Execute the query and try to get hold of a query response
     QueryResponse solrResponse = null;
     try {
@@ -130,25 +113,25 @@ public class SolrRequester {
     }
 
     // Create and configure the query result
-    final SearchResultImpl result = new SearchResultImpl(query.getQuery());
+    final JaxbSearchResult result = new JaxbSearchResult(query.getQuery());
     result.setSearchTime(solrResponse.getQTime());
     result.setOffset(solrResponse.getResults().getStart());
     result.setLimit(solrResponse.getResults().size());
-    result.setTotal(solrResponse.getResults().getNumFound());
+    result.setTotalSize(solrResponse.getResults().getNumFound());
 
     // Walk through response and create new items with title, creator, etc:
     for (final SolrDocument doc : solrResponse.getResults()) {
-      final SearchResultItemImpl item = SearchResultItemImpl.fill(new SearchResultItem() {
+      final JaxbSearchResultItem item = JaxbSearchResultItem.create(new SearchResultItem() {
         private final String dfltString = null;
 
         @Override
         public String getId() {
-          return Schema.getId(doc);
+          return Schema.getDcId(doc);
         }
 
         /**
          * {@inheritDoc}
-         * 
+         *
          * @see org.opencastproject.episode.api.SearchResultItem#getOrganization()
          */
         @Override
@@ -331,9 +314,9 @@ public class SolrRequester {
         @Override
         public MediaSegment[] getSegments() {
           if (SearchResultItemType.AudioVisual.equals(getType()))
-            return createSearchResultSegments(doc, query).toArray(new MediaSegmentImpl[0]);
+            return createSearchResultSegments(doc, query).toArray(new JaxbMediaSegment[0]);
           else
-            return new MediaSegmentImpl[0];
+            return new JaxbMediaSegment[0];
         }
 
         @Override
@@ -341,6 +324,23 @@ public class SolrRequester {
           Boolean locked = Schema.getOcLocked(doc);
           return locked != null ? locked : false;
         }
+
+        @Override
+        public Option<Date> getOcDeleted() {
+          return option(Schema.getOcDeleted(doc));
+        }
+
+        @Override
+        public Version getOcVersion() {
+          return Schema.getOcVersion(doc);
+        }
+
+        @Override
+        public boolean getOcLatestVersion() {
+          Boolean latestVersion = Schema.getOcLatestVersion(doc);
+          return latestVersion != null ? latestVersion : false;
+        }
+
       });
 
       // Add the item to the result set
@@ -352,14 +352,14 @@ public class SolrRequester {
 
   /**
    * Creates a list of <code>MediaSegment</code>s from the given result document.
-   * 
+   *
    * @param doc
-   *          the result document
+   *         the result document
    * @param query
-   *          the original query
+   *         the original query
    */
-  private List<MediaSegmentImpl> createSearchResultSegments(SolrDocument doc, SolrQuery query) {
-    List<MediaSegmentImpl> segments = new ArrayList<MediaSegmentImpl>();
+  private List<JaxbMediaSegment> createSearchResultSegments(SolrDocument doc, SolrQuery query) {
+    List<JaxbMediaSegment> segments = new ArrayList<JaxbMediaSegment>();
 
     // The maximum number of hits in a segment
     int maxHits = 0;
@@ -371,7 +371,7 @@ public class SolrRequester {
 
       // Ceate a new segment
       int segmentId = Integer.parseInt(fieldName.substring(Schema.SEGMENT_TEXT_PREFIX.length()));
-      MediaSegmentImpl segment = new MediaSegmentImpl(segmentId);
+      JaxbMediaSegment segment = new JaxbMediaSegment(segmentId);
       segment.setText(mkString(doc.getFieldValue(fieldName)));
 
       // Read the hints for this segment
@@ -436,7 +436,7 @@ public class SolrRequester {
       segments.add(segment);
     }
 
-    for (MediaSegmentImpl segment : segments) {
+    for (JaxbMediaSegment segment : segments) {
       int hitsInSegment = segment.getRelevance();
       if (hitsInSegment > 0)
         segment.setRelevance((int) ((100 * hitsInSegment) / maxHits));
@@ -447,9 +447,9 @@ public class SolrRequester {
 
   /**
    * Modifies the query such that certain fields are being boosted (meaning they gain some weight).
-   * 
+   *
    * @param query
-   *          The user query.
+   *         The user query.
    * @return The boosted query
    */
   public StringBuffer createBoostedFullTextQuery(String query) {
@@ -519,9 +519,9 @@ public class SolrRequester {
 
   /**
    * Simple helper method to avoid null strings.
-   * 
+   *
    * @param f
-   *          object which implements <code>toString()</code> method.
+   *         object which implements <code>toString()</code> method.
    * @return The input object or empty string.
    */
   private static String mkString(Object f) {
@@ -533,14 +533,14 @@ public class SolrRequester {
 
   /**
    * Converts the query object into a solr query and returns the results.
-   * 
+   *
    * @param q
-   *          the query
+   *         the query
    * @param action
-   *          one of {@link org.opencastproject.episode.api.EpisodeService#READ_PERMISSION},
-   *          {@link org.opencastproject.episode.api.EpisodeService#WRITE_PERMISSION}
+   *         one of {@link org.opencastproject.episode.api.EpisodeService#READ_PERMISSION},
+   *         {@link org.opencastproject.episode.api.EpisodeService#WRITE_PERMISSION}
    * @param applyPermissions
-   *          whether to apply the permissions to the query. Set to false for administrative queries.
+   *         whether to apply the permissions to the query. Set to false for administrative queries.
    * @return the search results
    */
   private SolrQuery createQuery(EpisodeQuery q, String action, boolean applyPermissions) throws SolrServerException {
@@ -557,10 +557,14 @@ public class SolrRequester {
       if (sb.length() > 0)
         sb.append(" AND ");
       sb.append("(");
-      sb.append(Schema.ID);
+      sb.append(Schema.DC_ID);
       sb.append(":");
       sb.append(cleanSolrIdRequest);
       sb.append(")");
+    }
+
+    if (q.isOnlyLastVersion()) {
+      append(sb, Schema.OC_LATEST_VERSION, Boolean.TRUE.toString());
     }
 
     // full text query with boost
@@ -631,7 +635,11 @@ public class SolrRequester {
     if (q.getDeletedDate() != null) {
       if (sb.length() > 0)
         sb.append(" AND ");
-      sb.append(Schema.OC_DELETED + ":" + SolrUtils.serializeDateRange(q.getDeletedDate(), null));
+      sb.append(Schema.OC_DELETED).append(":").append(SolrUtils.serializeDateRange(q.getDeletedDate(), null));
+    } else if (!q.isIncludeDeleted()) {
+      if (sb.length() > 0)
+        sb.append(" AND ");
+      sb.append("-" + Schema.OC_DELETED + ":[* TO *]");
     }
 
     if (sb.length() == 0)
@@ -659,12 +667,6 @@ public class SolrRequester {
       sb.append(" AND ");
     sb.append(Schema.OC_MEDIATYPE + ":" + SearchResultItem.SearchResultItemType.AudioVisual);
 
-    if (q.getDeletedDate() == null) {
-      if (sb.length() > 0)
-        sb.append(" AND ");
-      sb.append("-" + Schema.OC_DELETED + ":[* TO *]");
-    }
-
     SolrQuery query = new SolrQuery(sb.toString());
 
     // limit & offset
@@ -676,18 +678,19 @@ public class SolrRequester {
 
     // sorting
     // todo multiValued fields cannot be used for sorting -- need to have the language here
-//    if (q.getSort() != null) {
-//      ORDER order = q.isSortAscending() ? ORDER.asc : ORDER.desc;
-//      query.addSortField(getSortField(q.getSort()), order);
-//    }
-//    if (!EpisodeQuery.Sort.DATE_CREATED.equals(q.getSort())) {
-//      query.addSortField(getSortField(EpisodeQuery.Sort.DATE_CREATED), ORDER.desc);
-//    }
-    query.addSortField(Schema.DC_CREATED, ORDER.desc);
+    // if (q.getSort() != null) {
+    // ORDER order = q.isSortAscending() ? ORDER.asc : ORDER.desc;
+    // query.addSortField(getSortField(q.getSort()), order);
+    // }
+    // if (!EpisodeQuery.Sort.DATE_CREATED.equals(q.getSort())) {
+    // query.addSortField(getSortField(EpisodeQuery.Sort.DATE_CREATED), ORDER.desc);
+    // }
+    // query.addSortField(Schema.DC_CREATED, ORDER.desc);
     // If the dublin core field dc:created has not been filled in...
-    query.addSortField(Schema.OC_MODIFIED, ORDER.desc);
+    // query.addSortField(Schema.OC_MODIFIED, ORDER.desc);
 
     query.setFields("* score");
+
     return query;
   }
 
@@ -706,7 +709,7 @@ public class SolrRequester {
       case SUBJECT:
         return Schema.DC_SUBJECT_SUM;
       case MEDIA_PACKAGE_ID:
-        return Schema.ID;
+        return Schema.DC_ID;
       default:
         throw new IllegalArgumentException("No mapping found between sort field and index");
     }
@@ -715,9 +718,12 @@ public class SolrRequester {
   /**
    * Appends query parameters to a solr query
    *
-   * @param sb The {@link StringBuilder} containing the query
-   * @param key the key for this search parameter
-   * @param value the value for this search parameter
+   * @param sb
+   *         The {@link StringBuilder} containing the query
+   * @param key
+   *         the key for this search parameter
+   * @param value
+   *         the value for this search parameter
    * @return the appended {@link StringBuilder}
    */
   private StringBuilder append(StringBuilder sb, String key, String value) {
@@ -737,9 +743,12 @@ public class SolrRequester {
    * Appends query parameters to a solr query in a way that they are found even though they are not treated as a full
    * word in solr.
    *
-   * @param sb The {@link StringBuilder} containing the query
-   * @param key the key for this search parameter
-   * @param value the value for this search parameter
+   * @param sb
+   *         The {@link StringBuilder} containing the query
+   * @param key
+   *         the key for this search parameter
+   * @param value
+   *         the value for this search parameter
    * @return the appended {@link StringBuilder}
    */
   private StringBuilder appendFuzzy(StringBuilder sb, String key, String value) {
@@ -760,8 +769,10 @@ public class SolrRequester {
   /**
    * Appends query parameters to a solr query
    *
-   * @param sb The {@link StringBuilder} containing the query
-   * @param key the key for this search parameter
+   * @param sb
+   *         The {@link StringBuilder} containing the query
+   * @param key
+   *         the key for this search parameter
    * @return the appended {@link StringBuilder}
    */
   private StringBuilder append(StringBuilder sb, String key, Date startDate, Date endDate) {
@@ -783,9 +794,9 @@ public class SolrRequester {
 
   /**
    * Returns the search results, regardless of permissions. This should be used for maintenance purposes only.
-   * 
+   *
    * @param q
-   *          the search query
+   *         the search query
    * @return the readable search result
    * @throws SolrServerException
    */
@@ -796,9 +807,9 @@ public class SolrRequester {
 
   /**
    * Returns the search results that are accessible for read by the current user.
-   * 
+   *
    * @param q
-   *          the search query
+   *         the search query
    * @return the readable search result
    * @throws SolrServerException
    */
@@ -811,7 +822,7 @@ public class SolrRequester {
    * Returns the search results that are accessible for read by the current user.
    *
    * @param q
-   *          the search query
+   *         the search query
    * @return the readable search result
    * @throws SolrServerException
    */
@@ -826,9 +837,9 @@ public class SolrRequester {
 
   /**
    * Returns the search results that are accessible for write by the current user.
-   * 
+   *
    * @param q
-   *          the search query
+   *         the search query
    * @return the writable search result
    * @throws SolrServerException
    */
@@ -839,9 +850,9 @@ public class SolrRequester {
 
   /**
    * Sets the security service.
-   * 
+   *
    * @param securityService
-   *          the securityService to set
+   *         the securityService to set
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;

@@ -17,8 +17,9 @@
 package org.opencastproject.util.osgi;
 
 import org.opencastproject.util.data.Effect0;
-import org.opencastproject.util.data.Function0;
+import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Tuple;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -28,46 +29,50 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.util.Dictionary;
+import java.util.List;
 
 import static org.opencastproject.util.data.Collections.dict;
+import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.data.functions.Functions.noop;
 import static org.osgi.framework.Constants.SERVICE_DESCRIPTION;
 import static org.osgi.framework.Constants.SERVICE_PID;
 
 /**
  * An implementation of SimpleServicePublisher creates and registers another service with the OSGi environment.
  * <p/>
- * Using this class helps to decouple business logic from the OSGi environment specifics like setters for
- * dependencies, implementing an activate method or being dependent from the {@link ManagedService} interface
- * to receive configuration data. You are now able to develop a normal java class with a decent constructor, etc.
- * that is also easier to test. Wiring up with OSGi is done through an implementation of this little helper.
+ * Using this class helps to decouple business logic from the OSGi environment. The business class can be kept clean
+ * from any OSGi specific needs like dependency setters, activate/deactivate methods or the implementation of
+ * OSGi related interfaces like {@link ManagedService} to receive configuration data. This makes the business
+ * logic far easier to test and results in a mucher cleaner design.
  * <p/>
- * Another approach to decouple the service logic from the OSGi boilerplate is to create an abstract service class
+ * Another approach to decouple the service logic from the OSGi environment is to create an abstract service class
  * which declares all it's dependencies as abstract getter methods. The OSGi connection is then implemented in
- * an inheriting class. This method, however, has the drawback of renouncing a constructor which may be useful for
- * doing further initialization work.
+ * an inheriting class. This method, however, has the drawback of having to renounce a constructor implementation
+ * since no dependencies have been set yet.
  */
 public abstract class SimpleServicePublisher implements ManagedService {
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(SimpleServicePublisher.class);
 
   private ComponentContext cc;
-  private Option<Function0<Void>> shutdown = none();
+  private Option<Effect0> shutdown = none();
 
   /**
    * Create and register a service object. Register with
-   * the OSGi environment using <code>cc.getBundleContext().registerService(..)</code>.
+   * the OSGi environment using {@link #registerService(org.osgi.service.component.ComponentContext, Object, Class, String)}
+   * or <code>cc.getBundleContext().registerService(..)</code>.
    *
    * @param properties
    *         a configuration object received by the {@link ManagedService#updated(java.util.Dictionary)} callback, never null
-   * @return an effect to unregister the published service(s) and to do other cleanup like closing resources.
+   * @return an effect to unregister the published service(s) and to do other cleanup operations like closing resources.
    *         Consider using {@link #unregisterService(org.osgi.framework.ServiceRegistration)} and
    *         {@link #close(java.io.Closeable)}.
    */
-  public abstract Function0<Void> registerService(Dictionary properties,
-                                                  ComponentContext cc) throws ConfigurationException;
+  public abstract Tuple<List<ServiceRegistration>, Effect0> registerService(Dictionary properties, ComponentContext cc)
+          throws ConfigurationException;
 
   /**
    * Return false if the service to be registered does not need a configuration dictionary provided
@@ -95,7 +100,12 @@ public abstract class SimpleServicePublisher implements ManagedService {
     unregisterService();
     if (properties != null) {
       logger.info("[{}] Registering service", this.getClass().getName());
-      shutdown = some(registerService(properties, cc));
+      final Tuple<List<ServiceRegistration>, Effect0> registrations = registerService(properties, cc);
+      shutdown = some(mlist(registrations.getA()).foldl(noop, new Function2<Effect0, ServiceRegistration, Effect0>() {
+        @Override public Effect0 apply(Effect0 e, final ServiceRegistration svcReg) {
+          return e.then(unregisterService(svcReg)).toEffect();
+        }
+      }).then(registrations.getB()).toEffect());
     } else {
       logger.info("[{}] No config", this.getClass().getName());
     }
@@ -142,7 +152,7 @@ public abstract class SimpleServicePublisher implements ManagedService {
   }
 
   private void unregisterService() {
-    for (Function0<Void> s : shutdown) {
+    for (Effect0 s : shutdown) {
       logger.info("[{}] Unregister service", this.getClass().getName());
       s.apply();
     }

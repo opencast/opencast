@@ -42,6 +42,7 @@ import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.Option.none;
@@ -403,5 +404,10 @@ public final class IoSupport {
         return new FileInputStream(a);
       }
     };
+  }
+
+  /** Create a file from the list of path elements. */
+  public static File file(String... pathElems) {
+    return new File(path(pathElems));
   }
 }

@@ -17,6 +17,7 @@
 package org.opencastproject.episode.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.util.data.Option;
 
 import java.util.Date;
 
@@ -52,7 +53,7 @@ public interface SearchResultItem {
    * @return the organization identifier
    */
   String getOrganization();
-  
+
   /**
    * @return the dcExtent
    */
@@ -195,4 +196,16 @@ public interface SearchResultItem {
    */
   boolean getOcLocked();
 
+  /**
+   * @return <code>true</code> if latest version in archive
+   */
+  boolean getOcLatestVersion();
+
+  /** Return the time of deletion or none. */
+  Option<Date> getOcDeleted();
+
+  /**
+   * @return the version in the archive
+   */
+  Version getOcVersion();
 }

@@ -1,4 +1,4 @@
-MediaSegmentImpl
-MediaSegmentPreviewImpl
-SearchResultImpl
-SearchResultItemImpl
+JaxbMediaSegment
+JaxbMediaSegmentPreview
+JaxbSearchResult
+JaxbSearchResultItem

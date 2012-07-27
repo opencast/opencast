@@ -16,9 +16,6 @@
 
 package org.opencastproject.episode.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -26,6 +23,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Part of a search result that models a video segment.
@@ -33,7 +32,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "segment", namespace = "http://search.opencastproject.org")
 @XmlRootElement(name = "segment", namespace = "http://search.opencastproject.org")
-public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentImpl> {
+public class JaxbMediaSegment implements MediaSegment, Comparable<JaxbMediaSegment> {
 
   /** The segment number **/
   @XmlAttribute(name = "index")
@@ -66,12 +65,12 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
   /** The preview urls */
   @XmlElementWrapper(name = "previews")
   @XmlElement(name = "preview")
-  private List<MediaSegmentPreviewImpl> previewUrls = new ArrayList<MediaSegmentPreviewImpl>();
+  private List<JaxbMediaSegmentPreview> previewUrls = new ArrayList<JaxbMediaSegmentPreview>();
 
   /**
    * A no-arg constructor, which is needed for JAXB serialization.
    */
-  public MediaSegmentImpl() {
+  public JaxbMediaSegment() {
   }
 
   /**
@@ -80,7 +79,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
    * @param segment
    *          the segment number
    */
-  public MediaSegmentImpl(int segment) {
+  public JaxbMediaSegment(int segment) {
     this.number = segment;
   }
 
@@ -214,7 +213,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
    */
   @Override
   public void addPreview(String url, String reference) {
-    previewUrls.add(new MediaSegmentPreviewImpl(url, reference));
+    previewUrls.add(new JaxbMediaSegmentPreview(url, reference));
   }
 
   /**
@@ -223,7 +222,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   @Override
-  public int compareTo(MediaSegmentImpl o) {
+  public int compareTo(JaxbMediaSegment o) {
     return this.getIndex() - o.getIndex();
   }
 

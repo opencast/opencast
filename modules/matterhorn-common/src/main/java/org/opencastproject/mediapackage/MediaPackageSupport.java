@@ -17,11 +17,17 @@
 package org.opencastproject.mediapackage;
 
 import org.opencastproject.util.PathSupport;
-
+import org.opencastproject.util.data.Effect;
+import org.opencastproject.util.data.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+
+import static org.opencastproject.util.IoSupport.withResource;
 
 /**
  * Utility class used for media package handling.
@@ -118,4 +124,41 @@ public final class MediaPackageSupport {
     return f;
   }
 
+  /** Immutable modification of a media package. */
+  public static MediaPackage modify(MediaPackage mp, Function<MediaPackage, Void> f) {
+    final MediaPackage clone = (MediaPackage) mp.clone();
+    f.apply(clone);
+    return clone;
+  }
+
+  /** Create a copy of the given media package. */
+  public static MediaPackage copy(MediaPackage mp) {
+    return (MediaPackage) mp.clone();
+  }
+
+  /** Rewrite the URIs of all media package elements. Modifications are done on a copy of the given package. */
+  public static MediaPackage rewriteUris(final MediaPackage mp, final Function<MediaPackageElement, URI> f) {
+    return modify(mp, new Effect<MediaPackage>() {
+      @Override public void run(MediaPackage mp) {
+        for (MediaPackageElement e : mp.getElements()) {
+          e.setURI(f.apply(e));
+        }
+      }
+    });
+  }
+
+  /** For testing purposes only! Loads a mediapackage from the class path. */
+  public static MediaPackage loadMediaPackageFromClassPath(String manifest) {
+    final MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
+    final URL rootUrl = MediaPackageSupport.class.getResource("/");
+    mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(rootUrl));
+    final InputStream in = MediaPackageSupport.class.getResourceAsStream(manifest);
+    if (in == null)
+      throw new Error(manifest + "can not be found");
+    return withResource(in, new Function.X<InputStream, MediaPackage>() {
+      @Override public MediaPackage xapply(InputStream is) throws MediaPackageException {
+        return mediaPackageBuilder.loadFromXml(is);
+      }
+    });
+  }
 }

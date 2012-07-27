@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlValue;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "preview", namespace = "http://search.opencastproject.org")
 @XmlRootElement(name = "preview", namespace = "http://search.opencastproject.org")
-public class MediaSegmentPreviewImpl implements MediaSegmentPreview {
+public class JaxbMediaSegmentPreview implements MediaSegmentPreview {
 
   /** The preview type **/
   @XmlAttribute(name = "ref")
@@ -43,7 +43,7 @@ public class MediaSegmentPreviewImpl implements MediaSegmentPreview {
   /**
    * Needed by JAXB.
    */
-  public MediaSegmentPreviewImpl() {
+  public JaxbMediaSegmentPreview() {
   }
 
   /**
@@ -54,7 +54,7 @@ public class MediaSegmentPreviewImpl implements MediaSegmentPreview {
    * @param reference
    *          reference to the source track
    */
-  public MediaSegmentPreviewImpl(String url, String reference) {
+  public JaxbMediaSegmentPreview(String url, String reference) {
     this.url = url;
     this.reference = reference;
   }
