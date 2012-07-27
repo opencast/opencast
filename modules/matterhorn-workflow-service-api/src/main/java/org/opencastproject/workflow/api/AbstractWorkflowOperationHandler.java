@@ -66,25 +66,30 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
   @Override
-  public abstract WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException;
+  public abstract WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException;
 
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#skip(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#skip(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
   @Override
-  public WorkflowOperationResult skip(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult skip(WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     return createResult(Action.SKIP);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#destroy(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#destroy(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
   @Override
   public void destroy(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
@@ -126,15 +131,15 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * Converts a comma separated string into a set of values. Useful for converting operation configuration strings into
    * multi-valued sets.
    * 
-   * @param commaSeparated
-   *          The comma separated string
+   * @param elements
+   *          The comma space separated string
    * @return the set of values
    */
-  protected List<String> asList(String commaSeparated) {
-    commaSeparated = StringUtils.trimToNull(commaSeparated);
+  protected List<String> asList(String elements) {
+    elements = StringUtils.trimToNull(elements);
     List<String> list = new ArrayList<String>();
-    if (commaSeparated != null) {
-      for (String s : commaSeparated.split(",")) {
+    if (elements != null) {
+      for (String s : StringUtils.split(elements, ",")) {
         if (StringUtils.trimToNull(s) != null) {
           list.add(s.trim());
         }

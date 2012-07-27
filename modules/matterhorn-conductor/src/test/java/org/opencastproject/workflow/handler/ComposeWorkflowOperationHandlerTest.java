@@ -126,10 +126,10 @@ public class ComposeWorkflowOperationHandlerTest {
     // operation configuration
     String targetTags = "engage,rss";
     Map<String, String> configurations = new HashMap<String, String>();
-    configurations.put("source-flavor", "presentation/source");
+    configurations.put("source-flavors", "presentation/source");
     configurations.put("target-tags", targetTags);
     configurations.put("target-flavor", "presenter/delivery");
-    configurations.put("encoding-profile", "flash.http");
+    configurations.put("encoding-profiles", "flash.http");
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
@@ -157,24 +157,14 @@ public class ComposeWorkflowOperationHandlerTest {
     // set up mock composer service
     composerService = EasyMock.createNiceMock(ComposerService.class);
     EasyMock.expect(composerService.listProfiles()).andReturn(profileList);
-    EasyMock.expect(
-            composerService.encode((Track) EasyMock.anyObject(), (String) EasyMock.anyObject()))
-            .andReturn(job);
+    EasyMock.expect(composerService.encode((Track) EasyMock.anyObject(), (String) EasyMock.anyObject())).andReturn(job);
     EasyMock.replay(composerService);
     operationHandler.setComposerService(composerService);
 
     Map<String, String> configurations = new HashMap<String, String>();
     try {
-      // no source flavour
-      getWorkflowOperationResult(mp, configurations);
-      Assert.fail("Since neither source audio nor source video flavour is specified exception should be thrown");
-    } catch (WorkflowOperationException e) {
-      // expecting exception
-    }
-
-    try {
-      // no source flavour
-      configurations.put("source-flavor", "presentation/source");
+      // no encoding profile
+      configurations.put("source-flavors", "presentation/source");
       getWorkflowOperationResult(mp, configurations);
       Assert.fail("Since encoding profile is not specified exception should be thrown");
     } catch (WorkflowOperationException e) {
