@@ -40,13 +40,13 @@ table
 #oc_body { position: relative; overflow: hidden; }
 
 #oc_flash-player { text-align: center; background-color: #000000; }
-#oc_video-player-controls { height: 30px; background-position: 0 0px; background-image: url("/engage/ui/img/engage_player/oc_icons.png"); }
+#oc_video-player-controls { height: 30px; background-position: 0 0px; background-image: url("../../img/engage_player/oc_icons.png"); }
 
 #oc_video-player-controls-embed
 {
   height:                   26px;
   width:                    100%;
-  background-image:         url("/engage/ui/img/engage_player/oc_icons.png");
+  background-image:         url("../../img/engage_player/oc_icons.png");
   background-position:      0 0px;
   text-align:               center;
   padding-top:              5px;
@@ -119,7 +119,7 @@ table
 {
   display:                  none;
 }
-#oc_time-chooser { width: 30px; height: 10px; background: url("/engage/ui/img/engage_player/oc_icons_2.png") no-repeat -180px -162px transparent;}
+#oc_time-chooser { width: 30px; height: 10px; background: url("../../img/engage_player/oc_icons_2.png") no-repeat -180px -162px transparent;}
 .oc_popuplayer { position: absolute; left: 0; top: -100px; }
 .oc_popuplayer-list { list-style:none outside none; padding: 0}
 .oc_popuplayer-list li { padding: 5px 0; }
@@ -211,7 +211,7 @@ table
 
 .oc_slider-volume-Thumb
 {
-  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background:               transparent url("../../img/engage_player/oc_icons.png");
   background-position:      -30px -270px;
   margin:                   0px;
   padding:                  0px;
@@ -239,7 +239,7 @@ table
 
 .oc-slider-volume-Thumb
 {
-  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background:               transparent url("../../img/engage_player/oc_icons.png");
   background-position:      -30px -270px;
   margin:                   0px;
   padding:                  0px;
@@ -296,7 +296,7 @@ table
 
 .scrubber-button 
 {
-  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background:               transparent url("../../img/engage_player/oc_icons.png");
   background-position:      -60px -360px;
   height:                   19px;
   width:                    9px;
@@ -316,7 +316,7 @@ img
 
 #draggable 
 { 
-  background:               transparent url("/engage/ui/img/engage_player/oc_icons.png");
+  background:               transparent url("../../img/engage_player/oc_icons.png");
   background-position:      -60px -360px;
   height:                   19px;
   width:                    9px;
