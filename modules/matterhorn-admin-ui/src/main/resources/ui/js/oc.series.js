@@ -27,6 +27,7 @@ var SERIES_SERVICE_URL = "/series";
 var SERIES_LIST_URL = "/admin/index.html#/series_list";
 var ANOYMOUS_URL = "/info/me.json";
 var DUBLINCORE_NS_URI     = 'http://purl.org/dc/terms/';
+var OC_NS_URI = 'http://www.opencastproject.org/matterhorn/';
 var CREATE_MODE = 1;
 var EDIT_MODE   = 2;
 
@@ -243,13 +244,24 @@ ocSeries.Internationalize = function(){
 }
 
 ocSeries.loadSeries = function(data) {
-  data = data['http://purl.org/dc/terms/']
+  data_save = data;
+  data = data[DUBLINCORE_NS_URI]
   $("#id").val(data['identifier'][0].value);
   for(var key in data) {
     if(key == "title") {
       ocSeries.seriesTitle = data[key][0].value;
     }
     $('#' + key).attr('value', data[key][0].value);
+  }
+  data = data_save[OC_NS_URI];
+  for(key in data) {
+    if($('#' + key).attr('type') == "checkbox") {
+      if(data[key][0].value == "true") {
+        $('#' + key).attr('checked', 'checked');
+      }
+    } else {
+      $('#' + key).attr('value', data[key][0].value);
+    }
   }
 }
 
@@ -325,7 +337,7 @@ ocSeries.createDublinCoreDocument = function() {
   dcDoc = ocUtils.createDoc('dublincore', 'http://www.opencastproject.org/xsd/1.0/dublincore/');
   $(dcDoc.documentElement).attr('xmlns:dcterms', 'http://purl.org/dc/terms/');
   $(dcDoc.documentElement).attr('xmlns:dc', 'http://purl.org/dc/elements/1.1/');
-  $(dcDoc.documentElement).attr('xmlns:oc', 'http://www.opencastproject.org/matterhorn');
+  $(dcDoc.documentElement).attr('xmlns:oc', 'http://www.opencastproject.org/matterhorn/');
   $('.dc-metadata-field').each(function() {
     $field = $(this);
     var $newElm = $(dcDoc.createElement('dcterms:' + $field.attr('id')));
@@ -337,6 +349,16 @@ ocSeries.createDublinCoreDocument = function() {
     $newElm.text($('#id').val());
     $(dcDoc.documentElement).append($newElm);
   }
+  $('.oc-metadata-field').each(function() {
+    $field = $(this);
+    var $newElm = $(dcDoc.createElement('oc:' + $field.attr('id')));
+    if($field.attr('type') == "checkbox") {
+      $newElm.text($field.attr('checked') == "checked");
+    } else {
+      $newElm.text($field.val());
+    }
+    $(dcDoc.documentElement).append($newElm)
+  });
   var out = ocUtils.xmlToString(dcDoc);
   return out;
 }
