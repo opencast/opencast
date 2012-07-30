@@ -22,13 +22,12 @@ import org.opencastproject.composer.api.EncodingProfile.MediaType;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
-import org.opencastproject.mediapackage.selector.SimpleElementSelector;
+import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -156,7 +155,7 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
     String sourceFlavorsOption = StringUtils.trimToNull(operation.getConfiguration("source-flavors"));
     String targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration("target-flavor"));
 
-    AbstractMediaPackageElementSelector<MediaPackageElement> elementSelector = new SimpleElementSelector();
+    AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
     // Make sure either one of tags or flavors are provided
     if (StringUtils.isBlank(sourceTagsOption) && StringUtils.isBlank(sourceFlavorOption)
@@ -195,7 +194,7 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
     for (String profileName : asList(profilesOption)) {
       EncodingProfile profile = composerService.getProfile(profileName);
       if (profile == null)
-        throw new IllegalStateException("Encoding profile '" + profileName + "' was not found");
+        throw new WorkflowOperationException("Encoding profile '" + profileName + "' was not found");
       profiles.add(profile);
     }
 
@@ -205,7 +204,7 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
       String profileId = StringUtils.trim(profileOption);
       EncodingProfile profile = composerService.getProfile(profileId);
       if (profile == null)
-        throw new IllegalStateException("Encoding profile '" + profileId + "' was not found");
+        throw new WorkflowOperationException("Encoding profile '" + profileId + "' was not found");
       profiles.add(profile);
     }
 
@@ -233,23 +232,12 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
     }
 
     // Look for elements matching the tag
-    Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, false);
-    if (elements.isEmpty()) {
-      logger.info("No elements matching anything");
-      return createResult(mediaPackage, Action.CONTINUE);
-    }
+    Collection<Track> elements = elementSelector.select(mediaPackage, false);
 
     // Encode all tracks found
     long totalTimeInQueue = 0;
     Map<Job, JobInformation> encodingJobs = new HashMap<Job, JobInformation>();
-    for (MediaPackageElement element : elements) {
-
-      // Make sure we are only looking at a tracks
-      if (!MediaPackageElement.Type.Track.equals(element.getElementType())) {
-        logger.debug("Skipping media package element {}", element);
-        continue;
-      }
-      Track track = (Track) element;
+    for (Track track : elements) {
 
       // Skip audio/video only mismatches
       if (audioOnly && track.hasVideo()) {
@@ -278,6 +266,11 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
         // Start encoding and wait for the result
         encodingJobs.put(composerService.encode(track, profile.getIdentifier()), new JobInformation(track, profile));
       }
+    }
+
+    if (encodingJobs.isEmpty()) {
+      logger.info("No matching tracks found");
+      return createResult(mediaPackage, Action.CONTINUE);
     }
 
     // Wait for the jobs to return
