@@ -72,7 +72,6 @@ public class CaptureAdminRestEndpointTest {
 
     // parse the xml and extract the running clients names
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    // factory.setNamespaceAware(true); // don't forget this!
     DocumentBuilder builder = factory.newDocumentBuilder();
     Document doc = builder.parse(IOUtils.toInputStream(xmlResponse, "UTF-8"));
     XPath xPath = XPathFactory.newInstance().newXPath();
