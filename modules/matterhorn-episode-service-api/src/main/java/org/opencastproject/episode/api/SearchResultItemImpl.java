@@ -18,6 +18,12 @@ package org.opencastproject.episode.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -26,11 +32,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * This class models an item in the search result. It represents a 'video' or 'series' object. It does not, however,
@@ -53,7 +54,7 @@ public class SearchResultItemImpl implements SearchResultItem {
   private String organization;
 
   /** The media package */
-  @XmlElement(name = "mediapackage")
+  @XmlElement(name = "mediapackage", namespace = "http://mediapackage.opencastproject.org")
   private MediaPackage mediaPackage = null;
 
   /** Dublin core field 'dc:extent' */
@@ -675,9 +676,8 @@ public class SearchResultItemImpl implements SearchResultItem {
    * @see org.opencastproject.episode.api.SearchResultItem#getSegments()
    */
   public MediaSegment[] getSegments() {
-    return mediaSegments != null
-        ? mediaSegments.toArray(new MediaSegment[mediaSegments.size()])
-        : new MediaSegmentImpl[0];
+    return mediaSegments != null ? mediaSegments.toArray(new MediaSegment[mediaSegments.size()])
+            : new MediaSegmentImpl[0];
   }
 
   /**

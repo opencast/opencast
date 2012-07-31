@@ -40,6 +40,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Tests the functionality of a remote workflow service rest endpoint
  */
+@Ignore
 public class LtiAuthenticationTest {
   private static final Logger logger = LoggerFactory.getLogger(LtiAuthenticationTest.class);
 
@@ -68,7 +70,6 @@ public class LtiAuthenticationTest {
   private DefaultHttpClient httpClient;
   private OAuthClient oauthClient;
 
-
   @BeforeClass
   public static void setupClass() throws Exception {
     logger.info("Running " + LtiAuthenticationTest.class.getName());
@@ -78,7 +79,7 @@ public class LtiAuthenticationTest {
   public static void tearDownClass() throws Exception {
     logger.info("Finished " + LtiAuthenticationTest.class.getName());
   }
-  
+
   @Before
   public void setUp() throws Exception {
     httpClient = new DefaultHttpClient();
@@ -100,38 +101,38 @@ public class LtiAuthenticationTest {
     oauthMessage.addParameter(OAuth.OAUTH_SIGNATURE_METHOD, OAuth.HMAC_SHA1);
     oauthMessage.addParameter(OAuth.OAUTH_NONCE, nonce);
     oauthMessage.addParameter(OAuth.OAUTH_TIMESTAMP, timestamp);
-    
+
     // Add some LTI parameters
     oauthMessage.addParameter("user_id", LTI_CONSUMER_USER);
     oauthMessage.addParameter("context_id", LTI_CONSUMER_CONTEXT);
     oauthMessage.addParameter("consumer_gui", LTI_CONSUMER_GUID);
     oauthMessage.addParameter("custom_test", "true");
-    
+
     // Sign the request
     OAuthConsumer consumer = new OAuthConsumer(null, CONSUMER_KEY, CONSUMER_SECRET, null);
     OAuthAccessor accessor = new OAuthAccessor(consumer);
     oauthMessage.sign(accessor);
 
     // Get the response
-    OAuthResponseMessage oauthResponse = (OAuthResponseMessage)oauthClient.invoke(oauthMessage, ParameterStyle.BODY);
-    
+    OAuthResponseMessage oauthResponse = (OAuthResponseMessage) oauthClient.invoke(oauthMessage, ParameterStyle.BODY);
+
     // Make sure we got what we wanted
     Assert.assertEquals(HttpStatus.SC_OK, oauthResponse.getHttpResponse().getStatusCode());
     String cookie = oauthResponse.getHttpResponse().getHeader("Set-Cookie");
     Assert.assertNotNull(cookie);
-    
+
     String sessionId = cookie.substring(0, cookie.lastIndexOf(";"));
-    
+
     // Send a GET request to "/info/me.json" using this cookie
     HttpGet get = new HttpGet(Main.BASE_URL + "/info/me.json");
     get.setHeader("Cookie", sessionId);
     HttpResponse httpResponse = httpClient.execute(get);
     String me = EntityUtils.toString(httpResponse.getEntity());
     JSONObject meJson = (JSONObject) new JSONParser().parse(me);
-    
+
     // Ensure that the "current user" was set by the LTI consumer
     Assert.assertEquals(LTI_USER_PREFIX + LTI_CONSUMER_USER, meJson.get("username"));
-    
+
     // Send a GET request to "/lti" using this cookie
     get = new HttpGet(Main.BASE_URL + "/lti");
     get.setHeader("Cookie", sessionId);
@@ -141,16 +142,16 @@ public class LtiAuthenticationTest {
 
     // Ensure that the LTI information sent by the tool consumer is available
     Assert.assertEquals(LTI_CONSUMER_CONTEXT, ltiJson.get("context_id"));
-    
+
     // Make sure we can't use the same nonce twice
     try {
-      oauthResponse = (OAuthResponseMessage)oauthClient.invoke(oauthMessage, ParameterStyle.BODY);
+      oauthResponse = (OAuthResponseMessage) oauthClient.invoke(oauthMessage, ParameterStyle.BODY);
       Assert.fail();
-    } catch(OAuthProblemException e) {
+    } catch (OAuthProblemException e) {
       // expected
     }
   }
-  
+
   @Test
   public void testLtiLaunchFromUnknownConsumer() throws Exception {
     // Construct a POST message with the oauth parameters
@@ -161,12 +162,12 @@ public class LtiAuthenticationTest {
     oauthMessage.addParameter(OAuth.OAUTH_SIGNATURE_METHOD, OAuth.HMAC_SHA1);
     oauthMessage.addParameter(OAuth.OAUTH_NONCE, nonce);
     oauthMessage.addParameter(OAuth.OAUTH_TIMESTAMP, timestamp);
-    
+
     // Add some LTI parameters
     oauthMessage.addParameter("user_id", LTI_CONSUMER_USER);
     oauthMessage.addParameter("context_id", LTI_CONSUMER_CONTEXT);
     oauthMessage.addParameter("custom_test", "true");
-    
+
     // Sign the request
     OAuthConsumer consumer = new OAuthConsumer(null, CONSUMER_KEY, "wrong secret", null);
     OAuthAccessor accessor = new OAuthAccessor(consumer);
@@ -176,12 +177,11 @@ public class LtiAuthenticationTest {
     try {
       oauthClient.invoke(oauthMessage, ParameterStyle.BODY);
       Assert.fail("OAuth with a bad signature should result in an exception");
-    } catch(OAuthProblemException e) {
+    } catch (OAuthProblemException e) {
       // expected
     }
-    
-  }
 
+  }
 
   @Test
   public void testLtiLaunchFromUnknownUser() throws Exception {
@@ -195,34 +195,34 @@ public class LtiAuthenticationTest {
     oauthMessage.addParameter(OAuth.OAUTH_SIGNATURE_METHOD, OAuth.HMAC_SHA1);
     oauthMessage.addParameter(OAuth.OAUTH_NONCE, nonce);
     oauthMessage.addParameter(OAuth.OAUTH_TIMESTAMP, timestamp);
-    
+
     // Add some LTI parameters
     oauthMessage.addParameter("user_id", unknownUserId);
     oauthMessage.addParameter("context_id", LTI_CONSUMER_CONTEXT);
     oauthMessage.addParameter("custom_test", "true");
-    
+
     // Sign the request
     OAuthConsumer consumer = new OAuthConsumer(null, CONSUMER_KEY, CONSUMER_SECRET, null);
     OAuthAccessor accessor = new OAuthAccessor(consumer);
     oauthMessage.sign(accessor);
 
     // Get the response
-    OAuthResponseMessage oauthResponse = (OAuthResponseMessage)oauthClient.invoke(oauthMessage, ParameterStyle.BODY);
-    
+    OAuthResponseMessage oauthResponse = (OAuthResponseMessage) oauthClient.invoke(oauthMessage, ParameterStyle.BODY);
+
     // Make sure we got what we wanted
     Assert.assertEquals(HttpStatus.SC_OK, oauthResponse.getHttpResponse().getStatusCode());
     String cookie = oauthResponse.getHttpResponse().getHeader("Set-Cookie");
     Assert.assertNotNull(cookie);
-    
+
     String sessionId = cookie.substring(0, cookie.lastIndexOf(";"));
-    
+
     // Send a GET request to "/info/me.json" using this cookie
     HttpGet get = new HttpGet(Main.BASE_URL + "/info/me.json");
     get.setHeader("Cookie", sessionId);
     HttpResponse httpResponse = httpClient.execute(get);
     String me = EntityUtils.toString(httpResponse.getEntity());
     JSONObject meJson = (JSONObject) new JSONParser().parse(me);
-    
+
     // Ensure that the "current user" was set by the LTI consumer
     Assert.assertEquals(LTI_USER_PREFIX + unknownUserId, meJson.get("username"));
   }

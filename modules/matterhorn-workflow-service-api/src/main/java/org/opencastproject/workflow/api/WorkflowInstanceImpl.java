@@ -68,13 +68,13 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   @XmlElement(name = "parent", nillable = true)
   private Long parentId;
 
-  @XmlElement(name = "creator")
+  @XmlElement(name = "creator", namespace = "http://org.opencastproject.security")
   private User creator;
 
-  @XmlElement(name = "organization")
+  @XmlElement(name = "organization", namespace = "http://org.opencastproject.security")
   private Organization organization;
 
-  @XmlElement(name = "mediapackage")
+  @XmlElement(name = "mediapackage", namespace = "http://mediapackage.opencastproject.org")
   private MediaPackage mediaPackage;
 
   @XmlElement(name = "operation")

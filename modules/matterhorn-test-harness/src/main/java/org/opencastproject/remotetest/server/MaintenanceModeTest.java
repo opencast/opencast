@@ -70,12 +70,12 @@ public class MaintenanceModeTest {
   @Test
   public void testMaintenanceMode() throws Exception {
     // Ensure that there is a service available
-    HttpGet availableServicesGet = new HttpGet(Main.BASE_URL + "/services/available.xml?serviceType="
-            + SERVICE_TYPE);
+    HttpGet availableServicesGet = new HttpGet(Main.BASE_URL + "/services/available.xml?serviceType=" + SERVICE_TYPE);
     HttpResponse availableServicesResponse = client.execute(availableServicesGet);
     Assert.assertEquals(HttpStatus.SC_OK, availableServicesResponse.getStatusLine().getStatusCode());
     String availableServicesXml = EntityUtils.toString(availableServicesResponse.getEntity());
-    NodeList availableServicesNodes = (NodeList) Utils.xpath(availableServicesXml, "//service", XPathConstants.NODESET);
+    NodeList availableServicesNodes = (NodeList) Utils.xpath(availableServicesXml, "//*[local-name() = 'service']",
+            XPathConstants.NODESET);
     Assert.assertTrue(availableServicesNodes.getLength() == 1);
 
     // Start a job
@@ -107,7 +107,8 @@ public class MaintenanceModeTest {
     availableServicesResponse = client.execute(availableServicesGet);
     Assert.assertEquals(HttpStatus.SC_OK, availableServicesResponse.getStatusLine().getStatusCode());
     availableServicesXml = EntityUtils.toString(availableServicesResponse.getEntity());
-    availableServicesNodes = (NodeList) Utils.xpath(availableServicesXml, "//service", XPathConstants.NODESET);
+    availableServicesNodes = (NodeList) Utils.xpath(availableServicesXml, "//*[local-name() = 'service']",
+            XPathConstants.NODESET);
     Assert.assertTrue(availableServicesNodes.getLength() == 0);
 
     // Try to start another job on this server. This should still be possible, even in maintenance mode, because the job

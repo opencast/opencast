@@ -1,4 +1,5 @@
-<definition>
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
   <id>error</id>
   <description>Notifies the logs that an error occurred</description>
   <operations>

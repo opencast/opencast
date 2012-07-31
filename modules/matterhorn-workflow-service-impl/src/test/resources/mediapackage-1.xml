@@ -1,10 +1,10 @@
 <oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" start="2007-12-05T13:40:00" duration="1004400000">
-  <title>Climate</title>
-  <metadata>
-    <catalog id="catalog-1" type="dublincore/episode">
-      <mimetype>text/xml</mimetype>
-      <url>dc-1.xml</url>
-      <checksum type="md5">20e466615251074e127a1627fd0dae3e</checksum>
-    </catalog>
-  </metadata>
+  <oc:title>Climate</oc:title>
+  <oc:metadata>
+    <oc:catalog id="catalog-1" type="dublincore/episode">
+      <oc:mimetype>text/xml</oc:mimetype>
+      <oc:url>dc-1.xml</oc:url>
+      <oc:checksum type="md5">20e466615251074e127a1627fd0dae3e</oc:checksum>
+    </oc:catalog>
+  </oc:metadata>
 </oc:mediapackage>

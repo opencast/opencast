@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.io.File;
@@ -50,8 +51,15 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
-/** Handles an individual ingest from copying the media package, changing the correct metadata and posting it to the server. **/
+/**
+ * Handles an individual ingest from copying the media package, changing the correct metadata and posting it to the
+ * server.
+ **/
 public class IngestJob implements Runnable {
   // The logger.
   private static final Logger logger = LoggerFactory.getLogger(IngestJob.class);
@@ -143,8 +151,10 @@ public class IngestJob implements Runnable {
       DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
       Document doc = docBuilder.parse(filepath);
 
-      // Get the mediapackage element by tag name directly
-      Node mediapackage = doc.getElementsByTagName("mediapackage").item(0);
+      // Get the mediapackage
+      XPath xPath = XPathFactory.newInstance().newXPath();
+      Node mediapackage = ((NodeList) xPath.evaluate("//*[local-name() = 'mediapackage']", doc, XPathConstants.NODESET))
+              .item(0);
 
       // update mediapackage attribute
       NamedNodeMap attr = mediapackage.getAttributes();
@@ -165,6 +175,8 @@ public class IngestJob implements Runnable {
       ioe.printStackTrace();
     } catch (SAXException sae) {
       sae.printStackTrace();
+    } catch (XPathExpressionException xpe) {
+      xpe.printStackTrace();
     }
   }
 
@@ -281,14 +293,14 @@ public class IngestJob implements Runnable {
       if (retValue == HttpURLConnection.HTTP_OK) {
         logger.info(id + " successfully ingested.");
       }
-      
+
       else {
-        logger.info(id + " ingest failed with return code " + retValue + " and status line " + response.getStatusLine().toString());
+        logger.info(id + " ingest failed with return code " + retValue + " and status line "
+                + response.getStatusLine().toString());
       }
 
     } catch (MalformedURLException e) {
-      logger.error("Malformed URL for ingest target \"" + loadTest.getCoreAddress()
-              + "/ingest/addZippedMediaPackage\"");
+      logger.error("Malformed URL for ingest target \"" + loadTest.getCoreAddress() + "/ingest/addZippedMediaPackage\"");
     }
   }
 

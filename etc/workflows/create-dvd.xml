@@ -1,4 +1,5 @@
-<definition>
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
   <id>create-dvd</id>
   <title>Encode suitable for standalone DVD players</title>
   <description>

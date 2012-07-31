@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ns1:SchedulerEvent xmlns:ns1="http://scheduler.opencastproject.org">
+<SchedulerEvent xmlns="http://scheduler.opencastproject.org">
 	<id>@@id@@</id>
 	<metadata>
 		<item key="channel-id">
@@ -38,4 +38,4 @@
 		<resource>MOCK_PRESENTER</resource>
 		<resource>MOCK_MICROPHONE</resource>
 	</resources>
-</ns1:SchedulerEvent>
+</SchedulerEvent>

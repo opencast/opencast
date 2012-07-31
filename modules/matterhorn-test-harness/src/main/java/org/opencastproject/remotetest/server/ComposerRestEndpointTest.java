@@ -94,7 +94,7 @@ public class ComposerRestEndpointTest {
     while (!JobUtils.isJobInState(jobId, "FINISHED")) {
       Thread.sleep(2000); // wait and try again
       System.out.println("Waiting for encoding job " + jobId + " to finish");
-      if(JobUtils.isJobInState(jobId, "FAILED")) {
+      if (JobUtils.isJobInState(jobId, "FAILED")) {
         Assert.fail();
       }
     }
@@ -121,7 +121,7 @@ public class ComposerRestEndpointTest {
     while (!JobUtils.isJobInState(jobId, "FINISHED")) {
       Thread.sleep(2000); // wait and try again
       System.out.println("Waiting for image extraction job " + jobId + " to finish");
-      if(JobUtils.isJobInState(jobId, "FAILED")) {
+      if (JobUtils.isJobInState(jobId, "FAILED")) {
         Assert.fail();
       }
     }
@@ -147,7 +147,7 @@ public class ComposerRestEndpointTest {
     while (!JobUtils.isJobInState(jobId, "FINISHED")) {
       Thread.sleep(2000); // wait and try again
       System.out.println("Waiting for image conversion job " + jobId + " to finish");
-      if(JobUtils.isJobInState(jobId, "FAILED")) {
+      if (JobUtils.isJobInState(jobId, "FAILED")) {
         Assert.fail();
       }
     }
@@ -175,7 +175,7 @@ public class ComposerRestEndpointTest {
     while (!JobUtils.isJobInState(jobId, "FINISHED")) {
       Thread.sleep(2000); // wait and try again
       System.out.println("Waiting for encoding job " + jobId + " to finish");
-      if(JobUtils.isJobInState(jobId, "FAILED")) {
+      if (JobUtils.isJobInState(jobId, "FAILED")) {
         Assert.fail();
       }
 
@@ -186,17 +186,17 @@ public class ComposerRestEndpointTest {
     long duration = getDurationFromJob(jobXml);
     Assert.assertTrue(duration < 14546);
   }
-  
+
   @Test
   public void testWatermarking() throws Exception {
-    File workingDirectory = new File (System.getProperty("java.io.tmpdir"), "watermarktest");
+    File workingDirectory = new File(System.getProperty("java.io.tmpdir"), "watermarktest");
     if (!workingDirectory.exists()) {
       workingDirectory.mkdirs();
     }
     URL sourceUrl = getClass().getResource("/watermark.png");
     File sourceFile = new File(workingDirectory, "watermark.png");
     FileUtils.copyURLToFile(sourceUrl, sourceFile);
-    
+
     HttpPost postEncode = new HttpPost(ComposerResources.getServiceUrl() + "watermark");
     List<NameValuePair> formParams = new ArrayList<NameValuePair>();
     formParams.add(new BasicNameValuePair("sourceTrack", SampleUtils.generateVideoTrack(BASE_URL)));
@@ -216,11 +216,11 @@ public class ComposerRestEndpointTest {
     while (!JobUtils.isJobInState(jobId, "FINISHED")) {
       Thread.sleep(2000); // wait and try again
       System.out.println("Waiting for watermarking job " + jobId + " to finish");
-      if(JobUtils.isJobInState(jobId, "FAILED")) {
+      if (JobUtils.isJobInState(jobId, "FAILED")) {
         Assert.fail();
       }
     }
-    
+
     FileUtils.forceDelete(workingDirectory);
   }
 
@@ -236,10 +236,10 @@ public class ComposerRestEndpointTest {
     factory.setNamespaceAware(true);
     DocumentBuilder builder = factory.newDocumentBuilder();
     Document doc = builder.parse(IOUtils.toInputStream(jobXml, "UTF-8"));
-    String payload = (String) XPathFactory.newInstance().newXPath().compile("//payload")
+    String payload = (String) XPathFactory.newInstance().newXPath().compile("//*[local-name() = 'payload']")
             .evaluate(doc, XPathConstants.STRING);
     Document payloadDoc = builder.parse(IOUtils.toInputStream(payload, "UTF-8"));
-    Element element = ((Element) XPathFactory.newInstance().newXPath().compile("//duration[1]")
+    Element element = ((Element) XPathFactory.newInstance().newXPath().compile("//*[local-name() = 'duration'][1]")
             .evaluate(payloadDoc, XPathConstants.NODE));
     if (element == null)
       throw new IllegalStateException("Track doesn't contain a duration");

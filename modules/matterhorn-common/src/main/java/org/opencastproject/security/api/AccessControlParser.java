@@ -31,7 +31,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  * Marshals and unmarshals {@link AccessControlList}s to/from XML.
@@ -51,9 +51,9 @@ public final class AccessControlParser {
 
   /** ACE constant used in JSON formatted access control entries */
   public static final String ACE = "ace";
-  
+
   /** Encoding expected from all inputs */
-  public static final String ENCODING = "UTF-8";  
+  public static final String ENCODING = "UTF-8";
 
   private static final JAXBContext jaxbContext;
 
@@ -165,8 +165,7 @@ public final class AccessControlParser {
     Unmarshaller unmarshaller;
     try {
       unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in),
-              AccessControlList.class).getValue();
+      return unmarshaller.unmarshal(new StreamSource(in), AccessControlList.class).getValue();
     } catch (Exception e) {
       if (e instanceof IOException) {
         throw (IOException) e;

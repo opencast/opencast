@@ -90,9 +90,9 @@ public class ServiceRegistryRestEndpointTest {
     try {
       in = response.getEntity().getContent();
       doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
-      String typeFromResponse = (String) Utils.xpath(doc, "//type", XPathConstants.STRING);
+      String typeFromResponse = (String) Utils.xpath(doc, "//*[local-name() = 'type']", XPathConstants.STRING);
       Assert.assertEquals("org.opencastproject.composer", typeFromResponse);
-      String hostFromResponse = (String) Utils.xpath(doc, "//host", XPathConstants.STRING);
+      String hostFromResponse = (String) Utils.xpath(doc, "//*[local-name() = 'host']", XPathConstants.STRING);
       Assert.assertEquals(BASE_URL, hostFromResponse);
     } finally {
       IOUtils.closeQuietly(in);
@@ -113,7 +113,8 @@ public class ServiceRegistryRestEndpointTest {
     try {
       in = response.getEntity().getContent();
       doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
-      int serviceCount = ((Number) Utils.xpath(doc, "count(//service)", XPathConstants.NUMBER)).intValue();
+      int serviceCount = ((Number) Utils.xpath(doc, "count(//*[local-name() = 'service'])", XPathConstants.NUMBER))
+              .intValue();
       Assert.assertTrue(serviceCount > 0);
     } finally {
       IOUtils.closeQuietly(in);
@@ -128,7 +129,8 @@ public class ServiceRegistryRestEndpointTest {
     try {
       in = response.getEntity().getContent();
       doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
-      int serviceCount = ((Number) Utils.xpath(doc, "count(//service)", XPathConstants.NUMBER)).intValue();
+      int serviceCount = ((Number) Utils.xpath(doc, "count(//*[local-name() = 'service'])", XPathConstants.NUMBER))
+              .intValue();
       Assert.assertEquals(1, serviceCount);
     } finally {
       IOUtils.closeQuietly(in);
@@ -143,19 +145,21 @@ public class ServiceRegistryRestEndpointTest {
     try {
       in = response.getEntity().getContent();
       doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
-      int serviceCount = ((Number) Utils.xpath(doc, "count(//service)", XPathConstants.NUMBER)).intValue();
+      int serviceCount = ((Number) Utils.xpath(doc, "count(//*[local-name() = 'service'])", XPathConstants.NUMBER))
+              .intValue();
       Assert.assertTrue(serviceCount > 0);
     } finally {
       IOUtils.closeQuietly(in);
       Main.returnClient(client);
     }
   }
-  
+
   /**
    * TODO: Finish this after coming up with a good strategy on how to propagate maintenance mode from the service
    * implementation (serviceRegistry.createJob()) to the rest endpoint.
    */
-  @Test @Ignore
+  @Test
+  @Ignore
   public void testNodeMaintenance() throws Exception {
 
     // Start an encoding job via the rest endpoint
@@ -169,7 +173,6 @@ public class ServiceRegistryRestEndpointTest {
     HttpResponse postResponse = client.execute(postEncode);
     Assert.assertEquals(200, postResponse.getStatusLine().getStatusCode());
 
-    
     // Try to start another job, make sure we don't succeed
     postResponse = client.execute(postEncode);
     Assert.assertEquals(404, postResponse.getStatusLine().getStatusCode());

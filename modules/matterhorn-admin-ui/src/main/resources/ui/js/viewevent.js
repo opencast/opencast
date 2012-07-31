@@ -100,7 +100,8 @@ function handleWorkflow(workflowDoc){
   if(workflowDoc.documentElement){
     rootEl = $(workflowDoc.documentElement);
   }else{
-    rootEl = $("ns2\\:workflow-instance");
+    $.xmlns["wf"] = "http://workflow.opencastproject.org";
+    rootEl = $("wf|workflow-instance");
   }
   if(rootEl){
     dcURL = rootEl.find("metadata:first > catalog[type='dublincore/episode'] url:first").text();

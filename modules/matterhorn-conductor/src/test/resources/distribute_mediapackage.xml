@@ -1,59 +1,59 @@
 <oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org"
 	id="10.0000/1" start="2007-12-05T13:40:00" duration="1004400000">
-	<media>
-		<track id="track-1" type="presentation/source">
-			<mimetype>video/quicktime</mimetype>
-			<url>media.mov</url>
-			<checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</checksum>
-			<duration>1004400000</duration>
-			<video>
-				<device type="UFG03" version="30112007" vendor="Unigraf" />
-				<encoder type="H.264" version="7.4" vendor="Apple Inc" />
-				<resolution>640x480</resolution>
-				<scanType type="progressive" />
-				<bitrate>540520</bitrate>
-				<frameRate>2</frameRate>
-			</video>
-		</track>
-		<track id="track-2" type="presenter/source">
-			<mimetype>video/quicktime</mimetype>
-			<url>media.mov</url>
-			<checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</checksum>
-			<duration>1004400000</duration>
-			<tags>
-				<tag>engage</tag>
-			</tags>
-			<video>
-				<device type="UFG03" version="30112007" vendor="Unigraf" />
-				<encoder type="H.264" version="7.4" vendor="Apple Inc" />
-				<resolution>640x480</resolution>
-				<scanType type="progressive" />
-				<bitrate>540520</bitrate>
-				<frameRate>2</frameRate>
-			</video>
-		</track>
-	</media>
-	<metadata>
-		<catalog id="catalog-1" type="dublincore/episode">
-			<mimetype>text/xml</mimetype>
-			<url>dublincore.xml</url>
-			<checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
-		</catalog>
-		<catalog id="catalog-2" type="metadata/mpeg-7" ref="track:track-1">
-			<mimetype>text/xml</mimetype>
-			<url>mpeg7.xml</url>
-			<checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
-		</catalog>
-	</metadata>
-	<attachments>
-		<attachment id="notes" type="attachment/notes">
-			<mimetype>text/plain</mimetype>
-			<url>attachment.txt</url>
-			<tags>
-				<tag>atom</tag>
-				<tag>rss</tag>
-			</tags>
-			<checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</checksum>
-		</attachment>
-	</attachments>
+	<oc:media>
+		<oc:track id="track-1" type="presentation/source">
+			<oc:mimetype>video/quicktime</oc:mimetype>
+			<oc:url>media.mov</oc:url>
+			<oc:checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</oc:checksum>
+			<oc:duration>1004400000</oc:duration>
+			<oc:video>
+				<oc:device type="UFG03" version="30112007" vendor="Unigraf" />
+				<oc:encoder type="H.264" version="7.4" vendor="Apple Inc" />
+				<oc:resolution>640x480</oc:resolution>
+				<oc:scanType type="progressive" />
+				<oc:bitrate>540520</oc:bitrate>
+				<oc:frameRate>2</oc:frameRate>
+			</oc:video>
+		</oc:track>
+		<oc:track id="track-2" type="presenter/source">
+			<oc:mimetype>video/quicktime</oc:mimetype>
+			<oc:url>media.mov</oc:url>
+			<oc:checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</oc:checksum>
+			<oc:duration>1004400000</oc:duration>
+			<oc:tags>
+				<oc:tag>engage</oc:tag>
+			</oc:tags>
+			<oc:video>
+				<oc:device type="UFG03" version="30112007" vendor="Unigraf" />
+				<oc:encoder type="H.264" version="7.4" vendor="Apple Inc" />
+				<oc:resolution>640x480</oc:resolution>
+				<oc:scanType type="progressive" />
+				<oc:bitrate>540520</oc:bitrate>
+				<oc:frameRate>2</oc:frameRate>
+			</oc:video>
+		</oc:track>
+	</oc:media>
+	<oc:metadata>
+		<oc:catalog id="catalog-1" type="dublincore/episode">
+			<oc:mimetype>text/xml</oc:mimetype>
+			<oc:url>dublincore.xml</oc:url>
+			<oc:checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</oc:checksum>
+		</oc:catalog>
+		<oc:catalog id="catalog-2" type="metadata/mpeg-7" ref="track:track-1">
+			<oc:mimetype>text/xml</oc:mimetype>
+			<oc:url>mpeg7.xml</oc:url>
+			<oc:checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</oc:checksum>
+		</oc:catalog>
+	</oc:metadata>
+	<oc:attachments>
+		<oc:attachment id="notes" type="attachment/notes">
+			<oc:mimetype>text/plain</oc:mimetype>
+			<oc:url>attachment.txt</oc:url>
+			<oc:tags>
+				<oc:tag>atom</oc:tag>
+				<oc:tag>rss</oc:tag>
+			</oc:tags>
+			<oc:checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</oc:checksum>
+		</oc:attachment>
+	</oc:attachments>
 </oc:mediapackage>

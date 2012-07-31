@@ -291,9 +291,7 @@ public class SeriesRestService {
       String id = newSeries.getFirst(PROPERTY_IDENTIFIER);
       String serializedSeries = serializeDublinCore(newSeries);
       logger.debug("Created series {} ", id);
-      return Response.status(CREATED)
-              .header("Location", getSeriesXmlUrl(id))
-              .header("Location", getSeriesJsonUrl(id))
+      return Response.status(CREATED).header("Location", getSeriesXmlUrl(id)).header("Location", getSeriesJsonUrl(id))
               .entity(serializedSeries).build();
     } catch (Exception e) {
       logger.warn("Could not add/update series: {}", e.getMessage());
@@ -562,7 +560,7 @@ public class SeriesRestService {
    * @return sample ACL
    */
   public String getSampleAccessControlList() {
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:acl xmlns:ns2=\"org.opencastproject.security\"><ace><role>admin</role><action>delete</action><allow>true</allow></ace></ns2:acl>";
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><acl xmlns=\"org.opencastproject.security\"><ace><role>admin</role><action>delete</action><allow>true</allow></ace></acl>";
   }
 
 }

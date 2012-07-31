@@ -15,7 +15,11 @@
  */
 package org.opencastproject.fileupload.api.job;
 
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+
 import java.util.UUID;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -24,39 +28,35 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
-/** A Class representing the information about an upload job.
+/**
+ * A Class representing the information about an upload job.
  * 
  */
-@XmlType(name = "uploadjob", namespace = "http://workflow.opencastproject.org")
-@XmlRootElement(name = "uploadjob", namespace = "http://workflow.opencastproject.org")
+@XmlType(name = "uploadjob", namespace = "http://fileupload.opencastproject.org")
+@XmlRootElement(name = "uploadjob", namespace = "http://fileupload.opencastproject.org")
 @XmlAccessorType(XmlAccessType.NONE)
 public class FileUploadJob {
 
   @XmlEnum
-  public enum JobState {          // states an upload job can be in
+  public enum JobState { // states an upload job can be in
     @XmlEnumValue("READY")
-    READY,
-    @XmlEnumValue("INPROGRESS")
-    INPROGRESS,
-    @XmlEnumValue("FINALIZING")
-    FINALIZING,
-    @XmlEnumValue("COMPLETE")
+    READY, @XmlEnumValue("INPROGRESS")
+    INPROGRESS, @XmlEnumValue("FINALIZING")
+    FINALIZING, @XmlEnumValue("COMPLETE")
     COMPLETE
   }
-  
+
   @XmlAttribute()
-  private String id;                        // this jobs identifier
+  private String id; // this jobs identifier
   @XmlAttribute()
-  private JobState state = JobState.READY;  // this jobs state
+  private JobState state = JobState.READY; // this jobs state
   @XmlElement(name = "payload")
-  private Payload payload;                  // information about this jobs payload
+  private Payload payload; // information about this jobs payload
   @XmlElement(name = "chunksize")
-  private int chunksize = -1;               // size of the chunks that are tranfered
+  private int chunksize = -1; // size of the chunks that are tranfered
   @XmlElement(name = "chunks-total")
-  private long chunksTotal = 1;             // total number of chunks the upload consists of
+  private long chunksTotal = 1; // total number of chunks the upload consists of
   @XmlElement(name = "current-chunk")
   private Chunk currentChunk = new Chunk(); // information about the current chunk
 
@@ -110,12 +110,11 @@ public class FileUploadJob {
   public void setCurrentChunk(Chunk currentChunk) {
     this.currentChunk = currentChunk;
   }
-  
+
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder()
-            .append("FileUploadJob(id=").append(this.id)
-            .append(", filename=").append(this.payload.filename).append(")");
+    StringBuilder sb = new StringBuilder().append("FileUploadJob(id=").append(this.id).append(", filename=")
+            .append(this.payload.filename).append(")");
     return sb.toString();
   }
 }

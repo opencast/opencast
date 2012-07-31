@@ -55,7 +55,8 @@
         var trackId = $('#jobId').val();
         var mpString = $('#mediapackage').val();
         var mp = $.parseXML(mpString);
-        var mpId = $(mp).find('ns2\\:mediapackage').attr('id');
+        $.xmlns["mp"] = "http://mediapackage.opencastproject.org";
+        var mpId = $(mp).find("mp|mediapackage").attr('id');
      	
         $.ajax({
         	url : '../../files/move/inbox/' + file + '/' + mpId + '/' + trackId + '/' + file,

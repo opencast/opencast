@@ -16,8 +16,9 @@
 /**
  * State and capture agent REST Service endpoints.
  */
-@XmlSchema
+@XmlSchema(elementFormDefault = XmlNsForm.QUALIFIED, attributeFormDefault = XmlNsForm.QUALIFIED, namespace = "http://capture.opencastproject.org")
 package org.opencastproject.capture.endpoint;
 
+import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.bind.annotation.XmlSchema;
 

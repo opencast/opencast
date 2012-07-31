@@ -2,32 +2,32 @@
 <ns2:mediapackage start=""
   id="597d0b42-5af6-450e-ac0b-c2cb619fc2bc" duration="14546"
   xmlns:ns2="http://mediapackage.opencastproject.org">
-  <media>
-    <track id="track-1" type="presentation/source">
-      <mimetype>video/quicktime</mimetype>
-      <tags />
-      <url>av.mov
-      </url>
-      <checksum type="md5">9d3523e464f18ad51f59564acde4b95a</checksum>
-      <duration>14546</duration>
-      <audio id="audio-1">
-        <device />
-        <encoder />
-        <bitdepth>16</bitdepth>
-        <channels>2</channels>
-        <samplingrate>44100</samplingrate>
-        <bitrate>128004.0</bitrate>
-      </audio>
-      <video id="video-1">
-        <device />
-        <encoder />
-        <bitrate>387969.0</bitrate>
-        <framerate>1.994</framerate>
-        <resolution>640x480</resolution>
-        <scantype type="Progressive" />
-      </video>
-    </track>
-  </media>
-  <metadata />
-  <attachments />
+  <ns2:media>
+    <ns2:track id="track-1" type="presentation/source">
+      <ns2:mimetype>video/quicktime</ns2:mimetype>
+      <ns2:tags />
+      <ns2:url>av.mov
+      </ns2:url>
+      <ns2:checksum type="md5">9d3523e464f18ad51f59564acde4b95a</ns2:checksum>
+      <ns2:duration>14546</ns2:duration>
+      <ns2:audio id="audio-1">
+        <ns2:device />
+        <ns2:encoder />
+        <ns2:bitdepth>16</ns2:bitdepth>
+        <ns2:channels>2</ns2:channels>
+        <ns2:samplingrate>44100</ns2:samplingrate>
+        <ns2:bitrate>128004.0</ns2:bitrate>
+      </ns2:audio>
+      <ns2:video id="video-1">
+        <ns2:device />
+        <ns2:encoder />
+        <ns2:bitrate>387969.0</ns2:bitrate>
+        <ns2:framerate>1.994</ns2:framerate>
+        <ns2:resolution>640x480</ns2:resolution>
+        <ns2:scantype type="Progressive" />
+      </ns2:video>
+    </ns2:track>
+  </ns2:media>
+  <ns2:metadata />
+  <ns2:attachments />
 </ns2:mediapackage>

@@ -67,7 +67,7 @@ public class WorkflowAuthorizationTest {
   public void tearDown() throws Exception {
     Main.returnClient(client);
   }
-    
+
   @Test
   public void testStartAndRetrieveWorkflowInstance() throws Exception {
 
@@ -89,7 +89,7 @@ public class WorkflowAuthorizationTest {
     postWorkflow.setEntity(new UrlEncodedFormEntity(workflowParams, "UTF-8"));
     HttpResponse workflowResponse = client.execute(postWorkflow);
     Assert.assertEquals(200, workflowResponse.getStatusLine().getStatusCode());
-    
+
     // Grab the new workflow instance from the response
     String postResponse = EntityUtils.toString(workflowResponse.getEntity());
 
@@ -103,24 +103,29 @@ public class WorkflowAuthorizationTest {
     factory.setNamespaceAware(true);
     DocumentBuilder builder = factory.newDocumentBuilder();
     Document doc = builder.parse(IOUtils.toInputStream(xml, "UTF-8"));
-    return ((String)XPathFactory.newInstance().newXPath().compile("//attachment[@type='security/xacml']/@id").evaluate(doc, XPathConstants.STRING));
+    return ((String) XPathFactory.newInstance().newXPath()
+            .compile("//*[local-name() = 'attachment'][@type='security/xacml']/@id")
+            .evaluate(doc, XPathConstants.STRING));
   }
 
   protected String getSampleMediaPackage() throws Exception {
-    String template = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("authorization/mediapackage-with-series.xml"), "UTF-8");
+    String template = IOUtils.toString(
+            getClass().getClassLoader().getResourceAsStream("authorization/mediapackage-with-series.xml"), "UTF-8");
     return template.replaceAll("@SAMPLES_URL@", BASE_URL + "/workflow/samples");
   }
 
   protected String getSampleWorkflowDefinition() throws Exception {
-    return IOUtils.toString(getClass().getClassLoader().getResourceAsStream("authorization/workflow-definition-1.xml"), "UTF-8");
+    return IOUtils.toString(getClass().getClassLoader().getResourceAsStream("authorization/workflow-definition-1.xml"),
+            "UTF-8");
   }
 
   protected String getSampleSeries() throws Exception {
-    return IOUtils.toString(getClass().getClassLoader().getResourceAsStream("authorization/sample-series-1.xml"), "UTF-8");
+    return IOUtils.toString(getClass().getClassLoader().getResourceAsStream("authorization/sample-series-1.xml"),
+            "UTF-8");
   }
 
   protected String getSampleAcl() throws Exception {
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:acl xmlns:ns2=\"org.opencastproject.security\"><ace><role>admin</role><action>delete</action><allow>true</allow></ace></ns2:acl>";
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><acl xmlns=\"org.opencastproject.security\"><ace><role>admin</role><action>delete</action><allow>true</allow></ace></acl>";
 
   }
 }

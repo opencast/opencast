@@ -31,8 +31,8 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * A {@link List} of {@link UserActionList}s
  */
-@XmlType(name = "annotations", namespace = "http://usertracking.opencastproject.org")
-@XmlRootElement(name = "annotations", namespace = "http://usertracking.opencastproject.org")
+@XmlType(name = "actions", namespace = "http://usertracking.opencastproject.org")
+@XmlRootElement(name = "actions", namespace = "http://usertracking.opencastproject.org")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UserActionListImpl implements UserActionList {
 
@@ -45,18 +45,18 @@ public class UserActionListImpl implements UserActionList {
   @XmlAttribute(name = "limit")
   protected int limit;
 
-  @XmlElement(name = "annotation", namespace = "http://usertracking.opencastproject.org")
-  protected List<UserActionImpl> annotations;
+  @XmlElement(name = "action", namespace = "http://usertracking.opencastproject.org")
+  protected List<UserActionImpl> actions;
 
   public void add(UserAction annotation) {
-    annotations.add((UserActionImpl)annotation);
+    actions.add((UserActionImpl) annotation);
   }
 
   /**
    * A no-arg constructor needed by JAXB
    */
   public UserActionListImpl() {
-    this.annotations = new ArrayList<UserActionImpl>();
+    this.actions = new ArrayList<UserActionImpl>();
   }
 
   public void setTotal(int total) {

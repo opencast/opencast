@@ -156,11 +156,12 @@ public class TrackTest {
     }
 
     // Now again without namespaces
-    String xml = "<track type=\"presentation/source\"><tags/><url>http://downloads.opencastproject.org/media/movie.m4v</url><duration>-1</duration></track>";
+    String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\"><oc:tags/><oc:url>http://downloads.opencastproject.org/media/movie.m4v</oc:url><oc:duration>-1</oc:duration></oc:track>";
     inputStream = IOUtils.toInputStream(xml);
     try {
       TrackImpl t2 = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class).getValue();
       Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
+      Assert.assertEquals("http://downloads.opencastproject.org/media/movie.m4v", t2.getURI().toString());
     } finally {
       IoSupport.closeQuietly(inputStream);
     }
@@ -176,5 +177,6 @@ public class TrackTest {
     Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
             .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
     Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
+    Assert.assertEquals("http://downloads.opencastproject.org/media/movie.m4v", t3.getURI().toURL().toExternalForm());
   }
 }

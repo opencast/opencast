@@ -16,6 +16,15 @@
 
 package org.opencastproject.remotetest.server;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.remotetest.Main.BASE_URL;
+import static org.opencastproject.remotetest.util.WorkflowUtils.countSucceededWorkflows;
+
+import org.opencastproject.remotetest.Main;
+import org.opencastproject.remotetest.util.TrustedHttpClient;
+import org.opencastproject.remotetest.util.Utils;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
@@ -25,24 +34,17 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opencastproject.remotetest.Main;
-import org.opencastproject.remotetest.util.TrustedHttpClient;
-import org.opencastproject.remotetest.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import java.util.List;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.remotetest.Main.BASE_URL;
-import static org.opencastproject.remotetest.util.WorkflowUtils.countSucceededWorkflows;
 
 public class OaiPmhServerTest {
   private static final Logger logger = LoggerFactory.getLogger(OaiPmhServerTest.class);
@@ -92,34 +94,34 @@ public class OaiPmhServerTest {
   @Test
   public void testBadVerbError() {
     Document response = doGetRequest("verb=Scrunch");
-    assertXpathExists(response, "//error[@code='badVerb']");
+    assertXpathExists(response, "//*[local-name() = 'error'][@code='badVerb']");
   }
 
   @Test
   public void testGetRecordBadArgumentError() {
     Document response = doGetRequest("verb=GetRecord&identifier=unknown");
-    assertXpathExists(response, "//error[@code='badArgument']");
+    assertXpathExists(response, "//*[local-name() = 'error'][@code='badArgument']");
   }
 
   @Test
   public void testGetRecordIdDoesNotExistError() {
     Document response = doGetRequest("verb=GetRecord&identifier=_&metadataPrefix=oai_dc");
-    assertXpathExists(response, "//error[@code='idDoesNotExist']");
+    assertXpathExists(response, "//*[local-name() = 'error'][@code='idDoesNotExist']");
   }
 
   @Test
   public void testIdentify() {
     Document response = doGetRequest("verb=Identify");
-    assertXpathExists(response, "//Identify");
-    assertXpathEquals(response, "//protocolVersion/text()", "2.0");
+    assertXpathExists(response, "//*[local-name() = 'Identify']");
+    assertXpathEquals(response, "//*[local-name() = 'protocolVersion']/text()", "2.0");
   }
 
   @Test
   public void testListMetadataFormatsAll() throws Exception {
     Document response = doGetRequest("verb=ListMetadataFormats");
-    assertXpathExists(response, "//ListMetadataFormats");
-    List<String> prefixes =
-        Utils.nodeListToStringList((NodeList) Utils.xpath(response, "//metadataPrefix", XPathConstants.NODESET));
+    assertXpathExists(response, "//*[local-name() = 'ListMetadataFormats']");
+    List<String> prefixes = Utils.nodeListToStringList((NodeList) Utils.xpath(response,
+            "//*[local-name() = 'metadataPrefix']", XPathConstants.NODESET));
     assertTrue(prefixes.contains("oai_dc"));
     assertTrue(prefixes.contains("matterhorn"));
   }
@@ -127,47 +129,53 @@ public class OaiPmhServerTest {
   @Test
   public void testListSets() {
     Document doc = doGetRequest("verb=ListSets");
-    assertXpathExists(doc, "//ListSets/set/setSpec");
-    assertXpathExists(doc, "//ListSets/set/setName");
-    assertXpathExists(doc, "//ListSets/set/setDescription/*/*/text()");
-    assertXpathExists(doc, "//ListSets/set[setSpec=\"series\"]");
-    assertXpathExists(doc, "//ListSets/set[setSpec=\"episode\"]");
-    assertXpathExists(doc, "//ListSets/set[setSpec=\"episode:audio\"]");
-    assertXpathExists(doc, "//ListSets/set[setSpec=\"episode:video\"]");
+    assertXpathExists(doc, "//*[local-name() = 'ListSets']/*[local-name() = 'set']/*[local-name() = 'setSpec']");
+    assertXpathExists(doc, "//*[local-name() = 'ListSets']/*[local-name() = 'set']/*[local-name() = 'setName']");
+    assertXpathExists(doc,
+            "//*[local-name() = 'ListSets']/*[local-name() = 'set']/*[local-name() = 'setDescription']/*/*/text()");
+    assertXpathExists(doc, "//*[local-name() = 'ListSets']/*[local-name() = 'set'][setSpec=\"series\"]");
+    assertXpathExists(doc, "//*[local-name() = 'ListSets']/*[local-name() = 'set'][setSpec=\"episode\"]");
+    assertXpathExists(doc, "//*[local-name() = 'ListSets']/*[local-name() = 'set'][setSpec=\"episode:audio\"]");
+    assertXpathExists(doc, "//*[local-name() = 'ListSets']/*[local-name() = 'set'][setSpec=\"episode:video\"]");
   }
 
   @Test
   public void testVerbListIdentifiersBadArgument() {
     Document doc = doGetRequest("verb=ListIdentifiers");
-    assertXpathExists(doc, "//error[@code=\"badArgument\"]");
+    assertXpathExists(doc, "//*[local-name() = 'error'][@code=\"badArgument\"]");
   }
 
   @Test
   public void testVerbListIdentifiers() throws TransformerException, XPathExpressionException {
     Document doc = doGetRequest("verb=ListIdentifiers&metadataPrefix=oai_dc");
-    assertXpathExists(doc, "//ListIdentifiers/header/datestamp");
-    assertXpathExists(doc, "//ListIdentifiers/header/identifier");
+    assertXpathExists(doc,
+            "//*[local-name() = 'ListIdentifiers']/*[local-name() = 'header']/*[local-name() = 'datestamp']");
+    assertXpathExists(doc,
+            "//*[local-name() = 'ListIdentifiers']/*[local-name() = 'header']/*[local-name() = 'identifier']");
   }
 
   @Test
   public void testVerbListRecords() throws TransformerException, XPathExpressionException {
     Document doc = doGetRequest("verb=ListRecords&metadataPrefix=oai_dc");
-    assertXpathExists(doc, "//ListRecords/record/header");
-    assertXpathExists(doc, "//ListRecords/record/header/datestamp");
-    assertXpathExists(doc, "//ListRecords/record/header/identifier");
-    assertXpathExists(doc, "//ListRecords/record/metadata");
+    assertXpathExists(doc, "//*[local-name() = 'ListRecords']/*[local-name() = 'record']/*[local-name() = 'header']");
+    assertXpathExists(doc,
+            "//*[local-name() = 'ListRecords']/*[local-name() = 'record']/*[local-name() = 'header']/*[local-name() = 'datestamp']");
+    assertXpathExists(
+            doc,
+            "//*[local-name() = 'ListRecords']/*[local-name() = 'record']/*[local-name() = 'header']/*[local-name() = 'identifier']");
+    assertXpathExists(doc, "//*[local-name() = 'ListRecords']/*[local-name() = 'record']/*[local-name() = 'metadata']");
   }
 
   @Test
   public void testVerbListRecordsNoMatch() throws TransformerException, XPathExpressionException {
     Document doc = doGetRequest("verb=ListRecords&metadataPrefix=oai_dc&until=1000-01-01");
-    assertXpathExists(doc, "//error[@code=\"noRecordsMatch\"]");
+    assertXpathExists(doc, "//*[local-name() = 'error'][@code=\"noRecordsMatch\"]");
   }
 
   @Test
   public void testMatterhornMetadataProvider() {
     Document doc = doGetRequest("verb=ListRecords&metadataPrefix=matterhorn");
-    assertXpathExists(doc, "//metadata//title/text()");
+    assertXpathExists(doc, "//*[local-name() = 'metadata']//*[local-name() = 'title']/text()");
   }
 
   private Document doGetRequest(String query) {
@@ -202,4 +210,3 @@ public class OaiPmhServerTest {
     }
   }
 }
-

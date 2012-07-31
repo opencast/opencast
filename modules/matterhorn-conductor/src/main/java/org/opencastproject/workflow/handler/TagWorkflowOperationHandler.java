@@ -149,7 +149,8 @@ public class TagWorkflowOperationHandler extends ResumableWorkflowOperationHandl
         element.setIdentifier(null);
         element.setURI(e.getURI()); // use the same URI as the original
       }
-      element.setFlavor(MediaPackageElementFlavor.parseFlavor(configuredTargetFlavor));
+      if (configuredTargetFlavor != null)
+        element.setFlavor(MediaPackageElementFlavor.parseFlavor(configuredTargetFlavor));
 
       if (overrideTags.size() > 0) {
         element.clearTags();

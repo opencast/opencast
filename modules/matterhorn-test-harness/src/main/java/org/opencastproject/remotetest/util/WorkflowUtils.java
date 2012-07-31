@@ -92,7 +92,8 @@ public final class WorkflowUtils {
     HttpGet getWorkflowMethod = new HttpGet(BASE_URL + "/workflow/instance/" + workflowId + ".xml");
     TrustedHttpClient client = Main.getClient();
     String workflow = EntityUtils.toString(client.execute(getWorkflowMethod).getEntity());
-    String currentOperation = (String) Utils.xpath(workflow, "//operation[@state='PAUSED']/@id", XPathConstants.STRING);
+    String currentOperation = (String) Utils.xpath(workflow, "//*[local-name() = 'operation'][@state='PAUSED']/@id",
+            XPathConstants.STRING);
     Main.returnClient(client);
     return operation.equalsIgnoreCase(currentOperation);
   }
@@ -115,7 +116,7 @@ public final class WorkflowUtils {
     if (response.getStatusLine().getStatusCode() != 200)
       throw new IllegalStateException(EntityUtils.toString(response.getEntity()));
     String workflow = EntityUtils.toString(response.getEntity());
-    String currentState = (String) Utils.xpath(workflow, "/ns2:workflow/@state", XPathConstants.STRING);
+    String currentState = (String) Utils.xpath(workflow, "/*[local-name() = 'workflow']/@state", XPathConstants.STRING);
     Main.returnClient(client);
     return state.equalsIgnoreCase(currentState);
   }
@@ -186,7 +187,8 @@ public final class WorkflowUtils {
     TrustedHttpClient client = Main.getClient();
     HttpResponse response = client.execute(put);
     assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
-    String id = (String) Utils.xpath(workflowDefinition, "/definition/id", XPathConstants.STRING);
+    String id = (String) Utils.xpath(workflowDefinition, "/*[local-name() = 'definition']/*[local-name() = 'id']",
+            XPathConstants.STRING);
     assertNotNull(id);
     Main.returnClient(client);
     return id;

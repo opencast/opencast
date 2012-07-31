@@ -17,7 +17,7 @@
 /**
  * Capture-admin REST and WSDL Service endpoints
  */
-@XmlSchema(elementFormDefault=XmlNsForm.QUALIFIED, attributeFormDefault=XmlNsForm.QUALIFIED)
+@XmlSchema(elementFormDefault = XmlNsForm.QUALIFIED, attributeFormDefault = XmlNsForm.QUALIFIED, namespace = "http://capture.admin.opencastproject.org")
 package org.opencastproject.capture.admin.endpoint;
 
 import javax.xml.bind.annotation.XmlNsForm;

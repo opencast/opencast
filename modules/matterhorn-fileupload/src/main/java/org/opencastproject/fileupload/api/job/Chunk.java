@@ -21,22 +21,23 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-/** A class representing the information about the current chunk in an upload job.
+/**
+ * A class representing the information about the current chunk in an upload job.
  * 
  */
-@XmlType(name = "chunk", namespace = "http://workflow.opencastproject.org")
-@XmlRootElement(name = "chunk", namespace = "http://workflow.opencastproject.org")
+@XmlType(name = "chunk", namespace = "http://fileupload.opencastproject.org")
+@XmlRootElement(name = "chunk", namespace = "http://fileupload.opencastproject.org")
 @XmlAccessorType(XmlAccessType.NONE)
 public class Chunk {
-  
+
   @XmlElement(name = "number")
-  private int number = -1;                // number of the current chunk
+  private int number = -1; // number of the current chunk
   @XmlElement(name = "bytes-recieved")
-  private long recieved = 0;              // number of bytes of the current chunk that have already been recieved 
-  
+  private long recieved = 0; // number of bytes of the current chunk that have already been recieved
+
   public Chunk() {
   }
-  
+
   public Chunk(int number, long recieved) {
     this.number = number;
     this.recieved = recieved;
@@ -49,7 +50,7 @@ public class Chunk {
   public void setNumber(int number) {
     this.number = number;
   }
-  
+
   public int incrementNumber() {
     return ++number;
   }

@@ -26,7 +26,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  * Marshals and unmarshals {@link Job}s.
@@ -72,8 +72,7 @@ public final class JobParser {
     Unmarshaller unmarshaller;
     try {
       unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in), JaxbJob.class)
-              .getValue();
+      return unmarshaller.unmarshal(new StreamSource(in), JaxbJob.class).getValue();
     } catch (Exception e) {
       throw new IOException(e);
     } finally {
@@ -123,8 +122,7 @@ public final class JobParser {
     Unmarshaller unmarshaller;
     try {
       unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in),
-              JaxbJobList.class).getValue();
+      return unmarshaller.unmarshal(new StreamSource(in), JaxbJobList.class).getValue();
     } catch (Exception e) {
       throw new IOException(e);
     } finally {

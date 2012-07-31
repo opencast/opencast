@@ -22,8 +22,10 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
-@XmlRootElement(name = "agents")
+@XmlType(name = "agents", namespace = "http://capture.admin.opencastproject.org")
+@XmlRootElement(name = "agents", namespace = "http://capture.admin.opencastproject.org")
 public class AgentStateUpdateList {
 
   @XmlElement(name = "agent")

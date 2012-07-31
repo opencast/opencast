@@ -68,12 +68,12 @@ public class ScheduledCaptureTest {
   public void setUp() throws Exception {
     httpClient = Main.getClient();
   }
-  
+
   @After
   public void tearDown() throws Exception {
     Main.returnClient(httpClient);
   }
-  
+
   @Ignore
   @Test
   public void testScheduledCapture() throws Exception {
@@ -82,13 +82,15 @@ public class ScheduledCaptureTest {
     HttpResponse response = CaptureAdminResources.agents(httpClient);
     assertEquals("Response code (agents):", 200, response.getStatusLine().getStatusCode());
     Document xml = Utils.parseXml(response.getEntity().getContent());
-    assertTrue("Agent included? (agents):", Utils.xpathExists(xml, "//ns1:agent-state-update[name=\'" + CaptureResources.AGENT + "\']"));
+    assertTrue("Agent included? (agents):",
+            Utils.xpathExists(xml, "//*[local-name() = 'agent-state-update'][name=\'" + CaptureResources.AGENT + "\']"));
 
     // Agent registered (Capture Admin Agent)
     response = CaptureAdminResources.agent(httpClient, CaptureResources.AGENT);
     assertEquals("Response code (agent):", 200, response.getStatusLine().getStatusCode());
     xml = Utils.parseXml(response.getEntity().getContent());
-    assertTrue("Agent included? (agent):", Utils.xpathExists(xml, "//ns2:agent-state-update[name=\'" + CaptureResources.AGENT + "\']"));
+    assertTrue("Agent included? (agent):",
+            Utils.xpathExists(xml, "//*[local-name() = 'agent-state-update'][name=\'" + CaptureResources.AGENT + "\']"));
 
     // Agent idle (State)
     response = StateResources.getState(httpClient);
@@ -98,7 +100,11 @@ public class ScheduledCaptureTest {
     // Agent idle (Capture Admin Agent)
     response = CaptureAdminResources.agent(httpClient, CaptureResources.AGENT);
     assertEquals("Response code (agent):", 200, response.getStatusLine().getStatusCode());
-    assertEquals("Agent idle? (agent):", "idle", Utils.xpath(xml, "//ns2:agent-state-update[name=\'" + CaptureResources.AGENT + "\']/state", XPathConstants.STRING));
+    assertEquals(
+            "Agent idle? (agent):",
+            "idle",
+            Utils.xpath(xml, "//*[local-name() = 'agent-state-update'][name=\'" + CaptureResources.AGENT
+                    + "\']/*[local-name() = 'state']", XPathConstants.STRING));
 
     // Get initial recording count (Admin Proxy)
     response = AdminResources.countRecordings(httpClient);
@@ -119,27 +125,31 @@ public class ScheduledCaptureTest {
     response = SchedulerResources.getEvents(httpClient);
     assertEquals("Response code (getEvents):", 200, response.getStatusLine().getStatusCode());
     xml = Utils.parseXml(response.getEntity().getContent());
-    assertTrue("Event included? (getEvents):", Utils.xpathExists(xml, "//ns1:SchedulerEvent[id=\'" + id + "\']"));
+    assertTrue("Event included? (getEvents):",
+            Utils.xpathExists(xml, "//*[local-name() = 'SchedulerEvent'][id=\'" + id + "\']"));
 
     // Event included? (Scheduler: upcoming events)
     response = SchedulerResources.getUpcomingEvents(httpClient);
     assertEquals("Response code (getUpcomingEvents):", 200, response.getStatusLine().getStatusCode());
     xml = Utils.parseXml(response.getEntity().getContent());
-    assertTrue("Event included? (getUpcomingEvents):", Utils.xpathExists(xml, "//ns1:SchedulerEvent[id=\'" + id + "\']"));
+    assertTrue("Event included? (getUpcomingEvents):",
+            Utils.xpathExists(xml, "//*[local-name() = 'SchedulerEvent'][id=\'" + id + "\']"));
 
     // Compare event (Scheduler: event)
     response = SchedulerResources.getEvent(httpClient, id);
     assertEquals("Response code (getEvent):", 200, response.getStatusLine().getStatusCode());
     xml = Utils.parseXml(response.getEntity().getContent());
-    assertEquals("Event id (getEvent):", title, Utils.xpath(xml, "//item[@key='title']/value", XPathConstants.STRING));
-    assertEquals("Event title (getEvent):", id, Utils.xpath(xml, "//id", XPathConstants.STRING));
+    assertEquals("Event id (getEvent):", title, Utils.xpath(xml,
+            "//*[local-name() = 'item'][@key='title']/*[local-name() = 'value']", XPathConstants.STRING));
+    assertEquals("Event title (getEvent):", id, Utils.xpath(xml, "//*[local-name() = 'id']", XPathConstants.STRING));
 
     // Compare event DC metadata (Scheduler)
     response = SchedulerResources.getDublinCoreMetadata(httpClient, id);
     assertEquals("Response code (getDublinCoreMetadata):", 200, response.getStatusLine().getStatusCode());
     xml = Utils.parseXml(response.getEntity().getContent());
     assertEquals("Event id (getDublinCoreMetadata):", title, Utils.xpath(xml, "//dcterms:title", XPathConstants.STRING));
-    assertEquals("Event title (getDublinCoreMetadata):", id, Utils.xpath(xml, "//dcterms:identifier", XPathConstants.STRING));
+    assertEquals("Event title (getDublinCoreMetadata):", id,
+            Utils.xpath(xml, "//dcterms:identifier", XPathConstants.STRING));
 
     // Get post-scheduled recording count (Admin Proxy)
     response = AdminResources.countRecordings(httpClient);
@@ -148,9 +158,11 @@ public class ScheduledCaptureTest {
     System.out.println("Recording Scheduled: " + scheduledRecordingCount);
 
     // Compare total recording count
-    assertEquals("Total recording count increased by one:", (Long) initialRecordingCount.get("total") + 1, scheduledRecordingCount.get("total"));
+    assertEquals("Total recording count increased by one:", (Long) initialRecordingCount.get("total") + 1,
+            scheduledRecordingCount.get("total"));
     // Compare upcoming recording count
-    assertEquals("Upcoming recording count increased by one:", (Long) initialRecordingCount.get("upcoming") + 1, scheduledRecordingCount.get("upcoming"));
+    assertEquals("Upcoming recording count increased by one:", (Long) initialRecordingCount.get("upcoming") + 1,
+            scheduledRecordingCount.get("upcoming"));
 
     // Confirm recording started (State)
     int retries = 0;
@@ -182,7 +194,10 @@ public class ScheduledCaptureTest {
       response = CaptureAdminResources.agents(httpClient);
       assertEquals("Response code (agents):", 200, response.getStatusLine().getStatusCode());
       xml = Utils.parseXml(response.getEntity().getContent());
-      if (Utils.xpath(xml, "//ns1:agent-state-update[name=\'" + CaptureResources.AGENT + "\']/state", XPathConstants.STRING).equals("capturing")) {
+      if (Utils.xpath(
+              xml,
+              "//*[local-name() = 'agent-state-update'][name=\'" + CaptureResources.AGENT
+                      + "\']/*[local-name() = 'state']", XPathConstants.STRING).equals("capturing")) {
         break;
       }
 
@@ -200,11 +215,14 @@ public class ScheduledCaptureTest {
     System.out.println("Recording Started: " + capturingRecordingCount);
 
     // Compare total recording count
-    assertEquals("Total recording count the same (schedule to capture):", (Long) scheduledRecordingCount.get("total"), capturingRecordingCount.get("total"));
+    assertEquals("Total recording count the same (schedule to capture):", (Long) scheduledRecordingCount.get("total"),
+            capturingRecordingCount.get("total"));
     // Compare upcoming recording count
-    assertEquals("Upcoming recording count decreased by one:", (Long) scheduledRecordingCount.get("upcoming") - 1, capturingRecordingCount.get("upcoming"));
+    assertEquals("Upcoming recording count decreased by one:", (Long) scheduledRecordingCount.get("upcoming") - 1,
+            capturingRecordingCount.get("upcoming"));
     // Compare capturing recording count
-    assertEquals("Capture recording count increased by one:", (Long) scheduledRecordingCount.get("capturing") + 1, capturingRecordingCount.get("capturing"));
+    assertEquals("Capture recording count increased by one:", (Long) scheduledRecordingCount.get("capturing") + 1,
+            capturingRecordingCount.get("capturing"));
 
     // Confirm recording stopped (State)
     retries = 0;
@@ -235,7 +253,10 @@ public class ScheduledCaptureTest {
       response = CaptureAdminResources.agents(httpClient);
       assertEquals("Response code (agents):", 200, response.getStatusLine().getStatusCode());
       xml = Utils.parseXml(response.getEntity().getContent());
-      if (Utils.xpath(xml, "//ns1:agent-state-update[name=\'" + CaptureResources.AGENT + "\']/state", XPathConstants.STRING).equals("idle")) {
+      if (Utils.xpath(
+              xml,
+              "//*[local-name() = 'agent-state-update'][name=\'" + CaptureResources.AGENT
+                      + "\']/*[local-name() = 'state']", XPathConstants.STRING).equals("idle")) {
         break;
       }
 
@@ -253,11 +274,14 @@ public class ScheduledCaptureTest {
     System.out.println("Process Recording: " + processingRecordingCount);
 
     // Compare total recording count
-    assertEquals("Total recording count the same (capture to process):", (Long) capturingRecordingCount.get("total"), processingRecordingCount.get("total"));
+    assertEquals("Total recording count the same (capture to process):", (Long) capturingRecordingCount.get("total"),
+            processingRecordingCount.get("total"));
     // Compare capturing recording count
-    assertEquals("Capture recording count decreased by one:", (Long) capturingRecordingCount.get("capturing") - 1, processingRecordingCount.get("capturing"));
+    assertEquals("Capture recording count decreased by one:", (Long) capturingRecordingCount.get("capturing") - 1,
+            processingRecordingCount.get("capturing"));
     // Compare processing recording count
-    assertEquals("Process recording count increased by one:", (Long) capturingRecordingCount.get("processing") + 1, processingRecordingCount.get("processing"));
+    assertEquals("Process recording count increased by one:", (Long) capturingRecordingCount.get("processing") + 1,
+            processingRecordingCount.get("processing"));
 
     // Confirm recording indexed
     retries = 0;
@@ -269,7 +293,7 @@ public class ScheduledCaptureTest {
       response = SearchResources.all(httpClient, title);
       assertEquals("Response code (search all):", 200, response.getStatusLine().getStatusCode());
       xml = Utils.parseXml(response.getEntity().getContent());
-      if (Utils.xpathExists(xml, "//ns2:mediapackage[title=\'" + title + "\']")) {
+      if (Utils.xpathExists(xml, "//*[local-name() = 'mediapackage'][title=\'" + title + "\']")) {
         break;
       }
 
@@ -287,11 +311,14 @@ public class ScheduledCaptureTest {
     System.out.println("Finished Recording: " + finishedRecordingCount);
 
     // Compare total recording count
-    assertEquals("Total recording count the same (process to finish):", (Long) processingRecordingCount.get("total"), finishedRecordingCount.get("total"));
+    assertEquals("Total recording count the same (process to finish):", (Long) processingRecordingCount.get("total"),
+            finishedRecordingCount.get("total"));
     // Compare processing recording count
-    assertEquals("Process recording count decreased by one:", (Long) processingRecordingCount.get("processing") - 1, finishedRecordingCount.get("processing"));
+    assertEquals("Process recording count decreased by one:", (Long) processingRecordingCount.get("processing") - 1,
+            finishedRecordingCount.get("processing"));
     // Compare finished recording count
-    assertEquals("Finished recording count increased by one:", (Long) processingRecordingCount.get("finished") + 1, finishedRecordingCount.get("finished"));
+    assertEquals("Finished recording count increased by one:", (Long) processingRecordingCount.get("finished") + 1,
+            finishedRecordingCount.get("finished"));
 
   }
 }

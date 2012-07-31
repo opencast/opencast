@@ -27,6 +27,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -155,6 +156,8 @@ public class XACMLAuthorizationService implements AuthorizationService {
                 .getValue();
       } catch (JAXBException e) {
         throw new IllegalStateException("Unable to unmarshall xacml document" + xacmlPolicyFile);
+      } finally {
+        IoSupport.closeQuietly(in);
       }
       for (Object object : policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition()) {
         if (object instanceof RuleType) {
@@ -328,10 +331,10 @@ public class XACMLAuthorizationService implements AuthorizationService {
     ClassLoader originalClassLoader = currentThread.getContextClassLoader();
     try {
       currentThread.setContextClassLoader(XACMLAuthorizationService.class.getClassLoader());
-    if (acl == null) {
-      logger.debug("No ACL specified: no XACML attachment will be added to mediapackage '{}'", mediapackage);
-      return mediapackage;
-    }
+      if (acl == null) {
+        logger.debug("No ACL specified: no XACML attachment will be added to mediapackage '{}'", mediapackage);
+        return mediapackage;
+      }
       // Get XACML representation of these role + action tuples
       String xacmlContent = null;
       try {

@@ -15,15 +15,29 @@
  */
 package org.opencastproject.remotetest.util;
 
+import org.opencastproject.remotetest.Main;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.opencastproject.remotetest.Main;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -38,18 +52,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Test utilities
@@ -90,8 +92,8 @@ public class Utils {
   }
 
   /**
-   * Converts a node list to a list of their string values. Nodes that do not have a string
-   * value are returned as the empty string.
+   * Converts a node list to a list of their string values. Nodes that do not have a string value are returned as the
+   * empty string.
    */
   public static List<String> nodeListToStringList(NodeList nodes) {
     List<String> strings = new ArrayList<String>(nodes.getLength());
@@ -115,7 +117,16 @@ public class Utils {
   public static Object xpath(String document, String path, QName returnType) throws Exception {
     return xpath(parseXml(IOUtils.toInputStream(document, "UTF-8")), path, returnType);
   }
-  
+
+  public static Object xpath(InputStream is, String path, QName returnType) throws XPathExpressionException {
+    try {
+      XPath xPath = XPathFactory.newInstance().newXPath();
+      return xPath.compile(path).evaluate(is, returnType);
+    } finally {
+      IOUtils.closeQuietly(is);
+    }
+  }
+
   public static Object xpath(Document document, String path, QName returnType) throws XPathExpressionException,
           TransformerException {
     XPath xPath = XPathFactory.newInstance().newXPath();

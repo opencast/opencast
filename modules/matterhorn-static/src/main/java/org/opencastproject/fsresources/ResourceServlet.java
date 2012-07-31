@@ -41,6 +41,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * Serves static content from a configured path on the filesystem. In production systems, this should be replaced with
@@ -55,7 +59,7 @@ public class ResourceServlet extends HttpServlet {
   protected DocumentBuilder builder = null;
   private static final String dateFormat = "yyyy-MM-dd HH:mm:ss Z";
   private SecurityService securityService = null;
-  
+
   public ResourceServlet() {
   }
 
@@ -81,13 +85,14 @@ public class ResourceServlet extends HttpServlet {
     if (rootKey != null) {
       if (root == null)
         root = (String) cc.getProperties().get(rootKey);
-        if (root == null) {
-          logger.warn("No value for key " + rootKey + " found for this service.  Defaulting to value of org.opencastproject.download.directory.");
+      if (root == null) {
+        logger.warn("No value for key " + rootKey
+                + " found for this service.  Defaulting to value of org.opencastproject.download.directory.");
       }
     }
-    
+
     if (root == null) {
-        root = (String) cc.getBundleContext().getProperty("org.opencastproject.download.directory");
+      root = (String) cc.getBundleContext().getProperty("org.opencastproject.download.directory");
     }
 
     if (root == null) {
@@ -97,7 +102,7 @@ public class ResourceServlet extends HttpServlet {
     if (serverAlias == null)
       serverAlias = (String) cc.getProperties().get("alias");
 
-    //Get the interpreted values of the keys.
+    // Get the interpreted values of the keys.
     props.put("root", root);
     root = props.getProperty("root");
     props.put("serverAlias", serverAlias);
@@ -142,7 +147,7 @@ public class ResourceServlet extends HttpServlet {
     if (path == null) {
       path = "/";
     } else {
-      //Replace duplicate slashes with a single slash, and remove .. from the listing
+      // Replace duplicate slashes with a single slash, and remove .. from the listing
       path = path.trim().replaceAll("/+", "/").replaceAll("\\.\\.", "");
     }
     if (normalized != null && normalized.startsWith("/") && normalized.length() > 1) {
@@ -171,7 +176,7 @@ public class ResourceServlet extends HttpServlet {
         resp.sendError(HttpServletResponse.SC_FORBIDDEN);
         return;
       }
-      
+
       logger.debug("Serving index page for '{}'", f.getAbsolutePath());
       PrintWriter out = resp.getWriter();
       resp.setContentType("text/html;charset=UTF-8");
@@ -186,7 +191,7 @@ public class ResourceServlet extends HttpServlet {
         if (child.isDirectory() && !checkDirectory(child)) {
           continue;
         }
-        
+
         StringBuffer sb = new StringBuffer();
         sb.append("<tr><td>");
         sb.append("<a href=\"");
@@ -216,7 +221,7 @@ public class ResourceServlet extends HttpServlet {
   }
 
   protected boolean checkDirectory(File directory) {
-    //If security is off then everyone has access!
+    // If security is off then everyone has access!
     if (securityService == null) {
       return true;
     }
@@ -233,13 +238,16 @@ public class ResourceServlet extends HttpServlet {
       if (aclFile.isFile()) {
         logger.warn("Invalid XML in file " + aclFile.getAbsolutePath() + ", denying access by default");
       }
+    } catch (XPathExpressionException e) {
+      logger.error("Wrong xPath expression: {}", e);
     }
     return allowed;
   }
 
-  protected boolean isUserAllowed(File aclFile) throws SAXException, IOException {
+  protected boolean isUserAllowed(File aclFile) throws SAXException, IOException, XPathExpressionException {
     Document aclDoc = builder.parse(aclFile);
-    NodeList roles = aclDoc.getElementsByTagName("role");
+    XPath xPath = XPathFactory.newInstance().newXPath();
+    NodeList roles = (NodeList) xPath.evaluate("//*[local-name() = 'role']", aclDoc, XPathConstants.NODESET);
     for (int i = 0; i < roles.getLength(); i++) {
       Node role = roles.item(i);
       for (String userRole : securityService.getUser().getRoles()) {
@@ -250,6 +258,7 @@ public class ResourceServlet extends HttpServlet {
     }
     return false;
   }
+
   protected String formatLength(long length) {
     // FIXME: Why isn't there a library function for this?!
     // TODO: Make this better

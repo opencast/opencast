@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:mediapackage start="2010-05-19T09:27:46"
+<mediapackage start="2010-05-19T09:27:46"
 	id="d51f9d4e-b5e7-41e0-8640-0d1f43b2fed0" duration="65649"
-	xmlns:ns2="http://mediapackage.opencastproject.org">
+	xmlns="http://mediapackage.opencastproject.org">
 	<title>Compose workflow operation handler test</title>
 	<media>
 		<track id="compose-workflow-operation-test-encode-track-id">
@@ -68,4 +68,4 @@
 		</catalog>
 	</metadata>
 	<attachments />
-</ns2:mediapackage>
+</mediapackage>

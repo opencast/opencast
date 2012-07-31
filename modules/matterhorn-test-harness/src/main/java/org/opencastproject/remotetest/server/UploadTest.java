@@ -41,7 +41,8 @@ import javax.xml.xpath.XPathConstants;
 /**
  * Integration test for file upload using thin client
  */
-@Ignore // Until we can make the Jersey client work with digest auth, this must remain ignored
+@Ignore
+// Until we can make the Jersey client work with digest auth, this must remain ignored
 public class UploadTest {
   String trackUrl;
   String catalogUrl;
@@ -103,34 +104,39 @@ public class UploadTest {
     assertEquals("Response code (ingest):", 200, response.getStatusLine().getStatusCode());
     mediaPackage = EntityUtils.toString(response.getEntity(), "UTF-8");
     Document xml = Utils.parseXml(IOUtils.toInputStream(mediaPackage, "UTF-8"));
-    String workflowId = (String) Utils.xpath(xml, "//ns3:workflow/@id", XPathConstants.STRING);
-    String mediaPackageId = (String) Utils.xpath(xml, "//mediapackage/@id", XPathConstants.STRING);
+    String workflowId = (String) Utils.xpath(xml, "//*[local-name() = 'workflow']/@id", XPathConstants.STRING);
+    String mediaPackageId = (String) Utils.xpath(xml, "//*[local-name() = 'mediapackage']/@id", XPathConstants.STRING);
 
     // Confirm ingest
     response = IngestResources.getWorkflowInstance(client, workflowId);
     assertEquals("Response code (workflow instance):", 200, response.getStatusLine().getStatusCode());
 
     // Compare Track
-    String ingestedTrackUrl = (String) Utils.xpath(xml, "//media/track[@type='presenter/source']/url",
+    String ingestedTrackUrl = (String) Utils.xpath(xml,
+            "//*[local-name() = 'media']/*[local-name() = 'track'][@type='presenter/source']/*[local-name() = 'url']",
             XPathConstants.STRING);
     String ingestedMd5 = Utils.md5(Utils.getUrlAsFile(ingestedTrackUrl));
     String trackMd5 = Utils.md5(Utils.getUrlAsFile(trackUrl));
     assertEquals("Media Track Checksum:", ingestedMd5, trackMd5);
 
     // Compare Catalog
-    String ingestedCatalogUrl = (String) Utils.xpath(xml, "//metadata/catalog[@type='dublincore/episode']/url",
-            XPathConstants.STRING);
+    String ingestedCatalogUrl = (String) Utils
+            .xpath(xml,
+                    "//*[local-name() = 'metadata']/*[local-name() = 'catalog'][@type='dublincore/episode']/*[local-name() = 'url']",
+                    XPathConstants.STRING);
     Document ingestedCatalog = Utils.getUrlAsDocument(ingestedCatalogUrl);
     Document catalog = Utils.getUrlAsDocument(catalogUrl);
     for (String key : catalogKeys) {
-      assertEquals("Catalog " + key + ":", ((String) Utils.xpath(ingestedCatalog, "//dcterms:" + key,
-              XPathConstants.STRING)).trim(),
+      assertEquals("Catalog " + key + ":",
+              ((String) Utils.xpath(ingestedCatalog, "//dcterms:" + key, XPathConstants.STRING)).trim(),
               ((String) Utils.xpath(catalog, "//dcterms:" + key, XPathConstants.STRING)).trim());
     }
 
     // Compare Attachment
-    String ingestedAttachmentUrl = (String) Utils.xpath(xml, "//attachments/attachment[@type='attachment/txt']/url",
-            XPathConstants.STRING);
+    String ingestedAttachmentUrl = (String) Utils
+            .xpath(xml,
+                    "//*[local-name() = 'attachments']/*[local-name() = 'attachment'][@type='attachment/txt']/*[local-name() = 'url']",
+                    XPathConstants.STRING);
     ingestedMd5 = Utils.md5(Utils.getUrlAsFile(ingestedAttachmentUrl));
     String attachmentMd5 = Utils.md5(Utils.getUrlAsFile(attachmentUrl));
     assertEquals("Attachment Checksum:", ingestedMd5, attachmentMd5);
@@ -145,7 +151,9 @@ public class UploadTest {
       response = SearchResources.episode(client, mediaPackageId);
       assertEquals("Response code (episode):", 200, response.getStatusLine().getStatusCode());
       xml = Utils.parseXml(response.getEntity().getContent());
-      if (Utils.xpathExists(xml, "//ns2:result[@id='" + mediaPackageId + "']/ns2:mediapackage").equals(true)) {
+      if (Utils.xpathExists(xml,
+              "//*[local-name() = 'result'][@id='" + mediaPackageId + "']/*[local-name() = 'mediapackage']").equals(
+              true)) {
         break;
       }
 

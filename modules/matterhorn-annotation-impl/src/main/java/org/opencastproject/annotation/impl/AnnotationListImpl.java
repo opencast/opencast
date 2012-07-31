@@ -45,11 +45,11 @@ public class AnnotationListImpl implements AnnotationList {
   @XmlAttribute(name = "limit")
   protected int limit;
 
-  @XmlElement(name = "annotation", namespace = "http://usertracking.opencastproject.org")
+  @XmlElement(name = "annotation")
   protected List<AnnotationImpl> annotations;
 
   public void add(Annotation annotation) {
-    annotations.add((AnnotationImpl)annotation);
+    annotations.add((AnnotationImpl) annotation);
   }
 
   /**

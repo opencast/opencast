@@ -165,7 +165,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   public String getSampleMediaPackage() {
     String samplesUrl = serverUrl + "/workflow/samples";
 
-    return "<ns2:mediapackage xmlns:ns2=\"http://mediapackage.opencastproject.org\" start=\"2007-12-05T13:40:00\" duration=\"1004400000\">\n"
+    return "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\" start=\"2007-12-05T13:40:00\" duration=\"1004400000\">\n"
             + "  <media>\n"
             + "    <track id=\"track-1\" type=\"presenter/source\">\n"
             + "      <mimetype>audio/mp3</mimetype>\n" + "      <url>"
@@ -205,7 +205,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
             + "/dc-1.xml</url>\n"
             + "      <checksum type=\"md5\">20e466615251074e127a1627fd0dae3e</checksum>\n"
             + "    </catalog>\n"
-            + "  </metadata>\n" + "</ns2:mediapackage>";
+            + "  </metadata>\n" + "</mediapackage>";
   }
 
   public String getSampleWorkflowDefinition() throws IOException {
