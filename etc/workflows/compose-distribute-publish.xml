@@ -13,7 +13,7 @@
       <legend>Holds</legend>
       <span>Processing should be paused to allow for:</span>
       <ul class="oc-ui-checkbox-list">
-	<input id="videoPreview" name="videoPreview" type="checkbox" class="configField holdCheckbox" style="visibility:hidden" value="true"/>
+	  <input id="videoPreview" name="videoPreview" type="checkbox" class="configField holdCheckbox" style="visibility:hidden" value="true"/>
         <li class="ui-helper-clearfix">
           <span id="trimholdconfig">
             <input id="trimHold" name="trimHold" type="checkbox" class="configField holdCheckbox" value="true" />
@@ -28,6 +28,17 @@
         </li>
       </ul>
     </fieldset>
+    <fieldset>
+      <legend>Archive</legend>
+      <ul class="oc-ui-form-list">       
+	  <li class="ui-helper-clearfix">
+	    <span id="archiveconfig">
+	      <input id="archiveOp" name="archiveOp" type="checkbox" class="configField holdCheckbox" value="true"/>
+	      <span id="i18n_activate_archive">&nbsp;Archive the media package</span>
+	    </span>
+	  </li>
+      </ul>
+    </fieldset>  
     <fieldset>
       <legend>Distribution</legend>
       <ul class="oc-ui-form-list">
@@ -72,6 +83,12 @@
           {nodeKey: 'org.opencastproject.workflow.config.trimHold'},
           {getValue: function(){ return this.fields.trimHold.is(":checked"); }
           });
+	  
+        components['org.opencastproject.workflow.config.archiveOp'] = new ocAdmin.Component(
+          ['archiveOp'],
+          {nodeKey: 'org.opencastproject.workflow.config.archiveOp'},
+          {getValue: function(){ return this.fields.archiveOp.is(":checked");}
+          });
           
         components['org.opencastproject.workflow.config.captionHold'] = new ocAdmin.Component(
           ['captionHold'],
@@ -90,7 +107,9 @@
       ocWorkflowPanel.setComponentValues = function(values, components){
         components['org.opencastproject.workflow.config.captionHold'].setValue(values['org.opencastproject.workflow.config.captionHold']);
         components['org.opencastproject.workflow.config.trimHold'].setValue(values['org.opencastproject.workflow.config.trimHold']);
-	components['org.opencastproject.workflow.config.videoPreview'].setValue(values['org.opencastproject.workflow.config.videoPreview']);
+        components['org.opencastproject.workflow.config.videoPreview'].setValue(values['org.opencastproject.workflow.config.videoPreview']);
+        components['org.opencastproject.workflow.config.archiveOp'].setValue(values['org.opencastproject.workflow.config.archiveOp']);
+        components['license'].setValue(values['license']);
       }
     </script>
   ]]>
@@ -511,6 +530,7 @@
     <!-- Archive the current state of the mediapackage -->
 
     <operation
+      if="${archiveOp}"
       id="archive"
       fail-on-error="true"
       exception-handler-workflow="error"
@@ -537,8 +557,7 @@
       fail-on-error="false"
       description="Cleaning up">
       <configurations>
-
-        <configuration key="preserve-flavors">*/source,dublincore/*</configuration>
+        <configuration key="preserve-flavors"></configuration>
       </configurations>
     </operation>
   </operations>
