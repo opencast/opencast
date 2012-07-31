@@ -220,7 +220,7 @@ public class EpisodeRestService {
               @Override
               public Map<String, String> apply(Map<String, String> wfConf, Map.Entry<String, String[]> param) {
                 String key = param.getKey();
-                if ("id".equalsIgnoreCase(key))
+                if (!"mediaPackageIds".equalsIgnoreCase(key))
                   wfConf.put(key, param.getValue()[0]);
                 return wfConf;
               }
