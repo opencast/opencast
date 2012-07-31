@@ -21,8 +21,10 @@ import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
+import org.opencastproject.workingfilerepository.jmx.WorkingFileRepositoryBean;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -40,6 +42,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import javax.management.ObjectInstance;
 
 /**
  * A very simple (read: inadequate) implementation that stores all files under a root directory using the media package
@@ -59,6 +63,15 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       return name.endsWith(MD5_EXTENSION);
     }
   };
+
+  /** Working file repository JMX type */
+  private static final String JMX_WORKING_FILE_REPOSITORY_TYPE = "WorkingFileRepository";
+
+  /** The JMX working file repository bean */
+  private WorkingFileRepositoryBean workingFileRepositoryBean = new WorkingFileRepositoryBean(this);
+
+  /** The JMX bean object instance */
+  private ObjectInstance registeredMXBean;
 
   /** The remote service manager */
   protected ServiceRegistry remoteServiceManager;
@@ -118,7 +131,16 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       throw e;
     }
 
+    registeredMXBean = JmxUtil.registerMXBean(workingFileRepositoryBean, JMX_WORKING_FILE_REPOSITORY_TYPE);
+
     logger.info(getDiskSpace());
+  }
+
+  /**
+   * Callback from OSGi on service deactivation.
+   */
+  public void deactivate() {
+    JmxUtil.unregisterMXBean(registeredMXBean);
   }
 
   /**

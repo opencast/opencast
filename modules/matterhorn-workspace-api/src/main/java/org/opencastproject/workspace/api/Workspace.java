@@ -224,4 +224,18 @@ public interface Workspace {
   URI copyTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
           throws NotFoundException, IOException, IllegalArgumentException;
 
+  /**
+   * Gets the total space of storage in Bytes
+   * 
+   * @return Number of all bytes in storage
+   */
+  long getTotalSpace();
+
+  /**
+   * Gets the available space of storage in Bytes This is free storage that is not reserved
+   * 
+   * @return Number of available bytes in storage
+   */
+  long getUsableSpace();
+
 }

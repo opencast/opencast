@@ -481,6 +481,35 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
   /**
    * {@inheritDoc}
    * 
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getChildJobs(long)
+   */
+  @Override
+  public List<Job> getChildJobs(long id) throws NotFoundException, ServiceRegistryException {
+    String servicePath = "job/" + id + "/children.xml";
+    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, servicePath));
+    HttpResponse response = null;
+    int responseStatusCode;
+    try {
+      response = client.execute(get);
+      responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == HttpStatus.SC_NOT_FOUND) {
+        throw new NotFoundException("No children jobs found from parent job " + id);
+      }
+      if (responseStatusCode == HttpStatus.SC_OK) {
+        JaxbJobList jaxbJobList = JobParser.parseJobList(response.getEntity().getContent());
+        return new ArrayList<Job>(jaxbJobList.getJobs());
+      }
+    } catch (IOException e) {
+      throw new ServiceRegistryException("Unable to get job id=" + id, e);
+    } finally {
+      client.close(response);
+    }
+    throw new ServiceRegistryException("Unable to retrieve job " + id + " (" + responseStatusCode + ")");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getJobs(java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */

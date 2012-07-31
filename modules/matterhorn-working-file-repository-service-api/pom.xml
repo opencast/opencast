@@ -31,7 +31,10 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Export-Package> org.opencastproject.workingfilerepository.api;version=${project.version} </Export-Package>
+            <Export-Package>
+              org.opencastproject.workingfilerepository.api;version=${project.version},
+              org.opencastproject.workingfilerepository.jmx;version=${project.version}
+            </Export-Package>
           </instructions>
         </configuration>
       </plugin>

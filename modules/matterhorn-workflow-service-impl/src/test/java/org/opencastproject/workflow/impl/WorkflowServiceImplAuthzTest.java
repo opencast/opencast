@@ -50,8 +50,10 @@ import org.junit.Test;
 
 import java.io.File;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -123,6 +125,7 @@ public class WorkflowServiceImplAuthzTest {
     };
 
     // Organization Service
+    List<Organization> organizationList = Arrays.asList(new Organization[] { defaultOrganization });
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
             .andAnswer(new IAnswer<Organization>() {
@@ -132,6 +135,7 @@ public class WorkflowServiceImplAuthzTest {
                 return new Organization(orgId, orgId, "http://" + orgId, "ROLE_ADMIN", "ROLE_ANONYMOUS");
               }
             }).anyTimes();
+    EasyMock.expect(organizationDirectoryService.getOrganizations()).andReturn(organizationList).anyTimes();
     EasyMock.replay(organizationDirectoryService);
     service.setOrganizationDirectoryService(organizationDirectoryService);
 
@@ -196,6 +200,7 @@ public class WorkflowServiceImplAuthzTest {
   public void tearDown() throws Exception {
     serviceRegistry.deactivate();
     dao.deactivate();
+    service.deactivate();
   }
 
   @Test

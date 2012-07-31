@@ -282,6 +282,17 @@ public interface ServiceRegistry {
   List<Job> getJobs(String serviceType, Status status) throws ServiceRegistryException;
 
   /**
+   * Get all child jobs from a job
+   * 
+   * @param id
+   *          the parent job id
+   * @return a list of the child jobs ordered by execution
+   * @throws ServiceRegistryException
+   *           if there is a problem accessing the service registry
+   */
+  List<Job> getChildJobs(long id) throws NotFoundException, ServiceRegistryException;
+
+  /**
    * Finds the service registrations for this kind of job, ordered by load (lightest to heaviest).
    * 
    * @param serviceType

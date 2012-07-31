@@ -124,6 +124,10 @@
       <version>3.2.1</version>
     </dependency>
     <dependency>
+      <groupId>com.googlecode.guava-osgi</groupId>
+      <artifactId>guava-osgi</artifactId>
+    </dependency>
+    <dependency>
       <groupId>net.sourceforge.htmlunit</groupId>
       <artifactId>htmlunit</artifactId>
       <version>2.6</version>
@@ -195,6 +199,7 @@
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
             <Export-Package>
               org.opencastproject.ingest.impl;version=${project.version},
+              org.opencastproject.ingest.impl.jmx;version=${project.version},
               org.opencastproject.ingest.endpoint;version=${project.version},
               org.opencastproject.ingest.scanner;version=${project.version}
             </Export-Package>

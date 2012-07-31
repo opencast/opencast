@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -386,6 +388,51 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
         throw new IllegalStateException("Error unmarshaling job", e);
       }
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getChildJobs(long)
+   */
+  @Override
+  public List<Job> getChildJobs(long id) throws ServiceRegistryException {
+    List<Job> result = new ArrayList<Job>();
+    synchronized (jobs) {
+      for (String serializedJob : jobs.values()) {
+        Job job = null;
+        try {
+          job = JobParser.parseJob(serializedJob);
+        } catch (IOException e) {
+          throw new IllegalStateException("Error unmarshaling job", e);
+        }
+        if (job.getParentJobId() == null)
+          continue;
+        if (job.getParentJobId().equals(id) || job.getRootJobId().equals(id))
+          result.add(job);
+
+        Long parentJobId = job.getParentJobId();
+        while (parentJobId != null) {
+          try {
+            Job parentJob = getJob(job.getParentJobId());
+            if (parentJob.getParentJobId().equals(id)) {
+              result.add(job);
+              break;
+            }
+            parentJobId = parentJob.getParentJobId();
+          } catch (NotFoundException e) {
+            throw new ServiceRegistryException("Job from parent job id was not found!", e);
+          }
+        }
+      }
+    }
+    Collections.sort(result, new Comparator<Job>() {
+      @Override
+      public int compare(Job job1, Job job2) {
+        return job1.getDateCreated().compareTo(job1.getDateCreated());
+      }
+    });
+    return result;
   }
 
   /**

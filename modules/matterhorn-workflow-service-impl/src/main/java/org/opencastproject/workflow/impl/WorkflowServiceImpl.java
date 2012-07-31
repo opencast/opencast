@@ -46,6 +46,7 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -68,6 +69,7 @@ import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStatistics;
+import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -101,6 +103,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.management.ObjectInstance;
 
 /**
  * Implements WorkflowService with in-memory data structures to hold WorkflowOperations and WorkflowInstances.
@@ -136,6 +140,15 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /** Constant value indicating a <code>null</code> parent id */
   private static final String NULL_PARENT_ID = "-";
+
+  /** Workflow statistics JMX type */
+  private static final String JMX_WORKFLOWS_STATISTICS_TYPE = "WorkflowsStatistics";
+
+  /** The list of registered JMX beans */
+  private List<ObjectInstance> jmxBeans = new ArrayList<ObjectInstance>();
+
+  /** The JMX business object for workflows statistics */
+  private WorkflowsStatistics workflowsStatistics;
 
   /** Remove references to the component context once felix scr 1.2 becomes available */
   protected ComponentContext componentContext = null;
@@ -202,6 +215,18 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   public void activate(ComponentContext componentContext) {
     this.componentContext = componentContext;
     executorService = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+    try {
+      workflowsStatistics = new WorkflowsStatistics(getBeanStatistics(), getHoldWorkflows());
+      jmxBeans.add(JmxUtil.registerMXBean(workflowsStatistics, JMX_WORKFLOWS_STATISTICS_TYPE));
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Error registarting JMX statistic beans {}", e);
+    }
+  }
+
+  public void deactivate() {
+    for (ObjectInstance mxbean : jmxBeans) {
+      JmxUtil.unregisterMXBean(mxbean);
+    }
   }
 
   /**
@@ -1092,7 +1117,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
       // Update the service registry
       serviceRegistry.updateJob(job);
-
+      workflowsStatistics.updateWorkflow(getBeanStatistics(), getHoldWorkflows());
     } catch (ServiceRegistryException e) {
       throw new WorkflowDatabaseException(e);
     } catch (NotFoundException e) {
@@ -1611,6 +1636,62 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   @Override
   public long countJobs(Status status) throws ServiceRegistryException {
     return serviceRegistry.count(JOB_TYPE, status);
+  }
+
+  private WorkflowStatistics getBeanStatistics() throws WorkflowDatabaseException {
+    WorkflowStatistics stats = new WorkflowStatistics();
+    long total = 0L;
+    long failed = 0L;
+    long failing = 0L;
+    long instantiated = 0L;
+    long paused = 0L;
+    long running = 0L;
+    long stopped = 0L;
+    long finished = 0L;
+
+    Organization organization = securityService.getOrganization();
+    try {
+      for (Organization org : organizationDirectoryService.getOrganizations()) {
+        securityService.setOrganization(org);
+        WorkflowStatistics statistics = getStatistics();
+        total += statistics.getTotal();
+        failed += statistics.getFailed();
+        failing += statistics.getFailing();
+        instantiated += statistics.getInstantiated();
+        paused += statistics.getPaused();
+        running += statistics.getRunning();
+        stopped += statistics.getStopped();
+        finished += statistics.getFinished();
+      }
+    } finally {
+      securityService.setOrganization(organization);
+    }
+
+    stats.setTotal(total);
+    stats.setFailed(failed);
+    stats.setFailing(failing);
+    stats.setInstantiated(instantiated);
+    stats.setPaused(paused);
+    stats.setRunning(running);
+    stats.setStopped(stopped);
+    stats.setFinished(finished);
+    return stats;
+  }
+
+  private List<WorkflowInstance> getHoldWorkflows() throws WorkflowDatabaseException {
+    List<WorkflowInstance> workflows = new ArrayList<WorkflowInstance>();
+    Organization organization = securityService.getOrganization();
+    try {
+      for (Organization org : organizationDirectoryService.getOrganizations()) {
+        securityService.setOrganization(org);
+        WorkflowQuery workflowQuery = new WorkflowQuery().withState(WorkflowInstance.WorkflowState.PAUSED);
+        WorkflowSet workflowSet = getWorkflowInstances(workflowQuery);
+        workflows.addAll(Arrays.asList(workflowSet.getItems()));
+      }
+    } finally {
+      securityService.setOrganization(organization);
+    }
+    return workflows;
   }
 
   /**

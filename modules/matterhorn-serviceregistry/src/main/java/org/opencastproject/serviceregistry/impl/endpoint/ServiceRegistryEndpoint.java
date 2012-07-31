@@ -364,12 +364,35 @@ public class ServiceRegistryEndpoint {
   }
 
   @GET
+  @Path("job/{id}/children.xml")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "childrenjobsasxml", description = "Returns all children from a job as XML.", returnDescription = "A list of children jobs as XML", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "Jobs found."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No children jobs found.") })
+  public JaxbJobList getChildrenJobsAsXml(@PathParam("id") long id) throws NotFoundException {
+    return getChildrenJobsAsJson(id);
+  }
+
+  @GET
+  @Path("job/{id}/children.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "childrenjobsasjson", description = "Returns all children from a job as JSON.", returnDescription = "A list of children jobs as JSON", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "Jobs found."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No children jobs found.") })
+  public JaxbJobList getChildrenJobsAsJson(@PathParam("id") long id) throws NotFoundException {
+    try {
+      return new JaxbJobList(serviceRegistry.getChildJobs(id));
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @GET
   @Path("jobs.xml")
   @Produces(MediaType.TEXT_XML)
   public JaxbJobList getJobsAsXml(@QueryParam("serviceType") String serviceType, @QueryParam("status") Job.Status status) {
     try {
-      List<Job> jobs = serviceRegistry.getJobs(serviceType, status);
-      return new JaxbJobList(jobs);
+      return new JaxbJobList(serviceRegistry.getJobs(serviceType, status));
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }

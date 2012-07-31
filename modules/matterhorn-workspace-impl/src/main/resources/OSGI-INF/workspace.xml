@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.workspace.impl.WorkspaceImpl" immediate="true" activate="activate">
+ name="org.opencastproject.workspace.impl.WorkspaceImpl" immediate="true" activate="activate" deactivate="deactivaate">
   <implementation class="org.opencastproject.workspace.impl.WorkspaceImpl" />
   <property name="service.description" value="Workspace" />
   <service>
