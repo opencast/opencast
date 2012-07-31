@@ -202,6 +202,7 @@ Opencast.Series = (function ()
                     series_id = data['search-results'].result.dcIsPartOf;
                     if (series_id != '')
                     {
+                        $(document).trigger('setSeriesID', [series_id]);
                         $.ajax(
                         {
                             url: Opencast.Watch.getSeriesSeriesURL(),

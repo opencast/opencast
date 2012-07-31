@@ -91,4 +91,34 @@ $(document).ready( function() {
 	    }
         }
     });
+
+    //load series infos
+    $(document).bind('setSeriesID', function(event, seriesID) {
+        $.log("Eventhandler: setSeriesID: "+seriesID);
+        $.ajax({
+            url: '/series/'+seriesID+'.json',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data)
+            {
+                if(data !== undefined || data['http://www.opencastproject.org/matterhorn/'] !== undefined){
+                    // no comments plugin when disabled in series
+                    var annotations_module_enabled = data['http://www.opencastproject.org/matterhorn/'].annotation[0].value;
+                    if(annotations_module_enabled)
+                    {
+                        annotations_module_enabled = (annotations_module_enabled == "true") ? true : false;
+                    }
+                    if (!annotations_module_enabled)
+                    {
+                        // Detach "Comment" Tab
+                        $('#oc_btn-comments').detach();
+                        $('#oc_btn-add-comment').detach();
+                        $('#oc_checkbox-annotation-comment').detach();
+                        $('#oc_label-annotation-comment').detach();
+                    }
+                }           
+            }
+        });
+    });
+
 });
