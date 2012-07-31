@@ -233,6 +233,17 @@ public final class PersistenceUtil {
       return none();
     }
   }
+  
+  /** Run a query that should return the first result of it. */
+  public static <A> Option<A> runFirstResultQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
+    try {
+      return some((A) createNamedQuery(em, queryName, params).setMaxResults(1).getSingleResult());
+    } catch (NoResultException e) {
+      return none();
+    } catch (NonUniqueResultException e) {
+      return none();
+    }
+  }
 
   /** Execute a <code>count(x)</code> query. */
   public static long runCountQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {

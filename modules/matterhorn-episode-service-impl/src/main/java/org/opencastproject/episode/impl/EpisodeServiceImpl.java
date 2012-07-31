@@ -15,7 +15,20 @@
  */
 package org.opencastproject.episode.impl;
 
-import org.apache.solr.client.solrj.SolrServerException;
+import static org.opencastproject.episode.impl.StoragePath.spath;
+import static org.opencastproject.episode.impl.elementstore.DeletionSelector.delAll;
+import static org.opencastproject.episode.impl.elementstore.Source.source;
+import static org.opencastproject.mediapackage.MediaPackageSupport.modify;
+import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.util.JobUtil.waitForJob;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Collections.nil;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.episode.api.ArchivedMediaPackageElement;
 import org.opencastproject.episode.api.ConfiguredWorkflow;
 import org.opencastproject.episode.api.EpisodeQuery;
@@ -58,6 +71,8 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
+
+import org.apache.solr.client.solrj.SolrServerException;
 import org.osgi.framework.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,20 +83,6 @@ import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-
-import static org.opencastproject.episode.impl.StoragePath.spath;
-import static org.opencastproject.episode.impl.elementstore.DeletionSelector.delAll;
-import static org.opencastproject.episode.impl.elementstore.Source.source;
-import static org.opencastproject.mediapackage.MediaPackageSupport.modify;
-import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.util.JobUtil.waitForJob;
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.nil;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
 
 public final class EpisodeServiceImpl implements EpisodeService {
 
@@ -214,12 +215,14 @@ public final class EpisodeServiceImpl implements EpisodeService {
 
   /** Check if element <code>e</code> is already part of the history. */
   private Option<StoragePath> findElementInVersions(MediaPackageElement e) throws Exception {
-    return persistence.findAssetByChecksum(e.getChecksum().toString()).map(new Function<Asset, StoragePath>() {
-      @Override public StoragePath apply(Asset asset) {
-        logger.info("Found already archived asset with same checksum");
-        return asset.getStoragePath();
-      }
-    });
+    return persistence.findAssetByElementIdAndChecksum(e.getIdentifier(), e.getChecksum().toString()).map(
+            new Function<Asset, StoragePath>() {
+              @Override
+              public StoragePath apply(Asset asset) {
+                logger.info("Found already archived asset with same checksum");
+                return asset.getStoragePath();
+              }
+            });
   }
 
   /** Make sure each of the elements has a checksum available. */

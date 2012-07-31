@@ -15,9 +15,17 @@
  */
 package org.opencastproject.episode.impl.persistence;
 
+import static org.opencastproject.episode.api.Version.version;
+import static org.opencastproject.episode.impl.StoragePath.spath;
+import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.persistence.PersistenceUtil.runFirstResultQuery;
+import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResultQuery;
+
 import org.opencastproject.episode.impl.StoragePath;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
+
+import java.net.URI;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,19 +35,14 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import java.net.URI;
-
-import static org.opencastproject.episode.api.Version.version;
-import static org.opencastproject.episode.impl.StoragePath.spath;
-import static org.opencastproject.util.data.Tuple.tuple;
-import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResultQuery;
 
 /** An archived media package element. */
 @Entity(name = "Asset")
 @Table(name = "episode_asset")
 @NamedQueries({
         @NamedQuery(name = "Asset.findByUri", query = "SELECT a FROM Asset a WHERE a.uri = :uri"),
-        @NamedQuery(name = "Asset.findByChecksum", query = "SELECT a FROM Asset a WHERE a.checksum = :checksum") })
+        @NamedQuery(name = "Asset.findByChecksum", query = "SELECT a FROM Asset a WHERE a.checksum = :checksum"),
+        @NamedQuery(name = "Asset.findByElementIdAndChecksum", query = "SELECT a FROM Asset a WHERE a.checksum = :checksum AND a.mediaPackageElementId = :mediaPackageElementId") })
 public final class AssetDto {
   @Id
   @GeneratedValue
@@ -90,7 +93,18 @@ public final class AssetDto {
   public static Function<EntityManager, Option<AssetDto>> findByChecksum(final String checksum) {
     return new Function<EntityManager, Option<AssetDto>>() {
       @Override public Option<AssetDto> apply(EntityManager em) {
-        return runSingleResultQuery(em, "Asset.findByChecksum", tuple("checksum", checksum));
+        return runFirstResultQuery(em, "Asset.findByChecksum", tuple("checksum", checksum));
+      }
+    };
+  }
+
+  public static Function<EntityManager, Option<AssetDto>> findByElementIdAndChecksum(final String elementId,
+          final String checksum) {
+    return new Function<EntityManager, Option<AssetDto>>() {
+      @Override
+      public Option<AssetDto> apply(EntityManager em) {
+        return runFirstResultQuery(em, "Asset.findByElementIdAndChecksum", tuple("mediaPackageElementId", elementId),
+                tuple("checksum", checksum));
       }
     };
   }

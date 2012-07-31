@@ -15,11 +15,14 @@
  */
 package org.opencastproject.episode.persistence;
 
-import org.apache.commons.io.FileUtils;
-import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.episode.api.Version.version;
+import static org.opencastproject.episode.impl.EpisodeServiceImpl.rewriteForArchival;
+
 import org.opencastproject.episode.api.Version;
 import org.opencastproject.episode.impl.persistence.AbstractEpisodeServiceDatabase;
 import org.opencastproject.episode.impl.persistence.EpisodeDto;
@@ -40,18 +43,16 @@ import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.util.persistence.PersistenceEnv;
 import org.opencastproject.util.persistence.PersistenceUtil;
 
+import org.apache.commons.io.FileUtils;
+import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.episode.api.Version.version;
-import static org.opencastproject.episode.impl.EpisodeServiceImpl.rewriteForArchival;
 
 /**
  * Tests persistence: storing, merging, retrieving and removing.
@@ -178,8 +179,8 @@ public class EpisodeServicePersistenceTest {
   public void testAsset() throws Exception {
     episodeDatabase.storeEpisode(mediaPackage, accessControlList, new Date(), version(1L));
     final MediaPackageElement mpe = mediaPackage.getElements()[0];
-    assertTrue(episodeDatabase.findAssetByChecksum(mpe.getChecksum().toString()).isSome());
-    assertEquals(mpe.getChecksum().toString(), episodeDatabase.findAssetByChecksum(mpe.getChecksum().toString()).get().getChecksum());
+    assertTrue(episodeDatabase.findAssetByElementIdAndChecksum(mpe.getIdentifier(), mpe.getChecksum().toString()).isSome());
+    assertEquals(mpe.getChecksum().toString(), episodeDatabase.findAssetByElementIdAndChecksum(mpe.getIdentifier(), mpe.getChecksum().toString()).get().getChecksum());
   }
 
   /**

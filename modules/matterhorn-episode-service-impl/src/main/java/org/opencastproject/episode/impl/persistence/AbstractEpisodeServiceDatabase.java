@@ -15,6 +15,17 @@
  */
 package org.opencastproject.episode.impl.persistence;
 
+import static org.opencastproject.episode.api.EpisodeService.CONTRIBUTE_PERMISSION;
+import static org.opencastproject.episode.api.EpisodeService.READ_PERMISSION;
+import static org.opencastproject.episode.api.EpisodeService.WRITE_PERMISSION;
+import static org.opencastproject.episode.api.Version.version;
+import static org.opencastproject.episode.impl.StoragePath.spath;
+import static org.opencastproject.episode.impl.persistence.EpisodeDto.findByIdAndVersion;
+import static org.opencastproject.util.data.Collections.mkString;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Tuple3.tuple3;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import org.opencastproject.episode.api.Version;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -34,27 +45,18 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.util.data.functions.Booleans;
 import org.opencastproject.util.persistence.PersistenceEnv;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.opencastproject.episode.api.EpisodeService.CONTRIBUTE_PERMISSION;
-import static org.opencastproject.episode.api.EpisodeService.READ_PERMISSION;
-import static org.opencastproject.episode.api.EpisodeService.WRITE_PERMISSION;
-import static org.opencastproject.episode.api.Version.version;
-import static org.opencastproject.episode.impl.StoragePath.spath;
-import static org.opencastproject.episode.impl.persistence.EpisodeDto.findByIdAndVersion;
-import static org.opencastproject.util.data.Collections.mkString;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Tuple3.tuple3;
-import static org.opencastproject.util.data.functions.Misc.chuck;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
 
 /**
  * Implements {@link EpisodeServiceDatabase}. Defines permanent storage for series.
@@ -320,8 +322,9 @@ public abstract class AbstractEpisodeServiceDatabase implements EpisodeServiceDa
   }
 
   @Override
-  public Option<Asset> findAssetByChecksum(String checksum) throws EpisodeServiceDatabaseException {
-    return tx(AssetDto.findByChecksum(checksum)).map(AssetDto.toAsset);
+  public Option<Asset> findAssetByElementIdAndChecksum(String mediaPackageElementId, String checksum)
+          throws EpisodeServiceDatabaseException {
+    return tx(AssetDto.findByElementIdAndChecksum(mediaPackageElementId, checksum)).map(AssetDto.toAsset);
   }
 
   /**

@@ -191,5 +191,6 @@ public interface EpisodeServiceDatabase {
    */
   void storeEpisode(MediaPackage mediaPackage, AccessControlList acl, Date now, Version version) throws EpisodeServiceDatabaseException;
 
-  Option<Asset> findAssetByChecksum(String checksum) throws EpisodeServiceDatabaseException;
+  Option<Asset> findAssetByElementIdAndChecksum(String mediaPackageElementId, String checksum)
+          throws EpisodeServiceDatabaseException;
 }
