@@ -60,8 +60,6 @@ Opencast.Annotation_Comment_List = (function ()
      */
     function initialize()
     {
-	var reg = Opencast.Plugin_Controller.registerPlugin(Opencast.Annotation_Comment);
-	$.log("Opencast.Annotation_Comment registered: " + reg);
 
 	// no support for IE < version 8
 	if(!($.browser.msie && (parseInt($.browser.version, 10) < 9)))
