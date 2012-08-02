@@ -117,9 +117,7 @@ public class IngestRestService {
   // For the progress bar -1 bug workaround, keeping UploadJobs in memory rather than saving them using JPA
   private HashMap<String, UploadJob> jobs;
   // The number of ingests this service can handle concurrently. 
-  private int ingestLimit = 0;
-  // Whether this service has a limit for the number of ingests it can handle concurrently. 
-  private boolean ingestLimitEnabled = false;
+  private int ingestLimit = -1;
   
   public IngestRestService() {
     factory = MediaPackageBuilderFactory.newInstance();
@@ -135,11 +133,7 @@ public class IngestRestService {
   }
 
   protected synchronized boolean isIngestLimitEnabled() {
-    return ingestLimitEnabled;
-  }
-
-  private synchronized void setIngestLimitEnabled(boolean ingestLimitEnabled) {
-    this.ingestLimitEnabled = ingestLimitEnabled;
+    return ingestLimit >= 0;
   }
 
   public void setIngestService(IngestService ingestService) {
@@ -178,23 +172,17 @@ public class IngestRestService {
       if (defaultWorkflowDefinitionId == null) {
         throw new IllegalStateException("Default workflow definition is null: " + DEFAULT_WORKFLOW_DEFINITION);
       }
-
-      try {
-        ingestLimit = Integer.parseInt(StringUtils.trimToNull(cc.getBundleContext().getProperty(MAX_INGESTS_KEY)));
-        if (ingestLimit > 0) {
-          setIngestLimitEnabled(true);
-          logger.debug("Using an ingest limit of " + ingestLimit);
-        } else {
-          setIngestLimitEnabled(false);
-          ingestLimit = 0;
-          logger.debug("Ingest limit was 0 or less so the limit is disabled.");
+      if(cc.getBundleContext().getProperty(MAX_INGESTS_KEY) != null) {
+        try {
+          ingestLimit = Integer.parseInt(StringUtils.trimToNull(cc.getBundleContext().getProperty(MAX_INGESTS_KEY)));
+          if(ingestLimit == 0) {
+            ingestLimit = -1;
+          }
+        } catch (NumberFormatException e) {
+          logger.warn("Max ingest property with key " + MAX_INGESTS_KEY
+                  + " isn't defined so no ingest limit will be used.");
+          ingestLimit = -1;
         }
-
-      } catch (NumberFormatException e) {
-        logger.warn("Max ingest property with key " + MAX_INGESTS_KEY
-                + " isn't defined so no ingest limit will be used.");
-        setIngestLimitEnabled(false);
-        ingestLimit = 0;
       }
     }
   }

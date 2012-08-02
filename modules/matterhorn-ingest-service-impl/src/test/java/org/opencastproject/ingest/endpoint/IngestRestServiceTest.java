@@ -144,17 +144,17 @@ public class IngestRestServiceTest {
 
   @Test
   public void testNoIngestLimit() {
-    setupAndTestLimit(null, 0, false);
+    setupAndTestLimit(null, -1, false);
   }
 
   @Test
   public void testIngestLimitOfNegativeOne() {
-    setupAndTestLimit("-1", 0, false);
+    setupAndTestLimit("-1", -1, false);
   }
 
   @Test
   public void testIngestLimitOfZero() {
-    setupAndTestLimit("0", 0, false);
+    setupAndTestLimit("0", -1, false);
   }
 
   @Test
@@ -174,7 +174,7 @@ public class IngestRestServiceTest {
 
   @Test
   public void testInvalidLimitAddZippedMediaPackage() {
-    setupAndTestLimit("This is not a number", 0, false);
+    setupAndTestLimit("This is not a number", -1, false);
   }
 
   public void setupAndTestLimit(String limit, int expectedLimit, boolean expectedEnabled) {
