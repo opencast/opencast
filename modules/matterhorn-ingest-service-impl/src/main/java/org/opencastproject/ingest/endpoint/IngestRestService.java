@@ -172,10 +172,10 @@ public class IngestRestService {
       if (defaultWorkflowDefinitionId == null) {
         throw new IllegalStateException("Default workflow definition is null: " + DEFAULT_WORKFLOW_DEFINITION);
       }
-      if(cc.getBundleContext().getProperty(MAX_INGESTS_KEY) != null) {
+      if (cc.getBundleContext().getProperty(MAX_INGESTS_KEY) != null) {
         try {
           ingestLimit = Integer.parseInt(StringUtils.trimToNull(cc.getBundleContext().getProperty(MAX_INGESTS_KEY)));
-          if(ingestLimit == 0) {
+          if (ingestLimit == 0) {
             ingestLimit = -1;
           }
         } catch (NumberFormatException e) {
