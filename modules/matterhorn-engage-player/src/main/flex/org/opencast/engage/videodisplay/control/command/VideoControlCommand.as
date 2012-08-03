@@ -59,9 +59,12 @@ package org.opencast.engage.videodisplay.control.command
 			{
 				case VideoControlEvent.PLAY:
 					model.mediaPlayer.play();
-					model.currentPlayerState=PlayerState.PLAYING;
-					currentPlayPauseState=PlayerState.PAUSED;
-					ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+					if (model.mediaPlayer.playing())
+					{
+						model.currentPlayerState=PlayerState.PLAYING;
+						currentPlayPauseState=PlayerState.PAUSED;
+						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+					}
 
 					if (model.videoState == VideoState.COVER)
 					{
@@ -78,11 +81,14 @@ package org.opencast.engage.videodisplay.control.command
 						//ok for other servers
 						//model.mediaPlayer.seek(model.currentPlayhead);
 						model.mediaPlayer.seek(model.currentSeekPosition);
+						if (!model.mediaPlayer.playing()) 
+						{
+							model.currentPlayerState=PlayerState.PAUSED;
+							currentPlayPauseState=PlayerState.PLAYING;
+							ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						}
 					}
 
-					model.currentPlayerState=PlayerState.PAUSED;
-					currentPlayPauseState=PlayerState.PLAYING;
-					ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
 					break;
 
 				case VideoControlEvent.STOP:
@@ -90,16 +96,20 @@ package org.opencast.engage.videodisplay.control.command
 					{
 						model.mediaPlayer.pause();
 						model.mediaPlayer.seek(0);
-						model.currentPlayerState=PlayerState.PAUSED;
-						currentPlayPauseState=PlayerState.PLAYING;
-						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
 					}
-					//if the video has been watched completely - OSMF TimeEvent.COMPLETE - mediaPlayer not playing anymore
+						//if the video has been watched completely - OSMF TimeEvent.COMPLETE - mediaPlayer not playing anymore
 					else
 					{
 						model.mediaPlayer.play();
 						model.mediaPlayer.pause();
 						model.mediaPlayer.seek(0);
+					}
+
+					if (!model.mediaPlayer.playing()) 
+					{
+						model.currentPlayerState=PlayerState.PAUSED;
+						currentPlayPauseState=PlayerState.PLAYING;
+						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
 					}
 					break;
 
@@ -112,9 +122,12 @@ package org.opencast.engage.videodisplay.control.command
 					if (!model.mediaPlayer.playing())
 					{
 						model.mediaPlayer.play();
-						model.currentPlayerState=PlayerState.PLAYING;
-						currentPlayPauseState=PlayerState.PAUSED;
-						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						if (model.mediaPlayer.playing())
+						{
+							model.currentPlayerState=PlayerState.PLAYING;
+							currentPlayPauseState=PlayerState.PAUSED;
+							ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);						
+						}
 					}
 					if (model.startPlay == true)
 					{
@@ -138,9 +151,12 @@ package org.opencast.engage.videodisplay.control.command
 					if (!model.mediaPlayer.playing())
 					{
 						model.mediaPlayer.play();
-						model.currentPlayerState=PlayerState.PLAYING;
-						currentPlayPauseState=PlayerState.PAUSED;
-						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						if (model.mediaPlayer.playing())
+						{
+							model.currentPlayerState=PlayerState.PLAYING;
+							currentPlayPauseState=PlayerState.PAUSED;
+							ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						}
 					}
 
 					if (model.startPlay == true)
@@ -204,9 +220,12 @@ package org.opencast.engage.videodisplay.control.command
 					if (!model.mediaPlayer.playing())
 					{
 						model.mediaPlayer.play();
-						model.currentPlayerState=PlayerState.PLAYING;
-						currentPlayPauseState=PlayerState.PAUSED;
-						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						if (model.mediaPlayer.playing())
+						{
+							model.currentPlayerState=PlayerState.PLAYING;
+							currentPlayPauseState=PlayerState.PAUSED;
+							ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						}
 					}
 					model.mediaPlayer.seek((model.currentDuration / 10) * 0);
 					break;
@@ -216,9 +235,12 @@ package org.opencast.engage.videodisplay.control.command
 					if (!model.mediaPlayer.playing())
 					{
 						model.mediaPlayer.play();
-						model.currentPlayerState=PlayerState.PLAYING;
-						currentPlayPauseState=PlayerState.PAUSED;
-						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						if (model.mediaPlayer.playing())
+						{
+							model.currentPlayerState=PlayerState.PLAYING;
+							currentPlayPauseState=PlayerState.PAUSED;
+							ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						}
 					}
 					model.mediaPlayer.seek((model.currentDuration / 10) * 1);
 					break;
@@ -228,9 +250,12 @@ package org.opencast.engage.videodisplay.control.command
 					if (!model.mediaPlayer.playing())
 					{
 						model.mediaPlayer.play();
-						model.currentPlayerState=PlayerState.PLAYING;
-						currentPlayPauseState=PlayerState.PAUSED;
-						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						if (model.mediaPlayer.playing())
+						{
+							model.currentPlayerState=PlayerState.PLAYING;
+							currentPlayPauseState=PlayerState.PAUSED;
+							ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						}
 					}
 					model.mediaPlayer.seek((model.currentDuration / 10) * 2);
 					break;
@@ -240,9 +265,12 @@ package org.opencast.engage.videodisplay.control.command
 					if (!model.mediaPlayer.playing())
 					{
 						model.mediaPlayer.play();
-						model.currentPlayerState=PlayerState.PLAYING;
-						currentPlayPauseState=PlayerState.PAUSED;
-						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						if (model.mediaPlayer.playing())
+						{
+							model.currentPlayerState=PlayerState.PLAYING;
+							currentPlayPauseState=PlayerState.PAUSED;
+							ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						}
 					}
 					model.mediaPlayer.seek((model.currentDuration / 10) * 3);
 					break;
@@ -252,9 +280,12 @@ package org.opencast.engage.videodisplay.control.command
 					if (!model.mediaPlayer.playing())
 					{
 						model.mediaPlayer.play();
-						model.currentPlayerState=PlayerState.PLAYING;
-						currentPlayPauseState=PlayerState.PAUSED;
-						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						if (model.mediaPlayer.playing())
+						{
+							model.currentPlayerState=PlayerState.PLAYING;
+							currentPlayPauseState=PlayerState.PAUSED;
+							ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						}
 					}
 					model.mediaPlayer.seek((model.currentDuration / 10) * 4);
 					break;
@@ -264,9 +295,12 @@ package org.opencast.engage.videodisplay.control.command
 					if (!model.mediaPlayer.playing())
 					{
 						model.mediaPlayer.play();
-						model.currentPlayerState=PlayerState.PLAYING;
-						currentPlayPauseState=PlayerState.PAUSED;
-						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						if (model.mediaPlayer.playing())
+						{
+							model.currentPlayerState=PlayerState.PLAYING;
+							currentPlayPauseState=PlayerState.PAUSED;
+							ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						}
 					}
 					model.mediaPlayer.seek((model.currentDuration / 10) * 5);
 					break;
@@ -276,9 +310,12 @@ package org.opencast.engage.videodisplay.control.command
 					if (!model.mediaPlayer.playing())
 					{
 						model.mediaPlayer.play();
-						model.currentPlayerState=PlayerState.PLAYING;
-						currentPlayPauseState=PlayerState.PAUSED;
-						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						if (model.mediaPlayer.playing())
+						{
+							model.currentPlayerState=PlayerState.PLAYING;
+							currentPlayPauseState=PlayerState.PAUSED;
+							ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						}
 					}
 					model.mediaPlayer.seek((model.currentDuration / 10) * 6);
 					break;
@@ -288,9 +325,12 @@ package org.opencast.engage.videodisplay.control.command
 					if (!model.mediaPlayer.playing())
 					{
 						model.mediaPlayer.play();
-						model.currentPlayerState=PlayerState.PLAYING;
-						currentPlayPauseState=PlayerState.PAUSED;
-						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						if (model.mediaPlayer.playing())
+						{
+							model.currentPlayerState=PlayerState.PLAYING;
+							currentPlayPauseState=PlayerState.PAUSED;
+							ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						}
 					}
 					model.mediaPlayer.seek((model.currentDuration / 10) * 7);
 					break;
@@ -300,9 +340,12 @@ package org.opencast.engage.videodisplay.control.command
 					if (!model.mediaPlayer.playing())
 					{
 						model.mediaPlayer.play();
-						model.currentPlayerState=PlayerState.PLAYING;
-						currentPlayPauseState=PlayerState.PAUSED;
-						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						if (model.mediaPlayer.playing())
+						{
+							model.currentPlayerState=PlayerState.PLAYING;
+							currentPlayPauseState=PlayerState.PAUSED;
+							ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						}
 					}
 					model.mediaPlayer.seek((model.currentDuration / 10) * 8);
 					break;
@@ -312,9 +355,12 @@ package org.opencast.engage.videodisplay.control.command
 					if (!model.mediaPlayer.playing())
 					{
 						model.mediaPlayer.play();
-						model.currentPlayerState=PlayerState.PLAYING;
-						currentPlayPauseState=PlayerState.PAUSED;
-						ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						if (model.mediaPlayer.playing())
+						{
+							model.currentPlayerState=PlayerState.PLAYING;
+							currentPlayPauseState=PlayerState.PAUSED;
+							ExternalInterface.call(ExternalFunction.SETPLAYPAUSESTATE, currentPlayPauseState);
+						}
 					}
 					model.mediaPlayer.seek((model.currentDuration / 10) * 9);
 					break;

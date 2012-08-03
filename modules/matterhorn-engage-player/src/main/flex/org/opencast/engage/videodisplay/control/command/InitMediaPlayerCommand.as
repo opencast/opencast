@@ -15,9 +15,12 @@
  */
 package org.opencast.engage.videodisplay.control.command
 {
-	import flash.external.ExternalInterface;
-	import mx.core.FlexGlobals;
 	import bridge.ExternalFunction;
+
+	import flash.external.ExternalInterface;
+
+	import mx.core.FlexGlobals;
+
 	import org.opencast.engage.videodisplay.control.event.InitMediaPlayerEvent;
 	import org.opencast.engage.videodisplay.control.util.OpencastMediaPlayer;
 	import org.opencast.engage.videodisplay.model.VideodisplayModel;
@@ -28,9 +31,12 @@ package org.opencast.engage.videodisplay.control.command
 	import org.osmf.elements.AudioElement;
 	import org.osmf.elements.LightweightVideoElement;
 	import org.osmf.elements.VideoElement;
+	import org.osmf.events.MediaElementEvent;
 	import org.osmf.media.MediaElement;
 	import org.osmf.media.URLResource;
+	import org.osmf.net.StreamingURLResource;
 	import org.swizframework.Swiz;
+
 	/**
 	 * InitMediaPlayerCommand
 	 * This Command tries to initialize the player and the videos
@@ -80,7 +86,7 @@ package org.opencast.engage.videodisplay.control.command
 				model.coverURLSingle=event.coverURLOne;
 			}
 
-
+			
 			// Single Video/Audio
 			if (event.mediaURLOne != '' && (event.mediaURLTwo == '' || event.mediaURLTwo == ' '))
 			{
@@ -93,25 +99,37 @@ package org.opencast.engage.videodisplay.control.command
 				switch (fileType)
 				{
 					case "video":
-
-						//var newVideoElement : VideoElement = new VideoElement( new URLResource( event.mediaURLOne ) );
-						// Using OSMFs new LightweightVideoElelemt -> red5 rtmp stream not starting
-						var newVideoElement:LightweightVideoElement=new LightweightVideoElement(new URLResource(event.mediaURLOne));
-						newVideoElement.smoothing=true;
-						//newVideoElement.defaultDuration = 1000;
-						var mediaElementVideo:MediaElement=newVideoElement;
-
-						model.mediaPlayer.setSingleMediaElement(mediaElementVideo);
+						//#RAS
+						var urlResource:URLResource = null;
 
 						if (event.mediaURLOne.charAt(0) == 'h' || event.mediaURLOne.charAt(0) == 'H')
 						{
+							urlResource = new URLResource(event.mediaURLOne);
 							model.mediaTypeSingle=model.HTML;
 							model.mediaType=model.HTML;
 						}
 						else if (event.mediaURLOne.charAt(0) == 'r' || event.mediaURLOne.charAt(0) == 'R')
 						{
+							//#RAS hack for FLVs (remove .flv at the end)
+							var rtmpLink:String = event.mediaURLOne;
+							if (rtmpLink.substring(rtmpLink.length-4).toLowerCase() == ".flv")
+								rtmpLink = rtmpLink.substr(0, rtmpLink.length-4);
+
+							urlResource = new StreamingURLResource(rtmpLink);
 							model.mediaTypeSingle=model.RTMP;
 						}
+						//var newVideoElement : VideoElement = new VideoElement( new URLResource( event.mediaURLOne ) );
+						// Using OSMFs new LightweightVideoElelemt -> red5 rtmp stream not starting
+						var newVideoElement:LightweightVideoElement=new LightweightVideoElement(urlResource);
+
+						newVideoElement.smoothing=true;
+						//newVideoElement.defaultDuration = 1000;
+						var mediaElementVideo:MediaElement=newVideoElement;
+
+						//#RAS testing...
+						mediaElementVideo.addEventListener(MediaElementEvent.TRAIT_ADD, handleTraitAdded);
+
+						model.mediaPlayer.setSingleMediaElement(mediaElementVideo);
 						break;
 
 					case "audio":
@@ -130,37 +148,54 @@ package org.opencast.engage.videodisplay.control.command
 			}
 			else if (event.mediaURLOne != '' && event.mediaURLTwo != '')
 			{
+				//#RAS
+				var urlResource1:URLResource = null;
+				var urlResource2:URLResource = null;
+
 				if (event.mediaURLOne.charAt(0) == 'h' || event.mediaURLOne.charAt(0) == 'H')
 				{
+					urlResource1 = new URLResource(event.mediaURLOne);
 					model.mediaTypeOne=model.HTML;
 					model.mediaType=model.HTML;
 				}
 				else if (event.mediaURLOne.charAt(0) == 'r' || event.mediaURLOne.charAt(0) == 'R')
 				{
+					//#RAS hack for FLVs (remove .flv at the end)
+					var rtmpLink1:String = event.mediaURLOne;
+					if (rtmpLink1.substring(rtmpLink1.length-4).toLowerCase() == ".flv")
+						rtmpLink1 = rtmpLink1.substr(0, rtmpLink1.length-4);
+
+					urlResource1 = new StreamingURLResource(rtmpLink1);
 					model.mediaTypeOne=model.RTMP;
 				}
 
 				if (event.mediaURLTwo.charAt(0) == 'h' || event.mediaURLTwo.charAt(0) == 'H')
 				{
+					urlResource2 = new URLResource(event.mediaURLTwo);
 					model.mediaTypeTwo=model.HTML;
 					model.mediaType=model.HTML;
 				}
 				else if (event.mediaURLTwo.charAt(0) == 'r' || event.mediaURLTwo.charAt(0) == 'R')
 				{
+					//#RAS hack for FLVs and FMS (remove .flv at the end)
+					var rtmpLink2:String = event.mediaURLOne;
+					if (rtmpLink2.substring(rtmpLink2.length-4).toLowerCase() == ".flv")
+						rtmpLink2 = rtmpLink2.substr(0, rtmpLink2.length-4);
+
+					urlResource2 = new StreamingURLResource(rtmpLink2);
 					model.mediaTypeTwo=model.RTMP;
 				}
-
 
 				model.mediaPlayer=new OpencastMediaPlayer(VideoState.MULTI);
 
 				//var newVideoElementOne : VideoElement = new VideoElement( new URLResource( event.mediaURLOne ) );
-				var newVideoElementOne:LightweightVideoElement=new LightweightVideoElement(new URLResource(event.mediaURLOne));
+				var newVideoElementOne:LightweightVideoElement=new LightweightVideoElement(urlResource1);
 				newVideoElementOne.smoothing=true;
 				//newVideoElementOne.defaultDuration = 1000;
 				var mediaElementVideoOne:MediaElement=newVideoElementOne;
 				//model.mediaPlayer.setMediaElementOne( mediaElementVideoOne );
 
-				var newVideoElementTwo:LightweightVideoElement=new LightweightVideoElement(new URLResource(event.mediaURLTwo));
+				var newVideoElementTwo:LightweightVideoElement=new LightweightVideoElement(urlResource2);
 				newVideoElementTwo.smoothing=true;
 				//newVideoElementTwo.defaultDuration = 1000;
 				var mediaElementVideoTwo:MediaElement=newVideoElementTwo;
@@ -172,6 +207,11 @@ package org.opencast.engage.videodisplay.control.command
 			{
 				errorMessage("Error", "TRACK COULD NOT BE FOUND");
 			}
+		}
+
+		//TEST!!
+		private function handleTraitAdded(e:MediaElementEvent):void {
+			trace("traidAdded: " + e.traitType);
 		}
 
 		/**
