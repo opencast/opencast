@@ -13,7 +13,7 @@ case `uname` in
   if (match($0, "Red Hat Enterprise Linux")) { print "RHEL"; }
   else if (match($0, "SUSE Linux Enterprise Server")) { print "SLES"; }
   else { print $1; }
-  exit 0
+  exit 0;
 }' /etc/issue
     [ $? -ne 0 ] && exit 1
     ;;

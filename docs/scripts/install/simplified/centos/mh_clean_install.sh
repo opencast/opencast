@@ -5,13 +5,13 @@ CLEAN=0
 IGNERR=""
 FLAGS=""
 
-MH_VER=`cat "$HWD/version" 2>/dev/null`
+MH_VER=`cat "$HWD/mh_version" 2>/dev/null`
 while [ $# -gt 0 ]; do
   case "$1" in
     -c ) CLEAN=1; shift ;;
     -i ) IGNERR="-Dmaven.test.failure.ignore=true -Dmaven.test.error.ignore=true"; shift ;;
     -e ) FLAGS="-e"; shift ;;
-    -? ) echo "Usage: ${0##*/} [-c] [-i] [-e] <MH_ver>" 1>&2; exit 1 ;;
+    -? ) echo "Usage: ${0##*/} [-c] [-i] [-e] [<MH_ver>]" 1>&2; exit 1 ;;
     * ) export MH_VER="$1"; shift ;;
   esac
 done
@@ -23,11 +23,11 @@ case "$MH_VER" in
   * ) echo "Unsupported version $MH_VER" 1>&2; exit 1 ;;
 esac
 
-[ -z "$JAVA_HOME" ] && export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0
+[ -z "$JAVA_HOME" ] && export JAVA_HOME=`"$HWD/java_home.sh"`
 [ -z "$M2_HOME" ] && export M2_HOME=/usr/share/maven2
 [ -z "$M2_REPO" ] && export M2_REPO=~/.m2/repository
 [ -z "$TRUNK" ] && export TRUNK=/opt/matterhorn/trunk
-. "$HWD/felix_dirs.sh" $MH_VER
+. "$HWD/felix_dirs.sh" "$MH_VER"
 [ $? -ne 0 ] && exit 1
 
 if [ $CLEAN -gt 0 ]; then
@@ -41,3 +41,6 @@ echo "Compiling complete project"
 
 export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=512m"
 mvn $FLAGS clean install -DdeployTo="$FELIX_DEPLOY_DIR" $IGNERR
+[ $? -ne 0 ] && exit 1
+
+exit 0

@@ -10,8 +10,8 @@
      Defaults  passwd_timeout = 0
    - or completely disable asking for sudo password in /etc/sudoers:
      %wheel  ALL=(ALL)  NOPASSWD: ALL
-3. unzip attached mh13install-ubuntu.zip
-   $ unzip mh13install-ubuntu.zip
+3. copy all files from this SVN directory to some local directory
+   and cd to that directory
 4. install everything needed for Matterhorn
    $ ./install_all.sh 2>&1 | tee -a install.log
    This can take up to an hour or more, depending on your host. In the beginning

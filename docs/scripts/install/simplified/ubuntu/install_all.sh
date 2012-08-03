@@ -4,10 +4,10 @@ set -x
 #
 # Ubuntu Matterhon installation
 #
-MH_VER=`cat "$HWD/version" 2>/dev/null`
+MH_VER=`cat "$HWD/mh_version" 2>/dev/null`
 while [ $# -gt 0 ]; do
   case "$1" in
-    -? ) echo "Usage: ${0##*/} <MH_ver>" 1>&2; exit 1 ;;
+    -? ) echo "Usage: ${0##*/} [<MH_ver>]" 1>&2; exit 1 ;;
     * ) export MH_VER="$1"; shift ;;
   esac
 done
@@ -18,7 +18,7 @@ case "$MH_VER" in
   trunk ) ;;
   * ) echo "Unsupported version $MH_VER" 1>&2; exit 1 ;;
 esac
-echo $MH_VER > "$HWD/version"
+echo "$MH_VER" > "$HWD/mh_version"
 [ $? -ne 0 ] && exit 1
 #
 # Install java
@@ -59,7 +59,7 @@ sudo mkdir -p /opt/matterhorn
 sudo chown -R `id -u`:`id -g` /opt/matterhorn
 [ $? -ne 0 ] && exit 1
 #
-case $MH_VER in
+case "$MH_VER" in
   1.3.0 | 1.3.1 )
     MH_URL=https://opencast.jira.com/svn/MH/tags/$MH_VER
     MH_DIR=release_$MH_VER
@@ -84,7 +84,7 @@ ln -s $MH_DIR /opt/matterhorn/trunk
 #
 # Install & configure felix
 #
-case $MH_VER in
+case "$MH_VER" in
   1.3.* )
     "$HWD/install_felix.sh"
     [ $? -ne 0 ] && exit 1
@@ -102,7 +102,7 @@ case $MH_VER in
     [ $? -ne 0 ] && exit 1
     ;;
 esac
-"$HWD/customize_conf.sh" $MH_VER
+"$HWD/customize_conf.sh" "$MH_VER"
 [ $? -ne 0 ] && exit 1
 #
 # Install 3rd party tools
@@ -143,12 +143,14 @@ tar -zxvf "$HWD/jersey.tar.gz"
 cd -
 [ $? -ne 0 ] && exit 1
 #
-time "$HWD/mh_clean_install.sh" -c -i -e $MH_VER 2>&1 | tee mh_clean_install.log
+time "$HWD/mh_clean_install.sh" -c -i -e "$MH_VER" 2>&1 | tee mh_clean_install.log
 [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
 #
 # Run matterhorn
 #
-#"$HWD/mh_run.sh" -c $MH_VER 2>&1 | tee mh_run.log
+#"$HWD/customize_conf.sh" "$MH_VER"
+#[ $? -ne 0 ] && exit 1
+#"$HWD/mh_run.sh" -c "$MH_VER" 2>&1 | tee mh_run.log
 #[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
 #
 exit 0

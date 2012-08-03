@@ -1,6 +1,6 @@
 #!/bin/bash
 #set -x
-#
+
 echo $PATH | awk -v SP="$1" 'BEGIN {
   gsub("/+", "/", SP);
   if (SP != "/") sub("/$", "", SP);
@@ -21,5 +21,5 @@ echo $PATH | awk -v SP="$1" 'BEGIN {
   exit(1);
 }'
 [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
-#
+
 exit 0

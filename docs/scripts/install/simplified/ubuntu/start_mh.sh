@@ -2,10 +2,10 @@
 HWD=`cd "${0%/*}" 2>/dev/null; echo $PWD`
 [ "$FELIX_BATCH_ECHO" == "on" ] && set -x
 
-MH_VER=`cat "$HWD/version" 2>/dev/null`
+MH_VER=`cat "$HWD/mh_version" 2>/dev/null`
 while [ $# -gt 0 ]; do
   case "$1" in
-    -? ) echo "Usage: ${0##*/} <MH_ver>" 1>&2; exit 1 ;;
+    -? ) echo "Usage: ${0##*/} [<MH_ver>]" 1>&2; exit 1 ;;
     * ) export MH_VER="$1"; shift ;;
   esac
 done
@@ -24,7 +24,7 @@ fi
 
 # Empty $FELIX_LOAD_DIR triggers new configuration
 if ! `\ls "$FELIX_LOAD_DIR"/* >/dev/null 2>&1`; then
-  case $MH_VER in
+  case "$MH_VER" in
     1.3.* )
       if [ -z "$TRUNK" ]; then
         echo "TRUNK environment variable is not set!" 1>&2; exit 1
@@ -61,7 +61,7 @@ if ! `\ls "$FELIX_LOAD_DIR"/* >/dev/null 2>&1`; then
   cp "$FELIX_CONFIG_DIR/config.properties" "$FELIX_CONFIG_DIR/config.properties.org"
   [ $? -ne 0 ] && exit 1
   echo "Customize felix configuration"
-  "$HWD/customize_conf.sh" $MH_VER
+  "$HWD/customize_conf.sh" "$MH_VER"
   [ $? -ne 0 ] && exit 1
 fi
 
@@ -113,7 +113,8 @@ HOST_PORT=`awk '{
   }
   if (match(line, "^org.opencastproject.server.url[ 	]*=")) {
     sub("^org.opencastproject.server.url[ 	]*=[ 	]*", "", line);
-    print line
+    print line;
+    exit 0;
   }
 }' "$FELIX_CONFIG_DIR/config.properties"`
 
@@ -128,3 +129,6 @@ fi
 
 cd "$FELIX_HOME"
 java $DEBUG_OPTS $FELIX_OPTS $GRAPHICS_OPTS "$MAVEN_ARG" $JAVA_OPTS "$PAX_CONFMAN_OPTS" $LOG_OPTS -jar "$FELIX_HOME/bin/felix.jar" "$FELIX_CACHE"
+[ $? -ne 0 ] && exit 1
+
+exit 0
