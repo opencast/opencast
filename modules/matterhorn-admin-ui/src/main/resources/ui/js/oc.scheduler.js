@@ -537,7 +537,7 @@ var ocScheduler = (function() {
   sched.loadKnownAgents = function() {
     $(this.agentList).empty();
     $(this.agentList).append($('<option></option>').val('').html('Choose one:'));
-    $.get(CAPTURE_ADMIN_URL + '/agents.xml', this.handleAgentList, 'xml');
+    $.get(CAPTURE_ADMIN_URL + '/agents.json', this.handleAgentList, 'json');
   };
 
   /**
@@ -546,10 +546,9 @@ var ocScheduler = (function() {
    *  @param {XML Document}
    */
   sched.handleAgentList = function(data) {
-    $.each($('name', data),
-    function(i, agent) {
-      $(sched.agentList).append($('<option></option>').val($(agent).text()).html($(agent).text()));
-    });
+	$.each(data.agents, function(i, agent) {
+		$(sched.agentList).append($('<option></option>').val(agent.name).html(agent.name));
+	});
     sched.loadEvent();
   };
 
