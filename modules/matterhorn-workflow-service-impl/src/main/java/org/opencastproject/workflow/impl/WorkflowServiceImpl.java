@@ -48,6 +48,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
+import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -55,6 +56,7 @@ import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowListener;
 import org.opencastproject.workflow.api.WorkflowOperationDefinition;
+import org.opencastproject.workflow.api.WorkflowOperationDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -115,6 +117,9 @@ import javax.management.ObjectInstance;
  */
 public class WorkflowServiceImpl implements WorkflowService, JobProducer, ManagedService {
 
+  /** Retry strategy property name */
+  private static final String RETRY_STRATEGY = "retryStrategy";
+
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(WorkflowServiceImpl.class);
 
@@ -149,6 +154,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /** The JMX business object for workflows statistics */
   private WorkflowsStatistics workflowsStatistics;
+  /** Error resolution handler id constant */
+  public static final String ERROR_RESOLUTION_HANDLER_ID = "error-resolution";
 
   /** Remove references to the component context once felix scr 1.2 becomes available */
   protected ComponentContext componentContext = null;
@@ -1220,42 +1227,75 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     WorkflowOperationInstanceImpl currentOperation = (WorkflowOperationInstanceImpl) e.getOperation();
     int failedAttempt = currentOperation.getFailedAttempts() + 1;
     currentOperation.setFailedAttempts(failedAttempt);
+    currentOperation.addToExecutionHistory(currentOperation.getId());
 
-    if (failedAttempt == currentOperation.getMaxAttempts()) {
-      String errorDefId = currentOperation.getExceptionHandlingWorkflow();
-
-      // Adjust the workflow state according to the setting on the operation
-      if (currentOperation.isFailWorkflowOnException()) {
-        if (StringUtils.isBlank(errorDefId)) {
-          workflow.setState(FAILED);
-        } else {
-          workflow.setState(FAILING);
-
-          // Remove the rest of the original workflow
-          int currentOperationPosition = workflow.getOperations().indexOf(currentOperation);
-          List<WorkflowOperationInstance> operations = new ArrayList<WorkflowOperationInstance>();
-          operations.addAll(workflow.getOperations().subList(0, currentOperationPosition + 1));
-          workflow.setOperations(operations);
-
-          // Append the operations
-          WorkflowDefinition errorDef = null;
-          try {
-            errorDef = getWorkflowDefinitionById(errorDefId);
-            workflow.extend(errorDef);
-          } catch (NotFoundException notFoundException) {
-            throw new IllegalStateException("Unable to find the error workflow definition '" + errorDefId + "'");
-          }
-        }
-      }
-
-      // Fail the current operation
-      currentOperation.setState(OperationState.FAILED);
+    if (currentOperation.getMaxAttempts() != -1 && failedAttempt == currentOperation.getMaxAttempts()) {
+      handleFailedOperation(workflow, currentOperation);
     } else {
-      // We're going to try again, so set the current operation to instantiated
-      currentOperation.setState(OperationState.INSTANTIATED);
-      runWorkflowOperation(workflow, null); // I *think* we don't need properties here, since this isn't a resume (jmh)
+      switch (currentOperation.getRetryStrategy()) {
+        case NONE:
+          handleFailedOperation(workflow, currentOperation);
+          break;
+        case RETRY:
+          currentOperation.setState(OperationState.RETRY);
+          break;
+        case HOLD:
+          currentOperation.setState(OperationState.RETRY);
+          List<WorkflowOperationInstance> operations = workflow.getOperations();
+          WorkflowOperationDefinitionImpl errorResolutionDefinition = new WorkflowOperationDefinitionImpl(
+                  ERROR_RESOLUTION_HANDLER_ID, "Error Resolution Operation", "error", true);
+          WorkflowOperationInstanceImpl errorResolutionInstance = new WorkflowOperationInstanceImpl(
+                  errorResolutionDefinition, currentOperation.getPosition());
+          operations.add(currentOperation.getPosition(), errorResolutionInstance);
+          workflow.setOperations(operations);
+          break;
+        default:
+          break;
+      }
     }
     return workflow;
+  }
+
+  /**
+   * Handles the workflow for a failing operation.
+   * 
+   * @param workflow
+   *          the workflow
+   * @param currentOperation
+   *          the failing workflow operation instance
+   * @throws WorkflowDatabaseException
+   *           If the exception handler workflow is not found
+   */
+  private void handleFailedOperation(WorkflowInstance workflow, WorkflowOperationInstance currentOperation)
+          throws WorkflowDatabaseException {
+    String errorDefId = currentOperation.getExceptionHandlingWorkflow();
+
+    // Adjust the workflow state according to the setting on the operation
+    if (currentOperation.isFailWorkflowOnException()) {
+      if (StringUtils.isBlank(errorDefId)) {
+        workflow.setState(FAILED);
+      } else {
+        workflow.setState(FAILING);
+
+        // Remove the rest of the original workflow
+        int currentOperationPosition = workflow.getOperations().indexOf(currentOperation);
+        List<WorkflowOperationInstance> operations = new ArrayList<WorkflowOperationInstance>();
+        operations.addAll(workflow.getOperations().subList(0, currentOperationPosition + 1));
+        workflow.setOperations(operations);
+
+        // Append the operations
+        WorkflowDefinition errorDef = null;
+        try {
+          errorDef = getWorkflowDefinitionById(errorDefId);
+          workflow.extend(errorDef);
+        } catch (NotFoundException notFoundException) {
+          throw new IllegalStateException("Unable to find the error workflow definition '" + errorDefId + "'");
+        }
+      }
+    }
+
+    // Fail the current operation
+    currentOperation.setState(OperationState.FAILED);
   }
 
   /**
@@ -1335,6 +1375,26 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
         break;
       default:
         throw new IllegalStateException("Unknown action '" + action + "' returned");
+    }
+
+    if (ERROR_RESOLUTION_HANDLER_ID.equals(currentOperation.getTemplate()) && result.getAction() == Action.CONTINUE) {
+
+      Map<String, String> resultProperties = result.getProperties();
+      if (resultProperties == null || StringUtils.isBlank(resultProperties.get(RETRY_STRATEGY)))
+        throw new WorkflowDatabaseException("Retry strategy not present in properties!");
+
+      RetryStrategy retryStrategy = RetryStrategy.valueOf(resultProperties.get(RETRY_STRATEGY));
+      switch (retryStrategy) {
+        case NONE:
+          handleFailedOperation(workflow, workflow.getCurrentOperation());
+          break;
+        case RETRY:
+          currentOperation = (WorkflowOperationInstanceImpl) workflow.getCurrentOperation();
+          currentOperation.setRetryStrategy(RetryStrategy.NONE);
+          break;
+        default:
+          throw new WorkflowDatabaseException("Retry strategy not implemented yet!");
+      }
     }
 
     return workflow;
@@ -1560,6 +1620,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
               wfo.setState(OperationState.INSTANTIATED);
             }
 
+            wfo.setExecutionHost(job.getProcessingHost());
             logger.debug("Running {} {}", workflowInstance, wfo);
             wfo = runWorkflowOperation(workflowInstance, null);
             updateOperationJob(job.getId(), wfo.getState());
@@ -1612,6 +1673,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     Job job = serviceRegistry.getJob(jobId);
     switch (state) {
       case FAILED:
+      case RETRY:
         job.setStatus(Status.FAILED);
         break;
       case PAUSED:
