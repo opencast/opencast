@@ -72,6 +72,7 @@
     <script type="text/javascript" src="/admin/js/itunes_categories.js"></script>
     <script type="text/javascript" src="/admin/js/oc.mediapackage.js"></script>
     <script type="text/javascript" src="/admin/js/jquery.jqote2.js"></script>
+    <script type="text/javascript" src="/admin/js/jquery.xmlns.js"></script>
     <script type="text/javascript">
       var PLAYER_URL = '/admin/embed.html';
       var DEFAULT_SERIES_CATALOG_ID = 'seriesCatalog';
@@ -339,25 +340,28 @@
           url: '/workflow/instance/' + id + '.xml',
           dataType: 'xml', // or XML..
           success: function(data){
+        	 $.xmlns["wf"] = "http://workflow.opencastproject.org";
+        	 $.xmlns["sec"] = "http://org.opencastproject.security";
+        	 $.xmlns["mp"] = "http://mediapackage.opencastproject.org";
 
             // clone mediapackage for editing
-            mediapackage = ocUtils.createDoc('mediapackage', '');
-            var clone = $(data.documentElement).find("mediapackage").clone();
+            mediapackage = ocUtils.createDoc('mediapackage', $.xmlns["mp"]);
+            var clone = $(data.documentElement).find("mp|mediapackage").clone();
             $(clone).children().appendTo($(mediapackage.documentElement));
             $(mediapackage.documentElement).attr('id',$(clone).attr('id'));
             $(mediapackage.documentElement).attr('start',$(clone).attr('start'));
             $(mediapackage.documentElement).attr('duration',$(clone).attr('duration'));
 
             // populate series field if information present
-            var seriesid =  $(data.documentElement).find("mediapackage > series").text();
+            var seriesid =  $(data.documentElement).find("mp|mediapackage > series").text();
             if (seriesid != '') {
               $('#ispartof').val(seriesid);
-              $('#series').val($(data.documentElement).find("mediapackage > seriestitle").text());
-              $('#info-series')[0].innerHTML = $(data.documentElement).find("mediapackage > seriestitle").text();
+              $('#series').val($(data.documentElement).find("mp|mediapackage > seriestitle").text());
+              $('#info-series')[0].innerHTML = $(data.documentElement).find("mp|mediapackage > seriestitle").text();
             }
 
             // load metadata from DC xml for editing
-            catalogUrl = $(data.documentElement).find("mediapackage > metadata > catalog[type='dublincore/episode'] > url").text();
+            catalogUrl = $(data.documentElement).find("mp|mediapackage > mp|metadata > catalog[type='dublincore/episode'] > url").text();
             $.ajax({
               url: catalogUrl,
               dataType: 'xml',
@@ -413,7 +417,7 @@
 
             var previewFiles = new Array();
                         
-            $(data.documentElement).find("mediapackage > media > track").each(function(index, elm){
+            $(data.documentElement).find("mp|mediapackage > mp|media > track").each(function(index, elm){
               if ($(elm).attr('type').split(/\//)[1] == 'preview') {
                 previewFiles.push($(elm).find('url').text());
               }
@@ -436,7 +440,7 @@
             }
             // show links to source media
             var singleFile = true;
-            $(data.documentElement).find("mediapackage > media > track").each(function(index, elm){
+            $(data.documentElement).find("mp|mediapackage > mp|media > track").each(function(index, elm){
               if ($(elm).attr('type').split(/\//)[1] == 'source') {
                 var link = document.createElement('a');
                 var url = $(elm).find('url').text();
@@ -721,7 +725,7 @@
             ocUtils.log('Removing Series');
             $(mediapackage.documentElement).find('series').remove();
             $(mediapackage.documentElement).find('seriestitle').remove();
-            var $seriesCatalogRef = $(mediapackage.documentElement).find("metadata > catalog[type='dublincore/series']");
+            var $seriesCatalogRef = $(mediapackage.documentElement).find("mp|metadata > catalog[type='dublincore/series']");
             if ($seriesCatalogRef.length > 0) {
               // delete series DC xml from working file repo
               var seriesCatalogUrl = $seriesCatalogRef.find('url').text();
@@ -771,13 +775,13 @@
             });
             
             // find series dc ref in mediapackage
-            var seriesDcElm = $(mediapackage.documentElement).find("metadata > catalog[type='dublincore/series']");
+            var seriesDcElm = $(mediapackage.documentElement).find("mp|metadata > catalog[type='dublincore/series']");
             var seriesDcFileId = '';        // MediaPackageElementId of series DC catalog
             if (seriesDcElm.length == 0) {
               var seriesDcElm = $('<catalog></catalog>',mediapackage.documentElement).attr('id', DEFAULT_SERIES_CATALOG_ID).attr('type', 'dublincore/series');
               $('<mimetype></mimetype>',mediapackage.documentElement).text('text/xml').appendTo(seriesDcElm);
               $('<url></url>',mediapackage.documentElement).appendTo(seriesDcElm);
-              $(mediapackage.documentElement).find('metadata').append(seriesDcElm);
+              $(mediapackage.documentElement).find('mp|metadata').append(seriesDcElm);
             }
             // upload series dc xml
             seriesDcFileId = seriesDcElm.attr('id');
