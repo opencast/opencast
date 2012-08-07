@@ -49,7 +49,6 @@ public class ServiceRegistryJpaImplTest {
   private BundleContext bundleContext = null;
   private ComponentContext cc = null;
   private ServiceRegistryJpaImpl serviceRegistryJpaImpl = null;
-  private HostRegistration hostRegistration = null;
 
   @Before
   public void setUp() throws InvalidSyntaxException {
@@ -69,7 +68,7 @@ public class ServiceRegistryJpaImplTest {
 
   public void setUpQuery() {
     query = EasyMock.createNiceMock(Query.class);
-    EasyMock.expect(query.getSingleResult()).andReturn(new HostRegistration("http://localhost:8080", 9, true, false));
+    EasyMock.expect(query.getSingleResult()).andReturn(new HostRegistrationJpaImpl("http://localhost:8080", 9, true, false));
     EasyMock.expect(query.getResultList()).andReturn(new ArrayList<Object>()).anyTimes();
     EasyMock.replay(query);
   }

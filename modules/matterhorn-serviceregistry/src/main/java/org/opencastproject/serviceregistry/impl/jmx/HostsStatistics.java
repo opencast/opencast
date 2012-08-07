@@ -15,8 +15,8 @@
  */
 package org.opencastproject.serviceregistry.impl.jmx;
 
+import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
-import org.opencastproject.serviceregistry.impl.HostRegistration;
 import org.opencastproject.util.jmx.JmxUtil;
 
 import org.apache.commons.collections.CollectionUtils;

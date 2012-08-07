@@ -348,6 +348,15 @@ public interface ServiceRegistry {
   List<ServiceRegistration> getServiceRegistrations() throws ServiceRegistryException;
 
   /**
+   * Finds all host registrations, including offline hosts and those in maintenance mode.
+   * 
+   * @return A list of host registrations
+   * @throws ServiceRegistryException
+   *           if there is a problem accessing the service registry
+   */
+  List<HostRegistration> getHostRegistrations() throws ServiceRegistryException;
+
+  /**
    * Gets performance and runtime statistics for each known service registration.
    * 
    * @return the service statistics

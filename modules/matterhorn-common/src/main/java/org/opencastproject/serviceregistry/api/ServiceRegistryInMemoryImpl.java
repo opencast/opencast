@@ -734,7 +734,12 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   @Override
   public void setCurrentJob(Job job) {
     // TODO Auto-generated method stub
+  }
 
+  @Override
+  public List<HostRegistration> getHostRegistrations() throws ServiceRegistryException {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

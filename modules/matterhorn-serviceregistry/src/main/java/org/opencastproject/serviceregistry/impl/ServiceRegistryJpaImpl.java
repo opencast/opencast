@@ -29,6 +29,7 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.JaxbServiceRegistration;
 import org.opencastproject.serviceregistry.api.JaxbServiceStatistics;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
@@ -744,11 +745,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *          the host name
    * @return the host registration, or null if none exists
    */
-  protected HostRegistration fetchHostRegistration(EntityManager em, String host) {
+  protected HostRegistrationJpaImpl fetchHostRegistration(EntityManager em, String host) {
     Query query = em.createNamedQuery("HostRegistration.byHostName");
     query.setParameter("host", host);
     try {
-      return (HostRegistration) query.getSingleResult();
+      return (HostRegistrationJpaImpl) query.getSingleResult();
     } catch (NoResultException e) {
       logger.debug("No existing host registration for {}", host);
       return null;
@@ -769,9 +770,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       tx = em.getTransaction();
       tx.begin();
       // Find the existing registrations for this host and if it exists, update it
-      HostRegistration hostRegistration = fetchHostRegistration(em, host);
+      HostRegistrationJpaImpl hostRegistration = fetchHostRegistration(em, host);
       if (hostRegistration == null) {
-        hostRegistration = new HostRegistration(host, maxJobs, true, false);
+        hostRegistration = new HostRegistrationJpaImpl(host, maxJobs, true, false);
         em.persist(hostRegistration);
       } else {
         hostRegistration.setMaxJobs(maxJobs);
@@ -805,7 +806,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
-      HostRegistration existingHostRegistration = fetchHostRegistration(em, host);
+      HostRegistrationJpaImpl existingHostRegistration = fetchHostRegistration(em, host);
       if (existingHostRegistration == null) {
         throw new ServiceRegistryException("Host '" + host
                 + "' is not currently registered, so it can not be unregistered");
@@ -890,7 +891,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
-      HostRegistration hostRegistration = fetchHostRegistration(em, baseUrl);
+      HostRegistrationJpaImpl hostRegistration = fetchHostRegistration(em, baseUrl);
       if (hostRegistration == null) {
         throw new IllegalStateException(
                 "A service registration can not be updated when it has no associated host registration");
@@ -1039,7 +1040,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
-      HostRegistration reg = fetchHostRegistration(em, baseUrl);
+      HostRegistrationJpaImpl reg = fetchHostRegistration(em, baseUrl);
       if (reg == null) {
         throw new NotFoundException("Can not set maintenance mode on a host that has not been registered");
       }
@@ -1085,6 +1086,26 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @SuppressWarnings("unchecked")
   protected List<ServiceRegistration> getServiceRegistrations(EntityManager em) {
     return em.createNamedQuery("ServiceRegistration.getAll").getResultList();
+  }
+
+  /**
+   * Gets all host registrations
+   * 
+   * @param em
+   *          the current entity manager
+   * @return the list of host registrations
+   */
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<HostRegistration> getHostRegistrations() {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      return em.createNamedQuery("HostRegistration.getAll").getResultList();
+    } finally {
+      if (em != null)
+        em.close();
+    }
   }
 
   /**
@@ -2113,7 +2134,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           // Set the job's user and organization prior to dispatching
           String creator = job.getCreator();
           String creatorOrganization = job.getOrganization();
-          
+
           // Try to load the organization.
           Organization organization = null;
           try {
