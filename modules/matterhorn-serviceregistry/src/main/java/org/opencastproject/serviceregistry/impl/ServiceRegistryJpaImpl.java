@@ -173,7 +173,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   protected int maxJobs = 1;
 
   /** The thread pool to use for dispatching queued jobs and checking on phantom services. */
-  protected ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
+  protected ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 
   /** The security service */
   protected SecurityService securityService = null;

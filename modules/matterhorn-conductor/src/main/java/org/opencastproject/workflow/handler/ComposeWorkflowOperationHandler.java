@@ -28,7 +28,6 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
-import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -282,7 +281,6 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
     for (Map.Entry<Job, JobInformation> entry : encodingJobs.entrySet()) {
       Job job = entry.getKey();
       Track track = entry.getValue().getTrack();
-      EncodingProfile profile = entry.getValue().getProfile();
 
       // add this receipt's queue time to the total
       totalTimeInQueue += job.getQueueTime();
@@ -306,10 +304,6 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
         composedTrack.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
         logger.debug("Composed track has flavor '{}'", composedTrack.getFlavor());
       }
-
-      // Set the mimetype
-      if (profile.getMimeType() != null)
-        composedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
 
       // store new tracks to mediaPackage
       mediaPackage.addDerived(composedTrack, track);

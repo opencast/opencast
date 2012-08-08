@@ -16,8 +16,8 @@
 
 package org.opencastproject.composer.api;
 
+import org.apache.commons.lang.StringUtils;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +49,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   @XmlTransient
   protected Object source;
-  
+
   /** Format type */
   @XmlElement(name = "outputmediatype")
   protected MediaType outputType = null;
@@ -68,11 +68,10 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /** Installation-specific properties */
   @XmlElement(name = "extension")
-  protected HashMap<String, String> extension = null;
+  protected Map<String, String> extension = new HashMap<String, String>();
 
   /**
-   * Private, since the profile should be created using the static factory
-   * method.
+   * Private, since the profile should be created using the static factory method.
    * 
    * @param identifier
    *          the profile identifier
@@ -94,8 +93,19 @@ public class EncodingProfileImpl implements EncodingProfile {
    * 
    * @see org.opencastproject.composer.api.EncodingProfile#getIdentifier()
    */
+  @Override
   public String getIdentifier() {
     return identifier;
+  }
+
+  /**
+   * Sets the identifier
+   * 
+   * @param id
+   *          the identifier
+   */
+  public void setIdentifier(String id) {
+    identifier = id;
   }
 
   /**
@@ -103,8 +113,39 @@ public class EncodingProfileImpl implements EncodingProfile {
    * 
    * @see org.opencastproject.composer.api.EncodingProfile#getName()
    */
+  @Override
   public String getName() {
     return name;
+  }
+
+  /**
+   * Sets the profile name
+   * 
+   * @param name
+   *          the profile name
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.composer.api.EncodingProfile#getSource()
+   */
+  @Override
+  public Object getSource() {
+    return source;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.composer.api.EncodingProfile#getOutputType()
+   */
+  @Override
+  public MediaType getOutputType() {
+    return outputType;
   }
 
   /**
@@ -120,10 +161,11 @@ public class EncodingProfileImpl implements EncodingProfile {
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.composer.api.EncodingProfile#getOutputType()
+   * @see org.opencastproject.composer.api.EncodingProfile#getSuffix()
    */
-  public MediaType getOutputType() {
-    return outputType;
+  @Override
+  public String getSuffix() {
+    return suffix;
   }
 
   /**
@@ -139,30 +181,21 @@ public class EncodingProfileImpl implements EncodingProfile {
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.composer.api.EncodingProfile#getSuffix()
-   */
-  public String getSuffix() {
-    return suffix;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see org.opencastproject.composer.api.EncodingProfile#getMimeType()
    */
+  @Override
   public String getMimeType() {
     return mimeType;
   }
 
   /**
-   * Sets the type that is applicable for that profile. For example, an audio
-   * only-track hardly be applicable to a jpeg-slide extraction.
+   * Sets the Mimetype.
    * 
-   * @param type
-   *          applicable track type
+   * @param mimeType
+   *          the Mimetype
    */
-  public void setApplicableTo(MediaType type) {
-    this.applicableType = type;
+  public void setMimeType(String mimeType) {
+    this.mimeType = mimeType;
   }
 
   /**
@@ -170,8 +203,19 @@ public class EncodingProfileImpl implements EncodingProfile {
    * 
    * @see org.opencastproject.composer.api.EncodingProfile#getApplicableMediaType()
    */
+  @Override
   public MediaType getApplicableMediaType() {
     return applicableType;
+  }
+
+  /**
+   * Sets the applicable type.
+   * 
+   * @param applicableType
+   *          the applicableType to set
+   */
+  public void setApplicableType(MediaType applicableType) {
+    this.applicableType = applicableType;
   }
 
   /**
@@ -179,23 +223,11 @@ public class EncodingProfileImpl implements EncodingProfile {
    * 
    * @see org.opencastproject.composer.api.EncodingProfile#isApplicableTo(org.opencastproject.composer.api.EncodingProfile.MediaType)
    */
+  @Override
   public boolean isApplicableTo(MediaType type) {
     if (type == null)
       throw new IllegalArgumentException("Type must not be null");
-    if (applicableType == null)
-      return false;
-    return applicableType.equals(type);
-  }
-
-  /**
-   * Sets the extension properties for that profile. These properties may be
-   * intepreted by the encoder engine.
-   * 
-   * @param extension
-   *          the extension properties
-   */
-  public void setExtension(Map<String, String> extension) {
-    this.extension = new HashMap<String, String>(extension);
+    return type.equals(applicableType);
   }
 
   /**
@@ -203,35 +235,13 @@ public class EncodingProfileImpl implements EncodingProfile {
    * 
    * @see org.opencastproject.composer.api.EncodingProfile#getExtension(java.lang.String)
    */
+  @Override
   public String getExtension(String key) {
-    if (extension == null)
-      return null;
     return extension.get(key);
   }
 
   /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.composer.api.EncodingProfile#getExtensions()
-   */
-  public Map<String, String> getExtensions() {
-    if (extension == null)
-      return Collections.emptyMap();
-    return extension;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.composer.api.EncodingProfile#hasExtensions()
-   */
-  public boolean hasExtensions() {
-    return extension != null && extension.size() > 0;
-  }
-
-  /**
-   * Adds the given key-value pair to the extended configuration space of this
-   * media profile.
+   * Adds the given key-value pair to the extended configuration space of this media profile.
    * 
    * @param key
    *          the property key
@@ -239,28 +249,55 @@ public class EncodingProfileImpl implements EncodingProfile {
    *          the property value
    */
   public void addExtension(String key, String value) {
-    if (key == null)
+    if (StringUtils.isBlank(key))
       throw new IllegalArgumentException("Argument 'key' must not be null");
     if (value == null)
       throw new IllegalArgumentException("Argument 'value' must not be null");
-    if (extension == null)
-      extension = new HashMap<String, String>();
     extension.put(key, value);
   }
 
   /**
-   * Removes the specified property from the extended configuation space and
-   * returns either the property value or <code>null</code> if no property was
-   * found.
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.composer.api.EncodingProfile#getExtensions()
+   */
+  @Override
+  public Map<String, String> getExtensions() {
+    return extension;
+  }
+
+  /**
+   * Sets the extension properties for that profile. These properties may be intepreted by the encoder engine.
+   * 
+   * @param extension
+   *          the extension properties
+   */
+  public void setExtensions(Map<String, String> extension) {
+    if (extension == null)
+      return;
+    this.extension = extension;
+  }
+
+  /**
+   * Removes the specified property from the extended configuation space and returns either the property value or
+   * <code>null</code> if no property was found.
    * 
    * @param key
    *          the property key
    * @return the property value or <code>null</code>
    */
   public String removeExtension(String key) {
-    if (extension == null)
-      return null;
     return extension.remove(key);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.composer.api.EncodingProfile#hasExtensions()
+   */
+  @Override
+  public boolean hasExtensions() {
+    return extension != null && extension.size() > 0;
   }
 
   /**
@@ -297,57 +334,4 @@ public class EncodingProfileImpl implements EncodingProfile {
     return identifier;
   }
 
-  /**
-   * Returns the extended profile definitions.
-   * 
-   * @return the profile extensions
-   */
-  public HashMap<String, String> getExtension() {
-    return extension;
-  }
-
-  /**
-   * Sets the profile extensions.
-   * 
-   * @param extensions the extensions
-   */
-  public void setExtension(HashMap<String, String> extensions) {
-    this.extension = extensions;
-  }
-
-  public void setIdentifier(String identifier) {
-    this.identifier = identifier;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public void setMimeType(String mimeType) {
-    this.mimeType = mimeType;
-  }
-
-  /**
-   * @return the applicableType
-   */
-  public MediaType getApplicableType() {
-    return applicableType;
-  }
-
-  /**
-   * @param applicableType the applicableType to set
-   */
-  public void setApplicableType(MediaType applicableType) {
-    this.applicableType = applicableType;
-  }
-  
-
-  /**
-   * {@inheritDoc}
-   * @see org.opencastproject.composer.api.EncodingProfile#getSource()
-   */
-  @Override
-  public Object getSource() {
-    return source;
-  }
 }

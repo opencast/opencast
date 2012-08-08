@@ -45,6 +45,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -154,8 +155,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @throws EncoderException
    *           if encoding fails
    */
-  protected Track encode(Job job, Track videoTrack, Track audioTrack, String profileId,
-          Map<String, String> properties) throws EncoderException, MediaPackageException {
+  protected Track encode(Job job, Track videoTrack, Track audioTrack, String profileId, Map<String, String> properties)
+          throws EncoderException, MediaPackageException {
 
     final String targetTrackId = idBuilder.createNew().toString();
     try {
@@ -243,8 +244,10 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       Track inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
       inspectedTrack.setIdentifier(targetTrackId);
 
-      return inspectedTrack;
+      if (profile.getMimeType() != null)
+        inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
 
+      return inspectedTrack;
     } catch (Exception e) {
       logger.warn("Error encoding " + videoTrack + " and " + audioTrack, e);
       if (e instanceof EncoderException) {
@@ -948,7 +951,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           encodingProfile = arguments.get(2);
           resultingElement = watermark(job, firstTrack, watermark, encodingProfile);
           serialized = MediaPackageElementParser.getAsXml(resultingElement);
-          break;        
+          break;
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
       }
@@ -962,8 +965,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       throw new ServiceRegistryException("Error handling operation '" + op + "'", e);
     }
   }
-
-
 
   /**
    * Sets the media inspection service
@@ -1099,15 +1100,13 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   public Job watermark(Track mediaTrack, String watermark, String profileId) throws EncoderException,
           MediaPackageException {
     try {
-      return serviceRegistry.createJob(
-              JOB_TYPE,
-              Operation.Watermark.toString(),
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Watermark.toString(),
               Arrays.asList(MediaPackageElementParser.getAsXml(mediaTrack), watermark, profileId));
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
-    }    
+    }
   }
-  
+
   /**
    * Encodes a video track with a watermark.
    * 
@@ -1123,8 +1122,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @return the receipt
    * @throws EncoderException
    *           if encoding fails
-   */ 
-  protected MediaPackageElement watermark(Job job, Track mediaTrack, String watermark, String encodingProfile) 
+   */
+  protected MediaPackageElement watermark(Job job, Track mediaTrack, String watermark, String encodingProfile)
           throws EncoderException, MediaPackageException {
     logger.info("watermarking track {}.", mediaTrack.getIdentifier());
     File watermarkFile = new File(watermark);
@@ -1132,11 +1131,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       logger.error("Watermark image {} not found.", watermark);
       throw new EncoderException("Watermark image not found");
     }
-    
-    Map<String, String> watermarkProperties = new HashMap<String, String>(); 
+
+    Map<String, String> watermarkProperties = new HashMap<String, String>();
     watermarkProperties.put("watermark", watermarkFile.getAbsolutePath());
-    
+
     return this.encode(job, mediaTrack, null, encodingProfile, watermarkProperties);
-  }  
+  }
 
 }
