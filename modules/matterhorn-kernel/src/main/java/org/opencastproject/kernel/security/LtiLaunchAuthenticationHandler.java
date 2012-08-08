@@ -128,7 +128,7 @@ public class LtiLaunchAuthenticationHandler implements
     String consumerGUID = request.getParameter(LTI_CONSUMER_GUID);
     //This is an optional field it could be blank
     if (StringUtils.isBlank(consumerGUID)) {
-      consumerGUID = "UknownConcumer";
+      consumerGUID = "UknownConsumer";
     }
 
     //We need to construct a complex ID to avoid confusion

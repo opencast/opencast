@@ -51,6 +51,8 @@ import java.util.concurrent.TimeUnit;
  * Tests the functionality of a remote workflow service rest endpoint
  */
 public class LtiAuthenticationTest {
+  private static final String LTI_CONSUMER_NAME = "UknownConsumer:";
+
   private static final Logger logger = LoggerFactory.getLogger(LtiAuthenticationTest.class);
 
   public static final String CONSUMER_KEY = "consumerkey";
@@ -129,7 +131,7 @@ public class LtiAuthenticationTest {
     JSONObject meJson = (JSONObject) new JSONParser().parse(me);
 
     // Ensure that the "current user" was set by the LTI consumer
-    Assert.assertEquals(LTI_USER_PREFIX + LTI_CONSUMER_USER, meJson.get("username"));
+    Assert.assertEquals(LTI_USER_PREFIX + LTI_CONSUMER_NAME + LTI_CONSUMER_USER, meJson.get("username"));
 
     // Send a GET request to "/lti" using this cookie
     get = new HttpGet(Main.BASE_URL + "/lti");
@@ -222,7 +224,7 @@ public class LtiAuthenticationTest {
     JSONObject meJson = (JSONObject) new JSONParser().parse(me);
 
     // Ensure that the "current user" was set by the LTI consumer
-    Assert.assertEquals(LTI_USER_PREFIX + unknownUserId, meJson.get("username"));
+    Assert.assertEquals(LTI_USER_PREFIX + LTI_CONSUMER_NAME + unknownUserId, meJson.get("username"));
   }
 
 }
