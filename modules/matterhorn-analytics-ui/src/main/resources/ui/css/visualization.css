@@ -1,0 +1,142 @@
+/* Defaults */
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0;}
+table{border-collapse:collapse;border-spacing:0;}
+img{border:0;}
+html{font:13px/1.231 arial,helvetica,clean,sans-serif; }
+ul,li {list-style: none;}
+input:focus, button:focus { outline: 1px #999 solid; }
+table tr td { background: white!important; color: black; }
+table tr.highlight td { background: #d1e8ff!important; color: black; }
+table tr:hover td { background: silver!important; color: black!important; }
+table tr:hover a { color: black!important; font-weight: bold!important; }
+table tr:hover a:hover { text-decoration: underline!important; }
+
+.layout-centered { margin-left: auto; margin-right: auto}
+.layout-inline { display: inline-block; }
+.layout-float-left { float: left; }
+.clear {clear:both; height: 0px; width: 0px;}
+.center { text-align: center;}
+.recordings-page {margin-left: 30px; margin-right: 30px;}
+
+.instruction-text { font-style: italic; color: #999; font-size: 0.85em}
+.instruction-text:hover { font-style: italic; color: #000; font-size: 0.85em}
+
+/* Icons */
+.icon { width:16px; height:16px; background-repeat: none; background-position: center center; float: left; }
+.icon-check {       background-image: url(../img/icons/tick.png); }
+.icon-error {       background-image: url(../img/icons/exclamation.png); }
+.icon-info {        background-image: url(../img/icons/information.png); }
+.icon-running {     background-image: url(../img/icons/cog.png); }
+.icon-add {         background-image: url(../img/icons/add.png); margin-right: 10px; }
+.icon-delete {      background-image: url(../img/icons/delete.png); }
+.icon-idle 	{   background-image: url(../img/icons/cup.png); margin: 0px 10px; }
+.icon-capturing {   background-image: url(../img/icons/camera.png); }
+.icon-online {	    background-image: url(../img/icons/available.png); }
+.icon-offline {     background-image: url(../img/icons/offline.png); margin: 0px 10px; }
+.icon-arrow-right { background-image: url(../img/icons/arrow-right.png); background-position: 0 0;}
+.icon-arrow-down {  background-image: url(../img/icons/arrow-down.png); background-position: 0 0; }
+.icon-help {        background-image: url(../img/icons/help.png); background-position: 0 0; vertical-align: top; }
+.icon-bullet {      background-image: url(../img/icons/bullet-arrow.png);  background-position: 0 0; }
+.inline-icon { display: inline-block; }
+.loadingAnimation { background-image:url(../img/loading.gif); background-position: center; background-repeat:no-repeat; height:40px; width:100%; }
+
+#pageHeader { background: #A72123; padding: 2px; margin-bottom: 20px; text-align: right;}
+#pageHeader a { color: #FFFFFF; margin-right: 10px; text-decoration: none;}
+#pageHeader #currentVersion { float: left; margin-left: 10px;}
+
+#header { margin-bottom: -2em; } /* IE Problem */
+#header #oc-logo { float: right;}
+#header a h1 { margin-left: 160px; font-size: 18px; color: #F6921E; text-decoration: none!important;}
+
+#wrapper { width: 95%; margin: 0 auto; }
+
+div.container {
+width: 100%;
+margin-top: 40px;
+}
+div.buttonContainer {
+	margin-bottom: 5px;
+}
+div.menu {
+float: left;
+padding: 10px;
+width: 20%;
+height: 700px;
+border: 1px solid gray;
+}
+div.content {
+float: right;
+padding: 10px;
+width: 75%;
+height: 700px;
+border: 1px solid gray;
+}
+select {
+width: 100%;
+margin: auto;
+margin-top: 5px;
+}
+.hidden {
+	display: none;
+}
+.current {	
+}
+.cyclePopularity {
+float:left;
+padding: 0px 10px 0px 0px;
+height: 120px;
+position: relative;
+width: 160;
+height: 120;
+}
+
+.episodeMetadata {
+float:left;
+height: 120px;
+width: 70%;
+}
+
+.episodePopularity {
+display: block;
+height: 130px;
+padding: 10px 0px 0px 10px;
+border: 1px solid gray;
+margin: 5px 0px 0px 5px;
+}
+
+# for the svg graphics on the stacked line chart
+path {
+stroke-width: 1;
+fill: none;
+}
+line {
+stroke: black;
+}
+text {
+font-family: Arial;
+font-size: 9pt;
+}
+
+/* page: user summary */
+#summaryTable .foldable {cursor: pointer;}
+#summaryTable .fold-body {display: none;}
+#summaryTable .sortable {cursor:pointer;}
+table#summaryTable td { padding: 1px 3px; }
+table#summaryTable th { padding: 2px 0; }
+#summaryTable tr td {color: black;}
+#summaryTable th div { position: relative; padding: 2px;}
+#summaryTable th div.sort-icon {position: absolute; right: 5px; top: 0.1em; padding: 0px;}
+#summaryTable tr {height:30px;}
+#summaryTable tr td, #seriesTable {color: black;}
+#bulkHeader {height:13px !important;}
+
+#aot .option {
+	padding: 10px;
+}
+#aot {
+	border-bottom: 2px dotted lightgrey;
+	padding-bottom: 20px;
+}
+#aotoptions span {
+	padding-right: 35px;
+}

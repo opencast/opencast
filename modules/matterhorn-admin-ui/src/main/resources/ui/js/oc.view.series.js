@@ -23,7 +23,8 @@ var ocViewSeries = (function(){
   var trans = {
     read: "View", 
     contribute: "Contribute", 
-    write: "Administer"
+    write: "Administer",
+    analyze: "Analyze"
   };
 
   this.initViewSeries = function() {

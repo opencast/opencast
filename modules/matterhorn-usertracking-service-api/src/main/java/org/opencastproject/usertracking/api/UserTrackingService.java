@@ -127,6 +127,43 @@ public interface UserTrackingService {
           throws UserTrackingException;
 
   /**
+   * Returns annotations of a given key and mediapackage id ordered by date. 
+   * 
+   * @param key
+   *          the annotation key
+   * @param mediapackageId
+   *          the mediapackage id
+   * @param offset
+   *          the offset
+   * @param limit
+   *          the limit
+   * @return the annotation list
+   * @throws UserTrackingException
+   *           if the user tracking service encounters an error
+   */
+  UserActionList getUserActionsByTypeAndMediapackageIdByDate(String key, String mediapackageId, int offset, int limit)
+          throws UserTrackingException;
+
+  
+  /**
+   * Returns annotations of a given key and mediapackage id ordered descending by date. 
+   * 
+   * @param key
+   *          the annotation key
+   * @param mediapackageId
+   *          the mediapackage id
+   * @param offset
+   *          the offset
+   * @param limit
+   *          the limit
+   * @return the annotation list
+   * @throws UserTrackingException
+   *           if the user tracking service encounters an error
+   */
+  UserActionList getUserActionsByTypeAndMediapackageIdByDescendingDate(String key, String mediapackageId, int offset, int limit)
+          throws UserTrackingException;
+  
+  /**
    * Returns the views of a mediapackage
    * 
    * @param mediapackageId
@@ -168,6 +205,21 @@ public interface UserTrackingService {
   Report getReport(int offset, int limit) throws UserTrackingException;
 
   /**
+   * Gets the summary of user activity for a given media package and type of activity.
+   * 
+   * @param key
+   *          The annotation key to look for.
+   * @param mediapackageId
+   *          The mediapackage to collect the summaries from.
+   * @param offset
+   *          The offset
+   * @param limit
+   *          The limit
+   * @return A summary of all user activity that the user is able to see.
+   */
+  UserSummaryList getUserSummaryByTypeAndMediaPackage(String key, String mediapackageId);
+  
+  /**
    * Returns a list of footprints, if a userId is passed only the footprints of that user are returned.
    * 
    * @param mediapackageId
@@ -192,7 +244,7 @@ public interface UserTrackingService {
    *           if the no user action with this identifier exists
    */
   UserAction getUserAction(Long id) throws UserTrackingException, NotFoundException;
-
+  
   /**
    * Returns the flag turning user tracking on or off.
    * Turning user tracking off disables the detailed information gathering, but does *not* disable footprint gathering.

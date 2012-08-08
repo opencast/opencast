@@ -1,1 +1,4 @@
-UserActionImplUserActionListImpl
+UserActionImpl
+UserActionListImpl
+UserSummaryImpl
+UserSummaryListImpl

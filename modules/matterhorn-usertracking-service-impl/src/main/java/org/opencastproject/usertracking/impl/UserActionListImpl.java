@@ -19,6 +19,8 @@ import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserActionList;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -52,6 +54,12 @@ public class UserActionListImpl implements UserActionList {
     actions.add((UserActionImpl) annotation);
   }
 
+  public void add(Collection<UserAction> userActions) {
+    for (UserAction userAction : userActions) {
+      actions.add((UserActionImpl)userAction);
+    }
+  }
+  
   /**
    * A no-arg constructor needed by JAXB
    */
@@ -69,5 +77,25 @@ public class UserActionListImpl implements UserActionList {
 
   public void setOffset(int offset) {
     this.offset = offset;
+  }
+  
+  public int getTotal() {
+    return total;
+  }
+  
+  public int getLimit() {
+    return limit;
+  }
+  
+  public int getOffset() {
+    return offset;
+  }
+  
+  public List<UserAction> getUserActions() {
+    List<UserAction> userActions = new LinkedList<UserAction>();
+    for (UserActionImpl userActionImpl : actions) {
+      userActions.add(userActionImpl);
+    }
+    return userActions;
   }
 }

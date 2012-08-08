@@ -79,6 +79,27 @@
         <module>modules/matterhorn-workspace-api</module>
       </modules>
     </profile>
+    
+    <profile>
+      <id>analytics</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-analytics-impl</module>
+        <module>modules/matterhorn-analytics-ui</module>
+        <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-dublincore</module>
+        <module>modules/matterhorn-json</module>
+        <module>modules/matterhorn-metadata-api</module>
+        <module>modules/matterhorn-search-service-api</module>
+        <module>modules/matterhorn-series-service-api</module>
+        <module>modules/matterhorn-static</module>
+        <module>modules/matterhorn-usertracking-service-api</module>
+        <module>modules/matterhorn-usertracking-service-impl</module>
+        <module>modules/matterhorn-workspace-api</module>
+      </modules>
+    </profile>
 
     <profile>
       <id>gstreamer-launch-service</id>

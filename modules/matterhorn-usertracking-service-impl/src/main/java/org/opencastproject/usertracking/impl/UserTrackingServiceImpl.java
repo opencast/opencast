@@ -318,7 +318,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-
+  
   @SuppressWarnings("unchecked")
   public UserActionList getUserActionsByTypeAndDay(String type, String day, int offset, int limit) {
     UserActionList result = new UserActionListImpl();
@@ -358,6 +358,132 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     }
   }
 
+  public UserActionList getUserActionsByTypeAndMediapackageIdByDate(String type, String mediapackageId, int offset,
+          int limit) {
+    UserActionList result = new UserActionListImpl();
+
+    result.setTotal(getTotal(type, mediapackageId));
+    result.setOffset(offset);
+    result.setLimit(limit);
+
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("findUserActionsByMediaPackageAndTypeAscendingByDate");
+      q.setParameter("type", type);
+      q.setParameter("mediapackageId", mediapackageId);
+      q.setFirstResult(offset);
+      q.setMaxResults(limit);
+      @SuppressWarnings("unchecked")
+      Collection<UserAction> userActions = q.getResultList();
+
+      for (UserAction a : userActions) {
+        result.add(a);
+      }
+      return result;
+    } finally {
+      if (em != null && em.isOpen()) {
+        em.close();
+      }
+    }
+  }
+  
+  public UserActionList getUserActionsByTypeAndMediapackageIdByDescendingDate(String type, String mediapackageId,
+          int offset, int limit) {
+    UserActionList result = new UserActionListImpl();
+    result.setTotal(getTotal(type, mediapackageId));
+    result.setOffset(offset);
+    result.setLimit(limit);
+
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("findUserActionsByMediaPackageAndTypeDescendingByDate");
+      q.setParameter("type", type);
+      q.setParameter("mediapackageId", mediapackageId);
+      q.setFirstResult(offset);
+      q.setMaxResults(limit);
+      @SuppressWarnings("unchecked")
+      Collection<UserAction> userActions = q.getResultList();
+
+      for (UserAction a : userActions) {
+        result.add(a);
+      }
+      return result;
+    } finally {
+      if (em != null && em.isOpen()) {
+        em.close();
+      }
+    }
+  }
+  
+  @SuppressWarnings("unchecked")
+  public UserSummaryListImpl getUserSummaryByTypeAndMediaPackage(String type, String mediapackageId) {
+    UserSummaryListImpl result = new UserSummaryListImpl();
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("userSummaryByMediapackageByType");
+      q.setParameter("type", type);
+      q.setParameter("mediapackageId", mediapackageId);
+      List<Object[]> users = q.getResultList();
+      for (Object[] user : users) {
+        UserSummaryImpl userSummary = new UserSummaryImpl();
+        userSummary.ingest(user);
+        result.add(userSummary);
+      }
+      return result;
+    } catch (Exception e) { 
+      logger.warn("Unable to return any results from mediapackage " + mediapackageId + " of type " + type + " because of ", e);
+      return result;
+    }
+    finally {
+      if (em != null && em.isOpen()) {
+        em.close();
+      }
+    }
+  }
+  
+  /*@SuppressWarnings("unchecked")
+  public UserActionList getUserActionsByTypeAndDay(String type, String day, int offset, int limit) {
+    UserActionList result = new UserActionListImpl();
+
+    int year = Integer.parseInt(day.substring(0, 4));
+    int month = Integer.parseInt(day.substring(4, 6)) - 1;
+    int date = Integer.parseInt(day.substring(6, 8));
+
+    Calendar calBegin = new GregorianCalendar();
+    calBegin.set(year, month, date, 0, 0);
+    Calendar calEnd = new GregorianCalendar();
+    calEnd.set(year, month, date, 23, 59);
+
+    result.setTotal(getTotal(type, calBegin, calEnd));
+    result.setOffset(offset);
+    result.setLimit(limit);
+
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      em.createQuery(arg0);
+      Query q = em.createNamedQuery("findUserActionsByTypeAndIntervall");
+      q.setParameter("type", type);
+      q.setParameter("begin", calBegin, TemporalType.TIMESTAMP);
+      q.setParameter("end", calEnd, TemporalType.TIMESTAMP);
+      q.setFirstResult(offset);
+      q.setMaxResults(limit);
+      Collection<UserAction> userActions = q.getResultList();
+
+      for (UserAction a : userActions) {
+        result.add(a);
+      }
+      return result;
+    } finally {
+      if (em != null && em.isOpen()) {
+        em.close();
+      }
+    }
+  }*/
+  
   private int getTotal(String type, Calendar calBegin, Calendar calEnd) {
     EntityManager em = null;
     try {
@@ -388,7 +514,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-
+  
   @SuppressWarnings("unchecked")
   public UserActionList getUserActionsByDay(String day, int offset, int limit) {
     UserActionList result = new UserActionListImpl();
@@ -493,17 +619,37 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     report.setLimit(limit);
     report.setOffset(offset);
 
-    int year = Integer.parseInt(from.substring(0, 4));
-    int month = Integer.parseInt(from.substring(4, 6)) - 1;
-    int date = Integer.parseInt(from.substring(6, 8));
     Calendar calBegin = new GregorianCalendar();
-    calBegin.set(year, month, date, 0, 0);
-
-    year = Integer.parseInt(to.substring(0, 4));
-    month = Integer.parseInt(to.substring(4, 6)) - 1;
-    date = Integer.parseInt(to.substring(6, 8));
     Calendar calEnd = new GregorianCalendar();
-    calEnd.set(year, month, date, 23, 59);
+    
+    // Expecting a date in the format 20121231 or 201212312359
+    if (from.length() == 8 && to.length() == 8) {
+    	int year = Integer.parseInt(from.substring(0, 4));
+        int month = Integer.parseInt(from.substring(4, 6)) - 1;
+        int date = Integer.parseInt(from.substring(6, 8));
+        calBegin.set(year, month, date, 0, 0);
+
+        year = Integer.parseInt(to.substring(0, 4));
+        month = Integer.parseInt(to.substring(4, 6)) - 1;
+        date = Integer.parseInt(to.substring(6, 8));
+        calEnd.set(year, month, date, 23, 59);
+    } else {
+    	int year = Integer.parseInt(from.substring(0, 4));
+        int month = Integer.parseInt(from.substring(4, 6)) - 1;
+        int date = Integer.parseInt(from.substring(6, 8));
+        int hour = Integer.parseInt(from.substring(8, 10));
+        int minute = Integer.parseInt(from.substring(10, 12));
+        calBegin.set(year, month, date, hour, minute);
+
+        year = Integer.parseInt(to.substring(0, 4));
+        month = Integer.parseInt(to.substring(4, 6)) - 1;
+        date = Integer.parseInt(to.substring(6, 8));
+        hour = Integer.parseInt(to.substring(8, 10));
+        minute = Integer.parseInt(to.substring(10, 12));
+        calEnd.set(year, month, date, hour, minute);
+    }
+    
+    
 
     report.setTotal(getDistinctEpisodeIdTotal(calBegin, calEnd));
 
@@ -534,7 +680,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-
+  
   public FootprintList getFootprints(String mediapackageId, String userId) {
     EntityManager em = null;
     try {
