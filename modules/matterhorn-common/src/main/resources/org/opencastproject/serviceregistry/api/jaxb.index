@@ -1,5 +1,7 @@
 JaxbServiceRegistration
 JaxbServiceRegistrationList
+JaxbHostRegistration
+JaxbHostRegistrationList
 JaxbServiceStatistics
 JaxbServiceStatisticsList
 SystemLoad
