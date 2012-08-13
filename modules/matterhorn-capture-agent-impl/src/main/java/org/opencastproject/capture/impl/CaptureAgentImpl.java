@@ -70,7 +70,6 @@ import org.quartz.SimpleTrigger;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -82,6 +81,8 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
@@ -99,14 +100,6 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimetypesFileTypeMap;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 /**
  * Implementation of the Capture Agent: using gstreamer, generates several Pipelines to store several tracks from a
@@ -629,18 +622,19 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
     FileOutputStream fos = null;
     try {
       logger.debug("Serializing metadata and MediaPackage...");
-
+      
       // Gets the manifest.xml as a Document object and writes it to a file
       MediaPackageSerializer serializer = new DefaultMediaPackageSerializerImpl(recording.getBaseDir());
       File manifestFile = new File(recording.getBaseDir(), CaptureParameters.MANIFEST_NAME);
-      Result outputFile = new StreamResult(manifestFile);
-      Document manifest = MediaPackageParser.getAsXml(recording.getMediaPackage(), serializer);
 
-      TransformerFactory tf = TransformerFactory.newInstance();
-      Transformer t = tf.newTransformer();
-      t.setOutputProperty(OutputKeys.INDENT, "yes");
-      t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-      t.transform(new DOMSource(manifest), outputFile);
+      MediaPackage mp = recording.getMediaPackage();
+      for (MediaPackageElement element : mp.elements()) {
+        if (element.getURI() != null) {
+          element.setURI(new URI(serializer.encodeURI(element.getURI())));
+        }
+      }
+      fos = new FileOutputStream(manifestFile);
+      MediaPackageParser.getAsXml(mp, fos, true);
 
     } catch (MediaPackageException e) {
       logger.error("MediaPackage Exception: {}.", e);
@@ -650,12 +644,8 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
       logger.error("I/O Exception: {}.", e);
       setRecordingState(recording.getID(), RecordingState.MANIFEST_ERROR);
       return false;
-    } catch (TransformerConfigurationException e) {
-      logger.error("Transformer configuration exception: {}.", e);
-      setRecordingState(recording.getID(), RecordingState.MANIFEST_ERROR);
-      return false;
-    } catch (TransformerException e) {
-      logger.error("Transformer exception: {}.", e);
+    } catch (URISyntaxException e) {
+      logger.error("URI Syntax Exception: {}.", e);
       setRecordingState(recording.getID(), RecordingState.MANIFEST_ERROR);
       return false;
     } finally {
