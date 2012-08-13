@@ -546,9 +546,8 @@ var ocScheduler = (function() {
    *  @param {XML Document}
    */
   sched.handleAgentList = function(data) {
-	// TODO: Remove once MH-8850 has been resolved
-	var agentList = data.agents.agent != undefined ? data.agents.agent : data.agents;
-	$.each(agentList, function(i, agent) {
+	var agents = ocUtils.ensureArray(data.agents.agent);
+	$.each(agents, function(i, agent) {
 		$(sched.agentList).append($('<option></option>').val(agent.name).html(agent.name));
 	});
     sched.loadEvent();
