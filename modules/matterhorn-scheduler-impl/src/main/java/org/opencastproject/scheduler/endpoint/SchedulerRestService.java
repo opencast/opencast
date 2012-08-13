@@ -288,7 +288,7 @@ public class SchedulerRestService {
         return Response
                 .status(Status.CREATED)
                 .header("Location",
-                        PathSupport.concat(new String[] { this.serverUrl, this.serviceUrl, "recordings", id + ".xml" }))
+                        PathSupport.concat(new String[] { this.serverUrl, this.serviceUrl, id + ".xml" }))
                 .build();
       }
     } catch (Exception e) {
