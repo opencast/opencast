@@ -100,7 +100,7 @@
 	components['org.opencastproject.workflow.config.videoPreview'] = new ocAdmin.Component(
 	  ['videoPreview'],
 	  {nodeKey: 'org.opencastproject.workflow.config.videoPreview'},
-	  {getValue: function(){ return this.fields.captionHold.is(":checked") || this.fields.trimHold.is(":checked");}
+	  {getValue: function(){ return this.fields.videoPreview.is(":checked");}
 	  });
           
           //etc...
