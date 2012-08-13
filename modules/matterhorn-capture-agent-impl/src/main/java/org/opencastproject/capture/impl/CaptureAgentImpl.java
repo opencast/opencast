@@ -626,14 +626,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
       // Gets the manifest.xml as a Document object and writes it to a file
       MediaPackageSerializer serializer = new DefaultMediaPackageSerializerImpl(recording.getBaseDir());
       File manifestFile = new File(recording.getBaseDir(), CaptureParameters.MANIFEST_NAME);
-      /*Result outputFile = new StreamResult(manifestFile);
-      Document manifest = MediaPackageParser.getAsXml(recording.getMediaPackage(), serializer);
-      
-      TransformerFactory tf = TransformerFactory.newInstance();
-      Transformer t = tf.newTransformer();
-      t.setOutputProperty(OutputKeys.INDENT, "yes");
-      t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-      t.transform(new DOMSource(manifest), outputFile);*/
+
       MediaPackage mp = recording.getMediaPackage();
       for (MediaPackageElement element : mp.elements()) {
         if (element.getURI() != null) {
@@ -651,17 +644,10 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
       logger.error("I/O Exception: {}.", e);
       setRecordingState(recording.getID(), RecordingState.MANIFEST_ERROR);
       return false;
-/*    } catch (TransformerConfigurationException e) {
-      logger.error("Transformer configuration exception: {}.", e);
+    } catch (URISyntaxException e) {
+      logger.error("URI Syntax Exception: {}.", e);
       setRecordingState(recording.getID(), RecordingState.MANIFEST_ERROR);
       return false;
-    } catch (TransformerException e) {
-      logger.error("Transformer exception: {}.", e);
-      setRecordingState(recording.getID(), RecordingState.MANIFEST_ERROR);
-      return false;*/
-    } catch (URISyntaxException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
     } finally {
       IOUtils.closeQuietly(fos);
     }
