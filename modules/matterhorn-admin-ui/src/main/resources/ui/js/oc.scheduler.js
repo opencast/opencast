@@ -512,7 +512,8 @@ var ocScheduler = (function() {
    *  @param {XML Document}
    */
   sched.handleAgentList = function(data) {
-	$.each(data.agents, function(i, agent) {
+	var agents = ocUtils.ensureArray(data.agents.agent);
+	$.each(agents, function(i, agent) {
 		$(sched.agentList).append($('<option></option>').val(agent.name).html(agent.name));
 	});
     sched.loadEvent();
