@@ -25,6 +25,8 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.RU
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.STOPPED;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SUCCEEDED;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobProducer;
@@ -72,9 +74,6 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
@@ -150,7 +149,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   private static final String JMX_WORKFLOWS_STATISTICS_TYPE = "WorkflowsStatistics";
 
   /** The list of registered JMX beans */
-  private List<ObjectInstance> jmxBeans = new ArrayList<ObjectInstance>();
+  private final List<ObjectInstance> jmxBeans = new ArrayList<ObjectInstance>();
 
   /** The JMX business object for workflows statistics */
   private WorkflowsStatistics workflowsStatistics;
@@ -173,7 +172,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   protected WorkflowServiceIndex index;
 
   /** The list of workflow listeners */
-  private List<WorkflowListener> listeners = new CopyOnWriteArrayList<WorkflowListener>();
+  private final List<WorkflowListener> listeners = new CopyOnWriteArrayList<WorkflowListener>();
 
   /** The thread pool to use for firing listeners and handling dispatched jobs */
   protected ThreadPoolExecutor executorService;
@@ -283,8 +282,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       }
 
       if (newWorkflowInstance.getCurrentOperation() != null) {
-        if (oldWorkflowInstance == null || oldWorkflowInstance.getCurrentOperation() == null
-                || !oldWorkflowInstance.getCurrentOperation().equals(newWorkflowInstance.getCurrentOperation())) {
+        if (oldWorkflowInstance == null || oldWorkflowInstance.getCurrentOperation() == null || !oldWorkflowInstance.getCurrentOperation().equals(newWorkflowInstance.getCurrentOperation())) {
           Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -311,12 +309,14 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * 
    * @see org.opencastproject.workflow.api.WorkflowService#listAvailableWorkflowDefinitions()
    */
+  @Override
   public List<WorkflowDefinition> listAvailableWorkflowDefinitions() {
     List<WorkflowDefinition> list = new ArrayList<WorkflowDefinition>();
     for (Entry<String, WorkflowDefinition> entry : workflowDefinitions.entrySet()) {
       list.add(entry.getValue());
     }
     Collections.sort(list, new Comparator<WorkflowDefinition>() {
+      @Override
       public int compare(WorkflowDefinition o1, WorkflowDefinition o2) {
         return o1.getId().compareTo(o2.getId());
       }
@@ -353,8 +353,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    *          list of checked workflows, used to avoid circular checking
    * @return <code>true</code> if all bits and pieces used for executing <code>workflowDefinition</code> are in place
    */
-  private boolean isRunnable(WorkflowDefinition workflowDefinition, List<String> availableOperations,
-          List<WorkflowDefinition> checkedWorkflows) {
+  private boolean isRunnable(WorkflowDefinition workflowDefinition, List<String> availableOperations, List<WorkflowDefinition> checkedWorkflows) {
     if (checkedWorkflows.contains(workflowDefinition))
       return true;
 
@@ -370,12 +369,10 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
         try {
           catchWorkflowDefinition = getWorkflowDefinitionById(catchWorkflow);
         } catch (NotFoundException e) {
-          logger.info("{} is not runnable due to missing catch workflow {} on operation {}", new Object[] {
-                  workflowDefinition, catchWorkflow, op });
+          logger.info("{} is not runnable due to missing catch workflow {} on operation {}", new Object[] { workflowDefinition, catchWorkflow, op });
           return false;
         } catch (WorkflowDatabaseException e) {
-          logger.info("{} is not runnable because we can not load the catch workflow {} on operation {}", new Object[] {
-                  workflowDefinition, catchWorkflow, op });
+          logger.info("{} is not runnable because we can not load the catch workflow {} on operation {}", new Object[] { workflowDefinition, catchWorkflow, op });
           return false;
         }
         if (!isRunnable(catchWorkflowDefinition, availableOperations, checkedWorkflows))
@@ -436,6 +433,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * 
    * @see org.opencastproject.workflow.api.WorkflowService#registerWorkflowDefinition(org.opencastproject.workflow.api.WorkflowDefinition)
    */
+  @Override
   public void registerWorkflowDefinition(WorkflowDefinition workflow) {
     if (workflow == null || workflow.getId() == null) {
       throw new IllegalArgumentException("Workflow must not be null, and must contain an ID");
@@ -452,6 +450,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * 
    * @see org.opencastproject.workflow.api.WorkflowService#unregisterWorkflowDefinition(java.lang.String)
    */
+  @Override
   public void unregisterWorkflowDefinition(String workflowDefinitionId) {
     workflowDefinitions.remove(workflowDefinitionId);
   }
@@ -461,8 +460,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * 
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowById(long)
    */
-  public WorkflowInstanceImpl getWorkflowById(long id) throws WorkflowDatabaseException, NotFoundException,
-          UnauthorizedException {
+  @Override
+  public WorkflowInstanceImpl getWorkflowById(long id) throws WorkflowDatabaseException, NotFoundException, UnauthorizedException {
     try {
       Job job = serviceRegistry.getJob(id);
       if (Status.DELETED.equals(job.getStatus())) {
@@ -491,8 +490,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    *      org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
-  public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage)
-          throws WorkflowDatabaseException, WorkflowParsingException {
+  public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage) throws WorkflowDatabaseException, WorkflowParsingException {
     if (workflowDefinition == null)
       throw new IllegalArgumentException("workflow definition must not be null");
     if (mediaPackage == null)
@@ -507,8 +505,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * @see org.opencastproject.workflow.api.WorkflowService#start(org.opencastproject.workflow.api.WorkflowDefinition,
    *      org.opencastproject.mediapackage.MediaPackage)
    */
-  public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage,
-          Map<String, String> properties) throws WorkflowDatabaseException, WorkflowParsingException {
+  @Override
+  public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage, Map<String, String> properties) throws WorkflowDatabaseException, WorkflowParsingException {
     try {
       return start(workflowDefinition, mediaPackage, null, properties);
     } catch (NotFoundException e) {
@@ -524,8 +522,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    *      org.opencastproject.mediapackage.MediaPackage, Long, java.util.Map)
    */
   @Override
-  public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage sourceMediaPackage,
-          Long parentWorkflowId, Map<String, String> properties) throws WorkflowDatabaseException,
+  public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage sourceMediaPackage, Long parentWorkflowId, Map<String, String> properties) throws WorkflowDatabaseException,
           WorkflowParsingException, NotFoundException {
 
     if (workflowDefinition == null)
@@ -550,8 +547,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     if (organization == null)
       throw new SecurityException("Current organization is unknown");
 
-    WorkflowInstance workflowInstance = new WorkflowInstanceImpl(workflowDefinition, sourceMediaPackage,
-            parentWorkflowId, currentUser, organization, properties);
+    WorkflowInstance workflowInstance = new WorkflowInstanceImpl(workflowDefinition, sourceMediaPackage, parentWorkflowId, currentUser, organization, properties);
     workflowInstance = updateConfiguration(workflowInstance, properties);
 
     // Create and configure the workflow instance
@@ -572,8 +568,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
         arguments.add(mapToString(properties));
       }
 
-      Job job = serviceRegistry.createJob(JOB_TYPE, Operation.START_WORKFLOW.toString(), arguments,
-              workflowInstanceXml, false, null);
+      Job job = serviceRegistry.createJob(JOB_TYPE, Operation.START_WORKFLOW.toString(), arguments, workflowInstanceXml, false, null);
 
       // Have the workflow take on the job's identity
       workflowInstance.setId(job.getId());
@@ -661,8 +656,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       }
     }
     if (handlerList.size() > 1) {
-      throw new IllegalStateException("Multiple operation handlers found for operation '" + operation.getTemplate()
-              + "'");
+      throw new IllegalStateException("Multiple operation handlers found for operation '" + operation.getTemplate() + "'");
     } else if (handlerList.size() == 1) {
       return handlerList.get(0);
     }
@@ -680,8 +674,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * @throws WorkflowParsingException
    *           if the workflow instance can't be parsed
    */
-  protected Job runWorkflow(WorkflowInstance workflow) throws WorkflowDatabaseException, WorkflowParsingException,
-          UnauthorizedException {
+  protected Job runWorkflow(WorkflowInstance workflow) throws WorkflowDatabaseException, WorkflowParsingException, UnauthorizedException {
     if (!INSTANTIATED.equals(workflow.getState())) {
       if (RUNNING.equals(workflow.getState())) {
         logger.info("Ignoring to start {}, it is already in RUNNING state", workflow);
@@ -703,8 +696,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       throw new IllegalStateException("Current operation expected to be first");
 
     try {
-      Job job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
-              Arrays.asList(Long.toString(workflow.getId())), null, false, null);
+      Job job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(), Arrays.asList(Long.toString(workflow.getId())), null, false, null);
       operation.setId(job.getId());
       update(workflow);
       job.setStatus(Status.QUEUED);
@@ -732,8 +724,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * @throws WorkflowParsingException
    *           if the workflow can't be parsed
    */
-  protected WorkflowOperationInstance runWorkflowOperation(WorkflowInstance workflow, Map<String, String> properties)
-          throws WorkflowDatabaseException, WorkflowParsingException, UnauthorizedException {
+  protected WorkflowOperationInstance runWorkflowOperation(WorkflowInstance workflow, Map<String, String> properties) throws WorkflowDatabaseException, WorkflowParsingException, UnauthorizedException {
     WorkflowOperationInstance processingOperation = workflow.getCurrentOperation();
     if (processingOperation == null)
       throw new IllegalStateException("No operation to run, workflow is " + workflow.getState());
@@ -795,11 +786,9 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       try {
         dbWorkflowState = getWorkflowById(workflow.getId()).getState();
       } catch (WorkflowDatabaseException e) {
-        throw new IllegalStateException("The workflow with ID " + workflow.getId()
-                + " can not be accessed in the database", e);
+        throw new IllegalStateException("The workflow with ID " + workflow.getId() + " can not be accessed in the database", e);
       } catch (NotFoundException e) {
-        throw new IllegalStateException("The workflow with ID " + workflow.getId()
-                + " can not be found in the database", e);
+        throw new IllegalStateException("The workflow with ID " + workflow.getId() + " can not be found in the database", e);
       } catch (UnauthorizedException e) {
         throw new IllegalStateException("The workflow with ID " + workflow.getId() + " can not be read", e);
       }
@@ -820,8 +809,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
         case FAILING:
         case RUNNING:
           try {
-            job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
-                    Arrays.asList(Long.toString(workflow.getId())), null, false, null);
+            job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(), Arrays.asList(Long.toString(workflow.getId())), null, false, null);
             currentOperation.setId(job.getId());
             update(workflow);
             job.setStatus(Status.QUEUED);
@@ -858,6 +846,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    *          the workflow definition id
    * @return the workflow
    */
+  @Override
   public WorkflowDefinition getWorkflowDefinitionById(String id) throws NotFoundException, WorkflowDatabaseException {
     WorkflowDefinition def = workflowDefinitions.get(id);
     if (def == null)
@@ -870,8 +859,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * 
    * @see org.opencastproject.workflow.api.WorkflowService#stop(long)
    */
-  public WorkflowInstance stop(long workflowInstanceId) throws WorkflowDatabaseException, WorkflowParsingException,
-          NotFoundException, UnauthorizedException {
+  @Override
+  public WorkflowInstance stop(long workflowInstanceId) throws WorkflowDatabaseException, WorkflowParsingException, NotFoundException, UnauthorizedException {
     WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
     instance.setState(STOPPED);
     update(instance);
@@ -883,8 +872,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * 
    * @see org.opencastproject.workflow.api.WorkflowService#remove(long)
    */
-  public void remove(long workflowInstanceId) throws WorkflowDatabaseException, NotFoundException,
-          UnauthorizedException, WorkflowParsingException {
+  @Override
+  public void remove(long workflowInstanceId) throws WorkflowDatabaseException, NotFoundException, UnauthorizedException, WorkflowParsingException {
     WorkflowQuery query = new WorkflowQuery();
     query.withId(Long.toString(workflowInstanceId));
     WorkflowSet workflows = index.getWorkflowInstances(query, READ_PERMISSION, false);
@@ -908,8 +897,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * 
    * @see org.opencastproject.workflow.api.WorkflowService#suspend(long)
    */
-  public WorkflowInstance suspend(long workflowInstanceId) throws WorkflowDatabaseException, WorkflowParsingException,
-          NotFoundException, UnauthorizedException {
+  @Override
+  public WorkflowInstance suspend(long workflowInstanceId) throws WorkflowDatabaseException, WorkflowParsingException, NotFoundException, UnauthorizedException {
     WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
     instance.setState(PAUSED);
     update(instance);
@@ -922,8 +911,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * @see org.opencastproject.workflow.api.WorkflowService#resume(long)
    */
   @Override
-  public WorkflowInstance resume(long id) throws WorkflowDatabaseException, WorkflowParsingException,
-          NotFoundException, UnauthorizedException {
+  public WorkflowInstance resume(long id) throws WorkflowDatabaseException, WorkflowParsingException, NotFoundException, UnauthorizedException {
     return resume(id, null);
   }
 
@@ -932,8 +920,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * 
    * @see org.opencastproject.workflow.api.WorkflowService#resume(long, Map)
    */
-  public WorkflowInstance resume(long workflowInstanceId, Map<String, String> properties)
-          throws WorkflowDatabaseException, WorkflowParsingException, NotFoundException, UnauthorizedException {
+  @Override
+  public WorkflowInstance resume(long workflowInstanceId, Map<String, String> properties) throws WorkflowDatabaseException, WorkflowParsingException, NotFoundException, UnauthorizedException {
 
     WorkflowInstance workflowInstance = getWorkflowById(workflowInstanceId);
     workflowInstance = updateConfiguration(workflowInstance, properties);
@@ -946,8 +934,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     if (OperationState.INSTANTIATED.equals(currentOperation.getState())) {
       try {
         // the operation has its own job. Update that too.
-        Job operationJob = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
-                Arrays.asList(Long.toString(workflowInstanceId)), null, false, null);
+        Job operationJob = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(), Arrays.asList(Long.toString(workflowInstanceId)), null, false, null);
 
         // this method call is publicly visible, so it doesn't necessarily go through the accept method. Set the
         // workflow state manually.
@@ -1015,8 +1002,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * @throws MediaPackageException
    *           if there is an error accessing the workflow's security policy in its mediapackage
    */
-  protected void assertPermission(WorkflowInstance workflow, String action) throws UnauthorizedException,
-          MediaPackageException {
+  protected void assertPermission(WorkflowInstance workflow, String action) throws UnauthorizedException, MediaPackageException {
     User currentUser = securityService.getUser();
     Organization currentOrg = securityService.getOrganization();
     String currentOrgAdminRole = currentOrg.getAdminRole();
@@ -1026,11 +1012,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     User workflowCreator = workflow.getCreator();
     String workflowOrgId = workflowCreator.getOrganization();
 
-    boolean authorized = currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-            || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(workflowOrgId))
-            || currentUser.equals(workflowCreator)
-            || (authorizationService.hasPermission(mediapackage, WRITE_PERMISSION) && currentOrgId
-                    .equals(workflowOrgId));
+    boolean authorized = currentUser.hasRole(GLOBAL_ADMIN_ROLE) || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(workflowOrgId)) || currentUser.equals(workflowCreator)
+            || (authorizationService.hasPermission(mediapackage, WRITE_PERMISSION) && currentOrgId.equals(workflowOrgId));
 
     if (!authorized) {
       throw new UnauthorizedException(currentUser, action);
@@ -1042,8 +1025,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * 
    * @see org.opencastproject.workflow.api.WorkflowService#update(org.opencastproject.workflow.api.WorkflowInstance)
    */
-  public void update(final WorkflowInstance workflowInstance) throws WorkflowDatabaseException,
-          WorkflowParsingException, UnauthorizedException {
+  @Override
+  public void update(final WorkflowInstance workflowInstance) throws WorkflowDatabaseException, WorkflowParsingException, UnauthorizedException {
     WorkflowInstance originalWorkflowInstance = null;
     try {
       originalWorkflowInstance = getWorkflowById(workflowInstance.getId());
@@ -1190,6 +1173,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * 
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstances(org.opencastproject.workflow.api.WorkflowQuery)
    */
+  @Override
   public WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
     return index.getWorkflowInstances(query, WRITE_PERMISSION, true);
   }
@@ -1199,8 +1183,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * 
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesForAdministrativeRead(org.opencastproject.workflow.api.WorkflowQuery)
    */
-  public WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery query) throws WorkflowDatabaseException,
-          UnauthorizedException {
+  @Override
+  public WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery query) throws WorkflowDatabaseException, UnauthorizedException {
     User user = securityService.getUser();
     if (!user.hasRole(GLOBAL_ADMIN_ROLE)) {
       throw new UnauthorizedException(user, getClass().getName() + ".getForAdministrativeRead");
@@ -1219,8 +1203,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * @return the workflow instance
    * @throws WorkflowParsingException
    */
-  protected WorkflowInstance handleOperationException(WorkflowInstance workflow, WorkflowOperationException e)
-          throws WorkflowDatabaseException, WorkflowParsingException, UnauthorizedException {
+  protected WorkflowInstance handleOperationException(WorkflowInstance workflow, WorkflowOperationException e) throws WorkflowDatabaseException, WorkflowParsingException, UnauthorizedException {
     // Add the exception's localized message to the workflow instance
     workflow.addErrorMessage(e.getLocalizedMessage());
 
@@ -1242,10 +1225,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
         case HOLD:
           currentOperation.setState(OperationState.RETRY);
           List<WorkflowOperationInstance> operations = workflow.getOperations();
-          WorkflowOperationDefinitionImpl errorResolutionDefinition = new WorkflowOperationDefinitionImpl(
-                  ERROR_RESOLUTION_HANDLER_ID, "Error Resolution Operation", "error", true);
-          WorkflowOperationInstanceImpl errorResolutionInstance = new WorkflowOperationInstanceImpl(
-                  errorResolutionDefinition, currentOperation.getPosition());
+          WorkflowOperationDefinitionImpl errorResolutionDefinition = new WorkflowOperationDefinitionImpl(ERROR_RESOLUTION_HANDLER_ID, "Error Resolution Operation", "error", true);
+          WorkflowOperationInstanceImpl errorResolutionInstance = new WorkflowOperationInstanceImpl(errorResolutionDefinition, currentOperation.getPosition());
           operations.add(currentOperation.getPosition(), errorResolutionInstance);
           workflow.setOperations(operations);
           break;
@@ -1266,8 +1247,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * @throws WorkflowDatabaseException
    *           If the exception handler workflow is not found
    */
-  private void handleFailedOperation(WorkflowInstance workflow, WorkflowOperationInstance currentOperation)
-          throws WorkflowDatabaseException {
+  private void handleFailedOperation(WorkflowInstance workflow, WorkflowOperationInstance currentOperation) throws WorkflowDatabaseException {
     String errorDefId = currentOperation.getExceptionHandlingWorkflow();
 
     // Adjust the workflow state according to the setting on the operation
@@ -1310,8 +1290,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * @throws WorkflowDatabaseException
    *           if updating the workflow fails
    */
-  protected WorkflowInstance handleOperationResult(WorkflowInstance workflow, WorkflowOperationResult result)
-          throws WorkflowDatabaseException {
+  protected WorkflowInstance handleOperationResult(WorkflowInstance workflow, WorkflowOperationResult result) throws WorkflowDatabaseException {
 
     // Get the operation and its handler
     WorkflowOperationInstanceImpl currentOperation = (WorkflowOperationInstanceImpl) workflow.getCurrentOperation();
@@ -1319,8 +1298,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
     // Create an operation result for the lazy or else update the workflow's media package
     if (result == null) {
-      logger.warn("Handling a null operation result for workflow {} in operation {}", workflow.getId(),
-              currentOperation.getTemplate());
+      logger.warn("Handling a null operation result for workflow {} in operation {}", workflow.getId(), currentOperation.getTemplate());
       result = new WorkflowOperationResultImpl(workflow.getMediaPackage(), null, Action.CONTINUE, 0);
     } else {
       MediaPackage mp = result.getMediaPackage();
@@ -1501,11 +1479,13 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       if (job.getArguments().size() > 1 && job.getArguments().get(0) != null) {
         try {
           WorkflowDefinition workflowDef = WorkflowParser.parseWorkflowDefinition(job.getArguments().get(0));
-          String firstOperationId = workflowDef.getOperations().get(0).getId();
-          WorkflowOperationHandler handler = getWorkflowOperationHandler(firstOperationId);
-          if (handler instanceof ResumableWorkflowOperationHandler) {
-            if (((ResumableWorkflowOperationHandler) handler).isAlwaysPause()) {
-              return true;
+          if (workflowDef.getOperations().size() > 0) {
+            String firstOperationId = workflowDef.getOperations().get(0).getId();
+            WorkflowOperationHandler handler = getWorkflowOperationHandler(firstOperationId);
+            if (handler instanceof ResumableWorkflowOperationHandler) {
+              if (((ResumableWorkflowOperationHandler) handler).isAlwaysPause()) {
+                return true;
+              }
             }
           }
         } catch (WorkflowParsingException e) {
@@ -1515,8 +1495,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
       long runningWorkflows;
       try {
-        runningWorkflows = serviceRegistry.countByOperation(JOB_TYPE, Operation.START_WORKFLOW.toString(),
-                Job.Status.RUNNING);
+        runningWorkflows = serviceRegistry.countByOperation(JOB_TYPE, Operation.START_WORKFLOW.toString(), Job.Status.RUNNING);
       } catch (ServiceRegistryException e) {
         logger.warn("Unable to determine the number of running workflows", e);
         return false;
@@ -1530,8 +1509,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
       // Reject if there's enough going on already.
       if (runningWorkflows >= maxWorkflows) {
-        logger.debug("Refused to accept dispatched job '{}'. This server is already running {} workflows.", job,
-                runningWorkflows);
+        logger.debug("Refused to accept dispatched job '{}'. This server is already running {} workflows.", job, runningWorkflows);
         return false;
       }
     }
@@ -1631,8 +1609,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       } catch (IllegalArgumentException e) {
         throw new ServiceRegistryException("This service can't handle operations of type '" + op + "'", e);
       } catch (IndexOutOfBoundsException e) {
-        throw new ServiceRegistryException("This argument list for operation '" + op + "' does not meet expectations",
-                e);
+        throw new ServiceRegistryException("This argument list for operation '" + op + "' does not meet expectations", e);
       }
       return null;
     } catch (Exception e) {
@@ -1891,8 +1868,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
         maxConcurrentWorkflows = Integer.parseInt(maxConfiguration);
         logger.info("Set maximum concurrent workflows to {}", maxConcurrentWorkflows);
       } catch (NumberFormatException e) {
-        logger.warn("Can not set max concurrent workflows to {}. {} must be an integer", maxConfiguration,
-                MAX_CONCURRENT_CONFIG_KEY);
+        logger.warn("Can not set max concurrent workflows to {}. {} must be an integer", maxConfiguration, MAX_CONCURRENT_CONFIG_KEY);
       }
     }
   }
@@ -1963,7 +1939,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     private Job job = null;
 
     /** The current job */
-    private Job currentJob;
+    private final Job currentJob;
 
     /**
      * Constructs a new job runner
