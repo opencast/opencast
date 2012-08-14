@@ -55,25 +55,6 @@
         <version>2.4.1</version>
         <executions>
           <execution>
-            <id>copy-jquery</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/ui/jquery</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../../shared-resources/jquery/</directory>
-                  <includes>
-                    <include> **/** </include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
             <id>copy-img</id>
             <phase>validate</phase>
             <goals>
