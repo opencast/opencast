@@ -322,9 +322,8 @@ public abstract class AbstractEpisodeServiceDatabase implements EpisodeServiceDa
   }
 
   @Override
-  public Option<Asset> findAssetByElementIdAndChecksum(String mediaPackageElementId, String checksum)
-          throws EpisodeServiceDatabaseException {
-    return tx(AssetDto.findByElementIdAndChecksum(mediaPackageElementId, checksum)).map(AssetDto.toAsset);
+  public Option<Asset> findAssetByChecksum(String checksum) throws EpisodeServiceDatabaseException {
+    return tx(AssetDto.findOneByChecksum(checksum)).map(AssetDto.toAsset);
   }
 
   /**

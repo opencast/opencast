@@ -179,8 +179,12 @@ public class EpisodeServicePersistenceTest {
   public void testAsset() throws Exception {
     episodeDatabase.storeEpisode(mediaPackage, accessControlList, new Date(), version(1L));
     final MediaPackageElement mpe = mediaPackage.getElements()[0];
-    assertTrue(episodeDatabase.findAssetByElementIdAndChecksum(mpe.getIdentifier(), mpe.getChecksum().toString()).isSome());
-    assertEquals(mpe.getChecksum().toString(), episodeDatabase.findAssetByElementIdAndChecksum(mpe.getIdentifier(), mpe.getChecksum().toString()).get().getChecksum());
+    assertTrue(episodeDatabase.findAssetByChecksum(mpe.getChecksum().toString()).isSome());
+    assertEquals(mpe.getChecksum().toString(), episodeDatabase.findAssetByChecksum(mpe.getChecksum().toString()).get().getChecksum());
+    episodeDatabase.storeEpisode(mediaPackage, accessControlList, new Date(), version(2L));
+    assertTrue(episodeDatabase.findAssetByChecksum(mpe.getChecksum().toString()).isSome());
+    episodeDatabase.storeEpisode(mediaPackage, accessControlList, new Date(), version(3L));
+    assertTrue(episodeDatabase.findAssetByChecksum(mpe.getChecksum().toString()).isSome());
   }
 
   /**

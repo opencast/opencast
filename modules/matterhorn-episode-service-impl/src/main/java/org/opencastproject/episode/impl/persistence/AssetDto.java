@@ -41,8 +41,7 @@ import javax.persistence.Table;
 @Table(name = "episode_asset")
 @NamedQueries({
         @NamedQuery(name = "Asset.findByUri", query = "SELECT a FROM Asset a WHERE a.uri = :uri"),
-        @NamedQuery(name = "Asset.findByChecksum", query = "SELECT a FROM Asset a WHERE a.checksum = :checksum"),
-        @NamedQuery(name = "Asset.findByElementIdAndChecksum", query = "SELECT a FROM Asset a WHERE a.checksum = :checksum AND a.mediaPackageElementId = :mediaPackageElementId") })
+        @NamedQuery(name = "Asset.findByChecksum", query = "SELECT a FROM Asset a WHERE a.checksum = :checksum") })
 public final class AssetDto {
   @Id
   @GeneratedValue
@@ -90,21 +89,10 @@ public final class AssetDto {
     };
   }
 
-  public static Function<EntityManager, Option<AssetDto>> findByChecksum(final String checksum) {
+  public static Function<EntityManager, Option<AssetDto>> findOneByChecksum(final String checksum) {
     return new Function<EntityManager, Option<AssetDto>>() {
       @Override public Option<AssetDto> apply(EntityManager em) {
         return runFirstResultQuery(em, "Asset.findByChecksum", tuple("checksum", checksum));
-      }
-    };
-  }
-
-  public static Function<EntityManager, Option<AssetDto>> findByElementIdAndChecksum(final String elementId,
-          final String checksum) {
-    return new Function<EntityManager, Option<AssetDto>>() {
-      @Override
-      public Option<AssetDto> apply(EntityManager em) {
-        return runFirstResultQuery(em, "Asset.findByElementIdAndChecksum", tuple("mediaPackageElementId", elementId),
-                tuple("checksum", checksum));
       }
     };
   }

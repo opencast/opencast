@@ -170,6 +170,8 @@ public class EpisodeServiceImplTest {
     ElementStore elementStore = EasyMock.createNiceMock(ElementStore.class);
     EasyMock.expect(elementStore.delete(EasyMock.<DeletionSelector>anyObject()))
             .andReturn(true).once();
+    EasyMock.expect(elementStore.copy(EasyMock.<StoragePath>anyObject(), EasyMock.<StoragePath>anyObject()))
+            .andReturn(true).anyTimes();
     EasyMock.replay(elementStore);
 
     // mpeg7 service
