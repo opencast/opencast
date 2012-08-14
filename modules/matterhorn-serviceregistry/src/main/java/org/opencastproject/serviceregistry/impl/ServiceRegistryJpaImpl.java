@@ -2113,14 +2113,21 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           // Set the job's user and organization prior to dispatching
           String creator = job.getCreator();
           String creatorOrganization = job.getOrganization();
-          Organization organization = organizationDirectoryService.getOrganization(creatorOrganization);
-          securityService.setOrganization(organization);
+          
+          // Try to load the organization.
+          Organization organization = null;
+          try {
+            organization = organizationDirectoryService.getOrganization(creatorOrganization);
+            securityService.setOrganization(organization);
+          } catch (NotFoundException e) {
+            logger.debug("Skipping dispatching of job for non-existing organization '{}'", creatorOrganization);
+            continue;
+          }
+
+          // Try to load the user
           User user = userDirectoryService.loadUser(creator);
           if (user == null) {
             logger.warn("Unable to dispatch job {}: creator '{}' is not available", job.getId(), creator);
-            continue;
-          } else if (organization == null) {
-            logger.warn("Unable to dispatch job {}: organization '{}' is not available", job.getId(), organization);
             continue;
           }
           securityService.setUser(user);
