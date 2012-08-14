@@ -200,21 +200,8 @@
       exception-handler-workflow="error"
       description="Encoding presenter (camera) video for preview">
       <configurations>
-        <configuration key="source-flavor">presenter/work</configuration>
-        <configuration key="target-flavor">presenter/preview</configuration>
-        <configuration key="encoding-profile">flash-preview.http</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="compose"
-      if="${videoPreview}"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Encoding presentation (screen) for preview">
-      <configurations>
-        <configuration key="source-flavor">presentation/work</configuration>
-        <configuration key="target-flavor">presentation/preview</configuration>
+        <configuration key="source-flavor">*/work</configuration>
+        <configuration key="target-flavor">*/preview</configuration>
         <configuration key="encoding-profile">flash-preview.http</configuration>
       </configurations>
     </operation>
@@ -372,54 +359,13 @@
       id="compose"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="Encoding presenter (camera) to mpeg4 audio download">
+      description="Encoding to feed download formats">
       <configurations>
-        <configuration key="source-flavor">presenter/trimmed</configuration>
-
-        <configuration key="target-flavor">presenter/delivery</configuration>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
         <configuration key="target-tags">rss, atom</configuration>
-        <configuration key="encoding-profile">feed-m4a.http</configuration>
+        <configuration key="encoding-profiles">feed-m4a.http, feed-avi.http</configuration>
       </configurations>
-    </operation>
-    <operation
-      id="compose"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Encoding presentation (screen) to mpeg4 audio download">
-      <configurations>
-
-        <configuration key="source-flavor">presentation/trimmed</configuration>
-        <configuration key="target-flavor">presentation/delivery</configuration>
-        <configuration key="target-tags">rss, atom</configuration>
-        <configuration key="encoding-profile">feed-m4a.http</configuration>
-      </configurations>
-    </operation>
-    <operation
-      id="compose"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Encoding presenter (camera) to avi/mpeg4 download">
-
-      <configurations>
-        <configuration key="source-flavor">presenter/trimmed</configuration>
-        <configuration key="target-flavor">presenter/delivery</configuration>
-        <configuration key="target-tags">rss, atom</configuration>
-        <configuration key="encoding-profile">feed-avi.http</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="compose"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Encoding presentation (screen) to avi/mpeg4 download">
-      <configurations>
-        <configuration key="source-flavor">presentation/trimmed</configuration>
-        <configuration key="target-flavor">presentation/delivery</configuration>
-        <configuration key="target-tags">rss, atom</configuration>
-        <configuration key="encoding-profile">feed-avi.http</configuration>
-      </configurations>
-
     </operation>
     
     <!-- encode to feed preview images -->
