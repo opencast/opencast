@@ -22,6 +22,9 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.HostRegistrationParser;
+import org.opencastproject.serviceregistry.api.JaxbHostRegistrationList;
 import org.opencastproject.serviceregistry.api.JaxbServiceRegistrationList;
 import org.opencastproject.serviceregistry.api.JaxbServiceStatistics;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
@@ -680,6 +683,33 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
       client.close(response);
     }
     throw new ServiceRegistryException("Unable to get service registrations (" + responseStatusCode + ")");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getHostRegistrations()
+   */
+  @Override
+  public List<HostRegistration> getHostRegistrations() throws ServiceRegistryException {
+    String servicePath = "hosts.xml";
+    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, servicePath));
+    HttpResponse response = null;
+    int responseStatusCode;
+    try {
+      response = client.execute(get);
+      responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == HttpStatus.SC_OK) {
+        JaxbHostRegistrationList serviceList = HostRegistrationParser.parseRegistrations(response.getEntity()
+                .getContent());
+        return new ArrayList<HostRegistration>(serviceList.getRegistrations());
+      }
+    } catch (IOException e) {
+      throw new ServiceRegistryException("Unable to get host registrations", e);
+    } finally {
+      client.close(response);
+    }
+    throw new ServiceRegistryException("Unable to get host registrations (" + responseStatusCode + ")");
   }
 
   /**

@@ -86,7 +86,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
   private Long id;
 
   /** The host that provides this service */
-  private HostRegistration hostRegistration;
+  private HostRegistrationJpaImpl hostRegistration;
 
   /**
    * Creates a new service registration which is online
@@ -105,7 +105,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
    * @param path
    *          the URL path on this host to the service endpoint
    */
-  public ServiceRegistrationJpaImpl(HostRegistration hostRegistration, String serviceType, String path) {
+  public ServiceRegistrationJpaImpl(HostRegistrationJpaImpl hostRegistration, String serviceType, String path) {
     super(serviceType, hostRegistration.getBaseUrl(), path);
     this.hostRegistration = hostRegistration;
   }
@@ -119,7 +119,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
    *          the job type
    * @param jobProducer
    */
-  public ServiceRegistrationJpaImpl(HostRegistration hostRegistration, String serviceType, String path,
+  public ServiceRegistrationJpaImpl(HostRegistrationJpaImpl hostRegistration, String serviceType, String path,
           boolean jobProducer) {
     super(serviceType, hostRegistration.getBaseUrl(), path, jobProducer);
     this.hostRegistration = hostRegistration;
@@ -234,13 +234,13 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
   }
 
   /**
-   * Gets the associated {@link HostRegistration}
+   * Gets the associated {@link HostRegistrationJpaImpl}
    * 
    * @return the host registration
    */
   @ManyToOne
   @JoinColumn(name = "host_registration")
-  public HostRegistration getHostRegistration() {
+  public HostRegistrationJpaImpl getHostRegistration() {
     return hostRegistration;
   }
 
@@ -248,7 +248,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
    * @param hostRegistration
    *          the hostRegistration to set
    */
-  public void setHostRegistration(HostRegistration hostRegistration) {
+  public void setHostRegistration(HostRegistrationJpaImpl hostRegistration) {
     this.hostRegistration = hostRegistration;
   }
 
@@ -259,7 +259,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
     } else {
       super.host = hostRegistration.getBaseUrl();
       super.maintenanceMode = hostRegistration.isMaintenanceMode();
-      if (!hostRegistration.online)
+      if (!hostRegistration.isOnline())
         super.online = false;
     }
   }

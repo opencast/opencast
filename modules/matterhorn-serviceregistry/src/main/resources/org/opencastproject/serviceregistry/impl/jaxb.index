@@ -1,2 +1,3 @@
 JobJpaImpl
 ServiceRegistrationJpaImpl
+HostRegistrationJpaImpl

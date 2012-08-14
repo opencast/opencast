@@ -6,7 +6,7 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
     http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
   <persistence-unit name="org.opencastproject.serviceregistry" transaction-type="RESOURCE_LOCAL">
-    <class>org.opencastproject.serviceregistry.impl.HostRegistration</class>
+    <class>org.opencastproject.serviceregistry.impl.HostRegistrationJpaImpl</class>
     <class>org.opencastproject.serviceregistry.impl.JobJpaImpl</class>
     <!-- class>org.opencastproject.serviceregistry.impl.JobContextJpaImpl</class -->
     <class>org.opencastproject.serviceregistry.impl.ServiceRegistrationJpaImpl</class>

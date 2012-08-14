@@ -28,6 +28,8 @@ import org.opencastproject.job.api.JaxbJobList;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.rest.RestConstants;
+import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.JaxbHostRegistrationList;
 import org.opencastproject.serviceregistry.api.JaxbServiceRegistration;
 import org.opencastproject.serviceregistry.api.JaxbServiceRegistrationList;
 import org.opencastproject.serviceregistry.api.JaxbServiceStatisticsList;
@@ -284,6 +286,29 @@ public class ServiceRegistryEndpoint {
   public JaxbServiceRegistrationList getRegistrationsAsJson(@QueryParam("serviceType") String serviceType,
           @QueryParam("host") String host) throws NotFoundException {
     return getRegistrationsAsXml(serviceType, host);
+  }
+
+  @GET
+  @Path("hosts.xml")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "hostsasxml", description = "Returns a host registraton or list of available host registrations as XML.", returnDescription = "The host list as XML", reponses = { @RestResponse(responseCode = SC_OK, description = "Returned the available hosts.") })
+  public JaxbHostRegistrationList getHostsAsXml() throws NotFoundException {
+    JaxbHostRegistrationList registrations = new JaxbHostRegistrationList();
+    try {
+      for (HostRegistration reg : serviceRegistry.getHostRegistrations())
+        registrations.add(reg);
+      return registrations;
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @GET
+  @Path("hosts.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "hostsasjson", description = "Returns a host registraton or list of available host registrations as JSON.", returnDescription = "The host list as JSON", reponses = { @RestResponse(responseCode = SC_OK, description = "Returned the available hosts.") })
+  public JaxbHostRegistrationList getHostsAsJson() throws NotFoundException {
+    return getHostsAsXml();
   }
 
   @POST
