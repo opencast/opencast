@@ -1,15 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" immediate="true"
-               name="org.opencastproject.episode.endpoint.EpisodeRestService">
-  <implementation class="org.opencastproject.episode.endpoint.EpisodeRestService" />
-  <property name="service.description" value="Episode REST Endpoint" />
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+        immediate="true"
+        activate="activate"
+        name="org.opencastproject.episode.endpoint.OsgiEpisodeServiceRestEndpoint">
+  <implementation class="org.opencastproject.episode.endpoint.OsgiEpisodeServiceRestEndpoint"/>
 
-  <property name="opencast.service.type" value="org.opencastproject.episode" />
-  <property name="opencast.service.path" value="/episode" />
+  <property name="service.description" value="EpisodeService REST Endpoint"/>
+  <property name="opencast.service.type" value="org.opencastproject.episode"/>
+  <property name="opencast.service.path" value="/episode"/>
 
+  <!-- Needed for the RestPublisher to pick up the service. -->
   <service>
-    <provide interface="org.opencastproject.episode.endpoint.EpisodeRestService" />
+    <provide interface="org.opencastproject.episode.endpoint.OsgiEpisodeServiceRestEndpoint"/>
   </service>
-  <reference name="service-impl" interface="org.opencastproject.episode.api.EpisodeService"
-    cardinality="1..1" policy="static" bind="setEpisodeService" />
+
+  <reference name="episode-service"
+          interface="org.opencastproject.episode.api.EpisodeService"
+          cardinality="1..1"
+          policy="static"
+          bind="setEpisodeService"/>
+  <reference name="workflow-service"
+          interface="org.opencastproject.workflow.api.WorkflowService"
+          cardinality="1..1"
+          policy="static"
+          bind="setWorkflowService"/>
 </scr:component>

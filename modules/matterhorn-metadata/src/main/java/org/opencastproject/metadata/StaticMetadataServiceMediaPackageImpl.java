@@ -75,7 +75,7 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.MetadataService#getMetadata(org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
@@ -180,9 +180,8 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
   }
 
   /**
-   * 
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.MetadataService#getPriority()
    */
   @Override
@@ -192,9 +191,9 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
 
   /**
    * @param values
-   *          may be null
+   *         may be null
    * @param valueName
-   *          the name of the returned {@link MetadataValue}
+   *         the name of the returned {@link MetadataValue}
    */
   private static List<MetadataValue<String>> strings2MetadataValues(final String[] values, final String valueName) {
     if (values != null) {

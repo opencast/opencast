@@ -13,10 +13,32 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.util.data;
+package org.opencastproject.episode.impl.persistence;
 
-public abstract class Cell<A> {
-  public abstract A get();
-  public abstract <B> Cell<B> lift(Function<A, B> f);
-  protected abstract Tuple<A, Object> change();
+import org.opencastproject.episode.impl.StoragePath;
+
+import java.net.URI;
+
+public final class Asset {
+  private final URI uri;
+  private final StoragePath storagePath;
+  private final String checksum;
+
+  public Asset(URI uri, StoragePath storagePath, String checksum) {
+    this.uri = uri;
+    this.storagePath = storagePath;
+    this.checksum = checksum;
+  }
+
+  public URI getUri() {
+    return uri;
+  }
+
+  public StoragePath getStoragePath() {
+    return storagePath;
+  }
+
+  public String getChecksum() {
+    return checksum;
+  }
 }

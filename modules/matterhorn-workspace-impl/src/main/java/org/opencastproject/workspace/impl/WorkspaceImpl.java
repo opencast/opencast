@@ -32,6 +32,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.TeeInputStream;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.params.BasicHttpParams;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -247,6 +248,25 @@ public class WorkspaceImpl implements Workspace {
       } else if (HttpServletResponse.SC_NOT_MODIFIED == response.getStatusLine().getStatusCode()) {
         logger.debug("{} has not been modified.", urlString);
         return f;
+      } else if (HttpServletResponse.SC_ACCEPTED == response.getStatusLine().getStatusCode()) {
+        logger.debug("{} is not ready, try again in one minute.", urlString);
+        String token = response.getHeaders("token")[0].getValue();
+        get.setParams(new BasicHttpParams().setParameter("token", token));
+        Thread.sleep(60000);
+        while (true) {
+          response = trustedHttpClient.execute(get);
+          if (HttpServletResponse.SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+            throw new NotFoundException(uri + " does not exist");
+          } else if (HttpServletResponse.SC_NOT_MODIFIED == response.getStatusLine().getStatusCode()) {
+            logger.debug("{} has not been modified.", urlString);
+            return f;
+          } else if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_ACCEPTED) {
+            logger.debug("{} is not ready, try again in one minute.", urlString);
+            Thread.sleep(60000);
+          } else {
+            break;
+          }
+        }
       }
 
       // if the lock file exists, another thread is currently downloading the file. wait for it.
