@@ -139,7 +139,6 @@ public class ComposeWorkflowOperationHandlerTest {
     Track trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID);
     Assert.assertEquals("presenter/delivery", trackEncoded.getFlavor().toString());
     Assert.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
-    Assert.assertEquals(MimeTypes.MPEG4, trackEncoded.getMimeType());
     Assert.assertEquals(SOURCE_TRACK_ID, trackEncoded.getReference().getIdentifier());
   }
 

@@ -44,6 +44,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
+import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
@@ -52,6 +53,11 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.tika.metadata.HttpHeaders;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.sax.BodyContentHandler;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -59,7 +65,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Dictionary;
@@ -96,6 +104,18 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectoryService = null;
+
+  /** The Apache Tika parser */
+  private Parser tikaParser;
+
+  /**
+   * Sets the Apache Tika parser.
+   * 
+   * @param tikaParser
+   */
+  public void setTikaParser(Parser tikaParser) {
+    this.tikaParser = tikaParser;
+  }
 
   /**
    * Creates a new media inspection service instance.
@@ -257,19 +277,28 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
         }
 
         // Mimetype
+        InputStream is = null;
         try {
-          MimeType mimeType = MimeTypes.fromURL(file.toURI().toURL());
+          // Try to get the Mimetype from Apache Tika
+          is = new FileInputStream(file);
+          MimeType mimeType = extractContentType(is);
 
-          // The mimetype library doesn't know about audio/video metadata, so the type might be wrong.
-          if ("audio".equals(mimeType.getType()) && metadata.hasVideoStreamMetadata()) {
-            mimeType = MimeTypes.parseMimeType("video/" + mimeType.getSubtype());
-          } else if ("video".equals(mimeType.getType()) && !metadata.hasVideoStreamMetadata()) {
-            mimeType = MimeTypes.parseMimeType("audio/" + mimeType.getSubtype());
+          // If Mimetype could not be extracted try to get it from opencast
+          if (mimeType == null) {
+            mimeType = MimeTypes.fromURL(file.toURI().toURL());
+
+            // The mimetype library doesn't know about audio/video metadata, so the type might be wrong.
+            if ("audio".equals(mimeType.getType()) && metadata.hasVideoStreamMetadata()) {
+              mimeType = MimeTypes.parseMimeType("video/" + mimeType.getSubtype());
+            } else if ("video".equals(mimeType.getType()) && !metadata.hasVideoStreamMetadata()) {
+              mimeType = MimeTypes.parseMimeType("audio/" + mimeType.getSubtype());
+            }
           }
-
           track.setMimeType(MimeTypes.fromURL(file.toURI().toURL()));
         } catch (Exception e) {
-          logger.info("Unable to find mimetype for {}", file.getAbsolutePath());
+          logger.error("Unable to find mimetype for {}", file.getAbsolutePath());
+        } finally {
+          IoSupport.closeQuietly(is);
         }
 
         // Audio metadata
@@ -295,6 +324,31 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
       } else {
         throw new MediaInspectionException(e);
       }
+    }
+  }
+
+  /**
+   * Determines the content type of an input stream. This method reads part of the stream, so it is typically best to
+   * close the stream immediately after calling this method.
+   * 
+   * @param in
+   *          the input stream
+   * @return the content type
+   */
+  private MimeType extractContentType(InputStream in) {
+    try {
+      // Find the content type, based on the stream content
+      BodyContentHandler contenthandler = new BodyContentHandler();
+      Metadata metadata = new Metadata();
+      ParseContext context = new ParseContext();
+      tikaParser.parse(in, contenthandler, metadata, context);
+      String mimeType = metadata.get(HttpHeaders.CONTENT_TYPE);
+      if (mimeType == null)
+        return null;
+      return MimeTypes.parseMimeType(mimeType);
+    } catch (Exception e) {
+      logger.warn("Unable to extract mimetype from input stream, ", e);
+      return null;
     }
   }
 

@@ -19,6 +19,8 @@ import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.EncodingProfile.MediaType;
 import org.opencastproject.composer.api.EncodingProfileImpl;
 import org.opencastproject.util.ConfigurationException;
+import org.opencastproject.util.MimeType;
+import org.opencastproject.util.MimeTypes;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -144,7 +146,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
    * @param profile
    * @param properties
    * @param artifact
-   * @return
+   * @return the loaded profile or null if profile
    * @throws RuntimeException
    */
   private EncodingProfile loadProfile(String profile, Properties properties, File artifact)
@@ -177,9 +179,16 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
     // Mimetype
     Object mimeTypeObj = getDefaultProperty(profile, PROP_MIMETYPE, properties, defaultProperties);
-    if (StringUtils.isBlank(mimeTypeObj.toString()))
-      throw new ConfigurationException("Mime type of profile '" + profile + "' is missing");
-    df.setMimeType(StringUtils.trim(mimeTypeObj.toString()));
+    if (mimeTypeObj != null && StringUtils.isNotBlank(mimeTypeObj.toString())) {
+      MimeType mimeType;
+      try {
+        mimeType = MimeTypes.parseMimeType(mimeTypeObj.toString());
+      } catch (Exception e) {
+        throw new ConfigurationException("Mime type " + mimeTypeObj.toString()
+                + " could not be parsed as a mime type! Expressions are not allowed!");
+      }
+      df.setMimeType(mimeType.asString());
+    }
 
     // Applicable to the following track categories
     Object applicableObj = getDefaultProperty(profile, PROP_APPLICABLE, properties, defaultProperties);
