@@ -1,0 +1,13 @@
+{"totalCount":"5","catalogs":[
+
+{"http:\/\/purl.org\/dc\/terms\/":{"title":[{"value":"Ten Video Series"}],"identifier":[{"value":"ten-video-series"}]}},
+
+{"http:\/\/purl.org\/dc\/terms\/":{"title":[{"value":"Two Video Series"}],"identifier":[{"value":"two-video-series"}]}},
+
+{"http:\/\/purl.org\/dc\/terms\/":{"title":[{"value":"One Video Series"}],"identifier":[{"value":"one-video-series"}]}},
+
+{"http:\/\/purl.org\/dc\/terms\/":{"title":[{"value":"No Data Series"}],"identifier":[{"value":"no-data-series"}]}},
+
+{"http:\/\/purl.org\/dc\/terms\/":{"title":[{"value":"2nd Secured Series"}],"identifier":[{"value":"7e6ecbc3-d59a-4aa7-a5ae-f5cd065ffeb6"}]}}
+
+]}

@@ -195,7 +195,7 @@ table#agentsTable th, table#seriesTable th, table#recordingsTable th, table#stat
 
 /* Role Privileges */
 #hint {margin-left: 50px; margin-top: 5px;}
-#rolePrivilegeTable {margin-left: 30%; margin-top: 10px; margin-bottom: 10px;}
+#rolePrivilegeTable {margin-left: 20%; margin-top: 10px; margin-bottom: 10px;}
 #rolePrivilegeTable th {text-align: left; min-width: 30px;}
 #rolePrivilegeTable th, td {padding: 5px;}
 
@@ -238,7 +238,8 @@ for inspect
 #awf-config-container legend {padding: 0 5px;}
 #awf-config-container fieldset {padding: 10px;}
 
-.role-label {width: 200px; display: inline-block; text-align: right; margin-right: 10px; padding: 2px;}
+.role-label {display: inline-block; text-align: right; margin-right: 10px; padding: 2px;}
+
 
 a.secondaryButton, a.secondaryButton:link, a.secondaryButton:visited {
   margin-right: 16px;

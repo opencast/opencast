@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.analytics.impl.AnalyticsServiceImpl" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.analytics.impl.AnalyticsServiceImpl" />
+  <property name="service.description" value="Analytics Service Implementation" />
+  <property name="service.pid" value="org.opencastproject.analytics.impl.AnalyticsServiceImpl" />
+  <service>
+    <provide interface="org.opencastproject.analytics.impl.AnalyticsServiceImpl" />
+  </service>
+  <reference name="trustedClient" interface="org.opencastproject.security.api.TrustedHttpClient"
+    cardinality="1..1" policy="dynamic" bind="setTrustedClient" />
+  <reference name="series-service-impl" interface="org.opencastproject.series.api.SeriesService"
+    cardinality="1..1" policy="static" bind="setService" />
+  <reference name="security-service-impl" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setService" unbind="unsetService" />
+   <reference name="search-service-impl" interface="org.opencastproject.search.api.SearchService"
+    cardinality="1..1" policy="static" bind="setService" />
+   <reference name="search-service-impl" interface="org.opencastproject.usertracking.api.UserTrackingService"
+    cardinality="1..1" policy="static" bind="setService" />
+</scr:component>
+

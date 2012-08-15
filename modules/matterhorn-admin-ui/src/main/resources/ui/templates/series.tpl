@@ -100,6 +100,7 @@
             <th>Role</th>
             <th>View</th>
             <th>Administer</th>
+            <th>Analyze</th>
             <th></th>
           </tr>
         </thead>

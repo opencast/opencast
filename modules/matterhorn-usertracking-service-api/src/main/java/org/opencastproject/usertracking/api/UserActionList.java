@@ -15,18 +15,30 @@
  */
 package org.opencastproject.usertracking.api;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * A List of {@link UserAction}s
  * 
  */
 public interface UserActionList {
-  
+  /** Set the total number of results for this particular query. **/
   void setTotal(int total);
-  
+  /** Set the upper limit of the total number of results to return upon request. **/
   void setLimit(int limit);
-  
+  /** Set the offset * limit to skip over before returning the results. **/
   void setOffset(int offset);
-  
+  /** Add a single UserAction to this collection. **/
   void add(UserAction annotation);
-  
+  /** Add a complete Collection of UserActions to this collection. **/
+  void add(Collection<UserAction> userActions);
+  /** Return the total number of possible results for this query. **/
+  int getTotal();
+  /** Return the maximum number of results to collect. **/
+  int getLimit();
+  /** Return the offset of result lists to skip over to get these results. **/
+  int getOffset();
+  /** Return a list of the UserActions in this Collection. **/
+  List<UserAction> getUserActions();
 }

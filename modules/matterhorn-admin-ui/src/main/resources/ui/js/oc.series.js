@@ -90,6 +90,7 @@ ocSeries.init = function(){
   privilegeRow += '<td><input type="text" class="role_search"/></td>';
   privilegeRow += '<td class="privilege_edit"><input type="checkbox" name="priv_view" class="privilege_edit" /></td>';
   privilegeRow += '<td class="privilege_edit"><input type="checkbox" name="priv_edit" class="privilege_edit" /></td>';
+  privilegeRow += '<td class="privilege_edit"><input type="checkbox" name="priv_analyze" class="privilege_edit" /></td>';
   privilegeRow += '<td class="privilege_edit"><img src="/admin/img/icons/delete.png" alt="delete" title="Delete Role"></td>';
   privilegeRow += '</tr>';
   var $row;
@@ -124,6 +125,7 @@ ocSeries.init = function(){
       $row.find('[name|="priv_view"]').attr('checked', 'checked');
       $row.find('[name|="priv_view"]').attr('disabled', 'disabled');
       $row.find('[name|="priv_edit"]').attr('disabled', 'disabled');
+      $row.find('[name|="priv_analyze"]').attr('disabled', 'disabled');
       $row.find('img').hide();
       $row.find('img').click(removeRole)
       $row.find('.role_search').autocomplete({
@@ -135,6 +137,7 @@ ocSeries.init = function(){
       var $tr = $(this).parent().parent();
       $tr.children().find('[name|="priv_edit"]').removeAttr('disabled');
       $tr.children().find('[name|="priv_view"]').removeAttr('disabled');
+      $tr.children().find('[name|="priv_analyze"]').removeAttr('disabled');
       $tr.children().find('img').show();
     }
     $(this).attr('id', ui.item.value);
@@ -150,6 +153,7 @@ ocSeries.init = function(){
     $row.find('[name|="priv_view"]').attr('checked', 'checked');
     $row.find('[name|="priv_view"]').attr('disabled', 'disabled');
     $row.find('[name|="priv_edit"]').attr('disabled', 'disabled');
+    $row.find('[name|="priv_analyze"]').attr('disabled', 'disabled');
     $row.find('img').hide();
     $row.find('img').click(removeRole);
 
@@ -211,6 +215,9 @@ ocSeries.init = function(){
         if(value.read) {
           $row.find('[name|="priv_view"]').attr('checked', 'checked');
         }
+        if(value.analyze) {
+          $row.find('[name|="priv_analyze"]').attr('checked', 'checked');
+        }
         $('#rolePrivilegeTable > tbody').append($row);
       }
     });
@@ -219,6 +226,7 @@ ocSeries.init = function(){
     $row.find('[name|="priv_view"]').attr('checked', 'checked');
     $row.find('[name|="priv_view"]').attr('disabled', 'disabled');
     $row.find('[name|="priv_edit"]').attr('disabled', 'disabled');
+    $row.find('[name|="priv_analyze"]').attr('disabled', 'disabled');
     $row.find('img').hide();
     $row.find('img').click(removeRole)
 
@@ -346,7 +354,7 @@ ocSeries.createACLDocument = function() {
   $('.role_search').each(function () {
     var $field = $(this);
     //check whether there is a value and entered value is a valid role
-    if ($field.attr('value') != "" && $.inArray($field.attr('value'), ocSeries.roles) != -1) {
+    if ($field.attr('value') != "") {
       if($field.parent().parent().children().find('[name|="priv_view"]').attr('checked')) {
         out += '<ace>';
         out += '<role>' + $field.attr('value') + '</role>';
@@ -361,6 +369,13 @@ ocSeries.createACLDocument = function() {
         out += '<allow>true</allow>';
         out += '</ace>';
       }
+      if($field.parent().parent().children().find('[name|="priv_analyze"]').attr('checked')) {
+          out += '<ace>';
+          out += '<role>' + $field.attr('value') + '</role>';
+          out += '<action>analyze</action>';
+          out += '<allow>true</allow>';
+          out += '</ace>';
+        }
     }
   });
   if($('#anonymous_view').attr('checked')) {
