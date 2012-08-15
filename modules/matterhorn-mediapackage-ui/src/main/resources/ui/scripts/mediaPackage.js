@@ -9,7 +9,7 @@ MediaPackage = function(xmlMediaPackage){
 	var self = this;
 	
 	// Instance variables
-	this.attachments = new Array();
+	this.attachements = new Array();
 	this.catalogs = new Array();
 	this.creators = new Array();
 	this.duration = '';
@@ -146,23 +146,23 @@ MediaPackage = function(xmlMediaPackage){
 			self.tracks.push(tmpTrack);
 		});
 		
-		//Get all attachment
-		$(self.xml).find('mp|attachment').each(function(index,element){
-			var tmpAttachment = new Attachment();
-			tmpAttachment.url = $(element).find('mp|url').text();
+		//Get all attachement
+		$(self.xml).find('mp|attachement').each(function(index,element){
+			var tmpAttachement = new Attachement();
+			tmpAttachement.url = $(element).find('mp|url').text();
 			var checksum = $(element).find('mp|checksum');
-			tmpAttachment.checksum.value = checksum.text();
-			tmpAttachment.checksum.type = checksum.attr('type');
-			tmpAttachment.mimetype = $(element).find('mp|mimetype').text();
-			tmpAttachment.type = $(element).attr('type');
-			tmpAttachment.ref = $(element).attr('ref');
-			tmpAttachment.id = $(element).attr('id');
+			tmpAttachement.checksum.value = checksum.text();
+			tmpAttachement.checksum.type = checksum.attr('type');
+			tmpAttachement.mimetype = $(element).find('mp|mimetype').text();
+			tmpAttachement.flavor = $(element).attr('type');
+			tmpAttachement.ref = $(element).attr('ref');
+			tmpAttachement.id = $(element).attr('id');
 			$(element).find('mp|tags').each(function(index,subElement){
-				tmpAttachment.tags.push($(subElement).text());
+				tmpAttachement.tags.push($(subElement).text());
 			});
 			
-			tmpAttachment.xml = element;
-			self.attachments.push(tmpAttachment);
+			tmpAttachement.xml = element;
+			self.attachements.push(tmpAttachement);
 		});
 		
 		// Get MediaPackage attributes
@@ -337,28 +337,28 @@ MediaPackage = function(xmlMediaPackage){
 			});
 		}
 		
-		// Add attachments
-		if(self.attachments.length > 0){
-			var attachments = addElementToXmlDoc('attachments',doc.documentElement,doc);
-			$.each(self.attachments,function(index,attachment){
-				// If attachments is valid
-				if(checkValue(attachment.id) && checkValue(attachment.url)){
-					var attachmentElement = addElementToXmlDoc('attachment', attachments, doc);
-					if(checkValue(attachment.ref))attachmentElement.setAttribute('ref',attachment.ref);
-					if(checkValue(attachment.type))attachmentElement.setAttribute('type',attachment.type);
-					if(checkValue(attachment.id))attachmentElement.setAttribute('id',attachment.id);
+		// Add attachements
+		if(self.attachements.length > 0){
+			var attachements = addElementToXmlDoc('attachements',doc.documentElement,doc);
+			$.each(self.attachements,function(index,attachement){
+				// If attachements is valid
+				if(checkValue(attachement.id) && checkValue(attachement.url)){
+					var attachementElement = addElementToXmlDoc('attachement', media, doc);
+					if(checkValue(attachement.ref))attachementElement.setAttribute('ref',attachement.ref);
+					if(checkValue(attachement.type))attachementElement.setAttribute('type',attachement.type);
+					if(checkValue(attachement.id))attachementElement.setAttribute('id',attachement.id);
 	
-					addTextElementToXmlDoc('mimetype',attachment.mimetype,attachmentElement,doc);
-					addTextElementToXmlDoc('url',attachment.url,attachmentElement,doc);
-					if(checkValue(attachment.checksum.value)) {
-					  var checksumElm = addTextElementToXmlDoc('checksum',attachment.checksum.value,attachmentElement,doc);
-					  checksumElm.setAttribute('type',attachment.checksum.type);
+					addTextElementToXmlDoc('mimetype',attachement.mimetype,attachementElement,doc);
+					addTextElementToXmlDoc('url',attachement.url,attachementElement,doc);
+					if(checkValue(attachement.checksum.value)) {
+					  var checksumElm = addTextElementToXmlDoc('checksum',attachement.checksum.value,attachementElement,doc);
+					  checksumElm.setAttribute('type',attachement.checksum.type);
 					}
 				}
 				
-				if(attachment.tags.length > 0){
-					var tags = addElementToXmlDoc('tags',attachmentElement,doc);
-					$.each(attachment.tags,function(index,value){
+				if(attachement.tags.length > 0){
+					var tags = addElementToXmlDoc('tags',attachementElement,doc);
+					$.each(attachement.tags,function(index,value){
 						if(checkValue(value))
 							addTextElementToXmlDoc('tag', value, tags, doc);
 					});
@@ -392,8 +392,8 @@ MediaPackage = function(xmlMediaPackage){
 		$.each(self.tracks,function(idx,value){
 			newMP.tracks[idx]=value.clone();
 		});
-		$.each(self.attachments,function(idx,value){
-			newMP.attachments[idx]=value.clone();
+		$.each(self.attachements,function(idx,value){
+			newMP.attachements[idx]=value.clone();
 		});
 		return newMP;
 	}
@@ -817,16 +817,16 @@ Track = function(){
 };
 
 /**
- * Attachment class
+ * Attachement class
  */
-Attachment = function(){	
+Attachement = function(){	
 	var self = this;
 	
   this.checksum = {
       value: '',
       type: 'md5'
   };
-	this.type = '';
+	this.flavor = '';
 	this.id = '';
 	this.mimetype = '';
 	this.ref ='';
@@ -835,16 +835,16 @@ Attachment = function(){
 	this.xml = '';
 	
 	this.clone = function(){
-		var newAttachment = new Attachment();
-		newAttachment.checksum = $.extend(true,{},self.checksum);
-		newAttachment.type = self.type;
-		newAttachment.id = self.id;
-		newAttachment.mimetype = self.mimetype;
-		newAttachment.ref = self.ref;
-		newAttachment.tags = cloneArray(self.tags);
-		newAttachment.url = self.url;
-		newAttachment.xml = self.xml;
-		return newAttachment;
+		var newAttachement = new Attachement();
+		newAttachement.checksum = $.extend(true,{},self.checksum);
+		newAttachement.flavor = self.flavor;
+		newAttachement.id = self.id;
+		newAttachement.mimetype = self.mimetype;
+		newAttachement.ref = self.ref;
+		newAttachement.tags = cloneArray(self.tags);
+		newAttachement.url = self.url;
+		newAttachement.xml = self.xml;
+		return newAttachement;
 	}
 	
 	return this;
@@ -859,12 +859,7 @@ Attachment = function(){
 function cloneArray(array){
 	var newArray = new Array();
 	$.each(array,function(index,value){
-		var newValue = value;
-		if(typeof(value) == 'object') {
-			newValue = clone(value);
-		} else if(typeof(value) == 'array') {
-			newValue = cloneArray(value);
-		}
+		if(typeof(value) == 'object')
 		newArray.push(value);
 	});
 	return newArray;

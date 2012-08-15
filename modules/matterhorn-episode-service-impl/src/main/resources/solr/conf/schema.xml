@@ -229,14 +229,13 @@
   </types>
 
   <fields>
-    <!-- The mediapackage id and the version. This is the unique identifier. -->
+    <!-- The bundle id. This is the unique identifier. -->
     <field name="id" type="string" indexed="true" stored="true" required="true" />
    
     <!-- Dublin core fields. -->
 
     <!-- universal, i.e. localization independent fields -->
     <!-- these may be, e.g. fields containing an id, a date or follow some fixed vocabulary -->
-    <field name="dc_id" type="string" indexed="true" stored="true" required="true" />
     <field name="dc_created" type="date" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_extent" type="integer" indexed="false" stored="true" />
     <field name="dc_language" type="text" indexed="true" stored="true" omitNorms="true"/>
@@ -293,8 +292,6 @@
     <field name="oc_elementtags" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="oc_elementflavors" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="oc_locked" type="boolean" indexed="true" stored="true" omitNorms="true"/>
-	<field name="oc_version" type="integer" indexed="true" stored="true" omitNorms="true" />
-	<field name="oc_latest_version" type="boolean" indexed="true" stored="true" omitNorms="true" />
 
     <!-- The dynamic fields with segment text and hint -->
     <dynamicField name="oc_text_*" type="text" indexed="true" stored="true"/>

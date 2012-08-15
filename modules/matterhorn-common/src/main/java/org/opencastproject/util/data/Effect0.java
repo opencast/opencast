@@ -18,7 +18,7 @@ package org.opencastproject.util.data;
 
 /**
  * Run a side effect.
- *
+ * 
  * @see X
  */
 public abstract class Effect0 extends Function0<Void> {
@@ -29,15 +29,14 @@ public abstract class Effect0 extends Function0<Void> {
     return null;
   }
 
-  /** Run the side effect. */
+  /**
+   * Run the side effect.
+   */
   protected abstract void run();
 
-  /** Return the effect as a Function0. */
-  public Function0<Void> toFunction() {
-    return this;
-  }
-
-  /** Version of {@link Effect0} that allows for throwing a checked exception. */
+  /**
+   * Version of {@link Effect0} that allows for throwing a checked exception.
+   */
   public abstract static class X extends Effect0 {
 
     @Override

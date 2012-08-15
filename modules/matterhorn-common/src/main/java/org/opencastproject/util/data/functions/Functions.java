@@ -16,7 +16,6 @@
 
 package org.opencastproject.util.data.functions;
 
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
@@ -157,11 +156,15 @@ public final class Functions {
     };
   }
 
-  /** Noop effect. */
-  public static final Effect0 noop = new Effect0() {
-    @Override protected void run() {
-    }
-  };
+  /** Noop function of arity 0. */
+  public static <A> Function0<A> noop() {
+    return new Function0<A>() {
+      @Override
+      public A apply() {
+        return null;
+      }
+    };
+  }
 
   /** Identity function. */
   public static <A> Function<A, A> identity() {

@@ -37,26 +37,13 @@ public final class OsgiUtil {
   }
 
   /**
-   * Get a mandatory, non-blank value from the <em>bundle</em> context.
+   * Get a mandatory, non-blank value from a component context.
    *
    * @throws RuntimeException
    *         key does not exist or its value is blank
    */
   public static String getContextProperty(ComponentContext cc, String key) {
     String p = cc.getBundleContext().getProperty(key);
-    if (StringUtils.isBlank(p))
-      throw new RuntimeException("Please provide context property " + key);
-    return p;
-  }
-
-  /**
-   * Get a mandatory, non-blank value from the <em>component</em> context.
-   *
-   * @throws RuntimeException
-   *         key does not exist or its value is blank
-   */
-  public static String getComponentContextProperty(ComponentContext cc, String key) {
-    String p = (String) cc.getProperties().get(key);
     if (StringUtils.isBlank(p))
       throw new RuntimeException("Please provide context property " + key);
     return p;

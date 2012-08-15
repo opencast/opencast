@@ -20,7 +20,7 @@ import org.opencastproject.util.data.functions.Functions;
 
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
-import static org.opencastproject.util.data.functions.Misc.chuck;
+import static org.opencastproject.util.data.functions.Functions.chuck;
 
 /**
  * Function of arity 1.

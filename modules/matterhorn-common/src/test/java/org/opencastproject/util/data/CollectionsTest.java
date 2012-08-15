@@ -31,13 +31,11 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Collections.append;
 import static org.opencastproject.util.data.Collections.array;
-import static org.opencastproject.util.data.Collections.concat;
 import static org.opencastproject.util.data.Collections.cons;
 import static org.opencastproject.util.data.Collections.iterator;
 import static org.opencastproject.util.data.Collections.join;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Collections.repeat;
-import static org.opencastproject.util.data.Collections.toArray;
 
 public class CollectionsTest {
 
@@ -202,12 +200,5 @@ public class CollectionsTest {
   @Test
   public void testAppendArray() {
     Object[] as = append(new String[]{"a", "b"}, new Exception());
-  }
-
-  @Test
-  public void testConcat() {
-    final List<List<Integer>> l = list(list(1), list(2, 3), Collections.<Integer>nil(), list(9, 2, 1));
-    final List<Integer> c = concat(l);
-    assertArrayEquals(array(1, 2, 3, 9, 2, 1), toArray(c));
   }
 }

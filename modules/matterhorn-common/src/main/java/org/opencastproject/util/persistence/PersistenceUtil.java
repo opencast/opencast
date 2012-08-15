@@ -45,7 +45,6 @@ import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Functions supporting persistence.
@@ -100,21 +99,7 @@ public final class PersistenceUtil {
    * Transaction propagation is <em>not</em> supported.
    */
   public static PersistenceEnv newPersistenceEnvironment(final EntityManagerFactory emf) {
-    return newPersistenceEnvironment(emf, Functions.<Exception>identity());
-  }
-
-  /**
-   * Shortcut for <code>newPersistenceEnvironment(newEntityManagerFactory(cc, emName, persistenceProps))</code>.
-   */
-  public static PersistenceEnv newPersistenceEnvironment(ComponentContext cc, String emName, Map persistenceProps) {
-    return newPersistenceEnvironment(newEntityManagerFactory(cc, emName, persistenceProps));
-  }
-
-  /**
-   * Shortcut for <code>newPersistenceEnvironment(newEntityManagerFactory(cc, emName))</code>.
-   */
-  public static PersistenceEnv newPersistenceEnvironment(ComponentContext cc, String emName) {
-    return newPersistenceEnvironment(newEntityManagerFactory(cc, emName));
+    return newPersistenceEnvironment(emf, Functions.<RuntimeException>identity());
   }
 
   /**
@@ -122,13 +107,13 @@ public final class PersistenceUtil {
    *
    * @see #newPersistenceEnvironment(javax.persistence.EntityManagerFactory, org.opencastproject.util.data.Function)
    */
-  public static <T extends Exception> PersistenceEnv equip(final PersistenceEnv penv, final Function<Exception, T> exHandler) {
+  public static <T extends RuntimeException> PersistenceEnv equip(final PersistenceEnv penv, final Function<RuntimeException, T> exHandler) {
     return new PersistenceEnv() {
       @Override public <A> A tx(Function<EntityManager, A> transactional) {
         try {
           return penv.tx(transactional);
-        } catch (Exception e) {
-          return chuck(exHandler.apply(e));
+        } catch (RuntimeException e) {
+          throw exHandler.apply(e);
         }
       }
 
@@ -146,7 +131,7 @@ public final class PersistenceUtil {
    * Please note that calling {@link PersistenceEnv#tx(org.opencastproject.util.data.Function)} always creates a <em>new</em> transaction.
    * Transaction propagation is <em>not</em> supported.
    */
-  public static <T extends Exception> PersistenceEnv newPersistenceEnvironment(final EntityManagerFactory emf, final Function<Exception, T> exHandler) {
+  public static <T extends RuntimeException> PersistenceEnv newPersistenceEnvironment(final EntityManagerFactory emf, final Function<RuntimeException, T> exHandler) {
     return new PersistenceEnv() {
       @Override
       public <A> A tx(Function<EntityManager, A> transactional) {
@@ -162,7 +147,7 @@ public final class PersistenceUtil {
             tx.rollback();
           }
           // propagate exception
-          return chuck(exHandler.apply(e));
+          throw(exHandler.apply(e));
         } finally {
           em.close();
         }
@@ -227,17 +212,6 @@ public final class PersistenceUtil {
   public static <A> Option<A> runSingleResultQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
     try {
       return some((A) createNamedQuery(em, queryName, params).getSingleResult());
-    } catch (NoResultException e) {
-      return none();
-    } catch (NonUniqueResultException e) {
-      return none();
-    }
-  }
-  
-  /** Run a query that should return the first result of it. */
-  public static <A> Option<A> runFirstResultQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
-    try {
-      return some((A) createNamedQuery(em, queryName, params).setMaxResults(1).getSingleResult());
     } catch (NoResultException e) {
       return none();
     } catch (NonUniqueResultException e) {
@@ -330,14 +304,4 @@ public final class PersistenceUtil {
             .getOrElse(Option.<EntityManagerFactory>error("Cannot create entity manager factory. Maybe you mispelled the name of the persistence unit?"));
   }
 
-  /**
-   * Create a new persistence environment based on an entity manager factory backed by an in-memory H2 database for
-   * testing purposes.
-   *
-   * @param emName
-   *         name of the persistence unit (see META-INF/persistence.xml)
-   */
-  public static PersistenceEnv newTestPersistenceEnv(String emName) {
-    return newPersistenceEnvironment(newTestEntityManagerFactory(emName));
-  }
 }

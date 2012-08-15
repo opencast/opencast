@@ -126,10 +126,6 @@ public final class PathSupport {
     return path;
   }
 
-  public static String path(String... parts) {
-    return concat(parts);
-  }
-
   /**
    * Returns the trimmed url. Trimmed means that the url is free from leading or trailing whitespace characters, and
    * that a directory url like <code>/news/</code> is closed by a slash (<code>/</code>).

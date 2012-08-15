@@ -48,6 +48,8 @@ public class FunctionsTest {
       @Override protected String xapply(String s) throws IOException {
         throw new IOException(s);
       }
-    } .apply("error");
+      // CHECKSTYLE:OFF
+    }.apply("error");
+    // CHECKSTYLE:ON
   }
 }

@@ -15,12 +15,15 @@
  */
 package org.opencastproject.runtimeinfo;
 
-import org.apache.commons.lang.StringUtils;
+import static org.opencastproject.rest.RestConstants.SERVICES_FILTER;
+import static org.opencastproject.rest.RestConstants.SERVICE_PATH_PROPERTY;
+
 import org.opencastproject.runtimeinfo.rest.RestDocData;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestService;
+
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -28,6 +31,14 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -37,20 +48,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
 
-import static org.opencastproject.rest.RestConstants.SERVICES_FILTER;
-import static org.opencastproject.rest.RestConstants.SERVICE_PATH_PROPERTY;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-
-/** A bundle activator that registers the REST documentation servlet. */
+/**
+ * A bundle activator that registers the REST documentation servlet.
+ */
 public class Activator extends HttpServlet implements BundleActivator {
 
   /** The logger */
@@ -80,7 +81,9 @@ public class Activator extends HttpServlet implements BundleActivator {
     bundleContext.registerService(Servlet.class.getName(), this, props);
   }
 
-  /** Add a list of global information, such as the server URL, to the globalMacro map. */
+  /**
+   * Add a list of global information, such as the server URL, to the globalMacro map.
+   */
   private void prepareMacros() {
     globalMacro = new HashMap<String, String>();
     globalMacro.put("PING_BACK_URL", bundleContext.getProperty("org.opencastproject.anonymous.feedback.url"));
@@ -105,7 +108,7 @@ public class Activator extends HttpServlet implements BundleActivator {
     }
   }
 
-  private void writeServiceDocumentation(final String docPath, HttpServletRequest req, HttpServletResponse resp)
+  private void writeServiceDocumentation(String docPath, HttpServletRequest req, HttpServletResponse resp)
           throws IOException {
     ServiceReference reference = null;
     for (ServiceReference ref : getRestEndpointServices()) {
@@ -116,45 +119,41 @@ public class Activator extends HttpServlet implements BundleActivator {
       }
     }
 
-    final StringBuilder docs = new StringBuilder();
+    StringBuilder docs = new StringBuilder();
 
     if (reference == null) {
       docs.append("REST docs unavailable for ");
       docs.append(docPath);
     } else {
-      final Object restService = bundleContext.getService(reference);
-      findRestAnnotation(restService.getClass()).fold(new Option.Match<RestService, Void>() {
-        @Override public Void some(RestService annotation) {
-          globalMacro.put("SERVICE_CLASS_SIMPLE_NAME", restService.getClass().getSimpleName());
-          RestDocData data = new RestDocData(annotation.name(), annotation.title(), docPath, annotation.notes(), restService, globalMacro);
-          data.setAbstract(annotation.abstractText());
+      Object endpointService = bundleContext.getService(reference);
 
-          for (Method m : restService.getClass().getMethods()) {
-            RestQuery rq = (RestQuery) m.getAnnotation(RestQuery.class);
-            String httpMethodString = null;
-            for (Annotation a : m.getAnnotations()) {
-              HttpMethod httpMethod = (HttpMethod) a.annotationType().getAnnotation(HttpMethod.class);
-              if (httpMethod != null) {
-                httpMethodString = httpMethod.value();
-              }
-            }
-            Produces produces = (Produces) m.getAnnotation(Produces.class);
-            Path path = (Path) m.getAnnotation(Path.class);
-            Class<?> returnType = m.getReturnType();
-            if ((rq != null) && (httpMethodString != null) && (path != null)) {
-              data.addEndpoint(rq, returnType, produces, httpMethodString, path);
+      RestService rs = (RestService) endpointService.getClass().getAnnotation(RestService.class);
+      if (rs != null) {
+        globalMacro.put("SERVICE_CLASS_SIMPLE_NAME", endpointService.getClass().getSimpleName());
+        RestDocData data = new RestDocData(rs.name(), rs.title(), docPath, rs.notes(), endpointService, globalMacro);
+        data.setAbstract(rs.abstractText());
+
+        for (Method m : endpointService.getClass().getMethods()) {
+          RestQuery rq = (RestQuery) m.getAnnotation(RestQuery.class);
+          String httpMethodString = null;
+          for (Annotation a : m.getAnnotations()) {
+            HttpMethod httpMethod = (HttpMethod) a.annotationType().getAnnotation(HttpMethod.class);
+            if (httpMethod != null) {
+              httpMethodString = httpMethod.value();
             }
           }
-          String template = DocUtil.loadTemplate("/ui/restdocs/template.xhtml");
-          docs.append(DocUtil.generate(data, template));
-          return null;
+          Produces produces = (Produces) m.getAnnotation(Produces.class);
+          Path path = (Path) m.getAnnotation(Path.class);
+          Class<?> returnType = m.getReturnType();
+          if ((rq != null) && (httpMethodString != null) && (path != null)) {
+            data.addEndpoint(rq, returnType, produces, httpMethodString, path);
+          }
         }
-
-        @Override public Void none() {
-          docs.append("No documentation has been found for ").append(restService.getClass().getSimpleName());
-          return null;
-        }
-      });
+        String template = DocUtil.loadTemplate("/ui/restdocs/template.xhtml");
+        docs.append(DocUtil.generate(data, template));
+      } else {
+        docs.append("No documentation has been found for " + endpointService.getClass().getSimpleName());
+      }
     }
 
     resp.setContentType("text/html");
@@ -170,16 +169,4 @@ public class Activator extends HttpServlet implements BundleActivator {
     }
   }
 
-  /** Try to find the RestService annotation starting at <code>endpointClass</code>. */
-  public static Option<RestService> findRestAnnotation(Class<?> endpointClass) {
-    if (endpointClass == null) {
-      return none();
-    }
-    final RestService rs = endpointClass.getAnnotation(RestService.class);
-    if (rs == null) {
-      return findRestAnnotation(endpointClass.getSuperclass());
-    } else {
-      return some(rs);
-    }
-  }
 }

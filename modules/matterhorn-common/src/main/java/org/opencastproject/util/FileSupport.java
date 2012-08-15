@@ -16,7 +16,6 @@
 
 package org.opencastproject.util;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -286,7 +285,7 @@ public final class FileSupport {
 
     // Create the target directory if it doesn't exist yet
     if (!targetDirectory.exists()) {
-      FileUtils.forceMkdir(targetDirectory);
+      targetDirectory.mkdir();
     }
 
     logger.trace("Linking files in " + sourceDirectory + " to " + targetDirectory);

@@ -19,15 +19,13 @@ package org.opencastproject.episode.impl.solr;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
-import org.opencastproject.episode.api.Version;
+import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import static org.opencastproject.util.data.Collections.head;
 
 /**
  * This class reflects the solr schema.xml. Note that all getters returning simple values may always return null. Please
@@ -46,7 +44,6 @@ public final class Schema {
   // Dublin core fields
 
   // Localization independent fields
-  public static final String DC_ID = "dc_id";
   public static final String DC_EXTENT = "dc_extent";
   public static final String DC_TYPE = "dc_type";
   public static final String DC_CREATED = "dc_created";
@@ -103,8 +100,6 @@ public final class Schema {
   public static final String OC_TEXT_PREFIX = "oc_text_";
   public static final String OC_HINT_PREFIX = "oc_hint_";
   public static final String OC_ACL_PREFIX = "oc_acl_";
-  public static final String OC_VERSION = "oc_version";
-  public static final String OC_LATEST_VERSION = "oc_latest_version";
 
   /**
    * Solr ranking score
@@ -152,8 +147,6 @@ public final class Schema {
     Option<String> getId();
 
     Option<String> getOrganization();
-
-    Option<String> getDcId();
 
     Option<Date> getDcCreated();
 
@@ -209,10 +202,6 @@ public final class Schema {
 
     Option<Boolean> getOcPublished();
 
-    Option<Version> getOcVersion();
-
-    Option<Boolean> getOcLatestVersion();
-
     List<DField<String>> getOcAcl();
 
     List<DField<String>> getSegmentText();
@@ -228,8 +217,6 @@ public final class Schema {
       setId(doc, fields.getId().get());
     if (fields.getOrganization().isSome())
       setOrganization(doc, fields.getOrganization().get());
-    if (fields.getDcId().isSome())
-      setDcId(doc, fields.getDcId().get());
     if (fields.getDcCreated().isSome())
       setDcCreated(doc, fields.getDcCreated().get());
     if (fields.getDcExtent().isSome())
@@ -282,10 +269,6 @@ public final class Schema {
       setOcElementtags(doc, fields.getOcElementtags().get());
     if (fields.getOcElementflavors().isSome())
       setOcElementflavors(doc, fields.getOcElementflavors().get());
-    if (fields.getOcVersion().isSome())
-      setOcVersion(doc, fields.getOcVersion().get());
-    if (fields.getOcLatestVersion().isSome())
-      setOcLatestVersion(doc, fields.getOcLatestVersion().get());
     for (DField<String> v : fields.getOcAcl())
       setOcAcl(doc, v);
     for (Boolean v : fields.getOcPublished())
@@ -338,14 +321,6 @@ public final class Schema {
 
   public static void setOrganization(SolrInputDocument doc, String organization) {
     doc.setField(OC_ORGANIZATION, organization);
-  }
-
-  public static String getDcId(SolrDocument doc) {
-    return (String) doc.get(DC_ID);
-  }
-
-  public static void setDcId(SolrInputDocument doc, String mpId) {
-    doc.setField(DC_ID, mpId);
   }
 
   public static Date getDcCreated(SolrDocument doc) {
@@ -586,23 +561,6 @@ public final class Schema {
     return (Boolean) doc.get(OC_LOCKED);
   }
 
-  public static void setOcLatestVersion(SolrInputDocument doc, boolean isLatestVersion) {
-    doc.setField(OC_LATEST_VERSION, isLatestVersion);
-  }
-
-  public static Boolean getOcLatestVersion(SolrDocument doc) {
-    return (Boolean) doc.get(OC_LATEST_VERSION);
-  }
-
-  public static Version getOcVersion(SolrDocument doc) {
-    Integer version = (Integer) doc.get(OC_VERSION);
-    return version != null ? Version.version(version) : null;
-  }
-
-  public static void setOcVersion(SolrInputDocument doc, Version version) {
-    doc.setField(OC_VERSION, version.value());
-  }
-
   public static double getScore(SolrDocument doc) {
     return Double.parseDouble(mkString(doc.getFieldValue(SCORE)));
   }
@@ -621,7 +579,7 @@ public final class Schema {
    * Helper to get the first element of the given list or a default value <code>dflt</code> if the list is empty.
    */
   public static <A> A getFirst(List<DField<A>> fs, A dflt) {
-    return head(fs).map(new Function<DField<A>, A>() {
+    return Collections.head(fs).map(new Function<DField<A>, A>() {
       @Override
       public A apply(DField<A> f) {
         return f.getValue();

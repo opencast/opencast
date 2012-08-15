@@ -97,12 +97,12 @@ public final class NonEmptyList<A> implements List<A> {
 
   @Override
   public boolean add(A a) {
-    throw err();
+    throw new RuntimeException("List is immutable");
   }
 
   @Override
   public boolean remove(Object o) {
-    throw err();
+    throw new RuntimeException("List is immutable");
   }
 
   @Override
@@ -226,7 +226,7 @@ public final class NonEmptyList<A> implements List<A> {
     throw err();
   }
 
-  private Error err() {
-    return new Error("List is immutable");
+  private RuntimeException err() {
+    return new RuntimeException("List is immutable");
   }
 }

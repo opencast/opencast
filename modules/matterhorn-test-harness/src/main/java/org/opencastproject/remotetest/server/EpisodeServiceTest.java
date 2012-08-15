@@ -99,7 +99,6 @@ public class EpisodeServiceTest {
       doPostRequest("episode/unlock", HttpStatus.SC_NO_CONTENT, tuple("id", id));
     } else {
       doPostRequest("episode/lock", HttpStatus.SC_NO_CONTENT, tuple("id", id));
-      // TODO test apply should not work
     }
     // and test it
     Document r3 = doGetRequest("episode/episode.xml", HttpStatus.SC_OK, tuple("id", id), tuple("limit", 0),
@@ -121,28 +120,7 @@ public class EpisodeServiceTest {
             tuple("id", id));
   }
 
-  @Test
-  public void testDeleteMediaPackage() throws Exception {
-    // get a media package id
-    Document r1 = doGetRequest("workflow/instances.xml", HttpStatus.SC_OK, tuple("startPage", 0), tuple("count", 1));
-    String id = (String) xpath(r1, "//mediapackage/@id", XPathConstants.STRING);
-
-    Document r2 = doGetRequest("episode/episode.xml", HttpStatus.SC_OK, tuple("id", id), tuple("limit", 0),
-            tuple("offset", 0));
-
-    // assert is in episode service
-    boolean locked = Boolean.parseBoolean((String) xpath(r2, "//ocLocked", XPathConstants.STRING));
-
-    // get ArchiveMP, assert is same and not null
-    // archive test getElement, assertOK
-
-    // archive delete assert ok
-
-    // get episode.xml, assert not found or found but marked as deleted
-
-    // get ArchiveMP, assert is null
-    // archive test getElement, assert Not found
-  }
+  //
 
   private Document doGetRequest(String path, int expectedHttpResonseCode, Tuple<String, ?>... params) {
     List<NameValuePair> qparams = new ArrayList<NameValuePair>();
@@ -212,13 +190,5 @@ public class EpisodeServiceTest {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private String getTestWorkflow() throws Exception {
-    return IOUtils.toString(getClass().getClassLoader().getResourceAsStream("test-archive.xml"), "UTF-8");
-  }
-
-  private String getTestApplyWorkflow() throws Exception {
-    return IOUtils.toString(getClass().getClassLoader().getResourceAsStream("test-apply-archive.xml"), "UTF-8");
   }
 }

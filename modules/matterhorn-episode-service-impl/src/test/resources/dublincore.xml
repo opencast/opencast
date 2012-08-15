@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
-<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance/"
-        xsi:schemaLocation="http://www.opencastproject.org http://www.opencastproject.org/schema.xsd"
-        xmlns:dcterms="http://purl.org/dc/terms/">
+<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance/"
+  xsi:schemaLocation="http://www.opencastproject.org http://www.opencastproject.org/schema.xsd" xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:dcterms="http://purl.org/dc/terms/" xmlns:oc="http://www.opencastproject.org/matterhorn">
 
   <dcterms:title>
     Land and Vegetation: Key players on the Climate Scene

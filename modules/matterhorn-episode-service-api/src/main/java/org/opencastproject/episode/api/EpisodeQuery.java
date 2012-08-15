@@ -24,7 +24,6 @@ import java.util.Date;
  */
 public class EpisodeQuery {
   private boolean includeLocked = false;
-  private boolean includeDeleted = false;
   private String id;
   private String text;
   private String seriesId;
@@ -42,7 +41,6 @@ public class EpisodeQuery {
   private Date deletedDate = null;
   private Sort sort = Sort.DATE_CREATED;
   private boolean sortAscending = true;
-  private boolean onlyLastVersion = false;
 
   public enum Sort {
     DATE_CREATED, TITLE, CREATOR, LANGUAGE, LICENSE, SUBJECT, MEDIA_PACKAGE_ID
@@ -51,14 +49,6 @@ public class EpisodeQuery {
   public EpisodeQuery includeLocked(boolean includeLocked) {
     this.includeLocked = includeLocked;
     return this;
-  }
-
-  public boolean isIncludeLocked() {
-    return includeLocked;
-  }
-
-  public boolean isIncludeDeleted() {
-    return includeDeleted;
   }
 
   public EpisodeQuery withId(String id) {
@@ -171,11 +161,9 @@ public class EpisodeQuery {
 
   /**
    * Sort the results by the specified field, either ascending or descending.
-   * 
-   * @param sort
-   *          the sort field
-   * @param ascending
-   *          whether to sort ascending (true) or descending (false)
+   *
+   * @param sort the sort field
+   * @param ascending whether to sort ascending (true) or descending (false)
    */
   public EpisodeQuery withSort(Sort sort, boolean ascending) {
     this.sort = sort;
@@ -185,29 +173,20 @@ public class EpisodeQuery {
 
   /**
    * Return the field to use in sorting the results of the query.
-   * 
+   *
    * @return the sort field
    */
   public Sort getSort() {
     return sort;
   }
 
-  public EpisodeQuery withOnlyLastVersion() {
-    this.onlyLastVersion = true;
-    return this;
-  }
-
   /**
    * Return whether to sort the results in ascending order.
-   * 
+   *
    * @return whether the search results should be sorted in ascending order
    */
   public boolean isSortAscending() {
     return sortAscending;
-  }
-
-  public boolean isOnlyLastVersion() {
-    return onlyLastVersion;
   }
 
   public MediaPackageElementFlavor[] getElementFlavors() {
@@ -228,15 +207,8 @@ public class EpisodeQuery {
     return this;
   }
 
-  /** Only return items that have been deleted since the given date. Overrides {@link #includeDeleted(boolean)}. */
   public EpisodeQuery withDeletedSince(Date date) {
     this.deletedDate = date;
-    return this;
-  }
-
-  /** Include deleted items in the response. {@link #withDeletedSince} always takes precedence. */
-  public EpisodeQuery includeDeleted(boolean include) {
-    this.includeDeleted = include;
     return this;
   }
 

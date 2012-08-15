@@ -215,7 +215,7 @@ public class EpisodesPermissionsUpdatedEventHandler implements EventHandler {
           securityService.setUser(new User(systemAccount, defaultOrg.getId(), new String[] { GLOBAL_ADMIN_ROLE }));
 
           EpisodeQuery q = new EpisodeQuery().withSeriesId(seriesId);
-          SearchResult result = episodeService.findForAdministrativeRead(q);
+          SearchResult result = episodeService.getForAdministrativeRead(q);
 
           for (SearchResultItem item : result.getItems()) {
             String org = item.getOrganization();

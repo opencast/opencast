@@ -18,7 +18,7 @@ package org.opencastproject.util.data;
 
 import org.opencastproject.util.data.functions.Functions;
 
-import static org.opencastproject.util.data.functions.Misc.chuck;
+import static org.opencastproject.util.data.functions.Functions.chuck;
 
 /**
  * Function of arity 0, i.e. a constant function.
@@ -40,15 +40,6 @@ public abstract class Function0<A> {
   /** Apply this function and ignore its result, then apply <code>f</code>. */
   public <B> Function0<B> then(final Function0<B> f) {
     return Functions.then(Function0.this, f);
-  }
-
-  /** Turn a Function0 into an Effect0 discarding its return value. */
-  public Effect0 toEffect() {
-    return new Effect0() {
-      @Override protected void run() {
-        Function0.this.apply();
-      }
-    };
   }
 
   /**

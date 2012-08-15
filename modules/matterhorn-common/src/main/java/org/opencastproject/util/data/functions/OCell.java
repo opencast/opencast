@@ -14,7 +14,26 @@
  *
  */
 
-/**
- * Implementation of series persistent storage.
- */
-package org.opencastproject.episode.impl.persistence;
+package org.opencastproject.util.data.functions;
+
+import org.opencastproject.util.data.Cell;
+import org.opencastproject.util.data.Option;
+
+import static org.opencastproject.util.data.Option.some;
+
+/** Cell containing optional values. Just to shorten type annotations a bit. */
+public class OCell<A> extends Cell<Option<A>> {
+  public OCell(Option<A> as) {
+    super(as);
+  }
+
+  /** Create a cell containing some a. */
+  public static <A> OCell<A> ocell(A a) {
+    return new OCell<A>(some(a));
+  }
+
+  /** Create a cell containing none. */
+  public static <A> OCell<A> ocell() {
+    return new OCell<A>(Option.<A>none());
+  }
+}

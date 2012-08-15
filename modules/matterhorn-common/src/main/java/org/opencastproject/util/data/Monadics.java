@@ -20,7 +20,6 @@ import org.apache.commons.lang.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -28,7 +27,6 @@ import java.util.NoSuchElementException;
 import static java.lang.StrictMath.min;
 import static java.util.Arrays.asList;
 import static org.opencastproject.util.data.Collections.iterator;
-import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
@@ -47,7 +45,7 @@ public final class Monadics {
   // }
 
   /** The list monad. */
-  public abstract static class ListMonadic<A> implements Iterable<A> {
+  public abstract static class ListMonadic<A> {
 
     private ListMonadic() {
     }
@@ -105,8 +103,6 @@ public final class Monadics {
 
     public abstract <B> ListMonadic<Tuple<A, B>> zip(Iterator<B> bs);
 
-    public abstract ListMonadic<A> sort(Comparator<A> c);
-
     /** Return the head of the list. */
     public abstract Option<A> head();
 
@@ -121,7 +117,7 @@ public final class Monadics {
   }
 
   /** The iterator monad. */
-  public abstract static class IteratorMonadic<A> implements Iterable<A> {
+  public abstract static class IteratorMonadic<A> {
 
     private IteratorMonadic() {
     }
@@ -187,20 +183,12 @@ public final class Monadics {
     public abstract List<A> eval();
   }
 
-  private static <A> List<A> newList() {
-    return new ArrayList<A>();
-  }
-
-  private static <A> List<A> newList(int size) {
-    return new ArrayList<A>(size);
-  }
-
   /** Constructor function optimized for lists. */
   public static <A> ListMonadic<A> mlist(final List<A> as) {
     return new ListMonadic<A>() {
       @Override
       public <B> ListMonadic<B> fmap(Function<A, B> f) {
-        List<B> target = newList(as.size());
+        List<B> target = new ArrayList<B>(as.size());
         for (A a : as) {
           target.add(f.apply(a));
         }
@@ -209,7 +197,7 @@ public final class Monadics {
 
       @Override
       public <B, M extends Collection<B>> ListMonadic<B> bind(Function<A, M> f) {
-        List<B> target = newList();
+        List<B> target = new ArrayList<B>();
         for (A a : as) {
           target.addAll(f.apply(a));
         }
@@ -218,7 +206,7 @@ public final class Monadics {
 
       @Override
       public ListMonadic<A> filter(Function<A, Boolean> p) {
-        List<A> target = newList(as.size());
+        List<A> target = new ArrayList<A>(as.size());
         for (A a : as) {
           if (p.apply(a)) {
             target.add(a);
@@ -279,7 +267,7 @@ public final class Monadics {
 
       @Override
       public <M extends Collection<A>> ListMonadic<A> concat(M m) {
-        List<A> target = newList(as.size() + m.size());
+        List<A> target = new ArrayList<A>(as.size() + m.size());
         target.addAll(as);
         target.addAll(m);
         return mlist(target);
@@ -309,7 +297,7 @@ public final class Monadics {
 
       @Override
       public <B, M extends Collection<B>> ListMonadic<Tuple<A, B>> zip(M m) {
-        final List<Tuple<A, B>> target = newList(min(as.size(), m.size()));
+        final List<Tuple<A, B>> target = new ArrayList<Tuple<A, B>>(min(as.size(), m.size()));
         final Iterator<A> asi = as.iterator();
         final Iterator<B> mi = m.iterator();
         while (asi.hasNext() && mi.hasNext()) {
@@ -320,7 +308,7 @@ public final class Monadics {
 
       @Override
       public <B> ListMonadic<Tuple<A, B>> zip(B[] bs) {
-        final List<Tuple<A, B>> target = newList(min(as.size(), bs.length));
+        final List<Tuple<A, B>> target = new ArrayList<Tuple<A, B>>(min(as.size(), bs.length));
         int i = 0;
         final Iterator<A> asi = as.iterator();
         while (asi.hasNext() && i < bs.length) {
@@ -331,24 +319,12 @@ public final class Monadics {
 
       @Override
       public <B> ListMonadic<Tuple<A, B>> zip(Iterator<B> bs) {
-        final List<Tuple<A, B>> target = newList(as.size());
+        final List<Tuple<A, B>> target = new ArrayList<Tuple<A, B>>(as.size());
         final Iterator<A> asi = as.iterator();
         while (asi.hasNext() && bs.hasNext()) {
           target.add(tuple(asi.next(), bs.next()));
         }
         return mlist(target);
-      }
-
-      @Override public ListMonadic<A> sort(Comparator<A> c) {
-        final List<A> target = newList(as.size());
-        target.addAll(as);
-        java.util.Collections.sort(target, c);
-        return mlist(target);
-      }
-
-      @Override
-      public Iterator<A> iterator() {
-        return as.iterator();
       }
 
       @Override
@@ -363,7 +339,7 @@ public final class Monadics {
     return new ListMonadic<A>() {
       @Override
       public <B> ListMonadic<B> fmap(Function<A, B> f) {
-        List<B> target = newList(as.length);
+        List<B> target = new ArrayList<B>(as.length);
         for (A a : as) {
           target.add(f.apply(a));
         }
@@ -372,7 +348,7 @@ public final class Monadics {
 
       @Override
       public <B, BB extends Collection<B>> ListMonadic<B> bind(Function<A, BB> f) {
-        List<B> target = newList();
+        List<B> target = new ArrayList<B>();
         for (A a : as) {
           target.addAll(f.apply(a));
         }
@@ -381,7 +357,7 @@ public final class Monadics {
 
       @Override
       public ListMonadic<A> filter(Function<A, Boolean> p) {
-        List<A> target = newList(as.length);
+        List<A> target = new ArrayList<A>(as.length);
         for (A a : as) {
           if (p.apply(a)) {
             target.add(a);
@@ -442,7 +418,7 @@ public final class Monadics {
 
       @Override
       public <AA extends Collection<A>> ListMonadic<A> concat(AA aa) {
-        List<A> target = newList(as.length + aa.size());
+        List<A> target = new ArrayList<A>(as.length + aa.size());
         for (A a : as) {
           target.add(a);
         }
@@ -474,7 +450,7 @@ public final class Monadics {
 
       @Override
       public <B, M extends Collection<B>> ListMonadic<Tuple<A, B>> zip(M m) {
-        final List<Tuple<A, B>> target = newList(min(as.length, m.size()));
+        final List<Tuple<A, B>> target = new ArrayList<Tuple<A, B>>(min(as.length, m.size()));
         int i = 0;
         final Iterator<B> mi = m.iterator();
         while (i < as.length && mi.hasNext()) {
@@ -485,7 +461,7 @@ public final class Monadics {
 
       @Override
       public <B> ListMonadic<Tuple<A, B>> zip(B[] bs) {
-        final List<Tuple<A, B>> target = newList(min(as.length, bs.length));
+        final List<Tuple<A, B>> target = new ArrayList<Tuple<A, B>>(min(as.length, bs.length));
         int i = 0;
         while (i < as.length && i < bs.length) {
           target.add(tuple(as[i], bs[i]));
@@ -496,23 +472,12 @@ public final class Monadics {
 
       @Override
       public <B> ListMonadic<Tuple<A, B>> zip(Iterator<B> bs) {
-        final List<Tuple<A, B>> target = newList(as.length);
+        final List<Tuple<A, B>> target = new ArrayList<Tuple<A, B>>(as.length);
         int i = 0;
         while (i < as.length && bs.hasNext()) {
           target.add(tuple(as[i++], bs.next()));
         }
         return mlist(target);
-      }
-
-      @Override public ListMonadic<A> sort(Comparator<A> c) {
-        final List<A> target = list(as);
-        java.util.Collections.sort(target, c);
-        return mlist(target);
-      }
-
-      @Override
-      public Iterator<A> iterator() {
-        return Collections.iterator(as);
       }
 
       @Override
@@ -527,7 +492,7 @@ public final class Monadics {
     return new ListMonadic<A>() {
       @Override
       public <B> ListMonadic<B> fmap(Function<A, B> f) {
-        List<B> target = newList();
+        List<B> target = new ArrayList<B>();
         while (as.hasNext()) {
           target.add(f.apply(as.next()));
         }
@@ -536,7 +501,7 @@ public final class Monadics {
 
       @Override
       public <B, BB extends Collection<B>> ListMonadic<B> bind(Function<A, BB> f) {
-        List<B> target = newList();
+        List<B> target = new ArrayList<B>();
         while (as.hasNext()) {
           target.addAll(f.apply(as.next()));
         }
@@ -545,7 +510,7 @@ public final class Monadics {
 
       @Override
       public ListMonadic<A> filter(Function<A, Boolean> p) {
-        List<A> target = newList();
+        List<A> target = new ArrayList<A>();
         while (as.hasNext()) {
           A a = as.next();
           if (p.apply(a)) {
@@ -651,7 +616,7 @@ public final class Monadics {
 
       @Override
       public <B, M extends Collection<B>> ListMonadic<Tuple<A, B>> zip(M m) {
-        final List<Tuple<A, B>> target = newList(m.size());
+        final List<Tuple<A, B>> target = new ArrayList<Tuple<A, B>>(m.size());
         final Iterator<B> mi = m.iterator();
         while (as.hasNext() && mi.hasNext()) {
           target.add(tuple(as.next(), mi.next()));
@@ -661,7 +626,7 @@ public final class Monadics {
 
       @Override
       public <B> ListMonadic<Tuple<A, B>> zip(B[] bs) {
-        final List<Tuple<A, B>> target = newList(bs.length);
+        final List<Tuple<A, B>> target = new ArrayList<Tuple<A, B>>(bs.length);
         int i = 0;
         while (as.hasNext() && i < bs.length) {
           target.add(tuple(as.next(), bs[i++]));
@@ -671,19 +636,11 @@ public final class Monadics {
 
       @Override
       public <B> ListMonadic<Tuple<A, B>> zip(Iterator<B> bs) {
-        final List<Tuple<A, B>> target = newList();
+        final List<Tuple<A, B>> target = new ArrayList<Tuple<A, B>>();
         while (as.hasNext() && bs.hasNext()) {
           target.add(tuple(as.next(), bs.next()));
         }
         return mlist(target);
-      }
-
-      @Override public Iterator<A> iterator() {
-        return as;
-      }
-
-      @Override public ListMonadic<A> sort(Comparator<A> c) {
-        throw new UnsupportedOperationException();
       }
 
       @Override
@@ -833,11 +790,6 @@ public final class Monadics {
       @Override
       public Option<A> next() {
         return as.hasNext() ? some(as.next()) : Option.<A>none();
-      }
-
-      @Override
-      public Iterator<A> iterator() {
-        return as;
       }
 
       @Override

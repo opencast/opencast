@@ -143,7 +143,7 @@ public final class UrlSupport {
   }
 
   /** Create a URI from the given parts. */
-  public static URI uri(Object... parts) {
+  public static URI createUri(Object... parts) {
     return URI.create(concat(mlist(parts).map(asStringNull()).value()));
   }
 

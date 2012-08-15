@@ -13,20 +13,26 @@
  *  permissions and limitations under the License.
  *
  */
+
 package org.opencastproject.episode.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.util.data.Function2;
-import org.opencastproject.util.data.Option;
+import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
-import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
-/** The episode service is Matterhorn's media package archive. It also supports batch reprocessing */
+/**
+ * The episode service is Matterhorn's media package archive. It also supports batch reprocessing
+ */
 public interface EpisodeService {
-  /** Identifier for service registration and location */
+  /**
+   * Identifier for service registration and location
+   */
   String JOB_TYPE = "org.opencastproject.episode";
 
   /**
@@ -42,88 +48,176 @@ public interface EpisodeService {
   String WRITE_PERMISSION = "write";
 
   /**
-   * The {@link org.opencastproject.security.api.AccessControlEntry#getAction()} that allows a user in a particular role
-   * to contribute a mediapackage from the search index.
-   */
-  String CONTRIBUTE_PERMISSION = "contribute";
-
-  /**
    * Adds the media package to the archive.
    *
    * @param mediaPackage
-   *         the media package
+   *          the media package
    * @throws EpisodeServiceException
-   *         if an error occurs while adding the media package
+   *           if an error occurs while adding the media package
+   * @throws MediaPackageException
+   *           if an error occurs accessing the media package
+   * @throws UnauthorizedException
+   *           if the current user is not authorized to execute the operation
+   * @throws ServiceRegistryException
+   *           if the job for adding the mediapackage can not be created
    */
-  void add(MediaPackage mediaPackage) throws EpisodeServiceException;
+  void add(MediaPackage mediaPackage) throws EpisodeServiceException, MediaPackageException, UnauthorizedException,
+          ServiceRegistryException;
 
   /**
    * Removes the media package identified by <code>mediaPackageId</code> from the archive.
    *
    * @param mediaPackageId
-   *         id of the media package to remove
+   *          id of the media package to remove
    * @return <code>true</code> if the episode was found and deleted
    * @throws EpisodeServiceException
-   *         if an error occurs while removing the media package
+   *           if an error occurs while removing the media package
+   * @throws UnauthorizedException
+   *           if the current user is not authorized to execute the operation
    */
-  boolean delete(String mediaPackageId) throws EpisodeServiceException;
+  boolean delete(String mediaPackageId) throws EpisodeServiceException, UnauthorizedException;
+
+  /**
+   * Lock or unlock a media package.
+   *
+   * @param mediaPackageId
+   *          id of the media package to (un)lock
+   * @return <code>true</code> if the episode was found and (un)locked
+   * @throws EpisodeServiceException
+   *           if an error occurs while (un)locking the media package
+   * @throws UnauthorizedException
+   *           if the current user is not authorized to execute the operation
+   */
+  boolean lock(String mediaPackageId, boolean lock) throws EpisodeServiceException, UnauthorizedException;
 
   /**
    * Process all media packages found by query <code>q</code> with workflow <code>workflowDefinition</code>.
    *
-   * @param workflow
-   *         the configured workflow to apply to media packages
-   * @param rewriteUri
-   *         a function to rewrite media package element URLs
+   * @param workflowDefinition
+   *          the workflow to apply to all found media packages
    * @param q
-   *         the query
+   *          the query
    * @return a list of started workflows todo should report about failed workflow starts
    * @throws EpisodeServiceException
+   * @throws UnauthorizedException
    */
-  List<WorkflowInstance> applyWorkflow(ConfiguredWorkflow workflow,
-                                       Function2<Version, MediaPackageElement, URI> rewriteUri,
-                                       EpisodeQuery q) throws EpisodeServiceException;
+  WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, EpisodeQuery q) throws EpisodeServiceException, UnauthorizedException;
+
+  /**
+   * Process all media packages found by query <code>q</code> with workflow <code>workflowDefinition</code> and
+   * workflow properties <code>properties</code>.
+   *
+   * @param workflowDefinition
+   *          the workflow to apply to all found media packages
+   * @param q
+   *          the query
+   * @param properties
+   *          properties to configure the workflow
+   * @return a list of started workflows todo should report about failed workflow starts
+   * @throws EpisodeServiceException
+   * @throws UnauthorizedException
+   */
+  WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, EpisodeQuery q, Map<String, String> properties)
+          throws EpisodeServiceException, UnauthorizedException;
 
   /**
    * Process all media packages with workflow <code>workflowDefinition</code>.
    *
-   * @param workflow
-   *         the configured workflow to apply to media packages
-   * @param rewriteUri
-   *         a function to rewrite media package element URLs
    * @param mediaPackageIds
-   *         list of media package ids
+   *          list of media package ids
+   * @param workflowDefinition
+   *          the workflow to apply to all found media packages
    * @return a list of started workflows todo should report about failed workflow starts
    * @throws EpisodeServiceException
+   * @throws UnauthorizedException
    */
-  List<WorkflowInstance> applyWorkflow(ConfiguredWorkflow workflow,
-                                       Function2<Version, MediaPackageElement, URI> rewriteUri,
-                                       List<String> mediaPackageIds) throws EpisodeServiceException;
+  WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, List<String> mediaPackageIds)
+          throws EpisodeServiceException, UnauthorizedException;
 
   /**
-   * Find search results based on the specified query object.
+   * Process all media packages with workflow <code>workflowDefinition</code> and
+   * workflow properties <code>properties</code>.
+   *
+   * @param mediaPackageIds
+   *          list of media package ids
+   * @param workflowDefinition
+   *          the workflow to apply to all found media packages
+   * @param properties
+   *          properties to configure the workflow
+   * @return a list of started workflows todo should report about failed workflow starts
+   * @throws EpisodeServiceException
+   * @throws UnauthorizedException
+   */
+  WorkflowInstance[] applyWorkflow(WorkflowDefinition workflowDefinition, List<String> mediaPackageIds, Map<String, String> properties)
+          throws EpisodeServiceException, UnauthorizedException;
+
+  /**
+   * Process all media packages with workflow identified by <code>workflowDefinitionId</code>.
+   *
+   * @param mediaPackageIds
+   *          list of media package ids
+   * @param workflowDefinitionId
+   *          the workflow to apply to all found media packages
+   * @return a list of started workflows todo should report about failed workflow starts
+   * @throws EpisodeServiceException
+   * @throws UnauthorizedException
+   */
+  WorkflowInstance[] applyWorkflow(String workflowDefinitionId, List<String> mediaPackageIds) throws EpisodeServiceException, UnauthorizedException;
+
+  /**
+   * Process all media packages with workflow identified by <code>workflowDefinitionId</code> and
+   * workflow properties <code>properties</code>.
+   *
+   * @param mediaPackageIds
+   *          list of media package ids
+   * @param workflowDefinitionId
+   *          the workflow to apply to all found media packages
+   * @param properties
+   *          properties to configure the workflow
+   * @return a list of started workflows todo should report about failed workflow starts
+   * @throws EpisodeServiceException
+   * @throws UnauthorizedException
+   */
+  WorkflowInstance[] applyWorkflow(String workflowDefinitionId, List<String> mediaPackageIds, Map<String, String> properties)
+          throws EpisodeServiceException, UnauthorizedException;
+
+  /**
+   * Find search results based on the specified query object
    *
    * @param q
-   *         The {@link EpisodeQuery} containing the details of the desired results
+   *          The {@link EpisodeQuery} containing the details of the desired results
    * @return The search result
    * @throws EpisodeServiceException
-   *         if an error occurs while searching for media packages
+   *           if an error occurs while searching for media packages
    */
-  SearchResult find(EpisodeQuery q) throws EpisodeServiceException;
+  SearchResult getByQuery(EpisodeQuery q) throws EpisodeServiceException;
 
   /**
    * Finds search results across any organization, protected by any access control. This should be used for
    * administrative purposes, such as bulk edits based on metadata updates.
    *
    * @param q
-   *         The {@link EpisodeQuery} containing the details of the desired results
+   *          The {@link EpisodeQuery} containing the details of the desired results
    * @return The search result
    * @throws EpisodeServiceException
-   *         if an error occurs while searching for media packages
+   *           if an error occurs while searching for media packages
+   * @throws UnauthorizedException
+   *           if the user does not an administrative role
    */
-  SearchResult findForAdministrativeRead(EpisodeQuery q) throws EpisodeServiceException;
+  SearchResult getForAdministrativeRead(EpisodeQuery q) throws EpisodeServiceException, UnauthorizedException;
 
-  /** Get an archived media package element. */
-  Option<ArchivedMediaPackageElement> get(String mediaPackageId, String mediaPackageElementId, Version version)
-          throws EpisodeServiceException;
+  /**
+   * Sends a query to the search service. Depending on the service implementation, the query might be an sql statement a
+   * solr query or something similar. In the future, a higher level query language might be a better solution.
+   *
+   * @param query
+   *          the search query
+   * @param offset
+   *          the offset
+   * @param limit
+   *          the limit
+   * @return the search result
+   * @throws EpisodeServiceException
+   */
+  SearchResult getByQuery(String query, int limit, int offset) throws EpisodeServiceException;
 }

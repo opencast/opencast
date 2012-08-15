@@ -18,7 +18,7 @@ package org.opencastproject.util.data;
 
 import org.opencastproject.util.data.functions.Functions;
 
-import static org.opencastproject.util.data.functions.Misc.chuck;
+import static org.opencastproject.util.data.functions.Functions.chuck;
 
 /**
  * Function of arity 2.

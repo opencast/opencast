@@ -99,7 +99,7 @@ public class JobBarrier {
   /**
    * Creates a wrapper for <code>job</code>, using <code>registry</code> to poll for the job outcome.
    * 
-   * @param jobs
+   * @param job
    *          the job to poll
    * @param registry
    *          the registry
@@ -324,7 +324,7 @@ public class JobBarrier {
   /**
    * Result of a waiting operation on a certain number of jobs.
    */
-  public static class Result {
+  public class Result {
 
     /** The outcome of this barrier */
     private Map<Job, Job.Status> status = null;
