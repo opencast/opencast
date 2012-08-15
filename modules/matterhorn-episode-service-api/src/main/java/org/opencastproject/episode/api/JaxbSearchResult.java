@@ -17,10 +17,8 @@
 package org.opencastproject.episode.api;
 
 import org.apache.commons.io.IOUtils;
-
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.functions.Misc;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -33,6 +31,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.opencastproject.util.data.Monadics.mlist;
 
 /**
  * The search result represents a set of result items that has been compiled as a result for a search operation.
@@ -40,14 +43,14 @@ import javax.xml.transform.stream.StreamSource;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "search-results", namespace = "http://search.opencastproject.org", propOrder = { "query", "resultSet" })
 @XmlRootElement(name = "search-results", namespace = "http://search.opencastproject.org")
-public class SearchResultImpl implements SearchResult {
+public class JaxbSearchResult implements SearchResult {
 
   /** Context for serializing and deserializing */
   private static final JAXBContext context;
 
   static {
     try {
-      context = JAXBContext.newInstance("org.opencastproject.episode.api", SearchResultImpl.class.getClassLoader());
+      context = JAXBContext.newInstance("org.opencastproject.episode.api", JaxbSearchResult.class.getClassLoader());
     } catch (JAXBException e) {
       throw new IllegalStateException(e);
     }
@@ -60,11 +63,11 @@ public class SearchResultImpl implements SearchResult {
    *          the input stream
    * @return the deserialized search result
    */
-  public static SearchResultImpl valueOf(InputStream xml) {
+  public static JaxbSearchResult valueOf(InputStream xml) {
     try {
       Unmarshaller unmarshaller = context.createUnmarshaller();
       Source source = new StreamSource(xml);
-      return unmarshaller.unmarshal(source, SearchResultImpl.class).getValue();
+      return unmarshaller.unmarshal(source, JaxbSearchResult.class).getValue();
     } catch (JAXBException e) {
       throw new IllegalStateException(e.getLinkedException() != null ? e.getLinkedException() : e);
     } finally {
@@ -74,7 +77,7 @@ public class SearchResultImpl implements SearchResult {
   
   /** A list of search items. */
   @XmlElement(name = "result")
-  private List<SearchResultItemImpl> resultSet = null;
+  private List<JaxbSearchResultItem> resultSet = null;
 
   /** The query that yielded the result set */
   @XmlElement(name = "query")
@@ -99,8 +102,8 @@ public class SearchResultImpl implements SearchResult {
   /**
    * A no-arg constructor needed by JAXB
    */
-  public SearchResultImpl() {
-    this.resultSet = new ArrayList<SearchResultItemImpl>();
+  public JaxbSearchResult() {
+    this.resultSet = new ArrayList<JaxbSearchResultItem>();
   }
 
   /**
@@ -109,15 +112,16 @@ public class SearchResultImpl implements SearchResult {
    * @param query
    *          the query
    */
-  public SearchResultImpl(String query) {
+  public JaxbSearchResult(String query) {
     this();
     if (query == null)
       throw new IllegalArgumentException("Query cannot be null");
     this.query = query;
   }
 
-  public SearchResultItem[] getItems() {
-    return resultSet.toArray(new SearchResultItem[resultSet.size()]);
+  @Override
+  public List<SearchResultItem> getItems() {
+    return mlist(resultSet).map(Misc.<JaxbSearchResultItem, SearchResultItem>cast()).value();
   }
 
   /**
@@ -126,20 +130,27 @@ public class SearchResultImpl implements SearchResult {
    * @param item
    *          the item to add
    */
-  public void addItem(SearchResultItemImpl item) {
+  public void addItem(JaxbSearchResultItem item) {
     if (item == null)
       throw new IllegalArgumentException("Parameter item cannot be null");
     resultSet.add(item);
   }
 
+  public void setItems(List<JaxbSearchResultItem> items) {
+    resultSet = items;
+  }
+
+  @Override
   public String getQuery() {
     return query;
   }
 
+  @Override
   public long size() {
     return resultSet != null ? resultSet.size() : 0;
   }
 
+  @Override
   public long getOffset() {
     return offset;
   }
@@ -154,6 +165,7 @@ public class SearchResultImpl implements SearchResult {
     this.offset = offset;
   }
 
+  @Override
   public long getLimit() {
     return limit;
   }
@@ -168,6 +180,7 @@ public class SearchResultImpl implements SearchResult {
     this.limit = limit;
   }
 
+  @Override
   public long getSearchTime() {
     return searchTime;
   }
@@ -188,18 +201,33 @@ public class SearchResultImpl implements SearchResult {
    * @param total
    *          the total hit count
    */
-  public void setTotal(long total) {
+  public void setTotalSize(long total) {
     this.total = total;
   }
 
+  @Override
   public long getTotalSize() {
     return total;
   }
 
+  @Override
   public long getPage() {
     if (limit != 0)
       return offset / limit;
     return 0;
   }
 
+  public static JaxbSearchResult create(SearchResult a) {
+    final JaxbSearchResult r = new JaxbSearchResult();
+    r.setLimit(a.getLimit());
+    r.setOffset(a.getOffset());
+    r.setItems(mlist(a.getItems()).map(new Function<SearchResultItem, JaxbSearchResultItem>() {
+      @Override public JaxbSearchResultItem apply(SearchResultItem item) {
+        return JaxbSearchResultItem.create(item);
+      }
+    }).value());
+    r.setSearchTime(a.getSearchTime());
+    r.setTotalSize(a.getTotalSize());
+    return r;
+  }
 }

@@ -16,6 +16,8 @@
 
 package org.opencastproject.episode.api;
 
+import java.util.List;
+
 /**
  * A single result of searching.
  */
@@ -26,7 +28,7 @@ public interface SearchResult {
    * 
    * @return Item list.
    */
-  SearchResultItem[] getItems();
+  List<SearchResultItem> getItems();
 
   /**
    * Get the user query.

@@ -226,7 +226,16 @@ public final class Collections {
 
   /** Make a string from a collection separating each element by <code>sep</code>. */
   public static String mkString(Collection<?> as, String sep) {
-    StringBuffer b = new StringBuffer();
+    final StringBuilder b = new StringBuilder();
+    for (Object a : as) {
+      b.append(a).append(sep);
+    }
+    return b.substring(0, Math.max(b.length() - sep.length(), 0));
+  }
+
+  /** Make a string from a collection separating each element by <code>sep</code>. */
+  public static <A> String mkString(A[] as, String sep) {
+    final StringBuilder b = new StringBuilder();
     for (Object a : as) {
       b.append(a).append(sep);
     }
@@ -290,6 +299,14 @@ public final class Collections {
   /** The empty list. */
   public static <A> List<A> nil() {
     return java.util.Collections.EMPTY_LIST;
+  }
+
+  /** Construct a new list by prepending an element to a given list. */
+  public static <A> List<A> cons(A a, List<A> as) {
+    final List<A> target = new ArrayList<A>(as.size() + 1);
+    target.add(a);
+    target.addAll(as);
+    return target;
   }
 
   /** Create a set from an array. */
@@ -554,10 +571,10 @@ public final class Collections {
     };
   }
 
-  /** Sequence a collection of collections by concatenating them all. */
-  public static <A, M1 extends Collection<A>, M2 extends Collection<M1>> List<A> sequence(M2 as) {
+  /** Concat (aka flatten) a collection of collections by concatenating them all. [[a]] -> [a] */
+  public static <A, M extends Collection<? extends Collection<A>>> List<A> concat(M as) {
     final List<A> target = new ArrayList<A>(as.size());
-    for (M1 a : as) {
+    for (Collection<A> a : as) {
       target.addAll(a);
     }
     return target;

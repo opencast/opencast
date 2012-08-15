@@ -17,12 +17,7 @@
 package org.opencastproject.episode.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import org.opencastproject.util.data.Option;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -32,6 +27,13 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import static org.opencastproject.util.data.Option.option;
 
 /**
  * This class models an item in the search result. It represents a 'video' or 'series' object. It does not, however,
@@ -40,7 +42,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "result", namespace = "http://search.opencastproject.org")
 @XmlRootElement(name = "result", namespace = "http://search.opencastproject.org")
-public class SearchResultItemImpl implements SearchResultItem {
+public class JaxbSearchResultItem implements SearchResultItem {
 
   /** Serial version id **/
   private static final long serialVersionUID = 1L;
@@ -164,10 +166,21 @@ public class SearchResultItemImpl implements SearchResultItem {
   @XmlElement
   private double score = -1;
 
+  /** The version in the archive */
+  @XmlElement
+  private long ocVersion = -1;
+
+  /** Is latest version archive field */
+  @XmlElement
+  private boolean ocLatestVersion = false;
+
+  @XmlElement
+  private Date ocDeleted = null;
+
   /** Media segment list **/
   @XmlElementWrapper(name = "segments")
   @XmlElement(name = "segment")
-  private SortedSet<MediaSegmentImpl> mediaSegments = null;
+  private SortedSet<JaxbMediaSegment> mediaSegments = null;
 
   /**
    * {@inheritDoc}
@@ -277,6 +290,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcPublisher()
    */
+  @Override
   public String getDcPublisher() {
     return dcPublisher;
   }
@@ -294,6 +308,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcContributor()
    */
+  @Override
   public String getDcContributor() {
     return dcContributor;
   }
@@ -311,6 +326,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcAbstract()
    */
+  @Override
   public String getDcAbstract() {
     return dcAbstract;
   }
@@ -328,6 +344,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcDescription()
    */
+  @Override
   public String getDcDescription() {
     return dcDescription;
   }
@@ -345,6 +362,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcCreated()
    */
+  @Override
   public Date getDcCreated() {
     return dcCreated;
   }
@@ -362,6 +380,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcAvailableFrom()
    */
+  @Override
   public Date getDcAvailableFrom() {
     return dcAvailableFrom;
   }
@@ -379,6 +398,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcAvailableTo()
    */
+  @Override
   public Date getDcAvailableTo() {
     return dcAvailableTo;
   }
@@ -396,6 +416,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcLanguage()
    */
+  @Override
   public String getDcLanguage() {
     return dcLanguage;
   }
@@ -413,6 +434,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcRightsHolder()
    */
+  @Override
   public String getDcRightsHolder() {
     return dcRightsHolder;
   }
@@ -430,6 +452,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcSpatial()
    */
+  @Override
   public String getDcSpatial() {
     return dcSpatial;
   }
@@ -447,6 +470,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcTemporal()
    */
+  @Override
   public String getDcTemporal() {
     return dcTemporal;
   }
@@ -464,6 +488,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcIsPartOf()
    */
+  @Override
   public String getDcIsPartOf() {
     return dcIsPartOf;
   }
@@ -481,6 +506,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcReplaces()
    */
+  @Override
   public String getDcReplaces() {
     return dcReplaces;
   }
@@ -498,6 +524,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcType()
    */
+  @Override
   public String getDcType() {
     return dcType;
   }
@@ -515,6 +542,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcAccessRights()
    */
+  @Override
   public String getDcAccessRights() {
     return dcAccessRights;
   }
@@ -532,6 +560,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getDcLicense()
    */
+  @Override
   public String getDcLicense() {
     return dcLicense;
   }
@@ -549,6 +578,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getType()
    */
+  @Override
   public SearchResultItemType getType() {
     return mediaType;
   }
@@ -569,6 +599,24 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   public void setOcLocked(Boolean ocLocked) {
     this.ocLocked = ocLocked;
+  }
+
+  @Override
+  public boolean getOcLatestVersion() {
+    return ocLatestVersion;
+  }
+
+  public void setOcLatestVersion(Boolean ocLatestVersion) {
+    this.ocLatestVersion = ocLatestVersion;
+  }
+
+  @Override
+  public Option<Date> getOcDeleted() {
+    return option(ocDeleted);
+  }
+
+  public void setOcDeleted(Option<Date> date) {
+    this.ocDeleted = date.getOrElse((Date) null);
   }
 
   /**
@@ -594,6 +642,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getMediaPackage()
    */
+  @Override
   public MediaPackage getMediaPackage() {
     return mediaPackage;
   }
@@ -603,6 +652,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getKeywords()
    */
+  @Override
   public String[] getKeywords() {
     return keywords.toArray(new String[keywords.size()]);
   }
@@ -624,6 +674,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getCover()
    */
+  @Override
   public String getCover() {
     return cover;
   }
@@ -641,6 +692,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getModified()
    */
+  @Override
   public Date getModified() {
     return modified;
   }
@@ -658,6 +710,7 @@ public class SearchResultItemImpl implements SearchResultItem {
    * 
    * @see org.opencastproject.episode.api.SearchResultItem#getScore()
    */
+  @Override
   public double getScore() {
     return score;
   }
@@ -673,11 +726,30 @@ public class SearchResultItemImpl implements SearchResultItem {
   /**
    * {@inheritDoc}
    * 
+   * @see org.opencastproject.episode.api.SearchResultItem#getOcVersion()
+   */
+  @Override
+  public Version getOcVersion() {
+    return Version.version(ocVersion);
+  }
+
+  /**
+   * @param ocVersion
+   *          the version from the media package in the archive
+   */
+  public void setOcVersion(Version ocVersion) {
+    this.ocVersion = ocVersion.value();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see org.opencastproject.episode.api.SearchResultItem#getSegments()
    */
+  @Override
   public MediaSegment[] getSegments() {
     return mediaSegments != null ? mediaSegments.toArray(new MediaSegment[mediaSegments.size()])
-            : new MediaSegmentImpl[0];
+            : new JaxbMediaSegment[0];
   }
 
   /**
@@ -689,15 +761,15 @@ public class SearchResultItemImpl implements SearchResultItem {
    */
   public void addSegment(MediaSegment segment) {
     if (mediaSegments == null)
-      mediaSegments = new TreeSet<MediaSegmentImpl>();
-    mediaSegments.add((MediaSegmentImpl) segment); // TODO: assuming this
+      mediaSegments = new TreeSet<JaxbMediaSegment>();
+    mediaSegments.add((JaxbMediaSegment) segment); // TODO: assuming this
   }
 
   /**
    * Build a result item from an anonymously implemented interface to ensure you don't miss any fields.
    */
-  public static SearchResultItemImpl fill(SearchResultItem from) {
-    SearchResultItemImpl item = new SearchResultItemImpl();
+  public static JaxbSearchResultItem create(SearchResultItem from) {
+    JaxbSearchResultItem item = new JaxbSearchResultItem();
     item.setId(from.getId());
     item.setOrganization(from.getOrganization());
     item.setMediaPackage(from.getMediaPackage());
@@ -729,8 +801,12 @@ public class SearchResultItemImpl implements SearchResultItem {
     item.setCover(from.getCover());
     item.setModified(from.getModified());
     item.setScore(from.getScore());
+    item.setOcVersion(from.getOcVersion());
+    item.setOcDeleted(from.getOcDeleted());
+    item.setOcLatestVersion(from.getOcLatestVersion());
     for (MediaSegment s : from.getSegments())
       item.addSegment(s);
     return item;
   }
+
 }

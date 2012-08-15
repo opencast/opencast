@@ -13,27 +13,23 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.util.data.functions;
 
-import org.opencastproject.util.data.Cell;
+import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
-import static org.opencastproject.util.data.Option.some;
+import java.util.List;
 
-/** Cell containing optional values. Just to shorten type annotations a bit. */
-public class OCell<A> extends Cell<Option<A>> {
-  public OCell(Option<A> as) {
-    super(as);
+/** {@link Option} related functions. */
+public final class Options {
+  private Options() {
   }
 
-  /** Create a cell containing some a. */
-  public static <A> OCell<A> ocell(A a) {
-    return new OCell<A>(some(a));
-  }
-
-  /** Create a cell containing none. */
-  public static <A> OCell<A> ocell() {
-    return new OCell<A>(Option.<A>none());
+  public static <A> Function<Option<A>, List<A>> asList() {
+    return new Function<Option<A>, List<A>>() {
+      @Override public List<A> apply(Option<A> a) {
+        return a.list();
+      }
+    };
   }
 }

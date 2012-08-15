@@ -11,6 +11,7 @@ _.mixin({whole: function(xs, f) {
 }});
 
 var opencast = opencast || {};
+$.xmlns["mp"] = "http://mediapackage.opencastproject.org";
 
 opencast.episode = (function() {
 
@@ -82,7 +83,7 @@ opencast.episode = (function() {
               
               addCatalog: function(mp, catalog, catalogDCXML) {
             	   var doc = $.parseXML(mp);
-	          	   var mpId = $(doc).find('mp\\:mediapackage').attr("id");
+	          	   var mpId = $(doc).find('mp|mediapackage').attr("id");
             	   var uuid = generateUUID();
             	  
             	   var response = false;
@@ -106,7 +107,7 @@ opencast.episode = (function() {
 	          },
 	          changeCatalog: function(mp, catalog, catalogDCXML) {
 	        	    var doc = $.parseXML(mp);
-	          		var mpId = $(doc).find('mp\\:mediapackage').attr("id");
+	          		var mpId = $(doc).find('mp|mediapackage').attr("id");
          	  
 	          		var response = false;
 	         		$.ajax({
@@ -128,7 +129,7 @@ opencast.episode = (function() {
 	          deleteCatalog: function(catalog) {
 	          		var mp = this.getMediaPackage();
 	          		var doc = $.parseXML(mp);
-	          		var mpId = $(doc).find('mp\\:mediapackage').attr("id");
+	          		var mpId = $(doc).find('mp|mediapackage').attr("id");
 	          		
 	          		var response = false;
 	          		$.ajax({
@@ -471,7 +472,7 @@ opencast.episode = (function() {
             $("#tableContainer").delegate(".edit", "click", function() {
               var eid = $(this).attr("data-eid");
               getMediaPackageXml(eid).done(function(xml) {
-                $(xml).find("mediapackage").each(function(_, mp) {
+                $(xml).find("mp|mediapackage").each(function(_, mp) {
                   openMetadataEditor(mp);
                 });
               });
