@@ -71,4 +71,12 @@ public final class StoragePath {
   public int hashCode() {
     return EqualsUtil.hash(mediaPackageId, mediaPackageElementId, organizationId, version);
   }
+
+  @Override public String toString() {
+    return "[StoragePath orgId=" + organizationId
+            + " mpId=" + mediaPackageId
+            + " version=" + version
+            + " mpeId=" + mediaPackageElementId
+            + "]";
+  }
 }

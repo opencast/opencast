@@ -15,20 +15,7 @@
  */
 package org.opencastproject.episode.impl;
 
-import static org.opencastproject.episode.impl.StoragePath.spath;
-import static org.opencastproject.episode.impl.elementstore.DeletionSelector.delAll;
-import static org.opencastproject.episode.impl.elementstore.Source.source;
-import static org.opencastproject.mediapackage.MediaPackageSupport.modify;
-import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.util.JobUtil.waitForJob;
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.nil;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-
+import org.apache.solr.client.solrj.SolrServerException;
 import org.opencastproject.episode.api.ArchivedMediaPackageElement;
 import org.opencastproject.episode.api.ConfiguredWorkflow;
 import org.opencastproject.episode.api.EpisodeQuery;
@@ -66,13 +53,10 @@ import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple3;
-import org.opencastproject.util.data.functions.Booleans;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
-
-import org.apache.solr.client.solrj.SolrServerException;
 import org.osgi.framework.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +67,21 @@ import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import static org.opencastproject.episode.impl.StoragePath.spath;
+import static org.opencastproject.episode.impl.elementstore.DeletionSelector.delAll;
+import static org.opencastproject.episode.impl.elementstore.Source.source;
+import static org.opencastproject.mediapackage.MediaPackageSupport.modify;
+import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.util.JobUtil.waitForJob;
+import static org.opencastproject.util.data.Collections.array;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Collections.nil;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
 
 public final class EpisodeServiceImpl implements EpisodeService {
 
@@ -151,7 +150,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
         // archive elements
         final Function<MediaPackage, MediaPackage> archiveElements = new Function.X<MediaPackage, MediaPackage>() {
           @Override public MediaPackage xapply(MediaPackage mediaPackage) throws Exception {
-            archiveElements(mediaPackage, version, Booleans.<MediaPackageElement>all());
+            archiveElements(mediaPackage, version);
             return mediaPackage;
           }
         };
@@ -189,14 +188,15 @@ public final class EpisodeServiceImpl implements EpisodeService {
   }
 
   /** Store all elements of <code>mp</code> under the given version if they match the filter. */
-  private void archiveElements(MediaPackage mp, final Version version,
-                              Function<MediaPackageElement, Boolean> filter) throws Exception {
+  private void archiveElements(MediaPackage mp, final Version version) throws Exception {
     final String mpId = mp.getIdentifier().toString();
     final String orgId = getOrgId();
-    for (final MediaPackageElement e : mlist(mp.getElements()).filter(filter)) {
+    for (final MediaPackageElement e : mp.getElements()) {
+      logger.info("Archiving {} {} {}", array(e.getFlavor(), e.getMimeType(), e.getURI()));
       findElementInVersions(e).fold(new Option.Match<StoragePath, Void>() {
         @Override public Void some(StoragePath found) {
-          elementStore.copy(found, spath(orgId, mpId, version, e.getIdentifier()));
+          if (!elementStore.copy(found, spath(orgId, mpId, version, e.getIdentifier())))
+            throw new EpisodeServiceException("Could not copy asset " + found);
           return null;
         }
 
@@ -214,15 +214,13 @@ public final class EpisodeServiceImpl implements EpisodeService {
   }
 
   /** Check if element <code>e</code> is already part of the history. */
-  private Option<StoragePath> findElementInVersions(MediaPackageElement e) throws Exception {
-    return persistence.findAssetByElementIdAndChecksum(e.getIdentifier(), e.getChecksum().toString()).map(
-            new Function<Asset, StoragePath>() {
-              @Override
-              public StoragePath apply(Asset asset) {
-                logger.info("Found already archived asset with same checksum");
-                return asset.getStoragePath();
-              }
-            });
+  private Option<StoragePath> findElementInVersions(final MediaPackageElement e) throws Exception {
+    return persistence.findAssetByChecksum(e.getChecksum().toString()).map(new Function<Asset, StoragePath>() {
+      @Override public StoragePath apply(Asset asset) {
+        logger.info("Content of {} with checksum {} has been archived before", e.getIdentifier(), e.getChecksum());
+        return asset.getStoragePath();
+      }
+    });
   }
 
   /** Make sure each of the elements has a checksum available. */

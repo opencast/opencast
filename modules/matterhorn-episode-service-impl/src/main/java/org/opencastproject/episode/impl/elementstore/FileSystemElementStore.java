@@ -24,7 +24,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.opencastproject.episode.api.Version;
 import org.opencastproject.episode.impl.StoragePath;
 import org.opencastproject.security.api.TrustedHttpClient;
-import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
@@ -42,11 +41,15 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 
+import static org.apache.commons.io.FilenameUtils.EXTENSION_SEPARATOR;
+import static org.apache.commons.io.FilenameUtils.getExtension;
+import static org.opencastproject.util.FileSupport.link;
 import static org.opencastproject.util.IoSupport.file;
 import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.functions.Strings.trimToNone;
 
 public class FileSystemElementStore implements ElementStore {
 
@@ -70,7 +73,7 @@ public class FileSystemElementStore implements ElementStore {
 
   /**
    * Sets the trusted http client
-   * 
+   *
    * @param httpClient
    *          the http client
    */
@@ -80,7 +83,7 @@ public class FileSystemElementStore implements ElementStore {
 
   /**
    * Service activator, called via declarative services configuration.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -94,32 +97,19 @@ public class FileSystemElementStore implements ElementStore {
       rootDirectory = PathSupport.concat(storageDir, DEFAULT_ARCHIVE_DIRECTORY);
     }
 
-    try {
-      File f = new File(rootDirectory);
-      if (!f.exists())
-        FileUtils.forceMkdir(f);
-    } catch (IOException e) {
-      logger.error("Unable to create the archive repository root directory at {}", rootDirectory);
-      throw e;
-    }
+    mkDirs(file(rootDirectory));
   }
 
-  /**
-   * @see org.opencastproject.episode.impl.elementstore.ElementStore#put(org.opencastproject.episode.impl.StoragePath, Source)
-   */
+  /** @see org.opencastproject.episode.impl.elementstore.ElementStore#put(org.opencastproject.episode.impl.StoragePath, Source) */
   @Override
   public void put(StoragePath storagePath, Source source) throws ElementStoreException {
     InputStream in = null;
     FileOutputStream output = null;
     HttpResponse response = null;
-    File destination = null;
+    final File destination = createFile(storagePath, source);
     try {
-      File destDir = getStoragePathDir(storagePath);
-      if (!destDir.exists())
-        FileUtils.forceMkdir(destDir);
-      destination = new File(destDir, getFileName(storagePath, source.getUri()));
-
-      HttpGet getRequest = new HttpGet(source.getUri());
+      mkParent(destination);
+      final HttpGet getRequest = new HttpGet(source.getUri());
       response = httpClient.execute(getRequest);
       in = response.getEntity().getContent();
       output = FileUtils.openOutputStream(destination);
@@ -135,49 +125,41 @@ public class FileSystemElementStore implements ElementStore {
     }
   }
 
-  /**
-   * @see org.opencastproject.episode.impl.elementstore.ElementStore#copy(StoragePath, StoragePath)
-   */
+  /** @see org.opencastproject.episode.impl.elementstore.ElementStore#copy(StoragePath, StoragePath) */
   @Override
-  public boolean copy(StoragePath from, StoragePath to) throws ElementStoreException {
-    Option<File> sourceFile = findStoragePathFile(from);
-    if (sourceFile.isNone())
-      return false;
-
-    File destDir = null;
-    try {
-      destDir = getStoragePathDir(to);
-      if (!destDir.exists())
-        FileUtils.forceMkdir(destDir);
-
-      FileSupport.link(sourceFile.get(), destDir, true);
-      return true;
-    } catch (IOException e) {
-      logger.error("Error copying archive file {} to {}", sourceFile, destDir);
-      throw new ElementStoreException(e);
-    }
+  public boolean copy(final StoragePath from, final StoragePath to) throws ElementStoreException {
+    return findStoragePathFile(from).map(new Function<File, Boolean>() {
+      @Override public Boolean apply(File f) {
+        final File t = createFile(to, f);
+        mkParent(t);
+        logger.debug("Copying {} to {}", f.getAbsolutePath(), t.getAbsolutePath());
+        try {
+          link(f, t, true);
+        } catch (IOException e) {
+          logger.error("Error copying archive file {} to {}", f, t);
+          throw new ElementStoreException(e);
+        }
+        return true;
+      }
+    }).getOrElse(false);
   }
 
-  /**
-   * @see org.opencastproject.episode.impl.elementstore.ElementStore#get(StoragePath)
-   */
+  /** @see org.opencastproject.episode.impl.elementstore.ElementStore#get(StoragePath) */
   @Override
   public Option<InputStream> get(final StoragePath path) throws ElementStoreException {
-    Option<File> file = findStoragePathFile(path);
-    if (file.isNone())
-      return Option.<InputStream> none();
-
-    try {
-      return Option.<InputStream> some(new FileInputStream(file.get()));
-    } catch (FileNotFoundException e) {
-      logger.error("Error getting archiv file {}", file);
-      throw new ElementStoreException(e);
-    }
+    return findStoragePathFile(path).map(new Function<File, InputStream>() {
+      @Override public InputStream apply(File file) {
+        try {
+          return new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+          logger.error("Error getting archiv file {}", file);
+          throw new ElementStoreException(e);
+        }
+      }
+    });
   }
 
-  /**
-   * @see org.opencastproject.episode.impl.elementstore.ElementStore#delete(DeletionSelector)
-   */
+  /** @see org.opencastproject.episode.impl.elementstore.ElementStore#delete(DeletionSelector) */
   @Override
   public boolean delete(DeletionSelector sel) throws ElementStoreException {
     File dir = getDeletionSelectorDir(sel);
@@ -191,28 +173,8 @@ public class FileSystemElementStore implements ElementStore {
   }
 
   /**
-   * Returns a file name from a {@link StoragePath} and {@link URI}
-   * 
-   * @param storagePath
-   *          the storage path
-   * @param source
-   *          the URI
-   * @return the file name
-   * @throws MalformedURLException
-   *           If a protocol handler for the URL could not be found, or if some other error occurred while constructing
-   *           the URL
-   */
-  private String getFileName(StoragePath storagePath, URI source) throws MalformedURLException {
-    String extension = FilenameUtils.getExtension(source.toURL().getPath());
-    if (StringUtils.isBlank(extension))
-      return storagePath.getMediaPackageElementId();
-
-    return storagePath.getMediaPackageElementId() + FilenameUtils.EXTENSION_SEPARATOR + extension;
-  }
-
-  /**
    * Returns the directory file from a deletion selector
-   * 
+   *
    * @param sel
    *          the deletion selector
    * @return the directory file
@@ -224,21 +186,56 @@ public class FileSystemElementStore implements ElementStore {
     return file(basePath);
   }
 
-  /**
-   * Returns the storage path directory file
-   * 
-   * @param storagePath
-   *          the storage path
-   * @return the directory file
-   */
-  private File getStoragePathDir(StoragePath storagePath) {
-    return file(rootDirectory, storagePath.getOrganizationId(),
-                storagePath.getMediaPackageId(), storagePath.getVersion().toString());
+  /** Create all parent directories of a file. */
+  private void mkParent(File f) {
+    mkDirs(f.getParentFile());
+  }
+
+  /** Create this directory and all of its parents. */
+  private void mkDirs(File d) {
+    if (d != null && !d.exists() && !d.mkdirs()) {
+      final String msg = "Cannot create directory " + d;
+      logger.error(msg);
+      throw new ElementStoreException(msg);
+    }
+  }
+
+  /** Return the extension of a file. */
+  private Option<String> extension(File f) {
+    return trimToNone(getExtension(f.getAbsolutePath()));
+  }
+
+  /** Return the extension of a URI, i.e. the extentension of its path. */
+  private Option<String> extension(URI uri) {
+    try {
+      return trimToNone(getExtension(uri.toURL().getPath()));
+    } catch (MalformedURLException e) {
+      throw new Error(e);
+    }
+  }
+
+  /** Create a file from a storage path and the extension of file <code>f</code>. */
+  private File createFile(StoragePath p, File f) {
+    return createFile(p, extension(f));
+  }
+
+  /** Create a file from a storage path and the extension of the URI of <code>s</code>. */
+  private File createFile(StoragePath p, Source s) {
+    return createFile(p, extension(s.getUri()));
+  }
+
+  /** Create a file from a storage path and an optional extension. */
+  private File createFile(StoragePath p, Option<String> extension) {
+    return file(rootDirectory,
+                p.getOrganizationId(),
+                p.getMediaPackageId(),
+                p.getVersion().toString(),
+                extension.isSome() ? p.getMediaPackageElementId() + EXTENSION_SEPARATOR + extension.get() : p.getMediaPackageElementId());
   }
 
   /**
    * Returns a file {@link Option} from a storage path if one is found or an empty {@link Option}
-   * 
+   *
    * @param storagePath
    *          the storage path
    * @return the file {@link Option}
@@ -249,7 +246,8 @@ public class FileSystemElementStore implements ElementStore {
         return FilenameUtils.getBaseName(name).equals(storagePath.getMediaPackageElementId());
       }
     };
-    return option(getStoragePathDir(storagePath).listFiles(filter)).bind(new Function<File[], Option<File>>() {
+    final File containerDir = createFile(storagePath, none("")).getParentFile();
+    return option(containerDir.listFiles(filter)).bind(new Function<File[], Option<File>>() {
       @Override public Option<File> apply(File[] files) {
         switch (files.length) {
           case 0:
@@ -257,11 +255,11 @@ public class FileSystemElementStore implements ElementStore {
           case 1:
             return some(files[0]);
           default:
-            throw new ElementStoreException("Storage path " + files[0].getParent() + "contains multiple files whit the same element id!: "
+            throw new ElementStoreException("Storage path " + files[0].getParent()
+                                                    + "contains multiple files with the same element id!: "
                                                     + storagePath.getMediaPackageElementId());
         }
       }
     });
   }
-
 }

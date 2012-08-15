@@ -392,7 +392,10 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
     });
   }
 
-  /** Function to rewrite media package element URIs so that they point to this REST endpoint. */
+  /**
+   * Function to rewrite media package element URIs so that they point to this REST endpoint.
+   * The created URIs have to correspond with the parameter list of {@link #getElement(String, String, long, String)}.
+   */
   private final Function2<Version, MediaPackageElement, URI> rewriteUri = new Function2<Version, MediaPackageElement, URI>() {
     @Override public URI apply(Version version, MediaPackageElement mpe) {
       return uri(getServerUrl(),
