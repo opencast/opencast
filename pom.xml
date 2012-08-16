@@ -46,6 +46,7 @@
         <module>modules/matterhorn-fileupload</module>
         <module>modules/matterhorn-episode-service-api</module>
         <module>modules/matterhorn-episode-service-impl</module>
+        <module>modules/matterhorn-episode-service-filesystem</module>
         <module>modules/matterhorn-export-distribution-ui</module>
         <module>modules/matterhorn-gstreamer-service-api</module>
         <module>modules/matterhorn-ingest-service-api</module>

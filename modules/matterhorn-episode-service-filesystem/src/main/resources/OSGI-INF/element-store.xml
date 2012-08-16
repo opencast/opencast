@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.episode.impl.elementstore.ElementStore" activate="activate" immediate="true">
-  <implementation class="org.opencastproject.episode.impl.elementstore.FileSystemElementStore" />
+ name="org.opencastproject.episode.filesystem.ElementStore" activate="activate" immediate="true">
+  <implementation class="org.opencastproject.episode.filesystem.FileSystemElementStore" />
   <property name="service.description" value="File system based element store" />
   <service>
     <provide interface="org.opencastproject.episode.impl.elementstore.ElementStore" />
