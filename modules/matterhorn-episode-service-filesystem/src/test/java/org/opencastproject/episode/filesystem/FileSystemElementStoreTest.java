@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.episode.impl.elementstore;
+package org.opencastproject.episode.filesystem;
 
 import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opencastproject.episode.api.Version;
 import org.opencastproject.episode.impl.StoragePath;
+import org.opencastproject.episode.impl.elementstore.DeletionSelector;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.PathSupport;
@@ -39,9 +40,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createNiceMock;
-import static org.easymock.classextension.EasyMock.replay;
 import static org.opencastproject.episode.impl.elementstore.Source.source;
 
 public class FileSystemElementStoreTest {
@@ -70,27 +68,27 @@ public class FileSystemElementStoreTest {
 
   @Before
   public void setUp() throws Exception {
-    HttpEntity entity = createNiceMock(HttpEntity.class);
-    expect(entity.getContent()).andReturn(getClass().getClassLoader().getResourceAsStream(FILE_NAME)).anyTimes();
-    replay(entity);
+    HttpEntity entity = EasyMock.createNiceMock(HttpEntity.class);
+    EasyMock.expect(entity.getContent()).andReturn(getClass().getClassLoader().getResourceAsStream(FILE_NAME)).anyTimes();
+    EasyMock.replay(entity);
 
-    HttpResponse response = createNiceMock(HttpResponse.class);
-    expect(response.getEntity()).andReturn(entity).anyTimes();
-    replay(response);
+    HttpResponse response = EasyMock.createNiceMock(HttpResponse.class);
+    EasyMock.expect(response.getEntity()).andReturn(entity).anyTimes();
+    EasyMock.replay(response);
 
-    TrustedHttpClient httpClient = createNiceMock(TrustedHttpClient.class);
-    expect(httpClient.execute((HttpUriRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
-    replay(httpClient);
+    TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
+    EasyMock.expect(httpClient.execute((HttpUriRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
+    EasyMock.replay(httpClient);
 
     tmpRoot = FileSupport.getTempDirectory(TEST_ROOT_DIR_NAME);
 
-    BundleContext bundleContext = createNiceMock(BundleContext.class);
-    expect(bundleContext.getProperty(FileSystemElementStore.CONFIG_ARCHIVE_ROOT_DIR)).andReturn(tmpRoot.getPath());
-    replay(bundleContext);
+    BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
+    EasyMock.expect(bundleContext.getProperty(FileSystemElementStore.CONFIG_ARCHIVE_ROOT_DIR)).andReturn(tmpRoot.getPath());
+    EasyMock.replay(bundleContext);
 
-    ComponentContext cc = createNiceMock(ComponentContext.class);
-    expect(cc.getBundleContext()).andReturn(bundleContext).anyTimes();
-    replay(cc);
+    ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
+    EasyMock.expect(cc.getBundleContext()).andReturn(bundleContext).anyTimes();
+    EasyMock.replay(cc);
 
     repo.setHttpClient(httpClient);
     repo.activate(cc);

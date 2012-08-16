@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.episode.impl.elementstore;
+package org.opencastproject.episode.filesystem;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -23,6 +23,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.opencastproject.episode.api.Version;
 import org.opencastproject.episode.impl.StoragePath;
+import org.opencastproject.episode.impl.elementstore.DeletionSelector;
+import org.opencastproject.episode.impl.elementstore.ElementStore;
+import org.opencastproject.episode.impl.elementstore.ElementStoreException;
+import org.opencastproject.episode.impl.elementstore.Source;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Function;

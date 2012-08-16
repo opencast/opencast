@@ -105,16 +105,6 @@
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
     <dependency>
-      <groupId>rome</groupId>
-      <artifactId>rome</artifactId>
-      <version>1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.syndication.feed.module</groupId>
-      <artifactId>itunes</artifactId>
-      <version>0.4</version>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
@@ -205,15 +195,12 @@
             </Import-Package>
             <Export-Package>
               org.opencastproject.episode.impl;version=${project.version},
-              org.opencastproject.episode.impl.solr;version=${project.version},
-              org.opencastproject.episode.impl.persistence;version=${project.version},
-              org.opencastproject.episode.endpoint;version=${project.version}
+              org.opencastproject.episode.impl.elementstore;version=${project.version}
             </Export-Package>
             <Service-Component>
               OSGI-INF/episode-service.xml,
               OSGI-INF/episode-service-rest.xml,
-              OSGI-INF/episode-service-persistence.xml,
-              OSGI-INF/element-store.xml
+              OSGI-INF/episode-service-persistence.xml
             </Service-Component>
             <JPA-PersistenceUnits>org.opencastproject.episode.impl.persistence</JPA-PersistenceUnits>   
           </instructions>
