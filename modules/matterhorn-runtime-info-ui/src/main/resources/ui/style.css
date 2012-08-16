@@ -32,7 +32,8 @@ body {
 	}
 
 #middlebanner,
-#middlebanner2 {
+#middlebanner2,
+#middlebanner3 {
 	background-color:#861B1D;
 	width:100%;
 	display:inline-block;
@@ -92,6 +93,12 @@ body {
 	padding-left: 42px;
 	}
 
+#middlebanner3 #col5m {
+	float:left;
+	width:425px;
+	padding-left: 42px;
+	}
+
 #bottombanner #col1b,
 #bottombanner #col2b,
 #bottombanner #col3b {
@@ -117,7 +124,10 @@ h2 {
 	}
 
 #middlebanner h2,
-#middlebanner2 h2 {
+#middlebanner2 h2, 
+#middlebanner2 h3, 
+#middlebanner3 h2,
+#middlebanner3 h3 {
 	font-size:1.9em;
 	margin-top:0;
 	}
@@ -130,7 +140,9 @@ h2 {
 #middlebanner p,
 #middlebanner ul,
 #middlebanner2 p,
-#middlebanner2 ul {
+#middlebanner2 ul,
+#middlebanner3 p,
+#middlebanner3 ul {
 	color:#CCCCCC;
 	}
 #middlebanner #col1m p,
@@ -158,6 +170,13 @@ h2 {
 	margin-left:110px;
 	}
 
+#middlebanner3 #col5m p,
+#middlebanner3 #col5m a,
+#middlebanner3 #col5m h2,
+#middlebanner3 #col5m ul {
+	margin-left:94px;
+	}
+
 #bottombanner p,
 #bottombanner ul,
 #bottombanner a {
@@ -165,12 +184,14 @@ h2 {
 	}
 
 #middlebanner img,
-#middlebanner2 img {
+#middlebanner2 img,
+#middlebanner3 img {
 	position:absolute;
 	}
 	
 #middlebanner a.redbutton,
-#middlebanner2 a.redbutton {
+#middlebanner2 a.redbutton,
+#middlebanner3 a.redbutton {
 	border:2px solid #FFF;
 	background-color:#0E2E2D;
 	color:#FFF;
@@ -182,7 +203,8 @@ h2 {
 	border-radius:8px; /* CSS3 */ 
 	}
 #middlebanner a.redbutton:hover,
-#middlebanner2 a.redbutton:hover {
+#middlebanner2 a.redbutton:hover, 
+#middlebanner3 a.redbutton:hover {
 	border:2px solid #F6921E;
 	background-color:#A72123;
 	color:#FFF;
@@ -207,8 +229,9 @@ a:hover {
 	padding-left: 16px;
 	color:#A72123;
 }
-#middlebanner ul
-#middlebanner2 ul {
+#middlebanner ul,
+#middlebanner2 ul,
+#middlebanner3 ul {
 	/*list-style-image:url(/admin/img/bullet_white.png);*/
 	padding: 0 0 16px 16px;
 }
