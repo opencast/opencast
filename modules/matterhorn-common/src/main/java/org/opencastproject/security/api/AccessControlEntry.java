@@ -24,8 +24,8 @@ import javax.xml.bind.annotation.XmlType;
  * A tuple of role, action, and whether the combination is to be allowed.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ace", namespace = "org.opencastproject.security")
-@XmlRootElement(name = "ace", namespace = "org.opencastproject.security")
+@XmlType(name = "ace", namespace = "http://org.opencastproject.security")
+@XmlRootElement(name = "ace", namespace = "http://org.opencastproject.security")
 public final class AccessControlEntry {
 
   /** The role */
@@ -104,9 +104,10 @@ public final class AccessControlEntry {
   public int hashCode() {
     return (role + action + Boolean.toString(allow)).hashCode();
   }
-  
+
   /**
    * {@inheritDoc}
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
@@ -118,5 +119,5 @@ public final class AccessControlEntry {
     sb.append(action);
     return sb.toString();
   }
-  
+
 }

@@ -29,8 +29,8 @@ import javax.xml.bind.annotation.XmlType;
  * A list of {@link AccessControlEntry}s.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "acl", namespace = "org.opencastproject.security")
-@XmlRootElement(name = "acl", namespace = "org.opencastproject.security")
+@XmlType(name = "acl", namespace = "http://org.opencastproject.security")
+@XmlRootElement(name = "acl", namespace = "http://org.opencastproject.security")
 public final class AccessControlList {
 
   /** The list of access control entries */
@@ -54,14 +54,15 @@ public final class AccessControlList {
   public List<AccessControlEntry> getEntries() {
     return entries;
   }
-  
+
   /**
    * {@inheritDoc}
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
     return entries.toString();
   }
-  
+
 }
