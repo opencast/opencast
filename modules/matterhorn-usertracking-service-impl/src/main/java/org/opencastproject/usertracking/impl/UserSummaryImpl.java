@@ -44,8 +44,8 @@ import javax.xml.bind.annotation.XmlType;
 @Table(name = "user_action")
 @NamedQueries({ 
  @NamedQuery(name = "userSummaryByMediapackageByType", query = "SELECT a.userId, COUNT(distinct a.sessionId), COUNT(distinct a.mediapackageId), SUM(a.length), MAX(a.created) FROM UserAction a WHERE a.type = :type AND a.mediapackageId = :mediapackageId GROUP BY a.userId;") })
-@XmlType(name = "summary", namespace = "http://usersummary.opencastproject.org")
-@XmlRootElement(name = "summary", namespace = "http://usersummary.opencastproject.org")
+@XmlType(name = "summary", namespace = "http://usertracking.opencastproject.org")
+@XmlRootElement(name = "summary", namespace = "http://usertracking.opencastproject.org")
 @XmlAccessorType(XmlAccessType.NONE)
 public class UserSummaryImpl implements UserSummary {
   @Id

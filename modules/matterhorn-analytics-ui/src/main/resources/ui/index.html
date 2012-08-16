@@ -41,14 +41,6 @@ var getEpisodesBySeriesEndpointURL = analyticsRestEndpointBaseURL + "episodes.js
 var getEpisodeViewsAndWatchesURL = analyticsRestEndpointBaseURL + "views.json?episodeID={episodeID}&start={start}&end={end}&interval={interval}";
 var getUsersSummaryURL = analyticsRestEndpointBaseURL + "/userSummary.json?type={type}&seriesID={seriesID}";
 var firstViewForSeriesURL = analyticsRestEndpointBaseURL + "/firstview.json?seriesID={seriesID}";
-var useLocalData = false;
-if (useLocalData) {
-	engageURL = "http://akm220.usask.ca:8080/engage/ui/watch.html?id=${episodeID}";
-	seriesURL = "data/series.json";
-	getEpisodesBySeriesEndpointURL = "data/{seriesID}.json";
-	getEpisodeViewsAndWatchesURL = "data/{episodeID}.json";
-	getUsersSummaryURL = "data/{seriesID}-users.json";
-} 
 
 /** Constants dealing with image attachments **/
 var imageMimeType = "image/jpeg";
