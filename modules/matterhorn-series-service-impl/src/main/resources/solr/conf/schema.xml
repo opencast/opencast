@@ -273,6 +273,7 @@
    <field name="access_control" type="text" indexed="false" stored="true" multiValued="false"/>
    <field name="acl_edit" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="acl_contribute" type="string" indexed="true" stored="true" multiValued="true"/>
+   <field name="acl_read" type="string" indexed="true" stored="true" multiValued="true"/>
 
    <!-- Sort fields -->
   

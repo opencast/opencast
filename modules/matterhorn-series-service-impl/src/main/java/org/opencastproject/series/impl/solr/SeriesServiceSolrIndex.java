@@ -197,11 +197,6 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     deactivate();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.workflow.impl.WorkflowServiceIndex#activate()
-   */
   @Override
   public void activate() {
     // Set up the solr server
@@ -268,11 +263,6 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     solrServer = SolrServerFactory.newEmbeddedInstance(solrRoot, solrDataDir);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.workflow.SeriesServiceIndex.WorkflowServiceIndex#deactivate()
-   */
   @Override
   public void deactivate() {
     SolrServerFactory.shutdown(solrServer);
@@ -366,6 +356,8 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
         inputDoc.addField(SolrFields.ACCESS_CONTROL_CONTRIBUTE, ace.getRole());
       } else if (SeriesService.EDIT_SERIES_PERMISSION.equals(ace.getAction()) && ace.isAllow()) {
         inputDoc.addField(SolrFields.ACCESS_CONTROL_EDIT, ace.getRole());
+      } else if (SeriesService.READ_CONTENT_PERMISSION.equals(ace.getAction()) && ace.isAllow()) {
+        inputDoc.addField(SolrFields.ACCESS_CONTROL_READ, ace.getRole());
       }
     }
 
@@ -559,7 +551,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
    *          the value for this search parameter
    * @return the appended {@link StringBuilder}
    */
-  private StringBuilder append(StringBuilder sb, String key, String value) {
+  private StringBuilder appendAnd(StringBuilder sb, String key, String value) {
     if (StringUtils.isBlank(key) || StringUtils.isBlank(value)) {
       return sb;
     }
@@ -583,12 +575,31 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
    *          the values for this search parameter
    * @return the appended {@link StringBuilder}
    */
-  private StringBuilder append(StringBuilder sb, String key, String[] values) {
+  private StringBuilder appendAnd(StringBuilder sb, String key, String[] values) {
+    return append(sb, "AND", key, values);
+  }
+
+  /**
+   * Appends a multivalued query parameter to a solr query
+   *
+   * @param sb
+   *          The {@link StringBuilder} containing the query
+   * @param key
+   *          the key for this search parameter
+   * @param values
+   *          the values for this search parameter
+   * @return the appended {@link StringBuilder}
+   */
+  private StringBuilder appendOr(StringBuilder sb, String key, String[] values) {
+    return append(sb, "OR", key, values);
+  }
+
+  private StringBuilder append(StringBuilder sb, String bool, String key, String[] values) {
     if (StringUtils.isBlank(key) || values.length == 0) {
       return sb;
     }
     if (sb.length() > 0) {
-      sb.append(" AND (");
+      sb.append(" ").append(bool).append(" (");
     }
     for (int i = 0; i < values.length; i++) {
       if (i > 0) {
@@ -636,11 +647,9 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
    *          The {@link StringBuilder} containing the query
    * @param key
    *          the key for this search parameter
-   * @param value
-   *          the value for this search parameter
    * @return the appended {@link StringBuilder}
    */
-  private StringBuilder append(StringBuilder sb, String key, Date startDate, Date endDate) {
+  private StringBuilder appendAnd(StringBuilder sb, String key, Date startDate, Date endDate) {
     if (StringUtils.isBlank(key) || (startDate == null && endDate == null)) {
       return sb;
     }
@@ -669,21 +678,21 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
   protected String buildSolrQueryString(SeriesQuery query, boolean forEdit) {
     String orgId = securityService.getOrganization().getId();
     StringBuilder sb = new StringBuilder();
-    append(sb, SolrFields.COMPOSITE_ID_KEY, getCompositeKey(query.getSeriesId(), orgId));
+    appendAnd(sb, SolrFields.COMPOSITE_ID_KEY, getCompositeKey(query.getSeriesId(), orgId));
     appendFuzzy(sb, SolrFields.TITLE_KEY, query.getSeriesTitle());
     appendFuzzy(sb, SolrFields.FULLTEXT_KEY, query.getText());
     appendFuzzy(sb, SolrFields.CREATOR_KEY, query.getCreator());
     appendFuzzy(sb, SolrFields.CONTRIBUTOR_KEY, query.getContributor());
-    append(sb, SolrFields.LANGUAGE_KEY, query.getLanguage());
-    append(sb, SolrFields.LICENSE_KEY, query.getLicense());
+    appendAnd(sb, SolrFields.LANGUAGE_KEY, query.getLanguage());
+    appendAnd(sb, SolrFields.LICENSE_KEY, query.getLicense());
     appendFuzzy(sb, SolrFields.SUBJECT_KEY, query.getSubject());
     appendFuzzy(sb, SolrFields.ABSTRACT_KEY, query.getAbstract());
     appendFuzzy(sb, SolrFields.DESCRIPTION_KEY, query.getDescription());
     appendFuzzy(sb, SolrFields.PUBLISHER_KEY, query.getPublisher());
     appendFuzzy(sb, SolrFields.RIGHTS_HOLDER_KEY, query.getRightsHolder());
     appendFuzzy(sb, SolrFields.SUBJECT_KEY, query.getSubject());
-    append(sb, SolrFields.CREATED_KEY, query.getCreatedFrom(), query.getCreatedTo());
-    append(sb, SolrFields.ORGANIZATION, orgId);
+    appendAnd(sb, SolrFields.CREATED_KEY, query.getCreatedFrom(), query.getCreatedTo());
+    appendAnd(sb, SolrFields.ORGANIZATION, orgId);
 
     appendAuthorization(sb, forEdit);
 
@@ -704,10 +713,16 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     User currentUser = securityService.getUser();
     Organization currentOrg = securityService.getOrganization();
     if (!currentUser.hasRole(currentOrg.getAdminRole()) && !currentUser.hasRole(GLOBAL_ADMIN_ROLE)) {
+      final String[] roles = currentUser.getRoles();
       if (forEdit) {
-        append(sb, SolrFields.ACCESS_CONTROL_EDIT, currentUser.getRoles());
-      } else {
-        append(sb, SolrFields.ACCESS_CONTROL_CONTRIBUTE, currentUser.getRoles());
+        appendAnd(sb, SolrFields.ACCESS_CONTROL_EDIT, roles);
+      } else if (roles.length > 0) {
+        sb.append(" AND (");
+        for (String role : roles)
+        append(sb, "", SolrFields.ACCESS_CONTROL_CONTRIBUTE, currentUser.getRoles());
+        sb.append(" OR ");
+        append(sb, "", SolrFields.ACCESS_CONTROL_READ, currentUser.getRoles());
+        sb.append(")");
       }
     }
     return sb;
