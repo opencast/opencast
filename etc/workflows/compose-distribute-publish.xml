@@ -14,7 +14,7 @@
       <legend>Holds</legend>
       <span>Processing should be paused to allow for:</span>
       <ul class="oc-ui-checkbox-list">
-	  <input id="videoPreview" name="videoPreview" type="checkbox" class="configField holdCheckbox" style="visibility:hidden" value="true"/>
+          <input id="videoPreview" name="videoPreview" type="checkbox" class="configField holdCheckbox" style="visibility:hidden" value="true"/>
         <li class="ui-helper-clearfix">
           <span id="trimholdconfig">
             <input id="trimHold" name="trimHold" type="checkbox" class="configField holdCheckbox" value="true" />
@@ -32,12 +32,12 @@
     <fieldset>
       <legend>Archive</legend>
       <ul class="oc-ui-form-list">       
-	  <li class="ui-helper-clearfix">
-	    <span id="archiveconfig">
-	      <input id="archiveOp" name="archiveOp" type="checkbox" class="configField holdCheckbox" value="true"/>
-	      <span id="i18n_activate_archive">&nbsp;Archive the media package</span>
-	    </span>
-	  </li>
+          <li class="ui-helper-clearfix">
+            <span id="archiveconfig">
+              <input id="archiveOp" name="archiveOp" type="checkbox" class="configField holdCheckbox" value="true"/>
+              <span id="i18n_activate_archive">&nbsp;Archive the media package</span>
+            </span>
+          </li>
       </ul>
     </fieldset>  
     <fieldset>
@@ -66,8 +66,8 @@
       var ocWorkflowPanel = ocWorkflowPanel || {};
       
       var checkVideoPreview = function(){
-	var checkValue = trimHold.checked || captionHold.checked;
-	videoPreview.checked = checkValue;
+        var checkValue = trimHold.checked || captionHold.checked;
+        videoPreview.checked = checkValue;
       }
       
       trimHold.addEventListener("click",checkVideoPreview,false);
@@ -81,27 +81,32 @@
          */
         components['org.opencastproject.workflow.config.trimHold'] = new ocAdmin.Component(
           ['trimHold'],
-          {nodeKey: 'org.opencastproject.workflow.config.trimHold'},
+          {key: 'org.opencastproject.workflow.config.trimHold'},
           {getValue: function(){ return this.fields.trimHold.is(":checked"); }
           });
-	  
+          
         components['org.opencastproject.workflow.config.archiveOp'] = new ocAdmin.Component(
           ['archiveOp'],
-          {nodeKey: 'org.opencastproject.workflow.config.archiveOp'},
+          {key: 'org.opencastproject.workflow.config.archiveOp'},
           {getValue: function(){ return this.fields.archiveOp.is(":checked");}
           });
           
         components['org.opencastproject.workflow.config.captionHold'] = new ocAdmin.Component(
           ['captionHold'],
-          {nodeKey: 'org.opencastproject.workflow.config.captionHold'},
+          {key: 'org.opencastproject.workflow.config.captionHold'},
           {getValue: function(){ return this.fields.captionHold.is(":checked");}
           });
-	  
-	components['org.opencastproject.workflow.config.videoPreview'] = new ocAdmin.Component(
-	  ['videoPreview'],
-	  {nodeKey: 'org.opencastproject.workflow.config.videoPreview'},
-	  {getValue: function(){ return this.fields.videoPreview.is(":checked");}
-	  });
+          
+        components['org.opencastproject.workflow.config.videoPreview'] = new ocAdmin.Component(
+          ['videoPreview'],
+          {key: 'org.opencastproject.workflow.config.videoPreview'},
+          {getValue: function(){ return this.fields.videoPreview.is(":checked");}
+          });
+          
+        ocScheduler.dublinCore.components['license'] = new ocAdmin.Component(
+          ['license'],
+          {label: 'licenseLabel', key: 'license'}
+          );
           
           //etc...
       }
