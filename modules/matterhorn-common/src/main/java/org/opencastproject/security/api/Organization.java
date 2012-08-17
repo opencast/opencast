@@ -241,7 +241,7 @@ public class Organization {
    * An organization property. To read about why this class is necessary, see http://java.net/jira/browse/JAXB-223
    */
   @XmlAccessorType(XmlAccessType.FIELD)
-  @XmlType(name = "property", namespace = "org.opencastproject.security")
+  @XmlType(name = "property", namespace = "http://org.opencastproject.security")
   public static class OrgProperty {
 
     /** The property key */
