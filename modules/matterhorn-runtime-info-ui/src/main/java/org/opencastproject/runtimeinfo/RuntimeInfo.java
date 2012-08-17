@@ -164,11 +164,10 @@ public class RuntimeInfo {
 
     // Get request protocol and port
     String targetScheme = request.getScheme();
-    int targetPort = request.getLocalPort();
 
     // Create the target URL
-    URL targetEngageBaseUrl = new URL(targetScheme, engageBaseUrl.getHost(), targetPort, engageBaseUrl.getFile());
-    URL targetAdminBaseUrl = new URL(targetScheme, adminBaseUrl.getHost(), targetPort, adminBaseUrl.getFile());
+    URL targetEngageBaseUrl = new URL(targetScheme, engageBaseUrl.getHost(), engageBaseUrl.getPort(), engageBaseUrl.getFile());
+    URL targetAdminBaseUrl = new URL(targetScheme, adminBaseUrl.getHost(), adminBaseUrl.getPort(), adminBaseUrl.getFile());
 
     JSONObject json = new JSONObject();
     json.put("engage", targetEngageBaseUrl.toString());
