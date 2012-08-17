@@ -35,6 +35,9 @@ public interface SolrFields {
   /** The key representing the roles that can edit the series */
   String ACCESS_CONTROL_EDIT = "acl_edit";
 
+  /** The key representing the roles that can read the series */
+  String ACCESS_CONTROL_READ = "acl_read";
+
   /** Dublin core fields */
   String TITLE_KEY = "dc_title";
   String SUBJECT_KEY = "dc_subject";
