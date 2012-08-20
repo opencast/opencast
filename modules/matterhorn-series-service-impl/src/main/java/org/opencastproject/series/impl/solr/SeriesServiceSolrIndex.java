@@ -718,7 +718,6 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
         appendAnd(sb, SolrFields.ACCESS_CONTROL_EDIT, roles);
       } else if (roles.length > 0) {
         sb.append(" AND (");
-        for (String role : roles)
         append(sb, "", SolrFields.ACCESS_CONTROL_CONTRIBUTE, currentUser.getRoles());
         sb.append(" OR ");
         append(sb, "", SolrFields.ACCESS_CONTROL_READ, currentUser.getRoles());
