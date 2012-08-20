@@ -1333,9 +1333,9 @@
     <developer>
       <id>ruben.perez</id>
       <name>Ruben Perez Vazquez</name>
-      <email>rubenperez@uvigo.es</email>
-      <organization>Universidade de Vigo</organization>
-      <organizationUrl>http://www.uvigo.es</organizationUrl>
+      <email>rubenperez@teltek.es</email>
+      <organization>Teltek</organization>
+      <organizationUrl>http://www.teltek.es</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
