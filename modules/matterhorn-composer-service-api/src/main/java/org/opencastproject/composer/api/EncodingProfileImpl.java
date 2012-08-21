@@ -16,19 +16,26 @@
 
 package org.opencastproject.composer.api;
 
+import org.opencastproject.util.EqualsUtil;
+
 import org.apache.commons.lang.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
 
 /**
  * Default implementation for encoding profiles.
@@ -68,7 +75,8 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /** Installation-specific properties */
   @XmlElement(name = "extension")
-  protected Map<String, String> extension = new HashMap<String, String>();
+  @XmlElementWrapper(name = "extensions")
+  protected List<Extension> extensions = new ArrayList<Extension>();
 
   /**
    * Private, since the profile should be created using the static factory method.
@@ -237,7 +245,7 @@ public class EncodingProfileImpl implements EncodingProfile {
    */
   @Override
   public String getExtension(String key) {
-    return extension.get(key);
+    return getExtensions().get(key);
   }
 
   /**
@@ -253,7 +261,8 @@ public class EncodingProfileImpl implements EncodingProfile {
       throw new IllegalArgumentException("Argument 'key' must not be null");
     if (value == null)
       throw new IllegalArgumentException("Argument 'value' must not be null");
-    extension.put(key, value);
+    removeExtension(key);
+    extensions.add(new Extension(key, value));
   }
 
   /**
@@ -263,7 +272,11 @@ public class EncodingProfileImpl implements EncodingProfile {
    */
   @Override
   public Map<String, String> getExtensions() {
-    return extension;
+    Map<String, String> map = new HashMap<String, String>();
+    for (Extension extension : extensions) {
+      map.put(extension.getKey(), extension.getValue());
+    }
+    return map;
   }
 
   /**
@@ -273,9 +286,10 @@ public class EncodingProfileImpl implements EncodingProfile {
    *          the extension properties
    */
   public void setExtensions(Map<String, String> extension) {
-    if (extension == null)
-      return;
-    this.extension = extension;
+    extensions.clear();
+    for (Entry<String, String> entry : extension.entrySet()) {
+      extensions.add(new Extension(entry));
+    }
   }
 
   /**
@@ -287,7 +301,16 @@ public class EncodingProfileImpl implements EncodingProfile {
    * @return the property value or <code>null</code>
    */
   public String removeExtension(String key) {
-    return extension.remove(key);
+    int index = -1;
+    for (int i = 0; i < extensions.size(); i++) {
+      if (extensions.get(i).getKey().equals(key)) {
+        index = i;
+        break;
+      }
+    }
+    if (index == -1)
+      return null;
+    return extensions.remove(index).getValue();
   }
 
   /**
@@ -297,7 +320,7 @@ public class EncodingProfileImpl implements EncodingProfile {
    */
   @Override
   public boolean hasExtensions() {
-    return extension != null && extension.size() > 0;
+    return extensions != null && extensions.size() > 0;
   }
 
   /**
@@ -332,6 +355,82 @@ public class EncodingProfileImpl implements EncodingProfile {
   @Override
   public String toString() {
     return identifier;
+  }
+
+  /**
+   * An extension property. To read about why this class is necessary, see http://java.net/jira/browse/JAXB-223
+   */
+  @XmlAccessorType(XmlAccessType.FIELD)
+  @XmlType(name = "extension", namespace = "http://composer.opencastproject.org")
+  public static class Extension {
+
+    /** The property key */
+    @XmlAttribute
+    private String key;
+
+    /** The property value */
+    @XmlValue
+    private String value;
+
+    /**
+     * No-arg constructor needed by JAXB
+     */
+    public Extension() {
+    }
+
+    /**
+     * Constructs an extension property with a key and a value.
+     * 
+     * @param key
+     *          the key
+     * @param value
+     *          the value
+     */
+    public Extension(String key, String value) {
+      this.key = key;
+      this.value = value;
+    }
+
+    /**
+     * Constructs an extension property with a map entry.
+     * 
+     * @param key
+     *          the key
+     * @param value
+     *          the value
+     */
+    public Extension(Map.Entry<String, String> e) {
+      key = e.getKey();
+      value = e.getValue();
+    }
+
+    /**
+     * @return the key
+     */
+    public String getKey() {
+      return key;
+    }
+
+    /**
+     * @return the value
+     */
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof Extension) {
+        Extension ext = (Extension) obj;
+        return key.equals(ext.getKey()) && value.equals(ext.getValue());
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return EqualsUtil.hash(key, value);
+    }
   }
 
 }
