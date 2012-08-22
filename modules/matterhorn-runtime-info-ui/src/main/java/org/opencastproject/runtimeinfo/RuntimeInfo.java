@@ -72,7 +72,7 @@ public class RuntimeInfo {
   private static final String HTTP_ENABLE_PROPERTY = "org.apache.felix.http.enable";
   private static final String HTTPS_ENABLE_PROPERTY = "org.apache.felix.https.enable";
   private static final String ADMIN_URL_PROPERTY = "org.opencastproject.admin.ui.url";
-  private static final String ENGAGE_URL_PROPERTY = "org.opencastproject.admin.ui.url";
+  private static final String ENGAGE_URL_PROPERTY = "org.opencastproject.engage.ui.url";
   private static final String SERVER_URL_PROPERTY = "org.opencastproject.server.url";
 
   private static final int DEFAULT_HTTP_PORT = -1;
@@ -166,8 +166,10 @@ public class RuntimeInfo {
     String targetScheme = request.getScheme();
 
     // Create the target URL
-    URL targetEngageBaseUrl = new URL(targetScheme, engageBaseUrl.getHost(), engageBaseUrl.getPort(), engageBaseUrl.getFile());
-    URL targetAdminBaseUrl = new URL(targetScheme, adminBaseUrl.getHost(), adminBaseUrl.getPort(), adminBaseUrl.getFile());
+    URL targetEngageBaseUrl = new URL(targetScheme, engageBaseUrl.getHost(), engageBaseUrl.getPort(),
+            engageBaseUrl.getFile());
+    URL targetAdminBaseUrl = new URL(targetScheme, adminBaseUrl.getHost(), adminBaseUrl.getPort(),
+            adminBaseUrl.getFile());
 
     JSONObject json = new JSONObject();
     json.put("engage", targetEngageBaseUrl.toString());
