@@ -627,22 +627,26 @@ ocUpload.Ingest = (function() {
     $uploader.contents().find('#flavor').val(track.flavor);
     $uploader.contents().find('#mediapackage').val(MediaPackage.document);
     
-    track.id = createUploadJob($uploader);
-    track.flavor = $uploader.parent().find('input.track-flavor').val();
-    
-    //upload mediapackage to upload service
-    
-    if(ocUtils.isChunkedUploadCompliable()) {
-      ocUtils.log("Uploading via Chunked upload")
-      var file = $uploader.contents().find('.file-selector')[0].files[0];
-      nextPart(file, 0, track.id, 0, ocUpload.CHUNKSIZE);
-    } else {
-      ocUtils.log("Uploading via submitting form")
-      $uploader.contents().find('#uploadForm').submit();
+    if(checkBoxId == 'fileSourceSingleA') {
+    	track.id = createUploadJob($uploader);
+    	track.flavor = $uploader.parent().find('input.track-flavor').val();
+    	
+    	//upload mediapackage to upload service
+    	
+    	if(ocUtils.isChunkedUploadCompliable()) {
+    		ocUtils.log("Uploading via Chunked upload")
+    		var file = $uploader.contents().find('.file-selector')[0].files[0];
+    		nextPart(file, 0, track.id, 0, ocUpload.CHUNKSIZE);
+    	} else {
+    		ocUtils.log("Uploading via submitting form")
+    		$uploader.contents().find('#uploadForm').submit();
+    	}
+    	
+    	ocUpload.Listener.startProgressUpdate(track.id);
     }
-    
-    if(checkBoxId == 'fileSourceSingleA')
-      ocUpload.Listener.startProgressUpdate(track.id);
+    else if(checkBoxId == 'fileSourceSingleB') {
+    	$uploader.contents().find('#uploadForm').submit();
+    }
   }
   
   function createUploadJob($uploader) {
@@ -726,8 +730,6 @@ ocUpload.Ingest = (function() {
         track = element;
       }
     });
-    $uploader = track.payload;
-    
     MediaPackage.document = ocMediapackage.addTrack(MediaPackage.document, trackUrl, track.flavor);
     
     track.done = true;
