@@ -158,8 +158,8 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * @return the filename
    */
   protected String getFileNameFromElements(MediaPackageElement source, MediaPackageElement derived) {
-    String fileName = FilenameUtils.getBaseName(source.getURI().toString());
-    String fileExtension = FilenameUtils.getExtension(derived.getURI().toString());
+    String fileName = FilenameUtils.getBaseName(source.getURI().getPath().toString());
+    String fileExtension = FilenameUtils.getExtension(derived.getURI().getPath().toString());
     return fileName + "." + fileExtension;
   }
 

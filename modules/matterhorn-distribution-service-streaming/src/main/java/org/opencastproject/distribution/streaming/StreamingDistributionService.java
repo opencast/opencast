@@ -177,7 +177,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
    *           cannot be copied or another unexpected exception occurs.
    */
-  public MediaPackageElement distributeElement(MediaPackage mediapackage, String elementId) 
+  public MediaPackageElement distributeElement(MediaPackage mediapackage, String elementId)
           throws DistributionException {
     if (mediapackage == null)
       throw new IllegalArgumentException("Mediapackage must be specified");
@@ -186,6 +186,13 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
     String mediaPackageId = mediapackage.getIdentifier().compact();
     MediaPackageElement element = mediapackage.getElementById(elementId);
+
+    // Streaming servers only deal with tracks
+    if (!MediaPackageElement.Type.Track.equals(element.getElementType())) {
+      logger.debug("Skipping {} {} for distribution to the streaming server", element.getElementType().toString()
+              .toLowerCase(), element.getIdentifier());
+      return null;
+    }
 
     // Make sure the element exists
     if (mediapackage.getElementById(elementId) == null)
@@ -237,7 +244,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       }
     }
   }
-  
+
   /**
    * {@inheritDoc}
    * 
@@ -291,7 +298,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     // Find the element that has been created as part of the distribution process
     String mediaPackageId = mediapackage.getIdentifier().compact();
     URI distributedURI = null;
-    MediaPackageElement distributedElement = null; 
+    MediaPackageElement distributedElement = null;
     try {
       distributedURI = getDistributionUri(mediaPackageId, element);
       for (MediaPackageElement e : mediapackage.getElements()) {
@@ -307,7 +314,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     // Has this element been distributed?
     if (distributedElement == null)
       return null;
-    
+
     String mediapackageId = mediapackage.getIdentifier().compact();
     try {
 
@@ -351,7 +358,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   protected File getDistributionFile(MediaPackage mediaPackage, MediaPackageElement element) {
     String elementId = element.getIdentifier();
     String fileName = FilenameUtils.getName(element.getURI().toString());
-    
+
     String directoryName = distributionDirectory.getAbsolutePath();
     String destinationFileName = PathSupport.concat(new String[] { directoryName,
             mediaPackage.getIdentifier().compact(), elementId, fileName });
@@ -375,8 +382,8 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
     String tag = "";
     if (fileName.endsWith(".mp4"))
-    	tag = "mp4:";
-    
+      tag = "mp4:";
+
     String destinationURI = UrlSupport.concat(new String[] { streamingUrl, tag + mediaPackageId, elementId, fileName });
     return new URI(destinationURI);
   }

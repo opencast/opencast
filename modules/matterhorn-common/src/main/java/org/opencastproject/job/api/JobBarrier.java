@@ -15,6 +15,7 @@
  */
 package org.opencastproject.job.api;
 
+import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.JobCanceledException;
@@ -139,7 +140,7 @@ public class JobBarrier {
    */
   public Result waitForJobs(long timeout) throws IllegalStateException {
     if (jobs.size() == 0)
-      throw new IllegalArgumentException("No jobs have been submitted");
+      return new Result(new HashMap<Job, Status>());
     synchronized (this) {
       JobStatusUpdater updater = new JobStatusUpdater(timeout);
       try {
@@ -170,7 +171,7 @@ public class JobBarrier {
   }
 
   /**
-   * Sets the outcome of the variuos jobs that were monitored.
+   * Sets the outcome of the various jobs that were monitored.
    * 
    * @param status
    *          the status
