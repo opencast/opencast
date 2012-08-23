@@ -352,6 +352,20 @@ public class SeriesRestService {
   }
 
   @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("/count")
+  @RestQuery(name = "count", description = "Returns the number of series", returnDescription = "Returns the number of series", reponses = { @RestResponse(responseCode = SC_OK, description = "The number of series") })
+  public Response getCount() throws UnauthorizedException {
+    try {
+      int count = seriesService.getSeriesCount();
+      return Response.ok(count).build();
+    } catch (SeriesException se) {
+      logger.warn("Could not count series: {}", se.getMessage());
+      throw new WebApplicationException(se);
+    }
+  }
+
+  @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("series.json")
   @RestQuery(name = "listSeriesAsJson", description = "Returns the series matching the query parameters", returnDescription = "Returns the series search results as JSON", restParameters = {

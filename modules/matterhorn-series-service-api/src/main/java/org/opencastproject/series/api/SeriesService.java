@@ -27,6 +27,11 @@ import org.opencastproject.util.NotFoundException;
  */
 public interface SeriesService {
 
+  /**
+   * Identifier for service registration and location
+   */
+  String JOB_TYPE = "org.opencastproject.series";
+
   /** Identifier for the permission to make changes to a series */
   String EDIT_SERIES_PERMISSION = "write";
 
@@ -120,6 +125,6 @@ public interface SeriesService {
    *           if query could not be performed
    */
   DublinCoreCatalogList getSeries(SeriesQuery query) throws SeriesException, UnauthorizedException;
-  
+
   int getSeriesCount() throws SeriesException;
 }
