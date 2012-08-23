@@ -247,7 +247,7 @@
     <profile>
       <id>engage-standalone</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
         <module>modules/matterhorn-annotation-api</module>
