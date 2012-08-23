@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
- 
+
 var Opencast = Opencast || {};
 
 /**
@@ -357,6 +357,19 @@ Opencast.segments_ui_Plugin = (function ()
         createSegments(withSegments);
     }
 
+    /** If obj is an array just returns obj else returns Array with obj as content.
+     *  If obj === undefined returns empty Array.
+     *
+     */
+    function ensureArray(obj) {
+      if (obj === undefined) return [];
+      if ($.isArray(obj)) {
+        return obj;
+      } else {
+        return [obj];
+      }
+    }
+
     /**
      * @memberOf Opencast.segments_ui_Plugin
      * @description Processes the Data and puts it into the Element
@@ -370,19 +383,30 @@ Opencast.segments_ui_Plugin = (function ()
             cs5 = false,
             cs6 = false,
             cs7 = false;
+
+        var segments, tracks, attachments, catalogs;
+
             
         // Process Element Segments 1
-        if (withSegments && (elementSegments1 !== undefined) && (segments_ui_dataSegments.segment !== undefined) && (segments_ui_dataSegments.segment.length > 0)) {
-            processedTemplateData = templateSegments1.process(segments_ui_dataSegments);
-            elementSegments1.html(processedTemplateData);
-            cs1 = true;
+        if (withSegments && 
+            (elementSegments1 !== undefined) && 
+            (segments_ui_dataSegments.segment !== undefined) && 
+            ((segments = {segment: ensureArray(segments_ui_dataSegments.segment)}).segment.length > 0)) {
+
+              processedTemplateData = templateSegments1.process(segments);
+              elementSegments1.html(processedTemplateData);
+              cs1 = true;
         }
 
         // Process Element Media 1
-        if ((elementMedia1 !== undefined) && (segments_ui_dataMPMedia.track !== undefined) && (segments_ui_dataMPMedia.track.length > 0)) {
-            processedTemplateData = templateMedia1.process(segments_ui_dataMPMedia);
-            elementMedia1.html(processedTemplateData);
-            cs2 = true;
+        if ((elementMedia1 !== undefined) && 
+            (segments_ui_dataMPMedia.track !== undefined) && 
+            ((tracks = {track: ensureArray(segments_ui_dataMPMedia.track)}).track.length > 0)) {
+
+              tracks = $.extend({},segments_ui_dataMPMedia,tracks);
+              processedTemplateData = templateMedia1.process(tracks);
+              elementMedia1.html(processedTemplateData);
+              cs2 = true;
         }
 
         // Process Element Data 1
@@ -393,10 +417,13 @@ Opencast.segments_ui_Plugin = (function ()
         }
 
         // Process Element MediaPackage 1
-        if ((elementMediaPackage1 !== undefined) && (segments_ui_dataMPAttach.attachment !== undefined) && (segments_ui_dataMPAttach.attachment.length > 0)) {
-            processedTemplateData = templateMPAttach1.process(segments_ui_dataMPAttach);
-            elementMediaPackage1.html(processedTemplateData);
-            cs4 = true;
+        if ((elementMediaPackage1 !== undefined) && 
+            (segments_ui_dataMPAttach.attachment !== undefined) && 
+            ((attachments = {attachment: ensureArray(segments_ui_dataMPAttach.attachment)}).attachment.length > 0)) {
+
+              processedTemplateData = templateMPAttach1.process(attachments);
+              elementMediaPackage1.html(processedTemplateData);
+              cs4 = true;
         }
 
         // Process Element Data 2
@@ -407,17 +434,23 @@ Opencast.segments_ui_Plugin = (function ()
         }
 
         // Process Element MediaPackage 2
-        if ((elementMediaPackage2 !== undefined) && (segments_ui_dataMPCatalog.catalog !== undefined) && (segments_ui_dataMPCatalog.catalog.length > 0)) {
-            processedTemplateData = templateMPCatalog1.process(segments_ui_dataMPCatalog);
-            elementMediaPackage2.html(processedTemplateData);
-            cs6 = true;
+        if ((elementMediaPackage2 !== undefined) && 
+            (segments_ui_dataMPCatalog.catalog !== undefined) && 
+            ((catalogs = {catalog: ensureArray(segments_ui_dataMPCatalog.catalog)}).catalog.length > 0)) {
+
+              processedTemplateData = templateMPCatalog1.process(catalogs);
+              elementMediaPackage2.html(processedTemplateData);
+              cs6 = true;
         }
 
         // Process Element Segments 2
-        if (withSegments && (elementSegments2 !== undefined) && (segments_ui_dataSegments.segment !== undefined) && (segments_ui_dataSegments.segment.length > 0)) {
-            processedTemplateData = templateSegments2.process(segments_ui_dataSegments);
-            elementSegments2.html(processedTemplateData);
-            cs7 = true;
+        if (withSegments && (elementSegments2 !== undefined) && 
+            (segments_ui_dataSegments.segment !== undefined) && 
+            segments && (segments.segment.length > 0)) {
+
+              processedTemplateData = templateSegments2.process(segments);
+              elementSegments2.html(processedTemplateData);
+              cs7 = true;
         }
         var tl = '' + (cs1 ? " 1 " : '') + (cs2 ? " 2 " : '') + (cs3 ? " 3 " : '') + (cs4 ? " 4 " : '') + (cs5 ? " 5 " : '') + (cs6 ? " 6 " : '') + (cs7 ? " 7 " : '');
         $.log("Segments UI Plugin: Following Templates have (successfully) been proceeded: " + tl + " from 7 Templates possible");

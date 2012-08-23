@@ -45,18 +45,30 @@
   <operations>
 
     <!-- hold for captions -->
- 
     <operation
       id="caption"
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Waiting for user to upload captions">
       <configurations>
+        <configuration key="target-tags">engage</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Distribute to download server -->
+    <operation
+      id="distribute-download"
+      max-attempts="2"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Distributing to progressive downloads">
+      <configurations>
+        <configuration key="source-tags">engage</configuration>
+        <configuration key="target-tags">publish</configuration>
       </configurations>
     </operation>
  
     <!-- Publish to engage search index -->
- 
     <operation
       id="publish"
       fail-on-error="true"
@@ -73,6 +85,13 @@
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Archiving">
+    </operation>
+
+    <!-- Cleanup the working file repository -->
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
     </operation>
     
     
