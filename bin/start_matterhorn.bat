@@ -89,6 +89,7 @@ SET FELIX_OPTS=-Dfelix.home=%FELIX_HOME% -Dfelix.work=%FELIX_WORK_DIR%
 SET FELIX_CONFIG_OPTS=-Dfelix.config.properties="file:%FELIX_CONFIG_DIR%/config.properties" -Dfelix.system.properties="file:%FELIX_CONFIG_DIR%/system.properties"
 SET MAVEN_ARG=-DM2_REPO="%M2_REPO%"
 SET FELIX_FILEINSTALL_OPTS=-Dfelix.fileinstall.dir="%FELIX_CONFIG_DIR%\load"
+SET JMX_OPTS=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
 SET PAX_CONFMAN_OPTS=-Dbundles.configuration.location="%FELIX_CONFIG_DIR%"
 SET PAX_LOGGING_OPTS=-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN -Dopencast.logdir="%OPENCAST_LOGDIR%"
 SET ECLIPSELINK_LOGGING_OPTS=-Declipselink.logging.level=SEVERE
@@ -105,7 +106,7 @@ if exist "%FELIX_CACHE%" (
 REM # Finally start felix
 
 pushd "%FELIX_HOME%"
-java %DEBUG_OPTS% %FELIX_OPTS% %FELIX_CONFIG_OPTS% %GRAPHICS_OPTS% %MAVEN_ARG% %FELIX_FILEINSTALL_OPTS% %PAX_CONFMAN_OPTS% %PAX_LOGGING_OPTS% %ECLIPSELINK_LOGGING_OPTS% %UTIL_LOGGING_OPTS% -jar "%FELIX_HOME%\bin\felix.jar" "%FELIX_CACHE%"
+java %DEBUG_OPTS% %FELIX_OPTS% %FELIX_CONFIG_OPTS% %GRAPHICS_OPTS% %MAVEN_ARG% %FELIX_FILEINSTALL_OPTS% %PAX_CONFMAN_OPTS% %PAX_LOGGING_OPTS% %ECLIPSELINK_LOGGING_OPTS% %UTIL_LOGGING_OPTS% %JMX_OPTS% -jar "%FELIX_HOME%\bin\felix.jar" "%FELIX_CACHE%"
 popd
 
 ENDLOCAL
