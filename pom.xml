@@ -96,8 +96,8 @@
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-static</module>
-        <module>modules/matterhorn-usertracking-api</module>
-        <module>modules/matterhorn-usertracking-impl</module>
+        <module>modules/matterhorn-usertracking-service-api</module>
+        <module>modules/matterhorn-usertracking-service-impl</module>
         <module>modules/matterhorn-workspace-api</module>
       </modules>
     </profile>
@@ -237,8 +237,8 @@
         <module>modules/matterhorn-search-service-feeds</module>
         <module>modules/matterhorn-search-service-impl</module>
         <module>modules/matterhorn-solr</module>
-        <module>modules/matterhorn-usertracking-api</module>
-        <module>modules/matterhorn-usertracking-impl</module>
+        <module>modules/matterhorn-usertracking-service-api</module>
+        <module>modules/matterhorn-usertracking-service-impl</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workspace-api</module>
       </modules>
