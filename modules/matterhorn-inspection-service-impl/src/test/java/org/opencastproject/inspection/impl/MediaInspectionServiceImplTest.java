@@ -39,6 +39,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import junit.framework.Assert;
 
+import org.apache.tika.parser.AutoDetectParser;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -101,6 +102,8 @@ public class MediaInspectionServiceImplTest {
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
     service.setUserDirectoryService(userDirectoryService);
+
+    service.setTikaParser(new AutoDetectParser());
 
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
