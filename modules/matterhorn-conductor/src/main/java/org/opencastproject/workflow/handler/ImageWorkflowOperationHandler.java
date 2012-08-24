@@ -41,8 +41,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -110,9 +112,11 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
-  public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     logger.debug("Running image workflow operation on {}", workflowInstance);
 
     MediaPackage src = (MediaPackage) workflowInstance.getMediaPackage().clone();
@@ -174,15 +178,28 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     }
 
     long totalTimeInQueue = 0;
+
+    // Start the segmentation jobs
+    Map<Track, Job> jobs = new HashMap<Track, Job>();
     for (Track t : videoTracks) {
       // take the minimum of the specified time and the video track duration
       long time = Math.min(Long.parseLong(timeConfiguration), t.getDuration() / 1000L);
 
       // Start encoding and wait for the result
       Job job = composerService.image(t, profile.getIdentifier(), time);
-      if (!waitForStatus(job).isSuccess()) {
-        throw new WorkflowOperationException("Encoding failed");
-      }
+      jobs.put(t, job);
+    }
+
+    // Wait for the jobs to be finished
+    waitForStatus(jobs.values().toArray(new Job[jobs.size()]));
+
+    // Go through the job results and process them
+    for (Map.Entry<Track, Job> entry : jobs.entrySet()) {
+      Track t = entry.getKey();
+      Job job = entry.getValue();
+
+      if (!Job.Status.FINISHED.equals(job.getStatus()))
+        throw new WorkflowOperationException("Image extraction from " + t + " at " + timeConfiguration + " failed");
 
       // add this receipt's queue time to the total
       totalTimeInQueue += job.getQueueTime();
@@ -209,8 +226,11 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
             composedImage.addTag(tag);
         }
       }
+
       // store new image in the mediaPackage
       mediaPackage.addDerived(composedImage, t);
+
+      // Now determine the element's new filename
       String fileName = getFileNameFromElements(t, composedImage);
       composedImage.setURI(workspace.moveTo(composedImage.getURI(), mediaPackage.getIdentifier().toString(),
               composedImage.getIdentifier(), fileName));
