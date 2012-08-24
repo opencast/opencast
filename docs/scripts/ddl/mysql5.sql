@@ -172,6 +172,35 @@ CREATE TABLE oaipmh_harvesting (
 	PRIMARY KEY (url)
 );
 
+CREATE TABLE episode_asset (
+  id BIGINT(20) NOT NULL,
+  mediapackageelement_id VARCHAR(255) NOT NULL,
+  mediapackage_id VARCHAR(255) NOT NULL,
+  organization_id VARCHAR(255) NOT NULL,
+  checksum VARCHAR(255) NOT NULL,
+  uri VARCHAR(255) NOT NULL,
+  version BIGINT(20) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE episode_episode (
+  mediapackage_id VARCHAR(255) NOT NULL,
+  version BIGINT(20) NOT NULL,
+  latest_version TINYINT(1) DEFAULT 0 NOT NULL,
+  organization_id VARCHAR(255) DEFAULT NULL,
+  deletion_date DATETIME DEFAULT NULL,
+  access_control TEXT(65535),
+  locked TINYINT(1) DEFAULT 0 NOT NULL,
+  mediapackage TEXT(65535),
+  modification_date DATETIME DEFAULT NULL,
+  PRIMARY KEY (mediapackage_id,version)
+);
+
+CREATE TABLE episode_version (
+  mediapackageid VARCHAR(255) NOT NULL,
+  last_version BIGINT(20) NOT NULL,
+  PRIMARY KEY (mediapackageid)
+);
 
 ALTER TABLE host_registration ADD CONSTRAINT UNQ_host_registration_0 UNIQUE (
 	host

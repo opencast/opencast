@@ -229,5 +229,38 @@ CREATE TABLE "oaipmh_harvesting" (
 	PRIMARY KEY (url)
 );
 
+--
+-- Tables for episode service
+--
+CREATE TABLE "episode_asset" (
+  "id" bigint NOT NULL,
+  "mediapackageelement_id" character varying(255) NOT NULL,
+  "mediapackage_id" character varying(255) NOT NULL,
+  "organization_id" character varying(255) NOT NULL,
+  "checksum" character varying(255) NOT NULL,
+  "uri" character varying(255) NOT NULL,
+  "version" bigint NOT NULL,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "episode_episode" (
+  "mediapackage_id" character varying(255) NOT NULL,
+  "version bigint" NOT NULL,
+  "latest_version" boolean NOT NULL,
+  "organization_id" character varying(255) DEFAULT NULL,
+  "deletion_date" timestamp DEFAULT NULL,
+  "access_control" text,
+  "locked" boolean NOT NULL,
+  "mediapackage" text,
+  "modification_date" timestamp DEFAULT NULL,
+  PRIMARY KEY ("mediapackage_id", "version")
+);
+
+CREATE TABLE "episode_version" (
+  "mediapackageid" character varying(255) NOT NULL,
+  "last_version" bigint NOT NULL,
+  PRIMARY KEY ("mediapackageid")
+);
+
 
 INSERT INTO sequence (seq_name, seq_count) values ('SEQ_GEN',0);
