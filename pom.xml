@@ -51,7 +51,7 @@
         <module>modules/matterhorn-gstreamer-service-api</module>
         <module>modules/matterhorn-ingest-service-api</module>
         <module>modules/matterhorn-ingest-service-impl</module>
-		<module>modules/matterhorn-inspection-service-api</module>
+        <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-lti</module>
@@ -64,10 +64,10 @@
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-scheduler-api</module>
         <module>modules/matterhorn-scheduler-impl</module>
-	    <module>modules/matterhorn-search-service-api</module>
+        <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
-		<module>modules/matterhorn-speech-recognition-service-api</module>
+        <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static</module>
         <module>modules/matterhorn-solr</module>
         <module>modules/matterhorn-textanalyzer-api</module>
@@ -295,7 +295,7 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
-		<module>modules/matterhorn-speech-recognition-service-api</module>
+        <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
         <module>modules/matterhorn-textextractor-tesseract</module>
@@ -328,7 +328,7 @@
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
-		<module>modules/matterhorn-speech-recognition-service-api</module>
+        <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-remote</module>
         <module>modules/matterhorn-videosegmenter-api</module>
@@ -442,6 +442,7 @@
       <modules>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-json</module>
+        <module>modules/matterhorn-ldap</module>
         <module>modules/matterhorn-userdirectory-ldap</module>
       </modules>
     </profile>
