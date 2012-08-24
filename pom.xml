@@ -245,6 +245,39 @@
     </profile>
 
     <profile>
+      <id>engage-standalone</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-annotation-api</module>
+        <module>modules/matterhorn-annotation-impl</module>
+        <module>modules/matterhorn-authorization-xacml</module>
+        <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-db</module>
+        <module>modules/matterhorn-dublincore</module>
+        <module>modules/matterhorn-engage-ui</module>
+        <module>modules/matterhorn-json</module>
+        <module>modules/matterhorn-kernel</module>
+        <module>modules/matterhorn-lti</module>
+        <module>modules/matterhorn-metadata-api</module>
+        <module>modules/matterhorn-mpeg7</module>
+        <module>modules/matterhorn-runtime-dependencies</module>
+        <module>modules/matterhorn-runtime-info-ui</module>
+        <module>modules/matterhorn-series-service-api</module>
+        <module>modules/matterhorn-series-service-remote</module>
+        <module>modules/matterhorn-search-service-api</module>
+        <module>modules/matterhorn-search-service-feeds</module>
+        <module>modules/matterhorn-search-service-impl</module>
+        <module>modules/matterhorn-solr</module>
+        <module>modules/matterhorn-usertracking-service-api</module>
+        <module>modules/matterhorn-usertracking-service-impl</module>
+        <module>modules/matterhorn-webconsole</module>
+        <module>modules/matterhorn-workspace-api</module>
+      </modules>
+    </profile>
+
+    <profile>
       <id>engage-stub</id>
       <activation>
         <activeByDefault>false</activeByDefault>
