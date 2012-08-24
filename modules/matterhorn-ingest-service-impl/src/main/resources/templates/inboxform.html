@@ -5,6 +5,7 @@
     <meta http-equiv="cache-control" content="no-cache">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <script type="text/javascript" src="/js/jquery/jquery.js"></script>
+    <script type="text/javascript" src="/admin/js/jquery.xmlns.js"></script>
     <script type="text/javascript">
       $(document).ready(function() {
     	var uuid = generateUUID();
@@ -64,14 +65,7 @@
           	async: false,
           	dataType : 'text',
           	success : function(url) {
-			  	trackUrl = url;			  	
-			  	var trackxml = mp.createElement('track');
-				trackxml = $(trackxml).attr('type',flavor).attr('id', trackId);
-				var urlxml = $(mp.createElement('url')).text(trackUrl);
-				trackxml = $(trackxml).append(urlxml);
-				$(mp.documentElement).find('media').append(trackxml);
-				$('#mp').val(parent.ocUtils.xmlToString(mp));
-				parent.ocUpload.Listener.uploadComplete(trackId);
+				parent.ocUpload.Listener.uploadComplete(trackId, url);
         	}
         });
         
