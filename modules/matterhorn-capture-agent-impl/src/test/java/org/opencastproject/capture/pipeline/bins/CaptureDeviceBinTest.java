@@ -181,14 +181,6 @@ public class CaptureDeviceBinTest {
   }
 
   @Ignore@Test
-  public void testEpiphanSrcAndTestSink() {
-    if (!gstreamerInstalled)
-      return;
-    runDeviceTest(PipelineTestHelpers.V4L_LOCATION, ProducerType.EPIPHAN_VGA2USB, "Epiphan VGA2USB Source",
-            tempDirectory + "/epiphanSrc.mpeg");
-  }
-
-  @Ignore@Test
   public void testBlueCherryAndTestSink() {
     if (!gstreamerInstalled)
       return;

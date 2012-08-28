@@ -39,7 +39,6 @@ public final class ProducerFactory {
     CUSTOM_VIDEO_SRC, /* Allows the user to specify their producer with gstreamer command line syntax */
     CUSTOM_AUDIO_SRC, /* Allows the user to specify their producer with gstreamer command line syntax */
     DV_1394, /* A DV camera that runs over firewire */
-    EPIPHAN_VGA2USB, /* Epiphan VGA2USB frame grabber */
     FILE, /* A media file on the filesystem or a file device that requires no decoding */
     FILE_DEVICE, /* Generic file device source (such as a Hauppauge card that produces an MPEG file) */
     HAUPPAUGE_WINTV, /* Hauppauge devices */
@@ -98,9 +97,7 @@ public final class ProducerFactory {
           throws UnableToLinkGStreamerElementsException, UnableToCreateGhostPadsForBinException,
           UnableToSetElementPropertyBecauseElementWasNullException, CaptureDeviceNullPointerException,
           UnableToCreateElementException, NoProducerFoundException {
-    if (captureDevice.getName() == ProducerType.EPIPHAN_VGA2USB)
-      return new EpiphanVGA2USBV4LProducer(captureDevice, properties);
-    else if (captureDevice.getName() == ProducerType.HAUPPAUGE_WINTV)
+    if (captureDevice.getName() == ProducerType.HAUPPAUGE_WINTV)
       return new HauppaugePVR350VideoProducer(captureDevice, properties);
     else if (captureDevice.getName() == ProducerType.FILE)
       return new UndecodedFileProducer(captureDevice, properties);

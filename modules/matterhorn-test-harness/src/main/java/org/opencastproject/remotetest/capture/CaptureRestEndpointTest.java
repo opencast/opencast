@@ -129,7 +129,7 @@ public class CaptureRestEndpointTest {
     System.out.println("\n\nInstructions to test capture agent\n==================================");
     System.out.println("The capture agents can be tested by setting the appropriate\n" +
         "properties for the JVM. They properties right now are: testHauppauge, " +
-        "testEpiphan, testBt878, testAlsa.\n" +
+        "testBt878, testAlsa.\n" +
         "Each property should be assigned to its location instead of setting a boolean.\n" +
         "An example test could be: mvn test -DargLine=\"-DtestHauppauge=/dev/video0 -DtestAlsa=hw:0\"\n\n");
   }
