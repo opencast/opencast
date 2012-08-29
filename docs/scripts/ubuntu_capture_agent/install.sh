@@ -43,8 +43,6 @@ export DEV_RULES=/etc/udev/rules.d/matterhorn.rules
 export CONFIG_SCRIPT=device_config.sh
 # Default value for the core url
 export DEFAULT_CORE_URL=http://localhost:8080
-# Subdirectory where the epiphan driver will be downloaded to
-export VGA2USB_DIR=epiphan_driver
 # Location of the file 'sources.list'
 export SRC_LIST=/etc/apt/sources.list
 # Suffix to be appended to the backup file for sources.list
@@ -117,9 +115,6 @@ export FLAVORS="presenter/source presentation/source"
 # Default size for a capture device queue (in megabytes)
 export DEFAULT_QUEUE_SIZE=512
 
-# URL to download the epiphan driver
-export EPIPHAN_URL=http://www.epiphan.com/downloads/linux
-
 # Subdir under the user home where FELIX_HOME is
 export FELIX_HOME=$OC_DIR/felix
 
@@ -158,11 +153,6 @@ export JV4LINFO_PATH=/usr/lib
 export JV4LINFO_DIR=$CA_DIR/jv4linfo
                                                                          
 ## Help messages
-# Help for the driver list choice
-export VGA2USB_HELP_MSG="You might want to check $EPIPHAN_URL to see a complete list of the available drivers.
-If you cannot find a driver that works with your kernel configuration please email Epiphan Systems inc. (info@epiphan.com)
-and include the output from the command \"uname -a\". In this machine this output is:
-$(uname -a))"
 # Help for the device friendly name prompt
 export FRIENDLY_NAMES_HELP="The friendly name (e.g. \"screen\", or \"professor\") will identify the device in the system and will be displayed in the user interfaces for controlling this device.
 It can't contain spaces or punctuation."
@@ -212,12 +202,8 @@ export QUEUE_SUFFIX="buffer.bytes"
 # Suffix for the comma-separated list of all the devices attached to a capture agent in the capture properties file
 export LIST_SUFFIX="names"
 
-# One of the possible values for the ".type" suffix, indicating an Epiphan device, in the capture properties file
-export EPIPHAN_TYPE="EPIPHAN_VGA2USB"
-
 # Required scripts for installation
 SETUP_USER=./setup_user.sh
-INSTALL_VGA2USB=./install_vga2usb_drivers.sh
 SETUP_DEVICES=./setup_devices.sh
 SETUP_DEPENDENCIES=./setup_dependencies.sh
 INSTALL_DEPENDENCIES=./install_dependencies.sh
@@ -230,7 +216,7 @@ export FUNCTIONS=./functions.sh
 # This one is exported because it has to be modified by another script
 export CLEANUP=./cleanup.sh
 
-SCRIPTS=( "$SETUP_USER" "$INSTALL_VGA2USB" "$SETUP_DEVICES" "$SETUP_DEPENDENCIES" "$INSTALL_DEPENDENCIES"\
+SCRIPTS=( "$SETUP_USER" "$SETUP_DEVICES" "$SETUP_DEPENDENCIES" "$INSTALL_DEPENDENCIES"\
           "$SETUP_ENVIRONMENT" "$SETUP_DIRECTORY" "$SETUP_SOURCE" "$SETUP_BOOT" "$CLEANUP" "$FUNCTIONS")
 SCRIPTS_EXT=docs/scripts/ubuntu_capture_agent
 
@@ -315,13 +301,6 @@ mkdir -p $CA_DIR
 . ${INSTALL_DEPENDENCIES}
 if [[ "$?" -ne 0 ]]; then
     echo "Error installing the 3rd party dependencies."
-    exit 1
-fi
-
-# Install the vga2usb driver
-${INSTALL_VGA2USB}
-if [[ "$?" -ne 0 ]]; then
-    echo "Error installing the vga2usb driver."
     exit 1
 fi
 

@@ -39,11 +39,6 @@ if [[ $(echo "${response:-no}" | grep -i '^no$') ]]; then
   exit 0
 fi
 
-# Remove vga2usb driver
-echo -n "Removing the vga2usb driver... "
-rmmod vga2usb 2> /dev/null
-echo "Done"
-
 # Remove dependencies installed by the scripts
 echo -n "Removing the packages installed by matterhorn (this may take a long time)... "
 apt-get -y purge $PKG_LIST &> /dev/null

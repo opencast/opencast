@@ -12,19 +12,6 @@ The script sets up a *new* user to control everything matterhorn related on the
 system. This user will be given sudo privileges because it needs to control many
 devices that are owned by root as well as insert modules into the kernel.
 
-At this point the project only supports using the Epiphan VGA2USB device for
-capturing the screen, therefore the script must install the driver to use this.
-It will try to locate the driver based on the kernel, but if there is no successful
-match, either it was excluded from the script or it does not exist yet on the
-Epiphan Linux driver download page http://www.epiphan.com/downloads/linux. If it
-does not exist on the Epiphan download page then it can be requested by emailing
-info@epiphan.com with your kernel information. 
-
-Alternatively, if your driver is not listed in the script itself, but does exist
-on the Epiphan website, you can use option 9 to input the URL to the appropriate
-driver which will then be downloaded and installed. No modification of the script
-is necessary to incorporate a new driver.
-
 The sources which APT uses is modified so that the machine has all that it 
 requires right now for installing dependencies. To avoid conflicts it backs up
 the original sources list and creates a new one. The necessary dependencies are

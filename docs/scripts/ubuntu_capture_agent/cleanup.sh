@@ -49,11 +49,6 @@ if [[ $(echo "${response:-yes}" | grep -i '^yes$') ]]; then
   rm -rf $CA_FILES_DIR
 fi
 
-# Remove vga2usb driver
-echo -n "Removing the vga2usb driver... "
-rmmod vga2usb 2> /dev/null
-echo "Done"
-
 # Remove dependencies installed by the scripts
 echo -n "Removing the packages installed by matterhorn (this may take a long time)... "
 apt-get -y purge $PKG_LIST &> /dev/null
