@@ -349,6 +349,20 @@ Opencast.segments_ui = (function ()
 		    data['search-results'].result.mediapackage.media.checkQuality = checkForQualities;
 		    data['search-results'].result.mediapackage.media.isVideo = isVideo;
 		    data['search-results'].result.mediapackage.media.rtmpAvailable = rtmpAvailable;
+
+		    // Make sure that data['search-results'] is an array
+		    data['search-results'] = ocUtils.ensureArray(data['search-results']);
+
+
+                    // Make sure we have an array of tracks --even if it's empty
+                    if (typeof data['search-results'].result.mediapackage.media.track !== "undefined")
+                    {
+                       if (!$.isArray(data['search-results'].result.mediapackage.media.track))
+                       {
+                          data['search-results'].result.mediapackage.media.track = [data['search-results'].result.mediapackage.media.track];
+                       }
+                    }
+
                     // Check if any Media.tracks are available
                     if ((data['search-results'].result.mediapackage.media !== undefined) && (data['search-results'].result.mediapackage.media !== "") && (data['search-results'].result.mediapackage.media.track.length > 0))
                     {
