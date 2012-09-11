@@ -350,10 +350,6 @@ Opencast.segments_ui = (function ()
 		    data['search-results'].result.mediapackage.media.isVideo = isVideo;
 		    data['search-results'].result.mediapackage.media.rtmpAvailable = rtmpAvailable;
 
-		    // Make sure that data['search-results'] is an array
-		    data['search-results'] = ocUtils.ensureArray(data['search-results']);
-
-
                     // Make sure we have an array of tracks --even if it's empty
                     if (typeof data['search-results'].result.mediapackage.media.track !== "undefined")
                     {
