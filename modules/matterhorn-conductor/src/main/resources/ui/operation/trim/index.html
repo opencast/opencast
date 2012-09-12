@@ -931,7 +931,7 @@
       }
 
       function updateMetadataField(DCname, MPname) {
-        var $dcelm = $(DCmetadata.documentElement).find('dcterms\\:' + DCname);
+        var $dcelm = $(DCmetadata.documentElement).find(DCname);
         //dcterms:created ->
         if ($dcelm.length != 0) {
           updateMPElement(MPname, $dcelm.text());
@@ -939,7 +939,7 @@
       }
 
       function updateMetadataGroupField(DCname, MPgroupname, MPname) {
-        var $dcelms = $(DCmetadata.documentElement).find('dcterms\\:' + DCname);
+        var $dcelms = $(DCmetadata.documentElement).find(DCname);
         if ($dcelms.length != 0) {
           $parent = $(mediapackage.documentElement).find(MPgroupname);
           if ($parent.length > 0) {
