@@ -14,7 +14,7 @@ CREATE TABLE "annotation" (
   "id" bigint NOT NULL,
   "outpoint" bigint DEFAULT NULL,
   "inpoint" bigint DEFAULT NULL,
-  "mediapackage_id" character varying(36) DEFAULT NULL,
+  "mediapackage_id" character varying(65535) DEFAULT NULL,
   "session_id" text,
   "created" timestamp DEFAULT NULL,
   "user_id" text,

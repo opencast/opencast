@@ -7,7 +7,7 @@ CREATE TABLE annotation (
 	id BIGINT NOT NULL,
 	outpoint INTEGER,
 	inpoint INTEGER,
-	mediapackage_id VARCHAR(36),
+	mediapackage_id VARCHAR(65535),
 	session_id TEXT(65535),
 	created DATETIME,
 	user_id TEXT(65535),
