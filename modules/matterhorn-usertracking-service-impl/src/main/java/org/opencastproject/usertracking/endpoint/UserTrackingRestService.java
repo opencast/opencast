@@ -271,7 +271,7 @@ public class UserTrackingRestService {
       try {
         out = Integer.parseInt(StringUtils.trim(outString));
       } catch (NumberFormatException e) {
-        throw new WebApplicationException(e);
+        throw new WebApplicationException(e, Response.status(Status.BAD_REQUEST).entity("in must be a non null integer").build());
       }
     }
 
