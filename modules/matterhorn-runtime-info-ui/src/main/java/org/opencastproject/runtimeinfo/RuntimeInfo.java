@@ -113,39 +113,39 @@ public class RuntimeInfo {
 
     // Get admin UI url
     String adminBaseUrlStr = bundleContext.getProperty(ADMIN_URL_PROPERTY);
-    if (adminBaseUrlStr == null)
+    if (StringUtils.isBlank(adminBaseUrlStr))
       adminBaseUrl = serverUrl;
     else
       adminBaseUrl = new URL(adminBaseUrlStr);
 
     // Get engage UI url
     String engageBaseUrlStr = bundleContext.getProperty(ENGAGE_URL_PROPERTY);
-    if (engageBaseUrl == null)
+    if (StringUtils.isBlank(engageBaseUrlStr))
       engageBaseUrl = serverUrl;
     else
       engageBaseUrl = new URL(engageBaseUrlStr);
 
     // Get http/https settings
     String httpEnableStr = bundleContext.getProperty(HTTP_ENABLE_PROPERTY);
-    if (httpEnableStr == null)
+    if (StringUtils.isBlank(httpEnableStr))
       httpEnable = true;
     else
       httpEnable = Boolean.parseBoolean(httpEnableStr);
 
     String httpsEnableStr = bundleContext.getProperty(HTTPS_ENABLE_PROPERTY);
-    if (httpsEnableStr == null)
+    if (StringUtils.isBlank(httpsEnableStr))
       httpsEnable = false;
     else
       httpsEnable = Boolean.parseBoolean(httpsEnableStr);
 
     String httpPortStr = bundleContext.getProperty(HTTP_PORT_PROPERTY);
-    if (serverUrl == null)
+    if (StringUtils.isBlank(httpPortStr))
       httpPort = DEFAULT_HTTP_PORT;
     else
       httpPort = Integer.parseInt(httpPortStr);
 
     String httpsPortStr = bundleContext.getProperty(HTTPS_PORT_PROPERTY);
-    if (httpsPortStr == null)
+    if (StringUtils.isBlank(httpsPortStr))
       httpsPort = DEFAULT_HTTPS_PORT;
     else
       httpsPort = Integer.parseInt(httpsPortStr);
