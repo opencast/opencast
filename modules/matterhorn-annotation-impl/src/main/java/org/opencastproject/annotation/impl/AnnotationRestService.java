@@ -204,7 +204,7 @@ public class AnnotationRestService {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("{id}.xml")
+  @Path("{id}.json")
   @RestQuery(name = "annotationasjson", description = "Gets an annotation by its identifier", returnDescription = "A JSON representation of the user annotation.", pathParameters = { @RestParameter(name = "id", description = "The episode identifier", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the user annotation") })
   public AnnotationImpl getAnnotationAsJson(@PathParam("id") String idAsString) throws NotFoundException {
     return getAnnotationAsXml(idAsString);
