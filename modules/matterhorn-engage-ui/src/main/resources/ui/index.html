@@ -116,10 +116,12 @@
                   if (Opencast.pager.getCurrentSearchQuery() != null)
                   {
                       $('.title').text('No recordings found for : "' + searchQuery + '"');
+                      $('.title').last().remove();
                   }
                   else
                   {
                       $('.title').text("No recordings published yet.");
+                      $('.title').last().remove();
 
                   }
               }
