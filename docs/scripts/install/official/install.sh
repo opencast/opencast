@@ -259,7 +259,7 @@ export CLEANUP=./cleanup.sh
 
 SCRIPTS=( "$SETUP_USER" "$SETUP_DEVICES" "$INSTALL_DEPENDENCIES" "$SETUP_ENVIRONMENT"\
           "$SETUP_SOURCE" "$SETUP_BOOT" "$CLEANUP" "$FUNCTIONS" "$INSTALL_DEPENDENCIES_UBUNTU" "$INSTALL_DEPENDENCIES_CENTOS" )
-SCRIPTS_EXT=docs/scripts/installer
+SCRIPTS_EXT=docs/scripts/install/official
 
 # The subsidiary scripts will check for this variable to check they are being run from here
 export INSTALL_RUN=true
