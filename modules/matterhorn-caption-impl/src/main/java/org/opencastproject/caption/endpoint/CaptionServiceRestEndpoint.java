@@ -146,14 +146,18 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
           @RestParameter(description = "Caption language (for those formats that store such information).", isRequired = false, defaultValue = "en", name = "language", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(description = "OK, Conversion successfully completed.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The converted captions file")
   public Response convert(@FormParam("input") String inputType, @FormParam("output") String outputType,
           @FormParam("captions") String catalogAsXml, @FormParam("language") String lang) {
+    MediaPackageElement element;
     try {
-
-      MediaPackageElement element = toMediaPackageElement(catalogAsXml);
-      if (!Catalog.TYPE.equals(element.getElementType())) {
+      element = toMediaPackageElement(catalogAsXml);
+      if (!Catalog.TYPE.equals(element.getElementType()))
         return Response.status(Response.Status.BAD_REQUEST).entity("Captions must be of type catalog.").build();
-      }
-      Job job = service.convert((Catalog) element, inputType, outputType, lang);
+    } catch (Exception e) {
+      logger.info("Unable to parse serialized captions");
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
 
+    try {
+      Job job = service.convert((Catalog) element, inputType, outputType, lang);
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (Exception e) {
       logger.error(e.getMessage());
