@@ -7,7 +7,7 @@
   </div>
   <div id="uploadContainer">
     <button id="uploadButton" type="button">Upload Recording</button>
-    <button id="scheduleButton" type="button">Schedule Recording</button>
+    <button id="scheduleButton" type="button">Schedule Recordings</button>
   </div>
   <div id="controlsTop" class="ui-helper-clearfix">
     <div class="IE_buffer"></div>
