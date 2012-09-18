@@ -1,0 +1,33 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-ports ] && exit 0
+#
+sudox port -f install gstreamer || exit 1
+sudox port -f install gst-plugins-base || exit 1
+sudox port -f install gst-plugins-good || exit 1
+sudox port -f install gst-plugins-bad || exit 1
+sudox port -f install gst-plugins-ugly || exit 1
+sudox port -f install gst-ffmpeg || exit 1
+#
+# Fix gst launch, if version independent launcher is not installed
+#
+for file in gst-feedback gst-inspect gst-launch gst-typefind gst-xmlinspect gst-xmllaunch; do
+  which $file >/dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    FP=`which ${file}-0.10`
+    [ -z "$FP" ] && exit 1
+    DIR="${FP%/*}"
+    sudox ln -fs "$DIR/${file}-0.10" "$DIR/$file"
+    [ $? -ne 0 ] && exit 1
+  fi
+done
+#
+touch .done-ports
+[ $? -ne 0 ] && exit 1
+exit 0

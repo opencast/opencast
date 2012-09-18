@@ -10,6 +10,7 @@ source "${HOME3P}/utilx"
 compile base_libs    ports || exit 1
 compile ffmpeg_libs  ports || exit 1
 compile ffmpeg       ports || exit 1
+compile gstreamer    ports || exit 1
 compile mediainfo    ports || exit 1
 compile ocropus_libs ports || exit 1
 # tesseract depends on leptonica and gif
