@@ -15,6 +15,7 @@
  */
 package org.opencastproject.distribution.acl.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import org.opencastproject.distribution.api.DistributionService;
@@ -95,7 +96,9 @@ public class AclDistributionRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "distribute", description = "Distribute an access control list to control a media package element to this distribution channel", returnDescription = "The job that can be used to track the distribution", restParameters = {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
-          @RestParameter(name = "elementId", isRequired = true, description = "The element to distribute", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job") })
+          @RestParameter(name = "elementId", isRequired = true, description = "The element to distribute", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job"),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "The given mediapackage could not be distributed") })
   public Response distribute(@FormParam("mediapackage") String mediaPackageXml, @FormParam("elementId") String elementId)
           throws Exception {
     Job job = null;
@@ -114,7 +117,9 @@ public class AclDistributionRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "retract", description = "Retract an access control list to control a media package element from this distribution channel", returnDescription = "The job that can be used to track the retraction", restParameters = {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
-          @RestParameter(name = "elementId", isRequired = true, description = "The element to retract", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job") })
+          @RestParameter(name = "elementId", isRequired = true, description = "The element to retract", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job"),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "The given mediapackage could not be retracted") })
   public Response retract(@FormParam("mediapackage") String mediaPackageXml, @FormParam("elementId") String elementId)
           throws Exception {
     Job job = null;
