@@ -19,6 +19,7 @@ fi
 FELIX_OPTS="-Dfelix.home=$FELIX_HOME"
 FELIX_WORK="-Dfelix.work=$FELIX_HOME/work"
 FELIX_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$FELIX/load"
+JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
 PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX/conf"
 PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN -Dopencast.logdir=$LOGDIR"
 UTIL_LOGGING_OPTS="-Djava.util.logging.config.file=$FELIX/conf/services/java.util.logging.properties"
@@ -31,4 +32,4 @@ FELIX_CACHE="$FELIX/felix-cache"
 rm -rf $FELIX_CACHE
 
 # Finally start felix
-java $FELIX_OPTS $MEM $GRAPHICS_OPTS $TEMP_OPTS $FELIX_WORK $FELIX_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS $UTIL_LOGGING_OPTS $CXF_OPTS -jar $FELIX/bin/felix.jar $FELIX_CACHE
+java $FELIX_OPTS $MEM $GRAPHICS_OPTS $TEMP_OPTS $FELIX_WORK $FELIX_FILEINSTALL_OPTS $PAX_CONFMAN_OPTS $PAX_LOGGING_OPTS $UTIL_LOGGING_OPTS $CXF_OPTS $JMX_OPTS -jar $FELIX/bin/felix.jar $FELIX_CACHE
