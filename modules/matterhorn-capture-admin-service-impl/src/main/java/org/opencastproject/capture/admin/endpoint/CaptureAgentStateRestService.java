@@ -57,14 +57,15 @@ import javax.ws.rs.core.Response;
  * The REST endpoint for the capture agent service on the capture device
  */
 @Path("/")
-@RestService(name = "captureadminservice", title = "Capture Admin Service", notes = {
-  "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-  "If the service is down or not working it will return a status 503, this means the the underlying service is not working and "
-  + "is either restarting or has failed",
-  "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In other words, there is a bug! "
-  + "You should file an error report with your server logs from the time when the error occurred: "
-  + "<a href=\"https://issues.opencastproject.org\">Opencast Issue Tracker</a>" }, abstractText = "This service is a registry of capture agents and their recordings. "
-+ "Please see the <a href='http://wiki.opencastproject.org/confluence/display/open/Capture+Admin+Service'>service contract</a> for further information.")
+@RestService(name = "captureadminservice", title = "Capture Admin Service",
+  abstractText = "This service is a registry of capture agents and their recordings.",
+  notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+        "If the service is down or not working it will return a status 503, this means the the underlying service is "
+        + "not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
+        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class CaptureAgentStateRestService {
 
   private static final Logger logger = LoggerFactory.getLogger(CaptureAgentStateRestService.class);

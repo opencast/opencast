@@ -51,12 +51,15 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/")
 @RestService(name = "fileupload", title = "Big File Upload Service",
-notes = {
-  "All paths above are relative to the REST endpoint base (something like http://your.server/upload)",
-  "When posting chunk data the field holding the actual data MUST be the LAST FIELD transmitted in the request otherwise the endpoint doesn't get the chunk metadata and fails.",
-  "It is also possible to upload a file as a single chunk (ie as an ordinary HTML form submit): The upload job then must be created with filesize and chunksize set to -1. When uploading, chunk-number must be 0."
-},
-abstractText = "This service provides a facility to upload files that exceed the 2 GB boundry imposed by most browsers through chunked uploads via HTTP.")
+  abstractText = "This service provides a facility to upload files that exceed the 2 GB boundry imposed by most "
+               + "browsers through chunked uploads via HTTP.",
+  notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+        "If the service is down or not working it will return a status 503, this means the the underlying service is "
+        + "not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
+        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class FileUploadRestService {
 
   // message field names

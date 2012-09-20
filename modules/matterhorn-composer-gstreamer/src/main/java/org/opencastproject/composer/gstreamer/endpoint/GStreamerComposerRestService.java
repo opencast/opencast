@@ -72,14 +72,16 @@ import javax.xml.parsers.ParserConfigurationException;
  * A REST endpoint delegating functionality to the {@link ComposerService}
  */
 @Path("/")
-@RestService(name = "gstreamercomposer", title = "GStreamer Composer", notes = {
+@RestService(name = "gstreamercomposer", title = "GStreamer Composer", 
+  abstractText = "This service creates and augments Matterhorn media packages that include media tracks, metadata "
+               + "catalogs and attachments.",
+  notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-        "If the service is down or not working it will return a status 503, this means the the underlying service is not working and "
-                + "is either restarting or has failed",
-        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In other words, there is a bug! "
-                + "You should file an error report with your server logs from the time when the error occurred: "
-                + "<a href=\"https://issues.opencastproject.org\">Opencast Issue Tracker</a>" }, abstractText = "This service creates and augments Matterhorn media packages that include media tracks, metadata catalogs and "
-        + "attachments.")
+        "If the service is down or not working it will return a status 503, this means the the underlying service is "
+        + "not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
+        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -499,5 +501,15 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
             + "    <url>serverUrl/workflow/samples/captions_test_fra.srt</url>\n"
             + "    <checksum type=\"md5\">8f6cd99bbb6d591107f3b5c47ee51f2c</checksum>\n" + "    <tags>\n"
             + "      <tag>lang:fr</tag>\n" + "    </tags>\n" + "  </catalog>\n" + "</captions>\n";
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
+   */
+  @Override
+  public ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
   }
 }
