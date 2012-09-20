@@ -17,6 +17,7 @@ var ocScheduler = (function() {
   var sched = {};
   // REST endpoints
   var SCHEDULER_URL     = '/recordings';
+  var NEW_RECORDING_SCHEDULER_URL  = '/admin/index.html#/scheduler';
   var WORKFLOW_URL      = '/workflow';
   var CAPTURE_ADMIN_URL = '/capture-admin';
   var SERIES_URL        = '/series';
@@ -548,6 +549,7 @@ var ocScheduler = (function() {
       $('#content').load('complete_scheduling.html', function() {
         $('#submitModal').dialog('close');
         $('#back_to_recordings').attr('href', RECORDINGS_URL + "?" + window.location.hash.split('?')[1]);
+        $('#schedule_new_recording').attr('href', NEW_RECORDING_SCHEDULER_URL);
         for (var i in sched.catalogs) {
           data = sched.catalogs[i].components;
           for (var key in data) {
