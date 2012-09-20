@@ -55,7 +55,15 @@ import javax.ws.rs.core.Response.Status;
  * The REST endpoint for the annotation service.
  */
 @Path("/")
-@RestService(name = "annotation", title = "Annotation Service", notes = { "" }, abstractText = "This service is used for managing user generated annotations.")
+@RestService(name = "annotation", title = "Annotation Service",
+  abstractText = "This service is used for managing user generated annotations.",
+  notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+        "If the service is down or not working it will return a status 503, this means the the underlying service is "
+        + "not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
+        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class AnnotationRestService {
 
   /** The logger */

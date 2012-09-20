@@ -52,11 +52,15 @@ import javax.ws.rs.core.Response.ResponseBuilder;
  * The REST endpoint
  */
 @Path("/")
-@RestService(name = "search", title = "Search Service", notes = {
-        "All paths are relative to the REST endpoint base (something like http://your.server/files)",
-        "If you notice that this service is not working as expected, there might be a bug! "
-                + "You should file an error report with your server logs from the time when the error occurred: "
-                + "<a href=\"http://opencast.jira.com\">Opencast Issue Tracker</a>" }, abstractText = "This service indexes and queries available (distributed) episodes.")
+@RestService(name = "search", title = "Search Service",
+  abstractText = "This service indexes and queries available (distributed) episodes.",
+  notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+        "If the service is down or not working it will return a status 503, this means the the underlying service is "
+        + "not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
+        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class SearchRestService {
 
   private static final Logger logger = LoggerFactory.getLogger(SearchRestService.class);
