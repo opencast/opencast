@@ -408,6 +408,7 @@ var ocScheduler = (function() {
   sched.handleAgentChange = function(elm){
     var time;
     var agent = elm.target.value;
+    $('#noticeContainer').hide();
     $(ocScheduler.inputList).empty();
     sched.dublinCore.components.agentTimeZone = new ocAdmin.Component(['agentTimeZone'],
     {
