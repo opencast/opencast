@@ -135,6 +135,17 @@
       </configurations>
     </operation>
 
+    <!-- tag the dublin core catalogs so they will be distributed and added to search -->
+    
+    <operation
+      id="tag"
+      description="Tagging dublin core catalogs for publishing">
+      <configurations>
+        <configuration key="source-flavors">dublincore/*</configuration>
+        <configuration key="target-tags">+engage</configuration>
+      </configurations>
+    </operation> 
+
     <!-- inspect the media -->
     
     <operation
