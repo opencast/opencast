@@ -15,12 +15,12 @@
  */
 package org.opencastproject.episode.impl;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
+import static org.opencastproject.util.data.Collections.cons;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.data.functions.Booleans.ne;
+
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.impl.elementstore.ElementStore;
 import org.opencastproject.episode.impl.persistence.EpisodeServiceDatabase;
@@ -43,6 +43,13 @@ import org.opencastproject.util.data.VCell;
 import org.opencastproject.util.osgi.SimpleServicePublisher;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -57,12 +64,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
-
-import static org.opencastproject.util.data.Collections.cons;
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Tuple.tuple;
-import static org.opencastproject.util.data.functions.Booleans.ne;
 
 public class EpisodeServicePublisher extends SimpleServicePublisher {
 
@@ -81,8 +82,8 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
   /** The delete operation */
   public static final String OPERATION_DELETE = "delete";
 
-  private VCell<List<StaticMetadataService>> metadataSvcs =
-          VCell.<List<StaticMetadataService>>cell(new ArrayList<StaticMetadataService>());
+  private VCell<List<StaticMetadataService>> metadataSvcs = VCell
+          .<List<StaticMetadataService>> cell(new ArrayList<StaticMetadataService>());
   private Mpeg7CatalogService mpeg7CatalogService;
   private SeriesService seriesService;
   private Workspace workspace;
@@ -147,11 +148,13 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
     this.mediaInspectionSvc = mediaInspectionSvc;
   }
 
-  @Override public Tuple<List<ServiceRegistration>, Effect0> registerService(Dictionary properties, final ComponentContext cc)
+  @Override
+  public Tuple<List<ServiceRegistration>, Effect0> registerService(Dictionary properties, final ComponentContext cc)
           throws ConfigurationException {
     final String solrServerUrlConfig = StringUtils.trimToNull(cc.getBundleContext().getProperty(CONFIG_SOLR_URL));
     final SolrServer solrServer = new Function0<SolrServer>() {
-      @Override public SolrServer apply() {
+      @Override
+      public SolrServer apply() {
         if (solrServerUrlConfig != null) {
           try {
             URL solrServerUrl = new URL(solrServerUrlConfig);
@@ -170,7 +173,7 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
           String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
           if (storageDir == null)
             throw new IllegalStateException("Storage dir must be set (org.opencastproject.storage.dir)");
-          String solrRoot = PathSupport.concat(storageDir, "archive");
+          String solrRoot = PathSupport.concat(storageDir, "archiveindex");
           try {
             return setupSolr(new File(solrRoot));
           } catch (Exception e) {
@@ -182,44 +185,35 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
       IllegalStateException connectError(String target, Exception e) {
         return new IllegalStateException("Unable to connect to solr at " + target, e);
       }
-    } .apply();
+    }.apply();
 
     final SolrRequester solrRequester = new SolrRequester(solrServer, securityService);
-    final SolrIndexManager solrIndex = new SolrIndexManager(solrServer,
-                                                            workspace,
-                                                            metadataSvcs,
-                                                            seriesService,
-                                                            mpeg7CatalogService,
-                                                            securityService);
-    final EpisodeServiceImpl episodeService = new EpisodeServiceImpl(solrRequester,
-                                                                     solrIndex,
-                                                                     securityService,
-                                                                     authorizationService,
-                                                                     orgDirectory,
-                                                                     serviceRegistry,
-                                                                     workflowService,
-                                                                     mediaInspectionSvc,
-                                                                     persistence,
-                                                                     elementStore);
+    final SolrIndexManager solrIndex = new SolrIndexManager(solrServer, workspace, metadataSvcs, seriesService,
+            mpeg7CatalogService, securityService);
+    final EpisodeServiceImpl episodeService = new EpisodeServiceImpl(solrRequester, solrIndex, securityService,
+            authorizationService, orgDirectory, serviceRegistry, workflowService, mediaInspectionSvc, persistence,
+            elementStore);
     // Populate the search index if it is empty
     episodeService.populateIndex();
     return tuple(list(registerService(cc, episodeService, EpisodeService.class, "Episode service")),
-                 (Effect0) new Effect0() {
-                   @Override protected void run() {
-                     SolrServerFactory.shutdown(solrServer);
-                   }
-                 });
+            (Effect0) new Effect0() {
+              @Override
+              protected void run() {
+                SolrServerFactory.shutdown(solrServer);
+              }
+            });
   }
 
-  @Override public boolean needConfig() {
+  @Override
+  public boolean needConfig() {
     return false;
   }
 
   /**
    * Prepares the embedded solr environment.
-   *
+   * 
    * @param solrRoot
-   *         the solr root directory
+   *          the solr root directory
    */
   public static SolrServer setupSolr(File solrRoot) throws IOException, SolrServerException {
     logger.info("Setting up solr search index at {}", solrRoot);
@@ -259,9 +253,9 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
 
   /**
    * Prepares the embedded solr environment.
-   *
+   * 
    * @param url
-   *         the url of the remote solr server
+   *          the url of the remote solr server
    */
   public static SolrServer setupSolr(URL url) throws IOException, SolrServerException {
     logger.info("Connecting to solr search index at {}", url);
