@@ -1006,7 +1006,7 @@ ocRecordings = new (function() {
     ocRecordings.Configuration.lastPage = ocRecordings.Configuration.page;
     ocRecordings.disableRefresh();
     ocRecordings.stopStatisticsUpdate();
-    $('#bulkActionPanel :input[type=textarea], #bulkActionPanel :text').keyup(ocRecordings.bulkEditFieldHandler);
+    $('#bulkActionPanel textarea, #bulkActionPanel :text').keyup(ocRecordings.bulkEditFieldHandler);
   }
 
   this.bulkEditFieldHandler = function(e) {
@@ -1033,7 +1033,7 @@ ocRecordings = new (function() {
     $('#bulkActionSelect').change();
     $('#bulkActionPanel').hide();
     ocRecordings.bulkEditComponents = [];
-    $('#bulkActionPanel :input[type=textarea], #bulkActionPanel :text').val('');
+    $('#bulkActionPanel textarea, #bulkActionPanel :text').val('');
     ocRecordings.changedBulkEditFields = {};
     ocRecordings.numSelectedRecordings = 0;
   }
