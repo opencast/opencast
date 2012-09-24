@@ -74,9 +74,9 @@ ocSeriesList.askForSeries = function()
     type: "GET",
     success: function(data)
     {
-      ocSeriesList.Configuration.total = parseInt(data.totalCount);
-      ocSeriesList.Configuration.lastPage = Math.floor(ocSeriesList.Configuration.total / ocSeriesList.Configuration.count)
       ocSeriesList.buildSeriesView(data);
+      ocSeriesList.Configuration.total = data.totalCount;
+      ocSeriesList.Configuration.lastPage = Math.ceil(ocSeriesList.Configuration.total / ocSeriesList.Configuration.count)
       if(ocSeriesList.Configuration.total <= ocSeriesList.Configuration.count){
         $('#prevText').show();
         $('#prevButtons').hide();
@@ -89,7 +89,7 @@ ocSeriesList.askForSeries = function()
 
         $('#nextText').hide();
         $('#nextButtons').show();
-      }else if(ocSeriesList.Configuration.startPage == ocSeriesList.Configuration.lastPage) {
+      }else if(ocSeriesList.Configuration.startPage + 1 == ocSeriesList.Configuration.lastPage) {
         $('#nextText').show();
         $('#nextButtons').hide();
 
@@ -102,6 +102,8 @@ ocSeriesList.askForSeries = function()
         $('#nextText').hide();
         $('#nextButtons').show();  
       }
+      $('#curPage').text(ocSeriesList.Configuration.startPage + 1);
+      $('#numPage').text(ocSeriesList.Configuration.lastPage);
     }
   });
 }
