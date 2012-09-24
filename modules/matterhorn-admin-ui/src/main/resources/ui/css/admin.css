@@ -8,7 +8,7 @@ input:focus, button:focus { outline: 1px #999 solid; }
 table tr td { background: white!important; color: black; }
 table tr.highlight td { background: #d1e8ff!important; color: black; }
 table tr:hover td { background: silver!important; color: black!important; }
-table tr:hover a { color: black!important; font-weight: bold!important; }
+table tr:hover a { color: black!important; }
 table tr:hover a:hover { text-decoration: underline!important; }
 
 .layout-centered { margin-left: auto; margin-right: auto}
