@@ -413,6 +413,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     q.withText(text);
     q.withSeriesId(seriesId);
     q.withSeriesTitle(seriesTitle);
+    q.withSubject(subject);
     q.withMediaPackage(mediapackageId);
     q.withCreator(creator);
     q.withContributor(contributor);
