@@ -19,6 +19,7 @@ import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
@@ -364,8 +365,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
                   + "of the following: DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, "
                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING),
-          @RestParameter(name = "startPage", isRequired = false, description = "The paging offset", type = STRING),
-          @RestParameter(name = "count", isRequired = false, description = "The number of results to return.", type = STRING),
+          @RestParameter(name = "startPage", isRequired = false, description = "The paging offset", type = INTEGER),
+          @RestParameter(name = "count", isRequired = false, description = "The number of results to return.", type = INTEGER),
           @RestParameter(name = "compact", isRequired = false, description = "Whether to return a compact version of "
                   + "the workflow instance, with mediapackage elements, workflow and workflow operation configurations and "
                   + "non-current operations removed.", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow set.") })
@@ -512,8 +513,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
                   + "of the following: DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, "
                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING),
-          @RestParameter(name = "startPage", isRequired = false, description = "The paging offset", type = STRING),
-          @RestParameter(name = "count", isRequired = false, description = "The number of results to return.", type = STRING),
+          @RestParameter(name = "startPage", isRequired = false, description = "The paging offset", type = INTEGER),
+          @RestParameter(name = "count", isRequired = false, description = "The number of results to return.", type = INTEGER),
           @RestParameter(name = "compact", isRequired = false, description = "Whether to return a compact version of "
                   + "the workflow instance, with mediapackage elements, workflow and workflow operation configurations and "
                   + "non-current operations removed.", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow set.") })

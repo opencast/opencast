@@ -130,8 +130,8 @@ public class UserTrackingRestService {
   @RestQuery(name = "actionsasxml", description = "Get user actions by type and day", returnDescription = "The user actions.", restParameters = {
           @RestParameter(name = "type", description = "The type of the user action", isRequired = false, type = Type.STRING),
           @RestParameter(name = "day", description = "The day of creation (format: YYYYMMDD)", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "offset", description = "The page number", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the user actions") })
+          @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = Type.INTEGER),
+          @RestParameter(name = "offset", description = "The page number", isRequired = false, type = Type.INTEGER) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the user actions") })
   public UserActionListImpl getUserActionsAsXml(@QueryParam("id") String id, @QueryParam("type") String type,
           @QueryParam("day") String day, @QueryParam("limit") int limit, @QueryParam("offset") int offset) {
 
@@ -167,8 +167,8 @@ public class UserTrackingRestService {
   @RestQuery(name = "actionsasjson", description = "Get user actions by type and day", returnDescription = "The user actions.", restParameters = {
           @RestParameter(name = "type", description = "The type of the user action", isRequired = false, type = Type.STRING),
           @RestParameter(name = "day", description = "The day of creation (format: YYYYMMDD)", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "offset", description = "The page number", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the user actions") })
+          @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = Type.INTEGER),
+          @RestParameter(name = "offset", description = "The page number", isRequired = false, type = Type.INTEGER) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the user actions") })
   public UserActionListImpl getUserActionsAsJson(@QueryParam("id") String id, @QueryParam("type") String type,
           @QueryParam("day") String day, @QueryParam("limit") int limit, @QueryParam("offset") int offset) {
     return getUserActionsAsXml(id, type, day, limit, offset); // same logic, different @Produces annotation
@@ -203,8 +203,8 @@ public class UserTrackingRestService {
   @RestQuery(name = "reportasxml", description = "Get a report for a time range", returnDescription = "The report.", restParameters = {
           @RestParameter(name = "from", description = "The beginning of the time range", isRequired = false, type = Type.STRING),
           @RestParameter(name = "to", description = "The end of the time range", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "offset", description = "The page number", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the report") })
+          @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = Type.INTEGER),
+          @RestParameter(name = "offset", description = "The page number", isRequired = false, type = Type.INTEGER) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the report") })
   public ReportImpl reportAsXml(@QueryParam("from") String from, @QueryParam("to") String to,
           @QueryParam("offset") int offset, @QueryParam("limit") int limit) {
 
@@ -232,8 +232,8 @@ public class UserTrackingRestService {
   @RestQuery(name = "reportasjson", description = "Get a report for a time range", returnDescription = "The report.", restParameters = {
           @RestParameter(name = "from", description = "The beginning of the time range", isRequired = false, type = Type.STRING),
           @RestParameter(name = "to", description = "The end of the time range", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "offset", description = "The page number", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the report") })
+          @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = Type.INTEGER),
+          @RestParameter(name = "offset", description = "The page number", isRequired = false, type = Type.INTEGER) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the report") })
   public ReportImpl reportAsJson(@QueryParam("from") String from, @QueryParam("to") String to,
           @QueryParam("offset") int offset, @QueryParam("limit") int limit) {
     return reportAsXml(from, to, offset, limit); // same logic, different @Produces annotation
