@@ -18,6 +18,7 @@ package org.opencastproject.mediapackage;
 
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
+import org.opencastproject.util.data.Option;
 
 import java.net.URI;
 import java.util.Collection;
@@ -208,7 +209,7 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
    * 
    * @return the size
    */
-  long getSize();
+  Option<Long> getSize();
 
   /**
    * Sets the file size in bytes

@@ -202,7 +202,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
 
         @Override public Void none() {
           elementStore.put(spath(orgId, mpId, version, e.getIdentifier()),
-                           source(e.getURI(), Option.some(e.getSize()), option(e.getMimeType())));
+                           source(e.getURI(), e.getSize(), option(e.getMimeType())));
           return null;
         }
       });
@@ -248,7 +248,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
   public static Function<MediaPackageElement, List<Job>> enrichIfNecessary(final MediaInspectionService svc) {
     return new Function.X<MediaPackageElement, List<Job>>() {
       @Override public List<Job> xapply(MediaPackageElement element) throws Exception {
-        if (element.getChecksum() == null)
+        if (element.getChecksum() == null || element.getSize().isNone())
           return list(svc.enrich(element, true));
         return nil();
       }

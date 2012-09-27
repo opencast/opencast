@@ -43,7 +43,7 @@ public class CatalogImpl extends AbstractMediaPackageElement implements Catalog 
   /** Needed by JAXB */
   protected CatalogImpl() {
     // default to text/xml mimetype
-    super(Type.Catalog, null, null, -1, null, MimeTypes.parseMimeType("text/xml"));
+    super(Type.Catalog, null, null, null, null, MimeTypes.parseMimeType("text/xml"));
   }
 
   /**
@@ -62,7 +62,7 @@ public class CatalogImpl extends AbstractMediaPackageElement implements Catalog 
    * @param mimeType
    *          the catalog mime type
    */
-  protected CatalogImpl(String id, MediaPackageElementFlavor flavor, URI uri, long size, Checksum checksum,
+  protected CatalogImpl(String id, MediaPackageElementFlavor flavor, URI uri, Long size, Checksum checksum,
           MimeType mimeType) {
     super(Type.Catalog, flavor, uri, size, checksum, mimeType);
   }
@@ -81,7 +81,7 @@ public class CatalogImpl extends AbstractMediaPackageElement implements Catalog 
    * @param mimeType
    *          the catalog mime type
    */
-  protected CatalogImpl(MediaPackageElementFlavor flavor, URI uri, long size, Checksum checksum, MimeType mimeType) {
+  protected CatalogImpl(MediaPackageElementFlavor flavor, URI uri, Long size, Checksum checksum, MimeType mimeType) {
     this(null, flavor, uri, size, checksum, mimeType);
   }
 

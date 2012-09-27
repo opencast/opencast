@@ -730,9 +730,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
       try {
         trackUrl = element.getURI().toURL().toExternalForm();
         String trackMimeType = element.getMimeType().toString();
-        long trackLength = element.getSize();
-        if (trackLength <= 0)
-          trackLength = resultItem.getDcExtent();
+        long trackLength = element.getSize().isSome() ? element.getSize().get() : resultItem.getDcExtent();
         Enclosure enclosure = new EnclosureImpl(trackUrl, trackMimeType, trackLength);
         entry.addEnclosure(enclosure);
         enclosedFormats.add(element);

@@ -128,7 +128,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    * @param mimeType
    *          the catalog mime type
    */
-  protected XMLCatalogImpl(String id, MediaPackageElementFlavor flavor, URI uri, long size, Checksum checksum,
+  protected XMLCatalogImpl(String id, MediaPackageElementFlavor flavor, URI uri, Long size, Checksum checksum,
           MimeType mimeType) {
     super(id, flavor, uri, size, checksum, mimeType);
     bindPrefix(XMLConstants.XML_NS_PREFIX, XMLConstants.XML_NS_URI);
@@ -150,7 +150,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    * @param mimeType
    *          the catalog mime type
    */
-  protected XMLCatalogImpl(MediaPackageElementFlavor flavor, URI uri, long size, Checksum checksum, MimeType mimeType) {
+  protected XMLCatalogImpl(MediaPackageElementFlavor flavor, URI uri, Long size, Checksum checksum, MimeType mimeType) {
     this(null, flavor, uri, size, checksum, mimeType);
   }
 

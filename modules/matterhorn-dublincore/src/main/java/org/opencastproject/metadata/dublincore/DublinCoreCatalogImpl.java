@@ -16,6 +16,17 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import static org.opencastproject.util.data.Monadics.mlist;
+
+import org.opencastproject.mediapackage.EName;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.mediapackage.XMLCatalogImpl;
+import org.opencastproject.util.Checksum;
+import org.opencastproject.util.MimeTypes;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Function2;
+
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
@@ -25,14 +36,6 @@ import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.opencastproject.mediapackage.EName;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.mediapackage.XMLCatalogImpl;
-import org.opencastproject.util.Checksum;
-import org.opencastproject.util.MimeTypes;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -42,11 +45,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -62,7 +60,11 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static org.opencastproject.util.data.Monadics.mlist;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.TransformerException;
 
 //import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
 
@@ -101,8 +103,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
   public static final EName PROPERTY_RECURRENCE = new EName(OC_NS_URI, "recurrence");
 
   /**
-   * The timezone of the agent specified to be scheduled with an event.
-   * IE: "America/Chicago"
+   * The timezone of the agent specified to be scheduled with an event. IE: "America/Chicago"
    */
 
   public static final EName PROPERTY_AGENT_TIMEZONE = new EName(OC_NS_URI, "agentTimezone");
@@ -128,17 +129,17 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Creates a new dublin core metadata container.
-   *
+   * 
    * @param id
-   *         the element identifier withing the package
+   *          the element identifier withing the package
    * @param uri
-   *         the document location
+   *          the document location
    * @param size
-   *         the catalog size in bytes
+   *          the catalog size in bytes
    * @param checksum
-   *         the catalog checksum
+   *          the catalog checksum
    */
-  protected DublinCoreCatalogImpl(String id, URI uri, MediaPackageElementFlavor flavor, long size, Checksum checksum) {
+  protected DublinCoreCatalogImpl(String id, URI uri, MediaPackageElementFlavor flavor, Long size, Checksum checksum) {
     super(id, flavor, uri, size, checksum, MimeTypes.XML);
     bindings.bindPrefix(XMLConstants.DEFAULT_NS_PREFIX, OPENCASTPROJECT_DUBLIN_CORE_NS_URI);
     bindings.bindPrefix("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
@@ -149,36 +150,36 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Creates a new dublin core metadata container, defaulting the flavor to {@link MediaPackageElements#EPISODE}.
-   *
+   * 
    * @param uri
-   *         the document location
+   *          the document location
    * @param size
-   *         the catalog size in bytes
+   *          the catalog size in bytes
    * @param checksum
-   *         the catalog checksum
+   *          the catalog checksum
    */
-  protected DublinCoreCatalogImpl(URI uri, long size, Checksum checksum) {
+  protected DublinCoreCatalogImpl(URI uri, Long size, Checksum checksum) {
     this(null, uri, MediaPackageElements.EPISODE, size, checksum);
   }
 
   /**
    * Creates a new dublin core metadata container.
-   *
+   * 
    * @param id
-   *         the element identifier withing the package
+   *          the element identifier withing the package
    */
   protected DublinCoreCatalogImpl(String id) {
-    this(id, null, MediaPackageElements.EPISODE, 0, null);
+    this(id, null, MediaPackageElements.EPISODE, null, null);
   }
 
   /** Creates a new dublin core metadata container. */
   protected DublinCoreCatalogImpl() {
-    this(null, null, MediaPackageElements.EPISODE, 0, null);
+    this(null, null, MediaPackageElements.EPISODE, null, null);
   }
 
   /**
    * Creates a new dublin core metadata container.
-   *
+   * 
    * @return the new dublin core metadata container
    */
   public static DublinCoreCatalogImpl newInstance() {
@@ -187,9 +188,9 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Reads the metadata from the specified file and returns it encapsulated in a {@link DublinCoreCatalog} object.
-   *
+   * 
    * @param in
-   *         the stream containing the dublin core metadata
+   *          the stream containing the dublin core metadata
    */
   public DublinCoreCatalogImpl(InputStream in) {
     this();
@@ -281,24 +282,27 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
   }
 
   private static final Function<CatalogEntry, DublinCoreValue> toDublinCoreValue = new Function<CatalogEntry, DublinCoreValue>() {
-    @Override public DublinCoreValue apply(CatalogEntry e) {
+    @Override
+    public DublinCoreValue apply(CatalogEntry e) {
       return toDublinCoreValue(e);
     }
   };
 
-  @Override public Map<EName, List<DublinCoreValue>> getValues() {
+  @Override
+  public Map<EName, List<DublinCoreValue>> getValues() {
     return mlist(data.values().iterator())
             .foldl(new HashMap<EName, List<DublinCoreValue>>(),
-                   new Function2<HashMap<EName, List<DublinCoreValue>>, List<CatalogEntry>, HashMap<EName, List<DublinCoreValue>>>() {
-                     @Override
-                     public HashMap<EName, List<DublinCoreValue>> apply(HashMap<EName, List<DublinCoreValue>> map, List<CatalogEntry> entries) {
-                       if (entries.size() > 0) {
-                         final EName property = entries.get(0).getEName();
-                         map.put(property, mlist(entries).map(toDublinCoreValue).value());
-                       }
-                       return map;
-                     }
-                   });
+                    new Function2<HashMap<EName, List<DublinCoreValue>>, List<CatalogEntry>, HashMap<EName, List<DublinCoreValue>>>() {
+                      @Override
+                      public HashMap<EName, List<DublinCoreValue>> apply(HashMap<EName, List<DublinCoreValue>> map,
+                              List<CatalogEntry> entries) {
+                        if (entries.size() > 0) {
+                          final EName property = entries.get(0).getEName();
+                          map.put(property, mlist(entries).map(toDublinCoreValue).value());
+                        }
+                        return map;
+                      }
+                    });
   }
 
   public String getFirst(EName property, String language) {
@@ -571,13 +575,13 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Saves the dublin core metadata container to a dom.
-   *
+   * 
    * @throws ParserConfigurationException
-   *         if the xml parser environment is not correctly configured
+   *           if the xml parser environment is not correctly configured
    * @throws TransformerException
-   *         if serialization of the metadata document fails
+   *           if serialization of the metadata document fails
    * @throws IOException
-   *         if an error with catalog serialization occurs
+   *           if an error with catalog serialization occurs
    */
   public Document toXml() throws ParserConfigurationException, TransformerException, IOException {
     // Create the DOM document
@@ -594,7 +598,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.mediapackage.XMLCatalogImpl#toJson()
    */
   public String toJson() throws IOException {
@@ -604,9 +608,9 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Reads values from a JSON object
-   *
+   * 
    * @param json
-   *         the json object representing the dublin core catalog
+   *          the json object representing the dublin core catalog
    * @return the dublin core catalog
    */
   @SuppressWarnings("unchecked")
@@ -614,7 +618,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     Set<Entry<String, JSONObject>> namespaceEntrySet = json.entrySet();
     for (Entry<String, JSONObject> namespaceEntry : namespaceEntrySet) { // e.g. http://purl.org/dc/terms/
       String namespace = namespaceEntry.getKey();
-      //String prefix = bindings.lookupPrefix(namespace);
+      // String prefix = bindings.lookupPrefix(namespace);
       JSONObject namespaceObj = namespaceEntry.getValue();
       Set<Entry<String, JSONArray>> entrySet = namespaceObj.entrySet();
       for (Entry<String, JSONArray> entry : entrySet) { // e.g. title
@@ -648,7 +652,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Converts the catalog to JSON object.
-   *
+   * 
    * @return JSON object
    */
   @SuppressWarnings("unchecked")
@@ -705,18 +709,18 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
   /**
    * Adds the dublin core property identified by <code>name</code> to the root node if it's value is different from
    * <code>null</code>.
-   *
+   * 
    * @param document
-   *         the document
+   *          the document
    * @param root
-   *         the root node
+   *          the root node
    * @param property
-   *         the property name
+   *          the property name
    * @param required
-   *         <code>true</code> if this property is required
+   *          <code>true</code> if this property is required
    * @return <code>true</code> if the element was added
    * @throws IllegalStateException
-   *         if a required property is missing
+   *           if a required property is missing
    */
   private boolean addElement(Document document, Element root, EName property, boolean required)
           throws IllegalStateException {
@@ -754,9 +758,9 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
     /**
      * Creates a new parser for dublin core documents. The parsed data will be added to <code>dcCatalog</code>.
-     *
+     * 
      * @param dcCatalog
-     *         the catalog to populate
+     *          the catalog to populate
      */
     DublinCoreParser(DublinCoreCatalogImpl dcCatalog) {
       this.dcDoc = dcCatalog;
@@ -764,18 +768,18 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
     /**
      * Parses the catalog and returns an object representation for it.
-     *
+     * 
      * @param is
-     *         the input stream containing the dublin core catalog
+     *          the input stream containing the dublin core catalog
      * @return the catalog representation
      * @throws javax.xml.parsers.ParserConfigurationException
-     *         if setting up the parser failed
+     *           if setting up the parser failed
      * @throws org.xml.sax.SAXException
-     *         if an error occured while parsing the document
+     *           if an error occured while parsing the document
      * @throws java.io.IOException
-     *         if the stream cannot be accessed in a proper way
+     *           if the stream cannot be accessed in a proper way
      * @throws IllegalArgumentException
-     *         if the document is not a dublincore document
+     *           if the document is not a dublincore document
      */
     public DublinCoreCatalogImpl parse(InputStream is) throws SAXException, IOException, ParserConfigurationException {
       if (dcDoc == null)
@@ -802,7 +806,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
     /**
      * Returns the element content.
-     *
+     * 
      * @return the element content
      */
     private String getContent() {
@@ -813,7 +817,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
     /**
      * Read <code>type</code> attribute from track or catalog element.
-     *
+     * 
      * @see org.xml.sax.helpers.DefaultHandler#startElement(String, String, String, org.xml.sax.Attributes)
      */
     @Override

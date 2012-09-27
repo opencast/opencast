@@ -52,6 +52,8 @@ import org.opencastproject.textextractor.api.TextExtractor;
 import org.opencastproject.textextractor.api.TextExtractorException;
 import org.opencastproject.textextractor.api.TextFrame;
 import org.opencastproject.textextractor.api.TextLine;
+import org.opencastproject.util.Checksum;
+import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -221,6 +223,15 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
       Catalog catalog = (Catalog) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
               .newElement(Catalog.TYPE, MediaPackageElements.TEXTS);
       catalog.setURI(uri);
+
+      // Set the file size and checksum
+      try {
+        File file = workspace.get(uri);
+        catalog.setSize(file.length());
+        catalog.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, file));
+      } catch (IOException e) {
+        throw new TextAnalyzerException("Unable to set the catalog size and/or checksum", e);
+      }
 
       logger.info("Finished text extraction of {}", imageUrl);
 
@@ -422,7 +433,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
-  
+
   /**
    * Sets a reference to the organization directory service.
    * 
