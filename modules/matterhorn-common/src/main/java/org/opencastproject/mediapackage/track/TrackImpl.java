@@ -79,7 +79,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
    * @param mimeType
    *          the track mime type
    */
-  TrackImpl(MediaPackageElementFlavor flavor, MimeType mimeType, URI uri, Long size, Checksum checksum) {
+  TrackImpl(MediaPackageElementFlavor flavor, MimeType mimeType, URI uri, long size, Checksum checksum) {
     super(Type.Track, flavor, uri, size, checksum, mimeType);
   }
 

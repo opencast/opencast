@@ -41,8 +41,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.util.Checksum;
-import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
@@ -339,15 +337,6 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
         throw new VideoSegmenterException("Unable to put the mpeg7 catalog into the workspace", e);
       }
       mpeg7Catalog.setURI(uri);
-
-      // Set the file size and checksum
-      try {
-        File file = workspace.get(uri);
-        mpeg7Catalog.setSize(file.length());
-        mpeg7Catalog.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, file));
-      } catch (IOException e) {
-        throw new VideoSegmenterException("Unable to set the catalog size and/or checksum", e);
-      }
 
       try {
         ds.disconnect();
@@ -735,7 +724,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
   protected UserDirectoryService getUserDirectoryService() {
     return userDirectoryService;
   }
-
+  
   /**
    * {@inheritDoc}
    * 

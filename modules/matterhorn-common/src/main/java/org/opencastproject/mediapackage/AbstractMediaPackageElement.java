@@ -18,7 +18,6 @@ package org.opencastproject.mediapackage;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeType;
-import org.opencastproject.util.data.Option;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -82,8 +81,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   protected URI uri = null;
 
   /** Size in bytes */
-  @XmlElement(name = "size")
-  protected Long size = null;
+  protected long size = -1L;
 
   /** The element's checksum */
   @XmlElement(name = "checksum")
@@ -111,7 +109,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    *          the elements location
    */
   protected AbstractMediaPackageElement(Type elementType, MediaPackageElementFlavor flavor, URI uri) {
-    this(null, elementType, flavor, uri, null, null, null);
+    this(null, elementType, flavor, uri, -1, null, null);
   }
 
   /**
@@ -130,7 +128,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    * @param mimeType
    *          the element mime type
    */
-  protected AbstractMediaPackageElement(Type elementType, MediaPackageElementFlavor flavor, URI uri, Long size,
+  protected AbstractMediaPackageElement(Type elementType, MediaPackageElementFlavor flavor, URI uri, long size,
           Checksum checksum, MimeType mimeType) {
     this(null, elementType, flavor, uri, size, checksum, mimeType);
   }
@@ -154,11 +152,10 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    *          the element mime type
    */
   protected AbstractMediaPackageElement(String id, Type elementType, MediaPackageElementFlavor flavor, URI uri,
-          Long size, Checksum checksum, MimeType mimeType) {
+          long size, Checksum checksum, MimeType mimeType) {
     if (elementType == null)
       throw new IllegalArgumentException("Argument 'elementType' is null");
     this.id = id;
-    this.size = size;
     this.elementType = elementType;
     this.flavor = flavor;
     this.mimeType = mimeType;
@@ -375,8 +372,8 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#getSize()
    */
-  public Option<Long> getSize() {
-    return Option.option(size);
+  public long getSize() {
+    return size;
   }
 
   /**

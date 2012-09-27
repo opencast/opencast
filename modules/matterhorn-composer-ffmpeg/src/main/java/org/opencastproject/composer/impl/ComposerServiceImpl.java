@@ -45,8 +45,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.util.Checksum;
-import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
@@ -558,24 +556,15 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         }
       }
 
+      // cleanup
+      cleanup(encodingOutput.toArray(new File[encodingOutput.size()]));
+
       MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
       List<Attachment> imageAttachments = new LinkedList<Attachment>();
-      int i = 0;
       for (URI url : workspaceURIs) {
         Attachment attachment = (Attachment) builder.elementFromURI(url, Attachment.TYPE, null);
         imageAttachments.add(attachment);
-        File f = encodingOutput.get(i++);
-        attachment.setSize(f.length());
-        // Checksum
-        try {
-          attachment.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, f));
-        } catch (IOException e) {
-          throw new MediaInspectionException("Unable to read " + f, e);
-        }
       }
-
-      // cleanup
-      cleanup(encodingOutput.toArray(new File[encodingOutput.size()]));
 
       return imageAttachments;
     } catch (Exception e) {

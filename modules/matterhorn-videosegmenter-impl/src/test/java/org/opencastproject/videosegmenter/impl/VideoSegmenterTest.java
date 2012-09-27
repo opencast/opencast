@@ -132,7 +132,6 @@ public class VideoSegmenterTest {
         return tempFile.toURI();
       }
     });
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(tempFile);
     EasyMock.replay(workspace);
 
     User anonymous = new User("anonymous", DEFAULT_ORGANIZATION_ID, new String[] { DEFAULT_ORGANIZATION_ANONYMOUS });

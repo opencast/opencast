@@ -265,10 +265,6 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
         }
         track = (TrackImpl) element;
 
-        // Size
-        if (metadata.getSize() != null && metadata.getSize() > 0)
-          track.setSize(metadata.getSize());
-
         // Duration
         if (metadata.getDuration() != null)
           track.setDuration(metadata.getDuration());
@@ -437,8 +433,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
         track.setIdentifier(originalTrack.getIdentifier());
         track.setMimeType(originalTrack.getMimeType());
         track.setReference(originalTrack.getReference());
-        if (originalTrack.getSize().isSome())
-          track.setSize(originalTrack.getSize().get());
+        track.setSize(originalTrack.getSize());
         track.setURI(originalTrackUrl);
         for (String tag : originalTrack.getTags()) {
           track.addTag(tag);
@@ -447,11 +442,6 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
         // enrich the new track with basic info
         if (track.getDuration() == -1L || override)
           track.setDuration(metadata.getDuration());
-
-        // enrich the new track with basic info
-        if (track.getSize().isNone() || override)
-          track.setSize(metadata.getSize());
-
         if (track.getChecksum() == null || override) {
           try {
             track.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, file));
@@ -543,10 +533,6 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
           throw new MediaInspectionException("Error generating checksum for " + element.getURI(), e);
         }
       }
-
-      // Size
-      if (element.getSize().isNone() || override)
-        element.setSize(file.length());
 
       // Mimetype
       if (element.getMimeType() == null || override) {

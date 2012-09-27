@@ -16,7 +16,6 @@
 package org.opencastproject.episode.api;
 
 import org.opencastproject.util.MimeType;
-import org.opencastproject.util.data.Option;
 
 import java.io.InputStream;
 
@@ -24,16 +23,17 @@ import java.io.InputStream;
 public class ArchivedMediaPackageElement {
   private final InputStream inputStream;
   private final MimeType mimeType;
-  private final Option<Long> size;
+  private final long size;
 
-  public ArchivedMediaPackageElement(InputStream inputStream, MimeType mimeType, Option<Long> size) {
+  public ArchivedMediaPackageElement(InputStream inputStream, MimeType mimeType, long size) {
     this.inputStream = inputStream;
     this.mimeType = mimeType;
     this.size = size;
   }
 
   /**
-   * Return an input stream to the element's content. Client code is in charge of closing the stream.
+   * Return an input stream to the element's content.
+   * Client code is in charge of closing the stream.
    */
   public InputStream getInputStream() {
     return inputStream;
@@ -49,7 +49,7 @@ public class ArchivedMediaPackageElement {
   }
 
   /** Return the number of bytes that are occupied by this media package element. */
-  public Option<Long> getSize() {
+  public long getSize() {
     return size;
   }
 }

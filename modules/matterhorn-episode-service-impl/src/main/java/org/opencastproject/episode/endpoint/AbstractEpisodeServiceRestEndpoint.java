@@ -15,6 +15,7 @@
  */
 package org.opencastproject.episode.endpoint;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.opencastproject.episode.api.ArchivedMediaPackageElement;
 import org.opencastproject.episode.api.EpisodeQuery;
@@ -31,7 +32,6 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageImpl;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
@@ -62,7 +62,10 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -341,16 +344,29 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
         } else {
           fileName = fileName.concat(mimeType.getSubtype());
         }
-        
+
         // Write the file contents back
-        return RestUtil.streamResponse(inputStream,
-                                       mimeType.asString(),
-                                       element.getSize(),
-                                       Option.some(fileName)).build();
+        return Response
+                .ok(new StreamingOutput() {
+                  @Override public void write(OutputStream os) throws IOException, WebApplicationException {
+                    try {
+                      IOUtils.copy(inputStream, os);
+                    } catch (IOException e) {
+                      Throwable cause = e.getCause();
+                      if (cause == null || !"Broken pipe".equals(cause.getMessage()))
+                        logger.warn("Error writing file contents to response", e);
+                    } finally {
+                      IOUtils.closeQuietly(inputStream);
+                    }
+                  }
+                })
+                .header("Content-disposition", "attachment; filename=" + fileName)
+                .header("Content-length", element.getSize())
+                .type(mimeType.asString())
+                .build();
       }
 
-      @Override
-      public Response none() {
+      @Override public Response none() {
         return chuck(new NotFoundException());
       }
     });
