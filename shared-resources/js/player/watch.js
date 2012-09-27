@@ -214,7 +214,7 @@ Opencast.Watch = (function ()
         }
 
         // Parse the plugin URLs
-        $.getJSON('/engage/ui/json/servicedata.json', function(data)
+        $.getJSON('json/servicedata.json', function(data)
         {
             $.log("Start parsing servicedata.json");
             analyticsURL = data.plugin_urls.analytics;
