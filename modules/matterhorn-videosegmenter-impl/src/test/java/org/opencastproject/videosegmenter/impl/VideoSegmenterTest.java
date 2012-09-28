@@ -106,7 +106,7 @@ public class VideoSegmenterTest {
     track.setFlavor(MediaPackageElements.PRESENTATION_SOURCE);
     track.setMimeType(MimeTypes.MJPEG);
     track.addStream(new VideoStreamImpl());
-    track.setDuration(20000);
+    track.setDuration(new Long(20000));
     System.setProperty("java.awt.headless", "true");
     System.setProperty("awt.toolkit", "sun.awt.HeadlessToolkit");
   }

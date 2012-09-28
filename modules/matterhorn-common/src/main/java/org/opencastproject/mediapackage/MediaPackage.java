@@ -129,12 +129,11 @@ public interface MediaPackage extends Cloneable {
   Date getDate();
 
   /**
-   * Returns the media package duration in milliseconds. The actual duration is detected from the included tracks, so
-   * there is no setter in place.
+   * Returns the media package duration in milliseconds or <code>null</code> if no duration is available.
    * 
    * @return the duration
    */
-  long getDuration();
+  Long getDuration();
 
   /**
    * Sets the duration of the media package in milliseconds. This method will throw an {@link IllegalStateException} if
@@ -146,7 +145,7 @@ public interface MediaPackage extends Cloneable {
    * @throws IllegalStateException
    *           if the mediapackage already contains a track
    */
-  void setDuration(long duration) throws IllegalStateException;
+  void setDuration(Long duration) throws IllegalStateException;
 
   /**
    * Returns <code>true</code> if the given element is part of the media package.
@@ -567,10 +566,11 @@ public interface MediaPackage extends Cloneable {
   /**
    * Removes the element with the given identifier from the mediapackage and returns it.
    * 
-   * @param id the element identifier
+   * @param id
+   *          the element identifier
    */
   MediaPackageElement removeElementById(String id);
-  
+
   /**
    * Removes the track from the media package.
    * 

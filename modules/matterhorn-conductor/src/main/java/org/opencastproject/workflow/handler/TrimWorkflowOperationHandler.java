@@ -94,10 +94,12 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
   @Override
-  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     logger.info("Holding for review / trim...");
 
     return createResult(Action.PAUSE);
@@ -106,10 +108,12 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#skip(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#skip(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
   @Override
-  public WorkflowOperationResult skip(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult skip(WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     // If we do not hold for trim, we still need to put tracks in the mediapackage with the right flavor
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
@@ -136,20 +140,22 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
    *      JobContext, java.util.Map)
    */
   @Override
-  public WorkflowOperationResult resume(WorkflowInstance workflowInstance, JobContext context, Map<String, String> properties)
-          throws WorkflowOperationException {
+  public WorkflowOperationResult resume(WorkflowInstance workflowInstance, JobContext context,
+          Map<String, String> properties) throws WorkflowOperationException {
     logger.info("Trimming workflow {} using {}", workflowInstance.getId(), properties);
 
     // Validate the trimming arguments
     long trimStart = Long.parseLong(properties.get("trimin"));
     long trimDuration = Long.parseLong(properties.get("newduration"));
-    long recordingDuration = workflowInstance.getMediaPackage().getDuration();
+    Long recordingDuration = workflowInstance.getMediaPackage().getDuration();
 
+    if (recordingDuration == null || recordingDuration <= 0)
+      throw new WorkflowOperationException("Mediapackage must have a duration");
     if (trimDuration <= 0)
       throw new WorkflowOperationException("Trimming duration must be a positive integer");
-    else if (recordingDuration > 0 && trimStart > recordingDuration)
+    else if (trimStart > recordingDuration)
       throw new WorkflowOperationException("Trimming start is outside of recording");
-    else if (recordingDuration > 0 && trimStart + trimDuration > recordingDuration)
+    else if (trimStart + trimDuration > recordingDuration)
       throw new WorkflowOperationException("Trimming end is outside of recording");
 
     // Get the source flavor to match
@@ -158,13 +164,13 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
     String configuredTargetFlavorSubtype = currentOperation.getConfiguration(TARGET_FLAVOR_SUBTYPE_PROPERTY);
     MediaPackageElementFlavor matchingFlavor = MediaPackageElementFlavor.parseFlavor(configuredSourceFlavor);
 
-    
     for (Track t : workflowInstance.getMediaPackage().getTracks()) {
       MediaPackageElementFlavor trackFlavor = t.getFlavor();
       if (trackFlavor != null && matchingFlavor.matches(trackFlavor)) {
         String profileId = currentOperation.getConfiguration(ENCODING_PROFILE_PROPERTY);
-        
-        logger.info("Trimming {} to ({}, {})", new String[] { t.toString(), properties.get("trimin"), properties.get("trimout") });
+
+        logger.info("Trimming {} to ({}, {})",
+                new String[] { t.toString(), properties.get("trimin"), properties.get("trimout") });
 
         Track trimmedTrack = null;
         try {
@@ -173,7 +179,7 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
           if (!waitForStatus(job).isSuccess()) {
             throw new WorkflowOperationException("Trimming of " + t + " failed");
           }
-          
+
           trimmedTrack = (Track) MediaPackageElementParser.getFromXml(job.getPayload());
           if (trimmedTrack == null) {
             throw new WorkflowOperationException("Trimming failed to produce a track");

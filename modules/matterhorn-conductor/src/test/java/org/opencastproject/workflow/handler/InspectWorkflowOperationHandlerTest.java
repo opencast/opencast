@@ -129,7 +129,7 @@ public class InspectWorkflowOperationHandlerTest {
     EasyMock.expect(job.getDateCreated()).andReturn(new Date());
     EasyMock.expect(job.getDateStarted()).andReturn(new Date());
     EasyMock.replay(job);
-    
+
     // set up mock service registry
     ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job).anyTimes();
@@ -137,9 +137,7 @@ public class InspectWorkflowOperationHandlerTest {
     operationHandler.setServiceRegistry(serviceRegistry);
 
     inspectionService = EasyMock.createNiceMock(MediaInspectionService.class);
-    EasyMock.expect(
-            inspectionService.enrich((Track) EasyMock.anyObject(), EasyMock.anyBoolean()))
-            .andReturn(job);
+    EasyMock.expect(inspectionService.enrich((Track) EasyMock.anyObject(), EasyMock.anyBoolean())).andReturn(job);
     EasyMock.replay(inspectionService);
     operationHandler.setInspectionService(inspectionService);
 

@@ -51,11 +51,11 @@ public interface Track extends MediaPackageElement {
   boolean hasVideo();
 
   /**
-   * Returns the track duration in milliseconds.
+   * Returns the track duration in milliseconds or <code>null</code> if the duration is not available.
    * 
    * @return the track duration
    */
-  long getDuration();
+  Long getDuration();
 
   /**
    * Returns the track's description with details about framerate, codecs etc.

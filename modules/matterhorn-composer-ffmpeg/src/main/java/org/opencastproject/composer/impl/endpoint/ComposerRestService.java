@@ -75,16 +75,14 @@ import javax.xml.parsers.ParserConfigurationException;
  * A REST endpoint delegating functionality to the {@link ComposerService}
  */
 @Path("/")
-@RestService(name = "composer", title = "Composer", 
-  abstractText = "This service creates and augments Matterhorn media packages that include media tracks, metadata "
-               + "catalogs and attachments.",
-  notes = {
+@RestService(name = "composer", title = "Composer", abstractText = "This service creates and augments Matterhorn media packages that include media tracks, metadata "
+        + "catalogs and attachments.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
-        + "not working and is either restarting or has failed",
+                + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class ComposerRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -212,6 +210,11 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
 
     // Make sure the trim times make sense
     Track sourceTrack = (Track) sourceElement;
+
+    if (sourceTrack.getDuration() == null)
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack element does not have a duration")
+              .build();
+
     if (start < 0) {
       start = 0;
     } else if (duration <= 0) {

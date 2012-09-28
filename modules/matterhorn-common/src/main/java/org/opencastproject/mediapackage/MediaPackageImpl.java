@@ -126,7 +126,7 @@ public final class MediaPackageImpl implements MediaPackage {
   private long startTime = 0L;
 
   /** The media package duration */
-  private long duration = 0;
+  private Long duration = null;
 
   /** The media package's other (uncategorized) files */
   private List<MediaPackageElement> elements = new ArrayList<MediaPackageElement>();
@@ -193,10 +193,10 @@ public final class MediaPackageImpl implements MediaPackage {
    * @see org.opencastproject.mediapackage.MediaPackage#getDuration()
    */
   @XmlAttribute(name = "duration")
-  public long getDuration() {
-    if (duration <= 0 && hasTracks()) {
+  public Long getDuration() {
+    if (duration == null && hasTracks()) {
       for (Track t : getTracks()) {
-        if (duration < t.getDuration())
+        if (duration == null || duration < t.getDuration())
           duration = t.getDuration();
       }
     }
@@ -209,7 +209,7 @@ public final class MediaPackageImpl implements MediaPackage {
    * @see org.opencastproject.mediapackage.MediaPackage#setDuration(long)
    */
   @Override
-  public void setDuration(long duration) throws IllegalStateException {
+  public void setDuration(Long duration) throws IllegalStateException {
     if (hasTracks())
       throw new IllegalStateException(
               "The duration is determined by the length of the tracks and cannot be set manually");
@@ -1074,7 +1074,7 @@ public final class MediaPackageImpl implements MediaPackage {
    * @see org.opencastproject.mediapackage.MediaPackage#remove(org.opencastproject.mediapackage.Track)
    */
   public void remove(Track track) {
-    duration = 0;
+    duration = null;
     removeElement(track);
   }
 
@@ -1299,7 +1299,7 @@ public final class MediaPackageImpl implements MediaPackage {
       id = createElementIdentifier("track", getTracks().length + 1);
       track.setIdentifier(id.toString());
     }
-    duration = 0;
+    duration = null;
     integrate(track);
   }
 
@@ -1758,14 +1758,14 @@ public final class MediaPackageImpl implements MediaPackage {
       if (element instanceof Track) {
         tracks++;
         id = "track-" + tracks;
-        long duration = ((Track) element).getDuration();
+        Long duration = ((Track) element).getDuration();
         // Todo Do not demand equal durations for now... This is an issue that has to be discussed further
         // if (this.duration > 0 && this.duration != duration)
         // throw new MediaPackageException("Track " + element + " cannot be added due to varying duration (" + duration
         // +
         // " instead of " + this.duration +")");
         // else
-        if (this.duration < 0)
+        if (this.duration == null)
           this.duration = duration;
       } else if (element instanceof Attachment) {
         attachments++;
@@ -1801,7 +1801,7 @@ public final class MediaPackageImpl implements MediaPackage {
       if (element instanceof Track) {
         tracks--;
         if (tracks == 0)
-          duration = 0L;
+          duration = null;
       } else if (element instanceof Attachment)
         attachments--;
       else if (element instanceof Catalog)

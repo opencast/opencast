@@ -170,7 +170,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
       switch (op) {
         case Inspect:
           URI uri = URI.create(arguments.get(0));
-          inspectedElement = inspect(job, uri);
+          inspectedElement = inspectTrack(job, uri);
           break;
         case Enrich:
           MediaPackageElement element = MediaPackageElementParser.getFromXml(arguments.get(0));
@@ -231,7 +231,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
    * @throws MediaInspectionException
    *           if inspection fails
    */
-  protected Track inspect(Job job, URI trackURI) throws MediaInspectionException {
+  protected Track inspectTrack(Job job, URI trackURI) throws MediaInspectionException {
     logger.debug("inspect(" + trackURI + ") called, using workspace " + workspace);
 
     try {
@@ -254,6 +254,8 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
       MediaContainerMetadata metadata = getFileMetadata(file);
       if (metadata == null) {
         throw new MediaInspectionException("Media analyzer returned no metadata from " + file);
+      } else if (metadata.getAudioStreamMetadata().size() == 0 && metadata.getVideoStreamMetadata().size() == 0) {
+        throw new MediaInspectionException("File at " + trackURI + " does not seem to be a/v media");
       } else {
         MediaPackageElementBuilder elementBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         TrackImpl track;
@@ -266,7 +268,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
         track = (TrackImpl) element;
 
         // Duration
-        if (metadata.getDuration() != null)
+        if (metadata.getDuration() != null && metadata.getDuration() > 0)
           track.setDuration(metadata.getDuration());
 
         // Checksum
@@ -440,7 +442,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
         }
 
         // enrich the new track with basic info
-        if (track.getDuration() == -1L || override)
+        if (track.getDuration() == null || override)
           track.setDuration(metadata.getDuration());
         if (track.getChecksum() == null || override) {
           try {
@@ -628,18 +630,15 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
    *           if metadata extraction fails
    */
   protected MediaContainerMetadata getFileMetadata(File file) throws MediaInspectionException {
-    if (file == null) {
+    if (file == null)
       throw new IllegalArgumentException("file to analyze cannot be null");
-    }
-    MediaContainerMetadata metadata = null;
     try {
       MediaAnalyzer analyzer = new MediaInfoAnalyzer();
       analyzer.setConfig(analyzerConfig);
-      metadata = analyzer.analyze(file);
+      return analyzer.analyze(file);
     } catch (MediaAnalyzerException e) {
       throw new MediaInspectionException(e);
     }
-    return metadata;
   }
 
   protected void setWorkspace(Workspace workspace) {
