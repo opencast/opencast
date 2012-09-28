@@ -119,7 +119,7 @@ public class StreamHelper extends Thread {
     this.outputStream = redirect;
     this.logger = logger;
     this.contentBuffer = contentBuffer;
-    start(); // FIXME This class should either be final, or should not start threads in the constructor.
+    start();
   }
 
   /**
@@ -135,28 +135,27 @@ public class StreamHelper extends Thread {
   @Override
   public void run() {
     BufferedReader reader = null;
-    InputStreamReader isreader = null;
     try {
       if (outputStream != null) {
         writer = new PrintWriter(outputStream);
       }
-      isreader = new InputStreamReader(inputStream);
-      reader = new BufferedReader(isreader);
-      if (reader.ready()) {
-        String line = reader.readLine();
-        while (keepReading && reader.ready() && line != null) {
-          append(line);
-          log(line);
+      reader = new BufferedReader(new InputStreamReader(inputStream));
+      String line = reader.readLine();
+      while (keepReading && line != null) {
+        append(line);
+        log(line);
+        line = null;
+        if (reader.ready())
           line = reader.readLine();
-        }
-        if (writer != null)
-          writer.flush();
       }
-    } catch (IOException ioe) {
-      logger.error("Error reading process stream: {}", ioe.getMessage(), ioe);
+      if (writer != null)
+        writer.flush();
+    } catch (IOException e) {
+      logger.error("Error reading process stream: {}", e.getMessage(), e);
+    } catch (Throwable t) {
+      logger.debug("Unknown error while reading from process input: {}", t.getMessage());
     } finally {
       IoSupport.closeQuietly(reader);
-      IoSupport.closeQuietly(isreader);
       IoSupport.closeQuietly(writer);
     }
   }
