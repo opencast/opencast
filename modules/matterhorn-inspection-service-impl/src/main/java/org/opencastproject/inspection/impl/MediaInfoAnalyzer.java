@@ -133,7 +133,7 @@ public class MediaInfoAnalyzer extends CmdlineMediaAnalyzerSupport {
 
   protected String[] getAnalysisOptions(File media) {
     String mediaPath = media.getAbsolutePath().replaceAll(" ", "\\ ");
-    return new String[] { "--Language=raw", "--Full", mediaPath};
+    return new String[] { "--Language=raw", "--Full", mediaPath };
   }
 
   protected void onAnalysis(String line) {
@@ -266,11 +266,11 @@ public class MediaInfoAnalyzer extends CmdlineMediaAnalyzerSupport {
         Object converted = converter.invoke(null, value);
         BeanUtils.setProperty(target, property, converted);
       } catch (NoSuchMethodException e) {
-        // throw new RuntimeException(e);
+        logger.warn("No setter found for property '{}'", property);
       } catch (InvocationTargetException e) {
-        // throw new RuntimeException(e);
+        logger.warn("Error setting property '{}'", property);
       } catch (IllegalAccessException e) {
-        // throw new RuntimeException(e);
+        logger.warn("Access restriction error setting property '{}'", property);
       }
     }
 

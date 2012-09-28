@@ -15,6 +15,10 @@
  */
 package org.opencastproject.metadata;
 
+import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.api.MetadataValue;
 import org.opencastproject.metadata.api.StaticMetadata;
@@ -24,6 +28,7 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.NonEmptyList;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,15 +39,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-
 /**
- * This service provides {@link org.opencastproject.metadata.api.StaticMetadata} for a given mediapackage, based
- * on the information in the media package itself.
- *
+ * This service provides {@link org.opencastproject.metadata.api.StaticMetadata} for a given mediapackage, based on the
+ * information in the media package itself.
+ * 
  * todo unit tests will follow
  */
 public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataService {
@@ -75,7 +75,7 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.metadata.api.MetadataService#getMetadata(org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
@@ -93,7 +93,7 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
 
       @Override
       public Option<Long> getExtent() {
-        return some(mp.getDuration());
+        return option(mp.getDuration());
       }
 
       @Override
@@ -181,7 +181,7 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.metadata.api.MetadataService#getPriority()
    */
   @Override
@@ -191,18 +191,19 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
 
   /**
    * @param values
-   *         may be null
+   *          may be null
    * @param valueName
-   *         the name of the returned {@link MetadataValue}
+   *          the name of the returned {@link MetadataValue}
    */
   private static List<MetadataValue<String>> strings2MetadataValues(final String[] values, final String valueName) {
     if (values != null) {
-      return map(Arrays.asList(values), new ArrayList<MetadataValue<String>>(), new Function<String, MetadataValue<String>>() {
-        @Override
-        public MetadataValue<String> apply(String s) {
-          return new MetadataValue<String>(s, valueName);
-        }
-      });
+      return map(Arrays.asList(values), new ArrayList<MetadataValue<String>>(),
+              new Function<String, MetadataValue<String>>() {
+                @Override
+                public MetadataValue<String> apply(String s) {
+                  return new MetadataValue<String>(s, valueName);
+                }
+              });
     } else {
       return Collections.emptyList();
     }

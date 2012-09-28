@@ -182,6 +182,9 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // Start the segmentation jobs
     Map<Track, Job> jobs = new HashMap<Track, Job>();
     for (Track t : videoTracks) {
+      if (t.getDuration() == null)
+        throw new IllegalStateException("Track " + t + " does not have a duration");
+
       // take the minimum of the specified time and the video track duration
       long time = Math.min(Long.parseLong(timeConfiguration), t.getDuration() / 1000L);
 

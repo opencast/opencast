@@ -76,7 +76,8 @@ public final class MediaPackageParser {
    * @throws MediaPackageException
    *           if serializing fails
    */
-  public static Document getAsXml(MediaPackage mediaPackage, MediaPackageSerializer serializer) throws MediaPackageException {
+  public static Document getAsXml(MediaPackage mediaPackage, MediaPackageSerializer serializer)
+          throws MediaPackageException {
     DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
     docBuilderFactory.setNamespaceAware(true);
 
@@ -102,7 +103,7 @@ public final class MediaPackageParser {
       mpXml.setAttribute("start", DateTimeSupport.toUTC(mediaPackage.getDate().getTime()));
 
     // Duration
-    if (mediaPackage.getDuration() > 0)
+    if (mediaPackage.getDuration() != null)
       mpXml.setAttribute("duration", Long.toString(mediaPackage.getDuration()));
 
     // Separate the media package members

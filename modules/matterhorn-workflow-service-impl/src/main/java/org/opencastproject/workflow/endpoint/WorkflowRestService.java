@@ -99,15 +99,13 @@ import javax.ws.rs.core.Response.Status;
  * A REST endpoint for the {@link WorkflowService}
  */
 @Path("/")
-@RestService(name = "workflowservice", title = "Workflow Service",
-  abstractText = "This service lists available workflows and starts, stops, suspends and resumes workflow instances.", 
-  notes = {
+@RestService(name = "workflowservice", title = "Workflow Service", abstractText = "This service lists available workflows and starts, stops, suspends and resumes workflow instances.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
-        + "not working and is either restarting or has failed",
+                + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /** The default number of results returned */
@@ -479,7 +477,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
         // Remove all mediapackage elements (but keep the duration)
         MediaPackage mediaPackage = instance.getMediaPackage();
-        long duration = instance.getMediaPackage().getDuration();
+        Long duration = instance.getMediaPackage().getDuration();
         for (MediaPackageElement element : mediaPackage.elements()) {
           mediaPackage.remove(element);
         }

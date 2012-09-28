@@ -115,10 +115,12 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
   @Override
-  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     MediaPackage mediaPackage = (MediaPackage) workflowInstance.getMediaPackage().clone();
     // Inspect the tracks
     long totalTimeInQueue = 0;
@@ -190,8 +192,10 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
       // Extent
       if (!dublinCore.hasValue(DublinCore.PROPERTY_EXTENT)) {
         DublinCoreValue extent = EncodingSchemeUtils.encodeDuration(mediaPackage.getDuration());
-        dublinCore.set(DublinCore.PROPERTY_EXTENT, extent);
-        logger.debug("Setting dc:extent to '{}'", extent.getValue());
+        if (mediaPackage.getDuration() != null) {
+          dublinCore.set(DublinCore.PROPERTY_EXTENT, extent);
+          logger.debug("Setting dc:extent to '{}'", extent.getValue());
+        }
       }
 
       // Date created

@@ -85,8 +85,8 @@ public class TrackTest {
    */
   @Test
   public void testSetDuration() {
-    track.setDuration(-1);
-    track.setDuration(10);
+    track.setDuration(null);
+    track.setDuration(new Long(10));
   }
 
   /**
@@ -94,7 +94,7 @@ public class TrackTest {
    */
   @Test
   public void testGetDuration() {
-    assertEquals(-1, track.getDuration());
+    assertEquals(null, track.getDuration());
   }
 
   /**

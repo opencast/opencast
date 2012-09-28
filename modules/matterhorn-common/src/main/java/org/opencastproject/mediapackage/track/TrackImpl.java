@@ -54,7 +54,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   /** The duration in milliseconds */
   @XmlElement(name = "duration")
-  protected long duration = -1L;
+  protected Long duration = null;
 
   @XmlElement(name = "audio")
   protected List<AudioStream> audio = new ArrayList<AudioStream>();
@@ -112,14 +112,14 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
    * @param duration
    *          the duration
    */
-  public void setDuration(long duration) {
+  public void setDuration(Long duration) {
     this.duration = duration;
   }
 
   /**
    * @see org.opencastproject.mediapackage.Track#getDuration()
    */
-  public long getDuration() {
+  public Long getDuration() {
     return duration;
   }
 

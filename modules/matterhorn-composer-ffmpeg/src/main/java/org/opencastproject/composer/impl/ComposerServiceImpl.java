@@ -506,6 +506,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
       // The time should not be outside of the track's duration
       for (long time : times) {
+        if (sourceTrack.getDuration() == null)
+          throw new EncoderException("Unable to extract an image from a track with unknown duration");
         if (time < 0 || time > sourceTrack.getDuration()) {
           throw new EncoderException("Can not extract an image at time " + Long.valueOf(time)
                   + " from a track with duration " + Long.valueOf(sourceTrack.getDuration()));
