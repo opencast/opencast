@@ -80,7 +80,13 @@ public abstract class CmdlineMediaAnalyzerSupport implements MediaAnalyzer {
     ProcessExecutor<MediaAnalyzerException> mediaAnalyzer = null;
     mediaAnalyzer = new ProcessExecutor<MediaAnalyzerException>(binary, cmdOptions) {
       @Override
-      protected boolean onLineRead(String line) {
+      protected boolean onStdout(String line) {
+        onAnalysis(line);
+        return true;
+      }
+
+      @Override
+      protected boolean onStderr(String line) {
         onAnalysis(line);
         return true;
       }
