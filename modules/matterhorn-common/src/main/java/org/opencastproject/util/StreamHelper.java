@@ -17,6 +17,7 @@
 package org.opencastproject.util;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,6 +30,8 @@ import java.io.PrintWriter;
  * Helper class to handle Runtime.exec() output.
  */
 public class StreamHelper extends Thread {
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(StreamHelper.class);
 
   /** The input stream */
   private InputStream inputStream;
@@ -43,7 +46,7 @@ public class StreamHelper extends Thread {
   protected PrintWriter writer = null;
 
   /** Append messages to this logger */
-  protected Logger logger = null;
+  protected Logger processLogger = null;
 
   /** True to keep reading the streams */
   protected boolean keepReading = true;
@@ -77,13 +80,13 @@ public class StreamHelper extends Thread {
    * 
    * @param inputStream
    *          the input stream to read from
-   * @param logger
+   * @param processLogger
    *          the logger to append to
    * @param contentBuffer
    *          the buffer to write the captured output to
    */
-  public StreamHelper(InputStream inputStream, Logger logger, StringBuffer contentBuffer) {
-    this(inputStream, null, logger, contentBuffer);
+  public StreamHelper(InputStream inputStream, Logger processLogger, StringBuffer contentBuffer) {
+    this(inputStream, null, processLogger, contentBuffer);
   }
 
   /**
@@ -109,15 +112,15 @@ public class StreamHelper extends Thread {
    *          the input stream to read from
    * @param redirect
    *          a stream to also redirect the captured output to
-   * @param logger
+   * @param processLogger
    *          the logger to append to
    * @param contentBuffer
    *          the buffer to write the captured output to
    */
-  public StreamHelper(InputStream inputStream, OutputStream redirect, Logger logger, StringBuffer contentBuffer) {
+  public StreamHelper(InputStream inputStream, OutputStream redirect, Logger processLogger, StringBuffer contentBuffer) {
     this.inputStream = inputStream;
     this.outputStream = redirect;
-    this.logger = logger;
+    this.processLogger = processLogger;
     this.contentBuffer = contentBuffer;
     start();
   }
@@ -188,8 +191,8 @@ public class StreamHelper extends Thread {
    *          the stream output
    */
   protected void log(String output) {
-    if (logger != null) {
-      logger.info(output);
+    if (processLogger != null) {
+      processLogger.info(output);
     }
   }
 
