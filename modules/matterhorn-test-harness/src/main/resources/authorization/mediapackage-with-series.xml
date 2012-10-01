@@ -1,4 +1,4 @@
-<oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" start="2007-12-05T13:40:00" duration="1004400000" id="597d0b42-5af6-450e-ac0b-c2cb619fc2bf">
+<mediapackage xmlns:oc="http://mediapackage.opencastproject.org" start="2007-12-05T13:40:00" duration="1004400000" id="597d0b42-5af6-450e-ac0b-c2cb619fc2bf">
   <series>10.245/5819</series>
   <media>
     <track id="track-1" type="presentation/source">
@@ -12,4 +12,4 @@
       <url>@SAMPLES_URL@/dc-1.xml</url>
     </catalog>
   </metadata>
-</oc:mediapackage>
+</mediapackage>

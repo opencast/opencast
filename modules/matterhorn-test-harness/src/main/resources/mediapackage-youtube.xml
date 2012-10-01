@@ -1,4 +1,5 @@
-<oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" start="2007-12-05T13:40:00" duration="1004400000">
+<mediapackage xmlns:oc="http://mediapackage.opencastproject.org" start="2007-12-05T13:40:00" duration="1004400000"
+        id="mp-mediapackage-youtube.xml">
   <media>
     <track id="track-1" type="presentation/source">
       <mimetype>video/mpeg</mimetype>
@@ -15,4 +16,4 @@
       <url>@SAMPLES_URL@/dc-2.xml</url>
     </catalog>
   </metadata>
-</oc:mediapackage>
+</mediapackage>
