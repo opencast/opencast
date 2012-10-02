@@ -26,33 +26,28 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
  * @see X
  */
 public abstract class Function2<A, B, C> {
-
-  /**
-   * Apply function to <code>a</code> and <code>b</code>.
-   */
+  /** Apply function to <code>a</code> and <code>b</code>. */
   public abstract C apply(A a, B b);
 
-  /**
-   * Currying.
-   */
+  /** Currying. */
   public Function<B, C> curry(final A a) {
     return Functions.curry(this, a);
   }
 
-  /**
-   * Currying.
-   */
+  /** Currying. */
   public Function<A, Function<B, C>> curry() {
     return Functions.curry(this);
   }
 
-  /**
-   * Version of {@link Function2} that allows for throwing a checked exception.
-   */
-  public abstract static class X<A, B, C> extends Function2<A, B, C> {
+  /** Turn this function into an effect by discarding its result. */
+  public Effect2<A, B> toEffect() {
+    return Functions.toEffect(this);
+  }
 
+  /** Version of {@link Function2} that allows for throwing a checked exception. */
+  public abstract static class X<A, B, C> extends Function2<A, B, C> {
     @Override
-    public C apply(A a, B b) {
+    public final C apply(A a, B b) {
       try {
         return xapply(a, b);
       } catch (Exception e) {

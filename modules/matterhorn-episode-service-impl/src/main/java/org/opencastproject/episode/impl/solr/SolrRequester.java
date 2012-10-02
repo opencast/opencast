@@ -13,73 +13,38 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.episode.impl.solr;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.opencastproject.episode.api.EpisodeQuery;
-import org.opencastproject.episode.api.JaxbMediaSegment;
 import org.opencastproject.episode.api.JaxbSearchResult;
-import org.opencastproject.episode.api.JaxbSearchResultItem;
-import org.opencastproject.episode.api.MediaSegment;
 import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultItem;
-import org.opencastproject.episode.api.Version;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilder;
-import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.User;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.util.SolrUtils;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Predicate;
+import org.opencastproject.util.data.functions.Options;
+import org.opencastproject.util.data.functions.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import static org.opencastproject.episode.api.EpisodeService.READ_PERMISSION;
-import static org.opencastproject.episode.api.EpisodeService.WRITE_PERMISSION;
-import static org.opencastproject.util.data.Collections.filter;
-import static org.opencastproject.util.data.Collections.head;
+import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 
-/**
- * Class implementing <code>LookupRequester</code> to provide connection to solr indexing facility.
- */
+/** Class implementing <code>LookupRequester</code> to provide connection to solr indexing facility. */
 public class SolrRequester {
-
-  /**
-   * Logging facility
-   */
+  /** Logging facility */
   private static Logger logger = LoggerFactory.getLogger(SolrRequester.class);
 
-  /**
-   * The connection to the solr database
-   */
+  /** The connection to the solr database */
   private SolrServer solrServer = null;
-
-  /**
-   * The security service
-   */
-  private SecurityService securityService;
 
   /**
    * Creates a new requester for solr that will be using the given connection object to query the search index.
@@ -87,11 +52,10 @@ public class SolrRequester {
    * @param connection
    *         the solr connection
    */
-  public SolrRequester(SolrServer connection, SecurityService securityService) {
+  public SolrRequester(SolrServer connection) {
     if (connection == null)
       throw new IllegalStateException("Unable to run queries on null connection");
     this.solrServer = connection;
-    this.securityService = securityService;
   }
 
   /**
@@ -121,328 +85,10 @@ public class SolrRequester {
 
     // Walk through response and create new items with title, creator, etc:
     for (final SolrDocument doc : solrResponse.getResults()) {
-      final JaxbSearchResultItem item = JaxbSearchResultItem.create(new SearchResultItem() {
-        private final String dfltString = null;
-
-        @Override
-        public String getId() {
-          return Schema.getDcId(doc);
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @see org.opencastproject.episode.api.SearchResultItem#getOrganization()
-         */
-        @Override
-        public String getOrganization() {
-          return Schema.getOrganization(doc);
-        }
-
-        @Override
-        public MediaPackage getMediaPackage() {
-          MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
-          String mediaPackageFieldValue = Schema.getOcMediapackage(doc);
-          if (mediaPackageFieldValue != null) {
-            try {
-              return builder.loadFromXml(mediaPackageFieldValue);
-            } catch (Exception e) {
-              logger.warn("Unable to read media package from search result", e);
-            }
-          }
-          return null;
-        }
-
-        @Override
-        public long getDcExtent() {
-          if (getType().equals(SearchResultItemType.AudioVisual)) {
-            Long extent = Schema.getDcExtent(doc);
-            if (extent != null)
-              return extent;
-          }
-          return -1;
-        }
-
-        @Override
-        public String getDcTitle() {
-          final List<DField<String>> titles = Schema.getDcTitle(doc);
-          // try to return the first title without any language information first...
-          return head(filter(titles, new Predicate<DField<String>>() {
-            @Override
-            public Boolean apply(DField<String> f) {
-              return f.getSuffix().equals(Schema.LANGUAGE_UNDEFINED);
-            }
-          })).map(new Function<DField<String>, String>() {
-            @Override
-            public String apply(DField<String> f) {
-              return f.getValue();
-            }
-          }).getOrElse(new Function0<String>() {
-            @Override
-            public String apply() {
-              // ... since none is present return the first arbitrary title
-              return Schema.getFirst(titles, dfltString);
-            }
-          });
-        }
-
-        @Override
-        public String getDcSubject() {
-          return Schema.getFirst(Schema.getDcSubject(doc), dfltString);
-        }
-
-        @Override
-        public String getDcDescription() {
-          return Schema.getFirst(Schema.getDcDescription(doc), dfltString);
-        }
-
-        @Override
-        public String getDcCreator() {
-          return Schema.getFirst(Schema.getDcCreator(doc), dfltString);
-        }
-
-        @Override
-        public String getDcPublisher() {
-          return Schema.getFirst(Schema.getDcPublisher(doc), dfltString);
-        }
-
-        @Override
-        public String getDcContributor() {
-          return Schema.getFirst(Schema.getDcContributor(doc), dfltString);
-        }
-
-        @Override
-        public String getDcAbstract() {
-          return null;
-        }
-
-        @Override
-        public Date getDcCreated() {
-          return Schema.getDcCreated(doc);
-        }
-
-        @Override
-        public Date getDcAvailableFrom() {
-          return Schema.getDcAvailableFrom(doc);
-        }
-
-        @Override
-        public Date getDcAvailableTo() {
-          return Schema.getDcAvailableTo(doc);
-        }
-
-        @Override
-        public String getDcLanguage() {
-          return Schema.getDcLanguage(doc);
-        }
-
-        @Override
-        public String getDcRightsHolder() {
-          return Schema.getFirst(Schema.getDcRightsHolder(doc), dfltString);
-        }
-
-        @Override
-        public String getDcSpatial() {
-          return Schema.getFirst(Schema.getDcSpatial(doc), dfltString);
-        }
-
-        @Override
-        public String getDcTemporal() {
-          return null;
-        }
-
-        @Override
-        public String getDcIsPartOf() {
-          return Schema.getDcIsPartOf(doc);
-        }
-
-        @Override
-        public String getDcReplaces() {
-          return Schema.getDcReplaces(doc);
-        }
-
-        @Override
-        public String getDcType() {
-          return Schema.getDcType(doc);
-        }
-
-        @Override
-        public String getDcAccessRights() {
-          return Schema.getFirst(Schema.getDcAccessRights(doc), dfltString);
-        }
-
-        @Override
-        public String getDcLicense() {
-          return Schema.getFirst(Schema.getDcLicense(doc), dfltString);
-        }
-
-        @Override
-        public String getOcMediapackage() {
-          return Schema.getOcMediapackage(doc);
-        }
-
-        @Override
-        public SearchResultItemType getType() {
-          String t = Schema.getOcMediatype(doc);
-          return t != null ? SearchResultItemType.valueOf(t) : null;
-        }
-
-        @Override
-        public String[] getKeywords() {
-          if (getType().equals(SearchResultItemType.AudioVisual)) {
-            String k = Schema.getOcKeywords(doc);
-            return k != null ? k.split(" ") : new String[0];
-          } else
-            return new String[0];
-        }
-
-        @Override
-        public String getCover() {
-          return Schema.getOcCover(doc);
-        }
-
-        @Override
-        public Date getModified() {
-          return Schema.getOcModified(doc);
-        }
-
-        @Override
-        public double getScore() {
-          return Schema.getScore(doc);
-        }
-
-        @Override
-        public MediaSegment[] getSegments() {
-          if (SearchResultItemType.AudioVisual.equals(getType()))
-            return createSearchResultSegments(doc, query).toArray(new JaxbMediaSegment[0]);
-          else
-            return new JaxbMediaSegment[0];
-        }
-
-        @Override
-        public boolean getOcLocked() {
-          Boolean locked = Schema.getOcLocked(doc);
-          return locked != null ? locked : false;
-        }
-
-        @Override
-        public Option<Date> getOcDeleted() {
-          return option(Schema.getOcDeleted(doc));
-        }
-
-        @Override
-        public Version getOcVersion() {
-          return Schema.getOcVersion(doc);
-        }
-
-        @Override
-        public boolean getOcLatestVersion() {
-          Boolean latestVersion = Schema.getOcLatestVersion(doc);
-          return latestVersion != null ? latestVersion : false;
-        }
-
-      });
-
       // Add the item to the result set
-      result.addItem(item);
+      result.addItem(Convert.convert(doc, query));
     }
-
     return result;
-  }
-
-  /**
-   * Creates a list of <code>MediaSegment</code>s from the given result document.
-   *
-   * @param doc
-   *         the result document
-   * @param query
-   *         the original query
-   */
-  private List<JaxbMediaSegment> createSearchResultSegments(SolrDocument doc, SolrQuery query) {
-    List<JaxbMediaSegment> segments = new ArrayList<JaxbMediaSegment>();
-
-    // The maximum number of hits in a segment
-    int maxHits = 0;
-
-    // Loop over every segment
-    for (String fieldName : doc.getFieldNames()) {
-      if (!fieldName.startsWith(Schema.SEGMENT_TEXT_PREFIX))
-        continue;
-
-      // Ceate a new segment
-      int segmentId = Integer.parseInt(fieldName.substring(Schema.SEGMENT_TEXT_PREFIX.length()));
-      JaxbMediaSegment segment = new JaxbMediaSegment(segmentId);
-      segment.setText(mkString(doc.getFieldValue(fieldName)));
-
-      // Read the hints for this segment
-      Properties segmentHints = new Properties();
-      try {
-        String hintFieldName = Schema.SEGMENT_HINT_PREFIX + segment.getIndex();
-        Object hintFieldValue = doc.getFieldValue(hintFieldName);
-        segmentHints.load(new ByteArrayInputStream(hintFieldValue.toString().getBytes()));
-      } catch (IOException e) {
-        logger.warn("Cannot load hint properties.");
-      }
-
-      // get segment time
-      String segmentTime = segmentHints.getProperty("time");
-      if (segmentTime == null)
-        throw new IllegalStateException("Found segment without time hint");
-      segment.setTime(Long.parseLong(segmentTime));
-
-      // get segment duration
-      String segmentDuration = segmentHints.getProperty("duration");
-      if (segmentDuration == null)
-        throw new IllegalStateException("Found segment without duration hint");
-      segment.setDuration(Long.parseLong(segmentDuration));
-
-      // get preview urls
-      for (Entry<Object, Object> entry : segmentHints.entrySet()) {
-        if (entry.getKey().toString().startsWith("preview.")) {
-          String[] parts = entry.getKey().toString().split("\\.");
-          segment.addPreview(entry.getValue().toString(), parts[1]);
-        }
-      }
-
-      // calculate the segment's relevance with respect to the query
-      String queryText = query.getQuery();
-      String segmentText = segment.getText();
-      if (!StringUtils.isBlank(queryText) && !StringUtils.isBlank(segmentText)) {
-        segmentText = segmentText.toLowerCase();
-        Pattern p = Pattern.compile(".*fulltext:\\(([^)]*)\\).*");
-        Matcher m = p.matcher(queryText);
-        if (m.matches()) {
-          String[] queryTerms = StringUtils.split(m.group(1).toLowerCase());
-          int segmentHits = 0;
-          int textLength = segmentText.length();
-          for (String t : queryTerms) {
-            int startIndex = 0;
-            while (startIndex < textLength - 1) {
-              int foundAt = segmentText.indexOf(t, startIndex);
-              if (foundAt < 0)
-                break;
-              segmentHits++;
-              startIndex = foundAt + t.length();
-            }
-          }
-
-          // for now, just store the number of hits, but keep track of the maximum hit count
-          segment.setRelevance(segmentHits);
-          if (segmentHits > maxHits)
-            maxHits = segmentHits;
-        }
-      }
-
-      segments.add(segment);
-    }
-
-    for (JaxbMediaSegment segment : segments) {
-      int hitsInSegment = segment.getRelevance();
-      if (hitsInSegment > 0)
-        segment.setRelevance((int) ((100 * hitsInSegment) / maxHits));
-    }
-
-    return segments;
   }
 
   /**
@@ -536,47 +182,26 @@ public class SolrRequester {
    *
    * @param q
    *         the query
-   * @param action
-   *         one of {@link org.opencastproject.episode.api.EpisodeService#READ_PERMISSION},
-   *         {@link org.opencastproject.episode.api.EpisodeService#WRITE_PERMISSION}
-   * @param applyPermissions
-   *         whether to apply the permissions to the query. Set to false for administrative queries.
    * @return the search results
    */
-  private SolrQuery createQuery(EpisodeQuery q, String action, boolean applyPermissions) throws SolrServerException {
-    StringBuilder sb = new StringBuilder();
-
-    String solrQueryRequest = q.getQuery();
-    if (solrQueryRequest != null) {
-      sb.append(q.getQuery());
-    }
-
-    String solrIdRequest = StringUtils.trimToNull(q.getId());
-    if (solrIdRequest != null) {
-      String cleanSolrIdRequest = SolrUtils.clean(solrIdRequest);
+  private SolrQuery createQuery(EpisodeQuery q) throws SolrServerException {
+    final StringBuilder sb = new StringBuilder();
+    for (String solrQueryRequest : q.getQuery()) sb.append(solrQueryRequest);
+    for (String solrIdRequest : q.getId().bind(SolrUtils.clean)) {
       if (sb.length() > 0)
         sb.append(" AND ");
       sb.append("(");
       sb.append(Schema.DC_ID);
       sb.append(":");
-      sb.append(cleanSolrIdRequest);
+      sb.append(solrIdRequest);
       sb.append(")");
     }
 
-    if (q.isOnlyLastVersion()) {
-      append(sb, Schema.OC_LATEST_VERSION, Boolean.TRUE.toString());
-    }
-
     // full text query with boost
-    String solrTextRequest = StringUtils.trimToNull(q.getText());
-    if (solrTextRequest != null) {
-      String cleanSolrTextRequest = SolrUtils.clean(q.getText());
-      if (StringUtils.isNotEmpty(cleanSolrTextRequest)) {
-        if (sb.length() > 0)
-          sb.append(" AND ");
-        sb.append("*:");
-        sb.append(createBoostedFullTextQuery(cleanSolrTextRequest));
-      }
+    for (String solrTextRequest : q.getText().bind(SolrUtils.clean)) {
+      if (sb.length() > 0) sb.append(" AND ");
+      sb.append("*:");
+      sb.append(createBoostedFullTextQuery(solrTextRequest));
     }
 
     appendFuzzy(sb, Schema.DC_CREATOR_SUM, q.getCreator());
@@ -585,15 +210,12 @@ public class SolrRequester {
     appendFuzzy(sb, Schema.DC_LICENSE_SUM, q.getLicense());
     appendFuzzy(sb, Schema.DC_TITLE_SUM, q.getTitle());
     append(sb, Schema.DC_IS_PART_OF, q.getSeriesId());
+    append(sb, Schema.OC_ORGANIZATION, q.getOrganization());
 
-    if (q.getElementTags() != null && q.getElementTags().length > 0) {
-      if (sb.length() > 0)
-        sb.append(" AND ");
+    if (q.getElementTags().size() > 0) {
+      if (sb.length() > 0) sb.append(" AND ");
       StringBuilder tagBuilder = new StringBuilder();
-      for (int i = 0; i < q.getElementTags().length; i++) {
-        String tag = SolrUtils.clean(q.getElementTags()[i]);
-        if (StringUtils.isEmpty(tag))
-          continue;
+      for (String tag : mlist(q.getElementTags()).bind(Options.<String>asList().o(SolrUtils.clean))) {
         if (tagBuilder.length() == 0) {
           tagBuilder.append("(");
         } else {
@@ -608,15 +230,11 @@ public class SolrRequester {
         sb.append(tagBuilder);
       }
     }
-
-    if (q.getElementFlavors() != null && q.getElementFlavors().length > 0) {
+    if (q.getElementFlavors().size() > 0) {
       if (sb.length() > 0)
         sb.append(" AND ");
       StringBuilder flavorBuilder = new StringBuilder();
-      for (int i = 0; i < q.getElementFlavors().length; i++) {
-        String flavor = SolrUtils.clean(q.getElementFlavors()[i].toString());
-        if (StringUtils.isEmpty(flavor))
-          continue;
+      for (String flavor : mlist(q.getElementFlavors()).bind(Options.<String>asList().o(SolrUtils.clean).o(Strings.<MediaPackageElementFlavor>asStringNull()))) {
         if (flavorBuilder.length() == 0) {
           flavorBuilder.append("(");
         } else {
@@ -631,50 +249,41 @@ public class SolrRequester {
         sb.append(flavorBuilder);
       }
     }
-
-    if (q.getDeletedDate() != null) {
-      if (sb.length() > 0)
-        sb.append(" AND ");
-      sb.append(Schema.OC_DELETED).append(":").append(SolrUtils.serializeDateRange(q.getDeletedDate(), null));
-    } else if (!q.isIncludeDeleted()) {
-      if (sb.length() > 0)
-        sb.append(" AND ");
+    for (Date deleted : q.getDeletedDate()) {
+      if (sb.length() > 0) sb.append(" AND ");
+      sb.append(Schema.OC_DELETED).append(":").append(SolrUtils.serializeDateRange(option(deleted), Option.<Date>none()));
+    }
+    if (!q.getIncludeDeleted()) {
+      if (sb.length() > 0) sb.append(" AND ");
       sb.append("-" + Schema.OC_DELETED + ":[* TO *]");
     }
-
-    if (sb.length() == 0)
-      sb.append("*:*");
-
-    if (applyPermissions) {
-      sb.append(" AND ").append(Schema.OC_ORGANIZATION).append(":").append(securityService.getOrganization().getId());
-      User user = securityService.getUser();
-      String[] roles = user.getRoles();
-      if (roles.length > 0) {
-        sb.append(" AND (");
-        StringBuilder roleList = new StringBuilder();
-        for (String role : roles) {
-          if (roleList.length() > 0)
-            roleList.append(" OR ");
-          roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":").append(role);
-        }
-        sb.append(roleList.toString());
-        sb.append(")");
-      }
+    
+    if (q.getOnlyLastVersion()) {
+      if (sb.length() > 0) sb.append(" AND ");
+      sb.append(Schema.OC_LATEST_VERSION + ":true");
     }
-
+    
     // only episodes
-    if (sb.length() > 0)
-      sb.append(" AND ");
+    if (sb.length() > 0) sb.append(" AND ");
     sb.append(Schema.OC_MEDIATYPE + ":" + SearchResultItem.SearchResultItemType.AudioVisual);
 
-    SolrQuery query = new SolrQuery(sb.toString());
+    // only add date range if at least on criteria is set
+    if (q.getAddedBefore().isSome() || q.getAddedAfter().isSome()) {
+      if (sb.length() > 0) sb.append(" AND ");
+      sb.append(Schema.OC_TIMESTAMP + ":["
+                        + q.getAddedAfter().map(SolrUtils.serializeDate).getOrElse("*")
+                        + " TO "
+                        + q.getAddedBefore().map(SolrUtils.serializeDate).getOrElse("*") + "]");
+    }
 
+    if (sb.length() == 0) sb.append("*:*");
+
+    final SolrQuery solr = new SolrQuery(sb.toString());
     // limit & offset
-    if (q.getLimit() > 0)
-      query.setRows(q.getLimit());
-
-    if (q.getOffset() > 0)
-      query.setStart(q.getOffset());
+    if (q.getLimit().isSome() && q.getLimit().get() > 0)
+      solr.setRows(q.getLimit().get());
+    if (q.getOffset().isSome() && q.getOffset().get() > 0)
+      solr.setStart(q.getOffset().get());
 
     // sorting
     // todo multiValued fields cannot be used for sorting -- need to have the language here
@@ -689,9 +298,9 @@ public class SolrRequester {
     // If the dublin core field dc:created has not been filled in...
     // query.addSortField(Schema.OC_MODIFIED, ORDER.desc);
 
-    query.setFields("* score");
+    solr.setFields("* score");
 
-    return query;
+    return solr;
   }
 
   private static String getSortField(EpisodeQuery.Sort sort) {
@@ -726,16 +335,13 @@ public class SolrRequester {
    *         the value for this search parameter
    * @return the appended {@link StringBuilder}
    */
-  private StringBuilder append(StringBuilder sb, String key, String value) {
-    if (StringUtils.isBlank(key) || StringUtils.isBlank(value)) {
-      return sb;
+  private StringBuilder append(StringBuilder sb, String key, Option<String> value) {
+    for (String val : value) {
+      if (sb.length() > 0) sb.append(" AND ");
+      sb.append(key);
+      sb.append(":");
+      sb.append(ClientUtils.escapeQueryChars(val.toLowerCase()));
     }
-    if (sb.length() > 0) {
-      sb.append(" AND ");
-    }
-    sb.append(key);
-    sb.append(":");
-    sb.append(ClientUtils.escapeQueryChars(value.toLowerCase()));
     return sb;
   }
 
@@ -751,111 +357,28 @@ public class SolrRequester {
    *         the value for this search parameter
    * @return the appended {@link StringBuilder}
    */
-  private StringBuilder appendFuzzy(StringBuilder sb, String key, String value) {
-    if (StringUtils.isBlank(key) || StringUtils.isBlank(value)) {
-      return sb;
+  private StringBuilder appendFuzzy(StringBuilder sb, String key, Option<String> value) {
+    for (String val : value) {
+      if (sb.length() > 0) {
+        sb.append(" AND ");
+      }
+      sb.append("(");
+      sb.append(key).append(":").append(ClientUtils.escapeQueryChars(val.toLowerCase()));
+      sb.append(" OR ");
+      sb.append(key).append(":*").append(ClientUtils.escapeQueryChars(val.toLowerCase())).append("*");
+      sb.append(")");
     }
-    if (sb.length() > 0) {
-      sb.append(" AND ");
-    }
-    sb.append("(");
-    sb.append(key).append(":").append(ClientUtils.escapeQueryChars(value.toLowerCase()));
-    sb.append(" OR ");
-    sb.append(key).append(":*").append(ClientUtils.escapeQueryChars(value.toLowerCase())).append("*");
-    sb.append(")");
     return sb;
   }
 
   /**
-   * Appends query parameters to a solr query
-   *
-   * @param sb
-   *         The {@link StringBuilder} containing the query
-   * @param key
-   *         the key for this search parameter
-   * @return the appended {@link StringBuilder}
-   */
-  private StringBuilder append(StringBuilder sb, String key, Date startDate, Date endDate) {
-    if (StringUtils.isBlank(key) || (startDate == null && endDate == null)) {
-      return sb;
-    }
-    if (sb.length() > 0) {
-      sb.append(" AND ");
-    }
-    if (startDate == null)
-      startDate = new Date(0);
-    if (endDate == null)
-      endDate = new Date(Long.MAX_VALUE);
-    sb.append(key);
-    sb.append(":");
-    sb.append(SolrUtils.serializeDateRange(startDate, endDate));
-    return sb;
-  }
-
-  /**
-   * Returns the search results, regardless of permissions. This should be used for maintenance purposes only.
+   * Query the Solr index.
    *
    * @param q
    *         the search query
-   * @return the readable search result
-   * @throws SolrServerException
    */
-  public SearchResult getForAdministrativeRead(EpisodeQuery q) throws SolrServerException {
-    SolrQuery query = createQuery(q, READ_PERMISSION, false);
+  public SearchResult find(EpisodeQuery q) throws SolrServerException {
+    SolrQuery query = createQuery(q);
     return createSearchResult(query);
   }
-
-  /**
-   * Returns the search results that are accessible for read by the current user.
-   *
-   * @param q
-   *         the search query
-   * @return the readable search result
-   * @throws SolrServerException
-   */
-  public SearchResult getForRead(EpisodeQuery q) throws SolrServerException {
-    SolrQuery query = createQuery(q, READ_PERMISSION, true);
-    return createSearchResult(query);
-  }
-
-  /**
-   * Returns the search results that are accessible for read by the current user.
-   *
-   * @param q
-   *         the search query
-   * @return the readable search result
-   * @throws SolrServerException
-   */
-  public SolrDocumentList getForWriteRaw(EpisodeQuery q) throws SolrServerException {
-    SolrQuery query = createQuery(q, WRITE_PERMISSION, true);
-    try {
-      return solrServer.query(query).getResults();
-    } catch (Exception e) {
-      throw new SolrServerException(e);
-    }
-  }
-
-  /**
-   * Returns the search results that are accessible for write by the current user.
-   *
-   * @param q
-   *         the search query
-   * @return the writable search result
-   * @throws SolrServerException
-   */
-  public SearchResult getForWrite(EpisodeQuery q) throws SolrServerException {
-    SolrQuery query = createQuery(q, WRITE_PERMISSION, true);
-    return createSearchResult(query);
-  }
-
-  /**
-   * Sets the security service.
-   *
-   * @param securityService
-   *         the securityService to set
-   */
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
-  }
-
 }

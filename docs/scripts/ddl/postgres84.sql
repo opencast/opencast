@@ -245,7 +245,7 @@ CREATE TABLE "episode_asset" (
 
 CREATE TABLE "episode_episode" (
   "mediapackage_id" character varying(255) NOT NULL,
-  "version bigint" NOT NULL,
+  "version" bigint NOT NULL,
   "latest_version" boolean NOT NULL,
   "organization_id" character varying(255) DEFAULT NULL,
   "deletion_date" timestamp DEFAULT NULL,
@@ -256,10 +256,10 @@ CREATE TABLE "episode_episode" (
   PRIMARY KEY ("mediapackage_id", "version")
 );
 
-CREATE TABLE "episode_version" (
-  "mediapackageid" character varying(255) NOT NULL,
-  "last_version" bigint NOT NULL,
-  PRIMARY KEY ("mediapackageid")
+CREATE TABLE "episode_version_claim" (
+ "media_package_id" character varying(255) NOT NULL,
+ "last_claimed" bigint NOT NULL,
+ PRIMARY KEY ("media_package_id")
 );
 
 

@@ -16,20 +16,16 @@
 package org.opencastproject.episode.persistence;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.episode.api.Version.version;
 import static org.opencastproject.episode.impl.EpisodeServiceImpl.rewriteForArchival;
+import static org.opencastproject.util.data.Option.some;
 
-import org.opencastproject.episode.api.Version;
 import org.opencastproject.episode.impl.persistence.AbstractEpisodeServiceDatabase;
-import org.opencastproject.episode.impl.persistence.EpisodeDto;
+import org.opencastproject.episode.impl.persistence.Episode;
 import org.opencastproject.episode.impl.persistence.EpisodeServiceDatabase;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -38,8 +34,6 @@ import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.PathSupport;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.util.persistence.PersistenceEnv;
 import org.opencastproject.util.persistence.PersistenceUtil;
 
@@ -102,44 +96,31 @@ public class EpisodeServicePersistenceTest {
 
   @Test
   public void testAdding() throws Exception {
-    Date modifictaionDate = new Date();
-    episodeDatabase.storeEpisode(mediaPackage, accessControlList, modifictaionDate, version(1L));
+    Date modificationDate = new Date();
+    episodeDatabase.storeEpisode(mediaPackage, accessControlList, modificationDate, version(1L));
 
-    Iterator<Tuple3<MediaPackage, Version, String>> allEpisodes = episodeDatabase.getAllEpisodes();
+    Iterator<Episode> allEpisodes = episodeDatabase.getAllEpisodes();
     while (allEpisodes.hasNext()) {
-      Tuple3<MediaPackage, Version, String> episode = allEpisodes.next();
+      final Episode e = allEpisodes.next();
 
-      String mediaPackageId = episode.getA().getIdentifier().toString();
-      Version version = episode.getB();
+      String mpId = e.getMediaPackage().getIdentifier().toString();
 
-      AccessControlList acl = episodeDatabase.getAccessControlList(mediaPackageId, version);
+      AccessControlList acl = e.getAcl();
       assertEquals(accessControlList.getEntries().size(), acl.getEntries().size());
       assertEquals(accessControlList.getEntries().get(0), acl.getEntries().get(0));
-      assertNull(episodeDatabase.getDeletionDate(mediaPackageId));
-      assertTrue(episodeDatabase.getLockState(mediaPackageId));
-      assertTrue(episodeDatabase.isLatestVersion(mediaPackageId, version));
-      assertEquals(modifictaionDate, episodeDatabase.getModificationDate(mediaPackageId, version));
-      assertEquals(episode.getA(), MediaPackageParser.getFromXml(episodeDatabase.getEpisode(mediaPackageId, version).get().getMediaPackageXML()));
-      assertEquals(securityService.getOrganization().getId(), episode.getC());
-      assertEquals(securityService.getOrganization().getId(),
-                   episodeDatabase.getOrganizationId(mediaPackageId, version));
+      assertTrue(e.getDeletionDate().isNone());
+      assertEquals(some(true), episodeDatabase.isLatestVersion(mpId, e.getVersion()));
+      assertEquals(modificationDate, e.getModificationDate());
+      assertEquals(securityService.getOrganization().getId(), e.getOrganization());
     }
   }
 
   @Test
   public void testVersionAdding() throws Exception {
     episodeDatabase.storeEpisode(rewriteForArchival(version(1L)).apply(mediaPackage), accessControlList, new Date(), version(1L));
-    assertTrue(episodeDatabase.isLatestVersion(mediaPackage.getIdentifier().toString(), version(1L)));
+    assertEquals(some(true), episodeDatabase.isLatestVersion(mediaPackage.getIdentifier().toString(), version(1L)));
     episodeDatabase.storeEpisode(rewriteForArchival(version(2L)).apply(mediaPackage), accessControlList, new Date(), version(2L));
-    assertFalse(episodeDatabase.isLatestVersion(mediaPackage.getIdentifier().toString(), version(1L)));
-  }
-
-  @Test
-  public void testLocking() throws Exception {
-    episodeDatabase.storeEpisode(mediaPackage, accessControlList, new Date(), version(1L));
-    assertTrue(episodeDatabase.getLockState(mediaPackage.getIdentifier().toString()));
-    episodeDatabase.lockEpisode(mediaPackage.getIdentifier().toString(), false);
-    assertFalse(episodeDatabase.getLockState(mediaPackage.getIdentifier().toString()));
+    assertEquals(some(false), episodeDatabase.isLatestVersion(mediaPackage.getIdentifier().toString(), version(1L)));
   }
 
   @Test
@@ -147,26 +128,21 @@ public class EpisodeServicePersistenceTest {
     episodeDatabase.storeEpisode(mediaPackage, accessControlList, new Date(), version(1L));
     Date deletionDate = new Date();
     episodeDatabase.deleteEpisode(mediaPackage.getIdentifier().toString(), deletionDate);
-    assertEquals(deletionDate, episodeDatabase.getDeletionDate(mediaPackage.getIdentifier().toString()));
+    assertEquals(deletionDate, episodeDatabase.getDeletionDate(mediaPackage.getIdentifier().toString()).get());
   }
 
   @Test
   public void testRetrieving() throws Exception {
     episodeDatabase.storeEpisode(mediaPackage, accessControlList, new Date(), version(1L));
 
-    boolean exception = false;
-    Option<EpisodeDto> episodeOpt = episodeDatabase.getEpisode(mediaPackage.getIdentifier().toString(), version(0L));
-    assertTrue(episodeOpt.isNone());
-
-    EpisodeDto episode = episodeDatabase.getEpisode(mediaPackage.getIdentifier().toString(), version(1L)).get();
-    assertNotNull(episode);
+    assertTrue(episodeDatabase.getEpisode(mediaPackage.getIdentifier().toString(), version(0L)).isNone());
+    assertTrue(episodeDatabase.getEpisode(mediaPackage.getIdentifier().toString(), version(1L)).isSome());
 
     Date deletionDate = new Date();
     episodeDatabase.deleteEpisode(mediaPackage.getIdentifier().toString(), deletionDate);
-    episode = episodeDatabase.getEpisode(mediaPackage.getIdentifier().toString(), version(1L)).get();
-    assertEquals(deletionDate, episodeDatabase.getDeletionDate(mediaPackage.getIdentifier().toString()));
+    assertEquals(deletionDate, episodeDatabase.getDeletionDate(mediaPackage.getIdentifier().toString()).get());
 
-    Iterator<Tuple3<MediaPackage, Version, String>> allEpisodes = episodeDatabase.getAllEpisodes();
+    Iterator<Episode> allEpisodes = episodeDatabase.getAllEpisodes();
     int i = 0;
     while (allEpisodes.hasNext()) {
       allEpisodes.next();

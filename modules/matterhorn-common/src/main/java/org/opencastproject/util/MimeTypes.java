@@ -13,10 +13,13 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.util;
 
 import org.apache.commons.io.IOUtils;
+import org.opencastproject.util.data.Collections;
+import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.functions.Options;
+import org.opencastproject.util.data.functions.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -36,6 +39,15 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.opencastproject.util.MimeType.mimeType;
+
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
 
 /**
  * This class represents the mime type registry that is responsible for providing resolving mime types through all
@@ -44,10 +56,11 @@ import java.util.List;
  * The registry is initialized from the file <code>org.opencastproject.util.MimeTypes.xml</code>.
  */
 public final class MimeTypes {
-
   /** Disallow construction of this utility class */
   private MimeTypes() {
   }
+
+  public static final Pattern MIME_TYPE_PATTERN = Pattern.compile("([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)");
 
   /** Name of the mime type files */
   public static final String DEFINITION_FILE = "/org/opencastproject/util/MimeTypes.xml";
@@ -76,7 +89,6 @@ public final class MimeTypes {
 
   // Initialize common mime types
   static {
-    initFromFile();
     XML = MimeTypes.parseMimeType("text/xml");
     TEXT = MimeTypes.parseMimeType("text/plain");
     JSON = MimeTypes.parseMimeType("application/json");
@@ -91,18 +103,13 @@ public final class MimeTypes {
     CALENDAR = MimeTypes.parseMimeType("text/calendar");
     ZIP = MimeTypes.parseMimeType("application/zip");
     JAR = MimeTypes.parseMimeType("application/java-archive");
-  }
-
-  /**
-   * Initializes the mime type registry from the given file.
-   */
-  static void initFromFile() {
+    // initialize from file
     InputStream is = null;
     InputStreamReader isr = null;
     try {
       String definitions = null;
       is = MimeTypes.class.getResourceAsStream(DEFINITION_FILE);
-      StringBuffer buf = new StringBuffer();
+      StringBuilder buf = new StringBuilder();
       if (is == null)
         throw new FileNotFoundException(DEFINITION_FILE);
 
@@ -134,86 +141,39 @@ public final class MimeTypes {
     }
   }
 
-  /**
-   * Initializes the mime type registry with those types that are relevant for matterhorn, e. g. <code>video/dv</code>
-   * and <code>video/mj2</code>.
-   */
-  static void initFromDefaults() {
-    MimeType mimeType = null;
+  /** Get a mime type from the registry. */
+  public static Option<MimeType> get(String type, String subtype) {
+    for (MimeType t : mimeTypes) {
+      if (t.getType().equals(type) && t.getSubtype().equals(subtype))
+        return some(t);
+    }
+    return none();
+  }
 
-    // Plain Text
-    mimeType = new MimeType("text", "plain", "txt");
-    mimeTypes.add(mimeType);
-
-    // TYPE_XML
-    mimeType = new MimeType("text", "xml", "xml");
-    mimeTypes.add(mimeType);
-
-    // JSON
-    mimeType = new MimeType("application", "json", "json");
-    mimeTypes.add(mimeType);
-
-    // MPEG-4
-    mimeType = new MimeType("video", "mp4", "mp4");
-    mimeTypes.add(mimeType);
-
-    // MPEG-4 with AAC Audio
-    mimeType = new MimeType("video", "x-m4v", "m4v");
-    mimeTypes.add(mimeType);
-
-    // DV
-    mimeType = new MimeType("video", "x-dv", "dv");
-    mimeType.addEquivalent("application", "x-dv");
-    mimeTypes.add(mimeType);
-
-    // ISO Motion JPEG 2000
-    mimeType = new MimeType("video", "mj2", "mj2");
-    mimeType.addSuffix("mjp2");
-    mimeTypes.add(mimeType);
-
-    // MPEG Audio
-    mimeType = new MimeType("audio", "mpeg", "mp3");
-    mimeTypes.add(mimeType);
-
-    // AAC Audio
-    mimeType = new MimeType("audio", "x-m4a", "m4a");
-    mimeTypes.add(mimeType);
-
+  /** Get a mime type from the registry or create a new one if not available. */
+  public static MimeType getOrCreate(String type, String subtype) {
+    for (MimeType t : get(type, subtype)) return t;
+    return mimeType(type, subtype);
   }
 
   /**
    * Returns a mime type for the given type and subtype, e. g. <code>video/mj2</code>.
-   * <p>
-   * If no mime type can be derived a <code>UnknownFileTypeException</code> is thrown.
-   * 
+   *
    * @param mimeType
    *          the mime type
    * @return the corresponding mime type
-   * @throws UnknownFileTypeException
-   *           if the mime type is unknown
    */
   public static MimeType parseMimeType(String mimeType) {
-    if (mimeType == null)
-      throw new IllegalArgumentException("Argument 'mimeType' was null");
-
-    String[] t = mimeType.trim().split("/");
-    if (t.length < 2) {
-      throw new IllegalArgumentException("Argument 'mimeType' is malformed");
+    final Matcher m = MIME_TYPE_PATTERN.matcher(mimeType);
+    if (!m.matches())
+      throw new IllegalArgumentException("Malformed mime type '" + mimeType + "'");
+    final String type = m.group(1);
+    final String subtype = m.group(2);
+    for (MimeType t : mimeTypes) {
+      if (t.getType().equals(type) && t.getSubtype().equals(subtype))
+        return t;
     }
-
-    for (MimeType m : mimeTypes) {
-      if (m.getType().equals(t[0]) && m.getSubtype().equals(t[1]))
-        try {
-          return m.clone();
-        } catch (CloneNotSupportedException e) {
-          // MimeTypeImpl.clone() is implemented, so this will never happen.
-        }
-    }
-
-    logger.debug("Discovered previously unknown mime type '" + mimeType + "'");
-    MimeType m = new MimeType(t[0], t[1]);
-    mimeTypes.add(m);
-    return m;
+    return mimeType(type, subtype);
   }
 
   /**
@@ -234,12 +194,7 @@ public final class MimeTypes {
       throw new IllegalArgumentException("Argument 'suffix' was null!");
 
     for (MimeType m : mimeTypes) {
-      if (m.supportsSuffix(suffix))
-        try {
-          return m.clone();
-        } catch (CloneNotSupportedException e) {
-          // clone() is implemented, so this will never happen.
-        }
+      if (m.supportsSuffix(suffix)) return m;
     }
     throw new UnknownFileTypeException("File suffix '" + suffix + "' cannot be matched to any mime type");
   }
@@ -397,10 +352,10 @@ public final class MimeTypes {
         return;
       } else if ("MimeType".equals(name)) {
         String[] t = type.split("/");
-        String[] exts = extensions.split(",");
-        MimeType mimeType = new MimeType(t[0].trim(), t[1].trim(), exts[0].trim());
-        if (description != null)
-          mimeType.setDescription(description);
+        MimeType mimeType = mimeType(t[0].trim(), t[1].trim(),
+                                     mlist(extensions.split(",")).bind(Options.<String>asList().o(Strings.trimToNone)).value(),
+                                     Collections.<MimeType>nil(),
+                                     option(description), none(""), none(""));
         registry.add(mimeType);
       }
     }

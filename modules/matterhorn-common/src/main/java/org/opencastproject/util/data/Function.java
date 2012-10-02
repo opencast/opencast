@@ -33,47 +33,38 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
  * @see X
  */
 public abstract class Function<A, B> {
-
-  /**
-   * Apply function to <code>a</code>.
-   */
+  /** Apply function to <code>a</code>. */
   public abstract B apply(A a);
 
-  /**
-   * Currying.
-   */
+  /** Currying. */
   public Function0<B> curry(final A a) {
     return Functions.curry(this, a);
   }
 
-  /**
-   * Currying.
-   */
+  /** Currying. */
   public Function<A, Function0<B>> curry() {
     return Functions.curry(this);
   }
 
-  /**
-   * Function composition. <code>g.o(f).apply(x) == g(f(x))</code>
-   */
+  /** Function composition. <code>g.o(f).apply(x) == g(f(x))</code> */
   public <C> Function<C, B> o(final Function<C, A> f) {
     return Functions.o(Function.this, f);
   }
 
-  /**
-   * Function composition. <code>g.o(f).apply() == g(f())</code>
-   */
+  /** Function composition. <code>g.o(f).apply() == g(f())</code> */
   public Function0<B> o(final Function0<A> f) {
     return Functions.o(Function.this, f);
   }
 
-  /**
-   * Version of {@link Function} that allows for throwing a checked exception.
-   */
-  public abstract static class X<A, B> extends Function<A, B> {
+  /** Turn this function into an effect by discarding its result. */
+  public Effect<A> toEffect() {
+    return Functions.toEffect(this);
+  }
 
+  /** Version of {@link Function} that allows for throwing a checked exception. */
+  public abstract static class X<A, B> extends Function<A, B> {
     @Override
-    public B apply(A a) {
+    public final B apply(A a) {
       try {
         return xapply(a);
       } catch (Exception e) {
@@ -87,9 +78,9 @@ public abstract class Function<A, B> {
      */
     protected abstract B xapply(A a) throws Exception;
   }
-  
+
+  /** Version of {@link Function} that allows for throwing a checked exception. */
   public abstract static class Xe<A, B, Err> extends Function<A, Either<Err, B>> {
-    
     private final Function<Exception, Err> toErr;
 
     protected Xe(Function<Exception, Err> toErr) {

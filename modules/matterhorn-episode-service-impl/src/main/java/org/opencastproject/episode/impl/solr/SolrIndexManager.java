@@ -60,8 +60,8 @@ import org.opencastproject.metadata.mpeg7.TextAnnotation;
 import org.opencastproject.metadata.mpeg7.Video;
 import org.opencastproject.metadata.mpeg7.VideoSegment;
 import org.opencastproject.metadata.mpeg7.VideoText;
-import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
@@ -87,17 +87,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static org.opencastproject.episode.api.EpisodeService.READ_PERMISSION;
-import static org.opencastproject.episode.api.EpisodeService.WRITE_PERMISSION;
 import static org.opencastproject.util.data.Collections.flatMap;
 import static org.opencastproject.util.data.Collections.head;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Collections.nil;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 
@@ -229,7 +227,7 @@ public class SolrIndexManager {
   }
 
   /**
-   * Removes the entry with the given <code>id</code> from the database. The entry can either be a series or an episode.
+   * Set the deleted flag of all versions of the media package with the given id.
    *
    * @param id
    *         identifier of the series or episode to delete
@@ -298,8 +296,6 @@ public class SolrIndexManager {
           inputDocument.setField(field, doc.get(field));
         }
 
-        // Set the oc_deleted field to the current date, then update
-        Schema.setOcLocked(inputDocument, locked);
         solrServer.add(inputDocument);
         solrServer.commit();
       }
@@ -307,6 +303,28 @@ public class SolrIndexManager {
     } catch (IOException e) {
       throw new SolrServerException(e);
     }
+  }
+
+  /** Set the "latestVersion" flag of an index entry. */
+  private void setLatestVersion(MediaPackage sourceMediaPackage, Version version, boolean isLatestVersion)
+          throws SolrServerException, IOException {
+    final SolrQuery query = new SolrQuery(Schema.ID + ":" + sourceMediaPackage.getIdentifier() + version);
+    QueryResponse response = solrServer.query(query);
+
+    // Did we find the episode?
+    if (response.getResults().size() == 0)
+      return;
+
+    if (response.getResults().size() > 1)
+      throw new SolrServerException("Multiple values with the same unique identifier found!");
+
+    SolrDocument doc = response.getResults().get(0);
+    SolrInputDocument inputDoc = new SolrInputDocument();
+    for (String field : doc.getFieldNames()) {
+      inputDoc.setField(field, doc.get(field));
+    }
+    Schema.setOcLatestVersion(inputDoc, false);
+    solrServer.add(inputDoc);
   }
 
   /**
@@ -327,28 +345,14 @@ public class SolrIndexManager {
   public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl, Date now, Version version)
           throws SolrServerException {
     try {
-      // Load the existing media packages
-      SolrQuery query = new SolrQuery(Schema.DC_ID + ":" + sourceMediaPackage.getIdentifier());
-      QueryResponse solrResponse = solrServer.query(query);
-
-      // Use all existing fields
-      for (SolrDocument doc : solrResponse.getResults()) {
-        SolrInputDocument inputDocument = new SolrInputDocument();
-        for (String field : doc.getFieldNames()) {
-          inputDocument.setField(field, doc.get(field));
-        }
-
-        Schema.setOcLatestVersion(inputDocument, false);
-        solrServer.add(inputDocument);
-      }
-
       SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl, version);
-      Schema.setOcLatestVersion(episodeDocument, true);
-      Schema.setOcModified(episodeDocument, now);
+      Schema.setOcTimestamp(episodeDocument, now);
 
       SolrInputDocument seriesDocument = createSeriesInputDocument(sourceMediaPackage.getSeries(), acl);
       if (seriesDocument != null)
         Schema.enrich(episodeDocument, seriesDocument);
+
+      Schema.setOcLatestVersion(episodeDocument, true);
 
       // If neither an episode nor a series was contained, there is no point in trying to update
       if (episodeDocument == null && seriesDocument == null) {
@@ -356,6 +360,8 @@ public class SolrIndexManager {
         solrServer.rollback();
         return false;
       }
+
+      setLatestVersion(sourceMediaPackage, new Version(version.value() - 1L), false);
 
       // Post everything to the search index
       if (episodeDocument != null)
@@ -386,20 +392,18 @@ public class SolrIndexManager {
    *         the access control list for this mediapackage
    * @param version
    *         the archive version
-   * @param latest
-   *         the latest version from archive
-   * @param locked
-   *         the lock state
    * @param deletionDate
    *         the deletion date
    * @param modificationDate
    *         the modification date
+   * @param isLatestVersion
+   *          the latest version flag
    * @return <code>true</code> if successfully added
    * @throws SolrServerException
    *         if an errors occurs while talking to solr
    */
-  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl, Version version, boolean latest,
-                     boolean locked, Date deletionDate, Date modificationDate) throws SolrServerException {
+  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl, Version version,
+          Option<Date> deletionDate, Date modificationDate, boolean isLatestVersion) throws SolrServerException {
     try {
       SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl, version);
 
@@ -407,11 +411,10 @@ public class SolrIndexManager {
       if (seriesDocument != null)
         Schema.enrich(episodeDocument, seriesDocument);
 
-      Schema.setOcLatestVersion(episodeDocument, latest);
-      Schema.setOcLocked(episodeDocument, locked);
-      Schema.setOcModified(episodeDocument, modificationDate);
-      if (deletionDate != null)
-        Schema.setOcDeleted(episodeDocument, deletionDate);
+      Schema.setOcTimestamp(episodeDocument, modificationDate);
+      Schema.setOcLatestVersion(episodeDocument, isLatestVersion);
+      for (Date a : deletionDate)
+        Schema.setOcDeleted(episodeDocument, a);
 
       solrServer.add(episodeDocument);
       solrServer.add(seriesDocument);
@@ -455,9 +458,9 @@ public class SolrIndexManager {
     Schema.setOcMediatype(doc, SearchResultItemType.AudioVisual.toString());
     Schema.setOrganization(doc, securitySvc.getOrganization().getId());
     Schema.setOcMediapackage(doc, MediaPackageParser.getAsXml(mediaPackage));
+    Schema.setOcAcl(doc, AccessControlParser.toXml(acl));
     Schema.setOcElementtags(doc, tags(mediaPackage));
     Schema.setOcElementflavors(doc, flavors(mediaPackage));
-    Schema.setOcLocked(doc, false);
     Schema.setOcVersion(doc, version);
     // Add cover
     Attachment[] cover = mediaPackage.getAttachments(MediaPackageElements.MEDIAPACKAGE_COVER_FLAVOR);
@@ -486,10 +489,6 @@ public class SolrIndexManager {
     } else {
       logger.debug("No segmentation catalog found");
     }
-
-    // /
-    // Add authorization
-    setAuthorization(doc, securitySvc, acl);
 
     return doc;
   }
@@ -652,6 +651,11 @@ public class SolrIndexManager {
       }
 
       @Override
+      public Option<String> getOcAcl() {
+        return Option.none(); // set elsewhere
+      }
+
+      @Override
       public Option<String> getOcKeywords() {
         return Option.none(); // set elsewhere
       }
@@ -682,30 +686,20 @@ public class SolrIndexManager {
       }
 
       @Override
-      public List<DField<String>> getOcAcl() {
-        return Collections.EMPTY_LIST; // set elsewhere
-      }
-
-      @Override
-      public Option<Boolean> getOcPublished() {
-        return Option.none();
-      }
-
-      @Override
       public List<DField<String>> getSegmentText() {
-        return Collections.EMPTY_LIST; // set elsewhere
+        return nil(); // set elsewhere
       }
 
       @Override
       public List<DField<String>> getSegmentHint() {
-        return Collections.EMPTY_LIST; // set elsewhere
+        return nil(); // set elsewhere
       }
 
       @Override
       public Option<Version> getOcVersion() {
         return Option.none(); // set elsewhere
       }
-
+      
       @Override
       public Option<Boolean> getOcLatestVersion() {
         return Option.none(); // set elsewhere
@@ -730,60 +724,6 @@ public class SolrIndexManager {
         return new DField<String>(v.getValue(), v.getLanguage());
       }
     });
-  }
-
-  /**
-   * Adds authorization fields to the solr document.
-   *
-   * @param doc
-   *         the solr document
-   * @param acl
-   *         the access control list
-   */
-  static void setAuthorization(SolrInputDocument doc, SecurityService securityService, AccessControlList acl) {
-    Map<String, List<String>> permissions = new HashMap<String, List<String>>();
-
-    // Define containers for common permissions
-    List<String> reads = new ArrayList<String>();
-    permissions.put(READ_PERMISSION, reads);
-    List<String> writes = new ArrayList<String>();
-    permissions.put(WRITE_PERMISSION, writes);
-
-    String adminRole = null;
-
-    adminRole = securityService.getOrganization().getAdminRole();
-
-    // The admin user can read and write
-    if (adminRole != null) {
-      reads.add(adminRole);
-      writes.add(adminRole);
-    }
-
-    for (AccessControlEntry entry : acl.getEntries()) {
-      if (!entry.isAllow()) {
-        logger.warn("Search service does not support denial via ACL, ignoring {}", entry);
-        continue;
-      }
-      List<String> actionPermissions = permissions.get(entry.getAction());
-      /*
-       * MH-8353 a series could have a permission defined we don't know how to handle -DH
-       */
-      if (actionPermissions == null) {
-        logger.warn("Search service doesn't know how to handle action: " + entry.getAction());
-        continue;
-      }
-      if (acl == null) {
-        actionPermissions = new ArrayList<String>();
-        permissions.put(entry.getAction(), actionPermissions);
-      }
-      actionPermissions.add(entry.getRole());
-
-    }
-
-    // Write the permissions to the solr document
-    for (Entry<String, List<String>> entry : permissions.entrySet()) {
-      Schema.setOcAcl(doc, new DField<String>(mkString(entry.getValue(), ","), entry.getKey()));
-    }
   }
 
   static String mkString(Collection<?> as, String sep) {
@@ -860,9 +800,6 @@ public class SolrIndexManager {
     // DC fields
     addSeriesMetadata(doc, dc);
 
-    // Authorization
-    setAuthorization(doc, securitySvc, acl);
-
     return doc;
   }
 
@@ -876,190 +813,93 @@ public class SolrIndexManager {
    */
   static void addSeriesMetadata(final SolrInputDocument doc, final DublinCoreCatalog dc) throws IOException {
     Schema.fill(doc, new Schema.FieldCollector() {
-      @Override
-      public Option<String> getId() {
-        return Option.none();
-      }
-
-      @Override
-      public Option<String> getOrganization() {
-        return Option.none();
-      }
-
-      @Override
-      public Option<String> getDcId() {
-        return Option.some(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER));
-      }
-
-      @Override
-      public Option<Date> getDcCreated() {
-        return head(dc.get(DublinCore.PROPERTY_CREATED)).flatMap(toDateF);
-      }
-
-      @Override
-      public Option<Long> getDcExtent() {
-        return head(dc.get(DublinCore.PROPERTY_EXTENT)).flatMap(toDurationF);
-      }
-
-      @Override
-      public Option<String> getDcLanguage() {
-        return option(dc.getFirst(DublinCore.PROPERTY_LANGUAGE));
-      }
-
-      @Override
-      public Option<String> getDcIsPartOf() {
-        return option(dc.getFirst(DublinCore.PROPERTY_IS_PART_OF));
-      }
-
-      @Override
-      public Option<String> getDcReplaces() {
-        return option(dc.getFirst(DublinCore.PROPERTY_REPLACES));
-      }
-
-      @Override
-      public Option<String> getDcType() {
-        return option(dc.getFirst(DublinCore.PROPERTY_TYPE));
-      }
-
-      @Override
-      public Option<Date> getDcAvailableFrom() {
+      @Override public Option<String> getId() { return Option.none(); }
+      @Override public Option<String> getOrganization() { return Option.none(); }
+      @Override public Option<String> getDcId() { return Option.some(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER)); }
+      @Override public Option<Date> getDcCreated() { return head(dc.get(DublinCore.PROPERTY_CREATED)).flatMap(toDateF); }
+      @Override public Option<Long> getDcExtent() { return head(dc.get(DublinCore.PROPERTY_EXTENT)).flatMap(toDurationF); }
+      @Override public Option<String> getDcLanguage() { return option(dc.getFirst(DublinCore.PROPERTY_LANGUAGE)); }
+      @Override public Option<String> getDcIsPartOf() { return option(dc.getFirst(DublinCore.PROPERTY_IS_PART_OF)); }
+      @Override public Option<String> getDcReplaces() { return option(dc.getFirst(DublinCore.PROPERTY_REPLACES)); }
+      @Override public Option<String> getDcType() { return option(dc.getFirst(DublinCore.PROPERTY_TYPE)); }
+      @Override public Option<Date> getDcAvailableFrom() {
         return option(dc.getFirst(DublinCore.PROPERTY_AVAILABLE)).flatMap(new Function<String, Option<Date>>() {
-          @Override
-          public Option<Date> apply(String s) {
+          @Override public Option<Date> apply(String s) {
             return option(EncodingSchemeUtils.decodePeriod(s).getStart());
           }
         });
       }
-
-      @Override
-      public Option<Date> getDcAvailableTo() {
-        return option(dc.getFirst(DublinCore.PROPERTY_AVAILABLE)).flatMap(new Function<String, Option<Date>>() {
-          @Override
-          public Option<Date> apply(String s) {
-            return option(EncodingSchemeUtils.decodePeriod(s).getEnd());
-          }
-        });
+      @Override public Option<Date> getDcAvailableTo() { return option(dc.getFirst(DublinCore.PROPERTY_AVAILABLE)).flatMap(new Function<String, Option<Date>>() {
+        @Override public Option<Date> apply(String s) {
+          return option(EncodingSchemeUtils.decodePeriod(s).getEnd());
+        }
+      });
       }
-
-      @Override
-      public List<DField<String>> getDcTitle() {
-        return fromDCValue(dc.get(DublinCore.PROPERTY_TITLE));
-      }
-
-      @Override
-      public List<DField<String>> getDcSubject() {
+      @Override public List<DField<String>> getDcTitle() { return fromDCValue(dc.get(DublinCore.PROPERTY_TITLE)); }
+      @Override public List<DField<String>> getDcSubject() {
         return fromDCValue(dc.get(DublinCore.PROPERTY_SUBJECT));
       }
-
-      @Override
-      public List<DField<String>> getDcCreator() {
+      @Override public List<DField<String>> getDcCreator() {
         return fromDCValue(dc.get(DublinCore.PROPERTY_CREATOR));
       }
-
-      @Override
-      public List<DField<String>> getDcPublisher() {
+      @Override public List<DField<String>> getDcPublisher() {
         return fromDCValue(dc.get(DublinCore.PROPERTY_PUBLISHER));
       }
-
-      @Override
-      public List<DField<String>> getDcContributor() {
+      @Override public List<DField<String>> getDcContributor() {
         return fromDCValue(dc.get(DublinCore.PROPERTY_CONTRIBUTOR));
 
       }
-
-      @Override
-      public List<DField<String>> getDcDescription() {
+      @Override public List<DField<String>> getDcDescription() {
         return fromDCValue(dc.get(DublinCore.PROPERTY_DESCRIPTION));
       }
-
-      @Override
-      public List<DField<String>> getDcRightsHolder() {
+      @Override public List<DField<String>> getDcRightsHolder() {
         return fromDCValue(dc.get(DublinCore.PROPERTY_RIGHTS_HOLDER));
       }
-
-      @Override
-      public List<DField<String>> getDcSpatial() {
+      @Override public List<DField<String>> getDcSpatial() {
         return fromDCValue(dc.get(DublinCore.PROPERTY_SPATIAL));
       }
-
-      @Override
-      public List<DField<String>> getDcAccessRights() {
+      @Override public List<DField<String>> getDcAccessRights() {
         return fromDCValue(dc.get(DublinCore.PROPERTY_ACCESS_RIGHTS));
       }
-
-      @Override
-      public List<DField<String>> getDcLicense() {
+      @Override public List<DField<String>> getDcLicense() {
         return fromDCValue(dc.get(DublinCore.PROPERTY_LICENSE));
       }
-
-      @Override
-      public Option<String> getOcMediatype() {
+      @Override public Option<String> getOcMediatype() {
         return Option.none();
       }
-
-      @Override
-      public Option<String> getOcMediapackage() {
+      @Override public Option<String> getOcMediapackage() { return Option.none(); }
+      @Override public Option<String> getOcAcl() {
         return Option.none();
       }
-
-      @Override
-      public Option<String> getOcKeywords() {
+      @Override public Option<String> getOcKeywords() {
         return Option.none();
       }
-
-      @Override
-      public Option<String> getOcCover() {
+      @Override public Option<String> getOcCover() {
         return Option.none();
       }
-
-      @Override
-      public Option<Date> getOcModified() {
+      @Override public Option<Date> getOcModified() {
         return Option.none();
       }
-
-      @Override
-      public Option<Date> getOcDeleted() {
+      @Override public Option<Date> getOcDeleted() {
         return Option.none();
       }
-
-      @Override
-      public Option<String> getOcElementtags() {
+      @Override public Option<String> getOcElementtags() {
         return Option.none();
       }
-
-      @Override
-      public Option<String> getOcElementflavors() {
+      @Override public Option<String> getOcElementflavors() {
         return Option.none();
       }
-
-      @Override
-      public List<DField<String>> getOcAcl() {
-        return Collections.EMPTY_LIST;
-      }
-
-      @Override
-      public Option<Boolean> getOcPublished() {
+      @Override public Option<Version> getOcVersion() {
         return Option.none();
       }
-
-      @Override
-      public Option<Version> getOcVersion() {
+      @Override public Option<Boolean> getOcLatestVersion() {
         return Option.none();
       }
-
-      @Override
-      public List<DField<String>> getSegmentText() {
-        return Collections.EMPTY_LIST;
+      @Override public List<DField<String>> getSegmentText() {
+        return nil();
       }
-
-      @Override
-      public List<DField<String>> getSegmentHint() {
-        return Collections.EMPTY_LIST;
-      }
-
-      @Override
-      public Option<Boolean> getOcLatestVersion() {
-        return Option.none();
+      @Override public List<DField<String>> getSegmentHint() {
+        return nil();
       }
     });
   }

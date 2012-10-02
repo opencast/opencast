@@ -24,6 +24,8 @@ import static org.opencastproject.util.EqualsUtil.hash;
  * API changes.
  */
 public final class Version {
+  public static final Version FIRST = version(0L);
+
   private final long nr;
 
   public Version(long nr) {

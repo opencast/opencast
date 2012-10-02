@@ -36,7 +36,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-/** An archived media package element. */
+/** JPA link to {@link org.opencastproject.episode.impl.persistence.Asset}. */
 @Entity(name = "Asset")
 @Table(name = "episode_asset")
 @NamedQueries({
@@ -66,6 +66,7 @@ public final class AssetDto {
   @Column(name = "checksum", nullable = false)
   private String checksum;
 
+  /** Create a new DTO. */
   public static AssetDto create(URI uri, StoragePath path, String checksum) {
     final AssetDto dto = new AssetDto();
     dto.uri = uri.toString();
@@ -77,10 +78,12 @@ public final class AssetDto {
     return dto;
   }
 
+  /** Convert into business object. */
   public Asset toAsset() {
     return new Asset(URI.create(uri), spath(organizationId, mediaPackageId, version(version), mediaPackageElementId), checksum);
   }
 
+  /** Find an asset by its URI. */
   public static Function<EntityManager, Option<AssetDto>> findByUri(final URI uri) {
     return new Function<EntityManager, Option<AssetDto>>() {
       @Override public Option<AssetDto> apply(EntityManager em) {
@@ -89,6 +92,7 @@ public final class AssetDto {
     };
   }
 
+  /** Find an arbitrary asset having the same checksum. */
   public static Function<EntityManager, Option<AssetDto>> findOneByChecksum(final String checksum) {
     return new Function<EntityManager, Option<AssetDto>>() {
       @Override public Option<AssetDto> apply(EntityManager em) {
@@ -97,6 +101,7 @@ public final class AssetDto {
     };
   }
 
+  /** Convert a DTO into the corresponding business object. */
   public static final Function<AssetDto, Asset> toAsset = new Function<AssetDto, Asset>() {
     @Override public Asset apply(AssetDto dto) {
       return dto.toAsset();

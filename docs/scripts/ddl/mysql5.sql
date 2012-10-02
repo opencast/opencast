@@ -196,10 +196,10 @@ CREATE TABLE episode_episode (
   PRIMARY KEY (mediapackage_id,version)
 );
 
-CREATE TABLE episode_version (
-  mediapackageid VARCHAR(255) NOT NULL,
-  last_version BIGINT(20) NOT NULL,
-  PRIMARY KEY (mediapackageid)
+CREATE TABLE episode_version_claim (
+ media_package_id VARCHAR(255) NOT NULL,
+ last_claimed BIGINT(20) NOT NULL,
+ PRIMARY KEY (media_package_id)
 );
 
 ALTER TABLE host_registration ADD CONSTRAINT UNQ_host_registration_0 UNIQUE (

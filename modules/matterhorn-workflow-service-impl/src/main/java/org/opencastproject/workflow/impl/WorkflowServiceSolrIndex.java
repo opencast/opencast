@@ -16,6 +16,7 @@
 package org.opencastproject.workflow.impl;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.workflow.api.WorkflowService.READ_PERMISSION;
 import static org.opencastproject.workflow.api.WorkflowService.WRITE_PERMISSION;
 
@@ -779,8 +780,6 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    *          The {@link StringBuilder} containing the query
    * @param key
    *          the key for this search parameter
-   * @param value
-   *          the value for this search parameter
    * @return the appended {@link StringBuilder}
    */
   private StringBuilder append(StringBuilder sb, String key, Date startDate, Date endDate) {
@@ -796,7 +795,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       endDate = new Date(Long.MAX_VALUE);
     sb.append(key);
     sb.append(":");
-    sb.append(SolrUtils.serializeDateRange(startDate, endDate));
+    sb.append(SolrUtils.serializeDateRange(option(startDate), option(endDate)));
     return sb;
   }
 
@@ -901,8 +900,6 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    *          The {@link StringBuilder} containing the query
    * @param key
    *          the key for this search parameter
-   * @param value
-   *          the value for this search parameter
    * @return the appended {@link StringBuilder}
    */
   protected StringBuilder appendMap(StringBuilder sb, String key, List<QueryTerm> queryTerms) {

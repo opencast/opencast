@@ -39,6 +39,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,7 @@ import static org.opencastproject.search.api.SearchService.READ_PERMISSION;
 import static org.opencastproject.search.api.SearchService.WRITE_PERMISSION;
 import static org.opencastproject.util.data.Collections.filter;
 import static org.opencastproject.util.data.Collections.head;
+import static org.opencastproject.util.data.Option.option;
 
 /**
  * Class implementing <code>LookupRequester</code> to provide connection to solr indexing facility.
@@ -643,7 +645,7 @@ public class SolrRequester {
     if (q.getDeletedDate() != null) {
       if (sb.length() > 0)
         sb.append(" AND ");
-      sb.append(Schema.OC_DELETED + ":" + SolrUtils.serializeDateRange(q.getDeletedDate(), null));
+      sb.append(Schema.OC_DELETED + ":" + SolrUtils.serializeDateRange(option(q.getDeletedDate()), Option.<Date>none()));
     }
 
     if (sb.length() == 0)

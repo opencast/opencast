@@ -28,6 +28,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
+import org.opencastproject.episode.api.EpisodeServiceException;
 import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultItem;
 import org.opencastproject.episode.api.Version;
@@ -64,6 +65,8 @@ import org.opencastproject.series.impl.solr.SeriesServiceSolrIndex;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.data.Collections;
+import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.persistence.PersistenceEnv;
 import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workspace.api.Workspace;
@@ -76,22 +79,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.opencastproject.episode.api.EpisodeQuery.systemQuery;
+import static org.opencastproject.mediapackage.MediaPackageSupport.loadMediaPackageFromClassPath;
 import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ADMIN;
 import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ANONYMOUS;
 import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
 import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_NAME;
 import static org.opencastproject.util.UrlSupport.DEFAULT_BASE_URL;
+import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.VCell.cell;
 
 /**
  * Tests the functionality of the search service.
- * 
+ *
  * todo setup scenario where gathering metadata from both the media package and the dublin core is required
  * (StaticMetadataServiceMediaPackageImpl, StaticMetadataServiceDublinCoreImpl)
  */
@@ -107,11 +113,11 @@ public class EpisodeServiceImplTest {
   private AccessControlList acl = null;
 
   /** A user with permissions. */
-  private final User userWithPermissions = new User("sample", "opencastproject.org", new String[] { "ROLE_STUDENT",
-          "ROLE_OTHERSTUDENT", new DefaultOrganization().getAnonymousRole() });
+  private final User userWithPermissions = new User("sample", "opencastproject.org", new String[]{"ROLE_STUDENT",
+          "ROLE_OTHERSTUDENT", new DefaultOrganization().getAnonymousRole()});
 
   /** A user without permissions. */
-  private final User userWithoutPermissions = new User("sample", "opencastproject.org", new String[] { "ROLE_NOTHING" });
+  private final User userWithoutPermissions = new User("sample", "opencastproject.org", new String[]{"ROLE_NOTHING"});
 
   private final Organization defaultOrganization = new DefaultOrganization();
   private final User defaultUser = userWithPermissions;
@@ -160,7 +166,7 @@ public class EpisodeServiceImplTest {
     ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
     EasyMock.expect(
             serviceRegistry.createJob((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (List<String>) EasyMock.anyObject(), (String) EasyMock.anyObject(), EasyMock.anyBoolean()))
+                                      (List<String>) EasyMock.anyObject(), (String) EasyMock.anyObject(), EasyMock.anyBoolean()))
             .andReturn(new JaxbJob()).anyTimes();
     EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(new JaxbJob()).anyTimes();
     EasyMock.expect(serviceRegistry.getJobs((String) EasyMock.anyObject(), (Status) EasyMock.anyObject()))
@@ -233,7 +239,7 @@ public class EpisodeServiceImplTest {
     solrServer = EpisodeServicePublisher.setupSolr(new File(solrRoot));
     StaticMetadataService mdService = newStaticMetadataService(workspace);
     SeriesService seriesService = newSeriesService();
-    service = new EpisodeServiceImpl(new SolrRequester(solrServer, securityService),
+    service = new EpisodeServiceImpl(new SolrRequester(solrServer),
                                      new SolrIndexManager(solrServer,
                                                           workspace,
                                                           cell(Arrays.asList(mdService)),
@@ -273,42 +279,33 @@ public class EpisodeServiceImplTest {
     service = null;
   }
 
-  /**
-   * Test whether an empty search index will work.
-   */
+  /** Test whether an empty search index will work. */
   @Test
   public void testEmptySearchIndex() {
-    SearchResult result = service.find(new EpisodeQuery().withId("foo"));
+    SearchResult result = service.find(systemQuery().id("foo"));
     assertEquals(0, result.size());
   }
 
-  /**
-   * Adds a simple media package that has a dublin core for the episode only.
-   */
+  /** Adds a simple media package that has a dublin core for the episode only. */
   @Test
   public void testGetMediaPackage() throws Exception {
-    MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
+    MediaPackage mediaPackage = loadMediaPackageFromClassPath("/manifest-simple.xml");
 
     // Make sure our mocked ACL has the read and write permission
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
+    setReadWritePermissions();
 
-    // Add the media package to the search index
     service.add(mediaPackage);
 
     // Make sure it's properly indexed and returned for authorized users
-    EpisodeQuery q = new EpisodeQuery();
-    q.withId("10.0000/1");
+    EpisodeQuery q = systemQuery();
+    q.id("10.0000/1");
     SearchResult result = service.find(q);
     assertEquals(1, result.size());
-    assertFalse(result.getItems().get(0).getOcLocked());
 
     service.delete(mediaPackage.getIdentifier().toString());
 
-    q = new EpisodeQuery();
-    q.withId("10.0000/1");
+    q = systemQuery();
+    q.id("10.0000/1");
     result = service.find(q);
     assertEquals(0, result.size());
 
@@ -321,107 +318,87 @@ public class EpisodeServiceImplTest {
     service.add(mediaPackage);
 
     // This mediapackage should not be readable by the current user (due to the lack of role ROLE_UNKNOWN)
-    q = new EpisodeQuery();
-    q.withId("10.0000/1");
-    assertEquals(0, service.find(q).size());
-  }
-
-//  @Test
-//  public void testLockMediaPackage() throws Exception {
-//    MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
-//
-//    // Make sure our mocked ACL has the read and write permission
-//    acl.getEntries().add(
-//            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
-//    acl.getEntries().add(
-//            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
-//
-//    // Add the media package to the episode service
-//    service.add(mediaPackage);
-//
-//    // lock it
-//    service.lock("10.0000/1", true);
-//    {
-//      EpisodeQuery q = new EpisodeQuery();
-//      q.withId("10.0000/1");
-//      SearchResult result = service.find(q);
-//      assertEquals(1, result.size());
-//      assertTrue(result.getItems().get(0).getOcLocked());
-//    }
-//
-//    // then unlock
-//    service.lock("10.0000/1", false);
-//    {
-//      EpisodeQuery q = new EpisodeQuery();
-//      q.withId("10.0000/1");
-//      SearchResult result = service.find(q);
-//      assertEquals(1, result.size());
-//      assertFalse(result.getItems().get(0).getOcLocked());
-//    }
-//  }
-
-  private MediaPackage getMediaPackage(String path) throws MediaPackageException {
-    MediaPackageBuilderFactory builderFactory = MediaPackageBuilderFactory.newInstance();
-    MediaPackageBuilder mediaPackageBuilder = builderFactory.newMediaPackageBuilder();
-    URL rootUrl = EpisodeServiceImplTest.class.getResource("/");
-    mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(rootUrl));
-
-    // Load the simple media package
-    MediaPackage mediaPackage = null;
-    InputStream is = null;
+    q = systemQuery();
+    q.id("10.0000/1");
     try {
-      is = EpisodeServiceImplTest.class.getResourceAsStream(path);
-      mediaPackage = mediaPackageBuilder.loadFromXml(is);
-    } finally {
-      IOUtils.closeQuietly(is);
+      service.find(q).size();
+      fail("This mediapackage should not be readable by the current user");
+    } catch (EpisodeServiceException e) {
+      assertTrue(e.isCauseNotAuthorized());
     }
-    return mediaPackage;
   }
 
-  /**
-   * Tests whether an episode can be found based on its series metadata.
-   */
+  @Test
+  public void testOnlyLastVersion2() throws Exception {
+    final MediaPackage mpSimple = loadMediaPackageFromClassPath("/manifest-simple.xml");
+
+    // Make sure our mocked ACL has the read and write permission
+    setReadWritePermissions();
+    // create three versions of mpSimple
+    service.add(mpSimple);
+    service.add(mpSimple);
+    service.add(mpSimple);
+    assertEquals(3, service.find(systemQuery().id("10.0000/1")).size());
+    // modify mediapackage
+    service.add(mpSimple);
+    {
+      final SearchResult r = service.find(systemQuery().id("10.0000/1"));
+      assertEquals(4, r.size());
+      // check that each added media package has a unique version
+      assertEquals(r.size(),
+                   mlist(service.find(systemQuery().id("10.0000/1")).getItems())
+                           .foldl(Collections.<Version>set(), new Function2<Set<Version>, SearchResultItem, Set<Version>>() {
+                             @Override public Set<Version> apply(Set<Version> sum, SearchResultItem item) {
+                               sum.add(item.getOcVersion());
+                               return sum;
+                             }
+                           }).size());
+    }
+    {
+      final SearchResult r = service.find(systemQuery().id("10.0000/1").onlyLastVersion());
+      assertEquals(1, r.size());
+      // todo not good to make assumptions about versions...
+      assertEquals(Version.version(3), r.getItems().get(0).getOcVersion());
+    }
+  }
+
+  /** Tests whether an episode can be found based on its series metadata. */
   @Test
   @Ignore
   public void testSearchForEpisodeWithSeriesMetadata() throws Exception {
-    MediaPackage mediaPackage = getMediaPackage("/manifest-full.xml");
+    MediaPackage mediaPackage = loadMediaPackageFromClassPath("/manifest-full.xml");
     service.add(mediaPackage);
 
-    SearchResult episodeMetadataResult = service.find(new EpisodeQuery().withText("Vegetation"));
-    SearchResult seriesMetadataResult = service.find(new EpisodeQuery().withText("Atmospheric Science"));
+    SearchResult episodeMetadataResult = service.find(systemQuery().text("Vegetation"));
+    SearchResult seriesMetadataResult = service.find(systemQuery().text("Atmospheric Science"));
 
     assertEquals(1, episodeMetadataResult.getItems().size());
     assertEquals(1, seriesMetadataResult.getItems().size());
   }
 
-  /**
-   * Adds a simple media package that has a dublin core for the episode only.
-   */
+  /** Adds a simple media package that has a dublin core for the episode only. */
   @Test
   public void testAddSimpleMediaPackage() throws Exception {
-    MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
+    MediaPackage mediaPackage = loadMediaPackageFromClassPath("/manifest-simple.xml");
 
     // Make sure our mocked ACL has the read and write permission
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
+    setReadWritePermissions();
 
     // Add the media package to the search index
     service.add(mediaPackage);
 
     // Make sure it's properly indexed and returned
-    EpisodeQuery q = new EpisodeQuery();
-    q.withId("10.0000/1");
+    EpisodeQuery q = systemQuery();
+    q.id("10.0000/1");
     assertEquals(1, service.find(q).size());
 
-    q = new EpisodeQuery();
+    q = systemQuery();
 
     assertEquals(1, service.find(q).size());
 
     // Test for various fields
-    q = new EpisodeQuery();
-    q.withId("10.0000/1");
+    q = systemQuery();
+    q.id("10.0000/1");
     SearchResult result = service.find(q);
     assertEquals(1, result.getTotalSize());
     SearchResultItem resultItem = result.getItems().get(0);
@@ -429,103 +406,64 @@ public class EpisodeServiceImplTest {
     assertEquals(1, resultItem.getMediaPackage().getCatalogs().length);
   }
 
-  /**
-   * Adds a simple media package that has a dublin core for the episode only.
-   */
   @Test
-  public void testGetOnlyLastVersion() throws Exception {
-    MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
-
+  public void testOnlyLastVersion() throws Exception {
+    final MediaPackage mpSimple = loadMediaPackageFromClassPath("/manifest-simple.xml");
     // Make sure our mocked ACL has the read and write permission
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
-
+    setReadWritePermissions();
     // Add the media package to the search index
-    service.add(mediaPackage);
-    service.add(mediaPackage);
-
+    service.add(mpSimple);
+    service.add(mpSimple);
     // Make sure it's properly indexed and returned
-    EpisodeQuery q = new EpisodeQuery().withId("10.0000/1");
-
-    assertEquals(2, service.find(q).size());
-
-    q = new EpisodeQuery().withId("10.0000/1").withOnlyLastVersion();
-
-    SearchResult byQuery = service.find(q);
-    assertEquals(1, byQuery.size());
+    assertEquals(2, service.find(systemQuery().id("10.0000/1")).size());
+    assertEquals(1, service.find(systemQuery().onlyLastVersion()).size());
+    // add another media package
+    final MediaPackage mpFull = loadMediaPackageFromClassPath("/manifest-full.xml");
+    service.add(mpFull);
+    assertEquals(3, service.find(systemQuery()).size());
+    // now there must be two last versions
+    assertEquals(2, service.find(systemQuery().onlyLastVersion()).size());
   }
 
-  /**
-   * Ads a simple media package that has a dublin core for the episode only.
-   */
+  /** Ads a simple media package that has a dublin core for the episode only. */
   @Test
   public void testAddFullMediaPackage() throws Exception {
-    MediaPackageBuilderFactory builderFactory = MediaPackageBuilderFactory.newInstance();
-    MediaPackageBuilder mediaPackageBuilder = builderFactory.newMediaPackageBuilder();
-    URL rootUrl = EpisodeServiceImplTest.class.getResource("/");
-    mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(rootUrl));
-
-    // Load the simple media package
-    MediaPackage mediaPackage = null;
-    InputStream is = null;
-    try {
-      is = EpisodeServiceImplTest.class.getResourceAsStream("/manifest-full.xml");
-      mediaPackage = mediaPackageBuilder.loadFromXml(is);
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
-
+    MediaPackage mp = loadMediaPackageFromClassPath("/manifest-full.xml");
     // Make sure our mocked ACL has the read and write permission
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
+    setReadWritePermissions();
 
     // Add the media package to the search index
-    service.add(mediaPackage);
+    service.add(mp);
 
     // Make sure it's properly indexed and returned
-    EpisodeQuery q = new EpisodeQuery();
-    q.withId("10.0000/2");
-    assertEquals(1, service.find(q).size());
-    q.withId(null); // Clear the ID requirement
-    assertEquals(1, service.find(q).size());
+    assertEquals(1, service.find(systemQuery().id("10.0000/2")).size());
+    assertEquals(1, service.find(systemQuery()).size());
   }
 
   @Test
   public void testDelete() throws Exception {
-    final MediaPackage mp1 = getMediaPackage("/manifest-simple.xml");
-    final MediaPackage mp2 = getMediaPackage("/manifest-full.xml");
+    final MediaPackage mp1 = loadMediaPackageFromClassPath("/manifest-simple.xml");
+    final MediaPackage mp2 = loadMediaPackageFromClassPath("/manifest-full.xml");
     final String mpId = mp1.getIdentifier().toString();
     // Make sure our mocked ACL has the read and write permission
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
+    setReadWritePermissions();
     // add both media packages
     service.add(mp1);
     service.add(mp2);
     assertTrue(service.delete(mpId));
-    assertEquals(1L, service.find(new EpisodeQuery().withId(mpId).includeDeleted(true)).getTotalSize());
-    assertEquals(2L, service.find(new EpisodeQuery().includeDeleted(true)).getTotalSize());
-    assertEquals(1L, service.find(new EpisodeQuery().includeDeleted(false).withDeletedSince(new Date(0L))).getTotalSize());
-    assertEquals(1L, service.find(new EpisodeQuery()).getTotalSize());
+    assertEquals(1L, service.find(systemQuery().id(mpId).includeDeleted(true)).getTotalSize());
+    assertEquals(2L, service.find(systemQuery().includeDeleted(true)).getTotalSize());
+    assertEquals(1L, service.find(systemQuery().includeDeleted(false).deletedSince(new Date(0L))).getTotalSize());
+    assertEquals(1L, service.find(systemQuery()).getTotalSize());
   }
 
-  /**
-   * Test removal from the search index.
-   */
+  /** Test removal from the search index. */
   @Test
   public void testDeleteMediaPackage() throws Exception {
-    MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
+    MediaPackage mediaPackage = loadMediaPackageFromClassPath("/manifest-simple.xml");
 
     // Make sure our mocked ACL has the read and write permission
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
+    setReadWritePermissions();
 
     // Add the media package to the search index
     service.add(mediaPackage);
@@ -533,14 +471,18 @@ public class EpisodeServiceImplTest {
     // Now take the role away from the user
     userResponder.setResponse(userWithoutPermissions);
     organizationResponder.setResponse(new Organization(DEFAULT_ORGANIZATION_ID, DEFAULT_ORGANIZATION_NAME,
-            DEFAULT_BASE_URL, DEFAULT_ORGANIZATION_ADMIN, DEFAULT_ORGANIZATION_ANONYMOUS));
+                                                       DEFAULT_BASE_URL, DEFAULT_ORGANIZATION_ADMIN, DEFAULT_ORGANIZATION_ANONYMOUS));
 
     // Try to delete it
-    Assert.assertFalse("Unauthorized user was able to delete a mediapackage",
-            service.delete(mediaPackage.getIdentifier().toString()));
+    try {
+      service.delete(mediaPackage.getIdentifier().toString());
+      fail("Unauthorized user was able to delete a mediapackage");
+    } catch (EpisodeServiceException e) {
+      assertTrue(e.isCauseNotAuthorized());
+    }
 
     // Second try with a "fixed" roleset
-    User adminUser = new User("admin", "opencastproject.org", new String[] { new DefaultOrganization().getAdminRole() });
+    User adminUser = new User("admin", "opencastproject.org", new String[]{new DefaultOrganization().getAdminRole()});
     userResponder.setResponse(adminUser);
     Date deletedDate = new Date();
     assertTrue(service.delete(mediaPackage.getIdentifier().toString()));
@@ -549,20 +491,14 @@ public class EpisodeServiceImplTest {
     userResponder.setResponse(defaultUser);
     organizationResponder.setResponse(defaultOrganization);
 
-    EpisodeQuery q = new EpisodeQuery();
-    q.withId("10.0000/1");
-    assertEquals(0, service.find(q).size());
-    q.withId(null); // Clear the ID requirement
-    assertEquals(0, service.find(q).size());
-
-    q = new EpisodeQuery();
-    q.withDeletedSince(deletedDate);
-    assertEquals(1, service.find(q).size());
+    assertEquals(0, service.find(systemQuery().id("10.0000/1")).size());
+    assertEquals(0, service.find(systemQuery()).size());
+    assertEquals(1, service.find(systemQuery().deletedSince(deletedDate)).size());
   }
 
   /**
    * Ads a media package with one dublin core for the episode and one for the series.
-   * 
+   *
    * todo media package needs to return a series id for this test to work
    */
   @Test
@@ -586,16 +522,13 @@ public class EpisodeServiceImplTest {
     }
 
     // Make sure our mocked ACL has the read and write permission
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
-    acl.getEntries().add(
-            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
+    setReadWritePermissions();
 
     // Add the media package to the search index
     service.add(mediaPackage);
 
     // Make sure it's properly indexed and returned
-    EpisodeQuery q = new EpisodeQuery();
+    EpisodeQuery q = systemQuery();
 
     SearchResult result = service.find(q);
     assertEquals(1, result.size());
@@ -624,11 +557,29 @@ public class EpisodeServiceImplTest {
     }
 
     // We should have nothing in the search index
-    assertEquals(0, service.find(new EpisodeQuery()).size());
+    assertEquals(0, service.find(systemQuery()).size());
 
     service.populateIndex();
 
     // This time we should have 10 results
-    assertEquals(10, service.find(new EpisodeQuery()).size());
+    assertEquals(10, service.find(systemQuery()).size());
+  }
+
+  @Test
+  public void testFindByDate() throws Exception {
+    final MediaPackage mp = loadMediaPackageFromClassPath("/manifest-full.xml");
+    setReadWritePermissions();
+    service.add(mp);
+    final Date dayAhead = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000);
+    assertEquals(1, service.find(systemQuery().addedBefore(dayAhead)).size());
+    assertEquals(0, service.find(systemQuery().addedAfter(dayAhead)).size());
+    assertEquals(1, service.find(systemQuery().addedAfter(new Date(0)).addedBefore(dayAhead)).size());
+  }
+
+  private void setReadWritePermissions() {
+    acl.getEntries().add(
+            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.READ_PERMISSION, true));
+    acl.getEntries().add(
+            new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
   }
 }

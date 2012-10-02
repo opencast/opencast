@@ -44,10 +44,10 @@ import static org.opencastproject.util.data.Option.option;
 @XmlRootElement(name = "result", namespace = "http://search.opencastproject.org")
 public class JaxbSearchResultItem implements SearchResultItem {
 
-  /** Serial version id **/
+  /** Serial version id * */
   private static final long serialVersionUID = 1L;
 
-  /** Media identificator. **/
+  /** Media identificator. * */
   @XmlID
   @XmlAttribute(name = "id")
   private String id = "";
@@ -115,10 +115,6 @@ public class JaxbSearchResultItem implements SearchResultItem {
   @XmlElement
   private String dcSpatial = null;
 
-  /** Dublin core field 'dc:temporal' */
-  @XmlElement
-  private String dcTemporal = null;
-
   /** Dublin core field 'dc:ispartof' */
   @XmlElement
   private String dcIsPartOf = null;
@@ -142,9 +138,8 @@ public class JaxbSearchResultItem implements SearchResultItem {
   /** Field oc_mediapackage */
   private String ocMediapackage;
 
-  /** Field oc_published */
-  @XmlElement
-  private boolean ocLocked;
+  /** Field oc_acl */
+  private String ocAcl;
 
   /** Search result item type */
   @XmlElement
@@ -154,15 +149,15 @@ public class JaxbSearchResultItem implements SearchResultItem {
   @XmlElementWrapper(name = "keywords")
   private List<String> keywords = new ArrayList<String>();
 
-  /** The cover url. **/
+  /** The cover url. * */
   @XmlElement
   private String cover = null;
 
-  /** Media date of last modification in milliseconds **/
+  /** Media date of last modification in milliseconds * */
   @XmlElement
   private Date modified = null;
 
-  /** Result ranking score **/
+  /** Result ranking score * */
   @XmlElement
   private double score = -1;
 
@@ -177,33 +172,23 @@ public class JaxbSearchResultItem implements SearchResultItem {
   @XmlElement
   private Date ocDeleted = null;
 
-  /** Media segment list **/
+  /** Media segment list * */
   @XmlElementWrapper(name = "segments")
   @XmlElement(name = "segment")
   private SortedSet<JaxbMediaSegment> mediaSegments = null;
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getId()
-   */
   public String getId() {
     return id;
   }
 
   /**
    * @param id
-   *          the id to set
+   *         the id to set
    */
   public void setId(String id) {
     this.id = id;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getOrganization()
-   */
   @Override
   public String getOrganization() {
     return organization;
@@ -211,85 +196,60 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param organization
-   *          the organization to set
+   *         the organization to set
    */
   public void setOrganization(String organization) {
     this.organization = organization;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcExtent()
-   */
   public long getDcExtent() {
     return dcExtent;
   }
 
   /**
    * @param dcExtent
-   *          the dcExtent to set
+   *         the dcExtent to set
    */
   public void setDcExtent(long dcExtent) {
     this.dcExtent = dcExtent;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcTitle()
-   */
   public String getDcTitle() {
     return dcTitle;
   }
 
   /**
    * @param dcTitle
-   *          the dcTitle to set
+   *         the dcTitle to set
    */
   public void setDcTitle(String dcTitle) {
     this.dcTitle = dcTitle;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcSubject()
-   */
   public String getDcSubject() {
     return dcSubject;
   }
 
   /**
    * @param dcSubject
-   *          the dcSubject to set
+   *         the dcSubject to set
    */
   public void setDcSubject(String dcSubject) {
     this.dcSubject = dcSubject;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcCreator()
-   */
   public String getDcCreator() {
     return dcCreator;
   }
 
   /**
    * @param dcCreator
-   *          the dcCreator to set
+   *         the dcCreator to set
    */
   public void setDcCreator(String dcCreator) {
     this.dcCreator = dcCreator;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcPublisher()
-   */
   @Override
   public String getDcPublisher() {
     return dcPublisher;
@@ -297,17 +257,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcPublisher
-   *          the dcPublisher to set
+   *         the dcPublisher to set
    */
   public void setDcPublisher(String dcPublisher) {
     this.dcPublisher = dcPublisher;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcContributor()
-   */
   @Override
   public String getDcContributor() {
     return dcContributor;
@@ -315,17 +270,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcContributor
-   *          the dcContributor to set
+   *         the dcContributor to set
    */
   public void setDcContributor(String dcContributor) {
     this.dcContributor = dcContributor;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcAbstract()
-   */
   @Override
   public String getDcAbstract() {
     return dcAbstract;
@@ -333,17 +283,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcAbstract
-   *          the dcAbtract to set
+   *         the dcAbtract to set
    */
   public void setDcAbstract(String dcAbstract) {
     this.dcAbstract = dcAbstract;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcDescription()
-   */
   @Override
   public String getDcDescription() {
     return dcDescription;
@@ -351,17 +296,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcDescription
-   *          the dcDescription to set
+   *         the dcDescription to set
    */
   public void setDcDescription(String dcDescription) {
     this.dcDescription = dcDescription;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcCreated()
-   */
   @Override
   public Date getDcCreated() {
     return dcCreated;
@@ -369,17 +309,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcCreated
-   *          the dcCreated to set
+   *         the dcCreated to set
    */
   public void setDcCreated(Date dcCreated) {
     this.dcCreated = dcCreated;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcAvailableFrom()
-   */
   @Override
   public Date getDcAvailableFrom() {
     return dcAvailableFrom;
@@ -387,17 +322,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcAvailableFrom
-   *          the dcAvailableFrom to set
+   *         the dcAvailableFrom to set
    */
   public void setDcAvailableFrom(Date dcAvailableFrom) {
     this.dcAvailableFrom = dcAvailableFrom;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcAvailableTo()
-   */
   @Override
   public Date getDcAvailableTo() {
     return dcAvailableTo;
@@ -405,17 +335,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcAvailableTo
-   *          the dcAvailableTo to set
+   *         the dcAvailableTo to set
    */
   public void setDcAvailableTo(Date dcAvailableTo) {
     this.dcAvailableTo = dcAvailableTo;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcLanguage()
-   */
   @Override
   public String getDcLanguage() {
     return dcLanguage;
@@ -423,17 +348,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcLanguage
-   *          the dcLanguage to set
+   *         the dcLanguage to set
    */
   public void setDcLanguage(String dcLanguage) {
     this.dcLanguage = dcLanguage;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcRightsHolder()
-   */
   @Override
   public String getDcRightsHolder() {
     return dcRightsHolder;
@@ -441,17 +361,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcRightsHolder
-   *          the dcRightsHolder to set
+   *         the dcRightsHolder to set
    */
   public void setDcRightsHolder(String dcRightsHolder) {
     this.dcRightsHolder = dcRightsHolder;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcSpatial()
-   */
   @Override
   public String getDcSpatial() {
     return dcSpatial;
@@ -459,35 +374,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcSpatial
-   *          the dcSpatial to set
+   *         the dcSpatial to set
    */
   public void setDcSpatial(String dcSpatial) {
     this.dcSpatial = dcSpatial;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcTemporal()
-   */
-  @Override
-  public String getDcTemporal() {
-    return dcTemporal;
-  }
-
-  /**
-   * @param dcTemporal
-   *          the dcTemporal to set
-   */
-  public void setDcTemporal(String dcTemporal) {
-    this.dcTemporal = dcTemporal;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcIsPartOf()
-   */
   @Override
   public String getDcIsPartOf() {
     return dcIsPartOf;
@@ -495,17 +387,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcIsPartOf
-   *          the dcIsPartOf to set
+   *         the dcIsPartOf to set
    */
   public void setDcIsPartOf(String dcIsPartOf) {
     this.dcIsPartOf = dcIsPartOf;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcReplaces()
-   */
   @Override
   public String getDcReplaces() {
     return dcReplaces;
@@ -513,17 +400,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcReplaces
-   *          the dcReplaces to set
+   *         the dcReplaces to set
    */
   public void setDcReplaces(String dcReplaces) {
     this.dcReplaces = dcReplaces;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcType()
-   */
   @Override
   public String getDcType() {
     return dcType;
@@ -531,17 +413,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcType
-   *          the dcType to set
+   *         the dcType to set
    */
   public void setDcType(String dcType) {
     this.dcType = dcType;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcAccessRights()
-   */
   @Override
   public String getDcAccessRights() {
     return dcAccessRights;
@@ -549,17 +426,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcAccessRights
-   *          the dcAccessRights to set
+   *         the dcAccessRights to set
    */
   public void setDcAccessRights(String dcAccessRights) {
     this.dcAccessRights = dcAccessRights;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getDcLicense()
-   */
   @Override
   public String getDcLicense() {
     return dcLicense;
@@ -567,17 +439,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param dcLicense
-   *          the dcLicense to set
+   *         the dcLicense to set
    */
   public void setDcLicense(String dcLicense) {
     this.dcLicense = dcLicense;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getType()
-   */
   @Override
   public SearchResultItemType getType() {
     return mediaType;
@@ -593,21 +460,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
   }
 
   @Override
-  public boolean getOcLocked() {
-    return ocLocked;
+  public String getOcAcl() {
+    return ocAcl;
   }
 
-  public void setOcLocked(Boolean ocLocked) {
-    this.ocLocked = ocLocked;
-  }
-
-  @Override
-  public boolean getOcLatestVersion() {
-    return ocLatestVersion;
-  }
-
-  public void setOcLatestVersion(Boolean ocLatestVersion) {
-    this.ocLatestVersion = ocLatestVersion;
+  public void setOcAcl(String ocAcl) {
+    this.ocAcl = ocAcl;
   }
 
   @Override
@@ -621,7 +479,7 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param mediaType
-   *          the mediaType to set
+   *         the mediaType to set
    */
   public void setMediaType(SearchResultItemType mediaType) {
     this.mediaType = mediaType;
@@ -629,29 +487,19 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * Sets the media package that is associated with the search result item.
-   * 
+   *
    * @param mediaPackage
-   *          the media package
+   *         the media package
    */
   public void setMediaPackage(MediaPackage mediaPackage) {
     this.mediaPackage = mediaPackage;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getMediaPackage()
-   */
   @Override
   public MediaPackage getMediaPackage() {
     return mediaPackage;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getKeywords()
-   */
   @Override
   public String[] getKeywords() {
     return keywords.toArray(new String[keywords.size()]);
@@ -659,9 +507,9 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * Add a keyword to this search item.
-   * 
+   *
    * @param keyword
-   *          the keyword
+   *         the keyword
    */
   public void addKeyword(String keyword) {
     if (keywords == null)
@@ -669,11 +517,6 @@ public class JaxbSearchResultItem implements SearchResultItem {
     keywords.add(keyword);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getCover()
-   */
   @Override
   public String getCover() {
     return cover;
@@ -681,35 +524,25 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param cover
-   *          the cover to set
+   *         the cover to set
    */
   public void setCover(String cover) {
     this.cover = cover;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getModified()
-   */
   @Override
-  public Date getModified() {
+  public Date getTimestamp() {
     return modified;
   }
 
   /**
    * @param modified
-   *          the modified to set
+   *         the modified to set
    */
-  public void setModified(Date modified) {
+  public void setTimestamp(Date modified) {
     this.modified = modified;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getScore()
-   */
   @Override
   public double getScore() {
     return score;
@@ -717,17 +550,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param score
-   *          the score to set
+   *         the score to set
    */
   public void setScore(double score) {
     this.score = score;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getOcVersion()
-   */
   @Override
   public Version getOcVersion() {
     return Version.version(ocVersion);
@@ -735,17 +563,12 @@ public class JaxbSearchResultItem implements SearchResultItem {
 
   /**
    * @param ocVersion
-   *          the version from the media package in the archive
+   *         the version from the media package in the archive
    */
   public void setOcVersion(Version ocVersion) {
     this.ocVersion = ocVersion.value();
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.episode.api.SearchResultItem#getSegments()
-   */
   @Override
   public MediaSegment[] getSegments() {
     return mediaSegments != null ? mediaSegments.toArray(new MediaSegment[mediaSegments.size()])
@@ -755,58 +578,13 @@ public class JaxbSearchResultItem implements SearchResultItem {
   /**
    * Adds a segment to the list of media segments. The list is backed by a sorted set, so there is no need to add the
    * segments in order, although it is certainly more performant.
-   * 
+   *
    * @param segment
-   *          the segment to add
+   *         the segment to add
    */
   public void addSegment(MediaSegment segment) {
     if (mediaSegments == null)
       mediaSegments = new TreeSet<JaxbMediaSegment>();
     mediaSegments.add((JaxbMediaSegment) segment); // TODO: assuming this
   }
-
-  /**
-   * Build a result item from an anonymously implemented interface to ensure you don't miss any fields.
-   */
-  public static JaxbSearchResultItem create(SearchResultItem from) {
-    JaxbSearchResultItem item = new JaxbSearchResultItem();
-    item.setId(from.getId());
-    item.setOrganization(from.getOrganization());
-    item.setMediaPackage(from.getMediaPackage());
-    item.setDcExtent(from.getDcExtent());
-    item.setDcTitle(from.getDcTitle());
-    item.setDcSubject(from.getDcSubject());
-    item.setDcDescription(from.getDcDescription());
-    item.setDcCreator(from.getDcCreator());
-    item.setDcPublisher(from.getDcPublisher());
-    item.setDcContributor(from.getDcContributor());
-    item.setDcAbstract(from.getDcAbstract());
-    item.setDcCreated(from.getDcCreated());
-    item.setDcAvailableFrom(from.getDcAvailableFrom());
-    item.setDcAvailableTo(from.getDcAvailableTo());
-    item.setDcLanguage(from.getDcLanguage());
-    item.setDcRightsHolder(from.getDcRightsHolder());
-    item.setDcSpatial(from.getDcSpatial());
-    item.setDcTemporal(from.getDcTemporal());
-    item.setDcIsPartOf(from.getDcIsPartOf());
-    item.setDcReplaces(from.getDcReplaces());
-    item.setDcType(from.getDcType());
-    item.setDcAccessRights(from.getDcAccessRights());
-    item.setDcLicense(from.getDcLicense());
-    item.setOcMediapackage(from.getOcMediapackage());
-    item.setOcLocked(from.getOcLocked());
-    item.setMediaType(from.getType());
-    for (String k : from.getKeywords())
-      item.addKeyword(k);
-    item.setCover(from.getCover());
-    item.setModified(from.getModified());
-    item.setScore(from.getScore());
-    item.setOcVersion(from.getOcVersion());
-    item.setOcDeleted(from.getOcDeleted());
-    item.setOcLatestVersion(from.getOcLatestVersion());
-    for (MediaSegment s : from.getSegments())
-      item.addSegment(s);
-    return item;
-  }
-
 }

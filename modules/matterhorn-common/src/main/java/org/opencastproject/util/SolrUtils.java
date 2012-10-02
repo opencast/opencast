@@ -16,12 +16,17 @@
 package org.opencastproject.util;
 
 import org.apache.commons.lang.StringUtils;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+
+import static org.opencastproject.util.data.functions.Strings.format;
+import static org.opencastproject.util.data.functions.Strings.trimToNone;
 
 /**
  * Utility class for the solr database.
@@ -43,11 +48,17 @@ public final class SolrUtils {
    * @return The cleaned string.
    */
   public static String clean(String q) {
-    q = q.replaceAll(charCleanerRegex, "\\\\$1");
-    q = q.replaceAll("\\&\\&", "\\\\&\\\\&");
-    q = q.replaceAll("\\|\\|", "\\\\|\\\\|");
-    return q;
+    return q.replaceAll(charCleanerRegex, "\\\\$1")
+            .replaceAll("\\&\\&", "\\\\&\\\\&")
+            .replaceAll("\\|\\|", "\\\\|\\\\|");
   }
+
+  /** {@link #clean(String)} as a function. Return none if string is empty after cleaning. */
+  public static final Function<String, Option<String>> clean = new Function<String, Option<String>>() {
+    @Override public Option<String> apply(String s) {
+      return trimToNone(clean(s));
+    }
+  };
 
   /**
    * Returns a serialized version of the date or <code>null</code> if <code>null</code> was passed in for the date.
@@ -61,6 +72,13 @@ public final class SolrUtils {
       return null;
     return newSolrDateFormat().format(date);
   }
+
+  /** {@link #serializeDate(java.util.Date)} as a function. */
+  public static final Function<Date, String> serializeDate = new Function<Date, String>() {
+    @Override public String apply(Date date) {
+      return serializeDate(date);
+    }
+  };
 
   /**
    * Returns the date or <code>null</code> if <code>null</code> was passed in for the date.
@@ -81,25 +99,19 @@ public final class SolrUtils {
    * Returns an expression to search for any date that lies in between <code>startDate</date> and <code>endDate</date>.
    * 
    * @param startDate
-   *          the start date or null for an infinite left endpoint, "*" in solr query syntax
+   *          the start date or none for an infinite left endpoint, "*" in solr query syntax
    * @param endDate
-   *          the end date or null for an infinite right endpoint, "*" in solr query syntax
+   *          the end date or none for an infinite right endpoint, "*" in solr query syntax
    * @return the serialized search expression
    */
-  public static String serializeDateRange(Date startDate, Date endDate) {
-    StringBuffer buf = new StringBuffer("[");
-    DateFormat f = newSolrDateFormat();
-    if (startDate != null)
-      buf.append(f.format(startDate));
-    else
-      buf.append("*");
-    buf.append(" TO ");
-    if (endDate != null)
-      buf.append(f.format(endDate));
-    else
-      buf.append("*");
-    buf.append("]");
-    return buf.toString();
+  public static String serializeDateRange(Option<Date> startDate, Option<Date> endDate) {
+    final Function<Date, String> f = format(newSolrDateFormat());
+    return new StringBuilder("[")
+            .append(startDate.map(f).getOrElse("*"))
+            .append(" TO ")
+            .append(endDate.map(f).getOrElse("*"))
+            .append("]")
+            .toString();
   }
 
   /**

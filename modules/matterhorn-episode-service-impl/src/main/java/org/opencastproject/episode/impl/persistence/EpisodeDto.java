@@ -16,7 +16,12 @@
 package org.opencastproject.episode.impl.persistence;
 
 import org.opencastproject.episode.api.Version;
+import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
+import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.persistence.PersistenceUtil;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,226 +34,140 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
+import java.util.List;
 
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.data.functions.Functions.chuck;
 import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResultQuery;
 
-/**
- * Entity object for storing episodes in persistence storage. Media package id, version and organization are stored as
- * primary key.
- */
+/** JPA link to {@link Episode}. */
 @Entity(name = "Episode")
 @Table(name = "episode_episode")
 @NamedQueries({
-        @NamedQuery(name = "Episode.findAll", query = "SELECT e FROM Episode e"),
-        @NamedQuery(name = "Episode.findByIdAndVersion", query = "SELECT e FROM Episode e WHERE e.mediaPackageId=:mediaPackageId AND e.version=:version"),
-        @NamedQuery(name = "Episode.findLatestById", query = "SELECT e FROM Episode e WHERE e.mediaPackageId=:mediaPackageId "
-                + "AND e.version = (SELECT MAX(e2.version) FROM Episode e2 WHERE e2.mediaPackageId =:mediaPackageId)"),
-        @NamedQuery(name = "Episode.findAllById", query = "SELECT e FROM Episode e WHERE e.mediaPackageId=:mediaPackageId") })
+                      @NamedQuery(name = "Episode.findAll", query = "SELECT e FROM Episode e"),
+                      @NamedQuery(name = "Episode.findByIdAndVersion", query = "SELECT e FROM Episode e WHERE e.mediaPackageId=:mediaPackageId AND e.version=:version"),
+                      @NamedQuery(name = "Episode.findLatestById", query =
+                              "SELECT e FROM Episode e WHERE e.mediaPackageId = :mediaPackageId "
+                                      + "AND e.version = (SELECT MAX(e2.version) FROM Episode e2 WHERE e2.mediaPackageId = :mediaPackageId)"),
+                      @NamedQuery(name = "Episode.findLatestVersion", query =
+                              "SELECT MAX(a.version) FROM Episode a WHERE a.mediaPackageId = :mediaPackageId "),
+                      @NamedQuery(name = "Episode.findAllById", query = "SELECT e FROM Episode e WHERE e.mediaPackageId=:mediaPackageId") })
 public final class EpisodeDto {
-
-  /** Episode ID, primary key */
   @Id
   @Column(name = "mediapackage_id", length = 128)
   private String mediaPackageId;
 
-  /** Episode ID, primary key */
   @Id
   @Column(name = "version")
   private long version;
 
-  /** The organization id */
-  @Column(name = "organization_id", length = 128)
+  @Column(name = "organization_id", length = 128, nullable = false)
   private String organization;
 
-  /** The archive latest version */
-  @Column(name = "latest_version")
-  private boolean latestVersion;
-
-  /** The media package locking */
-  @Column(name = "locked")
-  private boolean locked;
-
-  /** The media package deleted */
   @Column(name = "deletion_date")
   @Temporal(TemporalType.TIMESTAMP)
   private Date deletionDate;
 
-  /** The media package deleted */
-  @Column(name = "modification_date")
+  @Column(name = "modification_date", nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date modificationDate;
 
-  /** Serialized access control */
   @Lob
-  @Column(name = "access_control", length = 65535)
+  @Column(name = "access_control", length = 65535, nullable = false)
   private String accessControl;
 
-  /** Serialized media package */
   @Lob
-  @Column(name = "mediapackage", length = 65535)
-  private String mediaPackageXML;
+  @Column(name = "mediapackage", length = 65535, nullable = false)
+  private String mediaPackageXml;
 
-  /**
-   * Default constructor without any import.
-   */
-  public EpisodeDto() {
+  public static EpisodeDto create(Episode episode) {
+    try {
+      final EpisodeDto dto = new EpisodeDto();
+      dto.mediaPackageId = episode.getMediaPackage().getIdentifier().toString();
+      dto.version = episode.getVersion().value();
+      dto.organization = episode.getOrganization();
+      for (Date a : episode.getDeletionDate()) dto.deletionDate = a;
+      dto.modificationDate = episode.getModificationDate();
+      dto.accessControl = AccessControlParser.toXml(episode.getAcl());
+      dto.mediaPackageXml = MediaPackageParser.getAsXml(episode.getMediaPackage());
+      return dto;
+    } catch (Exception e) {
+      return chuck(e);
+    }
   }
 
-  /**
-   * @return the organization
-   */
-  public String getOrganization() {
-    return organization;
+  public Episode toEpisode() {
+    try {
+      return new Episode(MediaPackageParser.getFromXml(mediaPackageXml),
+                         getVersion(),
+                         organization,
+                         getAcl(),
+                         modificationDate,
+                         getDeletionDate());
+    } catch (Exception e) {
+      return chuck(e);
+    }
   }
 
-  /**
-   * @param organization
-   *          the organization to set
-   */
-  public void setOrganization(String organization) {
-    this.organization = organization;
+  public static final Function<EpisodeDto, Episode> toEpisode = new Function<EpisodeDto, Episode>() {
+    @Override public Episode apply(EpisodeDto dto) {
+      return dto.toEpisode();
+    }
+  };
+
+  // some shortcut accessors for those cases where a complete conversion into an Episode is a waste
+
+  public Version getVersion() {
+    return Version.version(version);
   }
 
-  /**
-   * @return the serialized access control list
-   */
-  public String getAccessControl() {
-    return accessControl;
+  public AccessControlList getAcl() {
+    try {
+      return AccessControlParser.parseAcl(accessControl);
+    } catch (Exception e) {
+      return chuck(e);
+    }
   }
 
-  /**
-   * Sets serialized access control.
-   * 
-   * @param accessControl
-   *          serialized access control
-   */
-  public void setAccessControl(String accessControl) {
-    this.accessControl = accessControl;
+  public Option<Date> getDeletionDate() {
+    return option(deletionDate);
   }
 
-  /**
-   * @return media package id
-   */
-  public String getMediaPackageId() {
-    return mediaPackageId;
+  // not sure about this.
+  public void setDeletionDate(Date d) {
+    deletionDate = d;
   }
 
-  /**
-   * Sets media package id
-   * 
-   * @param media
-   *          package id
-   */
-  public void setMediaPackageId(String mediaPackageId) {
-    this.mediaPackageId = mediaPackageId;
-  }
+  // finders
 
-  /**
-   * @return the serialized media package
-   */
-  public String getMediaPackageXML() {
-    return mediaPackageXML;
-  }
-
-  /**
-   * Sets the serialized media package
-   * 
-   * @param mediaPackageXML
-   *          the serialized media package
-   */
-  public void setMediaPackageXML(String mediaPackageXML) {
-    this.mediaPackageXML = mediaPackageXML;
-  }
-
-  /**
-   * @return the archive version
-   */
-  public long getVersion() {
-    return version;
-  }
-
-  /**
-   * Sets the archive version
-   * 
-   * @param version
-   *          the archive version
-   */
-  public void setVersion(long version) {
-    this.version = version;
-  }
-
-  /**
-   * @return latest version
-   */
-  public boolean isLatestVersion() {
-    return latestVersion;
-  }
-
-  /**
-   * Sets the latest version
-   * 
-   * @param latestVersion
-   *          the latest version
-   */
-  public void setLatestVersion(boolean latestVersion) {
-    this.latestVersion = latestVersion;
-  }
-
-  /**
-   * @return the lock state
-   */
-  public boolean isLocked() {
-    return locked;
-  }
-
-  /**
-   * Sets the lock state
-   * 
-   * @param locked
-   *          the lock state
-   */
-  public void setLocked(boolean locked) {
-    this.locked = locked;
-  }
-
-  /**
-   * @return the deletion date
-   */
-  public Date getDeletionDate() {
-    return deletionDate;
-  }
-
-  /**
-   * Sets the deletion date
-   * 
-   * @param deletionDate
-   *          the deletion date
-   */
-  public void setDeletionDate(Date deletionDate) {
-    this.deletionDate = deletionDate;
-  }
-
-  /**
-   * @return the modification date
-   */
-  public Date getModificationDate() {
-    return modificationDate;
-  }
-
-  /**
-   * Sets the modification date
-   * 
-   * @param modificationDate
-   *          the modification date
-   */
-  public void setModificationDate(Date modificationDate) {
-    this.modificationDate = modificationDate;
-  }
-
+  /** Find an episode by media package id and version. */
   public static Option<EpisodeDto> findByIdAndVersion(EntityManager em, String mediaPackageId, Version version) {
     return runSingleResultQuery(em, "Episode.findByIdAndVersion",
                                 tuple("version", version.value()),
                                 tuple("mediaPackageId", mediaPackageId));
+  }
+
+  /** Find the latest version identifier of a media package. */
+  public static Option<Version> findLatestVersion(EntityManager em, String mediaPackageId) {
+    for (Long version : PersistenceUtil.<Long>runSingleResultQuery(em, "Episode.findLatestVersion",
+                                                                   tuple("mediaPackageId", mediaPackageId))) {
+      return some(Version.version(version));
+    }
+    return none();
+  }
+
+  public static Option<EpisodeDto> findLatestById(EntityManager em, String mediaPackageId) {
+    return runSingleResultQuery(em, "Episode.findLatestById", tuple("mediaPackageId", mediaPackageId));
+  }
+
+  public static List<EpisodeDto> findAllById(EntityManager em, String mediaPackageId) {
+    return PersistenceUtil.findAll(em, "Episode.findAllById", tuple("mediaPackageId", mediaPackageId));
+  }
+
+  public static List<EpisodeDto> findAll(EntityManager em) {
+    return PersistenceUtil.findAll(em, "Episode.findAll");
   }
 }

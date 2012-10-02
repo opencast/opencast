@@ -229,7 +229,8 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     buf.append(keySuffix);
     String key = buf.toString();
     list.add(key);
-    return properties.getProperty(key);
+    final String prop = properties.getProperty(key);
+    return prop != null ? prop.trim() : prop;
   }
 
   /**

@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.xpath.XPath;
@@ -82,25 +81,6 @@ public abstract class AbstractElementBuilderPlugin implements MediaPackageElemen
 
   public void setPriority(int priority) {
     this.priority = priority;
-  }
-
-  /**
-   * Registers the given mime types with the media package element builder.
-   * 
-   * @param mimeType
-   *          the type to register (e. g. text/xml)
-   * @param description
-   *          a description for the mime type
-   * @throws UnknownFileTypeException
-   *           if the mime type is not known
-   */
-  protected void registerMimeType(String mimeType, String description) throws UnknownFileTypeException {
-    if (this.mimeTypes == null)
-      this.mimeTypes = new ArrayList<MimeType>();
-    MimeType m = MimeTypes.parseMimeType(mimeType);
-    m.setDescription(description);
-    this.mimeTypes.add(m);
-    logger.debug("Processing of documents of type " + description + "(" + m + ") enabled");
   }
 
   /**

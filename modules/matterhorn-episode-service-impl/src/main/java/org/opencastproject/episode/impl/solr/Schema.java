@@ -13,7 +13,6 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.episode.impl.solr;
 
 import org.apache.solr.common.SolrDocument;
@@ -23,11 +22,13 @@ import org.opencastproject.episode.api.Version;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import static org.opencastproject.util.data.Collections.head;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * This class reflects the solr schema.xml. Note that all getters returning simple values may always return null. Please
@@ -92,17 +93,17 @@ public final class Schema {
   // Additional fields
   public static final String OC_ORGANIZATION = "oc_organization";
   public static final String OC_MEDIAPACKAGE = "oc_mediapackage";
+  public static final String OC_ACL = "oc_acl";
   public static final String OC_KEYWORDS = "oc_keywords";
   public static final String OC_COVER = "oc_cover";
-  public static final String OC_MODIFIED = "oc_modified";
+  // addition time of the entry
+  public static final String OC_TIMESTAMP = "oc_timestamp";
   public static final String OC_DELETED = "oc_deleted";
   public static final String OC_MEDIATYPE = "oc_mediatype";
   public static final String OC_ELEMENTTAGS = "oc_elementtags";
   public static final String OC_ELEMENTFLAVORS = "oc_elementflavors";
-  public static final String OC_LOCKED = "oc_locked";
   public static final String OC_TEXT_PREFIX = "oc_text_";
   public static final String OC_HINT_PREFIX = "oc_hint_";
-  public static final String OC_ACL_PREFIX = "oc_acl_";
   public static final String OC_VERSION = "oc_version";
   public static final String OC_LATEST_VERSION = "oc_latest_version";
 
@@ -150,158 +151,169 @@ public final class Schema {
    */
   interface FieldCollector {
     Option<String> getId();
-
     Option<String> getOrganization();
-
     Option<String> getDcId();
-
     Option<Date> getDcCreated();
-
     Option<Long> getDcExtent();
-
     Option<String> getDcLanguage();
-
     Option<String> getDcIsPartOf();
-
     Option<String> getDcReplaces();
-
     Option<String> getDcType();
-
     Option<Date> getDcAvailableFrom();
-
     Option<Date> getDcAvailableTo();
-
     List<DField<String>> getDcTitle();
-
     List<DField<String>> getDcSubject();
-
     List<DField<String>> getDcCreator();
-
     List<DField<String>> getDcPublisher();
-
     List<DField<String>> getDcContributor();
-
     List<DField<String>> getDcDescription();
-
     List<DField<String>> getDcRightsHolder();
-
     List<DField<String>> getDcSpatial();
-
     List<DField<String>> getDcAccessRights();
-
     List<DField<String>> getDcLicense();
-
     Option<String> getOcMediatype();
-
     Option<String> getOcMediapackage();
-
+    Option<String> getOcAcl();
     Option<String> getOcKeywords();
-
     Option<String> getOcCover();
-
     Option<Date> getOcModified();
-
     Option<Date> getOcDeleted();
-
     Option<String> getOcElementtags();
-
     Option<String> getOcElementflavors();
-
-    Option<Boolean> getOcPublished();
-
     Option<Version> getOcVersion();
-
     Option<Boolean> getOcLatestVersion();
-
-    List<DField<String>> getOcAcl();
-
     List<DField<String>> getSegmentText();
-
     List<DField<String>> getSegmentHint();
   }
 
   /**
    * Fill a solr document. Return a "some" if you want a field to get copied to the solr document.
    */
-  public static void fill(SolrInputDocument doc, FieldCollector fields) {
-    if (fields.getId().isSome())
-      setId(doc, fields.getId().get());
-    if (fields.getOrganization().isSome())
-      setOrganization(doc, fields.getOrganization().get());
-    if (fields.getDcId().isSome())
-      setDcId(doc, fields.getDcId().get());
-    if (fields.getDcCreated().isSome())
-      setDcCreated(doc, fields.getDcCreated().get());
-    if (fields.getDcExtent().isSome())
-      setDcExtent(doc, fields.getDcExtent().get());
-    if (fields.getDcLanguage().isSome())
-      setDcLanguage(doc, fields.getDcLanguage().get());
-    if (fields.getDcIsPartOf().isSome())
-      setDcIsPartOf(doc, fields.getDcIsPartOf().get());
-    if (fields.getDcReplaces().isSome())
-      setDcReplaces(doc, fields.getDcReplaces().get());
-    if (fields.getDcType().isSome())
-      setDcType(doc, fields.getDcType().get());
-    if (fields.getDcAvailableFrom().isSome())
-      setDcAvailableFrom(doc, fields.getDcAvailableFrom().get());
-    if (fields.getDcAvailableTo().isSome())
-      setDcAvailableTo(doc, fields.getDcAvailableTo().get());
-    for (DField<String> v : fields.getDcTitle())
-      setDcTitle(doc, v);
-    for (DField<String> v : fields.getDcSubject())
-      setDcSubject(doc, v);
-    for (DField<String> v : fields.getDcCreator())
-      setDcCreator(doc, v);
-    for (DField<String> v : fields.getDcPublisher())
-      setDcPublisher(doc, v);
-    for (DField<String> v : fields.getDcContributor())
-      setDcContributor(doc, v);
-    for (DField<String> v : fields.getDcDescription())
-      setDcDescription(doc, v);
-    for (DField<String> v : fields.getDcRightsHolder())
-      setDcRightsHolder(doc, v);
-    for (DField<String> v : fields.getDcSpatial())
-      setDcSpatial(doc, v);
-    for (DField<String> v : fields.getDcAccessRights())
-      setDcAccessRights(doc, v);
-    for (DField<String> v : fields.getDcLicense())
-      setDcLicense(doc, v);
-    if (fields.getOcMediatype().isSome())
-      setOcMediatype(doc, fields.getOcMediatype().get());
-    if (fields.getOcMediapackage().isSome())
-      setOcMediapackage(doc, fields.getOcMediapackage().get());
-    if (fields.getOcKeywords().isSome())
-      setOcKeywords(doc, fields.getOcKeywords().get());
-    if (fields.getOcCover().isSome())
-      setOcCover(doc, fields.getOcCover().get());
-    if (fields.getOcModified().isSome())
-      setOcModified(doc, fields.getOcModified().get());
-    if (fields.getOcDeleted().isSome())
-      setOcDeleted(doc, fields.getOcDeleted().get());
-    if (fields.getOcElementtags().isSome())
-      setOcElementtags(doc, fields.getOcElementtags().get());
-    if (fields.getOcElementflavors().isSome())
-      setOcElementflavors(doc, fields.getOcElementflavors().get());
-    if (fields.getOcVersion().isSome())
-      setOcVersion(doc, fields.getOcVersion().get());
-    if (fields.getOcLatestVersion().isSome())
-      setOcLatestVersion(doc, fields.getOcLatestVersion().get());
-    for (DField<String> v : fields.getOcAcl())
-      setOcAcl(doc, v);
-    for (Boolean v : fields.getOcPublished())
-      setOcLocked(doc, v);
-    for (DField<String> v : fields.getSegmentText())
-      setSegmentText(doc, v);
-    for (DField<String> v : fields.getSegmentHint())
-      setSegmentHint(doc, v);
+  public static void fill(final SolrInputDocument doc, final FieldCollector fields) {
+    final FieldCollector copyToDoc = new FieldCollector() {
+      @Override public Option<String> getId() {
+        for (String a : fields.getId()) setId(doc, a); return null;
+      }
+      @Override public Option<String> getOrganization() {
+        for (String a : fields.getOrganization()) setOrganization(doc, a); return null;
+      }
+      @Override public Option<String> getDcId() {
+        for (String a : fields.getDcId()) setDcId(doc, a); return null;
+      }
+      @Override public Option<Date> getDcCreated() {
+        for (Date a : fields.getDcCreated()) setDcCreated(doc, a); return null;
+      }
+      @Override public Option<Long> getDcExtent() {
+        for (Long a : fields.getDcExtent()) setDcExtent(doc, a); return null;
+      }
+      @Override public Option<String> getDcLanguage() {
+        for (String a : fields.getDcLanguage()) setDcLanguage(doc, a); return null;
+      }
+      @Override public Option<String> getDcIsPartOf() {
+        for (String a : fields.getDcIsPartOf()) setDcIsPartOf(doc, a); return null;
+      }
+      @Override public Option<String> getDcReplaces() {
+        for (String a : fields.getDcReplaces()) setDcReplaces(doc, a); return null;
+      }
+      @Override public Option<String> getDcType() {
+        for (String a : fields.getDcType()) setDcType(doc, a); return null;
+      }
+      @Override public Option<Date> getDcAvailableFrom() {
+        for (Date a : fields.getDcAvailableFrom()) setDcAvailableFrom(doc, a); return null;
+      }
+      @Override public Option<Date> getDcAvailableTo() {
+        for (Date a : fields.getDcAvailableTo()) setDcAvailableTo(doc, a); return null;
+      }
+      @Override public List<DField<String>> getDcTitle() {
+        for (DField<String> v : fields.getDcTitle()) setDcTitle(doc, v); return null;
+      }
+      @Override public List<DField<String>> getDcSubject() {
+        for (DField<String> v : fields.getDcSubject()) setDcSubject(doc, v); return null;
+      }
+      @Override public List<DField<String>> getDcCreator() {
+        for (DField<String> v : fields.getDcCreator()) setDcCreator(doc, v); return null;
+      }
+      @Override public List<DField<String>> getDcPublisher() {
+        for (DField<String> v : fields.getDcPublisher()) setDcPublisher(doc, v); return null;
+      }
+      @Override public List<DField<String>> getDcContributor() {
+        for (DField<String> v : fields.getDcContributor()) setDcContributor(doc, v); return null;
+      }
+      @Override public List<DField<String>> getDcDescription() {
+        for (DField<String> v : fields.getDcDescription()) setDcDescription(doc, v); return null;
+      }
+      @Override public List<DField<String>> getDcRightsHolder() {
+        for (DField<String> v : fields.getDcRightsHolder()) setDcRightsHolder(doc, v); return null;
+      }
+      @Override public List<DField<String>> getDcSpatial() {
+        for (DField<String> v : fields.getDcSpatial()) setDcSpatial(doc, v); return null;
+      }
+      @Override public List<DField<String>> getDcAccessRights() {
+        for (DField<String> v : fields.getDcAccessRights()) setDcAccessRights(doc, v); return null;
+      }
+      @Override public List<DField<String>> getDcLicense() {
+        for (DField<String> v : fields.getDcLicense()) setDcLicense(doc, v); return null;
+      }
+      @Override public Option<String> getOcMediatype() {
+        for (String a : fields.getOcMediatype()) setOcMediatype(doc, a); return null;
+      }
+      @Override public Option<String> getOcMediapackage() {
+        for (String a : fields.getOcMediapackage()) setOcMediapackage(doc, a); return null;
+      }
+      @Override public Option<String> getOcAcl() {
+        for (String a : fields.getOcAcl()) setOcAcl(doc, a); return null;
+      }
+      @Override public Option<String> getOcKeywords() {
+        for (String a : fields.getOcKeywords()) setOcKeywords(doc, a); return null;
+      }
+      @Override public Option<String> getOcCover() {
+        for (String a : fields.getOcCover()) setOcCover(doc, a); return null;
+      }
+      @Override public Option<Date> getOcModified() {
+        for (Date a : fields.getOcModified()) setOcTimestamp(doc, a); return null;
+      }
+      @Override public Option<Date> getOcDeleted() {
+        for (Date a : fields.getOcDeleted()) setOcDeleted(doc, a); return null;
+      }
+      @Override public Option<String> getOcElementtags() {
+        for (String a : fields.getOcElementtags()) setOcElementtags(doc, a); return null;
+      }
+      @Override public Option<String> getOcElementflavors() {
+        for (String a : fields.getOcElementflavors()) setOcElementflavors(doc, a); return null;
+      }
+      @Override public Option<Version> getOcVersion() {
+        for (Version a : fields.getOcVersion()) setOcVersion(doc, a); return null;
+      }
+      @Override public Option<Boolean> getOcLatestVersion() {
+        for (Boolean a : fields.getOcLatestVersion()) setOcLatestVersion(doc, a); return null;
+      }
+      @Override public List<DField<String>> getSegmentText() {
+        for (DField<String> v : fields.getSegmentText()) setSegmentText(doc, v); return null;
+      }
+      @Override public List<DField<String>> getSegmentHint() {
+        for (DField<String> v : fields.getSegmentHint()) setSegmentHint(doc, v); return null;
+      }
+    };
+    callAllMethods(FieldCollector.class, copyToDoc);
+  }
+
+  /** Call all methods of <code>c</code> on object <code>o</code>. */
+  private static void callAllMethods(Class<?> c, Object o) {
+    try {
+      for (Method m : c.getDeclaredMethods()) {
+        m.invoke(o);
+      }
+    } catch (Exception e) {
+      chuck(e);
+    }
   }
 
   /**
    * Adds one solr document's data as unstructured, full-text searchable data to another document.
-   * 
+   *
    * @param docToEnrich
    *          the solr document to enrich with the other additional metadata
-   * 
+   *
    * @param additionalMetadata
    *          the solr document containing the additional metadata
    * @throws IllegalArgumentException
@@ -509,6 +521,14 @@ public final class Schema {
     doc.setField(OC_MEDIAPACKAGE, mediapackage);
   }
 
+  public static String getOcAcl(SolrDocument doc) {
+    return mkString(doc.get(OC_ACL));
+  }
+
+  public static void setOcAcl(SolrInputDocument doc, String acl) {
+    doc.setField(OC_ACL, acl);
+  }
+
   public static String getOcKeywords(SolrDocument doc) {
     return mkString(doc.get(OC_KEYWORDS));
   }
@@ -530,12 +550,12 @@ public final class Schema {
     doc.setField(OC_COVER, cover);
   }
 
-  public static Date getOcModified(SolrDocument doc) {
-    return (Date) doc.get(OC_MODIFIED);
+  public static Date getOcTimestamp(SolrDocument doc) {
+    return (Date) doc.get(OC_TIMESTAMP);
   }
 
-  public static void setOcModified(SolrInputDocument doc, Date modified) {
-    doc.setField(OC_MODIFIED, modified);
+  public static void setOcTimestamp(SolrInputDocument doc, Date timestamp) {
+    doc.setField(OC_TIMESTAMP, timestamp);
   }
 
   public static Date getOcDeleted(SolrDocument doc) {
@@ -570,33 +590,17 @@ public final class Schema {
     return getDynamicStringValues(doc, OC_HINT_PREFIX);
   }
 
-  public static List<DField<String>> getOcAcl(SolrDocument doc) {
-    return getDynamicStringValues(doc, OC_ACL_PREFIX);
+  public static Version getOcVersion(SolrDocument doc) {
+    Integer version = (Integer) doc.get(OC_VERSION);
+    return version != null ? Version.version(version) : null;
   }
 
-  public static void setOcAcl(SolrInputDocument doc, DField<String> acl) {
-    doc.setField(OC_ACL_PREFIX + acl.getSuffix(), acl.getValue());
-  }
-
-  public static void setOcLocked(SolrInputDocument doc, boolean locked) {
-    doc.setField(OC_LOCKED, locked);
-  }
-
-  public static Boolean getOcLocked(SolrDocument doc) {
-    return (Boolean) doc.get(OC_LOCKED);
+  public static boolean isOcLatestVersion(SolrDocument doc) {
+    return mkBoolean(doc.get(OC_LATEST_VERSION));
   }
 
   public static void setOcLatestVersion(SolrInputDocument doc, boolean isLatestVersion) {
     doc.setField(OC_LATEST_VERSION, isLatestVersion);
-  }
-
-  public static Boolean getOcLatestVersion(SolrDocument doc) {
-    return (Boolean) doc.get(OC_LATEST_VERSION);
-  }
-
-  public static Version getOcVersion(SolrDocument doc) {
-    Integer version = (Integer) doc.get(OC_VERSION);
-    return version != null ? Version.version(version) : null;
   }
 
   public static void setOcVersion(SolrInputDocument doc, Version version) {
@@ -632,6 +636,10 @@ public final class Schema {
   private static String mkString(Object v) {
     return v != null ? v.toString() : null;
   }
+  
+  private static boolean mkBoolean(Object v) {
+    return v != null ? (Boolean) v : null;
+  }
 
   private static Date mkDate(Object v) {
     return v != null ? (Date) v : null;
@@ -650,5 +658,4 @@ public final class Schema {
     }
     return r;
   }
-
 }

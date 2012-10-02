@@ -20,6 +20,7 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 
+import java.text.Format;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -51,8 +52,8 @@ public final class Strings {
    */
   public static Option<String> trimToNone(String a) {
     if (a != null) {
-      String trimmed = a.trim();
-      return trimmed.length() > 0 ? some(a) : Option.<String>none();
+      final String trimmed = a.trim();
+      return trimmed.length() > 0 ? some(trimmed) : Option.<String>none();
     } else {
       return none();
     }
@@ -145,6 +146,14 @@ public final class Strings {
     };
   }
 
+  public static <A> Function<A, String> format(final Format f) {
+    return new Function<A, String>() {
+      @Override public String apply(A a) {
+        return f.format(a);
+      }
+    };
+  }
+
   /**
    * Return a function that replaces all occurrences of <code>regex</code> in the argument
    * with <code>replacement</code>.
@@ -173,4 +182,22 @@ public final class Strings {
    * Split function to split comma separated values. Regex = <code>\s*,\s*</code>.
    */
   public static final Function<String, String[]> csvSplit = split(Pattern.compile("\\s*,\\s*"));
+
+  /** A function to prepend the argument string with a prefix. */
+  public static Function<String, String> prepend(final String prefix) {
+    return new Function<String, String>() {
+      @Override public String apply(String s) {
+        return prefix + s;
+      }
+    };
+  }
+
+  /** A function to append a suffix to the argument string. */
+  public static Function<String, String> append(final String suffix) {
+    return new Function<String, String>() {
+      @Override public String apply(String s) {
+        return s + suffix;
+      }
+    };
+  }
 }

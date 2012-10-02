@@ -16,13 +16,14 @@
 
 package org.opencastproject.util.data;
 
+import static org.opencastproject.util.data.functions.Functions.chuck;
+
 /**
  * Run a side effect.
  *
  * @see X
  */
 public abstract class Effect0 extends Function0<Void> {
-
   @Override
   public final Void apply() {
     run();
@@ -32,26 +33,25 @@ public abstract class Effect0 extends Function0<Void> {
   /** Run the side effect. */
   protected abstract void run();
 
-  /** Return the effect as a Function0. */
+  /** Return the effect as a function of arity 0. */
   public Function0<Void> toFunction() {
     return this;
   }
 
   /** Version of {@link Effect0} that allows for throwing a checked exception. */
   public abstract static class X extends Effect0 {
-
     @Override
-    protected void run() {
+    protected final void run() {
       try {
         xrun();
       } catch (Exception e) {
-        throw new FunctionException(e);
+        chuck(e);
       }
     }
 
     /**
-     * Run the side effect. An exception may be thrown which gets transformed into a
-     * {@link FunctionException}. To change this behaviour also override {@link #run()}.
+     * Run the side effect. Any thrown exception gets "chucked" so that you may
+     * catch them as is. See {@link org.opencastproject.util.data.functions.Functions#chuck(Throwable)} for details.
      */
     protected abstract void xrun() throws Exception;
   }

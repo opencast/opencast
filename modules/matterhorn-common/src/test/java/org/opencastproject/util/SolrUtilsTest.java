@@ -16,6 +16,7 @@
 package org.opencastproject.util;
 
 import org.junit.Test;
+import org.opencastproject.util.data.Option;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -24,6 +25,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.util.data.Option.some;
 
 /**
  * Test case for {@link SolrUtils}.
@@ -71,7 +73,7 @@ public class SolrUtilsTest {
 
   /**
    * Test method for
-   * {@link org.opencastproject.util.SolrUtils#serializeDateRange(Date, Date)}.
+   * {@link org.opencastproject.util.SolrUtils#serializeDateRange(org.opencastproject.util.data.Option, org.opencastproject.util.data.Option)}.
    */
   @Test
   public void testSerializeDateRange() {
@@ -80,9 +82,9 @@ public class SolrUtilsTest {
     String serializedStartDate = dateFormatUTC().format(startDate);
     String serializedEndDate = dateFormatUTC().format(endDate);
     String day = "[" + serializedStartDate + " TO " + serializedEndDate + "]";
-    assertEquals(day, SolrUtils.serializeDateRange(startDate, endDate));
-    assertEquals("[* TO " + serializedEndDate + "]", SolrUtils.serializeDateRange(null, endDate));
-    assertEquals("[" + serializedStartDate + " TO *]", SolrUtils.serializeDateRange(startDate, null));
+    assertEquals(day, SolrUtils.serializeDateRange(some(startDate), some(endDate)));
+    assertEquals("[* TO " + serializedEndDate + "]", SolrUtils.serializeDateRange(Option.<Date>none(), some(endDate)));
+    assertEquals("[" + serializedStartDate + " TO *]", SolrUtils.serializeDateRange(some(startDate), Option.<Date>none()));
   }
 
 }

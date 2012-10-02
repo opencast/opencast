@@ -26,10 +26,7 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
  * @see X
  */
 public abstract class Function0<A> {
-
-  /**
-   * Apply function yielding a constant value. Don't be tempted to become impure!
-   */
+  /** Apply function yielding a constant value. Don't be tempted to become impure! */
   public abstract A apply();
 
   /** Apply this function, then pass the result to <code>f</code>. */
@@ -42,22 +39,15 @@ public abstract class Function0<A> {
     return Functions.then(Function0.this, f);
   }
 
-  /** Turn a Function0 into an Effect0 discarding its return value. */
+  /** Turn this function into an effect by discarding its result. */
   public Effect0 toEffect() {
-    return new Effect0() {
-      @Override protected void run() {
-        Function0.this.apply();
-      }
-    };
+    return Functions.toEffect(this);
   }
 
-  /**
-   * Version of {@link Function0} that allows for throwing a checked exception.
-   */
+  /** Version of {@link Function0} that allows for throwing a checked exception. */
   public abstract static class X<A> extends Function0<A> {
-
     @Override
-    public A apply() {
+    public final A apply() {
       try {
         return xapply();
       } catch (Exception e) {
