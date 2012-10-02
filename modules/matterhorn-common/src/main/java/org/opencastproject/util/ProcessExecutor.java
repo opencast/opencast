@@ -19,7 +19,6 @@ package org.opencastproject.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -78,7 +77,6 @@ public class ProcessExecutor<T extends Exception> {
   }
 
   public final void execute() throws ProcessExcecutorException {
-    BufferedReader in = null;
     Process process = null;
     StreamHelper errorStreamHelper = null;
     StreamHelper inputStreamHelper = null;
@@ -128,7 +126,6 @@ public class ProcessExecutor<T extends Exception> {
       throw new ProcessExcecutorException(msg, t);
     } finally {
       IoSupport.closeQuietly(process);
-      IoSupport.closeQuietly(in);
     }
   }
 
