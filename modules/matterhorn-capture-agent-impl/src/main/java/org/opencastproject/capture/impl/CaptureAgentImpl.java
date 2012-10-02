@@ -15,6 +15,8 @@
  */
 package org.opencastproject.capture.impl;
 
+import static org.opencastproject.util.MimeType.mimeType;
+
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.AgentState;
 import org.opencastproject.capture.admin.api.Recording;
@@ -47,7 +49,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
-import org.opencastproject.util.MimeType;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.XProperties;
 import org.opencastproject.util.ZipUtil;
@@ -584,7 +585,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
                   flavor);
           t.setSize(outputFile.length());
           String[] detectedMimeType = new MimetypesFileTypeMap().getContentType(outputFile).split("/");
-          t.setMimeType(new MimeType(detectedMimeType[0], detectedMimeType[1]));
+          t.setMimeType(mimeType(detectedMimeType[0], detectedMimeType[1]));
           t.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, outputFile));
           if (recording.getProperty(CaptureParameters.RECORDING_DURATION) != null) {
             t.setDuration(Long.parseLong(recording.getProperty(CaptureParameters.RECORDING_DURATION)));
