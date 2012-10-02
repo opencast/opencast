@@ -24,4 +24,9 @@
           cardinality="1..1"
           policy="static"
           bind="setWorkflowService"/>
+  <reference name="security-service"
+          interface="org.opencastproject.security.api.SecurityService"
+          cardinality="1..1"
+          policy="static"
+          bind="setSecurityService"/>
 </scr:component>

@@ -257,9 +257,29 @@ public final class PersistenceUtil {
    *         the query parameters
    * @param toA
    *         map to the desired result object
+   * @deprecated
    */
   public static <A, B> Option<A> find(EntityManager em, final Function<B, A> toA, final String queryName, final Tuple<String, ?>... params) {
     return PersistenceUtil.<B>runSingleResultQuery(em, queryName, params).map(toA);
+  }
+
+  /**
+   * Find multiple objects.
+   */
+  public static <A> List<A> findAll(EntityManager em, final String queryName, final Tuple<String, ?>... params) {
+    return (List<A>) createNamedQuery(em, queryName, params).getResultList();
+  }
+
+  /**
+   * Find multiple objects with optional pagination.
+   */
+  public static <A> List<A> findAll(EntityManager em, final String queryName,
+                                    Option<Integer> offset, Option<Integer> limit,
+                                    final Tuple<String, ?>... params) {
+    final Query q = createNamedQuery(em, queryName, params);
+    for (Integer x : offset) q.setFirstResult(x);
+    for (Integer x : limit) q.setMaxResults(x);
+    return (List<A>) q.getResultList();
   }
 
   /**
@@ -269,6 +289,7 @@ public final class PersistenceUtil {
    *         the query parameters
    * @param toA
    *         map to the desired result object
+   * @deprecated use {@link #findAll(javax.persistence.EntityManager, String, org.opencastproject.util.data.Tuple[])} instead
    */
   public static <A, B> List<A> findAll(EntityManager em, final Function<B, A> toA, final String queryName, final Tuple<String, ?>... params) {
     return mlist((List<B>) createNamedQuery(em, queryName, params).getResultList()).map(toA).value();
@@ -281,6 +302,7 @@ public final class PersistenceUtil {
    *         the query parameters
    * @param toA
    *         map to the desired result object
+   * @deprecated use {@link #findAll(javax.persistence.EntityManager, String, org.opencastproject.util.data.Option, org.opencastproject.util.data.Option, org.opencastproject.util.data.Tuple[])} instead
    */
   public static <A, B> List<A> findAll(EntityManager em, final Function<B, A> toA,
                                        Option<Integer> offset, Option<Integer> limit,

@@ -68,6 +68,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.util.data.Option.option;
 
 /**
  * Implements {@link SeriesServiceIndex}.
@@ -662,7 +663,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
       endDate = new Date(Long.MAX_VALUE);
     sb.append(key);
     sb.append(":");
-    sb.append(SolrUtils.serializeDateRange(startDate, endDate));
+    sb.append(SolrUtils.serializeDateRange(option(startDate), option(endDate)));
     return sb;
   }
 

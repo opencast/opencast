@@ -13,43 +13,39 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.episode.api;
 
-/**
- * Exception that is thrown for failing search operations.
- */
+import org.opencastproject.security.api.UnauthorizedException;
+
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
+/** Exception that is thrown by the episode service to indicate any unrecoverable error. */
 public class EpisodeServiceException extends RuntimeException {
 
   /** Serial version uid */
   private static final long serialVersionUID = -7411693851983157126L;
 
-  /**
-   * 
-   */
-  public EpisodeServiceException() {
-  }
-
-  /**
-   * @param message
-   */
   public EpisodeServiceException(String message) {
     super(message);
   }
 
-  /**
-   * @param cause
-   */
   public EpisodeServiceException(Throwable cause) {
     super(cause);
   }
 
-  /**
-   * @param message
-   * @param cause
-   */
-  public EpisodeServiceException(String message, Throwable cause) {
-    super(message, cause);
+  /** Return true if the exception is caused by a {@link org.opencastproject.security.api.UnauthorizedException}. */
+  // todo is an authorization failure really unrecoverable?
+  public boolean isCauseNotAuthorized() {
+    return getCause() instanceof UnauthorizedException;
   }
 
+  /**
+   * If the exception is caused by an {@link org.opencastproject.security.api.UnauthorizedException}
+   * rethrow it, otherwise do nothing.
+   */
+  public void rethrowUnauthorizedException() {
+    if (isCauseNotAuthorized()) {
+      chuck(getCause());
+    }
+  }
 }

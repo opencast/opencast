@@ -33,7 +33,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -58,6 +57,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.activation.FileTypeMap;
+
+import static org.opencastproject.util.MimeType.mimeType;
 
 /**
  * Implementation of {@link CaptionService}. Uses {@link ComponentContext} to get all registered
@@ -220,7 +221,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
       Catalog catalog = (Catalog) elementBuilder.elementFromURI(exported, Catalog.TYPE, new MediaPackageElementFlavor(
               "captions", outputFormat));
       String[] mimetype = FileTypeMap.getDefaultFileTypeMap().getContentType(exported.getPath()).split("/");
-      catalog.setMimeType(new MimeType(mimetype[0], mimetype[1]));
+      catalog.setMimeType(mimeType(mimetype[0], mimetype[1]));
       catalog.addTag("lang:" + language);
 
       return catalog;

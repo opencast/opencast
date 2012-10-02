@@ -177,7 +177,7 @@ public class LtiLaunchAuthenticationHandler implements
       userAuthorities.add(new GrantedAuthorityImpl("ROLE_USER"));
       userAuthorities.add(new GrantedAuthorityImpl("ROLE_ANONYMOUS"));
       
-      logger.info("Returning user with {0} authoraties", userAuthorities.size());
+      logger.info("Returning user with {} authorities", userAuthorities.size());
       
       userDetails = new User(userIdFromConsumer, "oauth", true, true, true, true, userAuthorities);
     }

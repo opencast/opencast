@@ -13,7 +13,6 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.episode.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
@@ -26,186 +25,107 @@ import java.util.Date;
  * {@link SearchResult}
  */
 public interface SearchResultItem {
-
   /**
    * A search result item can either represent an episode ({@link SearchResultItemType#AudioVisual}) or a series (
    * {@link SearchResultItemType#Series})
    */
   public enum SearchResultItemType {
     AudioVisual, Series
-  };
+  }
 
-  /**
-   * @return the id
-   */
+  /** @return the id */
   String getId();
 
-  /**
-   * Returns the media package that was used to create the entry in the search index.
-   * 
-   * @return the media package
-   */
+  /** Returns the media package that was used to create the entry in the search index. */
   MediaPackage getMediaPackage();
 
-  /**
-   * Returns the organization that produced this item.
-   * 
-   * @return the organization identifier
-   */
+  /** Returns the organization that produced this item. */
   String getOrganization();
 
-  /**
-   * @return the dcExtent
-   */
+  /** @return the dcExtent */
   long getDcExtent();
 
-  /**
-   * @return the dcTitle
-   */
+  /** @return the dcTitle */
   String getDcTitle();
 
-  /**
-   * @return the dcSubject
-   */
+  /** @return the dcSubject */
   String getDcSubject();
 
-  /**
-   * @return the dcDescription
-   */
+  /** @return the dcDescription */
   String getDcDescription();
 
-  /**
-   * @return the dcCreator
-   */
+  /** @return the dcCreator */
   String getDcCreator();
 
-  /**
-   * @return the dcPublisher
-   */
+  /** @return the dcPublisher */
   String getDcPublisher();
 
-  /**
-   * @return the dcContributor
-   */
+  /** @return the dcContributor */
   String getDcContributor();
 
-  /**
-   * @return the dcAbtract
-   */
+  /** @return the dcAbtract */
   String getDcAbstract();
 
-  /**
-   * @return the dcCreated
-   */
+  /** @return the dcCreated */
   Date getDcCreated();
 
-  /**
-   * @return the dcAvailableFrom
-   */
+  /** @return the dcAvailableFrom */
   Date getDcAvailableFrom();
 
-  /**
-   * @return the dcAvailableTo
-   */
+  /** @return the dcAvailableTo */
   Date getDcAvailableTo();
 
-  /**
-   * @return the dcLanguage
-   */
+  /** @return the dcLanguage */
   String getDcLanguage();
 
-  /**
-   * @return the dcRightsHolder
-   */
+  /** @return the dcRightsHolder */
   String getDcRightsHolder();
 
-  /**
-   * @return the dcSpatial
-   */
+  /** @return the dcSpatial */
   String getDcSpatial();
 
-  /**
-   * @return the dcTemporal
-   */
-  String getDcTemporal();
-
-  /**
-   * @return the dcIsPartOf
-   */
+  /** @return the dcIsPartOf */
   String getDcIsPartOf();
 
-  /**
-   * @return the dcReplaces
-   */
+  /** @return the dcReplaces */
   String getDcReplaces();
 
-  /**
-   * @return the dcType
-   */
+  /** @return the dcType */
   String getDcType();
 
-  /**
-   * @return the dcAccessRights
-   */
+  /** @return the dcAccessRights */
   String getDcAccessRights();
 
-  /**
-   * @return the dcLicense
-   */
+  /** @return the dcLicense */
   String getDcLicense();
 
-  /**
-   * @return the mediapackage serialized to XML
-   */
+  /** @return the mediapackage serialized to XML */
   String getOcMediapackage();
 
-  /**
-   * @return the mediaType
-   */
+  /** @return the acl serialized to XML */
+  String getOcAcl();
+
+  /** @return the mediaType */
   SearchResultItemType getType();
 
-  /**
-   * @return the keywords
-   */
+  /** @return the keywords */
   String[] getKeywords();
 
-  /**
-   * @return the cover
-   */
+  /** @return the cover */
   String getCover();
 
-  /**
-   * @return the modified
-   */
-  Date getModified();
+  /** @return the modified */
+  Date getTimestamp();
 
-  /**
-   * @return the score
-   */
+  /** @return the score */
   double getScore();
 
-  /**
-   * Get the result item segment list.
-   * 
-   * @return The segment list.
-   */
+  /** Get the result item segment list. */
   MediaSegment[] getSegments();
-
-  /**
-   * @return the publication state
-   */
-  boolean getOcLocked();
-
-  /**
-   * @return <code>true</code> if latest version in archive
-   */
-  boolean getOcLatestVersion();
 
   /** Return the time of deletion or none. */
   Option<Date> getOcDeleted();
 
-  /**
-   * @return the version in the archive
-   */
+  /** @return the version in the archive */
   Version getOcVersion();
 }

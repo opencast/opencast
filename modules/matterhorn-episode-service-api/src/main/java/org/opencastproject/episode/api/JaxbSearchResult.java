@@ -13,11 +13,9 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.episode.api;
 
 import org.apache.commons.io.IOUtils;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.functions.Misc;
 
 import javax.xml.bind.JAXBContext;
@@ -215,19 +213,5 @@ public class JaxbSearchResult implements SearchResult {
     if (limit != 0)
       return offset / limit;
     return 0;
-  }
-
-  public static JaxbSearchResult create(SearchResult a) {
-    final JaxbSearchResult r = new JaxbSearchResult();
-    r.setLimit(a.getLimit());
-    r.setOffset(a.getOffset());
-    r.setItems(mlist(a.getItems()).map(new Function<SearchResultItem, JaxbSearchResultItem>() {
-      @Override public JaxbSearchResultItem apply(SearchResultItem item) {
-        return JaxbSearchResultItem.create(item);
-      }
-    }).value());
-    r.setSearchTime(a.getSearchTime());
-    r.setTotalSize(a.getTotalSize());
-    return r;
   }
 }

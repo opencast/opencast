@@ -18,176 +18,89 @@ package org.opencastproject.episode.impl.persistence;
 import org.opencastproject.episode.api.Version;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Tuple3;
 
 import java.util.Date;
 import java.util.Iterator;
 
-/**
- * API that defines persistent storage of episodes.
- */
+/** API that defines persistent storage of episodes. */
 public interface EpisodeServiceDatabase {
 
   /**
    * Returns all episodes in persistence storage
-   * 
-   * @return {@link Tuple3} iterator representing stored episodes
+   *
+   * @return {@link Episode} iterator representing stored episodes
    * @throws EpisodeServiceDatabaseException
-   *           if exception occurs
+   *         if exception occurs
    */
-  Iterator<Tuple3<MediaPackage, Version, String>> getAllEpisodes() throws EpisodeServiceDatabaseException;
+  Iterator<Episode> getAllEpisodes() throws EpisodeServiceDatabaseException;
 
   Version claimVersion(String mpId) throws EpisodeServiceDatabaseException;
 
   /**
-   * Returns the organization id of the selected episode
-   * 
-   * @param mediaPackageId
-   *          the media package id to select
-   * @param version
-   *          the archive version to select
-   * @return the organization id
-   * @throws NotFoundException
-   *           if episode with specified id and version does not exist
-   * @throws EpisodeServiceDatabaseException
-   *           if an error occurs
-   */
-  String getOrganizationId(String mediaPackageId, Version version) throws NotFoundException,
-          EpisodeServiceDatabaseException;
-
-  /**
    * Returns the media package from the selected episode
-   * todo do not return DTO, convert to business object
-   * 
+   *
    * @param mediaPackageId
-   *          the media package id to select
+   *         the media package id to select
    * @param version
-   *          the archive version to select
+   *         the archive version to select
    * @return the media package
-   * @throws NotFoundException
-   *           if episode with specified id and version does not exist
    * @throws EpisodeServiceDatabaseException
-   *           if an error occurs
+   *         if an error occurs
    */
-  Option<EpisodeDto> getEpisode(String mediaPackageId, Version version) throws EpisodeServiceDatabaseException;
+  Option<Episode> getEpisode(String mediaPackageId, Version version) throws EpisodeServiceDatabaseException;
 
-  /**
-   * Returns the ACL from the selected episode
-   * 
-   * @param mediaPackageId
-   *          the media package id to select
-   * @param version
-   *          the archive version to select
-   * @return the {@link AccessControlList}
-   * @throws NotFoundException
-   *           if episode with specified id and version does not exist
-   * @throws EpisodeServiceDatabaseException
-   *           if an error occurs
-   */
-  AccessControlList getAccessControlList(String mediaPackageId, Version version) throws NotFoundException,
-          EpisodeServiceDatabaseException;
+  Option<Episode> getLatestEpisode(String mediaPackageId) throws EpisodeServiceDatabaseException;
 
   /**
    * Returns the latest version flag of the selected episode
-   * 
+   *
    * @param mediaPackageId
-   *          the media package id to select
+   *         the media package id to select
    * @param version
-   *          the archive version to select
+   *         the archive version to select
    * @return the latest version flag
-   * @throws NotFoundException
-   *           if episode with specified id and version does not exist
    * @throws EpisodeServiceDatabaseException
-   *           if an error occurs
+   *         if an error occurs
    */
-  boolean isLatestVersion(String mediaPackageId, Version version) throws NotFoundException, EpisodeServiceDatabaseException;
-
-  /**
-   * Returns the lock state of the selected episode
-   * 
-   * @param mediaPackageId
-   *          the media package id to select
-   * @return the lock state
-   * @throws NotFoundException
-   *           if episode with specified id does not exist
-   * @throws EpisodeServiceDatabaseException
-   *           if an error occurs
-   */
-  boolean getLockState(String mediaPackageId) throws NotFoundException, EpisodeServiceDatabaseException;
-
-  /**
-   * Returns the modification date from the selected episode.
-   * 
-   * @param mediaPackageId
-   *          the media package id to select
-   * @param version
-   *          the archive version to select
-   * @return the modification date
-   * @throws NotFoundException
-   *           if episode with specified id and version does not exist
-   * @throws EpisodeServiceDatabaseException
-   *           if an error occurs
-   */
-  Date getModificationDate(String mediaPackageId, Version version) throws NotFoundException,
-          EpisodeServiceDatabaseException;
+  Option<Boolean> isLatestVersion(String mediaPackageId, Version version) throws EpisodeServiceDatabaseException;
 
   /**
    * Returns the deletion date from the selected episode.
-   * 
+   *
    * @param mediaPackageId
-   *          the media package id to select
+   *         the media package id to select
    * @return the deletion date
-   * @throws NotFoundException
-   *           if episode with specified id does not exist
    * @throws EpisodeServiceDatabaseException
-   *           if an error occurs
+   *         if an error occurs
    */
-  Date getDeletionDate(String mediaPackageId) throws NotFoundException, EpisodeServiceDatabaseException;
+  Option<Date> getDeletionDate(String mediaPackageId) throws EpisodeServiceDatabaseException;
 
   /**
    * Sets a deletion date to the selected episode.
-   * 
+   *
    * @param mediaPackageId
-   *          the media package id to select
+   *         the media package id to select
    * @param deletionDate
-   *          the deletion date to set
-   * @throws NotFoundException
-   *           if episode with specified id does not exist
+   *         the deletion date to set
    * @throws EpisodeServiceDatabaseException
-   *           if an error occurs
+   *         if an error occurs
    */
-  void deleteEpisode(String mediaPackageId, Date deletionDate) throws NotFoundException,
-          EpisodeServiceDatabaseException;
-
-  /**
-   * Sets a lock state to the selected episode.
-   * 
-   * @param mediaPackageId
-   *          the media package id to select
-   * @param lock
-   *          the lock state
-   * @throws NotFoundException
-   *           if episode with specified id does not exist
-   * @throws EpisodeServiceDatabaseException
-   *           if an error occurs
-   */
-  void lockEpisode(String mediaPackageId, boolean lock) throws NotFoundException, EpisodeServiceDatabaseException;
+  boolean deleteEpisode(String mediaPackageId, Date deletionDate) throws EpisodeServiceDatabaseException;
 
   /**
    * Stores a new version of a media package
-   * 
+   *
    * @param mediaPackage
-   *          the media package to store
+   *         the media package to store
    * @param acl
-   *          the acl of the media package
+   *         the acl of the media package
    * @param now
-   *          the store date
+   *         the store date
    * @param version
-   *          the new version from the archive
+   *         the new version from the archive
    * @throws EpisodeServiceDatabaseException
-   *           if an error occurs
+   *         if an error occurs
    */
   void storeEpisode(MediaPackage mediaPackage, AccessControlList acl, Date now, Version version) throws EpisodeServiceDatabaseException;
 

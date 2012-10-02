@@ -15,25 +15,28 @@
  */
 package org.opencastproject.episode.endpoint;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.opencastproject.episode.api.ArchivedMediaPackageElement;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.api.EpisodeServiceException;
-import org.opencastproject.episode.api.JaxbSearchResult;
 import org.opencastproject.episode.api.JaxbSearchResultItem;
 import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultItem;
+import org.opencastproject.episode.api.UriRewriter;
 import org.opencastproject.episode.api.Version;
+import org.opencastproject.episode.impl.solr.Convert;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageImpl;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -62,22 +65,20 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static javax.servlet.http.HttpServletResponse.SC_ACCEPTED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.episode.api.ConfiguredWorkflow.workflow;
+import static org.opencastproject.episode.api.EpisodeQuery.query;
 import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
 import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
@@ -105,6 +106,8 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
   public abstract EpisodeService getEpisodeService();
 
   public abstract WorkflowService getWorkflowService();
+
+  public abstract SecurityService getSecurityService();
 
   public abstract String getServerUrl();
 
@@ -134,13 +137,13 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
              reponses = { @RestResponse(description = "The mediapackage was added, no content to return.", responseCode = HttpServletResponse.SC_NO_CONTENT),
                           @RestResponse(description = "There has been an internal error and the mediapackage could not be added", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
              returnDescription = "No content is returned.")
-  public Response add(@FormParam("mediapackage") MediaPackageImpl mediaPackage) throws EpisodeServiceException {
-    try {
-      getEpisodeService().add(mediaPackage);
-      return Response.noContent().build();
-    } catch (Exception e) {
-      throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
-    }
+  public Response add(@FormParam("mediapackage") final MediaPackageImpl mediaPackage) {
+    return handleException(new Function0<Response>() {
+      @Override public Response apply() {
+        getEpisodeService().add(mediaPackage);
+        return Response.noContent().build();
+      }
+    });
   }
 
   @DELETE
@@ -152,15 +155,15 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
              reponses = { @RestResponse(description = "The mediapackage was removed, no content to return.", responseCode = HttpServletResponse.SC_NO_CONTENT),
                           @RestResponse(description = "There has been an internal error and the mediapackage could not be deleted", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
              returnDescription = "No content is returned.")
-  public Response delete(@PathParam("id") String mediaPackageId) throws EpisodeServiceException, NotFoundException {
-    try {
-      if (mediaPackageId != null && getEpisodeService().delete(mediaPackageId))
-        return Response.noContent().build();
-      else
-        throw new NotFoundException();
-    } catch (Exception e) {
-      throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
-    }
+  public Response delete(@PathParam("id") final String mediaPackageId) {
+    return handleException(new Function0.X<Response>() {
+      @Override public Response xapply() throws NotFoundException {
+        if (mediaPackageId != null && getEpisodeService().delete(mediaPackageId))
+          return Response.noContent().build();
+        else
+          throw new NotFoundException();
+      }
+    });
   }
 
 //  @POST
@@ -202,25 +205,29 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
                                               description = "A list of media package ids.", isRequired = true) },
              reponses = {@RestResponse(description = "The workflows have been started.", responseCode = HttpServletResponse.SC_NO_CONTENT) },
              returnDescription = "No content is returned.")
-  public Response applyWorkflow(@PathParam("wfDefId") String wfId,
-                                @FormParam("mediaPackageIds") List<String> mpIds,
-                                @Context HttpServletRequest req) throws Exception {
-    final Map<String, String[]> params = (Map<String, String[]>) req.getParameterMap();
-    // filter and reduce String[] to String
-    final Map<String, String> wfp = mlist(params.entrySet().iterator()).foldl(
-            Collections.<String, String>map(),
-            new Function2<Map<String, String>, Map.Entry<String, String[]>, Map<String, String>>() {
-              @Override
-              public Map<String, String> apply(Map<String, String> wfConf, Map.Entry<String, String[]> param) {
-                final String key = param.getKey();
-                if (!"mediaPackageIds".equalsIgnoreCase(key))
-                  wfConf.put(key, param.getValue()[0]);
-                return wfConf;
-              }
-            });
-    final WorkflowDefinition wfd = getWorkflowService().getWorkflowDefinitionById(wfId);
-    getEpisodeService().applyWorkflow(workflow(wfd, wfp), rewriteUri, mpIds);
-    return Response.noContent().build();
+  public Response applyWorkflow(@PathParam("wfDefId") final String wfId,
+                                @FormParam("mediaPackageIds") final List<String> mpIds,
+                                @Context final HttpServletRequest req) {
+    return handleException(new Function0.X<Response>() {
+      @Override public Response xapply() throws Exception {
+        final Map<String, String[]> params = (Map<String, String[]>) req.getParameterMap();
+        // filter and reduce String[] to String
+        final Map<String, String> wfp = mlist(params.entrySet().iterator()).foldl(
+                Collections.<String, String>map(),
+                new Function2<Map<String, String>, Map.Entry<String, String[]>, Map<String, String>>() {
+                  @Override
+                  public Map<String, String> apply(Map<String, String> wfConf, Map.Entry<String, String[]> param) {
+                    final String key = param.getKey();
+                    if (!"mediaPackageIds".equalsIgnoreCase(key))
+                      wfConf.put(key, param.getValue()[0]);
+                    return wfConf;
+                  }
+                });
+        final WorkflowDefinition wfd = getWorkflowService().getWorkflowDefinitionById(wfId);
+        getEpisodeService().applyWorkflow(workflow(wfd, wfp), rewriteUri, mpIds);
+        return Response.noContent().build();
+      }
+    });
   }
 
   @GET
@@ -248,125 +255,127 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
              reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) },
              returnDescription = "The search results, expressed as xml or json.")
   // CHECKSTYLE:OFF -- more than 7 parameters
-  public Response findEpisode(@QueryParam("id") String id,
-                              @QueryParam("q") String text,
-                              @QueryParam("creator") String creator,
-                              @QueryParam("contributor") String contributor,
-                              @QueryParam("language") String language,
-                              @QueryParam("series") String series,
-                              @QueryParam("license") String license,
-                              @QueryParam("title") String title,
-                              @QueryParam("tag") String[] tags,
-                              @QueryParam("flavor") String[] flavors,
-                              @QueryParam("limit") int limit,
-                              @QueryParam("offset") int offset,
-                              @QueryParam("sort") String sort,
-                              @QueryParam("onlyLatest") @DefaultValue("true") boolean onlyLatest,
-                              @PathParam("format") String format) throws Exception {
+  public Response findEpisode(@QueryParam("id") final String id,
+                              @QueryParam("q") final String text,
+                              @QueryParam("creator") final String creator,
+                              @QueryParam("contributor") final String contributor,
+                              @QueryParam("language") final String language,
+                              @QueryParam("series") final String series,
+                              @QueryParam("license") final String license,
+                              @QueryParam("title") final String title,
+                              @QueryParam("tag") final String[] tags,
+                              @QueryParam("flavor") final String[] flavors,
+                              @QueryParam("limit") final int limit,
+                              @QueryParam("offset") final int offset,
+                              @QueryParam("sort") final String sort,
+                              @QueryParam("onlyLatest") @DefaultValue("true") final boolean onlyLatest,
+                              @PathParam("format") final String format) {
     // CHECKSTYLE:ON
-
-    // Prepare the flavors
-    List<MediaPackageElementFlavor> flavorSet = new ArrayList<MediaPackageElementFlavor>();
-    if (flavors != null) {
-      for (String f : flavors) {
-        try {
-          flavorSet.add(MediaPackageElementFlavor.parseFlavor(f));
-        } catch (IllegalArgumentException e) {
-          logger.debug("invalid flavor '{}' specified in query", f);
+    return handleException(new Function0<Response>() {
+      @Override public Response apply() {
+        // Prepare the flavors
+        List<MediaPackageElementFlavor> flavorSet = new ArrayList<MediaPackageElementFlavor>();
+        if (flavors != null) {
+          for (String f : flavors) {
+            try {
+              flavorSet.add(MediaPackageElementFlavor.parseFlavor(f));
+            } catch (IllegalArgumentException e) {
+              logger.debug("invalid flavor '{}' specified in query", f);
+            }
+          }
         }
+
+        final EpisodeQuery search = query(getSecurityService()).elementFlavors(flavorSet).limit(limit).offset(offset);
+        
+        if (tags != null)
+          search.elementTags(tags);
+        
+        if (StringUtils.isNotBlank(id))
+          search.id(id);
+        
+        if (StringUtils.isNotBlank(text))
+          search.text(StringUtils.trimToEmpty(text));
+        
+        if (StringUtils.isNotBlank(creator))
+          search.creator(creator);
+        
+        if (StringUtils.isNotBlank(contributor))
+          search.contributor(contributor);
+        
+        if (StringUtils.isNotBlank(language))
+          search.language(language);
+        
+        if (StringUtils.isNotBlank(series))
+          search.seriesId(series);
+        
+        if (StringUtils.isNotBlank(license))
+          search.license(license);
+        
+        if (StringUtils.isNotBlank(title))
+          search.title(title);
+
+        if (StringUtils.isNotBlank(sort)) {
+          // Parse the sort field and direction
+          EpisodeQuery.Sort sortField = null;
+          if (sort.endsWith(DESCENDING_SUFFIX)) {
+            String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
+            try {
+              sortField = EpisodeQuery.Sort.valueOf(enumKey);
+              search.sort(sortField, false);
+            } catch (IllegalArgumentException e) {
+              logger.warn("No sort enum matches '{}'", enumKey);
+            }
+          } else {
+            try {
+              sortField = EpisodeQuery.Sort.valueOf(sort);
+              search.sort(sortField, true);
+            } catch (IllegalArgumentException e) {
+              logger.warn("No sort enum matches '{}'", sort);
+            }
+          }
+        }
+
+        if (onlyLatest)
+          search.onlyLastVersion();
+
+        // Return the results using the requested format
+        final String type = "json".equals(format) ? MediaType.APPLICATION_JSON : MediaType.APPLICATION_XML;
+        final SearchResult sr = rewriteForDelivery(getEpisodeService().find(search));
+        return Response.ok(sr).type(type).build();
       }
-    }
-
-    final EpisodeQuery search = new EpisodeQuery().withId(id)
-            .withElementFlavors(flavorSet.toArray(new MediaPackageElementFlavor[flavorSet.size()]))
-            .withElementTags(tags).withLimit(limit).withOffset(offset).withText(StringUtils.trimToNull(text))
-            .withCreator(creator).withContributor(contributor).withLanguage(language).withSeriesId(series)
-            .withLicense(license).withTitle(title);
-
-    if (StringUtils.isNotBlank(sort)) {
-      // Parse the sort field and direction
-      EpisodeQuery.Sort sortField = null;
-      if (sort.endsWith(DESCENDING_SUFFIX)) {
-        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
-        try {
-          sortField = EpisodeQuery.Sort.valueOf(enumKey);
-          search.withSort(sortField, false);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", enumKey);
-        }
-      } else {
-        try {
-          sortField = EpisodeQuery.Sort.valueOf(sort);
-          search.withSort(sortField, true);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", sort);
-        }
-      }
-    }
-
-    if (onlyLatest)
-      search.withOnlyLastVersion();
-
-    // Return the results using the requested format
-    final String type = "json".equals(format) ? MediaType.APPLICATION_JSON : MediaType.APPLICATION_XML;
-    final SearchResult sr = rewriteForDelivery(getEpisodeService().find(search));
-    return Response.ok(sr).type(type).build();
+    });
   }
 
   @GET
-  @Path(ARCHIVE_PATH_PREFIX + "{mediaPackageID}/{mediaPackageElementID}/{version}")
+  @Path(ARCHIVE_PATH_PREFIX + "{mediaPackageID}/{mediaPackageElementID}/{version}/{ignore}")
   @RestQuery(name = "getElement",
              description = "Gets the file from the archive under /mediaPackageID/mediaPackageElementID/version",
              returnDescription = "The file",
              pathParameters = { @RestParameter(name = "mediaPackageID", description = "the mediapackage identifier", isRequired = true, type = STRING),
                                 @RestParameter(name = "mediaPackageElementID", description = "the mediapackage element identifier", isRequired = true, type = STRING),
-                                @RestParameter(name = "version", description = "the mediapackage version", isRequired = true, type = STRING) },
+                                @RestParameter(name = "version", description = "the mediapackage version", isRequired = true, type = STRING),
+                                @RestParameter(name = "ignore", description = "this value is being ignored. just for documentation purposes", isRequired = false, type = STRING) },
              reponses = { @RestResponse(responseCode = SC_OK, description = "File returned"),
-                          @RestResponse(responseCode = SC_ACCEPTED, description = "File is not ready"),
                           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
-  public Response getElement(@PathParam("mediaPackageID") String mediaPackageID,
+  public Response getElement(@PathParam("mediaPackageID") final String mediaPackageID,
                              @PathParam("mediaPackageElementID") final String mediaPackageElementID,
-                             @PathParam("version") long version,
-                             @HeaderParam("If-None-Match") String ifNoneMatch) throws Exception {
-    if (StringUtils.isNotBlank(ifNoneMatch))
-      return Response.notModified().build();
-
-    return getEpisodeService().get(mediaPackageID, mediaPackageElementID, Version.version(version)).fold(new Option.Match<ArchivedMediaPackageElement, Response>() {
-      @Override public Response some(ArchivedMediaPackageElement element) {
-        final InputStream inputStream = element.getInputStream();
-        MimeType mimeType = element.getMimeType();
-
-        String fileName = mediaPackageElementID.concat(".");
-        if (StringUtils.isNotBlank(mimeType.getSuffix())) {
-          fileName = fileName.concat(mimeType.getSuffix());
-        } else if (mimeType.getSuffixes().length > 0) {
-          fileName = fileName.concat(mimeType.getSuffixes()[0]);
-        } else {
-          fileName = fileName.concat(mimeType.getSubtype());
+                             @PathParam("version") final long version,
+                             @HeaderParam("If-None-Match") final String ifNoneMatch) {
+    return handleException(new Function0<Response>() {
+      @Override public Response apply() {
+        if (StringUtils.isNotBlank(ifNoneMatch))
+          return Response.notModified().build();
+        for (ArchivedMediaPackageElement element : getEpisodeService().get(mediaPackageID, mediaPackageElementID, Version.version(version))) {
+          final InputStream inputStream = element.getInputStream();
+          final MimeType mimeType = element.getMimeType();
+          final String fileName = mediaPackageElementID.concat(".").concat(mimeType.getSuffix().getOrElse(mimeType.getSubtype()));
+          // Write the file contents back
+          return RestUtil.streamResponse(inputStream,
+                                         mimeType.asString(),
+                                         element.getSize() > 0 ? some(element.getSize()) : Option.<Long>none(),
+                                         some(fileName)).build();
         }
-
-        // Write the file contents back
-        return Response
-                .ok(new StreamingOutput() {
-                  @Override public void write(OutputStream os) throws IOException, WebApplicationException {
-                    try {
-                      IOUtils.copy(inputStream, os);
-                    } catch (IOException e) {
-                      Throwable cause = e.getCause();
-                      if (cause == null || !"Broken pipe".equals(cause.getMessage()))
-                        logger.warn("Error writing file contents to response", e);
-                    } finally {
-                      IOUtils.closeQuietly(inputStream);
-                    }
-                  }
-                })
-                .header("Content-disposition", "attachment; filename=" + fileName)
-                .header("Content-length", element.getSize())
-                .type(mimeType.asString())
-                .build();
-      }
-
-      @Override public Response none() {
+        // none
         return chuck(new NotFoundException());
       }
     });
@@ -380,17 +389,16 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
              returnDescription = "The mediapackage",
              pathParameters = { @RestParameter(name = "mediaPackageID", description = "the mediapackage identifier", isRequired = true, type = STRING) },
              reponses = { @RestResponse(responseCode = SC_OK, description = "Mediapackage returned"),
-                          @RestResponse(responseCode = SC_ACCEPTED, description = "Mediapackage is not ready"),
                           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
-  public Response getMediapackage(@PathParam("mediaPackageID") String mediaPackageId) throws Exception {
-    final EpisodeQuery idQuery = new EpisodeQuery().withId(mediaPackageId);
-    return mlist(getEpisodeService().find(idQuery).getItems()).head().fold(new Option.Match<SearchResultItem, Response>() {
-      @Override public Response some(SearchResultItem item) {
-        final MediaPackage rewritten = rewriteUris(item.getMediaPackage(), rewriteUri.curry(item.getOcVersion()));
-        return Response.ok(rewritten).build();
-      }
-
-      @Override public Response none() {
+  public Response getMediapackage(@PathParam("mediaPackageID") final String mediaPackageId) {
+    return handleException(new Function0<Response>() {
+      @Override public Response apply() {
+        final EpisodeQuery idQuery = query(getSecurityService()).id(mediaPackageId);
+        for (SearchResultItem item : mlist(getEpisodeService().find(idQuery).getItems()).head()) {
+          final MediaPackage rewritten = rewriteUris(item.getMediaPackage(), rewriteUri.curry(item.getOcVersion()));
+          return Response.ok(rewritten).build();
+        }
+        // none
         return chuck(new NotFoundException());
       }
     });
@@ -400,24 +408,25 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
    * Function to rewrite media package element URIs so that they point to this REST endpoint.
    * The created URIs have to correspond with the parameter list of {@link #getElement(String, String, long, String)}.
    */
-  private final Function2<Version, MediaPackageElement, URI> rewriteUri = new Function2<Version, MediaPackageElement, URI>() {
+  private final UriRewriter rewriteUri = new UriRewriter() {
     @Override public URI apply(Version version, MediaPackageElement mpe) {
       return uri(getServerUrl(),
                  getMountPoint(),
                  ARCHIVE_PATH_PREFIX,
                  mpe.getMediaPackage().getIdentifier(),
                  mpe.getIdentifier(),
-                 version);
+                 version,
+                 mpe.getElementType().toString().toLowerCase() + ".mov");
     }
   };
 
   /** Rewrite all URIs of contained media package elements to point to the EpisodeService. */
   public SearchResult rewriteForDelivery(final SearchResult result) {
-    return JaxbSearchResult.create(new SearchResult() {
+    return Convert.convert(new SearchResult() {
       @Override public List<SearchResultItem> getItems() {
         return mlist(result.getItems()).map(new Function<SearchResultItem, SearchResultItem>() {
           @Override public SearchResultItem apply(SearchResultItem item) {
-            final JaxbSearchResultItem rewritten = JaxbSearchResultItem.create(item);
+            final JaxbSearchResultItem rewritten = Convert.convert(item);
             rewritten.setMediaPackage(rewriteUris(item.getMediaPackage(), rewriteUri.curry(item.getOcVersion())));
             return rewritten;
           }
@@ -425,12 +434,33 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
       }
 
       @Override public String getQuery() { return result.getQuery(); }
+
       @Override public long size() { return result.size(); }
+
       @Override public long getTotalSize() { return result.getTotalSize(); }
+
       @Override public long getOffset() { return result.getOffset(); }
+
       @Override public long getLimit() { return result.getLimit(); }
+
       @Override public long getSearchTime() { return result.getSearchTime(); }
+
       @Override public long getPage() { return result.getPage(); }
     });
+  }
+
+  /** Unify exception handling. */
+  public static <A> A handleException(final Function0<A> f) {
+    try {
+      return f.apply();
+    } catch (EpisodeServiceException e) {
+      if (e.isCauseNotAuthorized())
+        throw new WebApplicationException(e, Response.Status.UNAUTHORIZED);
+      throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+    } catch (Exception e) {
+      if (e instanceof NotFoundException)
+        throw new WebApplicationException(e, Response.Status.NOT_FOUND);
+      throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+    }
   }
 }

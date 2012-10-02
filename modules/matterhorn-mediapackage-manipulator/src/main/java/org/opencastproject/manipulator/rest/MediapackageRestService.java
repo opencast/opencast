@@ -31,7 +31,6 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
-import org.opencastproject.util.MimeType;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -39,6 +38,8 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.opencastproject.util.MimeType.mimeType;
 
 @Path("/")
 @RestService(name = "mediapackage", title = "Mediapackage manipulator RestService",
@@ -228,7 +229,7 @@ public class MediapackageRestService {
 
       Attachment a = new AttachmentImpl();
       a.setFlavor(new MediaPackageElementFlavor(flavors[0], flavors[1]));
-      a.setMimeType(new MimeType(types[0], types[1]));
+      a.setMimeType(mimeType(types[0], types[1]));
       a.setURI(new URI(attachmentUri));
 
       mp.add(a);

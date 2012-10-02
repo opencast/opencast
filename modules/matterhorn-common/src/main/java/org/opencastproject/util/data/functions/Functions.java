@@ -16,7 +16,9 @@
 
 package org.opencastproject.util.data.functions;
 
+import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Effect0;
+import org.opencastproject.util.data.Effect2;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
@@ -153,6 +155,33 @@ public final class Functions {
             return f.apply(a);
           }
         };
+      }
+    };
+  }
+
+  /** Turn a function of arity 0 into an effect by discarding its result. */
+  public static <A> Effect0 toEffect(final Function0<A> f) {
+    return new Effect0() {
+      @Override protected void run() {
+        f.apply();
+      }
+    };
+  }
+
+  /** Turn a function into an effect by discarding its result. */
+  public static <A, B> Effect<A> toEffect(final Function<A, B> f) {
+    return new Effect<A>() {
+      @Override protected void run(A a) {
+        f.apply(a);
+      }
+    };
+  }
+
+  /** Turn a function of arity 2 into an effect by discarding its result. */
+  public static <A, B, C> Effect2<A, B> toEffect(final Function2<A, B, C> f) {
+    return new Effect2<A, B>() {
+      @Override protected void run(A a, B b) {
+        f.apply(a, b);
       }
     };
   }

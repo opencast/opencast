@@ -7,7 +7,7 @@
     http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
   <persistence-unit name="org.opencastproject.episode.impl.persistence" transaction-type="RESOURCE_LOCAL">
     <class>org.opencastproject.episode.impl.persistence.EpisodeDto</class>
-    <class>org.opencastproject.episode.impl.persistence.VersionDto</class>
+    <class>org.opencastproject.episode.impl.persistence.VersionClaimDto</class>
     <class>org.opencastproject.episode.impl.persistence.AssetDto</class>
     <properties>
       <property name="eclipselink.create-ddl-jdbc-file-name" value="create-matterhorn-episode-service-impl.jdbc"/>

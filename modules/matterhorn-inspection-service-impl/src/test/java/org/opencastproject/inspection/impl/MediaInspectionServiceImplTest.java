@@ -17,6 +17,7 @@ package org.opencastproject.inspection.impl;
 
 import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ANONYMOUS;
 import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
+import static org.opencastproject.util.MimeType.mimeType;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
@@ -177,7 +178,7 @@ public class MediaInspectionServiceImplTest {
       // make changes to metadata
       Checksum cs = track.getChecksum();
       track.setChecksum(null);
-      MimeType mt = new MimeType("video", "flash");
+      MimeType mt = mimeType("video", "flash");
       track.setMimeType(mt);
       // test the enrich scenario
       Job newJob = service.enrich(track, false);

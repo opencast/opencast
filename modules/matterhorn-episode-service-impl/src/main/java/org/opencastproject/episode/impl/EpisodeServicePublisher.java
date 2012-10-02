@@ -186,13 +186,23 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
         return new IllegalStateException("Unable to connect to solr at " + target, e);
       }
     }.apply();
-
-    final SolrRequester solrRequester = new SolrRequester(solrServer, securityService);
-    final SolrIndexManager solrIndex = new SolrIndexManager(solrServer, workspace, metadataSvcs, seriesService,
-            mpeg7CatalogService, securityService);
-    final EpisodeServiceImpl episodeService = new EpisodeServiceImpl(solrRequester, solrIndex, securityService,
-            authorizationService, orgDirectory, serviceRegistry, workflowService, mediaInspectionSvc, persistence,
-            elementStore);
+    final SolrRequester solrRequester = new SolrRequester(solrServer);
+    final SolrIndexManager solrIndex = new SolrIndexManager(solrServer,
+                                                            workspace,
+                                                            metadataSvcs,
+                                                            seriesService,
+                                                            mpeg7CatalogService,
+                                                            securityService);
+    final EpisodeServiceImpl episodeService = new EpisodeServiceImpl(solrRequester,
+                                                                     solrIndex,
+                                                                     securityService,
+                                                                     authorizationService,
+                                                                     orgDirectory,
+                                                                     serviceRegistry,
+                                                                     workflowService,
+                                                                     mediaInspectionSvc,
+                                                                     persistence,
+                                                                     elementStore);
     // Populate the search index if it is empty
     episodeService.populateIndex();
     return tuple(list(registerService(cc, episodeService, EpisodeService.class, "Episode service")),

@@ -16,15 +16,16 @@
 package org.opencastproject.episode.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
-import java.net.URI;
 import java.util.List;
 
-/** The episode service is Matterhorn's media package archive. It also supports batch reprocessing */
+/**
+ * The episode service is Matterhorn's media package archive and re-processing hub.
+ * Each method may throw an {@link org.opencastproject.episode.api.EpisodeServiceException} indicating
+ * an error situation.
+ */
 public interface EpisodeService {
   /** Identifier for service registration and location */
   String JOB_TYPE = "org.opencastproject.episode";
@@ -63,8 +64,6 @@ public interface EpisodeService {
    * @param mediaPackageId
    *         id of the media package to remove
    * @return <code>true</code> if the episode was found and deleted
-   * @throws EpisodeServiceException
-   *         if an error occurs while removing the media package
    */
   boolean delete(String mediaPackageId) throws EpisodeServiceException;
 
@@ -77,11 +76,11 @@ public interface EpisodeService {
    *         a function to rewrite media package element URLs
    * @param q
    *         the query
-   * @return a list of started workflows todo should report about failed workflow starts
-   * @throws EpisodeServiceException
+   * @return a list of started workflows
    */
+  // todo change return value to report about failed workflow starts
   List<WorkflowInstance> applyWorkflow(ConfiguredWorkflow workflow,
-                                       Function2<Version, MediaPackageElement, URI> rewriteUri,
+                                       UriRewriter rewriteUri,
                                        EpisodeQuery q) throws EpisodeServiceException;
 
   /**
@@ -93,11 +92,12 @@ public interface EpisodeService {
    *         a function to rewrite media package element URLs
    * @param mediaPackageIds
    *         list of media package ids
-   * @return a list of started workflows todo should report about failed workflow starts
+   * @return a list of started workflows
    * @throws EpisodeServiceException
    */
+  // todo change return value to report about failed workflow starts
   List<WorkflowInstance> applyWorkflow(ConfiguredWorkflow workflow,
-                                       Function2<Version, MediaPackageElement, URI> rewriteUri,
+                                       UriRewriter rewriteUri,
                                        List<String> mediaPackageIds) throws EpisodeServiceException;
 
   /**

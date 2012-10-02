@@ -16,6 +16,7 @@
 package org.opencastproject.episode.endpoint;
 
 import org.opencastproject.episode.api.EpisodeService;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.osgi.service.component.ComponentContext;
 
@@ -29,6 +30,7 @@ import static org.opencastproject.util.OsgiUtil.getContextProperty;
 public final class OsgiEpisodeServiceRestEndpoint extends AbstractEpisodeServiceRestEndpoint {
   private EpisodeService episodeService;
   private WorkflowService workflowService;
+  private SecurityService securityService;
   private String serverUrl;
   private String mountPoint;
 
@@ -51,19 +53,28 @@ public final class OsgiEpisodeServiceRestEndpoint extends AbstractEpisodeService
     return mountPoint;
   }
 
+  @Override public SecurityService getSecurityService() {
+    return securityService;
+  }
+
   /** OSGi callback. */
   public void activate(ComponentContext cc) {
     serverUrl = getContextProperty(cc, "org.opencastproject.server.url");
     mountPoint = getComponentContextProperty(cc, "opencast.service.path");
   }
 
-  /** OSGi callback. */
+  /** OSGi DI callback. */
   public void setEpisodeService(EpisodeService episodeService) {
     this.episodeService = episodeService;
   }
 
-  /** OSGi callback. */
+  /** OSGi DI callback. */
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
+  }
+
+  /** OSGi DI callback. */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 }
