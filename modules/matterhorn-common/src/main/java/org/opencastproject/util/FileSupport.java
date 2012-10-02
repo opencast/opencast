@@ -299,6 +299,8 @@ public final class FileSupport {
       stdout = new StreamHelper(p.getInputStream());
       stderr = new LinkErrorStreamHelper(p.getErrorStream(), error);
       p.waitFor();
+      stdout.join();
+      stderr.join();
       // Find does not return with an error if -exec fails
       if (p.exitValue() != 0 || error.length() > 0) {
         logger.debug("Unable to link files from " + sourceDirectory + " to " + targetDirectory + ": " + error);
@@ -401,6 +403,8 @@ public final class FileSupport {
         stdout = new StreamHelper(p.getInputStream());
         stderr = new LinkErrorStreamHelper(p.getErrorStream(), error);
         p.waitFor();
+        stdout.join();
+        stderr.join();
         // Find does not return with an error if -exec fails
         if (p.exitValue() != 0 || error.length() > 0) {
           logger.debug("Unable to link files from " + sourceLocation + " to " + dest + ": " + error);
@@ -435,6 +439,8 @@ public final class FileSupport {
         stdout = new StreamHelper(p.getInputStream());
         stderr = new LinkErrorStreamHelper(p.getErrorStream(), error);
         p.waitFor();
+        stdout.join();
+        stderr.join();
         // Find does not return with an error if -exec fails
         if (p.exitValue() != 0 || error.length() > 0) {
           logger.debug("Unable to create a link from " + sourceLocation + " to " + dest + ": " + error);
@@ -488,6 +494,8 @@ public final class FileSupport {
       stdout = new StreamHelper(p.getInputStream());
       stderr = new LinkErrorStreamHelper(p.getErrorStream(), error);
       p.waitFor();
+      stdout.join();
+      stderr.join();
       // Find does not return with an error if -exec fails
       if (p.exitValue() != 0 || error.length() > 0) {
         logger.debug("Unable to create a link from " + sourceLocation + " to " + targetLocation + ": " + error);
