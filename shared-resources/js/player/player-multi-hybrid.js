@@ -1841,7 +1841,7 @@ Opencast.Player = (function ()
           return;
         }
 	// Return if the in and out positions are NaN
-	if( isNaN(inPosition) || isNaN(outPosition) ){
+	if (isNaN(inPosition) || isNaN(outPosition)) {
             return;
         }
 
