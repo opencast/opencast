@@ -190,9 +190,6 @@ Opencast.Annotation_Comment = (function ()
 	{
 	    return;
 	}
-	
-	var reg = Opencast.Plugin_Controller.registerPlugin(Opencast.Annotation_Comment);
-	$.log("Opencast.Annotation_Comment registered: " + reg);
     	
 	if(modus === "public")
 	{
