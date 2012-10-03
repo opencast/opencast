@@ -1840,6 +1840,11 @@ Opencast.Player = (function ()
 	if (!Opencast.Player.detailedLogging && (eventType != Opencast.logging.FOOTPRINT || eventType.matches("/.*AJAX-FAILED/i"))) {
           return;
         }
+	// Return if the in and out positions are NaN
+	if (isNaN(inPosition) || isNaN(outPosition)) {
+            return;
+        }
+
         $.ajax(
         {
             type: 'GET',
