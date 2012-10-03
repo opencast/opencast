@@ -33,9 +33,10 @@ ocCaptureAgent = new (function ()
           }				
         });	
       }				
-      if (ocCaptureAgent.polling_time >0) {	
+      if (ocCaptureAgent.polling_time > 0) {	
         $.each(ocCaptureAgent.agentsObj["agents"],function(i,item){
-          if ((item.name == agent_name)&&(item["time-since-last-update"] > ocCaptureAgent.polling_time*1000 )) {						
+                // Added a 5 second slack to account for overheard processing the http request.
+		if ((item.name == agent_name) && (item["time-since-last-update"] > (ocCaptureAgent.polling_time + 5) * 1000 )) {						
             item.state = "offline";
             return false;
           }	
