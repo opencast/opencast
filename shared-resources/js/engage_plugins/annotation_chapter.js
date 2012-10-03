@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
- 
+
 var Opencast = Opencast || {};
 
 /**
@@ -26,7 +26,7 @@ Opencast.Annotation_Chapter = (function ()
     var ANNOTATION_CHAPTER = "Annotation",
         ANNOTATION_CHAPTERHIDE = "Annotation off";
     var annotationType = "chapter";
-    
+
     /**
      * @memberOf Opencast.Annotation_Chapter
      * @description Initializes Annotation Chapter
@@ -47,20 +47,27 @@ Opencast.Annotation_Chapter = (function ()
             success: function (data)
             {
                 $.log("Annotation AJAX call: Requesting data succeeded");
-                if ((data !== undefined) && (data['annotations'] !== undefined) && (data['annotations'].annotation !== undefined))
-                {
-                    $.log("Annotation AJAX call: Data available");
-                    // Display the controls
-                    $('#oc_checkbox-annotations').show();
-                    $('#oc_label-annotations').show();
-                    $('#oc_video-view').show();
-                    Opencast.Analytics.initialize();
-                }
-                else
-                {
-                    $.log("Annotation AJAX call: Data not available");
-                    displayNoAnnotationsAvailable("No data available");
-                }
+                var data = data ? data : [],
+                    annotations = data['annotations'];
+
+                if ( annotations !== undefined ){
+                    if ( annotations.annotation !== undefined ){
+                        $.log("Annotation AJAX call: Data available");
+                        // Display the controls
+                        $('#oc_checkbox-annotations').show();
+                        $('#oc_label-annotations').show();
+                        $('#oc_video-view').show();
+                        Opencast.Analytics.initialize();
+                    }else
+                        {
+                            $.log("Annotation AJAX call: Data not available");
+                            displayNoAnnotationsAvailable("No data available");
+                        }
+                }else
+                    {
+                        $.log("Annotation AJAX call: Data not available");
+                        displayNoAnnotationsAvailable("No data available");
+                    }
             },
             // If no data comes back
             error: function (xhr, ajaxOptions, thrownError)
@@ -71,7 +78,7 @@ Opencast.Annotation_Chapter = (function ()
             }
         });
     }
-    
+
     /**
      * @memberOf Opencast.Annotation_Chapter
      * @description Show Annotation_Chapter
@@ -140,7 +147,7 @@ Opencast.Annotation_Chapter = (function ()
             }
         });
     }
-    
+
     /**
      * @memberOf Opencast.Annotation_Chapter
      * @description Displays that no Annotation is available and hides Annotations
@@ -157,7 +164,7 @@ Opencast.Annotation_Chapter = (function ()
         $('#oc_label-annotations').hide();
         hide();
     }
-    
+
     /**
      * @memberOf Opencast.Annotation_Chapter
      * @description Hide the Annotation
@@ -169,7 +176,7 @@ Opencast.Annotation_Chapter = (function ()
         $('#segmentstable2').show();
         annotationChapterDisplayed = false;
     }
-    
+
     /**
      * @memberOf Opencast.Annotation_Chapter
      * @description Toggle Analytics
@@ -186,7 +193,7 @@ Opencast.Annotation_Chapter = (function ()
         }
         return true;
     }
-    
+
     /**
      * @memberOf Opencast.Annotation_Chapter
      * @description Set the mediaPackageId
@@ -196,7 +203,7 @@ Opencast.Annotation_Chapter = (function ()
     {
         mediaPackageId = id;
     }
-    
+
     /**
      * @memberOf Opencast.Annotation_Chapter
      * @description Set the duration
@@ -206,7 +213,7 @@ Opencast.Annotation_Chapter = (function ()
     {
         duration = val;
     }
-    
+
     return {
         initialize: initialize,
         hide: hide,
