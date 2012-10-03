@@ -34,7 +34,7 @@ li#titleNote {padding:0 0 4px 0;}
 .icon-add {         background-image: url(/admin/img/icons/add.png); margin-right: 10px; }
 .icon-delete {      background-image: url(/admin/img/icons/delete.png); }
 .icon-idle 	{   background-image: url(/admin/img/icons/cup.png); margin: 0px 10px; }
-.icon-capturing {   background-image: url(/admin/img/icons/camera.png); }
+.icon-capturing {   background-image: url(/admin/img/icons/camera.png); margin: 0px 10px; }
 .icon-online {	    background-image: url(/admin/img/icons/available.png); }
 .icon-offline {     background-image: url(/admin/img/icons/offline.png); margin: 0px 10px; }
 .icon-arrow-right { background-image: url(/admin/img/icons/arrow-right.png); background-position: 0 0;}
