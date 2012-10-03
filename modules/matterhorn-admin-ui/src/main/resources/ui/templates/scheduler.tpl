@@ -124,10 +124,10 @@
           <span class="ui-icon ui-icon-info"></span> <b>Notice</b>
         </h3>
         <ul>
-          <li id="noticeOffline" class="missing-fields-item">
+          <li id="noticeOffline" class="missing-fields-item ui-helper-hidden">
 			<span class="ui-icon ui-icon-carat-1-e"></span>The <a href="javascript:document.getElementById('agent').focus();">capture agent</a> you previously selected is currently offline. You may want to select a different capture agent.
           </li>
-          <li id="noticeTzDiff" class="missing-fields-item">
+          <li id="noticeTzDiff" class="missing-fields-item ui-helper-hidden">
             <span class="ui-icon ui-icon-carat-1-e" title=""></span>The timezone for this <a href="javascript:document.getElementById('agent').focus();">capture agent</a> is <span id="tzdiff"></span>. Capture will occur according to the time local to the agent, though when you look at your list of Recordings it will be shown in your local time.
           </li>
         </ul>
