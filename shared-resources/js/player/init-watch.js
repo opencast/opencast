@@ -101,7 +101,7 @@ $(document).ready( function() {
             dataType: 'json',
             success: function(data)
             {
-                if(data !== undefined || data['http://www.opencastproject.org/matterhorn/'] !== undefined){
+                if(data !== undefined && data['http://www.opencastproject.org/matterhorn/'] !== undefined) {
                     // no comments plugin when disabled in series
                     var annotations_module_enabled = data['http://www.opencastproject.org/matterhorn/'].annotation[0].value;
                     if(annotations_module_enabled)
