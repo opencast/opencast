@@ -56,7 +56,6 @@
       <div id="additionalContentTabs" style="border: none;">
         <ul>
           <li><a href="#commonTab" id="i18n_common_tab">Common Descriptors</a></li>
-          <!--<li><a href="#additionalTab" id="i18n_additional_tab">Additional Metadata</a></li>-->
         </ul>
         <div id="commonTab">
           <ul class="oc-ui-form-list">
@@ -113,6 +112,26 @@
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+  <!-- SETTINGS -->
+  <div class="form-box layout-centered ui-widget oc-ui-collapsible-widget">
+    <div class="form-box-head ui-widget-header ui-corner-top oc-ui-cursor">
+      <div class="ui-icon ui-icon-triangle-1-e fold-icon"></div>
+      <div id="i18n_content_descriptors" class="fold-icon-text">Settings</div>
+    </div>
+    <div class="ui-widget-content ui-corner-bottom">
+      <div id="commonTab">
+        <ul class="oc-ui-form-list">
+          <li>
+            <label class="scheduler-label"></label>
+            <input type="checkbox" class="oc-ui-form-field oc-metadata-field" id="annotation" />
+            <label for="annotation" style="text-align: left; width: 300px;">
+              Allow Annotations
+            </label>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
   <div class="form-box layout-centered ui-widget">

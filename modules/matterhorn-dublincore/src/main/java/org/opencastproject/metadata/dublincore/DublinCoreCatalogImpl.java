@@ -90,6 +90,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   public static final EName PROPERTY_PROMOTED = new EName(OC_NS_URI, "promoted");
   public static final EName PROPERTY_ADVERTISED = new EName(OC_NS_URI, "advertised");
+  public static final EName PROPERTY_ANNOTATION = new EName(OC_NS_URI, "annotation");
 
   /* Extended Metadata */
 
