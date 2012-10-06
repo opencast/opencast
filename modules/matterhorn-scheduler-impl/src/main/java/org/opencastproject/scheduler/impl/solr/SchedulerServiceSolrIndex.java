@@ -786,11 +786,20 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
    */
   @Override
   public void delete(final String id) throws SchedulerServiceDatabaseException {
+
     if (synchronousIndexing) {
       try {
         synchronized (solrServer) {
+          DublinCoreCatalog catalog = getDublinCore(id);
           solrServer.deleteById(id);
           solrServer.commit();
+          if (catalog != null) {
+            String spatial = catalog.getFirst(DublinCoreCatalog.PROPERTY_SPATIAL);
+            if (StringUtils.isNotBlank(spatial)) {
+              logger.debug("Marking calendar feed for {} as modified", spatial);
+              touchLastEntry(spatial);
+            }
+          }
         }
       } catch (Exception e) {
         throw new SchedulerServiceDatabaseException(e);
@@ -801,8 +810,16 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
         public void run() {
           try {
             synchronized (solrServer) {
+              DublinCoreCatalog catalog = getDublinCore(id);
               solrServer.deleteById(id);
               solrServer.commit();
+              if (catalog != null) {
+                String spatial = catalog.getFirst(DublinCoreCatalog.PROPERTY_SPATIAL);
+                if (StringUtils.isNotBlank(spatial)) {
+                  logger.debug("Marking calendar feed for {} as modified", spatial);
+                  touchLastEntry(spatial);
+                }
+              }
             }
           } catch (Exception e) {
             logger.warn("Could not delete from index event {}: {}", id, e.getMessage());
@@ -860,6 +877,50 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
         }
       }
       return caProperties;
+    }
+  }
+
+  /**
+   * Touches the most recent entry by updating its last modification date.
+   * 
+   * @param spatial
+   *          the spatial parameter aka capture agent identifier
+   * @throws SchedulerServiceDatabaseException
+   *           if updating of the last modified value fails
+   */
+  private void touchLastEntry(String spatial) throws SchedulerServiceDatabaseException {
+    SchedulerQuery filter = new SchedulerQuery().setSpatial(spatial);
+    SolrQuery q = new SolrQuery(buildSolrQueryString(filter));
+    q.addSortField(SolrFields.LAST_MODIFIED + "_sort", SolrQuery.ORDER.desc);
+    q.setRows(1);
+
+    QueryResponse response = null;
+
+    // See if there is a matching entry
+    try {
+      response = solrServer.query(q);
+      if (response.getResults().isEmpty()) {
+        logger.debug("No remaining events scheduled for {}", spatial);
+        return;
+      }
+    } catch (SolrServerException e) {
+      logger.error("Could not complete query request: {}", e);
+      throw new SchedulerServiceDatabaseException(e);
+    }
+
+    // Update that entry and write it back
+    SolrDocument doc = response.getResults().get(0);
+    final SolrInputDocument inputDoc = ClientUtils.toSolrInputDocument(doc);
+    inputDoc.setField(SolrFields.LAST_MODIFIED, new Date());
+    try {
+      solrServer.add(inputDoc);
+      solrServer.commit();
+    } catch (SolrServerException e) {
+      logger.error("Error updating scheduler entry: {}", e);
+      throw new SchedulerServiceDatabaseException(e);
+    } catch (IOException e) {
+      logger.error("Error updating scheduler entry: {}", e);
+      throw new SchedulerServiceDatabaseException(e);
     }
   }
 

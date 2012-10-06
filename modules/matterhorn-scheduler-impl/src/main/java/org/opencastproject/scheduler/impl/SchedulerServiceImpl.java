@@ -987,7 +987,8 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   @Override
   public Date getScheduleLastModified(SchedulerQuery filter) throws SchedulerException {
     try {
-      return index.getLastModifiedDate(filter);
+      Date lastModified = index.getLastModifiedDate(filter);
+      return lastModified != null ? lastModified : new Date();
     } catch (SchedulerServiceDatabaseException e) {
       logger.error("Failed to retrieve last modified for CA {}: {}", filter, e.getMessage());
       throw new SchedulerException(e);
