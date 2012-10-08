@@ -304,7 +304,9 @@ Opencast.WorkflowInspect = (function() {
     jQuery.each(data.workflow.operations, function(index, operationInstance) {
       var op = data.workflow.operations[index];
       if(op.state == 'SUCCEEDED') {
-        var runtime = (op.completed - op.started) / 1000;
+        var ds = new Date (op.started);
+        var dc = new Date (op.completed);
+        var runtime = (dc.getTime() - ds.getTime()) / 1000;
         if(runtime < 1) {
           return;
         }
