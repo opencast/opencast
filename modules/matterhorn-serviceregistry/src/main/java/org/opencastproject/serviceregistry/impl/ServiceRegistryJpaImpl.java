@@ -1389,6 +1389,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
             case FINISHED:
               stats.setMeanRunTime(meanRunTime.longValue());
               stats.setMeanQueueTime(meanQueueTime.longValue());
+              stats.setFinishedJobs(count.intValue());
               break;
             default:
               break;

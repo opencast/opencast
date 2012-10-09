@@ -164,6 +164,7 @@ ocStatistics = new (function() {
         };
         ocStatistics.serversView[reg.host] = server;
         server.runningTotal = 0;
+        server.finishedTotal =0;
         server.queuedTotal = 0;
         server.meanRunTimeTotal = 0;
         server.meanQueueTimeTotal = 0;
@@ -172,6 +173,7 @@ ocStatistics = new (function() {
       // if the service is not a job producer, we don't show it here
       if(!reg.jobproducer) return true;
 
+      server.finishedTotal += parseInt(serviceInstance.finished);
       server.runningTotal += parseInt(serviceInstance.running);
       server.meanRunTimeTotal += parseInt(serviceInstance.meanruntime);
       server.queuedTotal += parseInt(serviceInstance.queued);
@@ -183,6 +185,7 @@ ocStatistics = new (function() {
       var serviceTypeIdentifier = reg.type.replace(/\./g, "_");
       singleService.id = serviceTypeIdentifier;
       singleService.path = reg.path;
+      singleService.finished = serviceInstance.finished;
       singleService.running = serviceInstance.running;
       var duration = ocUtils.getDuration(serviceInstance.meanruntime);
       singleService.meanRunTime = duration.substring(duration.indexOf(':')+1);
@@ -194,6 +197,7 @@ ocStatistics = new (function() {
     });
 
     $.each(ocStatistics.serversView,function(s,server){
+      server.finishedTotal = ocUtils.formatInt(server.finishedTotal);
       server.runningTotal = ocUtils.formatInt(server.runningTotal);
       server.queuedTotal = ocUtils.formatInt(server.queuedTotal);
       var duration = ocUtils.getDuration(server.meanRunTimeTotal);
@@ -222,6 +226,7 @@ ocStatistics = new (function() {
         service.servers = [];
         service.meanRunTimeTotal = 0;
         service.meanQueueTimeTotal = 0;
+        service.finishedTotal = 0;
         service.runningTotal = 0;
         service.queuedTotal = 0;
         ocStatistics.servicesView[serviceTypeIdentifier] = service;
@@ -235,12 +240,14 @@ ocStatistics = new (function() {
 
       service.meanRunTimeTotal += parseInt(serviceInstance.meanruntime);
       service.meanQueueTimeTotal += parseInt(serviceInstance.meanqueuetime);
+      service.finishedTotal += parseInt(serviceInstance.finished);
       service.runningTotal += parseInt(serviceInstance.running);
       service.queuedTotal += parseInt(serviceInstance.queued);
 
       singleServer.online = reg.online;
       singleServer.state = reg.service_state;
       singleServer.maintenance = reg.maintenance;
+      singleServer.finished = ocUtils.formatInt(serviceInstance.finished);
       singleServer.running = ocUtils.formatInt(serviceInstance.running);
       singleServer.queued = ocUtils.formatInt(serviceInstance.queued);
 
@@ -251,6 +258,7 @@ ocStatistics = new (function() {
     });		
 
     $.each(ocStatistics.servicesView,function(i,service){		
+      service.finishedTotal = ocUtils.formatInt(service.finishedTotal);
       service.runningTotal = ocUtils.formatInt(service.runningTotal);
       service.queuedTotal = ocUtils.formatInt(service.queuedTotal);
       var duration = ocUtils.getDuration(service.meanRunTimeTotal);
