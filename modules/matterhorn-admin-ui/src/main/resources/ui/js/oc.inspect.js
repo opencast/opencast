@@ -289,15 +289,7 @@ Opencast.WorkflowInspect = (function() {
   /** render workflow performance chart
    */
   function renderWorkflowPerformance(data) {
-    // Make a graph object with canvas id and width
-    var g = new Bluff.SideStackedBar('graph', '600x300');
-
-    // Set theme and options
-    //g.theme_greyscale();
-    g.title = 'Processing times for ' + data.workflow.mediapackage.title;
-    g.x_axis_label = 'Seconds';
-
-    // Add data and labels
+	var chart;
     var queue = [];
     var run = [];
     var labels = {};
@@ -310,18 +302,57 @@ Opencast.WorkflowInspect = (function() {
         if(runtime < 1) {
           return;
         }
-        run.push(runtime);
-        queue.push(op['time-in-queue'] / 1000);
+        run.push({y:runtime,description:op.description});
+        queue.push({y:op['time-in-queue'] / 1000,description:op.description});
         labels['' + run.length-1] = op.id;
       }
     });
-
-    g.data('Queue', queue);
-    g.data('Run', run);
-    g.labels = labels;
-
-    // Render the graph
-    g.draw();
+    
+    chart = new Highcharts.Chart({
+      chart: {
+        renderTo: 'graph',
+    	type: 'bar'
+      },
+  	  title: {
+        text: 'Processing times for ' + data.workflow.mediapackage.title
+      },
+      xAxis: {
+        categories: labels
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: 'Seconds'
+        }
+      },
+      legend: {
+        backgroundColor: '#FFFFFF',
+        reversed: true
+      },
+      tooltip: {
+        formatter: function() {
+          return '<span style="color:'+this.series.color+'">' + this.series.name + '</span><br/>'
+          + this.x + ' ('+this.point.description+'): <b>' + this.y +'</b>';
+        }  
+      },
+      plotOptions: {
+        series: {
+          stacking: 'normal'
+        }
+      },
+      credits: {
+        enabled: false
+      },
+      series: [{
+        name: 'run',
+        data: run,
+        color: '#89A54E'
+      },{
+        name: 'queue',
+        data: queue,
+        color: '#AA4643'
+      }]
+    });
   }
 
   /** Build an object that can be rendered easily from the Configuration objects
