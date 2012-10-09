@@ -251,3 +251,10 @@ a.secondaryButton:hover, a.secondaryButton:focus {
   color: #2d8f8b;
   text-decoration: underline;
 }
+
+/* Fix for correctly displaying Highcharts on hidden tabs */
+.ui-tabs .ui-tabs-hide {
+  position: absolute;
+  top: -10000px;
+  display: block !important;  
+}

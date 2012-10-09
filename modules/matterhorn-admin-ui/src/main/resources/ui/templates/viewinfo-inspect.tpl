@@ -301,6 +301,5 @@
 
 
   <div id="performance">
-    <canvas id="graph" width="600" height="300"></canvas>
-  </div>
+    <div id="graph" style="width: 760px; height: 400px"></div>  </div>
 </div>
