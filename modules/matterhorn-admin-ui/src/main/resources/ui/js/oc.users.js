@@ -42,7 +42,7 @@ ocUsers.buildUsersView = function(users) {
       var roles = "[";
       for(i =0; i < roleArray.length; i++) {
         roles +="\"";
-        roles += roleArray[i].trim();
+        roles += $.trim(roleArray[i]);
         roles +="\"";
         if(i < roleArray.length -1) {
           roles += ",";
