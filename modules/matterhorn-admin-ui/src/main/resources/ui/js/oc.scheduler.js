@@ -380,7 +380,7 @@ var ocScheduler = (function() {
     {
       key: 'agentTimeZone',
       nsPrefix: 'oc',
-      nsURI: 'http://www.opencastproject.org/matterhorn/',
+      nsURI: 'http://www.opencastproject.org/matterhorn/'
     });
     if(agent){
       $.get('/capture-admin/agents/' + agent + '/configuration.xml',
