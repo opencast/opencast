@@ -34,7 +34,7 @@
       <span id="pageList"></span>
       <span id="nextButtons">
         <a class="nextPage" href="javascript:ocSeriesList.nextPage();" id="nextPage">next&gt;</a>
-        <a class="nextPage" href="javascript:ocSeriesList.Configuration.startPage = ocSeriesList.Configuration.lastPage;ocSeriesList.askForSeries();" id="lastPage">last &raquo;</a>
+        <a class="nextPage" href="javascript:ocSeriesList.Configuration.startPage = ocSeriesList.Configuration.lastPage-1;ocSeriesList.askForSeries();" id="lastPage">last &raquo;</a>
       </span>
       <span id="nextText" class="ui-helper-hidden">
         <span>next&gt;</span>
