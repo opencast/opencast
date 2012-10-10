@@ -57,7 +57,7 @@ while [[ true ]]; do
 	unset mirrors
     fi
 done
-hasBrokenJDK=`grep 10.04 /etc/lsb-release`
+hasBrokenJDK=`grep '10.04\|10.10' /etc/lsb-release`
 if [ -n "$hasBrokenJDK" ]; then
 	echo "Ubuntu 10.04 detected.  This version ships a JDK with a known issue.  Updating to use a newer JDK."
 	sudo apt-get install -qq --force-yes python-software-properties > /dev/null
