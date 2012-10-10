@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlType;
  * A JAXB-annotated list of organizations.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "organizations", namespace = "org.opencastproject.security")
+@XmlType(name = "organizations", namespace = "http://org.opencastproject.security")
 @XmlRootElement(name = "organizations", namespace = "http://org.opencastproject.security")
 public class OrganizationList {
 

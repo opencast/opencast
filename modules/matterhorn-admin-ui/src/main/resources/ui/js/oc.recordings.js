@@ -1265,7 +1265,7 @@ ocRecordings = new (function() {
             url: SERIES_URL + '/',
             data: { 
               series: series,
-              acl: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="org.opencastproject.security"><ace><role>anonymous</role><action>read</action><allow>true</allow></ace></acl>'
+              acl: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="http://org.opencastproject.security"><ace><role>anonymous</role><action>read</action><allow>true</allow></ace></acl>'
             },
             dataType: 'xml',
             success: function(data){

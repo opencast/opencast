@@ -372,7 +372,7 @@ ocSeries.createDublinCoreDocument = function() {
 }
 
 ocSeries.createACLDocument = function() {
-  var out = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="org.opencastproject.security">';
+  var out = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="http://org.opencastproject.security">';
   $('.role_search').each(function () {
     var $field = $(this);
     //check whether there is a value and entered value is a valid role
