@@ -50,7 +50,8 @@ ocCaptureAgent = new (function ()
         var devices,devices_arr;
         if (b==="url"){
           if (property=="") property="#";
-          else if(property.lastIndexOf("http://")!=0) property = "http://"+property;	
+          else if(property.lastIndexOf("http://")!=0 && property.lastIndexOf("https://")!=0)
+            property = "http://"+property;
         }			
         if (b==="name") {
           $.ajax({
