@@ -11,12 +11,10 @@ fi
 
 supportedDevices[0]="Hauppauge WinTV PVR-350"
 supportedDevices[1]="BT878 video (ProVideo PV143)"
-supportedDevices[2]="Epiphan VGA2USB"
-supportedDevices[3]="Hauppauge HVR-1600"
-supportedDevices[4]="Hauppauge WinTV PVR-150"
-supportedDevices[5]="Hauppauge WinTV-HVR1300 DVB-T/H"
-supportedDevices[6]="WinTV PVR USB2 Model Category 2"
-supportedDevices[7]="Epiphan VGA2USB #[A-Z0-9]+"
+supportedDevices[2]="Hauppauge HVR-1600"
+supportedDevices[3]="Hauppauge WinTV PVR-150"
+supportedDevices[4]="Hauppauge WinTV-HVR1300 DVB-T/H"
+supportedDevices[5]="WinTV PVR USB2 Model Category 2"
 
 # Include the utility functions
 . ${FUNCTIONS}
@@ -25,11 +23,6 @@ supportedDevices[7]="Epiphan VGA2USB #[A-Z0-9]+"
 for line in `ls /dev/video* | grep '/dev/video[0-9][0-9]*$'`; do
     devlist[${#devlist[@]}]=$line
 done
-
-# Make sure that the epiphan cards have an input connected
-echo -e "\n\nWARNING: Please, make sure that your VGA2USB cards, if any, have an input connected. Otherwise they will NOT be detected"
-echo -e "Press any key to continue...\n\n"
-read -n 1 -s
 
 # Read each line in the file. Using this C-like structure because the traditional 'for var in $list' does not get well with whitespaces in the names
 #FIXME: Some Hauppages, as they create two devices in the kernel, appear duplicated. They should only appear once.
@@ -190,11 +183,6 @@ for (( i = 0; i < ${#device[@]}; i++ )); do
     echo "$DEVICE_PREFIX.${cleanName[$i]}.$OUT_SUFFIX=${cleanName[$i]}.${extension[$i]}" >> $CAPTURE_PROPS
     echo "$DEVICE_PREFIX.${cleanName[$i]}.$FLAVOR_SUFFIX=$flavor" >> $CAPTURE_PROPS
     echo "$DEVICE_PREFIX.${cleanName[$i]}.$QUEUE_SUFFIX=$((q_size*1024*1024))" >> $CAPTURE_PROPS
-
-    # Fix for MH-8196
-    if [[ "$(echo ${devName[$i]} | grep -i "Epiphan")" ]]; then
-	echo "$DEVICE_PREFIX.${cleanName[$i]}.${TYPE_SUFFIX}=${EPIPHAN_TYPE}" >> $CAPTURE_PROPS
-    fi
 
     allDevices="${allDevices}${cleanName[$i]},"
     
