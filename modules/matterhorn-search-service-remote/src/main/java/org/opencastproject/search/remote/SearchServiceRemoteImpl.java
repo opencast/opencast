@@ -143,7 +143,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
     if (!q.isIncludeEpisodes() && q.isIncludeSeries()) {
       url.append("/series?");
     } else if (q.isIncludeEpisodes() && !q.isIncludeSeries()) {
-      url.append("/episode?");
+      url.append("/episode.xml?");
     } else {
       url.append("/?");
     }
