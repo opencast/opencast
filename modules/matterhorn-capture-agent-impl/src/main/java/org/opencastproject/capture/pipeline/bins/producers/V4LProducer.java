@@ -39,7 +39,7 @@ public class V4LProducer extends VideoProducer {
   protected Element v4lsrc;
 
   /**
-   * V4LProducer captures from a generic V4L src such as the Epiphan VGA2USB.
+   * V4LProducer captures from a generic V4L src.
    * 
    * @param captureDevice
    *          The details of the capture device such as location, bitrate, container etc.

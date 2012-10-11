@@ -70,7 +70,7 @@ public class ConsumerFactoryTest {
 
     Properties captureDeviceProperties = PipelineTestHelpers.createCaptureDeviceProperties(captureDevice, null, null,
             null, null, null, null);
-    captureDevice = PipelineTestHelpers.createCaptureDevice("/dev/video0", ProducerType.EPIPHAN_VGA2USB,
+    captureDevice = PipelineTestHelpers.createCaptureDevice("/dev/video0", ProducerType.V4L2SRC,
             "Friendly Name", "/tmp/testpipe/test.mp2", captureDeviceProperties);
 
     properties = PipelineTestHelpers.createConfidenceMonitoringProperties();

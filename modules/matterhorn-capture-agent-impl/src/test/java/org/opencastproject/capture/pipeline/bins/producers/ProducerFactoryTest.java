@@ -80,7 +80,7 @@ public class ProducerFactoryTest {
     captureDeviceProperties = PipelineTestHelpers.createCaptureDeviceProperties(captureDevice, null, null, null, null,
             null, null);
     captureDevice = PipelineTestHelpers.createCaptureDevice("/dev/video0",
-            ProducerType.EPIPHAN_VGA2USB, "Friendly Name", "/tmp/testpipe/test.mp2",
+            ProducerType.V4L2SRC, "Friendly Name", "/tmp/testpipe/test.mp2",
             captureDeviceProperties);
 
     // setup testing properties
@@ -111,42 +111,6 @@ public class ProducerFactoryTest {
       ProducerBin srcBin = ProducerFactory.getInstance().getProducer(captureDevice, properties);
       // Make sure we got the right object back
       Assert.assertTrue(srcBin instanceof VideoTestSrcProducer);
-      checkCorrectnessOfVideoSource(srcBin);
-    } catch (UnableToCreateElementException e) {
-      logger.error("testVideoTestSrc in SourceFactoryTest", e);
-    }
-  }
-
-  @Test
-  public void testExistingEpiphanSource() throws Exception {
-    if (!gstreamerInstalled)
-      return;
-    try {
-      // Setup properties for an epiphan card.
-      captureDevice = PipelineTestHelpers.createCaptureDevice("/dev/video0",
-              ProducerType.EPIPHAN_VGA2USB, "Epiphan VGA 2 USB", "/tmp/testpipe/test.mpeg",
-              captureDeviceProperties);
-      ProducerBin srcBin = ProducerFactory.getInstance().getProducer(captureDevice, properties);
-      // Make sure we got the right object back
-      Assert.assertTrue(srcBin instanceof EpiphanVGA2USBV4LProducer);
-      checkCorrectnessOfVideoSource(srcBin);
-    } catch (UnableToCreateElementException e) {
-      logger.error("testVideoTestSrc in SourceFactoryTest", e);
-    }
-  }
-
-  @Test
-  public void testMissingEpiphanSource() throws Exception {
-    if (!gstreamerInstalled)
-      return;
-    try {
-      // Setup properties for an epiphan card.
-      captureDevice = PipelineTestHelpers.createCaptureDevice("/woot/video0",
-              ProducerType.EPIPHAN_VGA2USB, "Epiphan VGA 2 USB", "/tmp/testpipe/test.mpeg",
-              captureDeviceProperties);
-      ProducerBin srcBin = ProducerFactory.getInstance().getProducer(captureDevice, properties);
-      // Make sure we got the right object back
-      Assert.assertTrue(srcBin instanceof EpiphanVGA2USBV4LProducer);
       checkCorrectnessOfVideoSource(srcBin);
     } catch (UnableToCreateElementException e) {
       logger.error("testVideoTestSrc in SourceFactoryTest", e);

@@ -395,9 +395,7 @@ public final class GStreamerPipeline {
       try {
         V4LInfo v4linfo = JV4LInfo.getV4LInfo(srcLoc);
         String deviceString = v4linfo.toString();
-        if (deviceString.contains("Epiphan VGA2USB") || deviceString.contains("Epiphan VGA2PCI")) {
-          return ProducerType.EPIPHAN_VGA2USB;
-        } else if (deviceString.contains("Hauppauge") || deviceString.contains("WinTV")) {
+        if (deviceString.contains("Hauppauge") || deviceString.contains("WinTV")) {
           return ProducerType.HAUPPAUGE_WINTV;
         } else if (deviceString.contains("BT878")) {
           return ProducerType.BLUECHERRY_PROVIDEO;
@@ -407,12 +405,7 @@ public final class GStreamerPipeline {
         }
       } catch (JV4LInfoException e) {
         // The v4l device caused an exception
-        if (e.getMessage().equalsIgnoreCase("No medium found")) {
-          logger.warn("No VGA signal detected. Trying to start capture regardless...");
-          return ProducerType.EPIPHAN_VGA2USB;
-        } else {
-          throw new UnrecognizedDeviceException("Unexpected jv4linfo exception: " + e.getMessage() + " for " + srcLoc);
-        }
+        throw new UnrecognizedDeviceException("Unexpected jv4linfo exception: " + e.getMessage() + " for " + srcLoc);
       }
     }
   }
