@@ -75,7 +75,7 @@ public class UserActionImpl implements UserAction {
 
   @Lob
   //@Index
-  @Column(name = "mediapackage_id", length = 65535)
+  @Column(name = "mediapackage_id", length = 255)
   @XmlElement(name = "mediapackageId")
   private String mediapackageId;
 
