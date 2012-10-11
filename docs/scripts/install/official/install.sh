@@ -273,7 +273,9 @@ export CLEANUP=./cleanup.sh
 
 SCRIPTS=( "$SETUP_USER" "$INSTALL_VGA2USB" "$SETUP_DEVICES" "$INSTALL_DEPENDENCIES" "$SETUP_ENVIRONMENT"\
           "$SETUP_SOURCE" "$SETUP_BOOT" "$CLEANUP" "$FUNCTIONS" "$INSTALL_DEPENDENCIES_UBUNTU" "$INSTALL_DEPENDENCIES_CENTOS" )
-SCRIPTS_EXT=docs/scripts/installer
+
+# Location of these install scripts, relative to the source code's root directory
+SCRIPTS_EXT=docs/scripts/install/official
 
 # The subsidiary scripts will check for this variable to check they are being run from here
 export INSTALL_RUN=true
@@ -286,35 +288,29 @@ mkdir -p $WORKING_DIR
 rm -f $WORKING_DIR/*
 cd $WORKING_DIR
 
-# If wget isn't installed, get it from the ubuntu software repo
-wget foo &> /dev/null
-if [ $? -eq 127 ]; then
-    apt-get -y --force-yes install wget &>/dev/null
-    if [ $? -ne 0 ]; then
-	echo "Couldn't install the necessary command 'wget'. Please try to install it manually and re-run this script"
-	exit 1
-    fi
-fi
 
 # Check for the necessary scripts and download them from the svn location
-# Using C-like syntax in case file names have whitespaces
-for (( i = 0; i < ${#SCRIPTS[@]}; i++ )); do
-    f=${SCRIPTS[$i]}
-	# Check if the script is in the directory where the install.sh script was launched
-	if [[ -e $START_PATH/$f ]]; then
-	    # ... and copies it to the working directory
-	    cp $START_PATH/$f $WORKING_DIR/
-	else
-	    # The script is not in the initial directory, so try to download it from the opencast source page
-	    wget $SRC_DEFAULT/$SCRIPTS_EXT/$f &> /dev/null	    
-	    # Check the file is downloaded
-	    if [[ $? -ne 0 ]]; then
-		echo "Couldn't retrieve the script $f from the repository. Try to download it manually and re-run this script."
-		exit 2
-	    fi
-	fi  
-    chmod +x $f
+unset missing
+for f in "${REQUIRED[@]}"; do
+    # Check if the script is in the directory where the install.sh script was launched
+    if [[ -e $START_PATH/$f ]]; then
+	# ... and copies it to the working directory
+	cp $START_PATH/$f $WORKING_DIR
+	chmod +x $f
+    else
+	missing=("${missing[@]}" "$f")
+    fi  
 done
+
+if [[ "${missing[@]}" ]]; then
+    echo "Error. Some required files scripts are missing:"
+    for f in "${missing[@]}"; do
+	echo -e "\t$f"
+    done
+    echo -e "\nPlease make sure you got all the contents from the folder '$SCRIPTS_EXT'"
+    exit 2
+fi
+
 
 # Include the functions
 . ${FUNCTIONS}

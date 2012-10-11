@@ -95,6 +95,7 @@ export UBUNTU_11_10="Ubuntu 11.10 \n \l"
 export UBUNTU_11_10_PACKAGES_FILE="Ubuntu-11-10.packages"
 export PACKAGE_LIST_DEFAULT_FILE="default.packages"
 
+PACKAGE_LISTS=("$UBUNTU_10_10_PACKAGES_FILE" "$UBUNTU_11_04_PACKAGES_FILE" "$UBUNTU_11_10_PACKAGES_FILE" "$PACKAGE_LIST_DEFAULT_FILE")
 
 # Packages that require the user approval to be installed (Please note the quotation mark at the end!!!)
 # There should be one package per line, but several packages may be included if they need to be treated 'as a block'
@@ -232,7 +233,9 @@ export CLEANUP=./cleanup.sh
 
 SCRIPTS=( "$SETUP_USER" "$INSTALL_VGA2USB" "$SETUP_DEVICES" "$SETUP_DEPENDENCIES" "$INSTALL_DEPENDENCIES"\
           "$SETUP_ENVIRONMENT" "$SETUP_DIRECTORY" "$SETUP_SOURCE" "$SETUP_BOOT" "$CLEANUP" "$FUNCTIONS")
-SCRIPTS_EXT=docs/scripts/ubuntu_capture_agent
+
+# List of required files that need to be present in the run directory when this script is executed
+REQUIRED=("${SCRIPTS[@]}" "${PACKAGE_LISTS[@]}")
 
 # The subsidiary scripts will check for this variable to check they are being run from here
 export INSTALL_RUN=true
@@ -266,35 +269,29 @@ physical="$(cat /proc/cpuinfo | grep -m 1 'cores' | cut -d ':' -f 2)"
 virtual="$(cat /proc/cpuinfo | grep -m 1 'siblings' | cut -d ':' -f 2)"
 echo "$model_name ($physical physical core(s), $virtual virtual cores)" >> $LOG_FILE
 
-# If wget isn't installed, get it from the ubuntu software repo
-wget foo &> /dev/null
-if [ $? -eq 127 ]; then
-    apt-get -y --force-yes install wget &>/dev/null
-    if [ $? -ne 0 ]; then
-	echo "Couldn't install the necessary command 'wget'. Please try to install it manually and re-run this script"
-	exit 1
-    fi
-fi
 
 # Check for the necessary scripts and download them from the svn location
-# Using C-like syntax in case file names have whitespaces
-for (( i = 0; i < ${#SCRIPTS[@]}; i++ )); do
-    f=${SCRIPTS[$i]}
-	# Check if the script is in the directory where the install.sh script was launched
-	if [[ -e $START_PATH/$f ]]; then
-	    # ... and copies it to the working directory
-	    cp $START_PATH/$f $WORKING_DIR
-	else
-	    # The script is not in the initial directory, so try to download it from the opencast source page
-	    wget $SRC_DEFAULT/$SCRIPTS_EXT/$f &> /dev/null	    
-	    # Check the file is downloaded
-	    if [[ $? -ne 0 ]]; then
-		echo "Couldn't retrieve the script $f from the repository. Try to download it manually and re-run this script."
-		exit 2
-	    fi
-	fi  
-    chmod +x $f
+unset missing
+for f in "${REQUIRED[@]}"; do
+    # Check if the script is in the directory where the install.sh script was launched
+    if [[ -e $START_PATH/$f ]]; then
+	# ... and copies it to the working directory
+	cp $START_PATH/$f $WORKING_DIR
+	chmod +x $f
+    else
+	missing=("${missing[@]}" "$f")
+    fi  
 done
+
+if [[ "${missing[@]}" ]]; then
+    echo "Error. Some required files scripts are missing:"
+    for f in "${missing[@]}"; do
+	echo -e "\t$f"
+    done
+    echo -e "\nPlease make sure you got all the contents from the folder 'docs/scripts/ubuntu_capture_agent'"
+    exit 2
+fi
+
 
 # Include the functions
 . ${FUNCTIONS}

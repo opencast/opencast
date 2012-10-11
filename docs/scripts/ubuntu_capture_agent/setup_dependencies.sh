@@ -33,26 +33,10 @@ case "$ISSUE" in
       ;;
 esac
 
-# Grab the package list for this particular platform if it hasn't been downloaded. 
-# Using C-like syntax in case file names have whitespaces
 echo "Using package list file $PACKAGE_LIST_FILE"
 
-# Check if the script is in the directory where the install.sh script was launched
-if [[ -e $START_PATH/$PACKAGE_LIST_FILE ]]; then
-    # ... and copies it to the working directory
-    cp $START_PATH/$PACKAGE_LIST_FILE $WORKING_DIR
-else
-    # The script is not in the initial directory, so try to download it from the opencast source page
-    wget $SRC_DEFAULT/$SCRIPTS_EXT/$PACKAGE_LIST_FILE &> /dev/null
-    # Check the file is downloaded
-    if [[ $? -ne 0 ]]; then
-        echo "Couldn't retrieve the package list $PACKAGE_LIST_FILE from the repository. Try to download it manually and re-run this script."
-        exit 2
-    fi
-fi
-
 # Set the correct permissions on the file. 
-chmod +x $PACKAGE_LIST_FILE
+chmod +r $PACKAGE_LIST_FILE
 
 # Get the package list into a variable for future use. 
-PKG_LIST=$(cat $PACKAGE_LIST_FILE | tr " " "\n")
+export PKG_LIST=$(cat $PACKAGE_LIST_FILE | tr " " "\n")
