@@ -375,14 +375,23 @@ yesno() {
     
     prompt="$1"
 
+    tolower() {
+	echo $1 | tr [:upper:] [:lower:]
+    }
+
+    toupper() {
+	echo $1 | tr [:lower:] [:upper:]
+    }
+
+    # Capitalize the default answer
     if [[ "$default" == "$yesword" ]]; then
-	prompt="$prompt [${yesabbr^^}/${noabbr,,}]"
+	prompt="$prompt [$(toupper $yesabbr)/$(tolower $noabbr)]"
     elif [[ "$default" == "$noword" ]]; then
-	prompt="$prompt [${yesabbr,,}/${noabbr^^}]"
+	prompt="$prompt [$(tolower $yesabbr)/$(toupper $noabbr)]"
     else
-	prompt="$prompt [${yesabbr,,}/${noabbr,,}]"
+	prompt="$prompt [$(tolower $yesabbr)/$(tolower $noabbr)]"
     fi
-    
+
     if [[ $help ]]; then
 	prompt="$prompt ($help_prompt): "
     else
