@@ -1,7 +1,8 @@
 #!/bin/bash
+HWD=`cd "${0%/*}" 2>/dev/null; echo $PWD`
 set -x
 VER=6
-UPD=31
+UPD=33
 BLD=04
 #
 # Install java on CentOS
@@ -9,69 +10,69 @@ BLD=04
 install_java_centos() {
   set -x
   #
-  case `./arch.sh` in
+  case `"$HWD/arch.sh"` in
     i386 )
-      PKG=jdk-${VER}u${UPD}-linux-i586-rpm.bin
+      PKG="jdk-${VER}u${UPD}-linux-i586-rpm.bin"
       ARCH=i386
       ;;
     x86_64 )
-      PKG=jdk-${VER}u${UPD}-linux-x64-rpm.bin
+      PKG="jdk-${VER}u${UPD}-linux-x64-rpm.bin"
       ARCH=amd64
       ;;
     * ) 
-      echo "Unknown architecture: `./arch.sh`" 1>&2
+      echo "Unknown architecture: `"$HWD/arch.sh"`" 1>&2
       return 1 ;;
   esac
   #
   JDK=`rpm -q jdk 2>/dev/null`
   if [ $? -eq 0 ]; then
-    sudo rpm -e "$JDK" # erase previous version of java
+    sudo rpm -e "$JDK"  # erase previous version of java
     [ $? -ne 0 ] && return 1
   fi
   #
-  if [ ! -s $PKG ]; then
-    wget -t 5 -4 --load-cookies java_cookie.txt http://download.oracle.com/otn-pub/java/jdk/${VER}u${UPD}-b${BLD}/$PKG -O $PKG
+  if [ ! -s "$PKG" ]; then
+    wget -t 5 -4 --retry-connrefused --progress=dot:mega --no-cache --load-cookies java_cookie.txt "http://download.oracle.com/otn-pub/java/jdk/${VER}u${UPD}-b${BLD}/$PKG" -O "$PKG"
     [ $? -ne 0 ] && return 1
   fi
-  chmod +x $PKG
+  chmod +x "$PKG"
   [ $? -ne 0 ] && return 1
-  sudo ./$PKG
+  sudo "./$PKG"
   [ $? -ne 0 ] && return 1
   #
   JDK=`\ls -d1 /usr/java/jdk*${UPD}/jre/bin/java 2>/dev/null | awk 'END{print}'`
   JDK="${JDK%/jre/bin/java}"
   #
-  sudo /usr/sbin/alternatives --install /usr/bin/java java $JDK/jre/bin/java 30000
+  sudo /usr/sbin/alternatives --install /usr/bin/java java "$JDK/jre/bin/java" 30000
   [ $? -ne 0 ] && return 1
   sudo /usr/sbin/alternatives --auto java
   [ $? -ne 0 ] && return 1
   #
-  sudo /usr/sbin/alternatives --install /usr/bin/javaws javaws $JDK/jre/bin/javaws 30000
+  sudo /usr/sbin/alternatives --install /usr/bin/javaws javaws "$JDK/jre/bin/javaws" 30000
   [ $? -ne 0 ] && return 1
   sudo /usr/sbin/alternatives --auto javaws
   [ $? -ne 0 ] && return 1
   #
-  sudo /usr/sbin/alternatives --install /usr/bin/javac javac $JDK/bin/javac 30000
+  sudo /usr/sbin/alternatives --install /usr/bin/javac javac "$JDK/bin/javac" 30000
   [ $? -ne 0 ] && return 1
   sudo /usr/sbin/alternatives --auto javac
   [ $? -ne 0 ] && return 1
   #
-  sudo /usr/sbin/alternatives --install /usr/bin/javadoc javadoc $JDK/bin/javadoc 30000
+  sudo /usr/sbin/alternatives --install /usr/bin/javadoc javadoc "$JDK/bin/javadoc" 30000
   [ $? -ne 0 ] && return 1
   sudo /usr/sbin/alternatives --auto javadoc
   [ $? -ne 0 ] && return 1
   #
-  sudo /usr/sbin/alternatives --install /usr/bin/javah javah $JDK/bin/javah 30000
+  sudo /usr/sbin/alternatives --install /usr/bin/javah javah "$JDK/bin/javah" 30000
   [ $? -ne 0 ] && return 1
   sudo /usr/sbin/alternatives --auto javah
   [ $? -ne 0 ] && return 1
   #
-  sudo /usr/sbin/alternatives --install /usr/bin/javap javap $JDK/bin/javap 30000
+  sudo /usr/sbin/alternatives --install /usr/bin/javap javap "$JDK/bin/javap" 30000
   [ $? -ne 0 ] && return 1
   sudo /usr/sbin/alternatives --auto javap
   [ $? -ne 0 ] && return 1
   #
-  sudo /usr/sbin/alternatives --install /usr/lib/mozilla/plugins/libjavaplugin.so libjavaplugin.so $JDK/jre/lib/$ARCH/libnpjp2.so 30000
+  sudo /usr/sbin/alternatives --install /usr/lib/mozilla/plugins/libjavaplugin.so libjavaplugin.so "$JDK/jre/lib/$ARCH/libnpjp2.so" 30000
   [ $? -ne 0 ] && return 1
   sudo /usr/sbin/alternatives --auto libjavaplugin.so
   [ $? -ne 0 ] && return 1
@@ -84,32 +85,32 @@ install_java_centos() {
 install_java_ubuntu() {
   set -x
   #
-  case `./arch.sh` in
+  case `"$HWD/arch.sh"` in
     i386 )
-      PKG=jdk-${VER}u${UPD}-linux-i586.bin
+      PKG="jdk-${VER}u${UPD}-linux-i586.bin"
       ARCH=i386
       ;;
     x86_64 )
-      PKG=jdk-${VER}u${UPD}-linux-x64.bin
+      PKG="jdk-${VER}u${UPD}-linux-x64.bin"
       ARCH=amd64
       ;;
     * ) 
-      echo "Unknown architecture: `./arch.sh`" 1>&2
+      echo "Unknown architecture: `"$HWD/arch.sh"`" 1>&2
       return 1 ;;
   esac
   #
-  ./enable_partner.sh
+  "$HWD/enable_partner.sh"
   [ $? -ne 0 ] && return 1
   sudo apt-get update
   [ $? -ne 0 ] && return 1
   #
-  if [ ! -s $PKG ]; then
-    wget -t 5 -4 --load-cookies java_cookie.txt http://download.oracle.com/otn-pub/java/jdk/${VER}u${UPD}-b${BLD}/$PKG -O $PKG
+  if [ ! -s "$PKG" ]; then
+    wget -t 5 -4 --retry-connrefused --progress=dot:mega --no-cache --load-cookies java_cookie.txt "http://download.oracle.com/otn-pub/java/jdk/${VER}u${UPD}-b${BLD}/$PKG" -O "$PKG"
     [ $? -ne 0 ] && return 1
   fi
-  chmod +x $PKG
+  chmod +x "$PKG"
   [ $? -ne 0 ] && return 1
-  sudo ./$PKG
+  sudo "./$PKG"
   [ $? -ne 0 ] && return 1
   sudo mkdir -p /usr/lib/jvm
   [ $? -ne 0 ] && return 1
@@ -119,37 +120,37 @@ install_java_ubuntu() {
   JDK=`\ls -d1 /usr/lib/jvm/jdk*${UPD}/jre/bin/java 2>/dev/null | awk 'END{print}'`
   JDK="${JDK%/jre/bin/java}"
   #
-  sudo update-alternatives --install /usr/bin/java java $JDK/jre/bin/java 30000
+  sudo update-alternatives --install /usr/bin/java java "$JDK/jre/bin/java" 30000
   [ $? -ne 0 ] && return 1
   sudo update-alternatives --auto java
   [ $? -ne 0 ] && return 1
   #
-  sudo update-alternatives --install /usr/bin/javaws javaws $JDK/jre/bin/javaws 30000
+  sudo update-alternatives --install /usr/bin/javaws javaws "$JDK/jre/bin/javaws" 30000
   [ $? -ne 0 ] && return 1
   sudo update-alternatives --auto javaws
   [ $? -ne 0 ] && return 1
   #
-  sudo update-alternatives --install /usr/bin/javac javac $JDK/bin/javac 30000
+  sudo update-alternatives --install /usr/bin/javac javac "$JDK/bin/javac" 30000
   [ $? -ne 0 ] && return 1
   sudo update-alternatives --auto javac
   [ $? -ne 0 ] && return 1
   #
-  sudo update-alternatives --install /usr/bin/javadoc javadoc $JDK/bin/javadoc 30000
+  sudo update-alternatives --install /usr/bin/javadoc javadoc "$JDK/bin/javadoc" 30000
   [ $? -ne 0 ] && return 1
   sudo update-alternatives --auto javadoc
   [ $? -ne 0 ] && return 1
   #
-  sudo update-alternatives --install /usr/bin/javah javah $JDK/bin/javah 30000
+  sudo update-alternatives --install /usr/bin/javah javah "$JDK/bin/javah" 30000
   [ $? -ne 0 ] && return 1
   sudo update-alternatives --auto javah
   [ $? -ne 0 ] && return 1
   #
-  sudo update-alternatives --install /usr/bin/javap javap $JDK/bin/javap 30000
+  sudo update-alternatives --install /usr/bin/javap javap "$JDK/bin/javap" 30000
   [ $? -ne 0 ] && return 1
   sudo update-alternatives --auto javap
   [ $? -ne 0 ] && return 1
   #
-  sudo update-alternatives --install /usr/lib/mozilla/plugins/libjavaplugin.so mozilla-javaplugin.so $JDK/jre/lib/$ARCH/libnpjp2.so 30000
+  sudo update-alternatives --install /usr/lib/mozilla/plugins/libjavaplugin.so mozilla-javaplugin.so "$JDK/jre/lib/$ARCH/libnpjp2.so" 30000
   [ $? -ne 0 ] && return 1
   sudo update-alternatives --auto mozilla-javaplugin.so
   [ $? -ne 0 ] && return 1
@@ -178,32 +179,44 @@ gzip -df java_cookie.txt.gz
 [ $? -ne 0 ] && exit 1
 rm -f java_cookie.b64
 [ $? -ne 0 ] && exit 1
-exit 0
 #
-case `./os.sh` in
+case `"$HWD/os.sh"` in
   CentOS | RHEL )
     install_java_centos
     [ $? -ne 0 ] && exit 1
     #
-    JAVA_VERSION=`./java_version.sh`
+    JAVA_VERSION=`"$HWD/java_version.sh"`
     [ -z "$JAVA_VERSION" ] && exit 1
-    export JAVA_HOME="/usr/java/jdk${JAVA_VERSION}"
-    ./set_profile_var.sh "JAVA_HOME" "$JAVA_HOME"
+    JAVA_HOME=`"$HWD/java_home.sh"`
+    [ -z "$JAVA_HOME" ] && exit 1
+    "$HWD/set_profile_var.sh" "JAVA_HOME" "$JAVA_HOME"
     [ $? -ne 0 ] && exit 1
+    "$HWD/check_path.sh" "$JAVA_HOME/bin"
+    if [ $? -ne 0 ]; then
+      export PATH="$PATH:$JAVA_HOME/bin"
+      echo 'export PATH="$PATH:$JAVA_HOME/bin"' >> ~/.profile
+      [ $? -ne 0 ] && exit 1
+    fi
     ;;
   Ubuntu )
     install_java_ubuntu
     [ $? -ne 0 ] && exit 1
     #
-    JAVA_VERSION=`./java_version.sh`
+    JAVA_VERSION=`"$HWD/java_version.sh"`
     [ -z "$JAVA_VERSION" ] && exit 1
-    #JAVA_VERSION=${JAVA_VERSION//_/.}
-    export JAVA_HOME="/usr/lib/jvm/jdk${JAVA_VERSION}"
-    ./set_profile_var.sh "JAVA_HOME" "$JAVA_HOME"
+    JAVA_HOME=`"$HWD/java_home.sh"`
+    [ -z "$JAVA_HOME" ] && exit 1
+    "$HWD/set_profile_var.sh" "JAVA_HOME" "$JAVA_HOME"
     [ $? -ne 0 ] && exit 1
+    "$HWD/check_path.sh" "$JAVA_HOME/bin"
+    if [ $? -ne 0 ]; then
+      export PATH="$PATH:$JAVA_HOME/bin"
+      echo 'export PATH="$PATH:$JAVA_HOME/bin"' >> ~/.profile
+      [ $? -ne 0 ] && exit 1
+    fi
     ;;
   * )
-    echo "Unsupported operating system: `./os.sh`" 1>&2
+    echo "Unsupported operating system: `"$HWD/os.sh"`" 1>&2
     exit 1
     ;;
 esac

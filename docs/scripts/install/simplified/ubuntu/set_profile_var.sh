@@ -1,8 +1,8 @@
 #!/bin/bash
 TMPFILE=`mktemp /tmp/${0##*/}.XXXXX`
 trap 'rm -f $TMPFILE' 0
-set -x
-#
+#set -x
+
 VAR_NAME="$1"
 if [ -z "$VAR_NAME" ]; then
   echo "Variable name is required" 1>&2
@@ -13,12 +13,12 @@ if [ -z "$VAR_VALUE" ]; then
   echo "Variable value is required" 1>&2
   exit 2
 fi
-#
+
 if [ ! -f ~/.profile ]; then
   touch ~/.profile
   [ $? -ne 0 ] && exit 1
 fi
-#
+
 awk -v var="$VAR_NAME" -v value="$VAR_VALUE" 'BEGIN {
   found_var = 0; found_exp_var = 0; found_exp = 0; err = 0;
 } {
@@ -68,5 +68,5 @@ awk -v var="$VAR_NAME" -v value="$VAR_VALUE" 'BEGIN {
 [ $? -ne 0 ] && exit 1
 cp $TMPFILE ~/.profile
 [ $? -ne 0 ] && exit 1
-#
+
 exit 0

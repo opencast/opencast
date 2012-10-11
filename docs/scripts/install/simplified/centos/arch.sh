@@ -3,7 +3,7 @@
 #
 # arch
 #  i386, x86_64, <unknown>
-#
+
 case `uname -m` in
   i386 | i486 | i586 | i686 )
     echo i386
@@ -15,4 +15,5 @@ case `uname -m` in
     uname -m
     ;;
 esac
+
 exit 0
