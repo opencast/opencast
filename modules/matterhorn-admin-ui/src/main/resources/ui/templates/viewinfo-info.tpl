@@ -68,8 +68,8 @@
           <td class="td-value"><%= ocUtils.makeLocaleDateString(ocUtils.fromUTCDateString(data[j].workflow.mediapackage.start)) %></td>
         </tr>
         <tr>
-          <td class="td-key">End Time:</td>
-          <td class="td-value"><%= ocUtils.makeLocaleDateString(ocUtils.fromUTCDateString(data[j].workflow.mediapackage.start).getTime() + parseInt(data[j].workflow.mediapackage.duration)) %></td>
+          <td class="td-key">Duration:</td>
+          <td class="td-value"><%= data[j].workflow.mediapackage.duration %></td>
         </tr>
         <tr>
           <td class="td-key">Capture Agent:</td>
