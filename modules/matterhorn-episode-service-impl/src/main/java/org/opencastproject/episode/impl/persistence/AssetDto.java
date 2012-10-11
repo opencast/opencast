@@ -54,7 +54,7 @@ public final class AssetDto {
   @Column(name = "organization_id", nullable = false)
   private String organizationId;
 
-  @Column(name = "mediapackage_id", nullable = false)
+  @Column(name = "mediapackage_id", nullable = false, length = 255)
   private String mediaPackageId;
 
   @Column(name = "mediapackageelement_id", nullable = false)
