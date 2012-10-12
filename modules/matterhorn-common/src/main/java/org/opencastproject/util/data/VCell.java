@@ -51,12 +51,12 @@ public final class VCell<A> extends Cell<A> {
   }
 
   /** Create a cell containing some a. */
-  public static <A> Cell<Option<A>> ocell(A a) {
+  public static <A> VCell<Option<A>> ocell(A a) {
     return cell(some(a));
   }
 
   /** Create a cell containing none. */
-  public static <A> Cell<Option<A>> ocell() {
+  public static <A> VCell<Option<A>> ocell() {
     return cell(Option.<A>none());
   }
 

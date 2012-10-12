@@ -15,13 +15,14 @@
  */
 package org.opencastproject.episode.impl;
 
-import static org.opencastproject.util.data.Collections.cons;
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Tuple.tuple;
-import static org.opencastproject.util.data.functions.Booleans.ne;
-
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.opencastproject.episode.api.EpisodeService;
+import org.opencastproject.episode.api.HttpMediaPackageElementProvider;
 import org.opencastproject.episode.impl.elementstore.ElementStore;
 import org.opencastproject.episode.impl.persistence.EpisodeServiceDatabase;
 import org.opencastproject.episode.impl.solr.SolrIndexManager;
@@ -43,13 +44,6 @@ import org.opencastproject.util.data.VCell;
 import org.opencastproject.util.osgi.SimpleServicePublisher;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -64,6 +58,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
+
+import static org.opencastproject.util.data.Collections.cons;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.data.functions.Booleans.ne;
 
 public class EpisodeServicePublisher extends SimpleServicePublisher {
 
@@ -95,6 +95,16 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
   private EpisodeServiceDatabase persistence;
   private ElementStore elementStore;
   private MediaInspectionService mediaInspectionSvc;
+  private EpisodeServiceImpl episodeService;
+
+  public synchronized void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
+    // Populate the search index if it is empty
+    // bad approach but episode service and its rest endpoint are in a cyclic dependency
+    episodeService.populateIndex(httpMediaPackageElementProvider.getUriRewriter());
+  }
+
+  public void unsetHttpMediaPackageElementProvider(HttpMediaPackageElementProvider ingore) {
+  }
 
   public void setStaticMetadataService(StaticMetadataService metadataSvc) {
     metadataSvcs.set(cons(metadataSvc, metadataSvcs.get()));
@@ -193,18 +203,16 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
                                                             seriesService,
                                                             mpeg7CatalogService,
                                                             securityService);
-    final EpisodeServiceImpl episodeService = new EpisodeServiceImpl(solrRequester,
-                                                                     solrIndex,
-                                                                     securityService,
-                                                                     authorizationService,
-                                                                     orgDirectory,
-                                                                     serviceRegistry,
-                                                                     workflowService,
-                                                                     mediaInspectionSvc,
-                                                                     persistence,
-                                                                     elementStore);
-    // Populate the search index if it is empty
-    episodeService.populateIndex();
+    episodeService = new EpisodeServiceImpl(solrRequester,
+                                            solrIndex,
+                                            securityService,
+                                            authorizationService,
+                                            orgDirectory,
+                                            serviceRegistry,
+                                            workflowService,
+                                            mediaInspectionSvc,
+                                            persistence,
+                                            elementStore);
     return tuple(list(registerService(cc, episodeService, EpisodeService.class, "Episode service")),
             (Effect0) new Effect0() {
               @Override

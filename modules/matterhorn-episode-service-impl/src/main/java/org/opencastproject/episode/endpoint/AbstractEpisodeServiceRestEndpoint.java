@@ -20,6 +20,7 @@ import org.opencastproject.episode.api.ArchivedMediaPackageElement;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.api.EpisodeServiceException;
+import org.opencastproject.episode.api.HttpMediaPackageElementProvider;
 import org.opencastproject.episode.api.JaxbSearchResultItem;
 import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultItem;
@@ -84,16 +85,12 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 /** REST endpoint of the episode service. */
 // no @Path annotation here since this class cannot be created by JAX-RS. Put it on implementations.
-@RestService(name = "episode", title = "Episode Service",
-  abstractText = "This service indexes and queries available (distributed) episodes.",
-  notes = {
-        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-        "If the service is down or not working it will return a status 503, this means the the underlying service is "
-        + "not working and is either restarting or has failed",
-        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
-public abstract class AbstractEpisodeServiceRestEndpoint {
+@RestService(name = "episode", title = "Episode Service", notes = {
+        "All paths are relative to the REST endpoint base (something like http://your.server/files)",
+        "If you notice that this service is not working as expected, there might be a bug! "
+                + "You should file an error report with your server logs from the time when the error occurred: "
+                + "<a href=\"http://opencast.jira.com\">Opencast Issue Tracker</a>" }, abstractText = "This service indexes and queries available (distributed) episodes.")
+public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPackageElementProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractEpisodeServiceRestEndpoint.class);
 
@@ -265,8 +262,8 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
                               @QueryParam("title") final String title,
                               @QueryParam("tag") final String[] tags,
                               @QueryParam("flavor") final String[] flavors,
-                              @QueryParam("limit") final int limit,
-                              @QueryParam("offset") final int offset,
+                              @QueryParam("limit") final Integer limit,
+                              @QueryParam("offset") final Integer offset,
                               @QueryParam("sort") final String sort,
                               @QueryParam("onlyLatest") @DefaultValue("true") final boolean onlyLatest,
                               @PathParam("format") final String format) {
@@ -285,7 +282,13 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
           }
         }
 
-        final EpisodeQuery search = query(getSecurityService()).elementFlavors(flavorSet).limit(limit).offset(offset);
+        final EpisodeQuery search = query(getSecurityService()).elementFlavors(flavorSet);
+
+        if (limit != null)
+          search.limit(limit);
+
+        if (offset != null)
+          search.offset(offset);
         
         if (tags != null)
           search.elementTags(tags);
@@ -371,7 +374,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
           final String fileName = mediaPackageElementID.concat(".").concat(mimeType.getSuffix().getOrElse(mimeType.getSubtype()));
           // Write the file contents back
           return RestUtil.streamResponse(inputStream,
-                                         mimeType.asString(),
+                                         mimeType.toString(),
                                          element.getSize() > 0 ? some(element.getSize()) : Option.<Long>none(),
                                          some(fileName)).build();
         }
@@ -404,6 +407,10 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
     });
   }
 
+  @Override public UriRewriter getUriRewriter() {
+    return rewriteUri;
+  }
+
   /**
    * Function to rewrite media package element URIs so that they point to this REST endpoint.
    * The created URIs have to correspond with the parameter list of {@link #getElement(String, String, long, String)}.
@@ -416,7 +423,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint {
                  mpe.getMediaPackage().getIdentifier(),
                  mpe.getIdentifier(),
                  version,
-                 mpe.getElementType().toString().toLowerCase() + ".mov");
+                 mpe.getElementType().toString().toLowerCase() + "." + mpe.getMimeType().getSuffix().getOrElse(".unknown"));
     }
   };
 

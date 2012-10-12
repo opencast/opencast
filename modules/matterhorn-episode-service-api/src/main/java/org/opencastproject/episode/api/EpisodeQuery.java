@@ -41,8 +41,8 @@ public final class EpisodeQuery {
   private Option<String> license = none();
   private Option<String> title = none();
   private Option<String> query = none();
-  private Option<Integer> limit = some(-1);
-  private Option<Integer> offset = some(-1);
+  private Integer limit = Integer.MAX_VALUE;
+  private Integer offset = 0;
   private Option<String> organization = none();
   private List<String> tags = nil();
   private List<MediaPackageElementFlavor> flavors = nil();
@@ -77,12 +77,14 @@ public final class EpisodeQuery {
   }
 
   public EpisodeQuery limit(int limit) {
-    this.limit = some(limit);
+    if (limit < 1) throw new IllegalArgumentException("limit < 1");
+    this.limit = limit;
     return this;
   }
 
   public EpisodeQuery offset(int offset) {
-    this.offset = some(offset);
+    if (offset < 0) throw new IllegalArgumentException("offset < 0");
+    this.offset = offset;
     return this;
   }
 
@@ -192,11 +194,13 @@ public final class EpisodeQuery {
     return id;
   }
 
-  public Option<Integer> getLimit() {
+  /** Defaults to {@link Integer#MAX_VALUE}. */
+  public Integer getLimit() {
     return limit;
   }
 
-  public Option<Integer> getOffset() {
+  /** Defaults to <code>0</code>. */
+  public Integer getOffset() {
     return offset;
   }
 

@@ -556,9 +556,8 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   }
 
   /**
-   * {@inheritDoc}
-   * 
-   * @see java.lang.Object#clone()
+   * Attention: The media package reference is not being cloned so that calling <code>getMediaPackage()</code>
+   * on the clone yields null.
    */
   public Object clone() {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
