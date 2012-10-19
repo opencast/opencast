@@ -178,7 +178,7 @@ package org.opencast.engage.videodisplay.control.command
 				else if (event.mediaURLTwo.charAt(0) == 'r' || event.mediaURLTwo.charAt(0) == 'R')
 				{
 					//#RAS hack for FLVs and FMS (remove .flv at the end)
-					var rtmpLink2:String = event.mediaURLOne;
+					var rtmpLink2:String = event.mediaURLTwo;
 					if (rtmpLink2.substring(rtmpLink2.length-4).toLowerCase() == ".flv")
 						rtmpLink2 = rtmpLink2.substr(0, rtmpLink2.length-4);
 
