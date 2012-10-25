@@ -66,7 +66,7 @@ ocRecordings = new (function() {
    */
   this.Configuration = new (function() {
 
-    // default configuartion
+    // default configuration
     this.state = 'all';
     this.pageSize = 10;
     this.page = 0;
@@ -77,10 +77,14 @@ ocRecordings = new (function() {
     this.filterField = null;
     this.filterText = '';
     
-    this.lastState = 'all'
+    this.lastState = 'all';
     this.lastPageSize = 10;
     this.lastPage = 0;
 
+    this.dateFilter = $.cookie('dateFilter') || 'all';
+    this.fromdate = $.cookie('fromDate') || '';
+    this.todate = $.cookie('toDate') || '';
+    
     // parse url parameters
     try {
       var p = document.location.href.split('?', 2)[1] || false;
@@ -163,6 +167,12 @@ ocRecordings = new (function() {
       // paging
       params.push('count=' + ocRecordings.Configuration.pageSize);
       params.push('startPage=' + ocRecordings.Configuration.page);
+      
+      if (ocRecordings.Configuration.dateFilter != 'all') {
+        params.push('fromdate=' + ocRecordings.Configuration.fromdate);
+        params.push('todate=' + ocRecordings.Configuration.todate);
+      }
+
       var url = WORKFLOW_LIST_URL + '?' + params.join('&');
       $.ajax(
       {
@@ -180,6 +190,66 @@ ocRecordings = new (function() {
     }
   }
 
+  function setDateRange() {
+	  var filter = ocRecordings.Configuration.dateFilter;
+	  var today = new Date();
+	  today.setMilliseconds(0);
+	  today.setSeconds(0);
+	  today.setMinutes(0);
+	  today.setHours(0);
+	  var from = new Date(); 
+	  var to =   new Date(); 
+	  from.setTime(today);
+	  to.setTime(today);
+	  
+	  switch (filter) {
+	    case 'today':
+	    	to.setDate(to.getDate() + 1);
+	    	break;
+	    case 'yesterday':
+	    	from.setDate(from.getDate() - 1);
+	    	break;
+	    case 'tomorrow':
+	    	from.setDate(from.getDate() + 1);
+	    	to.setDate(to.getDate() +2);
+	    	break;
+	    case 'this_week':
+	    	day=from.getDay();
+	    	from.setDate(from.getDate() - day);
+	    	to.setDate(to.getDate() - day + 7);
+	    	break;
+	    case 'next_week':
+	    	day=from.getDay();
+	    	from.setDate(from.getDate() - day + 7);
+	    	to.setDate(to.getDate() - day + 14);
+	    	break;
+	    case 'past_week':
+	    	day=from.getDay();
+	    	from.setDate(from.getDate() - day - 7);
+	    	to.setDate(to.getDate() - day);
+	    	break;
+	    case 'all':
+		ocRecordings.Configuration.fromdate = '';
+		ocRecordings.Configuration.todate = '';
+	    case 'range':
+	    	$( "#todate" ).datepicker( "option", "minDate", null );
+	    	$( "#fromdate" ).datepicker( "option", "maxDate", null );
+		if (ocRecordings.Configuration.fromdate != '' && ocRecordings.Configuration.todate != '') {
+		    from = new Date(ocRecordings.Configuration.fromdate)
+		    to   = new Date(ocRecordings.Configuration.todate)
+		    $('#fromdate').val($.datepicker.formatDate('yy-mm-dd', from));
+		    $('#todate').val($.datepicker.formatDate('yy-mm-dd', to));
+		}
+		return;
+	    default:	   
+	  }
+	  ocRecordings.Configuration.fromdate = ocUtils.toISODate(from);
+  	  ocRecordings.Configuration.todate = ocUtils.toISODate(to);
+	  $('#fromdate').val($.datepicker.formatDate('yy-mm-dd', from));
+	  $('#todate').val($.datepicker.formatDate('yy-mm-dd', to));
+	  
+  }
+  
   function refreshStatistics() {
     if (!ocRecordings.refreshingStats) {
       ocRecordings.refreshingStats = true;
@@ -761,7 +831,66 @@ ocRecordings = new (function() {
       options : FILTER_FIELDS,
       selectedOption : ocRecordings.Configuration.filterField
     });
-
+    
+    $('#setRange').click( function() {
+    	ocUtils.log("set range")
+    	fromText=$('#fromdate').val();
+    	toText=$('#todate').val();
+    	ocUtils.log("set range:" + fromText + ":" +toText);
+    	ocRecordings.Configuration.dateFilter="all";
+    	if (fromText != "") {
+    		from = new Date(fromText);
+    		ocRecordings.Configuration.fromdate = ocUtils.toISODate(from);
+    		ocRecordings.Configuration.dateFilter="range";
+    	}
+    	if (toText != "") {
+    		to =   new Date(toText);
+    		to.setDate(to.getDate() + 1);
+    		ocRecordings.Configuration.todate = ocUtils.toISODate(to);
+    		ocRecordings.Configuration.dateFilter="range"
+    	}
+    	$.cookie( 'dateFilter', ocRecordings.Configuration.dateFilter );
+    	$.cookie('fromDate', ocRecordings.Configuration.fromdate);
+    	$.cookie('toDate', ocRecordings.Configuration.todate);
+    	refresh();
+    });
+    
+    $('#dateFilter').change( function() {
+    	filter=$('#dateFilter').val();
+    	ocRecordings.Configuration.dateFilter=filter;
+    	ocUtils.log(ocRecordings.Configuration.dateFilter);
+    	setDateRange();
+    	$.cookie( 'dateFilter', ocRecordings.Configuration.dateFilter );
+    	if (filter !='range') {
+    		refresh();
+    	}
+    });
+    
+    $.datepicker.setDefaults( {
+    	showOn: 'both',
+    	buttonImage: 'img/icons/calendar.gif',
+    	buttonImageOnly: true,
+    	showOtherMonths: true,
+    	selectOtherMonths: true,
+    	dateFormat: 'yy-mm-dd',
+    });
+    
+    $('#fromdate').datepicker({
+    	onSelect: function(dateText, inst) { 
+    		$( "#todate" ).datepicker( "option", "minDate", new Date(dateText+" 00:00:00") );
+    		$('#dateFilter').val("range");
+    		ocUtils.log(dateText);
+    	}
+    });
+    
+    $('#todate').datepicker({
+    	onSelect: function(dateText, inst) { 
+    		$( "#fromdate" ).datepicker( "option", "maxDate", new Date(dateText+" 00:00:00") );
+    		$('#dateFilter').val("range");
+    		ocUtils.log(dateText);
+    	}
+    });
+        
     // set refresh
     ocRecordings.updateRefreshInterval(ocRecordings.Configuration.doRefresh, ocRecordings.Configuration.refresh);
 
@@ -777,6 +906,13 @@ ocRecordings = new (function() {
       $('#refreshControlsContainer span').css('color', 'silver');
     }
     $('#refreshInterval').val(ocRecordings.Configuration.refresh);
+    $('#dateFilter').val(ocRecordings.Configuration.dateFilter);
+    if (ocRecordings.Configuration.dateFilter == 'range') {
+    	$('#fromdate').val(ocRecordings.Configuration.fromdate);
+    	$('#todate').val(ocRecordings.Configuration.todate);
+    }
+    $('#dateFilter').change();
+    
     // attatch event handlers
     $('#refreshEnabled').change(function() {
       if ($(this).is(':checked')) {
@@ -1265,7 +1401,7 @@ ocRecordings = new (function() {
             url: SERIES_URL + '/',
             data: { 
               series: series,
-              acl: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="http://org.opencastproject.security"><ace><role>anonymous</role><action>read</action><allow>true</allow></ace></acl>'
+              acl: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="org.opencastproject.security"><ace><role>anonymous</role><action>read</action><allow>true</allow></ace></acl>'
             },
             dataType: 'xml',
             success: function(data){
