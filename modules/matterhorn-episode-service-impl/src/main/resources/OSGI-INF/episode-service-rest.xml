@@ -9,9 +9,11 @@
   <property name="opencast.service.type" value="org.opencastproject.episode"/>
   <property name="opencast.service.path" value="/episode"/>
 
-  <!-- Needed for the RestPublisher to pick up the service. -->
   <service>
+    <!-- Needed for the RestPublisher to pick up the service. -->
     <provide interface="org.opencastproject.episode.endpoint.OsgiEpisodeServiceRestEndpoint"/>
+    <!-- / -->
+    <provide interface="org.opencastproject.episode.api.HttpMediaPackageElementProvider"/>
   </service>
 
   <reference name="episode-service"

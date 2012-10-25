@@ -285,7 +285,11 @@ public final class EpisodeServiceImpl implements EpisodeService {
 
   //
 
-  void populateIndex() {
+  /**
+   * Since the index is populated from persitent storage where media package element URIs have been transformed to
+   * location independend URNs these have to be rewritten to point to actual locations.
+   */
+  void populateIndex(UriRewriter uriRewriter) {
     long instancesInSolr = 0L;
     try {
       instancesInSolr = solrIndex.count();
@@ -293,6 +297,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
       throw new IllegalStateException(e);
     }
     if (instancesInSolr == 0L) {
+      logger.info("Start populating episode search index");
       try {
         Map<String, Version> maps = new HashMap<String, Version>();
         Iterator<Episode> episodes = persistence.getAllEpisodes();
@@ -314,8 +319,20 @@ public final class EpisodeServiceImpl implements EpisodeService {
           secSvc.setOrganization(organization);
           secSvc.setUser(new User(organization.getName(), organization.getId(), new String[] { organization
                   .getAdminRole() }));
-          solrIndex.add(episode.getMediaPackage(), episode.getAcl(), episode.getVersion(), episode.getDeletionDate(),
-                  episode.getModificationDate(), isLatestVersion);
+          // The whole media package gets rewritten here. This is not the best approach since then
+          // the media package is stored in the index with concrete URLs.
+          // Just rewriting URLs on a per element basis does not work either since a media package element clone loses
+          // the reference to its parent media package. Some rewriters like the one provided by the
+          // AbstractEpisodeServiceRestEndpoint need this reference though.
+          //
+          // However storing the concrete URLs in the index is not that problematic because
+          // URLs get rewritten on delivery anyway. See #add(..)
+          solrIndex.add(rewriteUris(episode.getMediaPackage(), uriRewriter.curry(episode.getVersion())),
+                        episode.getAcl(),
+                        episode.getVersion(),
+                        episode.getDeletionDate(),
+                        episode.getModificationDate(),
+                        isLatestVersion);
         }
         logger.info("Finished populating episode search index");
       } catch (Exception e) {
@@ -325,6 +342,8 @@ public final class EpisodeServiceImpl implements EpisodeService {
         secSvc.setOrganization(null);
         secSvc.setUser(null);
       }
+    } else {
+      logger.debug("No need to populate episode search index");
     }
   }
 

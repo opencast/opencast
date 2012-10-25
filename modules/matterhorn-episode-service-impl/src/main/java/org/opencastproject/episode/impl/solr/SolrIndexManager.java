@@ -70,6 +70,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.data.Cell;
 import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 import org.slf4j.Logger;
@@ -98,6 +99,7 @@ import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Collections.nil;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /** Utility class used to manage the search index. */
 public class SolrIndexManager {
@@ -331,7 +333,7 @@ public class SolrIndexManager {
    * Posts the media package to solr. Depending on what is referenced in the media package, the method might create one
    * or two entries: one for the episode and one for the series that the episode belongs to.
    *
-   * This implementation of the search service removes all references to non "engage/download" media tracks
+   * Media package element URIs need to be URLs pointing to existing locations.
    *
    * @param sourceMediaPackage
    *         the media package to post
@@ -339,10 +341,15 @@ public class SolrIndexManager {
    *         the access control list for this mediapackage
    * @param now
    *         current date
+   * @param version
+   *         the archive version
    * @throws SolrServerException
    *         if an errors occurs while talking to solr
    */
-  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl, Date now, Version version)
+  public boolean add(MediaPackage sourceMediaPackage,
+                     AccessControlList acl,
+                     Date now,
+                     Version version)
           throws SolrServerException {
     try {
       SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl, version);
@@ -402,8 +409,12 @@ public class SolrIndexManager {
    * @throws SolrServerException
    *         if an errors occurs while talking to solr
    */
-  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl, Version version,
-          Option<Date> deletionDate, Date modificationDate, boolean isLatestVersion) throws SolrServerException {
+  public boolean add(MediaPackage sourceMediaPackage,
+                     AccessControlList acl,
+                     Version version,
+                     Option<Date> deletionDate,
+                     Date modificationDate,
+                     boolean isLatestVersion) throws SolrServerException {
     try {
       SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl, version);
 
@@ -443,11 +454,12 @@ public class SolrIndexManager {
    * @throws MediaPackageException
    *         if serialization of the media package fails
    */
-  private SolrInputDocument createEpisodeInputDocument(MediaPackage mediaPackage, AccessControlList acl,
-                                                       Version version)
+  private SolrInputDocument createEpisodeInputDocument(final MediaPackage mediaPackage,
+                                                       AccessControlList acl,
+                                                       final Version version)
           throws MediaPackageException, IOException {
 
-    SolrInputDocument doc = new SolrInputDocument();
+    final SolrInputDocument doc = new SolrInputDocument();
     String mediaPackageId = mediaPackage.getIdentifier().toString();
 
     // Fill the input document
@@ -477,18 +489,30 @@ public class SolrIndexManager {
     // /
     // Add mpeg7
     logger.debug("Looking for mpeg-7 catalogs containing segment texts");
-    Catalog[] mpeg7Catalogs = mediaPackage.getCatalogs(MediaPackageElements.TEXTS);
-    if (mpeg7Catalogs.length == 0) {
-      logger.debug("No text catalogs found, trying segments only");
-      mpeg7Catalogs = mediaPackage.getCatalogs(MediaPackageElements.SEGMENTS);
-    }
     // TODO: merge the segments from each mpeg7 if there is more than one mpeg7 catalog
-    if (mpeg7Catalogs.length > 0) {
-      Mpeg7Catalog mpeg7Catalog = loadMpeg7Catalog(mpeg7Catalogs[0]);
-      addMpeg7Metadata(doc, mediaPackage, mpeg7Catalog);
-    } else {
-      logger.debug("No segmentation catalog found");
-    }
+    mlist(mediaPackage.getCatalogs(MediaPackageElements.TEXTS)).head()
+        .orElse(new Function0<Option<Catalog>>() {
+          @Override public Option<Catalog> apply() {
+            logger.debug("No text catalogs found, trying segments only");
+            return mlist(mediaPackage.getCatalogs(MediaPackageElements.SEGMENTS)).head();
+          }
+        })
+        .fold(new Option.Match<Catalog, Void>() {
+          @Override public Void some(final Catalog mpeg7) {
+            try {
+              // load catalog and add it to the solr input document
+              addMpeg7Metadata(doc, mediaPackage, loadMpeg7Catalog(mpeg7));
+            } catch (IOException e) {
+              return chuck(e);
+            }
+            return null;
+          }
+
+          @Override public Void none() {
+            logger.debug("No segmentation catalog found");
+            return null;
+          }
+        });
 
     return doc;
   }

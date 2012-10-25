@@ -31,6 +31,7 @@ import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.api.EpisodeServiceException;
 import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultItem;
+import org.opencastproject.episode.api.UriRewriter;
 import org.opencastproject.episode.api.Version;
 import org.opencastproject.episode.impl.elementstore.DeletionSelector;
 import org.opencastproject.episode.impl.elementstore.ElementStore;
@@ -45,8 +46,9 @@ import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
@@ -74,6 +76,7 @@ import org.opencastproject.workspace.api.Workspace;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,6 +97,7 @@ import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZ
 import static org.opencastproject.util.UrlSupport.DEFAULT_BASE_URL;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.VCell.cell;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Tests the functionality of the search service.
@@ -151,13 +155,19 @@ public class EpisodeServiceImplTest {
   public void setUp() throws Exception {
     final File dcFile = new File(getClass().getResource("/dublincore.xml").toURI());
     final File dcSeriesFile = new File(getClass().getResource("/series-dublincore.xml").toURI());
+    final File mpeg7 = new File(getClass().getResource("/mpeg7.xml").toURI());
     Assert.assertNotNull(dcFile);
 
     // workspace
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
-      public File answer() throws Throwable {
-        return EasyMock.getCurrentArguments()[0].toString().contains("series") ? dcSeriesFile : dcFile;
+      @Override public File answer() throws Throwable {
+        final String arg = EasyMock.getCurrentArguments()[0].toString();
+        if (arg.contains("series"))
+          return dcSeriesFile;
+        if (arg.contains("mpeg"))
+          return mpeg7;
+        return dcFile;
       }
     }).anyTimes();
     EasyMock.replay(workspace);
@@ -542,27 +552,34 @@ public class EpisodeServiceImplTest {
     List<String> args = new ArrayList<String>();
     args.add(new DefaultOrganization().getId());
 
-    List<Job> jobs = new ArrayList<Job>();
+    // create 10 empty media packages, no need to rewrite for archival
     for (long i = 0; i < 10; i++) {
-      MediaPackage mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
+      final MediaPackage mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
       mediaPackage.setIdentifier(IdBuilderFactory.newInstance().newIdBuilder().createNew());
-      episodeDatabase.storeEpisode(mediaPackage, acl, new Date(), Version.version(i + 1));
-      String payload = MediaPackageParser.getAsXml(mediaPackage);
-      JaxbJob job = new JaxbJob();
-      job.setId(i);
-      job.setArguments(args);
-      job.setPayload(payload);
-      job.setStatus(Status.FINISHED);
-      jobs.add(job);
+      episodeDatabase.storeEpisode(mediaPackage, acl, new Date(), Version.FIRST);
     }
+    // load one with an mpeg7 catalog attached
+    final MediaPackage mpWithMpeg7 = EpisodeServiceImpl.rewriteForArchival(Version.FIRST)
+            .apply(MediaPackageSupport.loadMediaPackageFromClassPath("/manifest-full.xml"));
+    episodeDatabase.storeEpisode(mpWithMpeg7, acl, new Date(), Version.FIRST);
 
     // We should have nothing in the search index
     assertEquals(0, service.find(systemQuery()).size());
 
-    service.populateIndex();
+    // todo
+    service.populateIndex(new UriRewriter() {
+      @Override public URI apply(Version version, MediaPackageElement mediaPackageElement) {
+        // only the URI of the mpeg7 file needs to be rewritten so it is safe to return a static URL
+        try {
+          return getClass().getResource("/mpeg7.xml").toURI();
+        } catch (URISyntaxException e) {
+          return chuck(e);
+        }
+      }
+    });
 
-    // This time we should have 10 results
-    assertEquals(10, service.find(systemQuery()).size());
+    // This time we should have 11 results
+    assertEquals(11, service.find(systemQuery()).size());
   }
 
   @Test

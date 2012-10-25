@@ -125,9 +125,19 @@ public final class MediaPackageSupport {
   }
 
   /** Immutable modification of a media package. */
-  public static MediaPackage modify(MediaPackage mp, Function<MediaPackage, Void> f) {
+  public static MediaPackage modify(MediaPackage mp, Effect<MediaPackage> e) {
     final MediaPackage clone = (MediaPackage) mp.clone();
-    f.apply(clone);
+    e.apply(clone);
+    return clone;
+  }
+
+  /**
+   * Immutable modification of a media package element. Attention: The returned element loses
+   * its media package membership (see {@link org.opencastproject.mediapackage.AbstractMediaPackageElement#clone()})
+   */
+  public static <A extends MediaPackageElement> A modify(A mpe, Effect<A> e) {
+    final A clone = (A) mpe.clone();
+    e.apply(clone);
     return clone;
   }
 
@@ -143,6 +153,18 @@ public final class MediaPackageSupport {
         for (MediaPackageElement e : mp.getElements()) {
           e.setURI(f.apply(e));
         }
+      }
+    });
+  }
+
+  /**
+   * Rewrite the URI of a media package element. Modification is done on a copy of the given element.
+   * Attention: The returned element loses its media package membership (see {@link org.opencastproject.mediapackage.AbstractMediaPackageElement#clone()})
+   */
+  public static <A extends MediaPackageElement> A rewriteUri(final A mpe, final Function<A, URI> f) {
+    return modify(mpe, new Effect<A>() {
+      @Override protected void run(A e) {
+        e.setURI(f.apply(e));
       }
     });
   }

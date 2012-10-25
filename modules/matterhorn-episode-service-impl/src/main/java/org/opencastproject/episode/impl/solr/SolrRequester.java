@@ -280,10 +280,8 @@ public class SolrRequester {
 
     final SolrQuery solr = new SolrQuery(sb.toString());
     // limit & offset
-    if (q.getLimit().isSome() && q.getLimit().get() > 0)
-      solr.setRows(q.getLimit().get());
-    if (q.getOffset().isSome() && q.getOffset().get() > 0)
-      solr.setStart(q.getOffset().get());
+    solr.setRows(q.getLimit());
+    solr.setStart(q.getOffset());
 
     // sorting
     // todo multiValued fields cannot be used for sorting -- need to have the language here
