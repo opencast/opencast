@@ -43,6 +43,7 @@ ocSeriesList.SortColumns = [
 ];
 
 ocSeriesList.init = function(){
+  ocSeriesList.askForSeries();
   $('#addHeader').jqotesubtpl('templates/series_list-header.tpl', {});
   if ($.cookie('series_count') != null) {
     $('#pageSize').children()
@@ -75,8 +76,8 @@ ocSeriesList.askForSeries = function()
     success: function(data)
     {
       ocSeriesList.buildSeriesView(data);
-      ocSeriesList.Configuration.total = data.totalCount;
-      ocSeriesList.Configuration.lastPage = Math.ceil(ocSeriesList.Configuration.total / ocSeriesList.Configuration.count)
+      ocSeriesList.Configuration.total = parseInt(data.totalCount);
+      ocSeriesList.Configuration.lastPage = Math.ceil(ocSeriesList.Configuration.total / ocSeriesList.Configuration.count);
       if(ocSeriesList.Configuration.total <= ocSeriesList.Configuration.count){
         $('#prevText').show();
         $('#prevButtons').hide();
