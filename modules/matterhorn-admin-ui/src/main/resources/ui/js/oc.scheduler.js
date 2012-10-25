@@ -554,10 +554,14 @@ var ocScheduler = (function() {
         for (var i in sched.catalogs) {
           data = sched.catalogs[i].components;
           for (var key in data) {
+          
             if (data[key] != "" && key != 'files') { //print text, not file names
               $('#field-'+key).css('display','block');
               $('#field-'+key).children('.fieldValue').text(data[key].value);
             }
+            if (key == "temporal" || key == "recurrence") {			
+              $('#field-'+key).children('.fieldValue').text(data[key].asFriendlyString());
+              }
           }
         }
       });
@@ -846,33 +850,6 @@ var ocScheduler = (function() {
 
     if(sched.type === MULTIPLE_EVENTS){
 
-      dcComps.temporal = new ocAdmin.Component(['recurDurationHour', 'recurDurationMin', 'recurStart', 'recurStartTimeHour', 'recurStartTimeMin'],
-      {
-        key: 'temporal'
-      },
-
-      {
-        getValue: function() {
-          var date = this.fields.recurStart.datepicker('getDate');
-          if(date && date.constructor == Date) {
-            var start = date / 1000; // Get date in milliseconds, convert to seconds.
-            start += this.fields.recurStartTimeHour.val() * 3600; // convert hour to seconds, add to date.
-            start += this.fields.recurStartTimeMin.val() * 60; //convert minutes to seconds, add to date.
-            start -= sched.tzDiff * 60; //Agent TZ offset
-            start = start * 1000; //back to milliseconds
-          }
-          var duration = this.fields.recurDurationHour.val() * 3600; // seconds per hour
-          duration += this.fields.recurDurationMin.val() * 60; // seconds per min
-          duration = duration * 1000;
-        },
-        setValue: function(val) {
-          var temporal = parseDublinCoreTemporal(val);
-          ocScheduler.components.recurrenceStart.setValue(temporal.start);
-          ocScheduler.components.recurrenceEnd.setValue(temporal.end);
-          ocScheduler.components.recurrenceDuration.setValue(temporal.dur);
-        }
-      });
-
       compositeComps.recurrenceStart = new ocAdmin.Component(['recurStart', 'recurStartTimeHour', 'recurStartTimeMin'],
       {
         required: true,
@@ -1075,7 +1052,7 @@ var ocScheduler = (function() {
         }
       });
 
-      dcComps.recurrence = new ocAdmin.Component(['scheduleRepeat', 'repeatSun', 'repeatMon', 'repeatTue', 'repeatWed', 'repeatThu', 'repeatFri', 'repeatSat'],
+      dcComps.recurrence = new ocAdmin.Component(['scheduleRepeat', 'repeatSun', 'repeatMon', 'repeatTue', 'repeatWed', 'repeatThu', 'repeatFri', 'repeatSat', 'recurrenceStart'],
       {
         required: true,
         key: 'recurrence',
@@ -1121,7 +1098,7 @@ var ocScheduler = (function() {
               if(this.fields.repeatSat[0].checked) {
                 days.push(dotw[(6 + dayOffset) % 7]);
               }
-              this.value = rrule + days.toString() + ";BYHOUR=" + hour + ";BYMINUTE=" + min;
+              this.value = rrule + this.getDays() + ";BYHOUR=" + hour + ";BYMINUTE=" + min;
             }
           }
           return this.value;
@@ -1194,6 +1171,45 @@ var ocScheduler = (function() {
             parent.appendChild(container);
           }
           return container;
+        },
+        getDays: function(ignoreOffset) {
+        	  var dotw, days, date, dayOffset;
+        	  dotw      = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+            days      = [];
+            date      = new Date(ocScheduler.components.recurrenceStart.getValue());
+            dayOffset = 0;
+            if(date.getDay() != date.getUTCDay()) {
+              dayOffset = date.getDay() < date.getUTCDay() ? 1 : -1;
+            }
+            if (ignoreOffset != undefined && ignoreOffset == true) {
+            	dayOffset = 0;
+            }
+            if(this.fields.repeatSun[0].checked) {
+              days.push(dotw[(0 + dayOffset) % 7]);
+            }
+            if(this.fields.repeatMon[0].checked) {
+              days.push(dotw[(1 + dayOffset) % 7]);
+            }
+            if(this.fields.repeatTue[0].checked) {
+              days.push(dotw[(2 + dayOffset) % 7]);
+            }
+            if(this.fields.repeatWed[0].checked) {
+              days.push(dotw[(3 + dayOffset) % 7]);
+            }
+            if(this.fields.repeatThu[0].checked) {
+              days.push(dotw[(4 + dayOffset) % 7]);
+            }
+            if(this.fields.repeatFri[0].checked) {
+              days.push(dotw[(5 + dayOffset) % 7]);
+            }
+            if(this.fields.repeatSat[0].checked) {
+              days.push(dotw[(6 + dayOffset) % 7]);
+            }
+            return days.toString();
+            
+        },
+        asFriendlyString: function() {
+        		   return "Weekly on " + this.getDays(true) ;
         }
       });
 
@@ -1236,6 +1252,24 @@ var ocScheduler = (function() {
             error.push(endValid);
           }
           return error;
+        },
+        setValue: function(val) {
+	       var temporal = parseDublinCoreTemporal(val);
+	             ocScheduler.components.recurrenceStart.setValue(temporal.start);
+		           ocScheduler.components.recurrenceEnd.setValue(temporal.end);
+			         ocScheduler.components.recurrenceDuration.setValue(temporal.dur);
+				     },
+				         asString: function() {
+					       return "Starting: " + (new Date(this.getValue())).toLocaleString();
+					           },
+        asFriendlyString: function() {
+          var recurEnd, recurStart, recurStartTimeHour, recurStartTimeMin;
+          recurEnd = this.fields.recurEnd.val();
+          recurStart = this.fields.recurStart.val();
+          //recurStartTimeHour = this.fields.recurStartTimeHour.val();
+          //recurStartTimeMin  = this.fields.recurStartTimeMin.val();
+          return  "startDate= " + recurStart + " endDate= " + recurEnd ;
+          
         }
       });
 
@@ -1284,6 +1318,9 @@ var ocScheduler = (function() {
           var temporal = parseDublinCoreTemporal(val);
           ocScheduler.components.startDate.setValue(temporal.start);
           ocScheduler.components.duration.setValue(temporal.dur);
+        },
+        asFriendlyString: function() {
+        		   return "";
         },
         validate: function() {
           var startValid = ocScheduler.components.startDate.validate();
