@@ -643,6 +643,7 @@
             <phase>install</phase>
             <configuration>
               <target if="deployTo">
+                <delete dir="${deployTo}/lib/matterhorn/${project.build.finalName}" />
                 <copy file="${project.build.directory}/${project.build.finalName}.jar" todir="${deployTo}/lib/matterhorn"
                   failonerror="false" />
               </target>
@@ -656,7 +657,8 @@
             <phase>install</phase>
             <configuration>
               <target if="unpackTo">
-                <unzip dest="${unpackTo}/${project.build.finalName}" overwrite="true">
+                <delete file="${unpackTo}/lib/matterhorn/${project.build.finalName}.jar" />
+                <unzip dest="${unpackTo}/lib/matterhorn/${project.build.finalName}" overwrite="true">
                   <fileset dir="${project.build.directory}">
                     <include name="${project.build.finalName}.jar" />
                   </fileset>
