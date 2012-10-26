@@ -1101,7 +1101,7 @@ ocRecordings = new (function() {
 
   //TEMPORARY (quick'n'dirty) PAGING
   this.nextPage = function() {
-    numPages = Math.floor(this.totalRecordings / ocRecordings.Configuration.pageSize);
+    numPages = Math.ceil(this.totalRecordings / ocRecordings.Configuration.pageSize);
     if( ocRecordings.Configuration.page < numPages ) {
       ocRecordings.Configuration.page++;
     }
@@ -1116,7 +1116,7 @@ ocRecordings = new (function() {
   }
   
   this.lastPage = function() {
-    ocRecordings.Configuration.page = Math.floor(this.totalRecordings / ocRecordings.Configuration.pageSize);
+    ocRecordings.Configuration.page = Math.ceil(this.totalRecordings / ocRecordings.Configuration.pageSize) -1;
     ocRecordings.reload();
   }
   
