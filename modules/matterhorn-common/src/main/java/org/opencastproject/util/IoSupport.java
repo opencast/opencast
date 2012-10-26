@@ -209,6 +209,7 @@ public final class IoSupport {
    * @param url
    *         The {@code URL} to read the source data from.
    * @return A String containing the source data or null in the case of an error.
+   * @deprecated this method doesn't support UTF8 or handle HTTP response codes 
    */
   public static String readFileFromURL(URL url) {
     return readFileFromURL(url, null);
@@ -223,6 +224,7 @@ public final class IoSupport {
    *         The {@code TrustedHttpClient} which should be used to communicate with the remote server. This can be null
    *         for local file reads.
    * @return A String containing the source data or null in the case of an error.
+   * @deprecated this method doesn't support UTF8 or handle HTTP response codes
    */
   public static String readFileFromURL(URL url, TrustedHttpClient trustedClient) {
     StringBuilder sb = new StringBuilder();
