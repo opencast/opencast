@@ -1,11 +1,11 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:sec="http://www.springframework.org/schema/security"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:osgi="http://www.springframework.org/schema/osgi"
   xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.springframework.org/schema/osgi  
        http://www.springframework.org/schema/osgi/spring-osgi.xsd
        http://www.springframework.org/schema/security
-       http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+       http://www.springframework.org/schema/security/spring-security-3.1.xsd">
 
   <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast Matterhorn"
     entry-point-ref="matterhornEntryPoint">
@@ -14,13 +14,13 @@
     <!-- # URL SECURITY # -->
     <!-- ################ -->
     <sec:intercept-url pattern='/login.html' access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern="/admin/img/favicon.ico" filters="none" />
-    <sec:intercept-url pattern="/favicon.ico" filters="none" />
-    <sec:intercept-url pattern='/images/**' filters="none" />
-    <sec:intercept-url pattern="/img/**" filters="none" />
-    <sec:intercept-url pattern="/js/**" filters="none" />
-    <sec:intercept-url pattern='/style.css' filters='none' />
-    <sec:intercept-url pattern="/css/**" filters="none" />
+    <sec:intercept-url pattern="/admin/img/favicon.ico" access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern="/favicon.ico" access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern='/images/**' access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern="/img/**" access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern="/js/**" access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern='/style.css' access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern="/css/**" access='ROLE_ANONYMOUS' />
 
     <!-- Enable anonymous access to the /info/me.json resource -->
     <sec:intercept-url pattern='/info/me.json' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
@@ -30,6 +30,19 @@
     <sec:intercept-url pattern='/search/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
     <sec:intercept-url pattern='/usertracking/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
     <sec:intercept-url pattern='/static/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern='/export/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+
+    <!-- Enable anonymous access to the annotation and the series endpoints -->
+    <sec:intercept-url pattern='/series/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern='/annotation/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern='/annotation/**' method="PUT" access='ROLE_ANONYMOUS, ROLE_USER' />
+
+    <!-- Enable anonymous access to the OAI-PMH repository              -->
+    <!-- The OAI-PMH specification demands boths GET and POST requests  -->
+    <!-- Please make sure that the path configured here matches         -->
+    <!-- the path configured for the repository servlet.                -->
+    <sec:intercept-url pattern='/oaipmh/**' method='GET' access='ROLE_ANONYMOUS, ROLE_USER'/>
+    <sec:intercept-url pattern='/oaipmh/**' method='POST' access='ROLE_ANONYMOUS, ROLE_USER'/>
 
     <!-- Enable anonymous access to the rss and atom feeds -->
     <sec:intercept-url pattern='/feeds/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
@@ -48,8 +61,11 @@
     <!-- Enable access to the LTI sample tool -->
     <sec:intercept-url pattern="/ltisample/**" access="ROLE_OAUTH_USER" />
 
-    <!-- Everything else is for any logged in user -->
-    <sec:intercept-url pattern='/**' access='ROLE_ADMIN' />
+    <!-- Enable access to the LTI tools -->
+    <sec:intercept-url pattern="/ltitools/**" access="ROLE_OAUTH_USER" />
+
+    <!-- Everything else is for the admin users -->
+    <sec:intercept-url pattern='/**' access='ROLE_ADMIN, ROLE_COURSE_ADMIN, ROLE_INSTRUCTOR' />
 
     <!-- ############################# -->
     <!-- # LOGIN / LOGOUT MECHANISMS # -->
