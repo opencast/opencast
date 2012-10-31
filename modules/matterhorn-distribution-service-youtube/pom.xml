@@ -130,13 +130,13 @@
       <artifactId>com.springsource.org.jdom</artifactId>
     </dependency>
     
-    <!-- testing -->
-
     <dependency>
-      <groupId>javax.mail</groupId>
-      <artifactId>mail</artifactId>
-      <scope>test</scope>
-    </dependency>
+      <groupId>org.sakaiproject.nakamura</groupId>
+      <artifactId>javax.activation-mail</artifactId>
+      <version>1.1.1.1.4.2-1.4.2</version>
+	</dependency>
+    
+    <!-- testing -->
     
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -179,6 +179,9 @@
               org.jdom.*,
               flexjson,
             </Private-Package>
+            <Import-Bundle>
+              javax.activation-mail
+            </Import-Bundle>
             <Import-Package>
               *;resolution:=optional
             </Import-Package>
@@ -193,6 +196,7 @@
               gdata-media;inline=true,
               gdata-youtube;inline=true,
               google-collections;inline=true,
+              javax.activation-mail;inline=true,
             </Embed-Dependency>
             <Service-Component>
               OSGI-INF/distribution-service-youtube.xml

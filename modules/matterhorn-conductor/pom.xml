@@ -160,13 +160,10 @@
     	<version>3.2.4</version>
     </dependency>
     <dependency>
-    	<groupId>org.apache.servicemix.bundles</groupId>
-    	<artifactId>
-    		org.apache.servicemix.bundles.javax.mail
-    	</artifactId>
-    	<version>1.4.1_5</version>
-    	<type>bundle</type>
-    </dependency>
+	    <groupId>org.sakaiproject.nakamura</groupId>
+	    <artifactId>javax.activation-mail</artifactId>
+	    <version>1.1.1.1.4.2-1.4.2</version>
+	</dependency>
   </dependencies>
   <build>
     <plugins>
