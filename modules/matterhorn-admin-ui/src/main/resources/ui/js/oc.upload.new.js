@@ -117,7 +117,7 @@ var ocUpload = (function() {
         if($('#ispartof').val() === '' && $('#series').val() !== ''){
           ocUtils.log("Searching for series in series endpoint");
           $.ajax({
-            url : ocUpload.SERIES_SEARCH_URL + '?seriesTitle=' + $('#series').val(),
+            url : ocUpload.SERIES_SEARCH_URL,
             type : 'get',
             dataType : 'json',
             success : function(data) {
@@ -126,11 +126,15 @@ var ocUpload = (function() {
               series_list = data["catalogs"],
               series_title,
               series_id;
-
-              if(series_list.length !== 0){
-                series_title = series_list[0][DUBLIN_CORE_NS_URI]["title"] ? series_list[0][DUBLIN_CORE_NS_URI]["title"][0].value : "";
-                series_id = series_list[0][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[0][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
-                $('#ispartof').val(series_id);
+              $('#ispartof').val('');
+              for (i in series_list) {
+                var series_title, series_id;
+                series_title = series_list[i][DUBLIN_CORE_NS_URI]["title"] ? series_list[i][DUBLIN_CORE_NS_URI]["title"][0].value : "";
+                series_id = series_list[i][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[i][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
+                if (series_title === series_input){
+                  $('#ispartof').val(series_id);
+                  break;
+                }
               }
             }
           });
@@ -371,7 +375,7 @@ ocUpload.UI = (function() {
     //ocUpload.backToRecordings();
     window.location = '/admin/index.html#/recordings?' + window.location.hash.split('?')[1];;
   }
-
+  
   /**
    * collects metadata to show in sucess screen
    *
@@ -391,7 +395,6 @@ ocUpload.UI = (function() {
       if(file != undefined) {
         metadata['files'].push(file);
       }
-
     });
     this.metadata = metadata;
   }
