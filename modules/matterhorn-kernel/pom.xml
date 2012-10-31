@@ -135,11 +135,11 @@
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-bundle-jaxrs</artifactId>
     </dependency>
-    
-    <dependency>
-      <groupId>org.apache.geronimo.javamail</groupId>
-      <artifactId>geronimo-javamail_1.4_provider</artifactId>
-      <version>1.8.3</version>
+	
+	<dependency>
+      <groupId>org.sakaiproject.nakamura</groupId>
+      <artifactId>javax.activation-mail</artifactId>
+      <version>1.1.1.1.4.2-1.4.2</version>
 	</dependency>
 
     <!-- Logging -->
@@ -194,12 +194,11 @@
               spring-security-oauth;inline=true,
               jboss-xacml;inline=true,
               json-simple;inline=true,
-              geronimo-javamail_1.4_provider;inline=true
+              javax.activation-mail;inline=true
             </Embed-Dependency>
             <Private-Package>
               org.jboss.security.xacml.core,
               org.jboss.security.xacml.core.model.policy,
-              org.apache.geronimo.javamail,
             </Private-Package>
             <Import-Package>
               javax.activation,
