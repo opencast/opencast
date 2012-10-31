@@ -205,7 +205,7 @@ var ocScheduler = (function() {
         if($('#series').val() === '' && $('#seriesSelect').val() !== ''){
           ocUtils.log("Searching for series in series endpoint");
           $.ajax({
-            url : SERIES_SEARCH_URL + '?seriesTitle=' + $('#seriesSelect').val(),
+            url : SERIES_SEARCH_URL,// + '?seriesTitle=' + $('#seriesSelect').val(),
             type : 'get',
             dataType : 'json',
             success : function(data) {
@@ -213,11 +213,15 @@ var ocScheduler = (function() {
               series_list = data["catalogs"],
               series_title,
               series_id;
-
-              if(series_list.length !== 0){
-                series_title = series_list[0][DUBLIN_CORE_NS_URI]["title"] ? series_list[0][DUBLIN_CORE_NS_URI]["title"][0].value : "";
-                series_id = series_list[0][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[0][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
-                $('#series').val(series_id);
+              $('#series').val('');
+              for (i in series_list) {
+                var series_title, series_id;
+                series_title = series_list[i][DUBLIN_CORE_NS_URI]["title"] ? series_list[i][DUBLIN_CORE_NS_URI]["title"][0].value : "";
+                series_id = series_list[i][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[i][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
+                if (series_title === series_input){
+                  $('#series').val(series_id);
+                  break;
+                }
               }
             }
           });
