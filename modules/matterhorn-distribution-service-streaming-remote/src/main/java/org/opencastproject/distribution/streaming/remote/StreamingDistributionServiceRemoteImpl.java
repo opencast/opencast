@@ -24,7 +24,6 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
@@ -113,7 +112,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     params.add(new BasicNameValuePair("mediapackage", mediapackageXml));
     params.add(new BasicNameValuePair("elementId", elementId));
-    HttpPost post = new HttpPost();
+    HttpPost post = new HttpPost("/retract");
     HttpResponse response = null;
     UrlEncodedFormEntity entity = null;
     try {
@@ -123,7 +122,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
     }
     post.setEntity(entity);
     try {
-      response = getResponse(post, HttpStatus.SC_NO_CONTENT);
+      response = getResponse(post);
       Job receipt = null;
       if (response != null) {
         logger.info("retracted {} from {}", mediaPackage, distributionChannel);
