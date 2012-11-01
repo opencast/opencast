@@ -88,7 +88,7 @@ CREATE TABLE job_service_registration (
 	Job_id BIGINT(20) NOT NULL,
 	servicesRegistration_id BIGINT(20) NOT NULL,
 	PRIMARY KEY (Job_id, servicesRegistration_id)
-)
+);
 
 CREATE TABLE matterhorn_role (
 	username VARCHAR(128) NOT NULL,
