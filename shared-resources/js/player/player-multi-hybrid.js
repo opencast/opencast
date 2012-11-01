@@ -1837,7 +1837,7 @@ Opencast.Player = (function ()
     function addEvent(eventType)
     {
         //If the detailed logging is turned off (false), and the log type is not a footprint then return.
-	if (!Opencast.Player.detailedLogging && (eventType != Opencast.logging.FOOTPRINT || eventType.matches("/.*AJAX-FAILED/i"))) {
+	if (!Opencast.Player.detailedLogging && (eventType != Opencast.logging.FOOTPRINT || eventType.match(/.*AJAX-FAILED/i) != null)) {
           return;
         }
 	// Return if the in and out positions are NaN
