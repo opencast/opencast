@@ -122,6 +122,15 @@ CREATE TABLE "job_context" (
 );
 
 --
+-- Table: job_service_registration
+--
+CREATE TABLE "job_service_registration" (
+	"Job_id" bigint NOT NULL,
+	"servicesRegistration_id" bigint NOT NULL,
+	PRIMARY KEY ("Job_id", "servicesRegistration_id")
+)
+
+--
 -- Table: matterhorn_role
 --
 CREATE TABLE "matterhorn_role" (

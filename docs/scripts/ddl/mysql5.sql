@@ -84,6 +84,12 @@ CREATE TABLE job (
 	PRIMARY KEY (id)
 );
 
+CREATE TABLE job_service_registration (
+	Job_id BIGINT(20) NOT NULL,
+	servicesRegistration_id BIGINT(20) NOT NULL,
+	PRIMARY KEY (Job_id, servicesRegistration_id)
+)
+
 CREATE TABLE matterhorn_role (
 	username VARCHAR(128) NOT NULL,
 	organization VARCHAR(128) NOT NULL,
@@ -234,6 +240,16 @@ ALTER TABLE job_arguments ADD CONSTRAINT UNQ_job_arguments_0 UNIQUE (
 ALTER TABLE job_context ADD CONSTRAINT UNQ_job_context_0 UNIQUE (
 	root_job,
 	key_entry
+);
+
+ALTER TABLE job_service_registration ADD CONSTRAINT FK_job_service_registration_Job_id FOREIGN KEY (
+	Job_id) REFERENCES job (
+	id
+);
+
+ALTER TABLE job_service_registration ADD CONSTRAINT job_service_registration_servicesRegistration_id FOREIGN KEY (
+	servicesRegistration_id) REFERENCES service_registration (
+	id
 );
 
 ALTER TABLE service_registration ADD CONSTRAINT FK_service_registration_host_registration FOREIGN KEY (
