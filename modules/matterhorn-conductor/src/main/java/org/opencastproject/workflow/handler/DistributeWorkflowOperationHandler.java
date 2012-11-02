@@ -19,10 +19,12 @@ import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
@@ -158,17 +160,14 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
 
       // Also distribute the security configuration
       // -----
-      // Stop distributing the security config for now since no one actually uses it.
-      // This is done as a fix for MH-8515. I leave the code in place since it should
-      // be reactivated as soon as this issues has been resolved cleanly. Please see
-      // the ticket for further information [cedriessen]
+      // This was removed in the meantime by a fix for MH-8515, but could now be used again.
       // -----
-      // Attachment[] securityAttachments = mediaPackage.getAttachments(MediaPackageElements.XACML_POLICY);
-      // if (securityAttachments != null && securityAttachments.length > 0) {
-      // for (Attachment a : securityAttachments) {
-      // elementIds.add(a.getIdentifier());
-      // }
-      // }
+      Attachment[] securityAttachments = mediaPackage.getAttachments(MediaPackageElements.XACML_POLICY);
+      if (securityAttachments != null && securityAttachments.length > 0) {
+        for (Attachment a : securityAttachments) {
+          elementIds.add(a.getIdentifier());
+        }
+      }
 
       // Finally, push the elements to the distribution channel
       List<String> targetTagList = asList(targetTags);
