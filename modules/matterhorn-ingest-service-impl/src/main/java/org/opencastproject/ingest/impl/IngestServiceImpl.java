@@ -79,6 +79,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Stack;
 import java.util.UUID;
 
@@ -313,7 +314,18 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       InputStream manifestStream = null;
       try {
         manifestStream = manifest.toURI().toURL().openStream();
-        mp = builder.loadFromXml(manifestStream);
+        // TODO: Uncomment the following line and remove the patch when the compatibility with pre-1.4 MediaPackages is discarded
+        //mp = builder.loadFromXml(manifestStream);
+        //////////////////////////////// BEGIN PATCH ////////////////////////////////////
+        StringBuffer manifestXml = new StringBuffer(new Scanner(manifestStream).useDelimiter("\\A").next());
+        if (manifestXml.indexOf("xmlns=") == -1) {
+          int pos = manifestXml.indexOf("<mediapackage");
+          if (pos > -1) {
+            manifestXml = manifestXml.insert(pos + 14, "xmlns=\"http://mediapackage.opencastproject.org\"  ");
+          }
+        }
+        mp = builder.loadFromXml(manifestXml.toString());
+        //////////////////////////////// END PATCH ///////////////////////////////////////
       } finally {
         IOUtils.closeQuietly(manifestStream);
       }
