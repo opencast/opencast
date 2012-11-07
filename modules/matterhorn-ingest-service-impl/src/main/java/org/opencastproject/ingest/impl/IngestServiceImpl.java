@@ -66,9 +66,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
@@ -79,11 +82,15 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Stack;
 import java.util.UUID;
 
 import javax.management.ObjectInstance;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 /**
  * Creates and augments Matterhorn MediaPackages. Stores media into the Working File Repository.
@@ -213,7 +220,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream)
    */
   public WorkflowInstance addZippedMediaPackage(InputStream zipStream) throws IngestException, IOException,
-          MediaPackageException {
+  MediaPackageException {
     try {
       return addZippedMediaPackage(zipStream, null, null);
     } catch (NotFoundException e) {
@@ -227,7 +234,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream, java.lang.String)
    */
   public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String wd) throws MediaPackageException,
-          IOException, IngestException, NotFoundException {
+  IOException, IngestException, NotFoundException {
     return addZippedMediaPackage(zipStream, wd, null);
   }
 
@@ -314,18 +321,35 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       InputStream manifestStream = null;
       try {
         manifestStream = manifest.toURI().toURL().openStream();
-        // TODO: Uncomment the following line and remove the patch when the compatibility with pre-1.4 MediaPackages is discarded
-        //mp = builder.loadFromXml(manifestStream);
-        //////////////////////////////// BEGIN PATCH ////////////////////////////////////
-        StringBuffer manifestXml = new StringBuffer(new Scanner(manifestStream).useDelimiter("\\A").next());
-        if (manifestXml.indexOf("xmlns=") == -1) {
-          int pos = manifestXml.indexOf("<mediapackage");
-          if (pos > -1) {
-            manifestXml = manifestXml.insert(pos + 14, "xmlns=\"http://mediapackage.opencastproject.org\"  ");
+        mp = builder.loadFromXml(manifestStream);
+        // TODO: Remove the following patch when the compatibility with pre-1.4 MediaPackages is discarded
+        // =========================================================================================
+        // =================================== PATCH BEGIN =========================================
+        // =========================================================================================
+        ByteArrayOutputStream baos = null;
+        ByteArrayInputStream bais = null;
+        String nameSpace = "http://mediapackage.opencastproject.org";
+        
+        try {
+          Document domMP = MediaPackageParser.getAsXml(mp, new DefaultMediaPackageSerializerImpl(manifest.getParentFile()));
+          if (!nameSpace.equals(domMP.getDocumentElement().getAttribute("xmlns"))) {
+            domMP.getDocumentElement().setAttribute("xmlns", nameSpace);
+            baos = new ByteArrayOutputStream();
+            TransformerFactory.newInstance().newTransformer().transform(new DOMSource(domMP), new StreamResult(baos));
+            bais = new ByteArrayInputStream(baos.toByteArray());
+            mp = builder.loadFromXml(bais);
           }
+        } catch (TransformerException e) {
+          throw new MediaPackageException("Error serializing a MediaPackage", e);
+        } catch (TransformerFactoryConfigurationError e) {
+          throw new MediaPackageException("Error serializing a MediaPackage", e);
+        } finally {
+          IOUtils.closeQuietly(bais);
+          IOUtils.closeQuietly(baos);
         }
-        mp = builder.loadFromXml(manifestXml.toString());
-        //////////////////////////////// END PATCH ///////////////////////////////////////
+        // =========================================================================================        
+        // =================================== PATCH END ===========================================
+        // =========================================================================================        
       } finally {
         IOUtils.closeQuietly(manifestStream);
       }
@@ -390,7 +414,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#createMediaPackage()
    */
   public MediaPackage createMediaPackage() throws MediaPackageException,
-          org.opencastproject.util.ConfigurationException, HandleException {
+  org.opencastproject.util.ConfigurationException, HandleException {
     MediaPackage mediaPackage;
     try {
       mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
@@ -683,7 +707,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   @Override
   public WorkflowInstance ingest(MediaPackage mp, String wd, Map<String, String> properties) throws IngestException,
-          NotFoundException {
+  NotFoundException {
     try {
       return ingest(mp, wd, properties, null);
     } catch (UnauthorizedException e) {
