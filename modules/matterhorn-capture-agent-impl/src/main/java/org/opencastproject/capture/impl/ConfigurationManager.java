@@ -34,10 +34,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 import java.util.Timer;
@@ -72,8 +74,8 @@ public class ConfigurationManager implements ManagedService {
    * Used to store the listeners that need to be updated when a change is made to the properties of this
    * ConfigurationManager.
    **/
-  private LinkedList<ConfigurationManagerListener> listeners = new LinkedList<ConfigurationManagerListener>();
-
+  private List<ConfigurationManagerListener> listeners  = Collections.synchronizedList(new LinkedList<ConfigurationManagerListener>());
+  
   /** If this ConfigurationManager has had its properties updated this will be initialised. **/
   public boolean isInitialized() {
     return initialized;

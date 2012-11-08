@@ -29,6 +29,7 @@ import org.opencastproject.capture.impl.jobs.AgentConfigurationJob;
 import org.opencastproject.capture.impl.jobs.AgentStateJob;
 import org.opencastproject.capture.impl.jobs.JobParameters;
 import org.opencastproject.capture.impl.jobs.LoadRecordingsJob;
+import org.opencastproject.capture.impl.monitoring.ConfidenceMonitorImpl;
 import org.opencastproject.capture.pipeline.GStreamerPipeline;
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -106,10 +107,10 @@ import javax.activation.MimetypesFileTypeMap;
  * Implementation of the Capture Agent: using gstreamer, generates several Pipelines to store several tracks from a
  * certain recording.
  */
-public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedService,
-        ConfigurationManagerListener, CaptureFailureHandler {
-  // The amount of time to wait until shutting down the pipeline manually. 
-  //private static final long DEFAULT_PIPELINE_SHUTDOWN_TIMEOUT = 60000L;
+public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedService, ConfigurationManagerListener,
+        CaptureFailureHandler {
+  // The amount of time to wait until shutting down the pipeline manually.
+  // private static final long DEFAULT_PIPELINE_SHUTDOWN_TIMEOUT = 60000L;
 
   private static final Logger logger = LoggerFactory.getLogger(CaptureAgentImpl.class);
 
@@ -118,7 +119,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
 
   /** The amount of time between the recording load task running, measured in seconds **/
   private static final int RECORDING_LOAD_TASK_DELAY = 60;
-  
+
   /** Keeps the recordings which have not been successfully ingested yet. **/
   private Map<String, AgentRecording> pendingRecordings = new ConcurrentHashMap<String, AgentRecording>();
 
@@ -145,7 +146,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
 
   /** The http client used to communicate with the core */
   private TrustedHttpClient client = null;
-  
+
   /** The capture framework to use to capture from the various devices. **/
   private CaptureFramework captureFramework = null;
 
@@ -194,7 +195,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
     this.captureFramework = captureFramework;
     logger.debug("Setting Capture Framework to " + captureFramework.toString());
   }
-  
+
   /**
    * Returns the configuration service form which this capture agent should draw its configuration data.
    * 
@@ -298,6 +299,12 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
   @Override
   public String startCapture(MediaPackage mediaPackage, Properties properties) {
     logger.debug("startCapture(mediaPackage, properties): {} {}", mediaPackage, properties);
+    // Stop the confidence monitoring if its pipeline is playing.
+    if (confidence) {
+      logger.info("Confidence monitoring disabled for capturing.");
+      ConfidenceMonitorImpl.getInstance().stopMonitoring();
+    }
+    
     // Check to make sure we're not already capturing something
     if (currentRecID != null || !agentState.equals(AgentState.IDLE)) {
       logger.warn("Unable to start capture, a different capture is still in progress in {}.",
@@ -312,6 +319,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
     } else {
       setAgentState(AgentState.CAPTURING);
     }
+
     // Generate a combined properties object for this capture
     Properties capProperties = configService.merge(properties, false);
 
@@ -326,8 +334,8 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
       return null;
     }
 
-    String recordingID = newRec.getID(); 
-    
+    String recordingID = newRec.getID();
+
     try {
       captureFramework.start(newRec, this);
     } catch (UnableToStartCaptureException exception) {
@@ -491,6 +499,8 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
 
     logger.info("Recording \"{}\" succesfully stopped", theRec.getID());
 
+    startConfidenceMonitoring();
+
     if (immediateIngest) {
       if (scheduler.scheduleSerializationAndIngest(theRec.getID())) {
         logger.info("Ingest scheduled for recording {}.", theRec.getID());
@@ -566,7 +576,9 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
 
         String outputProperty = CaptureParameters.CAPTURE_DEVICE_PREFIX + name + CaptureParameters.CAPTURE_DEVICE_DEST;
         if (null == recording.getProperty(outputProperty)) {
-          logger.error(CaptureParameters.CAPTURE_DEVICE_PREFIX + name + CaptureParameters.CAPTURE_DEVICE_DEST
+          logger.error(CaptureParameters.CAPTURE_DEVICE_PREFIX
+                  + name
+                  + CaptureParameters.CAPTURE_DEVICE_DEST
                   + "does not exist in the recording's properties.  Your CA's configuration file, or the configuration "
                   + "received from the core is missing information.  This should be checked ASAP.");
           // FIXME: Is the admin reading the agent logs? (jt)
@@ -870,25 +882,6 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
    * @see org.opencastproject.capture.admin.api.AgentState
    */
   protected void setAgentState(String state) {
-    // ConfidenceMonitorImp shoud be an singelton service and allways active
-//    if (confidence && ConfidenceMonitorImpl.getInstance() != null) {
-//      if (state.equalsIgnoreCase(AgentState.CAPTURING)) {
-//        ConfidenceMonitorImpl.getInstance().stopMonitoring();
-//        logger.info("Confidence monitoring has been shut down.");
-//        // Gst.deinit();
-//      } else if (state.equalsIgnoreCase(AgentState.IDLE)) {
-//        
-//        try {
-//          if (ConfidenceMonitorImpl.getInstance().startMonitoring()) {
-//            logger.info("Confidence monitoring started.");
-//          }
-//          // TODO: What if the pipeline crashes out? We just run without it?
-//        } catch (Exception e) {
-//          logger.warn("Confidence monitoring not started: {}", e);
-//        }
-//      }
-//    }
-
     agentState = state;
   }
 
@@ -1195,10 +1188,6 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
   public void activate(ComponentContext ctx) {
     logger.info("Starting CaptureAgentImpl.");
     confidence = Boolean.valueOf(configService.getItem(CaptureParameters.CAPTURE_CONFIDENCE_ENABLE));
-//    if (confidence)
-//      logger.info("Confidence monitoring enabled.");
-//    else
-//      logger.info("Confidence monitoring disabled.");
 
     if (ctx != null) {
       // Setup the shell commands
@@ -1223,6 +1212,21 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
       logger.warn("Config service was null, unable to set local server url!");
     } else if (ctx == null) {
       logger.warn("Context was null, unable to set local server url!");
+    }
+  }
+
+  private void startConfidenceMonitoring() {
+    if (confidence) {
+      logger.info("Confidence monitoring enabled.");
+      
+      boolean confidenceStarted = ConfidenceMonitorImpl.getInstance().startMonitoring(); 
+      if (confidenceStarted) {
+        logger.info("Confidence Monitoring is starting");
+      } else {
+        logger.warn("Confidence Monitoring failed to start. ");
+      }
+    } else {
+      logger.info("Confidence monitoring disabled.");
     }
   }
 
@@ -1470,7 +1474,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService,  ManagedSer
       logger.error("SchedulerException in StateServiceImpl while trying to schedule capability push jobs: {}.", e);
     }
   }
-  
+
   /**
    * Determines if the current agent state is idle.
    * 
