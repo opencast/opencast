@@ -133,7 +133,7 @@
       id="tag"
       description="Tagging source material for archival">
       <configurations>
-        <configuration key="source-flavors">*/source</configuration>
+        <configuration key="source-flavors">*/source,dublincore/*</configuration>
         <configuration key="target-tags">+archive</configuration>
       </configurations>
     </operation>
