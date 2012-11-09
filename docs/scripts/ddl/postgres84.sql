@@ -77,7 +77,7 @@ CREATE INDEX "IX_host_registration_UNQ_host_registration_0" on "host_registratio
 --
 CREATE TABLE "job" (
   "id" bigint NOT NULL,
-  "status" bigint DEFAULT NULL,
+  "status" integer DEFAULT NULL,
   "payload" text,
   "date_started" timestamp DEFAULT NULL,
   "run_time" bigint DEFAULT NULL,
@@ -119,6 +119,15 @@ CREATE TABLE "job_context" (
   "key_entry" character varying(255) NOT NULL,
   "value" text,
   CONSTRAINT "UNQ_job_context_0" UNIQUE ("root_job", "key_entry")
+);
+
+--
+-- Table: job_service_registration
+--
+CREATE TABLE "job_service_registration" (
+	"Job_id" bigint NOT NULL,
+	"servicesRegistration_id" bigint NOT NULL,
+	PRIMARY KEY ("Job_id", "servicesRegistration_id")
 );
 
 --
@@ -184,7 +193,7 @@ CREATE TABLE "service_registration" (
   "service_type" character varying(255) NOT NULL,
   "online" boolean NOT NULL,
   "online_from" timestamp,
-  "service_state" character varying(32) NOT NULL,
+  "service_state" integer NOT NULL,
   "state_changed" timestamp,
   "warning_state_trigger" bigint,
   "error_state_trigger" bigint,
@@ -246,11 +255,9 @@ CREATE TABLE "episode_asset" (
 CREATE TABLE "episode_episode" (
   "mediapackage_id" character varying(255) NOT NULL,
   "version" bigint NOT NULL,
-  "latest_version" boolean NOT NULL,
   "organization_id" character varying(255) DEFAULT NULL,
   "deletion_date" timestamp DEFAULT NULL,
   "access_control" text,
-  "locked" boolean NOT NULL,
   "mediapackage" text,
   "modification_date" timestamp DEFAULT NULL,
   PRIMARY KEY ("mediapackage_id", "version")
