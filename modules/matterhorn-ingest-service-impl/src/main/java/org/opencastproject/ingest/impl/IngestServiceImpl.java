@@ -44,7 +44,6 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.ZipUtil;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -74,10 +73,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
@@ -153,9 +150,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectoryService = null;
 
-  /** The local temp directory to use for unzipping mediapackages */
-  private String tempFolder;
-
   /** The default workflow identifier, if one is configured */
   protected String defaultWorkflowDefinionId;
 
@@ -174,16 +168,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   protected void activate(ComponentContext cc) {
     logger.info("Ingest Service started.");
-    tempFolder = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
     defaultWorkflowDefinionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(WORKFLOW_DEFINITION_DEFAULT));
     if (defaultWorkflowDefinionId == null) {
       logger.info("No default workflow definition specified. Ingest operations without a specified workflow "
               + "definition will fail");
     }
-    if (tempFolder == null)
-      throw new IllegalStateException("Storage directory must be set (org.opencastproject.storage.dir)");
-    tempFolder = PathSupport.concat(tempFolder, "ingest");
-
     registerMXBean = JmxUtil.registerMXBean(ingestStatistics, "IngestStatistics");
   }
 
@@ -220,7 +209,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream)
    */
   public WorkflowInstance addZippedMediaPackage(InputStream zipStream) throws IngestException, IOException,
-  MediaPackageException {
+          MediaPackageException {
     try {
       return addZippedMediaPackage(zipStream, null, null);
     } catch (NotFoundException e) {
@@ -234,7 +223,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream, java.lang.String)
    */
   public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String wd) throws MediaPackageException,
-  IOException, IngestException, NotFoundException {
+          IOException, IngestException, NotFoundException {
     return addZippedMediaPackage(zipStream, wd, null);
   }
 
@@ -265,8 +254,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     // Start a job synchronously. We can't keep the open input stream waiting around.
     Job job = null;
 
-    String tempPath = PathSupport.concat(tempFolder, UUID.randomUUID().toString());
-
     // Keep track of the zip file we use to store the zip stream
     File zipFile = null;
 
@@ -280,27 +267,19 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
       // locally unpack the mediaPackage
       // save inputStream to file
-      File tempDir = createDirectory(tempPath);
-      zipFile = new File(tempPath, job.getId() + ".zip");
-      OutputStream out = new FileOutputStream(zipFile);
+      URI uri = workspace.putInCollection("ingest-temp" + job.getId(), job.getId() + ".zip", zipStream);
+      zipFile = workspace.get(uri);
       logger.info("Ingesting zipped media package to {}", zipFile);
 
-      try {
-        IOUtils.copyLarge(zipStream, out);
-      } finally {
-        out.close();
-        zipStream.close();
-      }
-
       // unpack, cleanup will happen in the finally block
-      ZipUtil.unzip(zipFile, tempDir);
+      ZipUtil.unzip(zipFile, zipFile.getParentFile());
 
       // check media package and write data to file repo
-      File manifest = getManifest(tempDir);
+      File manifest = getManifest(zipFile.getParentFile());
       if (manifest == null) {
         // try to find the manifest in a subdirectory, since the zip may
         // have been constructed this way
-        File[] subDirs = tempDir.listFiles(new FileFilter() {
+        File[] subDirs = zipFile.getParentFile().listFiles(new FileFilter() {
           public boolean accept(File pathname) {
             return pathname.isDirectory();
           }
@@ -329,9 +308,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         ByteArrayOutputStream baos = null;
         ByteArrayInputStream bais = null;
         String nameSpace = "http://mediapackage.opencastproject.org";
-        
+
         try {
-          Document domMP = MediaPackageParser.getAsXml(mp, new DefaultMediaPackageSerializerImpl(manifest.getParentFile()));
+          Document domMP = MediaPackageParser.getAsXml(mp,
+                  new DefaultMediaPackageSerializerImpl(manifest.getParentFile()));
           if (!nameSpace.equals(domMP.getDocumentElement().getAttribute("xmlns"))) {
             domMP.getDocumentElement().setAttribute("xmlns", nameSpace);
             baos = new ByteArrayOutputStream();
@@ -347,9 +327,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           IOUtils.closeQuietly(bais);
           IOUtils.closeQuietly(baos);
         }
-        // =========================================================================================        
+        // =========================================================================================
         // =================================== PATCH END ===========================================
-        // =========================================================================================        
+        // =========================================================================================
       } finally {
         IOUtils.closeQuietly(manifestStream);
       }
@@ -398,8 +378,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Job.Status.FAILED);
       throw e;
     } finally {
-      FileUtils.deleteQuietly(zipFile);
-      FileUtils.deleteQuietly(new File(tempPath));
+      workspace.deleteFromCollection("ingest-temp" + job.getId(), job.getId() + ".zip");
+      FileUtils.deleteQuietly(zipFile.getParentFile());
       try {
         serviceRegistry.updateJob(job);
       } catch (Exception e) {
@@ -414,7 +394,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#createMediaPackage()
    */
   public MediaPackage createMediaPackage() throws MediaPackageException,
-  org.opencastproject.util.ConfigurationException, HandleException {
+          org.opencastproject.util.ConfigurationException, HandleException {
     MediaPackage mediaPackage;
     try {
       mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
@@ -707,7 +687,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   @Override
   public WorkflowInstance ingest(MediaPackage mp, String wd, Map<String, String> properties) throws IngestException,
-  NotFoundException {
+          NotFoundException {
     try {
       return ingest(mp, wd, properties, null);
     } catch (UnauthorizedException e) {
@@ -943,13 +923,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       FileUtils.forceMkdir(f);
     }
     return f;
-  }
-
-  // ---------------------------------------------
-  // --------- config ---------
-  // ---------------------------------------------
-  public void setTempFolder(String tempFolder) {
-    this.tempFolder = tempFolder;
   }
 
   // ---------------------------------------------

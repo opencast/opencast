@@ -35,6 +35,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -45,6 +46,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -78,6 +80,12 @@ public class IngestServiceImplTest {
     urlCatalog2 = IngestServiceImplTest.class.getResource("/series-dublincore.xml").toURI();
     urlAttachment = IngestServiceImplTest.class.getResource("/cover.png").toURI();
     urlPackage = IngestServiceImplTest.class.getResource("/data.zip").toURI();
+
+    File ingestTempDir = new File(new File(urlPackage).getParentFile(), "ingest-temp");
+    FileUtils.forceMkdir(ingestTempDir);
+    File tempFile = new File(ingestTempDir, "data.zip");
+    FileUtils.copyURLToFile(urlPackage.toURL(), tempFile);
+
     // set up service and mock workspace
     workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(
@@ -120,6 +128,7 @@ public class IngestServiceImplTest {
     EasyMock.expect(
             workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlCatalog);
+    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(tempFile);
 
     workflowInstance = EasyMock.createNiceMock(WorkflowInstance.class);
     EasyMock.expect(workflowInstance.getId()).andReturn(workflowInstanceID);
@@ -177,10 +186,10 @@ public class IngestServiceImplTest {
 
     service = new IngestServiceImpl();
     service.setHttpClient(httpClient);
-    service.setTempFolder("target/temp/");
     service.setWorkspace(workspace);
     service.setWorkflowService(workflowService);
-    ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService, organizationDirectoryService);
+    ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,
+            userDirectoryService, organizationDirectoryService);
     serviceRegistry.registerService(service);
     service.setServiceRegistry(serviceRegistry);
     service.defaultWorkflowDefinionId = "sample";
