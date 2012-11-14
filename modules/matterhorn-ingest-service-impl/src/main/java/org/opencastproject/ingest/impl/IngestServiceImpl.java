@@ -65,12 +65,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -83,11 +80,6 @@ import java.util.Stack;
 import java.util.UUID;
 
 import javax.management.ObjectInstance;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 /**
  * Creates and augments Matterhorn MediaPackages. Stores media into the Working File Repository.
@@ -301,35 +293,39 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       try {
         manifestStream = manifest.toURI().toURL().openStream();
         mp = builder.loadFromXml(manifestStream);
-        // TODO: Remove the following patch when the compatibility with pre-1.4 MediaPackages is discarded
-        // =========================================================================================
-        // =================================== PATCH BEGIN =========================================
-        // =========================================================================================
-        ByteArrayOutputStream baos = null;
-        ByteArrayInputStream bais = null;
-        String nameSpace = "http://mediapackage.opencastproject.org";
-
-        try {
-          Document domMP = MediaPackageParser.getAsXml(mp,
-                  new DefaultMediaPackageSerializerImpl(manifest.getParentFile()));
-          if (!nameSpace.equals(domMP.getDocumentElement().getAttribute("xmlns"))) {
-            domMP.getDocumentElement().setAttribute("xmlns", nameSpace);
-            baos = new ByteArrayOutputStream();
-            TransformerFactory.newInstance().newTransformer().transform(new DOMSource(domMP), new StreamResult(baos));
-            bais = new ByteArrayInputStream(baos.toByteArray());
-            mp = builder.loadFromXml(bais);
-          }
-        } catch (TransformerException e) {
-          throw new MediaPackageException("Error serializing a MediaPackage", e);
-        } catch (TransformerFactoryConfigurationError e) {
-          throw new MediaPackageException("Error serializing a MediaPackage", e);
-        } finally {
-          IOUtils.closeQuietly(bais);
-          IOUtils.closeQuietly(baos);
-        }
-        // =========================================================================================
-        // =================================== PATCH END ===========================================
-        // =========================================================================================
+        // ===========================================================
+        // Disabled this patch because integration test are broken
+        // ===========================================================
+        //
+        // // TODO: Remove the following patch when the compatibility with pre-1.4 MediaPackages is discarded
+        // // =========================================================================================
+        // // =================================== PATCH BEGIN =========================================
+        // // =========================================================================================
+        // ByteArrayOutputStream baos = null;
+        // ByteArrayInputStream bais = null;
+        // String nameSpace = "http://mediapackage.opencastproject.org";
+        //
+        // try {
+        // Document domMP = MediaPackageParser.getAsXml(mp,
+        // new DefaultMediaPackageSerializerImpl(manifest.getParentFile()));
+        // if (!nameSpace.equals(domMP.getDocumentElement().getAttribute("xmlns"))) {
+        // domMP.getDocumentElement().setAttribute("xmlns", nameSpace);
+        // baos = new ByteArrayOutputStream();
+        // TransformerFactory.newInstance().newTransformer().transform(new DOMSource(domMP), new StreamResult(baos));
+        // bais = new ByteArrayInputStream(baos.toByteArray());
+        // mp = builder.loadFromXml(bais);
+        // }
+        // } catch (TransformerException e) {
+        // throw new MediaPackageException("Error serializing a MediaPackage", e);
+        // } catch (TransformerFactoryConfigurationError e) {
+        // throw new MediaPackageException("Error serializing a MediaPackage", e);
+        // } finally {
+        // IOUtils.closeQuietly(bais);
+        // IOUtils.closeQuietly(baos);
+        // }
+        // // =========================================================================================
+        // // =================================== PATCH END ===========================================
+        // // =========================================================================================
       } finally {
         IOUtils.closeQuietly(manifestStream);
       }
