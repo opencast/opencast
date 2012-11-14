@@ -336,6 +336,9 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     scheduleOperation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_STOP, Long.toString(endDate.getTime()));
     scheduleOperation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_LOCATION,
             event.getFirst(DublinCore.PROPERTY_SPATIAL));
+    // Set the location in the workflow as well, so that it shows up in the UI properly.
+    workflow.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_LOCATION,
+            event.getFirst(DublinCore.PROPERTY_SPATIAL));
 
     // update the workflow
     workflowService.update(workflow);
