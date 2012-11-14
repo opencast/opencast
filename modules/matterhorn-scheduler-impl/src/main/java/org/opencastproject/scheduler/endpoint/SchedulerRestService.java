@@ -878,7 +878,7 @@ public class SchedulerRestService {
    * @return an iCalendar
    */
   @GET
-  @Produces(MediaType.TEXT_PLAIN)
+  @Produces("text/calendar") // NOTE: charset not supported by current jaxrs impl (is ignored), set explicitly in response
   @Path("calendars")
   @RestQuery(name = "getcalendar", description = "Returns iCalendar for specified set of events", returnDescription = "ICalendar for events", restParameters = {
           @RestParameter(name = "agentid", description = "Filter events by capture agent", isRequired = false, type = Type.STRING),
@@ -911,7 +911,9 @@ public class SchedulerRestService {
       }
       String result = service.getCalendar(filter);
       if (!result.isEmpty()) {
-        return Response.ok(result).header(HttpHeaders.ETAG, "mod" + Long.toString(lastModified.getTime())).build();
+        return Response.ok(result).header(
+                HttpHeaders.ETAG, "mod" + Long.toString(lastModified.getTime())).header(
+                HttpHeaders.CONTENT_TYPE, "text/calendar; charset=UTF-8").build();
       } else {
         throw new NotFoundException();
       }
