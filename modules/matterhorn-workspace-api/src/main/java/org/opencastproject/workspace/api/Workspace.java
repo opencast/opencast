@@ -15,6 +15,7 @@
  */
 package org.opencastproject.workspace.api;
 
+import org.opencastproject.storage.StorageUsage;
 import org.opencastproject.util.NotFoundException;
 
 import java.io.File;
@@ -29,7 +30,7 @@ import java.net.URI;
  * Additionally, when the system is configured to use shared storage, this performance gain is also achieved across
  * distributed osgi containers. The methods from WorkingFileRepository are also available as a convenience to clients.
  */
-public interface Workspace {
+public interface Workspace extends StorageUsage {
 
   /**
    * Gets a locally cached {@link File} for the given URI.
@@ -223,19 +224,5 @@ public interface Workspace {
    */
   URI copyTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
           throws NotFoundException, IOException, IllegalArgumentException;
-
-  /**
-   * Gets the total space of storage in Bytes
-   * 
-   * @return Number of all bytes in storage
-   */
-  long getTotalSpace();
-
-  /**
-   * Gets the available space of storage in Bytes This is free storage that is not reserved
-   * 
-   * @return Number of available bytes in storage
-   */
-  long getUsableSpace();
 
 }

@@ -18,6 +18,7 @@ package org.opencastproject.workingfilerepository.remote;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import org.apache.http.HttpResponse;
@@ -244,8 +245,8 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getTotalSpace()
    */
   @Override
-  public long getTotalSpace() {
-    return (Long) (getStorageReport().get("size"));
+  public Option<Long> getTotalSpace() {
+    return Option.some((Long) (getStorageReport().get("size")));
   }
 
   /**
@@ -313,8 +314,8 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getUsableSpace()
    */
   @Override
-  public long getUsableSpace() {
-    return (Long) (getStorageReport().get("usable"));
+  public Option<Long> getUsableSpace() {
+    return Option.some((Long) (getStorageReport().get("usable")));
   }
 
   /**
@@ -323,8 +324,8 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getUsedSpace()
    */
   @Override
-  public long getUsedSpace() {
-    return (Long) (getStorageReport().get("used"));
+  public Option<Long> getUsedSpace() {
+    return Option.some((Long) (getStorageReport().get("used")));
   }
 
   /**

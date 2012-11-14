@@ -43,8 +43,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedNativeQueries;
-import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -111,10 +109,12 @@ import javax.xml.bind.annotation.XmlType;
         @NamedQuery(name = "Job.count.history.failed", query = "SELECT COUNT(j) FROM Job j "
                 + "WHERE j.status = org.opencastproject.job.api.Job$Status.FAILED AND j.processorServiceRegistration IS NOT NULL "
                 + "AND j.processorServiceRegistration.serviceType = :serviceType AND j.processorServiceRegistration.hostRegistration.baseUrl = :host "
-                + "AND j.dateCompleted >= j.processorServiceRegistration.stateChanged") })
-@NamedNativeQueries({ @NamedNativeQuery(name = "Job.countPerHostService", query = "SELECT h.host, s.service_type, j.status, COUNT(*) FROM job j, service_registration s, host_registration h "
-        + "WHERE CASE WHEN j.processor_service IS NOT NULL THEN j.processor_service ELSE j.creator_service END = s.id "
-        + "AND s.host_registration = h.id GROUP BY s.service_type, j.status, h.host") })
+                + "AND j.dateCompleted >= j.processorServiceRegistration.stateChanged"),
+        @NamedQuery(name = "Job.countPerHostService", query = "SELECT h.baseUrl, s.serviceType, j.status, count(j) "
+                + "FROM Job j, ServiceRegistration s, HostRegistration h "
+                + "WHERE ((j.processorServiceRegistration IS NOT NULL AND j.processorServiceRegistration = s) "
+                + "OR (j.creatorServiceRegistration IS NOT NULL AND j.creatorServiceRegistration = s)) "
+                + "AND s.hostRegistration = h GROUP BY h.baseUrl, s.serviceType, j.status") })
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(name = "job", namespace = "http://job.opencastproject.org")
 @XmlRootElement(name = "job", namespace = "http://job.opencastproject.org")

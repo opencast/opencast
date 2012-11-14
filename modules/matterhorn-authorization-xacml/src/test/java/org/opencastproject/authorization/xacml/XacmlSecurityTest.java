@@ -26,6 +26,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import de.schlichtherle.io.FileOutputStream;
@@ -310,15 +311,18 @@ public class XacmlSecurityTest {
     }
 
     @Override
-    public long getTotalSpace() {
-      // TODO Auto-generated method stub
-      return 0;
+    public Option<Long> getTotalSpace() {
+      return Option.<Long> none();
     }
 
     @Override
-    public long getUsableSpace() {
-      // TODO Auto-generated method stub
-      return 0;
+    public Option<Long> getUsableSpace() {
+      return Option.<Long> none();
+    }
+
+    @Override
+    public Option<Long> getUsedSpace() {
+      return Option.<Long> none();
     }
 
   }

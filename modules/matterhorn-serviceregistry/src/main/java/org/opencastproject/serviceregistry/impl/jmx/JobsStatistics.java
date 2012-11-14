@@ -15,7 +15,6 @@
  */
 package org.opencastproject.serviceregistry.impl.jmx;
 
-import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.util.jmx.JmxUtil;
@@ -49,7 +48,7 @@ public class JobsStatistics extends NotificationBroadcasterSupport implements Jo
   public void updateJobCount(List<Object[]> perHostServiceCount) {
     jobCounts.clear();
     for (Object[] result : perHostServiceCount) {
-      Status status = Job.Status.values()[(Integer) result[2]];
+      Status status = (Status) result[2];
       jobCounts.put(Tuple3.tuple3((String) result[0], (String) result[1], status), (Long) result[3]);
     }
     sendNotification(JmxUtil.createUpdateNotification(this, sequenceNumber++, "Job updated"));

@@ -15,6 +15,14 @@
  */
 package org.opencastproject.serviceregistry.impl;
 
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.apache.commons.lang.StringUtils;
+import org.easymock.EasyMock;
+import org.eclipse.persistence.jpa.PersistenceProvider;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobParser;
@@ -29,22 +37,23 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Monadics;
+import org.opencastproject.util.persistence.PersistenceEnv;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
-import org.apache.commons.lang.StringUtils;
-import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
+import javax.persistence.EntityManager;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.util.data.Collections.mkString;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.functions.Booleans.eq;
+import static org.opencastproject.util.persistence.PersistenceUtil.newPersistenceEnvironment;
 
 public class JobTest {
 
@@ -63,6 +72,7 @@ public class JobTest {
   private ServiceRegistrationJpaImpl regType2Localhost = null;
   @SuppressWarnings("unused")
   private ServiceRegistrationJpaImpl regType2Remotehost = null;
+  private PersistenceEnv penv;
 
   @Before
   public void setUp() throws Exception {
@@ -78,8 +88,9 @@ public class JobTest {
     props.put("eclipselink.ddl-generation", "create-tables");
     props.put("eclipselink.ddl-generation.output-mode", "database");
 
+    final PersistenceProvider pp = new PersistenceProvider();
     serviceRegistry = new ServiceRegistryJpaImpl();
-    serviceRegistry.setPersistenceProvider(new PersistenceProvider());
+    serviceRegistry.setPersistenceProvider(pp);
     serviceRegistry.setPersistenceProperties(props);
     serviceRegistry.activate(null);
 
@@ -106,6 +117,8 @@ public class JobTest {
     regType1Remotehost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_1, REMOTEHOST, PATH);
     regType2Localhost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_2, LOCALHOST, PATH);
     regType2Remotehost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_2, REMOTEHOST, PATH);
+
+    penv = newPersistenceEnvironment(pp.createEntityManagerFactory("org.opencastproject.serviceregistry", props));
   }
 
   @After
@@ -322,6 +335,45 @@ public class JobTest {
     Assert.assertEquals(LOCALHOST, type1Hosts.get(1).getHost());
     Assert.assertEquals(REMOTEHOST, type2Hosts.get(0).getHost());
     Assert.assertEquals(LOCALHOST, type2Hosts.get(1).getHost());
+  }
+
+  @Test
+  public void testCountPerHostService() throws Exception {
+    // create some test data
+    testGetHostsCount();
+    // Add an additional dispatchable job. This is important as it leaves the processing host field empty.
+    JobJpaImpl localRunning1 = (JobJpaImpl) serviceRegistry.createJob(JOB_TYPE_2, OPERATION_NAME, null, null, true);
+    localRunning1.setStatus(Status.RUNNING);
+    serviceRegistry.updateJob(localRunning1);
+    //
+    final Monadics.ListMonadic<String> jpql = resultToString(new Function.X<EntityManager, List<Object[]>>() {
+      @Override
+      public List<Object[]> xapply(EntityManager em) throws Exception {
+        return serviceRegistry.getCountPerHostService(em);
+      }
+    });
+    assertTrue(jpql.exists(eq("http://remotehost:8080,testing1,RUNNING,1")));
+    assertTrue(jpql.exists(eq("http://localhost:8080,testing2,RUNNING,2"))); // <-- 2 jobs, one of them is the dispatchable job
+    assertTrue(jpql.exists(eq("http://remotehost:8080,testing1,FINISHED,1")));
+    assertTrue(jpql.exists(eq("http://localhost:8080,testing2,FINISHED,1")));
+    assertTrue(jpql.exists(eq("http://localhost:8080,testing1,FINISHED,1")));
+    assertTrue(jpql.exists(eq("http://localhost:8080,testing1,RUNNING,2")));
+    assertEquals(6, jpql.value().size());
+  }
+
+  private Monadics.ListMonadic<String> resultToString(final Function<EntityManager, List<Object[]>> q) {
+    return penv.tx(new Function.X<EntityManager, Monadics.ListMonadic<String>>() {
+      @Override
+      protected Monadics.ListMonadic<String> xapply(EntityManager em) throws Exception {
+        // (host, service_type, status, count)
+        return mlist(q.apply(em)).map(new Function<Object[], String>() {
+          @Override
+          public String apply(Object[] a) {
+            return mkString(a, ",");
+          }
+        });
+      }
+    });
   }
 
   @Test
@@ -543,5 +595,4 @@ public class JobTest {
     Assert.assertNull("Job should have no associated processor", serviceRegistry.getJob(job.getId())
             .getProcessingHost());
   }
-
 }

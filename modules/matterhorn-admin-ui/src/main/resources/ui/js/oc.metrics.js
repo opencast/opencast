@@ -498,7 +498,7 @@ ocMetrics = new (function() {
 	        	attribute: 'Failed'
 	        }
         ]);
-  	    factory.createPercentageArea({
+  	    factory.create({
 	  			title: "Workspace Storage",
 	  			type: "GBytes",
 	  	  		typeShort: " GB",
@@ -511,11 +511,16 @@ ocMetrics = new (function() {
   	      	},
   	      	{
   	      		container: 'matterhorn',
+  	      		name: 'org.opencastproject.matterhorn:type=Workspace',
+  	      		attribute: 'FreeSpace'
+  	      	},
+  	      	{
+  	      		container: 'matterhorn',
   	      	    name: 'org.opencastproject.matterhorn:type=Workspace',
   	      	    attribute: 'UsedSpace'
   	      	}
   	    ]);
-  	    factory.createPercentageArea({
+  	    factory.create({
 	  			title: "Working File Repository Storage",
 	  			type: "GBytes",
 	  			typeShort: " GB",
@@ -526,12 +531,39 @@ ocMetrics = new (function() {
             	name: 'org.opencastproject.matterhorn:type=WorkingFileRepository',
             	attribute: 'TotalSpace'
             },
+  	      	{
+  	      		container: 'matterhorn',
+  	      		name: 'org.opencastproject.matterhorn:type=Workspace',
+  	      		attribute: 'FreeSpace'
+  	      	},
             {
             	container: 'matterhorn',
             	name: 'org.opencastproject.matterhorn:type=WorkingFileRepository',
             	attribute: 'UsedSpace'
             }
         ]);
+  	    factory.create({
+	  	    	title: "Archive Storage",
+	  	    	type: "GBytes",
+	  	    	typeShort: " GB",
+	  	    	dividing: 1073741824,
+	  	    	decimals: 4
+	  	    },[{
+	  	    	container: 'matterhorn',
+	  	    	name: 'org.opencastproject.matterhorn:type=ElementStore',
+	  	    	attribute: 'TotalSpace'
+	  	    },
+  	      	{
+  	      		container: 'matterhorn',
+  	      		name: 'org.opencastproject.matterhorn:type=Workspace',
+  	      		attribute: 'FreeSpace'
+  	      	},
+	  	    {
+	  	    	container: 'matterhorn',
+	  	    	name: 'org.opencastproject.matterhorn:type=ElementStore',
+	  	    	attribute: 'UsedSpace'
+	  	    }
+  	    ]);
   	    factory.createPlotLine({
 	  			title: "Ingests",
 	  			type: "Number of"

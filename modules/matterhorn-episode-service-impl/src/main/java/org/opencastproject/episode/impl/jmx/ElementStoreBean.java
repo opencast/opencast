@@ -13,25 +13,25 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workingfilerepository.jmx;
+package org.opencastproject.episode.impl.jmx;
 
+import org.opencastproject.episode.impl.elementstore.ElementStore;
 import org.opencastproject.util.data.Option.Match;
-import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
-public class WorkingFileRepositoryBean implements WorkingFileRepositoryMXBean {
+public class ElementStoreBean implements ElementStoreMXBean {
 
-  private final WorkingFileRepository workingFileRepository;
+  private final ElementStore elementStore;
 
-  public WorkingFileRepositoryBean(WorkingFileRepository workingFileRepository) {
-    this.workingFileRepository = workingFileRepository;
+  public ElementStoreBean(ElementStore elementStore) {
+    this.elementStore = elementStore;
   }
 
   /**
-   * @see org.opencastproject.workingfilerepository.jmx.WorkingFileRepositoryMXBean#getFreeSpace()
+   * @see org.opencastproject.episode.impl.jmx.ElementStoreMXBean#getFreeSpace()
    */
   @Override
   public long getFreeSpace() {
-    return workingFileRepository.getUsableSpace().fold(new Match<Long, Long>() {
+    return elementStore.getUsableSpace().fold(new Match<Long, Long>() {
       @Override
       public Long some(Long a) {
         return a;
@@ -45,11 +45,11 @@ public class WorkingFileRepositoryBean implements WorkingFileRepositoryMXBean {
   }
 
   /**
-   * @see org.opencastproject.workingfilerepository.jmx.WorkingFileRepositoryMXBean#getUsedSpace()
+   * @see org.opencastproject.episode.impl.jmx.ElementStoreMXBean#getUsedSpace()
    */
   @Override
   public long getUsedSpace() {
-    return workingFileRepository.getUsedSpace().fold(new Match<Long, Long>() {
+    return elementStore.getUsedSpace().fold(new Match<Long, Long>() {
       @Override
       public Long some(Long a) {
         return a;
@@ -63,11 +63,11 @@ public class WorkingFileRepositoryBean implements WorkingFileRepositoryMXBean {
   }
 
   /**
-   * @see org.opencastproject.workingfilerepository.jmx.WorkingFileRepositoryMXBean#getTotalSpace()
+   * @see org.opencastproject.episode.impl.jmx.ElementStoreMXBean#getTotalSpace()
    */
   @Override
   public long getTotalSpace() {
-    return workingFileRepository.getTotalSpace().fold(new Match<Long, Long>() {
+    return elementStore.getTotalSpace().fold(new Match<Long, Long>() {
       @Override
       public Long some(Long a) {
         return a;
