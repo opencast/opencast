@@ -24,6 +24,7 @@
 
     <!-- Enable anonymous access to the /info/me.json resource -->
     <sec:intercept-url pattern='/info/me.json' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern='/info/components.json' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
 
     <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
     <sec:intercept-url pattern='/engage/ui/**' access='ROLE_ANONYMOUS, ROLE_USER' />
