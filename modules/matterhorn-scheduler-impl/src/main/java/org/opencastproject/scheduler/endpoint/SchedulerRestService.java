@@ -395,7 +395,7 @@ public class SchedulerRestService {
   @Path("{id:[0-9]+}")
   @RestQuery(name = "updaterecordings", description = "Updates Dublin Core of specified event", returnDescription = "Status OK is returned if event was successfully updated, NOT FOUND if specified event does not exist or BAD REQUEST if data is missing or invalid", pathParameters = { @RestParameter(name = "id", description = "ID of event to be updated", isRequired = true, type = Type.STRING) }, restParameters = {
           @RestParameter(name = "dublincore", isRequired = false, description = "Updated Dublin Core for event", type = Type.TEXT),
-          @RestParameter(name = "agentproperties", isRequired = false, description = "Updated Capture Agent properties", type = Type.TEXT) }, reponses = {
+          @RestParameter(name = "agentparameters", isRequired = false, description = "Updated Capture Agent properties", type = Type.TEXT) }, reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
           @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
           @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Data is missing or invalid") })
