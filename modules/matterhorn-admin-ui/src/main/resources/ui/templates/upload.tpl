@@ -57,7 +57,7 @@
                 <label class="scheduler-label" for="series" id="seriesLabel"><span id="i18n_series_label">Course/Series</span>:</label>
 
                 <input type="text" class="oc-ui-form-field" id="series" name="series" maxlength="255">
-                <input type="hidden" class="oc-ui-form-field dc-metadata-field" id="ispartof" name="ispartof" value="">
+                <input type="hidden" class="oc-ui-form-field dc-metadata-field" id="isPartOf" name="isPartOf" value="">
               </li>
               <li>
                 <label class="scheduler-label" id="recordingDateLabel"><span class="scheduler-required-text">* </span><span id="i18n_date_label">Recording Date</span>:</label>

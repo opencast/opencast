@@ -362,7 +362,7 @@
             // populate series field if information present
             var seriesid =  $(data.documentElement).find("mp|mediapackage > series").text();
             if (seriesid != '') {
-              $('#ispartof').val(seriesid);
+              $('#isPartOf').val(seriesid);
               $('#series').val($(data.documentElement).find("mp|mediapackage > seriestitle").text());
               $('#info-series')[0].innerHTML = $(data.documentElement).find("mp|mediapackage > seriestitle").text();
             }
@@ -508,10 +508,10 @@
                   });
                 },
                 select: function(event, ui){
-                  $('#ispartof').val(ui.item.id);
+                  $('#isPartOf').val(ui.item.id);
                 },
                 change: function(event, ui){
-                  if($('#ispartof').val() === '' && $('#series').val() !== ''){
+                  if($('#isPartOf').val() === '' && $('#series').val() !== ''){
                     ocUtils.log("Searching for series in series endpoint");
                     $.ajax({
                       url : seriesServiceURL + '/series.json?seriesTitle=' + $('#series').val(),
@@ -526,25 +526,25 @@
                         if(series_list.length !== 0){
                           series_title = series_list[0][DUBLIN_CORE_NS_URI]["title"] ? series_list[0][DUBLIN_CORE_NS_URI]["title"][0].value : "";
                           series_id = series_list[0][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[0][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
-                          $('#ispartof').val(series_id);
+                          $('#isPartOf').val(series_id);
                         }
                       }
                     });
-                  } else if($('#ispartof').val() === '' && $('#series').val() === '') {
-                    $('#ispartof').val('');
+                  } else if($('#isPartOf').val() === '' && $('#series').val() === '') {
+                    $('#isPartOf').val('');
                   }
                 },
                 search: function(){
-                  $('#ispartof').val('');
+                  $('#isPartOf').val('');
                 }
               });
               //              $('#series').autocomplete({
               //                source: seriesServiceURL + '/search',
               //                select: function(event, ui){
-              //                  $('#ispartof').val(ui.item.id);
+              //                  $('#isPartOf').val(ui.item.id);
               //                },
               //                search: function(){
-              //                  $('#ispartof').val('');
+              //                  $('#isPartOf').val('');
               //                }
               //              });
               
@@ -751,7 +751,7 @@
           } else {
             // update/add series data to mediapackage
             var seriesDcXml = '';
-            if ($('#ispartof').val() == '') {
+            if ($('#isPartOf').val() == '') {
               // create series
               ocUtils.log('Creating Series ' + $('#series').val());
               seriesXml = '<series><additionalMetadata><metadata><key>title</key><value>' + $('#series').val() + '</value></metadata></additionalMetadata></series>';
@@ -762,19 +762,19 @@
                 data: { series: seriesXml },
                 dataType : 'json',
                 success: function(data){
-                  $('#ispartof').val(data.series.id);
+                  $('#isPartOf').val(data.series.id);
                 }
               });
             }
             // get seriesDcXml
-            ocUtils.log('Getting DC catalog for series ' + $('#ispartof').val());
+            ocUtils.log('Getting DC catalog for series ' + $('#isPartOf').val());
             $.ajax({
-              url : seriesServiceURL + '/' + $('#ispartof').val() + '.xml',
+              url : seriesServiceURL + '/' + $('#isPartOf').val() + '.xml',
               type : 'get',
               async : false,
               dataType : 'xml',
               error : function() {
-                ocUtils.log('Could not retrieve series DC catalog for series ' + $('#ispartof').val());
+                ocUtils.log('Could not retrieve series DC catalog for series ' + $('#isPartOf').val());
               },
               success : function(data) {
                 seriesDcXml = ocUtils.xmlToString(data);
@@ -810,7 +810,7 @@
             });
             // finally update series in mediapackage instance
             updateMPElement('seriestitle', $('#series').val());
-            updateMPElement('series', $('#ispartof').val());
+            updateMPElement('series', $('#isPartOf').val());
           }
         }
 
@@ -891,11 +891,11 @@
 
         // update series
         if ($('#series').val() != '') {
-          if ($('#ispartof').val() == '') {
+          if ($('#isPartOf').val() == '') {
             createSeriesFromText();
           }
           updateMPElement('seriestitle', $('#series').val());
-          updateMPElement('series', $('#ispartof').val());  
+          updateMPElement('series', $('#isPartOf').val());  
         }
       }
       
@@ -913,7 +913,7 @@
           },
           success: function(data) {
             id = data.getElementsByTagName('dcterms:identifier')[0].textContent;
-            $('#ispartof').val(id);
+            $('#isPartOf').val(id);
           }
         });
       }
@@ -1056,7 +1056,7 @@
 	              <li id="seriesContainer">
 	                <label class="scheduler-label" for="series" id="seriesLabel"><span id="i18n_series_label">Course/Series</span>:</label>
 	                <input type="text" class="oc-ui-form-field" id="series" name="series" maxlength="255">
-	                <input type="hidden" class="oc-ui-form-field" id="ispartof" name="ispartof">
+	                <input type="hidden" class="oc-ui-form-field" id="isPartOf" name="isPartOf">
 	              </li>
 	
 	

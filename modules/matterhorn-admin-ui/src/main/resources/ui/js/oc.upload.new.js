@@ -111,10 +111,10 @@ var ocUpload = (function() {
         });
       },
       select: function(event, ui){
-        $('#ispartof').val(ui.item.id);
+        $('#isPartOf').val(ui.item.id);
       },
       change: function(event, ui){
-        if($('#ispartof').val() === '' && $('#series').val() !== ''){
+        if($('#isPartOf').val() === '' && $('#series').val() !== ''){
           ocUtils.log("Searching for series in series endpoint");
           $.ajax({
             url : ocUpload.SERIES_SEARCH_URL,
@@ -126,13 +126,13 @@ var ocUpload = (function() {
               series_list = data["catalogs"],
               series_title,
               series_id;
-              $('#ispartof').val('');
+              $('#isPartOf').val('');
               for (i in series_list) {
                 var series_title, series_id;
                 series_title = series_list[i][DUBLIN_CORE_NS_URI]["title"] ? series_list[i][DUBLIN_CORE_NS_URI]["title"][0].value : "";
                 series_id = series_list[i][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[i][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
                 if (series_title === series_input){
-                  $('#ispartof').val(series_id);
+                  $('#isPartOf').val(series_id);
                   break;
                 }
               }
@@ -141,7 +141,7 @@ var ocUpload = (function() {
         }
       },
       search: function(){
-        $('#ispartof').val('');
+        $('#isPartOf').val('');
       }
     });
   }
@@ -474,9 +474,9 @@ ocUpload.Ingest = (function() {
 
     // enqueue Series Dublin Core
     var series = $('#series').val();
-    //var seriesId = $('#ispartof').val();
+    //var seriesId = $('#isPartOf').val();
     if (series !== '') {
-      var seriesId = $('#ispartof').val();
+      var seriesId = $('#isPartOf').val();
       if (seriesId === '') {
         seriesId = createSeries(series);
       }
