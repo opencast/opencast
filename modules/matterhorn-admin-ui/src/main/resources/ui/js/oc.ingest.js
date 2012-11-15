@@ -114,7 +114,7 @@ ocIngest.addCatalog = function(mediaPackage, dcCatalog, flavor) {
     success    : function(data, status) {
       ocUtils.log("DublinCore catalog added");
       ocIngest.mediaPackage = data;
-      var seriesId = $('#ispartof').val();
+      var seriesId = $('#isPartOf').val();
       if (seriesId && ocIngest.seriesDC == null) {
         ocIngest.addSeriesCatalog(seriesId);
       } else {

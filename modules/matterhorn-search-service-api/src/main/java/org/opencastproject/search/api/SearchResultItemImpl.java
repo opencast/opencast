@@ -117,7 +117,7 @@ public class SearchResultItemImpl implements SearchResultItem {
   @XmlElement
   private String dcTemporal = null;
 
-  /** Dublin core field 'dc:ispartof' */
+  /** Dublin core field 'dc:isPartOf' */
   @XmlElement
   private String dcIsPartOf = null;
 

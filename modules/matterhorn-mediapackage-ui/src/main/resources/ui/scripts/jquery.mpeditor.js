@@ -83,7 +83,7 @@
 		    // enqueue Series Dublin Core
 		    var series = self.find('#series').val();
 		    if (series !== '') {
-		      var seriesId = self.find('#ispartof').val();
+		      var seriesId = self.find('#isPartOf').val();
 		      if (seriesId === '') {
 		        seriesId = self.createSeries(series);
 		      }
@@ -531,10 +531,10 @@
 		        });
 		      },
 		      select: function(event, ui){
-		        self.find('#ispartof').val(ui.item.id);
+		        self.find('#isPartOf').val(ui.item.id);
 		      },
 		      search: function(){
-		        self.find('#ispartof').val('');
+		        self.find('#isPartOf').val('');
 		      }
 		    });
 		}
