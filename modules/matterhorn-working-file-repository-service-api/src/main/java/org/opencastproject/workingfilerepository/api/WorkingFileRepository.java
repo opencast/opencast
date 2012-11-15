@@ -15,6 +15,7 @@
  */
 package org.opencastproject.workingfilerepository.api;
 
+import org.opencastproject.storage.StorageUsage;
 import org.opencastproject.util.NotFoundException;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ import java.net.URI;
  * The Working File Repository is a file storage service that supports the lecture capture system. It may be used by
  * other clients, but is neither intended nor required to be used by other systems.
  */
-public interface WorkingFileRepository {
+public interface WorkingFileRepository extends StorageUsage {
 
   /** The character encoding used for URLs */
   String CHAR_ENCODING = "UTF-8";
@@ -233,27 +234,6 @@ public interface WorkingFileRepository {
    */
   URI copyTo(String fromCollection, String fromFileName, String toMediaPackage, String toMediaPackageElement,
           String toFileName) throws NotFoundException, IOException;
-
-  /**
-   * Gets the total space of storage in Bytes
-   * 
-   * @return Number of all bytes in storage
-   */
-  long getTotalSpace();
-
-  /**
-   * Gets the available space of storage in Bytes This is free storage that is not reserved
-   * 
-   * @return Number of available bytes in storage
-   */
-  long getUsableSpace();
-
-  /**
-   * Gets the used space of storage in Bytes
-   * 
-   * @return Number of used bytes in storage
-   */
-  long getUsedSpace();
 
   /**
    * A textual representation of available and total storage

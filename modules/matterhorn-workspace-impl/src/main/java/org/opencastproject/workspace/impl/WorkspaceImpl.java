@@ -19,6 +19,7 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
@@ -644,8 +645,8 @@ public class WorkspaceImpl implements Workspace {
    * @see org.opencastproject.workspace.api.Workspace#getTotalSpace()
    */
   @Override
-  public long getTotalSpace() {
-    return new File(wsRoot).getTotalSpace();
+  public Option<Long> getTotalSpace() {
+    return Option.some(new File(wsRoot).getTotalSpace());
   }
 
   /**
@@ -654,8 +655,18 @@ public class WorkspaceImpl implements Workspace {
    * @see org.opencastproject.workspace.api.Workspace#getUsableSpace()
    */
   @Override
-  public long getUsableSpace() {
-    return new File(wsRoot).getUsableSpace();
+  public Option<Long> getUsableSpace() {
+    return Option.some(new File(wsRoot).getUsableSpace());
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.workspace.api.Workspace#getUsedSpace()
+   */
+  @Override
+  public Option<Long> getUsedSpace() {
+    return Option.some(FileUtils.sizeOfDirectory(new File(wsRoot)));
   }
 
   /**
@@ -667,4 +678,5 @@ public class WorkspaceImpl implements Workspace {
   public URI getBaseUri() {
     return wfr.getBaseUri();
   }
+
 }

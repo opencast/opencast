@@ -180,6 +180,7 @@
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.serviceregistry.api;version=${project.version},
               org.opencastproject.security.api;version=${project.version},
+              org.opencastproject.storage;version=${project.version},
               org.opencastproject.security.util;version=${project.version}
             </Export-Package>
           </instructions>

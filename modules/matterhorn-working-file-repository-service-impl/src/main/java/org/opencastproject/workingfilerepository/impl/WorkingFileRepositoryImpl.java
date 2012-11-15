@@ -21,6 +21,7 @@ import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
@@ -736,9 +737,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * 
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getTotalSpace()
    */
-  public long getTotalSpace() {
+  public Option<Long> getTotalSpace() {
     File f = new File(rootDirectory);
-    return f.getTotalSpace();
+    return Option.some(f.getTotalSpace());
   }
 
   /**
@@ -746,9 +747,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * 
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getUsableSpace()
    */
-  public long getUsableSpace() {
+  public Option<Long> getUsableSpace() {
     File f = new File(rootDirectory);
-    return f.getUsableSpace();
+    return Option.some(f.getUsableSpace());
   }
 
   /**
@@ -757,9 +758,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getUsedSpace()
    */
   @Override
-  public long getUsedSpace() {
-    File f = new File(rootDirectory);
-    return f.getTotalSpace() - f.getUsableSpace();
+  public Option<Long> getUsedSpace() {
+    return Option.some(FileUtils.sizeOfDirectory(new File(rootDirectory)));
   }
 
   /**
@@ -768,9 +768,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getDiskSpace()
    */
   public String getDiskSpace() {
-    int usable = Math.round(getUsableSpace() / 1024 / 1024 / 1024);
-    int total = Math.round(getTotalSpace() / 1024 / 1024 / 1024);
-    long percent = Math.round(100.0 * getUsableSpace() / (1 + getTotalSpace()));
+    int usable = Math.round(getUsableSpace().get() / 1024 / 1024 / 1024);
+    int total = Math.round(getTotalSpace().get() / 1024 / 1024 / 1024);
+    long percent = Math.round(100.0 * getUsableSpace().get() / (1 + getTotalSpace().get()));
     return "Usable space " + usable + " Gb out of " + total + " Gb (" + percent + "%)";
   }
 

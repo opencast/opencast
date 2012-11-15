@@ -1231,7 +1231,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   @SuppressWarnings("unchecked")
-  protected List<Object[]> getCountPerHostService(EntityManager em) throws ServiceRegistryException {
+  List<Object[]> getCountPerHostService(EntityManager em) throws ServiceRegistryException {
     Query query = null;
     try {
       query = em.createNamedQuery("Job.countPerHostService");

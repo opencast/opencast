@@ -16,6 +16,7 @@
 package org.opencastproject.episode.impl.elementstore;
 
 import org.opencastproject.episode.impl.StoragePath;
+import org.opencastproject.storage.StorageUsage;
 import org.opencastproject.util.data.Option;
 
 import java.io.InputStream;
@@ -23,16 +24,17 @@ import java.io.InputStream;
 /**
  * Versioned storage for binary resources.
  * <p/>
- * The ElementStore is designed to be as simple as possible, so that it must not have
- * any additional logic or persistent storage of metadata.
+ * The ElementStore is designed to be as simple as possible, so that it must not have any additional logic or persistent
+ * storage of metadata.
  */
-public interface ElementStore {
+public interface ElementStore extends StorageUsage {
+
   /** Add the content of <code>soure</code> under the given path. */
   void put(StoragePath path, Source source) throws ElementStoreException;
 
   /**
    * Copy a resource to a new location.
-   *
+   * 
    * @return true, if the selected resource could be found and copied
    */
   boolean copy(StoragePath from, StoragePath to) throws ElementStoreException;
@@ -42,7 +44,7 @@ public interface ElementStore {
 
   /**
    * Delete all selected resources.
-   *
+   * 
    * @return true, if the selected resources could be found and deleted
    */
   boolean delete(DeletionSelector sel) throws ElementStoreException;
