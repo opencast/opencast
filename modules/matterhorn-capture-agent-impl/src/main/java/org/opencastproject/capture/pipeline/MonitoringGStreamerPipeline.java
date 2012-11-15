@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 public final class MonitoringGStreamerPipeline {
 
   static final Logger logger = LoggerFactory.getLogger(MonitoringGStreamerPipeline.class);
-  
+          
   private static Pipeline monitoringPipeline = null;
   
   protected MonitoringGStreamerPipeline() { }
@@ -66,6 +66,7 @@ public final class MonitoringGStreamerPipeline {
     
     // create CaptureDevice
     for (String deviceName : friendlyNames) {
+      logger.debug("Adding " + deviceName + " as a device to confidence monitor.");
       CaptureDevice captureDevice = createCaptureDevice(deviceName, properties);
       if (!addCaptureDeviceBinsToPipeline(captureDevice, properties, monitoringPipeline)) {
         logger.error("Failed to create pipeline for {}.", deviceName);
@@ -129,6 +130,7 @@ public final class MonitoringGStreamerPipeline {
     CaptureDeviceBin captureDeviceBin = null;
     try {
       captureDeviceBin = new CaptureDeviceBin(captureDevice, properties, true);
+      logger.debug("Adding CaptureDeviceBin to the Confidence Monitoring Pipeline " + captureDeviceBin.toString());
       return pipeline.add(captureDeviceBin.getBin());
     } catch (Exception e) {
       logger.error("Can not create CaptureDeviceBin: ", e);
@@ -151,11 +153,12 @@ public final class MonitoringGStreamerPipeline {
    * @return true if successfully, false otherwise.
    */
   public static boolean stop() {
-      if (monitoringPipeline == null) return true;
-      if (!monitoringPipeline.setState(State.NULL).equals(StateChangeReturn.FAILURE)) {
-          monitoringPipeline = null;
-          return true;
-      }
-      return false;
+    logger.debug("Stopping confidence monitoring pipeline " + monitoringPipeline);
+    if (monitoringPipeline != null && monitoringPipeline.getState() != State.NULL) {
+      monitoringPipeline.setState(State.NULL);
+    }
+    
+    monitoringPipeline = null;
+    return true;
   }
 }

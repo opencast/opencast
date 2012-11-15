@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -210,6 +211,7 @@ public class ConfidenceMonitorRestService {
     // Attempt to grab audio information, if exception is thrown the device does not exist
     try {
       List<Double> rmsValues = service.getRMSValues(device, timestamp);
+      Collections.reverse(rmsValues);
       for (int i = 0; i < rmsValues.size(); i++) {
         double valueDB = rmsValues.get(i);
         double rms = Math.pow(10, valueDB / 20);

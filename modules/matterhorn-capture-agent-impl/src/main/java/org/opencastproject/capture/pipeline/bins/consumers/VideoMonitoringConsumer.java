@@ -140,6 +140,7 @@ public class VideoMonitoringConsumer extends ConsumerBin {
     
     capsfilter.set(GStreamerProperties.CAPS, Caps.fromString(GStreamerProperties.VIDEO_X_RAW_YUV + ", " 
             + GStreamerProperties.FRAMERATE + "=1/" + interval));
+    
     multifilesink.set(GStreamerProperties.LOCATION, new File(location, device + ".jpg").getAbsolutePath());
     multifilesink.set("async", "true");
   }
@@ -203,7 +204,7 @@ public class VideoMonitoringConsumer extends ConsumerBin {
       @Override
       public void stateChanged(GstObject source, State old, State current, State pending) {
         if (source != multifilesink) return;
-        
+
         ConfidenceMonitorImpl monitoringService = ConfidenceMonitorImpl.getInstance();
         if (current == State.PLAYING) { 
           // add monitoring entry to ConfidenceMonitoring-Service
@@ -211,7 +212,7 @@ public class VideoMonitoringConsumer extends ConsumerBin {
             monitoringService.createMonitoringEntry(captureDevice.getFriendlyName(), MonitoringEntry.MONITORING_TYPE.VIDEO, 
                   new File(confidenceMonitoringProperties.getImageloc(), confidenceMonitoringProperties.getDevice() + ".jpg").getAbsolutePath());
           }
-        } else if (current == State.NULL) {
+        } else {
           // remove monitoring entry from ConfidenceMonitoring-Service
           if (monitoringService != null) {
             monitoringService.removeMonitoringEntry(captureDevice.getFriendlyName(), MonitoringEntry.MONITORING_TYPE.VIDEO);
@@ -220,4 +221,6 @@ public class VideoMonitoringConsumer extends ConsumerBin {
       }
     });
   }
+  
+  
 }

@@ -44,7 +44,7 @@ public final class ConfidenceMonitorImpl implements ConfidenceMonitor, Configura
 
   private Logger logger = LoggerFactory.getLogger(ConfidenceMonitorImpl.class);
   private static ConfidenceMonitorImpl instance = null;
-  private ConfigurationManager configService;
+  private static ConfigurationManager configService;
   private static List<MonitoringEntry> monitoringEntries = Collections.synchronizedList(new LinkedList<MonitoringEntry>());
   private String coreURL = null;
 
@@ -217,8 +217,9 @@ public final class ConfidenceMonitorImpl implements ConfidenceMonitor, Configura
 
     if (coreURL != null) {
       if (confidence && instance == null) {
-        instance = this;
+        instance = new ConfidenceMonitorImpl();
         logger.info("Confidence monitoring enabled!");
+        startMonitoring();
       }
     } else {
       if (instance != null) {
