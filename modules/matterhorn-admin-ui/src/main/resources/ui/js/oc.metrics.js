@@ -533,7 +533,7 @@ ocMetrics = new (function() {
             },
   	      	{
   	      		container: 'matterhorn',
-  	      		name: 'org.opencastproject.matterhorn:type=Workspace',
+  	      		name: 'org.opencastproject.matterhorn:type=WorkingFileRepository',
   	      		attribute: 'FreeSpace'
   	      	},
             {
@@ -555,7 +555,7 @@ ocMetrics = new (function() {
 	  	    },
   	      	{
   	      		container: 'matterhorn',
-  	      		name: 'org.opencastproject.matterhorn:type=Workspace',
+  	      		name: 'org.opencastproject.matterhorn:type=ElementStore',
   	      		attribute: 'FreeSpace'
   	      	},
 	  	    {
