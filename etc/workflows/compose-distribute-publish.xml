@@ -64,14 +64,17 @@
     </fieldset>
     <script type="text/javascript">
       var ocWorkflowPanel = ocWorkflowPanel || {};
+      var trimHold = $('input#trimHold');
+	  var captionHold = $('input#captionHold');
+      var videoPreview = $('input#videoPreview');
       
       var checkVideoPreview = function(){
-        var checkValue = trimHold.checked || captionHold.checked;
-        videoPreview.checked = checkValue;
+      	var checkValue = trimHold.is(':checked') || captionHold.is(':checked');
+      	videoPreview.attr('checked', checkValue);
       }
       
-      trimHold.addEventListener("click",checkVideoPreview,false);
-      captionHold.addEventListener("click",checkVideoPreview,false);
+      trimHold.click(checkVideoPreview);
+	  captionHold.click(checkVideoPreview);
       
       ocWorkflowPanel.registerComponents = function(components){
         /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
