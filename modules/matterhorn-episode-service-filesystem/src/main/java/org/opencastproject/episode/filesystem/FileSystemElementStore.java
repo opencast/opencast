@@ -15,16 +15,12 @@
  */
 package org.opencastproject.episode.filesystem;
 
-import static org.apache.commons.io.FilenameUtils.EXTENSION_SEPARATOR;
-import static org.apache.commons.io.FilenameUtils.getExtension;
-import static org.opencastproject.util.FileSupport.link;
-import static org.opencastproject.util.IoSupport.file;
-import static org.opencastproject.util.PathSupport.path;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.functions.Strings.trimToNone;
-
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.opencastproject.episode.api.Version;
 import org.opencastproject.episode.impl.StoragePath;
 import org.opencastproject.episode.impl.elementstore.DeletionSelector;
@@ -35,13 +31,6 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +44,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+
+import static org.apache.commons.io.FilenameUtils.EXTENSION_SEPARATOR;
+import static org.apache.commons.io.FilenameUtils.getExtension;
+import static org.opencastproject.util.FileSupport.link;
+import static org.opencastproject.util.IoSupport.file;
+import static org.opencastproject.util.PathSupport.path;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.functions.Strings.trimToNone;
 
 public class FileSystemElementStore implements ElementStore {
 
@@ -265,6 +264,8 @@ public class FileSystemElementStore implements ElementStore {
       public Option<File> apply(File[] files) {
         switch (files.length) {
           case 0:
+            logger.warn("Cannot find media package element " + storagePath.getMediaPackageElementId()
+                        + " in " + containerDir.getAbsolutePath());
             return none();
           case 1:
             return some(files[0]);
