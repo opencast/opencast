@@ -15,6 +15,8 @@
  */
 package org.opencastproject.search.remote;
 
+import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.search.api.SearchException;
@@ -56,7 +58,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
    * @see org.opencastproject.search.api.SearchService#add(org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
-  public void add(MediaPackage mediaPackage) throws SearchException {
+  public Job add(MediaPackage mediaPackage) throws SearchException {
     HttpPost post = new HttpPost("/add");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -67,14 +69,21 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
       throw new SearchException("Unable to assemble a remote search request for mediapackage " + mediaPackage, e);
     }
 
-    HttpResponse response = getResponse(post, HttpStatus.SC_NO_CONTENT);
-    if (response == null) {
-      throw new SearchException("Unable to add mediapackage " + mediaPackage + " using the remote search services");
-    } else {
+    HttpResponse response = null;
+    try {
+      response = getResponse(post, HttpStatus.SC_OK);
+      if (response != null) {
+        Job job = JobParser.parseJob(response.getEntity().getContent());
+        logger.info("Publishing mediapackage '{}' using a remote search service", mediaPackage.getIdentifier());
+        return job;
+      }
+    } catch (Exception e) {
+      throw new SearchException("Unable to publish " + mediaPackage.getIdentifier() + " using a remote search service", e);
+    } finally {
       closeConnection(response);
     }
-    logger.info("Successfully added {} to the search service", mediaPackage);
-    return;
+    
+    throw new SearchException("Unable to publish " + mediaPackage.getIdentifier() + " using a remote search service");
   }
 
   /**
@@ -83,28 +92,23 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
    * @see org.opencastproject.search.api.SearchService#delete(java.lang.String)
    */
   @Override
-  public boolean delete(String mediaPackageId) throws SearchException {
+  public Job delete(String mediaPackageId) throws SearchException {
     HttpDelete del = new HttpDelete(mediaPackageId);
     HttpResponse response = null;
     try {
-      response = getResponse(del, HttpStatus.SC_NO_CONTENT);
-      if (response == null) {
-        throw new SearchException("Unable to remove " + mediaPackageId + " from a remote search index");
+      response = getResponse(del, HttpStatus.SC_OK);
+      if (response != null) {
+        Job job = JobParser.parseJob(response.getEntity().getContent());
+        logger.info("Remvoing mediapackage '{}' from a remote search service", mediaPackageId);
+        return job;
       }
-      int status = response.getStatusLine().getStatusCode();
-      if (status == HttpStatus.SC_NO_CONTENT) {
-        logger.info("Successfully deleted {} from the remote search index", mediaPackageId);
-        return true;
-      } else if (status == HttpStatus.SC_NOT_FOUND) {
-        logger.info("Mediapackage {} not found in remote search index", mediaPackageId);
-        return false;
-      } else {
-        throw new SearchException("Unable to remove " + mediaPackageId + " from a remote search index, http status="
-                + status);
-      }
+    } catch (Exception e) {
+      throw new SearchException("Unable to remove " + mediaPackageId + " from a remote search service", e);
     } finally {
       closeConnection(response);
     }
+    
+    throw new SearchException("Unable to remove " + mediaPackageId + " from a remote search service");
   }
 
   /**
@@ -157,7 +161,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
     }
     queryStringParams.add(new BasicNameValuePair("limit", Integer.toString(q.getLimit())));
     queryStringParams.add(new BasicNameValuePair("offset", Integer.toString(q.getOffset())));
-    
+
     url.append(URLEncodedUtils.format(queryStringParams, "UTF-8"));
 
     return url.toString();

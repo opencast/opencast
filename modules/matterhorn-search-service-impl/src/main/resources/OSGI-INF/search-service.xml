@@ -5,6 +5,7 @@
   <property name="service.description" value="Search Service" />
   <service>
     <provide interface="org.opencastproject.search.api.SearchService" />
+    <provide interface="org.opencastproject.search.impl.SearchServiceImpl" />
   </service>
   <reference name="staticMetadata"
           interface="org.opencastproject.metadata.api.StaticMetadataService"
@@ -27,5 +28,7 @@
   <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
           cardinality="1..1" policy="static" bind="setServiceRegistry"/>
   <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-    cardinality="1..1" policy="static" bind="setOrgDirectory" />
+          cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+  <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"
+          cardinality="1..1" policy="static" bind="setUserDirectoryService" />
 </scr:component>

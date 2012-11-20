@@ -18,8 +18,8 @@ package org.opencastproject.search.impl;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
+import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
-import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
@@ -40,6 +40,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -67,6 +68,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -74,7 +76,7 @@ import java.util.List;
 /**
  * A Solr-based {@link SearchService} implementation.
  */
-public final class SearchServiceImpl implements SearchService {
+public final class SearchServiceImpl extends AbstractJobProducer implements SearchService {
 
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
@@ -88,11 +90,10 @@ public final class SearchServiceImpl implements SearchService {
   /** The job type */
   public static final String JOB_TYPE = "org.opencastproject.search";
 
-  /** The add operation */
-  public static final String OPERATION_ADD = "add";
-
-  /** The delete operation */
-  public static final String OPERATION_DELETE = "delete";
+  /** List of available operations on jobs */
+  private enum Operation {
+    Add, Delete
+  };
 
   /** Solr server */
   private SolrServer solrServer;
@@ -116,65 +117,23 @@ public final class SearchServiceImpl implements SearchService {
   /** The authorization service */
   private AuthorizationService authorizationService;
 
-  /** The organization directory */
-  private OrganizationDirectoryService orgDirectory;
-
   /** The service registry */
   private ServiceRegistry serviceRegistry;
 
   /** Persistent storage */
   private SearchServiceDatabase persistence;
 
-  /** Dynamic reference. */
-  public void setStaticMetadataService(StaticMetadataService mdService) {
-    this.mdServices.add(mdService);
-    if (indexManager != null)
-      indexManager.setStaticMetadataServices(mdServices);
-  }
+  /** The user directory service */
+  protected UserDirectoryService userDirectoryService = null;
 
-  public void unsetStaticMetadataService(StaticMetadataService mdService) {
-    this.mdServices.remove(mdService);
-    if (indexManager != null)
-      indexManager.setStaticMetadataServices(mdServices);
-  }
+  /** The organization directory service */
+  protected OrganizationDirectoryService organizationDirectory = null;
 
-  public void setMpeg7CatalogService(Mpeg7CatalogService mpeg7CatalogService) {
-    this.mpeg7CatalogService = mpeg7CatalogService;
-  }
-
-  public void setPersistence(SearchServiceDatabase persistence) {
-    this.persistence = persistence;
-  }
-
-  public void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
-  }
-
-  public void setWorkspace(Workspace workspace) {
-    this.workspace = workspace;
-  }
-
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
-  }
-
-  public void setAuthorizationService(AuthorizationService authorizationService) {
-    this.authorizationService = authorizationService;
-  }
-
-  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
-    this.serviceRegistry = serviceRegistry;
-  }
-
-  public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
-    this.orgDirectory = orgDirectory;
-  }
-
-  /** For testing purposes only! */
-  void testSetup(SolrServer server, SolrRequester requester, SolrIndexManager manager) {
-    this.solrServer = server;
-    this.solrRequester = requester;
-    this.indexManager = manager;
+  /**
+   * Creates a new instance of the search service.
+   */
+  public SearchServiceImpl() {
+    super(JOB_TYPE);
   }
 
   /**
@@ -331,8 +290,32 @@ public final class SearchServiceImpl implements SearchService {
    * 
    * @see org.opencastproject.search.api.SearchService#add(org.opencastproject.mediapackage.MediaPackage)
    */
-  public void add(MediaPackage mediaPackage) throws SearchException, MediaPackageException, IllegalArgumentException,
+  public Job add(MediaPackage mediaPackage) throws SearchException, MediaPackageException, IllegalArgumentException,
           UnauthorizedException, ServiceRegistryException {
+    try {
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Add.toString(),
+              Arrays.asList(MediaPackageParser.getAsXml(mediaPackage)));
+    } catch (ServiceRegistryException e) {
+      throw new SearchException(e);
+    }
+  }
+
+  /**
+   * Immediately adds the mediapackage to the search index.
+   * 
+   * @param mediaPackage
+   *          the media package
+   * @throws SearchException
+   *           if the media package cannot be added to the search index
+   * @throws MediaPackageException
+   *           if the mediapckage is invalid
+   * @throws IllegalArgumentException
+   *           if the mediapackage is <code>null</code>
+   * @throws UnauthorizedException
+   *           if the user does not have the rights to add the mediapackage
+   */
+  public void addSynchronously(MediaPackage mediaPackage) throws SearchException, MediaPackageException,
+          IllegalArgumentException, UnauthorizedException {
     User currentUser = securityService.getUser();
     String orgAdminRole = securityService.getOrganization().getAdminRole();
     if (!currentUser.hasRole(orgAdminRole) && !currentUser.hasRole(GLOBAL_ADMIN_ROLE)
@@ -355,16 +338,6 @@ public final class SearchServiceImpl implements SearchService {
     }
 
     try {
-      List<String> args = new ArrayList<String>();
-      args.add(securityService.getOrganization().getId());
-      Job job = serviceRegistry.createJob(JOB_TYPE, OPERATION_ADD, args, MediaPackageParser.getAsXml(mediaPackage),
-              false);
-      job.setStatus(Status.FINISHED);
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (NotFoundException e) {
-        throw new IllegalStateException(e); // should not be possible
-      }
       if (indexManager.add(mediaPackage, acl, now)) {
         logger.info("Added mediapackage {} to the search index", mediaPackage.getIdentifier());
       } else {
@@ -380,7 +353,29 @@ public final class SearchServiceImpl implements SearchService {
    * 
    * @see org.opencastproject.search.api.SearchService#delete(java.lang.String)
    */
-  public boolean delete(String mediaPackageId) throws SearchException, UnauthorizedException, NotFoundException {
+  public Job delete(String mediaPackageId) throws SearchException, UnauthorizedException, NotFoundException {
+    try {
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Delete.toString(), Arrays.asList(mediaPackageId));
+    } catch (ServiceRegistryException e) {
+      throw new SearchException(e);
+    }
+  }
+
+  /**
+   * Immediately removes the given mediapackage from the search service.
+   * 
+   * @param mediaPackageId
+   *          the mediapackage
+   * @return <code>true</code> if the mediapackage was deleted
+   * @throws SearchException
+   *           if deletion failed
+   * @throws UnauthorizedException
+   *           if the user did not have access to the media package
+   * @throws NotFoundException
+   *           if the mediapackage did not exist
+   */
+  public boolean deleteSynchronously(String mediaPackageId) throws SearchException, UnauthorizedException,
+          NotFoundException {
     SearchResult result;
     try {
       result = solrRequester.getForWrite(new SearchQuery().withId(mediaPackageId));
@@ -468,7 +463,7 @@ public final class SearchServiceImpl implements SearchService {
 
           String mediaPackageId = mediaPackage.getA().getIdentifier().toString();
 
-          Organization organization = orgDirectory.getOrganization(mediaPackage.getB());
+          Organization organization = organizationDirectory.getOrganization(mediaPackage.getB());
           securityService.setOrganization(organization);
           securityService.setUser(new User(organization.getName(), organization.getId(), new String[] { organization
                   .getAdminRole() }));
@@ -489,4 +484,142 @@ public final class SearchServiceImpl implements SearchService {
       }
     }
   }
+
+  /**
+   * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
+   */
+  @Override
+  protected String process(Job job) throws Exception {
+    Operation op = null;
+    String operation = job.getOperation();
+    List<String> arguments = job.getArguments();
+    try {
+      op = Operation.valueOf(operation);
+      switch (op) {
+        case Add:
+          MediaPackage mediaPackage = MediaPackageParser.getFromXml(arguments.get(0));
+          addSynchronously(mediaPackage);
+          return null;
+        case Delete:
+          String mediapackageId = arguments.get(0);
+          boolean deleted = deleteSynchronously(mediapackageId);
+          return Boolean.toString(deleted);
+        default:
+          throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
+      }
+    } catch (IllegalArgumentException e) {
+      throw new ServiceRegistryException("This service can't handle operations of type '" + op + "'", e);
+    } catch (IndexOutOfBoundsException e) {
+      throw new ServiceRegistryException("This argument list for operation '" + op + "' does not meet expectations", e);
+    } catch (Exception e) {
+      throw new ServiceRegistryException("Error handling operation '" + op + "'", e);
+    }
+  }
+
+  /** For testing purposes only! */
+  void testSetup(SolrServer server, SolrRequester requester, SolrIndexManager manager) {
+    this.solrServer = server;
+    this.solrRequester = requester;
+    this.indexManager = manager;
+  }
+
+  /** Dynamic reference. */
+  public void setStaticMetadataService(StaticMetadataService mdService) {
+    this.mdServices.add(mdService);
+    if (indexManager != null)
+      indexManager.setStaticMetadataServices(mdServices);
+  }
+
+  public void unsetStaticMetadataService(StaticMetadataService mdService) {
+    this.mdServices.remove(mdService);
+    if (indexManager != null)
+      indexManager.setStaticMetadataServices(mdServices);
+  }
+
+  public void setMpeg7CatalogService(Mpeg7CatalogService mpeg7CatalogService) {
+    this.mpeg7CatalogService = mpeg7CatalogService;
+  }
+
+  public void setPersistence(SearchServiceDatabase persistence) {
+    this.persistence = persistence;
+  }
+
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
+  }
+
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
+  }
+
+  public void setAuthorizationService(AuthorizationService authorizationService) {
+    this.authorizationService = authorizationService;
+  }
+
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  /**
+   * Callback for setting the security service.
+   * 
+   * @param securityService
+   *          the securityService to set
+   */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
+  /**
+   * Callback for setting the user directory service.
+   * 
+   * @param userDirectoryService
+   *          the userDirectoryService to set
+   */
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    this.userDirectoryService = userDirectoryService;
+  }
+
+  /**
+   * Sets a reference to the organization directory service.
+   * 
+   * @param organizationDirectory
+   *          the organization directory
+   */
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
+    this.organizationDirectory = organizationDirectory;
+  }
+
+  /**
+   * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
+   */
+  @Override
+  protected OrganizationDirectoryService getOrganizationDirectoryService() {
+    return organizationDirectory;
+  }
+
+  /**
+   * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
+   */
+  @Override
+  protected SecurityService getSecurityService() {
+    return securityService;
+  }
+
+  /**
+   * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
+   */
+  @Override
+  protected ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
+  }
+
+  /**
+   * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
+   */
+  @Override
+  protected UserDirectoryService getUserDirectoryService() {
+    return userDirectoryService;
+  }
+
 }
