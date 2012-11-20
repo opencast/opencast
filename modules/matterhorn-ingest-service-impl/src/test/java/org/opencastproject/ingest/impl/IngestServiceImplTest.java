@@ -43,6 +43,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.easymock.EasyMock;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -50,6 +51,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 public class IngestServiceImplTest {
@@ -57,21 +59,23 @@ public class IngestServiceImplTest {
   private WorkflowService workflowService = null;
   private WorkflowInstance workflowInstance = null;
   private Workspace workspace = null;
-  private MediaPackage mediaPackage = null;
-  private URI urlTrack;
-  private URI urlTrack1;
-  private URI urlTrack2;
-  private URI urlCatalog;
-  private URI urlCatalog1;
-  private URI urlCatalog2;
-  private URI urlAttachment;
-  private URI urlPackage;
+  private static URI baseDir;
+  private static URI urlTrack;
+  private static URI urlTrack1;
+  private static URI urlTrack2;
+  private static URI urlCatalog;
+  private static URI urlCatalog1;
+  private static URI urlCatalog2;
+  private static URI urlAttachment;
+  private static URI urlPackage;
+  private static URI urlPackageOld;
 
   private static long workflowInstanceID = 1L;
 
-  @SuppressWarnings("unchecked")
-  @Before
-  public void setUp() throws Exception {
+  
+  @BeforeClass
+  public static void beforeClass() throws URISyntaxException {
+    baseDir = IngestServiceImplTest.class.getResource("/").toURI();
     urlTrack = IngestServiceImplTest.class.getResource("/av.mov").toURI();
     urlTrack1 = IngestServiceImplTest.class.getResource("/vonly.mov").toURI();
     urlTrack2 = IngestServiceImplTest.class.getResource("/aonly.mov").toURI();
@@ -80,11 +84,20 @@ public class IngestServiceImplTest {
     urlCatalog2 = IngestServiceImplTest.class.getResource("/series-dublincore.xml").toURI();
     urlAttachment = IngestServiceImplTest.class.getResource("/cover.png").toURI();
     urlPackage = IngestServiceImplTest.class.getResource("/data.zip").toURI();
-
-    File ingestTempDir = new File(new File(urlPackage).getParentFile(), "ingest-temp");
+    urlPackageOld = IngestServiceImplTest.class.getResource("/data.old.zip").toURI();
+  }
+  
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Before
+  public void setUp() throws Exception { 
+    
+    File ingestTempDir = new File(new File(baseDir), "ingest-temp");
     FileUtils.forceMkdir(ingestTempDir);
-    File tempFile = new File(ingestTempDir, "data.zip");
-    FileUtils.copyURLToFile(urlPackage.toURL(), tempFile);
+    
+    File packageFile = new File(ingestTempDir, baseDir.relativize(urlPackage).toString());
+    File packageFileOld = new File(ingestTempDir, baseDir.relativize(urlPackageOld).toString());
+    FileUtils.copyURLToFile(urlPackage.toURL(), packageFile);
+    FileUtils.copyURLToFile(urlPackageOld.toURL(), packageFileOld);
 
     // set up service and mock workspace
     workspace = EasyMock.createNiceMock(Workspace.class);
@@ -128,7 +141,17 @@ public class IngestServiceImplTest {
     EasyMock.expect(
             workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlCatalog);
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(tempFile);
+    
+    EasyMock.expect(
+            workspace.putInCollection((String)EasyMock.anyObject(), (String)EasyMock.anyObject(),
+                    (InputStream)EasyMock.anyObject())).andReturn(urlPackage);
+
+    EasyMock.expect(
+            workspace.putInCollection((String)EasyMock.anyObject(), (String)EasyMock.anyObject(),
+                    (InputStream)EasyMock.anyObject())).andReturn(urlPackageOld);
+    
+    EasyMock.expect(workspace.get(urlPackage)).andReturn(packageFile).anyTimes();
+    EasyMock.expect(workspace.get(urlPackageOld)).andReturn(packageFileOld).anyTimes();
 
     workflowInstance = EasyMock.createNiceMock(WorkflowInstance.class);
     EasyMock.expect(workflowInstance.getId()).andReturn(workflowInstanceID);
@@ -144,9 +167,7 @@ public class IngestServiceImplTest {
             workflowService.start((WorkflowDefinition) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject()))
             .andReturn(workflowInstance);
 
-    EasyMock.replay(workspace);
-    EasyMock.replay(workflowInstance);
-    EasyMock.replay(workflowService);
+    EasyMock.replay(workspace, workflowInstance, workflowService);
 
     User anonymous = new User("anonymous", DEFAULT_ORGANIZATION_ID, new String[] { DEFAULT_ORGANIZATION_ANONYMOUS });
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
@@ -198,6 +219,9 @@ public class IngestServiceImplTest {
 
   @Test
   public void testThinClient() throws Exception {
+    
+    MediaPackage mediaPackage = null;
+
     mediaPackage = service.createMediaPackage();
     mediaPackage = service.addTrack(urlTrack, null, mediaPackage);
     mediaPackage = service.addCatalog(urlCatalog, MediaPackageElements.EPISODE, mediaPackage);
@@ -211,16 +235,41 @@ public class IngestServiceImplTest {
 
   @Test
   public void testThickClient() throws Exception {
-    InputStream packageStream = urlPackage.toURL().openStream();
-    WorkflowInstance instance = service.addZippedMediaPackage(packageStream);
+    
+    InputStream packageStream = null;
     try {
-      packageStream.close();
+      packageStream = urlPackage.toURL().openStream();
+      WorkflowInstance instance = service.addZippedMediaPackage(packageStream);
+
+      //Assert.assertEquals(2, mediaPackage.getTracks().length);
+      //Assert.assertEquals(3, mediaPackage.getCatalogs().length);
+      Assert.assertEquals(workflowInstanceID, instance.getId());
     } catch (IOException e) {
       Assert.fail(e.getMessage());
+    } finally {
+      IOUtils.closeQuietly(packageStream);
     }
-    // Assert.assertEquals(2, mediaPackage.getTracks().length);
-    // Assert.assertEquals(3, mediaPackage.getCatalogs().length);
-    Assert.assertEquals(workflowInstanceID, instance.getId());
+
   }
+  
+  @Test
+  public void testThickClientOldMP() throws Exception {
+    
+    InputStream packageStream = null;
+    try {
+      packageStream = urlPackageOld.toURL().openStream();
+      WorkflowInstance instance = service.addZippedMediaPackage(packageStream);
+
+      //Assert.assertEquals(2, mediaPackage.getTracks().length);
+      //Assert.assertEquals(3, mediaPackage.getCatalogs().length);
+      Assert.assertEquals(workflowInstanceID, instance.getId());
+    } catch (IOException e) {
+      Assert.fail(e.getMessage());
+    } finally {
+      IOUtils.closeQuietly(packageStream);
+    }
+
+  }
+
 
 }
