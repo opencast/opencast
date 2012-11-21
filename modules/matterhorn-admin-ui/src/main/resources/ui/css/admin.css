@@ -162,6 +162,7 @@ table#agentsTable th, table#seriesTable th, table#recordingsTable th, table#stat
 .oc-ui-form-list .scheduler-label, .scheduler-label { display: inline-block; width: 35%; text-align: right; vertical-align: top; }
 .oc-ui-form-field { border: 1px #aaa solid; width: 450px; }
 .oc-ui-checkbox-list { padding-left: 30px; }
+.oc-ui-checkbox-list-upload { padding-left: 35%; }
 .oc-ui-collapsible-widget > .ui-widget-content { display: none; }
 .form-box { margin-top: 10px; width: 800px; }
 .form-box .form-box-head { padding: 3px 5px }
