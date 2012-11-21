@@ -90,6 +90,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
   @POST
   @Path("add")
+  @Produces(MediaType.APPLICATION_XML)
   @RestQuery(name = "add", description = "Adds a mediapackage to the search index.", restParameters = { @RestParameter(description = "The media package to add to the search index.", isRequired = true, name = "mediapackage", type = RestParameter.Type.TEXT, defaultValue = "${this.sampleMediaPackage}") }, reponses = {
           @RestResponse(description = "XML encoded receipt is returned", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "There has been an internal error and the mediapackage could not be added", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "The job receipt")
@@ -105,6 +106,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
   @DELETE
   @Path("{id}")
+  @Produces(MediaType.APPLICATION_XML)
   @RestQuery(name = "remove", description = "Removes a mediapackage from the search index.", pathParameters = { @RestParameter(description = "The media package ID to remove from the search index.", isRequired = true, name = "id", type = RestParameter.Type.STRING) }, reponses = {
           @RestResponse(description = "The mediapackage was removed, no content to return.", responseCode = HttpServletResponse.SC_NO_CONTENT),
           @RestResponse(description = "There has been an internal error and the mediapackage could not be deleted", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "The job receipt")
