@@ -21,6 +21,7 @@ import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
@@ -194,14 +195,13 @@ public class RuntimeInfo {
                 adminBaseUrl.getFile());
       }
     } else {
-      targetAdminBaseUrl = new URL(targetScheme, adminBaseUrl.getHost(), adminBaseUrl.getPort(),
-              adminBaseUrl.getFile());
+      targetAdminBaseUrl = new URL(targetScheme, adminBaseUrl.getHost(), adminBaseUrl.getPort(), adminBaseUrl.getFile());
     }
 
     JSONObject json = new JSONObject();
     json.put("engage", targetEngageBaseUrl.toString());
     json.put("admin", targetAdminBaseUrl.toString());
-    json.put("rest", getRestEndpointsAsJson());
+    json.put("rest", getRestEndpointsAsJson(request));
     json.put("ui", getUserInterfacesAsJson());
 
     return json.toJSONString();
@@ -246,7 +246,7 @@ public class RuntimeInfo {
   }
 
   @SuppressWarnings("unchecked")
-  protected JSONArray getRestEndpointsAsJson() {
+  protected JSONArray getRestEndpointsAsJson(HttpServletRequest request) throws MalformedURLException {
     JSONArray json = new JSONArray();
     ServiceReference[] serviceRefs = null;
     try {
@@ -265,10 +265,10 @@ public class RuntimeInfo {
       endpoint.put("description", description);
       endpoint.put("version", version);
       endpoint.put("type", type);
+      URL url = new URL(request.getScheme(), request.getServerName(), request.getServerPort(), servletContextPath);
       endpoint.put("path", servletContextPath);
-      endpoint.put("docs", serverUrl + servletContextPath + "/docs"); // This is a Matterhorn convention
-      endpoint.put("wadl", serverUrl + servletContextPath + "/?_wadl&_type=xml"); // This triggers a CXF-specific
-                                                                                  // handler
+      endpoint.put("docs", UrlSupport.concat(url.toExternalForm(), "/docs")); // This is a Matterhorn convention
+      endpoint.put("wadl", UrlSupport.concat(url.toExternalForm(), "/?_wadl&_type=xml")); // This triggers a
       json.add(endpoint);
     }
     return json;
