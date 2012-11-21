@@ -32,6 +32,9 @@ var ocScheduler = (function() {
   var SINGLE_EVENT      = 3;
   var MULTIPLE_EVENTS   = 4;
   var SUBMIT_MODE       = 5;
+  
+  // Define dcterms namespace
+  $.xmlns["dcterms"] = "http://purl.org/dc/terms/";
 
   sched.mode              = CREATE_MODE;
   sched.type              = SINGLE_EVENT;
@@ -805,7 +808,7 @@ var ocScheduler = (function() {
             success: function(data){
               window.debug = data;
               creationSucceeded = true;
-              seriesId = $(data).find('dcterms\\:identifier').text();
+              seriesId = $(data).find('dcterms|identifier').text();
               $('#series').val(seriesId);
               seriesComponent.fields.series.val(seriesId);
             },
