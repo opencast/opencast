@@ -13,7 +13,7 @@
     <fieldset>
       <legend>Holds</legend>
       <span>Processing should be paused to allow for:</span>
-      <ul class="oc-ui-checkbox-list">
+      <ul class="oc-ui-checkbox-list-upload">
           <input id="videoPreview" name="videoPreview" type="checkbox" class="configField holdCheckbox" style="visibility:hidden" value="true"/>
         <li class="ui-helper-clearfix">
           <span id="trimholdconfig">
@@ -31,7 +31,7 @@
     </fieldset>
     <fieldset>
       <legend>Archive</legend>
-      <ul class="oc-ui-form-list">       
+      <ul class="oc-ui-checkbox-list-upload">       
           <li class="ui-helper-clearfix">
             <span id="archiveconfig">
               <input id="archiveOp" name="archiveOp" type="checkbox" class="configField holdCheckbox" value="true"/>
