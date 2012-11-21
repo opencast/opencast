@@ -183,7 +183,7 @@ public class ExportWorkflowOperationHandler extends ResumableWorkflowOperationHa
       track = (Track) MediaPackageElementParser.getFromXml(trackString);
       mediaPackage.add(track);
     } catch (MediaPackageException e) {
-     logger.warn("Couldn't add track to media package ", e);
+     logger.warn("Couldn't add track (" + trackString + ") to media package ", e);
     }
   }
 

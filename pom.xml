@@ -47,7 +47,6 @@
         <module>modules/matterhorn-episode-service-api</module>
         <module>modules/matterhorn-episode-service-impl</module>
         <module>modules/matterhorn-episode-service-filesystem</module>
-        <module>modules/matterhorn-export-distribution-ui</module>
         <module>modules/matterhorn-gstreamer-service-api</module>
         <module>modules/matterhorn-ingest-service-api</module>
         <module>modules/matterhorn-ingest-service-impl</module>
@@ -103,7 +102,23 @@
     </profile>
 
     <profile>
-      <id>gstreamer-launch-service</id>
+      <id>export-admin</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-export-impl</module>
+        <module>modules/matterhorn-gstreamer-service-api</module>
+        <module>modules/matterhorn-gstreamer-service-remote</module>
+        <module>modules/matterhorn-json</module>
+        <module>modules/matterhorn-serviceregistry</module>
+        <module>modules/matterhorn-static</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>export-worker</id>
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
@@ -113,15 +128,16 @@
       </modules>
     </profile>
 
-    <profile>
-      <id>export</id>
+     <profile>
+      <id>export-all-in-one</id>
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-export-impl</module>
         <module>modules/matterhorn-gstreamer-service-api</module>
-        <module>modules/matterhorn-gstreamer-service-remote</module>
+        <module>modules/matterhorn-gstreamer-service-impl</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-serviceregistry</module>
         <module>modules/matterhorn-static</module>
@@ -171,7 +187,6 @@
         <module>modules/matterhorn-distribution-service-streaming</module>
         <module>modules/matterhorn-distribution-service-youtube</module>
         <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-export-distribution-ui</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
