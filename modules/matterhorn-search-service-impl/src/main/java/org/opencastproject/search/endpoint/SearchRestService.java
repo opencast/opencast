@@ -15,20 +15,23 @@
  */
 package org.opencastproject.search.endpoint;
 
+import org.opencastproject.job.api.JaxbJob;
+import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageImpl;
+import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchService;
+import org.opencastproject.search.impl.SearchServiceImpl;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.util.NotFoundException;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang.StringUtils;
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,35 +55,22 @@ import javax.ws.rs.core.Response.ResponseBuilder;
  * The REST endpoint
  */
 @Path("/")
-@RestService(name = "search", title = "Search Service",
-  abstractText = "This service indexes and queries available (distributed) episodes.",
-  notes = {
+@RestService(name = "search", title = "Search Service", abstractText = "This service indexes and queries available (distributed) episodes.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
-        + "not working and is either restarting or has failed",
+                + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
-public class SearchRestService {
+                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+public class SearchRestService extends AbstractJobProducerEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(SearchRestService.class);
 
-  protected SearchService searchService;
+  /** The search service */
+  protected SearchServiceImpl searchService;
 
-  /**
-   * Callback from OSGi that is called when this service is activated.
-   * 
-   * @param cc
-   *          OSGi component context
-   */
-
-  public void activate(ComponentContext cc) {
-    // String serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
-  }
-
-  public void setSearchService(SearchService searchService) {
-    this.searchService = searchService;
-  }
+  /** The service registry */
+  private ServiceRegistry serviceRegistry;
 
   public String getSampleMediaPackage() {
     return "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\" start=\"2007-12-05T13:40:00\" duration=\"1004400000\"><title>t1</title>\n"
@@ -100,31 +90,32 @@ public class SearchRestService {
 
   @POST
   @Path("add")
+  @Produces(MediaType.APPLICATION_XML)
   @RestQuery(name = "add", description = "Adds a mediapackage to the search index.", restParameters = { @RestParameter(description = "The media package to add to the search index.", isRequired = true, name = "mediapackage", type = RestParameter.Type.TEXT, defaultValue = "${this.sampleMediaPackage}") }, reponses = {
-          @RestResponse(description = "The mediapackage was added, no content to return.", responseCode = HttpServletResponse.SC_NO_CONTENT),
-          @RestResponse(description = "There has been an internal error and the mediapackage could not be added", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "No content is returned.")
+          @RestResponse(description = "XML encoded receipt is returned", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "There has been an internal error and the mediapackage could not be added", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "The job receipt")
   public Response add(@FormParam("mediapackage") MediaPackageImpl mediaPackage) throws SearchException {
     try {
-      searchService.add(mediaPackage);
-      return Response.noContent().build();
+      Job job = searchService.add(mediaPackage);
+      return Response.ok(new JaxbJob(job)).build();
     } catch (Exception e) {
-      logger.warn(e.getMessage(), e);
+      logger.info(e.getMessage());
       return Response.serverError().build();
     }
   }
 
   @DELETE
   @Path("{id}")
+  @Produces(MediaType.APPLICATION_XML)
   @RestQuery(name = "remove", description = "Removes a mediapackage from the search index.", pathParameters = { @RestParameter(description = "The media package ID to remove from the search index.", isRequired = true, name = "id", type = RestParameter.Type.STRING) }, reponses = {
           @RestResponse(description = "The mediapackage was removed, no content to return.", responseCode = HttpServletResponse.SC_NO_CONTENT),
-          @RestResponse(description = "There has been an internal error and the mediapackage could not be added", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "No content is returned.")
-  public Response remove(@PathParam("id") String mediaPackageId) throws SearchException, NotFoundException {
+          @RestResponse(description = "There has been an internal error and the mediapackage could not be deleted", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "The job receipt")
+  public Response remove(@PathParam("id") String mediaPackageId) throws SearchException {
     try {
-      if (searchService.delete(mediaPackageId))
-        return Response.noContent().build();
-      throw new NotFoundException();
+      Job job = searchService.delete(mediaPackageId);
+      return Response.ok(new JaxbJob(job)).build();
     } catch (Exception e) {
-      logger.warn(e.getMessage(), e);
+      logger.info(e.getMessage());
       return Response.serverError().build();
     }
   }
@@ -293,4 +284,41 @@ public class SearchRestService {
     else
       return Response.ok(searchService.getByQuery(query)).type(MediaType.APPLICATION_XML).build();
   }
+
+  /**
+   * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
+   */
+  @Override
+  public JobProducer getService() {
+    return searchService;
+  }
+
+  /**
+   * Callback from OSGi to set the search service implementation.
+   * 
+   * @param searchService
+   *          the service implementation
+   */
+  public void setSearchService(SearchServiceImpl searchService) {
+    this.searchService = searchService;
+  }
+
+  /**
+   * Callback from OSGi to set the service registry implementation.
+   * 
+   * @param serviceRegistry
+   *          the service registry
+   */
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  /**
+   * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
+   */
+  @Override
+  public ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
+  }
+
 }

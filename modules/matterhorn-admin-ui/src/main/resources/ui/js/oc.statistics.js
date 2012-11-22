@@ -30,7 +30,8 @@ ocStatistics = new (function() {
     "org_opencastproject_distribution_youtube"   : "Media distribution (YouTube)",
     "org_opencastproject_gstreamer"              : "GStreamer Launch Service",
     "org_opencastproject_inspection"             : "Media inspection",
-    "org_opencastproject_workflow"               : "Workflow"
+    "org_opencastproject_workflow"               : "Workflow",
+    "org_opencastproject_search"                 : "Engage"
   };
 
   /** Executed when directly when script is loaded: parses url parameters and

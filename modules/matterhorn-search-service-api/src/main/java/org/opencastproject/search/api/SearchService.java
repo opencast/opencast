@@ -16,6 +16,7 @@
 
 package org.opencastproject.search.api;
 
+import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -26,6 +27,7 @@ import org.opencastproject.util.NotFoundException;
  * Provides search capabilities, possibly to the engage tools, possibly to other services.
  */
 public interface SearchService {
+
   /**
    * Identifier for service registration and location
    */
@@ -63,7 +65,7 @@ public interface SearchService {
    * @throws ServiceRegistryException
    *           if the job for adding the mediapackage can not be created
    */
-  void add(MediaPackage mediaPackage) throws SearchException, MediaPackageException, UnauthorizedException,
+  Job add(MediaPackage mediaPackage) throws SearchException, MediaPackageException, UnauthorizedException,
           ServiceRegistryException;
 
   /**
@@ -77,7 +79,7 @@ public interface SearchService {
    * @throws UnauthorizedException
    *           if the current user is not authorized to remove this mediapackage from the search index
    */
-  boolean delete(String mediaPackageId) throws SearchException, UnauthorizedException, NotFoundException;
+  Job delete(String mediaPackageId) throws SearchException, UnauthorizedException, NotFoundException;
 
   /**
    * Find search results based on the specified query object

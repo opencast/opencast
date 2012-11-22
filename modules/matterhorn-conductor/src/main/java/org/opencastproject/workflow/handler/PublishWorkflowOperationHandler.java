@@ -15,12 +15,14 @@
  */
 package org.opencastproject.workflow.handler;
 
+import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
+import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -170,8 +172,20 @@ public class PublishWorkflowOperationHandler extends AbstractWorkflowOperationHa
         createResult(mediaPackageForSearch, Action.CONTINUE);
       }
       logger.info("Publishing media package {} to search index", mediaPackageForSearch);
+      
       // adding media package to the search index
-      searchService.add(mediaPackageForSearch);
+      Job publishJob = null;
+      try {
+        publishJob = searchService.add(mediaPackageForSearch);
+        if (!waitForStatus(publishJob).isSuccess()) {
+          throw new WorkflowOperationException("Mediapackage " + mediaPackageForSearch.getIdentifier() + " could not be published");
+        }
+      } catch (SearchException e) {
+        throw new WorkflowOperationException("Error publishing media package", e);
+      } catch (MediaPackageException e) {
+        throw new WorkflowOperationException("Error parsing media package", e);
+      }
+
       logger.debug("Publish operation complete");
       return createResult(mediaPackageFromWorkflow, Action.CONTINUE);
     } catch (Throwable t) {
