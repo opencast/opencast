@@ -31,7 +31,7 @@
         <option>50</option>
         <option>100</option>
       </select>
-      episodes per page.
+      archives per page.
     </div>
 
 

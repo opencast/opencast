@@ -2,7 +2,7 @@
   <thead>
   <tr>
     <th class="ui-state-default">
-      <input type="checkbox" id="selectAllEpisodes" title="Select all episodes on this page"/>
+      <input type="checkbox" id="selectAllEpisodes" title="Select all archives on this page"/>
     </th>
     <th id="sortTitle" width="25%" class="ui-widget-header sortable">
       <div>Title
@@ -63,7 +63,7 @@
     <% }); %>
     <% if (this.episodes.length == 0) { %>
       <tr>
-        <td colspan="6" align="center">No Episodes found</td>
+        <td colspan="6" align="center">No Archives found</td>
       </tr>
     <% } %>
   </tbody>
