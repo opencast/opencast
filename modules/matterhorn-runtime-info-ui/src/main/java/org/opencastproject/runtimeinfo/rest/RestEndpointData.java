@@ -185,13 +185,8 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
    * 
    * @param param
    *          the required parameter to add
-   * @throws IllegalStateException
-   *           if the endpoint is a GET endpoint
    */
   public void addRequiredParam(RestParamData param) throws IllegalStateException {
-    if (isGetMethod()) {
-      throw new IllegalStateException("Cannot add required params for GET endpoints.");
-    }
     param.setRequired(true);
     param.setPath(false);
     if (requiredParams == null) {
