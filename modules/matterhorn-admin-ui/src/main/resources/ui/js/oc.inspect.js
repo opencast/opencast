@@ -156,7 +156,18 @@ Opencast.WorkflowInspect = (function() {
         mp.metadata = {};
         mp.metadata.catalog = [];
       }
-
+      
+      // Join tags to a comma seperated string
+      var joinTags = function(array) {
+    	  $.each(array, function(i, elem) {
+    		  var tags = Opencast.RenderUtils.ensureArray(elem.tags.tag);
+    		  elem.tags = tags.join(', ');
+    	  });
+      };
+      joinTags(mp.attachments);
+      joinTags(mp.media.track);
+      joinTags(mp.metadata.catalog);
+      
       // 'flatten' encoder and scantype properties
       try {
         $.each(mp.media.track, function(index, track) {
