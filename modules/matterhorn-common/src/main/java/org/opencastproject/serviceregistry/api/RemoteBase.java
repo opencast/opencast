@@ -15,7 +15,11 @@
  */
 package org.opencastproject.serviceregistry.api;
 
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityConstants;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.security.api.User;
 import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.lang.StringUtils;
@@ -50,8 +54,11 @@ public class RemoteBase {
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
 
-  /** the http client */
+  /** The http client */
   protected ServiceRegistry remoteServiceManager = null;
+  
+  /** The security service */
+  protected SecurityService securityService = null;
 
   /**
    * Creates a remote implementation for the given type of service.
@@ -84,6 +91,15 @@ public class RemoteBase {
   }
 
   /**
+   * Sets the remote service manager.
+   * 
+   * @param remoteServiceManager
+   */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
+  /**
    * Makes a request to all available remote services and returns the response as soon as the first of them returns the
    * {@link HttpStatus.SC_OK} as the status code.
    * 
@@ -110,6 +126,18 @@ public class RemoteBase {
    * @return the response object, or null if we can not connect to any services
    */
   protected HttpResponse getResponse(HttpRequestBase httpRequest, Integer... expectedHttpStatus) {
+
+    // If a security service has been set, use it to pass the current security context on
+    if (securityService != null) {
+      logger.debug("Adding security context to request");
+      Organization organization = securityService.getOrganization();
+      if (organization != null)
+        httpRequest.addHeader(SecurityConstants.ORGANIZATION_HEADER, organization.getId());
+      User user = securityService.getUser();
+      if (user != null)
+        httpRequest.addHeader(SecurityConstants.USER_HEADER, user.getUserName());
+    }
+
     // Try forever
     while (true) {
 
