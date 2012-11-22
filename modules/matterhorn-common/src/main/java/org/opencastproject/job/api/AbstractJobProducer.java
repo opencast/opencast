@@ -183,8 +183,8 @@ public abstract class AbstractJobProducer implements JobProducer {
     @Override
     public Void call() throws Exception {
       SecurityService securityService = getSecurityService();
-      Organization organization = getOrganizationDirectoryService().getOrganization(job.getOrganization());
       try {
+        Organization organization = getOrganizationDirectoryService().getOrganization(job.getOrganization());
         getServiceRegistry().setCurrentJob(currentJob);
         securityService.setOrganization(organization);
         User user = getUserDirectoryService().loadUser(job.getCreator());
