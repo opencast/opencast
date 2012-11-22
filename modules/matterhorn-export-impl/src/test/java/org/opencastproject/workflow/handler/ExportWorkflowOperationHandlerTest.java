@@ -100,12 +100,11 @@ public class ExportWorkflowOperationHandlerTest {
             .toURI();
     randomXMLURI = ExportWorkflowOperationHandlerTest.class.getResource("/compose_encode_mediapackage.xml").toURI();
 
-    Attachment binaryFile = AttachmentImpl.fromURI(movieFileURI);
     Attachment withoutGStreamerFile = AttachmentImpl.fromURI(withoutGStreamerURI);
     Attachment withGStreamer = AttachmentImpl.fromURI(withGStreamerURI);
     Attachment randomXML = AttachmentImpl.fromURI(randomXMLURI);
 
-    Attachment[] attachments = { binaryFile, withoutGStreamerFile, randomXML, withGStreamer };
+    Attachment[] attachments = { withoutGStreamerFile, randomXML, withGStreamer };
 
     Track movieTrack = TrackImpl.fromURI(movieFileURI);
     movieTrack.setIdentifier("track-1");
@@ -129,6 +128,7 @@ public class ExportWorkflowOperationHandlerTest {
     Job job = EasyMock.createNiceMock(Job.class);
     EasyMock.expect(job.getStatus()).andReturn(Status.FINISHED).anyTimes();
     EasyMock.expect(job.getQueueTime()).andReturn(10L).anyTimes();
+    EasyMock.expect(job.getPayload()).andReturn(getPayload()).anyTimes();
     EasyMock.replay(job);
     
     gstreamerService = EasyMock.createNiceMock(GStreamerService.class);
@@ -139,6 +139,17 @@ public class ExportWorkflowOperationHandlerTest {
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job).anyTimes();
     EasyMock.replay(serviceRegistry);
   }
+
+  public String getPayload() {
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:track id=\"c3c2cab6-03c4-4536-a69e-143d7cba0130\""
+            + "xmlns:ns2=\"http://mediapackage.opencastproject.org\"><mimetype>video/msvideo</mimetype><tags/>"
+            + "<url>http://mhworker2test.usask.ca:8080/files/collection/composer/14583.avi</url><checksum type=\"md5\">"
+            + "9cc12cd9d443737e84400aa09e1b99bc</checksum><duration>7499080</duration><audio id=\"audio-1\"><device/>"
+            + "<encoder type=\"MPEG Audio\"/><channels>2</channels><bitrate>64000.0</bitrate></audio><video id=\"video-1\">"
+            + "<device/><encoder type=\"MPEG-4 Visual\"/><bitrate>200455.0</bitrate><framerate>25.0</framerate><resolution>320x240</resolution>"
+            + "<scantype type=\"Progressive\"/></video></ns2:track>";
+  }
+
 
   /**
    * Test it correctly processes attachments
@@ -166,11 +177,10 @@ public class ExportWorkflowOperationHandlerTest {
      if (!gstreamerInstalled) {
        return;
     }
-    Attachment binaryFile = AttachmentImpl.fromURI(movieFileURI);
     Attachment withoutGStreamerFile = AttachmentImpl.fromURI(withoutGStreamerURI);
     Attachment randomXML = AttachmentImpl.fromURI(randomXMLURI);
 
-    Attachment[] attachments = { binaryFile, withoutGStreamerFile, randomXML };
+    Attachment[] attachments = { withoutGStreamerFile, randomXML };
 
     mediaPackage = EasyMock.createNiceMock(MediaPackage.class);
     EasyMock.expect(mediaPackage.getAttachments()).andReturn(attachments);
