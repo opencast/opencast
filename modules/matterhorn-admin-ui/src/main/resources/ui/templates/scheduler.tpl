@@ -1,4 +1,21 @@
 <div id="content">
+
+  <!-- CONTENT AREA -->
+  <div class="layout-page-content">
+    <div class="form-box layout-centered scheduler-selection-container">
+      <h2><span id="i18n_page_title">Schedule Recording</span></h2>
+      <ul id="recordingType" class="layout-centered">
+        <li>
+          <input type="radio" id="singleRecording" name="recordingType" checked="checked" />
+          <label for="singleRecording" class="lbl_radio"> Single Recording</label>
+        </li>
+        <li>
+          <input type="radio" id="multipleRecordings" name="recordingType" />
+          <label for="multipleRecordings" class="lbl_radio"> Group of Recordings</label>
+        </li>
+      </ul>
+    </div>
+    
   <div class="form-box layout-centered layout-page-header ui-helper-hidden" id="missingFieldsContainer">
     <div class="ui-state-error ui-corner-all scheduler-info-container">
       <h3 style="position: relative; padding-left: 20px;">
@@ -40,22 +57,6 @@
       </ul>
     </div>
   </div>
-
-  <!-- CONTENT AREA -->
-  <div class="layout-page-content">
-    <div class="form-box layout-centered scheduler-selection-container">
-      <h2><span id="i18n_page_title">Schedule Recording</span></h2>
-      <ul id="recordingType" class="layout-centered">
-        <li>
-          <input type="radio" id="singleRecording" name="recordingType" checked="checked" />
-          <label for="singleRecording" class="lbl_radio"> Single Recording</label>
-        </li>
-        <li>
-          <input type="radio" id="multipleRecordings" name="recordingType" />
-          <label for="multipleRecordings" class="lbl_radio"> Group of Recordings</label>
-        </li>
-      </ul>
-    </div>
 
     <!-- Common Scheduling Information -->
     <div class="form-box layout-centered ui-widget">

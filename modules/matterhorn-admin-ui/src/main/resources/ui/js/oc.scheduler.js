@@ -1516,11 +1516,15 @@ var ocScheduler = (function() {
   }
 
   function showUserMessages(errors, type) {
+    var errorContainer         = $('.scheduler-info-container'),
+        missingFieldsContainer = $('#missingFieldsContainer');
+    
     type = type || 'error';
-    if(type === 'error' && $('#missingFieldsContainer').css('display') === 'none') {
-      $('#missingFieldsContainer').show();
+
+    if(type === 'error' && missingFieldsContainer.css('display') === 'none') {
+      missingFieldsContainer.show();
     } else {
-      $('#missingFieldsContainer li').hide();
+      missingFieldsContainer.find('li').hide();
     }
     for(var i in errors) {
       $('#' + errors[i].name).show();
@@ -1529,6 +1533,8 @@ var ocScheduler = (function() {
         $('#' + label).addClass('label-error');
       }
     }
+    $(window).scrollTop(errorContainer.offset().top)
+             .scrollLeft(errorContainer.offset().left);
   }
 
   function hideUserMessages() {

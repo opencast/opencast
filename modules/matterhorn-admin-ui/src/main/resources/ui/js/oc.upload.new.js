@@ -210,6 +210,8 @@ ocUpload.UI = (function() {
   }
 
   this.updateMissingFieldNotification = function(missingFields) {
+    var errorContainer = $('.scheduler-info-container');
+
     ocUtils.log('Updating missing fields notification');
     if (missingFields == false) {
       $('#missingFieldsContainer').hide();
@@ -222,6 +224,9 @@ ocUpload.UI = (function() {
           $(this).hide();
         }
       });
+
+      $(window).scrollTop(errorContainer.offset().top)
+             .scrollLeft(errorContainer.offset().left);
     }
   }
 
