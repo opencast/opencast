@@ -107,9 +107,6 @@ public class SeriesRestService {
   /** Default number of items on page */
   private static final int DEFAULT_LIMIT = 20;
 
-  /** Maximum number of items on page */
-  private static final int MAX_LIMIT = 100;
-
   /** Suffix to mark descending ordering of results */
   public static final String DESCENDING_SUFFIX = "_DESC";
 
@@ -486,9 +483,8 @@ public class SeriesRestService {
       } catch (NumberFormatException e) {
         logger.warn("Bad count parameter");
       }
-      if ((count < 1) || (count > MAX_LIMIT)) {
+      if (count < 1)
         count = DEFAULT_LIMIT;
-      }
     }
 
     SeriesQuery q = new SeriesQuery();
