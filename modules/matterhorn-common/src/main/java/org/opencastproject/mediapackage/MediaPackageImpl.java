@@ -1086,11 +1086,11 @@ public final class MediaPackageImpl implements MediaPackage {
    * @param element
    */
   protected void removeElement(MediaPackageElement element) {
+    removeInternal(element);
+    fireElementRemoved(element);
     if (element instanceof AbstractMediaPackageElement) {
       ((AbstractMediaPackageElement) element).setMediaPackage(null);
     }
-    removeInternal(element);
-    fireElementRemoved(element);
   }
 
   /**
