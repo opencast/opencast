@@ -153,7 +153,7 @@ table#agentsTable th, table#seriesTable th, table#recordingsTable th, table#stat
 .oc-ui-form-field { border: 1px #aaa solid; width: 450px; }
 .oc-ui-checkbox-list { padding-left: 30px; }
 .oc-ui-collapsible-widget > .ui-widget-content { display: none; }
-.form-box { margin-top: 10px; width: 800px; }
+.form-box { margin-top: 10px; min-width: 800px; }
 .form-box .form-box-head { padding: 3px 5px }
 .form-box .form-box-content { padding: 20px; }
 #additional_icon, .fold-icon { float: left; margin-left: -5px; } 

@@ -876,8 +876,12 @@ function cloneArray(array){
  * @see http://keithdevens.com/weblog/archive/2007/Jun/07/javascript.clone
  */
 function clone(obj){
-    if(obj == null || typeof(obj) != 'object')
+    if (obj == null || typeof(obj) != 'object') {
         return obj;
+    } else if (obj instanceof Element) {
+   		// Return a clone of an HTML eleemnt
+    	return $(obj).clone()[0];
+    }
 
     var temp = new obj.constructor(); 
     for(var key in obj)

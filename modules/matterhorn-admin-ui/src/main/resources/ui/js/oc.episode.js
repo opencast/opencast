@@ -211,12 +211,20 @@ opencast.episode = (function() {
    *  @return $win
    */
   function openWindow($win, opt) {
-    $win.dialog("option", _.extend({
+    var options =  _.extend({
       width: $(window).width() - 40,
+      width: '80%',
       height: $(window).height() - 40,
       position: ["center", "center"],
       show: "scale"
-    }, opt || {})).dialog("open");
+    }, opt || {});
+
+    $win.dialog("option",options).dialog("open");
+
+    $(window).bind('resize',function(){
+      $win.dialog("option",options);
+    });
+
     return $win;
   }
 
