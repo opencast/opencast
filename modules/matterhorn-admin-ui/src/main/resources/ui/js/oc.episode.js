@@ -501,7 +501,7 @@ opencast.episode = (function() {
                 function (a) {
                   return selectedEpisodes[a]
                 }).value().length;
-        $("#selectedEpisodesCount").html(c + " episode(s) selected");
+        $("#selectedEpisodesCount").html(c + " archives(s) selected");
       }
 
       /** Create a state object from the current URL.
