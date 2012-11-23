@@ -15,6 +15,11 @@
  */
 package org.opencastproject.remotetest;
 
+import org.opencastproject.remotetest.server.WorkingFileRepoRestEndpointTest;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 import org.opencastproject.remotetest.server.CaptureAdminRestEndpointTest;
 import org.opencastproject.remotetest.server.ComposerRestEndpointTest;
 import org.opencastproject.remotetest.server.DistributionDownloadRestEndpointTest;
@@ -30,11 +35,6 @@ import org.opencastproject.remotetest.server.ScheduledCaptureTest;
 import org.opencastproject.remotetest.server.UnscheduledCaptureTest;
 import org.opencastproject.remotetest.server.UploadTest;
 import org.opencastproject.remotetest.server.WorkflowRestEndpointTest;
-import org.opencastproject.remotetest.server.WorkingFileRepoRestEndpointTest;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * Runs the server-side tests
