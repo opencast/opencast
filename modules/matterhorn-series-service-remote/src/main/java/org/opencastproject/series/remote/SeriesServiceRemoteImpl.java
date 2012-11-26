@@ -133,7 +133,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     HttpDelete del = new HttpDelete(seriesID);
     HttpResponse response = null;
     try {
-      response = getResponse(del);
+      response = getResponse(del, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND);
       if (response == null)
         throw new SeriesException("Unable to remove " + seriesID + " from a remote series index");
       int status = response.getStatusLine().getStatusCode();
@@ -156,7 +156,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     HttpGet get = new HttpGet(seriesID + ".xml");
     HttpResponse response = null;
     try {
-      response = getResponse(get);
+      response = getResponse(get, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND);
       if (response == null)
         throw new SeriesException("Unable to get series from remote series index");
       int status = response.getStatusLine().getStatusCode();
@@ -181,7 +181,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     HttpGet get = new HttpGet(seriesID + "/acl.xml");
     HttpResponse response = null;
     try {
-      response = getResponse(get);
+      response = getResponse(get, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND);
       if (response == null)
         throw new SeriesException("Unable to get series ACL from remote series index");
       int status = response.getStatusLine().getStatusCode();
