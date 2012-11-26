@@ -47,6 +47,16 @@ case `os` in
     sudox apt-get -y install gstreamer0.10-ffmpeg
     [ $? -ne 0 ] && exit 1
     ;;
+   openSUSE )
+    sudox zypper  --non-interactive install gstreamer        # gst-launch-0.10
+    [ $? -ne 0 ] && exit 1
+    sudox zypper  --non-interactive install gstreamer-plugins-base
+    [ $? -ne 0 ] && exit 1
+    sudox zypper  --non-interactive install gstreamer-plugins-good
+    [ $? -ne 0 ] && exit 1
+    sudox zypper  --non-interactive install gstreamer-plugins-bad
+    [ $? -ne 0 ] && exit 1
+    ;;
   * )
     echo "Unsupported operating system: `os`" 1>&2
     exit 1
