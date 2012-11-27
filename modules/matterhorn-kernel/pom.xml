@@ -59,18 +59,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>org.springframework.security.openid</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.springframework.security.oauth</groupId>
       <artifactId>spring-security-oauth</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.openid4java</groupId>
-      <artifactId>com.springsource.org.openid4java</artifactId>
     </dependency>
 
     <dependency>
@@ -276,7 +266,6 @@
               org.springframework.security.core.userdetails,
               org.springframework.security.core.userdetails.cache,
               org.springframework.security.core.userdetails.memory,
-              org.springframework.security.openid;resolution:=optional,
               org.springframework.security.web,
               org.springframework.security.web.authentication,
               org.springframework.security.web.authentication.www,
