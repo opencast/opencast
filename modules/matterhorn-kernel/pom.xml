@@ -319,6 +319,7 @@
               OSGI-INF/security-service.xml,
               OSGI-INF/smtp-service.xml,
               OSGI-INF/user-and-role-directory-service.xml,
+              OSGI-INF/remote-user-and-role-filter.xml,
               OSGI-INF/security-config-scanner.xml
             </Service-Component>
           </instructions>
