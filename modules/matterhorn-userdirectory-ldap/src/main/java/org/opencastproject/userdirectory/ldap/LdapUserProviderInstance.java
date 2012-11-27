@@ -217,7 +217,8 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
         cache.put(userName, nullToken);
         return null;
       }
-      Collection<GrantedAuthority> authorities = userDetails.getAuthorities();
+
+      Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
       String[] roles = null;
       if (authorities != null) {
         int i = 0;
