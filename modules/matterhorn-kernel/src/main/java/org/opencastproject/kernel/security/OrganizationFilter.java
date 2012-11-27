@@ -15,15 +15,11 @@
  */
 package org.opencastproject.kernel.security;
 
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
-import static org.opencastproject.security.api.SecurityConstants.ORGANIZATION_HEADER;
-
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,31 +95,16 @@ public class OrganizationFilter implements Filter {
 
     try {
 
-      // Check if the organization was specified in the header
-      String organizationHeader = httpRequest.getHeader(ORGANIZATION_HEADER);
-      if (StringUtils.isNotBlank(organizationHeader)) {
-        try {
-          org = organizationDirectory.getOrganization(organizationHeader);
-          logger.trace("Switching to organization '{}' from request header {}", organizationHeader, ORGANIZATION_HEADER);
-        } catch (NotFoundException e) {
-          logger.warn("Non-existing organization '{}' in request header {}", organizationHeader, ORGANIZATION_HEADER);
-        }
-      }
-
-      // If the header did not specify the organization, use the request url
-
-      if (org == null) {
-        try {
-          org = organizationDirectory.getOrganization(url);
-        } catch (NotFoundException e) {
-          logger.trace("No organization mapped to {}", url);
-          List<Organization> orgs = organizationDirectory.getOrganizations();
-          if (orgs.size() == 1 && DEFAULT_ORGANIZATION_ID.equals(orgs.get(0).getId())) {
-            logger.trace("Defaulting organization to {}", DEFAULT_ORGANIZATION_ID);
-            org = orgs.get(0);
-          } else {
-            logger.warn("No organization is mapped to handle {}", url);
-          }
+      try {
+        org = organizationDirectory.getOrganization(url);
+      } catch (NotFoundException e) {
+        logger.trace("No organization mapped to {}", url);
+        List<Organization> orgs = organizationDirectory.getOrganizations();
+        if (orgs.size() == 1) {
+          org = orgs.get(0);
+          logger.trace("Defaulting organization to {}", org);
+        } else {
+          logger.warn("No organization is mapped to handle {}", url);
         }
       }
 

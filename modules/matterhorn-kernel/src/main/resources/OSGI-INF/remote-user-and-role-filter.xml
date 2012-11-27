@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+
+  <scr:component name="org.opencastproject.kernel.security.RemoteUserAndOrganizationFilter" immediate="true">
+    <implementation class="org.opencastproject.kernel.security.RemoteUserAndOrganizationFilter" />
+    <property name="service.description" value="Remote User and Organization Filter" />
+    <property name="contextId" value="opencast.httpcontext" />
+    <!-- The CleanSessionsFilter must have the highest service.ranking value. See CleanSessionsFilter.java for details. -->
+    <!-- This filter must be called after the organization filter -->
+    <property name="service.ranking" value="4" />
+    <property name="pattern" value=".*" />
+    <service>
+      <provide interface="javax.servlet.Filter" />
+    </service>
+    <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+      cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+    <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
+      cardinality="1..1" policy="static" bind="setSecurityService" />
+    <reference name="userDirectoryService" interface="org.opencastproject.security.api.UserDirectoryService"
+      cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+  </scr:component>
+
+</scr:components>
