@@ -15,33 +15,68 @@
  */
 package org.opencastproject.security.api;
 
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.StringWriter;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  * Tests the JAXB java to xml conversion of the organization class.
  */
 public class OrganizationParsingTest {
+
+  private static final String ORG_XML_FILE = "/organization.xml";
+
+  private JAXBContext jaxbContext;
+
+  @Before
+  public void setUp() throws Exception {
+    jaxbContext = JAXBContext.newInstance(JaxbOrganization.class);
+  }
+
   @Test
-  public void testOrgParsing() throws Exception {
-    JAXBContext jaxbContext = JAXBContext.newInstance(Organization.class);
+  public void testMarshalOrganization() throws Exception {
     StringWriter writer = new StringWriter();
     Organization org = new DefaultOrganization();
     jaxbContext.createMarshaller().marshal(org, writer);
 
-    String expectedOutput = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<organization id=\"mh_default_org\" xmlns=\"http://org.opencastproject.security\">"
-            + "<name>Opencast Project</name><serverName>http://localhost:8080</serverName><serverPort>80</serverPort>"
-            + "<adminRole>ROLE_ADMIN</adminRole><anonymousRole>ANONYMOUS</anonymousRole><properties>"
-            + "<property key=\"logo_small\">/admin/img/mh_logos/OpencastLogo.png</property>"
-            + "<property key=\"logo_large\">/admin/img/mh_logos/MatterhornLogo_large.png</property>"
-            + "</properties></organization>";
+    String expectedOutput = IOUtils.toString(getClass().getResourceAsStream(ORG_XML_FILE), "UTF-8");
 
     assertEquals("Organization XML not formed as expected", expectedOutput, writer.toString());
   }
+
+  @Test
+  public void testUnmarshalOrganization() throws Exception {
+    Organization org = new DefaultOrganization();
+
+    StreamSource streamSource = new StreamSource(getClass().getResourceAsStream(ORG_XML_FILE));
+    JaxbOrganization organization = jaxbContext.createUnmarshaller().unmarshal(streamSource, JaxbOrganization.class)
+            .getValue();
+
+    assertEquals(org.getId(), organization.getId());
+    assertEquals(org.getName(), organization.getName());
+    assertEquals(org.getAdminRole(), organization.getAdminRole());
+    assertEquals(org.getAnonymousRole(), organization.getAnonymousRole());
+    assertEquals(org.getServers().size(), organization.getServers().size());
+    for (Map.Entry<String, Integer> server : org.getServers().entrySet()) {
+      boolean found = false;
+      for (Map.Entry<String, Integer> s : organization.getServers().entrySet()) {
+        if (server.getKey().equals(s.getKey()) && server.getValue().equals(s.getValue())) {
+          found = true;
+          break;
+        }
+      }
+     assertTrue(found);
+    }
+    assertEquals(org.getProperties(), organization.getProperties());
+  }
+
 }

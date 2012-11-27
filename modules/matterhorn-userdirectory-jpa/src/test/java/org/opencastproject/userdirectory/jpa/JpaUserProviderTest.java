@@ -15,6 +15,7 @@
  */
 package org.opencastproject.userdirectory.jpa;
 
+import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 
@@ -41,8 +42,12 @@ public class JpaUserProviderTest {
   
   @Before
   public void setUp() throws Exception {
-    org1 = new Organization("org1", "org1", "localhost", "admin", "anon");
-    org2 = new Organization("org2", "org2", "127.0.0.1", "admin", "anon");
+    Map<String, Integer> server1 = new HashMap<String, Integer>();
+    server1.put("localhost", 8080);
+    org1 = new JaxbOrganization("org1", "org1", server1, "admin", "anon", null);
+    Map<String, Integer> server2 = new HashMap<String, Integer>();
+    server1.put("127.0.0.1", 8080);
+    org2 = new JaxbOrganization("org2", "org2", server2, "admin", "anon", null);
 
     pooledDataSource = new ComboPooledDataSource();
     pooledDataSource.setDriverClass("org.h2.Driver");

@@ -19,7 +19,6 @@ import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZ
 import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ANONYMOUS;
 import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
 import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_NAME;
-import static org.opencastproject.util.UrlSupport.DEFAULT_BASE_URL;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,36 +27,41 @@ import java.util.Map;
 /**
  * The default organization.
  */
-public class DefaultOrganization extends Organization {
+public class DefaultOrganization extends JaxbOrganization {
 
   /** The default organization properties */
   public static final Map<String, String> DEFAULT_PROPERTIES;
 
+  /** Servername - port mappings */
+  public static final Map<String, Integer> DEFAULT_SERVERS;
+  
   static {
-    Map<String, String> map = new HashMap<String, String>();
-    map.put("logo_large", "/admin/img/mh_logos/MatterhornLogo_large.png");
-    map.put("logo_small", "/admin/img/mh_logos/OpencastLogo.png");
-    DEFAULT_PROPERTIES = Collections.unmodifiableMap(map);
+    Map<String, String> properties = new HashMap<String, String>();
+    properties.put("logo_large", "/admin/img/mh_logos/MatterhornLogo_large.png");
+    properties.put("logo_small", "/admin/img/mh_logos/OpencastLogo.png");
+    DEFAULT_PROPERTIES = Collections.unmodifiableMap(properties);
+    
+    Map<String, Integer> servers = new HashMap<String, Integer>();
+    servers.put("http://localhost", 80);
+    DEFAULT_SERVERS = Collections.unmodifiableMap(servers);
   }
 
   /**
    * No-arg constructor needed by JAXB
    */
   public DefaultOrganization() {
-    super(DEFAULT_ORGANIZATION_ID, DEFAULT_ORGANIZATION_NAME, DEFAULT_BASE_URL, DEFAULT_ORGANIZATION_ADMIN,
+    super(DEFAULT_ORGANIZATION_ID, DEFAULT_ORGANIZATION_NAME, DEFAULT_SERVERS, DEFAULT_ORGANIZATION_ADMIN,
             DEFAULT_ORGANIZATION_ANONYMOUS, DEFAULT_PROPERTIES);
   }
 
   /**
-   * Creates a default organization for the given hostname and port number.
+   * Creates a default organization for the given servers.
    * 
-   * @param host
-   *          the server name
-   * @param port
-   *          the server port
+   * @param servers
+   *          the server names and ports
    */
-  public DefaultOrganization(String host, int port) {
-    super(DEFAULT_ORGANIZATION_ID, DEFAULT_ORGANIZATION_NAME, host, port, DEFAULT_ORGANIZATION_ADMIN,
+  public DefaultOrganization(Map<String, Integer> servers) {
+    super(DEFAULT_ORGANIZATION_ID, DEFAULT_ORGANIZATION_NAME, servers, DEFAULT_ORGANIZATION_ADMIN,
             DEFAULT_ORGANIZATION_ANONYMOUS, DEFAULT_PROPERTIES);
   }
 

@@ -286,6 +286,7 @@
               org.opencastproject.kernel.pingback;version=${project.version},
               org.opencastproject.kernel.rest;version=${project.version},
               org.opencastproject.kernel.security;version=${project.version},
+              org.opencastproject.kernel.security.persistence;version=${project.version},
               org.opencastproject.kernel.userdirectory;version=${project.version},
               org.springframework.security.oauth;version=1.0.0.M1,
               org.springframework.security.oauth.common;version=1.0.0.M1,
@@ -302,6 +303,7 @@
               OSGI-INF/jsonp.xml,
               OSGI-INF/organization-directory-service.xml,
               OSGI-INF/organization-filter.xml,
+              OSGI-INF/organization-persistence.xml,
               OSGI-INF/current-job-filter.xml,
               OSGI-INF/pingback.xml,
               OSGI-INF/rest.xml,
@@ -311,6 +313,9 @@
               OSGI-INF/remote-user-and-role-filter.xml,
               OSGI-INF/security-config-scanner.xml
             </Service-Component>
+            <JPA-PersistenceUnits>
+              org.opencastproject.kernel
+            </JPA-PersistenceUnits>
           </instructions>
         </configuration>
       </plugin>

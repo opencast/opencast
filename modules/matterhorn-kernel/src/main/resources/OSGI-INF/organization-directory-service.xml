@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
 
-  <scr:component name="org.opencastproject.kernel.security.OrganizationDirectoryServiceImpl" activate="activate" immediate="true">
+  <scr:component name="org.opencastproject.kernel.security.OrganizationDirectoryServiceImpl" immediate="true">
     <implementation class="org.opencastproject.kernel.security.OrganizationDirectoryServiceImpl" />
     <property name="service.pid" value="org.opencastproject.organization" />
     <property name="service.description" value="Organization Directory Service" />
@@ -11,6 +11,8 @@
     </service>
     <reference name="configAdmin" interface="org.osgi.service.cm.ConfigurationAdmin"
       cardinality="1..1" policy="static" bind="setConfigurationAdmin" />
+    <reference name="persistence" interface="org.opencastproject.kernel.security.persistence.OrganizationDatabase"
+      cardinality="1..1" policy="static" bind="setOrgPersistence" />
   </scr:component>
 
   <scr:component name="org.opencastproject.kernel.security.OrganizationEndpoint" immediate="true">
