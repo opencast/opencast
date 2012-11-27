@@ -87,11 +87,11 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
     digestUsername = cc.getBundleContext().getProperty("org.opencastproject.security.digest.user");
     digestUserPass = cc.getBundleContext().getProperty("org.opencastproject.security.digest.pass");
     adminUsername = StringUtils
-            .trimToNull(cc.getBundleContext().getProperty("org.opencastproject.security.demo.admin.user"));
+            .trimToNull(cc.getBundleContext().getProperty("org.opencastproject.security.admin.user"));
     adminUserPass = StringUtils
-            .trimToNull(cc.getBundleContext().getProperty("org.opencastproject.security.demo.admin.pass"));
+            .trimToNull(cc.getBundleContext().getProperty("org.opencastproject.security.admin.pass"));
     adminUserRoles = StringUtils.trimToNull(cc.getBundleContext().getProperty(
-            "org.opencastproject.security.demo.admin.roles"));
+            "org.opencastproject.security.admin.roles"));
   }
 
   private List<User> getAdminUsers(Organization organization) {
