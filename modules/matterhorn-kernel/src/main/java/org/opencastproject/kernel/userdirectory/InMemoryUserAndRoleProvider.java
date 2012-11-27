@@ -15,32 +15,67 @@
  */
 package org.opencastproject.kernel.userdirectory;
 
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ADMIN;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.RoleProvider;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.util.PasswordEncoder;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * An in-memory user directory containing the users and roles used by the system.
  */
 public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
 
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(InMemoryUserAndRoleProvider.class);
+
   /** The roles associated with the matterhorn system account */
-  public static final String[] MH_SYSTEM_ROLES = new String[] { "ROLE_ADMIN", "ROLE_USER", DEFAULT_ORGANIZATION_ADMIN };
+  public static final String[] MH_SYSTEM_ROLES = new String[] { GLOBAL_ADMIN_ROLE };
+
+  protected OrganizationDirectoryService orgDirectoryService;
+
+  protected SecurityService securityService;
+
+  private String digestUsername;
+  private String digestUserPass;
+  private String adminUsername;
+  private String adminUserPass;
+  private String adminUserRoles;
 
   /**
-   * A collection of accounts internal to Matterhorn.
+   * Sets a reference to the organization directory service.
+   * 
+   * @param organizationDirectory
+   *          the organization directory
    */
-  protected Map<String, User> internalAccounts = null;
+  public void setOrganizationDirectoryService(OrganizationDirectoryService orgDirectoryService) {
+    this.orgDirectoryService = orgDirectoryService;
+  }
+
+  /**
+   * Sets a reference to the security service.
+   * 
+   * @param securityService
+   *          the security service
+   */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
 
   /**
    * Callback to activate the component.
@@ -49,37 +84,51 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
    *          the declarative services component context
    */
   protected void activate(ComponentContext cc) {
-    internalAccounts = new HashMap<String, User>();
+    digestUsername = cc.getBundleContext().getProperty("org.opencastproject.security.digest.user");
+    digestUserPass = cc.getBundleContext().getProperty("org.opencastproject.security.digest.pass");
+    adminUsername = StringUtils
+            .trimToNull(cc.getBundleContext().getProperty("org.opencastproject.security.admin.user"));
+    adminUserPass = StringUtils
+            .trimToNull(cc.getBundleContext().getProperty("org.opencastproject.security.admin.pass"));
+    adminUserRoles = StringUtils.trimToNull(cc.getBundleContext().getProperty(
+            "org.opencastproject.security.admin.roles"));
+  }
+
+  private List<User> getAdminUsers(Organization organization) {
+    List<User> users = new ArrayList<User>();
+
+    String orgAdminRole = organization.getAdminRole();
+    String orgAnonymousRole = organization.getAnonymousRole();
 
     // Create the digest auth user with a clear text password
-    String digestUsername = cc.getBundleContext().getProperty("org.opencastproject.security.digest.user");
-    String digestUserPass = cc.getBundleContext().getProperty("org.opencastproject.security.digest.pass");
-    User systemAccount = new User(digestUsername, digestUserPass, DEFAULT_ORGANIZATION_ID, MH_SYSTEM_ROLES);
-    internalAccounts.put(digestUsername, systemAccount);
+    Set<String> roleList = new HashSet<String>();
+    roleList.add(orgAdminRole);
+    roleList.add(orgAnonymousRole);
+    for (String roleName : MH_SYSTEM_ROLES) {
+      roleList.add(roleName);
+    }
+    
+    // Add the roles as defined in the system configuration
+    if (StringUtils.isNotBlank(adminUserRoles)) {
+      for (String roleName : StringUtils.split(adminUserRoles, ',')) {
+        roleList.add(StringUtils.trim(roleName));
+      }
+    }
 
-    // Create a demo user with an encoded password for use in the UI
-    String adminUsername = StringUtils.trimToNull(cc.getBundleContext().getProperty(
-            "org.opencastproject.security.demo.admin.user"));
-    String adminUserPass = StringUtils.trimToNull(cc.getBundleContext().getProperty(
-            "org.opencastproject.security.demo.admin.pass"));
-    String adminUserRoles = StringUtils.trimToNull(cc.getBundleContext().getProperty(
-            "org.opencastproject.security.demo.admin.roles"));
+    User digestUser = new User(digestUsername, digestUserPass, organization.getId(), roleList.toArray(new String[roleList.size()]));
+    users.add(digestUser);
 
-    // Load the admin user, if necessary
-    if (StringUtils.isNotBlank(adminUsername) && StringUtils.isNotBlank(adminUserPass)
-            && StringUtils.isNotBlank(adminUserRoles)) {
-
-      // Strip any whitespace from the roles
-      String[] roleArray = StringUtils.split(adminUserRoles, ',');
-      for (int i = 0; i < roleArray.length; i++)
-        roleArray[i] = StringUtils.trim(roleArray[i]);
+    // Create the admin user with an encoded password for use in the UI, if necessary
+    if (adminUsername != null && adminUserPass != null) {
 
       // Encode the password
       String encodedPass = PasswordEncoder.encode(adminUserPass, adminUsername);
 
-      // Add the user
-      internalAccounts.put(adminUsername, new User(adminUsername, encodedPass, DEFAULT_ORGANIZATION_ID, roleArray));
+      User adminUser = new User(adminUsername, encodedPass, organization.getId(), roleList.toArray(new String[roleList.size()]));
+      users.add(adminUser);
     }
+
+    return users;
   }
 
   /**
@@ -89,7 +138,11 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   @Override
   public String[] getRoles() {
-    return MH_SYSTEM_ROLES;
+    Set<String> roles = new HashSet<String>();
+    for (User user : getAdminUsers(securityService.getOrganization())) {
+      roles.addAll(Arrays.asList(user.getRoles()));
+    }
+    return roles.toArray(new String[roles.size()]);
   }
 
   /**
@@ -99,7 +152,11 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   @Override
   public User loadUser(String userName) {
-    return internalAccounts.get(userName);
+    for (User user : getAdminUsers(securityService.getOrganization())) {
+      if (user.getUserName().equals(userName))
+        return user;
+    }
+    return null;
   }
 
   /**
@@ -129,7 +186,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   @Override
   public String[] getRolesForUser(String userName) {
-    return new String[0];
+    return new String[] {};
   }
 
 }
