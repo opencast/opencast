@@ -7,7 +7,7 @@
     <property name="contextId" value="opencast.httpcontext" />
     <!-- The CleanSessionsFilter must have the highest service.ranking value. See CleanSessionsFilter.java for details. -->
     <!-- This filter must be called after the organization filter -->
-    <property name="service.ranking" value="4" />
+    <property name="service.ranking" value="1" />
     <property name="pattern" value=".*" />
     <service>
       <provide interface="javax.servlet.Filter" />

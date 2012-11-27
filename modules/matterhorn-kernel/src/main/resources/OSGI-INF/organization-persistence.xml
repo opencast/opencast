@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+  <scr:component name="org.opencastproject.kernel.security.persistence.OrganizationDatabaseImpl" immediate="true" activate="activate" deactivate="deactivate">
+    <implementation class="org.opencastproject.kernel.security.persistence.OrganizationDatabaseImpl" />
+    <property name="service.description" value="Organization Persistence" />
+    <service>
+      <provide interface="org.opencastproject.kernel.security.persistence.OrganizationDatabase" />
+    </service>
+    <reference name="persistence" interface="javax.persistence.spi.PersistenceProvider"
+      cardinality="1..1" policy="static" bind="setPersistenceProvider" />    
+    <reference name="props" interface="java.util.Map"
+      cardinality="1..1" policy="static" target="(type=persistence)" bind="setPersistenceProperties" />
+    <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+      cardinality="1..1" policy="static" bind="setSecurityService" />
+  </scr:component>
+</scr:components>
