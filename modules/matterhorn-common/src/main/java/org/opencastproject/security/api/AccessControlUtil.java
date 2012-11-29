@@ -49,31 +49,26 @@ public final class AccessControlUtil {
    *           if any of the arguments are null
    */
   public static boolean isAuthorized(AccessControlList acl, User user, Organization org, String action) {
-    if (action == null || user == null || acl == null) {
+    if (action == null || user == null || acl == null)
       throw new IllegalArgumentException();
-    }
+
+    // Check for the global and local admin role
+    if (user.hasRole(GLOBAL_ADMIN_ROLE) || user.hasRole(org.getAdminRole()))
+      return true;
+
     String[] userRoles = user.getRoles();
     for (AccessControlEntry entry : acl.getEntries()) {
-      if (!action.equals(entry.getAction())) {
+      if (!action.equals(entry.getAction()))
         continue;
-      }
+
       String aceRole = entry.getRole();
       for (String role : userRoles) {
-        if (!role.equals(aceRole)) {
+        if (!role.equals(aceRole))
           continue;
-        }
+
         return entry.isAllow();
       }
     }
-    // Check for the local admin role
-    if (user.hasRole(org.getAdminRole())) {
-      return true;
-    }
-    // Check for the global admin role
-    if (user.hasRole(GLOBAL_ADMIN_ROLE)) {
-      return true;
-    }
-
     return false;
   }
 }
