@@ -103,6 +103,26 @@ CREATE TABLE matterhorn_user (
 	PRIMARY KEY (username, organization)
 );
 
+CREATE TABLE org_properties (
+    org_id VARCHAR(128) NOT NULL,
+    value VARCHAR(255) DEFAULT NULL,
+    name VARCHAR(255) DEFAULT NULL
+);
+
+CREATE TABLE org_servers (
+    org_id varchar(128) NOT NULL,
+    port int(11) DEFAULT NULL,
+    name varchar(255) DEFAULT NULL
+);
+
+CREATE TABLE organization (
+    org_id VARCHAR(128) NOT NULL,
+    anonymous_role VARCHAR(255) DEFAULT NULL,
+    name VARCHAR(255) DEFAULT NULL,
+    admin_role VARCHAR(255) DEFAULT NULL,
+    PRIMARY KEY (org_id)
+);
+
 CREATE TABLE scheduled_event (
 	event_id BIGINT NOT NULL,
 	capture_agent_metadata TEXT(65535),

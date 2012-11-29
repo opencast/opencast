@@ -16,6 +16,8 @@
 package org.opencastproject.serviceregistry.impl;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.opencastproject.security.api.SecurityConstants.ORGANIZATION_HEADER;
+import static org.opencastproject.security.api.SecurityConstants.USER_HEADER;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
@@ -1708,6 +1710,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       String serviceUrl = UrlSupport
               .concat(new String[] { registration.getHost(), registration.getPath(), "dispatch" });
       HttpPost post = new HttpPost(serviceUrl);
+
+      // Add current organization and user so they can be used during execution at the remote end
+      post.addHeader(ORGANIZATION_HEADER, securityService.getOrganization().getId());
+      post.addHeader(USER_HEADER, securityService.getUser().getUserName());
+
       try {
         String jobXml = JobParser.toXml(jpaJob);
         List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();

@@ -150,6 +150,35 @@ CREATE TABLE "matterhorn_user" (
 );
 
 --
+-- Table: org_servers
+--
+CREATE TABLE "org_servers" (
+    "org_id" character varying(128) NOT NULL,
+    "port" integer(11) DEFAULT NULL,
+    "name" character varying(255) DEFAULT NULL
+);
+
+--
+-- Table: org_properties
+--
+CREATE TABLE "org_properties" (
+  "org_id" character varying(128) NOT NULL,
+  "value" character varying(255) DEFAULT NULL,
+  "name" character varying(255) DEFAULT NULL
+);
+
+--
+-- Table: organization
+--
+CREATE TABLE "organization" (
+  "org_id" character varying(128) NOT NULL,
+  "anonymous_role" character varying(255) DEFAULT NULL,
+  "name" character varying(255) DEFAULT NULL,
+  "admin_role" character varying(255) DEFAULT NULL,
+  PRIMARY KEY ("org_id")
+);
+
+--
 -- Table: scheduled_event
 --
 CREATE TABLE "scheduled_event" (

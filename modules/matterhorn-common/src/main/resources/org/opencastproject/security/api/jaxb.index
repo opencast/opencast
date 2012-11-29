@@ -1,4 +1,4 @@
 AccessControlEntry
 AccessControlList
-Organization
-OrganizationList
+JaxbOrganization
+JaxbOrganizationList

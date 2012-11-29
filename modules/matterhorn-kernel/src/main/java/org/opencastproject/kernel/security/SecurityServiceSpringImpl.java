@@ -65,8 +65,11 @@ public class SecurityServiceSpringImpl implements SecurityService {
    * @see org.opencastproject.security.api.SecurityService#getUser()
    */
   @Override
-  public User getUser() {
+  public User getUser() throws IllegalStateException {
     Organization org = getOrganization();
+    if (org == null)
+      throw new IllegalStateException("No organization is set in security context");
+    
     User delegatedUser = delegatedUserHolder.get();
     if (delegatedUser != null) {
       return delegatedUser;

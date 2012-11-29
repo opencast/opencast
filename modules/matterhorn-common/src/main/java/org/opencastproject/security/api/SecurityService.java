@@ -24,8 +24,10 @@ public interface SecurityService {
    * Gets the current user, or the local organization's anonymous user if the user has not been authenticated.
    * 
    * @return the user
+   * @throws IllegalStateException
+   *           if no organization is set in the security context
    */
-  User getUser();
+  User getUser() throws IllegalStateException;
 
   /**
    * Gets the organization associated with the current thread context.

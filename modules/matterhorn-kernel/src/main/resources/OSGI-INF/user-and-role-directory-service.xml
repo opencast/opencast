@@ -25,6 +25,10 @@
       <provide interface="org.opencastproject.security.api.UserProvider" />
       <provide interface="org.opencastproject.security.api.RoleProvider" />
     </service>
+    <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
+      cardinality="1..1" policy="static" bind="setSecurityService" />
+    <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+      cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
   </scr:component>
 
   <scr:component name="org.opencastproject.kernel.userdirectory.RoleEndpoint" immediate="true">

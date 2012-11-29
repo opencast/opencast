@@ -23,7 +23,6 @@ import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZ
 import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ANONYMOUS;
 import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
 import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_NAME;
-import static org.opencastproject.util.UrlSupport.DEFAULT_BASE_URL;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
@@ -50,6 +49,7 @@ import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -501,8 +501,12 @@ public class SearchServiceImplTest {
 
     // Now take the role away from the user
     userResponder.setResponse(userWithoutPermissions);
-    organizationResponder.setResponse(new Organization(DEFAULT_ORGANIZATION_ID, DEFAULT_ORGANIZATION_NAME,
-            DEFAULT_BASE_URL, DEFAULT_ORGANIZATION_ADMIN, DEFAULT_ORGANIZATION_ANONYMOUS));
+
+    Map<String, Integer> servers = new HashMap<String, Integer>();
+    servers.put("localhost", 8080);
+    Organization org = new JaxbOrganization(DEFAULT_ORGANIZATION_ID, DEFAULT_ORGANIZATION_NAME,
+            servers, DEFAULT_ORGANIZATION_ADMIN, DEFAULT_ORGANIZATION_ANONYMOUS, null);
+    organizationResponder.setResponse(org);
 
     // Try to delete it
     job = service.delete(mediaPackage.getIdentifier().toString());

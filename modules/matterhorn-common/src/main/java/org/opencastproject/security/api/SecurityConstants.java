@@ -21,10 +21,10 @@ package org.opencastproject.security.api;
 public interface SecurityConstants {
 
   /** Header name for the current organization */
-  String ORGANIZATION_HEADER = "X-MH-ORGANIZATION";
-  
+  String ORGANIZATION_HEADER = "X-OPENCAST-MATTERHORN-ORGANIZATION";
+
   /** Header name for the current user */
-  String USER_HEADER = "X-MH-USER";
+  String USER_HEADER = "X-OPENCAST-MATTERHORN-USER";
 
   /** Name of the Matterhorn admin role */
   String GLOBAL_ADMIN_ROLE = "MATTERHORN_ADMINISTRATOR";

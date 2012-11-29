@@ -22,6 +22,7 @@ import static org.opencastproject.workflow.api.WorkflowOperationInstance.Operati
 import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.SUCCEEDED;
 
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
@@ -72,7 +73,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   private User creator;
 
   @XmlElement(name = "organization", namespace = "http://org.opencastproject.security")
-  private Organization organization;
+  private JaxbOrganization organization;
 
   @XmlElement(name = "mediapackage", namespace = "http://mediapackage.opencastproject.org")
   private MediaPackage mediaPackage;
@@ -123,7 +124,8 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
     this.description = def.getDescription();
     this.parentId = parentWorkflowId;
     this.creator = creator;
-    this.organization = organization;
+    if (organization != null)
+      this.organization = JaxbOrganization.fromOrganization(organization);
     this.state = WorkflowState.INSTANTIATED;
     this.mediaPackage = mediaPackage;
     this.operations = new ArrayList<WorkflowOperationInstance>();
@@ -206,7 +208,10 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
    *          the organization
    */
   public void setOrganization(Organization organization) {
-    this.organization = organization;
+    if (organization == null)
+      this.organization = null;
+    else
+      this.organization = JaxbOrganization.fromOrganization(organization);
   }
 
   /**
@@ -286,24 +291,24 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
         WorkflowOperationInstance operation = operations.get(position);
 
         switch (operation.getState()) {
-        case FAILED:
-          break;
-        case INSTANTIATED:
-          if (SUCCEEDED.equals(previousState) || SKIPPED.equals(previousState) || FAILED.equals(previousState))
+          case FAILED:
+            break;
+          case INSTANTIATED:
+            if (SUCCEEDED.equals(previousState) || SKIPPED.equals(previousState) || FAILED.equals(previousState))
+              currentOperation = operation;
+            break;
+          case PAUSED:
             currentOperation = operation;
-          break;
-        case PAUSED:
-          currentOperation = operation;
-          break;
-        case RUNNING:
-          currentOperation = operation;
-          break;
-        case SKIPPED:
-          break;
-        case SUCCEEDED:
-          break;
-        default:
-          throw new IllegalStateException("Found operation in unknown state '" + operation.getState() + "'");
+            break;
+          case RUNNING:
+            currentOperation = operation;
+            break;
+          case SKIPPED:
+            break;
+          case SUCCEEDED:
+            break;
+          default:
+            throw new IllegalStateException("Found operation in unknown state '" + operation.getState() + "'");
         }
 
         previousState = operation.getState();
@@ -313,17 +318,17 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
       // If we are at the last operation and there is no more work to do, we're done
       if (operations.get(operations.size() - 1) == currentOperation) {
         switch (currentOperation.getState()) {
-        case FAILED:
-        case SKIPPED:
-        case SUCCEEDED:
-          currentOperation = null;
-          break;
-        case INSTANTIATED:
-        case PAUSED:
-        case RUNNING:
-          break;
-        default:
-          throw new IllegalStateException("Found operation in unknown state '" + currentOperation.getState() + "'");
+          case FAILED:
+          case SKIPPED:
+          case SUCCEEDED:
+            currentOperation = null;
+            break;
+          case INSTANTIATED:
+          case PAUSED:
+          case RUNNING:
+            break;
+          default:
+            throw new IllegalStateException("Found operation in unknown state '" + currentOperation.getState() + "'");
         }
       }
 
