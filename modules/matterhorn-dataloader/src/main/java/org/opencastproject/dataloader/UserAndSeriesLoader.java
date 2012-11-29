@@ -200,7 +200,7 @@ public class UserAndSeriesLoader {
       logger.info("Finished loading sample series and users");
     }
   }
-
+  
   /**
    * Loads demo users into persistence.
    * 

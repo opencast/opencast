@@ -84,7 +84,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
         UserDetails userDetails = (UserDetails) principal;
 
         String[] roles = null;
-        Collection<GrantedAuthority> authorities = auth.getAuthorities();
+        Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
         if (authorities != null && authorities.size() > 0) {
           roles = new String[authorities.size()];
           int i = 0;

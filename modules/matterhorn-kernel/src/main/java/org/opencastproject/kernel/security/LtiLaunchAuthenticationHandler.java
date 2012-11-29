@@ -157,7 +157,7 @@ public class LtiLaunchAuthenticationHandler implements
     Collection<GrantedAuthority> userAuthorities = null;
     try {
       userDetails = userDetailsService.loadUserByUsername(userIdFromConsumer);
-      userAuthorities = userDetails.getAuthorities();
+      userAuthorities = (Collection<GrantedAuthority>) userDetails.getAuthorities();
       //This list is potentially an modifiable collection
       userAuthorities = new HashSet<GrantedAuthority>(userAuthorities);
       //we still need to enrich this user with the LTI Roles
