@@ -186,6 +186,10 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.jdom</groupId>
+      <artifactId>com.springsource.org.jdom</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
