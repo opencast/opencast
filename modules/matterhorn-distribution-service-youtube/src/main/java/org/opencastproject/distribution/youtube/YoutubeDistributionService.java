@@ -415,7 +415,7 @@ public class YoutubeDistributionService extends AbstractJobProducer implements D
               .elementFromURI(new URI(uploadedEntry.getMediaGroup().getPlayer().getUrl()), TYPE, YOUTUBE);
 
     } catch (Exception e) {
-      logger.warn("Error distributing " + element, e);
+      logger.warn("Error distributing {}, {}", element, e.getMessage());
       if (e instanceof DistributionException) {
         throw (DistributionException) e;
       } else {
@@ -480,7 +480,7 @@ public class YoutubeDistributionService extends AbstractJobProducer implements D
         }
       }
     } catch (Exception e) {
-      logger.error("Failure retracting YouTube media", e);
+      logger.error("Failure retracting YouTube media {}", e.getMessage());
       throw new DistributionException(e);
     }
   }
