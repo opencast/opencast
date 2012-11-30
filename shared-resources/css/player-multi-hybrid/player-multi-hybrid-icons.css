@@ -80,6 +80,17 @@ input
   background-position: -185px -155px;
 }
 
+#oc_player-series {
+  list-style: none outside none;
+}
+
+#oc_player-series div {
+  float: left;
+  padding-left: 25px;
+  line-height: 20px;
+  margin: 5px 10px;
+}
+
 #oc_series a {
   text-decoration: underline;
 }

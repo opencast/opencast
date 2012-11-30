@@ -220,7 +220,7 @@ input.ui-button {
     z-index: 1;
 }
 
-#oc_player-head-right, #data, #oc_video-view, #oc_checkbox-statistics, #oc_label-statistics, #oc_checkbox-annotations, #oc_label-annotations, #analytics, #annotation, #segments_ui_slider_data1, #segments_ui_slider_data2, #segments_ui_slider_information, #oc_ui_tabs, #oc_description, #oc_slides, #oc_slidetext, #oc_search-segment, #oc_search, #segment-tooltip, #oc_embed, #oc_player-head-see-more, #segments-table2, #oc_video-quality, #oc_share-time, #oc_download-button, #oc_search, #oc_title-bar-gallery-link, #oc_mobile_redirect, #oc_ie8comments {
+#oc_player-head-right, #data, #oc_video-view, #oc_checkbox-statistics, #oc_label-statistics, #oc_checkbox-annotations, #oc_label-annotations, #analytics, #annotation, #segments_ui_slider_data1, #segments_ui_slider_data2, #segments_ui_slider_information, #oc_ui_tabs, #oc_description, #oc_slides, #oc_slidetext, #oc_search-segment, #oc_search, #segment-tooltip, #oc_embed, #oc_player-head-see-more, #oc_player-series, #segments-table2, #oc_video-quality, #oc_share-time, #oc_download-button, #oc_search, #oc_title-bar-gallery-link, #oc_mobile_redirect, #oc_ie8comments {
     display: none;
 }
 
