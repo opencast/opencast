@@ -180,27 +180,24 @@ ocUtils.fromUTCDateString = function(UTCDate) {
  * @param seconds Seconds to format
  * @return formatted Seconds
  */
-ocUtils.formatSeconds = function(seconds)
+ocUtils.formatSeconds = function(seconds) 
 {
-  var result = "";
-  if (parseInt(seconds / 3600) < 10)
-  {
-    result += "0";
-  }
-  result += parseInt(seconds / 3600);
-  result += ":";
-  if ((parseInt(seconds / 60) - parseInt(seconds / 3600) * 60) < 10)
-  {
-    result += "0";
-  }
-  result += parseInt(seconds / 60) - parseInt(seconds / 3600) * 60;
-  result += ":";
-  if (seconds % 60 < 10)
-  {
-    result += "0";
-  }
-  result += Math.round(seconds % 60);
-  return result;
+	var result="";
+	seconds = Math.round(seconds)
+	var hours = Math.floor(seconds/3600);
+	seconds -= hours*3600;
+	var minutes = Math.floor(seconds/60);
+	seconds -= minutes *60;
+	
+	result += (hours < 10) ? "0" + hours : hours;
+	result += ":";
+	
+	result += (minutes < 10) ? "0" + minutes : minutes;
+	result += ":";
+	
+	result += (seconds < 10) ? "0" + seconds : seconds;
+	
+	return result;
 }
 
 /** converts a duration in ms to a human readable duration string
