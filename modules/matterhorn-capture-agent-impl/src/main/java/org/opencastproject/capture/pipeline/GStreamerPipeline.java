@@ -103,7 +103,7 @@ public final class GStreamerPipeline {
     if (waitProp != null) {
       wait = Integer.parseInt(waitProp);
     } else {
-      wait = 5; // Default taken from gstreamer docs
+      wait = 15; // Default taken from gstreamer docs
     }
 
     pipeline.debugToDotFile(Pipeline.DEBUG_GRAPH_SHOW_ALL, pipeline.getName());
