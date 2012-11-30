@@ -18,6 +18,7 @@ package org.opencastproject.search.remote;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
@@ -78,11 +79,12 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
         return job;
       }
     } catch (Exception e) {
-      throw new SearchException("Unable to publish " + mediaPackage.getIdentifier() + " using a remote search service", e);
+      throw new SearchException("Unable to publish " + mediaPackage.getIdentifier() + " using a remote search service",
+              e);
     } finally {
       closeConnection(response);
     }
-    
+
     throw new SearchException("Unable to publish " + mediaPackage.getIdentifier() + " using a remote search service");
   }
 
@@ -107,7 +109,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
     } finally {
       closeConnection(response);
     }
-    
+
     throw new SearchException("Unable to remove " + mediaPackageId + " from a remote search service");
   }
 
@@ -144,23 +146,49 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
    */
   private String getSearchUrl(SearchQuery q, boolean admin) {
     StringBuilder url = new StringBuilder();
-    if (!q.isIncludeEpisodes() && q.isIncludeSeries()) {
-      url.append("/series?");
+    if (q.isIncludeSeries()) {
+      url.append("/series.xml");
     } else if (q.isIncludeEpisodes() && !q.isIncludeSeries()) {
-      url.append("/episode.xml?");
-    } else {
-      url.append("/?");
+      url.append("/episode.xml");
     }
 
     List<NameValuePair> queryStringParams = new ArrayList<NameValuePair>();
+
     if (q.getText() != null) {
       queryStringParams.add(new BasicNameValuePair("q", q.getText()));
     }
+
+    if (q.getId() != null) {
+      queryStringParams.add(new BasicNameValuePair("id", q.getId()));
+    }
+
+    if (q.getSeriesId() != null) {
+      queryStringParams.add(new BasicNameValuePair("sid", q.getSeriesId()));
+    }
+
+    if (q.getElementFlavors() != null) {
+      for (MediaPackageElementFlavor f : q.getElementFlavors()) {
+        queryStringParams.add(new BasicNameValuePair("flavor[]", f.toString()));
+      }
+    }
+
+    if (q.getElementTags() != null) {
+      for (String t : q.getElementTags()) {
+        queryStringParams.add(new BasicNameValuePair("tag[]", t));
+      }
+    }
+
     if (admin) {
       queryStringParams.add(new BasicNameValuePair("admin", Boolean.TRUE.toString()));
     }
+
+    queryStringParams.add(new BasicNameValuePair("series", Boolean.toString(q.isIncludeSeries())));
+    queryStringParams.add(new BasicNameValuePair("episodes", Boolean.toString(q.isIncludeEpisodes())));
     queryStringParams.add(new BasicNameValuePair("limit", Integer.toString(q.getLimit())));
     queryStringParams.add(new BasicNameValuePair("offset", Integer.toString(q.getOffset())));
+
+    if (queryStringParams.size() > 0)
+      url.append("?");
 
     url.append(URLEncodedUtils.format(queryStringParams, "UTF-8"));
 

@@ -132,10 +132,11 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           @RestParameter(defaultValue = "false", description = "Whether to include this series information itself. This can be used in combination with \"id\" or \"q\".", isRequired = false, name = "series", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json.")
+          @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.BOOLEAN) }, reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json.")
   public Response getEpisodeAndSeriesById(@QueryParam("id") String id, @QueryParam("q") String text,
           @QueryParam("episodes") boolean includeEpisodes, @QueryParam("series") boolean includeSeries,
-          @QueryParam("limit") int limit, @QueryParam("offset") int offset, @PathParam("format") String format) {
+          @QueryParam("limit") int limit, @QueryParam("offset") int offset, @QueryParam("admin") boolean admin,
+          @PathParam("format") String format) throws SearchException, UnauthorizedException {
 
     SearchQuery query = new SearchQuery();
 
@@ -159,11 +160,22 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     query.withLimit(limit);
     query.withOffset(offset);
 
-    // Return the right format
-    if ("json".equals(format))
-      return Response.ok(searchService.getByQuery(query)).type(MediaType.APPLICATION_JSON).build();
-    else
-      return Response.ok(searchService.getByQuery(query)).type(MediaType.APPLICATION_XML).build();
+    // Build the response
+    ResponseBuilder rb = Response.ok();
+
+    if (admin) {
+      rb.entity(searchService.getForAdministrativeRead(query)).type(MediaType.APPLICATION_JSON);
+    } else {
+      rb.entity(searchService.getByQuery(query)).type(MediaType.APPLICATION_JSON);
+    }
+
+    if ("json".equals(format)) {
+      rb.type(MediaType.APPLICATION_JSON);
+    } else {
+      rb.type(MediaType.TEXT_XML);
+    }
+
+    return rb.build();
   }
 
   // CHECKSTYLE:OFF
@@ -178,13 +190,12 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           // "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".",
           // isRequired = false, name = "episodes", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING)
-  // @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false,
-  // name = "admin", type = RestParameter.Type.STRING)
-  }, reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json.")
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.BOOLEAN) }, reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json.")
   public Response getEpisode(@QueryParam("id") String id, @QueryParam("q") String text,
           @QueryParam("sid") String seriesId, @QueryParam("tag") String[] tags, @QueryParam("flavor") String[] flavors,
-          @QueryParam("limit") int limit, @QueryParam("offset") int offset, @PathParam("format") String format) {
+          @QueryParam("limit") int limit, @QueryParam("offset") int offset, @QueryParam("admin") boolean admin,
+          @PathParam("format") String format) throws SearchException, UnauthorizedException {
     // CHECKSTYLE:ON
     // Prepare the flavors
     List<MediaPackageElementFlavor> flavorSet = new ArrayList<MediaPackageElementFlavor>();
@@ -208,11 +219,22 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       search.withPublicationDateSort(true);
     }
 
-    // Return the results using the requested format
-    if ("json".equals(format))
-      return Response.ok(searchService.getByQuery(search)).type(MediaType.APPLICATION_JSON).build();
-    else
-      return Response.ok(searchService.getByQuery(search)).type(MediaType.APPLICATION_XML).build();
+    // Build the response
+    ResponseBuilder rb = Response.ok();
+
+    if (admin) {
+      rb.entity(searchService.getForAdministrativeRead(search)).type(MediaType.APPLICATION_JSON);
+    } else {
+      rb.entity(searchService.getByQuery(search)).type(MediaType.APPLICATION_JSON);
+    }
+
+    if ("json".equals(format)) {
+      rb.type(MediaType.APPLICATION_JSON);
+    } else {
+      rb.type(MediaType.TEXT_XML);
+    }
+
+    return rb.build();
   }
 
   @GET
