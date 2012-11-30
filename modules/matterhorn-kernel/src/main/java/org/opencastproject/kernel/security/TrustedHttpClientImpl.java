@@ -88,7 +88,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   public static final int DEFAULT_SOCKET_TIMEOUT = DEFAULT_CONNECTION_TIMEOUT;
 
   /** The default number of times to attempt a request after it has failed due to a nonce expiring. */
-  public static final int DEFAULT_NONCE_TIMEOUT_RETRIES = 3;
+  public static final int DEFAULT_NONCE_TIMEOUT_RETRIES = 12;
 
   /** The number of milliseconds in a single second. */
   private static final int MILLISECONDS_IN_SECONDS = 1000;
