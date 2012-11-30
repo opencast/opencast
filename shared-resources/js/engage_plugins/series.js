@@ -212,12 +212,16 @@ Opencast.Series = (function ()
                             success: function (data)
                             {
                                 $.log("Series AJAX call #2: Requesting data succeeded");
-                                if (data && data['search-results'] && data['search-results'].result && (data['search-results'].result.length > 1))
+                                if (data && data['search-results'] && data['search-results'].result)
                                 {
                                     if (data['search-results'].result.length > 1)
                                     {
                                         $('#oc_player-head-see-more').show();
+                                    	$("#oc_player-series").html("<div>" + data['search-results'].result[0].mediapackage.seriestitle + "</div>" );
+                                    } else {
+                                    	$("#oc_player-series").html("<div>" + data['search-results'].result.mediapackage.seriestitle + "</div>" );
                                     }
+                                    $('#oc_player-series').show();
                                 }
                             },
                             // If no data comes back
