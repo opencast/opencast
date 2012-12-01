@@ -82,6 +82,9 @@
     </script>
 
     <script type="text/javascript">
+      $.ajaxSetup({
+        cache: false
+      });
       var defaultPath = "/recordings", // the path to use when the base page directory is requested
           meJsonUrl = "/info/me.json", // path to the RuntimeInfo REST endpoint
           linkSelector = "#tabsWrapper ul:first a",
