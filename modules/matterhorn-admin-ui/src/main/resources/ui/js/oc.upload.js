@@ -161,7 +161,7 @@ ocUpload.init = function() {
     }
   });
   
-  ocWorkflow.init($('#workflowSelector'), $('#workflowConfigContainer'));
+  ocWorkflow.init($('#workflowSelector'), $('#workflowConfigContainer'), ['upload']);
 
   // test if we upload a new recording or want to retry a workflow
   ocUpload.retryId = ocUtils.getURLParam("retry");

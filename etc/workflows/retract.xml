@@ -2,6 +2,9 @@
 <definition xmlns="http://workflow.opencastproject.org">
   <id>retract</id>
   <title>Retract media package</title>
+  <tags>
+	<tag>archive</tag>
+  </tags>
   <description>Retract a media package from all distribution channels.</description>
   <operations>
 

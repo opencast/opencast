@@ -31,9 +31,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 public class WorkflowRestEndpointTest {
 
   private WorkflowRestService restService;
@@ -57,17 +54,6 @@ public class WorkflowRestEndpointTest {
     restService = new WorkflowRestService();
     restService.setService(service);
     restService.activate(null);
-  }
-
-  @Test
-  public void testGetWorkflowDefinitions() throws Exception {
-    Response jsonResponse = restService.getWorkflowDefinitions("json");
-    Assert.assertEquals(200, jsonResponse.getStatus());
-    Assert.assertEquals(MediaType.APPLICATION_JSON, jsonResponse.getMetadata().getFirst("Content-Type"));
-
-    Response xmlResponse = restService.getWorkflowDefinitions("xml");
-    Assert.assertEquals(200, xmlResponse.getStatus());
-    Assert.assertEquals(MediaType.TEXT_XML, xmlResponse.getMetadata().getFirst("Content-Type"));
   }
 
   @Test

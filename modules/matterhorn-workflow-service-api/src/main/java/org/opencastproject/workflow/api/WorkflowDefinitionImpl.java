@@ -16,7 +16,10 @@
 package org.opencastproject.workflow.api;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -45,14 +48,18 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
   @XmlElement(name = "id")
   private String id;
 
+  @XmlElement(name = "title")
+  private String title;
+
+  @XmlElementWrapper(name = "tags")
+  @XmlElement(name = "tag")
+  protected SortedSet<String> tags = new TreeSet<String>();
+
   @XmlElement(name = "description")
   private String description;
 
   @XmlElement(name = "published")
   private boolean published;
-
-  @XmlElement(name = "title")
-  private String title;
 
   @XmlElement(name = "configuration_panel")
   private String configurationPanel;
@@ -185,6 +192,67 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
     if (operations == null)
       operations = new ArrayList<WorkflowOperationDefinition>();
     return operations.remove(position);
+  }
+
+  /**
+   * @see org.opencastproject.workflow.api.WorkflowDefinition#addTag(String)
+   */
+  @Override
+  public void addTag(String tag) {
+    if (tag == null)
+      throw new IllegalArgumentException("Tag must not be null");
+    tags.add(tag);
+  }
+
+  /**
+   * @see org.opencastproject.workflow.api.WorkflowDefinition#removeTag(String)
+   */
+  @Override
+  public void removeTag(String tag) {
+    if (tag == null)
+      return;
+    tags.remove(tag);
+  }
+
+  /**
+   * @see org.opencastproject.workflow.api.WorkflowDefinition#containsTag(String)
+   */
+  @Override
+  public boolean containsTag(String tag) {
+    if (tag == null || tags == null)
+      return false;
+    return tags.contains(tag);
+  }
+
+  /**
+   * @see org.opencastproject.workflow.api.WorkflowDefinition#containsTag(Collection)
+   */
+  @Override
+  public boolean containsTag(Collection<String> tags) {
+    if (tags.size() == 0)
+      return true;
+    for (String tag : tags) {
+      if (containsTag(tag))
+        return true;
+    }
+    return false;
+  }
+
+  /**
+   * @see org.opencastproject.workflow.api.WorkflowDefinition#getTags()
+   */
+  @Override
+  public String[] getTags() {
+    return tags.toArray(new String[tags.size()]);
+  }
+
+  /**
+   * @see org.opencastproject.workflow.api.WorkflowDefinition#clearTags()
+   */
+  @Override
+  public void clearTags() {
+    if (tags != null)
+      tags.clear();
   }
 
   /**

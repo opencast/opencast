@@ -15,32 +15,43 @@
  */
 var ocWorkflow = {} || ocWorkflow;
 
-ocWorkflow.init = function(selectElm, configContainer) {
+ocWorkflow.init = function(selectElm, configContainer, tags) {
   ocWorkflow.container = configContainer;
   ocWorkflow.selector = selectElm;
   $(ocWorkflow.selector).change( function() {
     ocWorkflow.definitionSelected($(this).val(), configContainer);
   });
-  ocWorkflow.loadDefinitions(selectElm, configContainer);
+  ocWorkflow.loadDefinitions(selectElm, configContainer, tags);
 }
 
-ocWorkflow.loadDefinitions = function(selector, container) {
+ocWorkflow.loadDefinitions = function(selector, container, tags) {
   $.ajax({
     async: false,
     method: 'GET',
     url: '/workflow/definitions.json',
     dataType: 'json',
     success: function(data) {
-      for (i in data.workflow_definitions) {
-        if (data.workflow_definitions[i].id != 'error') {
-          var option = document.createElement("option");
-          option.setAttribute("value", data.workflow_definitions[i].id);
-          option.innerHTML = data.workflow_definitions[i].title || data.workflow_definitions[i].id;
-          if (data.workflow_definitions[i].id == "full") {
-            option.setAttribute("selected", "true");
-          }
-          $(selector).append(option);
+      var wfDefinitions = ocUtils.ensureArray(data.definitions.definition);
+      outerloop:
+      for (i in wfDefinitions) {
+        if (wfDefinitions[i].id == 'error')
+        	continue;
+        
+        if(tags != undefined && $.isArray(tags)) {
+        	var definitionTags = ocUtils.ensureArray(wfDefinitions[i].tags.tag);
+        	for(y in tags) {
+        		var include = _.contains(definitionTags, tags[y]);
+        		if(!include) continue outerloop;
+        	}
         }
+        
+        var option = document.createElement("option");
+        option.setAttribute("value", wfDefinitions[i].id);
+        option.innerHTML = wfDefinitions[i].title || wfDefinitions[i].id;
+        if (wfDefinitions[i].id == "full") {
+        	option.setAttribute("selected", "true");
+        }
+        $(selector).append(option);
       }
       ocWorkflow.definitionSelected($(selector).val(), container);
     }

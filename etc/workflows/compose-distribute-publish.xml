@@ -3,6 +3,11 @@
 
   <id>full</id>
   <title>Encode, Analyze, and Distribute</title>
+  <tags>
+  	<tag>upload</tag>
+	<tag>schedule</tag>
+	<tag>archive</tag>
+  </tags>
   <description>
     A simple workflow that transcodes the media into distribution formats, then sends the resulting distribution files,
     along with their associated metadata, to the distribution channels.
