@@ -146,7 +146,7 @@ var ocScheduler = (function() {
         $.ajax({
           url: SERIES_URL + '/series.json',
           data: {
-            q: request.term,
+        	seriesTitle: request.term,
             sort: 'TITLE'
           },
           dataType: 'json',
