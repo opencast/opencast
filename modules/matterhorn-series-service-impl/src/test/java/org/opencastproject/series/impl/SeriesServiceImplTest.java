@@ -15,16 +15,10 @@
  */
 package org.opencastproject.series.impl;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mchange.v2.c3p0.DataSources;
-import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.util.data.Collections.list;
+
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
@@ -42,6 +36,19 @@ import org.opencastproject.series.impl.persistence.SeriesServiceDatabaseImpl;
 import org.opencastproject.series.impl.solr.SeriesServiceSolrIndex;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
+
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.mchange.v2.c3p0.DataSources;
+
+import junit.framework.Assert;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.easymock.EasyMock;
+import org.eclipse.persistence.jpa.PersistenceProvider;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 
@@ -50,10 +57,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.data.Collections.list;
 
 /**
  * Test for Series Service.
@@ -191,7 +194,8 @@ public class SeriesServiceImplTest {
       SeriesQuery q = new SeriesQuery().withSort(SeriesQuery.Sort.TITLE, false);
       DublinCoreCatalogList r = seriesService.getSeries(q);
       Assert.assertEquals(2, r.getCatalogList().size());
-      Assert.assertEquals("Land and Vegetation: Key players on the Climate Scene", r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_TITLE));
+      Assert.assertEquals("Land and Vegetation: Key players on the Climate Scene",
+              r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_TITLE));
     }
     {
       SeriesQuery q = new SeriesQuery().withSort(SeriesQuery.Sort.SUBJECT, true);
@@ -302,13 +306,20 @@ public class SeriesServiceImplTest {
   }
 
   @Test
+  public void testDublinCoreCatalogPreservation() throws Exception {
+    seriesService.updateSeries(testCatalog2);
+    DublinCoreCatalog dc = seriesService.getSeries("10.0000/5820");
+    assertTrue(SeriesServiceImpl.equals(testCatalog2, testCatalog2));
+    assertTrue(SeriesServiceImpl.equals(dc, dc));
+    assertTrue(SeriesServiceImpl.equals(testCatalog2, dc));
+  }
+
+  @Test
   public void testACLEquality1() {
-    AccessControlList a = new AccessControlList(
-            new AccessControlEntry("a", "read", true),
-            new AccessControlEntry("b", "write", false));
-    AccessControlList b = new AccessControlList(
-            new AccessControlEntry("b", "write", false),
-            new AccessControlEntry("a", "read", true));
+    AccessControlList a = new AccessControlList(new AccessControlEntry("a", "read", true), new AccessControlEntry("b",
+            "write", false));
+    AccessControlList b = new AccessControlList(new AccessControlEntry("b", "write", false), new AccessControlEntry(
+            "a", "read", true));
     assertTrue(SeriesServiceImpl.equals(a, b));
   }
 
@@ -329,7 +340,8 @@ public class SeriesServiceImplTest {
   @Test
   public void testACLEquality4() {
     AccessControlList a = new AccessControlList(new AccessControlEntry("b", "write", false));
-    AccessControlList b = new AccessControlList(new AccessControlEntry("b", "write", false), new AccessControlEntry("b", "read", false));
+    AccessControlList b = new AccessControlList(new AccessControlEntry("b", "write", false), new AccessControlEntry(
+            "b", "read", false));
     assertFalse(SeriesServiceImpl.equals(a, b));
   }
 
@@ -338,8 +350,9 @@ public class SeriesServiceImplTest {
     // setup mock (no nice mock since times(..) seems to be accepting just an upper bound value)
     EventAdmin mock = EasyMock.createMock(EventAdmin.class);
     seriesService.setEventAdmin(mock);
-    mock.postEvent(EasyMock.<Event>anyObject());
-    EasyMock.expectLastCall().times(2); // expect two update events, updating testCatalog a second time should result in a no-op
+    mock.postEvent(EasyMock.<Event> anyObject());
+    EasyMock.expectLastCall().times(2); // expect two update events, updating testCatalog a second time should result in
+                                        // a no-op
     EasyMock.replay(mock);
     // start testing
     seriesService.updateSeries(testCatalog);
@@ -354,13 +367,12 @@ public class SeriesServiceImplTest {
     // setup mock (no nice mock since times(..) seems to be accepting just an upper bound value)
     EventAdmin mock = EasyMock.createMock(EventAdmin.class);
     seriesService.setEventAdmin(mock);
-    mock.postEvent(EasyMock.<Event>anyObject());
+    mock.postEvent(EasyMock.<Event> anyObject());
     EasyMock.expectLastCall().times(2); // expect two update events, updating ACL a second time should result in a no-op
     EasyMock.replay(mock);
     // start testing
-    AccessControlList acl = new AccessControlList(
-            new AccessControlEntry("a", "read", true),
-            new AccessControlEntry("b", "write", false));
+    AccessControlList acl = new AccessControlList(new AccessControlEntry("a", "read", true), new AccessControlEntry(
+            "b", "write", false));
     seriesService.updateSeries(testCatalog);
     seriesService.updateAccessControl("10.0000/5819", acl);
     seriesService.updateAccessControl("10.0000/5819", acl);

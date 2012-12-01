@@ -17,11 +17,11 @@ package org.opencastproject.series.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
@@ -80,15 +80,13 @@ import javax.ws.rs.core.Response;
  * 
  */
 @Path("/")
-@RestService(name = "seriesservice", title = "Series Service",
-  abstractText = "This service creates, edits and retrieves and helps managing series.", 
-  notes = {
+@RestService(name = "seriesservice", title = "Series Service", abstractText = "This service creates, edits and retrieves and helps managing series.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
-        + "not working and is either restarting or has failed",
+                + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class SeriesRestService {
 
   /** Logging utility */
@@ -166,8 +164,7 @@ public class SeriesRestService {
           @RestResponse(responseCode = SC_OK, description = "The series dublin core."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "You do not have permission to view this series."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to view this series. Maybe you need to authenticate.")
-  })
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to view this series. Maybe you need to authenticate.") })
   public Response getSeriesXml(@PathParam("seriesID") String seriesID) {
     logger.debug("Series Lookup: {}", seriesID);
     try {
@@ -177,9 +174,9 @@ public class SeriesRestService {
     } catch (NotFoundException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
     } catch (UnauthorizedException e) {
-    	logger.warn("permission exception retrieving series");
-    	//TODO this should be an 403 (Forbidden) if the user is logged in
-    	throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+      logger.warn("permission exception retrieving series");
+      // TODO this should be an 403 (Forbidden) if the user is logged in
+      throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     } catch (Exception e) {
       logger.error("Could not retrieve series: {}", e.getMessage());
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
