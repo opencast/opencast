@@ -341,17 +341,26 @@ ocUpload.UI = (function() {
       message = message.uploadjob;
       var filename = message.payload.filename;
       var total = message.payload.totalsize;
-      var received = message['current-chunk']['bytes-recieved'] + message['current-chunk'].number * message.chunksize;
-      var percentage = ((received / total) * 100).toFixed(1) + '%';
+      var received;
+      var percentage;
       
-      total = (total / ocUpload.MEGABYTE).toFixed(2) + ' MB';
-      received = (received / ocUpload.MEGABYTE).toFixed(2) + ' MB';
-
       $progress.find('.progress-label-top').text('Uploading ' + filename.replace("C:\\fakepath\\", ""));
-      $progress.find('.progressbar-indicator').css('width', percentage);
-      $progress.find('.progressbar-label > span').text(percentage);
-      $progress.find('.progress-label-left').text(received + ' received');
-      $progress.find('.progress-label-right').text(total + ' total');
+      
+      if(message.payload.totalsize !== -1) {
+        received = message['current-chunk']['bytes-recieved'] + message['current-chunk'].number * message.chunksize;
+        percentage = ((received / total) * 100).toFixed(1) + '%';
+        total = (total / ocUpload.MEGABYTE).toFixed(2) + ' MB';
+        received = (received / ocUpload.MEGABYTE).toFixed(2) + ' MB';
+        $progress.find('.progressbar-indicator').css('width', percentage);
+        $progress.find('.progressbar-label > span').text(percentage);
+        $progress.find('.progress-label-left').text(received + ' received');
+        $progress.find('.progress-label-right').text(total + ' total');        
+      } else {
+        received = message['current-chunk']['bytes-recieved'];
+        received = (received / ocUpload.MEGABYTE).toFixed(2) + ' MB';
+        $progress.find('.progressbar-label > span').text('');
+        $progress.find('.progress-label-left').text(received + ' received');
+      }
       
       if (message.payload.currentsize == message.payload.totalsize) {
         if(message.state == ocUpload.UPLOAD_COMPLETE) {
