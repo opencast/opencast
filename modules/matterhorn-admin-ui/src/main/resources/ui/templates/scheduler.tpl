@@ -318,15 +318,8 @@
             -->
             <fieldset>
               <ul class="oc-ui-form-list">
-                <li>
-                  <label for="scheduleRepeat" class="scheduler-label form-box-label"><span id="i18n_sched_repeats">Repeats</span>:</label>
-                  <select id="scheduleRepeat" disabled="true">
-                    <option value="norepeat" id="i18n_sched_no_repeat">Don't Repeat</option>
-                    <option value="weekly" selected="selected" id="i18n_sched_weekly">Weekly</option>
-                  </select>
-                </li>
                 <li id="daySelect">
-                  <label class="scheduler-label" for="repeatDays"><span class="scheduler-required-text">* </span><span id="i18n_sched_days">Days</span>:</label>
+                  <label class="scheduler-label" for="repeatDays"><span class="scheduler-required-text">* </span><span id="i18n_sched_days">Repeat Weekly on</span>:</label>
                   <table id="agentsTable2" class="layout-inline scheduler-day-table">
                     <thead>
                       <tr>
