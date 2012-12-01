@@ -55,12 +55,6 @@ opencast.episode = (function() {
     return $.getJSON("../episode/episode.json", params);
   }
 
-  /** @return jqXHR containing raw json
-   */
-  function getAvailableWorkflowDefinitions() {
-    return $.getJSON("../workflow/definitions.json");
-  }
-
   /** Open the metadata editor with mediapackage xml.
    *  @param mediapackageXml -- xml representation of the mediapackage
    */
@@ -463,7 +457,7 @@ opencast.episode = (function() {
             var $window = $("#awf-window").dialog({autoOpen: false});
             var $selectWorkflow = $("#awf-select");
             var $configContainer = $("#awf-config-container");
-            ocWorkflow.init($selectWorkflow, $configContainer);
+            ocWorkflow.init($selectWorkflow, $configContainer, ['archive']);
             $("#awf-start").click(function () {
               openWindow($window, {height: 250});
             });

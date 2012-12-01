@@ -15,6 +15,7 @@
  */
 package org.opencastproject.workflow.api;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -85,6 +86,53 @@ public interface WorkflowDefinition {
    * @return Whether this is a published workflow definition
    */
   boolean isPublished();
+
+  /**
+   * Tags the workflow definition with the given tag.
+   * 
+   * @param tag
+   *          the tag
+   */
+  void addTag(String tag);
+
+  /**
+   * Removes the tag from the workflow definition.
+   * 
+   * @param tag
+   *          the tag
+   */
+  void removeTag(String tag);
+
+  /**
+   * Returns <code>true</code> if the workflow definition contains the given tag.
+   * 
+   * @param tag
+   *          the tag
+   * @return <code>true</code> if the element is tagged
+   */
+  boolean containsTag(String tag);
+
+  /**
+   * Returns <code>true</code> if the workflow definition contains at least one of the given tags. If there are no tags
+   * contained in the set, then the definition is considered to match as well.
+   * 
+   * @param tags
+   *          the set of tag
+   * @return <code>true</code> if the element is tagged accordingly
+   */
+  boolean containsTag(Collection<String> tags);
+
+  /**
+   * Returns the tags for this workflow definition or an empty array if there are no tags.
+   * 
+   * @return the tags
+   */
+  String[] getTags();
+
+  /**
+   * Removes all tags associated with this workflow definition
+   */
+  void clearTags();
 
   /**
    * Appends the operation to the workflow definition.

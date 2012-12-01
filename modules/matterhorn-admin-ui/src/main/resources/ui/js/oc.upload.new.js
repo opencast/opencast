@@ -53,7 +53,8 @@ var ocUpload = (function() {
     });
     $('#recordDate').datepicker('setDate', initializerDate);
 
-    ocUpload.UI.loadWorkflowDefinitions();
+    ocWorkflow.init($('#workflowSelector'), $('.workflowConfigContainer'), ['upload']);
+    
     initSeriesAutocomplete();
     
     $.ajax({
@@ -228,36 +229,6 @@ ocUpload.UI = (function() {
       $(window).scrollTop(errorContainer.offset().top)
              .scrollLeft(errorContainer.offset().left);
     }
-  }
-
-  this.loadWorkflowDefinitions = function() {
-    ocUtils.log('Loading workflow definitions');
-    $.ajax({
-      method: 'GET',
-      url: ocUpload.WORKFLOW_DEFINITION_URL,
-      dataType: 'json',
-      success: function(data) {
-        var defs = [];
-        for (i in data.workflow_definitions) {
-          var $selector = $('#workflowSelector');
-          var workflow = data.workflow_definitions[i];
-          if ( workflow.id != 'error' &&
-                workflow.title != null &&
-                workflow.title != "") {
-            defs.push(workflow.id);
-            var $newOption = $('<option></option>')
-            .attr('value', workflow.id)
-            .text(workflow.title);
-            if (workflow.id == ocUpload.DEFAULT_WORKFLOW_DEFINITION) {
-              $newOption.attr('selected', 'true');
-            }
-            $selector.append($newOption);
-          }
-        }
-        ocUtils.log('Loaded workflow definitions: ' + defs.join(', '));
-      }
-    });
-    $('.workflowConfigContainer').load(ocUpload.WORKFLOW_PANEL_URL + ocUpload.DEFAULT_WORKFLOW_DEFINITION);
   }
 
   this.toggleUnfoldable = function() {

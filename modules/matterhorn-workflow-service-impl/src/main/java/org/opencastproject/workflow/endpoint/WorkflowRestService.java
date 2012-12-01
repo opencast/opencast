@@ -44,11 +44,11 @@ import org.opencastproject.workflow.api.Configurable;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
+import org.opencastproject.workflow.api.WorkflowDefinitionSet;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
-import org.opencastproject.workflow.api.WorkflowOperationDefinition;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowParser;
@@ -73,7 +73,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -258,22 +257,20 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   }
 
   @GET
-  @Path("definitions.{output:.*}")
-  @RestQuery(name = "definitions", description = "List all available workflow definitions", returnDescription = "Returns the workflow definitions", pathParameters = { @RestParameter(name = "output", isRequired = true, description = "The output format (XML or JSON)", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The workflow definitions.") })
-  @SuppressWarnings("unchecked")
-  public Response getWorkflowDefinitions(@PathParam("output") String output) throws Exception {
+  @Path("definitions.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "definitions", description = "List all available workflow definitions as JSON", returnDescription = "Returns the workflow definitions as JSON", reponses = { @RestResponse(responseCode = SC_OK, description = "The workflow definitions.") })
+  public WorkflowDefinitionSet getWorkflowDefinitionsAsJson() throws Exception {
+    return getWorkflowDefinitionsAsXml();
+  }
+
+  @GET
+  @Path("definitions.xml")
+  @Produces(MediaType.APPLICATION_XML)
+  @RestQuery(name = "definitions", description = "List all available workflow definitions as XML", returnDescription = "Returns the workflow definitions as XML", reponses = { @RestResponse(responseCode = SC_OK, description = "The workflow definitions.") })
+  public WorkflowDefinitionSet getWorkflowDefinitionsAsXml() throws Exception {
     List<WorkflowDefinition> list = service.listAvailableWorkflowDefinitions();
-    if ("json".equals(output)) {
-      List<JSONObject> jsonDefs = new ArrayList<JSONObject>();
-      for (WorkflowDefinition definition : list) {
-        jsonDefs.add(getWorkflowDefinitionAsJson(definition));
-      }
-      JSONObject json = new JSONObject();
-      json.put("workflow_definitions", jsonDefs);
-      return Response.ok(json.toJSONString()).header("Content-Type", MediaType.APPLICATION_JSON).build();
-    } else {
-      return Response.ok(WorkflowParser.toXml(list)).header("Content-Type", MediaType.TEXT_XML).build();
-    }
+    return new WorkflowDefinitionSet(list);
   }
 
   @GET
@@ -317,28 +314,6 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     } catch (WorkflowDatabaseException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
-  }
-
-  /**
-   * @param definition
-   */
-  @SuppressWarnings("unchecked")
-  protected JSONObject getWorkflowDefinitionAsJson(WorkflowDefinition definition) {
-    JSONObject json = new JSONObject();
-    json.put("id", definition.getId());
-    json.put("title", definition.getTitle());
-    json.put("description", definition.getDescription());
-    List<JSONObject> opList = new ArrayList<JSONObject>();
-    for (WorkflowOperationDefinition operationDefinition : definition.getOperations()) {
-      JSONObject op = new JSONObject();
-      op.put("name", operationDefinition.getId());
-      op.put("description", operationDefinition.getDescription());
-      op.put("exception-handler-workflow", operationDefinition.getExceptionHandlingWorkflow());
-      op.put("fail-on-error", operationDefinition.isFailWorkflowOnException());
-      opList.add(op);
-    }
-    json.put("operations", opList);
-    return json;
   }
 
   @GET
