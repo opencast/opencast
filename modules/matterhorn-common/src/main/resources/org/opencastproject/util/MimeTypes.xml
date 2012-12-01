@@ -112,12 +112,12 @@
   <MimeType>
     <Type>audio/mpeg</Type>
     <Description>MPEG audio</Description>
-    <Extensions>mpeg,mpg,m1s,m1a,mp2,mpm,mpa,m2a,mp3,swa</Extensions>
+    <Extensions>m1a,mp2,mpa,m2a,mp3,swa</Extensions>
   </MimeType>
   <MimeType>
     <Type>video/mpeg</Type>
     <Description>MPEG media</Description>
-    <Extensions>mpeg,mpg,m1s,m1v,m1a,m75,m15,mp2,mpm,mpv,mpa</Extensions>
+    <Extensions>mpeg,mpg,m1s,m75,m15,mpm,mpv</Extensions>
   </MimeType>
   <MimeType>
     <Type>audio/basic</Type>
