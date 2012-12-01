@@ -214,14 +214,14 @@
             <ul class="oc-ui-form-list">
               <!-- submit / cancal button -->
               <li class="ui-helper-clearfix">
-                <label class="scheduler-label">&nbsp;</label>
+                <label class="scheduler-label">&#160;</label>
                 <button id="submitButton" type="button" class="mouseover-pointer control-button">Upload</button>
                 <button id="cancelButton" type="button" class="mouseover-pointer control-button">Cancel</button>
               </li>
 
               <!-- * = required -->
               <li class="ui-helper-clearfix">
-                <label class="scheduler-label">&nbsp;</label>
+                <label class="scheduler-label">&#160;</label>
                 <span class="color-red">* </span><span id="i18n_required">Required</span>
               </li>
             </ul>
@@ -235,17 +235,17 @@
 </div>
 
 <div id="gray-out">
-  &nbsp;
+  &#160;
 </div>
 
 <div id="progressStage" class="ui-corner-all progress-stage" style="display:none;">
   <div class="progress-label-top upload-label">
-    &nbsp;
+    &#160;
   </div>
   <div class="progressbar ui-corner-all ui-helper-clearfix">
-    <div class="progressbar-indicator ui-state-default ui-corner-all" style="width:0%;">&nbsp;</div>
+    <div class="progressbar-indicator ui-state-default ui-corner-all" style="width:0%;">&#160;</div>
     <div class="progressbar-label"><span id="i18n_progress"></span></div>
   </div>
-  <div class="progress-label-left upload-label">&nbsp;</div>
-  <div class="progress-label-right upload-label">&nbsp;</div>
+  <div class="progress-label-left upload-label">&#160;</div>
+  <div class="progress-label-right upload-label">&#160;</div>
 </div>

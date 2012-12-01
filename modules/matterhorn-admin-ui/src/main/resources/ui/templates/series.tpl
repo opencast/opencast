@@ -139,13 +139,13 @@
       <form action="">
         <ul class="oc-ui-form-list">
           <li>
-            <label class="scheduler-label">&nbsp;</label>
+            <label class="scheduler-label">&#160;</label>
             <input type="button" value="Save" id="submitButton" class="mouseover-pointer control-button" />
             <a id="cancelButton" title="Cancel" class="secondaryButton">Cancel</a>
             <input type="hidden" id="id" />
           </li>
           <li>
-            <label class="scheduler-label">&nbsp;</label>
+            <label class="scheduler-label">&#160;</label>
             <span class="scheduler-required-text">*</span><span id="i18n_required">Required</span>
           </li>
         </ul>

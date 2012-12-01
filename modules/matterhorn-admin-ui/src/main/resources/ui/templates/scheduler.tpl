@@ -68,7 +68,7 @@
               <input type="text" id="title" name="title" class="oc-ui-form-field" maxlength="255" />
             </li>
             <li id="titleNote" class="ui-helper-hidden">
-              <label class="scheduler-label">&nbsp;</label>
+              <label class="scheduler-label">&#160;</label>
               <span class="scheduler-instruction-text">
                 Titles of individual recordings will be appended by sequential numbers starting with 1
               </span>
@@ -526,7 +526,7 @@
         <form action="">
           <ul class="oc-ui-form-list">
             <li>
-              <label class="scheduler-label">&nbsp;</label>
+              <label class="scheduler-label">&#160;</label>
               <input type="button" value="Schedule" id="submitButton" class="mouseover-pointer control-button" />
               <a id="cancelButton" title="Cancel" class="secondaryButton">Cancel</a>
               <input type="hidden" id="eventId" />
@@ -535,7 +535,7 @@
               <input type="hidden" id="agentTimeZone" />
             </li>
             <li>
-              <label class="scheduler-label">&nbsp;</label>
+              <label class="scheduler-label">&#160;</label>
               <span class="scheduler-required-text">*</span><span id="i18n_required">Required</span>
             </li>
           </ul>
