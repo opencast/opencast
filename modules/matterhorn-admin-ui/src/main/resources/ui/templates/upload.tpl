@@ -231,7 +231,7 @@
                 <label class="scheduler-label"><span id="i18n_file_location">File Location</span>:</label>
                 <input type="radio" class="file-source-select" name="fileSourceSingle" id="fileSourceSingleA" value="local" checked="true">
                 <label for="fileSourceSingleA" class="lbl_radio">Local hard drive</label>
-                &nbsp;&nbsp;
+                &#160;&#160;
 
                 <input type="radio" class="file-source-select" name="fileSourceSingle" id="fileSourceSingleB" value="inbox">
                 <label for="fileSourceSingleB" class="lbl_radio">Designated inbox on server</label>
@@ -253,11 +253,11 @@
               </li>
 
               <li class="ui-helper-clearfix">
-                <label class="scheduler-label">&nbsp;</label>
+                <label class="scheduler-label">&#160;</label>
                 <span style="font-size:80%;color:gray;">(Analysis and processing will occur to enable slide thumbnail navigation and possibly</span>
               </li>
               <li class="ui-helper-clearfix">
-                <label class="scheduler-label">&nbsp;</label>
+                <label class="scheduler-label">&#160;</label>
                 <span style="font-size:80%;color:gray;">in-video text search)</span>
               </li>
 
@@ -279,7 +279,7 @@
                   <label class="scheduler-label"><span class="i18n_file_location">File Location</span>:</label>
                   <input type="radio" class="file-source-select"  name="fileSourcePresentation" id="fileSourcePresentationA" value="local" checked="true">
                   <label for="fileSourcePresentationA" class="lbl_radio">Local hard drive</label>
-                  &nbsp;&nbsp;
+                  &#160;&#160;
 
                   <input type="radio" class="file-source-select" name="fileSourcePresentation" id="fileSourcePresentationB" value="inbox">
                   <label for="fileSourcePresentationB" class="lbl_radio">Designated inbox on server</label>
@@ -305,7 +305,7 @@
                   <label class="scheduler-label"><span class="i18n_file_location">File Location</span>:</label>
                   <input type="radio" class="file-source-select" name="fileSourcePresenter" id="fileSourcePresenterA" value="local" checked="true">
                   <label for="fileSourcePresenterA" class="lbl_radio">Local hard drive</label>
-                  &nbsp;&nbsp;
+                  &#160;&#160;
                   <input type="radio" class="file-source-select" name="fileSourcePresenter" id="fileSourcePresenterB" value="inbox">
 
                   <label for="fileSourcePresenterB" class="lbl_radio">Designated inbox on server</label>
@@ -331,7 +331,7 @@
                   <label class="scheduler-label"><span class="i18n_file_location">File Location</span>:</label>
                   <input type="radio" class="file-source-select" name="fileSourceAudio" id="fileSourceAudioA" value="local" checked="true">
                   <label for="fileSourceAudioA" class="lbl_radio">Local hard drive</label>
-                  &nbsp;&nbsp;
+                  &#160;&#160;
                   <input type="radio" class="file-source-select" name="fileSourceAudio" id="fileSourceAudioB" value="inbox">
                   <label for="fileSourceAudioB" class="lbl_radio">Designated inbox on server</label>
                 </li>
@@ -357,7 +357,7 @@
                   <label class="scheduler-label"><span class="i18n_file_location">File Location</span>:</label>
                   <input type="radio" class="file-source-select" name="fileSourceCaption" id="fileSourceAudioA" value="local" checked="true">
                   <label for="fileSourceCaptionA" class="lbl_radio">Local hard drive</label>
-                  &nbsp;&nbsp;
+                  &#160;&#160;
                   <input type="radio" class="file-source-select" name="fileSourceCaption" id="fileSourceAudioB" value="inbox">
                   <label for="fileSourceCaptionB" class="lbl_radio">Designated inbox on server</label>
                 </li>
@@ -404,14 +404,14 @@
             <ul class="oc-ui-form-list">
               <!-- submit / cancal button -->
               <li class="ui-helper-clearfix">
-                <label class="scheduler-label">&nbsp;</label>
+                <label class="scheduler-label">&#160;</label>
                 <button id="submitButton" type="button" class="mouseover-pointer control-button">Upload</button>
                 <a id="cancelButton" title="Cancel" class="secondaryButton">Cancel</a>
               </li>
 
               <!-- * = required -->
               <li class="ui-helper-clearfix">
-                <label class="scheduler-label">&nbsp;</label>
+                <label class="scheduler-label">&#160;</label>
                 <span class="color-red">* </span><span id="i18n_required">Required</span>
               </li>
             </ul>
@@ -425,17 +425,17 @@
 </div>
 
 <div id="gray-out">
-  &nbsp;
+  &#160;
 </div>
 
 <div id="progressStage" class="ui-corner-all progress-stage" style="display:none;">
   <div class="progress-label-top upload-label">
-    &nbsp;
+    &#160;
   </div>
   <div class="progressbar ui-corner-all ui-helper-clearfix">
-    <div class="progressbar-indicator ui-state-default ui-corner-all" style="width:0%;">&nbsp;</div>
+    <div class="progressbar-indicator ui-state-default ui-corner-all" style="width:0%;">&#160;</div>
     <div class="progressbar-label"><span id="i18n_progress"></span></div>
   </div>
-  <div class="progress-label-left upload-label">&nbsp;</div>
-  <div class="progress-label-right upload-label">&nbsp;</div>
+  <div class="progress-label-left upload-label">&#160;</div>
+  <div class="progress-label-right upload-label">&#160;</div>
 </div>

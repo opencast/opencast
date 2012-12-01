@@ -7,7 +7,7 @@
     </div>
   </div>
   <div class="portlet ui-widget-content ui-helper-clearfix ui-corner-all" id="portlet-template">
-	<div class="portlet-header ui-widget-header ui-corner-all"><span class='ui-icon ui-icon-minusthick'></span><span class="title">&nbsp;</span></div>
+	<div class="portlet-header ui-widget-header ui-corner-all"><span class='ui-icon ui-icon-minusthick'></span><span class="title">&#160;</span></div>
 	<div class="portlet-content"></div>
   </div>
   <div id="matterhorn-tableContainer" class="ui-widget ui-helper-clearfix jmx-tableContainer"></div>

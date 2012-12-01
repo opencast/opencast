@@ -21,7 +21,7 @@
                 <label class="scheduler-label"><span id="i18n_file_location">File Location</span>:</label>
                 <input type="radio" class="file-source-select" name="fileSourceSingle" id="fileSourceSingleA" value="local" checked="true">
                 <label for="fileSourceSingleA" class="lbl_radio">Local hard drive</label>
-                &nbsp;&nbsp;
+                &#160;&#160;
 
                 <input type="radio" class="file-source-select" name="fileSourceSingle" id="fileSourceSingleB" value="inbox">
                 <label for="fileSourceSingleB" class="lbl_radio">Designated inbox on server</label>
@@ -42,11 +42,11 @@
               </li>
 
               <li class="ui-helper-clearfix">
-                <label class="scheduler-label">&nbsp;</label>
+                <label class="scheduler-label">&#160;</label>
                 <span style="font-size:80%;color:gray;">(Analysis and processing will occur to enable slide thumbnail navigation and possibly</span>
               </li>
               <li class="ui-helper-clearfix">
-                <label class="scheduler-label">&nbsp;</label>
+                <label class="scheduler-label">&#160;</label>
                 <span style="font-size:80%;color:gray;">in-video text search)</span>
               </li>
 
@@ -68,7 +68,7 @@
                   <label class="scheduler-label"><span class="i18n_file_location">File Location</span>:</label>
                   <input type="radio" class="file-source-select"  name="fileSourcePresentation" id="fileSourcePresentationA" value="local" checked="true">
                   <label for="fileSourcePresentationA" class="lbl_radio">Local hard drive</label>
-                  &nbsp;&nbsp;
+                  &#160;&#160;
 
                   <input type="radio" class="file-source-select" name="fileSourcePresentation" id="fileSourcePresentationB" value="inbox">
                   <label for="fileSourcePresentationB" class="lbl_radio">Designated inbox on server</label>
@@ -94,7 +94,7 @@
                   <label class="scheduler-label"><span class="i18n_file_location">File Location</span>:</label>
                   <input type="radio" class="file-source-select" name="fileSourcePresenter" id="fileSourcePresenterA" value="local" checked="true">
                   <label for="fileSourcePresenterA" class="lbl_radio">Local hard drive</label>
-                  &nbsp;&nbsp;
+                  &#160;&#160;
                   <input type="radio" class="file-source-select" name="fileSourcePresenter" id="fileSourcePresenterB" value="inbox">
 
                   <label for="fileSourcePresenterB" class="lbl_radio">Designated inbox on server</label>
@@ -120,7 +120,7 @@
                   <label class="scheduler-label"><span class="i18n_file_location">File Location</span>:</label>
                   <input type="radio" class="file-source-select" name="fileSourceAudio" id="fileSourceAudioA" value="local" checked="true">
                   <label for="fileSourceAudioA" class="lbl_radio">Local hard drive</label>
-                  &nbsp;&nbsp;
+                  &#160;&#160;
                   <input type="radio" class="file-source-select" name="fileSourceAudio" id="fileSourceAudioB" value="inbox">
                   <label for="fileSourceAudioB" class="lbl_radio">Designated inbox on server</label>
                 </li>
@@ -146,7 +146,7 @@
                   <label class="scheduler-label"><span class="i18n_file_location">File Location</span>:</label>
                   <input type="radio" class="file-source-select" name="fileSourceCaption" id="fileSourceAudioA" value="local" checked="true">
                   <label for="fileSourceCaptionA" class="lbl_radio">Local hard drive</label>
-                  &nbsp;&nbsp;
+                  &#160;&#160;
                   <input type="radio" class="file-source-select" name="fileSourceCaption" id="fileSourceAudioB" value="inbox">
                   <label for="fileSourceCaptionB" class="lbl_radio">Designated inbox on server</label>
                 </li>

@@ -2,7 +2,7 @@
   <table id="recordingsTable" class="ui-widget" cellspacing="0" width="100%">
     <thead>
       <tr id="bulkHeader">
-        <th colspan="6">&nbsp;</th>
+        <th colspan="6">&#160;</th>
         <th class="recordings-table-head ui-helper-hidden" id="bulkActionButton"><a href="javascript:ocRecordings.displayBulkAction()">Bulk Action</a></th>
       </tr>
       <tr>
@@ -59,7 +59,7 @@
             <% } else { %>
             <%= data[j].recordings[i].state %>
             <% if (data[j].recordings[i].operation) { %>
-            :&nbsp;<%= data[j].recordings[i].operation %>
+            :&#160;<%= data[j].recordings[i].operation %>
             <% } %>
             <% } %>
           </div>
