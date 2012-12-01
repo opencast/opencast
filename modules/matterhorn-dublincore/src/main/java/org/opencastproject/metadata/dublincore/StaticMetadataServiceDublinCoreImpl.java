@@ -28,6 +28,7 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.NonEmptyList;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
+import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.workspace.api.Workspace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,14 +110,16 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
     final Option<Date> created = option(episode.getFirst(DublinCore.PROPERTY_CREATED)).map(new Function<String, Date>() {
       @Override
       public Date apply(String a) {
-        return EncodingSchemeUtils.decodeDate(a);
+        final Date date = EncodingSchemeUtils.decodeDate(a);
+        return date != null ? date : Misc.<Date>chuck(new RuntimeException(a + " does not conform to W3C-DTF encoding scheme."));
       }
     });
     final Option<String> language = option(episode.getFirst(DublinCore.PROPERTY_LANGUAGE));
     final Option<Long> extent = head(episode.get(DublinCore.PROPERTY_EXTENT)).map(new Function<DublinCoreValue, Long>() {
       @Override
       public Long apply(DublinCoreValue a) {
-        return EncodingSchemeUtils.decodeDuration(a);
+        final Long extent = EncodingSchemeUtils.decodeDuration(a);
+        return extent != null ? extent : Misc.<Long>chuck(new RuntimeException(a + " does not conform to ISO8601 encoding scheme for durations."));
       }
     });
     final Option<String> type = option(episode.getFirst(DublinCore.PROPERTY_TYPE));
@@ -127,12 +130,10 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
             new Function<DublinCoreValue, Option<Interval>>() {
               @Override
               public Option<Interval> apply(DublinCoreValue v) {
-                return option(EncodingSchemeUtils.decodePeriod(v)).map(new Function<DCMIPeriod, Interval>() {
-                  @Override
-                  public Interval apply(DCMIPeriod p) {
-                    return Interval.fromValues(p.getStart(), p.getEnd());
-                  }
-                });
+                final DCMIPeriod p = EncodingSchemeUtils.decodePeriod(v);
+                return p != null
+                        ? some(Interval.fromValues(p.getStart(), p.getEnd()))
+                        : Misc.<Option<Interval>>chuck(new RuntimeException(v + " does not conform to W3C-DTF encoding scheme for periods"));
               }
             });
     final NonEmptyList<MetadataValue<String>> titles = new NonEmptyList<MetadataValue<String>>(map(
