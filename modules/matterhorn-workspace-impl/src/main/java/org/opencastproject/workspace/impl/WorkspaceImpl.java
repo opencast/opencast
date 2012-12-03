@@ -19,6 +19,7 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workingfilerepository.api.PathMappable;
@@ -49,6 +50,9 @@ import java.util.Timer;
 
 import javax.management.ObjectInstance;
 import javax.servlet.http.HttpServletResponse;
+
+import static org.opencastproject.util.IoSupport.locked;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Implements a simple cache for remote URIs. Delegates methods to {@link WorkingFileRepository} wherever possible.
@@ -196,9 +200,9 @@ public class WorkspaceImpl implements Workspace {
    * 
    * @see org.opencastproject.workspace.api.Workspace#get(java.net.URI)
    */
-  public File get(URI uri) throws NotFoundException, IOException {
-    String urlString = uri.toString();
-    File f = getWorkspaceFile(uri, false);
+  public File get(final URI uri) throws NotFoundException, IOException {
+    final String urlString = uri.toString();
+    final File f = getWorkspaceFile(uri, false);
 
     // Does the file exist and is it up to date?
     Long workspaceFileLastModified = new Long(0); // make sure this is not null, otherwise the requested file can not be
@@ -235,67 +239,60 @@ public class WorkspaceImpl implements Workspace {
       ifNoneMatch = md5(f);
     }
 
-    HttpGet get = new HttpGet(urlString);
+    final HttpGet get = new HttpGet(urlString);
     if (ifNoneMatch != null)
       get.setHeader("If-None-Match", ifNoneMatch);
-    InputStream in = null;
-    OutputStream out = null;
-    HttpResponse response = null;
-    File lockFile = new File(f.getParent(), f.getName() + ".lock");
-    try {
-      response = trustedHttpClient.execute(get);
-      if (HttpServletResponse.SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-        throw new NotFoundException(uri + " does not exist");
-      } else if (HttpServletResponse.SC_NOT_MODIFIED == response.getStatusLine().getStatusCode()) {
-        logger.debug("{} has not been modified.", urlString);
-        return f;
-      } else if (HttpServletResponse.SC_ACCEPTED == response.getStatusLine().getStatusCode()) {
-        logger.debug("{} is not ready, try again in one minute.", urlString);
-        String token = response.getHeaders("token")[0].getValue();
-        get.setParams(new BasicHttpParams().setParameter("token", token));
-        Thread.sleep(60000);
-        while (true) {
+
+    return locked(f, new Function<File, File>() {
+      @Override
+      public File apply(File file) {
+        InputStream in = null;
+        OutputStream out = null;
+        HttpResponse response = null;
+        try {
           response = trustedHttpClient.execute(get);
           if (HttpServletResponse.SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
             throw new NotFoundException(uri + " does not exist");
           } else if (HttpServletResponse.SC_NOT_MODIFIED == response.getStatusLine().getStatusCode()) {
             logger.debug("{} has not been modified.", urlString);
             return f;
-          } else if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_ACCEPTED) {
+          } else if (HttpServletResponse.SC_ACCEPTED == response.getStatusLine().getStatusCode()) {
             logger.debug("{} is not ready, try again in one minute.", urlString);
+            String token = response.getHeaders("token")[0].getValue();
+            get.setParams(new BasicHttpParams().setParameter("token", token));
             Thread.sleep(60000);
-          } else {
-            break;
+            while (true) {
+              response = trustedHttpClient.execute(get);
+              if (HttpServletResponse.SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+                throw new NotFoundException(uri + " does not exist");
+              } else if (HttpServletResponse.SC_NOT_MODIFIED == response.getStatusLine().getStatusCode()) {
+                logger.debug("{} has not been modified.", urlString);
+                return f;
+              } else if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_ACCEPTED) {
+                logger.debug("{} is not ready, try again in one minute.", urlString);
+                Thread.sleep(60000);
+              } else {
+                break;
+              }
+            }
           }
+          logger.info("Downloading {} to {}", urlString, f.getAbsolutePath());
+          file.createNewFile();
+          in = response.getEntity().getContent();
+          out = new FileOutputStream(f);
+          IOUtils.copyLarge(in, out);
+        } catch (Exception e) {
+          logger.warn("Could not copy {} to {}", urlString, f.getAbsolutePath());
+          FileUtils.deleteQuietly(file);
+          return chuck(new NotFoundException(e));
+        } finally {
+          IOUtils.closeQuietly(in);
+          IOUtils.closeQuietly(out);
+          trustedHttpClient.close(response);
         }
+        return file;
       }
-
-      // if the lock file exists, another thread is currently downloading the file. wait for it.
-      while (lockFile.isFile()) {
-        logger.debug("Waiting on another thread to download {}", urlString);
-        Thread.sleep(5000);
-        if (!lockFile.isFile() && f.isFile()) {
-          return f;
-        }
-      }
-
-      logger.info("Downloading {} to {}", urlString, f.getAbsolutePath());
-      f.createNewFile();
-      in = response.getEntity().getContent();
-      out = new FileOutputStream(f);
-      IOUtils.copyLarge(in, out);
-    } catch (Exception e) {
-      logger.warn("Could not copy {} to {}", urlString, f.getAbsolutePath());
-      FileUtils.deleteQuietly(f);
-      throw new NotFoundException(e);
-    } finally {
-      IOUtils.closeQuietly(in);
-      IOUtils.closeQuietly(out);
-      trustedHttpClient.close(response);
-      FileUtils.deleteQuietly(lockFile);
-    }
-
-    return f;
+    });
   }
 
   /**

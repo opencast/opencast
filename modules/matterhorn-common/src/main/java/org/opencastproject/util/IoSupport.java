@@ -22,6 +22,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
+import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
@@ -39,8 +40,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.channels.FileLock;
 
 import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.data.Either.left;
@@ -411,5 +414,40 @@ public final class IoSupport {
   /** Create a file from the list of path elements. */
   public static File file(String... pathElems) {
     return new File(path(pathElems));
+  }
+
+  /**
+   * Run function <code>f</code> having exclusive read/write access to the given file.
+   * <p/>
+   * Please note that the implementation uses Java NIO {@link java.nio.channels.FileLock} which
+   * only guarantees that two Java processes cannot interfere with each other.
+   * <p/>
+   * The implementation blocks until a lock can be aquired.
+   */
+  public static synchronized <A> A locked(File file, Function<File, A> f) {
+    final Effect0 lock = aquireLock(file);
+    try {
+      return f.apply(file);
+    } finally {
+      lock.apply();
+    }
+  }
+
+  private static Effect0 aquireLock(File file) {
+    try {
+      final RandomAccessFile raf = new RandomAccessFile(file, "rw");
+      final FileLock lock = raf.getChannel().lock();
+      return new Effect0() {
+        @Override protected void run() {
+          try {
+            lock.release();
+          } catch (IOException ignore) {
+          }
+          IoSupport.closeQuietly(raf);
+        }
+      };
+    } catch (Exception e) {
+      throw new RuntimeException("Error aquiring lock for " + file.getAbsolutePath(), e);
+    }
   }
 }
