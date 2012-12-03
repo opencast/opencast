@@ -811,7 +811,8 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    *          whether to apply the permissions to the query. Set to false for administrative queries.
    * @return the solr query string
    */
-  protected String createQuery(WorkflowQuery query, String action, boolean applyPermissions) {
+  protected String createQuery(WorkflowQuery query, String action, boolean applyPermissions)
+          throws WorkflowDatabaseException {
     String orgId = securityService.getOrganization().getId();
     StringBuilder sb = new StringBuilder().append(ORG_KEY).append(":").append(orgId);
     append(sb, ID_KEY, query.getId(), false);
@@ -841,9 +842,15 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     return sb.toString();
   }
 
-  protected void appendSolrAuthFragment(StringBuilder sb, String action) {
+  protected void appendSolrAuthFragment(StringBuilder sb, String action) throws WorkflowDatabaseException {
     User user = securityService.getUser();
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE)) {
+    Organization organization;
+    try {
+      organization = orgDirectory.getOrganization(user.getOrganization());
+    } catch (NotFoundException e) {
+      throw new WorkflowDatabaseException(e);
+    }
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(organization.getAdminRole())) {
       sb.append(" AND ").append(ORG_KEY).append(":").append(securityService.getOrganization().getId());
       String[] roles = user.getRoles();
       if (roles.length > 0) {

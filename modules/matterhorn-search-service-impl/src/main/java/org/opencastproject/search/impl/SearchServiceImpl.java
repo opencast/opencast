@@ -438,9 +438,15 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   @Override
   public SearchResult getForAdministrativeRead(SearchQuery q) throws SearchException, UnauthorizedException {
     User user = securityService.getUser();
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE)) {
-      throw new UnauthorizedException(user, getClass().getName() + ".getForAdministrativeRead");
+    Organization organization;
+    try {
+      organization = organizationDirectory.getOrganization(user.getOrganization());
+    } catch (NotFoundException e) {
+      throw new SearchException(e);
     }
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(organization.getAdminRole()))
+      throw new UnauthorizedException(user, getClass().getName() + ".getForAdministrativeRead");
+
     try {
       return solrRequester.getForAdministrativeRead(q);
     } catch (SolrServerException e) {

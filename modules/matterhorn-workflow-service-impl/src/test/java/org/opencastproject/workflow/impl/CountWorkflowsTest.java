@@ -153,6 +153,7 @@ public class CountWorkflowsTest {
     dao.solrRoot = sRoot + File.separator + "solr";
     dao.setAuthorizationService(authzService);
     dao.setSecurityService(securityService);
+    dao.setOrgDirectory(organizationDirectoryService);
     dao.activate();
     service.setDao(dao);
     service.activate(null);

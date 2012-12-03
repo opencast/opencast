@@ -152,6 +152,7 @@ public class WorkflowOperationSkippingTest {
     dao.setServiceRegistry(serviceRegistry);
     dao.setSecurityService(securityService);
     dao.setAuthorizationService(authzService);
+    dao.setOrgDirectory(organizationDirectoryService);
 
     dao.activate();
     service.setDao(dao);
