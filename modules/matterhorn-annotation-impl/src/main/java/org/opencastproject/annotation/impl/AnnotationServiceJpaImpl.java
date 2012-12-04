@@ -156,6 +156,32 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
     }
   }
 
+  public Annotation changeAnnotation(Annotation a) throws NotFoundException {
+    EntityTransaction tx = null;
+    EntityManager em = null;
+    AnnotationImpl b = null;
+    long id = a.getAnnotationId();
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin(); 
+      Query q = em.createNamedQuery("updateAnnotation");
+      q.setParameter("value", a.getValue());
+      q.setParameter("annotationId", id);
+      int no = q.executeUpdate();
+      if (no == 1) {
+        b = em.find(AnnotationImpl.class, id);
+      }
+      tx.commit();
+      return b;
+    } finally {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      em.close();
+    }
+  }
+
   public Annotation getAnnotation(long id) throws NotFoundException {
     EntityManager em = null;
     try {

@@ -52,6 +52,8 @@ Opencast.Annotation_Comment_List_Plugin = (function ()
 	                                    '<div class="oc-comment-list-right-row">' +
 	                                        '<a style="float:right; color:blue" href="javascript:Opencast.Annotation_Comment_List.deleteComment(\'${c.id}\')" >Remove</a>' +
 	                                        '<div class="oc-comment-list-textspace"></div>' +
+	                                        '<a style="float:right; color:blue" href="javascript:Opencast.Annotation_Comment_List.editComment(\'${c.id}\')" >Change</a>' +
+	                                        '<div class="oc-comment-list-textspace"></div>' +
 	                                        '{if c.type == "scrubber"}' +
 	                                            '<a style="float:right; color:blue" href="javascript:Opencast.Annotation_Comment_List.clickCommentList(\'${c.id}\',\'${c.text}\',\'${c.inpoint}\',\'${c.slide}\',\'${c.user}\',\'${c.type}\')" >Jump To Comment</a>' +
 	                                        '{/if}' +
@@ -81,6 +83,7 @@ Opencast.Annotation_Comment_List_Plugin = (function ()
 											    '</div>' +
 											    '<div class="oc-comment-list-right-row">' +
 											        '<a style="float:right; color:blue" href="javascript:Opencast.Annotation_Comment_List.deleteComment(\'${rc.id}\')" >Remove</a>' +
+											        '<a style="float:right; color:blue" href="javascript:Opencast.Annotation_Comment_List.editComment(\'${rc.id}\')" >Change</a>' +
 											   '</div>' +
 											'</td>' +
 										'</tr>' +
