@@ -1001,30 +1001,36 @@ Opencast.Annotation_Comment = (function ()
         //set top header info
         $("#oc-comment-info-header-text").html("Comments at "+$.formatSeconds(commentTime));
         //process html for comments
+        var editCMBtn = "";
         var deleteCMBtn = "";
         if(userId === cm_username){
+            editCMBtn = "<input onclick='Opencast.Annotation_Comment.editComment("+commentId+",\"slide\")' class='oc-comment-info-cm-btn oc-comment-info-cm-editbtn' type='image' src='/engage/ui/img/misc/space.png' name='Edit' alt='Edit' title='Edit' value='Edit'>";
             deleteCMBtn = "<input onclick='Opencast.Annotation_Comment.deleteComment("+commentId+",\"slide\")' class='oc-comment-info-cm-btn oc-comment-info-cm-delbtn' type='image' src='/engage/ui/img/misc/space.png' name='Delete' alt='Delete' title='Delete' value='Delete'>";
         }
         $("#oc-comment-info-value-wrapper").html(
             "<div id='oc-comment-info-comment"+commentId+"'>"+
 		"<div class='oc-comment-info-cm-header'>"+
 		deleteCMBtn+
+		editCMBtn+
 		"<input onclick='Opencast.Annotation_Comment.replyComment("+commentId+")' class='oc-comment-info-cm-btn oc-comment-info-cm-repbtn' type='image' src='/engage/ui/img/misc/space.png' name='Reply' alt='Reply' title='Reply' value='Reply'>"+
 		"<input onclick='Opencast.Annotation_Comment.clickComment("+commentTime+")' class='oc-comment-info-cm-btn oc-comment-info-cm-gotobtn' type='image' src='/engage/ui/img/misc/space.png' name='Go To' alt='Go To' title='Go To' value='Go To'>"+
 		"<div class='oc-comment-info-header-text'>"+userId+" at "+$.formatSeconds(commentTime)+"</div>"+
 		"</div>"+
 		"<p id='oc-comment-cm-textbox-"+commentId+"' class='oc-comment-cm-textbox'>"+commentValue+"</p>"
-	);
+        );
         //process html for replys
         $(reply_map.getReplysToComment(commentId)).each(function(i){
-            var deleteReBtn = "";
-	    if(reply_map.getReplysToComment(commentId)[i].getCreator() === cm_username){
-	        deleteReBtn = "<input onclick='Opencast.Annotation_Comment.deleteComment("+reply_map.getReplysToComment(commentId)[i].getID()+",\"reply\")' class='oc-comment-info-cm-btn oc-comment-info-cm-delbtn' type='image' src='/engage/ui/img/misc/space.png' name='Delete' alt='Delete' title='Delete' value='Delete'>";
-	    }
-            $("#oc-comment-info-value-wrapper").append(
+        	var editReBtn = "";
+        	var deleteReBtn = "";
+		    if(reply_map.getReplysToComment(commentId)[i].getCreator() === cm_username){
+		        editReBtn = "<input onclick='Opencast.Annotation_Comment.editComment("+reply_map.getReplysToComment(commentId)[i].getID()+",\"reply\")' class='oc-comment-info-cm-btn oc-comment-info-cm-editbtn' type='image' src='/engage/ui/img/misc/space.png' name='Edit' alt='Edit' title='Edit' value='Edit'>";
+		        deleteReBtn = "<input onclick='Opencast.Annotation_Comment.deleteComment("+reply_map.getReplysToComment(commentId)[i].getID()+",\"reply\")' class='oc-comment-info-cm-btn oc-comment-info-cm-delbtn' type='image' src='/engage/ui/img/misc/space.png' name='Delete' alt='Delete' title='Delete' value='Delete'>";
+		    }
+	            $("#oc-comment-info-value-wrapper").append(
         	"<div id='oc-comment-info-comment"+reply_map.getReplysToComment(commentId)[i].getID()+"'>"+
 	    	    "<div class='oc-comment-info-reply-header'>"+
 	            deleteReBtn+
+	            editReBtn+
 	            "<div class='oc-comment-info-header-text'>"+reply_map.getReplysToComment(commentId)[i].getCreator()+"</div>"+		            	
 		    "</div>"+
 	            "<p class='oc-comment-reply-textbox'>"+reply_map.getReplysToComment(commentId)[i].getText()+"</p>"+
@@ -1054,14 +1060,17 @@ Opencast.Annotation_Comment = (function ()
         //set top header info
         $("#oc-comment-info-header-text").html("Comments at slide "+slNr);
         //process html for comments
+        var editCMBtn = "";
         var deleteCMBtn = "";
         if(userId === cm_username){
+            editCMBtn = "<input onclick='Opencast.Annotation_Comment.editComment("+commentId+",\"slide\")' class='oc-comment-info-cm-btn oc-comment-info-cm-editbtn' type='image' src='/engage/ui/img/misc/space.png' name='Edit' alt='Edit' title='Edit' value='Edit'>";
             deleteCMBtn = "<input onclick='Opencast.Annotation_Comment.deleteComment("+commentId+",\"slide\")' class='oc-comment-info-cm-btn oc-comment-info-cm-delbtn' type='image' src='/engage/ui/img/misc/space.png' name='Delete' alt='Delete' title='Delete' value='Delete'>";
         }
         $("#oc-comment-info-value-wrapper").html(
             "<div id='oc-comment-info-comment"+commentId+"'>"+
 		"<div class='oc-comment-info-cm-header'>"+
 		deleteCMBtn+
+		editCMBtn+
 		"<input onclick='Opencast.Annotation_Comment.replyComment("+commentId+")' class='oc-comment-info-cm-btn oc-comment-info-cm-repbtn' type='image' src='/engage/ui/img/misc/space.png' name='Reply' alt='Reply' title='Reply' value='Reply'>"+
 		"<div class='oc-comment-info-header-text'>"+userId+" at slide "+slNr+"</div>"+
 		"</div>"+
@@ -1069,14 +1078,17 @@ Opencast.Annotation_Comment = (function ()
 	);
         //process html for replys
         $(reply_map.getReplysToComment(commentId)).each(function(i){
+        	var editReBtn = "";
             var deleteReBtn = "";
-	    if(reply_map.getReplysToComment(commentId)[i].getCreator() === cm_username){
-	        deleteReBtn = "<input onclick='Opencast.Annotation_Comment.deleteComment("+reply_map.getReplysToComment(commentId)[i].getID()+",\"reply\")' class='oc-comment-info-cm-btn oc-comment-info-cm-delbtn' type='image' src='/engage/ui/img/misc/space.png' name='Delete' alt='Delete' title='Delete' value='Delete'>";
-	    }
+		    if(reply_map.getReplysToComment(commentId)[i].getCreator() === cm_username){
+		        editReBtn = "<input onclick='Opencast.Annotation_Comment.editComment("+reply_map.getReplysToComment(commentId)[i].getID()+",\"reply\")' class='oc-comment-info-cm-btn oc-comment-info-cm-editbtn' type='image' src='/engage/ui/img/misc/space.png' name='Edit' alt='Edit' title='Edit' value='Edit'>";
+		        deleteReBtn = "<input onclick='Opencast.Annotation_Comment.deleteComment("+reply_map.getReplysToComment(commentId)[i].getID()+",\"reply\")' class='oc-comment-info-cm-btn oc-comment-info-cm-delbtn' type='image' src='/engage/ui/img/misc/space.png' name='Delete' alt='Delete' title='Delete' value='Delete'>";
+		    }
             $("#oc-comment-info-value-wrapper").append(
         	"<div id='oc-comment-info-comment"+reply_map.getReplysToComment(commentId)[i].getID()+"'>"+
 	    	    "<div class='oc-comment-info-reply-header'>"+
 	            deleteReBtn+
+	            editReBtn+
 	            "<div class='oc-comment-info-header-text'>"+reply_map.getReplysToComment(commentId)[i].getCreator()+"</div>"+		            	
 		    "</div>"+
 	            "<p class='oc-comment-reply-textbox'>"+reply_map.getReplysToComment(commentId)[i].getText()+"</p>"+
@@ -1086,6 +1098,156 @@ Opencast.Annotation_Comment = (function ()
         //close first comment tag
         $("#oc-comment-info-value-wrapper").append("</div>");    	
     } 
+    
+    /**
+     * @memberOf Opencast.Annotation_Comment
+     * @description changes a comment replacing the text
+     */
+    
+    function changeComment(commentID, text)
+    {  	
+	    $.ajax(
+    			{
+    				type: 'GET',
+    				url: "/annotation/"+commentID+".json",
+    				dataType: 'json',
+    				jsonp: 'jsonp',
+    				success: function (data)
+    				{
+    					$.log("Annotation AJAX call: Requesting data succeeded");
+
+    					if ((data === undefined) || (data['annotation'] === undefined))
+    					{
+    						$.log("Annotation AJAX call: Data not available");
+    						//show nothing
+    						$('#oc-comments-list').html("");
+    						//displayNoAnnotationsAvailable("No data defined");
+    						isOpening = false;
+    					}
+    					else
+    					{
+    						$.log("Annotation AJAX call: Data available");
+
+    						var commentData = new Object();                  
+    						var commentArray = new Array();
+    						var replyArray = new Array();
+
+    						if(data['annotation'].total != 0){
+    							//split data by <> [user]<>[text]<>[type]<>[xPos]<>[yPos]<>[segId]
+    							//OR split data by <> [user]<>[text]<>[type]<>[replyID]
+    							var dataArray = data['annotation'].value.split("<>");
+    							dataArray[1] = text;
+    							var annText = dataArray.join("<>");      				
+    							// ajax CHANGE Request
+    							$.ajax(
+    									{
+    										type: 'PUT',
+    										url: "/annotation/"+commentID,
+    										data: "value="+annText,
+    										dataType: 'xml',
+    										success: function (xml)
+    										{
+    											$.log("change comment success");
+    										},
+    										error: function (jqXHR, textStatus, errorThrown)
+    										{
+    											$.log("Add_Comment error: "+textStatus);
+    										}
+    									}); 
+    						}
+    					}
+    				}
+    			});
+    }    
+
+    function editComment(commentId){
+    	//pause player
+    	Opencast.Player.doPause();
+    	addingAcomment = true;
+
+    	var oldEditSpace = $("#oc-comment-info-comment"+commentId).html()
+    	var editValue = $("#oc-comment-cm-textbox-"+commentId).text();
+    	var reply = false;
+    	var editSpace = oldEditSpace;
+    	if (editValue === ""){
+    		editValue = $(".oc-comment-reply-textbox").text();
+        	editSpace = editSpace.replace(/<p.*class=\"oc-comment-reply-textbox\">.*<\/p>/g, 
+        			'<div id="oc-comment-preedit-value" style="display:none"></div>' +
+        	    	'<div id="oc-comment-editbox">' +
+        	    	'<textarea id="oc-reply-edit-textbox" >' + editValue + '</textarea>' +
+        	    	'<input id="oc-comment-edit-cancel" class="oc-comment-cancel" type="image" src="/engage/ui/img/misc/space.png" name="Cancel" alt="cancel" title="cancel" value="cancel">' +
+        	    	'<input id="oc-comment-edit-submit" class="oc-comment-change" type="image" src="/engage/ui/img/misc/space.png" name="Change" alt="Change" title="Change" value="Change">' +
+        	    	'</div>');
+    		reply =  true;
+    	} else {
+    		editSpace = oldEditSpace.replace(/<p.*class=\"oc-comment-cm-textbox\">.*<\/p>/g,
+    				'<div id="oc-comment-preedit-value" style="display:none"></div>' +
+        	    	'<div id="oc-comment-editbox">' +
+        	    	'<textarea id="oc-comment-edit-textbox" >' + editValue + '</textarea>' +
+        	    	'<input id="oc-comment-edit-cancel" class="oc-comment-cancel" type="image" src="/engage/ui/img/misc/space.png" name="Cancel" alt="cancel" title="cancel" value="cancel">' +
+        	    	'<input id="oc-comment-edit-submit" class="oc-comment-change" type="image" src="/engage/ui/img/misc/space.png" name="Change" alt="Change" title="Change" value="Change">' +
+        	    	'</div>');
+    	}
+    	$("#oc-comment-info-comment"+commentId).html(editSpace);
+    	// submit comment btn click handler
+		if (reply){
+        	$("#oc-reply-edit-textbox").focus();
+        	$("#oc-reply-edit-textbox").select();		    
+		} else {
+        	$("#oc-comment-edit-textbox").focus();
+        	$("#oc-comment-edit-textbox").select();		    
+		}
+    	$("#oc-comment-edit-submit").click(function(){
+    		var commentValue = "";
+    		if (reply){
+    			commentValue = $("#oc-reply-edit-textbox").val();
+    		} else {
+    			commentValue = $("#oc-comment-edit-textbox").val();
+    		}
+    		commentValue = commentValue.replace(/<>/g,"");
+    		commentValue = commentValue.replace(/'/g,"`");
+    		commentValue = commentValue.replace(/"/g,"`");
+    		commentValue = commentValue.replace(/\n/,"");
+    		changeComment(commentId, commentValue);
+    		$("#oc-comment-info-comment"+commentId).html(oldEditSpace);
+    		if (reply){
+        		$(".oc-comment-reply-textbox").text(commentValue);
+    		} else {
+    			$("#oc-comment-cm-textbox-"+commentId).text(commentValue);
+    		}
+    	});
+
+    	// cancel comment btn click handler
+    	$("#oc-comment-edit-cancel").click(function(){
+    		$("#oc-comment-info-comment"+commentId).html(oldEditSpace);
+    	});
+
+		// Handler keypress CTRL+enter to submit comment
+    	$("#oc-comment-edit-textbox").keyup(function (event){
+    		if (event.ctrlKey === true){
+    			if (event.keyCode == 13){
+    	    		var commentValue = "";
+    	    		if (reply){
+    	    			commentValue = $("#oc-reply-edit-textbox").val();
+    	    		} else {
+    	    			commentValue = $("#oc-comment-edit-textbox").val();
+    	    		}
+    	    		commentValue = commentValue.replace(/<>/g,"");
+    	    		commentValue = commentValue.replace(/'/g,"`");
+    	    		commentValue = commentValue.replace(/"/g,"`");
+    	    		commentValue = commentValue.replace(/\n/,"");
+    	    		changeComment(commentId, commentValue);
+    	    		$("#oc-comment-info-comment"+commentId).html(oldEditSpace);
+    	    		if (reply){
+    	        		$(".oc-comment-reply-textbox").text(commentValue);
+    	    		} else {
+    	    			$("#oc-comment-cm-textbox-"+commentId).text(commentValue);
+    	    		}
+    			}
+    		}
+    	});    	
+    	addingAcomment = false;
+    }
     
     /**
      * @memberOf Opencast.annotation_comment
@@ -1428,6 +1590,7 @@ Opencast.Annotation_Comment = (function ()
         setMediaPackageId: setMediaPackageId,
         clickComment: clickComment,
         replyComment: replyComment,
+        editComment: editComment,
         deleteComment: deleteComment,
         hoverComment: hoverComment,
         hoverOutComment: hoverOutComment,

@@ -61,6 +61,49 @@
     background: none repeat scroll 0 0 rgba(255, 102, 0, 0.9);
 }
 
+#oc-comments-list-edit-textbox{
+    background-color: #FFFFFF;
+    border-style: solid;
+    border-color: grey;
+    height: 80px;
+    width:100%;
+    overflow: hidden;
+}
+
+#oc-comments-list-edit-submit{
+    background: none repeat scroll 0 0 #282828;
+    border-width: 1px;
+    border-color: black;
+    border-radius: 15px 15px 15px 15px;
+    margin-top: 10px;
+    margin-left: 5px;
+    float: right;
+    text-align: center;
+    width: 90px;
+    height: 18px;
+}
+
+#oc-comments-list-edit-cancel{
+    background: none repeat scroll 0 0 #282828;
+    border-width: 1px;
+    border-color: black;
+    border-radius: 15px 15px 15px 15px;
+    margin-top: 10px;
+    margin-left: 5px;
+    float: right;
+    text-align: center;
+    width: 70px;
+    height: 18px;
+}
+
+#oc-comments-list-edit-cancel:hover{
+    background: none repeat scroll 0 0 rgba(255, 102, 0, 0.9);
+}
+
+#oc-comments-list-edit-submit:hover{
+    background: none repeat scroll 0 0 rgba(255, 102, 0, 0.9);
+}
+
 .oc-comment-list-left-reply-row{
     float: left;
     width: 60px;

@@ -53,7 +53,13 @@ Opencast.Annotation_Comment_List = (function ()
                             	'</div>' +
                             '</td>' +                            
                         '</tr>';
-    
+
+    var editTemplate =  '<div id="oc-comment-preedit-value" style="display:none"></div>' +
+    					'<div id="oc-comments-list-editbox">' +
+							'<textarea id="oc-comments-list-edit-textbox" ></textarea>' +
+							'<input id="oc-comments-list-edit-cancel" value="Cancel" role="button" type="button" />' +
+							'<input id="oc-comments-list-edit-submit" value="Change" role="button" type="button" />' +
+						'</div>';
     /**
      * @memberOf Opencast.Annotation_Comment_List
      * @description Initializes the segments view
@@ -572,6 +578,66 @@ Opencast.Annotation_Comment_List = (function ()
     
     /**
      * @memberOf Opencast.Annotation_Comment_List
+     * @description changes a comment replacing the text
+     */
+    function changeComment(commentID, text)
+    {  	
+    	$.ajax(
+    			{
+    				type: 'GET',
+    				url: "/annotation/"+commentID+".json",
+    				dataType: 'json',
+    				jsonp: 'jsonp',
+    				success: function (data)
+    				{
+    					$.log("Annotation AJAX call: Requesting data succeeded");
+
+    					if ((data === undefined) || (data['annotation'] === undefined))
+    					{
+    						$.log("Annotation AJAX call: Data not available");
+    						//show nothing
+    						$('#oc-comments-list').html("");
+    						//displayNoAnnotationsAvailable("No data defined");
+    						isOpening = false;
+    					}
+    					else
+    					{
+    						$.log("Annotation AJAX call: Data available");
+
+    						var commentData = new Object();                  
+    						var commentArray = new Array();
+    						var replyArray = new Array();
+
+    						if(data['annotation'].total != 0){
+    							//split data by <> [user]<>[text]<>[type]<>[xPos]<>[yPos]<>[segId]
+    							//OR split data by <> [user]<>[text]<>[type]<>[replyID]
+    							var dataArray = data['annotation'].value.split("<>");
+    							dataArray[1] = text;
+    							var annText = dataArray.join("<>");      				
+    							// ajax CHANGE Request
+    							$.ajax(
+    									{
+    										type: 'PUT',
+    										url: "/annotation/"+commentID,
+    										data: "value="+annText,
+    										dataType: 'xml',
+    										success: function (xml)
+    										{
+    											$.log("change comment success");
+    										},
+    										error: function (jqXHR, textStatus, errorThrown)
+    										{
+    											$.log("Add_Comment error: "+textStatus);
+    										}
+    									}); 
+    						}
+    					}
+    				}
+    			});
+    }    
+    
+    /**
+     * @memberOf Opencast.Annotation_Comment_List
      * @description deletes comment
      */
     function deleteComment(commentID)
@@ -708,6 +774,62 @@ Opencast.Annotation_Comment_List = (function ()
         	});  		
     	});
     }
+    /**
+     * @memberOf Opencast.Annotation_Comment_List
+     * @description 
+     * @param String commentID
+     */
+    function editComment(commentID)
+    {
+    	//Only one reply form allowed
+    	cancelEdit(function(){
+    		var url = Opencast.Watch.getAnnotationURL();
+    		var commentVal = $("#comment-row-"+commentID).html();
+    		commentVal = commentVal.replace(/.*<p class=\"oc-comment-list-value-text\">/g, "");
+    		commentVal = commentVal.replace(/<\/p>.*/g, "");
+    		var commentContent = $("#comment-row-"+commentID).html().replace(/<p class=\"oc-comment-list-value-text\">.*<\/p>/g, editTemplate);
+    		$("#comment-row-"+commentID).html(commentContent);
+    		$("#oc-comment-preedit-value").val(commentVal);
+    		$("#oc-comments-list-edit-textbox").val(commentVal);
+//			$("#oc-comment-list-reply-wrapper").slideDown(600);
+			//draw identicon			
+			pwEncrypt = $().crypt( {method: 'md5',source: cm_username});
+            $(".oc-comment-list-user-icon").html(pwEncrypt);
+            $(".oc-comment-list-user-icon").identicon5({rotate:true, size:50});
+			//Submit Button
+			$("#oc-comments-list-edit-submit").click(function(){
+				var textBoxValue = $("#oc-comments-list-edit-textbox").val();
+				textBoxValue = textBoxValue.replace(/<>/g, "");
+				textBoxValue = textBoxValue.replace(/'/g, "`");
+				textBoxValue = textBoxValue.replace(/"/g, "`");
+				$.log("click submit " + textBoxValue );
+				if(textBoxValue !== commentVal) {
+					changeComment(commentID, textBoxValue);
+					$("#oc-comment-preedit-value").val(textBoxValue);
+					cancelEdit();
+				} else if(textBoxValue === commentVal) {
+					$("#oc-comments-list-edit-textbox").focus();
+					$("#oc-comments-list-edit-textbox").select();
+				} 
+			});
+			//Cancel Button
+			$("#oc-comments-list-edit-cancel").click(function(){
+				cancelEdit();
+			});
+	  		// Handler keypress CTRL+Enter on textbox
+	        $("#oc-comments-list-edit-textbox").keyup(function (event)
+	        {
+	            if (event.ctrlKey === true)
+	            {
+	                if (event.which === 13)
+	                {
+	                    $("#oc-comments-list-edit-submit").click();
+	                }
+	
+	           	}
+        	});  		
+    	});
+    }
     
      /**
      * @memberOf Opencast.Annotation_Comment_List
@@ -727,6 +849,26 @@ Opencast.Annotation_Comment_List = (function ()
 				cancel_callback();
 		}	
     }
+    
+    /**
+    * @memberOf Opencast.Annotation_Comment_List
+    * @description removes the reply form from the DOM
+    */
+   function cancelEdit(cancel_callback)
+   {
+   	if($("#oc-comments-list-editbox")[0] !== undefined){
+   			var textBoxValue = $("#oc-comment-preedit-value").val();
+   			$("#oc-comment-preedit-value").after("<p class=\"oc-comment-list-value-text\">" + textBoxValue + "</p>");
+   			$("#oc-comment-preedit-value").remove();
+			$("#oc-comments-list-editbox").remove();
+			if(cancel_callback !== undefined)
+				cancel_callback();
+		}else{
+			if(cancel_callback !== undefined)
+				cancel_callback();
+		}	
+   }
+   
     
      /**
      * @memberOf Opencast.Annotation_Comment_List
@@ -779,12 +921,15 @@ Opencast.Annotation_Comment_List = (function ()
         hide: hide,
         clickCommentList: clickCommentList,
         deleteComment: deleteComment,
+        changeComment: changeComment,
         setUsername: setUsername,
         getUsername: getUsername,
         getModus: getModus,
         setModus: setModus,
         replyComment: replyComment,
+        editComment: editComment,
         cancelReply: cancelReply,
+        cancelEdit: cancelEdit,
         hoverOutCommentList: hoverOutCommentList,
         goToComment: goToComment,
         doToggle: doToggle,

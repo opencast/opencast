@@ -196,6 +196,34 @@ public class AnnotationRestService {
     return Response.created(uri).entity(a).build();
   }
 
+  @PUT
+  @Path("{id}")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "change", description = "Changes the value of an annotation specified by its identifier ", returnDescription = "The user annotation.", 
+          pathParameters = {@RestParameter(name = "id", description = "The annotation identifier", isRequired = true, type = Type.STRING) },
+          restParameters = {@RestParameter(name = "value", description = "The value of the annotation", isRequired = true, type = Type.TEXT) },
+          reponses = { @RestResponse(responseCode = SC_CREATED, description = "The URL to this annotation is returned in the Location header, and an XML representation of the annotation itelf is returned in the response body.") })
+  public Response change(@PathParam("id") String idAsString, @FormParam("value") String value,
+          @Context HttpServletRequest request) throws NotFoundException {
+    Long id = null;
+    try {
+      id = Long.parseLong(idAsString);
+    } catch (NumberFormatException e) {
+        return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+    Annotation a = annotationService.getAnnotation(id);
+    a.setValue(value);
+    a = annotationService.changeAnnotation(a);
+    URI uri;
+    try {
+      uri = new URI(
+              UrlSupport.concat(new String[] { serverUrl, serviceUrl, Long.toString(a.getAnnotationId()), ".xml" }));
+    } catch (URISyntaxException e) {
+      throw new WebApplicationException(e);
+    }
+    return Response.created(uri).entity(a).build();
+  }
+
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("{id}.xml")
@@ -220,7 +248,8 @@ public class AnnotationRestService {
 
   @DELETE
   @Path("{id}")
-  @RestQuery(name = "remove", description = "Remove an annotation", returnDescription = "Return status code", pathParameters = { @RestParameter(name = "id", description = "The annotation identifier", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "Annotation deleted."), @RestResponse(responseCode = SC_NO_CONTENT, description = "Annotation not found.") })
+  @RestQuery(name = "remove", description = "Remove an annotation", returnDescription = "Return status code", 
+  pathParameters = { @RestParameter(name = "id", description = "The annotation identifier", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "Annotation deleted."), @RestResponse(responseCode = SC_NO_CONTENT, description = "Annotation not found.") })
   public Response removeAnnotation(@PathParam("id") String idAsString) throws NotFoundException {
     Long id = null;
     Annotation a; 
