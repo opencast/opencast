@@ -28,6 +28,7 @@ import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
+import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -46,9 +47,26 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 /**
  * A proxy to a remote series service.
  */
+@Path("/")
+@RestService(name = "seriesservice", title = "Series Service Remote", abstractText = "This service creates, edits and retrieves and helps managing series.", notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+        "If the service is down or not working it will return a status 503, this means the the underlying service is "
+                + "not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
+                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService {
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesServiceRemoteImpl.class);
@@ -151,6 +169,22 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     }
   }
 
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("{seriesID:.+}.json")
+  public Response getSeriesJSON(@PathParam("seriesID") String seriesID) {
+    logger.debug("Series Lookup: {}", seriesID);
+    try {
+      DublinCoreCatalog dc = getSeries(seriesID);
+      return Response.ok(dc.toJson()).build();
+    } catch (NotFoundException e) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.error("Could not retrieve series: {}", e.getMessage());
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   @Override
   public DublinCoreCatalog getSeries(String seriesID) throws SeriesException, NotFoundException, UnauthorizedException {
     HttpGet get = new HttpGet(seriesID + ".xml");
@@ -199,6 +233,19 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     } finally {
       closeConnection(response);
     }
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("series.json")
+  public Response getSeriesAsJson(@QueryParam("startPage") long startPage, @QueryParam("count") long count) {
+    try {
+      DublinCoreCatalogList result = getSeries(new SeriesQuery().setStartPage(startPage).setCount(count));
+      return Response.ok(result.getResultsAsJson()).build();
+    } catch (Exception e) {
+      logger.warn("Could not perform search query: {}", e.getMessage());
+    }
+    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
 
   @Override
