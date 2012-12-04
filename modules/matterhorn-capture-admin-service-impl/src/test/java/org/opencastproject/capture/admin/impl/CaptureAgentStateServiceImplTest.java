@@ -23,8 +23,6 @@ import static org.opencastproject.capture.admin.api.CaptureAgentStateService.BAD
 import static org.opencastproject.capture.admin.api.RecordingState.CAPTURING;
 import static org.opencastproject.capture.admin.api.RecordingState.UPLOADING;
 import static org.opencastproject.capture.admin.api.RecordingState.UPLOAD_FINISHED;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ADMIN;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
 
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
@@ -97,7 +95,8 @@ public class CaptureAgentStateServiceImplTest {
     EasyMock.replay(workflowService);
     service.setWorkflowService(workflowService);
 
-    User user = new User("testuser", DEFAULT_ORGANIZATION_ID, new String[] { DEFAULT_ORGANIZATION_ADMIN });
+    User user = new User("testuser", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+            new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN });
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
@@ -363,7 +362,7 @@ public class CaptureAgentStateServiceImplTest {
     Assert.assertEquals(1, service.getKnownAgents().size());
 
     // Use a security service that identifies us as a non-administrative user
-    User user = new User("testuser", DEFAULT_ORGANIZATION_ID, new String[] { "ROLE_NOT_ADMIN" });
+    User user = new User("testuser", DefaultOrganization.DEFAULT_ORGANIZATION_ID, new String[] { "ROLE_NOT_ADMIN" });
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
@@ -383,9 +382,9 @@ public class CaptureAgentStateServiceImplTest {
     String pid = UUID.randomUUID().toString();
     Dictionary<String, String> properties = new Hashtable<String, String>();
     properties.put("id", "agent1");
-    properties.put("organization", DEFAULT_ORGANIZATION_ID);
+    properties.put("organization", DefaultOrganization.DEFAULT_ORGANIZATION_ID);
     properties.put("url", "http://agent1:8080/");
-    properties.put("schedulerRoles", DEFAULT_ORGANIZATION_ADMIN + ", SOME_OTHER_ROLE");
+    properties.put("schedulerRoles", DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN + ", SOME_OTHER_ROLE");
     service.updated(pid, properties);
 
     // If any of the three values are missing, we should throw

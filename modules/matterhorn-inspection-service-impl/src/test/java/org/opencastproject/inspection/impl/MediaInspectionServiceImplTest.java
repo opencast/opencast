@@ -15,8 +15,6 @@
  */
 package org.opencastproject.inspection.impl;
 
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ANONYMOUS;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
 import static org.opencastproject.util.MimeType.mimeType;
 
 import org.opencastproject.job.api.Job;
@@ -74,8 +72,7 @@ public class MediaInspectionServiceImplTest {
       // Mediainfo requires a track in order to return a status code of 0, indicating that it is workinng as expected
       URI uriTrack = MediaInspectionServiceImpl.class.getResource("/av.mov").toURI();
       File f = new File(uriTrack);
-      p = new ProcessBuilder(MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT, f.getAbsolutePath())
-              .start();
+      p = new ProcessBuilder(MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT, f.getAbsolutePath()).start();
       stdout = new StreamHelper(p.getInputStream());
       stderr = new StreamHelper(p.getErrorStream());
       int exitCode = p.waitFor();
@@ -98,7 +95,8 @@ public class MediaInspectionServiceImplTest {
     // set up services and mock objects
     service = new MediaInspectionServiceImpl();
 
-    User anonymous = new User("anonymous", DEFAULT_ORGANIZATION_ID, new String[] { DEFAULT_ORGANIZATION_ANONYMOUS });
+    User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+            new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);

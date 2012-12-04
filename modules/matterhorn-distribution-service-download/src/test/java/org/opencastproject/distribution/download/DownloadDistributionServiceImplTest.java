@@ -15,9 +15,6 @@
  */
 package org.opencastproject.distribution.download;
 
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ANONYMOUS;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
-
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
@@ -72,7 +69,8 @@ public class DownloadDistributionServiceImplTest {
     distributionRoot = new File("./target/static");
     service = new DownloadDistributionService();
 
-    User anonymous = new User("anonymous", DEFAULT_ORGANIZATION_ID, new String[] { DEFAULT_ORGANIZATION_ANONYMOUS });
+    User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+            new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
@@ -141,7 +139,7 @@ public class DownloadDistributionServiceImplTest {
   @Test
   public void testRetract() throws Exception {
     int elementCount = mp.getElements().length;
-    
+
     // Distribute the mediapackage and all of its elements
     Job job1 = service.distribute(mp, "track-1");
     Job job2 = service.distribute(mp, "catalog-1");
@@ -149,7 +147,7 @@ public class DownloadDistributionServiceImplTest {
     Job job4 = service.distribute(mp, "notes");
     JobBarrier jobBarrier = new JobBarrier(serviceRegistry, 500, job1, job2, job3, job4);
     jobBarrier.waitForJobs();
-    
+
     // Add the new elements to the mediapackage
     mp.add(MediaPackageElementParser.getFromXml(job1.getPayload()));
     mp.add(MediaPackageElementParser.getFromXml(job2.getPayload()));
@@ -189,7 +187,7 @@ public class DownloadDistributionServiceImplTest {
     Assert.assertNotNull(mp.getElementById("catalog-1"));
     Assert.assertNotNull(mp.getElementById("catalog-2"));
     Assert.assertNotNull(mp.getElementById("notes"));
-    
+
     Assert.assertFalse(service.getDistributionFile(mp, mp.getElementById("track-1")).isFile());
     Assert.assertFalse(service.getDistributionFile(mp, mp.getElementById("catalog-1")).isFile());
     Assert.assertFalse(service.getDistributionFile(mp, mp.getElementById("catalog-2")).isFile());

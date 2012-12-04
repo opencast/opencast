@@ -17,9 +17,9 @@ package org.opencastproject.capture.admin.impl;
 
 import static org.opencastproject.capture.admin.api.AgentState.CAPTURING;
 import static org.opencastproject.capture.admin.api.AgentState.IDLE;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
 
 import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.security.api.DefaultOrganization;
 
 import junit.framework.Assert;
 
@@ -33,7 +33,7 @@ public class AgentTest {
 
   @Before
   public void setUp() {
-    agent = new AgentImpl("test", DEFAULT_ORGANIZATION_ID, IDLE, "http://localhost/", null);
+    agent = new AgentImpl("test", DefaultOrganization.DEFAULT_ORGANIZATION_ID, IDLE, "http://localhost/", null);
     Assert.assertNotNull(agent);
     time = agent.getLastHeardFrom();
   }

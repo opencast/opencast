@@ -70,7 +70,7 @@ public class EpisodeServicePersistenceTest {
     storage = PathSupport.concat("target", "db" + currentTime + ".h2.db");
 
     securityService = EasyMock.createNiceMock(SecurityService.class);
-    User user = new User("admin", SecurityConstants.DEFAULT_ORGANIZATION_ID,
+    User user = new User("admin", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
             new String[] { SecurityConstants.GLOBAL_ADMIN_ROLE });
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();

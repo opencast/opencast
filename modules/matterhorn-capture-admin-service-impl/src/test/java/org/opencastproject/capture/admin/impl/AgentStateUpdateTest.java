@@ -16,10 +16,10 @@
 package org.opencastproject.capture.admin.impl;
 
 import static org.opencastproject.capture.admin.api.AgentState.IDLE;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
 
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentStateUpdate;
+import org.opencastproject.security.api.DefaultOrganization;
 
 import junit.framework.Assert;
 
@@ -34,7 +34,7 @@ public class AgentStateUpdateTest {
 
   @Before
   public void setUp() throws InterruptedException {
-    agent = new AgentImpl("test", DEFAULT_ORGANIZATION_ID, IDLE, "", null);
+    agent = new AgentImpl("test", DefaultOrganization.DEFAULT_ORGANIZATION_ID, IDLE, "", null);
     Assert.assertNotNull(agent);
     Thread.sleep(5);
     asu = new AgentStateUpdate(agent);

@@ -15,9 +15,6 @@
  */
 package org.opencastproject.workflow.impl;
 
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ADMIN;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
-
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -28,9 +25,10 @@ import org.opencastproject.security.api.User;
  */
 public class SecurityServiceStub implements SecurityService {
 
-//  private User user = new User("admin", DEFAULT_ORGANIZATION_ID, new String[] { DEFAULT_ORGANIZATION_ADMIN });
-//
-  public static final User DEFAULT_ORG_ADMIN = new User("admin", DEFAULT_ORGANIZATION_ID, new String[] { DEFAULT_ORGANIZATION_ADMIN });
+  // private User user = new User("admin", DEFAULT_ORGANIZATION_ID, new String[] { DEFAULT_ORGANIZATION_ADMIN });
+  //
+  public static final User DEFAULT_ORG_ADMIN = new User("admin", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+          new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN });
 
   /** Holds delegates users for new threads that have been spawned from authenticated threads */
   private static final ThreadLocal<User> user = new ThreadLocal<User>();
@@ -45,7 +43,7 @@ public class SecurityServiceStub implements SecurityService {
     setUser(DEFAULT_ORG_ADMIN);
     setOrganization(new DefaultOrganization());
   }
-  
+
   @Override
   public User getUser() {
     return user.get();
