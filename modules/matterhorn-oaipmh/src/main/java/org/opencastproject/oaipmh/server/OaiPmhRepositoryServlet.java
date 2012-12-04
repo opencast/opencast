@@ -34,11 +34,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.opencastproject.oaipmh.util.OsgiUtil.checkDictionary;
 import static org.opencastproject.oaipmh.util.OsgiUtil.getCfg;
@@ -70,7 +70,7 @@ public final class OaiPmhRepositoryServlet extends HttpServlet implements Manage
    */
   private String currentServletAlias;
 
-  private List<MetadataProvider> metadataProviders = Collections.synchronizedList(new ArrayList<MetadataProvider>());
+  private List<MetadataProvider> metadataProviders = new CopyOnWriteArrayList<MetadataProvider>();
 
   /**
    * Service dependency. Called by the OSGi container. See the component xml.
