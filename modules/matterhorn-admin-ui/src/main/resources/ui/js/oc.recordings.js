@@ -110,68 +110,10 @@ ocRecordings = new (function() {
   function refresh() {
     if (!refreshing) {
       refreshing = true;
-      var params = [];
-      params.push('compact=true');
-      // 'state' to display
-      var state = ocRecordings.Configuration.state;
-      params.push('state=-stopped');
-      if (state == 'upcoming') {
-        params.push('state=paused');
-        params.push('state=running');
-        params.push('op=schedule');
-      }
-      else if (state == 'capturing') {
-        params.push('state=paused');
-        params.push('op=capture');
-        params.push('op=ingest');
-      }
-      else if (state == 'processing') {
-        params.push('state=running');
-        params.push('op=-schedule');
-        params.push('op=-capture');
-      }
-      else if (state == 'finished') {
-        params.push('state=succeeded');
-        params.push('op=-schedule');
-        params.push('op=-capture');
-      }
-      else if (state == 'hold') {
-        params.push('state=paused');
-        params.push('op=-schedule');
-        params.push('op=-capture');
-        params.push('op=-ingest');
-      }
-      else if (state == 'failed') {
-        params.push('state=failed');
-        params.push('state=failing');
-      }
-      else if (state === 'bulkedit' || state === 'bulkdelete') {
-        ocRecordings.Configuration.pageSize = 100;
-        ocRecordings.Configuration.page = 0;
-        params.push('state=paused');
-        params.push('state=running');
-        params.push('op=schedule');
-      }
-      // sorting if specified
-      if (ocRecordings.Configuration.sortField != null) {
-        var sort = SORT_FIELDS[ocRecordings.Configuration.sortField];
-        if (ocRecordings.Configuration.sortOrder == 'DESC') {
-          sort += "_DESC";
-        }
-        params.push('sort=' + sort);
-      }
-      // filtering if specified
-      if (ocRecordings.Configuration.filterText != '') {
-        params.push(ocRecordings.Configuration.filterField + '=' + encodeURI(ocRecordings.Configuration.filterText).replace('#','%23').replace('?','%3f')); 
-      }
+      var params = getRefreshParams();
       // paging
       params.push('count=' + ocRecordings.Configuration.pageSize);
       params.push('startPage=' + ocRecordings.Configuration.page);
-      
-      if (ocRecordings.Configuration.dateFilter != 'all') {
-        params.push('fromdate=' + ocRecordings.Configuration.fromdate);
-        params.push('todate=' + ocRecordings.Configuration.todate);
-      }
 
       var url = WORKFLOW_LIST_URL + '?' + params.join('&');
       $.ajax(
@@ -190,6 +132,118 @@ ocRecordings = new (function() {
     }
   }
 
+  /** Initiate recursive ajax calls to workflow instances list endpoint to collect non-paged list
+   */
+  function refreshWithoutPaging(startPage, workflowData) {
+    if (!refreshing) {
+      refreshing = true;
+      var params = getRefreshParams();
+      // paging
+      params.push('count=' + ocRecordings.Configuration.pageSize);
+      params.push('startPage=' + startPage);
+
+      var url = WORKFLOW_LIST_URL + '?' + params.join('&');
+      $.ajax(
+      {
+        url: url,
+        dataType: 'json',
+        success: function (data)
+        {
+          if (!workflowData)
+          {
+        	workflowData = data;
+          }
+          else
+          {
+        	  workflowData.workflows.count += data.workflows.count;
+        	  workflowData.workflows.workflow = workflowData.workflows.workflow && workflowData.workflows.workflow.concat(data.workflows.workflow);
+          }
+          workflowData.workflows.startPage = ++data.workflows.startPage;
+          
+          if (workflowData.workflows.workflow && workflowData.workflows.workflow.length < workflowData.workflows.totalCount)
+          {
+	        	refreshing = false;
+	        	refreshWithoutPaging(workflowData.workflows.startPage, workflowData);
+          } 
+          else 
+          {
+            ocRecordings.render(workflowData);
+            if (ocRecordings.Configuration.state == 'bulkedit' || ocRecordings.Configuration.state == 'bulkdelete')
+            {
+              $('.bulkSelect').show();
+            }
+          }
+        }
+      });
+    }
+  }
+  
+  /** Returns an array of params to send to the workflow instances list endpoint
+   */
+  function getRefreshParams() {
+	  var params = [];
+	  params.push('compact=true');
+	  // 'state' to display
+	  var state = ocRecordings.Configuration.state;
+	  params.push('state=-stopped');
+	  if (state == 'upcoming') {
+	    params.push('state=paused');
+	    params.push('state=running');
+	    params.push('op=schedule');
+	  }
+	  else if (state == 'capturing') {
+	    params.push('state=paused');
+	    params.push('op=capture');
+	    params.push('op=ingest');
+	  }
+	  else if (state == 'processing') {
+	    params.push('state=running');
+	    params.push('op=-schedule');
+	    params.push('op=-capture');
+	  }
+	  else if (state == 'finished') {
+	    params.push('state=succeeded');
+	    params.push('op=-schedule');
+	    params.push('op=-capture');
+	  }
+	  else if (state == 'hold') {
+	    params.push('state=paused');
+	    params.push('op=-schedule');
+	    params.push('op=-capture');
+	    params.push('op=-ingest');
+	  }
+	  else if (state == 'failed') {
+	    params.push('state=failed');
+	    params.push('state=failing');
+	  }
+	  else if (state === 'bulkedit' || state === 'bulkdelete') {
+	    ocRecordings.Configuration.pageSize = 100;
+	    ocRecordings.Configuration.page = 0;
+	    params.push('state=paused');
+	    params.push('state=running');
+	    params.push('op=schedule');
+	  }
+	  // sorting if specified
+	  if (ocRecordings.Configuration.sortField != null) {
+	    var sort = SORT_FIELDS[ocRecordings.Configuration.sortField];
+	    if (ocRecordings.Configuration.sortOrder == 'DESC') {
+	      sort += "_DESC";
+	    }
+	    params.push('sort=' + sort);
+	  }
+	  // filtering if specified
+	  if (ocRecordings.Configuration.filterText != '') {
+	    params.push(ocRecordings.Configuration.filterField + '=' + encodeURI(ocRecordings.Configuration.filterText).replace('#','%23').replace('?','%3f')); 
+	  }
+	  
+	  if (ocRecordings.Configuration.dateFilter != 'all') {
+	    params.push('fromdate=' + ocRecordings.Configuration.fromdate);
+	    params.push('todate=' + ocRecordings.Configuration.todate);
+	  }
+	
+	  return params;
+  }
+  
   function setDateRange() {
 	  var filter = ocRecordings.Configuration.dateFilter;
 	  var today = new Date();
@@ -1203,7 +1257,7 @@ ocRecordings = new (function() {
         $('#i18n_button_apply_bulk_action').html("Delete Recordings");
         ocRecordings.Configuration.state = 'bulkdelete'
       }
-      refresh();
+      refreshWithoutPaging(0);
     }
   }
   
@@ -1229,10 +1283,11 @@ ocRecordings = new (function() {
       return;
     }
     if(checked){
-      $.each($('.selectRecording'), function(i,v){
+      var checkboxes = $('.selectRecording');
+      $.each(checkboxes, function(i,v){
         v.checked = true;
       });
-      ocRecordings.numSelectedRecordings = ocRecordings.totalRecordings;
+      ocRecordings.numSelectedRecordings = checkboxes.size();
     } else {
       $.each($('.selectRecording'), function(i,v){
         v.checked = false;
