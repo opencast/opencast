@@ -43,13 +43,28 @@
       <div class="form-box layout-centered ui-widget">
         <div class="form-box-content ui-widget-content ui-corner-all">
           <form action="">
-	    <div id="importantData"></div>
-            <ul>
-              <li class="recordingDate">
-                <label class="scheduler-label" id="recordingDateLabel"><span class="scheduler-required-text">* </span><span id="i18n_date_label">Recording Date</span>:</label>
-                <input type="text" size="10" id="recordDate" name="recordDate" class="dc-metadata-field" />
+            <ul class="oc-ui-form-list">
+              <li>
+                <label class="scheduler-label" for="titleField" id="titleLabel"><span style="color: red;">* </span><span id="i18n_title_label">Title</span>:</label>
+
+                <input type="text" id="titleField" name="title" class="oc-ui-form-field requiredField dc-metadata-field" maxlength="255" />
               </li>
               <li>
+                <label class="scheduler-label" for="creator" id="creatorLabel"><span id="i18n_presenter_label">Presenter</span>:</label>
+                <input type="text" id="creator" name="creator" class="oc-ui-form-field dc-metadata-field"  maxlength="255"/>
+              </li>
+              <li id="seriesContainer">
+                <label class="scheduler-label" for="series" id="seriesLabel"><span id="i18n_series_label">Course/Series</span>:</label>
+
+                <input type="text" class="oc-ui-form-field" id="series" name="series" maxlength="255">
+                <input type="hidden" class="oc-ui-form-field dc-metadata-field" id="isPartOf" name="isPartOf" value="">
+              </li>
+              <li>
+                <label class="scheduler-label" id="recordingDateLabel"><span class="scheduler-required-text">* </span><span id="i18n_date_label">Recording Date</span>:</label>
+                <input type="text" size="10" id="recordDate" name="recordDate" class="dc-metadata-field" />
+              </li> 
+              <li>
+
                 <label class="scheduler-label" id="startTimeLabel"><span class="scheduler-required-text">* </span><span id="i18n_starttime_label">Start Time</span>:</label>
                 <select id="startTimeHour">
                   <option value="0">00</option>
@@ -81,7 +96,6 @@
                   <option value="22">22</option>
                   <option value="23">23</option>
                 </select>
-
                 <select id="startTimeMin">
                   <option value="0">00</option>
                   <option value="1">01</option>
@@ -155,7 +169,7 @@
                   <option value="59">59</option>
                 </select>
               </li>
-	    </ul>
+            </ul>
           </form>
 
         </div>
@@ -364,30 +378,45 @@
       </div>
 
       <!-- Processing Instructions -->
-      <div id="processingRecording"></div>
+      <div class="form-box layout-centered container ui-widget">
+        <div class="form-box-head ui-widget-header ui-corner-top"><b id="i18n_process_title">Processing</b></div>
+
+        <div class="form-box-content ui-widget-content ui-corner-bottom">
+          <ul class="oc-ui-form-list">
+            <li class="ui-helper-clearfix">
+              <label class="scheduler-label"><span style="color: red;">* </span><span id="i18n_process_instr">Processing instructions</span>:</label>
+              <select id="workflowSelector" id="workflowSelector" class="workflowSelector"></select>
+            </li>
+            <li class="workflowConfigContainer" id="workflowConfigContainer">
+
+              <div class="workflowConfigPanel"></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
 
       <!-- submit/cancel controls -->
       <div class="form-box layout-centered ui-widget">
-	<div class="form-box-content ui-widget-content ui-corner-all">
+        <div class="form-box-content ui-widget-content ui-corner-all">
 
           <form action="">
             <ul class="oc-ui-form-list">
               <!-- submit / cancal button -->
               <li class="ui-helper-clearfix">
-		<label class="scheduler-label">&nbsp;</label>
-		<button id="submitButton" type="button" class="mouseover-pointer control-button">Upload</button>
-		<a id="cancelButton" title="Cancel" class="secondaryButton">Cancel</a>
+                <label class="scheduler-label">&#160;</label>
+                <button id="submitButton" type="button" class="mouseover-pointer control-button">Upload</button>
+                <a id="cancelButton" title="Cancel" class="secondaryButton">Cancel</a>
               </li>
 
               <!-- * = required -->
               <li class="ui-helper-clearfix">
-		<label class="scheduler-label">&nbsp;</label>
-		<span class="color-red">* </span><span id="i18n_required">Required</span>
+                <label class="scheduler-label">&#160;</label>
+                <span class="color-red">* </span><span id="i18n_required">Required</span>
               </li>
             </ul>
-	</div>
+        </div>
       </div>
-
 
     </form>
 

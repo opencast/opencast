@@ -167,8 +167,6 @@ table#agentsTable th, table#seriesTable th, table#recordingsTable th, table#stat
 .form-box { margin-top: 10px; min-width: 800px; }
 .form-box .form-box-head { padding: 3px 5px }
 .form-box .form-box-content { padding: 20px; }
-#importantData{ margin-bottom: 3px; }
-.recordingDate{ margin-bottom: 5px; }
 #additional_icon, .fold-icon { float: left; margin-left: -5px; } 
 .unfoldable-icon { float: left; margin-left: -5px; }
 .uploadForm-container {height:30px;width:400px;padding:0px;overflow:hidden;border:none;}
