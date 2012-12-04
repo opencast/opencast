@@ -90,7 +90,7 @@
         </tr>
         <tr>
           <td class="td-key">License:</td>
-          <td id="licenseField" class="td-value"><%= (data[j].workflow.config.license) ? data[j].workflow.config.license : '' %></td>
+          <td id="licenseField" class="td-value"><%= (data[j].workflow.mediapackage.license) ? data[j].workflow.mediapackage.license : '' %></td>
         </tr>
       </table>
     </div>
