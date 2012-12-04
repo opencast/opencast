@@ -239,7 +239,7 @@
               </li>
               <!-- field: Media File -->
               <li class="ui-helper-clearfix">
-                <label class="scheduler-label"><span class="color-red">* </span><span id="i18n_upload_file">Media File</span>:</label>
+                <label id="trackLabel" class="scheduler-label"><span class="color-red">* </span><span id="i18n_upload_file">Media File</span>:</label>
                 <iframe class="uploadForm-container" frameborder="0" scrolling="no" src="upload.html?flavor=presenter/source" class="uploadForm-container"></iframe>
                 <input type="hidden" class="track-flavor" value="presenter/source"/>
               </li>
