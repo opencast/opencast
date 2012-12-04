@@ -958,9 +958,10 @@ Opencast.Player = (function ()
         {
             hideEmbed();
         });
+        $("#oc_embed-icon-one").removeClass("ui-state-focus");
         embedDialogDisplayed = true;
     }
-    
+
     /**
      * @memberOf Opencast.Player
      * @description Show the shared time dialog
