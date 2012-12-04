@@ -216,6 +216,7 @@ ocUpload.UI = (function() {
     ocUtils.log('Updating missing fields notification');
     if (missingFields == false) {
       $('#missingFieldsContainer').hide();
+      $('.label-error').removeClass('label-error');
     } else {
       $('#missingFieldsContainer').find('.missing-fields-item').each(function() {
         var fieldname = $(this).attr('id').substr(5);
@@ -225,6 +226,10 @@ ocUpload.UI = (function() {
           $(this).hide();
         }
       });
+
+      for(var i in missingFields ) {
+        $('#' + missingFields[i] +"Label").addClass('label-error');
+      }
 
       $(window).scrollTop(errorContainer.offset().top)
              .scrollLeft(errorContainer.offset().left);

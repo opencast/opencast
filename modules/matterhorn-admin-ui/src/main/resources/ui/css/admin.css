@@ -176,7 +176,7 @@ table#agentsTable th, table#seriesTable th, table#recordingsTable th, table#stat
 #hold-ul li { padding-left: 175px; }
 
 /* Error */
-
+.label-error { color: red ;}
 .scheduler-info-container { padding: 20px; }
 .scheduler-info-container li { position: relative; padding-left: 15px;}
 .scheduler-info-container span.ui-icon { position: absolute; left: 0; top: 0;}
