@@ -39,8 +39,9 @@ input
   line-height: 20px;
   margin: 5px 10px;
 }
-#oc_player-head-right a div {
+#oc_player-head-right a span {
   background-color: white;
+  display: block;
   }
 #oc_player-head-right #oc_share-button {
   background-position: -150px -125px;
@@ -54,7 +55,7 @@ input
 #oc_player-head-right #oc_shortcut-button:hover, #oc_player-head-right #oc_shortcut-button:focus  {
   background-position: -239px -155px;
 }
-#oc_player-head-right a div {
+#oc_player-head-right a span {
   border: none;
   }
 
@@ -69,7 +70,7 @@ input
   line-height: 20px;
   margin: 5px 10px;
 }
-#oc_player-head-see-more a div {
+#oc_player-head-see-more a span {
   background-color: white;
   border: none;
 }

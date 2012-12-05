@@ -561,7 +561,22 @@ Opencast.segments_ui = (function ()
                         data['search-results'].result.mediapackage.media.track = tmp;
                     }
                     // Create Trimpath Template
+		    // Fix bugbash2
+		    var segmentsTable1 = document.createElement('table');
+		    segmentsTable1.setAttribute('id', 'segmentstable1');
+		    segmentsTable1.setAttribute('class', 'segments');
+		    $('#analytics-and-annotations').append(segmentsTable1);
+		    var segmentsTable2 = document.createElement('table');
+		    segmentsTable2.setAttribute('id', 'segmentstable2');
+		    $('#segments-table2').append(segmentsTable2);
+		    // End fix bugbash2
                     Opencast.segments_ui_Plugin.addAsPlugin($('#segmentstable1'), $('#segments_ui-media1'), $('#data1'), $('#segments_ui-mediapackagesAttachments'), $('#data2'), $('#segments_ui-mediapackagesCatalog'), $('#segmentstable2'), data['search-results'].result, segmentsAvailable);
+		    // Fix bugbash2
+		    var tableData1 = document.createElement('table');
+		    tableData1.setAttribute('id', 'tableData1');
+		    tableData1.setAttribute('class', 'segments');
+		    $('#tableData1Container').append(tableData1);
+		    // End fix bugbash2
                     Opencast.segments_ui_slider_Plugin.addAsPlugin($('#tableData1'), $('#segments_ui_slider_data1'), $('#segments_ui_slider_data2'), data['search-results'].result, segmentsAvailable);
                     if(!onceLoaded)
                     {

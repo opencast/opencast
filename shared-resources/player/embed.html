@@ -56,7 +56,7 @@
                 <span id="noJSAlert-matter">matter</span><span id="noJSAlert-horn">horn</span>
                 <div class="noJSAlert-outer">
                     <div class="noJSAlert-inner-up">
-                        <div class="icon icon-error noJSAlert-inner-image">&nbsp;</div>
+                        <div class="icon icon-error noJSAlert-inner-image">&#160;</div>
                         JavaScript is disabled
                     </div>
                     <div class="noJSAlert-inner-down">
@@ -70,17 +70,22 @@
         </noscript>
         
         <div id="oc_body">
-            <a id="oc-link-advanced-player" href="#" target="_blank" title="View Advanced Player" title="Open Engage Player">
+            <a id="oc-link-advanced-player" href="#" target="_blank" title="Open Engage Player">
 				<img alt="Open Engage Player" src="img/mh_logos/MatterhornLogo_42x30.png" height="30px" width="42px" />
 			</a>
             <div id="oc_flash-player-loading">
                 <!-- START: Hide when no Javascript is activated -->
+                <span id="initializing-matter" class="hidden">matter</span>
+                <span id="initializing-horn" class="hidden">horn</span>
+                <span id="initializing_space" class="hidden">&#160;</span>
+                <span id="initializing" class="hidden">initializing</span>
+                <span id="loading-init" class="hidden"></span>
                 <script type="text/javascript">
-                    document.write('<span id="initializing-matter">matter</span>');
-                    document.write('<span id="initializing-horn">horn</span>');
-                    document.write('&nbsp;');
-                    document.write('<span id="initializing">initializing</span>');
-                    document.write('<span id="loading-init"></span>');
+                    document.getElementById('initializing-matter').className="";
+                    document.getElementById('initializing-horn').className="";
+                    document.getElementById('initializing_space').className="";
+                    document.getElementById('initializing').className="";
+                    document.getElementById('loading-init').className="";
                 </script>
                 <!-- END: Hide when no Javascript is activated -->
             </div>
@@ -102,8 +107,8 @@
                      <div id="simpleEdit">
                          <input id="oc_current-time" class="oc_current-time" type="text" name="Current Time" title="Current Time" value="00:00:00" tabIndex="0" />
                          <input id="oc_edit-time" class="oc_edit-time-hide" type="text" maxlength="8" size="8" name="Edit Current Time HH:MM:SS" title="Edit Current Time HH:MM:SS" value="00:00:00" />
-                         <span id="of">&nbsp;of&nbsp;</span>
-                         <span id="oc_duration" class="oc_duration" name="Duration" title="Duration" tabIndex="0">
+                         <span id="of">&#160;of&#160;</span>
+                         <span id="oc_duration" class="oc_duration" title="Duration" tabIndex="0">
                              Initializing
                          </span>
                          <span id="oc_video-cc">
@@ -114,12 +119,10 @@
                  <!-- END #oc_video-time -->
                 
                  <div id="oc_video-controls">
-                     <span id="skip">
-                         <a name="controls"></a>
-                         <h2>
-                             Video Player Controls
-                         </h2>
-                     </span>
+                     <h2 class="skip">
+                       <a name="controls"></a>
+                       Video Player Controls
+                     </h2>
                      <input id="oc_btn-skip-backward" class="oc_btn-skip-backward" type="submit" name="Jump To The Previous Slide" alt="Jump To The Previous Slide" title="Jump To The Previous Slide" value="" />
                      <input id="oc_btn-rewind" class="oc_btn-rewind" type="submit" name="Jump Back: Control + Alt + R" alt="Jump Back: Control + Alt + R" title="Jump Back: Control + Alt + R" value="" />
                      <input id="oc_btn-play-pause" class="oc_btn-play" type="submit" name="Play: Control + Alt + P" alt="Play: Control + Alt + P" title="Play: Control + Alt + P" value="" />
@@ -152,21 +155,21 @@
             <!-- segments_ui_slider + segments_ui -->
             <div id="data">
                 <div id="oc_seek-slider">
-                    <label id="skip" for="srubber">
+                    <label class="skip" for="scrubber">
                         Time Slider
                     </label>
                     <table id="scrubber-table">
                         <tbody>
                             <tr class="player-chrome">
-                                <td class="progress-segment">
-                                    <table class="segments" id="tableData1">
+                                <td class="progress-segment" id="tableData1Container">
+                                    <!-- table class="segments" id="tableData1" -->
                                         <!-- data comes here -->
-                                    </table>
+                                    <!-- /table -->
                                     <div class="progress-list">
                                         <span class="load-progress" value="0"></span>
                                         <span id="play-progress" class="play-progress" value="0"></span>
-                                        <span id="scubber-channel" class="scrubber-channel"><input id="scrubber" type="submit" type="image" src="img/misc/space.png" class="scrubber-button" role="slider"/>
-                                            <div id="draggable" class="ui-widget-content"></div>
+                                        <span id="scubber-channel" class="scrubber-channel"><input id="scrubber" type="image" src="img/misc/space.png" class="scrubber-button" role="slider"/>
+                                            <span id="draggable" class="ui-widget-content"></span>
                                         </span>
                                     </div>
                                 </td>
@@ -180,9 +183,9 @@
                 <div id="analytics-and-annotations">
                     <span id="analytics" class="analytics">Loading..</span>
                     <span id="annotation" class="annotation">Annotation..</span>
-                    <table class="segments" id="segmentstable1">
+                    <!-- table class="segments" id="segmentstable1" -->
                         <!-- data comes here -->
-                    </table>
+			<!-- /table -->
                 </div>
                 <!-- END #analytics-and-annotations -->
                 
@@ -195,7 +198,7 @@
                 <div id="data2"></div>
                 <div id="segments_ui-mediapackagesCatalog"></div>
                 <div id="segments-table2">
-                    <table id="segmentstable2"></table>
+                    <!-- table id="segmentstable2"></table -->
                 </div>
             </div>
             <!-- END #data -->
@@ -205,18 +208,18 @@
             <div id="oc_time-chooser-layer" class="ui-widget ui-widget-content ui-corner-all oc_popuplayer ui-helper-hidden" title="change player time/ session time" tabindex="-1" role="dialog" aria-hidden="true">
                 <ul id="oc_time-chooser-list" class="oc_popuplayer-list">
                     <li>
-                        <a href="javascript: " id="oc_btn-player-time" onclick="Opencast.Player.doToggleTimeLayer();" class="handcursor" title="View player time" role="button">
+                        <a href="javascript:;" id="oc_btn-player-time" onclick="Opencast.Player.doToggleTimeLayer();" class="handcursor" title="View player time" role="button">
                             View player time
                         </a>
                     </li>
                     <li>
-                        <a href="javascript: " id="oc_btn-session-time" onclick="Opencast.Player.doToggleTimeLayer();" class="handcursor" title="View session time" role="button">
+                        <a href="javascript:;" id="oc_btn-session-time" onclick="Opencast.Player.doToggleTimeLayer();" class="handcursor" title="View session time" role="button">
                             View session time
                         </a>
                     </li>
                 </ul>
                 <!-- END #oc_time-chooser-list -->
-                <button id="oc_btn-leave-session-time" class="oc_btn-close">
+                <button class="oc_btn-leave-session-time" id="oc_btn-close">
                     Leave time dialog
                 </button>
             </div>

@@ -14,8 +14,8 @@
     <link rel="stylesheet" type="text/css" href="/engage/ui/css/player/jquery.wysiwyg.css" ></link>
     <link rel="stylesheet" type="text/css" href="/engage/ui/css/oc.segments.css" ></link>
     <link rel="stylesheet" type="text/css" href="/engage/ui/css/player/watch.css" ></link>
-    <link rel="stylesheet" type="text/css" href="/engage/ui/css/annotation/oc.comments.css">
-    <link rel="stylesheet" type="text/css" href="/engage/ui/css/annotation/oc.comment.list.css">
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/annotation/oc.comments.css"/>
+    <link rel="stylesheet" type="text/css" href="/engage/ui/css/annotation/oc.comment.list.css"/>
     <!-- Javascript includes -->
     <script type="text/javascript" src="/engage/ui/js/jquery/jquery.js"></script>
     <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.utils.js"></script>
@@ -67,13 +67,13 @@
     <script type="text/javascript" src="/engage/ui/js/player/watch.js"></script>
   </head>
   <body>
-    <div id="skip">
+    <div class="skip">
       <a href="#controls" tabindex="10">
         Skip to player controls
       </a>
     </div>
 
-    <div id="skip">
+    <div class="skip">
       <a id="oc_a11y-shortcut" href="#shortcuts" onclick="Opencast.Player.doToggleShortcuts(event, 'oc_a11y-shortcut');" tabindex="20">
         Skip to Shortcuts
       </a>
@@ -84,9 +84,9 @@
       <center>
 	<div class="ie8comments-outer">
           <div class="ie8comments-inner-up">
-            <div class="icon icon-information ie8comments-inner-image">&nbsp;</div>
+            <div class="icon icon-information ie8comments-inner-image">&#160;</div>
             No support for your browser
-	    <div id="ie8comments-close" class="icon-2 icon-close ie8comments-inner-image-2">&nbsp;</div>
+	    <div id="ie8comments-close" class="icon-2 icon-close ie8comments-inner-image-2">&#160;</div>
           </div>
           <div class="ie8comments-inner-down">
 	    The comments feature is not available for Internet Explorer browsers with versions less than version 9.<br />
@@ -101,9 +101,9 @@
       <center>
 	<div class="mobile_redirect-outer">
           <div class="mobile_redirect-inner-up">
-            <div class="icon icon-information mobile_redirect-inner-image">&nbsp;</div>
+            <div class="icon icon-information mobile_redirect-inner-image">&#160;</div>
             Mobile experience
-	    <div id="mobile_redirect-close" class="icon-2 icon-close mobile_redirect-inner-image-2">&nbsp;</div>
+	    <div id="mobile_redirect-close" class="icon-2 icon-close mobile_redirect-inner-image-2">&#160;</div>
           </div>
           <div class="mobile_redirect-inner-down">
 	    For a better mobile experience there are also mobile phone apps for nearly every platform available.<br />
@@ -117,27 +117,27 @@
     <div id="oc_player-head">
       <div id="oc_title"></div>
       <div id="oc_player-head-see-more" class="ui-helper-hidden">
-        <a href="javascript: " id="oc_see-more-button" title="click to see more of this series" role="button" aria-pressed="false">
-          <div>
+        <a href="javascript:;" id="oc_see-more-button" title="click to see more of this series" role="button" aria-pressed="false">
+          <span>
             See More
-          </div>
+          </span>
         </a>
       </div>
       <div id="oc_player-head-right">
-        <a href="javascript: " id="oc_shortcut-button" title="click to show shortcuts" role="button" aria-pressed="false" tabindex="80">
-          <div>
+        <a href="javascript:;" id="oc_shortcut-button" title="click to show shortcuts" role="button" aria-pressed="false" tabindex="80">
+          <span>
             Shortcuts
-          </div>
+          </span>
         </a>
-        <a href="javascript: " id="oc_share-button" title="click to show share options" role="button" aria-pressed="false" tabindex="70">
-          <div>
+        <a href="javascript:;" id="oc_share-button" title="click to show share options" role="button" aria-pressed="false" tabindex="70">
+          <span>
             Share
-          </div>
+          </span>
         </a>
-        <a href="javascript: " id="oc_download-button" title="click to show downloads" role="button" aria-pressed="false" tabindex="60">
-          <div>
+        <a href="javascript:;" id="oc_download-button" title="click to show downloads" role="button" aria-pressed="false" tabindex="60">
+          <span>
             Download
-          </div>
+          </span>
       </a>
 
       </div>
@@ -148,12 +148,14 @@
     <div id="oc_body" class="ui-widget ui-widget-content ui-corner-bottom">
       <div id="oc_flash-player-loading">
         <span id="matterhorn-init-logo"></span>
+        <span id="initializing" class="hidden">initializing</span>
+        <span id="loading-init" class="hidden"></span>
         <!-- START: Hide when no Javascript is activated -->
         <script type="text/javascript">
-          document.write('<span id="initializing">initializing</span>');
-          document.write('<span id="loading-init"></span>');
+          document.getElementById("initializing").className = "";
+          document.getElementById("loading-init").className = "";
         </script>
-        <!-- END: Hide when no Javascript is activated -->
+         <!-- END: Hide when no Javascript is activated -->
       </div>
 
       <!-- If no Javascript is activated -->
@@ -161,7 +163,7 @@
         <center>
           <div class="noJSAlert-outer">
             <div class="noJSAlert-inner-up">
-              <div class="icon icon-error noJSAlert-inner-image">&nbsp;</div>
+              <div class="icon icon-error noJSAlert-inner-image">&#160;</div>
               JavaScript is disabled
             </div>
             <div class="noJSAlert-inner-down">
@@ -186,10 +188,10 @@
           <div id="simpleEdit">
             <input id="oc_current-time" class="oc_current-time handcursor ui-corner-all" type="text" name="Current Time" title="Current Time" value="00:00:00" />
             <input id="oc_edit-time" class="oc_edit-time-hide handcursor ui-corner-all" type="text" maxlength="8" size="8" name="Edit Current Time HH:MM:SS" title="Edit Current Time HH:MM:SS" value="00:00:00" />
-            &nbsp;of&nbsp;
-            <span id="oc_duration" class="oc_duration" name="Duration" title="Duration">
+            &#160;of&#160;
+            <span id="oc_duration" class="oc_duration" title="Duration">
               Initializing
-            </span>&nbsp;
+            </span>&#160;
             <span id="oc_video-cc">
               <input id="oc_btn-cc" class="oc_btn-cc-off" type="checkbox" name="Closed Captions Off: Control + Alt + C" title="Closed Captions Off: Control + Alt + C" value="" />
               <label for="oc_btn-cc" title="Closed Captions Off: Control + Alt + C">
@@ -203,12 +205,10 @@
         </div>
         <!-- END #oc_video-time -->
         <div id="oc_video-controls">
-          <span id="skip">
+          <h2 class="skip">
             <a name="controls"></a>
-            <h2>
-              Video Player Controls
-            </h2>
-          </span>
+            Video Player Controls
+          </h2>
           <input id="oc_btn-skip-backward" 
 		 class="oc_btn-skip-backward" 
 		 type="image" 
@@ -285,22 +285,22 @@
       <!-- segments_ui_slider + segments_ui -->
       <div id="data">
         <div id="oc_seek-slider">
-          <label id="skip" for="srubber">
+          <label class="skip" for="scrubber">
             Time Slider
           </label>
           <table id="scrubber-table">
             <tbody>
               <tr class="player-chrome">
-                <td class="progress-segment">
-                  <table class="segments" id="tableData1">
+                <td class="progress-segment" id="tableData1Container">
+                  <!-- table class="segments" id="tableData1" -->
                     <!-- data comes here -->
-                  </table>
+                  <!-- /table -->
                   <div class="progress-list">
                     <span class="load-progress" value="0"></span>
                     <span id="play-progress" class="play-progress" value="0"></span>
                     <span id="scubber-channel" class="scrubber-channel">
-                      <input id="scrubber" type="submit" type="image" src="/engage/ui/img/misc/space.png" class="scrubber-button" role="slider" />
-                      <div id="draggable" class="ui-widget-content"></div>
+                      <input id="scrubber" type="image" src="/engage/ui/img/misc/space.png" class="scrubber-button" role="slider" />
+                      <span id="draggable" class="ui-widget-content"></span>
                     </span>
                   </div>
                 </td>
@@ -315,9 +315,9 @@
           <div id="oc-comment-scrubber-box"></div>
           <span id="analytics" class="analytics">Loading..</span>
           <span id="annotation" class="annotation">Annotation..</span>
-          <table class="segments" id="segmentstable1">
+          <!-- table class="segments" id="segmentstable1" -->
             <!-- data comes here -->
-          </table>         
+          <!-- /table -->         
         </div>
         <div id="segments_ui_slider_data1"></div>
         <div id="segments_ui_slider_data2"></div>
@@ -328,13 +328,13 @@
         <div id="data2"></div>
         <div id="segments_ui-mediapackagesCatalog"></div>
         <div id="segments-table2">
-          <table id="segmentstable2"></table>
+          <!-- table id="segmentstable2"></table -->
         </div>
       </div>
       <!-- END #data -->
       <div id="oc_video-view">
         <span id="oc_video-quality">
-          <strong>Quality:</strong>&nbsp;
+          <strong>Quality:</strong>&#160;
           <select id="oc_video-quality-options">
             <option value="low">Low</option>
             <option value="medium" selected="selected">Medium</option>
@@ -342,7 +342,7 @@
             <option value="hd">HD</option>
           </select>
         </span>
-        &nbsp;
+        &#160;
         <strong>View:</strong>
         <input id="oc_checkbox-annotation-comment" type="checkbox" name="show comments" title="show comments" />
         <label id="oc_label-annotation-comment" for="oc_checkbox-annotation-comment">
@@ -356,7 +356,7 @@
         <label id="oc_label-statistics" for="oc_checkbox-statistics">
           Viewing Statistics
         </label>
-        &nbsp;
+        &#160;
         <div class="clear"></div>
       </div>
       <!-- END #oc_video-view -->
@@ -388,7 +388,7 @@
             </a>
           </li>
           <li class="oc_lecturer-search-field-wrap ui-corner-top" id="search-textarea">
-            <label id="skip" for="oc_lecturer-search-field" class="oc_offScreen-hidden">
+            <label for="oc_lecturer-search-field" class="skip oc_offScreen-hidden">
               Search this recording
             </label>
             <input id="oc_lecturer-search-field" type="text" onkeyup="Opencast.search.showResult(this, this.value);" onfocus="$(this).trigger('click');Opencast.search.showResult(this, this.value);" size="30" value="Search this recording" />
@@ -448,7 +448,7 @@
 	  <div id="oc-comments-list-addbox">
 	    <div>
 	      <input id="oc-comments-list-namebox" name="Name" type="text" />
-	      <textarea id="oc-comments-list-textbox" ></textarea>
+	      <textarea id="oc-comments-list-textbox" rows="4" colums="30"></textarea>
 	      <input id="oc-comments-list-submit" value="Add comment" role="button" type="button" />
 	      <input id="oc-comments-list-submit-timed" value="Add comment at 00:00:00" role="button" type="button" />
 	    </div>
@@ -479,7 +479,7 @@
 
     <!-- Download dialog -->
     <div id="oc_downloads" title="Download Media Files">
-      <span id="skip"><a name="downloads"></a></span>
+      <span class="skip"><a name="downloads"></a></span>
       <div id="oc_client_downloads"></div>
     </div>
     <!-- END #oc_downloads -->
@@ -488,17 +488,17 @@
     <div id="oc_share-layer" class="ui-widget ui-widget-content ui-corner-all oc_popuplayer ui-helper-hidden" title="share this Video" tabindex="-1" role="dialog" aria-hidden="true">
       <ul id="oc_share-list" class="oc_popuplayer-list">
         <li>
-          <a href="javascript: " id="oc_btn-embed" class="handcursor" title="Embed" role="button">
+          <a href="javascript:;" id="oc_btn-embed" class="handcursor" title="Embed" role="button">
             Embed
           </a>
         </li>
         <li>
-          <a href="javascript: " id="oc_btn-email" class="handcursor" title="Email" role="button">
+          <a href="javascript:;" id="oc_btn-email" class="handcursor" title="Email" role="button">
             Email
           </a>
         </li>
         <li>
-          <a href="javascript: " id="oc_btn-share-time" class="handcursor" title="Share video URL at current time" role="button">
+          <a href="javascript:;" id="oc_btn-share-time" class="handcursor" title="Share video URL at current time" role="button">
             Video at current time
           </a>
         </li>
@@ -510,17 +510,17 @@
     <div id="oc_time-chooser-layer" class="ui-widget ui-widget-content ui-corner-all oc_popuplayer ui-helper-hidden" title="change player time/ session time" tabindex="-1" role="dialog" aria-hidden="true">
       <ul id="oc_time-chooser-list" class="oc_popuplayer-list">
         <li>
-          <a href="javascript: " id="oc_btn-player-time" onclick="Opencast.Player.doToggleTimeLayer();" class="handcursor" title="View player time" role="button">
+          <a href="javascript:;" id="oc_btn-player-time" onclick="Opencast.Player.doToggleTimeLayer();" class="handcursor" title="View player time" role="button">
             View player time
           </a>
         </li>
         <li>
-          <a href="javascript: " id="oc_btn-session-time" onclick="Opencast.Player.doToggleTimeLayer();" class="handcursor" title="View session time" role="button">
+          <a href="javascript:;" id="oc_btn-session-time" onclick="Opencast.Player.doToggleTimeLayer();" class="handcursor" title="View session time" role="button">
             View session time
           </a>
         </li>
       </ul>
-      <button id="oc_btn-leave-session-time" class="oc_btn-close">
+      <button class="oc_btn-leave-session-time" id="oc_btn-close">
         Leave time dialog
       </button>
     </div>
@@ -542,25 +542,25 @@
         <label for="oc_embed-costum-width-textinput" class="handcursor">
           Width:
         </label>
-	&nbsp;
+	&#160;
         <input id="oc_embed-costum-width-textinput" maxlength="4" type="text" name="Costum width min 300px" alt="Costum width min 300px" title="Costum width min 300px" value="" />
         <div class="clear"></div>
         <label for="oc_embed-costum-height-textinput" class="handcursor">
           Height:
         </label>
-	&nbsp;
+	&#160;
         <input id="oc_embed-costum-height-textinput" maxlength="4" type="text" name="" alt="" title="" value="" />
 
         <div class="clear"></div>
         <label for="oc_embed-costum-hide-controls-checkbox" class="handcursor">
           Controls:
         </label>
-		&nbsp;
+		&#160;
         <input id="oc_embed-costum-hide-controls-checkbox" type="checkbox" name="Display controls" alt="Display controls" title="Display controls" value="" />
 	<br />
-        <label for="oc_embed-costum-hide-controls-checkbox" class="handcursor">
+        <label for="oc_embed-costum-hide-controls-checkbox" class="handcursor"/>
 
-        <a href="javascript: " id="oc_btn-leave-session-time" onclick="$('#oc_embed').dialog('close');" class="handcursor ui-helper-hidden-accessible" title="Leave embed dialog" role="button">
+        <a href="javascript:;" onclick="$('#oc_embed').dialog('close');" class="handcursor ui-helper-hidden-accessible oc_btn-leave-session-time" title="Leave embed dialog" role="button">
           Leave embed dialog
         </a>
       </div>
