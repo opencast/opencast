@@ -37,7 +37,7 @@ body {
 .icon {
     width:16px;
     height:16px;
-    background-repeat: none;
+    background-repeat: no-repeat;
     background-position: center center;
     float: left;
 }
@@ -73,16 +73,32 @@ body {
 	padding-right: 5px;
 }
 
-#skip {
+#skip, .skip {
 	position: absolute;
 	width: 80%;
 	top: -300px;
 	left: -2000px;
 }
 
-#skip a {
+#skip a, .skip a {
 	position: absolute;
 	top: 0;
+}*/
+
+.skip {
+	position: absolute;
+	width	: 80%;
+	top: -300px;
+	left: -2000px;
+}
+
+.skip a {
+	position: absolute;
+	top: 0;
+}
+
+.hidden {
+	display: none;
 }
 
 #header {
@@ -94,6 +110,17 @@ body {
     padding: 4px 0 0 140px;
     margin-bottom:20px
 }
+
+.h1 {
+    font-size: 1.5em;
+    padding-top: 1.3em;
+}
+
+.h2 {
+    font-size: 1.3em;
+    padding-top: 1.1em;
+}
+
 
 #oclogo {
     position:absolute;

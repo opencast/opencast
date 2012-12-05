@@ -1474,10 +1474,6 @@ Opencast.Player = (function ()
 	}
 	var w = width;
 	var h = height;
-	$('#oc_embed-costum-hide-controls-checkbox').unbind('click');
-	$('#oc_embed-costum-hide-controls-checkbox').bind('click', function() {
-	    Opencast.Player.embedIFrame(w, h, true);
-	});
     }
 
     /**

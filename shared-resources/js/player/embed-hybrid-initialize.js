@@ -799,7 +799,7 @@ Opencast.Initialize = (function ()
         //hide player controll
         $('#oc_video-player-controls, #oc_draggable-embed, #oc_segments-embed').hide();
         //initalize close button
-        $('#oc_btn-leave-session-time').button(
+        $('.oc_btn-leave-session-time').button(
         {
             icons: {
                 primary: 'ui-icon-close'
@@ -807,7 +807,7 @@ Opencast.Initialize = (function ()
             text: false
         });
         //bind click functions
-        $('#oc_time-chooser,  #oc_btn-leave-session-time').click(function ()
+        $('#oc_time-chooser,  .oc_btn-leave-session-time').click(function ()
         {
             Opencast.Player.doToggleTimeLayer();
         });

@@ -36,6 +36,14 @@
         }
         return fullAscii;
     }
+
+    /**
+     * @description Returns whether n is numeric or not
+     * @return true if n is numeric, false else
+     */
+    $.isNumber = function(n) {
+	return !isNaN(parseFloat(n)) && isFinite(n);
+    }
     
     /**
      * @description Returns the ascii alphabet lower case

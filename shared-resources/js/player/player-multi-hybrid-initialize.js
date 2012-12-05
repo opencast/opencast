@@ -39,6 +39,7 @@ Opencast.Initialize = (function ()
         clickLecturerSearchField = false,
         playerReady = false,
         locked = false,
+        controlsCheckboxSelected = false,
         formatOne = 0,
         formatTwo = 0,
         formatSingle = 0,
@@ -58,6 +59,10 @@ Opencast.Initialize = (function ()
         ddmenuitem = 0,
         dropdownActive = false,
         keysSet = false,
+        originalWidthMedia1 = 0,
+        originalHeightMedia1 = 0,
+        originalWidthMedia2 = 0,
+        originalHeightMedia2 = 0,
         KEY_0,
         KEY_1,
         KEY_2,
@@ -538,7 +543,8 @@ Opencast.Initialize = (function ()
             if (segmentTimeoutBackward !== undefined)
             {
                 clearTimeout(segmentTimeoutBackward);
-            }++segmentBackwardClickedCounter;
+            }
+	    ++segmentBackwardClickedCounter;
             segmentTimeoutBackward = setTimeout(function ()
             {
                 var currentSlideId = Opencast.segments.getCurrentSlideId();
@@ -766,14 +772,14 @@ Opencast.Initialize = (function ()
 	/* initalise search button */
         $("#oc_btn-search", "#oc_search").button();
         $("#oc_btn-cc", "#oc_video-time").button();
-        $('#oc_btn-leave-share, #oc_btn-leave-session-time').button(
+        $('#oc_btn-leave-share, .oc_btn-leave-session-time').button(
         {
             icons: {
                 primary: 'ui-icon-close'
             },
             text: false
         });
-        $('#oc_btn-leave-share, #oc_btn-leave-session-time').click(function ()
+        $('#oc_btn-leave-share, .oc_btn-leave-session-time').click(function ()
         {
             Opencast.Player.doToggleShare();
         }); /* initalise closed tabs */
@@ -819,6 +825,8 @@ Opencast.Initialize = (function ()
         //bind click functions
         $('#oc_share-button').click(function (e)
         {
+	    setEmbedButtons();
+	    setEmbed();
             Opencast.Player.doToggleShare(e);
         });
         $('#oc_btn-email').click(function ()
@@ -1014,7 +1022,7 @@ Opencast.Initialize = (function ()
      * @param Number mediaPercentOne, Number mediaPercentTwo
      */
     function getNewHeight(mediaPercentOne, mediaPercentTwo)
-    {
+    {	
         var newHeight = 0;
         var flashContainerWidth = $('#oc_flash-player').width() - 10;
         var newHeightMediaOne = ((flashContainerWidth) * (mediaPercentOne / 100)) / formatOne;
@@ -1093,6 +1101,7 @@ Opencast.Initialize = (function ()
                 break;
             }
         }
+
         var multiMediaContainerLeft = ((flashContainerWidth) - (newWidthMediaOne + newWidthMediaTwo)) / 2;
         Videodisplay.setMediaResolution(newWidthMediaOne, newHeightMediaOne, newWidthMediaTwo, newHeightMediaTwo, multiMediaContainerLeft);
         return Math.round(newHeight) + 10;
@@ -1126,6 +1135,14 @@ Opencast.Initialize = (function ()
             newSingleHeight = 300;
         }
         return Math.round(newSingleHeight) + 10;
+    }
+
+    function parseResolutionWidth(res) {
+	return res.substring(0, res.lastIndexOf('x'));
+    }
+
+    function parseResolutionHeight(res) {
+	return res.substring(res.lastIndexOf('x') + 1, res.length);
     }
 
     /**
@@ -1181,6 +1198,64 @@ Opencast.Initialize = (function ()
     {
         window.onresize = doResize;
         doResize();
+
+	$.ajax(
+	    {
+		url: Opencast.Watch.getSearchURL(),
+		data: 'id=' + mediaPackageId,
+		dataType: 'jsonp',
+		jsonp: 'jsonp',
+		success: function (data)
+		{
+		    if ((data !== undefined) &&
+			(data['search-results'] !== undefined) &&
+			(data['search-results'].result !== undefined) &&
+			(data['search-results'].result.mediapackage !== undefined)) {
+			$(data['search-results'].result.mediapackage.media.track).each(
+			    function (i)
+			    {
+				if(data['search-results'].result.mediapackage.media.track[i].video) {
+				    $.log('Media resolution: ' + data['search-results'].result.mediapackage.media.track[i].video.resolution);
+				    var pResWidth = parseResolutionWidth(data['search-results'].result.mediapackage.media.track[i].video.resolution);
+				    var pResHeight = parseResolutionHeight(data['search-results'].result.mediapackage.media.track[i].video.resolution)
+				    if(pResWidth > originalWidthMedia1) {
+					originalWidthMedia1 = pResWidth;
+					originalHeightMedia1 = pResHeight;
+					originalWidthMedia2 = originalWidthMedia1;
+					originalHeightMedia2 = originalHeightMedia1;
+				    }
+				}
+			    }
+			);
+			setEmbedButtons();
+			setEmbed();
+		    } else {
+			$.log("Player init Ajax call #3: Data undefined");
+		    }
+		},
+		// If no data comes back (JSONP-Call #1)
+		error: function (xhr, ajaxOptions, thrownError)
+		{
+		    $.log("Player init Ajax call #3: Requesting data failed");
+		}
+	    });
+
+	$('#oc_embed-costum-hide-controls-checkbox').unbind('click');
+	$('#oc_embed-costum-hide-controls-checkbox').bind('click', function() {
+	    Opencast.Initialize.setEmbedButtons();
+	    Opencast.Initialize.setEmbed();
+            var embedWidth = $('#oc_embed-costum-width-textinput').val();
+            var embedHeight = $('#oc_embed-costum-height-textinput').val();
+            if ($.isNumber(embedWidth) && $.isNumber(embedHeight)) {
+		if($('#oc_embed-costum-hide-controls-checkbox').is(':checked')) {
+		    embedHeight = parseInt(embedHeight) + OTHERDIVHEIGHT;
+		} else if(controlsCheckboxSelected) {
+		    embedHeight = parseInt(embedHeight) - OTHERDIVHEIGHT;
+		}
+		Opencast.Player.embedIFrame(embedWidth, embedHeight, true);
+	    }
+	    controlsCheckboxSelected = true;
+	});
     }
 
     /**
@@ -1190,23 +1265,25 @@ Opencast.Initialize = (function ()
     function setCostumEmbedHeight()
     {
         var embedWidth = $('#oc_embed-costum-width-textinput').val();
-        if (embedWidth >= MINWIDTH)
+        var embedHeight = $('#oc_embed-costum-height-textinput').val();
+        if (!$.isNumber(embedHeight))
         {
-            var embedHeight = (Math.round(embedWidth / getMaxFormat())) + OTHERDIVHEIGHT;
-            $('#oc_embed-costum-height-textinput').attr('value', embedHeight);
-            $('#oc_embed-costum-height-textinput').css('background-color', '#ffffff');
-            Opencast.Player.embedIFrame(embedWidth, embedHeight);
-        }
-        else
-        {
-            $('#oc_embed-costum-height-textinput').css('background-color', '#ff0000');
-            $('#oc_embed-costum-height-textinput').attr('value', '');
-            $('#oc_embed-textarea').val('');
-        }
-        if ($('#oc_embed-costum-width-textinput').val() === '')
-        {
-            $('#oc_embed-costum-height-textinput').css('background-color', '#ffffff');
-        }
+	    embedHeight = (Math.round(embedWidth / getMaxFormat())) + OTHERDIVHEIGHT;
+	    if(embedWidth >= MINWIDTH) {
+		$('#oc_embed-costum-height-textinput').attr('value', embedHeight);
+		$('#oc_embed-costum-height-textinput').css('background-color', '#ffffff');
+		Opencast.Player.embedIFrame(embedWidth, embedHeight, true);
+            } else
+            {
+		$('#oc_embed-costum-height-textinput').css('background-color', '#ff0000');
+		$('#oc_embed-costum-height-textinput').attr('value', '');
+		$('#oc_embed-textarea').val('Embed width too low. The minimum value is a width of ' + MINWIDTH + '.');
+	    }
+	} else if(embedWidth >= MINWIDTH) {
+	    Opencast.Player.embedIFrame(embedWidth, embedHeight, true);
+	} else {
+	    $('#oc_embed-textarea').val('Embed width too low. The minimum value is a width of ' + MINWIDTH + '.');
+	}
     }
 
     /**
@@ -1215,24 +1292,124 @@ Opencast.Initialize = (function ()
      */
     function setCostumEmbedWidth()
     {
+        var embedWidth = $('#oc_embed-costum-width-textinput').val();
         var embedHeight = $('#oc_embed-costum-height-textinput').val();
-        var embedWidth = Math.round((embedHeight - OTHERDIVHEIGHT) * getMaxFormat());
-        if (embedWidth >= MINWIDTH)
+        if (!$.isNumber(embedWidth))
         {
-            $('#oc_embed-costum-width-textinput').attr('value', embedWidth);
-            $('#oc_embed-costum-width-textinput').css('background-color', '#ffffff');
-            Opencast.Player.embedIFrame(embedWidth, embedHeight);
-        }
-        else
+            embedWidth = Math.round((embedHeight - OTHERDIVHEIGHT) * getMaxFormat());
+	    if(embedWidth >= MINWIDTH) {
+		$('#oc_embed-costum-width-textinput').attr('value', embedWidth);
+		$('#oc_embed-costum-width-textinput').css('background-color', '#ffffff');
+		Opencast.Player.embedIFrame(embedWidth, embedHeight, true);
+	    } else {
+		$('#oc_embed-costum-width-textinput').css('background-color', '#ff0000');
+		$('#oc_embed-costum-width-textinput').attr('value', '');
+		$('#oc_embed-textarea').val('');
+		$('#oc_embed-textarea').val('Embed width too low. The minimum value is a width of ' + MINWIDTH + '.');
+	    }
+	} else if(embedWidth >= MINWIDTH) {
+	    Opencast.Player.embedIFrame(embedWidth, embedHeight, true);
+	} else {
+	    $('#oc_embed-textarea').val('Embed width too low. The minimum value is a width of ' + MINWIDTH + '.');
+	}
+    }
+    
+    function setEmbedButtons() {
+        var embedWidhtOne = 620;
+        var embedWidhtTwo = 540;
+        var embedWidhtThree = 460
+        var embedWidhtFour = 380;
+        var embedWidhtFive = 300;
+	
+	var newOtherDivHeight = $('#oc_embed-costum-hide-controls-checkbox').is(':checked') ? OTHERDIVHEIGHT : 0;
+	
+	// new height = original height / original width * new width
+
+        var embedHeightOne = Math.round(originalHeightMedia1 / originalWidthMedia1 * embedWidhtOne) + newOtherDivHeight;
+        var embedHeightTwo = Math.round(originalHeightMedia1 / originalWidthMedia1 * embedWidhtTwo) + newOtherDivHeight;
+        var embedHeightThree = Math.round(originalHeightMedia1 / originalWidthMedia1 * embedWidhtThree) + newOtherDivHeight;
+        var embedHeightFour = Math.round(originalHeightMedia1 / originalWidthMedia1 * embedWidhtFour) + newOtherDivHeight;
+        var embedHeightFive = Math.round(originalHeightMedia1 / originalWidthMedia1 * embedWidhtFive) + newOtherDivHeight;
+	
+        $("#oc_embed-icon-one").css("width", "110px");
+        $("#oc_embed-icon-one").css("height", "73px");
+        $("#oc_embed-icon-one").attr(
         {
-            $('#oc_embed-costum-width-textinput').css('background-color', '#ff0000');
-            $('#oc_embed-costum-width-textinput').attr('value', '');
-            $('#oc_embed-textarea').val('');
-        }
-        if ($('#oc_embed-costum-height-textinput').val() === '')
+            alt: embedWidhtOne + ' x ' + embedHeightOne,
+            title: embedWidhtOne + ' x ' + embedHeightOne,
+            name: embedWidhtOne + ' x ' + embedHeightOne,
+            value: embedWidhtOne + ' x ' + embedHeightOne
+        });
+
+        var embedWidth = $('#oc_embed-costum-width-textinput').val();
+        var embedHeight = $('#oc_embed-costum-height-textinput').val();
+
+        $('#oc_embed-icon-one').click(function ()
         {
-            $('#oc_embed-costum-width-textinput').css('background-color', '#ffffff');
-        }
+	    embedWidth = embedWidhtOne;
+	    embedHeight = embedHeightOne;
+            Opencast.Player.embedIFrame(embedWidth, embedHeight, true);
+        });
+        $("#oc_embed-icon-two").css("width", "100px");
+        $("#oc_embed-icon-two").css("height", "65px");
+        $("#oc_embed-icon-two").attr(
+        {
+            alt: embedWidhtTwo + ' x ' + embedHeightTwo,
+            title: embedWidhtTwo + ' x ' + embedHeightTwo,
+            name: embedWidhtTwo + ' x ' + embedHeightTwo,
+            value: embedWidhtTwo + ' x ' + embedHeightTwo
+        });
+        $('#oc_embed-icon-two').click(function ()
+        {
+	    embedWidth = embedWidhtTwo;
+	    embedHeight = embedHeightTwo;
+            Opencast.Player.embedIFrame(embedWidth, embedHeight, true);
+        });
+        $("#oc_embed-icon-three").css("width", "90px");
+        $("#oc_embed-icon-three").css("height", "58px");
+        $("#oc_embed-icon-three").attr(
+        {
+            alt: embedWidhtThree + ' x ' + embedHeightThree,
+            title: embedWidhtThree + ' x ' + embedHeightThree,
+            name: embedWidhtThree + ' x ' + embedHeightThree,
+            value: embedWidhtThree + ' x ' + embedHeightThree
+        });
+        $('#oc_embed-icon-three').click(function ()
+        {
+	    embedWidth = embedWidhtThree;
+	    embedHeight = embedHeightThree;
+            Opencast.Player.embedIFrame(embedWidth, embedHeight, true);
+        });
+        $("#oc_embed-icon-four").css("width", "80px");
+        $("#oc_embed-icon-four").css("height", "50px");
+        $("#oc_embed-icon-four").attr(
+        {
+            alt: embedWidhtFour + ' x ' + embedHeightFour,
+            title: embedWidhtFour + ' x ' + embedHeightFour,
+            name: embedWidhtFour + ' x ' + embedHeightFour,
+            value: embedWidhtFour + ' x ' + embedHeightFour
+        });
+        $('#oc_embed-icon-four').click(function ()
+        {
+	    embedWidth = embedWidhtFour;
+	    embedHeight = embedHeightFour;
+            Opencast.Player.embedIFrame(embedWidth, embedHeight, true);
+        });
+        $("#oc_embed-icon-five").css("width", "70px");
+        $("#oc_embed-icon-five").css("height", "42px");
+        $("#oc_embed-icon-five").attr(
+        {
+            alt: embedWidhtFive + ' x ' + embedHeightFive,
+            title: embedWidhtFive + ' x ' + embedHeightFive,
+            name: embedWidhtFive + ' x ' + embedHeightFive,
+            value: embedWidhtFive + ' x ' + embedHeightFive
+        });
+        $('#oc_embed-icon-five').click(function ()
+        {
+	    embedWidth = embedWidhtFive;
+	    embedHeight = embedHeightFive;
+            Opencast.Player.embedIFrame(embedWidth, embedHeight, true);
+        });
     }
 
     /**
@@ -1241,11 +1418,6 @@ Opencast.Initialize = (function ()
      */
     function setEmbed()
     {
-        var embedWidhtOne = 620;
-        var embedWidhtTwo = 540;
-        var embedWidhtThree = 460
-        var embedWidhtFour = 380;
-        var embedWidhtFive = 300;
         if (formatSingle != 0)
         {
             setMaxFormat(formatSingle);
@@ -1263,76 +1435,7 @@ Opencast.Initialize = (function ()
         {
             setMaxFormat(1);
         }
-        var embedHeightOne = Math.round(embedWidhtOne / getMaxFormat()) + OTHERDIVHEIGHT;
-        var embedHeightTwo = Math.round(540 / getMaxFormat()) + OTHERDIVHEIGHT;
-        var embedHeightThree = Math.round(460 / getMaxFormat()) + OTHERDIVHEIGHT;
-        var embedHeightFour = Math.round(380 / getMaxFormat()) + OTHERDIVHEIGHT;
-        var embedHeightFive = Math.round(300 / getMaxFormat()) + OTHERDIVHEIGHT;
-        $("#oc_embed-icon-one").css("width", "110px");
-        $("#oc_embed-icon-one").css("height", "73px");
-        $("#oc_embed-icon-one").attr(
-        {
-            alt: embedWidhtOne + ' x ' + embedHeightOne,
-            title: embedWidhtOne + ' x ' + embedHeightOne,
-            name: embedWidhtOne + ' x ' + embedHeightOne,
-            value: embedWidhtOne + ' x ' + embedHeightOne
-        });
-        $('#oc_embed-icon-one').click(function ()
-        {
-            Opencast.Player.embedIFrame(embedWidhtOne, embedHeightOne);
-        });
-        $("#oc_embed-icon-two").css("width", "100px");
-        $("#oc_embed-icon-two").css("height", "65px");
-        $("#oc_embed-icon-two").attr(
-        {
-            alt: embedWidhtTwo + ' x ' + embedHeightTwo,
-            title: embedWidhtTwo + ' x ' + embedHeightTwo,
-            name: embedWidhtTwo + ' x ' + embedHeightTwo,
-            value: embedWidhtTwo + ' x ' + embedHeightTwo
-        });
-        $('#oc_embed-icon-two').click(function ()
-        {
-            Opencast.Player.embedIFrame(embedWidhtTwo, embedHeightTwo);
-        });
-        $("#oc_embed-icon-three").css("width", "90px");
-        $("#oc_embed-icon-three").css("height", "58px");
-        $("#oc_embed-icon-three").attr(
-        {
-            alt: embedWidhtThree + ' x ' + embedHeightThree,
-            title: embedWidhtThree + ' x ' + embedHeightThree,
-            name: embedWidhtThree + ' x ' + embedHeightThree,
-            value: embedWidhtThree + ' x ' + embedHeightThree
-        });
-        $('#oc_embed-icon-three').click(function ()
-        {
-            Opencast.Player.embedIFrame(embedWidhtThree, embedHeightThree);
-        });
-        $("#oc_embed-icon-four").css("width", "80px");
-        $("#oc_embed-icon-four").css("height", "50px");
-        $("#oc_embed-icon-four").attr(
-        {
-            alt: embedWidhtFour + ' x ' + embedHeightFour,
-            title: embedWidhtFour + ' x ' + embedHeightFour,
-            name: embedWidhtFour + ' x ' + embedHeightFour,
-            value: embedWidhtFour + ' x ' + embedHeightFour
-        });
-        $('#oc_embed-icon-four').click(function ()
-        {
-            Opencast.Player.embedIFrame(embedWidhtFour, embedHeightFour);
-        });
-        $("#oc_embed-icon-five").css("width", "70px");
-        $("#oc_embed-icon-five").css("height", "42px");
-        $("#oc_embed-icon-five").attr(
-        {
-            alt: embedWidhtFive + ' x ' + embedHeightFive,
-            title: embedWidhtFive + ' x ' + embedHeightFive,
-            name: embedWidhtFive + ' x ' + embedHeightFive,
-            value: embedWidhtFive + ' x ' + embedHeightFive
-        });
-        $('#oc_embed-icon-five').click(function ()
-        {
-            Opencast.Player.embedIFrame(embedWidhtFive, embedHeightFive);
-        });
+
         $('.oc_embed-icon').click(function ()
         {
             $('#oc_embed-textarea').select();
@@ -1390,8 +1493,6 @@ Opencast.Initialize = (function ()
                 formatTwo = (mediaTwoHeight >= 0) ? (mediaTwoWidth / mediaTwoHeight) : mediaTwoWidth;
             }
         }
-        // set the embed section
-        setEmbed();
     }
     return {
         bindVidSize: bindVidSize,
@@ -1401,6 +1502,8 @@ Opencast.Initialize = (function ()
         setPlayerReady: setPlayerReady,
         onPlayerReady: onPlayerReady,
         init: init,
+	setEmbedButtons: setEmbedButtons,
+	setEmbed: setEmbed,
         setMediaResolution: setMediaResolution
     };
 }());
