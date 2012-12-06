@@ -182,7 +182,7 @@ ocRecordings = new (function() {
    */
   function getRefreshParams() {
 	  var params = [];
-	  //params.push('compact=true');
+	  params.push('compact=true');
 	  // 'state' to display
 	  var state = ocRecordings.Configuration.state;
 	  params.push('state=-stopped');
@@ -418,8 +418,6 @@ ocRecordings = new (function() {
     this.holdAction=false;
     this.error = false;
     this.captureAgent = '';
-    this.workflowTitle = wf.title;
-    this.workflowStart = '';
 
     var self = this;    // ie for $.each
 
@@ -457,9 +455,6 @@ ocRecordings = new (function() {
     var op = false;
     if (wf.operations !== undefined && wf.operations.operation !== undefined) {
       op = wf.operations.operation;
-      if (op[0]) {
-      	this.workflowStart = ocUtils.getDateTimeStringCompact(new Date(op[0].started));
-      }
     }
     if (wf.state == 'SUCCEEDED') {
       this.state = 'Finished';
