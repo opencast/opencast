@@ -24,7 +24,7 @@
         <td  class="ui-state-active ui-helper-hidden bulkSelect">
           <input type="checkbox" value="<%= data[j].recordings[i].id %>" class="selectRecording" />
         </td>
-        <td class="ui-state-active">
+        <td class="ui-state-active" title="Processing Instruction: <%= data[j].recordings[i].workflowTitle %>&#013;Processing Start Time: <%= data[j].recordings[i].workflowStart %>">
           <%= data[j].recordings[i].title %>
         </td>
         <td class="ui-state-active">
