@@ -21,6 +21,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -76,7 +78,14 @@ public class LoadTestEngage implements Runnable {
 
     if (browserToUse == Main.BrowserToUse.Chrome) {
       driver = new ChromeDriver();
-    } else {
+    } 
+    else if (browserToUse == Main.BrowserToUse.Safari){
+      driver = new SafariDriver();
+    }
+    else if (browserToUse == Main.BrowserToUse.IE) {
+      driver = new InternetExplorerDriver();
+    }
+    else {
       driver = new FirefoxDriver();
     }
   }
@@ -95,7 +104,7 @@ public class LoadTestEngage implements Runnable {
         logger.info(name + " is watching the current episode for " + randomWatchTime + " seconds.");
         Thread.sleep(randomWatchTime * MILLISECONDS_IN_SECONDS);
       } catch (InterruptedException e) {
-        e.printStackTrace();
+        logger.error("There was an exception while sleeping before the next switch: " ,e);
       }
     }
   }
@@ -159,7 +168,7 @@ public class LoadTestEngage implements Runnable {
       try {
         Thread.sleep(1000);
       } catch (InterruptedException e) {
-        e.printStackTrace();
+        logger.error("There was an exception while fastforwarding:", e);
       }
     }
   }
