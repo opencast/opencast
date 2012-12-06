@@ -634,6 +634,17 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     if (!f.delete())
       throw new IOException(f + " cannot be deleted");
 
+    File parentDirectory = f.getParentFile();
+    String[] files = parentDirectory.list();
+    if (files.length == 0) {
+    	logger.debug("Attempting to delete empty collection directory {}", parentDirectory.getAbsolutePath());
+    	try {
+    		FileUtils.forceDelete(parentDirectory);
+    	} catch (IOException e) {
+    		logger.warn("Unable to delete empty collection directory {}", parentDirectory.getAbsolutePath());
+    		return false;
+    	}        
+    }
     return true;
   }
 
