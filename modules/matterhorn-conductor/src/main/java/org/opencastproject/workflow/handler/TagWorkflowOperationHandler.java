@@ -102,7 +102,8 @@ public class TagWorkflowOperationHandler extends ResumableWorkflowOperationHandl
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
 
-    String configuredSourceFlavors = StringUtils.trimToNull(currentOperation.getConfiguration(SOURCE_FLAVORS_PROPERTY));
+    String configuredSourceFlavors = StringUtils
+            .trimToEmpty(currentOperation.getConfiguration(SOURCE_FLAVORS_PROPERTY));
     String configuredSourceTags = StringUtils.trimToEmpty(currentOperation.getConfiguration(SOURCE_TAGS_PROPERTY));
     String configuredTargetFlavor = StringUtils.trimToNull(currentOperation.getConfiguration(TARGET_FLAVOR_PROPERTY));
     String configuredTargetTags = StringUtils.trimToEmpty(currentOperation.getConfiguration(TARGET_TAGS_PROPERTY));
