@@ -67,19 +67,19 @@ LOG_OPTS="$PAX_LOGGING_OPTS $MATTERHORN_LOGGING_OPTS $ECLIPSELINK_LOGGING_OPTS $
 GRAPHICS_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
 JAVA_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
 
-# The following lines are required to run Matterhorn as a service in Redhat.  
-# These lines should remain commented out.  
+# The following lines are required to run Matterhorn as a service in Redhat.
+# These lines should remain commented out.
 # It is necessary to run "chkconfig matterhorn on" to enable matterhorn service management with Redhat.
 
-#chkconfig: 2345 99 01 
-#description: lecture recording and management system 
+#chkconfig: 2345 99 01
+#description: lecture recording and management system
 
 # If this computer is OS X and $DYLD_FALLBACK_LIBRARY_PATH environment variable
 # is not defined, then set it to /opt/local/lib. This is required for the demo
-# capture agent.  
+# capture agent.
 unameResult=`uname`
 if [ $unameResult = 'Darwin' ];
-then 
+then
  	if [ "$DYLD_FALLBACK_LIBRARY_PATH" = "" ];
 	then
 		export DYLD_FALLBACK_LIBRARY_PATH="/opt/local/lib";
@@ -95,12 +95,9 @@ FELIX_CACHE="$FELIX_WORK_DIR/felix-cache"
 
 case "$1" in
   start)
-    echo -n "Starting Matterhorn as user $MATTERHORN_USER: " 
+    echo -n "Starting Matterhorn as user $MATTERHORN_USER: "
     if $IS_CA ; then
         $CA/device_config.sh
-        if [ -d $CA/epiphan_driver -a -z "$(lsmod | grep vga2usb)" ]; then
-                make -C $CA/epiphan_driver load
-        fi
     fi
 
 # check if felix is already running
@@ -118,16 +115,16 @@ case "$1" in
         rm -r $bundle
       done
     fi
-    
+
     cd $FELIX_HOME
 
 # starting felix
 
     su -c "java -Dgosh.args='--noshutdown -c noop=true' $DEBUG_OPTS $FELIX_OPTS $GRAPHICS_OPTS $TEMP_OPTS $MAVEN_ARG $JAVA_OPTS $PAX_CONFMAN_OPTS $LOG_OPTS $JMX_OPTS -jar $FELIX_HOME/bin/felix.jar $FELIX_CACHE 2>&1 > /dev/null &" $MATTERHORN_USER
-    echo "done." 
-    ;;    
+    echo "done."
+    ;;
   stop)
-    echo -n "Stopping Matterhorn: " 
+    echo -n "Stopping Matterhorn: "
     MATTERHORN_PID=`ps aux | awk '/felix.jar/ && !/awk/ {print $2}'`
     if [ -z "$MATTERHORN_PID" ]; then
       echo "Matterhorn already stopped"
@@ -141,15 +138,8 @@ case "$1" in
     MATTERHORN_PID=`ps aux | awk '/felix.jar/ && !/awk/ {print $2}'`
     if [ ! -z $MATTERHORN_PID ]; then
       echo "Hard killing since felix ($MATTERHORN_PID) seems unresponsive to regular kill"
-    
+
       kill -9 $MATTERHORN_PID
-    fi
-
-
-    if $IS_CA ; then
-        if [ -d $CA/epiphan_driver -a -z "$(lsmod | grep vga2usb)" ]; then
-                make -C $CA/epiphan_driver unload
-        fi
     fi
 
     echo "done."
@@ -166,7 +156,7 @@ case "$1" in
     else
       echo "OpenCast Matterhorn is running with PID $MATTERHORN_PID"
       exit 0
-    fi   
+    fi
     ;;
   *)
     echo "Usage: $0 {start|stop|restart|status}"
