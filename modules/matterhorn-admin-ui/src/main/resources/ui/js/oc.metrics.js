@@ -36,7 +36,8 @@ ocMetrics = new (function() {
 	    var charts = [];
 	    var series = [];
 	    var monitoredMbeans = [];
-	 
+	    var tzOffset = new Date().getTimezoneOffset();
+	    
 	    columnsCount = columnsCount || 1;
 	    pollInterval = pollInterval || 5000;
 	    var keepPoints = (keepHistorySec || 600) / (pollInterval / 1000);
@@ -130,7 +131,7 @@ ocMetrics = new (function() {
 	        var curChart = 0;
 	        $.each(responses, function() {
 	            var point = {
-	                x: this.timestamp * 1000,
+	                x: (this.timestamp - tzOffset * 60) * 1000,
 	                y: parseFloat(this.value)
 	            };
 	            var curSeries = series[curChart++];
