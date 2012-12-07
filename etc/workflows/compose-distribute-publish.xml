@@ -130,6 +130,15 @@
   </configuration_panel>
 
   <operations>
+	
+	<!-- Apply ACL from series to the mediapackage -->
+
+    <operation
+      id="apply-acl"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Applying access control rules">
+    </operation>
     
     <!-- tag the incoming source material for archival -->
 
@@ -137,7 +146,7 @@
       id="tag"
       description="Tagging source material for archival">
       <configurations>
-        <configuration key="source-flavors">*/source,dublincore/*</configuration>
+        <configuration key="source-flavors">*/source,dublincore/*,security/*</configuration>
         <configuration key="target-tags">+archive</configuration>
       </configurations>
     </operation>
@@ -172,7 +181,6 @@
       <configurations>
         <configuration key="source-flavor">presenter/source</configuration>
         <configuration key="target-flavor">presenter/work</configuration>
-
         <configuration key="rewrite">false</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
       </configurations>
@@ -185,7 +193,6 @@
       description="Preparing presentation audio and video work version">
       <configurations>
         <configuration key="source-flavor">presentation/source</configuration>
-
         <configuration key="target-flavor">presentation/work</configuration>
         <configuration key="rewrite">false</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
@@ -219,7 +226,17 @@
         <configuration key="target-flavor-subtype">trimmed</configuration>
         <configuration key="encoding-profile">trim.work</configuration>
       </configurations>
+    </operation>
 
+    <!-- tag the trimmed media for archive-->
+
+    <operation
+      id="tag"
+      description="Tagging trimmed media for archive">
+      <configurations>
+        <configuration key="source-flavors">*/trimmed</configuration>
+        <configuration key="target-tags">+archive</configuration>
+      </configurations>
     </operation>
     
     <!-- hold for captions -->
@@ -246,7 +263,6 @@
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presenter/player+preview</configuration>
         <configuration key="target-tags">engage</configuration>
-
         <configuration key="encoding-profile">player-preview.http</configuration>
         <configuration key="time">1</configuration>
       </configurations>
@@ -259,7 +275,6 @@
       description="Encoding presentation (screen) to player preview image">
       <configurations>
         <configuration key="source-flavor">presentation/trimmed</configuration>
-
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presentation/player+preview</configuration>
         <configuration key="target-tags">engage</configuration>
@@ -279,7 +294,6 @@
         <configuration key="source-flavor">presenter/trimmed</configuration>
         <configuration key="target-flavor">presenter/delivery</configuration>
         <configuration key="target-tags">engage</configuration>
-
         <configuration key="encoding-profile">flash.http</configuration>
       </configurations>
     </operation>
@@ -292,7 +306,6 @@
       <configurations>
         <configuration key="source-flavor">presentation/trimmed</configuration>
         <configuration key="target-flavor">presentation/delivery</configuration>
-
         <configuration key="target-tags">engage</configuration>
         <configuration key="encoding-profile">flash-vga.http</configuration>
       </configurations>
@@ -305,7 +318,6 @@
       description="Encoding presenter (screen) to flash audio download">
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>
-
         <configuration key="target-flavor">presenter/delivery</configuration>
         <configuration key="target-tags">engage</configuration>
         <configuration key="encoding-profile">flash-audio.http</configuration>
@@ -322,7 +334,6 @@
       description="Extracting segments from presentation">
       <configurations>
         <configuration key="source-flavor">presentation/trimmed</configuration>
-        <configuration key="target-tags">archive</configuration>
       </configurations>
     </operation>
 
@@ -437,15 +448,6 @@
       </configurations>
     </operation>
 
-    <!-- Apply ACL from series to the mediapackage -->
-
-    <operation
-      id="apply-acl"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Applying access control rules">
-    </operation>
-
     <!-- Distribute to download server -->
     
     <operation
@@ -470,6 +472,17 @@
       <configurations>
         <configuration key="source-tags">engage,-publish</configuration>
         <configuration key="target-tags">publish</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Remove archive tag from distributed material -->
+
+    <operation
+      id="tag"
+      description="Removing archive tag from distributed material">
+      <configurations>
+	    <configuration key="source-tags">publish</configuration>
+        <configuration key="target-tags">-archive</configuration>
       </configurations>
     </operation>
 
