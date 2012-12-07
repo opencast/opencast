@@ -23,7 +23,7 @@ import java.util.Locale;
 /**
  * Common metadata for all kinds of media objects.
  */
-class CommonMetadata {
+public class CommonMetadata {
 
   protected String format;
   protected String formatInfo;
