@@ -16,8 +16,8 @@
 package org.opencastproject.workflow.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
 import static org.opencastproject.workflow.api.WorkflowService.READ_PERMISSION;
-import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
@@ -28,6 +28,7 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -64,8 +65,8 @@ public class WorkflowServiceSolrIndexTest {
     EasyMock.replay(securityService);
 
     OrganizationDirectoryService orgDirectroy = EasyMock.createNiceMock(OrganizationDirectoryService.class);
-    EasyMock.expect(orgDirectroy.getOrganization((String) EasyMock.anyObject())).andReturn(
-            securityService.getOrganization());
+    EasyMock.expect(orgDirectroy.getOrganization((String) EasyMock.anyObject()))
+            .andReturn(securityService.getOrganization()).anyTimes();
     EasyMock.replay(orgDirectroy);
 
     // Create a job with a workflow as its payload
@@ -116,9 +117,7 @@ public class WorkflowServiceSolrIndexTest {
   public void testBuildSimpleQuery() throws Exception {
     WorkflowQuery q = new WorkflowQuery().withMediaPackage("123").withSeriesId("series1");
     String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
-    String expected = "oc_org:mh_default_org AND mediapackageid:123 AND seriesid:series1 AND oc_org:"
-            + DEFAULT_ORG_ADMIN.getOrganization() + " AND (oc_creator:" + DEFAULT_ORG_ADMIN.getUserName()
-            + " OR oc_acl_read:ROLE_ADMIN)";
+    String expected = "oc_org:mh_default_org AND mediapackageid:123 AND seriesid:series1";
     assertEquals(expected, solrQuery);
   }
 
@@ -130,9 +129,7 @@ public class WorkflowServiceSolrIndexTest {
     WorkflowQuery q = new WorkflowQuery().withSeriesId("series1").withState(WorkflowState.RUNNING)
             .withState(WorkflowState.PAUSED);
     String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
-    String expected = "oc_org:mh_default_org AND seriesid:series1 AND (state:running OR state:paused) AND oc_org:"
-            + DEFAULT_ORG_ADMIN.getOrganization() + " AND (oc_creator:" + DEFAULT_ORG_ADMIN.getUserName()
-            + " OR oc_acl_read:ROLE_ADMIN)";
+    String expected = "oc_org:mh_default_org AND seriesid:series1 AND (state:running OR state:paused)";
     assertEquals(expected, solrQuery);
   }
 
@@ -144,9 +141,7 @@ public class WorkflowServiceSolrIndexTest {
     WorkflowQuery q = new WorkflowQuery().withSeriesId("series1").withoutState(WorkflowState.RUNNING)
             .withoutState(WorkflowState.PAUSED);
     String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
-    String expected = "oc_org:mh_default_org AND seriesid:series1 AND (-state:running AND -state:paused AND *:*)"
-            + " AND oc_org:" + DEFAULT_ORG_ADMIN.getOrganization() + " AND (oc_creator:"
-            + DEFAULT_ORG_ADMIN.getUserName() + " OR oc_acl_read:ROLE_ADMIN)";
+    String expected = "oc_org:mh_default_org AND seriesid:series1 AND (-state:running AND -state:paused AND *:*)";
     assertEquals(expected, solrQuery);
   }
 
@@ -157,9 +152,31 @@ public class WorkflowServiceSolrIndexTest {
   public void testBuildNegativeStateQuery() throws Exception {
     WorkflowQuery q = new WorkflowQuery().withSeriesId("series1").withoutState(WorkflowState.RUNNING);
     String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
-    String expected = "oc_org:mh_default_org AND seriesid:series1 AND (-state:running AND *:*) AND oc_org:"
-            + DEFAULT_ORG_ADMIN.getOrganization() + " AND (oc_creator:" + DEFAULT_ORG_ADMIN.getUserName()
-            + " OR oc_acl_read:ROLE_ADMIN)";
+    String expected = "oc_org:mh_default_org AND seriesid:series1 AND (-state:running AND *:*)";
+    assertEquals(expected, solrQuery);
+  }
+
+  /**
+   * Tests whether a simple query is built correctly with the authentication fragment
+   */
+  @Test
+  public void testNonAdminQuery() throws Exception {
+    String userRole = "ROLE_USER";
+    User nonAdminUser = new User("noAdmin", DEFAULT_ORGANIZATION_ID, new String[] { userRole });
+
+    // security service
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getUser()).andReturn(nonAdminUser).anyTimes();
+    EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
+    EasyMock.replay(securityService);
+    dao.setSecurityService(securityService);
+
+    WorkflowQuery q = new WorkflowQuery().withMediaPackage("123").withSeriesId("series1");
+    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
+    String expected = "oc_org:mh_default_org AND mediapackageid:123 AND seriesid:series1 AND oc_org:"
+            + DEFAULT_ORGANIZATION_ID + " AND (oc_creator:" + nonAdminUser.getUserName() + " OR oc_acl_read:" + userRole
+            + ")";
+
     assertEquals(expected, solrQuery);
   }
 

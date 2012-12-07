@@ -177,6 +177,7 @@ public class WorkflowServiceImplTest {
     dao = new WorkflowServiceSolrIndex();
     dao.setServiceRegistry(serviceRegistry);
     dao.setSecurityService(securityService);
+    dao.setOrgDirectory(organizationDirectoryService);
     dao.setAuthorizationService(authzService);
     dao.solrRoot = sRoot + File.separator + "solr." + System.currentTimeMillis();
     dao.activate();

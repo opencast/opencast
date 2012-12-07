@@ -16,15 +16,14 @@
 
 package org.opencastproject.search.impl.solr;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.params.SolrParams;
-import org.apache.solr.servlet.SolrRequestParsers;
+import static org.opencastproject.search.api.SearchService.READ_PERMISSION;
+import static org.opencastproject.search.api.SearchService.WRITE_PERMISSION;
+import static org.opencastproject.util.RequireUtil.notNull;
+import static org.opencastproject.util.data.Collections.flatMap;
+import static org.opencastproject.util.data.Collections.head;
+import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Option.option;
+
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -71,6 +70,16 @@ import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.SolrParams;
+import org.apache.solr.servlet.SolrRequestParsers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,14 +100,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import static org.opencastproject.search.api.SearchService.READ_PERMISSION;
-import static org.opencastproject.search.api.SearchService.WRITE_PERMISSION;
-import static org.opencastproject.util.RequireUtil.notNull;
-import static org.opencastproject.util.data.Collections.flatMap;
-import static org.opencastproject.util.data.Collections.head;
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Option.option;
 
 /**
  * Utility class used to manage the search index.
@@ -601,13 +602,12 @@ public class SolrIndexManager {
   }
 
   static List<DField<String>> fromMValue(List<MetadataValue<String>> as) {
-    return map(as, new ArrayList<DField<String>>(),
-            new Function<MetadataValue<String>, DField<String>>() {
-              @Override
-              public DField<String> apply(MetadataValue<String> v) {
-                return new DField<String>(v.getValue(), v.getLanguage());
-              }
-            });
+    return map(as, new ArrayList<DField<String>>(), new Function<MetadataValue<String>, DField<String>>() {
+      @Override
+      public DField<String> apply(MetadataValue<String> v) {
+        return new DField<String>(v.getValue(), v.getLanguage());
+      }
+    });
   }
 
   static List<DField<String>> fromDCValue(List<DublinCoreValue> as) {
@@ -636,11 +636,7 @@ public class SolrIndexManager {
     List<String> writes = new ArrayList<String>();
     permissions.put(WRITE_PERMISSION, writes);
 
-    String adminRole = null;
-    String anonymousRole = null;
-
-    adminRole = securityService.getOrganization().getAdminRole();
-    anonymousRole = securityService.getOrganization().getAnonymousRole();
+    String adminRole = securityService.getOrganization().getAdminRole();
 
     // The admin user can read and write
     if (adminRole != null) {
@@ -1211,13 +1207,13 @@ public class SolrIndexManager {
    */
   static List<StaticMetadata> getMetadata(final List<StaticMetadataService> mdServices, final MediaPackage mp) {
     return flatMap(mdServices, new ArrayList<StaticMetadata>(),
-                   new Function<StaticMetadataService, Collection<StaticMetadata>>() {
-                     @Override
-                     public Collection<StaticMetadata> apply(StaticMetadataService s) {
-                       StaticMetadata md = s.getMetadata(mp);
-                       return md != null ? Arrays.asList(md) : Collections.<StaticMetadata>emptyList();
-                     }
-                   });
+            new Function<StaticMetadataService, Collection<StaticMetadata>>() {
+              @Override
+              public Collection<StaticMetadata> apply(StaticMetadataService s) {
+                StaticMetadata md = s.getMetadata(mp);
+                return md != null ? Arrays.asList(md) : Collections.<StaticMetadata> emptyList();
+              }
+            });
   }
 
   /**

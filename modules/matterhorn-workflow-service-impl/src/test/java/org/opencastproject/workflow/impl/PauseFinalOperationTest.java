@@ -147,6 +147,7 @@ public class PauseFinalOperationTest {
     dao.setAuthorizationService(authzService);
     dao.solrRoot = sRoot + File.separator + "solr";
     dao.setSecurityService(securityService);
+    dao.setOrgDirectory(organizationDirectoryService);
     dao.activate();
     service.setDao(dao);
     service.activate(null);

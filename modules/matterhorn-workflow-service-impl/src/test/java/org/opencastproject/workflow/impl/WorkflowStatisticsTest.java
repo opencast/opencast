@@ -180,6 +180,7 @@ public class WorkflowStatisticsTest {
     dao.setSecurityService(securityService);
     dao.setServiceRegistry(serviceRegistry);
     dao.setAuthorizationService(authzService);
+    dao.setOrgDirectory(organizationDirectoryService);
     dao.activate();
     service.setDao(dao);
     service.activate(null);
