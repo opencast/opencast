@@ -18,20 +18,15 @@ package org.opencastproject.event.handler;
 import static org.opencastproject.event.EventAdminConstants.ID;
 import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
 import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
-import static org.opencastproject.job.api.Job.Status.FINISHED;
-import static org.opencastproject.mediapackage.MediaPackageElementParser.getFromXml;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
-import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
+import org.opencastproject.episode.api.EpisodeServiceException;
 import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultItem;
-import org.opencastproject.job.api.Job;
-import org.opencastproject.job.api.JobBarrier;
-import org.opencastproject.job.api.JobBarrier.Result;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -53,7 +48,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -228,8 +222,7 @@ public class EpisodesPermissionsUpdatedEventHandler implements EventHandler {
 
             MediaPackage mp = item.getMediaPackage();
 
-            // If the security policy has been updated, make sure to distribute that change
-            // to the distribution channels as well
+            // Update the series XACML file
             if (SERIES_ACL_TOPIC.equals(event.getTopic())) {
 
               // Remove the original xacml policy attachments
@@ -243,16 +236,6 @@ public class EpisodesPermissionsUpdatedEventHandler implements EventHandler {
               // Build a new XACML file for this mediapackage
               AccessControlList acl = AccessControlParser.parseAcl((String) event.getProperty(PAYLOAD));
               authorizationService.setAccessControl(mp, acl);
-              Attachment fileRepoCopy = mp.getAttachments(XACML_POLICY)[0];
-
-              // Distribute the updated XACML file
-              Job distributionJob = distributionService.distribute(mp, fileRepoCopy.getIdentifier());
-              JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
-              Result jobResult = barrier.waitForJobs();
-              if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
-                mp.remove(fileRepoCopy);
-                mp.add(getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload()));
-              }
             }
 
             // Update the series dublin core
@@ -266,30 +249,25 @@ public class EpisodesPermissionsUpdatedEventHandler implements EventHandler {
               String filename = FilenameUtils.getName(c.getURI().toString());
               workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
                       dublinCoreService.serialize(seriesDublinCore));
-
-              // Distribute the updated series dc
-              Job distributionJob = distributionService.distribute(mp, c.getIdentifier());
-              JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
-              barrier.waitForJobs();
             }
 
-            // Update the search index with the modified mediapackage
-            episodeService.add(mp);
+            try {
+              // Update the search index with the modified mediapackage
+              episodeService.add(mp);
+            } catch (EpisodeServiceException e) {
+              logger.error("Error updating mediapackage {}: {}", mp, e.getMessage());
+            }
           }
 
         } catch (UnauthorizedException e) {
           logger.warn(e.getMessage());
         } catch (MediaPackageException e) {
           logger.warn(e.getMessage());
-        } catch (ServiceRegistryException e) {
-          logger.warn(e.getMessage());
         } catch (NotFoundException e) {
           logger.warn(e.getMessage());
         } catch (IOException e) {
           logger.warn(e.getMessage());
         } catch (AccessControlParsingException e) {
-          logger.warn(e.getMessage());
-        } catch (DistributionException e) {
           logger.warn(e.getMessage());
         } catch (SeriesException e) {
           logger.warn(e.getMessage());

@@ -78,7 +78,7 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase implements
       post.setEntity(entity);
       response = getResponse(post);
       if (response != null) {
-        logger.info("distributed {} to {}", elementId, distributionChannel);
+        logger.info("Distributing {} to {}", elementId, distributionChannel);
         try {
           receipt = JobParser.parseJob(response.getEntity().getContent());
           return receipt;
