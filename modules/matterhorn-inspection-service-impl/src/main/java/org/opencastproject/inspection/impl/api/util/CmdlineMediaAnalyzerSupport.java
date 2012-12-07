@@ -68,6 +68,7 @@ public abstract class CmdlineMediaAnalyzerSupport implements MediaAnalyzer {
     this.binary = binary;
   }
 
+  @Override
   public MediaContainerMetadata analyze(File media) throws MediaAnalyzerException {
 
     if (binary == null)
@@ -76,9 +77,9 @@ public abstract class CmdlineMediaAnalyzerSupport implements MediaAnalyzer {
     String[] cmdOptions = getAnalysisOptions(media);
     commandline = binary + " " + StringUtils.join(cmdOptions, " ");
 
+    logger.debug("Running {}", commandline);
     // Analyze
-    ProcessExecutor<MediaAnalyzerException> mediaAnalyzer = null;
-    mediaAnalyzer = new ProcessExecutor<MediaAnalyzerException>(binary, cmdOptions) {
+    final ProcessExecutor<MediaAnalyzerException> mediaAnalyzer = new ProcessExecutor<MediaAnalyzerException>(binary, cmdOptions) {
       @Override
       protected boolean onStdout(String line) {
         onAnalysis(line);

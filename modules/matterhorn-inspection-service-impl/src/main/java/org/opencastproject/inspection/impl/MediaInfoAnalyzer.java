@@ -42,6 +42,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static org.opencastproject.util.data.Collections.array;
+
 /**
  * This MediaAnalyzer implementation leverages MediaInfo (<a href="http://mediainfo.sourceforge.net/"
  * >http://mediainfo.sourceforge.net</a>) for analysis.
@@ -121,6 +123,7 @@ public class MediaInfoAnalyzer extends CmdlineMediaAnalyzerSupport {
    * 
    * @see org.opencastproject.inspection.impl.api.MediaAnalyzer#setConfig(java.util.Map)
    */
+  @Override
   public void setConfig(Map<String, Object> config) {
     if (config != null) {
       if (config.containsKey(MEDIAINFO_BINARY_CONFIG)) {
@@ -131,11 +134,13 @@ public class MediaInfoAnalyzer extends CmdlineMediaAnalyzerSupport {
     }
   }
 
+  @Override
   protected String[] getAnalysisOptions(File media) {
     String mediaPath = media.getAbsolutePath().replaceAll(" ", "\\ ");
     return new String[] { "--Language=raw", "--Full", mediaPath };
   }
 
+  @Override
   protected void onAnalysis(String line) {
     // Detect section
     for (StreamSection section : StreamSection.values()) {
@@ -268,7 +273,8 @@ public class MediaInfoAnalyzer extends CmdlineMediaAnalyzerSupport {
       } catch (NoSuchMethodException e) {
         logger.warn("No setter found for property '{}'", property);
       } catch (InvocationTargetException e) {
-        logger.warn("Error setting property '{}'", property);
+        logger.error("Error setting property {}={} on object {}", array(property, value, target));
+        logger.debug("Exception", e);
       } catch (IllegalAccessException e) {
         logger.warn("Access restriction error setting property '{}'", property);
       }
