@@ -27,6 +27,7 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -38,6 +39,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpHead;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +53,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Distributes media to the local media delivery directory.
  */
@@ -60,7 +65,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
 
   /** List of available operations on jobs */
   private enum Operation {
-    Distribute, Retract 
+    Distribute, Retract
   }
 
   /** Receipt type */
@@ -68,6 +73,12 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
 
   /** Default distribution directory */
   public static final String DEFAULT_DISTRIBUTION_DIR = "opencast" + File.separator + "static";
+
+  /** Timeout in millis for checking distributed file request */
+  private static final long TIMEOUT = 10000L;
+
+  /** Interval time in millis for checking distributed file request */
+  private static final long INTERVAL = 300L;
 
   /** Path to the distribution directory */
   protected File distributionDirectory = null;
@@ -89,6 +100,9 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
 
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectoryService = null;
+
+  /** The trusted HTTP client */
+  private TrustedHttpClient trustedHttpClient;
 
   /**
    * Creates a new instance of the download distribution service.
@@ -136,9 +150,10 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
    * Distributes the mediapackage's element to the location that is returned by the concrete implementation. In
    * addition, a representation of the distributed element is added to the mediapackage.
    * 
-   * @see org.opencastproject.distribution.api.DistributionService#distribute(org.opencastproject.mediapackage.MediaPackage, String)
+   * @see org.opencastproject.distribution.api.DistributionService#distribute(org.opencastproject.mediapackage.MediaPackage,
+   *      String)
    * @throws org.opencastproject.distribution.api.DistributionException
-   *          in case of an error
+   *           in case of an error
    */
   protected MediaPackageElement distribute(Job job, MediaPackage mediapackage, String elementId)
           throws DistributionException {
@@ -157,7 +172,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
    *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
    *           cannot be copied or another unexpected exception occurs.
    */
-  public MediaPackageElement distributeElement(MediaPackage mediapackage, String elementId) 
+  public MediaPackageElement distributeElement(MediaPackage mediapackage, String elementId)
           throws DistributionException {
     if (mediapackage == null)
       throw new IllegalArgumentException("Mediapackage must be specified");
@@ -206,8 +221,26 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
       distributedElement.setIdentifier(null);
 
       logger.info("Finished distribution of {}", element);
-      return distributedElement;
+      URI uri = distributedElement.getURI();
+      long now = 0L;
+      while (true) {
+        HttpResponse response = trustedHttpClient.execute(new HttpHead(uri));
+        if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK)
+          break;
 
+        if (now < TIMEOUT) {
+          try {
+            Thread.sleep(INTERVAL);
+            now += INTERVAL;
+            continue;
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        }
+        logger.warn("Status code of distributed file {}: {}", uri, response.getStatusLine().getStatusCode());
+        throw new DistributionException("Unable to load distributed file " + uri.toString());
+      }
+      return distributedElement;
     } catch (Exception e) {
       logger.warn("Error distributing " + element, e);
       if (e instanceof DistributionException) {
@@ -217,7 +250,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
       }
     }
   }
-  
+
   @Override
   public Job retract(MediaPackage mediaPackage, String elementId) throws DistributionException {
     if (mediaPackage == null)
@@ -235,11 +268,10 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
   }
 
   /**
-   * Retract a media package element from the distribution channel. The retracted element
-   * must not necessarily be the one given as parameter <code>elementId</code>. Instead, the
-   * element's distribution URI will be calculated and then in turn be
-   * matched against each element of the package. This way you are able to retract elements
-   * by providing the "original" element here.
+   * Retract a media package element from the distribution channel. The retracted element must not necessarily be the
+   * one given as parameter <code>elementId</code>. Instead, the element's distribution URI will be calculated and then
+   * in turn be matched against each element of the package. This way you are able to retract elements by providing the
+   * "original" element here.
    * 
    * @param job
    *          the associated job
@@ -249,7 +281,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
    *          the element identifier
    * @return the retracted element or <code>null</code> if the element was not retracted
    * @throws org.opencastproject.distribution.api.DistributionException
-   *          in case of an error
+   *           in case of an error
    */
   protected MediaPackageElement retract(Job job, MediaPackage mediapackage, String elementId)
           throws DistributionException {
@@ -298,7 +330,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
         logger.warn("Unable to delete element from {}", elementDir);
         return distributedElement;
       }
-      
+
       // Try to remove the file and - if possible - the parent folder
       FileUtils.forceDelete(elementDir.getParentFile());
       if (mediapackageDir.list().length == 0) {
@@ -334,14 +366,14 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
       MediaPackage mediapackage = MediaPackageParser.getFromXml(arguments.get(0));
       String elementId = arguments.get(1);
       switch (op) {
-      case Distribute:
-        MediaPackageElement distributedElement = distribute(job, mediapackage, elementId);
-        return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
-      case Retract:
-        MediaPackageElement retractedElement = retract(job, mediapackage, elementId);
-        return (retractedElement != null) ? MediaPackageElementParser.getAsXml(retractedElement) : null;
-      default:
-        throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
+        case Distribute:
+          MediaPackageElement distributedElement = distribute(job, mediapackage, elementId);
+          return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
+        case Retract:
+          MediaPackageElement retractedElement = retract(job, mediapackage, elementId);
+          return (retractedElement != null) ? MediaPackageElementParser.getAsXml(retractedElement) : null;
+        default:
+          throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
       }
     } catch (IllegalArgumentException e) {
       throw new ServiceRegistryException("This service can't handle operations of type '" + op + "'", e);
@@ -437,6 +469,16 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * Callback for setting the trusted HTTP client.
+   * 
+   * @param trustedHttpClient
+   *          the trusted HTTP client to set
+   */
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    this.trustedHttpClient = trustedHttpClient;
   }
 
   /**

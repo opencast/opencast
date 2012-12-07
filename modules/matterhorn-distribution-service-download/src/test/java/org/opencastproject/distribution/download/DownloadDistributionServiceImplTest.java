@@ -26,6 +26,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -37,6 +38,9 @@ import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -45,6 +49,8 @@ import org.junit.Test;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+
+import javax.servlet.http.HttpServletResponse;
 
 public class DownloadDistributionServiceImplTest {
 
@@ -69,6 +75,18 @@ public class DownloadDistributionServiceImplTest {
     distributionRoot = new File("./target/static");
     service = new DownloadDistributionService();
 
+    StatusLine statusLine = EasyMock.createNiceMock(StatusLine.class);
+    EasyMock.expect(statusLine.getStatusCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();
+    EasyMock.replay(statusLine);
+
+    HttpResponse response = EasyMock.createNiceMock(HttpResponse.class);
+    EasyMock.expect(response.getStatusLine()).andReturn(statusLine).anyTimes();
+    EasyMock.replay(response);
+
+    TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
+    EasyMock.expect(httpClient.execute((HttpUriRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
+    EasyMock.replay(httpClient);
+
     User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
             new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
@@ -92,7 +110,7 @@ public class DownloadDistributionServiceImplTest {
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
             organizationDirectoryService);
     service.setServiceRegistry(serviceRegistry);
-
+    service.setTrustedHttpClient(httpClient);
     service.distributionDirectory = distributionRoot;
     service.serviceUrl = UrlSupport.DEFAULT_BASE_URL;
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);

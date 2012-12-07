@@ -100,7 +100,7 @@ public class SeriesUpdatedEventHandler implements EventHandler {
 
   /** Dublin core catalog service */
   protected DublinCoreCatalogService dublinCoreService = null;
-  
+
   /** The workspace */
   protected Workspace workspace = null;
 
@@ -247,19 +247,23 @@ public class SeriesUpdatedEventHandler implements EventHandler {
               if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
                 mp.remove(fileRepoCopy);
                 mp.add(getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload()));
+              } else {
+                logger.error("Unable to distribute XACML {}", fileRepoCopy.getIdentifier());
+                continue;
               }
             }
 
             // Update the series dublin core
             DublinCoreCatalog seriesDublinCore = seriesService.getSeries(seriesId);
             mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
-            
+
             // Update the series dublin core
             Catalog[] seriesCatalogs = mp.getCatalogs(MediaPackageElements.SERIES);
             if (seriesCatalogs.length == 1) {
               Catalog c = seriesCatalogs[0];
               String filename = FilenameUtils.getName(c.getURI().toString());
-              workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename, dublinCoreService.serialize(seriesDublinCore));
+              workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
+                      dublinCoreService.serialize(seriesDublinCore));
 
               // Distribute the updated series dc
               Job distributionJob = distributionService.distribute(mp, c.getIdentifier());
@@ -269,6 +273,9 @@ public class SeriesUpdatedEventHandler implements EventHandler {
 
             // Update the search index with the modified mediapackage
             searchService.add(mp);
+            Job searchJob = searchService.add(mp);
+            JobBarrier barrier = new JobBarrier(serviceRegistry, searchJob);
+            barrier.waitForJobs();
           }
 
         } catch (SearchException e) {
