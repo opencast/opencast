@@ -15,11 +15,10 @@
  */
 package org.opencastproject.kernel.security;
 
-import static org.opencastproject.security.api.SecurityConstants.ANONYMOUS_USERNAME;
-
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -69,19 +68,18 @@ public class SecurityServiceSpringImpl implements SecurityService {
     Organization org = getOrganization();
     if (org == null)
       throw new IllegalStateException("No organization is set in security context");
-    
+
     User delegatedUser = delegatedUserHolder.get();
     if (delegatedUser != null) {
       return delegatedUser;
     }
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    String anonymousRole = org.getAnonymousRole();
     if (auth == null) {
-      return new User(ANONYMOUS_USERNAME, org.getId(), new String[] { anonymousRole });
+      return SecurityUtil.createAnonymousUser(org);
     } else {
       Object principal = auth.getPrincipal();
       if (principal == null) {
-        return new User(ANONYMOUS_USERNAME, org.getId(), new String[] { anonymousRole });
+        return SecurityUtil.createAnonymousUser(org);
       }
       if (principal instanceof UserDetails) {
         UserDetails userDetails = (UserDetails) principal;
@@ -97,7 +95,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
         }
         return new User(userDetails.getUsername(), org.getId(), roles);
       } else {
-        return new User(ANONYMOUS_USERNAME, org.getId(), new String[] { anonymousRole });
+        return SecurityUtil.createAnonymousUser(org);
       }
     }
   }

@@ -22,10 +22,6 @@ import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.episode.api.EpisodeQuery.systemQuery;
 import static org.opencastproject.mediapackage.MediaPackageSupport.loadMediaPackageFromClassPath;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ADMIN;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ANONYMOUS;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_NAME;
 import static org.opencastproject.util.UrlSupport.DEFAULT_BASE_URL;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.VCell.cell;
@@ -480,8 +476,9 @@ public class EpisodeServiceImplTest {
 
     Map<String, Integer> servers = new HashMap<String, Integer>();
     servers.put(DEFAULT_BASE_URL, 8080);
-    organizationResponder.setResponse(new JaxbOrganization(DEFAULT_ORGANIZATION_ID, DEFAULT_ORGANIZATION_NAME, servers,
-            DEFAULT_ORGANIZATION_ADMIN, DEFAULT_ORGANIZATION_ANONYMOUS, null));
+    organizationResponder.setResponse(new JaxbOrganization(DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+            DefaultOrganization.DEFAULT_ORGANIZATION_NAME, servers, DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN,
+            DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, null));
 
     // Try to delete it
     try {

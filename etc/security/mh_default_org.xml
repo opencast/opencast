@@ -28,30 +28,30 @@
     <sec:intercept-url pattern='/login.html' access='ROLE_ANONYMOUS' />
 
     <!-- Enable anonymous access to the /info/me.json resource -->
-    <sec:intercept-url pattern='/info/me.json' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
-    <sec:intercept-url pattern='/info/components.json' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern='/info/me.json' method="GET" access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern='/info/components.json' method="GET" access='ROLE_ANONYMOUS' />
 
     <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
-    <sec:intercept-url pattern='/engage/ui/**' access='ROLE_ANONYMOUS, ROLE_USER' />
-    <sec:intercept-url pattern='/search/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
-    <sec:intercept-url pattern='/usertracking/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
-    <sec:intercept-url pattern='/static/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
-    <sec:intercept-url pattern='/export/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern='/engage/ui/**' access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern='/search/**' method="GET" access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern='/usertracking/**' method="GET" access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern='/static/**' method="GET" access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern='/export/**' method="GET" access='ROLE_ANONYMOUS' />
 
     <!-- Enable anonymous access to the annotation and the series endpoints -->
-    <sec:intercept-url pattern='/series/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
-    <sec:intercept-url pattern='/annotation/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
-    <sec:intercept-url pattern='/annotation/**' method="PUT" access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern='/series/**' method="GET" access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern='/annotation/**' method="GET" access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern='/annotation/**' method="PUT" access='ROLE_ANONYMOUS' />
 
     <!-- Enable anonymous access to the OAI-PMH repository              -->
     <!-- The OAI-PMH specification demands boths GET and POST requests  -->
     <!-- Please make sure that the path configured here matches         -->
     <!-- the path configured for the repository servlet.                -->
-    <sec:intercept-url pattern='/oaipmh/**' method='GET' access='ROLE_ANONYMOUS, ROLE_USER'/>
-    <sec:intercept-url pattern='/oaipmh/**' method='POST' access='ROLE_ANONYMOUS, ROLE_USER'/>
+    <sec:intercept-url pattern='/oaipmh/**' method='GET' access='ROLE_ANONYMOUS'/>
+    <sec:intercept-url pattern='/oaipmh/**' method='POST' access='ROLE_ANONYMOUS'/>
 
     <!-- Enable anonymous access to the rss and atom feeds -->
-    <sec:intercept-url pattern='/feeds/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern='/feeds/**' method="GET" access='ROLE_ANONYMOUS' />
 
     <!-- Secure the system management URLs for admins only -->
     <sec:intercept-url pattern='/services/*' access='ROLE_ADMIN' />
@@ -86,6 +86,9 @@
     <!-- Digest auth is used by capture agents and is used to enable transparent clustering of services -->
     <sec:custom-filter position="BASIC_AUTH_FILTER" ref="digestFilter" />
 
+	<!-- Matterhorn is shipping its own implementation of the anonymous filter -->
+	<sec:custom-filter ref="anonymousFilter" position="ANONYMOUS_FILTER" />
+
     <!--
       2-legged oauth is used by trusted 3rd party applications, including LTI producers.
       If you do not plan to use OAuth, comment this out.
@@ -99,11 +102,26 @@
     <sec:request-cache ref="requestCache" />
 
     <!-- If any URLs are to be exposed to anonymous users, the "sec:anonymous" filter must be present -->
-    <sec:anonymous />
+    <sec:anonymous enabled="false" />
 
     <!-- Enables log out -->
     <sec:logout />
+
   </sec:http>
+
+  <!-- ######################################## -->
+  <!-- # Custom Anonymous Filter Definition   # -->
+  <!-- ######################################## -->
+ 
+  <bean id="anonymousFilter" class="org.opencastproject.kernel.security.TrustedAnonymousAuthenticationFilter">
+    <property name="userAttribute" ref="anonymousUserAttributes" />
+    <property name="key" value="anonymousKey" />
+  </bean>
+  
+  <bean id="anonymousUserAttributes" class="org.springframework.security.core.userdetails.memory.UserAttribute">
+    <property name="authoritiesAsString" value="ROLE_ANONYMOUS"/>
+    <property name="password" value="empty"/>
+  </bean>
 
   <!-- ######################################## -->
   <!-- # Authentication Entry and Exit Points # -->

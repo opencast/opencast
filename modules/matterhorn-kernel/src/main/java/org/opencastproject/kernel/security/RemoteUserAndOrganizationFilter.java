@@ -21,9 +21,11 @@ import static org.opencastproject.security.api.SecurityConstants.USER_HEADER;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang.StringUtils;
@@ -39,6 +41,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Security filter used to set the organization and user in remote implementations.
@@ -87,16 +90,23 @@ public class RemoteUserAndOrganizationFilter implements Filter {
       } catch (NotFoundException e) {
         logger.warn("Non-existing organization '{}' specified in request header {}", organizationHeader,
                 ORGANIZATION_HEADER);
+        ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        return;
       }
     }
 
-    // See if there is an organization provided in the request
+    // See if there is a user provided in the request
     User user = null;
     String userHeader = httpRequest.getHeader(USER_HEADER);
     if (StringUtils.isNotBlank(userHeader)) {
-      user = userDirectory.loadUser(userHeader);
-      if (user == null) {
-        logger.warn("Non-existing user '{}' specified in request header {}", userHeader, USER_HEADER);
+      if (SecurityConstants.GLOBAL_ANONYMOUS_USERNAME.equals(userHeader)) {
+        user = SecurityUtil.createAnonymousUser(org);
+      } else {
+        user = userDirectory.loadUser(userHeader);
+        if (user == null) {
+          logger.warn("Non-existing user '{}' specified in request header {}", userHeader, USER_HEADER);
+          ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        }
       }
     }
 

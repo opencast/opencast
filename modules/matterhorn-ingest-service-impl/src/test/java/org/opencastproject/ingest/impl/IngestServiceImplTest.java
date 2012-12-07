@@ -15,9 +15,6 @@
  */
 package org.opencastproject.ingest.impl;
 
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ANONYMOUS;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
-
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -70,12 +67,11 @@ public class IngestServiceImplTest {
   private static URI urlAttachment;
   private static URI urlPackage;
   private static URI urlPackageOld;
-  
-  private static File ingestTempDir;
-  private static File packageFile; 
-  
-  private static long workflowInstanceID = 1L;
 
+  private static File ingestTempDir;
+  private static File packageFile;
+
+  private static long workflowInstanceID = 1L;
 
   @BeforeClass
   public static void beforeClass() throws URISyntaxException {
@@ -89,17 +85,17 @@ public class IngestServiceImplTest {
     urlAttachment = IngestServiceImplTest.class.getResource("/cover.png").toURI();
     urlPackage = IngestServiceImplTest.class.getResource("/data.zip").toURI();
     urlPackageOld = IngestServiceImplTest.class.getResource("/data.old.zip").toURI();
-    
+
     ingestTempDir = new File(new File(baseDir), "ingest-temp");
     packageFile = new File(ingestTempDir, baseDir.relativize(urlPackage).toString());
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Before
-  public void setUp() throws Exception { 
+  public void setUp() throws Exception {
 
     FileUtils.forceMkdir(ingestTempDir);
-    
+
     // set up service and mock workspace
     workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(
@@ -144,14 +140,14 @@ public class IngestServiceImplTest {
                     (InputStream) EasyMock.anyObject())).andReturn(urlCatalog);
 
     EasyMock.expect(
-            workspace.putInCollection((String)EasyMock.anyObject(), (String)EasyMock.anyObject(),
-                    (InputStream)EasyMock.anyObject())).andReturn(urlPackage);
+            workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    (InputStream) EasyMock.anyObject())).andReturn(urlPackage);
 
     EasyMock.expect(
-            workspace.putInCollection((String)EasyMock.anyObject(), (String)EasyMock.anyObject(), 
-                    (InputStream)EasyMock.anyObject())).andReturn(urlPackageOld);
+            workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    (InputStream) EasyMock.anyObject())).andReturn(urlPackageOld);
 
-    EasyMock.expect(workspace.get((URI)EasyMock.anyObject())).andReturn(packageFile).anyTimes();
+    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(packageFile).anyTimes();
 
     workflowInstance = EasyMock.createNiceMock(WorkflowInstance.class);
     EasyMock.expect(workflowInstance.getId()).andReturn(workflowInstanceID);
@@ -169,7 +165,8 @@ public class IngestServiceImplTest {
 
     EasyMock.replay(workspace, workflowInstance, workflowService);
 
-    User anonymous = new User("anonymous", DEFAULT_ORGANIZATION_ID, new String[] { DEFAULT_ORGANIZATION_ANONYMOUS });
+    User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+            new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
@@ -177,7 +174,7 @@ public class IngestServiceImplTest {
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
-    .andReturn(organization).anyTimes();
+            .andReturn(organization).anyTimes();
     EasyMock.replay(organizationDirectoryService);
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -221,7 +218,7 @@ public class IngestServiceImplTest {
   public void tearDown() {
     FileUtils.deleteQuietly(ingestTempDir);
   }
-  
+
   @Test
   public void testThinClient() throws Exception {
 
@@ -242,14 +239,14 @@ public class IngestServiceImplTest {
   public void testThickClient() throws Exception {
 
     FileUtils.copyURLToFile(urlPackage.toURL(), packageFile);
-    
+
     InputStream packageStream = null;
     try {
       packageStream = urlPackage.toURL().openStream();
       WorkflowInstance instance = service.addZippedMediaPackage(packageStream);
 
-      //Assert.assertEquals(2, mediaPackage.getTracks().length);
-      //Assert.assertEquals(3, mediaPackage.getCatalogs().length);
+      // Assert.assertEquals(2, mediaPackage.getTracks().length);
+      // Assert.assertEquals(3, mediaPackage.getCatalogs().length);
       Assert.assertEquals(workflowInstanceID, instance.getId());
     } catch (IOException e) {
       Assert.fail(e.getMessage());
@@ -263,14 +260,14 @@ public class IngestServiceImplTest {
   public void testThickClientOldMP() throws Exception {
 
     FileUtils.copyURLToFile(urlPackageOld.toURL(), packageFile);
-    
+
     InputStream packageStream = null;
     try {
       packageStream = urlPackageOld.toURL().openStream();
       WorkflowInstance instance = service.addZippedMediaPackage(packageStream);
 
-      //Assert.assertEquals(2, mediaPackage.getTracks().length);
-      //Assert.assertEquals(3, mediaPackage.getCatalogs().length);
+      // Assert.assertEquals(2, mediaPackage.getTracks().length);
+      // Assert.assertEquals(3, mediaPackage.getCatalogs().length);
       Assert.assertEquals(workflowInstanceID, instance.getId());
     } catch (IOException e) {
       Assert.fail(e.getMessage());

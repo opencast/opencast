@@ -20,28 +20,19 @@ package org.opencastproject.security.api;
  */
 public interface SecurityConstants {
 
+  /** Header name for the digest authorization */
+  String AUTHORIZATION_HEADER = "X-Opencast-Matterhorn-Authorization";
+
   /** Header name for the current organization */
-  String ORGANIZATION_HEADER = "X-OPENCAST-MATTERHORN-ORGANIZATION";
+  String ORGANIZATION_HEADER = "X-Opencast-Matterhorn-Organization";
 
   /** Header name for the current user */
-  String USER_HEADER = "X-OPENCAST-MATTERHORN-USER";
+  String USER_HEADER = "X-Opencast-Matterhorn-User";
 
   /** Name of the Matterhorn admin role */
   String GLOBAL_ADMIN_ROLE = "MATTERHORN_ADMINISTRATOR";
 
   /** Name of the Matterhorn anonymous role */
-  String ANONYMOUS_USERNAME = "anonymous";
-
-  /** The default organization identifier */
-  String DEFAULT_ORGANIZATION_ID = "mh_default_org";
-
-  /** The default organization name */
-  String DEFAULT_ORGANIZATION_NAME = "Opencast Project";
-
-  /** Name of the default organization's local admin role */
-  String DEFAULT_ORGANIZATION_ADMIN = "ROLE_ADMIN";
-
-  /** Name of the default organization's local anonymous role */
-  String DEFAULT_ORGANIZATION_ANONYMOUS = "ANONYMOUS";
+  String GLOBAL_ANONYMOUS_USERNAME = "anonymous";
 
 }

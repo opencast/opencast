@@ -15,13 +15,12 @@
  */
 package org.opencastproject.dataloader;
 
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
-
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityConstants;
@@ -126,7 +125,7 @@ public class UserAndSeriesLoader {
     @Override
     public void run() {
       logger.info("Adding sample series...");
-      String[] organizationIds = new String[] { DEFAULT_ORGANIZATION_ID, TENANT1 };
+      String[] organizationIds = new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ID, TENANT1 };
 
       for (int i = 1; i <= NUM_SERIES; i++) {
         String seriesId = SERIES_PREFIX + i;
@@ -158,16 +157,15 @@ public class UserAndSeriesLoader {
               securityService.setUser(new User("userandseriesloader", orgId,
                       new String[] { SecurityConstants.GLOBAL_ADMIN_ROLE }));
               securityService.setOrganization(org);
-              
+
               try {
                 // Test if the serie already exist, it does not overwrite it.
                 if (seriesService.getSeries(seriesId) != null)
-                  continue;                
-              }
-              catch (NotFoundException e) {
+                  continue;
+              } catch (NotFoundException e) {
                 // If the serie does not exist, we create it.
                 seriesService.updateSeries(dc);
-                seriesService.updateAccessControl(seriesId, acl);                
+                seriesService.updateAccessControl(seriesId, acl);
               }
 
             } catch (UnauthorizedException e) {
@@ -185,22 +183,23 @@ public class UserAndSeriesLoader {
         }
       }
 
-      load(STUDENT_PREFIX, 20, new String[] { USER_ROLE }, DEFAULT_ORGANIZATION_ID);
+      load(STUDENT_PREFIX, 20, new String[] { USER_ROLE }, DefaultOrganization.DEFAULT_ORGANIZATION_ID);
       load(STUDENT_PREFIX, 20, new String[] { USER_ROLE }, TENANT1);
 
-      load(INSTRUCTOR_PREFIX, 2, new String[] { USER_ROLE, INSTRUCTOR_ROLE }, DEFAULT_ORGANIZATION_ID);
+      load(INSTRUCTOR_PREFIX, 2, new String[] { USER_ROLE, INSTRUCTOR_ROLE },
+              DefaultOrganization.DEFAULT_ORGANIZATION_ID);
       load(INSTRUCTOR_PREFIX, 2, new String[] { USER_ROLE, INSTRUCTOR_ROLE }, TENANT1);
 
-      load(ADMIN_PREFIX, 1, new String[] { USER_ROLE, COURSE_ADMIN_ROLE }, DEFAULT_ORGANIZATION_ID);
+      load(ADMIN_PREFIX, 1, new String[] { USER_ROLE, COURSE_ADMIN_ROLE }, DefaultOrganization.DEFAULT_ORGANIZATION_ID);
       load(ADMIN_PREFIX, 1, new String[] { USER_ROLE, COURSE_ADMIN_ROLE }, TENANT1);
 
-      loadLdapUser(DEFAULT_ORGANIZATION_ID);
+      loadLdapUser(DefaultOrganization.DEFAULT_ORGANIZATION_ID);
       loadLdapUser(TENANT1);
 
       logger.info("Finished loading sample series and users");
     }
   }
-  
+
   /**
    * Loads demo users into persistence.
    * 

@@ -19,10 +19,6 @@ package org.opencastproject.search.impl;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ADMIN;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ANONYMOUS;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_NAME;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
@@ -180,7 +176,8 @@ public class SearchServiceImplTest {
     EasyMock.expect(securityService.getOrganization()).andAnswer(organizationResponder).anyTimes();
     EasyMock.replay(securityService);
 
-    User anonymous = new User("anonymous", DEFAULT_ORGANIZATION_ID, new String[] { DEFAULT_ORGANIZATION_ANONYMOUS });
+    User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+            new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
@@ -218,7 +215,7 @@ public class SearchServiceImplTest {
 
     // search service
     service = new SearchServiceImpl();
-    
+
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
             organizationDirectoryService);
 
@@ -504,8 +501,9 @@ public class SearchServiceImplTest {
 
     Map<String, Integer> servers = new HashMap<String, Integer>();
     servers.put("localhost", 8080);
-    Organization org = new JaxbOrganization(DEFAULT_ORGANIZATION_ID, DEFAULT_ORGANIZATION_NAME,
-            servers, DEFAULT_ORGANIZATION_ADMIN, DEFAULT_ORGANIZATION_ANONYMOUS, null);
+    Organization org = new JaxbOrganization(DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+            DefaultOrganization.DEFAULT_ORGANIZATION_NAME, servers, DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN,
+            DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, null);
     organizationResponder.setResponse(org);
 
     // Try to delete it
@@ -513,7 +511,8 @@ public class SearchServiceImplTest {
     barrier = new JobBarrier(serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to delete mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
-    Assert.assertEquals("Unauthorized user was able to delete a mediapackage", Boolean.FALSE.toString(), job.getPayload());
+    Assert.assertEquals("Unauthorized user was able to delete a mediapackage", Boolean.FALSE.toString(),
+            job.getPayload());
 
     // Second try with a "fixed" roleset
     User adminUser = new User("admin", "opencastproject.org", new String[] { new DefaultOrganization().getAdminRole() });

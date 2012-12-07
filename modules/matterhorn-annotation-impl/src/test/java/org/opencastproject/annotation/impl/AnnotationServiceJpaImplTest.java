@@ -15,10 +15,9 @@
  */
 package org.opencastproject.annotation.impl;
 
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ANONYMOUS;
-
 import org.opencastproject.annotation.api.Annotation;
 import org.opencastproject.annotation.api.AnnotationList;
+import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
@@ -56,9 +55,9 @@ public class AnnotationServiceJpaImplTest {
     props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
     props.put("eclipselink.ddl-generation", "create-tables");
     props.put("eclipselink.ddl-generation.output-mode", "database");
-    
+
     // Set up a mock security service that always returns "me" as the current user
-    User me = new User("me", "opencast.org", new String[] { DEFAULT_ORGANIZATION_ANONYMOUS });
+    User me = new User("me", "opencast.org", new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(me).anyTimes();
     EasyMock.replay(securityService);
@@ -70,12 +69,12 @@ public class AnnotationServiceJpaImplTest {
     annotationService.setSecurityService(securityService);
     annotationService.activate(null);
   }
-  
+
   @After
   public void tearDown() throws Exception {
     annotationService.deactivate();
   }
-  
+
   @Test
   public void testAnnotationPersistence() throws Exception {
     // Add an annotation
@@ -87,10 +86,10 @@ public class AnnotationServiceJpaImplTest {
     a.setType("ugc");
     a.setValue("This is some user generated content");
     annotationService.addAnnotation(a);
-    
+
     // Ensure that by persisting the annotation, we now have an ID
     Assert.assertNotNull(a.getAnnotationId());
-    
+
     // Ensure that the annotation was saved and retrieved properly
     Annotation a1FromDb = annotationService.getAnnotation(a.getAnnotationId());
     Assert.assertEquals(a.getType(), a1FromDb.getType());
@@ -112,11 +111,11 @@ public class AnnotationServiceJpaImplTest {
     a.setType("ugc");
     a.setValue("This is some user generated content");
     annotationService.addAnnotation(a);
-  
-    //remove annotation
-    Assert.assertTrue(annotationService.removeAnnotation(a));  
 
-    //ensure that annotation was removed
+    // remove annotation
+    Assert.assertTrue(annotationService.removeAnnotation(a));
+
+    // ensure that annotation was removed
     Annotation a1FromDb = null;
     try {
       a1FromDb = annotationService.getAnnotation(a.getAnnotationId());
@@ -163,7 +162,7 @@ public class AnnotationServiceJpaImplTest {
   @Test
   public void testGetAnnotationsByTypeAndMediapackageId() throws Exception {
     String type = "a type of annotation, such as 'bookmark' or 'note'";
-    
+
     // Add an annotation
     AnnotationImpl a1 = new AnnotationImpl();
     a1.setType(type);
@@ -173,7 +172,7 @@ public class AnnotationServiceJpaImplTest {
     a1.setSessionId("session");
     a1.setValue("This is some user generated content");
     annotationService.addAnnotation(a1);
-    
+
     // Add another annotation of the same type to a different mediapackage
     AnnotationImpl a2 = new AnnotationImpl();
     a2.setType(type);
@@ -183,14 +182,14 @@ public class AnnotationServiceJpaImplTest {
     a2.setSessionId("a different session");
     a2.setValue("More user generated content");
     annotationService.addAnnotation(a2);
-    
+
     AnnotationList annotations = annotationService.getAnnotationsByTypeAndMediapackageId(type, "mp", 0, 100);
     Assert.assertEquals(1, annotations.getAnnotations().size());
   }
 
   @Test
   public void testGetAnnotationsByMediapackageId() throws Exception {
-    
+
     // Add an annotation
     AnnotationImpl a1 = new AnnotationImpl();
     a1.setType("note");
@@ -210,7 +209,7 @@ public class AnnotationServiceJpaImplTest {
     a2.setSessionId("session 2");
     a2.setValue("This is some user generated content 2");
     annotationService.addAnnotation(a2);
-    
+
     // Add another annotation to a different mediapackage
     AnnotationImpl a3 = new AnnotationImpl();
     a3.setType("bookmark");
@@ -220,13 +219,12 @@ public class AnnotationServiceJpaImplTest {
     a3.setSessionId("a different session");
     a3.setValue("More user generated content");
     annotationService.addAnnotation(a3);
-    
 
     // Test method
     AnnotationList annotationResult = annotationService.getAnnotationsByMediapackageId("mp", 0, 200);
 
     Assert.assertEquals(2, annotationResult.getAnnotations().size());
   }
-  
+
   // TODO: Many more queries need to be tested
 }

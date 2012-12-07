@@ -21,6 +21,7 @@ import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryP
 
 import org.opencastproject.kernel.http.api.HttpClient;
 import org.opencastproject.kernel.http.impl.HttpClientFactory;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -277,6 +278,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connectionTimeout);
     // Add the request header to elicit a digest auth response
     httpUriRequest.setHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
+    httpUriRequest.setHeader(SecurityConstants.AUTHORIZATION_HEADER, "true");
 
     if (serviceRegistry != null && serviceRegistry.getCurrentJob() != null)
       httpUriRequest.setHeader(CURRENT_JOB_HEADER, Long.toString(serviceRegistry.getCurrentJob().getId()));

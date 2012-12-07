@@ -26,7 +26,6 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -115,7 +114,7 @@ public class ComposerServiceTest {
     EasyMock.expect(cc.getBundleContext()).andReturn(bc).anyTimes();
 
     Organization org = new DefaultOrganization();
-    User user = new User("admin", org.getId(), new String[] { SecurityConstants.DEFAULT_ORGANIZATION_ADMIN });
+    User user = new User("admin", org.getId(), new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN });
     OrganizationDirectoryService orgDirectory = EasyMock.createNiceMock(OrganizationDirectoryService.class);
     EasyMock.expect(orgDirectory.getOrganization((String) EasyMock.anyObject())).andReturn(org).anyTimes();
 

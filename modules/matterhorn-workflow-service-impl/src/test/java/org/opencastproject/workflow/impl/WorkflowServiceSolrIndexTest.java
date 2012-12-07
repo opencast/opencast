@@ -16,7 +16,6 @@
 package org.opencastproject.workflow.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.opencastproject.security.api.SecurityConstants.DEFAULT_ORGANIZATION_ID;
 import static org.opencastproject.workflow.api.WorkflowService.READ_PERMISSION;
 
 import org.opencastproject.job.api.JaxbJob;
@@ -162,7 +161,7 @@ public class WorkflowServiceSolrIndexTest {
   @Test
   public void testNonAdminQuery() throws Exception {
     String userRole = "ROLE_USER";
-    User nonAdminUser = new User("noAdmin", DEFAULT_ORGANIZATION_ID, new String[] { userRole });
+    User nonAdminUser = new User("noAdmin", DefaultOrganization.DEFAULT_ORGANIZATION_ID, new String[] { userRole });
 
     // security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -174,8 +173,8 @@ public class WorkflowServiceSolrIndexTest {
     WorkflowQuery q = new WorkflowQuery().withMediaPackage("123").withSeriesId("series1");
     String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
     String expected = "oc_org:mh_default_org AND mediapackageid:123 AND seriesid:series1 AND oc_org:"
-            + DEFAULT_ORGANIZATION_ID + " AND (oc_creator:" + nonAdminUser.getUserName() + " OR oc_acl_read:" + userRole
-            + ")";
+            + DefaultOrganization.DEFAULT_ORGANIZATION_ID + " AND (oc_creator:" + nonAdminUser.getUserName()
+            + " OR oc_acl_read:" + userRole + ")";
 
     assertEquals(expected, solrQuery);
   }
