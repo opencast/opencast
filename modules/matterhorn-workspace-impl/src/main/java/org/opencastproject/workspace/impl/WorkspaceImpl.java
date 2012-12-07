@@ -15,6 +15,9 @@
  */
 package org.opencastproject.workspace.impl;
 
+import static org.opencastproject.util.IoSupport.locked;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
@@ -50,9 +53,6 @@ import java.util.Timer;
 
 import javax.management.ObjectInstance;
 import javax.servlet.http.HttpServletResponse;
-
-import static org.opencastproject.util.IoSupport.locked;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Implements a simple cache for remote URIs. Delegates methods to {@link WorkingFileRepository} wherever possible.
@@ -272,6 +272,8 @@ public class WorkspaceImpl implements Workspace {
                 logger.debug("{} is not ready, try again in one minute.", urlString);
                 Thread.sleep(60000);
               } else {
+                logger.warn("Received unexpected response status {} while trying to download from {}", response
+                        .getStatusLine().getStatusCode(), urlString);
                 break;
               }
             }
@@ -282,7 +284,7 @@ public class WorkspaceImpl implements Workspace {
           out = new FileOutputStream(f);
           IOUtils.copyLarge(in, out);
         } catch (Exception e) {
-          logger.warn("Could not copy {} to {}", urlString, f.getAbsolutePath());
+          logger.warn("Could not copy {} to {}: {}", new String[] { urlString, f.getAbsolutePath(), e.getMessage() });
           FileUtils.deleteQuietly(file);
           return chuck(new NotFoundException(e));
         } finally {
