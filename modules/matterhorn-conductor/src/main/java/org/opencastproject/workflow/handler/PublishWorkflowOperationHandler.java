@@ -15,6 +15,7 @@
  */
 package org.opencastproject.workflow.handler;
 
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -29,8 +30,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * Workflow operation for handling "publish" operations
@@ -149,6 +150,11 @@ public class PublishWorkflowOperationHandler extends AbstractWorkflowOperationHa
     return mp;
   }
 
+  /** Media package must meet these criteria in order to be published. */
+  private boolean isPublishable(MediaPackage mp) {
+    return !isBlank(mp.getTitle()) && mp.hasTracks();
+  }
+
   /**
    * {@inheritDoc}
    * 
@@ -168,8 +174,8 @@ public class PublishWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
     try {
       MediaPackage mediaPackageForSearch = getMediaPackageForSearchIndex(mediaPackageFromWorkflow, tagSet);
-      if (mediaPackageForSearch == null) {
-        createResult(mediaPackageForSearch, Action.CONTINUE);
+      if (!isPublishable(mediaPackageForSearch)) {
+        throw new WorkflowOperationException("Media package does not meet criteria for publication");
       }
       logger.info("Publishing media package {} to search index", mediaPackageForSearch);
       
