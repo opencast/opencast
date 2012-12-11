@@ -61,7 +61,7 @@ Opencast.Annotation_Comment_List_Plugin = (function ()
 	                                            '<a style="float:right; color:blue" href="javascript:Opencast.Annotation_Comment_List.clickCommentList(\'${c.id}\',\'${c.text}\',\'${c.inpoint}\',\'${c.slide}\',\'${c.user}\',\'${c.type}\')" >Jump To Slide</a>' +
 	                                        '{/if}' +
 	                                        '<div class="oc-comment-list-textspace"></div>' +
-	                                        '{if c.type != "reply"}' +
+	                                        '{if c.type != "reply" && c.isPrivate != true}' +
 	                                        	'<a style="float:right; color:blue" href="javascript:Opencast.Annotation_Comment_List.replyComment(\'${c.id}\')" >Reply</a>' +
 	                                        '{/if}' +	                                    
 	                                    '</div>' +

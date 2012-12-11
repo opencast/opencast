@@ -24,11 +24,12 @@ var Opencast = Opencast || {};
  * @memberOf .
  * @description Scrubber Comment Object 
  */
-function ScrubberComment(username, id, text, inpoint){
+function ScrubberComment(username, id, text, inpoint, isPrivate){
 	var creator = username;
 	var commentId = id;
 	var commentText = text;
 	var commentInpoint = inpoint;
+	var commentPrivate = isPrivate;
 	var self = this;
 	
 	this.getCreator = (function(){
@@ -43,17 +44,21 @@ function ScrubberComment(username, id, text, inpoint){
 	this.getInpoint = (function(){
 		return commentInpoint;
 	});
+	this.isPrivate = (function() {
+		return commentPrivate;
+	});
 }
 /**
  * @memberOf .
  * @description Slide Comment Object 
  */
-function SlideComment(username, id, text, slide, relPos){
+function SlideComment(username, id, text, slide, relPos, isPrivate){
 	var creator = username;
 	var commentId = id;
 	var commentText = text;
 	var commentOnSlide = slide;
 	var slidePosition = relPos;
+	var commentPrivate = isPrivate;
 	var self = this;
 	
 	this.getCreator = (function(){
@@ -74,16 +79,20 @@ function SlideComment(username, id, text, slide, relPos){
 	this.getY = (function(){
 		return slidePosition.y;
 	});
+	this.isPrivate = (function() {
+		return commentPrivate;
+	});
 }
 /**
  * @memberOf .
  * @description Reply Comment Object 
  */
-function ReplyComment(username, id, text, replyId){
+function ReplyComment(username, id, text, replyId, isPrivate){
 	var creator = username;
 	var commentId = id;
 	var commentText = text;
 	var commentReplyId = replyId;
+	var commentPrivate = isPrivate;
 	var self = this;
 	
 	this.getCreator = (function(){
@@ -97,6 +106,9 @@ function ReplyComment(username, id, text, replyId){
 	});
 	this.getResponseTo = (function(){
 		return commentReplyId;
+	});
+	this.isPrivate = (function() {
+		return commentPrivate;
 	});
 }
 
@@ -286,6 +298,8 @@ Opencast.Annotation_Comment = (function ()
 						       '<input id="oc-comment-add-submit" class="oc-comment-submit" type="image" src="/engage/ui/img/misc/space.png" name="Add" alt="Add" title="Add" value="Add">'+         
 						       '<input id="oc-comment-add-namebox" class="oc-comment-namebox" type="text" value="'+cm_username+'" disabled="disabled">'+
 						       '<div id="oc-comment-info-header-text-1" class="oc-comment-info-header-text"> at '+curTime+'</div>'+
+						       '<input id="oc-comment-private" type="checkbox" name="Private Annotation" title="Private Annotation">'+
+						       '<label id="oc-comment-private-label" for="oc-comment-private" style="color: white;">Private Comment</label>'+
 						       '</div>'+
 						       '<textarea id="oc-comment-add-textbox" class="oc-comment-textbox">Type Your Comment Here</textarea>'            
 					       );
@@ -297,6 +311,8 @@ Opencast.Annotation_Comment = (function ()
 						       '<input id="oc-comment-add-submit" class="oc-comment-submit" type="image" src="/engage/ui/img/misc/space.png" name="Add" alt="Add" title="Add" value="Add">'+           
 						       '<input id="oc-comment-add-namebox" class="oc-comment-namebox" type="text" value="'+cm_username+'">'+
 						       '<div id="oc-comment-info-header-text-1" class="oc-comment-info-header-text"> at '+curTime+'</div>'+
+						       '<input id="oc-comment-private" type="checkbox" name="Private Annotation" title="Private Annotation">'+
+						       '<label id="oc-comment-private-label" for="oc-comment-private" style="color: white;">Private Comment</label>'+						       
 						       '</div>'+
 						       '<textarea id="oc-comment-add-textbox" class="oc-comment-textbox">Type Your Comment Here</textarea>'            
 					       );
@@ -375,6 +391,8 @@ Opencast.Annotation_Comment = (function ()
 		        '<input id="oc-comment-add-submit" class="oc-comment-submit" type="image" src="/engage/ui/img/misc/space.png" name="Add" alt="Add" title="Add" value="Add">'+      	
 		        '<input id="oc-comment-add-namebox" class="oc-comment-namebox" type="text" disabled="disabled" value="'+cm_username+'">'+
 		        '<div id="oc-comment-info-header-text-1" class="oc-comment-info-header-text"> at Slide '+curSlide+'</div>'+
+		        '<input id="oc-comment-private" type="checkbox" name="Private Annotation" title="Private Annotation">'+
+		        '<label id="oc-comment-private-label" for="oc-comment-private" style="color: white;">Private Comment</label>'+
 		        '</div>'+
 	            	'<textarea id="oc-comment-add-textbox" class="oc-comment-textbox">Type Your Comment Here</textarea>'			
 		);
@@ -388,6 +406,8 @@ Opencast.Annotation_Comment = (function ()
 		        '<input id="oc-comment-add-submit" class="oc-comment-submit" type="image" src="/engage/ui/img/misc/space.png" name="Add" alt="Add" title="Add" value="Add">'+      	
 		        '<input id="oc-comment-add-namebox" class="oc-comment-namebox" type="text" value="'+cm_username+'">'+
 		        '<div id="oc-comment-info-header-text-1" class="oc-comment-info-header-text"> at Slide '+curSlide+'</div>'+
+		        '<input id="oc-comment-private" type="checkbox" name="Private Annotation" title="Private Annotation">'+
+		        '<label id="oc-comment-private-label" for="oc-comment-private" style="color: white;">Private Comment</label>'+
 		        '</div>'+
 	            	'<textarea id="oc-comment-add-textbox" class="oc-comment-textbox">Type Your Comment Here</textarea>'			
 		);
@@ -641,14 +661,21 @@ Opencast.Annotation_Comment = (function ()
 		{
 		    curTime = parseInt(Opencast.Player.getCurrentPosition());
 		}
+		
+		var isPrivate = false;
+		if ($("#oc-comment-private").attr("checked") !== undefined) {
+			isPrivate = true;
+		}		
+		
 		//add scrubber comment
-		addComment(nameValue,curTime,commentValue,"scrubber");                
+		addComment(nameValue,curTime,commentValue,"scrubber",isPrivate);                
 	    }else if(type === "slide"){
 		//add slide comment
 		addComment(nameValue,
 			   parseInt(Opencast.Player.getCurrentPosition()),
 			   commentValue,
 			   "slide",
+			   isPrivate,
 			   relativeSlideCommentPosition.x,
 			   relativeSlideCommentPosition.y,
 			   Opencast.segments.getCurrentSlideId()
@@ -692,7 +719,7 @@ Opencast.Annotation_Comment = (function ()
      * @description Add a comment
      * @param user,curPosition/replyID,value,type,xPos,yPos,segId
      */
-    function addComment(user,curPosition,value,type,xPos,yPos,segId)
+    function addComment(user,curPosition,value,type,isPrivate,xPos,yPos,segId)
     {
         //var user = "Anonymous";
         //if(Opencast.Player.getUserId() !== null){
@@ -727,12 +754,18 @@ Opencast.Annotation_Comment = (function ()
 	    }else{
 	        data = user+"<>"+value+"<>"+type;        
 	    }      
+        }
+        
+        var data = "episode="+mediaPackageId+"&type="+annotationType+"&in="+timePos+"&value="+data+"&out="+curPosition;
+        if (isPrivate) {
+          data = data + "&isPrivate=true"
         }        
+                
         $.ajax(
             {
 		type: 'PUT',
 		url: "../../annotation/",
-		data: "episode="+mediaPackageId+"&type="+annotationType+"&in="+timePos+"&value="+data+"&out="+curPosition,
+		data: data,
 		dataType: 'xml',
 		success: function (xml)
 		{
@@ -745,7 +778,7 @@ Opencast.Annotation_Comment = (function ()
                     show();
                     //check checkbox
                     $('#oc_checkbox-annotation-comment').attr('checked', true);
-                    
+                    Opencast.Player.addEvent("ADD_COMMENT_SCRUBBER");
                     var comment_list_show = $('#oc_btn-comments').attr("title");
                     if(comment_list_show == "Hide Comments"){
                         Opencast.Annotation_Comment_List.show();
@@ -771,6 +804,7 @@ Opencast.Annotation_Comment = (function ()
 
 	if(!isOpen && !isOpening)
 	{
+			Opencast.Player.addEvent("SHOW_SCRUBBER_COMMENTS");
             isOpening = true;
 
             // Request JSONP data
@@ -832,7 +866,8 @@ Opencast.Annotation_Comment = (function ()
                                        dataArray[0], //username
                                        data['annotations'].annotation[i].annotationId, //ID
                                        dataArray[1], //text
-                                       data['annotations'].annotation[i].inpoint //inpoint
+                                       data['annotations'].annotation[i].inpoint, //inpoint
+                                       data['annotations'].annotation[i].isPrivate
                                        );
                        scrubberArray[scCount] = comment;
                        scCount++;
@@ -844,7 +879,8 @@ Opencast.Annotation_Comment = (function ()
                                        data['annotations'].annotation[i].annotationId, //ID
                                        dataArray[1], //text
                                        dataArray[5], //slide nr
-                                       relPos //relative position on the slide
+                                       relPos, //relative position on the slide
+                                       data['annotations'].annotation[i].isPrivate
                                        );
                        slideArray[slCount] = comment;
                        slCount++;
@@ -873,7 +909,8 @@ Opencast.Annotation_Comment = (function ()
                                        dataArray[0], //username
                                        data['annotations'].annotation[i].annotationId, //ID
                                        dataArray[1], //text
-                                       dataArray[3] //Reply ID
+                                       dataArray[3], //Reply ID
+                                       data['annotations'].annotation[i].isPrivate
                                        );
                                        reply_map.addReplyToComment(comment);
                    }
@@ -893,7 +930,8 @@ Opencast.Annotation_Comment = (function ()
 						               dataArray[0], //username
 						               data['annotations'].annotation.annotationId, //ID
 						               dataArray[1], //text
-						               data['annotations'].annotation.inpoint //inpoint
+						               data['annotations'].annotation.inpoint, //inpoint
+						               data['annotations'].annotation.isPrivate
 						               );                                                                                   
 					       scrubberArray[scCount] = comment;
 					       scCount++;
@@ -905,7 +943,8 @@ Opencast.Annotation_Comment = (function ()
 						               data['annotations'].annotation.annotationId, //ID
 						               dataArray[1], //text
 						               dataArray[5], //slide nr
-						               relPos //relative position on the slide
+						               relPos, //relative position on the slide
+						               data['annotations'].annotation.isPrivate
 						               );              
 					       slideArray[slCount] = comment;
 					       slCount++;
@@ -989,8 +1028,9 @@ Opencast.Annotation_Comment = (function ()
      * @description shows given scrubber comment on timeline
      * @param commentId, commentValue, commentTime, userId
      */
-    function showScrubberComment(commentId, commentValue, commentTime, userId)
+    function showScrubberComment(commentId, commentValue, commentTime, userId, isPrivate)
     {
+    	Opencast.Player.addEvent("SHOW_SCRUBBER_COMMENT_" + commentId);
     	//process position and set comment info box
         var left = $("#scComment" + commentId).offset().left + 3;
         var top = $("#data").offset().top - 136;
@@ -1007,17 +1047,31 @@ Opencast.Annotation_Comment = (function ()
             editCMBtn = "<input onclick='Opencast.Annotation_Comment.editComment("+commentId+",\"slide\")' class='oc-comment-info-cm-btn oc-comment-info-cm-editbtn' type='image' src='/engage/ui/img/misc/space.png' name='Edit' alt='Edit' title='Edit' value='Edit'>";
             deleteCMBtn = "<input onclick='Opencast.Annotation_Comment.deleteComment("+commentId+",\"slide\")' class='oc-comment-info-cm-btn oc-comment-info-cm-delbtn' type='image' src='/engage/ui/img/misc/space.png' name='Delete' alt='Delete' title='Delete' value='Delete'>";
         }
-        $("#oc-comment-info-value-wrapper").html(
+        
+        if (isPrivate === 'true') { 
+	        $("#oc-comment-info-value-wrapper").html(
+	        "<div id='oc-comment-info-comment"+commentId+"'>"+
+			"<div class='oc-comment-info-cm-header'>"+
+			deleteCMBtn+
+			editCMBtn+
+			"<input onclick='Opencast.Annotation_Comment.clickComment("+commentTime+","+commentId+")' class='oc-comment-info-cm-btn oc-comment-info-cm-gotobtn' type='image' src='/engage/ui/img/misc/space.png' name='Go To' alt='Go To' title='Go To' value='Go To'>"+
+			"<div class='oc-comment-info-header-text'>"+userId+" at "+$.formatSeconds(commentTime)+"</div>"+
+			"</div>"+
+			"<p id='oc-comment-cm-textbox-"+commentId+"' class='oc-comment-cm-textbox'>"+commentValue+"</p>"
+	        );
+        } else {                
+	        $("#oc-comment-info-value-wrapper").html(
             "<div id='oc-comment-info-comment"+commentId+"'>"+
-		"<div class='oc-comment-info-cm-header'>"+
-		deleteCMBtn+
-		editCMBtn+
-		"<input onclick='Opencast.Annotation_Comment.replyComment("+commentId+")' class='oc-comment-info-cm-btn oc-comment-info-cm-repbtn' type='image' src='/engage/ui/img/misc/space.png' name='Reply' alt='Reply' title='Reply' value='Reply'>"+
-		"<input onclick='Opencast.Annotation_Comment.clickComment("+commentTime+")' class='oc-comment-info-cm-btn oc-comment-info-cm-gotobtn' type='image' src='/engage/ui/img/misc/space.png' name='Go To' alt='Go To' title='Go To' value='Go To'>"+
-		"<div class='oc-comment-info-header-text'>"+userId+" at "+$.formatSeconds(commentTime)+"</div>"+
-		"</div>"+
-		"<p id='oc-comment-cm-textbox-"+commentId+"' class='oc-comment-cm-textbox'>"+commentValue+"</p>"
-        );
+			"<div class='oc-comment-info-cm-header'>"+
+			deleteCMBtn+
+			editCMBtn+
+			"<input onclick='Opencast.Annotation_Comment.replyComment("+commentId+")' class='oc-comment-info-cm-btn oc-comment-info-cm-repbtn' type='image' src='/engage/ui/img/misc/space.png' name='Reply' alt='Reply' title='Reply' value='Reply'>"+
+			"<input onclick='Opencast.Annotation_Comment.clickComment("+commentTime+")' class='oc-comment-info-cm-btn oc-comment-info-cm-gotobtn' type='image' src='/engage/ui/img/misc/space.png' name='Go To' alt='Go To' title='Go To' value='Go To'>"+
+			"<div class='oc-comment-info-header-text'>"+userId+" at "+$.formatSeconds(commentTime)+"</div>"+
+			"</div>"+
+			"<p id='oc-comment-cm-textbox-"+commentId+"' class='oc-comment-cm-textbox'>"+commentValue+"</p>"
+        	);
+        }	
         //process html for replys
         $(reply_map.getReplysToComment(commentId)).each(function(i){
         	var editReBtn = "";
@@ -1048,6 +1102,7 @@ Opencast.Annotation_Comment = (function ()
      */
     function showSlideComment(commentId, commentValue, slideNr, userId)
     {
+    	Opencast.Player.addEvent("SHOW_SLIDE_COMMENT_" + commentId);
     	//process position and set comment info box
 	var left = $("#slideComment" + commentId).offset().left + 8;
         var top = $("#slideComment" + commentId).offset().top - 137;
@@ -1256,6 +1311,7 @@ Opencast.Annotation_Comment = (function ()
      */
     function replyComment(commentId)
     {
+    	Opencast.Player.addEvent("REPLY_COMMENT_" + commentId);
     	//pause player
     	Opencast.Player.doPause();
     	addingAcomment = true;
@@ -1319,6 +1375,7 @@ Opencast.Annotation_Comment = (function ()
      */
     function deleteComment(commentID, type)
     {
+    	Opencast.Player.addEvent("DELETE_COMMENT_" + commentID);
     	var del_local = function(cID, t){
 	    if(type === "reply"){
 		//Remove from local reply map
@@ -1381,8 +1438,9 @@ Opencast.Annotation_Comment = (function ()
      * @param commentId id of the comment
      * @param commentValue comment value
      */
-    function clickComment(commentTime)
+    function clickComment(commentTime,commentId)
     {
+    	Opencast.Player.addEvent("CLICK_COMMENT_" + commentId);
     	clickedOnComment = true;
 	//show comment on timeline
 	//showScrubberComment(commentId,commentValue,commentTime,userId);
@@ -1396,8 +1454,9 @@ Opencast.Annotation_Comment = (function ()
      * @param commentId id of the comment
      * @param commentValue comment value
      */
-    function hoverComment(commentId, commentValue, commentTime, userId)
+    function hoverComment(commentId, commentValue, commentTime, userId, isPrivate)
     {
+    	Opencast.Player.addEvent("HOVER_COMMENT_" + commentId);
     	if(addingAcomment === true){
     	    
     	}else if(clickedOnHoverBar === false & clickedOnComment === false){
@@ -1416,7 +1475,7 @@ Opencast.Annotation_Comment = (function ()
 	    	}
 	    });
 	    //show comment on timeline
-	    showScrubberComment(commentId,commentValue,commentTime,userId);
+	    showScrubberComment(commentId,commentValue,commentTime,userId, isPrivate);
 	}
     }
     
@@ -1427,7 +1486,8 @@ Opencast.Annotation_Comment = (function ()
      * @param commentValue comment value
      */
     function hoverSlideComment(commentId, commentValue, userId, slideNr)
-    {              
+    {          
+    	Opencast.Player.addEvent("HOVER_SLIDE_COMMENT_" + commentId);    
         if(addingAcomment === true){
     	    
     	}else if(clickedOnHoverBar === false & clickedOnComment === false){
@@ -1577,6 +1637,11 @@ Opencast.Annotation_Comment = (function ()
         modus = m;
     }
     
+    function isShown()
+    {
+      return isOpen;
+    }    
+    
     return {
         initialize: initialize,
         hide: hide,
@@ -1596,6 +1661,7 @@ Opencast.Annotation_Comment = (function ()
         hoverOutComment: hoverOutComment,
         hoverSlideComment: hoverSlideComment,
         hoverOutSlideComment: hoverOutSlideComment,
-        doToggle: doToggle
+        doToggle: doToggle,
+        isShown: isShown
     };
 }());

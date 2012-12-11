@@ -482,6 +482,8 @@
 	      <textarea id="oc-comments-list-textbox" rows="4" cols="30"></textarea>
 	      <input id="oc-comments-list-submit" value="Add comment" role="button" type="button" />
 	      <input id="oc-comments-list-submit-timed" value="Add comment at 00:00:00" role="button" type="button" />
+        <label id="oc-comments-list-private-label" for="oc-comments-list-private" style="float:right; margin-top: 10px;">Private Comment</label>
+        <input id="oc-comments-list-private" type="checkbox" name="Private Comment" title="Private Comment" style="float:right; margin-top: 10px;">
 	    </div>
 	  </div>
 	  <div id="oc-comments-list-header">
@@ -623,7 +625,7 @@
     <div id="comment-Info" class="oc-comment-Info">
        <div id="cm-info-box" class="oc-comment-box">
             <div id="oc-comment-info-header" class="oc-comment-header">
-                <span class="ui-icon ui-icon-closethick oc-comment-exit" style="float:right;-moz-user-select: none;">X</span>
+                <span class="ui-icon ui-icon-closethick oc-comment-exit" unselectable="on" style="float:right;-moz-user-select: none;">X</span>
                 <div id="oc-comment-info-header-text" class="oc-comment-header-text"></div>                   
             </div>
             <div id="oc-comment-info-value-wrapper">
