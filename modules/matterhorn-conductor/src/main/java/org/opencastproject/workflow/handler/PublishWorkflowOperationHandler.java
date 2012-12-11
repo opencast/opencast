@@ -195,7 +195,10 @@ public class PublishWorkflowOperationHandler extends AbstractWorkflowOperationHa
       logger.debug("Publish operation complete");
       return createResult(mediaPackageFromWorkflow, Action.CONTINUE);
     } catch (Throwable t) {
-      throw new WorkflowOperationException(t);
+      if (t instanceof WorkflowOperationException)
+        throw (WorkflowOperationException) t;
+      else
+        throw new WorkflowOperationException(t);
     }
   }
 
