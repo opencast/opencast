@@ -63,7 +63,12 @@ ocUtils.getURLParam = function(name, url) {
 
 ocUtils.xmlToString = function(doc) {
   if(typeof XMLSerializer != 'undefined'){
-    return (new XMLSerializer()).serializeToString(doc);
+    try {
+      return (new XMLSerializer()).serializeToString(doc);
+    } catch (e) { // IE9 supports XMLSerializer but causes an exception on some DOM types
+      if(doc.xml) return doc.xml;
+      else return '';
+    }
   } else if(doc.xml) {
     return doc.xml;
   } else {
@@ -78,9 +83,9 @@ ocUtils.isChunkedUploadCompliable = function() {
 ocUtils.createDoc = function(rootEl, rootNS){
   var doc = null;
   //Create a DOM Document, methods vary between browsers, e.g. IE and Firefox
-  if(document.implementation && document.implementation.createDocument){ //Firefox, Opera, Safari, Chrome, etc.
+  if(document.implementation && document.implementation.createDocument && !(navigator.userAgent.match(/MSIE\s(?!9.0)/))){ //Firefox, Opera, Safari, Chrome, etc.
     doc = document.implementation.createDocument(rootNS, rootEl, null);
-  }else{ // IE
+  } else { // IE must use an XML specific doc even though IE9 supports createDocument
     doc = new ActiveXObject('MSXML2.DOMDocument');
     doc.loadXML('<' + rootEl + ' xmlns="' + rootNS + '"></' + rootEl + '>');
   }
