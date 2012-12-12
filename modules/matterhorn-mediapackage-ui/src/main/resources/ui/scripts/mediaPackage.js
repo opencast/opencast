@@ -49,7 +49,7 @@ MediaPackage = function(xmlMediaPackage){
 			if(checkValue($(element).find('mimetype').text()))
 				tmpCatalog.mimetype = $(element).find('mp|mimetype').text();
 			tmpCatalog.xml = element;
-			$(element).find('mp|tags').each(function(index,subElement){
+			$(element).find('mp|tag').each(function(index,subElement){
 			  if(checkValue($(subElement).text()))
 			    tmpCatalog.tags.push($(subElement).text());
 			});
@@ -97,7 +97,7 @@ MediaPackage = function(xmlMediaPackage){
 			tmpTrack.flavor = $(element).attr('type');
 			tmpTrack.ref = $(element).attr('ref');
 			tmpTrack.id = $(element).attr('id');
-			$(element).find('mp|tags').each(function(index,subElement){
+			$(element).find('mp|tag').each(function(index,subElement){
 				tmpTrack.tags.push($(subElement).text());
 			});
 			
@@ -157,7 +157,7 @@ MediaPackage = function(xmlMediaPackage){
 			tmpAttachment.type = $(element).attr('type');
 			tmpAttachment.ref = $(element).attr('ref');
 			tmpAttachment.id = $(element).attr('id');
-			$(element).find('mp|tags').each(function(index,subElement){
+			$(element).find('mp|tag').each(function(index,subElement){
 				tmpAttachment.tags.push($(subElement).text());
 			});
 			
