@@ -60,6 +60,10 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
   /** Name of the configuration option that provides the encoding profile */
   private static final String ENCODING_PROFILE_PROPERTY = "encoding-profile";
 
+  /** Name of the configuration option that specified the maximum threshold
+   * between duration differences */
+  private static final String DURATION_THRESHOLD_PROPERTY = "duration-threshold";
+
   /** The composer service */
   private ComposerService composerService;
 
@@ -72,6 +76,11 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
     CONFIG_OPTIONS.put(TARGET_FLAVOR_SUBTYPE_PROPERTY,
             "The flavor subtype of the target track.  If this is set to \"trimmed\", "
                     + "a source track of \"presenter/work\" would become \"presenter/trimmed\"");
+    CONFIG_OPTIONS.put(DURATION_THRESHOLD_PROPERTY,
+            "The maximum allowed difference (in milliseconds) between the trimming \"out point\""
+                    + "and the actual duration of each track. "
+                    + "If specified, the trimming duration can be shortened by as many milliseconds"
+                    + " as this parameter indicates.");
   }
 
   /**
@@ -146,16 +155,16 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
 
     // Validate the trimming arguments
     long trimStart = Long.parseLong(properties.get("trimin"));
-    long trimDuration = Long.parseLong(properties.get("newduration"));
+    long initialTrimDuration = Long.parseLong(properties.get("newduration"));
     Long recordingDuration = workflowInstance.getMediaPackage().getDuration();
 
     if (recordingDuration == null || recordingDuration <= 0)
       throw new WorkflowOperationException("Mediapackage must have a duration");
-    if (trimDuration <= 0)
+    if (initialTrimDuration <= 0)
       throw new WorkflowOperationException("Trimming duration must be a positive integer");
     else if (trimStart > recordingDuration)
       throw new WorkflowOperationException("Trimming start is outside of recording");
-    else if (trimStart + trimDuration > recordingDuration)
+    else if (trimStart + initialTrimDuration > recordingDuration)
       throw new WorkflowOperationException("Trimming end is outside of recording");
 
     // Get the source flavor to match
@@ -164,13 +173,55 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
     String configuredTargetFlavorSubtype = currentOperation.getConfiguration(TARGET_FLAVOR_SUBTYPE_PROPERTY);
     MediaPackageElementFlavor matchingFlavor = MediaPackageElementFlavor.parseFlavor(configuredSourceFlavor);
 
+    // Get the duration threshold, if specified, and adjust trimming duration accordingly
+    String strThreshold = currentOperation.getConfiguration(DURATION_THRESHOLD_PROPERTY);
+
+    long durationThreshold = 0L;
+    if (strThreshold != null)
+      durationThreshold = Long.parseLong(strThreshold);
+
+    long trimEnd = trimStart + initialTrimDuration;
+
     for (Track t : workflowInstance.getMediaPackage().getTracks()) {
+      // By default we should trim at the indicated point
+      long trimDuration = initialTrimDuration;
+      
+      if (strThreshold != null) { 
+        // Check track duration and adjust trim point accordingly
+        if (t.getDuration() < trimEnd) {
+          // The track duration is shorter than the trim point
+          String notice = String.format(
+                  "Trim point (%1$d) exceeds track %2$s duration (%3$d ms.)",
+                  trimEnd,
+                  t.getIdentifier(),
+                  t.getDuration());
+          if (t.getDuration() >= trimEnd - durationThreshold) {
+            // The track duration is, however, within the specified threshold interval 
+            trimDuration = t.getDuration() - trimStart;
+            logger.warn(String.format(
+                    "%1$s, but is within the %2$d ms. threshold. "
+                            + "Adjusting trim point to track duration...",
+                            notice,
+                            durationThreshold));
+          } else {
+            if (durationThreshold > 0L)
+              notice = String.format(
+                      "%1$s and it's outside the %2$d ms. thresdhold",
+                      notice,
+                      durationThreshold);
+
+            // The track duration is outside the allowed threshold, fail!
+            throw new WorkflowOperationException(notice);
+          }
+        }
+      }
+
       MediaPackageElementFlavor trackFlavor = t.getFlavor();
       if (trackFlavor != null && matchingFlavor.matches(trackFlavor)) {
         String profileId = currentOperation.getConfiguration(ENCODING_PROFILE_PROPERTY);
 
         logger.info("Trimming {} to ({}, {})",
-                new String[] { t.toString(), properties.get("trimin"), properties.get("trimout") });
+                new String[] { t.toString(), properties.get("trimin"), Long.toString(trimStart + trimDuration) });
 
         Track trimmedTrack = null;
         try {

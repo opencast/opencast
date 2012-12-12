@@ -226,6 +226,7 @@
         <configuration key="source-flavor">*/work</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>
         <configuration key="encoding-profile">trim.work</configuration>
+        <!-- configuration key="duration-threshold">1000</configuration -->
       </configurations>
     </operation>
 
