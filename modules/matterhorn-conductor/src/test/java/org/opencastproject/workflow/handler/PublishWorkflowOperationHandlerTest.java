@@ -15,6 +15,9 @@
  */
 package org.opencastproject.workflow.handler;
 
+import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Test;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -27,10 +30,6 @@ import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
-
-import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -53,7 +52,9 @@ public class PublishWorkflowOperationHandlerTest {
     URI uriMP = InspectWorkflowOperationHandler.class.getResource("/publish_mediapackage.xml").toURI();
     URI uriMPSearch = InspectWorkflowOperationHandler.class.getResource("/publish_search_mediapackage.xml").toURI();
     mp = builder.loadFromXml(uriMP.toURL().openStream());
+    mp.setTitle("Land and Vegetation: Key players on the Climate Scene");
     mpSearch = builder.loadFromXml(uriMPSearch.toURL().openStream());
+    mpSearch.setTitle("publish_search_mediapackage");
 
     // set up service
     operationHandler = new PublishWorkflowOperationHandler();
