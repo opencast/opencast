@@ -30,6 +30,9 @@ var ocUpload = (function() {
   this.init = function() {
     ocUtils.log('Initializing UI');
     $('#addHeader').jqotesubtpl('templates/upload.tpl', {});
+    $('#importantData').jqotesubtpl('templates/importantData.tpl', {});
+    $('#processingRecording').jqotesubtpl('templates/metadata.tpl', {});
+
     $('.unfoldable-header').click(ocUpload.UI.toggleUnfoldable);
     $('.dc-metadata-field').change(ocUpload.UI.formFieldChanged);
     $('.uploadtype-select').click(ocUpload.UI.selectUploadType);
@@ -72,7 +75,7 @@ var ocUpload = (function() {
 
   function initSeriesAutocomplete() {
     ocUtils.log('Initializing autocomplete for series field')
-    $('#series').autocomplete({
+    $('#seriesSelect').autocomplete({
       source: function(request, response) {
         $.ajax({
           url: ocUpload.SERIES_SEARCH_URL + '?seriesTitle=' + request.term + '&edit=true',
@@ -115,7 +118,7 @@ var ocUpload = (function() {
         $('#isPartOf').val(ui.item.id);
       },
       change: function(event, ui){
-        if($('#isPartOf').val() === '' && $('#series').val() !== ''){
+        if($('#isPartOf').val() === '' && $('#seriesSelect').val() !== ''){
           ocUtils.log("Searching for series in series endpoint");
           $.ajax({
             url : ocUpload.SERIES_SEARCH_URL,
@@ -123,17 +126,17 @@ var ocUpload = (function() {
             dataType : 'json',
             success : function(data) {
               var DUBLIN_CORE_NS_URI  = 'http://purl.org/dc/terms/',
-              series_input = $('#series').val(),
+              series_input = $('#seriesSelect').val(),
               series_list = data["catalogs"],
               series_title,
               series_id;
-              $('#isPartOf').val('');
+              $('#series').val('');
               for (i in series_list) {
                 var series_title, series_id;
                 series_title = series_list[i][DUBLIN_CORE_NS_URI]["title"] ? series_list[i][DUBLIN_CORE_NS_URI]["title"][0].value : "";
                 series_id = series_list[i][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[i][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
                 if (series_title === series_input){
-                  $('#isPartOf').val(series_id);
+                  $('#series').val(series_id);
                   break;
                 }
               }
@@ -151,7 +154,7 @@ var ocUpload = (function() {
     ocUtils.log('Checking for missing inputs');
     var missing = [];
 
-    if ($.trim($('#titleField').val()) == '') {
+    if ($.trim($('#title').val()) == '') {
       ocUtils.log('Missing input: title');
       missing.push('title');
     }
@@ -463,10 +466,10 @@ ocUpload.Ingest = (function() {
     ocUtils.log("Added Dublin Core catalog for episode");
 
     // enqueue Series Dublin Core
-    var series = $('#series').val();
+    var series = $('#seriesSelect').val();
     //var seriesId = $('#isPartOf').val();
     if (series !== '') {
-      var seriesId = $('#isPartOf').val();
+      var seriesId = $('#series').val();
       if (seriesId === '') {
         seriesId = createSeries(series);
       }

@@ -60,6 +60,8 @@ var ocScheduler = (function() {
   sched.init = function init(){
 
     $('#addHeader').jqotesubtpl('templates/scheduler.tpl', {});
+    $('#importantData').jqotesubtpl('templates/importantData.tpl', {});
+    $('#processingScheduler').jqotesubtpl('templates/metadata.tpl', {});
 
     this.internationalize();
     this.registerCatalogs();
