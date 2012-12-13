@@ -141,7 +141,12 @@ public class Ingestor {
   public boolean canHandle(final File artifact) {
     logger.debug("CanHandle {}, {}", myInfo(), artifact.getAbsolutePath());
     File dir = artifact.getParentFile();
-    return dir != null && inbox.getAbsolutePath().equals(dir.getAbsolutePath());
+    try {
+      return dir != null && inbox.getCanonicalPath().equals(dir.getCanonicalPath());
+    } catch (IOException e) {
+      logger.warn("Unable to determine canonical path of {} ", artifact.getAbsolutePath());
+      return false;
+    }
   }
 
   public String myInfo() {
