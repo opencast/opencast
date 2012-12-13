@@ -86,6 +86,7 @@
 		      var seriesId = self.find('#isPartOf').val();
 		      if (seriesId === '') {
 		        seriesId = self.createSeries(series);
+		        self.find('#isPartOf').val(seriesId);
 		      }
 		      
 		      // Add or change series dublin core
