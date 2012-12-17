@@ -70,7 +70,6 @@
         <module>modules/matterhorn-static</module>
         <module>modules/matterhorn-solr</module>
         <module>modules/matterhorn-textanalyzer-api</module>
-        <module>modules/matterhorn-userdirectory-ldap</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
@@ -490,7 +489,7 @@
       <modules>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-ldap</module>
+        <module>modules/matterhorn-security-ldap</module>
         <module>modules/matterhorn-userdirectory-ldap</module>
       </modules>
     </profile>
@@ -501,7 +500,17 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
-        <module>modules/matterhorn-cas</module>
+        <module>modules/matterhorn-security-cas</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>directory-openid</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-security-openid</module>
       </modules>
     </profile>
 

@@ -1,37 +1,46 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-ldap</artifactId>
-  <name>matterhorn-ldap</name>
+  <artifactId>matterhorn-security-openid</artifactId>
+  <name>matterhorn-security-openid</name>
   <packaging>bundle</packaging>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.5-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
+
   <properties>
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
-    <spring-security.version>3.0.2.RELEASE</spring-security.version>
+    <checkstyle.skip>true</checkstyle.skip>
   </properties>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>org.springframework.security.openid</artifactId>
+    </dependency>
+ 
+    <dependency>
+      <groupId>org.openid4java</groupId>
+      <artifactId>com.springsource.org.openid4java</artifactId>
+    </dependency>
+
+  </dependencies>
+  
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.0.1</version>
         <extensions>true</extensions>
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>
-              org.springframework.security.ldap;version=${spring-security.version},
-              org.springframework.security.ldap.authentication;version=${spring-security.version},
-              org.springframework.security.ldap.ppolicy;version=${spring-security.version},
-              org.springframework.security.ldap.search;version=${spring-security.version},
-              org.springframework.security.ldap.server;version=${spring-security.version},
-              org.springframework.security.ldap.userdetails;version=${spring-security.version}
+              org.springframework.security.openid
             </Import-Package>
             <Fragment-Host>matterhorn-kernel</Fragment-Host>
           </instructions>
