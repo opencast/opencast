@@ -671,6 +671,13 @@ Opencast.Watch = (function ()
 
         // Opencast.ariaSpinbutton.initialize has to be called after #oc_video-player-controls is visible!
         Opencast.ariaSpinbutton.initialize('oc_volume-container', 'oc_volume-back', 'oc_volume-front', 8, 0, 100, true);
+
+	window.setTimeout(function(){
+	    $('#oc_btn-play-pause').click();
+	}, 100);
+	window.setTimeout(function(){
+	    $('#oc_btn-play-pause').click();
+	}, 500);
     }
 
     /**
