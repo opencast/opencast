@@ -60,19 +60,24 @@
             <span id="i18n_dist_mmm">&nbsp;iTunesU</span>
           </span>
         </li>
+        <!-- field: License -->
+        <li class="ui-helper-clearfix">
+          <label class="scheduler-label"><span id="i18n_license_label">License</span>:</label>
+          <input type="text" class="formField" id="license" name="license">
+        </li>
       </ul>
     </fieldset>
     <script type="text/javascript">
       var ocWorkflowPanel = ocWorkflowPanel || {};
       var trimHold = $('input#trimHold');
-      var captionHold = $('input#captionHold');
+	  var captionHold = $('input#captionHold');
       var videoPreview = $('input#videoPreview');
-
+      
       var checkVideoPreview = function(){
       	var checkValue = trimHold.is(':checked') || captionHold.is(':checked');
       	videoPreview.attr('checked', checkValue);
       }
-
+      
       trimHold.click(checkVideoPreview);
 	  captionHold.click(checkVideoPreview);
       
