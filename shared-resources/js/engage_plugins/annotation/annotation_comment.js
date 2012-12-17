@@ -561,7 +561,7 @@ Opencast.Annotation_Comment = (function ()
         $('#draggable').bind('dragstop', function (event, ui){
             //Check wether comments on the current slide 
             if(Opencast.segments.getCurrentSlideId() !== oldSlideId){
-                if(annotationCommentDisplayed){
+                if(isOpen === true){
                     isOpen = false;
                     isOpening = false;
                     show();
