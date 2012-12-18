@@ -91,11 +91,13 @@ import java.util.UUID;
 
 import javax.management.ObjectInstance;
 
-
 /**
  * Creates and augments Matterhorn MediaPackages. Stores media into the Working File Repository.
  */
 public class IngestServiceImpl extends AbstractJobProducer implements IngestService {
+
+  /** The collection name used for temporarily storing uploaded zip files */
+  private static final String COLLECTION_ID = "ingest-temp";
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(IngestServiceImpl.class);
@@ -212,7 +214,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream)
    */
   public WorkflowInstance addZippedMediaPackage(InputStream zipStream) throws IngestException, IOException,
-  MediaPackageException {
+          MediaPackageException {
     try {
       return addZippedMediaPackage(zipStream, null, null);
     } catch (NotFoundException e) {
@@ -226,7 +228,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream, java.lang.String)
    */
   public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String wd) throws MediaPackageException,
-  IOException, IngestException, NotFoundException {
+          IOException, IngestException, NotFoundException {
     return addZippedMediaPackage(zipStream, wd, null);
   }
 
@@ -270,14 +272,14 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
       // locally unpack the mediaPackage
       // save inputStream to file
-      URI uri = workspace.putInCollection("ingest-temp" + job.getId(), job.getId() + ".zip", zipStream);
-              
+      URI uri = workspace.putInCollection(COLLECTION_ID + job.getId(), job.getId() + ".zip", zipStream);
+
       zipFile = workspace.get(uri);
       logger.info("Ingesting zipped media package to {}", zipFile);
 
       // unpack, cleanup will happen in the finally block
       ZipUtil.unzip(zipFile, zipFile.getParentFile());
-      
+
       // check media package and write data to file repo
       File manifest = getManifest(zipFile.getParentFile());
       if (manifest == null) {
@@ -348,8 +350,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Job.Status.FAILED);
       throw e;
     } finally {
-      workspace.deleteFromCollection("ingest-temp" + job.getId(), job.getId() + ".zip");
-      FileUtils.deleteQuietly(zipFile.getParentFile());
+      workspace.deleteFromCollection(COLLECTION_ID + job.getId(), job.getId() + ".zip");
+      if (zipFile != null)
+        FileUtils.deleteQuietly(zipFile.getParentFile());
       try {
         serviceRegistry.updateJob(job);
       } catch (Exception e) {
@@ -358,18 +361,19 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
   }
 
-
-  public MediaPackage loadMediaPackageFromManifest(File manifest) throws IOException, MediaPackageException, IngestException {
+  public MediaPackage loadMediaPackageFromManifest(File manifest) throws IOException, MediaPackageException,
+          IngestException {
 
     MediaPackage mp = null;
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     builder.setSerializer(new DefaultMediaPackageSerializerImpl(manifest.getParentFile()));
     InputStream manifestStream = null;
-        
+
     try {
       manifestStream = manifest.toURI().toURL().openStream();
-              
-      // TODO: Uncomment the following line and remove the patch when the compatibility with pre-1.4 MediaPackages is discarded
+
+      // TODO: Uncomment the following line and remove the patch when the compatibility with pre-1.4 MediaPackages is
+      // discarded
       //
       // mp = builder.loadFromXml(manifestStream);
       //
@@ -380,16 +384,16 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       ByteArrayInputStream bais = null;
       try {
         Document domMP = new SAXBuilder().build(manifestStream);
-        String mpNSUri = "http://mediapackage.opencastproject.org";      
-        
+        String mpNSUri = "http://mediapackage.opencastproject.org";
+
         Namespace oldNS = domMP.getRootElement().getNamespace();
         Namespace newNS = Namespace.getNamespace(oldNS.getPrefix(), mpNSUri);
-        
+
         if (!newNS.equals(oldNS)) {
           @SuppressWarnings("rawtypes")
           Iterator it = domMP.getDescendants(new ElementFilter(oldNS));
           while (it.hasNext()) {
-            Element elem = (Element)it.next();
+            Element elem = (Element) it.next();
             elem.setNamespace(newNS);
           }
         }
@@ -415,14 +419,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     return mp;
   }
 
-
   /**
    * {@inheritDoc}
    * 
    * @see org.opencastproject.ingest.api.IngestService#createMediaPackage()
    */
   public MediaPackage createMediaPackage() throws MediaPackageException,
-  org.opencastproject.util.ConfigurationException, HandleException {
+          org.opencastproject.util.ConfigurationException, HandleException {
     MediaPackage mediaPackage;
     try {
       mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
@@ -715,7 +718,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   @Override
   public WorkflowInstance ingest(MediaPackage mp, String wd, Map<String, String> properties) throws IngestException,
-  NotFoundException {
+          NotFoundException {
     try {
       return ingest(mp, wd, properties, null);
     } catch (UnauthorizedException e) {
@@ -945,13 +948,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     return null;
   }
 
-  //  private File createDirectory(String dir) throws IOException {
-  //    File f = new File(dir);
-  //    if (!f.exists()) {
-  //      FileUtils.forceMkdir(f);
-  //    }
-  //    return f;
-  //  }
+  // private File createDirectory(String dir) throws IOException {
+  // File f = new File(dir);
+  // if (!f.exists()) {
+  // FileUtils.forceMkdir(f);
+  // }
+  // return f;
+  // }
 
   // ---------------------------------------------
   // --------- bind and unbind bundles ---------
