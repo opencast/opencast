@@ -594,10 +594,10 @@ public class IngestRestService {
     } finally {
       IOUtils.closeQuietly(zipInputStream);
       try {
-        workspace.deleteFromCollection(COLLECTION_ID, zipFileName);
+        workspace.delete(zipFileUri);
       } catch (NotFoundException nfe) {
         // That's fine, we failed somewhere on the way
-        logger.debug("Error removing missing temporary ingest file " + COLLECTION_ID + "/" + zipFileName, nfe);
+        logger.debug("Error removing missing temporary ingest file " + COLLECTION_ID + "/" + zipFileUri, nfe);
       } catch (IOException ioe) {
         logger.warn("Error removing temporary ingest file " + zipFileUri, ioe);
       }
