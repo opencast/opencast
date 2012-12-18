@@ -15,17 +15,9 @@
  */
 package org.opencastproject.episode.impl.persistence;
 
-import static org.opencastproject.episode.api.Version.version;
-import static org.opencastproject.episode.impl.StoragePath.spath;
-import static org.opencastproject.util.data.Tuple.tuple;
-import static org.opencastproject.util.persistence.PersistenceUtil.runFirstResultQuery;
-import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResultQuery;
-
 import org.opencastproject.episode.impl.StoragePath;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
-
-import java.net.URI;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,13 +27,22 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import java.net.URI;
+
+import static org.opencastproject.episode.api.Version.version;
+import static org.opencastproject.episode.impl.StoragePath.spath;
+import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.persistence.PersistenceUtil.runFirstResultQuery;
+import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResultQuery;
+import static org.opencastproject.util.persistence.PersistenceUtil.runUpdate;
 
 /** JPA link to {@link org.opencastproject.episode.impl.persistence.Asset}. */
 @Entity(name = "Asset")
 @Table(name = "episode_asset")
 @NamedQueries({
         @NamedQuery(name = "Asset.findByUri", query = "SELECT a FROM Asset a WHERE a.uri = :uri"),
-        @NamedQuery(name = "Asset.findByChecksum", query = "SELECT a FROM Asset a WHERE a.checksum = :checksum") })
+        @NamedQuery(name = "Asset.findByChecksum", query = "SELECT a FROM Asset a WHERE a.checksum = :checksum"),
+        @NamedQuery(name = "Asset.deleteByMediaPackageId", query = "DELETE FROM Asset a WHERE a.mediaPackageId = :mpId") })
 public final class AssetDto {
   @Id
   @GeneratedValue
@@ -99,6 +100,14 @@ public final class AssetDto {
         return runFirstResultQuery(em, "Asset.findByChecksum", tuple("checksum", checksum));
       }
     };
+  }
+
+  /**
+   * Delete assets by media package ID.
+   * @return true if at least on asset has been deleted
+   */
+  public static boolean deleteByMediaPackageId(EntityManager em, String mpId) {
+    return runUpdate(em, "Asset.deleteByMediaPackageId", tuple("mpId", mpId));
   }
 
   /** Convert a DTO into the corresponding business object. */
