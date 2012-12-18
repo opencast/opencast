@@ -15,12 +15,11 @@
  */
 package org.opencastproject.episode.persistence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.episode.api.Version.version;
-import static org.opencastproject.episode.impl.EpisodeServiceImpl.rewriteForArchival;
-import static org.opencastproject.util.data.Option.some;
-
+import org.apache.commons.io.FileUtils;
+import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.opencastproject.episode.impl.persistence.AbstractEpisodeServiceDatabase;
 import org.opencastproject.episode.impl.persistence.Episode;
 import org.opencastproject.episode.impl.persistence.EpisodeServiceDatabase;
@@ -33,20 +32,22 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.util.Checksum;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.persistence.PersistenceEnv;
 import org.opencastproject.util.persistence.PersistenceUtil;
-
-import org.apache.commons.io.FileUtils;
-import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.io.File;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.episode.api.Version.version;
+import static org.opencastproject.episode.impl.EpisodeServiceImpl.rewriteForArchival;
+import static org.opencastproject.util.data.Option.some;
 
 /**
  * Tests persistence: storing, merging, retrieving and removing.
@@ -125,10 +126,17 @@ public class EpisodeServicePersistenceTest {
 
   @Test
   public void testDeleting() throws Exception {
+    assertTrue("Media package is supposed to have elements", mediaPackage.getElements().length > 0);
+    final Checksum checksum = mediaPackage.getElements()[0].getChecksum();
+    assertNotNull("Media package elements are supposed to have checksums", checksum);
     episodeDatabase.storeEpisode(mediaPackage, accessControlList, new Date(), version(1L));
+    assertTrue("There should be one asset with checksum " + checksum,
+               episodeDatabase.findAssetByChecksum(checksum.toString()).isSome());
     Date deletionDate = new Date();
     episodeDatabase.deleteEpisode(mediaPackage.getIdentifier().toString(), deletionDate);
     assertEquals(deletionDate, episodeDatabase.getDeletionDate(mediaPackage.getIdentifier().toString()).get());
+    assertTrue("Asset with checksum " + checksum + " should have been deleted",
+               episodeDatabase.findAssetByChecksum(checksum.toString()).isNone());
   }
 
   @Test

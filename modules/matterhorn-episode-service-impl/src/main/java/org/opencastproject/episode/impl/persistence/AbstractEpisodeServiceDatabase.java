@@ -55,6 +55,7 @@ public abstract class AbstractEpisodeServiceDatabase implements EpisodeServiceDa
   public boolean deleteEpisode(final String mediaPackageId, final Date deletionDate) throws EpisodeServiceDatabaseException {
     return tx(new Function<EntityManager, Boolean>() {
       @Override public Boolean apply(EntityManager em) {
+        AssetDto.deleteByMediaPackageId(em, mediaPackageId);
         for (EpisodeDto episodeDto : findAllById(em, mediaPackageId)) {
           episodeDto.setDeletionDate(deletionDate);
           em.merge(episodeDto);
