@@ -453,6 +453,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               INGEST_TRACK_FROM_URI,
               Arrays.asList(uri.toString(), flavor == null ? null : flavor.toString(),
                       MediaPackageParser.getAsXml(mediaPackage)), null, false);
+      job.setStatus(Status.RUNNING);
+      serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
@@ -465,6 +467,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
+    } catch (NotFoundException e) {
+      throw new IngestException("Unable to update ingest job", e);
     } finally {
       try {
         if (job != null) {
@@ -488,6 +492,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     Job job = null;
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_STREAM, null, null, false);
+      job.setStatus(Status.RUNNING);
+      serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
@@ -500,6 +506,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
+    } catch (NotFoundException e) {
+      throw new IngestException("Unable to update ingest job", e);
     } finally {
       try {
         serviceRegistry.updateJob(job);
@@ -522,6 +530,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG_FROM_URI,
               Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false);
+      job.setStatus(Status.RUNNING);
+      serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
       if (MediaPackageElements.SERIES.equals(flavor)) {
@@ -537,6 +547,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
+    } catch (NotFoundException e) {
+      throw new IngestException("Unable to update ingest job", e);
     } finally {
       try {
         serviceRegistry.updateJob(job);
@@ -588,6 +600,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     Job job = null;
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_STREAM, null, null, false);
+      job.setStatus(Status.RUNNING);
+      serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
       if (MediaPackageElements.SERIES.equals(flavor)) {
@@ -603,6 +617,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
+    } catch (NotFoundException e) {
+      throw new IngestException("Unable to update ingest job", e);
     } finally {
       try {
         serviceRegistry.updateJob(job);
@@ -624,6 +640,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_ATTACHMENT_FROM_URI,
               Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false);
+      job.setStatus(Status.RUNNING);
+      serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Attachment,
@@ -636,6 +654,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
+    } catch (NotFoundException e) {
+      throw new IngestException("Unable to update ingest job", e);
     } finally {
       try {
         serviceRegistry.updateJob(job);
@@ -656,6 +676,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     Job job = null;
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_STREAM, null, null, false);
+      job.setStatus(Status.RUNNING);
+      serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Attachment,
@@ -668,6 +690,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
+    } catch (NotFoundException e) {
+      throw new IngestException("Unable to update ingest job", e);
     } finally {
       try {
         serviceRegistry.updateJob(job);
