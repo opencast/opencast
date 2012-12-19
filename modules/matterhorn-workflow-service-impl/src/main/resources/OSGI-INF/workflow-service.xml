@@ -26,4 +26,8 @@
     cardinality="1..1" policy="static" bind="setSeriesService" />
   <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
     cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+  <reference name="scanner" interface="org.opencastproject.workflow.impl.WorkflowDefinitionScanner"
+    cardinality="1..1" policy="static" bind="addWorkflowDefinitionScanner" />
+  <reference name="profilesReadyIndicator" policy="static" cardinality="1..1"
+      interface="org.opencastproject.util.ReadinessIndicator" target="(artifact=workflowdefinition)" />
 </scr:component>

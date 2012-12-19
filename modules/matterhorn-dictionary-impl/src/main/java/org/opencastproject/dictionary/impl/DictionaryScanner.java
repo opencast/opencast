@@ -15,17 +15,24 @@
  */
 package org.opencastproject.dictionary.impl;
 
+import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
+
 import org.opencastproject.dictionary.api.DictionaryService;
+import org.opencastproject.util.ReadinessIndicator;
 
 import org.apache.felix.fileinstall.ArtifactInstaller;
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 /**
  * Loads language packs into the dictionary service, deleting the language pack on completion.
@@ -35,6 +42,22 @@ public class DictionaryScanner implements ArtifactInstaller {
 
   /** The dictionary in which we can install languages */
   protected DictionaryService dictionaryService = null;
+
+  /** OSGi bundle context */
+  private BundleContext bundleCtx = null;
+
+  /** Sum of profiles files currently installed */
+  private int sumInstalledFiles = 0;
+
+  /**
+   * OSGi callback on component activation.
+   * 
+   * @param ctx
+   *          the bundle context
+   */
+  void activate(BundleContext ctx) {
+    this.bundleCtx = ctx;
+  }
 
   /** Sets the dictionary service */
   public void setDictionaryService(DictionaryService dictionaryService) {
@@ -60,7 +83,7 @@ public class DictionaryScanner implements ArtifactInstaller {
   public void install(File artifact) throws Exception {
     Integer numAllW = 1;
     String language = artifact.getName().split("\\.")[0];
-    
+
     // Make sure we are not importing something that already exists
     if (Arrays.asList(dictionaryService.getLanguages()).contains(language)) {
       logger.debug("Skipping existing dictionary '{}'", language);
@@ -90,7 +113,26 @@ public class DictionaryScanner implements ArtifactInstaller {
       }
     }
 
+    sumInstalledFiles++;
     logger.info("Finished loading language pack from {}", artifact);
+
+    // Determine the number of available profiles
+    String[] filesInDirectory = artifact.getParentFile().list(new FilenameFilter() {
+      public boolean accept(File arg0, String name) {
+        return name.endsWith(".csv");
+      }
+    });
+
+    // Once all profiles have been loaded, announce readiness
+    if (filesInDirectory.length == sumInstalledFiles) {
+      Dictionary<String, String> properties = new Hashtable<String, String>();
+      properties.put(ARTIFACT, "dictionary");
+      logger.debug("Indicating readiness of dictionnaries");
+      bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
+      logger.info("All {} dictionaries installed", filesInDirectory.length);
+    } else {
+      logger.info("{} of {} dictionaries installed", sumInstalledFiles, filesInDirectory.length);
+    }
   }
 
   /**

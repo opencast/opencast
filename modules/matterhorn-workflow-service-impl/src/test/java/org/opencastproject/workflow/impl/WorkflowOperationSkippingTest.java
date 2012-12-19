@@ -71,6 +71,7 @@ import java.util.TreeMap;
 public class WorkflowOperationSkippingTest {
 
   private WorkflowServiceImpl service = null;
+  private WorkflowDefinitionScanner scanner = null;
   private WorkflowDefinition workingDefinition = null;
   private MediaPackage mediapackage1 = null;
   private SucceedingWorkflowOperationHandler succeedingOperationHandler = null;
@@ -107,6 +108,8 @@ public class WorkflowOperationSkippingTest {
         return handlerRegistrations;
       }
     };
+    scanner = new WorkflowDefinitionScanner();
+    service.addWorkflowDefinitionScanner(scanner);
     MediaPackageMetadataService mds = EasyMock.createNiceMock(MediaPackageMetadataService.class);
     EasyMock.replay(mds);
     service.addMetadataService(mds);

@@ -59,6 +59,7 @@ import java.util.Set;
 public class PauseFinalOperationTest {
 
   private WorkflowServiceImpl service = null;
+  private WorkflowDefinitionScanner scanner = null;
   private WorkflowDefinition def = null;
   private WorkflowInstance workflow = null;
   private MediaPackage mp = null;
@@ -103,6 +104,9 @@ public class PauseFinalOperationTest {
         return handlerRegistrations;
       }
     };
+
+    scanner = new WorkflowDefinitionScanner();
+    service.addWorkflowDefinitionScanner(scanner);
 
     // security service
     DefaultOrganization defaultOrganization = new DefaultOrganization();
