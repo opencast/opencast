@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
-  <scr:component name="org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl" immediate="true">
+  <scr:component name="org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl" immediate="true" activate="activate">
     <implementation class="org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl" />
     <property name="service.description" value="Text Analysis Service" />
     <service>
@@ -24,6 +24,8 @@
       cardinality="1..1" policy="static" bind="setUserDirectoryService" />
     <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
       cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+    <reference name="profilesReadyIndicator" policy="static" cardinality="1..1"
+      interface="org.opencastproject.util.ReadinessIndicator" target="(artifact=dictionary)" />
   </scr:component>
 
   <scr:component name="org.opencastproject.textanalyzer.impl.endpoint.TextAnalysisRestEndpoint" immediate="true"

@@ -51,6 +51,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,10 +116,20 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   protected UserDirectoryService userDirectoryService = null;
 
   /**
-   * Creates a new composer service intance.
+   * Creates a new composer service instance.
    */
   public ComposerServiceImpl() {
     super(JOB_TYPE);
+  }
+
+  /**
+   * OSGi callback on component activation.
+   * 
+   * @param ctx
+   *          the bundle context
+   */
+  void activate(BundleContext ctx) {
+    logger.info("Activating composer service");
   }
 
   /**

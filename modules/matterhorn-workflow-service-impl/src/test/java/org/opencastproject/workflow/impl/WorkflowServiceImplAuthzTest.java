@@ -73,6 +73,7 @@ public class WorkflowServiceImplAuthzTest {
   private Responder<Organization> organizationResponder;
 
   private WorkflowServiceImpl service = null;
+  private WorkflowDefinitionScanner scanner = null;
   private WorkflowServiceSolrIndex dao = null;
   private Workspace workspace = null;
   private ServiceRegistryInMemoryImpl serviceRegistry = null;
@@ -126,6 +127,9 @@ public class WorkflowServiceImplAuthzTest {
         return new HashSet<WorkflowServiceImpl.HandlerRegistration>();
       }
     };
+
+    scanner = new WorkflowDefinitionScanner();
+    service.addWorkflowDefinitionScanner(scanner);
 
     // Organization Service
     List<Organization> organizationList = Arrays.asList(new Organization[] { defaultOrganization });

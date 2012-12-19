@@ -81,6 +81,7 @@ public class WorkflowServiceImplTest {
   private static final String REMOTE_SERVICE = "workflowService";
   private static final String REMOTE_HOST = "http://entwinemedia:8080";
   private WorkflowServiceImpl service = null;
+  private WorkflowDefinitionScanner scanner = null;
   private WorkflowDefinition workingDefinition = null;
   private WorkflowDefinition failingDefinitionWithoutErrorHandler = null;
   private WorkflowDefinition failingDefinitionWithErrorHandler = null;
@@ -126,12 +127,17 @@ public class WorkflowServiceImplTest {
     handlerRegistrations.add(new HandlerRegistration("failOnHost", new FailOnHostWorkflowOperationHandler()));
     handlerRegistrations.add(new HandlerRegistration("failOneTime", new FailOnceWorkflowOperationHandler()));
 
+    scanner = new WorkflowDefinitionScanner();
+
     // instantiate a service implementation and its DAO, overriding the methods that depend on the osgi runtime
     service = new WorkflowServiceImpl() {
       public Set<HandlerRegistration> getRegisteredHandlers() {
         return handlerRegistrations;
       }
     };
+
+    // Add scanner to activate workflow service and store definitions
+    service.addWorkflowDefinitionScanner(scanner);
 
     // security service
     DefaultOrganization organization = new DefaultOrganization();

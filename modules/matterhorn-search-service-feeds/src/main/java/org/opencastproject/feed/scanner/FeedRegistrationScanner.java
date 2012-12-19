@@ -15,8 +15,11 @@
  */
 package org.opencastproject.feed.scanner;
 
+import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
+
 import org.opencastproject.feed.api.FeedGenerator;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.util.ReadinessIndicator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
@@ -28,7 +31,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
@@ -51,6 +57,9 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
 
   /** The bundle context for this osgi component */
   protected BundleContext bundleContext;
+
+  /** Sum of profiles files currently installed */
+  private int sumInstalledFiles = 0;
 
   /** Sets the search service */
   public void setSearchService(SearchService searchService) {
@@ -108,6 +117,25 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
     generator.initialize(props);
     ServiceRegistration reg = bundleContext.registerService(FeedGenerator.class.getName(), generator, null);
     generators.put(artifact, reg);
+    sumInstalledFiles++;
+
+    // Determine the number of available profiles
+    String[] filesInDirectory = artifact.getParentFile().list(new FilenameFilter() {
+      public boolean accept(File arg0, String name) {
+        return name.endsWith(".properties");
+      }
+    });
+
+    // Once all profiles have been loaded, announce readiness
+    if (filesInDirectory.length == sumInstalledFiles) {
+      Dictionary<String, String> properties = new Hashtable<String, String>();
+      properties.put(ARTIFACT, "feed");
+      logger.debug("Indicating readiness of feed");
+      bundleContext.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
+      logger.info("All {} feeds installed", filesInDirectory.length);
+    } else {
+      logger.info("{} of {} feeds installed", sumInstalledFiles, filesInDirectory.length);
+    }
   }
 
   /**

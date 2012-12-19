@@ -55,6 +55,7 @@ import org.opencastproject.textextractor.api.TextLine;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,6 +117,16 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    */
   public TextAnalyzerServiceImpl() {
     super(JOB_TYPE);
+  }
+
+  /**
+   * OSGi callback on component activation.
+   * 
+   * @param ctx
+   *          the bundle context
+   */
+  void activate(BundleContext ctx) {
+    logger.info("Activating Text analyser service");
   }
 
   /**
@@ -422,7 +433,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
-  
+
   /**
    * Sets a reference to the organization directory service.
    * 

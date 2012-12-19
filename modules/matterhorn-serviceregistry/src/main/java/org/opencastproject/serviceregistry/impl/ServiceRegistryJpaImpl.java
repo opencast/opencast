@@ -216,6 +216,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   public void activate(ComponentContext cc) {
+    logger.info("Activate service registery");
+
     logger.debug("activate");
 
     // Set up persistence

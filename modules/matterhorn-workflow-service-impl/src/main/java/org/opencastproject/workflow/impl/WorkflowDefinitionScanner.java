@@ -15,19 +15,25 @@
  */
 package org.opencastproject.workflow.impl;
 
+import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
+
+import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowParser;
-import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.InputStream;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 /**
@@ -38,12 +44,25 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
   private static final Logger logger = LoggerFactory.getLogger(WorkflowDefinitionScanner.class);
 
   /** An internal collection of workflows that we have installed */
-  protected Map<File, WorkflowDefinition> installedWorkflows = new HashMap<File, WorkflowDefinition>();
+  protected Map<String, WorkflowDefinition> installedWorkflows = new HashMap<String, WorkflowDefinition>();
 
-  protected WorkflowService workflowService;
+  /** An internal collection of artifact id, bind the workflow definition files and their id */
+  protected Map<File, String> artifactIds = new HashMap<File, String>();
 
-  public void setWorkflowService(WorkflowService workflowService) {
-    this.workflowService = workflowService;
+  /** OSGi bundle context */
+  private BundleContext bundleCtx = null;
+
+  /** Sum of definition files currently installed */
+  private int sumInstalledFiles = 0;
+
+  /**
+   * OSGi callback on component activation.
+   * 
+   * @param ctx
+   *          the bundle context
+   */
+  void activate(BundleContext ctx) {
+    this.bundleCtx = ctx;
   }
 
   /**
@@ -59,12 +78,31 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
       WorkflowDefinition def = WorkflowParser.parseWorkflowDefinition(stream);
       if (def.getOperations().size() == 0)
         logger.warn("Workflow '{}' has no operations", def.getId());
-      ((WorkflowServiceImpl) workflowService).registerWorkflowDefinition(def);
-      installedWorkflows.put(artifact, def);
+      artifactIds.put(artifact, def.getId());
+      putWokflowDefinition(def.getId(), def);
+      sumInstalledFiles++;
     } catch (Exception e) {
       logger.warn("Unable to install workflow from {}, {}", artifact, e.getMessage());
     } finally {
       IOUtils.closeQuietly(stream);
+    }
+
+    // Determine the number of available profiles
+    String[] filesInDirectory = artifact.getParentFile().list(new FilenameFilter() {
+      public boolean accept(File arg0, String name) {
+        return name.endsWith(".xml");
+      }
+    });
+
+    // Once all profiles have been loaded, announce readiness
+    if (filesInDirectory.length == sumInstalledFiles) {
+      Dictionary<String, String> properties = new Hashtable<String, String>();
+      properties.put(ARTIFACT, "workflowdefinition");
+      logger.debug("Indicating readiness of workflow definitions");
+      bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
+      logger.info("All {} workflow definitions installed", filesInDirectory.length);
+    } else {
+      logger.info("{} of {} workflow definitions installed", sumInstalledFiles, filesInDirectory.length);
     }
   }
 
@@ -75,9 +113,8 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
    */
   public void uninstall(File artifact) throws Exception {
     // Since the artifact is gone, we can't open it to read its ID. So we look in the local map.
-    WorkflowDefinition def = installedWorkflows.get(artifact);
+    WorkflowDefinition def = removeWofklowDefinition(artifactIds.remove(artifact));
     logger.info("Uninstalling workflow '{}' from file {}", def.getId(), artifact.getAbsolutePath());
-    ((WorkflowServiceImpl) workflowService).unregisterWorkflowDefinition(def.getId());
   }
 
   /**
@@ -88,6 +125,48 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
   public void update(File artifact) throws Exception {
     uninstall(artifact);
     install(artifact);
+  }
+
+  /**
+   * Gets the workflow definitions with the given id.
+   * 
+   * @param id
+   * @return the workflow definition if exist or null
+   */
+  public WorkflowDefinition getWorkflowDefinition(String id) {
+    return installedWorkflows.get(id);
+  }
+
+  /**
+   * Get the list of installed workflow definitions.
+   * 
+   * @return the collection of installed workflow definitions id
+   */
+  public Map<String, WorkflowDefinition> getWorkflowDefinitions() {
+    return installedWorkflows;
+  }
+
+  /**
+   * Add the given workflow definition to the installed workflow definition id.
+   * 
+   * @param id
+   *          the id of the workflow definition to add
+   * @param wfd
+   *          the workflow definition id
+   */
+  public void putWokflowDefinition(String id, WorkflowDefinition wfd) {
+    installedWorkflows.put(id, wfd);
+  }
+
+  /**
+   * Remove the workflow definition with the given id from the installed definition list.
+   * 
+   * @param id
+   *          the workflow definition id
+   * @return the removed workflow definition
+   */
+  public WorkflowDefinition removeWofklowDefinition(String id) {
+    return installedWorkflows.remove(id);
   }
 
   /**

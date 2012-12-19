@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.composer.impl.EncodingProfileScanner" immediate="true">
+ name="org.opencastproject.composer.impl.EncodingProfileScanner" immediate="true" activate="activate">
   <implementation class="org.opencastproject.composer.impl.EncodingProfileScanner" />
   <property name="service.description" value="Encoding Profile Scanner" />
   <service>

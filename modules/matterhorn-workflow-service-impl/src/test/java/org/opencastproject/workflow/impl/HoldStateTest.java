@@ -69,6 +69,7 @@ public class HoldStateTest {
   private static final Logger logger = LoggerFactory.getLogger(HoldStateTest.class);
 
   private WorkflowServiceImpl service = null;
+  private WorkflowDefinitionScanner scanner = null;
   private WorkflowDefinition def = null;
   private WorkflowInstance workflow = null;
   private MediaPackage mp = null;
@@ -113,6 +114,9 @@ public class HoldStateTest {
         return handlerRegistrations;
       }
     };
+
+    scanner = new WorkflowDefinitionScanner();
+    service.addWorkflowDefinitionScanner(scanner);
 
     // security service
     securityService = EasyMock.createNiceMock(SecurityService.class);

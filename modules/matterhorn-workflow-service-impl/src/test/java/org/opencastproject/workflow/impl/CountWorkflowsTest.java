@@ -68,6 +68,7 @@ import java.util.TreeMap;
 public class CountWorkflowsTest {
 
   private WorkflowServiceImpl service = null;
+  private WorkflowDefinitionScanner scanner = null;
   private WorkflowDefinition def = null;
   private WorkflowServiceSolrIndex dao = null;
   private MediaPackage mp = null;
@@ -112,6 +113,9 @@ public class CountWorkflowsTest {
         return handlerRegistrations;
       }
     };
+
+    scanner = new WorkflowDefinitionScanner();
+    service.addWorkflowDefinitionScanner(scanner);
 
     // security service
     securityService = EasyMock.createNiceMock(SecurityService.class);

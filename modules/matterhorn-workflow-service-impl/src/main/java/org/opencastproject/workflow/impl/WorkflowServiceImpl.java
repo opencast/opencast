@@ -164,7 +164,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   protected int maxConcurrentWorkflows = -1;
 
   /** The collection of workflow definitions */
-  protected Map<String, WorkflowDefinition> workflowDefinitions = new HashMap<String, WorkflowDefinition>();
+  // protected Map<String, WorkflowDefinition> workflowDefinitions = new HashMap<String, WorkflowDefinition>();
 
   /** The metadata services */
   private SortedSet<MediaPackageMetadataService> metadataServices;
@@ -195,6 +195,9 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /** The series service */
   protected SeriesService seriesService;
+
+  /** The workflow definition scanner */
+  private WorkflowDefinitionScanner workflowDefinitionScanner;
 
   static {
     YES = new HashSet<String>(Arrays.asList(new String[] { "yes", "true", "on" }));
@@ -228,6 +231,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     } catch (WorkflowDatabaseException e) {
       logger.error("Error registarting JMX statistic beans {}", e);
     }
+
+    logger.info("Activate Worklow service");
   }
 
   public void deactivate() {
@@ -314,7 +319,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   @Override
   public List<WorkflowDefinition> listAvailableWorkflowDefinitions() {
     List<WorkflowDefinition> list = new ArrayList<WorkflowDefinition>();
-    for (Entry<String, WorkflowDefinition> entry : workflowDefinitions.entrySet()) {
+    for (Entry<String, WorkflowDefinition> entry : workflowDefinitionScanner.getWorkflowDefinitions().entrySet()) {
       list.add(entry.getValue());
     }
     Collections.sort(list, new Comparator<WorkflowDefinition>() {
@@ -444,10 +449,10 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       throw new IllegalArgumentException("Workflow must not be null, and must contain an ID");
     }
     String id = workflow.getId();
-    if (workflowDefinitions.containsKey(id)) {
+    if (workflowDefinitionScanner.getWorkflowDefinitions().containsKey(id)) {
       throw new IllegalStateException("A workflow definition with ID '" + id + "' is already registered.");
     }
-    workflowDefinitions.put(id, workflow);
+    workflowDefinitionScanner.putWokflowDefinition(id, workflow);
   }
 
   /**
@@ -457,7 +462,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    */
   @Override
   public void unregisterWorkflowDefinition(String workflowDefinitionId) {
-    workflowDefinitions.remove(workflowDefinitionId);
+    workflowDefinitionScanner.removeWofklowDefinition(workflowDefinitionId);
   }
 
   /**
@@ -866,7 +871,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    */
   @Override
   public WorkflowDefinition getWorkflowDefinitionById(String id) throws NotFoundException, WorkflowDatabaseException {
-    WorkflowDefinition def = workflowDefinitions.get(id);
+    WorkflowDefinition def = workflowDefinitionScanner.getWorkflowDefinition(id);
     if (def == null)
       throw new NotFoundException("Workflow definition '" + id + "' not found");
     return def;
@@ -1887,6 +1892,16 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    */
   protected void removeMetadataService(MediaPackageMetadataService service) {
     metadataServices.remove(service);
+  }
+
+  /**
+   * Callback to set the workflow definition scanner
+   * 
+   * @param scanner
+   *          the workflow definition scanner
+   */
+  protected void addWorkflowDefinitionScanner(WorkflowDefinitionScanner scanner) {
+    workflowDefinitionScanner = scanner;
   }
 
   /**
