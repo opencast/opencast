@@ -669,11 +669,12 @@ var ocScheduler = (function() {
       url: SCHEDULER_URL + "/conflicts.json",
       async: false,
       data: data,
-      type: 'get',
+      type: 'GET',
+      dataType: 'json',
       success: function(data) {
         var events = [];
-        data = data.catalogs
-        if (data != '') {
+        if (data != null && data != '') {
+          data = data.catalogs;
           for (var i in data) {
             var event = data[i];
             curId = $('#eventId').val();
