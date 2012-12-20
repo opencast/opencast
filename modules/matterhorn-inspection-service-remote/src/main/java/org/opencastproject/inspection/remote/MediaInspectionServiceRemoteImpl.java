@@ -19,12 +19,10 @@ import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
-import org.opencastproject.mediapackage.AbstractMediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -90,25 +88,23 @@ public class MediaInspectionServiceRemoteImpl extends RemoteBase implements Medi
    */
   @Override
   public Job enrich(MediaPackageElement original, boolean override) throws MediaInspectionException {
-    String url = "/enrich";
     List<NameValuePair> params = new ArrayList<NameValuePair>();
     try {
-      params.add(new BasicNameValuePair("mediaPackageElement", MediaPackageElementParser.getAsXml(((AbstractMediaPackageElement) original))));
+      params.add(new BasicNameValuePair("mediaPackageElement", MediaPackageElementParser.getAsXml(original)));
+      params.add(new BasicNameValuePair("override", new Boolean(override).toString()));
     } catch (Exception e) {
       throw new MediaInspectionException(e);
     }
-    params.add(new BasicNameValuePair("override", new Boolean(override).toString()));
     logger.info("Enriching {} using a remote media inspection service", original);
     HttpResponse response = null;
     try {
-      HttpPost post = new HttpPost(url);
-      HttpEntity entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      HttpPost post = new HttpPost("/enrich");
+      post.setEntity(new UrlEncodedFormEntity(params));
       response = getResponse(post);
       if (response != null) {
         Job receipt = JobParser.parseJob(response.getEntity().getContent());
-        logger.info("Completing inspection of media file at {} using a remote media inspection service", original
-                .getURI());
+        logger.info("Completing inspection of media file at {} using a remote media inspection service",
+                original.getURI());
         return receipt;
       }
     } catch (Exception e) {

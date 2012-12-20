@@ -191,7 +191,9 @@ public class ServiceRegistryEndpoint {
   @Path("maintenance")
   @RestQuery(name = "maintenance", description = "Sets the maintenance status for a server in the cluster.", returnDescription = "No content.", restParameters = {
           @RestParameter(name = "host", isRequired = true, type = Type.STRING, description = "The host name, including the http(s) protocol"),
-          @RestParameter(name = "maintenance", isRequired = true, type = Type.BOOLEAN, description = "Whether this host should be put into maintenance mode (true) or not") }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was registered successfully") })
+          @RestParameter(name = "maintenance", isRequired = true, type = Type.BOOLEAN, description = "Whether this host should be put into maintenance mode (true) or not") }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was registered successfully"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Host not found") })
   public Response setMaintenanceMode(@FormParam("host") String host, @FormParam("maintenance") boolean maintenance)
           throws NotFoundException {
     try {
@@ -260,7 +262,7 @@ public class ServiceRegistryEndpoint {
         }
       } else if (isNotBlank(serviceType)) {
         // This is a request for all service registrations of a particular type
-        for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByLoad(serviceType)) {
+        for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByType(serviceType)) {
           registrations.add(new JaxbServiceRegistration(reg));
         }
       } else if (isNotBlank(host)) {
@@ -353,7 +355,9 @@ public class ServiceRegistryEndpoint {
   @PUT
   @Path("job/{id}.xml")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "updatejob", description = "Updates an existing job", returnDescription = "No content", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The job identifier") }, restParameters = { @RestParameter(name = "job", isRequired = true, type = Type.TEXT, description = "The updated job as XML") }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "Job updated.") })
+  @RestQuery(name = "updatejob", description = "Updates an existing job", returnDescription = "No content", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The job identifier") }, restParameters = { @RestParameter(name = "job", isRequired = true, type = Type.TEXT, description = "The updated job as XML") }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Job updated."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Job not found.") })
   public Response updateJob(@PathParam("id") String id, @FormParam("job") String jobXml) throws NotFoundException {
     try {
       Job job = JobParser.parseJob(jobXml);

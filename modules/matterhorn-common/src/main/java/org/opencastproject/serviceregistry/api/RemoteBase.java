@@ -60,6 +60,8 @@ public class RemoteBase {
   /** The security service */
   protected SecurityService securityService = null;
 
+  private static final List<Integer> knownHttpStatuses = Arrays.asList(HttpStatus.SC_SERVICE_UNAVAILABLE);
+
   /**
    * Creates a remote implementation for the given type of service.
    * 
@@ -147,6 +149,15 @@ public class RemoteBase {
       while (remoteServices == null || remoteServices.size() == 0) {
         try {
           remoteServices = remoteServiceManager.getServiceRegistrationsByLoad(serviceType);
+          if (remoteServices == null || remoteServices.size() == 0) {
+            logger.debug("No services of type '{}' found, waiting...", serviceType);
+            try {
+              Thread.sleep(TIMEOUT);
+            } catch (InterruptedException e) {
+              logger.warn("Interrupted while waiting for remote service of type '{}'", serviceType);
+              return null;
+            }
+          }
         } catch (ServiceRegistryException e) {
           logger.warn("Unable to obtain a list of remote services", e);
           return null;
@@ -170,6 +181,9 @@ public class RemoteBase {
           } else {
             fullUrl = UrlSupport.concat(new String[] { remoteService.getHost(), remoteService.getPath(), uriSuffix });
           }
+
+          logger.debug("Connecting to remote service of type '{}' at {}", serviceType, fullUrl);
+
           URI uri = new URI(fullUrl);
           httpRequest.setURI(uri);
           response = client.execute(httpRequest);
@@ -177,6 +191,9 @@ public class RemoteBase {
           if (Arrays.asList(expectedHttpStatus).contains(status.getStatusCode())) {
             return response;
           } else {
+            if (!knownHttpStatuses.contains(status.getStatusCode())) {
+              logger.warn("Service at {} returned unexpected response code {}", fullUrl, status.getStatusCode());
+            }
             hostErrors.put(httpRequest.getMethod() + " " + uri.toString(), status.toString());
             closeConnection(response);
           }

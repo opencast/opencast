@@ -26,7 +26,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
-import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.RemoteBase;
@@ -40,21 +40,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 /**
  * Proxies a set of remote composer services for use as a JVM-local service. Remote services are selected at random.
@@ -75,14 +65,12 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    *      java.lang.String)
    */
   public Job encode(Track sourceTrack, String profileId) throws EncoderException {
-    String url = "/encode";
-    HttpPost post = new HttpPost(url);
+    HttpPost post = new HttpPost("/encode");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-      params.add(new BasicNameValuePair("sourceTrack", getXML(sourceTrack)));
+      params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
-      UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new EncoderException("Unable to assemble a remote composer request for track " + sourceTrack, e);
     }
@@ -111,16 +99,14 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    */
   @Override
   public Job trim(Track sourceTrack, String profileId, long start, long duration) throws EncoderException {
-    String url = "/trim";
-    HttpPost post = new HttpPost(url);
+    HttpPost post = new HttpPost("/trim");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-      params.add(new BasicNameValuePair("sourceTrack", getXML(sourceTrack)));
+      params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
       params.add(new BasicNameValuePair("start", Long.toString(start)));
       params.add(new BasicNameValuePair("duration", Long.toString(duration)));
-      UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new EncoderException("Unable to assemble a remote composer request for track " + sourceTrack, e);
     }
@@ -148,15 +134,13 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    *      org.opencastproject.mediapackage.Track, java.lang.String)
    */
   public Job mux(Track sourceVideoTrack, Track sourceAudioTrack, String profileId) throws EncoderException {
-    String url = "/mux";
-    HttpPost post = new HttpPost(url);
+    HttpPost post = new HttpPost("/mux");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-      params.add(new BasicNameValuePair("videoSourceTrack", getXML(sourceVideoTrack)));
-      params.add(new BasicNameValuePair("audioSourceTrack", getXML(sourceAudioTrack)));
+      params.add(new BasicNameValuePair("videoSourceTrack", MediaPackageElementParser.getAsXml(sourceVideoTrack)));
+      params.add(new BasicNameValuePair("audioSourceTrack", MediaPackageElementParser.getAsXml(sourceAudioTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
-      UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new EncoderException("Unable to assemble a remote composer request", e);
     }
@@ -185,24 +169,20 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    */
   @Override
   public EncodingProfile getProfile(String profileId) {
-    String url = "/profile/" + profileId + ".xml";
-    HttpGet get = new HttpGet(url);
+    HttpGet get = new HttpGet("/profile/" + profileId + ".xml");
     HttpResponse response = null;
     try {
       response = getResponse(get, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND);
-      if (response != null) {
-        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-          return EncodingProfileBuilder.getInstance().parseProfile(response.getEntity().getContent());
-        } else {
-          return null;
-        }
+      if (response != null && response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+        return EncodingProfileBuilder.getInstance().parseProfile(response.getEntity().getContent());
+      } else {
+        return null;
       }
     } catch (Exception e) {
       throw new RuntimeException(e);
     } finally {
       closeConnection(response);
     }
-    throw new RuntimeException("The remote composer service proxy could not get the profile " + profileId);
   }
 
   /**
@@ -212,16 +192,13 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    *      java.lang.String, long)
    */
   public Job image(Track sourceTrack, String profileId, long... times) throws EncoderException {
-    List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    UrlEncodedFormEntity entity = null;
-    String url = "/image";
-    HttpPost post = new HttpPost(url);
+    HttpPost post = new HttpPost("/image");
     try {
-      params.add(new BasicNameValuePair("sourceTrack", getXML(sourceTrack)));
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
       params.add(new BasicNameValuePair("time", buildTimeArray(times)));
-      entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new EncoderException(e);
     }
@@ -250,15 +227,12 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    */
   @Override
   public Job convertImage(Attachment image, String profileId) throws EncoderException, MediaPackageException {
-    List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    UrlEncodedFormEntity entity = null;
-    String url = "/convertimage";
-    HttpPost post = new HttpPost(url);
+    HttpPost post = new HttpPost("/convertimage");
     try {
-      params.add(new BasicNameValuePair("sourceImage", getXML(image)));
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("sourceImage", MediaPackageElementParser.getAsXml(image)));
       params.add(new BasicNameValuePair("profileId", profileId));
-      entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new EncoderException(e);
     }
@@ -275,8 +249,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
     } finally {
       closeConnection(response);
     }
-    throw new EncoderException("Unable to convert image at " + image
-            + " using the remote composer service proxy");
+    throw new EncoderException("Unable to convert image at " + image + " using the remote composer service proxy");
   }
 
   /**
@@ -287,15 +260,12 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    */
   @Override
   public Job captions(Track mediaTrack, Catalog[] captions) throws EmbedderException {
-    List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    UrlEncodedFormEntity entity = null;
-    String url = "/captions";
-    HttpPost post = new HttpPost(url);
+    HttpPost post = new HttpPost("/captions");
     try {
-      params.add(new BasicNameValuePair("mediaTrack", getXML(mediaTrack)));
-      params.add(new BasicNameValuePair("captions", getXMLArray(captions, "captions")));
-      entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("mediaTrack", MediaPackageElementParser.getAsXml(mediaTrack)));
+      params.add(new BasicNameValuePair("captions", MediaPackageElementParser.getArrayAsXml(Arrays.asList(captions))));
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new EmbedderException(e);
     }
@@ -323,8 +293,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    */
   @Override
   public EncodingProfile[] listProfiles() {
-    String url = "/profiles.xml";
-    HttpGet get = new HttpGet(url);
+    HttpGet get = new HttpGet("/profiles.xml");
     HttpResponse response = null;
     try {
       response = getResponse(get);
@@ -344,59 +313,6 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   }
 
   /**
-   * Serializes a mediapackage element to an xml string
-   * 
-   * @param element
-   *          the mediapackage element
-   * @return the xml string
-   * @throws Exception
-   *           if marshalling goes wrong
-   */
-  protected String getXML(MediaPackageElement element) throws Exception {
-    if (element == null)
-      return null;
-    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-    Document doc = docBuilder.newDocument();
-    Node node = element.toManifest(doc, null);
-    DOMSource domSource = new DOMSource(node);
-    StringWriter writer = new StringWriter();
-    StreamResult result = new StreamResult(writer);
-    Transformer transformer;
-    transformer = TransformerFactory.newInstance().newTransformer();
-    transformer.transform(domSource, result);
-    return writer.toString();
-  }
-
-  /**
-   * Serializes media package element array to XML string.
-   * 
-   * @param elementArray
-   *          elements to be serialized
-   * @param rootName
-   *          name of the root node
-   * @return the xml string
-   * @throws Exception
-   *           if marshalling fails
-   */
-  protected String getXMLArray(MediaPackageElement[] elementArray, String rootName) throws Exception {
-
-    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-    Document doc = docBuilder.newDocument();
-    Element root = doc.createElement(rootName);
-    for (MediaPackageElement element : elementArray) {
-      Node node = element.toManifest(doc, null);
-      root.appendChild(node);
-    }
-    DOMSource domSource = new DOMSource(root);
-    StringWriter writer = new StringWriter();
-    StreamResult result = new StreamResult(writer);
-    Transformer transformer = TransformerFactory.newInstance().newTransformer();
-    transformer.transform(domSource, result);
-
-    return writer.toString();
-  }
-
-  /**
    * Builds string containing times in seconds separated by comma.
    * 
    * @param times
@@ -404,9 +320,9 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    * @return string represented specified time array
    */
   protected String buildTimeArray(long[] times) {
-    if (times.length == 0) {
+    if (times.length == 0)
       return "";
-    }
+
     StringBuilder builder = new StringBuilder();
     builder.append(Long.toString(times[0]));
     for (int i = 1; i < times.length; i++) {
@@ -417,16 +333,14 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
 
   @Override
   public Job watermark(Track mediaTrack, String watermark, String profileId) throws EncoderException,
-          MediaPackageException {   
-    String url = "/watermark";
-    HttpPost post = new HttpPost(url);
+          MediaPackageException {
+    HttpPost post = new HttpPost("/watermark");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-      params.add(new BasicNameValuePair("sourceTrack", getXML(mediaTrack)));
+      params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(mediaTrack)));
       params.add(new BasicNameValuePair("watermark", watermark));
       params.add(new BasicNameValuePair("profileId", profileId));
-      UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new EncoderException("Unable to assemble a remote composer request for track " + mediaTrack, e);
     }

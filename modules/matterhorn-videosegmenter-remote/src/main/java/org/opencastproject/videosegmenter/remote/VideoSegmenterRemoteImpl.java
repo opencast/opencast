@@ -17,7 +17,7 @@ package org.opencastproject.videosegmenter.remote;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
-import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.videosegmenter.api.VideoSegmenterException;
@@ -29,19 +29,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 public class VideoSegmenterRemoteImpl extends RemoteBase implements VideoSegmenterService {
 
@@ -54,50 +44,31 @@ public class VideoSegmenterRemoteImpl extends RemoteBase implements VideoSegment
 
   @Override
   public Job segment(Track track) throws VideoSegmenterException {
-    List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    UrlEncodedFormEntity entity;
+    HttpPost post = new HttpPost();
     try {
-      params.add(new BasicNameValuePair("track", getXML(track)));
-      entity = new UrlEncodedFormEntity(params);
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("track", MediaPackageElementParser.getAsXml(track)));
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new VideoSegmenterException(e);
     }
-    Job receipt = null;
-    logger.info("Analyzing {} on a remote analysis server", track);
-    HttpPost post = new HttpPost();
-    post.setEntity(entity);
     HttpResponse response = null;
     try {
       response = getResponse(post);
       if (response != null) {
         try {
-          receipt = JobParser.parseJob(response.getEntity().getContent());
+          Job receipt = JobParser.parseJob(response.getEntity().getContent());
+          logger.info("Analyzing {} on a remote analysis server", track);
           return receipt;
         } catch (Exception e) {
-          throw new VideoSegmenterException("Unable to analyze element '" + track
-                  + "' using a remote analysis service", e);
+          throw new VideoSegmenterException(
+                  "Unable to analyze element '" + track + "' using a remote analysis service", e);
         }
       }
     } finally {
       closeConnection(response);
     }
     throw new VideoSegmenterException("Unable to analyze element '" + track + "' using a remote analysis service");
-  }
-
-  public String getXML(MediaPackageElement element) throws Exception {
-    if (element == null)
-      return null;
-    DocumentBuilder docBuilder;
-    docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-    Document doc = docBuilder.newDocument();
-    Node node = element.toManifest(doc, null);
-    DOMSource domSource = new DOMSource(node);
-    StringWriter writer = new StringWriter();
-    StreamResult result = new StreamResult(writer);
-    Transformer transformer;
-    transformer = TransformerFactory.newInstance().newTransformer();
-    transformer.transform(domSource, result);
-    return writer.toString();
   }
 
 }

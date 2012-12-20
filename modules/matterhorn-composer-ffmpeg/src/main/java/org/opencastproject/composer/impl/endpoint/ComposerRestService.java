@@ -26,12 +26,8 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
-import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageElementBuilder;
-import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
-import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -43,17 +39,11 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,9 +57,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * A REST endpoint delegating functionality to the {@link ComposerService}
@@ -149,25 +136,28 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "encode", description = "Starts an encoding process, based on the specified encoding profile ID and the track", restParameters = {
           @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
-          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "flash.http") }, reponses = { @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "flash.http") }, reponses = {
+          @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "If required parameters aren't set or if sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response encode(@FormParam("sourceTrack") String sourceTrackAsXml, @FormParam("profileId") String profileId)
           throws Exception {
     // Ensure that the POST parameters are present
-    if (sourceTrackAsXml == null || profileId == null) {
+    if (StringUtils.isBlank(sourceTrackAsXml) || StringUtils.isBlank(profileId))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack and profileId must not be null").build();
-    }
 
     // Deserialize the track
     MediaPackageElement sourceTrack = MediaPackageElementParser.getFromXml(sourceTrackAsXml);
-    if (!Track.TYPE.equals(sourceTrack.getElementType())) {
+    if (!Track.TYPE.equals(sourceTrack.getElementType()))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack element must be of type track").build();
-    }
 
-    // Asynchronously encode the specified tracks
-    Job job = composerService.encode((Track) sourceTrack, profileId);
-    if (job == null)
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Encoding failed").build();
-    return Response.ok().entity(new JaxbJob(job)).build();
+    try {
+      // Asynchronously encode the specified tracks
+      Job job = composerService.encode((Track) sourceTrack, profileId);
+      return Response.ok().entity(new JaxbJob(job)).build();
+    } catch (EncoderException e) {
+      logger.warn("Unable to encode the track: " + e.getMessage());
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
   }
 
   /**
@@ -194,19 +184,17 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "The duration in milisecond", isRequired = true, name = "duration", type = Type.STRING, defaultValue = "10000") }, reponses = {
           @RestResponse(description = "Results in an xml document containing the job for the trimming task", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "If the start time is negative or exceeds the track duration", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "if the duration is negative or, including the new start time, exceeds the track duration", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+          @RestResponse(description = "If the duration is negative or, including the new start time, exceeds the track duration", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response trim(@FormParam("sourceTrack") String sourceTrackAsXml, @FormParam("profileId") String profileId,
           @FormParam("start") long start, @FormParam("duration") long duration) throws Exception {
     // Ensure that the POST parameters are present
-    if (sourceTrackAsXml == null || profileId == null) {
+    if (StringUtils.isBlank(sourceTrackAsXml) || StringUtils.isBlank(profileId))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack and profileId must not be null").build();
-    }
 
     // Deserialize the track
     MediaPackageElement sourceElement = MediaPackageElementParser.getFromXml(sourceTrackAsXml);
-    if (!Track.TYPE.equals(sourceElement.getElementType())) {
+    if (!Track.TYPE.equals(sourceElement.getElementType()))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack element must be of type track").build();
-    }
 
     // Make sure the trim times make sense
     Track sourceTrack = (Track) sourceElement;
@@ -223,11 +211,14 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       duration = (sourceTrack.getDuration() - start);
     }
 
-    // Asynchronously encode the specified tracks
-    Job job = composerService.trim(sourceTrack, profileId, start, duration);
-    if (job == null)
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Trimming failed").build();
-    return Response.ok().entity(new JaxbJob(job)).build();
+    try {
+      // Asynchronously encode the specified tracks
+      Job job = composerService.trim(sourceTrack, profileId, start, duration);
+      return Response.ok().entity(new JaxbJob(job)).build();
+    } catch (EncoderException e) {
+      logger.warn("Unable to trim the track: " + e.getMessage());
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
   }
 
   /**
@@ -248,33 +239,37 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "mux", description = "Starts an encoding process, which will mux the two tracks using the given encoding profile", restParameters = {
           @RestParameter(description = "The track containing the audio stream", isRequired = true, name = "sourceAudioTrack", type = Type.TEXT, defaultValue = "${this.audioTrackDefault}"),
           @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceVideoTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
-          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "flash.http") }, reponses = { @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "flash.http") }, reponses = {
+          @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "If required parameters aren't set or if the source tracks aren't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response mux(@FormParam("audioSourceTrack") String audioSourceTrackXml,
           @FormParam("videoSourceTrack") String videoSourceTrackXml, @FormParam("profileId") String profileId)
           throws Exception {
     // Ensure that the POST parameters are present
-    if (audioSourceTrackXml == null || videoSourceTrackXml == null || profileId == null) {
+    if (StringUtils.isBlank(audioSourceTrackXml) || StringUtils.isBlank(videoSourceTrackXml)
+            || StringUtils.isBlank(profileId)) {
       return Response.status(Response.Status.BAD_REQUEST)
               .entity("audioSourceTrack, videoSourceTrack, and profileId must not be null").build();
     }
 
     // Deserialize the audio track
     MediaPackageElement audioSourceTrack = MediaPackageElementParser.getFromXml(audioSourceTrackXml);
-    if (!Track.TYPE.equals(audioSourceTrack.getElementType())) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("audioSourceTrack element must be of type track")
-              .build();
-    }
+    if (!Track.TYPE.equals(audioSourceTrack.getElementType()))
+      return Response.status(Response.Status.BAD_REQUEST).entity("audioSourceTrack must be of type track").build();
 
     // Deserialize the video track
     MediaPackageElement videoSourceTrack = MediaPackageElementParser.getFromXml(videoSourceTrackXml);
-    if (!Track.TYPE.equals(videoSourceTrack.getElementType())) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("videoSourceTrack element must be of type track")
-              .build();
-    }
+    if (!Track.TYPE.equals(videoSourceTrack.getElementType()))
+      return Response.status(Response.Status.BAD_REQUEST).entity("videoSourceTrack must be of type track").build();
 
-    // Asynchronously encode the specified tracks
-    Job job = composerService.mux((Track) videoSourceTrack, (Track) audioSourceTrack, profileId);
-    return Response.ok().entity(new JaxbJob(job)).build();
+    try {
+      // Asynchronously encode the specified tracks
+      Job job = composerService.mux((Track) videoSourceTrack, (Track) audioSourceTrack, profileId);
+      return Response.ok().entity(new JaxbJob(job)).build();
+    } catch (EncoderException e) {
+      logger.warn("Unable to mux tracks: " + e.getMessage());
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
   }
 
   /**
@@ -295,13 +290,14 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "image", description = "Starts an image extraction process, based on the specified encoding profile ID and the source track", restParameters = {
           @RestParameter(description = "The number of seconds (many numbers can be specified, separated by comma) into the video to extract the image", isRequired = true, name = "time", type = Type.STRING, defaultValue = "1"),
           @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
-          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "player-preview.http") }, reponses = { @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "player-preview.http") }, reponses = {
+          @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "If required parameters aren't set or if sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response image(@FormParam("sourceTrack") String sourceTrackXml, @FormParam("profileId") String profileId,
           @FormParam("time") String times) throws Exception {
     // Ensure that the POST parameters are present
-    if (sourceTrackXml == null || profileId == null) {
+    if (StringUtils.isBlank(sourceTrackXml) || StringUtils.isBlank(profileId))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack and profileId must not be null").build();
-    }
 
     // parse time codes
     long[] timeArray;
@@ -313,11 +309,11 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
 
     // Deserialize the source track
     MediaPackageElement sourceTrack = MediaPackageElementParser.getFromXml(sourceTrackXml);
-    if (!Track.TYPE.equals(sourceTrack.getElementType())) {
+    if (!Track.TYPE.equals(sourceTrack.getElementType()))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack element must be of type track").build();
-    }
 
     try {
+      // Asynchronously encode the specified tracks
       Job job = composerService.image((Track) sourceTrack, profileId, timeArray);
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
@@ -341,21 +337,22 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "convertimage", description = "Starts an image conversion process, based on the specified encoding profile ID and the source image", restParameters = {
           @RestParameter(description = "The original image", isRequired = true, name = "sourceImage", type = Type.TEXT, defaultValue = "${this.imageAttachmentDefault}"),
-          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "image-conversion.http") }, reponses = { @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "image-conversion.http") }, reponses = {
+          @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "If required parameters aren't set or if sourceImage isn't from the type Attachment", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response convertImage(@FormParam("sourceImage") String sourceImageXml, @FormParam("profileId") String profileId)
           throws Exception {
     // Ensure that the POST parameters are present
-    if (sourceImageXml == null || profileId == null) {
+    if (StringUtils.isBlank(sourceImageXml) || StringUtils.isBlank(profileId))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceImage and profileId must not be null").build();
-    }
 
     // Deserialize the source track
     MediaPackageElement sourceImage = MediaPackageElementParser.getFromXml(sourceImageXml);
-    if (!Attachment.TYPE.equals(sourceImage.getElementType())) {
+    if (!Attachment.TYPE.equals(sourceImage.getElementType()))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceImage element must be of type track").build();
-    }
 
     try {
+      // Asynchronously convert the specified image
       Job job = composerService.convertImage((Attachment) sourceImage, profileId);
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
@@ -371,8 +368,6 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
    *          media file to which captions will be embedded
    * @param captionsXml
    *          captions that will be embedded
-   * @param language
-   *          language of captions
    * @return A response containing the job for this encoding job in the response body.
    * @throws Exception
    */
@@ -381,29 +376,28 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "captions", description = "Starts caption embedding process, based on the specified source track and captions", restParameters = {
           @RestParameter(description = "QuickTime file containg video stream", isRequired = true, name = "mediaTrack", type = Type.TEXT, defaultValue = "${this.mediaTrackDefault}"),
-          @RestParameter(description = "Catalog(s) containing captions in SRT format", isRequired = true, name = "captions", type = Type.TEXT, defaultValue = "${this.captionsCatalogsDefault}") }, reponses = { @RestResponse(description = "Result in an xml document containing resulting media file.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
-  public Response captions(@FormParam("mediaTrack") String sourceTrackXml, @FormParam("captions") String captionsAsXml,
-          @FormParam("language") String language) throws Exception {
-    if (sourceTrackXml == null || captionsAsXml == null) {
+          @RestParameter(description = "Catalog(s) containing captions in SRT format", isRequired = true, name = "captions", type = Type.TEXT, defaultValue = "${this.captionsCatalogsDefault}") }, reponses = {
+          @RestResponse(description = "Result in an xml document containing resulting media file.", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "If required parameters aren't set, if mediaTrack isn't from the type Track and captions aren't from type Catalog", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  public Response captions(@FormParam("mediaTrack") String sourceTrackXml, @FormParam("captions") String captionsAsXml)
+          throws Exception {
+    if (StringUtils.isBlank(sourceTrackXml) || StringUtils.isBlank(captionsAsXml))
       return Response.status(Response.Status.BAD_REQUEST).entity("Source track and captions must not be null").build();
-    }
 
     MediaPackageElement mediaTrack = MediaPackageElementParser.getFromXml(sourceTrackXml);
-    if (!Track.TYPE.equals(mediaTrack.getElementType())) {
+    if (!Track.TYPE.equals(mediaTrack.getElementType()))
       return Response.status(Response.Status.BAD_REQUEST).entity("Source track element must be of type track").build();
-    }
 
-    MediaPackageElement[] mpElements = toMediaPackageElementArray(captionsAsXml);
-    if (mpElements.length == 0) {
+    List<? extends MediaPackageElement> mpElements = MediaPackageElementParser.getArrayFromXml(captionsAsXml);
+    if (mpElements.size() == 0)
       return Response.status(Response.Status.BAD_REQUEST).entity("At least one caption must be present").build();
-    }
+
     // cast to catalogs
-    Catalog[] captions = new Catalog[mpElements.length];
-    for (int i = 0; i < mpElements.length; i++) {
-      if (!Catalog.TYPE.equals(mpElements[i].getElementType())) {
+    Catalog[] captions = new Catalog[mpElements.size()];
+    for (int i = 0; i < mpElements.size(); i++) {
+      if (!Catalog.TYPE.equals(mpElements.get(i).getElementType()))
         return Response.status(Response.Status.BAD_REQUEST).entity("All captions must be of type catalog").build();
-      }
-      captions[i] = (Catalog) mpElements[i];
+      captions[i] = (Catalog) mpElements.get(i);
     }
 
     try {
@@ -433,26 +427,30 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "watermark", description = "re-encodes a source track with a watermark branding, the position of the watermark can be specified in the profileId, the watermark can be provided as a parameter", restParameters = {
           @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
           @RestParameter(description = "The watermark image path", isRequired = true, name = "watermark", type = Type.STRING, defaultValue = "$FELIX_HOME/conf/branding/watermark.png"),
-          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "watermark.branding") }, reponses = { @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "watermark.branding") }, reponses = {
+          @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "If required parameters aren't set or sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response watermark(@FormParam("sourceTrack") String sourceTrackAsXml,
           @FormParam("watermark") String watermark, @FormParam("profileId") String profileId) throws Exception {
     // Ensure that the POST parameters are present
-    if (sourceTrackAsXml == null || profileId == null || watermark == null) {
+    if (StringUtils.isBlank(sourceTrackAsXml) || StringUtils.isBlank(profileId) || StringUtils.isBlank(watermark)) {
       return Response.status(Response.Status.BAD_REQUEST)
               .entity("sourceTrack, watermark and profileId must not be null").build();
     }
 
     // Deserialize the track
     MediaPackageElement sourceTrack = MediaPackageElementParser.getFromXml(sourceTrackAsXml);
-    if (!Track.TYPE.equals(sourceTrack.getElementType())) {
+    if (!Track.TYPE.equals(sourceTrack.getElementType()))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack element must be of type track").build();
-    }
 
-    // Asynchronously encode the specified tracks
-    Job job = composerService.watermark((Track) sourceTrack, watermark, profileId);
-    if (job == null)
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Encoding failed").build();
-    return Response.ok().entity(new JaxbJob(job)).build();
+    try {
+      // Asynchronously encode the specified tracks
+      Job job = composerService.watermark((Track) sourceTrack, watermark, profileId);
+      return Response.ok().entity(new JaxbJob(job)).build();
+    } catch (EncoderException e) {
+      logger.warn("Unable to encode track: " + e.getMessage());
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
   }
 
   @GET
@@ -470,7 +468,9 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @GET
   @Path("profile/{id}.xml")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "profilesID", description = "Retrieve an encoding profile", pathParameters = { @RestParameter(name = "id", description = "the profile ID", isRequired = false, type = RestParameter.Type.STRING) }, reponses = { @RestResponse(description = "Results in an xml document describing the requested encoding profile", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(name = "profilesID", description = "Retrieve an encoding profile", pathParameters = { @RestParameter(name = "id", description = "the profile ID", isRequired = false, type = RestParameter.Type.STRING) }, reponses = {
+          @RestResponse(description = "Results in an xml document describing the requested encoding profile", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "If profile has not been found", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
   public Response getProfile(@PathParam("id") String profileId) throws NotFoundException {
     EncodingProfileImpl profile = (EncodingProfileImpl) composerService.getProfile(profileId);
     if (profile == null)
@@ -499,38 +499,6 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Override
   public ServiceRegistry getServiceRegistry() {
     return serviceRegistry;
-  }
-
-  /**
-   * Converts string representation of the one or more catalogs to object array
-   * 
-   * @param elementsAsXml
-   *          the serialized elements array representation
-   * @return
-   * @throws ParserConfigurationException
-   * @throws SAXException
-   * @throws IOException
-   */
-  protected MediaPackageElement[] toMediaPackageElementArray(String elementsAsXml) throws ParserConfigurationException,
-          SAXException, IOException {
-
-    List<MediaPackageElement> mpElements = new LinkedList<MediaPackageElement>();
-
-    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-    Document doc = docBuilder.parse(IOUtils.toInputStream(elementsAsXml, "UTF-8"));
-    // TODO -> explicit check for root node name?
-    NodeList nodeList = doc.getDocumentElement().getChildNodes();
-
-    MediaPackageSerializer serializer = new DefaultMediaPackageSerializerImpl();
-    MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-
-    for (int i = 0; i < nodeList.getLength(); i++) {
-      if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
-        mpElements.add(builder.elementFromManifest(nodeList.item(i), serializer));
-      }
-    }
-
-    return mpElements.toArray(new MediaPackageElement[mpElements.size()]);
   }
 
   /**

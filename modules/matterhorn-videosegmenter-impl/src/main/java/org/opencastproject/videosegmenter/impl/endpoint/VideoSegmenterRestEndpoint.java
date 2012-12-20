@@ -27,10 +27,13 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.videosegmenter.api.VideoSegmenterException;
 import org.opencastproject.videosegmenter.api.VideoSegmenterService;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.FormParam;
@@ -45,16 +48,17 @@ import javax.ws.rs.core.Response;
  * The REST endpoint for the {@link VideoSegmenterService} service
  */
 @Path("")
-@RestService(name = "videosegmentation", title = "Video Segmentation Service",
-  abstractText = "This service performs segmentation of media files.",
-  notes = {
+@RestService(name = "videosegmentation", title = "Video Segmentation Service", abstractText = "This service performs segmentation of media files.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
-        + "not working and is either restarting or has failed",
+                + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
+
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(VideoSegmenterRestEndpoint.class);
 
   /** The rest docs */
   protected String docs;
@@ -113,21 +117,22 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
           @RestResponse(description = "The underlying service could not segment the video.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "The job ID to use when polling for the resulting mpeg7 catalog.")
   public Response segment(@FormParam("track") String trackAsXml) throws Exception {
     // Ensure that the POST parameters are present
-    if (StringUtils.isBlank(trackAsXml)) {
+    if (StringUtils.isBlank(trackAsXml))
       return Response.status(Response.Status.BAD_REQUEST).entity("track must not be null").build();
-    }
 
     // Deserialize the track
     MediaPackageElement sourceTrack = MediaPackageElementParser.getFromXml(trackAsXml);
-    if (!Track.TYPE.equals(sourceTrack.getElementType())) {
+    if (!Track.TYPE.equals(sourceTrack.getElementType()))
       return Response.status(Response.Status.BAD_REQUEST).entity("mediapackage element must be of type track").build();
-    }
 
-    // Asynchronously segment the specified track
-    Job job = service.segment((Track) sourceTrack);
-    if (job == null)
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Segmentation failed").build();
-    return Response.ok().entity(new JaxbJob(job)).build();
+    try {
+      // Asynchronously segment the specified track
+      Job job = service.segment((Track) sourceTrack);
+      return Response.ok().entity(new JaxbJob(job)).build();
+    } catch (VideoSegmenterException e) {
+      logger.warn("Segmentation failed: " + e.getMessage());
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
   }
 
   @GET

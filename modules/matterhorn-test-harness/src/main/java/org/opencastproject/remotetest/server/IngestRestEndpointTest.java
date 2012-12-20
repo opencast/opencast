@@ -79,7 +79,7 @@ public class IngestRestEndpointTest {
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 
     // Grow media package
-    mp = postCall("/ingest/addTrack", "av.mov", "track/presenter", mp);
+    mp = postCall("/ingest/addTrack", "av.mov", "presenter/source", mp);
     mp = postCall("/ingest/addCatalog", "dublincore.xml", "dublincore/episode", mp);
     mp = postCall("/ingest/addAttachment", "cover.png", "cover/source", mp);
 

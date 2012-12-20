@@ -15,6 +15,11 @@
  */
 package org.opencastproject.series.remote;
 
+import static org.apache.http.HttpStatus.SC_CREATED;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_NO_CONTENT;
+import static org.apache.http.HttpStatus.SC_OK;
+
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
@@ -25,14 +30,12 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.RemoteBase;
-import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
@@ -40,10 +43,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,34 +84,29 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("series", dc.toXmlString()));
-      UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new SeriesException("Unable to assemble a remote series request for updating a series " + dc, e);
     }
 
-    HttpResponse response = null;
+    HttpResponse response = getResponse(post, SC_NO_CONTENT, SC_CREATED);
     try {
-      response = getResponse(post, HttpStatus.SC_NO_CONTENT, HttpStatus.SC_CREATED);
-      if (response == null)
-        throw new SeriesException("Unable to update series " + dc + " using the remote series services");
-      int status = response.getStatusLine().getStatusCode();
-      if (status == HttpStatus.SC_NO_CONTENT) {
-        logger.info("Successfully updated series {} to the series service", dc);
-        return null;
-      } else if (status == HttpStatus.SC_CREATED) {
-        DublinCoreCatalogImpl catalogImpl = new DublinCoreCatalogImpl(response.getEntity().getContent());
-        logger.info("Successfully created series {} to the series service", catalogImpl);
-        return catalogImpl;
-      } else {
-        throw new SeriesException("Unable to update series " + dc + " using the remote series services, http status="
-                + status);
+      if (response != null) {
+        if (SC_NO_CONTENT == response.getStatusLine().getStatusCode()) {
+          logger.info("Successfully updated series {} to the series service", dc);
+          return null;
+        } else {
+          DublinCoreCatalogImpl catalogImpl = new DublinCoreCatalogImpl(response.getEntity().getContent());
+          logger.info("Successfully created series {} to the series service", catalogImpl);
+          return catalogImpl;
+        }
       }
     } catch (Exception e) {
       throw new SeriesException("Unable to update series " + dc + " using the remote series services: " + e);
     } finally {
       closeConnection(response);
     }
+    throw new SeriesException("Unable to update series " + dc + " using the remote series services");
   }
 
   @Override
@@ -119,54 +117,48 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("seriesID", seriesID));
       params.add(new BasicNameValuePair("acl", AccessControlParser.toXml(accessControl)));
-      UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new SeriesException("Unable to assemble a remote series request for updating an ACL " + accessControl, e);
     }
 
-    HttpResponse response = null;
+    HttpResponse response = getResponse(post, SC_NO_CONTENT, SC_CREATED, SC_NOT_FOUND);
     try {
-      response = getResponse(post, HttpStatus.SC_NO_CONTENT, HttpStatus.SC_CREATED);
-      if (response == null)
-        throw new SeriesException("Unable to update series ACL " + accessControl + " using the remote series services");
-      int status = response.getStatusLine().getStatusCode();
-      if (status == HttpStatus.SC_NO_CONTENT) {
-        logger.info("Successfully updated ACL of {} to the series service", seriesID);
-        return true;
-      } else if (status == HttpStatus.SC_CREATED) {
-        logger.info("Successfully created ACL of {} to the series service", seriesID);
-        return false;
-      } else {
-        throw new SeriesException("Unable to update series ACL " + accessControl
-                + " using the remote series services, http status=" + status);
+      if (response != null) {
+        int status = response.getStatusLine().getStatusCode();
+        if (SC_NOT_FOUND == status) {
+          throw new NotFoundException("Series not found: " + seriesID);
+        } else if (SC_NO_CONTENT == status) {
+          logger.info("Successfully updated ACL of {} to the series service", seriesID);
+          return true;
+        } else if (SC_CREATED == status) {
+          logger.info("Successfully created ACL of {} to the series service", seriesID);
+          return false;
+        }
       }
     } finally {
       closeConnection(response);
     }
+    throw new SeriesException("Unable to update series ACL " + accessControl + " using the remote series services");
   }
 
   @Override
   public void deleteSeries(String seriesID) throws SeriesException, NotFoundException, UnauthorizedException {
     HttpDelete del = new HttpDelete(seriesID);
-    HttpResponse response = null;
+    HttpResponse response = getResponse(del, SC_OK, SC_NOT_FOUND);
     try {
-      response = getResponse(del);
-      if (response == null)
-        throw new SeriesException("Unable to remove " + seriesID + " from a remote series index");
-      int status = response.getStatusLine().getStatusCode();
-      if (status == HttpStatus.SC_OK) {
-        logger.info("Successfully deleted {} from the remote series index", seriesID);
-        return;
-      } else if (status == HttpStatus.SC_NOT_FOUND) {
-        logger.info("Series {} not found in remote series index", seriesID);
-        return;
-      } else {
-        throw new SeriesException("Unable to remove " + seriesID + " from a remote series index, http status=" + status);
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          throw new NotFoundException("Series not found: " + seriesID);
+        } else {
+          logger.info("Successfully deleted {} from the remote series index", seriesID);
+          return;
+        }
       }
     } finally {
       closeConnection(response);
     }
+    throw new SeriesException("Unable to remove " + seriesID + " from a remote series index");
   }
 
   @GET
@@ -188,51 +180,49 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @Override
   public DublinCoreCatalog getSeries(String seriesID) throws SeriesException, NotFoundException, UnauthorizedException {
     HttpGet get = new HttpGet(seriesID + ".xml");
-    HttpResponse response = null;
+    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
     try {
-      response = getResponse(get);
-      if (response == null)
-        throw new SeriesException("Unable to get series from remote series index");
-      int status = response.getStatusLine().getStatusCode();
-      if (status == HttpStatus.SC_OK) {
-        DublinCoreCatalog dublinCoreCatalog = new DublinCoreCatalogImpl(response.getEntity().getContent());
-        logger.info("Successfully get series {} from the remote series index", seriesID);
-        return dublinCoreCatalog;
-      } else if (status == HttpStatus.SC_NOT_FOUND) {
-        throw new NotFoundException("Series " + seriesID + " not found on remote series index!");
-      } else {
-        throw new SeriesException("Unable to get series from remote series index, http status=" + status);
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          throw new NotFoundException("Series " + seriesID + " not found on remote series index!");
+        } else {
+          DublinCoreCatalog dublinCoreCatalog = new DublinCoreCatalogImpl(response.getEntity().getContent());
+          logger.info("Successfully get series {} from the remote series index", seriesID);
+          return dublinCoreCatalog;
+        }
       }
+    } catch (NotFoundException e) {
+      throw e;
     } catch (Exception e) {
-      throw new SeriesException("Unable to parse series form remote series index: " + e);
+      throw new SeriesException("Unable to parse series from remote series index: " + e);
     } finally {
       closeConnection(response);
     }
+    throw new SeriesException("Unable to get series from remote series index");
   }
 
   @Override
   public AccessControlList getSeriesAccessControl(String seriesID) throws NotFoundException, SeriesException {
     HttpGet get = new HttpGet(seriesID + "/acl.xml");
-    HttpResponse response = null;
+    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
     try {
-      response = getResponse(get);
-      if (response == null)
-        throw new SeriesException("Unable to get series ACL from remote series index");
-      int status = response.getStatusLine().getStatusCode();
-      if (status == HttpStatus.SC_OK) {
-        AccessControlList acl = AccessControlParser.parseAcl(response.getEntity().getContent());
-        logger.info("Successfully get series ACL {} from the remote series index", seriesID);
-        return acl;
-      } else if (status == HttpStatus.SC_NOT_FOUND) {
-        throw new NotFoundException("Series ACL " + seriesID + " not found on remote series index!");
-      } else {
-        throw new SeriesException("Unable to get series ACL from remote series index, http status=" + status);
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          throw new NotFoundException("Series ACL " + seriesID + " not found on remote series index!");
+        } else {
+          AccessControlList acl = AccessControlParser.parseAcl(response.getEntity().getContent());
+          logger.info("Successfully get series ACL {} from the remote series index", seriesID);
+          return acl;
+        }
       }
+    } catch (NotFoundException e) {
+      throw e;
     } catch (Exception e) {
       throw new SeriesException("Unable to parse series ACL form remote series index: " + e);
     } finally {
       closeConnection(response);
     }
+    throw new SeriesException("Unable to get series ACL from remote series index");
   }
 
   @GET
@@ -251,50 +241,37 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @Override
   public DublinCoreCatalogList getSeries(SeriesQuery query) throws SeriesException, UnauthorizedException {
     HttpGet get = new HttpGet(getSeriesUrl(query));
-    HttpResponse response = null;
-    InputStream is = null;
+    HttpResponse response = getResponse(get);
     try {
-      response = getResponse(get);
-      if (response == null)
-        throw new SeriesException("Unable to get series from query from remote series index: " + getSeriesUrl(query));
-      int status = response.getStatusLine().getStatusCode();
-      if (status == HttpStatus.SC_OK) {
-        is = response.getEntity().getContent();
-        DublinCoreCatalogList list = DublinCoreCatalogList.parse(IOUtils.toString(is, "UTF-8"));
+      if (response != null) {
+        DublinCoreCatalogList list = DublinCoreCatalogList.parse(EntityUtils.toString(response.getEntity(), "UTF-8"));
         logger.info("Successfully get series dublin core catalog list from the remote series index");
         return list;
-      } else {
-        throw new SeriesException("Unable to get series from query from remote series index, http status=" + status);
       }
     } catch (Exception e) {
       throw new SeriesException("Unable to get series from query from remote series index: " + e);
     } finally {
       closeConnection(response);
-      IoSupport.closeQuietly(is);
     }
+    throw new SeriesException("Unable to get series from query from remote series index: " + getSeriesUrl(query));
   }
 
   @Override
   public int getSeriesCount() throws SeriesException {
     HttpGet get = new HttpGet("/count");
-    HttpResponse response = null;
+    HttpResponse response = getResponse(get);
     try {
-      response = getResponse(get);
-      if (response == null)
-        throw new SeriesException("Unable to count series from remote series index");
-      int status = response.getStatusLine().getStatusCode();
-      if (status == HttpStatus.SC_OK) {
+      if (response != null) {
         int count = Integer.parseInt(IOUtils.toString(response.getEntity().getContent()));
         logger.info("Successfully get series dublin core catalog list from the remote series index");
         return count;
-      } else {
-        throw new SeriesException("Unable to count series from remote series index, http status=" + status);
       }
     } catch (Exception e) {
       throw new SeriesException("Unable to count series from remote series index: " + e);
     } finally {
       closeConnection(response);
     }
+    throw new SeriesException("Unable to count series from remote series index");
   }
 
   /**

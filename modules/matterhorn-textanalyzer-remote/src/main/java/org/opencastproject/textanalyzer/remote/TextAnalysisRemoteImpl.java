@@ -18,7 +18,7 @@ package org.opencastproject.textanalyzer.remote;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.Attachment;
-import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.textanalyzer.api.TextAnalyzerException;
 import org.opencastproject.textanalyzer.api.TextAnalyzerService;
@@ -29,19 +29,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 public class TextAnalysisRemoteImpl extends RemoteBase implements TextAnalyzerService {
 
@@ -59,50 +49,31 @@ public class TextAnalysisRemoteImpl extends RemoteBase implements TextAnalyzerSe
    */
   @Override
   public Job extract(final Attachment image) throws TextAnalyzerException {
-    List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    UrlEncodedFormEntity entity;
+    HttpPost post = new HttpPost();
     try {
-      params.add(new BasicNameValuePair("image", getXML(image)));
-      entity = new UrlEncodedFormEntity(params);
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("image", MediaPackageElementParser.getAsXml(image)));
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new TextAnalyzerException(e);
     }
-    Job receipt = null;
-    logger.info("Analyzing {} on a remote analysis server", image);
-    HttpPost post = new HttpPost();
-    post.setEntity(entity);
     HttpResponse response = null;
     try {
       response = getResponse(post);
       if (response != null) {
         try {
-          receipt = JobParser.parseJob(response.getEntity().getContent());
+          Job receipt = JobParser.parseJob(response.getEntity().getContent());
+          logger.info("Analyzing {} on a remote analysis server", image);
           return receipt;
         } catch (Exception e) {
-          throw new TextAnalyzerException(
-                  "Unable to analyze element '" + image + "' using a remote analysis service", e);
+          throw new TextAnalyzerException("Unable to analyze element '" + image + "' using a remote analysis service",
+                  e);
         }
       }
     } finally {
       closeConnection(response);
     }
     throw new TextAnalyzerException("Unable to analyze element '" + image + "' using a remote analysis service");
-  }
-
-  public String getXML(MediaPackageElement element) throws Exception {
-    if (element == null)
-      return null;
-    DocumentBuilder docBuilder;
-    docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-    Document doc = docBuilder.newDocument();
-    Node node = element.toManifest(doc, null);
-    DOMSource domSource = new DOMSource(node);
-    StringWriter writer = new StringWriter();
-    StreamResult result = new StreamResult(writer);
-    Transformer transformer;
-    transformer = TransformerFactory.newInstance().newTransformer();
-    transformer.transform(domSource, result);
-    return writer.toString();
   }
 
 }
