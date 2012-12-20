@@ -16,8 +16,9 @@
 
 package org.opencastproject.oaipmh.server;
 
-import org.easymock.EasyMock;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.opencastproject.oaipmh.Granularity;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
@@ -26,21 +27,22 @@ import org.opencastproject.search.api.SearchResultItemImpl;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.util.data.NonEmptyList;
 import org.opencastproject.util.data.Option;
+
+import org.easymock.EasyMock;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class OaiPmhRepositoryTest {
 
@@ -68,10 +70,8 @@ public class OaiPmhRepositoryTest {
 
   @Test
   public void testVerbListIdentifiersAll() {
-    OaiPmhRepository repo = newRepo(newSearchServiceMock(
-            newSearchResultItem("id-1", new Date(), new Date()),
-            newSearchResultItem("id-2", newDate(2011, 5, 30), newDate(2011, 6, 1))
-    ));
+    OaiPmhRepository repo = newRepo(newSearchServiceMock(newSearchResultItem("id-1", new Date(), new Date()),
+            newSearchResultItem("id-2", newDate(2011, 5, 30), newDate(2011, 6, 1))));
     Document doc = repo.selectVerb(newParams("ListIdentifiers", null, "oai_dc", null, null, null)).generate();
     assertXpathExists(doc, "//ListIdentifiers/header[identifier=\"id-1\"]");
     assertXpathExists(doc, "//ListIdentifiers/header[identifier=\"id-2\"]");
@@ -81,24 +81,25 @@ public class OaiPmhRepositoryTest {
   }
 
   /**
-   * Date range queries are just checked for the error case, since it doesn't make much sense
-   * to test with a mocked search service.
+   * Date range queries are just checked for the error case, since it doesn't make much sense to test with a mocked
+   * search service.
    */
   @Test
   public void testVerbListIdentifiersDateRangeError() {
     OaiPmhRepository repo = newRepo(null);
-    Document doc1 = repo.selectVerb(newParams("ListIdentifiers", null, "oai_dc", "2011-01-02", "2011-01-01", null)).generate();
+    Document doc1 = repo.selectVerb(newParams("ListIdentifiers", null, "oai_dc", "2011-01-02", "2011-01-01", null))
+            .generate();
     assertXpathExists(doc1, "//error[@code=\"badArgument\"]");
-    Document doc2 = repo.selectVerb(newParams("ListIdentifiers", null, "oai_dc", "2011-01-01T10:20:10Z", "2011-01-01T10:20:00Z", null)).generate();
+    Document doc2 = repo.selectVerb(
+            newParams("ListIdentifiers", null, "oai_dc", "2011-01-01T10:20:10Z", "2011-01-01T10:20:00Z", null))
+            .generate();
     assertXpathExists(doc2, "//error[@code=\"badArgument\"]");
   }
 
   @Test
   public void testVerbListRecordsAll() {
-    OaiPmhRepository repo = newRepo(newSearchServiceMock(
-            newSearchResultItem("id-1", new Date(), new Date()),
-            newSearchResultItem("id-2", newDate(2011, 5, 30), newDate(2011, 6, 1))
-    ));
+    OaiPmhRepository repo = newRepo(newSearchServiceMock(newSearchResultItem("id-1", new Date(), new Date()),
+            newSearchResultItem("id-2", newDate(2011, 5, 30), newDate(2011, 6, 1))));
     Document doc = repo.selectVerb(newParams("ListRecords", null, "oai_dc", null, null, null)).generate();
     assertXpathExists(doc, "//ListRecords/record/header[identifier=\"id-1\"]");
     assertXpathExists(doc, "//ListRecords/record/header[identifier=\"id-2\"]");
@@ -110,35 +111,26 @@ public class OaiPmhRepositoryTest {
 
   @Test
   public void testResumption() {
-    SearchResultItem[] items1 = new SearchResultItem[]{
-        newSearchResultItem("id-1", newDate(2011, 5, 10), newDate(2011, 5, 10)),
-        newSearchResultItem("id-2", newDate(2011, 5, 11), newDate(2011, 5, 11)),
-        newSearchResultItem("id-3", newDate(2011, 5, 12), newDate(2011, 5, 12))
-    };
-    SearchResultItem[] items2 = new SearchResultItem[]{
-        newSearchResultItem("id-4", newDate(2011, 5, 13), newDate(2011, 5, 13)),
-        newSearchResultItem("id-5", newDate(2011, 5, 14), newDate(2011, 5, 14))
-    };
+    SearchResultItem[] items1 = new SearchResultItem[] {
+            newSearchResultItem("id-1", newDate(2011, 5, 10), newDate(2011, 5, 10)),
+            newSearchResultItem("id-2", newDate(2011, 5, 11), newDate(2011, 5, 11)),
+            newSearchResultItem("id-3", newDate(2011, 5, 12), newDate(2011, 5, 12)) };
+    SearchResultItem[] items2 = new SearchResultItem[] {
+            newSearchResultItem("id-4", newDate(2011, 5, 13), newDate(2011, 5, 13)),
+            newSearchResultItem("id-5", newDate(2011, 5, 14), newDate(2011, 5, 14)) };
     // setup search service mock
     // this setup is really ugly since it needs knowledge about implementation details
     SearchService search = EasyMock.createMock(SearchService.class);
     SearchResult result = EasyMock.createMock(SearchResult.class);
-    EasyMock.expect(search.getByQuery(EasyMock.<SearchQuery>anyObject()))
+    EasyMock.expect(search.getByQuery(EasyMock.<SearchQuery> anyObject())).andReturn(result).anyTimes();
+    EasyMock.expect(search.getByQuery(EasyMock.<String> anyObject(), EasyMock.anyInt(), EasyMock.anyInt()))
             .andReturn(result).anyTimes();
-    EasyMock.expect(result.getItems())
-            .andReturn(items1)
-            .andReturn(items2);
+    EasyMock.expect(result.getItems()).andReturn(items1).andReturn(items2);
     EasyMock.expect(result.getQuery()).andReturn("").anyTimes();
-    EasyMock.expect(result.getLimit())
-            .andReturn(RESULT_LIMIT).anyTimes();
-    EasyMock.expect(result.getOffset())
-            .andReturn(0L).times(2)
-            .andReturn(RESULT_LIMIT).anyTimes();
-    EasyMock.expect(result.size())
-            .andReturn((long) items1.length).times(2)
-            .andReturn((long) items2.length).times(2);
-    EasyMock.expect(result.getTotalSize())
-            .andReturn((long) items1.length + items2.length).anyTimes();
+    EasyMock.expect(result.getLimit()).andReturn(RESULT_LIMIT).anyTimes();
+    EasyMock.expect(result.getOffset()).andReturn(0L).times(2).andReturn(RESULT_LIMIT).anyTimes();
+    EasyMock.expect(result.size()).andReturn((long) items1.length).times(2).andReturn((long) items2.length).times(2);
+    EasyMock.expect(result.getTotalSize()).andReturn((long) items1.length + items2.length).anyTimes();
     EasyMock.replay(search);
     EasyMock.replay(result);
     // do testing
@@ -147,7 +139,8 @@ public class OaiPmhRepositoryTest {
     assertEquals(3.0, xpath(doc1, "count(//ListIdentifiers/header)", XPathConstants.NUMBER));
     assertXpathEquals(doc1, "r-token", "//ListIdentifiers/resumptionToken/text()");
     assertXpathExists(doc1, "//ListIdentifiers/resumptionToken[@cursor=0]");
-    assertXpathExists(doc1, "//ListIdentifiers/resumptionToken[@completeListSize=" + (items1.length + items2.length) + "]");
+    assertXpathExists(doc1, "//ListIdentifiers/resumptionToken[@completeListSize=" + (items1.length + items2.length)
+            + "]");
     assertXpathEquals(doc1, "id-1", "//ListIdentifiers/header[1]/identifier/text()");
     assertXpathEquals(doc1, "id-2", "//ListIdentifiers/header[2]/identifier/text()");
     assertXpathEquals(doc1, "id-3", "//ListIdentifiers/header[3]/identifier/text()");
@@ -233,12 +226,11 @@ public class OaiPmhRepositoryTest {
   private static SearchService newSearchServiceMock(SearchResultItem... items) {
     SearchService search = EasyMock.createNiceMock(SearchService.class);
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);
-    EasyMock.expect(search.getByQuery(EasyMock.<SearchQuery>anyObject()))
-            .andReturn(result);
-    EasyMock.expect(result.getItems())
-            .andReturn(items);
-    EasyMock.expect(result.size())
-            .andReturn((long) items.length);
+    EasyMock.expect(search.getByQuery(EasyMock.<SearchQuery> anyObject())).andReturn(result).anyTimes();
+    EasyMock.expect(search.getByQuery(EasyMock.<String> anyObject(), EasyMock.anyInt(), EasyMock.anyInt()))
+            .andReturn(result).anyTimes();
+    EasyMock.expect(result.getItems()).andReturn(items);
+    EasyMock.expect(result.size()).andReturn((long) items.length);
     EasyMock.replay(search);
     EasyMock.replay(result);
     return search;
