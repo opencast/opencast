@@ -513,18 +513,13 @@ public abstract class OaiPmhRepository {
                     until.map(toSolrDateRangeEnd).getOrElse("*")));
               }
               p.getSet().flatMap(convSetSpecToSolrQuery).map(Functions.appendTo(queryFragments));
-              final SearchQuery q = new SearchQuery().withQuery(mkString(queryFragments, " ")).withLimit(getResultLimit());
-              result = getSearchService().getByQuery(q);
+              result = getSearchService().getByQuery(mkString(queryFragments, " "), getResultLimit(), 0);
             } else {
               // resume query
               result = getSavedQuery(p.getResumptionToken().get()).fold(new Option.Match<ResumableQuery, SearchResult>() {
                 @Override
                 public SearchResult some(ResumableQuery rq) {
-                  final SearchQuery next = new SearchQuery()
-                      .withQuery(rq.getQuery())
-                      .withOffset(rq.getOffset() + rq.getLimit()) // move forward
-                      .withLimit(rq.getLimit());
-                  return getSearchService().getByQuery(next);
+                  return getSearchService().getByQuery(rq.getQuery(), rq.getLimit(), rq.getOffset() + rq.getLimit());
                 }
 
                 @Override

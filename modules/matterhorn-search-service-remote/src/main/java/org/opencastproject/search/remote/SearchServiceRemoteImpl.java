@@ -117,9 +117,8 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
   @Override
   public SearchResult getByQuery(SearchQuery q) throws SearchException {
     HttpGet get = new HttpGet(getSearchUrl(q, false));
-    HttpResponse response = null;
+    HttpResponse response = getResponse(get);
     try {
-      response = getResponse(get);
       if (response != null)
         return SearchResultImpl.valueOf(response.getEntity().getContent());
     } catch (Exception e) {
@@ -138,9 +137,8 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
   @Override
   public SearchResult getForAdministrativeRead(SearchQuery q) throws SearchException, UnauthorizedException {
     HttpGet get = new HttpGet(getSearchUrl(q, true));
-    HttpResponse response = null;
+    HttpResponse response = getResponse(get);
     try {
-      response = getResponse(get);
       if (response != null)
         return SearchResultImpl.valueOf(response.getEntity().getContent());
     } catch (Exception e) {
@@ -163,12 +161,11 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
     queryStringParams.add(new BasicNameValuePair("q", query));
     queryStringParams.add(new BasicNameValuePair("limit", Integer.toString(limit)));
     queryStringParams.add(new BasicNameValuePair("offset", Integer.toString(offset)));
-    queryStringParams.add(new BasicNameValuePair("format", "xml"));
-    HttpGet get = new HttpGet("/lucene?" + URLEncodedUtils.format(queryStringParams, "UTF-8"));
+    queryStringParams.add(new BasicNameValuePair("admin", Boolean.TRUE.toString()));
+    HttpGet get = new HttpGet("/lucene.xml?" + URLEncodedUtils.format(queryStringParams, "UTF-8"));
     logger.debug("Sending remote query '{}'", get.getRequestLine().toString());
-    HttpResponse response = null;
+    HttpResponse response = getResponse(get);
     try {
-      response = getResponse(get);
       if (response != null)
         return SearchResultImpl.valueOf(response.getEntity().getContent());
     } catch (Exception e) {
@@ -193,7 +190,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
     List<NameValuePair> queryStringParams = new ArrayList<NameValuePair>();
 
     if (q.getSeriesId() != null || q.getElementFlavors() != null || q.getElementTags() != null) {
-      url.append("/episode.xml");
+      url.append("/episode.xml?");
 
       if (q.getSeriesId() != null)
         queryStringParams.add(new BasicNameValuePair("sid", q.getSeriesId()));
@@ -210,7 +207,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
         }
       }
     } else {
-      url.append("/series.xml");
+      url.append("/series.xml?");
       queryStringParams.add(new BasicNameValuePair("series", Boolean.toString(q.isIncludeSeries())));
       queryStringParams.add(new BasicNameValuePair("episodes", Boolean.toString(q.isIncludeEpisodes())));
     }
@@ -230,13 +227,8 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
 
     queryStringParams.add(new BasicNameValuePair("limit", Integer.toString(q.getLimit())));
     queryStringParams.add(new BasicNameValuePair("offset", Integer.toString(q.getOffset())));
-    queryStringParams.add(new BasicNameValuePair("format", "xml"));
 
-    if (queryStringParams.size() > 0) {
-      url.append("?");
-      url.append(URLEncodedUtils.format(queryStringParams, "UTF-8"));
-    }
-
+    url.append(URLEncodedUtils.format(queryStringParams, "UTF-8"));
     return url.toString();
   }
 

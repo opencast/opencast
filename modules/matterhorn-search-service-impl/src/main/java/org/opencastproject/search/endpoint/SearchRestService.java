@@ -162,9 +162,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     ResponseBuilder rb = Response.ok();
 
     if (admin) {
-      rb.entity(searchService.getForAdministrativeRead(query)).type(MediaType.APPLICATION_JSON);
+      rb.entity(searchService.getForAdministrativeRead(query));
     } else {
-      rb.entity(searchService.getByQuery(query)).type(MediaType.APPLICATION_JSON);
+      rb.entity(searchService.getByQuery(query));
     }
 
     if ("json".equals(format)) {
@@ -222,9 +222,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     ResponseBuilder rb = Response.ok();
 
     if (admin) {
-      rb.entity(searchService.getForAdministrativeRead(search)).type(MediaType.APPLICATION_JSON);
+      rb.entity(searchService.getForAdministrativeRead(search));
     } else {
-      rb.entity(searchService.getByQuery(search)).type(MediaType.APPLICATION_JSON);
+      rb.entity(searchService.getByQuery(search));
     }
 
     if ("json".equals(format)) {
@@ -242,9 +242,11 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "lucene", description = "Search a lucene query.", pathParameters = { @RestParameter(description = "The output format (json or xml) of the response body.", isRequired = true, name = "format", type = RestParameter.Type.STRING) }, restParameters = {
           @RestParameter(defaultValue = "", description = "The lucene query.", isRequired = false, name = "q", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json")
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.BOOLEAN) }, reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json")
   public Response getByLuceneQuery(@QueryParam("q") String q, @QueryParam("limit") int limit,
-          @QueryParam("offset") int offset, @PathParam("format") String format) {
+          @QueryParam("offset") int offset, @QueryParam("admin") boolean admin, @PathParam("format") String format)
+          throws SearchException, UnauthorizedException {
     SearchQuery query = new SearchQuery();
     if (!StringUtils.isBlank(q))
       query.withQuery(q);
@@ -253,10 +255,22 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     query.withLimit(limit);
     query.withOffset(offset);
 
-    if ("json".equals(format))
-      return Response.ok(searchService.getByQuery(query)).type(MediaType.APPLICATION_JSON).build();
-    else
-      return Response.ok(searchService.getByQuery(query)).type(MediaType.APPLICATION_XML).build();
+    // Build the response
+    ResponseBuilder rb = Response.ok();
+
+    if (admin) {
+      rb.entity(searchService.getForAdministrativeRead(query));
+    } else {
+      rb.entity(searchService.getByQuery(query));
+    }
+
+    if ("json".equals(format)) {
+      rb.type(MediaType.APPLICATION_JSON);
+    } else {
+      rb.type(MediaType.TEXT_XML);
+    }
+
+    return rb.build();
   }
 
   /**
