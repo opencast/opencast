@@ -52,17 +52,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 /**
  * This implementation of the remote service registry is able to provide the functionality specified by the api over
@@ -95,21 +89,6 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /** The base URL of this server */
   protected String serverUrl = UrlSupport.DEFAULT_BASE_URL;
-
-  private static final JAXBContext jaxbContext;
-
-  static {
-    StringBuilder sb = new StringBuilder();
-    sb.append("org.opencastproject.mediapackage");
-    sb.append(":org.opencastproject.mediapackage.attachment");
-    sb.append(":org.opencastproject.mediapackage.track");
-    sb.append(":org.opencastproject.job.api");
-    try {
-      jaxbContext = JAXBContext.newInstance(sb.toString(), JobParser.class.getClassLoader());
-    } catch (JAXBException e) {
-      throw new IllegalStateException(e);
-    }
-  }
 
   /**
    * Callback for the OSGi environment that is called upon service activation.
@@ -149,14 +128,12 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    */
   @Override
   public void registerHost(String host, int maxConcurrentJobs) throws ServiceRegistryException {
-    String servicePath = "registerhost";
-    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, servicePath));
+    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, "registerhost"));
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("host", host));
       params.add(new BasicNameValuePair("maxJobs", Integer.toString(maxConcurrentJobs)));
-      UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (UnsupportedEncodingException e) {
       throw new ServiceRegistryException("Can not url encode post parameters", e);
     }
@@ -167,6 +144,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
       responseStatusCode = response.getStatusLine().getStatusCode();
       if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
         logger.info("Registered '" + host + "'.");
+        return;
       }
     } catch (Exception e) {
       throw new ServiceRegistryException("Unable to register '" + host + "'", e);
@@ -183,13 +161,11 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    */
   @Override
   public void unregisterHost(String host) throws ServiceRegistryException {
-    String servicePath = "unregisterhost";
-    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, servicePath));
+    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, "unregisterhost"));
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("host", host));
-      UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (UnsupportedEncodingException e) {
       throw new ServiceRegistryException("Can not url encode post parameters", e);
     }
@@ -200,6 +176,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
       responseStatusCode = response.getStatusLine().getStatusCode();
       if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
         logger.info("Unregistered '" + host + "'.");
+        return;
       }
     } catch (Exception e) {
       throw new ServiceRegistryException("Unable to unregister '" + host + "'", e);
@@ -218,16 +195,14 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
   @Override
   public ServiceRegistration registerService(String serviceType, String host, String path, boolean jobProducer)
           throws ServiceRegistryException {
-    String servicePath = "register";
-    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, servicePath));
+    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, "register"));
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("serviceType", serviceType));
       params.add(new BasicNameValuePair("host", host));
       params.add(new BasicNameValuePair("path", path));
       params.add(new BasicNameValuePair("jobProducer", Boolean.toString(jobProducer)));
-      UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (UnsupportedEncodingException e) {
       throw new ServiceRegistryException("Can not url encode post parameters", e);
     }
@@ -257,8 +232,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    */
   @Override
   public void unRegisterService(String serviceType, String host) throws ServiceRegistryException {
-    String servicePath = "unregister";
-    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, servicePath));
+    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, "unregister"));
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("serviceType", serviceType));
@@ -293,14 +267,12 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    */
   @Override
   public void setMaintenanceStatus(String host, boolean maintenance) throws NotFoundException, ServiceRegistryException {
-    String servicePath = "maintenance";
-    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, servicePath));
+    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, "maintenance"));
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("host", host));
       params.add(new BasicNameValuePair("maintenance", Boolean.toString(maintenance)));
-      UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (UnsupportedEncodingException e) {
       throw new ServiceRegistryException("Can not url encode post parameters", e);
     }
@@ -312,7 +284,11 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
       if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
         logger.info("Set maintenance mode on '" + host + "' to '" + maintenance + "'.");
         return;
+      } else if (responseStatusCode == HttpStatus.SC_NOT_FOUND) {
+        throw new NotFoundException("Host not found: " + host);
       }
+    } catch (NotFoundException e) {
+      throw e;
     } catch (Exception e) {
       throw new ServiceRegistryException("Unable to set maintenance mode on " + host + " to '" + maintenance + "'", e);
     } finally {
@@ -375,23 +351,21 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable,
           Job parentJob) throws ServiceRegistryException {
-    String servicePath = "job";
-    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, servicePath));
+    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, "job"));
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("jobType", type));
-      params.add(new BasicNameValuePair("operation", operation));
       params.add(new BasicNameValuePair("host", this.serverUrl));
-      if (payload != null)
-        params.add(new BasicNameValuePair("payload", payload));
-      params.add(new BasicNameValuePair("start", Boolean.toString(queueable)));
+      params.add(new BasicNameValuePair("operation", operation));
       if (arguments != null && !arguments.isEmpty()) {
         for (String argument : arguments) {
           params.add(new BasicNameValuePair("arg", argument));
         }
       }
-      UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      if (payload != null)
+        params.add(new BasicNameValuePair("payload", payload));
+      params.add(new BasicNameValuePair("start", Boolean.toString(queueable)));
+      post.setEntity(new UrlEncodedFormEntity(params));
     } catch (UnsupportedEncodingException e) {
       throw new ServiceRegistryException("Can not url encode post parameters", e);
     }
@@ -400,7 +374,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
     try {
       response = client.execute(post);
       responseStatusCode = response.getStatusLine().getStatusCode();
-      if (responseStatusCode == HttpStatus.SC_OK) {
+      if (responseStatusCode == HttpStatus.SC_CREATED) {
         Job job = JobParser.parseJob(response.getEntity().getContent());
         logger.debug("Created a new job '{}'", job);
         return job;
@@ -419,22 +393,16 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#updateJob(org.opencastproject.job.api.Job)
    */
   @Override
-  public Job updateJob(Job job) throws ServiceRegistryException {
-    String servicePath = "job/" + job.getId() + ".xml";
-    String jobXml;
-    try {
-      jobXml = serializeToString(job);
-    } catch (IOException e) {
-      throw new ServiceRegistryException("Can not serialize job " + job, e);
-    }
-    HttpPut put = new HttpPut(UrlSupport.concat(serviceURL, servicePath));
+  public Job updateJob(Job job) throws ServiceRegistryException, NotFoundException {
+    HttpPut put = new HttpPut(UrlSupport.concat(serviceURL, "job/" + job.getId() + ".xml"));
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-      params.add(new BasicNameValuePair("job", jobXml));
-      UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
-      put.setEntity(entity);
+      params.add(new BasicNameValuePair("job", JobParser.toXml(job)));
+      put.setEntity(new UrlEncodedFormEntity(params));
     } catch (UnsupportedEncodingException e) {
       throw new ServiceRegistryException("Can not url encode post parameters", e);
+    } catch (IOException e) {
+      throw new ServiceRegistryException("Can not serialize job " + job, e);
     }
     HttpResponse response = null;
     int responseStatusCode;
@@ -444,7 +412,11 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
       if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
         logger.info("Updated job '{}'", job);
         return job;
+      } else if (responseStatusCode == HttpStatus.SC_NOT_FOUND) {
+        throw new NotFoundException("Job not found: " + job.getId());
       }
+    } catch (NotFoundException e) {
+      throw e;
     } catch (Exception e) {
       throw new ServiceRegistryException("Unable to update " + job, e);
     } finally {
@@ -460,8 +432,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    */
   @Override
   public Job getJob(long id) throws NotFoundException, ServiceRegistryException {
-    String servicePath = "job/" + id + ".xml";
-    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, servicePath));
+    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, "job/" + id + ".xml"));
     HttpResponse response = null;
     int responseStatusCode;
     try {
@@ -488,8 +459,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    */
   @Override
   public List<Job> getChildJobs(long id) throws NotFoundException, ServiceRegistryException {
-    String servicePath = "job/" + id + "/children.xml";
-    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, servicePath));
+    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, "job/" + id + "/children.xml"));
     HttpResponse response = null;
     int responseStatusCode;
     try {
@@ -521,10 +491,8 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
     QueryStringBuilder qsb = new QueryStringBuilder("jobs.xml").add("serviceType", serviceType);
     if (status != null)
       qsb.add("status", status.toString());
-    String servicePath = qsb.toString();
 
-    String url = UrlSupport.concat(serviceURL, servicePath);
-    HttpGet get = new HttpGet(url);
+    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, qsb.toString()));
     HttpResponse response = null;
     int responseStatusCode;
     try {
@@ -537,14 +505,13 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
           jobs.add(job);
         }
         return jobs;
-      } else {
-        throw new ServiceRegistryException("Unable to retrieve jobs via http:" + response.getStatusLine());
       }
     } catch (IOException e) {
       throw new ServiceRegistryException("Unable to get jobs", e);
     } finally {
       client.close(response);
     }
+    throw new ServiceRegistryException("Unable to retrieve jobs via http:" + response.getStatusLine());
   }
 
   /**
@@ -649,6 +616,8 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
       responseStatusCode = response.getStatusLine().getStatusCode();
       if (responseStatusCode == HttpStatus.SC_OK) {
         return ServiceRegistrationParser.parse(response.getEntity().getContent());
+      } else if (responseStatusCode == HttpStatus.SC_NOT_FOUND) {
+        return null;
       }
     } catch (IOException e) {
       throw new ServiceRegistryException("Unable to get service registrations", e);
@@ -665,8 +634,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    */
   @Override
   public List<ServiceRegistration> getServiceRegistrations() throws ServiceRegistryException {
-    String servicePath = "services.xml";
-    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, servicePath));
+    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, "services.xml"));
     HttpResponse response = null;
     int responseStatusCode;
     try {
@@ -692,8 +660,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    */
   @Override
   public List<HostRegistration> getHostRegistrations() throws ServiceRegistryException {
-    String servicePath = "hosts.xml";
-    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, servicePath));
+    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, "hosts.xml"));
     HttpResponse response = null;
     int responseStatusCode;
     try {
@@ -719,8 +686,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    */
   @Override
   public List<ServiceStatistics> getServiceStatistics() throws ServiceRegistryException {
-    String servicePath = "statistics.xml";
-    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, servicePath));
+    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, "statistics.xml"));
     HttpResponse response = null;
     int responseStatusCode;
     try {
@@ -784,17 +750,16 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
       throw new IllegalArgumentException("Service type must not be null");
     }
     QueryStringBuilder queryStringBuilder = new QueryStringBuilder("count").add("serviceType", serviceType);
-    if (status != null) {
+    if (status != null)
       queryStringBuilder.add("status", status.toString());
-    }
-    if (StringUtils.isNotBlank(host)) {
+
+    if (StringUtils.isNotBlank(host))
       queryStringBuilder.add("host", host);
-    }
-    if (StringUtils.isNotBlank(operation)) {
+
+    if (StringUtils.isNotBlank(operation))
       queryStringBuilder.add("operation", operation);
-    }
-    String servicePath = queryStringBuilder.toString();
-    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, servicePath));
+
+    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, queryStringBuilder.toString()));
     HttpResponse response = null;
     int responseStatusCode;
     try {
@@ -818,27 +783,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    */
   @Override
   public SystemLoad getLoad() throws ServiceRegistryException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * Gets an xml representation of a {@link Job}
-   * 
-   * @param job
-   *          The job to marshall
-   * @return the serialized job
-   */
-  private String serializeToString(Job job) throws IOException {
-    Marshaller marshaller;
-    try {
-      marshaller = jaxbContext.createMarshaller();
-      Writer writer = new StringWriter();
-      marshaller.marshal(job, writer);
-      return writer.toString();
-    } catch (JAXBException e) {
-      throw new IOException(e);
-    }
+    throw new UnsupportedOperationException();
   }
 
   /**
@@ -858,7 +803,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    */
   @Override
   public int getMaxConcurrentJobs() throws ServiceRegistryException {
-    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, "/maxconcurrentjobs"));
+    HttpGet get = new HttpGet(UrlSupport.concat(serviceURL, "maxconcurrentjobs"));
     HttpResponse response = null;
     int responseStatusCode;
     try {
@@ -876,8 +821,33 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
   }
 
   @Override
-  public void sanitize(String serviceType, String host) {
-    // TODO Auto-generated method stub
+  public void sanitize(String serviceType, String host) throws NotFoundException {
+    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, "sanitize"));
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("serviceType", serviceType));
+      params.add(new BasicNameValuePair("host", host));
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (UnsupportedEncodingException e) {
+      throw new IllegalStateException("Can not url encode post parameters", e);
+    }
+
+    HttpResponse response = null;
+    int responseStatusCode;
+    try {
+      response = client.execute(post);
+      responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
+        return;
+      } else if (responseStatusCode == HttpStatus.SC_NOT_FOUND) {
+        throw new NotFoundException();
+      }
+    } catch (IOException e) {
+      throw new IllegalStateException("Unable to get service statistics", e);
+    } finally {
+      client.close(response);
+    }
+    throw new IllegalStateException("Unable to get service statistics (" + responseStatusCode + ")");
   }
 
   /**

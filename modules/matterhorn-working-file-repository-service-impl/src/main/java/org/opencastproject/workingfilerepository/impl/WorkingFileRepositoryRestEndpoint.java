@@ -16,6 +16,7 @@
 package org.opencastproject.workingfilerepository.impl;
 
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.IoSupport.withFile;
@@ -192,12 +193,16 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   @Path(WorkingFileRepository.COLLECTION_PATH_PREFIX + "{collectionId}/{fileName}")
   @RestQuery(name = "deleteFromCollection", description = "Remove the file from the working repository under /collectionId/filename", returnDescription = "No content", pathParameters = {
           @RestParameter(name = "collectionId", description = "the collection identifier", isRequired = true, type = STRING),
-          @RestParameter(name = "fileName", description = "the file name", isRequired = true, type = STRING) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "File deleted") })
+          @RestParameter(name = "fileName", description = "the file name", isRequired = true, type = STRING) }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "File deleted"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Collection or file not found") })
   public Response restDeleteFromCollection(@PathParam("collectionId") String collectionId,
           @PathParam("fileName") String fileName) {
     try {
-      this.deleteFromCollection(collectionId, fileName);
-      return Response.noContent().build();
+      if (this.deleteFromCollection(collectionId, fileName))
+        return Response.noContent().build();
+      else
+        return Response.status(SC_NOT_FOUND).build();
     } catch (Exception e) {
       return Response.serverError().entity(e.getMessage()).build();
     }
@@ -209,6 +214,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestParameter(name = "mediaPackageID", description = "the mediapackage identifier", isRequired = true, type = STRING),
           @RestParameter(name = "mediaPackageElementID", description = "the mediapackage element identifier", isRequired = true, type = STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "File returned"),
+          @RestResponse(responseCode = SC_NOT_MODIFIED, description = "If file not modified"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGet(@PathParam("mediaPackageID") final String mediaPackageID,
           @PathParam("mediaPackageElementID") final String mediaPackageElementID,
@@ -307,9 +313,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   @Path("/collectionuri/{collectionID}/{fileName}")
   @RestQuery(name = "getUriFromCollection", description = "Gets the URL for a file to be stored in the working repository under /collectionId/filename", returnDescription = "The url to this file", pathParameters = {
           @RestParameter(name = "collectionID", description = "the collection identifier", isRequired = true, type = STRING),
-          @RestParameter(name = "fileName", description = "the file name", isRequired = true, type = STRING) }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "URL returned"),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
+          @RestParameter(name = "fileName", description = "the file name", isRequired = true, type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "URL returned") })
   public Response restGetCollectionUri(@PathParam("collectionID") String collectionId,
           @PathParam("fileName") String fileName) {
     URI uri = this.getCollectionURI(collectionId, fileName);
@@ -320,9 +324,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   @Path("/uri/{mediaPackageID}/{mediaPackageElementID}")
   @RestQuery(name = "getUri", description = "Gets the URL for a file to be stored in the working repository under /mediaPackageID", returnDescription = "The url to this file", pathParameters = {
           @RestParameter(name = "mediaPackageID", description = "the mediaPackage identifier", isRequired = true, type = STRING),
-          @RestParameter(name = "mediaPackageElementID", description = "the mediaPackage element identifier", isRequired = true, type = STRING) }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "URL returned"),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
+          @RestParameter(name = "mediaPackageElementID", description = "the mediaPackage element identifier", isRequired = true, type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "URL returned") })
   public Response restGetUri(@PathParam("mediaPackageID") String mediaPackageID,
           @PathParam("mediaPackageElementID") String mediaPackageElementID) {
     URI uri = this.getURI(mediaPackageID, mediaPackageElementID);
@@ -334,9 +336,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   @RestQuery(name = "getUriWithFilename", description = "Gets the URL for a file to be stored in the working repository under /mediaPackageID", returnDescription = "The url to this file", pathParameters = {
           @RestParameter(name = "mediaPackageID", description = "the mediaPackage identifier", isRequired = true, type = STRING),
           @RestParameter(name = "mediaPackageElementID", description = "the mediaPackage element identifier", isRequired = true, type = STRING),
-          @RestParameter(name = "fileName", description = "the filename", isRequired = true, type = STRING) }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "URL returned"),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
+          @RestParameter(name = "fileName", description = "the filename", isRequired = true, type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "URL returned") })
   public Response restGetUri(@PathParam("mediaPackageID") String mediaPackageID,
           @PathParam("mediaPackageElementID") String mediaPackageElementID, @PathParam("fileName") String fileName) {
     URI uri = this.getURI(mediaPackageID, mediaPackageElementID, fileName);
@@ -347,8 +347,10 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/list/{collectionId}.json")
-  @RestQuery(name = "filesInCollection", description = "Lists files in a collection", returnDescription = "Links to the URLs in a collection", pathParameters = { @RestParameter(name = "collectionId", description = "the collection identifier", isRequired = true, type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "URLs returned") })
-  public Response restGetCollectionContents(@PathParam("collectionId") String collectionId) {
+  @RestQuery(name = "filesInCollection", description = "Lists files in a collection", returnDescription = "Links to the URLs in a collection", pathParameters = { @RestParameter(name = "collectionId", description = "the collection identifier", isRequired = true, type = STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "URLs returned"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Collection not found") })
+  public Response restGetCollectionContents(@PathParam("collectionId") String collectionId) throws NotFoundException {
     try {
       URI[] uris = super.getCollectionContents(collectionId);
       JSONArray jsonArray = new JSONArray();
@@ -356,6 +358,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
         jsonArray.add(uri.toString());
       }
       return Response.ok(jsonArray.toJSONString()).build();
+    } catch (NotFoundException e) {
+      throw e;
     } catch (Exception e) {
       return Response.serverError().entity(e.getMessage()).build();
     }
@@ -368,7 +372,9 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestParameter(name = "fromFileName", description = "the source file name", isRequired = true, type = STRING),
           @RestParameter(name = "toMediaPackage", description = "the destination mediapackage identifier", isRequired = true, type = STRING),
           @RestParameter(name = "toMediaPackageElement", description = "the destination mediapackage element identifier", isRequired = true, type = STRING),
-          @RestParameter(name = "toFileName", description = "the destination file name", isRequired = true, type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "URL returned") })
+          @RestParameter(name = "toFileName", description = "the destination file name", isRequired = true, type = STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "URL returned"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "File to copy not found") })
   public Response restCopyTo(@PathParam("fromCollection") String fromCollection,
           @PathParam("fromFileName") String fromFileName, @PathParam("toMediaPackage") String toMediaPackage,
           @PathParam("toMediaPackageElement") String toMediaPackageElement, @PathParam("toFileName") String toFileName) {
@@ -387,7 +393,9 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestParameter(name = "fromFileName", description = "the source file name", isRequired = true, type = STRING),
           @RestParameter(name = "toMediaPackage", description = "the destination mediapackage identifier", isRequired = true, type = STRING),
           @RestParameter(name = "toMediaPackageElement", description = "the destination mediapackage element identifier", isRequired = true, type = STRING),
-          @RestParameter(name = "toFileName", description = "the destination file name", isRequired = true, type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "URL returned") })
+          @RestParameter(name = "toFileName", description = "the destination file name", isRequired = true, type = STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "URL returned"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "File to move not found") })
   public Response restMoveTo(@PathParam("fromCollection") String fromCollection,
           @PathParam("fromFileName") String fromFileName, @PathParam("toMediaPackage") String toMediaPackage,
           @PathParam("toMediaPackageElement") String toMediaPackageElement, @PathParam("toFileName") String toFileName) {

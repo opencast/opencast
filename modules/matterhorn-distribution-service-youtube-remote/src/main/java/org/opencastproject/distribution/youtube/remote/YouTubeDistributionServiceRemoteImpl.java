@@ -24,7 +24,6 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
@@ -32,7 +31,6 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,22 +69,18 @@ public class YouTubeDistributionServiceRemoteImpl extends RemoteBase implements 
    *      java.lang.String)
    */
   public Job distribute(MediaPackage mediaPackage, String elementId) throws DistributionException {
-    String mediapackageXml = MediaPackageParser.getAsXml(mediaPackage);
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    params.add(new BasicNameValuePair("mediapackage", mediapackageXml));
+    params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
     params.add(new BasicNameValuePair("elementId", elementId));
     HttpPost post = new HttpPost();
     HttpResponse response = null;
-    Job receipt = null;
     try {
-      UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
-      post.setEntity(entity);
+      post.setEntity(new UrlEncodedFormEntity(params));
       response = getResponse(post);
       if (response != null) {
-        logger.info("distributed {} to {}", elementId, distributionChannel);
+        logger.info("Distributing {} to {}", elementId, distributionChannel);
         try {
-          receipt = JobParser.parseJob(response.getEntity().getContent());
-          return receipt;
+          return JobParser.parseJob(response.getEntity().getContent());
         } catch (Exception e) {
           throw new DistributionException("Unable to distribute mediapackage '" + elementId
                   + "' using a remote distribution service", e);
@@ -109,32 +103,26 @@ public class YouTubeDistributionServiceRemoteImpl extends RemoteBase implements 
    */
   @Override
   public Job retract(MediaPackage mediaPackage, String elementId) throws DistributionException {
-    String mediapackageXml = MediaPackageParser.getAsXml(mediaPackage);
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    params.add(new BasicNameValuePair("mediapackage", mediapackageXml));
+    params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
     params.add(new BasicNameValuePair("elementId", elementId));
-    HttpPost post = new HttpPost();
+    HttpPost post = new HttpPost("/retract");
     HttpResponse response = null;
-    UrlEncodedFormEntity entity = null;
     try {
-      entity = new UrlEncodedFormEntity(params);
-    } catch (UnsupportedEncodingException e) {
-      throw new DistributionException("Unable to retract mediapackage " + mediaPackage + " for http post", e);
-    }
-    post.setEntity(entity);
-    try {
-      response = getResponse(post, HttpStatus.SC_NO_CONTENT);
-      Job receipt = null;
+      post.setEntity(new UrlEncodedFormEntity(params));
+      response = getResponse(post);
       if (response != null) {
-        logger.info("retracted {} from {}", mediaPackage, distributionChannel);
+        logger.info("Retracting {} from {}", mediaPackage, distributionChannel);
         try {
-          receipt = JobParser.parseJob(response.getEntity().getContent());
-          return receipt;
+          return JobParser.parseJob(response.getEntity().getContent());
         } catch (Exception e) {
           throw new DistributionException("Unable to retract mediapackage '" + mediaPackage
                   + "' using a remote distribution service", e);
         }
       }
+    } catch (Exception e) {
+      throw new DistributionException("Unable to retract mediapackage " + elementId
+              + " using a remote distribution service proxy.", e);
     } finally {
       closeConnection(response);
     }

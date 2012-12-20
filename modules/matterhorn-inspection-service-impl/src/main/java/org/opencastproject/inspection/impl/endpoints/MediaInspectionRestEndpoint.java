@@ -19,9 +19,7 @@ import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
-import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
-import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -29,11 +27,9 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.io.IOUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 import java.net.URI;
 
@@ -46,22 +42,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * A service endpoint to expose the {@link MediaInspectionService} via REST.
  */
 @Path("/")
-@RestService(name = "mediainspection", title = "Media Inspection Service",
-  abstractText = "This service extracts technical metadata from media files.",
-  notes = {
+@RestService(name = "mediainspection", title = "Media Inspection Service", abstractText = "This service extracts technical metadata from media files.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
-        + "not working and is either restarting or has failed",
+                + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -116,7 +108,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @Path("inspect")
   @RestQuery(name = "inspect", description = "Analyze a given media file, returning a receipt to check on the status and outcome of the job", restParameters = { @RestParameter(description = "Location of the media file.", isRequired = false, name = "uri", type = RestParameter.Type.STRING) }, reponses = {
-          @RestResponse(description = "XML encoded receipt is returned.", responseCode = HttpServletResponse.SC_NO_CONTENT),
+          @RestResponse(description = "XML encoded receipt is returned.", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Service unavailabe or not currently present", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE),
           @RestResponse(description = "Problem retrieving media file or invalid media file or URL.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response inspectTrack(@QueryParam("uri") URI uri) {
@@ -136,18 +128,14 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
   @RestQuery(name = "enrich", description = "Analyze and add missing metadata of a given media file, returning a receipt to check on the status and outcome of the job.", restParameters = {
           @RestParameter(description = "MediaPackage Element, that should be enriched with metadata ", isRequired = true, name = "mediaPackageElement", type = RestParameter.Type.TEXT),
           @RestParameter(description = "Should the existing metadata values remain", isRequired = true, name = "override", type = RestParameter.Type.BOOLEAN) }, reponses = {
-          @RestResponse(description = "XML encoded receipt is returned.", responseCode = HttpServletResponse.SC_NO_CONTENT),
+          @RestResponse(description = "XML encoded receipt is returned.", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Service unavailabe or not currently present", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE),
           @RestResponse(description = "Problem retrieving media file or invalid media file or URL.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response enrichTrack(@FormParam("mediaPackageElement") String mediaPackageElement,
           @FormParam("override") boolean override) {
     checkNotNull(service);
     try {
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      Document doc = docBuilder.parse(IOUtils.toInputStream(mediaPackageElement, "UTF-8"));
-      MediaPackageElement mpe = MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-              .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
-      Job job = service.enrich(mpe, override);
+      Job job = service.enrich(MediaPackageElementParser.getFromXml(mediaPackageElement), override);
       return Response.ok(new JaxbJob(job)).build();
     } catch (Exception e) {
       logger.info(e.getMessage(), e);
