@@ -20,6 +20,7 @@ import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
 import org.opencastproject.dictionary.api.DictionaryService;
 import org.opencastproject.util.ReadinessIndicator;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -87,34 +88,38 @@ public class DictionaryScanner implements ArtifactInstaller {
     // Make sure we are not importing something that already exists
     if (Arrays.asList(dictionaryService.getLanguages()).contains(language)) {
       logger.debug("Skipping existing dictionary '{}'", language);
-      return;
-    }
-
-    logger.info("Loading language pack from {}", artifact);
-
-    // read csv file and fill dictionary index
-    BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(artifact)), 1024 * 1024);
-    String wordLine;
-    while ((wordLine = br.readLine()) != null) {
-      if (wordLine.startsWith("#")) {
-        if (wordLine.startsWith("#numAllW")) {
-          numAllW = Integer.valueOf(wordLine.split(":")[1]);
-        }
-        continue;
-      }
-      String[] arr = wordLine.split(",");
-      String word = arr[0];
-      Integer count = Integer.valueOf(arr[1]);
-      Double weight = 1.0 * count / numAllW;
+    } else {
+      logger.info("Loading language pack from {}", artifact);
+      // read csv file and fill dictionary index
+      BufferedReader br = null;
       try {
-        dictionaryService.addWord(word, language, count, weight);
-      } catch (Exception e) {
-        logger.warn("Unable to add word '{}' to the {} dictionary: {}", new String[] { word, language, e.getMessage() });
+        br = new BufferedReader(new InputStreamReader(new FileInputStream(artifact)), 1024 * 1024);
+        String wordLine;
+        while ((wordLine = br.readLine()) != null) {
+          if (wordLine.startsWith("#")) {
+            if (wordLine.startsWith("#numAllW")) {
+              numAllW = Integer.valueOf(wordLine.split(":")[1]);
+            }
+            continue;
+          }
+          String[] arr = wordLine.split(",");
+          String word = arr[0];
+          Integer count = Integer.valueOf(arr[1]);
+          Double weight = 1.0 * count / numAllW;
+          try {
+            dictionaryService.addWord(word, language, count, weight);
+          } catch (Exception e) {
+            logger.warn("Unable to add word '{}' to the {} dictionary: {}",
+                    new String[] { word, language, e.getMessage() });
+          }
+        }
+      } finally {
+        IOUtils.closeQuietly(br);
       }
+      logger.info("Finished loading language pack from {}", artifact);
     }
 
     sumInstalledFiles++;
-    logger.info("Finished loading language pack from {}", artifact);
 
     // Determine the number of available profiles
     String[] filesInDirectory = artifact.getParentFile().list(new FilenameFilter() {
@@ -142,7 +147,7 @@ public class DictionaryScanner implements ArtifactInstaller {
    */
   @Override
   public void uninstall(File artifact) throws Exception {
-    // Do nothing
+    sumInstalledFiles--;
   }
 
   /**
