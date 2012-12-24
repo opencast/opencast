@@ -25,6 +25,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.api.UserProvider;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -183,9 +184,8 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       }
 
       authorities.add(new GrantedAuthorityImpl(securityService.getOrganization().getAnonymousRole()));
-      String password = user.getPassword() == null ? "" : user.getPassword();
-      return new org.springframework.security.core.userdetails.User(user.getUserName(), password, true, true, true,
-              true, authorities);
+      return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(),
+              StringUtils.isNotBlank(user.getPassword()), true, true, true, authorities);
     }
   }
 
