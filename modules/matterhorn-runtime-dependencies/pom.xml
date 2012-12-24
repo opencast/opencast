@@ -212,6 +212,12 @@
       <artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
       <version>3.1_7</version>
     </dependency>
+    
+    <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.cglib</artifactId>
+      <version>2.2_2</version>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.commons</groupId>
