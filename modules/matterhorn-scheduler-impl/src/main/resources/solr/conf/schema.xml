@@ -247,7 +247,7 @@
    <field name="dc_available_to" type="date" indexed="true" stored="true" omitNorms="true" multiValued="false"/>
    <field name="dc_language" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
    <field name="dc_rights_holder" type="text" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
-   <field name="dc_spatial" type="text" indexed="true" stored="true" omitNorms="true"/>
+   <field name="dc_spatial" type="string" indexed="true" stored="true" omitNorms="true"/>
    <field name="dc_is_part_of" type="string" indexed="true" stored="true" omitNorms="true"/>
    <field name="dc_replaces" type="string" indexed="true" stored="true" omitNorms="true"/>
    <field name="dc_type" type="text" indexed="true" stored="true" omitNorms="true"/>
@@ -285,7 +285,7 @@
    <field name="dc_available_to_sort" type="date" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
    <field name="dc_language_sort" type="string" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
    <field name="dc_rights_holder_sort" type="text" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_spatial_sort" type="text" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
+   <field name="dc_spatial_sort" type="string" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
    <field name="dc_is_part_of_sort" type="string" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
    <field name="dc_replaces_sort" type="string" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
    <field name="dc_type_sort" type="text" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
@@ -323,6 +323,7 @@
    <copyField source="dc_description" dest="fulltext"/>
    <copyField source="dc_publisher" dest="fulltext"/>
    <copyField source="dc_contributor" dest="fulltext"/>
+   <copyField source="dc_spatial" dest="fulltext"/>
    
    <copyField source="dc_title" dest="dc_title_sort"/>
    <copyField source="dc_created" dest="dc_created_sort"/>
