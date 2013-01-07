@@ -21,17 +21,21 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
+import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -53,11 +57,12 @@ public class ArchiveWorkflowOperationHandler extends AbstractWorkflowOperationHa
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS
             .put("source-tags", "Archive any mediapackage elements with one of these (whitespace separated) tags");
+    CONFIG_OPTIONS.put("source-flavors", "The \"flavor\" of the track to use as a source input");
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -68,7 +73,7 @@ public class ArchiveWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /**
    * Callback for declarative services configuration that will introduce us to the search service. Implementation
    * assumes that the reference is configured as being static.
-   *
+   * 
    * @param episodeService
    *          an instance of the search service
    */
@@ -76,11 +81,24 @@ public class ArchiveWorkflowOperationHandler extends AbstractWorkflowOperationHa
     this.episodeService = episodeService;
   }
 
-  protected MediaPackage getMediaPackageForArchival(MediaPackage current, List<String> tags)
+  protected MediaPackage getMediaPackageForArchival(MediaPackage current, List<String> tags, String[] sourceFlavors)
           throws MediaPackageException {
     MediaPackage mp = (MediaPackage) current.clone();
 
-    List<MediaPackageElement> keep = Arrays.asList(current.getElementsByTags(tags));
+    Collection<MediaPackageElement> keep;
+
+    if (tags.isEmpty() && sourceFlavors.length < 1) {
+      keep = Arrays.asList(current.getElementsByTags(tags));
+    } else {
+      SimpleElementSelector simpleElementSelector = new SimpleElementSelector();
+      for (String flavor : sourceFlavors) {
+        simpleElementSelector.addFlavor(flavor);
+      }
+      for (String tag : tags) {
+        simpleElementSelector.addTag(tag);
+      }
+      keep = simpleElementSelector.select(current, false);
+    }
 
     // Mark everything that is set for removal
     List<MediaPackageElement> removals = new ArrayList<MediaPackageElement>();
@@ -141,34 +159,32 @@ public class ArchiveWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(WorkflowInstance, JobContext)
    */
-  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     MediaPackage mediaPackageFromWorkflow = workflowInstance.getMediaPackage();
+    WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
 
     // Check which tags have been configured
-    String tags = workflowInstance.getCurrentOperation().getConfiguration("source-tags");
-    logger.debug("No source tags have been specified, so everything will be added to the archive index");
+    String tags = StringUtils.trimToNull(currentOperation.getConfiguration("source-tags"));
+    String sourceFlavorsString = StringUtils.trimToEmpty(currentOperation.getConfiguration("source-flavors"));
 
-    MediaPackage mediaPackageForArchive = null;
-    
+    String[] sourceFlavors = StringUtils.split(sourceFlavorsString, ",");
+    if (sourceFlavors.length < 1 && tags == null)
+      logger.debug("No source tags have been specified, so everything will be added to the archive index");
+
+    List<String> tagSet = new ArrayList<String>();
     // If a set of tags has been specified, use it
-    if (tags != null) {
-      try {
-        List<String> tagSet = asList(tags);
-        mediaPackageForArchive = getMediaPackageForArchival(mediaPackageFromWorkflow, tagSet);
-      } catch (MediaPackageException e) {
-        throw new WorkflowOperationException(e);
-      }
-    } else {
-      mediaPackageForArchive = mediaPackageFromWorkflow;
-    }
+    if (tags != null)
+      tagSet = asList(tags);
 
     try {
-      if (mediaPackageForArchive == null) {
+      MediaPackage mediaPackageForArchive = getMediaPackageForArchival(mediaPackageFromWorkflow, tagSet, sourceFlavors);
+      if (mediaPackageForArchive == null)
         createResult(mediaPackageForArchive, Action.CONTINUE);
-      }
+
       logger.info("Archiving media package {}", mediaPackageForArchive);
       // adding media package to the episode service
       episodeService.add(mediaPackageForArchive);
