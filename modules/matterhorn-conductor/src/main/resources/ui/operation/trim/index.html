@@ -422,24 +422,39 @@
                      $('#player-container').text('No preview encoded track found in MediaPackage');
                      }*/
 
+	    var previewFilesTypes = new Array();
             var previewFiles = new Array();
                         
             $(data.documentElement).find("mp|mediapackage > mp|media > track").each(function(index, elm){
               if ($(elm).attr('type').split(/\//)[1] == 'preview') {
+	        previewFilesTypes.push($(elm).attr('type').split(/\//)[0]);
                 previewFiles.push($(elm).find('url').text());
               }
             });
             if (previewFiles.length > 0) {
               var url = PLAYER_URL + '?';
               for (var i = 0; i < previewFiles.length; i++) {
-                if (i == 0) {
+                if((previewFiles.length == 1) && (i == 0)) {
                   url += 'videoUrl=';
+                }
+                else if ((i == 0) && (previewFilesTypes[i] == 'presenter')) {
+                  url += 'videoUrl=';
+                }
+                else if ((i == 1) && (previewFilesTypes[i] == 'presentation')) {
+                  url += '&videoUrl2=';
+                }
+                else if ((i == 0) && (previewFilesTypes[i] == 'presentation')) {
+                  url += 'videoUrl2=';
+                }
+                else if ((i == 1) && (previewFilesTypes[i] == 'presenter')) {
+                  url += '&videoUrl=';
                 }
                 else {
                   url += '&videoUrl' + (i + 1) + '=';
                 }
-                url += previewFiles[i];
-              }
+                 url += previewFiles[i];
+               }
+
               $('#player-container').attr('src', url + "&play=false&preview=true&hideControls=false&hideAPLogo=true");
             }
             else {
