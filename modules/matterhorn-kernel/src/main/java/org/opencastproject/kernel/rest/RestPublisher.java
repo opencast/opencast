@@ -185,16 +185,25 @@ public class RestPublisher implements RestConstants {
     }
     servletRegistrationMap.put(servicePath, reg);
 
-    // Wait for the servlet to be initialized. Since the servlet is published via the whiteboard, this may happen
-    // asynchronously
-    while (!cxf.isInitialized()) {
+    // Wait for the servlet to be initialized as long as one minute. Since the servlet is published via the whiteboard,
+    // this may happen asynchronously. However, after 30 seconds we expect the HTTP service and the whiteboard
+    // implementation to be loaded and active.
+    int count = 0;
+    while (!cxf.isInitialized() && count < 300) {
       logger.debug("Waiting for the servlet at '{}' to be initialized", servicePath);
       try {
         Thread.sleep(100);
+        count ++;
       } catch (InterruptedException e) {
         logger.warn("Interrupt while waiting for RestServlet initialization");
         break;
       }
+    }
+    
+    // Was initialization successful
+    if (!cxf.isInitialized()) {
+      logger.error("Whiteboard implemenation failed to pick up REST endpoint declaration {}", serviceType);
+      return;
     }
 
     // Set up cxf
