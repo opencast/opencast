@@ -581,7 +581,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     try {
       String orgId = securityService.getOrganization().getId();
       StringBuilder queryString = new StringBuilder().append(ORG_KEY).append(":").append(orgId);
-      appendSolrAuthFragment(queryString, READ_PERMISSION);
+      appendSolrAuthFragment(queryString, WRITE_PERMISSION);
       SolrQuery solrQuery = new SolrQuery(queryString.toString());
       solrQuery.addFacetField(WORKFLOW_DEFINITION_KEY);
       solrQuery.addFacetField(OPERATION_KEY);
@@ -617,7 +617,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
               operationReport.setId(operation.getName());
 
               StringBuilder baseSolrQuery = new StringBuilder().append(ORG_KEY).append(":").append(orgId);
-              appendSolrAuthFragment(baseSolrQuery, READ_PERMISSION);
+              appendSolrAuthFragment(baseSolrQuery, WRITE_PERMISSION);
               solrQuery = new SolrQuery(baseSolrQuery.toString());
               solrQuery.addFacetField(STATE_KEY);
               solrQuery.addFacetQuery(STATE_KEY + ":" + WorkflowState.FAILED);
