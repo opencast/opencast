@@ -25,41 +25,43 @@
     <!-- ################ -->
     <!-- # URL SECURITY # -->
     <!-- ################ -->
-    <sec:intercept-url pattern='/login.html' access='ROLE_ANONYMOUS' />
+
+    <!-- Allow anonymous access to the login form -->
+    <sec:intercept-url pattern="/login.html" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the /info/me.json resource -->
-    <sec:intercept-url pattern='/info/me.json' method="GET" access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern='/info/components.json' method="GET" access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern="/info/me.json" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/info/components.json" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
-    <sec:intercept-url pattern='/engage/ui/**' access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern='/search/**' method="GET" access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern='/usertracking/**' method="GET" access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern='/static/**' method="GET" access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern='/export/**' method="GET" access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern="/engage/ui/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/search/**" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/usertracking/**" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/static/**" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/export/**" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the annotation and the series endpoints -->
-    <sec:intercept-url pattern='/series/**' method="GET" access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern='/annotation/**' method="GET" access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern='/annotation/**' method="PUT" access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern="/series/**" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/annotation/**" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/annotation/**" method="PUT" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the OAI-PMH repository              -->
     <!-- The OAI-PMH specification demands boths GET and POST requests  -->
     <!-- Please make sure that the path configured here matches         -->
     <!-- the path configured for the repository servlet.                -->
-    <sec:intercept-url pattern='/oaipmh/**' method='GET' access='ROLE_ANONYMOUS'/>
-    <sec:intercept-url pattern='/oaipmh/**' method='POST' access='ROLE_ANONYMOUS'/>
+    <sec:intercept-url pattern="/oaipmh/**" method="GET" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="/oaipmh/**" method="POST" access="ROLE_ANONYMOUS"/>
 
     <!-- Enable anonymous access to the rss and atom feeds -->
-    <sec:intercept-url pattern='/feeds/**' method="GET" access='ROLE_ANONYMOUS' />
+    <sec:intercept-url pattern="/feeds/**" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Secure the system management URLs for admins only -->
-    <sec:intercept-url pattern='/services/*' access='ROLE_ADMIN' />
-    <sec:intercept-url pattern='/system/**' access='ROLE_ADMIN' />
+    <sec:intercept-url pattern="/services/*" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/system/**" access="ROLE_ADMIN" />
     
     <!-- Secure the user management URLs for admins only -->
-    <sec:intercept-url pattern='/users/**' access='ROLE_ADMIN' />
-    <sec:intercept-url pattern='/admin/users.html' access='ROLE_ADMIN' />
+    <sec:intercept-url pattern="/users/**" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/admin/users.html" access="ROLE_ADMIN" />
 
     <!-- Enable 2-legged OAuth access ("signed fetch") to the LTI launch servlet -->
     <sec:intercept-url pattern="/lti" access="ROLE_OAUTH_USER" />
@@ -71,7 +73,7 @@
     <sec:intercept-url pattern="/ltitools/**" access="ROLE_OAUTH_USER" />
 
     <!-- Everything else is for the admin users -->
-    <sec:intercept-url pattern='/**' access='ROLE_ADMIN, ROLE_COURSE_ADMIN, ROLE_INSTRUCTOR' />
+    <sec:intercept-url pattern="/**" access="ROLE_ADMIN, ROLE_COURSE_ADMIN, ROLE_INSTRUCTOR" />
 
     <!-- ############################# -->
     <!-- # LOGIN / LOGOUT MECHANISMS # -->
@@ -86,8 +88,8 @@
     <!-- Digest auth is used by capture agents and is used to enable transparent clustering of services -->
     <sec:custom-filter position="BASIC_AUTH_FILTER" ref="digestFilter" />
 
-	<!-- Matterhorn is shipping its own implementation of the anonymous filter -->
-	<sec:custom-filter ref="anonymousFilter" position="ANONYMOUS_FILTER" />
+	  <!-- Matterhorn is shipping its own implementation of the anonymous filter -->
+	  <sec:custom-filter ref="anonymousFilter" position="ANONYMOUS_FILTER" />
 
     <!--
       2-legged oauth is used by trusted 3rd party applications, including LTI producers.
@@ -156,7 +158,6 @@
     </property>
   </bean>
 
-
   <!-- ################# -->
   <!-- # Digest Filter # -->
   <!-- ################# -->
@@ -171,7 +172,6 @@
       <bean class="org.springframework.security.core.userdetails.cache.NullUserCache" />
     </property>
   </bean>
-
 
   <!-- ####################### -->
   <!-- # OAuth (LTI) Support # -->
@@ -195,14 +195,14 @@
     <property name="authHandler">
       <bean class="org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler">
         <constructor-arg index="0" ref="userDetailsService" />
-	<!-- Uncomment to allow the included keys to be trusted to provide
-	known user details
-	<constructor-arg index="1">
-	  <list>
-             <value>trustedKey</value>
-             <value>trustedKey2</value>
+	      <!-- Uncomment to allow the included keys to be trusted to provide known user details
+	      <constructor-arg index="1">
+	        <list>
+            <value>trustedKey</value>
+            <value>trustedKey2</value>
           </list>
-	</constructor-arg>-->
+	      </constructor-arg>
+	      -->
       </bean>
     </property>
   </bean>
