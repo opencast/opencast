@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -62,10 +63,11 @@ public class OaiPmhServerTest {
     }
   }
 
-  private static boolean checkPresenceOfOaiPmhRepository() {
+  private static boolean checkPresenceOfOaiPmhRepository() throws IOException {
     HttpGet get = new HttpGet(baseUrl);
     TrustedHttpClient client = Main.getClient();
     HttpResponse response = client.execute(get);
+    response.getEntity().consumeContent();
     Main.returnClient(client);
     boolean serverPresent = response.getStatusLine().getStatusCode() != HttpStatus.SC_NOT_FOUND;
     if (serverPresent) {
