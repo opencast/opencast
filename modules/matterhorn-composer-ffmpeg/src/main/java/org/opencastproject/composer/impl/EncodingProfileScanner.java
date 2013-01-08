@@ -300,7 +300,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
       bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
       logger.info("All {} encoding profiles installed", filesInDirectory.length);
     } else {
-      logger.info("{} of {} encoding profiles installed", sumInstalledFiles, filesInDirectory.length);
+      logger.debug("{} of {} encoding profiles installed", sumInstalledFiles, filesInDirectory.length);
     }
   }
 

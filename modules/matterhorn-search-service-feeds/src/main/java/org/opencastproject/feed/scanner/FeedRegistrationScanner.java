@@ -134,7 +134,7 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
       bundleContext.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
       logger.info("All {} feeds installed", filesInDirectory.length);
     } else {
-      logger.info("{} of {} feeds installed", sumInstalledFiles, filesInDirectory.length);
+      logger.debug("{} of {} feeds installed", sumInstalledFiles, filesInDirectory.length);
     }
   }
 
