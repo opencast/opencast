@@ -16,8 +16,6 @@
 package org.opencastproject.serviceregistry.impl;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.JobDispatcher;
-import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.JobProducerHearbeat;
 
 import org.easymock.classextension.EasyMock;
 import org.junit.Before;
@@ -29,9 +27,6 @@ import org.osgi.service.component.ComponentContext;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -128,94 +123,9 @@ public class ServiceRegistryJpaImplTest {
     EasyMock.replay(cc);
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void nullContextActivatesOkay() throws ServiceRegistryException {
-    serviceRegistryJpaImpl.scheduledExecutor = EasyMock.createMock(ScheduledExecutorService.class);
-
-    EasyMock.expect(
-            serviceRegistryJpaImpl.scheduledExecutor.scheduleWithFixedDelay((JobDispatcher) EasyMock.anyObject(),
-                    EasyMock.eq(ServiceRegistryJpaImpl.DEFAULT_DISPATCH_PERIOD),
-                    EasyMock.eq(ServiceRegistryJpaImpl.DEFAULT_DISPATCH_PERIOD), EasyMock.eq(TimeUnit.MILLISECONDS)))
-            .andReturn(EasyMock.createNiceMock(ScheduledFuture.class));
-
-    EasyMock.expect(
-            serviceRegistryJpaImpl.scheduledExecutor.scheduleWithFixedDelay((JobProducerHearbeat) EasyMock.anyObject(),
-                    EasyMock.eq(ServiceRegistryJpaImpl.DEFAULT_HEART_BEAT),
-                    EasyMock.eq(ServiceRegistryJpaImpl.DEFAULT_HEART_BEAT), EasyMock.eq(TimeUnit.MINUTES))).andReturn(
-            EasyMock.createNiceMock(ScheduledFuture.class));
-    EasyMock.replay(serviceRegistryJpaImpl.scheduledExecutor);
-
     serviceRegistryJpaImpl.activate(null);
   }
 
-  @Test
-  public void heartBeatDisabledWithZeroInterval() {
-    String input = "0";
-
-    serviceRegistryJpaImpl.scheduledExecutor = EasyMock.createMock(ScheduledExecutorService.class);
-    EasyMock.replay(serviceRegistryJpaImpl.scheduledExecutor);
-
-    EasyMock.expect(bundleContext.getProperty(ServiceRegistryJpaImpl.OPT_HEARTBEATINTERVAL)).andReturn(input);
-    EasyMock.replay(bundleContext);
-
-    serviceRegistryJpaImpl.activate(cc);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Test
-  public void heartBeatDefaultValueSetProperly() {
-    String input = "";
-    long expected = ServiceRegistryJpaImpl.DEFAULT_HEART_BEAT;
-
-    serviceRegistryJpaImpl.scheduledExecutor = EasyMock.createMock(ScheduledExecutorService.class);
-    EasyMock.expect(
-            serviceRegistryJpaImpl.scheduledExecutor.scheduleWithFixedDelay((JobProducerHearbeat) EasyMock.anyObject(),
-                    EasyMock.eq(expected), EasyMock.eq(expected), EasyMock.eq(TimeUnit.MINUTES))).andReturn(
-            EasyMock.createNiceMock(ScheduledFuture.class));
-    EasyMock.replay(serviceRegistryJpaImpl.scheduledExecutor);
-
-    EasyMock.expect(bundleContext.getProperty(ServiceRegistryJpaImpl.OPT_HEARTBEATINTERVAL)).andReturn(input);
-    EasyMock.replay(bundleContext);
-
-    serviceRegistryJpaImpl.activate(cc);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Test
-  public void heartBeatNegativeValueSetToDefault() {
-    String input = "-20";
-    long expected = ServiceRegistryJpaImpl.DEFAULT_HEART_BEAT;
-
-    serviceRegistryJpaImpl.scheduledExecutor = EasyMock.createMock(ScheduledExecutorService.class);
-    EasyMock.expect(
-            serviceRegistryJpaImpl.scheduledExecutor.scheduleWithFixedDelay((JobProducerHearbeat) EasyMock.anyObject(),
-                    EasyMock.eq(expected), EasyMock.eq(expected), EasyMock.eq(TimeUnit.MINUTES))).andReturn(
-            EasyMock.createNiceMock(ScheduledFuture.class));
-    EasyMock.replay(serviceRegistryJpaImpl.scheduledExecutor);
-
-    EasyMock.expect(bundleContext.getProperty(ServiceRegistryJpaImpl.OPT_HEARTBEATINTERVAL)).andReturn(input);
-    EasyMock.replay(bundleContext);
-
-    serviceRegistryJpaImpl.activate(cc);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Test
-  public void heartBeatNominalValueSetProperly() {
-    String input = "10";
-    long expected = 10;
-
-    serviceRegistryJpaImpl.scheduledExecutor = EasyMock.createMock(ScheduledExecutorService.class);
-    EasyMock.expect(
-            serviceRegistryJpaImpl.scheduledExecutor.scheduleWithFixedDelay((JobProducerHearbeat) EasyMock.anyObject(),
-                    EasyMock.eq(expected), EasyMock.eq(expected), EasyMock.eq(TimeUnit.MINUTES))).andReturn(
-            EasyMock.createNiceMock(ScheduledFuture.class));
-    EasyMock.replay(serviceRegistryJpaImpl.scheduledExecutor);
-
-    EasyMock.expect(bundleContext.getProperty(ServiceRegistryJpaImpl.OPT_HEARTBEATINTERVAL)).andReturn(input);
-    EasyMock.replay(bundleContext);
-
-    serviceRegistryJpaImpl.activate(cc);
-  }
 }

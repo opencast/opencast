@@ -142,7 +142,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   static final long MIN_DISPATCH_INTERVAL = 1000;
 
   /** Default delay between job dispatching attempts, in milliseconds */
-  static final long DEFAULT_DISPATCH_PERIOD = 5000;
+  static final long DEFAULT_DISPATCH_INTERVAL = 5000;
 
   /** Default value for {@link #maxAttemptsBeforeErrorState} */
   private static final int MAX_FAILURE_BEFORE_ERROR_STATE = 1;
@@ -279,6 +279,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         throw new IllegalStateException(e);
       }
     }
+
+    // Schedule the heartbeat with the default interval
+    scheduledExecutor.scheduleWithFixedDelay(new JobProducerHearbeat(), DEFAULT_HEART_BEAT, DEFAULT_HEART_BEAT,
+            TimeUnit.SECONDS);
+
+    // Schedule the job dispatching with the default interval
+    scheduledExecutor.scheduleWithFixedDelay(new JobDispatcher(), DEFAULT_DISPATCH_INTERVAL, DEFAULT_DISPATCH_INTERVAL,
+            TimeUnit.MILLISECONDS);
   }
 
   public void deactivate() {
@@ -302,7 +310,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     // Stop the job dispatcher
     if (scheduledExecutor != null) {
-      scheduledExecutor.shutdown();
+      scheduledExecutor.shutdownNow();
     }
   }
 
@@ -469,7 +477,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
     }
 
-    long dispatchInterval = DEFAULT_DISPATCH_PERIOD;
+    long dispatchInterval = DEFAULT_DISPATCH_INTERVAL;
     String dispatchIntervalString = StringUtils.trimToNull((String) properties.get(OPT_DISPATCHINTERVAL));
     if (StringUtils.isNotBlank(dispatchIntervalString)) {
       try {
@@ -507,15 +515,25 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
     }
 
-    // Schedule the service heartbeat
-    if (heartbeatInterval > 0)
+    // Stop the current scheduled executors so we can configure new ones
+    if (scheduledExecutor != null) {
+      scheduledExecutor.shutdown();
+      scheduledExecutor = Executors.newScheduledThreadPool(2);
+    }
+
+    // Schedule the service heartbeat if the interval is > 0
+    if (heartbeatInterval > 0) {
+      logger.debug("Starting service heartbeat at a custom interval of {}s", heartbeatInterval);
       scheduledExecutor.scheduleWithFixedDelay(new JobProducerHearbeat(), heartbeatInterval, heartbeatInterval,
               TimeUnit.SECONDS);
+    }
 
     // Schedule the job dispatching.
-    if (dispatchInterval > 0)
+    if (dispatchInterval > 0) {
+      logger.debug("Starting job dispatching at a custom interval of {}s", DEFAULT_DISPATCH_INTERVAL / 1000);
       scheduledExecutor.scheduleWithFixedDelay(new JobDispatcher(), dispatchInterval, dispatchInterval,
               TimeUnit.MILLISECONDS);
+    }
   }
 
   /**
