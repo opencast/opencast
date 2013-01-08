@@ -531,7 +531,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     try {
       workflowToUpdate = workflowService.getWorkflowById(Long.parseLong(recordingId));
     } catch (NumberFormatException e) {
-      logger.warn("Recording id '{}' is not a long, and is therefore not a valid workflow identifier", recordingId, e);
+      logger.info("Recording id '{}' is not a long, assuming an unscheduled capture", recordingId);
       return;
     } catch (WorkflowDatabaseException e) {
       logger.warn("Unable to update workflow for recording {}: {}", recordingId, e);
