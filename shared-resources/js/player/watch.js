@@ -465,13 +465,13 @@ Opencast.Watch = (function ()
         // Check for videoUrl and videoUrl2 URL Parameters
         var mediaUrlTmp = $.getURLParameter('videoUrl');
         mediaUrlOne = (mediaUrlTmp == null) ? mediaUrlOne : mediaUrlTmp;
-        if(mediaUrlTmp != null)
+        if(mediaUrlOne != null)
         {
             $.log('Set Video URL 1 manually');
         }
         mediaUrlTmp = $.getURLParameter('videoUrl2');
         mediaUrlTwo = (mediaUrlTmp == null) ? mediaUrlTwo : mediaUrlTmp;
-        if(mediaUrlTmp != null)
+        if(mediaUrlTwo != null)
         {
             $.log('Set Video URL 2 manually');
         }
@@ -496,6 +496,15 @@ Opencast.Watch = (function ()
             mediaResolutionTwo = tmpMediaResolution;
         }
 
+	var displayOneVideo = $.getURLParameter('displayOneVideo');
+        if ((displayOneVideo != null) && (displayOneVideo.toLowerCase() == 'true'))
+	{
+	    displayOneVideo = true;
+	} else
+	{
+	    displayOneVideo = false;
+	}
+	    
 	$.log("-----");
         $.log("Final Mediadata");
         $.log("Mediapackage ID: " + mediaPackageId);
@@ -552,9 +561,16 @@ Opencast.Watch = (function ()
             Opencast.Player.setMediaURL(coverUrlOne, coverUrlTwo, mediaUrlOne, mediaUrlTwo, mimetypeOne, mimetypeTwo, PLAYERSTYLE, slideLength);
             if (mediaUrlOne !== '' && mediaUrlTwo !== '')
             {
-                Opencast.Initialize.setMediaResolution(mediaResolutionOne, mediaResolutionTwo);
-                Opencast.Player.setVideoSizeList(SINGLEPLAYERWITHSLIDES);
-                Opencast.Player.videoSizeControlMultiOnlyLeftDisplay();
+		if(displayOneVideo)
+		{
+                    Opencast.Initialize.setMediaResolution(mediaResolutionOne, mediaResolutionTwo);
+		    Opencast.Player.setVideoSizeList(SINGLEPLAYERWITHSLIDES);
+		    Opencast.Player.videoSizeControlMultiOnlyLeftDisplay();
+		} else
+		{
+                    Opencast.Player.setVideoSizeList(MULTIPLAYER);
+                    Opencast.Initialize.setMediaResolution(mediaResolutionOne, mediaResolutionTwo);
+		}
             }
             else if (mediaUrlOne !== '' && mediaUrlTwo === '')
             {
