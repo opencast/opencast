@@ -13,48 +13,43 @@
     <!-- ################ -->
     <!-- # URL SECURITY # -->
     <!-- ################ -->
-    <sec:intercept-url pattern='/login.html' access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern="/admin/img/favicon.ico" access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern="/favicon.ico" access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern='/images/**' access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern="/img/**" access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern="/js/**" access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern='/style.css' access='ROLE_ANONYMOUS' />
-    <sec:intercept-url pattern="/css/**" access='ROLE_ANONYMOUS' />
+
+    <!-- Allow anonymous access to the login form -->
+    <sec:intercept-url pattern="/login.html" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the /info/me.json resource -->
-    <sec:intercept-url pattern='/info/me.json' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
-    <sec:intercept-url pattern='/info/components.json' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern="/info/me.json" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/info/components.json" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
-    <sec:intercept-url pattern='/engage/ui/**' access='ROLE_ANONYMOUS, ROLE_USER' />
-    <sec:intercept-url pattern='/search/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
-    <sec:intercept-url pattern='/usertracking/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
-    <sec:intercept-url pattern='/static/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
-    <sec:intercept-url pattern='/export/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern="/engage/ui/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/search/**" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/usertracking/**" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/static/**" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/export/**" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the annotation and the series endpoints -->
-    <sec:intercept-url pattern='/series/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
-    <sec:intercept-url pattern='/annotation/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
-    <sec:intercept-url pattern='/annotation/**' method="PUT" access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern="/series/**" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/annotation/**" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/annotation/**" method="PUT" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the OAI-PMH repository              -->
     <!-- The OAI-PMH specification demands boths GET and POST requests  -->
     <!-- Please make sure that the path configured here matches         -->
     <!-- the path configured for the repository servlet.                -->
-    <sec:intercept-url pattern='/oaipmh/**' method='GET' access='ROLE_ANONYMOUS, ROLE_USER'/>
-    <sec:intercept-url pattern='/oaipmh/**' method='POST' access='ROLE_ANONYMOUS, ROLE_USER'/>
+    <sec:intercept-url pattern="/oaipmh/**" method="GET" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="/oaipmh/**" method="POST" access="ROLE_ANONYMOUS"/>
 
     <!-- Enable anonymous access to the rss and atom feeds -->
-    <sec:intercept-url pattern='/feeds/**' method="GET" access='ROLE_ANONYMOUS, ROLE_USER' />
+    <sec:intercept-url pattern="/feeds/**" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Secure the system management URLs for admins only -->
-    <sec:intercept-url pattern='/services/*' access='ROLE_ADMIN' />
-    <sec:intercept-url pattern='/system/**' access='ROLE_ADMIN' />
-
+    <sec:intercept-url pattern="/services/*" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/system/**" access="ROLE_ADMIN" />
+    
     <!-- Secure the user management URLs for admins only -->
-    <sec:intercept-url pattern='/users/**' access='ROLE_ADMIN' />
-    <sec:intercept-url pattern='/admin/users.html' access='ROLE_ADMIN' />
+    <sec:intercept-url pattern="/users/**" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/admin/users.html" access="ROLE_ADMIN" />
 
     <!-- Enable 2-legged OAuth access ("signed fetch") to the LTI launch servlet -->
     <sec:intercept-url pattern="/lti" access="ROLE_OAUTH_USER" />
@@ -66,7 +61,7 @@
     <sec:intercept-url pattern="/ltitools/**" access="ROLE_OAUTH_USER" />
 
     <!-- Everything else is for the admin users -->
-    <sec:intercept-url pattern='/**' access='ROLE_ADMIN, ROLE_COURSE_ADMIN, ROLE_INSTRUCTOR' />
+    <sec:intercept-url pattern="/**" access="ROLE_ADMIN, ROLE_COURSE_ADMIN, ROLE_INSTRUCTOR" />
 
     <!-- ############################# -->
     <!-- # LOGIN / LOGOUT MECHANISMS # -->
@@ -74,9 +69,6 @@
 
     <!-- Uncomment to enable x509 client certificates for identifying clients -->
     <!-- sec:x509 subject-principal-regex="CN=(.*?)," user-service-ref="userDetailsService" / -->
-
-    <!-- Comment out to disable support for openID. OpenID URLs must be specified in the user detail service below -->
-    <sec:openid-login authentication-failure-url="/login.html?error" user-service-ref="userDetailsService" />
 
     <!-- Digest auth is used by capture agents and is used to enable transparent clustering of services -->
     <sec:custom-filter position="BASIC_AUTH_FILTER" ref="digestFilter" />
@@ -97,16 +89,28 @@
     <sec:request-cache ref="requestCache" />
 
     <!-- If any URLs are to be exposed to anonymous users, the "sec:anonymous" filter must be present -->
-    <sec:anonymous />
+    <sec:anonymous enabled="false" />
 
-    <!-- Enables log out -->
-    <sec:logout />
-    
-    <!-- Enables Single Sign Out -->
-	<sec:logout logout-success-url="/cas-logout.jsp"/>
-	<sec:custom-filter ref="requestSingleLogoutFilter" before="LOGOUT_FILTER"/>
-	<sec:custom-filter ref="singleLogoutFilter" before="FORM_LOGIN_FILTER"/>
+    <!-- Enables CAS Single Sign Out -->
+    <sec:logout logout-success-url="/cas-logout.jsp"/>
+    <sec:custom-filter ref="requestSingleLogoutFilter" before="LOGOUT_FILTER"/>
+    <sec:custom-filter ref="singleLogoutFilter" before="FORM_LOGIN_FILTER"/>
+
   </sec:http>
+
+  <!-- ######################################## -->
+  <!-- # Custom Anonymous Filter Definition   # -->
+  <!-- ######################################## -->
+ 
+  <bean id="anonymousFilter" class="org.opencastproject.kernel.security.TrustedAnonymousAuthenticationFilter">
+    <property name="userAttribute" ref="anonymousUserAttributes" />
+    <property name="key" value="anonymousKey" />
+  </bean>
+  
+  <bean id="anonymousUserAttributes" class="org.springframework.security.core.userdetails.memory.UserAttribute">
+    <property name="authoritiesAsString" value="ROLE_ANONYMOUS"/>
+    <property name="password" value="empty"/>
+  </bean>
 
   <!-- ######################################## -->
   <!-- # Authentication Entry and Exit Points # -->
@@ -117,7 +121,6 @@
     <property name="userEntryPoint" ref="casEntryPoint" />
     <property name="digestAuthenticationEntryPoint" ref="digestEntryPoint" />
   </bean>
-
 
   <!-- Returns a 401 request for authentication via digest auth -->
   <bean id="digestEntryPoint" class="org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint">
@@ -137,7 +140,6 @@
     </property>
   </bean>
 
-
   <!-- ################# -->
   <!-- # Digest Filter # -->
   <!-- ################# -->
@@ -152,7 +154,6 @@
       <bean class="org.springframework.security.core.userdetails.cache.NullUserCache" />
     </property>
   </bean>
-
 
   <!-- ####################### -->
   <!-- # OAuth (LTI) Support # -->
@@ -176,6 +177,14 @@
     <property name="authHandler">
       <bean class="org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler">
         <constructor-arg index="0" ref="userDetailsService" />
+	      <!-- Uncomment to allow the included keys to be trusted to provide known user details
+	      <constructor-arg index="1">
+	        <list>
+            <value>trustedKey</value>
+            <value>trustedKey2</value>
+          </list>
+	      </constructor-arg>
+	      -->
       </bean>
     </property>
   </bean>
@@ -197,14 +206,13 @@
   </bean>
 
   <bean id="serviceProperties"
-        class="org.springframework.security.cas.ServiceProperties">
-    <property name="service"
-        value="http://localhost:8080/j_spring_cas_security_check"/>
+    class="org.springframework.security.cas.ServiceProperties">
+    <property name="service" value="/j_spring_cas_security_check"/>
     <property name="sendRenew" value="false"/>
   </bean>
   
   <bean id="casAuthenticationProvider"
-      class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+    class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
     <property name="userDetailsService" ref="userDetailsService"/>
     <property name="serviceProperties" ref="serviceProperties" />
     <property name="ticketValidator">
@@ -226,8 +234,6 @@
     </constructor-arg>
     <property name="filterProcessesUrl" value="/j_spring_cas_security_logout"/>
   </bean>
-
-
 
   <!-- #################### -->
   <!-- # OSGI Integration # -->
