@@ -15,6 +15,8 @@
  */
 package org.opencastproject.caption.impl;
 
+import static org.opencastproject.util.MimeType.mimeType;
+
 import org.opencastproject.caption.api.Caption;
 import org.opencastproject.caption.api.CaptionConverter;
 import org.opencastproject.caption.api.CaptionConverterException;
@@ -33,6 +35,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -57,8 +60,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.activation.FileTypeMap;
-
-import static org.opencastproject.util.MimeType.mimeType;
 
 /**
  * Implementation of {@link CaptionService}. Uses {@link ComponentContext} to get all registered
@@ -267,20 +268,15 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
     }
 
     FileInputStream stream = null;
+    String[] languageList;
     try {
       stream = new FileInputStream(captions);
+      languageList = converter.getLanguageList(stream);
     } catch (FileNotFoundException e) {
       throw new CaptionConverterException("Requested file " + captions + "could not be found.");
     } finally {
-      try {
-        if (stream != null)
-          stream.close();
-      } catch (IOException e) {
-        logger.warn("Could not close stream.");
-      }
+      IoSupport.closeQuietly(stream);
     }
-
-    String[] languageList = converter.getLanguageList(stream);
 
     return languageList == null ? new String[0] : languageList;
   }

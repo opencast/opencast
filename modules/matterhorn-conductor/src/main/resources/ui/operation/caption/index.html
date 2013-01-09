@@ -19,9 +19,11 @@
       .formField-list label {width:30%; float: left; text-align: right; margin-right: 5px;}
     </style>
     <script type="text/javascript" src="/admin/jquery/jquery.js"></script>
+    <script type="text/javascript" src="/admin/js/jquery.xmlns.js"></script>
     <script type="text/javascript">
 
-      var PLAYER_URL = window.location.origin+'/engage/ui/embed.html';
+      $.xmlns["mp"] = "http://mediapackage.opencastproject.org";
+      var PLAYER_URL = window.location.protocol + "//" + window.location.host + '/engage/ui/embed.html';
       
       var uploaderUrl = "/ingest/filechooser-local.html";
       var uploadFrame = null;
@@ -130,26 +132,10 @@
         	parent.ocRecordings.Hold.changedMediaPackage = null; 
           parent.ocRecordings.continueWorkflow();
       }
-      
-      
 
       $(document).ready(function() {
     	uploadFrame = document.getElementById("filechooser-ajax");
         var id = parent.document.getElementById("holdWorkflowId").value;
-        
-        //hide some stuff we don't want to see
-        window.parent.$('#uploadContainer').hide(0);
-        $('#trimming-hint').toggle();
-                
-        window.parent.$('#controlsTop').hide(0);
-        window.parent.$('#searchBox').hide(0);
-        window.parent.$('#tableContainer').hide(0);
-        if(window.parent.$('#refreshEnabled').is(':checked')) {
-          window.parent.$('#refreshEnabled').trigger('click');
-          window.parent.$('#refreshEnabled').trigger('change');
-        }
-        window.parent.$('#controlsFoot').hide(0);
-        
         
         // load preview player and metadata
         $.ajax({
@@ -157,7 +143,7 @@
           dataType : 'xml',    
           success : function(data) {
             // put mediapackge into form (for upload of captions file)
-            var mp = xmlToString($(data).find("mediapackage")[0]);
+            var mp = xmlToString($(data).find("mp|mediapackage")[0]);
             ocUpload.Listener.mediaPackage = mp;
 
             // look for already uploaded captions file
@@ -248,8 +234,6 @@
         <button type="button" id="continueWithoutBtn" onclick="continueWorkflow(false);" style="margin-right:16px;width:160px;" title="Move on to next steps in processing this recording without captions.">Continue without captions</button>
         <button type="button" style="margin-right:16px;" title="Cancel" onclick="cancel();">Cancel</button>
     </div>
-
-
   </body>
 </html>
 

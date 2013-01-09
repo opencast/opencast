@@ -35,6 +35,7 @@
         <module>modules/matterhorn-admin-ui</module>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-caption-api</module>
+		<module>modules/matterhorn-caption-impl</module>
         <module>modules/matterhorn-capture-admin-service-api</module>
         <module>modules/matterhorn-capture-admin-service-impl</module>
         <module>modules/matterhorn-common</module>
