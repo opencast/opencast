@@ -35,7 +35,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gdata.client.media.MediaService;
@@ -102,9 +101,6 @@ public class YoutubeDistributionService extends AbstractJobProducer implements D
 
   /** workspace instance */
   protected Workspace workspace = null;
-
-  /** workflow service instance */
-  protected WorkflowService workflowService = null;
 
   /** The remote service registry */
   protected ServiceRegistry serviceRegistry = null;
@@ -515,16 +511,6 @@ public class YoutubeDistributionService extends AbstractJobProducer implements D
     } catch (Exception e) {
       throw new ServiceRegistryException("Error handling operation '" + op + "'");
     }
-  }
-
-  /**
-   * Callback for the OSGi environment to set the workflow service
-   * 
-   * @param service
-   *          instance of the workflow service
-   */
-  protected void setWorkflowService(WorkflowService service) {
-    this.workflowService = service;
   }
 
   /**
