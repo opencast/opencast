@@ -568,7 +568,8 @@ Opencast.Watch = (function ()
 		    Opencast.Player.videoSizeControlMultiOnlyLeftDisplay();
 		} else
 		{
-                    Opencast.Player.setVideoSizeList(MULTIPLAYER);
+		    Opencast.Player.setVideoSizeList(SINGLEPLAYERWITHSLIDES);
+		    $('#oc_player_video-dropdown').append('<input id="oc_btn-centerDisplay" class="oc_btn-centerDisplay" type="image" src="../../img/misc/space.png" name="show_presenter_and_presentation_equal" alt="Show presenter and presentation equal" title="Show presenter and presentation equal"  onclick="Opencast.Player.videoSizeControlMultiDisplay();" onfocus="Opencast.Initialize.dropdownVideo_open();" onblur="Opencast.Initialize.dropdown_timer();" /><br/>');
                     Opencast.Initialize.setMediaResolution(mediaResolutionOne, mediaResolutionTwo);
 		}
             }
