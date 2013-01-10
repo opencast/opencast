@@ -431,14 +431,9 @@ ocMetrics = new (function() {
             }
         ]);
   	    factory.createPlotLine({
-	  			title: "Jobs",
+	  			title: "Processed Jobs",
 	  			type: "Number of"
 			},[{
-	        	container: 'matterhorn',
-	            name: 'org.opencastproject.matterhorn:type=JobsStatistics',
-	            attribute: 'RunningJobCount'
-	        },
-	        {
 	        	container: 'matterhorn',
 	            name: 'org.opencastproject.matterhorn:type=JobsStatistics',
 	            attribute: 'FinishedJobCount'
@@ -447,13 +442,22 @@ ocMetrics = new (function() {
 	        	container: 'matterhorn',
 	        	name: 'org.opencastproject.matterhorn:type=JobsStatistics',
 	        	attribute: 'FailedJobCount'
-	        },
-	        {
-	        	container: 'matterhorn',
-	        	name: 'org.opencastproject.matterhorn:type=JobsStatistics',
-	        	attribute: 'QueuedJobCount'
 	        }
 	    ]);
+  	    factory.createPlotLine({
+  	    	title: "Current Jobs",
+  	    	type: "Number of"
+	  	    },[{
+	  	    	container: 'matterhorn',
+	  	    	name: 'org.opencastproject.matterhorn:type=JobsStatistics',
+	  	    	attribute: 'RunningJobCount'
+	  	    },
+	  	    {
+	  	    	container: 'matterhorn',
+	  	    	name: 'org.opencastproject.matterhorn:type=JobsStatistics',
+	  	    	attribute: 'QueuedJobCount'
+	  	    }
+  	    ]);
 	    factory.createPlotLine({
 	  			title: "Services",
 	  			type: "Number of"
