@@ -63,7 +63,6 @@ ocWorkflow.definitionSelected = function(defId, container, callback) {
     ocWorkflowPanel = null;
   $(container).load('/workflow/configurationPanel?definitionId=' + defId,
     function() {
-      $('.holdCheckbox').attr('checked', false);
       $(container).show('fast');
       if (callback) {
         callback();

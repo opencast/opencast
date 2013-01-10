@@ -36,10 +36,10 @@
     </fieldset>
     <fieldset>
       <legend>Archive</legend>
-      <ul class="oc-ui-checkbox-list-upload">       
+      <ul class="oc-ui-checkbox-list-upload">
 	  <li class="ui-helper-clearfix">
 	    <span id="archiveconfig">
-	      <input id="archiveOp" name="archiveOp" type="checkbox" class="configField holdCheckbox" value="true"/>
+	      <input id="archiveOp" name="archiveOp" type="checkbox" checked="checked" class="configField holdCheckbox" value="true"/>
 	      <span id="i18n_activate_archive">&nbsp;Archive the media package</span>
 	    </span>
 	  </li>
