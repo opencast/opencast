@@ -147,6 +147,8 @@ public class DictionaryScanner implements ArtifactInstaller {
    */
   @Override
   public void uninstall(File artifact) throws Exception {
+    String language = artifact.getName().split("\\.")[0];
+    dictionaryService.clear(language);
     sumInstalledFiles--;
   }
 
