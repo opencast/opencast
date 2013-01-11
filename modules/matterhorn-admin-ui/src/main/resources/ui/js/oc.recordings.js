@@ -526,7 +526,8 @@ ocRecordings = new (function() {
       this.actions.push('edit');
       this.actions.push('delete');
     } else if (this.state == 'Finished') {
-      this.actions.push('play');
+      if(wf.template != "retract")
+        this.actions.push('play');
     //this.actions.push('publish');
     //this.actions.push('unpublish');
     } else if (this.state == 'Failed') {
