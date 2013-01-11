@@ -845,20 +845,20 @@ Opencast.Watch = (function ()
         $('#oc_client_shortcuts').append("<span tabindex=\"0\">Control + Alt + F = Forward the video.</span><br/>");
         $('#oc_client_shortcuts').append("<span tabindex=\"0\">Control + Alt + R = Rewind the video.</span><br/>");
         $('#oc_client_shortcuts').append("<span tabindex=\"0\">Control + Alt + T = Reads the current time aloud when using a screen reader</span><br/>");
-        $('#oc_client_shortcuts').append('<a href="javascript: " id="oc_btn-leave_shortcut" onclick="$(\'#oc_shortcut-button\').trigger(\'click\');" class="handcursor ui-helper-hidden-accessible" title="Leave shortcut dialog" role="button">Leave embed dialog</a>');
         switch ($.client.os)
         {
         case "Windows":
-            $('#oc_client_shortcuts').append("Windows Control + = to zoom in the player<br/>");
-            $('#oc_client_shortcuts').append("Windows Control - = to minimize in the player<br/>");
+            $('#oc_client_shortcuts').append("<span tabindex=\"0\">Windows Control + = to zoom in the player</span><br/>");
+            $('#oc_client_shortcuts').append("<span tabindex=\"0\">Windows Control - = to minimize in the player</span><br/>");
             break;
         case "Mac":
-            $('#oc_client_shortcuts').append("cmd + = Zoom into the player<br/>");
-            $('#oc_client_shortcuts').append("cmd - = Zoom out of the player<br/>");
+            $('#oc_client_shortcuts').append("<span tabindex=\"0\">cmd + = Zoom into the player</span><br/>");
+            $('#oc_client_shortcuts').append("<span tabindex=\"0\">cmd - = Zoom out of the player</span><br/>");
             break;
         case "Linux":
             break;
         }
+		$('#oc_client_shortcuts').append('<a href="javascript: " id="oc_btn-leave_shortcut" onclick="$(\'#oc_shortcut-button\').trigger(\'click\');" class="handcursor" title="Leave shortcut dialog" role="button">Leave embed dialog</a>');
     }
 
     return {
