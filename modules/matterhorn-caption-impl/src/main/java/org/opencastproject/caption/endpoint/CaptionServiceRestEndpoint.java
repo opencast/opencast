@@ -20,11 +20,8 @@ import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.Catalog;
-import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageElementBuilder;
-import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
-import org.opencastproject.mediapackage.MediaPackageSerializer;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.UrlSupport;
@@ -33,15 +30,13 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
-import java.io.IOException;
 import java.io.StringWriter;
 
 import javax.servlet.http.HttpServletResponse;
@@ -53,7 +48,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -63,15 +57,13 @@ import javax.xml.transform.stream.StreamResult;
  * Rest endpoint for {@link CaptionService}.
  */
 @Path("/")
-@RestService(name = "caption", title = "Caption Service", 
-  abstractText = "This service enables conversion from one caption format to another.",
-  notes = {
+@RestService(name = "caption", title = "Caption Service", abstractText = "This service enables conversion from one caption format to another.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
-        + "not working and is either restarting or has failed",
+                + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -154,7 +146,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
           @FormParam("captions") String catalogAsXml, @FormParam("language") String lang) {
     MediaPackageElement element;
     try {
-      element = toMediaPackageElement(catalogAsXml);
+      element = MediaPackageElementParser.getFromXml(catalogAsXml);
       if (!Catalog.TYPE.equals(element.getElementType()))
         return Response.status(Response.Status.BAD_REQUEST).entity("Captions must be of type catalog.").build();
     } catch (Exception e) {
@@ -163,7 +155,12 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
     }
 
     try {
-      Job job = service.convert((Catalog) element, inputType, outputType, lang);
+      Job job;
+      if (StringUtils.isNotBlank(lang)) {
+        job = service.convert((Catalog) element, inputType, outputType, lang);
+      } else {
+        job = service.convert((Catalog) element, inputType, outputType);
+      }
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (Exception e) {
       logger.error(e.getMessage());
@@ -188,7 +185,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
           @RestParameter(description = "Caption input format (for example: dfxp, subrip,...).", isRequired = false, defaultValue = "dfxp", name = "input", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(description = "OK, information was extracted and retrieved", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "Returned information about languages present in captions.")
   public Response languages(@FormParam("input") String inputType, @FormParam("captions") String catalogAsXml) {
     try {
-      MediaPackageElement element = toMediaPackageElement(catalogAsXml);
+      MediaPackageElement element = MediaPackageElementParser.getFromXml(catalogAsXml);
       if (!Catalog.TYPE.equals(element.getElementType())) {
         return Response.status(Response.Status.BAD_REQUEST).entity("Captions must be of type catalog").build();
       }
@@ -219,26 +216,6 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
       logger.error(e.getMessage());
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
-  }
-
-  /**
-   * Converts the string representation of the track to an object.
-   * 
-   * @param trackAsXml
-   *          the serialized track representation
-   * @return the track object
-   * @throws SAXException
-   * @throws IOException
-   * @throws ParserConfigurationException
-   */
-  protected MediaPackageElement toMediaPackageElement(String trackAsXml) throws SAXException, IOException,
-          ParserConfigurationException {
-    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-    Document doc = docBuilder.parse(IOUtils.toInputStream(trackAsXml, "UTF-8"));
-    MediaPackageSerializer serializer = new DefaultMediaPackageSerializerImpl();
-    MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-    MediaPackageElement sourceTrack = builder.elementFromManifest(doc.getDocumentElement(), serializer);
-    return sourceTrack;
   }
 
   protected String generateCatalog() {
