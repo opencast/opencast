@@ -30,6 +30,10 @@ var ocUpload = (function() {
   this.init = function() {
     ocUtils.log('Initializing UI');
     $('#addHeader').jqotesubtpl('templates/upload.tpl', {});
+    $('#processingRecording').jqotesubtpl('templates/processing-instructions.tpl', {});	
+    $('#common-data').jqotesubtpl('templates/common-data.tpl', {});
+    $('#additional-description').jqotesubtpl('templates/additional-description.tpl', {});
+
     $('.unfoldable-header').click(ocUpload.UI.toggleUnfoldable);
     $('.dc-metadata-field').change(ocUpload.UI.formFieldChanged);
     $('.uploadtype-select').click(ocUpload.UI.selectUploadType);
@@ -72,7 +76,7 @@ var ocUpload = (function() {
 
   function initSeriesAutocomplete() {
     ocUtils.log('Initializing autocomplete for series field')
-    $('#series').autocomplete({
+    $('#seriesSelect').autocomplete({
       source: function(request, response) {
         $.ajax({
           url: ocUpload.SERIES_SEARCH_URL + '?seriesTitle=' + request.term + '&edit=true',
@@ -115,7 +119,7 @@ var ocUpload = (function() {
         $('#isPartOf').val(ui.item.id);
       },
       change: function(event, ui){
-        if($('#isPartOf').val() === '' && $('#series').val() !== ''){
+        if($('#isPartOf').val() === '' && $('#seriesSelect').val() !== ''){
           ocUtils.log("Searching for series in series endpoint");
           $.ajax({
             url : ocUpload.SERIES_SEARCH_URL,
@@ -123,7 +127,7 @@ var ocUpload = (function() {
             dataType : 'json',
             success : function(data) {
               var DUBLIN_CORE_NS_URI  = 'http://purl.org/dc/terms/',
-              series_input = $('#series').val(),
+              series_input = $('#seriesSelect').val(),
               series_list = data["catalogs"],
               series_title,
               series_id;
@@ -151,7 +155,7 @@ var ocUpload = (function() {
     ocUtils.log('Checking for missing inputs');
     var missing = [];
 
-    if ($.trim($('#titleField').val()) == '') {
+    if ($.trim($('#title').val()) == '') {
       ocUtils.log('Missing input: title');
       missing.push('title');
     }
@@ -463,7 +467,7 @@ ocUpload.Ingest = (function() {
     ocUtils.log("Added Dublin Core catalog for episode");
 
     // enqueue Series Dublin Core
-    var series = $('#series').val();
+    var series = $('#seriesSelect').val();
     //var seriesId = $('#isPartOf').val();
     if (series !== '') {
       var seriesId = $('#isPartOf').val();

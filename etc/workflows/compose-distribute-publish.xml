@@ -60,11 +60,6 @@
             <span id="i18n_dist_mmm">&nbsp;iTunesU</span>
           </span>
         </li>
-        <!-- field: License -->
-        <li class="ui-helper-clearfix">
-          <label class="scheduler-label"><span id="i18n_license_label">License</span>:</label>
-          <input type="text" class="formField" id="license" name="license">
-        </li>
       </ul>
     </fieldset>
     <script type="text/javascript">
