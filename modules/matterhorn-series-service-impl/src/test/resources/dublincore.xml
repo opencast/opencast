@@ -1,29 +1,29 @@
 <?xml version="1.0"?>
 <dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance/"
-        xsi:schemaLocation="http://www.opencastproject.org http://www.opencastproject.org/schema.xsd"
-        xmlns:dcterms="http://purl.org/dc/terms/">
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance/"
+xsi:schemaLocation="http://www.opencastproject.org http://www.opencastproject.org/schema.xsd"
+xmlns:dcterms="http://purl.org/dc/terms/">
 
-  <dcterms:title xml:lang="en">
-    Land and Vegetation: Key players on the Climate Scene
-  </dcterms:title>
-  <dcterms:subject>
-    climate, land, vegetation
-  </dcterms:subject>
-  <dcterms:description xml:lang="en">
-    Introduction lecture from the Institute for
-    Atmospheric and Climate Science.
-  </dcterms:description>
-  <dcterms:publisher>
-    ETH Zurich, Switzerland
-  </dcterms:publisher>
-  <dcterms:publisher>
-    ETH Zürich, Switzerland
-  </dcterms:publisher>
-  <dcterms:identifier>
-    10.0000/5819
-  </dcterms:identifier>
-  <dcterms:format xsi:type="dcterms:IMT">
-    video/x-dv
-  </dcterms:format>
+<dcterms:title xml:lang="en">
+  Land and Vegetation: Key players on the Climate Scene
+</dcterms:title>
+<dcterms:subject>
+  climate, land, vegetation
+</dcterms:subject>
+<dcterms:description xml:lang="en">
+  Introduction lecture from the Institute for
+  Atmospheric and Climate Science.
+</dcterms:description>
+<dcterms:publisher>
+  ETH Zurich, Switzerland
+</dcterms:publisher>
+<dcterms:publisher>
+  ETH Zürich, Switzerland
+</dcterms:publisher>
+<dcterms:identifier>
+  10.0000/5819
+</dcterms:identifier>
+<dcterms:format xsi:type="dcterms:IMT">
+  video/x-dv
+</dcterms:format>
 </dublincore>

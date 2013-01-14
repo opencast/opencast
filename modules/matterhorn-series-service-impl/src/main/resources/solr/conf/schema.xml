@@ -276,26 +276,31 @@
    <field name="acl_read" type="string" indexed="true" stored="true" multiValued="true"/>
 
    <!-- Sort fields -->
-  
-   <field name="dc_title_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_subject_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_creator_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_publisher_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>  
-   <field name="dc_contributor_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_abstract_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_description_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_created_sort" type="date" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_available_from_sort" type="date" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_available_to_sort" type="date" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_language_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_rights_holder_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_spatial_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_temporal_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_is_part_of_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_replaces_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_type_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_access_rights_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
-   <field name="dc_license_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
+   <!-- It is certainly not a good idea to make sort fields multi valued since it may lead to unpredictable results
+        when fields really contain multiple values. But since Matterhorn mostly uses single valued DublinCores this
+        will most likely be ok. The reason for these fields being multi valued is that a multi valued
+        field cannot be copied into a single valued one.
+        The whole metadata handling in MH will be subject to a major rewrite soon so please
+        regard this as a short term fix. See also MH-8777. -->
+   <field name="dc_title_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_subject_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_creator_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_publisher_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_contributor_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_abstract_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_description_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_created_sort" type="date" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_available_from_sort" type="date" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_available_to_sort" type="date" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_language_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_rights_holder_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_spatial_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_temporal_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_is_part_of_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_replaces_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_type_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_access_rights_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_license_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
    
   <!-- A fulltext copy field. -->
     <field name="fulltext" type="text" indexed="true" stored="false" multiValued="true"/>
@@ -330,5 +335,25 @@
       for most applications.  -->
   <!-- <similarity class="org.apache.lucene.search.DefaultSimilarity"/>
   -->
-
+  
+  <!-- copy into sort fields -->
+  <copyField source="dc_title" dest="dc_title_sort" />
+  <copyField source="dc_subject" dest="dc_subject_sort" />
+  <copyField source="dc_creator" dest="dc_creator_sort" />
+  <copyField source="dc_publisher" dest="dc_publisher_sort" />
+  <copyField source="dc_contributor" dest="dc_contributor_sort" />
+  <copyField source="dc_abstract" dest="dc_abstract_sort" />
+  <copyField source="dc_description" dest="dc_description_sort" />
+  <copyField source="dc_created" dest="dc_created_sort" />
+  <copyField source="dc_available_from" dest="dc_available_from_sort" />
+  <copyField source="dc_available_to" dest="dc_available_to_sort" />
+  <copyField source="dc_language" dest="dc_language_sort" />
+  <copyField source="dc_rights_holder" dest="dc_rights_holder_sort" />
+  <copyField source="dc_spatial" dest="dc_spatial_sort" />
+  <copyField source="dc_temporal" dest="dc_temporal_sort" />
+  <copyField source="dc_is_part_of" dest="dc_is_part_of_sort" />
+  <copyField source="dc_replaces" dest="dc_replaces_sort" />
+  <copyField source="dc_type" dest="dc_type_sort" />
+  <copyField source="dc_access_rights" dest="dc_access_rights_sort" />
+  <copyField source="dc_license" dest="dc_license_sort" />
 </schema>
