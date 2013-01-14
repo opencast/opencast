@@ -23,10 +23,10 @@
       </h3>
       <ul>
         <li id="missingTitle" class="ui-state-error-text single-error multiple-error">
-          <span class="ui-icon ui-icon-carat-1-e"></span>Please enter a <a href="javascript:$('#title')[0].focus();">title</a> for the recording.
+          <span class="ui-icon ui-icon-carat-1-e"></span>Please enter a <a href="javascript:$('#titleField')[0].focus();">title</a> for the recording.
         </li>
         <li id="missingSeries" class="ui-state-error-text multiple-error">
-          <span class="ui-icon ui-icon-carat-1-e"></span>Please enter a <a href="javascript:$('#series')[0].focus();">Series name</a> for this group of recordings.
+          <span class="ui-icon ui-icon-carat-1-e"></span>Please enter a <a href="javascript:$('#isPartOf')[0].focus();">Series name</a> for this group of recordings.
         </li>
         <li id="missingDistribution" class="ui-state-error-text single-error multiple-error">
           <span class="ui-icon ui-icon-carat-1-e"></span>Please choose at least one <a href="javascript:document.getElementById('distITunesU').focus();">distribution channel</a>.
@@ -62,27 +62,7 @@
     <div class="form-box layout-centered ui-widget">
       <div class="form-box-content ui-widget-content ui-corner-all">
         <form action="">
-          <ul class="oc-ui-form-list">
-            <li>
-              <label class="scheduler-label" for="title" id="titleLabel"><span class="scheduler-required-text">* </span><span id="i18n_title_label"></span>:</label>
-              <input type="text" id="title" name="title" class="oc-ui-form-field" maxlength="255" />
-            </li>
-            <li id="titleNote" class="ui-helper-hidden">
-              <label class="scheduler-label">&#160;</label>
-              <span class="scheduler-instruction-text">
-                Titles of individual recordings will be appended by sequential numbers starting with 1
-              </span>
-            </li>
-            <li>
-              <label class="scheduler-label" for="creator" id="creatorLabel"><span id="i18n_presenter_label"></span>:</label>
-              <input type="text" class="oc-ui-form-field" name="creator" id="creator" maxlength="255" />
-            </li>
-            <li id="seriesContainer">
-              <label class="scheduler-label" for="seriesSelect" id="seriesLabel"><span id="i18n_series_label"></span>:</label>
-              <input type="text" class="oc-ui-form-field ui-autocomplete-input" name="seriesSelect" id="seriesSelect" maxlength="255" />
-              <input type="hidden" id="series" />
-            </li>
-          </ul>
+            <div id="common-data"></div>
         </form>
       </div>
     </div>
@@ -94,28 +74,7 @@
         <div id="i18n_additional">Additional Description</div>
         <div class="clear"></div>
       </div>
-      <div class="form-box-content ui-widget-content ui-corner-bottom">
-        <form action="">
-          <ul class="oc-ui-form-list">
-            <li class="additionalMeta">
-              <label class="scheduler-label" for="contributor" id="contributorLabel"><span id="i18n_dept_label"></span>:</label>
-              <input type="text" class="oc-ui-form-field" name="contributor" id="contributor" maxlength="255" />
-            </li>
-            <li class="additionalMeta">
-              <label class="scheduler-label" for="subject" id="subjectLabel"><span id="i18n_sub_label"></span>:</label>
-              <input type="text" class="oc-ui-form-field" name="subject" id="subject" maxlength="255" />
-            </li>
-            <li class="additionalMeta">
-              <label class="scheduler-label" for="language" id="languageLabel"><span id="i18n_lang_label"></span>:</label>
-              <input type="text" class="oc-ui-form-field" name="language" id="language" maxlength="255" />
-            </li>
-            <li class="additionalMeta">
-              <label class="scheduler-label" for="description" id="descriptionLabel"><span id="i18n_desc_label"></span>:</label>
-              <textarea name="description" id="description" class="oc-ui-form-field" rows="5" cols="10"></textarea>
-            </li>
-          </ul>
-        </form>
-      </div>
+      <div id="additional-description" class="form-box-content ui-widget-content ui-corner-bottom unfoldable-content"></div>
     </div>
 
     <!-- WARNINGS -->
@@ -318,8 +277,15 @@
             -->
             <fieldset>
               <ul class="oc-ui-form-list">
+                <li>
+                  <label for="scheduleRepeat" class="scheduler-label form-box-label"><span id="i18n_sched_repeats">Repeats</span>:</label>
+                  <select id="scheduleRepeat" disabled="true">
+                    <option value="norepeat" id="i18n_sched_no_repeat">Don't Repeat</option>
+                    <option value="weekly" selected="selected" id="i18n_sched_weekly">Weekly</option>
+                  </select>
+                </li>
                 <li id="daySelect">
-                  <label class="scheduler-label" for="repeatDays"><span class="scheduler-required-text">* </span><span id="i18n_sched_days">Repeat Weekly on</span>:</label>
+                  <label class="scheduler-label" for="repeatDays"><span class="scheduler-required-text">* </span><span id="i18n_sched_days">Days</span>:</label>
                   <table id="agentsTable2" class="layout-inline scheduler-day-table">
                     <thead>
                       <tr>
@@ -501,25 +467,14 @@
     </div>
 
     <!-- Processing Instructions -->
-    <div class="form-box layout-centered ui-widget">
-      <div class="form-box-head ui-widget-header ui-corner-top"><span id="i18n_process_title">Processing</span></div>
-      <div class="form-box-content ui-widget-content ui-corner-bottom">
-        <ul class="oc-ui-form-list">
-          <li class="ui-helper-clearfix">
-            <label class="scheduler-label"><span class="scheduler-required-text">* </span><span id="i18n_process_instr">Processing instructions</span>:</label>
-            <select id="workflowSelector"></select>
-          </li>
-        </ul>
-        <div id="workflowConfigContainer"></div>
-      </div>
-    </div>
+    <div id="processingScheduler"></div>
 
     <div class="form-box layout-centered ui-widget">
       <div class="form-box-content ui-widget-content ui-corner-all">
         <form action="">
           <ul class="oc-ui-form-list">
             <li>
-              <label class="scheduler-label">&#160;</label>
+              <label class="scheduler-label">&nbsp;</label>
               <input type="button" value="Schedule" id="submitButton" class="mouseover-pointer control-button" />
               <a id="cancelButton" title="Cancel" class="secondaryButton">Cancel</a>
               <input type="hidden" id="eventId" />
@@ -528,7 +483,7 @@
               <input type="hidden" id="agentTimeZone" />
             </li>
             <li>
-              <label class="scheduler-label">&#160;</label>
+              <label class="scheduler-label">&nbsp;</label>
               <span class="scheduler-required-text">*</span><span id="i18n_required">Required</span>
             </li>
           </ul>

@@ -229,6 +229,27 @@
             </configuration>
           </execution>
           <execution>
+            <id>copy-templates</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/ui/templates</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../../shared-resources/templates/</directory>
+                  <includes>
+                    <include>common-data.tpl</include>
+                    <include>processing-instructions.tpl</include>
+                    <include>additional-description.tpl</include>
+                  </includes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
             <id>copy-xsl</id>
             <phase>validate</phase>
             <goals>

@@ -16,12 +16,12 @@
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
-   	<dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-common</artifactId>
       <version>${project.version}</version>
     </dependency>
-   	<dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-kernel</artifactId>
       <version>${project.version}</version>
@@ -170,6 +170,11 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+	    <Include-Resource>
+	      {maven-resources},
+	      ui/operation/trim/common-data.tpl=../../shared-resources/templates/common-data.tpl,
+	      ui/operation/trim/additional-description.tpl=../../shared-resources/templates/additional-description.tpl
+	    </Include-Resource>
             <Import-Package>
               javax.xml.namespace;version=0,
               *;resolution:=optional  

@@ -111,6 +111,8 @@
       
       function initCategories() {
         var options = '';
+        $('#common-data').jqotesubtpl('common-data.tpl', {});
+        $('#additional-description').jqotesubtpl('additional-description.tpl', {});
         for ( var key in iTunesCategories) {
           options += '<option value="' + key + '">'
             + iTunesCategories[key]['name']
@@ -135,7 +137,7 @@
 
       function changedSubCategory() {
         var subject = $('#category option:selected').index() == 0 ? $('#categorySelector option:selected').text() : $('#category option:selected').text();
-        $("#meta-subject").val(subject);
+        $("#subject").val(subject);
       }
       
       $(document).ready(function(){
@@ -363,7 +365,7 @@
             var seriesid =  $(data.documentElement).find("mp|mediapackage > series").text();
             if (seriesid != '') {
               $('#isPartOf').val(seriesid);
-              $('#series').val($(data.documentElement).find("mp|mediapackage > seriestitle").text());
+              $('#seriesSelect').val($(data.documentElement).find("mp|mediapackage > seriestitle").text());
               $('#info-series')[0].innerHTML = $(data.documentElement).find("mp|mediapackage > seriestitle").text();
             }
 
@@ -380,7 +382,10 @@
                 $(data.documentElement).children().each(function(index, elm){
                   var tagName = elm.tagName.split(/:/)[1];
                   if ($(elm).text() != '') {
-                    $('#meta-' + tagName).val($(elm).text());               
+                    $('#' + tagName).val($(elm).text());
+		    if (tagName == 'license') {
+		       $('#' + tagName + 'Field').val($(elm).text());
+                    }
                     if ($('#info-' + tagName).length>0) $('#info-' + tagName)[0].innerHTML = $(elm).text();        
                     if ( tagName === "category") {
                       value = $(elm).text();
@@ -501,9 +506,9 @@
           success: function(data){                      // we are asking for a series service on the host this site comes from
             if (data.services.service !== undefined) {  // so there should always be none or one instance returned (instead of  data.services beeing an array
               seriesServiceURL = data.services.service.host + data.services.service.path;
-              $('#series').removeAttr('disabled');
+              $('#seriesSelect').removeAttr('disabled');
               ocUtils.log('Initializing autocomplete for series field')
-              $('#series').autocomplete({
+              $('#seriesSelect').autocomplete({
                 source: function(request, response) {
                   $.ajax({
                     url: seriesServiceURL + '/series.json?q=' + request.term,
@@ -526,14 +531,15 @@
                   $('#isPartOf').val(ui.item.id);
                 },
                 change: function(event, ui){
-                  if($('#isPartOf').val() === '' && $('#series').val() !== ''){
+                  seriesChanged = true;
+                  if($('#isPartOf').val() === '' && $('#seriesSelect').val() !== ''){
                     ocUtils.log("Searching for series in series endpoint");
                     $.ajax({
-                      url : seriesServiceURL + '/series.json?seriesTitle=' + $('#series').val(),
+                      url : seriesServiceURL + '/series.json?seriesTitle=' + $('#seriesSelect').val(),
                       type : 'get',
                       dataType : 'json',
                       success : function(data) {
-                        var series_input = $('#series').val(),
+                        var series_input = $('#seriesSelect').val(),
                         series_list = data["catalogs"],
                         series_title,
                         series_id;
@@ -545,7 +551,7 @@
                         }
                       }
                     });
-                  } else if($('#isPartOf').val() === '' && $('#series').val() === '') {
+                  } else if($('#isPartOf').val() === '' && $('#seriesSelect').val() === '') {
                     $('#isPartOf').val('');
                   }
                 },
@@ -553,7 +559,7 @@
                   $('#isPartOf').val('');
                 }
               });
-              //              $('#series').autocomplete({
+              //              $('#seriesSelect').autocomplete({
               //                source: seriesServiceURL + '/search',
               //                select: function(event, ui){
               //                  $('#isPartOf').val(ui.item.id);
@@ -564,7 +570,7 @@
               //              });
               
               // event handler: save information that series changed 
-              $('#series').change(function() {
+              $('#seriesSelect').change(function() {
                 seriesChanged = true;
               });
             }
@@ -731,7 +737,7 @@
 
         // if metadata was changed update DC catalog and mediapackage instance
         if (metadataChanged) {
-          if ($('#meta-title').val()) {
+          if ($('#title').val()) {
             updateDCMetadata();
             updateMediapackageMetadata();
             saveDCMetadata();
@@ -742,7 +748,7 @@
         }
 
         if (seriesChanged) {
-          if ($('#series').val() == '') {
+          if ($('#seriesSelect').val() == '') {
             // remove series from mediapackage
             ocUtils.log('Removing Series');
             $(mediapackage.documentElement).find('series').remove();
@@ -768,8 +774,8 @@
             var seriesDcXml = '';
             if ($('#isPartOf').val() == '') {
               // create series
-              ocUtils.log('Creating Series ' + $('#series').val());
-              seriesXml = '<series><additionalMetadata><metadata><key>title</key><value>' + $('#series').val() + '</value></metadata></additionalMetadata></series>';
+              ocUtils.log('Creating Series ' + $('#seriesSelect').val());
+              seriesXml = '<series><additionalMetadata><metadata><key>title</key><value>' + $('#seriesSelect').val() + '</value></metadata></additionalMetadata></series>';
               $.ajax({
                 async: false,
                 type: 'PUT',
@@ -824,7 +830,7 @@
               }
             });
             // finally update series in mediapackage instance
-            updateMPElement('seriestitle', $('#series').val());
+            updateMPElement('seriestitle', $('#seriesSelect').val());
             updateMPElement('series', $('#isPartOf').val());
           }
         }
@@ -905,17 +911,17 @@
         updateMetadataGroupField('contributor', 'contributors', 'contributor');
 
         // update series
-        if ($('#series').val() != '') {
+        if ($('#seriesSelect').val() != '') {
           if ($('#isPartOf').val() == '') {
             createSeriesFromText();
           }
-          updateMPElement('seriestitle', $('#series').val());
+          updateMPElement('seriestitle', $('#seriesSelect').val());
           updateMPElement('series', $('#isPartOf').val());  
         }
       }
       
       function createSeriesFromText() {
-        var dcDoc = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn"><dcterms:title xmlns="">' + $('#series').val() + '</dcterms:title><dcterms:creator xmlns=""></dcterms:creator><dcterms:contributor xmlns=""></dcterms:contributor><dcterms:subject xmlns=""></dcterms:subject><dcterms:language xmlns=""></dcterms:language><dcterms:license xmlns=""></dcterms:license><dcterms:description xmlns=""></dcterms:description></dublincore>';
+        var dcDoc = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn"><dcterms:title xmlns="">' + $('#seriesSelect').val() + '</dcterms:title><dcterms:creator xmlns=""></dcterms:creator><dcterms:contributor xmlns=""></dcterms:contributor><dcterms:subject xmlns=""></dcterms:subject><dcterms:language xmlns=""></dcterms:language><dcterms:license xmlns=""></dcterms:license><dcterms:description xmlns=""></dcterms:description></dublincore>';
         var acl = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="http://org.opencastproject.security"></acl>';
         $.ajax({
           type: 'POST',
@@ -927,7 +933,7 @@
             acl: acl
           },
           success: function(data) {
-            id = data.getElementsByTagName('dcterms:identifier')[0].textContent;
+            id = data.getElementsByTagName('identifier')[0].textContent;
             $('#isPartOf').val(id);
           }
         });
@@ -1059,22 +1065,8 @@
       
 	        <div class="form-box-content ui-widget-content ui-corner-all">
 	          <form action="">
-	            <ul class="oc-ui-form-list">
-	              <li>
-	                <label class="scheduler-label" for="title" id="titleLabel"><span style="color: red;">* </span><span id="i18n_title_label">Title</span>:</label>
-	                <input type="text" id="meta-title" name="title" class="oc-ui-form-field requiredField dcMetaField" maxlength="255" />
-	              </li>
-	              <li>
-	                <label class="scheduler-label" for="creator" id="creatorLabel"><span id="i18n_presenter_label">Presenter</span>:</label>
-	                <input type="text" name="creator" id="meta-creator" class="oc-ui-form-field dcMetaField"  maxlength="255"/>
-	              </li>
-	              <li id="seriesContainer">
-	                <label class="scheduler-label" for="series" id="seriesLabel"><span id="i18n_series_label">Course/Series</span>:</label>
-	                <input type="text" class="oc-ui-form-field" id="series" name="series" maxlength="255">
-	                <input type="hidden" class="oc-ui-form-field" id="isPartOf" name="isPartOf">
-	              </li>
-	
-	
+		    <div id="common-data"></div>
+                    <ul class="oc-ui-form-list">
 	              <li>
 	                <label class="scheduler-label" id="recordingDateLabel"><span id="i18n_date_label">Recording Date</span>:</label>
 	                <input type="text" size="10" id="recordDate" class="dcMetaField" name="created"/>
@@ -1183,57 +1175,23 @@
 	                <div class="clear"></div>        
 	          </div>       
 	                 
-	             <div class="form-box-content ui-widget-content ui-corner-bottom collapsable" style="display:none">    
-	             		     
-	              <form action="">
-	           	<ul class="oc-ui-form-list">
-	
-				  <li class="additionalMeta">
-	                <label class="scheduler-label" for="contributor" id="contributorLabel"><span id="i18n_dept_label">Contributor</span>:</label>
-	                <input type="text" class="oc-ui-form-field dcMetaField" name="contributor" id="meta-contributor" maxlength="255" />
-	              </li>
-	              
-	              <li class="additionalMeta">
-	                <label class="scheduler-label" for="subject" id="subjectLabel"><span id="i18n_sub_label">Subject</span>:</label>
-	                <input type="text" class="oc-ui-form-field dcMetaField" name="subject" id="meta-subject" maxlength="255" />
-	             </li>
-	             
-	              <li class="additionalMeta">
-	                <label class="scheduler-label" for="language" id="languageLabel"><span id="i18n_lang_label">Language</span>:</label>
-	                <input type="text" class="oc-ui-form-field dcMetaField" name="language" id="meta-language" maxlength="255" />
-	              </li>
-	              
-	              <li class="additionalMeta">
-	                <label class="scheduler-label" for="description" id="descriptionLabel"><span id="i18n_desc_label">Description</span>:</label>
-	                <textarea name="description" id="meta-description" class="oc-ui-form-field dcMetaField" rows="5" cols="10"></textarea>
-	              </li>
-	
-	              <li>
-	               	<label class="scheduler-label" for="keywords" id="keywordsLabel" ><span id="i18n_keywords_label">Keywords / Tags</span>:</label>
-	               	<input type="text" id="meta-keywords" name="keywords" class="oc-ui-form-field ocMetaField"  maxlength="255"/>
-	              </li>
-	              
-	              <li>
-	                <label class="scheduler-label" for="license" id="licenseLabel"><span id="i18n_license_label">License</span>:</label>
-	                <select id="meta-license" name="license" class="oc-ui-form-field dcMetaField">
-	                  <option value="All Rights Reserved">All Rights Reserved</option>
-	                  <option value="Creative Commons 3.0: Attribution-NonCommercial-NoDerivs" selected="selected">Creative Commons 3.0: Attribution-NonCommercial-NoDerivs</option>
-	                </select>
-	              </li>
-	              
-	              <li class="additionalMeta">
-	                <label class="scheduler-label" for="rightsholder" id="rightsholderLabel"><span id="i18n_rights_label">Copyright</span>:</label>
-	                <input type="text" disabled=true class="oc-ui-form-field dcMetaField" name="rightsholder" id="rightsholder" maxlength="255" value="" />
-	              </li>
-	              
-	             <li>      
-	                <label class="scheduler-label" for="category" id="categoryLabel"><span id="i18n_cat_label">Category</span></label>
-	                <select name="categorySelector" id="categorySelector" class="oc-ui-form-field"></select>
-	             </li>
-	             
-	           	</ul>
-	         	</form>
-	        </div>
+	         <div class="form-box-content ui-widget-content ui-corner-bottom collapsable" style="display:none">    
+		     <div id="additional-description"></div>
+		     <ul>
+		        <li>
+			  <label class="scheduler-label" for="keywords" id="keywordsLabel" ><span id="i18n_keywords_label">Keywords / Tags</span>:</label>
+			  <input type="text" id="keywords" name="keywords" class="oc-ui-form-field ocMetaField"  maxlength="255"/>
+			</li>
+			<li class="additionalMeta">
+			  <label class="scheduler-label" for="rightsholder" id="rightsholderLabel"><span id="i18n_rights_label">Copyright</span>:</label>
+			  <input type="text" disabled=true class="oc-ui-form-field dcMetaField" name="rightsholder" id="rightsholder" maxlength="255" value="" />
+			</li>
+			<li>
+			   <label class="scheduler-label" for="category" id="categoryLabel"><span id="i18n_cat_label">Category</span></label>
+			   <select name="categorySelector" id="categorySelector" class="oc-ui-form-field"></select>
+			</li>
+		     </ul>
+	         </div>
       </div>
 
       <script type="text/x-jqote-template" id="template">

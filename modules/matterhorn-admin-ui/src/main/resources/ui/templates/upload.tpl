@@ -43,22 +43,8 @@
       <div class="form-box layout-centered ui-widget">
         <div class="form-box-content ui-widget-content ui-corner-all">
           <form action="">
+            <div id="common-data"></div>
             <ul class="oc-ui-form-list">
-              <li>
-                <label class="scheduler-label" for="titleField" id="titleLabel"><span style="color: red;">* </span><span id="i18n_title_label">Title</span>:</label>
-
-                <input type="text" id="titleField" name="title" class="oc-ui-form-field requiredField dc-metadata-field" maxlength="255" />
-              </li>
-              <li>
-                <label class="scheduler-label" for="creator" id="creatorLabel"><span id="i18n_presenter_label">Presenter</span>:</label>
-                <input type="text" id="creator" name="creator" class="oc-ui-form-field dc-metadata-field"  maxlength="255"/>
-              </li>
-              <li id="seriesContainer">
-                <label class="scheduler-label" for="series" id="seriesLabel"><span id="i18n_series_label">Course/Series</span>:</label>
-
-                <input type="text" class="oc-ui-form-field" id="series" name="series" maxlength="255">
-                <input type="hidden" class="oc-ui-form-field dc-metadata-field" id="isPartOf" name="isPartOf" value="">
-              </li>
               <li>
                 <label class="scheduler-label" id="recordingDateLabel"><span class="scheduler-required-text">* </span><span id="i18n_date_label">Recording Date</span>:</label>
                 <input type="text" size="10" id="recordDate" name="recordDate" class="dc-metadata-field" />
@@ -183,31 +169,7 @@
           <div class="clear"></div>
 
         </div>
-        <div class="form-box-content ui-widget-content ui-corner-bottom unfoldable-content">
-          <form action="">
-            <ul class="oc-ui-form-list">
-              <li class="additionalMeta">
-                <label class="scheduler-label" for="contributor" id="contributorLabel"><span id="i18n_dept_label">Contributor</span>:</label>
-                <input type="text" class="oc-ui-form-field dc-metadata-field" name="contributor" id="contributor" maxlength="255" />
-              </li>
-
-              <li class="additionalMeta">
-                <label class="scheduler-label" for="subject" id="subjectLabel"><span id="i18n_sub_label">Subject</span>:</label>
-                <input type="text" class="oc-ui-form-field dc-metadata-field" name="subject" id="subject" maxlength="255" />
-              </li>
-              <li class="additionalMeta">
-                <label class="scheduler-label" for="language" id="languageLabel"><span id="i18n_lang_label">Language</span>:</label>
-                <input type="text" class="oc-ui-form-field dc-metadata-field" name="language" id="language" maxlength="255" />
-
-              </li>
-              <li class="additionalMeta">
-                <label class="scheduler-label" for="description" id="descriptionLabel"><span id="i18n_desc_label">Description</span>:</label>
-                <textarea name="description" id="description" class="oc-ui-form-field dc-metadata-field" rows="5" cols="10"></textarea>
-              </li>
-            </ul>
-          </form>
-
-        </div>
+        <div id="additional-description" class="form-box-content ui-widget-content ui-corner-bottom unfoldable-content"></div>
       </div>
 
       <!-- file upload -->
@@ -378,23 +340,7 @@
       </div>
 
       <!-- Processing Instructions -->
-      <div class="form-box layout-centered container ui-widget">
-        <div class="form-box-head ui-widget-header ui-corner-top"><b id="i18n_process_title">Processing</b></div>
-
-        <div class="form-box-content ui-widget-content ui-corner-bottom">
-          <ul class="oc-ui-form-list">
-            <li class="ui-helper-clearfix">
-              <label class="scheduler-label"><span style="color: red;">* </span><span id="i18n_process_instr">Processing instructions</span>:</label>
-              <select id="workflowSelector" id="workflowSelector" class="workflowSelector"></select>
-            </li>
-            <li class="workflowConfigContainer" id="workflowConfigContainer">
-
-              <div class="workflowConfigPanel"></div>
-            </li>
-          </ul>
-        </div>
-      </div>
-      
+      <div id="processingRecording"></div>      
 
       <!-- submit/cancel controls -->
       <div class="form-box layout-centered ui-widget">
