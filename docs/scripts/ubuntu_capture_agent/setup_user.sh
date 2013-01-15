@@ -37,7 +37,22 @@ elif [[ $var -ne 9 ]]; then
 fi
 
 # Setting up user's permissions by including it in the appropriate groups
-usermod -aG admin,video,audio "$input"
+adminGroupExists=$(grep '^admin:' /etc/group)
+admGroupExists=$(grep '^adm:' /etc/group)
+
+if [[ "$adminGroupExists" != "" ]]
+then
+        echo "$input will be added to the admin, video and audio groups."
+	usermod -aG admin,video,audio "$input"
+elif [[ "$admGroupExists" != "" ]]
+then
+        echo "$input will be added to the adm, video and audio groups."
+	usermod -aG adm,video,audio "$input"
+else
+        echo "There isn't a admin or adm group for the user in the /etc/group file. Please add $input to whatever the admin group is for this system. They will only be added to the video and audio groups right now."
+	usermod -aG video,audio "$input"
+fi
+
 
 # Exports the username, its home and other directories depending on them
 export USERNAME="$input"

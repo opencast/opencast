@@ -91,6 +91,8 @@ export UBUNTU_11_04="Ubuntu 11.04 \n \l"
 export UBUNTU_11_04_PACKAGES_FILE="Ubuntu-11-04.packages"
 export UBUNTU_11_10="Ubuntu 11.10 \n \l"
 export UBUNTU_11_10_PACKAGES_FILE="Ubuntu-11-10.packages"
+export UBUNTU_12_04="Ubuntu 12.04.1 LTS \n \l"
+export UBUNTU_12_04_PACKAGES_FILE="Ubuntu-12-04.packages"
 export PACKAGE_LIST_DEFAULT_FILE="default.packages"
 
 PACKAGE_LISTS=("$UBUNTU_10_10_PACKAGES_FILE" "$UBUNTU_11_04_PACKAGES_FILE" "$UBUNTU_11_10_PACKAGES_FILE" "$PACKAGE_LIST_DEFAULT_FILE")
@@ -132,7 +134,7 @@ export DEPLOY_DIR=matterhorn
 export JAVA_PREFIX=/usr/lib/jvm
 # A regexp to filter the right jvm directory from among all the installed ones
 # The chosen JAVA_HOME will be $JAVA_PREFIX/`ls $JAVA_PREFIX | grep $JAVA_PATTERN`
-export JAVA_PATTERNS="java-6-sun java-7-oracle java-6-openjdk"
+export JAVA_PATTERNS="java-6-sun java-7-oracle java-6-openjdk java-6-openjdk-i386"
                            
 # Path to the maven2 repository, under the user home
 export M2_SUFFIX=.m2/repository
