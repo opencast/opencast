@@ -217,10 +217,10 @@ Opencast.search = (function ()
             $(staticInputElem).val('');
         }
         // Hide other Tabs
-	Opencast.Plugin_Controller.hideAll(Opencast.search);
+		Opencast.Plugin_Controller.hideAll(Opencast.search);
         $("#oc_btn-lecturer-search").attr('aria-pressed', 'true');
         // Show a loading Image
-        $('#oc_search-segment').show();
+		Opencast.segments_text.show();
         $('#search-loading').show();
         $('#oc-search-result').hide();
         $('.oc-segments-preview').css('display', 'block');

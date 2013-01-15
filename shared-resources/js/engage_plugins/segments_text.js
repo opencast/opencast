@@ -57,6 +57,7 @@ Opencast.segments_text = (function ()
 		});
             $('#oc_btn-slidetext').html(SEGMENTS_TEXT_HIDE);
             $("#oc_btn-slidetext").attr('aria-pressed', 'true');
+			$("#oc_btn-slidetext").parent().addClass('ui-tabs-selected').addClass('ui-state-active');
             // Show a loading Image
             $('#oc_slidetext').show();
             $('#segments_text-loading').show();
