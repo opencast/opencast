@@ -27,6 +27,10 @@ case "$ISSUE" in
       echo "Using Configuration of Ubuntu 11.10 for packages"
       PACKAGE_LIST_FILE=$UBUNTU_11_10_PACKAGES_FILE
       ;;
+    "$UBUNTU_12_04" )
+      echo "Using Configuration of Ubuntu 12.04 for packages"
+      PACKAGE_LIST_FILE=$UBUNTU_12_04_PACKAGES_FILE
+      ;;
     * )
       echo "Using Default Configuration of packages"
       PACKAGE_LIST_FILE=$PACKAGE_LIST_DEFAULT_FILE
