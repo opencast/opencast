@@ -15,6 +15,7 @@
  */
 package org.opencastproject.workflow.handler;
 
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
@@ -36,8 +37,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
-
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -284,32 +283,34 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
       // add this receipt's queue time to the total
       totalTimeInQueue += job.getQueueTime();
+      // it is allowed for compose jobs to return an empty payload. See the EncodeEngine interface
+      if (job.getPayload().length() > 0) {
+        Track composedTrack = (Track) MediaPackageElementParser.getFromXml(job.getPayload());
 
-      Track composedTrack = (Track) MediaPackageElementParser.getFromXml(job.getPayload());
+        // Adjust the target tags
+        for (String tag : targetTags) {
+          logger.trace("Tagging composed track with '{}'", tag);
+          composedTrack.addTag(tag);
+        }
 
-      // Adjust the target tags
-      for (String tag : targetTags) {
-        logger.trace("Tagging composed track with '{}'", tag);
-        composedTrack.addTag(tag);
+        // Adjust the target flavor. Make sure to account for partial updates
+        if (targetFlavor != null) {
+          String flavorType = targetFlavor.getType();
+          String flavorSubtype = targetFlavor.getSubtype();
+          if ("*".equals(flavorType))
+            flavorType = track.getFlavor().getType();
+          if ("*".equals(flavorSubtype))
+            flavorSubtype = track.getFlavor().getSubtype();
+          composedTrack.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
+          logger.debug("Composed track has flavor '{}'", composedTrack.getFlavor());
+        }
+
+        // store new tracks to mediaPackage
+        mediaPackage.addDerived(composedTrack, track);
+        String fileName = getFileNameFromElements(track, composedTrack);
+        composedTrack.setURI(workspace.moveTo(composedTrack.getURI(), mediaPackage.getIdentifier().toString(),
+                                              composedTrack.getIdentifier(), fileName));
       }
-
-      // Adjust the target flavor. Make sure to account for partial updates
-      if (targetFlavor != null) {
-        String flavorType = targetFlavor.getType();
-        String flavorSubtype = targetFlavor.getSubtype();
-        if ("*".equals(flavorType))
-          flavorType = track.getFlavor().getType();
-        if ("*".equals(flavorSubtype))
-          flavorSubtype = track.getFlavor().getSubtype();
-        composedTrack.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
-        logger.debug("Composed track has flavor '{}'", composedTrack.getFlavor());
-      }
-
-      // store new tracks to mediaPackage
-      mediaPackage.addDerived(composedTrack, track);
-      String fileName = getFileNameFromElements(track, composedTrack);
-      composedTrack.setURI(workspace.moveTo(composedTrack.getURI(), mediaPackage.getIdentifier().toString(),
-              composedTrack.getIdentifier(), fileName));
     }
 
     WorkflowOperationResult result = createResult(mediaPackage, Action.CONTINUE, totalTimeInQueue);

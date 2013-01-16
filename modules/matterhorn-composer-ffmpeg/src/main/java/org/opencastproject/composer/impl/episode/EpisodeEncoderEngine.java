@@ -21,7 +21,7 @@ import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.impl.AbstractEncoderEngine;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.PathSupport;
-
+import org.opencastproject.util.data.Option;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -229,7 +229,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
   }
 
   /**
-   * @see org.opencastproject.composer.api.api.composer.EncoderEngine#needsLocalWorkCopy()
+   * @see org.opencastproject.composer.api.EncoderEngine#needsLocalWorkCopy()
    */
   public boolean needsLocalWorkCopy() {
     return true;
@@ -241,7 +241,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
    * @see org.opencastproject.composer.api.EncoderEngine#mux(java.io.File, java.io.File,
    *      org.opencastproject.composer.api.EncodingProfile, java.util.Map)
    */
-  public File mux(File audioSource, File videoSource, EncodingProfile format, Map<String, String> properties)
+  public Option<File> mux(File audioSource, File videoSource, EncodingProfile format, Map<String, String> properties)
           throws EncoderException {
     throw new UnsupportedOperationException("Not yet implemented");
     // xmlrpcController.submitJob(source, format);
@@ -257,7 +257,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
    *      org.opencastproject.composer.api.EncodingProfile, java.util.Map)
    */
   @Override
-  public File encode(File mediaSource, EncodingProfile format, Map<String, String> properties) throws EncoderException {
+  public Option<File> encode(File mediaSource, EncodingProfile format, Map<String, String> properties) throws EncoderException {
     return mux(null, mediaSource, format, properties);
   }
 
@@ -280,7 +280,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
    *      org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
    */
   @Override
-  public File trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
+  public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
           throws EncoderException {
     // TODO: Implement
     throw new UnsupportedOperationException("Not yet implemented");

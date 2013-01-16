@@ -280,6 +280,45 @@ public final class Functions {
     return target;
   }
 
+  /** Create an effect that runs its argument. */
+  public static final Effect<Effect0> run = new Effect<Effect0>() {
+    @Override protected void run(Effect0 e) {
+      e.apply();
+    }
+  };
+
+  /** Create an effect that runs all given effects in order. */
+  public static Effect0 all(final Effect0... es) {
+    return new Effect0() {
+      @Override protected void run() {
+        mlist(es).each(run);
+      }
+    };
+  }
+
+  /** Pure functions are covariant in their result type. */
+  public static <A, B> Function<A, B> co(Function<A, ? extends B> f) {
+    return (Function<A, B>) f;
+  }
+
+  public static <A, B> Function<Function<A, ? extends B>, Function<A, B>> co() {
+    return new Function<Function<A, ? extends B>, Function<A, B>>() {
+      @Override public Function<A, B> apply(Function<A, ? extends B> f) {
+        return co(f);
+      }
+    };
+  }
+
+  /** Pure functions are contravariant in their argument type. */
+  public static <A, B> Function<A, B> contra(Function<? super A, B> f) {
+    return (Function<A, B>) f;
+  }
+
+  /** Pure functions are covariant in their result type and contravariant in their argument type. */
+  public static <A, B> Function<A, B> variant(Function<? super A, ? extends B> f) {
+    return (Function<A, B>) f;
+  }
+
   private static <T extends Throwable, A> A castGeneric(Throwable t) throws T {
     // The cast to T does not happen here but _after_ returning from the method at _assignment_ time
     // But since there is no variable assignment. The Throwable is just thrown.

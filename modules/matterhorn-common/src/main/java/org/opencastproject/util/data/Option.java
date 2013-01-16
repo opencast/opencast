@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 /**
  * The option type encapsulates on optional value. It contains either some value or is empty.
  * Please make sure to NEVER wrap null into a some. Instead use none.
@@ -106,6 +108,22 @@ public abstract class Option<A> implements Iterable<A> {
     else throw none;
   }
 
+  /** Throw <code>none</code> if none. */
+  public <T extends Throwable> Option<A> orError(Class<T> none) throws T {
+    if (isSome()) return this;
+    else {
+      T t;
+      try {
+        t = none.newInstance();
+      } catch (InstantiationException e) {
+        return chuck(new Error("Error creating exception", e));
+      } catch (IllegalAccessException e) {
+        return chuck(new Error("Error creating exception", e));
+      }
+      throw t;
+    }
+  }
+
   /** Throw exception returned by <code>none</code> if none. */
   public <T extends Throwable> Option<A> orError(Function0<T> none) throws T {
     if (isSome()) return this;
@@ -120,6 +138,9 @@ public abstract class Option<A> implements Iterable<A> {
 
   /** Get the contained value in case of being "some" or return the result of evaluating <code>none</code> otherwise. */
   public abstract A getOrElse(Function0<A> none);
+
+  /** To interface with legacy applications or frameworks that still use <code>null</code> values. */
+  public abstract A getOrElseNull();
 
   /** Transform the option into a monadic list. */
   public abstract Monadics.ListMonadic<A> mlist();
@@ -194,6 +215,10 @@ public abstract class Option<A> implements Iterable<A> {
 
       @Override
       public A getOrElse(Function0<A> none) {
+        return a;
+      }
+
+      @Override public A getOrElseNull() {
         return a;
       }
 
@@ -291,6 +316,10 @@ public abstract class Option<A> implements Iterable<A> {
       @Override
       public A getOrElse(Function0<A> none) {
         return none.apply();
+      }
+
+      @Override public A getOrElseNull() {
+        return null;
       }
 
       @Override
@@ -394,5 +423,24 @@ public abstract class Option<A> implements Iterable<A> {
     B some(A a);
 
     B none();
+  }
+
+  /** Effect match. */
+  public abstract static class EMatch<A> implements Match<A, Void> {
+    @Override
+    public final Void some(A a) {
+      esome(a);
+      return null;
+    }
+
+    @Override
+    public final Void none() {
+      enone();
+      return null;
+    }
+
+    protected abstract void esome(A a);
+
+    protected abstract void enone();
   }
 }

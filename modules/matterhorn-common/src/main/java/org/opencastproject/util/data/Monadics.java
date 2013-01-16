@@ -31,6 +31,7 @@ import static org.opencastproject.util.data.Collections.iterator;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.Prelude.unexhaustiveMatch;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 public final class Monadics {
@@ -110,11 +111,35 @@ public final class Monadics {
     /** Return the head of the list. */
     public abstract Option<A> head();
 
+    /** Return the head of the list. */
+    public abstract A head2();
+
+    /** Turn the list into an option only if it contains exactly one element. */
+    public abstract Option<A> option();
+
+    /** Return the tail of the list. */
+    public abstract ListMonadic<A> tail();
+
     /** Limit the list to the first <code>n</code> elements. */
     public abstract ListMonadic<A> take(int n);
 
     /** Process the wrapped list en bloc. */
     public abstract <B> ListMonadic<B> inspect(Function<List<A>, List<B>> f);
+
+    /** Pattern matching on the wrapped list. */
+    public final <B> B match(Matcher<A, B>... ms) {
+      return match(list(ms));
+    }
+
+    /** Pattern matching on the wrapped list. */
+    public final <B> B match(List<Matcher<A, B>> ms) {
+      for (Matcher<A, B> m : ms) {
+        if (m.matches(this)) {
+          return m.apply(this);
+        }
+      }
+      return unexhaustiveMatch();
+    }
 
     /** Unwrap. */
     public abstract List<A> value();
@@ -195,6 +220,67 @@ public final class Monadics {
     return new ArrayList<A>(size);
   }
 
+  // -- matchers and constructors
+
+  public static interface Matcher<A, B> {
+    boolean matches(ListMonadic<A> m);
+    B apply(ListMonadic<A> m);
+  }
+
+  /** Matches the empty list. Like Haskell's <code>[]</code> */
+  public static <A, B> Matcher<A, B> caseNil(final Function0<B> f) {
+    return new Matcher<A, B>() {
+      @Override public boolean matches(ListMonadic<A> m) {
+        return m.value().size() == 0;
+      }
+
+      @Override public B apply(ListMonadic<A> m) {
+        return f.apply();
+      }
+    };
+  }
+
+  /** Matches lists with exactly one element. Like Haskell's <code>(x:[])</code> */
+  public static <A, B> Matcher<A, B> caseA(final Function<A, B> f) {
+    return new Matcher<A, B>() {
+      @Override public boolean matches(ListMonadic<A> m) {
+        return m.value().size() == 1;
+      }
+
+      @Override public B apply(ListMonadic<A> m) {
+        return f.apply(m.head2());
+      }
+    };
+  }
+
+  /** Matches lists with at least one element. Like Haskell's <code>(x:xs)</code> */
+  public static <A, B> Matcher<A, B> caseAN(final Function2<A, List<A>, B> f) {
+    return new Matcher<A, B>() {
+      @Override public boolean matches(ListMonadic<A> m) {
+        return m.value().size() >= 1;
+      }
+
+      @Override public B apply(ListMonadic<A> m) {
+        return f.apply(m.head2(), m.tail().value());
+      }
+    };
+  }
+
+  /** Matches any list. Like Haskell's <code>(xs)</code> */
+  public static <A, B> Matcher<A, B> caseN(final Function<List<A>, B> f) {
+    return new Matcher<A, B>() {
+      @Override public boolean matches(ListMonadic<A> m) {
+        return true;
+      }
+
+      @Override public B apply(ListMonadic<A> m) {
+        return f.apply(m.value());
+      }
+    };
+  }
+
+  // -- constructors
+
   /** Constructor function optimized for lists. */
   public static <A> ListMonadic<A> mlist(final List<A> as) {
     return new ListMonadic<A>() {
@@ -269,7 +355,21 @@ public final class Monadics {
 
       @Override
       public Option<A> head() {
-        return !as.isEmpty() ? some(as.get(0)) : Option.<A>none();
+        return !as.isEmpty() ? some(head2()) : Option.<A>none();
+      }
+
+      @Override public A head2() {
+        return as.get(0);
+      }
+
+      @Override public Option<A> option() {
+        return as.size() == 1 ? some(as.get(0)) : Option.<A>none();
+      }
+
+      @Override public ListMonadic<A> tail() {
+        if (as.size() <= 1)
+          return mlist();
+        return mlist(as.subList(1, as.size()));
       }
 
       @Override
@@ -435,6 +535,20 @@ public final class Monadics {
         return as.length != 0 ? some(as[0]) : Option.<A>none();
       }
 
+      @Override public A head2() {
+        return as[0];
+      }
+
+      @Override public Option<A> option() {
+        return as.length == 1 ? some(as[0]) : Option.<A>none();
+      }
+
+      @Override public ListMonadic<A> tail() {
+        if (as.length <= 1)
+          return mlist();
+        return (ListMonadic<A>) mlist(ArrayUtils.subarray(as, 1, as.length));
+      }
+
       @Override
       public ListMonadic<A> take(int n) {
         return (ListMonadic<A>) mlist(ArrayUtils.subarray(as, 0, n));
@@ -597,6 +711,18 @@ public final class Monadics {
 
       @Override
       public Option<A> head() {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override public A head2() {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override public Option<A> option() {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override public ListMonadic<A> tail() {
         throw new UnsupportedOperationException();
       }
 

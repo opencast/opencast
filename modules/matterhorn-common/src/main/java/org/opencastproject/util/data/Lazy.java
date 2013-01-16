@@ -21,7 +21,7 @@ package org.opencastproject.util.data;
  * The calculation is not synchronized for performance reasons. As a trade off the value may be calculated
  * multiple times if many threads concurrently access the lazy in uninitialized state.
  * Since <code>f</code> is expected to be a <em>pure</em> function this is not a serious problem despite the
- * fact that calculation <em>may</em> happen multiple times.
+ * fact that calculation <em>may</em> happens multiple times.
  */
 public final class Lazy<A> {
   private volatile A a;

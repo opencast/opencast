@@ -15,26 +15,25 @@
  */
 package org.opencastproject.composer.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import org.opencastproject.composer.api.EncodingProfile;
-import org.opencastproject.composer.impl.ffmpeg.FFmpegEncoderEngine;
-import org.opencastproject.util.FileSupport;
-import org.opencastproject.util.IoSupport;
-import org.opencastproject.util.StreamHelper;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opencastproject.composer.api.EncodingProfile;
+import org.opencastproject.composer.impl.ffmpeg.FFmpegEncoderEngine;
+import org.opencastproject.util.FileSupport;
+import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.StreamHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test trimming using ffmpeg.
@@ -112,7 +111,7 @@ public class TrimmingTest {
     File sourceFile = new File(workingDirectory, "slidechanges.mov");
     FileUtils.copyURLToFile(sourceUrl, sourceFile);
     EncodingProfile trimProfile = profiles.get("trim.work");
-    File trimmedMovie = engine.trim(sourceFile, trimProfile, 5000, 10000, null);
+    File trimmedMovie = engine.trim(sourceFile, trimProfile, 5000, 10000, null).get();
 
     // These are weak assertions, but anything else would require either integration with another 3rd party tool
     // or manual parsing of ffmpeg output. Instead, we keep this test generic (but weak).

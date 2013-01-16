@@ -17,6 +17,7 @@
 package org.opencastproject.composer.api;
 
 import org.opencastproject.composer.api.EncodingProfile.MediaType;
+import org.opencastproject.util.data.Option;
 
 import java.io.File;
 import java.util.List;
@@ -51,12 +52,13 @@ public interface EncoderEngine {
    *          the media file to use in encoding
    * @param format
    *          the media format definition
-   * @return the encoded file
-   * 
+   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass
+   *   encodings where the first run does not actually create a media file
+   *
    * @throws EncoderException
    *           if an error occurs during encoding
    */
-  File encode(File mediaSource, EncodingProfile format, Map<String, String> properties) throws EncoderException;
+  Option<File> encode(File mediaSource, EncodingProfile format, Map<String, String> properties) throws EncoderException;
 
   /**
    * Encodes a file into the specified format.
@@ -69,12 +71,13 @@ public interface EncoderEngine {
    *          the media format definition
    * @param properties
    *          the encoder properties
-   * @return the encoded file
+   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass
+   *   encodings where the first run does not actually create a media file
    * 
    * @throws EncoderException
    *           if an error occurs during encoding
    */
-  File mux(File audioSource, File videoSource, EncodingProfile format, Map<String, String> properties)
+  Option<File> mux(File audioSource, File videoSource, EncodingProfile format, Map<String, String> properties)
           throws EncoderException;
 
   /**
@@ -88,12 +91,13 @@ public interface EncoderEngine {
    *          the new start time in miliseconds
    * @param duration
    *          the new duration in miliseconds
-   * @return the encoded file
+   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass
+   *   encodings where the first run does not actually create a media file
    * 
    * @throws EncoderException
    *           if an error occurs during encoding
    */
-  File trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
+  Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
           throws EncoderException;
 
   /**

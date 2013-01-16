@@ -16,9 +16,13 @@
 package org.opencastproject.util.data.functions;
 
 import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 
 import java.util.List;
+
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
 
 /** {@link Option} related functions. */
 public final class Options {
@@ -32,4 +36,30 @@ public final class Options {
       }
     };
   }
+
+  public static <A, B> Function<A, Option<B>> never() {
+    return new Function<A, Option<B>>() {
+      @Override
+      public Option<B> apply(A a) {
+        return none();
+      }
+    };
+  }
+
+  public static <A> Function0<Option<A>> never2() {
+    return new Function0<Option<A>>() {
+      @Override
+      public Option<A> apply() {
+        return none();
+      }
+    };
+  }
+
+  /** Function that turns <code>true</code> into <code>some(true)</code> and false into <code>none</code>. */
+  private static Function<Boolean, Option<Boolean>> toOption = new Function<Boolean, Option<Boolean>>() {
+    @Override
+    public Option<Boolean> apply(Boolean a) {
+      return a ? some(true) : Option.<Boolean> none();
+    }
+  };
 }

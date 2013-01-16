@@ -54,4 +54,8 @@ public final class Tuple<A, B> {
   public static <A, B> Tuple<A, B> tuple(A a, B b) {
     return new Tuple<A, B>(a, b);
   }
+
+  @Override public String toString() {
+    return "(" + a + "," + b + ")";
+  }
 }
