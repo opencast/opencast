@@ -443,6 +443,9 @@
      *                                              - medium
      *                                              - high
      *                                              - hd
+     *                  - displayOneVideo   don't display two videos simultaneously when two videos are available
+     *                                          Valid Parameter:
+     *                                              - true
      * @return the value of URL-Parameter 'name' or null if not defined
      */
     $.getURLParameter = function(name)
