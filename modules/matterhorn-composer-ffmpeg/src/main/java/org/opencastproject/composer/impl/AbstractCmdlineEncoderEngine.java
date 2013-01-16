@@ -16,16 +16,17 @@
 
 package org.opencastproject.composer.impl;
 
+import org.apache.commons.io.FilenameUtils;
 import org.opencastproject.composer.api.EncoderEngine;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncoderListener;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.util.IoSupport;
-
-import org.apache.commons.io.FilenameUtils;
+import org.opencastproject.util.data.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.activation.MimetypesFileTypeMap;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -37,7 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.activation.MimetypesFileTypeMap;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
 
 /**
  * Wrapper around any kind of command line controllable encoder.
@@ -93,7 +95,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
    *      org.opencastproject.composer.api.EncodingProfile, java.util.Map)
    */
   @Override
-  public File encode(File mediaSource, EncodingProfile format, Map<String, String> properties) throws EncoderException {
+  public Option<File> encode(File mediaSource, EncodingProfile format, Map<String, String> properties) throws EncoderException {
     return process(null, mediaSource, format, properties);
   }
 
@@ -104,7 +106,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
    *      org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
    */
   @Override
-  public File trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
+  public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
           throws EncoderException {
     return process(null, mediaSource, format, properties);
   }
@@ -116,7 +118,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
    *      org.opencastproject.composer.api.EncodingProfile, java.util.Map)
    */
   @Override
-  public File mux(File audioSource, File videoSource, EncodingProfile profile, Map<String, String> properties)
+  public Option<File> mux(File audioSource, File videoSource, EncodingProfile profile, Map<String, String> properties)
           throws EncoderException {
     return process(audioSource, videoSource, profile, properties);
   }
@@ -139,7 +141,9 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       }
       params.put("time", Long.toString(time));
       try {
-        extractedImages.add(process(null, mediaSource, format, params));
+        for (File image : process(null, mediaSource, format, params)) {
+          extractedImages.add(image);
+        }
       } catch (Exception e) {
         cleanup(extractedImages);
         if (e instanceof EncoderException) {
@@ -169,7 +173,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
    * @throws EncoderException
    *           if processing fails
    */
-  protected File process(File audioSource, File videoSource, EncodingProfile profile, Map<String, String> properties)
+  protected Option<File> process(File audioSource, File videoSource, EncodingProfile profile, Map<String, String> properties)
           throws EncoderException {
     // Fist, update the parameters
     if (properties != null)
@@ -258,7 +262,10 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
                 profile.getIdentifier() });
       }
       fireEncoded(this, profile, audioSource, videoSource);
-      return new File(parentFile.getParent(), outFileName + outSuffix);
+      if (profile.getOutputType() != EncodingProfile.MediaType.Nothing)
+        return some(new File(parentFile.getParent(), outFileName + outSuffix));
+      else
+        return none();
     } catch (EncoderException e) {
       if (audioSource != null) {
         logger.warn(

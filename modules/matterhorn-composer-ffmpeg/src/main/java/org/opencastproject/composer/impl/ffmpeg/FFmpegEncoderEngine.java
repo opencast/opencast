@@ -19,7 +19,7 @@ package org.opencastproject.composer.impl.ffmpeg;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.impl.AbstractCmdlineEncoderEngine;
-
+import org.opencastproject.util.data.Option;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +80,7 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
    *      org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
    */
   @Override
-  public File trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
+  public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
           throws EncoderException {
     if (properties == null)
       properties = new HashMap<String, String>();

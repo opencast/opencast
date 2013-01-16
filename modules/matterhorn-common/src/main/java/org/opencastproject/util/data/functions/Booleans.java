@@ -17,6 +17,7 @@ package org.opencastproject.util.data.functions;
 
 import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
 
 /** Boolean functions. */
@@ -67,6 +68,49 @@ public final class Booleans {
   public static final Function2<Boolean, Boolean, Boolean> or = new Function2<Boolean, Boolean, Boolean>() {
     @Override public Boolean apply(Boolean a, Boolean b) {
       return a || b;
+    }
+  };
+
+  /** A function that always returns true. */
+  public static final Function0<Boolean> yes = new Function0<Boolean>() {
+    @Override
+    public Boolean apply() {
+      return true;
+    }
+  };
+
+  /** A function that always returns true. */
+  public static <A> Function<A, Boolean> yes() {
+    return new Function<A, Boolean>() {
+      @Override
+      public Boolean apply(A a) {
+        return true;
+      }
+    };
+  }
+
+  /** A function that always returns false. */
+  public static final Function0<Boolean> no = new Function0<Boolean>() {
+    @Override
+    public Boolean apply() {
+      return false;
+    }
+  };
+
+  /** A function that always returns false. */
+  private static <A> Function<A, Boolean> no() {
+    return new Function<A, Boolean>() {
+      @Override
+      public Boolean apply(A a) {
+        return false;
+      }
+    };
+  }
+
+  private static Function<Boolean, Boolean> negate = new Function<Boolean, Boolean>() {
+    @Override
+    public Boolean apply(Boolean a) {
+      return !a;
     }
   };
 }

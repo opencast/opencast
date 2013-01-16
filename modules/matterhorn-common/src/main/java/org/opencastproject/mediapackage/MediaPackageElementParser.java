@@ -16,15 +16,15 @@
 package org.opencastproject.mediapackage;
 
 import org.apache.commons.io.IOUtils;
+import org.opencastproject.util.data.Function;
 import org.w3c.dom.Document;
-
-import java.io.StringWriter;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringWriter;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Convenience implementation that supports serializing and deserializing media package elements.
@@ -62,6 +62,15 @@ public final class MediaPackageElementParser {
     }
   }
 
+  /** {@link #getAsXml(MediaPackageElement)} as function. */
+  public static <A extends MediaPackageElement> Function<A, String> getAsXml() {
+    return new Function.X<A, String>() {
+      @Override protected String xapply(MediaPackageElement elem) throws Exception {
+        return getAsXml(elem);
+      }
+    };
+  }
+
   /**
    * Parses the serialized media package element and returns its object representation.
    * 
@@ -82,6 +91,13 @@ public final class MediaPackageElementParser {
       throw new MediaPackageException(e);
     }
   }
+
+  /** {@link #getFromXml(String)} as function. */
+  public static final Function<String, MediaPackageElement> getFromXml = new Function.X<String, MediaPackageElement>() {
+    @Override public MediaPackageElement xapply(String s) throws Exception {
+      return getFromXml(s);
+    }
+  };
 
   /**
    * Serializes media package element list to a string.

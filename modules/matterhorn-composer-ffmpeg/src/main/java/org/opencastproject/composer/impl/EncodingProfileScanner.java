@@ -15,8 +15,9 @@
  */
 package org.opencastproject.composer.impl;
 
-import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
-
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.EncodingProfile.MediaType;
 import org.opencastproject.composer.api.EncodingProfileImpl;
@@ -24,10 +25,6 @@ import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.ReadinessIndicator;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+
+import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
 
 /**
  * This manager class tries to read encoding profiles from the classpath.
@@ -122,8 +121,8 @@ public class EncodingProfileScanner implements ArtifactInstaller {
   /**
    * Reads the profiles from the given set of properties.
    * 
-   * @param properties
-   *          the properties
+   * @param artifact
+   *          the properties file
    * @return the profiles found in the properties
    */
   Map<String, EncodingProfile> loadFromProperties(File artifact) throws IOException {
@@ -187,11 +186,11 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     // Output Type
     Object type = getDefaultProperty(profile, PROP_OUTPUT, properties, defaultProperties);
     if (StringUtils.isBlank(type.toString()))
-      throw new ConfigurationException("Type of profile '" + profile + "' is missing");
+      throw new ConfigurationException("Output type of profile '" + profile + "' is missing");
     try {
       df.setOutputType(MediaType.parseString(StringUtils.trimToEmpty(type.toString())));
     } catch (IllegalArgumentException e) {
-      throw new ConfigurationException("Type '" + type + "' of profile '" + profile + "' is unknwon");
+      throw new ConfigurationException("Output type '" + type + "' of profile '" + profile + "' is unknwon");
     }
 
     // Suffix

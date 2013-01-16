@@ -257,6 +257,14 @@ public final class Collections {
     return x;
   }
 
+  /** Merge two maps where <code>b</code> takes precedence. */
+  public static <A, B> Map<A, B> merge(Map<? extends A, ? extends B> a, Map<? extends A, ? extends B> b) {
+    final Map<A, B> x = new HashMap<A, B>();
+    x.putAll(a);
+    x.putAll(b);
+    return x;
+  }
+
   /** Create a new array by prepending <code>a</code> to <code>as</code>: <code>[a, as0, as1, .. asn]</code> */
   public static <A> A[] cons(A a, A[] as) {
     A[] x = (A[]) Array.newInstance(a.getClass(), as.length + 1);
@@ -289,6 +297,16 @@ public final class Collections {
       ax.add(a);
     }
     return ax;
+  }
+
+  /** Return nil if <code>a</code> is null or a list containing <code>a</code> otherwise. */
+  public static <A> List<A> toList(A a) {
+    return a != null ? list(a) : Collections.<A>nil();
+  }
+
+  /** Return the list as is or nil, if <code>as</code> is null. */
+  public static <A> List<A> mkList(List<A> as) {
+    return as != null ? as : Collections.<A>nil();
   }
 
   /** Create a list from an array. */

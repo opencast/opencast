@@ -16,9 +16,11 @@
 
 package org.opencastproject.util.data.functions;
 
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Predicate;
 
 import java.text.Format;
 import java.util.List;
@@ -34,6 +36,9 @@ public final class Strings {
 
   private Strings() {
   }
+
+  private static final List<String> NIL = nil();
+  private static final Option<String> NONE = none();
 
   /**
    * Trim a string and return either <code>some</code> or <code>none</code> if it's empty.
@@ -53,7 +58,7 @@ public final class Strings {
   public static Option<String> trimToNone(String a) {
     if (a != null) {
       final String trimmed = a.trim();
-      return trimmed.length() > 0 ? some(trimmed) : Option.<String>none();
+      return trimmed.length() > 0 ? some(trimmed) : NONE;
     } else {
       return none();
     }
@@ -61,7 +66,7 @@ public final class Strings {
 
   /** Return <code>a.toString()</code> wrapped in a some if <code>a != null</code>, none otherwise. */
   public static Option<String> asString(Object a) {
-    return a != null ? some(a.toString()) : Option.<String>none();
+    return a != null ? some(a.toString()) : NONE;
   }
 
   /** Return <code>a.toString()</code> wrapped in a some if <code>a != null</code>, none otherwise. */
@@ -150,6 +155,31 @@ public final class Strings {
     return new Function<A, String>() {
       @Override public String apply(A a) {
         return f.format(a);
+      }
+    };
+  }
+
+  public static final Predicate<String> notBlank = new Predicate<String>() {
+    @Override public Boolean apply(String a) {
+      return StringUtils.isBlank(a);
+    }
+  };
+
+  public static final Function<String, List<String>> trimToNil = new Function<String, List<String>>() {
+    @Override public List<String> apply(String a) {
+      if (a != null) {
+        final String trimmed = a.trim();
+        return trimmed.length() > 0 ? list(trimmed) : NIL;
+      } else {
+        return NIL;
+      }
+    }
+  };
+
+  public static Predicate<String> eqIgnoreCase(final String other) {
+    return new Predicate<String>() {
+      @Override public Boolean apply(String s) {
+        return s.equalsIgnoreCase(other);
       }
     };
   }

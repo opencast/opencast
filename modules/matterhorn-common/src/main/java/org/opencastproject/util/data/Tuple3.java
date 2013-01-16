@@ -60,4 +60,8 @@ public final class Tuple3<A, B, C> {
   public static <A, B, C> Tuple3<A, B, C> tuple3(A a, B b, C c) {
     return new Tuple3<A, B, C>(a, b, c);
   }
+
+  @Override public String toString() {
+    return "(" + a + "," + b + "," + c + ")";
+  }
 }

@@ -15,7 +15,11 @@
  */
 package org.opencastproject.util.data.functions;
 
+import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+
+import java.util.List;
 
 /** Various functions not directly bound to any type. */
 public final class Misc {
@@ -43,6 +47,26 @@ public final class Misc {
     return new Function<A, B>() {
       @Override public B apply(A a) {
         return (B) a;
+      }
+    };
+  }
+
+  /** Widening cast. */
+  public static <A> List<A> widen(List<? extends A> xs) {
+    return (List<A>) xs;
+  }
+
+  /** Widening cast. */
+  public static <A> Option<A> widen(Option<? extends A> xs) {
+    return (Option<A>) xs;
+  }
+
+  /** Print an object. */
+  public static <A> Effect<A> println() {
+    return new Effect<A>() {
+      @Override
+      protected void run(A a) {
+        System.out.println(a);
       }
     };
   }

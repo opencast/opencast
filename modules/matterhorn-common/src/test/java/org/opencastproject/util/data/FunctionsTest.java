@@ -22,6 +22,7 @@ import org.opencastproject.util.data.functions.Functions;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.util.data.functions.Functions.contra;
 import static org.opencastproject.util.data.functions.Functions.identity;
 
 public class FunctionsTest {
@@ -33,6 +34,21 @@ public class FunctionsTest {
     B b = new B();
     A a = Functions.<A>identity().apply(b);
     assertEquals(a, b);
+  }
+
+  @Test
+  public void testVariance() {
+    final Function<Number, String> f = new Function<Number, String>() {
+      @Override public String apply(Number s) {
+        return s.toString();
+      }
+    };
+    final Function<Number, Object> f1 = Functions.<Number, Object>co(f);
+    final Function<Double, String> f2 = contra(f);
+    final Function<Number, Object> f3 = Functions.<Number, Object>variant(f);
+    final Function<Double, Object> f4 = Functions.<Double, Object>variant(f);
+    assertEquals(f.apply(1), f1.apply(1));
+    assertEquals(f.apply(1d), f2.apply(1d));
   }
 
   class A {
