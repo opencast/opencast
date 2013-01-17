@@ -1555,8 +1555,8 @@ Opencast.Player = (function ()
                 }
                 else
                 {
-                    Videodisplay.seek(newPlayhead);
                     hideEditTime();
+                    Videodisplay.seek(newPlayhead);
 		    addEvent(Opencast.logging.VALID_EDIT_TIME);
                 }
             }
