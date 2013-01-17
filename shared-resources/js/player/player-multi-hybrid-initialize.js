@@ -1265,10 +1265,9 @@ Opencast.Initialize = (function ()
     function setCostumEmbedHeight()
     {
         var embedWidth = $('#oc_embed-costum-width-textinput').val();
-        var embedHeight = $('#oc_embed-costum-height-textinput').val();
-        if (!$.isNumber(embedHeight))
+        if ($.isNumber(embedWidth))
         {
-	    embedHeight = (Math.round(embedWidth / getMaxFormat())) + OTHERDIVHEIGHT;
+	    var embedHeight = getAspectRatioHeight(embedWidth);
 	    if(embedWidth >= MINWIDTH) {
 		$('#oc_embed-costum-height-textinput').attr('value', embedHeight);
 		$('#oc_embed-costum-height-textinput').css('background-color', '#ffffff');
@@ -1279,10 +1278,8 @@ Opencast.Initialize = (function ()
 		$('#oc_embed-costum-height-textinput').attr('value', '');
 		$('#oc_embed-textarea').val('Embed width too low. The minimum value is a width of ' + MINWIDTH + '.');
 	    }
-	} else if(embedWidth >= MINWIDTH) {
-	    Opencast.Player.embedIFrame(embedWidth, embedHeight, true);
 	} else {
-	    $('#oc_embed-textarea').val('Embed width too low. The minimum value is a width of ' + MINWIDTH + '.');
+	    $('#oc_embed-textarea').val('Embed width not valid. The minimum value is a width of ' + MINWIDTH + '.');
 	}
     }
 
@@ -1292,11 +1289,10 @@ Opencast.Initialize = (function ()
      */
     function setCostumEmbedWidth()
     {
-        var embedWidth = $('#oc_embed-costum-width-textinput').val();
         var embedHeight = $('#oc_embed-costum-height-textinput').val();
-        if (!$.isNumber(embedWidth))
+        if ($.isNumber(embedHeight))
         {
-            embedWidth = Math.round((embedHeight - OTHERDIVHEIGHT) * getMaxFormat());
+            var embedWidth = getAspectRatioWidth(embedHeight);
 	    if(embedWidth >= MINWIDTH) {
 		$('#oc_embed-costum-width-textinput').attr('value', embedWidth);
 		$('#oc_embed-costum-width-textinput').css('background-color', '#ffffff');
@@ -1307,11 +1303,23 @@ Opencast.Initialize = (function ()
 		$('#oc_embed-textarea').val('');
 		$('#oc_embed-textarea').val('Embed width too low. The minimum value is a width of ' + MINWIDTH + '.');
 	    }
-	} else if(embedWidth >= MINWIDTH) {
-	    Opencast.Player.embedIFrame(embedWidth, embedHeight, true);
 	} else {
-	    $('#oc_embed-textarea').val('Embed width too low. The minimum value is a width of ' + MINWIDTH + '.');
+	    $('#oc_embed-textarea').val('Embed height not valid. The minimum value is a height of ' + MINWIDTH + '.');
 	}
+    }
+
+    function getAspectRatioWidth(height) {
+	var newOtherDivHeight = $('#oc_embed-costum-hide-controls-checkbox').is(':checked') ? OTHERDIVHEIGHT : 0;
+	// new width = new height * original width / original height
+        var width = Math.round(height * originalWidthMedia1 / originalHeightMedia1) + newOtherDivHeight;
+	return width;
+    }
+
+    function getAspectRatioHeight(width) {
+	var newOtherDivHeight = $('#oc_embed-costum-hide-controls-checkbox').is(':checked') ? OTHERDIVHEIGHT : 0;
+	// new height = original height / original width * new width
+        var height = Math.round(originalHeightMedia1 / originalWidthMedia1 * width) + newOtherDivHeight;
+	return height;
     }
     
     function setEmbedButtons() {
@@ -1325,11 +1333,11 @@ Opencast.Initialize = (function ()
 	
 	// new height = original height / original width * new width
 
-        var embedHeightOne = Math.round(originalHeightMedia1 / originalWidthMedia1 * embedWidhtOne) + newOtherDivHeight;
-        var embedHeightTwo = Math.round(originalHeightMedia1 / originalWidthMedia1 * embedWidhtTwo) + newOtherDivHeight;
-        var embedHeightThree = Math.round(originalHeightMedia1 / originalWidthMedia1 * embedWidhtThree) + newOtherDivHeight;
-        var embedHeightFour = Math.round(originalHeightMedia1 / originalWidthMedia1 * embedWidhtFour) + newOtherDivHeight;
-        var embedHeightFive = Math.round(originalHeightMedia1 / originalWidthMedia1 * embedWidhtFive) + newOtherDivHeight;
+        var embedHeightOne = getAspectRatioHeight(embedWidhtOne);
+        var embedHeightTwo = getAspectRatioHeight(embedWidhtTwo);
+        var embedHeightThree = getAspectRatioHeight(embedWidhtThree);
+        var embedHeightFour = getAspectRatioHeight(embedWidhtFour);
+        var embedHeightFive = getAspectRatioHeight(embedWidhtFive);
 	
         $("#oc_embed-icon-one").css("width", "110px");
         $("#oc_embed-icon-one").css("height", "73px");
