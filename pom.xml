@@ -524,6 +524,7 @@
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
+		<module>modules/matterhorn-db</module>
         <module>modules/matterhorn-capture-admin-service-api</module>
         <module>modules/matterhorn-capture-agent-api</module>
         <module>modules/matterhorn-capture-agent-impl</module>
