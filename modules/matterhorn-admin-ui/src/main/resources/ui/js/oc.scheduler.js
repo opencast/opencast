@@ -348,67 +348,74 @@ var ocScheduler = (function() {
     this.loadKnownAgents();
   };
 
-  sched.submitForm = function(){
-    var payload = {};
-    var error = false;
+  sched.submitForm = function() {
+    function submit() {
+      var payload = {};
+      var error = false;
 
-    hideUserMessages();
-    sched.checkForConflictingEvents();
-    if(ocScheduler.conflictingEvents) {
-      $('#missingFieldsContainer').show();
-      $('#errorConflict').show();
-      $('#errorConflict li').show();
+      hideUserMessages();
+      sched.checkForConflictingEvents();
+      if (ocScheduler.conflictingEvents) {
+        $('#missingFieldsContainer').show();
+        $('#errorConflict').show();
+        $('#errorConflict li').show();
+        return false;
+      }
+
+      $.extend(true, sched.capture.components, ocScheduler.workflowComponents);
+
+      var errors = [];
+      for (var i in sched.catalogs) {
+        var serializedCatalog = sched.catalogs[i].serialize();
+        if (!serializedCatalog) {
+          errors = errors.concat(sched.catalogs[i].getErrors());
+        } else {
+          payload[sched.catalogs[i].name] = serializedCatalog;
+        }
+      }
+
+      if (errors.length > 0) {
+        showUserMessages(errors);
+      } else {
+        $('#submitButton').attr('disabled', 'disabled');
+        if (sched.type !== SINGLE_EVENT) {
+          $('#submitModal').dialog(
+                  {
+                    modal: true,
+                    resizable: false,
+                    draggable: false,
+                    create: function (event, ui) {
+                      $('.ui-dialog-titlebar-close').hide();
+                    }
+                  });
+        }
+        if (ocUtils.getURLParam('edit')) {
+          $.ajax({
+            type: 'PUT',
+            url: SCHEDULER_URL + '/' + $('#eventId').val(),
+            data: payload,
+            dataType: 'text',
+            complete: ocScheduler.eventSubmitComplete
+          });
+        } else {
+          $.ajax({
+            type: 'POST',
+            url: SCHEDULER_URL + '/',
+            data: payload,
+            dataType: 'text',
+            complete: ocScheduler.eventSubmitComplete
+          });
+        }
+      }
+      return true;
+    }
+
+    try {
+      return submit();
+    } catch (e) {
+      alert("Error submitting form: " + e);
       return false;
     }
-
-    $.extend(true, sched.capture.components, ocScheduler.workflowComponents);
-
-    var errors = [];
-    for (var i in sched.catalogs) {
-      var serializedCatalog = sched.catalogs[i].serialize();
-      if (!serializedCatalog) {
-        errors = errors.concat(sched.catalogs[i].getErrors());
-      } else {
-        payload[sched.catalogs[i].name] = serializedCatalog;
-      }
-    }
-
-    if(errors.length > 0) {
-      showUserMessages(errors);
-    } else {
-      $('#submitButton').attr('disabled', 'disabled');
-      if(sched.type !== SINGLE_EVENT)
-      {
-        $('#submitModal').dialog(
-        {
-          modal: true,
-          resizable: false,
-          draggable: false,
-          create: function (event, ui)
-          {
-            $('.ui-dialog-titlebar-close').hide();
-          }
-        });
-      }
-      if(ocUtils.getURLParam('edit')) {
-        $.ajax({
-          type: 'PUT',
-          url: SCHEDULER_URL + '/' + $('#eventId').val(),
-          data: payload,
-          dataType: 'text',
-          complete: ocScheduler.eventSubmitComplete
-        });
-      } else {
-        $.ajax({
-          type: 'POST',
-          url: SCHEDULER_URL + '/',
-          data: payload,
-          dataType: 'text',
-          complete: ocScheduler.eventSubmitComplete
-        });
-      }
-    }
-    return true;
   };
 
   sched.cancelForm = function() {
