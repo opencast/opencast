@@ -89,32 +89,33 @@ Opencast.embedControlHide = (function ()
             $.log("Not hiding the Advanced Player logo.");
             hideAPLogo = false;
         }
-        
-        _time = time | 500;
-        
-        //start width height listener and call it one time direct
-        setParams();
-        _intvalParams = setInterval('Opencast.embedControlHide.setParams()', 1000);
-        
-        //hide advanced Link
-        var advHeight = $('#oc-link-advanced-player img').outerHeight();
-        $('#oc_flash-player').css('marginTop', '-'+ (advHeight + 2)  +'px');
-        doHideAdvLinkFast();
-        
-        if(hideControls)
-        {
+
+	if(hideControls)
+	{
+            _time = time | 500;
+            
+            //start width height listener and call it one time direct
+            setParams();
+            _intvalParams = setInterval('Opencast.embedControlHide.setParams()', 1000);
+            
+            //hide advanced Link
+            var advHeight = $('#oc-link-advanced-player img').outerHeight();
+            $('#oc_flash-player').css('marginTop', '-'+ (advHeight + 2)  +'px');
+            doHideAdvLinkFast();
+            
             //start interval to bind key and mouse actions
             bindActions();
-        } else
-        {
-            doShowFast();
-            $('#oc_flash-player').css('marginBottom', '-50px');
-        }
+            
+            if(hideAPLogo)
+            {
+		$('#oc-link-advanced-player').css('marginLeft', '-'+_width+'px');
+            }
+	} else
+	{
+            // doShowFast();
+            // $('#oc_flash-player').css('marginBottom', '-50px');
+	}
         
-        if(hideAPLogo)
-        {
-            $('#oc-link-advanced-player').css('marginLeft', '-'+_width+'px');
-        }
     }
     
     /**
