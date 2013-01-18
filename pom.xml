@@ -369,7 +369,6 @@
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-composer-service-api</module>
         <module>modules/matterhorn-composer-service-remote</module>
-		<module>modules/matterhorn-db</module>
         <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-inspection-service-remote</module>
         <module>modules/matterhorn-json</module>
@@ -438,7 +437,6 @@
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
-		<module>modules/matterhorn-db</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-serviceregistry-remote</module>
@@ -526,7 +524,6 @@
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
-		<module>modules/matterhorn-db</module>
         <module>modules/matterhorn-capture-admin-service-api</module>
         <module>modules/matterhorn-capture-agent-api</module>
         <module>modules/matterhorn-capture-agent-impl</module>
@@ -626,7 +623,6 @@
       <modules>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-json</module>
-		<module>modules/matterhorn-db</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-load-test</module>
         <module>modules/matterhorn-runtime-info-ui</module>

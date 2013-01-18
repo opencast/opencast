@@ -51,7 +51,7 @@ public class DefaultOrganization extends JaxbOrganization {
   public static final String DEFAULT_ORGANIZATION_ADMIN = "ROLE_ADMIN";
 
   /** Name of the default organization's local anonymous role */
-  public static final String DEFAULT_ORGANIZATION_ANONYMOUS = "ANONYMOUS";
+  public static final String DEFAULT_ORGANIZATION_ANONYMOUS = "ROLE_ANONYMOUS";
 
   /**
    * No-arg constructor needed by JAXB
