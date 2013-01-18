@@ -128,4 +128,7 @@ public interface SearchResultItem {
 
   /** @return the version in the archive */
   Version getOcVersion();
+
+  /** True, if this is currently the latest version. */
+  boolean isOcLatestVersion();
 }

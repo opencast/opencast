@@ -38,7 +38,7 @@ import static org.opencastproject.util.persistence.PersistenceUtil.runUpdate;
         @NamedQuery(name = "VersionClaim.update", query = "update VersionClaim a set a.lastClaimed = :lastClaimed where a.mediaPackageId = :mediaPackageId") })
 public final class VersionClaimDto {
   @Id
-  @Column(name = "media_package_id", length = 255)
+  @Column(name = "media_package_id", length = 128)
   private String mediaPackageId;
 
   @Column(name = "last_claimed", nullable = false)

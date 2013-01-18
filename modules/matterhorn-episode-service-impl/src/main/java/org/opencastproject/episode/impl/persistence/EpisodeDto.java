@@ -57,7 +57,7 @@ import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResu
                       @NamedQuery(name = "Episode.findAllById", query = "SELECT e FROM Episode e WHERE e.mediaPackageId=:mediaPackageId") })
 public final class EpisodeDto {
   @Id
-  @Column(name = "mediapackage_id", length = 255)
+  @Column(name = "mediapackage_id", length = 128)
   private String mediaPackageId;
 
   @Id

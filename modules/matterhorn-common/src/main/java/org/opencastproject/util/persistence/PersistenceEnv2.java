@@ -13,25 +13,21 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.util.persistence;
 
+import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 
 import javax.persistence.EntityManager;
 
 /**
- * Persistence environment to perform a transaction.
- * @see PersistenceEnv2
+ * Persistence environment that handles errors with an either instead of throwing exceptions.
+ * @see PersistenceEnv
  */
-public interface PersistenceEnv {
-  /**
-   * Run code inside a transaction.
-   */
-  <A> A tx(Function<EntityManager, A> transactional);
+public interface PersistenceEnv2<F> {
+  /** Run code inside a transaction. */
+  <A> Either<F, A> tx(Function<EntityManager, A> transactional);
 
-  /**
-   * Close the environment and free all associated resources.
-   */
+  /** Close the environment and free all associated resources. */
   void close();
 }

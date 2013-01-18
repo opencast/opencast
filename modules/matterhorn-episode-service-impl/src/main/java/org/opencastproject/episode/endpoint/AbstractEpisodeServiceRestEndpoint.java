@@ -74,7 +74,6 @@ import java.util.Map;
 
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.opencastproject.episode.api.ConfiguredWorkflow.workflow;
 import static org.opencastproject.episode.api.EpisodeQuery.query;
 import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
 import static org.opencastproject.util.UrlSupport.uri;
@@ -82,6 +81,7 @@ import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
+import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
 /** REST endpoint of the episode service. */
 // no @Path annotation here since this class cannot be created by JAX-RS. Put it on implementations.

@@ -48,9 +48,9 @@ public class SolrRequester {
 
   /**
    * Creates a new requester for solr that will be using the given connection object to query the search index.
-   *
+   * 
    * @param connection
-   *         the solr connection
+   *          the solr connection
    */
   public SolrRequester(SolrServer connection) {
     if (connection == null)
@@ -60,12 +60,12 @@ public class SolrRequester {
 
   /**
    * Creates a search result from a given solr response.
-   *
+   * 
    * @param query
-   *         The solr query.
+   *          The solr query.
    * @return The search result.
    * @throws SolrServerException
-   *         if the solr server is not working as expected
+   *           if the solr server is not working as expected
    */
   private SearchResult createSearchResult(final SolrQuery query) throws SolrServerException {
     // Execute the query and try to get hold of a query response
@@ -93,9 +93,9 @@ public class SolrRequester {
 
   /**
    * Modifies the query such that certain fields are being boosted (meaning they gain some weight).
-   *
+   * 
    * @param query
-   *         The user query.
+   *          The user query.
    * @return The boosted query
    */
   public StringBuffer createBoostedFullTextQuery(String query) {
@@ -165,9 +165,9 @@ public class SolrRequester {
 
   /**
    * Simple helper method to avoid null strings.
-   *
+   * 
    * @param f
-   *         object which implements <code>toString()</code> method.
+   *          object which implements <code>toString()</code> method.
    * @return The input object or empty string.
    */
   private static String mkString(Object f) {
@@ -179,14 +179,15 @@ public class SolrRequester {
 
   /**
    * Converts the query object into a solr query and returns the results.
-   *
+   * 
    * @param q
-   *         the query
+   *          the query
    * @return the search results
    */
   private SolrQuery createQuery(EpisodeQuery q) throws SolrServerException {
     final StringBuilder sb = new StringBuilder();
-    for (String solrQueryRequest : q.getQuery()) sb.append(solrQueryRequest);
+    for (String solrQueryRequest : q.getQuery())
+      sb.append(solrQueryRequest);
     for (String solrIdRequest : q.getId().bind(SolrUtils.clean)) {
       if (sb.length() > 0)
         sb.append(" AND ");
@@ -199,7 +200,8 @@ public class SolrRequester {
 
     // full text query with boost
     for (String solrTextRequest : q.getText().bind(SolrUtils.clean)) {
-      if (sb.length() > 0) sb.append(" AND ");
+      if (sb.length() > 0)
+        sb.append(" AND ");
       sb.append("*:");
       sb.append(createBoostedFullTextQuery(solrTextRequest));
     }
@@ -213,9 +215,10 @@ public class SolrRequester {
     append(sb, Schema.OC_ORGANIZATION, q.getOrganization());
 
     if (q.getElementTags().size() > 0) {
-      if (sb.length() > 0) sb.append(" AND ");
+      if (sb.length() > 0)
+        sb.append(" AND ");
       StringBuilder tagBuilder = new StringBuilder();
-      for (String tag : mlist(q.getElementTags()).bind(Options.<String>asList().o(SolrUtils.clean))) {
+      for (String tag : mlist(q.getElementTags()).bind(Options.<String> asList().o(SolrUtils.clean))) {
         if (tagBuilder.length() == 0) {
           tagBuilder.append("(");
         } else {
@@ -234,7 +237,8 @@ public class SolrRequester {
       if (sb.length() > 0)
         sb.append(" AND ");
       StringBuilder flavorBuilder = new StringBuilder();
-      for (String flavor : mlist(q.getElementFlavors()).bind(Options.<String>asList().o(SolrUtils.clean).o(Strings.<MediaPackageElementFlavor>asStringNull()))) {
+      for (String flavor : mlist(q.getElementFlavors()).bind(
+              Options.<String> asList().o(SolrUtils.clean).o(Strings.<MediaPackageElementFlavor> asStringNull()))) {
         if (flavorBuilder.length() == 0) {
           flavorBuilder.append("(");
         } else {
@@ -250,33 +254,38 @@ public class SolrRequester {
       }
     }
     for (Date deleted : q.getDeletedDate()) {
-      if (sb.length() > 0) sb.append(" AND ");
-      sb.append(Schema.OC_DELETED).append(":").append(SolrUtils.serializeDateRange(option(deleted), Option.<Date>none()));
+      if (sb.length() > 0)
+        sb.append(" AND ");
+      sb.append(Schema.OC_DELETED).append(":")
+              .append(SolrUtils.serializeDateRange(option(deleted), Option.<Date> none()));
     }
     if (!q.getIncludeDeleted()) {
-      if (sb.length() > 0) sb.append(" AND ");
+      if (sb.length() > 0)
+        sb.append(" AND ");
       sb.append("-" + Schema.OC_DELETED + ":[* TO *]");
     }
-    
+
     if (q.getOnlyLastVersion()) {
-      if (sb.length() > 0) sb.append(" AND ");
+      if (sb.length() > 0)
+        sb.append(" AND ");
       sb.append(Schema.OC_LATEST_VERSION + ":true");
     }
-    
+
     // only episodes
-    if (sb.length() > 0) sb.append(" AND ");
+    if (sb.length() > 0)
+      sb.append(" AND ");
     sb.append(Schema.OC_MEDIATYPE + ":" + SearchResultItem.SearchResultItemType.AudioVisual);
 
     // only add date range if at least on criteria is set
     if (q.getAddedBefore().isSome() || q.getAddedAfter().isSome()) {
-      if (sb.length() > 0) sb.append(" AND ");
-      sb.append(Schema.OC_TIMESTAMP + ":["
-                        + q.getAddedAfter().map(SolrUtils.serializeDate).getOrElse("*")
-                        + " TO "
-                        + q.getAddedBefore().map(SolrUtils.serializeDate).getOrElse("*") + "]");
+      if (sb.length() > 0)
+        sb.append(" AND ");
+      sb.append(Schema.OC_TIMESTAMP + ":[" + q.getAddedAfter().map(SolrUtils.serializeDate).getOrElse("*") + " TO "
+              + q.getAddedBefore().map(SolrUtils.serializeDate).getOrElse("*") + "]");
     }
 
-    if (sb.length() == 0) sb.append("*:*");
+    if (sb.length() == 0)
+      sb.append("*:*");
 
     final SolrQuery solr = new SolrQuery(sb.toString());
     // limit & offset
@@ -324,18 +333,19 @@ public class SolrRequester {
 
   /**
    * Appends query parameters to a solr query
-   *
+   * 
    * @param sb
-   *         The {@link StringBuilder} containing the query
+   *          The {@link StringBuilder} containing the query
    * @param key
-   *         the key for this search parameter
+   *          the key for this search parameter
    * @param value
-   *         the value for this search parameter
+   *          the value for this search parameter
    * @return the appended {@link StringBuilder}
    */
   private StringBuilder append(StringBuilder sb, String key, Option<String> value) {
     for (String val : value) {
-      if (sb.length() > 0) sb.append(" AND ");
+      if (sb.length() > 0)
+        sb.append(" AND ");
       sb.append(key);
       sb.append(":");
       sb.append(ClientUtils.escapeQueryChars(val.toLowerCase()));
@@ -346,13 +356,13 @@ public class SolrRequester {
   /**
    * Appends query parameters to a solr query in a way that they are found even though they are not treated as a full
    * word in solr.
-   *
+   * 
    * @param sb
-   *         The {@link StringBuilder} containing the query
+   *          The {@link StringBuilder} containing the query
    * @param key
-   *         the key for this search parameter
+   *          the key for this search parameter
    * @param value
-   *         the value for this search parameter
+   *          the value for this search parameter
    * @return the appended {@link StringBuilder}
    */
   private StringBuilder appendFuzzy(StringBuilder sb, String key, Option<String> value) {
@@ -371,9 +381,9 @@ public class SolrRequester {
 
   /**
    * Query the Solr index.
-   *
+   * 
    * @param q
-   *         the search query
+   *          the search query
    */
   public SearchResult find(EpisodeQuery q) throws SolrServerException {
     SolrQuery query = createQuery(q);

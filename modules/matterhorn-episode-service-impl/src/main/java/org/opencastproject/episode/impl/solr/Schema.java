@@ -319,7 +319,7 @@ public final class Schema {
    * @throws IllegalArgumentException
    *           if either of the documents are null
    */
-  public static void enrich(SolrInputDocument docToEnrich, SolrInputDocument additionalMetadata)
+  public static void enrichFullText(SolrInputDocument docToEnrich, SolrInputDocument additionalMetadata)
           throws IllegalArgumentException {
     if (docToEnrich == null || additionalMetadata == null) {
       throw new IllegalArgumentException("Documents must not be null");

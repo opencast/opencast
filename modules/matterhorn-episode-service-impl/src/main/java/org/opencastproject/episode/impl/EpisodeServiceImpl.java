@@ -15,27 +15,8 @@
  */
 package org.opencastproject.episode.impl;
 
-import static org.opencastproject.episode.api.EpisodeQuery.query;
-import static org.opencastproject.episode.impl.StoragePath.spath;
-import static org.opencastproject.episode.impl.elementstore.DeletionSelector.delAll;
-import static org.opencastproject.episode.impl.elementstore.Source.source;
-import static org.opencastproject.mediapackage.MediaPackageSupport.modify;
-import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.util.JobUtil.waitForJob;
-import static org.opencastproject.util.data.Collections.array;
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.mkString;
-import static org.opencastproject.util.data.Collections.nil;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.functions.Functions.constant;
-import static org.opencastproject.util.data.functions.Misc.chuck;
-
+import org.apache.solr.client.solrj.SolrServerException;
 import org.opencastproject.episode.api.ArchivedMediaPackageElement;
-import org.opencastproject.episode.api.ConfiguredWorkflow;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.api.EpisodeServiceException;
@@ -72,12 +53,11 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Booleans;
+import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
-
-import org.apache.solr.client.solrj.SolrServerException;
 import org.osgi.framework.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +70,25 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import static org.opencastproject.episode.api.EpisodeQuery.query;
+import static org.opencastproject.episode.impl.StoragePath.spath;
+import static org.opencastproject.episode.impl.elementstore.DeletionSelector.delAll;
+import static org.opencastproject.episode.impl.elementstore.Source.source;
+import static org.opencastproject.mediapackage.MediaPackageSupport.modify;
+import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.util.JobUtil.waitForJob;
+import static org.opencastproject.util.data.Collections.array;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Collections.mkString;
+import static org.opencastproject.util.data.Collections.nil;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.functions.Functions.constant;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 public final class EpisodeServiceImpl implements EpisodeService {
   /** Log facility */
@@ -123,7 +122,10 @@ public final class EpisodeServiceImpl implements EpisodeService {
   }
 
   @Override
-  public void add(final MediaPackage mediaPackage) throws EpisodeServiceException {
+  // todo adding to the archive needs to be synchronized because of the index.
+  // It resets the oc_latest_version flag and this must not happen concurrently.
+  // This approach works as long as the archive is not distributed.
+  public synchronized void add(final MediaPackage mediaPackage) throws EpisodeServiceException {
     handleException(new Effect0.X() {
       @Override
       protected void xrun() throws Exception {
@@ -176,6 +178,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
             // todo url-rewritten media package cannot be stored in solr since the solrIndex
             // accesses metadata catalogs via StaticMetadataService which in turn uses the workspace to download
             // them. If the URL is already a URN this does not work.
+            // todo make archiving transactional
             persist.o(rewriteForArchival(version)).o(index).o(archiveElements).apply(enrichChecksums(mediaPackage));
           }
         });
