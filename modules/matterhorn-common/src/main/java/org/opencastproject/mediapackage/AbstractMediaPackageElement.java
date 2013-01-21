@@ -18,18 +18,9 @@ package org.opencastproject.mediapackage;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeType;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.Collection;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -41,6 +32,13 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlTransient;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.Collection;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * This class provides base functionality for media package elements.
@@ -160,16 +158,15 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
     this.flavor = flavor;
     this.mimeType = mimeType;
     this.uri = uri;
+    this.size = size;
     this.checksum = checksum;
     this.tags = new TreeSet<String>();
   }
 
   /**
-   * Sets the element id.
-   * 
-   * @param id
-   *          the new id
+   * @see org.opencastproject.mediapackage.MediaPackageElement#setIdentifier(String)
    */
+  @Override
   public void setIdentifier(String id) {
     this.id = id;
   }
@@ -177,15 +174,15 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#getIdentifier()
    */
+  @Override
   public String getIdentifier() {
     return id;
   }
 
   /**
-   * {@inheritDoc}
-   * 
    * @see org.opencastproject.mediapackage.MediaPackageElement#addTag(java.lang.String)
    */
+  @Override
   public void addTag(String tag) {
     if (tag == null)
       throw new IllegalArgumentException("Tag must not be null");
@@ -193,10 +190,9 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   }
 
   /**
-   * {@inheritDoc}
-   * 
    * @see org.opencastproject.mediapackage.MediaPackageElement#removeTag(java.lang.String)
    */
+  @Override
   public void removeTag(String tag) {
     if (tag == null)
       return;
@@ -204,8 +200,6 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   }
 
   /**
-   * {@inheritDoc}
-   * 
    * @see org.opencastproject.mediapackage.MediaPackageElement#containsTag(java.lang.String)
    */
   @Override
@@ -216,8 +210,6 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   }
 
   /**
-   * {@inheritDoc}
-   * 
    * @see org.opencastproject.mediapackage.MediaPackageElement#containsTag(java.util.Collection)
    */
   @Override
@@ -232,17 +224,14 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   }
 
   /**
-   * {@inheritDoc}
-   * 
    * @see org.opencastproject.mediapackage.MediaPackageElement#getTags()
    */
+  @Override
   public String[] getTags() {
     return tags.toArray(new String[tags.size()]);
   }
 
   /**
-   * {@inheritDoc}
-   * 
    * @see org.opencastproject.mediapackage.MediaPackageElement#clearTags()
    */
   @Override
@@ -254,6 +243,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#getMediaPackage()
    */
+  @Override
   public MediaPackage getMediaPackage() {
     return mediaPackage;
   }
@@ -261,6 +251,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#getElementType()
    */
+  @Override
   public Type getElementType() {
     return elementType;
   }
@@ -268,16 +259,15 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#getElementDescription()
    */
+  @Override
   public String getElementDescription() {
     return (description != null) ? description : uri.toString();
   }
 
   /**
-   * Sets the element name.
-   * 
-   * @param name
-   *          the name
+   * @see org.opencastproject.mediapackage.MediaPackageElement#setElementDescription(String)
    */
+  @Override
   public void setElementDescription(String name) {
     this.description = name;
   }
@@ -285,16 +275,15 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#getReference()
    */
+  @Override
   public MediaPackageReference getReference() {
     return reference;
   }
 
   /**
-   * Sets the media package element's reference.
-   * 
-   * @param reference
-   *          the reference
+   * @see org.opencastproject.mediapackage.MediaPackageElement#setReference(MediaPackageReference)
    */
+  @Override
   public void setReference(MediaPackageReference reference) {
     this.reference = reference;
   }
@@ -302,18 +291,15 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#getURI()
    */
+  @Override
   public URI getURI() {
     return uri;
   }
 
   /**
-   * Sets the url that is used to store the media package element.
-   * <p>
-   * Make sure you know what you are doing, since usually, the media package will take care of the elements locations.
-   * 
-   * @param uri
-   *          the elements url
+   * @see org.opencastproject.mediapackage.MediaPackageElement#setURI(java.net.URI)
    */
+  @Override
   public void setURI(URI uri) {
     this.uri = uri;
   }
@@ -321,16 +307,15 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#getChecksum()
    */
+  @Override
   public Checksum getChecksum() {
     return checksum;
   }
 
   /**
-   * Sets the element checksum.
-   * 
-   * @param checksum
-   *          the checksum
+   * @see org.opencastproject.mediapackage.MediaPackageElement#setChecksum(org.opencastproject.util.Checksum)
    */
+  @Override
   public void setChecksum(Checksum checksum) {
     this.checksum = checksum;
   }
@@ -338,26 +323,23 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#getMimeType()
    */
+  @Override
   public MimeType getMimeType() {
     return mimeType;
   }
 
   /**
-   * Sets the element mimetype.
-   * 
-   * @param mimeType
-   *          the element mimetype
+   * @see org.opencastproject.mediapackage.MediaPackageElement#setMimeType(org.opencastproject.util.MimeType)
    */
+  @Override
   public void setMimeType(MimeType mimeType) {
     this.mimeType = mimeType;
   }
 
   /**
-   * Sets the element's flavor.
-   * 
-   * @param flavor
-   *          the flavor
+   * @see org.opencastproject.mediapackage.MediaPackageElement#setFlavor(MediaPackageElementFlavor)
    */
+  @Override
   public void setFlavor(MediaPackageElementFlavor flavor) {
     this.flavor = flavor;
   }
@@ -365,6 +347,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#getFlavor()
    */
+  @Override
   public MediaPackageElementFlavor getFlavor() {
     return flavor;
   }
@@ -372,16 +355,15 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#getSize()
    */
+  @Override
   public long getSize() {
     return size;
   }
 
   /**
-   * Sets the element size in bytes.
-   * 
-   * @param size
-   *          size in bytes
+   * @see org.opencastproject.mediapackage.MediaPackageElement#setSize(long)
    */
+  @Override
   public void setSize(long size) {
     this.size = size;
   }
@@ -401,6 +383,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#referTo(org.opencastproject.mediapackage.MediaPackage)
    */
+  @Override
   public void referTo(MediaPackage mediaPackage) {
     referTo(new MediaPackageReferenceImpl(mediaPackage));
   }
@@ -408,6 +391,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#referTo(org.opencastproject.mediapackage.MediaPackageElement)
    */
+  @Override
   public void referTo(MediaPackageElement element) {
     referTo(new MediaPackageReferenceImpl(element));
   }
@@ -415,6 +399,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#referTo(org.opencastproject.mediapackage.MediaPackageReference)
    */
+  @Override
   public void referTo(MediaPackageReference reference) {
     // TODO: Check reference consistency
     this.reference = reference;
@@ -423,6 +408,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#clearReference()
    */
+  @Override
   public void clearReference() {
     this.reference = null;
   }
@@ -430,6 +416,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#verify()
    */
+  @Override
   public void verify() throws MediaPackageException {
     // TODO: Check availability at url
     // TODO: Download (?) and check checksum
@@ -443,6 +430,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   /**
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
+  @Override
   public int compareTo(MediaPackageElement o) {
     return uri.toString().compareTo(o.getURI().toString());
   }
@@ -465,8 +453,6 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   }
 
   /**
-   * {@inheritDoc}
-   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -483,6 +469,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    * @see org.opencastproject.mediapackage.ManifestContributor#toManifest(org.w3c.dom.Document,
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
+  @Override
   public Node toManifest(Document document, MediaPackageSerializer serializer) {
     Element node = document.createElement(elementType.toString().toLowerCase());
     if (id != null)
@@ -559,6 +546,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    * Attention: The media package reference is not being cloned so that calling <code>getMediaPackage()</code>
    * on the clone yields null.
    */
+  @Override
   public Object clone() {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     ByteArrayInputStream in = null;
