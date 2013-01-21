@@ -13,40 +13,41 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.episode.api;
-
-import org.opencastproject.workflow.api.WorkflowDefinition;
+package org.opencastproject.workflow.api;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/** A tuple of a workflow definition and its parameters. */
+/** Product type of a workflow definition and its parameters. */
 public class ConfiguredWorkflow {
   private final WorkflowDefinition workflowDefinition;
   private final Map<String, String> parameters;
 
   private static final Map<String, String> noparams = Collections.unmodifiableMap(new HashMap<String, String>());
 
+  /** Constructor. */
   public ConfiguredWorkflow(WorkflowDefinition workflowDefinition, Map<String, String> parameters) {
     this.workflowDefinition = workflowDefinition;
     this.parameters = parameters;
   }
 
-  /** Workflow with parameters. */
+  /** Create a workflow with parameters. */
   public static ConfiguredWorkflow workflow(WorkflowDefinition workflowDefinition, Map<String, String> parameters) {
     return new ConfiguredWorkflow(workflowDefinition, parameters);
   }
 
-  /** A parameterless workflow. */
+  /** Create a parameterless workflow. */
   public static ConfiguredWorkflow workflow(WorkflowDefinition workflowDefinition) {
     return new ConfiguredWorkflow(workflowDefinition, noparams);
   }
 
+  /** Get the workflow definition. */
   public WorkflowDefinition getWorkflowDefinition() {
     return workflowDefinition;
   }
 
+  /** Get the workflow's parameter map. */
   public Map<String, String> getParameters() {
     return parameters;
   }

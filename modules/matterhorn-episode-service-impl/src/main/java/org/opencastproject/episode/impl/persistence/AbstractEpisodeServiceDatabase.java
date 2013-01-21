@@ -69,15 +69,18 @@ public abstract class AbstractEpisodeServiceDatabase implements EpisodeServiceDa
   @Override
   public Option<Episode> getEpisode(final String mediaPackageId, final Version version) throws EpisodeServiceDatabaseException {
     return tx(new Function<EntityManager, Option<Episode>>() {
-      @Override public Option<Episode> apply(EntityManager em) {
+      @Override
+      public Option<Episode> apply(EntityManager em) {
         return findByIdAndVersion(em, mediaPackageId, version).map(EpisodeDto.toEpisode);
       }
     });
   }
 
-  @Override public Option<Episode> getLatestEpisode(final String mediaPackageId) throws EpisodeServiceDatabaseException {
+  @Override
+  public Option<Episode> getLatestEpisode(final String mediaPackageId) throws EpisodeServiceDatabaseException {
     return tx(new Function<EntityManager, Option<Episode>>() {
-      @Override public Option<Episode> apply(EntityManager em) {
+      @Override
+      public Option<Episode> apply(EntityManager em) {
         return findLatestById(em, mediaPackageId).map(EpisodeDto.toEpisode);
       }
     });
@@ -87,23 +90,28 @@ public abstract class AbstractEpisodeServiceDatabase implements EpisodeServiceDa
   public Iterator<Episode> getAllEpisodes() throws EpisodeServiceDatabaseException {
     // todo implement database paging
     return tx(new Function<EntityManager, Iterator<Episode>>() {
-      @Override public Iterator<Episode> apply(EntityManager em) {
+      @Override
+      public Iterator<Episode> apply(EntityManager em) {
         return mlist(findAll(em)).map(EpisodeDto.toEpisode).iterator();
       }
     });
   }
 
-  @Override public Version claimVersion(final String mpId) throws EpisodeServiceDatabaseException {
+  @Override
+  public Version claimVersion(final String mpId) throws EpisodeServiceDatabaseException {
     return tx(new Function<EntityManager, Version>() {
-      @Override public Version apply(final EntityManager em) {
+      @Override
+      public Version apply(final EntityManager em) {
         return VersionClaimDto.findLast(em, mpId).fold(new Option.Match<VersionClaimDto, Version>() {
-          @Override public Version some(VersionClaimDto dto) {
+          @Override
+          public Version some(VersionClaimDto dto) {
             final Version claimed = version(dto.getLastClaimed().value() + 1);
             VersionClaimDto.update(em, mpId, claimed);
             return claimed;
           }
 
-          @Override public Version none() {
+          @Override
+          public Version none() {
             em.persist(VersionClaimDto.create(mpId, FIRST));
             return FIRST;
           }
@@ -115,9 +123,11 @@ public abstract class AbstractEpisodeServiceDatabase implements EpisodeServiceDa
   @Override
   public Option<Boolean> isLatestVersion(final String mediaPackageId, final Version version) throws EpisodeServiceDatabaseException {
     return tx(new Function<EntityManager, Option<Boolean>>() {
-      @Override public Option<Boolean> apply(EntityManager em) {
+      @Override
+      public Option<Boolean> apply(EntityManager em) {
         return findLatestById(em, mediaPackageId).map(new Function<EpisodeDto, Boolean>() {
-          @Override public Boolean apply(EpisodeDto dto) {
+          @Override
+          public Boolean apply(EpisodeDto dto) {
             return dto.getVersion().equals(version);
           }
         });
@@ -128,13 +138,16 @@ public abstract class AbstractEpisodeServiceDatabase implements EpisodeServiceDa
   @Override
   public Option<Date> getDeletionDate(final String mediaPackageId) throws EpisodeServiceDatabaseException {
     return tx(new Function<EntityManager, Option<Date>>() {
-      @Override public Option<Date> apply(EntityManager em) {
+      @Override
+      public Option<Date> apply(EntityManager em) {
         return findLatestById(em, mediaPackageId).fold(new Option.Match<EpisodeDto, Option<Date>>() {
-          @Override public Option<Date> some(EpisodeDto episodeDto) {
+          @Override
+          public Option<Date> some(EpisodeDto episodeDto) {
             return episodeDto.getDeletionDate();
           }
 
-          @Override public Option<Date> none() {
+          @Override
+          public Option<Date> none() {
             return chuck(new NotFoundException("No episode with id=" + mediaPackageId + " exists"));
           }
         });
@@ -147,7 +160,8 @@ public abstract class AbstractEpisodeServiceDatabase implements EpisodeServiceDa
           throws EpisodeServiceDatabaseException {
     final String orgId = getSecurityService().getOrganization().getId();
     tx(new Effect<EntityManager>() {
-      @Override public void run(EntityManager em) {
+      @Override
+      public void run(EntityManager em) {
         // Create new episode entity
         final EpisodeDto episodeDto = EpisodeDto.create(new Episode(mediaPackage,
                                                                     version,
@@ -158,7 +172,11 @@ public abstract class AbstractEpisodeServiceDatabase implements EpisodeServiceDa
         em.persist(episodeDto);
         // create assets
         for (MediaPackageElement e : mediaPackage.getElements()) {
-          final AssetDto a = AssetDto.create(e.getURI(), spath(orgId, mediaPackage.getIdentifier().toString(), version, e.getIdentifier()), e.getChecksum().toString());
+          final AssetDto a = AssetDto.create(e.getURI(), spath(orgId,
+                                                               mediaPackage.getIdentifier().toString(),
+                                                               version,
+                                                               e.getIdentifier()),
+                                             e.getChecksum().toString());
           em.persist(a);
         }
       }

@@ -52,7 +52,7 @@ public class OsgiEpisodeServiceDatabase extends AbstractEpisodeServiceDatabase {
   /** OSGi callback. */
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for episodes");
-    penv = PersistenceUtil.newPersistenceEnvironment(cc, "org.opencastproject.episode.impl.persistence", persistenceProperties);
+    penv = PersistenceUtil.newPersistenceEnvironment(persistenceProvider, "org.opencastproject.episode.impl.persistence", persistenceProperties);
   }
 
   /** OSGi callback. Closes entity manager factory. */

@@ -18,6 +18,7 @@ package org.opencastproject.util;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /** Utility function helping to implement equality. */
 public final class EqualsUtil {
@@ -41,7 +42,7 @@ public final class EqualsUtil {
 
   /** Check if <code>a</code> and <code>b</code> have the same class ({@link Object#getClass()}). Each may be null. */
   public static boolean eqClasses(Object a, Object b) {
-    return bothNotNull(a, b) && a.getClass() == b.getClass();
+    return bothNotNull(a, b) && a.getClass().equals(b.getClass());
   }
 
   /** Compare the elements of two lists for equality treating the lists as sets. */
@@ -70,6 +71,16 @@ public final class EqualsUtil {
     } else {
       return eqObj(as, bs);
     }
+  }
+
+  /** Compare two maps. */
+  public static boolean eqMap(Map<?, ?> as, Map<?, ?> bs) {
+    for (Map.Entry<?, ?> ae : as.entrySet()) {
+      final Object bv = bs.get(ae.getKey());
+      if (bv == null || !eqObj(ae.getValue(), bv))
+        return false;
+    }
+    return true;
   }
 
   /** Check if both objects are either null or not null. */

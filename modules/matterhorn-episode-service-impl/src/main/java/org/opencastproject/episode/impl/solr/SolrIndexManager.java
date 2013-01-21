@@ -98,7 +98,9 @@ import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Collections.nil;
 import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /** Utility class used to manage the search index. */
@@ -308,7 +310,7 @@ public class SolrIndexManager {
   }
 
   /** Set the "latestVersion" flag of an index entry. */
-  private void setLatestVersion(MediaPackage sourceMediaPackage, Version version, boolean isLatestVersion)
+  private void resetFormerLatestVersion(MediaPackage sourceMediaPackage, Version version)
           throws SolrServerException, IOException {
     final SolrQuery query = new SolrQuery(Schema.ID + ":" + sourceMediaPackage.getIdentifier() + version);
     QueryResponse response = solrServer.query(query);
@@ -352,29 +354,17 @@ public class SolrIndexManager {
                      Version version)
           throws SolrServerException {
     try {
-      SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl, version);
+      final SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl, version);
       Schema.setOcTimestamp(episodeDocument, now);
 
-      SolrInputDocument seriesDocument = createSeriesInputDocument(sourceMediaPackage.getSeries(), acl);
-      if (seriesDocument != null)
-        Schema.enrich(episodeDocument, seriesDocument);
-
-      Schema.setOcLatestVersion(episodeDocument, true);
-
-      // If neither an episode nor a series was contained, there is no point in trying to update
-      if (episodeDocument == null && seriesDocument == null) {
-        logger.warn("Neither episode nor series metadata found");
-        solrServer.rollback();
-        return false;
-      }
-
-      setLatestVersion(sourceMediaPackage, new Version(version.value() - 1L), false);
-
-      // Post everything to the search index
-      if (episodeDocument != null)
-        solrServer.add(episodeDocument);
-      if (seriesDocument != null)
+      for (SolrInputDocument seriesDocument : createSeriesInputDocument(sourceMediaPackage.getSeries(), acl)) {
+        Schema.enrichFullText(episodeDocument, seriesDocument);
         solrServer.add(seriesDocument);
+      }
+      Schema.setOcLatestVersion(episodeDocument, true);
+      resetFormerLatestVersion(sourceMediaPackage, new Version(version.value() - 1L));
+      // Post everything to the search index
+      solrServer.add(episodeDocument);
       solrServer.commit();
       return true;
     } catch (Exception e) {
@@ -416,19 +406,17 @@ public class SolrIndexManager {
                      Date modificationDate,
                      boolean isLatestVersion) throws SolrServerException {
     try {
-      SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl, version);
-
-      SolrInputDocument seriesDocument = createSeriesInputDocument(sourceMediaPackage.getSeries(), acl);
-      if (seriesDocument != null)
-        Schema.enrich(episodeDocument, seriesDocument);
-
+      final SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl, version);
       Schema.setOcTimestamp(episodeDocument, modificationDate);
       Schema.setOcLatestVersion(episodeDocument, isLatestVersion);
-      for (Date a : deletionDate)
+      for (Date a : deletionDate) {
         Schema.setOcDeleted(episodeDocument, a);
-
+      }
+      for (SolrInputDocument seriesDocument : createSeriesInputDocument(sourceMediaPackage.getSeries(), acl)) {
+        Schema.enrichFullText(episodeDocument, seriesDocument);
+        solrServer.add(seriesDocument);
+      }
       solrServer.add(episodeDocument);
-      solrServer.add(seriesDocument);
       solrServer.commit();
       return true;
     } catch (Exception e) {
@@ -460,9 +448,11 @@ public class SolrIndexManager {
           throws MediaPackageException, IOException {
 
     final SolrInputDocument doc = new SolrInputDocument();
-    String mediaPackageId = mediaPackage.getIdentifier().toString();
-
-    // Fill the input document
+    final String mediaPackageId = mediaPackage.getIdentifier().toString();
+    // todo fix id generation ambiguity. currently tests are broken
+//    if (mediaPackageId.contains("#"))
+//      throw new Error("Media package id must not contain '#' characters: " + mediaPackageId);
+//    Schema.setId(doc, mediaPackageId + "#" + version);
     Schema.setId(doc, mediaPackageId + version);
     Schema.setDcId(doc, mediaPackageId);
     // /
@@ -780,12 +770,12 @@ public class SolrIndexManager {
    *         the access control list for this mediapackage
    * @return an input document ready to be posted to solr or null
    */
-  private SolrInputDocument createSeriesInputDocument(String seriesId, AccessControlList acl) throws IOException,
+  private Option<SolrInputDocument> createSeriesInputDocument(String seriesId, AccessControlList acl) throws IOException,
           UnauthorizedException {
 
     if (seriesId == null)
-      return null;
-    DublinCoreCatalog dc = null;
+      return none();
+    DublinCoreCatalog dc;
     try {
       dc = seriesSvc.getSeries(seriesId);
     } catch (SeriesException e) {
@@ -824,7 +814,7 @@ public class SolrIndexManager {
     // DC fields
     addSeriesMetadata(doc, dc);
 
-    return doc;
+    return some(doc);
   }
 
   /**

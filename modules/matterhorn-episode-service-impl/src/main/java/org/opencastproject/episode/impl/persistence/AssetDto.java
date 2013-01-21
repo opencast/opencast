@@ -52,19 +52,19 @@ public final class AssetDto {
   @Column(name = "uri", length = 256, nullable = false)
   private String uri;
 
-  @Column(name = "organization_id", nullable = false)
+  @Column(name = "organization_id", nullable = false, length = 128)
   private String organizationId;
 
-  @Column(name = "mediapackage_id", nullable = false, length = 255)
+  @Column(name = "mediapackage_id", nullable = false, length = 128)
   private String mediaPackageId;
 
-  @Column(name = "mediapackageelement_id", nullable = false)
+  @Column(name = "mediapackageelement_id", nullable = false, length = 128)
   private String mediaPackageElementId;
 
   @Column(name = "version", nullable = false)
   private Long version;
 
-  @Column(name = "checksum", nullable = false)
+  @Column(name = "checksum", nullable = false, length = 64)
   private String checksum;
 
   /** Create a new DTO. */

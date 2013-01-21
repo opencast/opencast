@@ -35,7 +35,6 @@ import org.opencastproject.util.data.Predicate;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,6 +43,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.opencastproject.util.ReflectionUtil.run;
 import static org.opencastproject.util.data.Collections.filter;
 import static org.opencastproject.util.data.Collections.head;
 import static org.opencastproject.util.data.Monadics.mlist;
@@ -58,7 +58,7 @@ public final class Convert {
   public static JaxbSearchResultItem convertToJaxbSearchResultItem(Function<JaxbSearchResultItem, SearchResultItem> f) {
     final JaxbSearchResultItem conv = new JaxbSearchResultItem();
     // copy to conv
-    callAllMethods(SearchResultItem.class, f.apply(conv));
+    run(SearchResultItem.class, f.apply(conv));
     return conv;
   }
 
@@ -227,6 +227,11 @@ public final class Convert {
           @Override public Version getOcVersion() {
             conv.setOcVersion(item.getOcVersion());
             return null;
+          }
+
+          @Override public boolean isOcLatestVersion() {
+            conv.setOcLatestVersion(item.isOcLatestVersion());
+            return false;
           }
         };
       }
@@ -452,6 +457,11 @@ public final class Convert {
             conv.setOcVersion(Schema.getOcVersion(doc));
             return null;
           }
+
+          @Override public boolean isOcLatestVersion() {
+            conv.setOcLatestVersion(Schema.isOcLatestVersion(doc));
+            return false;
+          }
         };
       }
     });
@@ -580,16 +590,5 @@ public final class Convert {
       return f.toString();
     else
       return "";
-  }
-
-  /** Call all methods of <code>c</code> on object <code>o</code>. */
-  private static void callAllMethods(Class<?> c, Object o) {
-    try {
-      for (Method m : c.getDeclaredMethods()) {
-        m.invoke(o);
-      }
-    } catch (Exception e) {
-      chuck(e);
-    }
   }
 }

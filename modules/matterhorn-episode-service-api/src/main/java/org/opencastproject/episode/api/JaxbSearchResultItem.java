@@ -202,6 +202,7 @@ public class JaxbSearchResultItem implements SearchResultItem {
     this.organization = organization;
   }
 
+  @Override
   public long getDcExtent() {
     return dcExtent;
   }
@@ -214,6 +215,7 @@ public class JaxbSearchResultItem implements SearchResultItem {
     this.dcExtent = dcExtent;
   }
 
+  @Override
   public String getDcTitle() {
     return dcTitle;
   }
@@ -226,6 +228,7 @@ public class JaxbSearchResultItem implements SearchResultItem {
     this.dcTitle = dcTitle;
   }
 
+  @Override
   public String getDcSubject() {
     return dcSubject;
   }
@@ -238,6 +241,7 @@ public class JaxbSearchResultItem implements SearchResultItem {
     this.dcSubject = dcSubject;
   }
 
+  @Override
   public String getDcCreator() {
     return dcCreator;
   }
@@ -567,6 +571,15 @@ public class JaxbSearchResultItem implements SearchResultItem {
    */
   public void setOcVersion(Version ocVersion) {
     this.ocVersion = ocVersion.value();
+  }
+
+  @Override
+  public boolean isOcLatestVersion() {
+    return ocLatestVersion;
+  }
+
+  public void setOcLatestVersion(boolean ocLatestVersion) {
+    this.ocLatestVersion = ocLatestVersion;
   }
 
   @Override

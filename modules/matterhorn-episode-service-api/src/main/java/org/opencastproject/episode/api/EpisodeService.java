@@ -17,6 +17,7 @@ package org.opencastproject.episode.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
 import java.util.List;
