@@ -81,17 +81,17 @@ public class UserActionImpl implements UserAction {
 
   @Lob
   //@Index
-  @Column(name = "user_id", length = 65535)
+  @Column(name = "user_id", length = 255)
   @XmlElement(name = "userId")
   private String userId;
 
   @Lob
-  @Column(name = "user_ip", length = 65535)
+  @Column(name = "user_ip", length = 255)
   @XmlElement(name = "userIp")
   private String userIp;
 
   @Lob
-  @Column(name = "session_id", length = 65535)
+  @Column(name = "session_id", length = 50)
   @XmlElement(name = "sessionId")
   private String sessionId;
 
@@ -108,7 +108,7 @@ public class UserActionImpl implements UserAction {
   private int length;
 
   @Lob
-  @Column(name = "type", length = 65535)
+  @Column(name = "type", length = 50)
   @XmlElement(name = "type")
   private String type;
 
