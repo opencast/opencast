@@ -64,20 +64,13 @@ import javax.ws.rs.core.MediaType;
 @Path("/")
 @RestService(name = "RuntimeInfo", title = "Runtime Information", notes = "", abstractText = "This service provides information about the runtime environment, including the servives that are deployed and the current user context.")
 public class RuntimeInfo {
-  private static final long serialVersionUID = 1L;
+
   private static final Logger logger = LoggerFactory.getLogger(RuntimeInfo.class);
 
   /** Configuration properties id */
-  private static final String HTTP_PORT_PROPERTY = "org.osgi.service.http.port";
-  private static final String HTTPS_PORT_PROPERTY = "org.osgi.service.http.port.secure";
-  private static final String HTTP_ENABLE_PROPERTY = "org.apache.felix.http.enable";
-  private static final String HTTPS_ENABLE_PROPERTY = "org.apache.felix.https.enable";
   private static final String ADMIN_URL_PROPERTY = "org.opencastproject.admin.ui.url";
   private static final String ENGAGE_URL_PROPERTY = "org.opencastproject.engage.ui.url";
   private static final String SERVER_URL_PROPERTY = "org.opencastproject.server.url";
-
-  private static final int DEFAULT_HTTP_PORT = -1;
-  private static final int DEFAULT_HTTPS_PORT = 8443;
 
   /** The rest publisher looks for any non-servlet with the 'opencast.service.path' property */
   public static final String SERVICE_FILTER = "(&(!(objectClass=javax.servlet.Servlet))("
@@ -88,10 +81,6 @@ public class RuntimeInfo {
   private URL serverUrl;
   private URL engageBaseUrl;
   private URL adminBaseUrl;
-  private boolean httpEnable;
-  private boolean httpsEnable;
-  private int httpPort;
-  private int httpsPort;
 
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
@@ -118,6 +107,7 @@ public class RuntimeInfo {
       adminBaseUrl = serverUrl;
     else
       adminBaseUrl = new URL(adminBaseUrlStr);
+    logger.debug("Default admin server url is {}", adminBaseUrlStr);
 
     // Get engage UI url
     String engageBaseUrlStr = bundleContext.getProperty(ENGAGE_URL_PROPERTY);
@@ -125,31 +115,7 @@ public class RuntimeInfo {
       engageBaseUrl = serverUrl;
     else
       engageBaseUrl = new URL(engageBaseUrlStr);
-
-    // Get http/https settings
-    String httpEnableStr = bundleContext.getProperty(HTTP_ENABLE_PROPERTY);
-    if (StringUtils.isBlank(httpEnableStr))
-      httpEnable = true;
-    else
-      httpEnable = Boolean.parseBoolean(httpEnableStr);
-
-    String httpsEnableStr = bundleContext.getProperty(HTTPS_ENABLE_PROPERTY);
-    if (StringUtils.isBlank(httpsEnableStr))
-      httpsEnable = false;
-    else
-      httpsEnable = Boolean.parseBoolean(httpsEnableStr);
-
-    String httpPortStr = bundleContext.getProperty(HTTP_PORT_PROPERTY);
-    if (StringUtils.isBlank(httpPortStr))
-      httpPort = DEFAULT_HTTP_PORT;
-    else
-      httpPort = Integer.parseInt(httpPortStr);
-
-    String httpsPortStr = bundleContext.getProperty(HTTPS_PORT_PROPERTY);
-    if (StringUtils.isBlank(httpsPortStr))
-      httpsPort = DEFAULT_HTTPS_PORT;
-    else
-      httpsPort = Integer.parseInt(httpsPortStr);
+    logger.debug("Default engage server url is {}", engageBaseUrl);
   }
 
   public void deactivate() {
