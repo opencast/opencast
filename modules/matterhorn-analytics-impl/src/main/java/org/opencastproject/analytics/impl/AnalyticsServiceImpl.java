@@ -78,6 +78,8 @@ public class AnalyticsServiceImpl {
   private static final int MAXIMUM_EPISODES = 100000;
   // The key to retrieve the url of the engage node so that we can use rest calls on it.
 	private static final String ENGAGE_URL_KEY = "org.opencastproject.engage.ui.url";
+	//The key to retrieve the url of the current server node so that we can use rest calls on it.
+	private static final String SERVER_URL_KEY = "org.opencastproject.server.url";
 	// The XML tag for the amount of time a video has been played.
 	private static final String PLAYED_XML_TAG = "played";
 	// The XML tag for the amount of views a video has been watched
@@ -119,19 +121,25 @@ public class AnalyticsServiceImpl {
 	 * Activate this module and get the admin and engage urls from the bundle
 	 * context.
 	 **/
-	public void activate(ComponentContext ctx) {
-		logger.debug("Activating " + AnalyticsServiceImpl.class.getName());
-		// Get the engage node's location
-		String engageURLProperty = StringUtils.trimToNull((String) ctx.getBundleContext().getProperty(ENGAGE_URL_KEY));
-		if (engageURLProperty == null) {
-			throw new ServiceException("Remote service registry can't find " + ENGAGE_URL_KEY);
-		}
-		try {
-			engageURL = new URL(engageURLProperty).toExternalForm();
-		} catch (MalformedURLException e) {
-			throw new ServiceException(ENGAGE_URL_KEY + " is malformed: " + engageURLProperty);
-		}
-	}
+  public void activate(ComponentContext ctx) {
+    logger.debug("Activating " + AnalyticsServiceImpl.class.getName());
+    // Get the engage node's location
+    String engageURLProperty = StringUtils.trimToNull((String) ctx.getBundleContext().getProperty(ENGAGE_URL_KEY));
+    // Get the server node's location in case the engage setting is not enabled.
+    String serverURLProperty = StringUtils.trimToNull((String) ctx.getBundleContext().getProperty(SERVER_URL_KEY));
+    if (engageURLProperty == null && serverURLProperty != null) {
+      engageURLProperty = serverURLProperty;
+      logger.info("Using " + serverURLProperty
+              + " as the engage location. If you have a seperate engage node please set the " + ENGAGE_URL_KEY
+              + " in config.properties.");
+    }
+    try {
+      engageURL = new URL(engageURLProperty).toExternalForm();
+    } catch (MalformedURLException e) {
+      throw new ServiceException(ENGAGE_URL_KEY + " is malformed: " + engageURLProperty);
+    }
+
+  }
 
   public void setService(SeriesService seriesService) {
     this.seriesService = seriesService;
