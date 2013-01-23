@@ -220,6 +220,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
       try {
         org = (JpaOrganization) persistence.getOrganization(id);
         org.addServer(server, port);
+        org.setProperties(orgProperties);
         logger.info("Registering organization '{}'", id);
       } catch (NotFoundException e) {
         org = new JpaOrganization(id, name, server, port, adminRole, anonRole, orgProperties);
