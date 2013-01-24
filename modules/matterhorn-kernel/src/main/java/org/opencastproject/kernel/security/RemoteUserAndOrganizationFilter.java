@@ -81,48 +81,74 @@ public class RemoteUserAndOrganizationFilter implements Filter {
     Organization originalOrganization = securityService.getOrganization();
     User originalUser = securityService.getUser();
 
-    // See if there is an organization provided in the request
-    Organization org = null;
-    String organizationHeader = httpRequest.getHeader(ORGANIZATION_HEADER);
-    if (StringUtils.isNotBlank(organizationHeader)) {
-      try {
-        org = organizationDirectory.getOrganization(organizationHeader);
-      } catch (NotFoundException e) {
-        logger.warn("Non-existing organization '{}' specified in request header {}", organizationHeader,
-                ORGANIZATION_HEADER);
-        ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
-        return;
-      }
-    }
+    // Organization and user as specified by the request
+    Organization requestOrganization = originalOrganization;
+    User requestUser = originalUser;
 
-    // See if there is a user provided in the request
-    User user = null;
-    String userHeader = httpRequest.getHeader(USER_HEADER);
-    if (StringUtils.isNotBlank(userHeader)) {
-      if (SecurityConstants.GLOBAL_ANONYMOUS_USERNAME.equals(userHeader)) {
-        user = SecurityUtil.createAnonymousUser(org);
-      } else {
-        user = userDirectory.loadUser(userHeader);
-        if (user == null) {
-          logger.warn("Non-existing user '{}' specified in request header {}", userHeader, USER_HEADER);
-          ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
-        }
-      }
-    }
-
-    // Switch to the new organization and user and continue down the filter chain
     try {
-      if (org != null && user != null) {
-        if (originalUser.hasRole(GLOBAL_ADMIN_ROLE)) {
-          securityService.setOrganization(org);
-          logger.trace("Switching to organization '{}' from request header {}", organizationHeader, ORGANIZATION_HEADER);
-          securityService.setUser(user);
-          logger.trace("Switching to user '{}' from request header {}", userHeader, USER_HEADER);
+
+      // See if there is an organization provided in the request
+      String organizationHeader = httpRequest.getHeader(ORGANIZATION_HEADER);
+      if (StringUtils.isNotBlank(organizationHeader)) {
+
+        // Organization switching is only allowed if the request is coming in with
+        // the global admin role enabled
+        if (!originalUser.hasRole(GLOBAL_ADMIN_ROLE)) {
+          logger.warn("An unauthorized request is trying to switch from organization '{}' to '{}'",
+                  originalOrganization.getId(), organizationHeader);
+          ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+          return;
+        }
+
+        try {
+          requestOrganization = organizationDirectory.getOrganization(organizationHeader);
+          securityService.setOrganization(requestOrganization);
+          logger.trace("Switching to organization '{}' from request header {}", requestOrganization.getId(),
+                  ORGANIZATION_HEADER);
+        } catch (NotFoundException e) {
+          logger.warn("Non-existing organization '{}' specified in request header {}", organizationHeader,
+                  ORGANIZATION_HEADER);
+          ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+          return;
+        }
+      } else {
+        logger.trace("Request organization remains '{}'", originalOrganization.getId());
+      }
+
+      // See if there is a user provided in the request
+      String userHeader = httpRequest.getHeader(USER_HEADER);
+      if (StringUtils.isNotBlank(userHeader)) {
+
+        // User switching is only allowed if the request is coming in with
+        // the global admin role enabled
+        if (!originalUser.hasRole(GLOBAL_ADMIN_ROLE)) {
+          logger.warn("An unauthorized request is trying to switch from user '{}' to '{}'", originalUser.getUserName(),
+                  userHeader);
+          ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+          return;
+        }
+
+        if (SecurityConstants.GLOBAL_ANONYMOUS_USERNAME.equals(userHeader)) {
+          requestUser = SecurityUtil.createAnonymousUser(requestOrganization);
+          logger.trace("Request user is switched to '{}'", requestUser.getUserName());
         } else {
-          logger.warn("User '{}' is not allowed to switch user context", originalUser);
+          requestUser = userDirectory.loadUser(userHeader);
+          if (requestUser != null) {
+            securityService.setUser(requestUser);
+            logger.trace("Switching to user '{}' from request header {}", userHeader, USER_HEADER);
+          } else {
+            logger.warn("Non-existing user '{}' specified in request header {}", userHeader, USER_HEADER);
+            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+          }
         }
       }
+
+      // Execute the rest of the filter chain
+      logger.trace("Executing the filter chain with user '{}@{}'", requestUser.getUserName(),
+              requestOrganization.getId());
       chain.doFilter(httpRequest, response);
+
     } finally {
       securityService.setOrganization(originalOrganization);
       securityService.setUser(originalUser);
