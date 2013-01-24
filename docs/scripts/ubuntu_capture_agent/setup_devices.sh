@@ -15,6 +15,8 @@ supportedDevices[2]="Hauppauge HVR-1600"
 supportedDevices[3]="Hauppauge WinTV PVR-150"
 supportedDevices[4]="Hauppauge WinTV-HVR1300 DVB-T/H"
 supportedDevices[5]="WinTV PVR USB2 Model Category 2"
+supportedDevices[6]="Epiphan VGA2USB #[A-Z0-9]+"
+supportedDevices[7]="Epiphan VGA2USB"
 
 # Include the utility functions
 . ${FUNCTIONS}
