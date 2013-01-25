@@ -95,13 +95,9 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
     String flavors = currentOperation.getConfiguration(PRESERVE_FLAVOR_PROPERTY);
     final List<MediaPackageElementFlavor> flavorsToPreserve = new ArrayList<MediaPackageElementFlavor>();
 
-    // If the configuration does not specify flavors, keep them all
-    if (flavors == null) {
-      flavorsToPreserve.add(MediaPackageElementFlavor.parseFlavor("*/*"));
-    } else {
-      for (String flavor : asList(flavors)) {
-        flavorsToPreserve.add(MediaPackageElementFlavor.parseFlavor(flavor));
-      }
+    // If the configuration does not specify flavors, remove them all
+    for (String flavor : asList(flavors)) {
+      flavorsToPreserve.add(MediaPackageElementFlavor.parseFlavor(flavor));
     }
 
     String baseUrl = workspace.getBaseUri().toString();
@@ -132,7 +128,7 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
     // Remove all of the files to keep from the one to delete
     urisToDelete.removeAll(urisToKeep);
-    
+
     // Now remove the files to delete
     for (URI uri : urisToDelete) {
       try {
