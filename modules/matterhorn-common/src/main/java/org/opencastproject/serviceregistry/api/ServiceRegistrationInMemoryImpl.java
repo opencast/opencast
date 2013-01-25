@@ -39,6 +39,9 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
   /** True if this service produces jobs */
   protected boolean isJobProducer = true;
 
+  /** True if this service is active */
+  protected boolean isActive = true;
+
   /** True if this service is online */
   protected boolean isOnline = true;
 
@@ -119,6 +122,16 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
   @Override
   public boolean isJobProducer() {
     return isJobProducer;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistration#isActive()
+   */
+  @Override
+  public boolean isActive() {
+    return isActive;
   }
 
   /**

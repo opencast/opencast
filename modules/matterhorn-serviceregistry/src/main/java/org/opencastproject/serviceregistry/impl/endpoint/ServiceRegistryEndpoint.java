@@ -163,6 +163,34 @@ public class ServiceRegistryEndpoint {
   }
 
   @POST
+  @Path("enablehost")
+  @RestQuery(name = "enablehost", description = "Enable a server from the cluster.", returnDescription = "No content.", restParameters = { @RestParameter(name = "host", isRequired = true, description = "The host name, including the http(s) protocol", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was enabled successfully"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "The host does not exist") })
+  public Response enableHost(@FormParam("host") String host) throws NotFoundException {
+    try {
+      serviceRegistry.enableHost(host);
+      return Response.status(Status.NO_CONTENT).build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @POST
+  @Path("disablehost")
+  @RestQuery(name = "disablehost", description = "Disable a server from the cluster.", returnDescription = "No content.", restParameters = { @RestParameter(name = "host", isRequired = true, description = "The host name, including the http(s) protocol", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was disabled successfully"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "The host does not exist") })
+  public Response disableHost(@FormParam("host") String host) throws NotFoundException {
+    try {
+      serviceRegistry.disableHost(host);
+      return Response.status(Status.NO_CONTENT).build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @POST
   @Path("registerhost")
   @RestQuery(name = "registerhost", description = "Add a new server to the cluster.", returnDescription = "No content.", restParameters = {
           @RestParameter(name = "host", isRequired = true, description = "The host name, including the http(s) protocol", type = Type.STRING),

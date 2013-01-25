@@ -21,6 +21,8 @@ import org.opencastproject.util.jmx.JmxUtil;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.PredicateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +36,8 @@ import javax.management.NotificationBroadcasterSupport;
 
 public class HostsStatistics extends NotificationBroadcasterSupport implements HostsStatisticsMXBean {
 
+  private static final Logger logger = LoggerFactory.getLogger(HostsStatistics.class);
+
   private static final int ONLINE = 0;
   private static final int MAINTENANCE = 1;
   private static final int OFFLINE = 2;
@@ -46,6 +50,11 @@ public class HostsStatistics extends NotificationBroadcasterSupport implements H
       String host = stats.getServiceRegistration().getHost();
       boolean online = stats.getServiceRegistration().isOnline();
       boolean inMaintenanceMode = stats.getServiceRegistration().isInMaintenanceMode();
+      if (!stats.getServiceRegistration().isActive()) {
+        hosts.remove(host);
+        logger.trace("Removing inactive host '{}'", host);
+        continue;
+      }
       if (online && !inMaintenanceMode) {
         hosts.put(host, ONLINE);
       } else if (online && inMaintenanceMode) {
@@ -57,6 +66,12 @@ public class HostsStatistics extends NotificationBroadcasterSupport implements H
   }
 
   public void updateHost(HostRegistration host) {
+    if (!host.isActive()) {
+      hosts.remove(host.toString());
+      logger.trace("Removing inactive host '{}'", host);
+      return;
+    }
+
     if (host.isOnline() && !host.isMaintenanceMode()) {
       hosts.put(host.toString(), ONLINE);
     } else if (host.isOnline() && host.isMaintenanceMode()) {

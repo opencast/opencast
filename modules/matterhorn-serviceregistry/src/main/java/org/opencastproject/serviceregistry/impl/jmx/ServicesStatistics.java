@@ -23,6 +23,8 @@ import org.opencastproject.util.jmx.JmxUtil;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.PredicateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +38,8 @@ import javax.management.NotificationBroadcasterSupport;
 
 public class ServicesStatistics extends NotificationBroadcasterSupport implements ServicesStatisticsMXBean {
 
+  private static final Logger logger = LoggerFactory.getLogger(ServicesStatistics.class);
+
   private static final String DELIMITER = ";";
 
   private Map<Tuple<String, String>, ServiceState> services = new HashMap<Tuple<String, String>, ServiceState>();
@@ -45,6 +49,10 @@ public class ServicesStatistics extends NotificationBroadcasterSupport implement
   public ServicesStatistics(String hostName, List<ServiceStatistics> statistics) {
     this.hostName = hostName;
     for (ServiceStatistics stats : statistics) {
+      if (!stats.getServiceRegistration().isActive()) {
+        logger.trace("Ignoring inactive service '{}'", stats);
+        continue;
+      }
       String host = stats.getServiceRegistration().getHost();
       String serviceType = stats.getServiceRegistration().getServiceType();
       ServiceState serviceState = stats.getServiceRegistration().getServiceState();
@@ -53,7 +61,12 @@ public class ServicesStatistics extends NotificationBroadcasterSupport implement
   }
 
   public void updateService(ServiceRegistration registration) {
-    services.put(Tuple.tuple(registration.getHost(), registration.getServiceType()), registration.getServiceState());
+    if (!registration.isActive()) {
+      services.remove(Tuple.tuple(registration.getHost(), registration.getServiceType()));
+      logger.trace("Removing inactive service '{}'", registration);
+    } else {
+      services.put(Tuple.tuple(registration.getHost(), registration.getServiceType()), registration.getServiceState());
+    }
 
     sendNotification(JmxUtil.createUpdateNotification(this, sequenceNumber++, "Service updated"));
   }

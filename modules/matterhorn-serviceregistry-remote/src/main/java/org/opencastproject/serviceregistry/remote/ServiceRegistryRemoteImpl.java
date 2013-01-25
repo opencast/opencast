@@ -124,6 +124,78 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
   /**
    * {@inheritDoc}
    * 
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#enableHost(String)
+   */
+  @Override
+  public void enableHost(String host) throws ServiceRegistryException, NotFoundException {
+    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, "enablehost"));
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("host", host));
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (UnsupportedEncodingException e) {
+      throw new ServiceRegistryException("Can not url encode post parameters", e);
+    }
+    HttpResponse response = null;
+    int responseStatusCode;
+    try {
+      response = client.execute(post);
+      responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
+        logger.info("Enabled host '" + host + "'.");
+        return;
+      } else if (responseStatusCode == HttpStatus.SC_NOT_FOUND) {
+        throw new NotFoundException("Host not found: " + host);
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ServiceRegistryException("Unable to enable '" + host + "'", e);
+    } finally {
+      client.close(response);
+    }
+    throw new ServiceRegistryException("Unable to enable '" + host + "'. HTTP status=" + responseStatusCode);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#disableHost(String)
+   */
+  @Override
+  public void disableHost(String host) throws ServiceRegistryException, NotFoundException {
+    HttpPost post = new HttpPost(UrlSupport.concat(serviceURL, "disablehost"));
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("host", host));
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (UnsupportedEncodingException e) {
+      throw new ServiceRegistryException("Can not url encode post parameters", e);
+    }
+    HttpResponse response = null;
+    int responseStatusCode;
+    try {
+      response = client.execute(post);
+      responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
+        logger.info("Disabled host '" + host + "'.");
+        return;
+      } else if (responseStatusCode == HttpStatus.SC_NOT_FOUND) {
+        throw new NotFoundException("Host not found: " + host);
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ServiceRegistryException("Unable to disable '" + host + "'", e);
+    } finally {
+      client.close(response);
+    }
+    throw new ServiceRegistryException("Unable to disable '" + host + "'. HTTP status=" + responseStatusCode);
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(java.lang.String, int)
    */
   @Override

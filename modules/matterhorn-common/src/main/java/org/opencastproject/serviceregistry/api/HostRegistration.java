@@ -43,6 +43,17 @@ public interface HostRegistration {
   void setMaxJobs(int maxJobs);
 
   /**
+   * @return whether this host is active
+   */
+  boolean isActive();
+
+  /**
+   * @param active
+   *          the active status to set
+   */
+  void setActive(boolean active);
+
+  /**
    * @return whether this host is online
    */
   boolean isOnline();
