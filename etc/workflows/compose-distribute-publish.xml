@@ -454,6 +454,7 @@
       exception-handler-workflow="error"
       description="Distributing to progressive downloads">
       <configurations>
+        <configuration key="check-availability">true</configuration>
         <configuration key="source-tags">engage,atom,rss,-publish</configuration>
         <configuration key="target-tags">publish</configuration>
       </configurations>

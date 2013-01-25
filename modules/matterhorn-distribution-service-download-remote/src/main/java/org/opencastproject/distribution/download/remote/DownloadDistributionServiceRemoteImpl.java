@@ -15,6 +15,10 @@
  */
 package org.opencastproject.distribution.download.remote;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
@@ -22,11 +26,6 @@ import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,10 +63,16 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase implements
    * @see org.opencastproject.distribution.api.DistributionService#distribute(org.opencastproject.mediapackage.MediaPackage,
    *      java.lang.String)
    */
+  @Override
   public Job distribute(MediaPackage mediaPackage, String elementId) throws DistributionException {
+    return distribute(mediaPackage, elementId, true);
+  }
+
+  public Job distribute(MediaPackage mediaPackage, String elementId, boolean checkAvailability) throws DistributionException {
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
     params.add(new BasicNameValuePair("elementId", elementId));
+    params.add(new BasicNameValuePair("checkAvailability", Boolean.toString(checkAvailability)));
     HttpPost post = new HttpPost();
     HttpResponse response = null;
     try {
@@ -79,24 +84,25 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase implements
           return JobParser.parseJob(response.getEntity().getContent());
         } catch (Exception e) {
           throw new DistributionException("Unable to distribute mediapackage '" + elementId
-                  + "' using a remote distribution service", e);
+                                                  + "' using a remote distribution service", e);
         }
       }
     } catch (Exception e) {
       throw new DistributionException("Unable to distribute mediapackage " + elementId
-              + " using a remote distribution service proxy.", e);
+                                              + " using a remote distribution service proxy.", e);
     } finally {
       closeConnection(response);
     }
     throw new DistributionException("Unable to distribute mediapackage " + elementId
-            + " using a remote distribution service proxy.");
+                                            + " using a remote distribution service proxy.");
+
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.distribution.api.DistributionService#retract(MediaPackage, String)
-   */
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.opencastproject.distribution.api.DistributionService#retract(MediaPackage, String)
+     */
   @Override
   public Job retract(MediaPackage mediaPackage, String elementId) throws DistributionException {
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
