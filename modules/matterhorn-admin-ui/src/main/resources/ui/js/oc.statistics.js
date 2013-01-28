@@ -156,6 +156,8 @@ ocStatistics = new (function() {
   this.buildServersView = function(data) {
     $.each(data.statistics.service, function(index, serviceInstance) {
       var reg = serviceInstance.serviceRegistration;
+      if(!reg.active)
+        return true;
       var server = ocStatistics.serversView[reg.host];
       if(server == null) {
         server = {
@@ -210,6 +212,7 @@ ocStatistics = new (function() {
   this.buildServicesView = function(data) {
     $.each(data.statistics.service, function(index, serviceInstance) {
       var reg = serviceInstance.serviceRegistration;
+      if(!reg.active) return true;
   
       // if the service is not a job producer, we don't show it here
       if(!reg.jobproducer) return true;

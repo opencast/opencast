@@ -400,6 +400,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
       if (creatingService.getHostRegistration().isMaintenanceMode()) {
         logger.warn("Creating a job from {}, which is currently in maintenance mode.", creatingService.getHost());
+      } else if (!creatingService.getHostRegistration().isActive()) {
+        logger.warn("Creating a job from {}, which is currently inactive.", creatingService.getHost());
       }
       JobJpaImpl job = new JobJpaImpl(currentUser, currentOrganization, creatingService, operation, arguments, payload,
               dispatchable);
@@ -856,6 +858,93 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * {@inheritDoc}
    * 
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#enableHost(String)
+   */
+  @Override
+  public void enableHost(String host) throws ServiceRegistryException, NotFoundException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      // Find the existing registrations for this host and if it exists, update it
+      HostRegistrationJpaImpl hostRegistration = fetchHostRegistration(em, host);
+      if (hostRegistration == null) {
+        throw new NotFoundException("Host '" + host + "' is currently not registered, so it can not be enabled");
+      } else {
+        hostRegistration.setActive(true);
+        em.merge(hostRegistration);
+      }
+      logger.info("Enabling {}", host);
+      tx.commit();
+      tx.begin();
+      for (ServiceRegistration serviceRegistration : getServiceRegistrationsByHost(host)) {
+        ServiceRegistrationJpaImpl registration = (ServiceRegistrationJpaImpl) serviceRegistration;
+        registration.setActive(true);
+        em.merge(registration);
+        servicesStatistics.updateService(registration);
+      }
+      tx.commit();
+      hostsStatistics.updateHost(hostRegistration);
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx != null && tx.isActive()) {
+        tx.rollback();
+      }
+      throw new ServiceRegistryException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#disableHost(String)
+   */
+  @Override
+  public void disableHost(String host) throws ServiceRegistryException, NotFoundException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      HostRegistrationJpaImpl hostRegistration = fetchHostRegistration(em, host);
+      if (hostRegistration == null) {
+        throw new NotFoundException("Host '" + host + "' is not currently registered, so it can not be disabled");
+      } else {
+        hostRegistration.setActive(false);
+        for (ServiceRegistration serviceRegistration : getServiceRegistrationsByHost(host)) {
+          ServiceRegistrationJpaImpl registration = (ServiceRegistrationJpaImpl) serviceRegistration;
+          registration.setActive(false);
+          em.merge(registration);
+          servicesStatistics.updateService(registration);
+        }
+        em.merge(hostRegistration);
+      }
+      logger.info("Disabling {}", host);
+      tx.commit();
+      hostsStatistics.updateHost(hostRegistration);
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx != null && tx.isActive()) {
+        tx.rollback();
+      }
+      throw new ServiceRegistryException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerService(java.lang.String, java.lang.String,
    *      java.lang.String)
    */
@@ -1092,6 +1181,18 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     try {
       em = emf.createEntityManager();
       return getServiceRegistrations(em);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<ServiceRegistration> getOnlineServiceRegistrations() {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      return em.createNamedQuery("ServiceRegistration.getAllOnline").getResultList();
     } finally {
       if (em != null)
         em.close();
@@ -2230,7 +2331,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public void run() {
 
       logger.debug("Checking for unresponsive services");
-      List<ServiceRegistration> serviceRegistrations = getServiceRegistrations();
+      List<ServiceRegistration> serviceRegistrations = getOnlineServiceRegistrations();
 
       for (ServiceRegistration service : serviceRegistrations) {
         hostsStatistics.updateHost(((ServiceRegistrationJpaImpl) service).getHostRegistration());

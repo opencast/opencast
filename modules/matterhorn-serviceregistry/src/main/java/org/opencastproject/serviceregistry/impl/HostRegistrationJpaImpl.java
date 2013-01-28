@@ -40,9 +40,9 @@ import javax.xml.bind.annotation.XmlType;
 @Entity(name = "HostRegistration")
 @Table(name = "host_registration", uniqueConstraints = @UniqueConstraint(columnNames = "host"))
 @NamedQueries({
-        @NamedQuery(name = "HostRegistration.cores", query = "SELECT sum(hr.maxJobs) FROM HostRegistration hr"),
+        @NamedQuery(name = "HostRegistration.cores", query = "SELECT sum(hr.maxJobs) FROM HostRegistration hr where hr.active = true"),
         @NamedQuery(name = "HostRegistration.byHostName", query = "SELECT hr from HostRegistration hr where hr.baseUrl = :host"),
-        @NamedQuery(name = "HostRegistration.getAll", query = "SELECT hr FROM HostRegistration hr") })
+        @NamedQuery(name = "HostRegistration.getAll", query = "SELECT hr FROM HostRegistration hr where hr.active = true") })
 public class HostRegistrationJpaImpl extends JaxbHostRegistration {
 
   /** The primary key identifying this host */
@@ -85,6 +85,13 @@ public class HostRegistrationJpaImpl extends JaxbHostRegistration {
   @XmlElement(name = "online")
   public boolean isOnline() {
     return super.isOnline();
+  }
+
+  @Override
+  @Column(name = "active", nullable = false)
+  @XmlElement(name = "active")
+  public boolean isActive() {
+    return super.isActive();
   }
 
   @Column(name = "maintenance", nullable = false)

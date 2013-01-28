@@ -46,6 +46,9 @@ public class JaxbHostRegistration implements HostRegistration {
   @XmlElement(name = "online")
   protected boolean online;
 
+  @XmlElement(name = "active")
+  protected boolean active;
+
   @XmlElement(name = "maintenance")
   protected boolean maintenanceMode;
 
@@ -54,6 +57,7 @@ public class JaxbHostRegistration implements HostRegistration {
    */
   public JaxbHostRegistration() {
     this.online = true;
+    this.active = true;
     this.maintenanceMode = false;
   }
 
@@ -74,6 +78,7 @@ public class JaxbHostRegistration implements HostRegistration {
     this.maxJobs = maxJobs;
     this.online = online;
     this.maintenanceMode = maintenance;
+    this.active = true;
   }
 
   /**
@@ -85,6 +90,7 @@ public class JaxbHostRegistration implements HostRegistration {
     this.baseUrl = hostRegistration.getBaseUrl();
     this.maxJobs = hostRegistration.getMaxJobs();
     this.online = hostRegistration.isOnline();
+    this.active = hostRegistration.isActive();
     this.maintenanceMode = hostRegistration.isMaintenanceMode();
   }
 
@@ -126,6 +132,26 @@ public class JaxbHostRegistration implements HostRegistration {
   @Override
   public void setMaxJobs(int maxJobs) {
     this.maxJobs = maxJobs;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#isActive()
+   */
+  @Override
+  public boolean isActive() {
+    return active;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#setActive(boolean)
+   */
+  @Override
+  public void setActive(boolean active) {
+    this.active = active;
   }
 
   /**

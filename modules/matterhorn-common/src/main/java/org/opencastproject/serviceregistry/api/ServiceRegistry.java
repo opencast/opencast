@@ -49,6 +49,31 @@ public interface ServiceRegistry {
   void unregisterHost(String host) throws ServiceRegistryException;
 
   /**
+   * Enable an inactive host as a provider of Matterhorn services.
+   * 
+   * @param host
+   *          The base URL for this server
+   * 
+   * @throws NotFoundException
+   *           if the host does not exist
+   * @throws ServiceRegistryException
+   *           if communication with the service registry fails
+   */
+  void enableHost(String host) throws ServiceRegistryException, NotFoundException;
+
+  /**
+   * Disables a Matterhorn server from service.
+   * 
+   * @param host
+   *          The base URL for this server
+   * @throws NotFoundException
+   *           if the host does not exist
+   * @throws ServiceRegistryException
+   *           if communication with the service registry fails
+   */
+  void disableHost(String host) throws ServiceRegistryException, NotFoundException;
+
+  /**
    * Returns the total number of jobs that can be handled by the currently registered hosts.
    * 
    * @return the total number of jobs that can be processed concurrently

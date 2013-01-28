@@ -40,6 +40,9 @@ public class JaxbServiceRegistration implements ServiceRegistration {
   @XmlElement(name = "path")
   protected String path;
 
+  @XmlElement(name = "active")
+  protected boolean active;
+
   @XmlElement(name = "online")
   protected boolean online;
 
@@ -70,6 +73,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
    */
   public JaxbServiceRegistration() {
     this.online = true;
+    this.active = true;
     this.maintenanceMode = false;
     this.onlineFrom = new Date();
     this.serviceState = ServiceState.NORMAL;
@@ -85,6 +89,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
     this.host = serviceRegistration.getHost();
     this.jobProducer = serviceRegistration.isJobProducer();
     this.maintenanceMode = serviceRegistration.isInMaintenanceMode();
+    this.active = serviceRegistration.isActive();
     this.online = serviceRegistration.isOnline();
     this.onlineFrom = serviceRegistration.getOnlineFrom();
     this.path = serviceRegistration.getPath();
@@ -180,6 +185,20 @@ public class JaxbServiceRegistration implements ServiceRegistration {
    */
   public void setInMaintenanceMode(boolean maintenanceMode) {
     this.maintenanceMode = maintenanceMode;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistration#isActive()
+   */
+  @Override
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
   }
 
   /**

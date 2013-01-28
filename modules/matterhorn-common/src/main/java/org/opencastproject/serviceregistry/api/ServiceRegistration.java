@@ -43,6 +43,11 @@ public interface ServiceRegistration {
   boolean isJobProducer();
 
   /**
+   * @return Whether the service is active
+   */
+  boolean isActive();
+
+  /**
    * @return Whether the service is online
    */
   boolean isOnline();
