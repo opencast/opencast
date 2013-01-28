@@ -68,7 +68,7 @@ var ocScheduler = (function() {
     this.registerCatalogs();
     this.registerEventHandlers();
 
-    ocWorkflow.init($('#workflowSelector'), $('#workflowConfigContainer'));
+    ocWorkflow.init($('#workflowSelector'), $('#workflowConfigContainer'), ['schedule']);
 
     if(this.type === SINGLE_EVENT){
       this.agentList = '#agent';
