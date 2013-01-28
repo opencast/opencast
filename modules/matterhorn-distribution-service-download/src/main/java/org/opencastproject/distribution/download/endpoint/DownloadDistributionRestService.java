@@ -15,7 +15,7 @@
  */
 package org.opencastproject.distribution.download.endpoint;
 
-import org.opencastproject.distribution.download.DownloadDistributionService;
+import org.opencastproject.distribution.download.DownloadDistributionServiceImpl;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
@@ -62,7 +62,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
   private static final Logger logger = LoggerFactory.getLogger(DownloadDistributionRestService.class);
 
   /** The download distribution service */
-  protected DownloadDistributionService service;
+  protected DownloadDistributionServiceImpl service;
 
   /** The service registry */
   protected ServiceRegistry serviceRegistry = null;
@@ -81,7 +81,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
    * @param service
    *          the service to set
    */
-  public void setService(DownloadDistributionService service) {
+  public void setService(DownloadDistributionServiceImpl service) {
     this.service = service;
   }
 

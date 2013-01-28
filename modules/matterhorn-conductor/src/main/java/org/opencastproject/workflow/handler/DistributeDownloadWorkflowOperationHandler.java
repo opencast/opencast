@@ -15,9 +15,12 @@
  */
 package org.opencastproject.workflow.handler;
 
-import org.apache.commons.lang.StringUtils;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.functions.Strings.toBool;
+import static org.opencastproject.util.data.functions.Strings.trimToNone;
+
 import org.opencastproject.distribution.api.DistributionException;
-import org.opencastproject.distribution.download.DownloadDistributionService;
+import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Attachment;
@@ -37,6 +40,8 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,16 +54,12 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.functions.Strings.toBool;
-import static org.opencastproject.util.data.functions.Strings.trimToNone;
-
 /**
  * The workflow definition for handling "distribute" operations to Engage download.
  */
-public class DistributeEngageDownloadWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
+public class DistributeDownloadWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(DistributeEngageDownloadWorkflowOperationHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(DistributeDownloadWorkflowOperationHandler.class);
 
   /** The distribution service */
   private DownloadDistributionService distributionService = null;

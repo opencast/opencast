@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.workflow.handler.DistributeEngageDownloadWorkflowOperationHandler" immediate="true" activate="activate">
-  <implementation class="org.opencastproject.workflow.handler.DistributeEngageDownloadWorkflowOperationHandler" />
-  <property name="service.description" value="Local Distribution Workflow Handler" />
+ name="org.opencastproject.workflow.handler.DistributeDownloadWorkflowOperationHandler" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.workflow.handler.DistributeDownloadWorkflowOperationHandler" />
+  <property name="service.description" value="Download Distribution Workflow Handler" />
   <property name="workflow.operation" value="distribute-download" />
   <service>
     <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
   </service>
-  <reference cardinality="1..1" interface="org.opencastproject.distribution.download.DownloadDistributionService"
+  <reference cardinality="1..1" interface="org.opencastproject.distribution.api.DownloadDistributionService"
   name="DistributionService" policy="static" bind="setDistributionService"/>
   <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
     policy="static" bind="setServiceRegistry" />

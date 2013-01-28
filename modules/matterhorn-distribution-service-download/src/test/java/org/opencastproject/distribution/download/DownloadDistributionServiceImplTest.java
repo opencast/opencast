@@ -51,7 +51,7 @@ import java.net.URI;
 
 public class DownloadDistributionServiceImplTest {
 
-  private DownloadDistributionService service = null;
+  private DownloadDistributionServiceImpl service = null;
   private MediaPackage mp = null;
   private File distributionRoot = null;
   private ServiceRegistry serviceRegistry = null;
@@ -70,7 +70,7 @@ public class DownloadDistributionServiceImplTest {
     }
 
     distributionRoot = new File(mediaPackageRoot, "static");
-    service = new DownloadDistributionService();
+    service = new DownloadDistributionServiceImpl();
 
     StatusLine statusLine = EasyMock.createNiceMock(StatusLine.class);
     EasyMock.expect(statusLine.getStatusCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();

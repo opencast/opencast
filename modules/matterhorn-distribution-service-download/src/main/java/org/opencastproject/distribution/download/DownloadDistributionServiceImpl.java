@@ -22,6 +22,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpHead;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
+import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -56,10 +57,10 @@ import java.util.List;
 /**
  * Distributes media to the local media delivery directory.
  */
-public class DownloadDistributionService extends AbstractJobProducer implements DistributionService {
+public class DownloadDistributionServiceImpl extends AbstractJobProducer implements DistributionService, DownloadDistributionService {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(DownloadDistributionService.class);
+  private static final Logger logger = LoggerFactory.getLogger(DownloadDistributionServiceImpl.class);
 
   /** List of available operations on jobs */
   private enum Operation {
@@ -105,7 +106,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
   /**
    * Creates a new instance of the download distribution service.
    */
-  public DownloadDistributionService() {
+  public DownloadDistributionServiceImpl() {
     super(JOB_TYPE);
   }
 

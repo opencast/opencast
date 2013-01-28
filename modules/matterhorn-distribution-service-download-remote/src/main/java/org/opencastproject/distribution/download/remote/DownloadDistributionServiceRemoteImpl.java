@@ -15,17 +15,19 @@
  */
 package org.opencastproject.distribution.download.remote;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
+import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +38,7 @@ import java.util.List;
 /**
  * A remote distribution service invoker.
  */
-public class DownloadDistributionServiceRemoteImpl extends RemoteBase implements DistributionService {
+public class DownloadDistributionServiceRemoteImpl extends RemoteBase implements DistributionService, DownloadDistributionService {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(DownloadDistributionServiceRemoteImpl.class);
