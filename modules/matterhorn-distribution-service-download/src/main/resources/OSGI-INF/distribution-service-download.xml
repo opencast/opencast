@@ -36,7 +36,7 @@
       <provide interface="org.opencastproject.distribution.download.endpoint.DownloadDistributionRestService" />
     </service>
 
-    <reference name="distributionService" interface="org.opencastproject.distribution.download.DownloadDistributionServiceImpl"
+    <reference name="distributionService" interface="org.opencastproject.distribution.api.DownloadDistributionService"
       cardinality="1..1" policy="static" bind="setService" />
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
       cardinality="1..1" policy="static" bind="setServiceRegistry" />
