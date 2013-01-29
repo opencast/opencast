@@ -48,10 +48,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.EntityManager;
@@ -247,7 +247,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       Organization org = securityService.getOrganization();
       AgentImpl a = new AgentImpl(agentName, org.getId(), state, "", new Properties());
       updateAgentInDatabase(a);
-    } else {
+    } else if (!agent.getState().equals(state)) {
       // the agent is known, so set the state
       logger.debug("Setting Agent {} to state {}.", agentName, state);
       agent.setState(state);
