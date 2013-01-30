@@ -63,6 +63,8 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
       q.includeEpisodes(true);
       q.includeSeries(true);
       q.withId(id.toString());
+      q.withLimit(size);
+      q.withPublicationDateSort(true);
       SearchResult result = searchService.getByQuery(q);
       if (result != null && result.size() > 0) {
         series.set(id.toString());
