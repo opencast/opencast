@@ -321,7 +321,7 @@ public class SeriesServiceImpl implements SeriesService {
   @Override
   public DublinCoreCatalog getSeries(String seriesID) throws SeriesException, NotFoundException {
     try {
-      return this.persistence.getSeries(notNull(seriesID, "seriesID"));
+      return index.getDublinCore(notNull(seriesID, "seriesID"));
     } catch (SeriesServiceDatabaseException e) {
       logger.error("Exception occured while retrieving series {}: {}", seriesID, e.getMessage());
       throw new SeriesException(e);
@@ -331,7 +331,7 @@ public class SeriesServiceImpl implements SeriesService {
   @Override
   public AccessControlList getSeriesAccessControl(String seriesID) throws NotFoundException, SeriesException {
     try {
-      return persistence.getAccessControlList(notNull(seriesID, "seriesID"));
+      return index.getAccessControl(notNull(seriesID, "seriesID"));
     } catch (SeriesServiceDatabaseException e) {
       logger.error("Exception occurred while retrieving access control rules for series {}: {}", seriesID,
                    e.getMessage());
@@ -342,7 +342,7 @@ public class SeriesServiceImpl implements SeriesService {
   @Override
   public int getSeriesCount() throws SeriesException {
     try {
-      return persistence.countSeries();
+      return (int) index.count();
     } catch (SeriesServiceDatabaseException e) {
       logger.error("Exception occured while counting series.", e);
       throw new SeriesException(e);
