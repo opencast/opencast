@@ -777,6 +777,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
     List<DublinCoreCatalog> events = new LinkedList<DublinCoreCatalog>();
     int i = 1;
+    int length = Integer.toString(dates.size()).length();
     for (Object date : dates) {
       Date d = (Date) date;
       // Adjust for DST, if start of event
@@ -790,7 +791,13 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
         }
       }
       DublinCoreCatalog event = (DublinCoreCatalog) ((DublinCoreCatalogImpl) template).clone();
-      event.set(DublinCore.PROPERTY_TITLE, template.getFirst(DublinCore.PROPERTY_TITLE) + " " + i);
+      int numZeros = length - Integer.toString(i).length();
+      StringBuilder sb = new StringBuilder();
+      for (int j = 0; j < numZeros; j++) {
+    	  sb.append(0);
+      }
+      sb.append(i);
+      event.set(DublinCore.PROPERTY_TITLE, template.getFirst(DublinCore.PROPERTY_TITLE) + " " + sb.toString());
 
       DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(d, new Date(d.getTime() + duration)),
               Precision.Second);
