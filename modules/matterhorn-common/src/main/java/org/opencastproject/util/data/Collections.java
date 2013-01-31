@@ -69,6 +69,19 @@ public final class Collections {
   }
 
   /**
+   * Get a value from a map, creating and adding a new one, if the value is missing, i.e. it is null. This happens
+   * synchronized on the map.
+   */
+  public static <K, V> V getOrCreate(Map<K, V> map, K key, Function0<V> f) {
+    V v = map.get(key);
+    if (v == null) {
+      v = f.apply();
+      map.put(key, v);
+    }
+    return v;
+  }
+
+  /**
    * Apply a function <code>f</code> to all elements of collection <code>as</code>
    * to produce a new collection <code>bs</code>.
    * <p/>
