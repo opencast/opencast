@@ -55,8 +55,14 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
   /** Sum of definition files currently installed */
   private int sumInstalledFiles = 0;
 
+  /** Tag to define if the the workflows definition have already been loaded */
+  private boolean areDefinitionsLoaded = false;
+
   /**
    * OSGi callback on component activation.
+   * private boolean initialized = true;
+   * 
+   * /** OSGi callback on component activation.
    * 
    * @param ctx
    *          the bundle context
@@ -97,10 +103,16 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
     // Once all profiles have been loaded, announce readiness
     if (filesInDirectory.length == sumInstalledFiles) {
       Dictionary<String, String> properties = new Hashtable<String, String>();
-      properties.put(ARTIFACT, "workflowdefinition");
-      logger.debug("Indicating readiness of workflow definitions");
-      bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
+
+      if (!areDefinitionsLoaded) {
+        properties.put(ARTIFACT, "workflowdefinition");
+        logger.debug("Indicating readiness of workflow definitions");
+        bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
+        areDefinitionsLoaded = true;
+      }
+
       logger.info("All {} workflow definitions installed", filesInDirectory.length);
+      sumInstalledFiles = 0;
     } else {
       logger.info("{} of {} workflow definitions installed", sumInstalledFiles, filesInDirectory.length);
     }
