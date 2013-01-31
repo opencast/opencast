@@ -16,8 +16,13 @@
 
 package org.opencastproject.distribution.download;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpHead;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
+import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -36,15 +41,11 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workspace.api.Workspace;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpHead;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -53,15 +54,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * Distributes media to the local media delivery directory.
  */
-public class DownloadDistributionService extends AbstractJobProducer implements DistributionService {
+public class DownloadDistributionServiceImpl extends AbstractJobProducer implements DistributionService, DownloadDistributionService {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(DownloadDistributionService.class);
+  private static final Logger logger = LoggerFactory.getLogger(DownloadDistributionServiceImpl.class);
 
   /** List of available operations on jobs */
   private enum Operation {
@@ -107,7 +106,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
   /**
    * Creates a new instance of the download distribution service.
    */
-  public DownloadDistributionService() {
+  public DownloadDistributionServiceImpl() {
     super(JOB_TYPE);
   }
 
@@ -130,17 +129,22 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
   }
 
   @Override
-  public Job distribute(MediaPackage mediapackage, String elementId) throws DistributionException,
-          MediaPackageException {
+  public Job distribute(MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException {
+    return distribute(mediapackage, elementId, true);
+  }
 
+  public Job distribute(MediaPackage mediapackage, String elementId, boolean checkAvailability)
+          throws DistributionException, MediaPackageException {
     if (mediapackage == null)
       throw new MediaPackageException("Mediapackage must be specified");
     if (elementId == null)
       throw new MediaPackageException("Element ID must be specified");
-
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Distribute.toString(),
-              Arrays.asList(MediaPackageParser.getAsXml(mediapackage), elementId));
+      return serviceRegistry.createJob(JOB_TYPE,
+                                       Operation.Distribute.toString(),
+                                       Arrays.asList(MediaPackageParser.getAsXml(mediapackage),
+                                                     elementId,
+                                                     Boolean.toString(checkAvailability)));
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -149,15 +153,15 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
   /**
    * Distributes the mediapackage's element to the location that is returned by the concrete implementation. In
    * addition, a representation of the distributed element is added to the mediapackage.
-   * 
+   *
    * @see org.opencastproject.distribution.api.DistributionService#distribute(org.opencastproject.mediapackage.MediaPackage,
    *      String)
    * @throws org.opencastproject.distribution.api.DistributionException
    *           in case of an error
    */
-  protected MediaPackageElement distribute(Job job, MediaPackage mediapackage, String elementId)
+  protected MediaPackageElement distribute(Job job, MediaPackage mediapackage, String elementId, boolean checkAvailability)
           throws DistributionException {
-    return distributeElement(mediapackage, elementId);
+    return distributeElement(mediapackage, elementId, checkAvailability);
   }
 
   /**
@@ -167,12 +171,14 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
    *          The media package that contains the element to distribute.
    * @param elementId
    *          The id of the element that should be distributed contained within the media package.
+   * @param checkAvailability
+   *          Check the availability of the distributed element via http.
    * @return A reference to the MediaPackageElement that has been distributed.
    * @throws DistributionException
    *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
    *           cannot be copied or another unexpected exception occurs.
    */
-  public MediaPackageElement distributeElement(MediaPackage mediapackage, String elementId)
+  public MediaPackageElement distributeElement(MediaPackage mediapackage, String elementId, boolean checkAvailability)
           throws DistributionException {
     if (mediapackage == null)
       throw new IllegalArgumentException("Mediapackage must be specified");
@@ -223,7 +229,7 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
       logger.info("Finished distribution of {}", element);
       URI uri = distributedElement.getURI();
       long now = 0L;
-      while (true) {
+      while (checkAvailability) {
         HttpResponse response = trustedHttpClient.execute(new HttpHead(uri));
         if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK)
           break;
@@ -367,7 +373,8 @@ public class DownloadDistributionService extends AbstractJobProducer implements 
       String elementId = arguments.get(1);
       switch (op) {
         case Distribute:
-          MediaPackageElement distributedElement = distribute(job, mediapackage, elementId);
+          Boolean checkAvailability = Boolean.parseBoolean(arguments.get(2));
+          MediaPackageElement distributedElement = distribute(job, mediapackage, elementId, checkAvailability);
           return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
         case Retract:
           MediaPackageElement retractedElement = retract(job, mediapackage, elementId);

@@ -17,7 +17,7 @@ package org.opencastproject.distribution.download.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
-import org.opencastproject.distribution.api.DistributionService;
+import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
@@ -35,6 +35,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -62,7 +63,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
   private static final Logger logger = LoggerFactory.getLogger(DownloadDistributionRestService.class);
 
   /** The download distribution service */
-  protected DistributionService service;
+  protected DownloadDistributionService service;
 
   /** The service registry */
   protected ServiceRegistry serviceRegistry = null;
@@ -81,7 +82,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
    * @param service
    *          the service to set
    */
-  public void setService(DistributionService service) {
+  public void setService(DownloadDistributionService service) {
     this.service = service;
   }
 
@@ -100,12 +101,14 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
   @RestQuery(name = "distribute", description = "Distribute a media package element to this distribution channel", returnDescription = "The job that can be used to track the distribution", restParameters = {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
           @RestParameter(name = "elementId", isRequired = true, description = "The element to distribute", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job") })
-  public Response distribute(@FormParam("mediapackage") String mediaPackageXml, @FormParam("elementId") String elementId)
+  public Response distribute(@FormParam("mediapackage") String mediaPackageXml,
+                             @FormParam("elementId") String elementId,
+                             @DefaultValue("true") @FormParam("checkAvailability") boolean checkAvailability)
           throws Exception {
     Job job = null;
     try {
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
-      job = service.distribute(mediapackage, elementId);
+      job = service.distribute(mediapackage, elementId, checkAvailability);
     } catch (Exception e) {
       logger.warn("Error distributing element", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
