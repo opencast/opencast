@@ -15,6 +15,7 @@
  */
 package org.opencastproject.kernel.security;
 
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.kernel.security.persistence.OrganizationDatabase;
 import org.opencastproject.kernel.security.persistence.OrganizationDatabaseException;
@@ -22,8 +23,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.util.NotFoundException;
-
-import org.apache.commons.lang.StringUtils;
+import org.opencastproject.util.data.Function0;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
@@ -37,6 +37,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import static org.opencastproject.util.data.Collections.getOrCreate;
 
 /**
  * Implements the organizational directory. As long as no organizations are published in the service registry, the
@@ -82,11 +84,13 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   /** The list of organizations to handle later */
   private final Map<String, Dictionary> unhandledOrganizations = new HashMap<String, Dictionary>();
 
+  // Local caches. Organizations change rarely so a simple hash map is sufficient.
+  // No need to deal with soft references or an LRU map.
+  private final Map<URL, Organization> orgsByUrl = new HashMap<URL, Organization>();
+  private final Map<String, Organization> orgsById = new HashMap<String, Organization>();
+
   /**
    * OSGi callback to set the security service.
-   * 
-   * @param securityService
-   *          the securityService to set
    */
   public void setOrgPersistence(OrganizationDatabase setOrgPersistence) {
     this.persistence = setOrgPersistence;
@@ -113,12 +117,18 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    * @see org.opencastproject.security.api.OrganizationDirectoryService#getOrganization(java.lang.String)
    */
   @Override
-  public Organization getOrganization(String id) throws NotFoundException {
+  public Organization getOrganization(final String id) throws NotFoundException {
     if (persistence == null) {
       logger.debug("No persistence available: Returning default organization for id {}", id);
       return defaultOrganization;
     }
-    return persistence.getOrganization(id);
+    synchronized (orgsById) {
+      return getOrCreate(orgsById, id, new Function0.X<Organization>() {
+        @Override public Organization xapply() throws Exception {
+          return persistence.getOrganization(id);
+        }
+      });
+    }
   }
 
   /**
@@ -127,12 +137,18 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    * @see org.opencastproject.security.api.OrganizationDirectoryService#getOrganization(java.net.URL)
    */
   @Override
-  public Organization getOrganization(URL url) throws NotFoundException {
+  public Organization getOrganization(final URL url) throws NotFoundException {
     if (persistence == null) {
       logger.debug("No persistence available: Returning default organization for url {}", url);
       return defaultOrganization;
     }
-    return persistence.getOrganizationByUrl(url);
+    synchronized (orgsByUrl) {
+      return getOrCreate(orgsByUrl, url, new Function0.X<Organization>() {
+        @Override public Organization xapply() throws Exception {
+          return persistence.getOrganizationByUrl(url);
+        }
+      });
+    }
   }
 
   /**
