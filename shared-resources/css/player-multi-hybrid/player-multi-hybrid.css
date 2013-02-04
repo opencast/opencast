@@ -659,6 +659,7 @@ option:hover
 
 .scrubber-button
 {
+  display:                  none;
   background:               transparent url("../../img/engage_player/oc_icons.png");
   background-position:      -60px -360px;
   height:                   19px;
@@ -678,7 +679,7 @@ option:hover
   width:                    9px;
   position:                 relative;
   border:                   0px;
-  top:                      -19px;
+  top:                      0px;
   z-index:                  3;
   margin-left:              -4px;
 }
