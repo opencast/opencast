@@ -2253,11 +2253,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         List<Job> jobsToDispatch = getDispatchableJobs(em);
         Map<String, Integer> hostLoads = getHostLoads(em, true);
         List<ServiceRegistration> serviceRegistrations = getServiceRegistrations(em);
+        List<String> undispatchableJobTypes = new ArrayList<String>();
 
         jobsStatistics.updateAvg(getAvgOperations(em));
         jobsStatistics.updateJobCount(getCountPerHostService(em));
 
         for (Job job : jobsToDispatch) {
+
+          // Skip jobs that we already know can't be dispatched
+          String jobSiganture = new StringBuilder(job.getJobType()).append('@').append(job.getOperation()).toString();
+          if (undispatchableJobTypes.contains(jobSiganture)) {
+            logger.trace("Skipping dispatching of job {} with type '{}'", job.getId(), job.getJobType());
+            continue;
+          }
 
           // Set the job's user and organization prior to dispatching
           String creator = job.getCreator();
@@ -2286,6 +2294,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
             String hostAcceptingJob = dispatchJob(em, job,
                     filterAndSortServiceRegistrations(serviceRegistrations, job.getJobType(), hostLoads));
             if (hostAcceptingJob == null) {
+              undispatchableJobTypes.add(jobSiganture);
               ServiceRegistryJpaImpl.logger.debug("Job {} could not be dispatched and is put back into queue",
                       job.getId());
             } else {
