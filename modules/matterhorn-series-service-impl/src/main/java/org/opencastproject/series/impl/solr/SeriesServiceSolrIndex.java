@@ -339,7 +339,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     }
     SolrDocument seriesDoc = getSolrDocumentByID(seriesId);
     if (seriesDoc == null) {
-      logger.info("No series with ID " + seriesId + " found.");
+      logger.debug("No series with ID " + seriesId + " found.");
       throw new NotFoundException("Series with ID " + seriesId + " was not found.");
     }
     String serializedAC;
@@ -865,7 +865,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
   public DublinCoreCatalog getDublinCore(String seriesId) throws SeriesServiceDatabaseException, NotFoundException {
     SolrDocument result = getSolrDocumentByID(seriesId);
     if (result == null) {
-      logger.info("No series exists with ID {}", seriesId);
+      logger.debug("No series exists with ID {}", seriesId);
       throw new NotFoundException("Series with ID " + seriesId + " does not exist");
     } else {
       String dcXML = (String) result.get(SolrFields.XML_KEY);
@@ -889,7 +889,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
   public AccessControlList getAccessControl(String seriesID) throws NotFoundException, SeriesServiceDatabaseException {
     SolrDocument seriesDoc = getSolrDocumentByID(seriesID);
     if (seriesDoc == null) {
-      logger.info("No series exists with ID '{}'", seriesID);
+      logger.debug("No series exists with ID '{}'", seriesID);
       throw new NotFoundException("No series with ID " + seriesID + " found.");
     }
     String serializedAC = (String) seriesDoc.get(SolrFields.ACCESS_CONTROL_KEY);
