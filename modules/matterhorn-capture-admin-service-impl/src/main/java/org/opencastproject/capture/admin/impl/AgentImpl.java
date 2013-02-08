@@ -269,15 +269,16 @@ public class AgentImpl implements Agent {
       log.warn("Unable to store agent " + "'s capabilities to the database, IO exception occurred.", e);
     }
 
-    // Figure out the capabiltiies variables
+    // Figure out the capabilities variables
 
     capabilitiesProperties = new Properties();
 
     String names = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES);
     if (names == null) {
-      log.warn("Null friendly name list for agent " + name + ".  Capabilities filtering aborted.");
+      log.debug("Capture agent '{}' failed to provide device names ({})", name, CaptureParameters.CAPTURE_DEVICE_NAMES);
       return;
     }
+
     capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, names);
     // Get the names and setup a hash map of them
     String[] friendlyNames = names.split(",");
