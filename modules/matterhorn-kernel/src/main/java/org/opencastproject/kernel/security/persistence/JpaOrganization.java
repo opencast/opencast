@@ -18,9 +18,6 @@ package org.opencastproject.kernel.security.persistence;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.EqualsUtil;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CollectionTable;
@@ -33,6 +30,8 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * JPA-annotated organization object.
@@ -43,7 +42,7 @@ import javax.persistence.Table;
 @NamedQueries({
         @NamedQuery(name = "Organization.findAll", query = "Select o FROM JpaOrganization o"),
         @NamedQuery(name = "Organization.findById", query = "Select o FROM JpaOrganization o where o.id = :id"),
-        @NamedQuery(name = "Organization.findByUrl", query = "Select o FROM JpaOrganization o JOIN o.servers s where key(s) = :serverName AND value(s) = :port"),
+        @NamedQuery(name = "Organization.findByHost", query = "Select o FROM JpaOrganization o JOIN o.servers s where key(s) = :serverName AND value(s) = :port"),
         @NamedQuery(name = "Organization.getCount", query = "Select COUNT(o) FROM JpaOrganization o") })
 public class JpaOrganization implements Organization {
 
