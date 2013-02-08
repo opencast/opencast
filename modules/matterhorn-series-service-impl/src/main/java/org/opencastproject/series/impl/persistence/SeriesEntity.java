@@ -32,7 +32,7 @@ import javax.persistence.Table;
  * 
  */
 @Entity(name = "SeriesEntity")
-@Table(name = "series")
+@Table(name = "mh_series")
 @NamedQueries({
         @NamedQuery(name = "Series.findAll", query = "select s from SeriesEntity s"),
         @NamedQuery(name = "Series.getCount", query = "select COUNT(s) from SeriesEntity s"),
@@ -43,12 +43,12 @@ public class SeriesEntity {
   /** Series ID, primary key */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "series_id", length = 128)
+  @Column(name = "id", length = 128)
   protected String seriesId;
 
   /** Series ID, primary key */
   @Id
-  @Column(name = "organization_id", length = 128)
+  @Column(name = "organization", length = 128)
   protected String organization;
 
   /** Serialized Dublin core */

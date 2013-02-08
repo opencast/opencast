@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.XmlType;
  * A JAXB-annotated implementation of {@link Annotation}
  */
 @Entity(name = "Annotation")
-@Table(name = "annotation")
+@Table(name = "mh_annotation")
 @NamedQueries({
 
         @NamedQuery(name = "findAnnotations", query = "SELECT a FROM Annotation a WHERE (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
@@ -71,18 +71,15 @@ public class AnnotationImpl implements Annotation {
   @XmlElement(name = "annotationId")
   private Long annotationId;
 
-  //@Index
-  @Column(name = "mediapackage_id", length = 255)
+  @Column(name = "mediapackage", length = 128)
   @XmlElement(name = "mediapackageId")
   private String mediapackageId;
 
-  @Lob
-  @Column(name = "user_id", length = 65535)
+  @Column(name = "user", length = 255)
   @XmlElement(name = "userId")
   private String userId;
 
-  @Lob
-  @Column(name = "session_id", length = 65535)
+  @Column(name = "session", length = 50)
   @XmlElement(name = "sessionId")
   private String sessionId;
 
@@ -98,17 +95,16 @@ public class AnnotationImpl implements Annotation {
   @XmlElement(name = "length")
   private int length;
 
-  @Lob
-  @Column(name = "annotation_type", length = 65535)
+  @Column(name = "type", length = 128)
   @XmlElement(name = "type")
   private String type;
 
-  @Column(name = "private_annotation")
+  @Column(name = "private")
   @XmlElement(name = "isPrivate")
   private Boolean privateAnnotation = false;
 
   @Lob
-  @Column(name = "annotation_value", length = 65535)
+  @Column(name = "value", length = 65535)
   @XmlElement(name = "value")
   private String value;
 

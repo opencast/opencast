@@ -68,7 +68,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @Entity(name = "Job")
 @Access(AccessType.PROPERTY)
-@Table(name = "job")
+@Table(name = "mh_job")
 @NamedQueries({
         // Job queries
         @NamedQuery(name = "Job", query = "SELECT j FROM Job j "
@@ -129,7 +129,6 @@ public class JobJpaImpl extends JaxbJob {
   /** The service that is processing, or processed, this job */
   protected ServiceRegistrationJpaImpl processorServiceRegistration;
 
-  // @ManyToMany(mappedBy = "root_id", fetch = FetchType.EAGER)
   protected List<JobPropertyJpaImpl> properties;
 
   /** The job context, to be created after loading by JPA */
@@ -139,7 +138,7 @@ public class JobJpaImpl extends JaxbJob {
 
   protected JobJpaImpl parentJob = null;
 
-  protected List<JobJpaImpl> childrenJobs = null;
+  protected List<JobJpaImpl> childJobs = null;
 
   @OneToMany(mappedBy = "warningStateTrigger")
   private List<ServiceRegistrationJpaImpl> servicesRegistration;
@@ -163,7 +162,7 @@ public class JobJpaImpl extends JaxbJob {
     this.organization = organization.getId();
     this.operation = operation;
     this.context = new JaxbJobContext();
-    this.childrenJobs = new ArrayList<JobJpaImpl>();
+    this.childJobs = new ArrayList<JobJpaImpl>();
     if (arguments != null) {
       this.arguments = new ArrayList<String>(arguments);
     }
@@ -225,12 +224,12 @@ public class JobJpaImpl extends JaxbJob {
 
   @OneToMany(mappedBy = "parentJob", fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.REFRESH,
           CascadeType.MERGE })
-  public List<JobJpaImpl> getChildrenJobs() {
-    return childrenJobs;
+  public List<JobJpaImpl> getChildJobs() {
+    return childJobs;
   }
 
-  public void setChildrenJobs(List<JobJpaImpl> jobs) {
-    this.childrenJobs = jobs;
+  public void setChildJobs(List<JobJpaImpl> jobs) {
+    this.childJobs = jobs;
   }
 
   /**
@@ -290,10 +289,10 @@ public class JobJpaImpl extends JaxbJob {
    */
   @Lob
   @Column(name = "argument", length = 2147483647)
-  @OrderColumn(name = "list_index")
+  @OrderColumn(name = "argument_index")
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "job_arguments", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"), uniqueConstraints = @UniqueConstraint(columnNames = {
-          "id", "list_index" }))
+  @CollectionTable(name = "mh_job_argument", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"), uniqueConstraints = @UniqueConstraint(columnNames = {
+          "id", "argument_index" }))
   @XmlElement(name = "arg")
   @XmlElementWrapper(name = "args")
   @Override
@@ -407,7 +406,7 @@ public class JobJpaImpl extends JaxbJob {
     super.setPayload(payload);
   }
 
-  @Column(name = "is_dispatchable")
+  @Column(name = "dispatchable")
   @XmlAttribute
   @Override
   public boolean isDispatchable() {
@@ -497,7 +496,7 @@ public class JobJpaImpl extends JaxbJob {
     }
     if (properties != null) {
       for (JobPropertyJpaImpl property : properties) {
-        context.getProperties().put(property.getKey(), property.getValue());
+        context.getProperties().put(property.getName(), property.getValue());
       }
     }
   }
@@ -533,7 +532,7 @@ public class JobJpaImpl extends JaxbJob {
   /**
    * @return the parentJob
    */
-  @JoinColumn(name = "parent_id", referencedColumnName = "id", nullable = true)
+  @JoinColumn(name = "parent", referencedColumnName = "id", nullable = true)
   public JobJpaImpl getParentJob() {
     return parentJob;
   }
@@ -553,7 +552,7 @@ public class JobJpaImpl extends JaxbJob {
   /**
    * @return the rootJob
    */
-  @JoinColumn(name = "root_id", referencedColumnName = "id", nullable = true)
+  @JoinColumn(name = "root", referencedColumnName = "id", nullable = true)
   public JobJpaImpl getRootJob() {
     return rootJob;
   }

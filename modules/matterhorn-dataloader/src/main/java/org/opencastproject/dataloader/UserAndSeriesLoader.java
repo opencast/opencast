@@ -46,9 +46,6 @@ import java.util.Set;
  */
 public class UserAndSeriesLoader {
 
-  /** The second tenant */
-  public static final String TENANT1 = "tenant1";
-
   /** The number of series to load */
   public static final int NUM_SERIES = 10;
 
@@ -125,7 +122,6 @@ public class UserAndSeriesLoader {
     @Override
     public void run() {
       logger.info("Adding sample series...");
-      String[] organizationIds = new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ID, TENANT1 };
 
       for (int i = 1; i <= NUM_SERIES; i++) {
         String seriesId = SERIES_PREFIX + i;
@@ -145,57 +141,49 @@ public class UserAndSeriesLoader {
         acl.getEntries().add(new AccessControlEntry(SERIES_PREFIX + i + "_" + INSTRUCTOR_PREFIX, WRITE, true));
         acl.getEntries().add(new AccessControlEntry(SERIES_PREFIX + i + "_" + ADMIN_PREFIX, WRITE, true));
 
-        try {
-          dc.set(DublinCore.PROPERTY_IDENTIFIER, seriesId);
-          dc.set(DublinCore.PROPERTY_TITLE, "Series #" + i);
-          dc.set(DublinCore.PROPERTY_CREATOR, "Creator #" + i);
-          dc.set(DublinCore.PROPERTY_CONTRIBUTOR, "Contributor #" + i);
+        dc.set(DublinCore.PROPERTY_IDENTIFIER, seriesId);
+        dc.set(DublinCore.PROPERTY_TITLE, "Series #" + i);
+        dc.set(DublinCore.PROPERTY_CREATOR, "Creator #" + i);
+        dc.set(DublinCore.PROPERTY_CONTRIBUTOR, "Contributor #" + i);
 
-          for (String orgId : organizationIds) {
-            Organization org = organizationDirectoryService.getOrganization(orgId);
+        for (Organization org : organizationDirectoryService.getOrganizations()) {
+          String orgId = org.getId();
+          try {
+            securityService.setUser(new User("userandseriesloader", orgId,
+                    new String[] { SecurityConstants.GLOBAL_ADMIN_ROLE }));
+            securityService.setOrganization(org);
+
             try {
-              securityService.setUser(new User("userandseriesloader", orgId,
-                      new String[] { SecurityConstants.GLOBAL_ADMIN_ROLE }));
-              securityService.setOrganization(org);
-
-              try {
-                // Test if the serie already exist, it does not overwrite it.
-                if (seriesService.getSeries(seriesId) != null)
-                  continue;
-              } catch (NotFoundException e) {
-                // If the series does not exist, we create it.
-                seriesService.updateSeries(dc);
-                seriesService.updateAccessControl(seriesId, acl);
-              }
-            } catch (UnauthorizedException e) {
-              logger.warn(e.getMessage());
-            } catch (SeriesException e) {
-              logger.warn("Unable to create series {}", dc);
+              // Test if the serie already exist, it does not overwrite it.
+              if (seriesService.getSeries(seriesId) != null)
+                continue;
             } catch (NotFoundException e) {
-              logger.warn("Unable to find series {}", dc);
-            } finally {
-              securityService.setOrganization(null);
-              securityService.setUser(null);
+              // If the series does not exist, we create it.
+              seriesService.updateSeries(dc);
+              seriesService.updateAccessControl(seriesId, acl);
             }
+          } catch (UnauthorizedException e) {
+            logger.warn(e.getMessage());
+          } catch (SeriesException e) {
+            logger.warn("Unable to create series {}", dc);
+          } catch (NotFoundException e) {
+            logger.warn("Unable to find series {}", dc);
+          } finally {
+            securityService.setOrganization(null);
+            securityService.setUser(null);
           }
-          logger.debug("Added series {}", dc);
-        } catch (NotFoundException e) {
-          logger.warn("Unable to find organization {}", e.getMessage());
         }
+        logger.debug("Added series {}", dc);
       }
 
       load(STUDENT_PREFIX, 20, new String[] { USER_ROLE }, DefaultOrganization.DEFAULT_ORGANIZATION_ID);
-      load(STUDENT_PREFIX, 20, new String[] { USER_ROLE }, TENANT1);
 
       load(INSTRUCTOR_PREFIX, 2, new String[] { USER_ROLE, INSTRUCTOR_ROLE },
               DefaultOrganization.DEFAULT_ORGANIZATION_ID);
-      load(INSTRUCTOR_PREFIX, 2, new String[] { USER_ROLE, INSTRUCTOR_ROLE }, TENANT1);
 
       load(ADMIN_PREFIX, 1, new String[] { USER_ROLE, COURSE_ADMIN_ROLE }, DefaultOrganization.DEFAULT_ORGANIZATION_ID);
-      load(ADMIN_PREFIX, 1, new String[] { USER_ROLE, COURSE_ADMIN_ROLE }, TENANT1);
 
       loadLdapUser(DefaultOrganization.DEFAULT_ORGANIZATION_ID);
-      loadLdapUser(TENANT1);
 
       logger.info("Finished loading sample series and users");
     }

@@ -28,7 +28,7 @@ import javax.persistence.Table;
  * A word that exists in a particular language.
  */
 @Entity
-@Table(name = "dictionary")
+@Table(name = "mh_dictionary")
 @NamedQueries({
   @NamedQuery(name = "Word.get", query = "SELECT w FROM Word w where w.text = :text and w.language = :language"),
   @NamedQuery(name = "Word.deleteLanguage", query = "DELETE from Word w where w.language = :language"),

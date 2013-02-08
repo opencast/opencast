@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "host", namespace = "http://serviceregistry.opencastproject.org")
 @XmlRootElement(name = "host", namespace = "http://serviceregistry.opencastproject.org")
 @Entity(name = "HostRegistration")
-@Table(name = "host_registration", uniqueConstraints = @UniqueConstraint(columnNames = "host"))
+@Table(name = "mh_host_registration", uniqueConstraints = @UniqueConstraint(columnNames = "host"))
 @NamedQueries({
         @NamedQuery(name = "HostRegistration.cores", query = "SELECT sum(hr.maxJobs) FROM HostRegistration hr where hr.active = true"),
         @NamedQuery(name = "HostRegistration.byHostName", query = "SELECT hr from HostRegistration hr where hr.baseUrl = :host"),

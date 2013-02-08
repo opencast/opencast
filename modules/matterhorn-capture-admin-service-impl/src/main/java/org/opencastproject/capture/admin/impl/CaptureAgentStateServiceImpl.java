@@ -199,7 +199,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       return (AgentImpl) q.getSingleResult();
     } catch (NoResultException e) {
       return null;
-    } // TODO check if closing em helps here.
+    }
   }
 
   /**

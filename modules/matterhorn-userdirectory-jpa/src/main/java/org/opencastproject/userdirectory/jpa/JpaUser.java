@@ -35,7 +35,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "matterhorn_user")
+@Table(name = "mh_user")
 @NamedQueries({
         @NamedQuery(name = "user", query = "select u from JpaUser u where u.username=:u and u.organization=:o"),
         @NamedQuery(name = "users", query = "select u from JpaUser u where u.organization=:o"),
@@ -58,7 +58,7 @@ public class JpaUser {
   protected String organization;
 
   @ElementCollection
-  @CollectionTable(name = "matterhorn_role", joinColumns = { @JoinColumn(name = "username", referencedColumnName = "username"),
+  @CollectionTable(name = "mh_role", joinColumns = { @JoinColumn(name = "username", referencedColumnName = "username"),
           @JoinColumn(name = "organization", referencedColumnName = "organization") })
   @Lob
   @Column(name = "role", length = 65535)
