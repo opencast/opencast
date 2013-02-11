@@ -579,6 +579,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     File source = getFileFromCollection(fromCollection, fromFileName);
     File sourceMd5 = getMd5File(source);
     File destDir = getElementDirectory(toMediaPackage, toMediaPackageElement);
+    
+    logger.debug("Moving {} from {} to {}/{}", new String[] { fromFileName, fromCollection, toMediaPackage, toMediaPackageElement });
     if (!destDir.exists()) {
       // we needed to create the directory, but couldn't
       try {
@@ -592,6 +594,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     File dest = null;
     try {
       dest = getFile(toMediaPackage, toMediaPackageElement);
+      logger.debug("Removing existing file from target location at {}", dest);
+      delete(toMediaPackage, toMediaPackageElement);
     } catch (NotFoundException e) {
       dest = new File(getElementDirectory(toMediaPackage, toMediaPackageElement), toFileName);
     }

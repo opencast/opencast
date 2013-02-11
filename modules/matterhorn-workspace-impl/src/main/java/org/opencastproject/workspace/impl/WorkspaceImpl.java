@@ -545,12 +545,15 @@ public class WorkspaceImpl implements Workspace {
     String filename = FilenameUtils.getName(path);
     String collection = getCollection(collectionURI);
 
+    logger.debug("Moving {} from {} to {}/{}", new String[] { filename, collection, toMediaPackage, toMediaPackageElement });
+
     // Move the local file
     File original = getWorkspaceFile(collectionURI, false);
     if (original.isFile()) {
       URI copyURI = wfr.getURI(toMediaPackage, toMediaPackageElement, toFileName);
       File copy = getWorkspaceFile(copyURI, true);
       FileUtils.forceMkdir(copy.getParentFile());
+      FileUtils.deleteQuietly(copy);
       FileUtils.moveFile(original, copy);
     }
 
