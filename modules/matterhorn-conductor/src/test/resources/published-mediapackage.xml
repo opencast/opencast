@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<oc:mediapackage start=""
+	id="597d0b42-5af6-450e-ac0b-c2cb619fc2bc" duration="14546"
+	xmlns:oc="http://mediapackage.opencastproject.org">
+	<oc:media>
+		<oc:track id="track-1-published" type="presentation/delivery">
+			<oc:mimetype>video/quicktime</oc:mimetype>
+			<oc:url>media.mov</oc:url>
+			<oc:checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</oc:checksum>
+			<oc:duration>1004400000</oc:duration>
+			<oc:video>
+				<oc:device type="UFG03" version="30112007" vendor="Unigraf" />
+				<oc:encoder type="H.264" version="7.4" vendor="Apple Inc" />
+				<oc:resolution>640x480</oc:resolution>
+				<oc:scanType type="progressive" />
+				<oc:bitrate>540520</oc:bitrate>
+				<oc:frameRate>2</oc:frameRate>
+			</oc:video>
+		</oc:track>
+		<oc:track id="track-2-published" type="presentation/delivery">
+			<oc:mimetype>audio/mp3</oc:mimetype>
+			<oc:url>media.mp3</oc:url>
+			<oc:checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</oc:checksum>
+			<oc:duration>1004400000</oc:duration>
+			<oc:audio>
+				<oc:device type="UFG03" version="30112007" vendor="Unigraf" />
+				<oc:encoder type="H.264" version="7.4" vendor="Apple Inc" />
+			</oc:audio>
+		</oc:track>
+	</oc:media>
+	<oc:metadata>
+		<oc:catalog id="catalog-1-published" type="dublincore/episode">
+			<oc:tags>
+				<oc:tag>archive</oc:tag>
+			</oc:tags>
+			<oc:mimetype>text/xml</oc:mimetype>
+			<oc:url>dublincore.xml</oc:url>
+			<oc:checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</oc:checksum>
+		</oc:catalog>
+		<oc:catalog id="catalog-2-published" type="mpeg-7/segments" ref="track:track-1">
+			<oc:mimetype>text/xml</oc:mimetype>
+			<oc:url>mpeg7.xml</oc:url>
+			<oc:checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</oc:checksum>
+		</oc:catalog>
+	</oc:metadata>
+	<oc:attachments>
+		<oc:attachment id="published-thumbnail" type="player/thumbnail">
+			<oc:mimetype>image/png</oc:mimetype>
+			<oc:url>thumbnail.png</oc:url>
+			<oc:tags>
+				<oc:tag>engage</oc:tag>
+			</oc:tags>
+			<oc:checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</oc:checksum>
+		</oc:attachment>
+	</oc:attachments>
+</oc:mediapackage>

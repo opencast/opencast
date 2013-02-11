@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>republish</id>
+  <title>Republish metadata</title>
+  <tags>
+    <tag>archive</tag>
+  </tags>
+  <description>Republish the recording metadata</description>
+  <operations>
+
+    <!-- tag the dublin core catalogs so they will be distributed and added to search -->
+
+    <operation
+      id="tag"
+      description="Tagging dublin core catalogs for publishing">
+      <configurations>
+        <configuration key="source-flavors">dublincore/*</configuration>
+        <configuration key="target-tags">+distribute</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Distribute to download server -->
+
+    <operation
+      id="distribute-download"
+      max-attempts="2"
+      fail-on-error="false"
+      exception-handler-workflow="error"
+      description="Distributing to progressive downloads">
+      <configurations>
+        <configuration key="source-tags">distribute</configuration>
+        <configuration key="check-availability">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Republish the recording -->
+
+    <operation
+      id="republish"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Published">
+      <configurations>
+        <configuration key="source-flavors">dublincore/episode, dublincore/series</configuration>
+        <configuration key="merge">true</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>
