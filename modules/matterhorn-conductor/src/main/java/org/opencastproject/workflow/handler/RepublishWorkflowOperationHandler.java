@@ -243,6 +243,10 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
       }
     }
 
+    // If no filter has been supplied, take all elements
+    if (flavors.size() == 0 && tags.size() == 0)
+      keep.addAll(Arrays.asList(mediaPackage.getElements()));
+    
     // Fix references and flavors
     for (MediaPackageElement element : filteredMediaPackage.getElements()) {
 
