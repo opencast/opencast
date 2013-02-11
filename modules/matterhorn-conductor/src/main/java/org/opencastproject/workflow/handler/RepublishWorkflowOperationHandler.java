@@ -224,27 +224,32 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
 
     // The list of elements to keep
     List<MediaPackageElement> keep = new ArrayList<MediaPackageElement>();
-    keep.addAll(Arrays.asList(filteredMediaPackage.getElements()));
 
     // Filter by flavor
     if (flavors.size() > 0) {
       logger.debug("Filtering elements based on flavors");
       for (MediaPackageElementFlavor flavor : flavors) {
-        keep.retainAll(Arrays.asList(mediaPackage.getElementsByFlavor(flavor)));
+        keep.addAll(Arrays.asList(mediaPackage.getElementsByFlavor(flavor)));
       }
     }
 
     // Keep those elements that have been identified in the tags
     if (tags.size() > 0) {
       logger.debug("Filtering elements based on tags");
-      keep.retainAll(Arrays.asList(mediaPackage.getElementsByTags(tags)));
+      if (keep.size() > 0) {
+        keep.retainAll(Arrays.asList(mediaPackage.getElementsByTags(tags)));
+      } else {
+        keep.addAll(Arrays.asList(mediaPackage.getElementsByTags(tags)));
+      }
     }
 
     // Fix references and flavors
     for (MediaPackageElement element : filteredMediaPackage.getElements()) {
-      
+
       if (!keep.contains(element)) {
-        logger.info("Removing {} '{}' from mediapackage '{}'", new String[] { element.getElementType().toString().toLowerCase(), element.getIdentifier(), filteredMediaPackage.getIdentifier().toString() });
+        logger.info("Removing {} '{}' from mediapackage '{}'", new String[] {
+                element.getElementType().toString().toLowerCase(), element.getIdentifier(),
+                filteredMediaPackage.getIdentifier().toString() });
         filteredMediaPackage.remove(element);
         continue;
       }
