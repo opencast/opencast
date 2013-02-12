@@ -31,6 +31,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
@@ -258,33 +259,43 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     } catch (WorkflowDatabaseException e) {
       throw new IllegalStateException(e);
     }
+
     if (instancesInSolr == 0) {
       // this may be a new index, so get all of the existing workflows and index them
-      long instancesInServiceRegistry;
+      List<Job> jobs = null;
       try {
-        instancesInServiceRegistry = serviceRegistry.count(WorkflowService.JOB_TYPE, null);
-        if (instancesInServiceRegistry > 0) {
-          logger.info("The workflow search index is empty.  Populating it now with {} workflows.",
-                  instancesInServiceRegistry);
-          for (Job job : serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null)) {
-            if (job.getPayload() == null)
-              continue;
-            WorkflowInstance instance = WorkflowParser.parseWorkflowInstance(job.getPayload());
+        jobs = serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null);
+      } catch (ServiceRegistryException e) {
+        logger.error("Unable to load the workflows jobs: {}", e.getMessage());
+        throw new ServiceException(e.getMessage());
+      }
 
+      if (jobs.size() > 0) {
+        logger.info("The workflow search index is empty. Populating it now with {} workflows.", jobs.size());
+        int errors = 0;
+        for (Job job : jobs) {
+          if (job.getPayload() == null)
+            continue;
+          WorkflowInstance instance = null;
+          try {
+            instance = WorkflowParser.parseWorkflowInstance(job.getPayload());
             Organization organization = orgDirectory.getOrganization(job.getOrganization());
             securityService.setOrganization(organization);
             securityService.setUser(new User(organization.getName(), organization.getId(), new String[] { organization
                     .getAdminRole() }));
             index(instance);
+          } catch (WorkflowDatabaseException e) {
+            logger.warn("Skipping restoring of workflow {}: {}", instance.getId(), e.getMessage());
+            errors++;
+          } catch (Throwable e) {
+            logger.warn("Skipping restoring of workflow {}: {}", instance.getId(), e.getMessage());
+            errors++;
           }
-          logger.info("Finished populating the workflow search index with {} workflows.", instancesInServiceRegistry);
         }
-      } catch (Exception e) {
-        logger.warn("Unable to index workflow instances: {}", e);
-        throw new ServiceException(e.getMessage());
-      } finally {
-        securityService.setUser(null);
-        securityService.setOrganization(null);
+
+        if (errors > 0)
+          logger.warn("Skipped {} erroneous workflows while populating the index", errors);
+        logger.info("Finished populating the workflow search index");
       }
     }
   }
