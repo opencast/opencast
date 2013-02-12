@@ -5,7 +5,7 @@
 	
 	var SERIES_SEARCH_URL = '/series/series.json';
 	var SERIES_URL = '/series';
-	var BASE_URL = 'http://'+window.location.hostname;
+	var BASE_URL = window.location.protocol+'//'+window.location.hostname;
 	 if(window.location.port!='')
 	  BASE_URL+=':'+window.location.port;
 		
