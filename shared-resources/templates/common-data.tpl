@@ -16,7 +16,7 @@
      <li id="seriesContainer">
        <label class="scheduler-label" for="seriesSelect" id="seriesLabel"><span id="i18n_series_label">Course/Series</span>:</label>
        <input type="text" class="oc-ui-form-field ui-autocomplete-input dcMetaField" name="seriesSelect" id="seriesSelect" maxlength="255" />
-       <input type="hidden" class="oc-ui-form-field" id="isPartOf" name="isPartOf">
+       <input type="hidden" class="oc-ui-form-field dc-metadata-field" id="isPartOf" name="isPartOf">
        <input type="hidden" id="series" />
      </li>
      <li class="ui-helper-clearfix">
