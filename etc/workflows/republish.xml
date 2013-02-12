@@ -43,6 +43,7 @@
       <configurations>
         <configuration key="source-flavors">dublincore/episode, dublincore/series</configuration>
         <configuration key="merge">true</configuration>
+        <configuration key="existing-only">true</configuration>
       </configurations>
     </operation>
 

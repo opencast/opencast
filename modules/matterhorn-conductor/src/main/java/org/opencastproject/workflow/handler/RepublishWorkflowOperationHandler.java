@@ -63,6 +63,7 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
   private static final String OPT_SOURCE_FLAVORS = "source-flavors";
   private static final String OPT_SOURCE_TAGS = "source-tags";
   private static final String OPT_MERGE = "merge";
+  private static final String OPT_EXISTING_ONLY = "existing-only";
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
@@ -72,6 +73,7 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
     CONFIG_OPTIONS.put(OPT_SOURCE_FLAVORS, "Republish any mediapackage elements with one of these flavors");
     CONFIG_OPTIONS.put(OPT_SOURCE_TAGS, "Republish only mediapackage elements that are tagged with one of these tags");
     CONFIG_OPTIONS.put(OPT_MERGE, "Merge with existing published data");
+    CONFIG_OPTIONS.put(OPT_EXISTING_ONLY, "Republish only if it can be merged with or replace existing published data");
   }
 
   /**
@@ -118,6 +120,7 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
 
     // Merge or replace?
     boolean merge = Boolean.parseBoolean(workflowInstance.getCurrentOperation().getConfiguration(OPT_MERGE));
+    boolean onlyExisting = Boolean.parseBoolean(workflowInstance.getCurrentOperation().getConfiguration(OPT_EXISTING_ONLY));
 
     // Apply tags and flavors to the current mediapackage
     MediaPackage filteredMediaPackage = null;
@@ -129,11 +132,15 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
 
     // If merge, load current mediapackage from search service
     MediaPackage publishedMediaPackage = null;
-    if (merge) {
+    if (merge || onlyExisting) {
       SearchQuery query = new SearchQuery().withId(mId.toString());
       SearchResult result = searchService.getByQuery(query);
       if (result.size() == 0) {
         logger.info("The search service doesn't know mediapackage {}", mId);
+        if (onlyExisting) {
+          logger.info("Skipping republish for {} since it is not currently published", mId);
+          return createResult(mediaPackage, Action.SKIP);
+        }
         publishedMediaPackage = filteredMediaPackage;
       } else if (result.size() > 1) {
         logger.warn("More than one mediapackage with id {} returned from search service", mId);
