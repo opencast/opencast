@@ -33,6 +33,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.solr.SolrServerFactory;
+import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.SolrUtils;
@@ -277,6 +278,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
           if (job.getPayload() == null)
             continue;
           WorkflowInstance instance = null;
+          boolean erroneousWorkflowJob = false;
           try {
             instance = WorkflowParser.parseWorkflowInstance(job.getPayload());
             Organization organization = orgDirectory.getOrganization(job.getOrganization());
@@ -286,10 +288,23 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
             index(instance);
           } catch (WorkflowDatabaseException e) {
             logger.warn("Skipping restoring of workflow {}: {}", instance.getId(), e.getMessage());
+            erroneousWorkflowJob = true;
             errors++;
           } catch (Throwable e) {
             logger.warn("Skipping restoring of workflow {}: {}", instance.getId(), e.getMessage());
+            erroneousWorkflowJob = true;
             errors++;
+          }
+
+          // Make sure this job is not being dispatched anymore
+          if (erroneousWorkflowJob && JobUtil.isReadyToDispatch(job)) {
+            job.setStatus(Job.Status.CANCELED);
+            try {
+              serviceRegistry.updateJob(job);
+              logger.info("Canceled job {} because unable to restore", job);
+            } catch (Exception e) {
+              logger.error("Error updating erroneous job {}: {}", job.getId(), e.getMessage());
+            }
           }
         }
 

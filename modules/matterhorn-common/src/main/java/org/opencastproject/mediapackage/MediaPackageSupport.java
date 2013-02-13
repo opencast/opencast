@@ -16,9 +16,17 @@
 
 package org.opencastproject.mediapackage;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.opencastproject.util.IoSupport.withResource;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.functions.Options.sequenceOpt;
+import static org.opencastproject.util.data.functions.Options.toOption;
+
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +34,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-
-import static org.opencastproject.util.IoSupport.withResource;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Utility class used for media package handling.
@@ -50,7 +58,7 @@ public final class MediaPackageSupport {
    */
   enum MergeMode {
     Merge, Replace, Skip, Fail
-  };
+  }
 
   /** the logging facility provided by log4j */
   private static final Logger logger = LoggerFactory.getLogger(MediaPackageSupport.class.getName());
@@ -132,8 +140,8 @@ public final class MediaPackageSupport {
   }
 
   /**
-   * Immutable modification of a media package element. Attention: The returned element loses
-   * its media package membership (see {@link org.opencastproject.mediapackage.AbstractMediaPackageElement#clone()})
+   * Immutable modification of a media package element. Attention: The returned element loses its media package
+   * membership (see {@link org.opencastproject.mediapackage.AbstractMediaPackageElement#clone()})
    */
   public static <A extends MediaPackageElement> A modify(A mpe, Effect<A> e) {
     final A clone = (A) mpe.clone();
@@ -149,7 +157,8 @@ public final class MediaPackageSupport {
   /** Rewrite the URIs of all media package elements. Modifications are done on a copy of the given package. */
   public static MediaPackage rewriteUris(final MediaPackage mp, final Function<MediaPackageElement, URI> f) {
     return modify(mp, new Effect<MediaPackage>() {
-      @Override public void run(MediaPackage mp) {
+      @Override
+      public void run(MediaPackage mp) {
         for (MediaPackageElement e : mp.getElements()) {
           e.setURI(f.apply(e));
         }
@@ -158,15 +167,44 @@ public final class MediaPackageSupport {
   }
 
   /**
-   * Rewrite the URI of a media package element. Modification is done on a copy of the given element.
-   * Attention: The returned element loses its media package membership (see {@link org.opencastproject.mediapackage.AbstractMediaPackageElement#clone()})
+   * Rewrite the URI of a media package element. Modification is done on a copy of the given element. Attention: The
+   * returned element loses its media package membership (see
+   * {@link org.opencastproject.mediapackage.AbstractMediaPackageElement#clone()})
    */
   public static <A extends MediaPackageElement> A rewriteUri(final A mpe, final Function<A, URI> f) {
     return modify(mpe, new Effect<A>() {
-      @Override protected void run(A e) {
+      @Override
+      protected void run(A e) {
         e.setURI(f.apply(e));
       }
     });
+  }
+
+  /**
+   * Basic sanity checking for media packages.
+   * 
+   * <pre>
+   * // media package is ok
+   * sanityCheck(mp).isNone()
+   * </pre>
+   * 
+   * @return none if the media package is a healthy condition, some([error_msgs]) otherwise
+   */
+  public static Option<List<String>> sanityCheck(MediaPackage mp) {
+    final Option<List<String>> errors = sequenceOpt(list(toOption(mp.getIdentifier() != null, "no ID"),
+            toOption(mp.getIdentifier() != null && isNotBlank(mp.getIdentifier().toString()), "blank ID")));
+    return errors.getOrElse(Collections.EMPTY_LIST).size() == 0 ? Option.<List<String>> none() : errors;
+  }
+
+  /** To be used in unit tests. */
+  public static MediaPackage loadFromClassPath(String path) {
+    return withResource(MediaPackageSupport.class.getResourceAsStream(path),
+            new Function.X<InputStream, MediaPackage>() {
+              @Override
+              public MediaPackage xapply(InputStream is) throws MediaPackageException {
+                return MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(is);
+              }
+            });
   }
 
   /** For testing purposes only! Loads a mediapackage from the class path. */
@@ -178,7 +216,8 @@ public final class MediaPackageSupport {
     if (in == null)
       throw new Error(manifest + "can not be found");
     return withResource(in, new Function.X<InputStream, MediaPackage>() {
-      @Override public MediaPackage xapply(InputStream is) throws MediaPackageException {
+      @Override
+      public MediaPackage xapply(InputStream is) throws MediaPackageException {
         return mediaPackageBuilder.loadFromXml(is);
       }
     });

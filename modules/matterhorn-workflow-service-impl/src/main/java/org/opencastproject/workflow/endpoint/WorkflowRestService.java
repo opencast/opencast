@@ -552,6 +552,37 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       throw new WebApplicationException(e, Status.BAD_REQUEST);
     }
 
+    return startWorkflow(workflowDefinition, mp, parentWorkflowId, localMap);
+  }
+
+  @POST
+  @Path("start")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "startbydefid", description = "Start a new workflow instance.", returnDescription = "An XML representation of the new workflow instance", restParameters = {
+          @RestParameter(name = "definitionId", isRequired = true, description = "The workflow definition id", type = STRING),
+          @RestParameter(name = "mediapackage", isRequired = true, description = "The XML representation of a mediapackage", type = TEXT, defaultValue = "${this.sampleMediaPackage}", jaxbClass = MediaPackageImpl.class),
+          @RestParameter(name = "parent", isRequired = false, description = "An optional parent workflow instance identifier", type = STRING),
+          @RestParameter(name = "properties", isRequired = false, description = "An optional set of key=value\\n properties", type = TEXT) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "An XML representation of the new workflow instance."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the workflow definition was not found or the parent workflow does not exist") })
+  public WorkflowInstanceImpl startByDefId(@FormParam("definitionId") String workflowDefinitionId,
+          @FormParam("mediapackage") MediaPackageImpl mp, @FormParam("parent") String parentWorkflowId,
+          @FormParam("properties") LocalHashMap localMap) throws NotFoundException {
+    if (mp == null)
+      throw new WebApplicationException(Status.BAD_REQUEST);
+
+    WorkflowDefinition workflowDefinition = null;
+    try {
+      workflowDefinition = service.getWorkflowDefinitionById(workflowDefinitionId);
+    } catch (WorkflowDatabaseException e) {
+      throw new WebApplicationException(e);
+    }
+
+    return startWorkflow(workflowDefinition, mp, parentWorkflowId, localMap);
+  }
+
+  private WorkflowInstanceImpl startWorkflow(WorkflowDefinition workflowDefinition, MediaPackageImpl mp,
+          String parentWorkflowId, LocalHashMap localMap) {
     Map<String, String> properties = new HashMap<String, String>();
     if (localMap != null)
       properties = localMap.getMap();

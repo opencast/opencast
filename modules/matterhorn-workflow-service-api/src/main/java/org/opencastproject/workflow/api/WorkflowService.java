@@ -122,7 +122,7 @@ public interface WorkflowService {
   /**
    * Finds workflow instances based on the specified query for administrative access.
    * 
-   * @param query
+   * @param q
    *          The query parameters
    * @return The {@link WorkflowSet} containing the workflow instances matching the query parameters
    * @throws WorkflowDatabaseException
@@ -229,15 +229,12 @@ public interface WorkflowService {
    * @return the workflow instance
    * @throws NotFoundException
    *           if no running workflow with this identifier exists
-   * @throws WorkflowDatabaseException
-   *           if there is a problem accessing the workflow instance in persistence
-   * @throws WorkflowParsingException
-   *           if there is a problem parsing the workflow instance from persistence
+   * @throws WorkflowException
+   *           if there is a problem processing the workflow
    * @throws UnauthorizedException
    *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
    */
-  WorkflowInstance stop(long workflowInstanceId) throws WorkflowDatabaseException, NotFoundException,
-          WorkflowParsingException, UnauthorizedException;
+  WorkflowInstance stop(long workflowInstanceId) throws WorkflowException, NotFoundException, UnauthorizedException;
 
   /**
    * Permenantly removes a workflow instance.
@@ -258,15 +255,12 @@ public interface WorkflowService {
    * @return the workflow instance
    * @throws NotFoundException
    *           if no running workflow with this identifier exists
-   * @throws WorkflowDatabaseException
-   *           if there is a problem accessing the workflow instance in persistence
-   * @throws WorkflowParsingException
-   *           if there is a problem parsing the workflow instance from persistence
+   * @throws WorkflowException
+   *           if there is a problem processing the workflow
    * @throws UnauthorizedException
    *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
    */
-  WorkflowInstance suspend(long workflowInstanceId) throws WorkflowDatabaseException, WorkflowParsingException,
-          NotFoundException, UnauthorizedException;
+  WorkflowInstance suspend(long workflowInstanceId) throws WorkflowException, NotFoundException, UnauthorizedException;
 
   /**
    * Resumes a suspended workflow instance.
@@ -276,15 +270,12 @@ public interface WorkflowService {
    * @return the workflow instance
    * @throws NotFoundException
    *           if no paused workflow with this identifier exists
-   * @throws WorkflowDatabaseException
-   *           if there is a problem accessing the workflow instance in persistence
-   * @throws WorkflowParsingException
-   *           if there is a problem parsing the workflow instance from persistence
+   * @throws WorkflowException
+   *           if there is a problem processing the workflow
    * @throws UnauthorizedException
    *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
    */
-  WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, WorkflowDatabaseException,
-          WorkflowParsingException, UnauthorizedException;
+  WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, WorkflowException, UnauthorizedException;
 
   /**
    * Resumes a suspended workflow instance, applying new properties to the workflow.
@@ -296,32 +287,27 @@ public interface WorkflowService {
    * @return the workflow instance
    * @throws NotFoundException
    *           if no workflow with this identifier exists
-   * @throws WorkflowDatabaseException
-   *           if there is a problem accessing the workflow instance in persistence
-   * @throws WorkflowParsingException
-   *           if there is a problem parsing the workflow instance from persistence
+   * @throws WorkflowException
+   *           if there is a problem processing the workflow
    * @throws IllegalStateException
    *           if the workflow with this identifier is not in the paused state
    * @throws UnauthorizedException
    *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
    */
   WorkflowInstance resume(long workflowInstanceId, Map<String, String> properties) throws NotFoundException,
-          WorkflowDatabaseException, WorkflowParsingException, IllegalStateException, UnauthorizedException;
+          WorkflowException, IllegalStateException, UnauthorizedException;
 
   /**
    * Updates the given workflow instance with regard to the media package, the properties and the operations involved.
    * 
    * @param workflowInstance
    *          the workflow instance
-   * @throws WorkflowDatabaseException
-   *           if there is a problem storing the workflow instance in persistence
-   * @throws WorkflowParsingException
-   *           if there is a problem serializing the workflow instance for persistence
+   * @throws WorkflowException
+   *           if there is a problem processing the workflow
    * @throws UnauthorizedException
    *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
    */
-  void update(WorkflowInstance workflowInstance) throws WorkflowDatabaseException, WorkflowParsingException,
-          UnauthorizedException;
+  void update(WorkflowInstance workflowInstance) throws WorkflowException, UnauthorizedException;
 
   /**
    * Gets the list of available workflow definitions. In order to be "available", a workflow definition must be

@@ -22,7 +22,7 @@ import static org.opencastproject.workflow.impl.WorkflowServiceImpl.YES;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
-import org.opencastproject.workflow.api.WorkflowDatabaseException;
+import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
@@ -30,7 +30,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workflow.api.WorkflowParsingException;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -178,13 +177,10 @@ final class WorkflowOperationWorker {
    * @return the workflow operation result
    * @throws WorkflowOperationException
    *           if executing the workflow operation handler fails
-   * @throws WorkflowDatabaseException
-   *           if updating the workflow fails
-   * @throws WorkflowParsingException
-   *           if serializing the workflow fails
+   * @throws WorkflowException
+   *           if there is a problem processing the workflow
    */
-  public WorkflowOperationResult start() throws WorkflowOperationException, WorkflowDatabaseException,
-          WorkflowParsingException, UnauthorizedException {
+  public WorkflowOperationResult start() throws WorkflowOperationException, WorkflowException, UnauthorizedException {
     WorkflowOperationInstance operation = workflow.getCurrentOperation();
 
     // Do we need to execute the operation?
@@ -235,15 +231,13 @@ final class WorkflowOperationWorker {
    * @return the workflow operation result
    * @throws WorkflowOperationException
    *           if executing the workflow operation handler fails
-   * @throws WorkflowDatabaseException
-   *           if updating the workflow fails
-   * @throws WorkflowParsingException
-   *           if serializing the workflow fails
+   * @throws WorkflowException
+   *           if there is a problem processing the workflow
    * @throws IllegalStateException
    *           if the workflow operation cannot be resumed
    */
-  public WorkflowOperationResult resume() throws WorkflowOperationException, WorkflowDatabaseException,
-          WorkflowParsingException, IllegalStateException, UnauthorizedException {
+  public WorkflowOperationResult resume() throws WorkflowOperationException, WorkflowException, IllegalStateException,
+          UnauthorizedException {
     WorkflowOperationInstance operation = workflow.getCurrentOperation();
 
     // Make sure we have a (suitable) handler
