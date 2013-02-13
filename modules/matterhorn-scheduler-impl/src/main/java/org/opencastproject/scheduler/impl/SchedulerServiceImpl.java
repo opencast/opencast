@@ -15,7 +15,16 @@
  */
 package org.opencastproject.scheduler.impl;
 
+import net.fortuna.ical4j.model.DateList;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.ValidationException;
+import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.property.RRule;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.ingest.api.IngestService;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -38,22 +47,14 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.series.endpoint.SeriesRestService;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowService;
-
-import net.fortuna.ical4j.model.DateList;
-import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Recur;
-import net.fortuna.ical4j.model.ValidationException;
-import net.fortuna.ical4j.model.parameter.Value;
-import net.fortuna.ical4j.model.property.RRule;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.opencastproject.workspace.api.Workspace;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -73,6 +74,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.opencastproject.scheduler.impl.Util.getEventIdentifier;
+import static org.opencastproject.scheduler.impl.Util.setEventIdentifierImmutable;
+import static org.opencastproject.scheduler.impl.Util.setEventIdentifierMutable;
+import static org.opencastproject.util.data.Tuple.tuple;
 
 /**
  * Implementation of {@link SchedulerService}.
@@ -119,6 +127,9 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   /** Solr index for events */
   protected SchedulerServiceIndex index;
 
+  /** Workspace */
+  protected Workspace workspace;
+
   /**
    * Properties that are updated by ManagedService updated method
    */
@@ -140,6 +151,11 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   /** OSGi callback */
   public void setSeriesRestService(SeriesRestService seriesRestService) {
     this.seriesRestService = seriesRestService;
+  }
+
+  /** OSGi callback */
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
   }
 
   /** OSGi callback */
@@ -199,8 +215,8 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
           logger.info("The event index is empty. Populating it now with {} events", Integer.valueOf(events.length));
           for (DublinCoreCatalog event : events) {
             index.index(event);
-            String id = event.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-            Properties properties = persistence.getEventMetadata(Long.parseLong(id));
+            final long id = getEventIdentifier(event);
+            Properties properties = persistence.getEventMetadata(id);
             if (properties != null) {
               index.index(id, properties);
             }
@@ -295,8 +311,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    */
   protected void updateWorkflow(DublinCoreCatalog event, Date startDate, Date endDate) throws SchedulerException,
           NotFoundException, WorkflowException, UnauthorizedException {
-    WorkflowInstance workflow = workflowService.getWorkflowById(Long.parseLong(event
-            .getFirst(DublinCore.PROPERTY_IDENTIFIER)));
+    WorkflowInstance workflow = workflowService.getWorkflowById(getEventIdentifier(event));
     WorkflowOperationInstance scheduleOperation = workflow.getCurrentOperation();
 
     // if the workflow is not in the hold state with 'schedule' as the current operation, we can't update the event
@@ -357,20 +372,42 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     mp.setTitle(dc.getFirst(DublinCore.PROPERTY_TITLE));
     mp.setLanguage(dc.getFirst(DublinCore.PROPERTY_LANGUAGE));
     mp.setLicense(dc.getFirst(DublinCore.PROPERTY_LICENSE));
-    mp.setSeries(seriesId);
 
-    if (StringUtils.isNotEmpty(mp.getSeries())) {
+    if (isBlank(mp.getSeries()) && isNotBlank(seriesId)) {
+      // add series dc to mp
+      mp.add(new URI(seriesRestService.getSeriesXmlUrl(seriesId)), MediaPackageElement.Type.Catalog,
+             MediaPackageElements.SERIES);
+    } else if (isNotBlank(mp.getSeries()) && !mp.getSeries().equals(seriesId)) {
+      // switch to new series dc and remove old
+      for (Catalog c : mp.getCatalogs(MediaPackageElements.SERIES)) {
+        logger.debug("Deleting existing series dublin core {} from media package {}", c.getIdentifier(), mp.getIdentifier().toString());
+        mp.remove(c);
+      }
+      mp.add(new URI(seriesRestService.getSeriesXmlUrl(seriesId)), MediaPackageElement.Type.Catalog,
+             MediaPackageElements.SERIES);
+    } else if (isNotBlank(mp.getSeries()) && isBlank(seriesId)) {
+      // remove series dc
+      for (Catalog c : mp.getCatalogs(MediaPackageElements.SERIES)) {
+        logger.debug("Deleting existing series dublin core {} from media package {}", c.getIdentifier(), mp.getIdentifier().toString());
+        mp.remove(c);
+      }
+    }
+
+    // set series title
+    if (isNotBlank(seriesId)) {
       try {
         DublinCoreCatalog sdc = seriesService.getSeries(seriesId);
         mp.setSeriesTitle(sdc.getFirst(DublinCore.PROPERTY_TITLE));
-        // add the series catalog
-        mp.add(new URI(seriesRestService.getSeriesXmlUrl(seriesId)), MediaPackageElement.Type.Catalog,
-                MediaPackageElements.SERIES);
       } catch (Exception e) {
-        logger.error("Unable to find series: " + dc.getFirst(DublinCore.PROPERTY_IS_PART_OF), e);
+        logger.error("Unable to find series: " + seriesId, e);
         throw e;
       }
+    } else {
+      mp.setSeriesTitle(null);
     }
+
+    // set series id
+    mp.setSeries(seriesId);
 
     for (DublinCoreValue value : dc.get(DublinCore.PROPERTY_CREATOR)) {
       mp.addCreator(value.getValue());
@@ -381,9 +418,17 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     for (DublinCoreValue value : dc.get(DublinCore.PROPERTY_SUBJECT)) {
       mp.addSubject(value.getValue());
     }
+    // remove existing episodes
+    for (Catalog c : mp.getCatalogs(MediaPackageElements.EPISODE)) {
+      logger.debug("Deleting existing episode dublin core {} from media package {}", c.getIdentifier(), mp.getIdentifier().toString());
+      mp.remove(c);
+      workspace.delete(c.getURI());
+    }
     // add the episode catalog
-    ingestService.addCatalog(IOUtils.toInputStream(dc.toXmlString(), "UTF-8"), "dublincore.xml",
-            MediaPackageElements.EPISODE, mp);
+    ingestService.addCatalog(IOUtils.toInputStream(dc.toXmlString(), "UTF-8"),
+                             "dublincore.xml",
+                             MediaPackageElements.EPISODE,
+                             mp);
   }
 
   /**
@@ -431,9 +476,9 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     Date startDate = period.getStart();
     Date endDate = period.getEnd();
 
-    final WorkflowInstance workflow;
+    final long eventId;
     try {
-      workflow = startWorkflowInstance(eventCatalog, startDate, endDate);
+      eventId = startWorkflowInstance(eventCatalog, startDate, endDate).getId();
     } catch (WorkflowException e) {
       logger.error("Could not start workflow: {}", e.getMessage());
       throw new SchedulerException(e);
@@ -441,17 +486,21 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       logger.error("Could not create media package: {}", e.getMessage());
       throw new SchedulerException(e);
     }
+    addEventInternal(setEventIdentifierImmutable(eventId, eventCatalog));
+    return eventId;
+  }
 
-    eventCatalog.set(DublinCore.PROPERTY_IDENTIFIER, Long.toString(workflow.getId()));
-
+  /** Add an event. The event DC _must_ have the identfier set. */
+  private void addEventInternal(final DublinCoreCatalog event) throws SchedulerException, UnauthorizedException {
     // store event asociated
+    final long eventId = getEventIdentifier(event);
     try {
-      persistence.storeEvents(eventCatalog);
+      persistence.storeEvents(event);
     } catch (SchedulerServiceDatabaseException e) {
       logger.error("Could not store event to persistent storage: {}", e);
       logger.info("Canceling workflow associated with event");
       try {
-        stopWorkflowInstance(workflow.getId());
+        stopWorkflowInstance(eventId);
       } catch (NotFoundException e1) {
         // should not happen
       }
@@ -459,23 +508,19 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     }
 
     try {
-      index.index(eventCatalog);
+      index.index(event);
     } catch (Exception e) {
-      logger.warn("Unable to index event with ID '{}': {}", workflow.getId(), e.getMessage());
+      logger.warn("Unable to index event with ID '{}': {}", eventId, e.getMessage());
       throw new SchedulerException(e);
     }
 
     // update with default CA properties
-    Properties caProperties = new Properties();
-    updateCAProperties(caProperties, eventCatalog);
     try {
-      updateCaptureAgentMetadata(workflow.getId(), caProperties);
+      updateCaptureAgentMetadata(new Properties(), tuple(eventId, event));
     } catch (NotFoundException e) {
       // should not happen
       throw new IllegalStateException(e);
     }
-
-    return workflow.getId();
   }
 
   /*
@@ -522,7 +567,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
         }
         throw new SchedulerException(e);
       }
-      event.set(DublinCore.PROPERTY_IDENTIFIER, Long.toString(instance.getId()));
+      setEventIdentifierMutable(instance.getId(), event);
       eventsIDs.add(instance.getId());
     }
 
@@ -548,17 +593,15 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       try {
         index.index(event);
       } catch (Exception e) {
-        logger.warn("Unable to index event {}: {}", event.getFirst(DublinCore.PROPERTY_IDENTIFIER), e.getMessage());
+        logger.warn("Unable to index event {}: {}", getEventIdentifier(event), e.getMessage());
         throw new SchedulerException(e);
       }
     }
 
     // update with CA properties with defaults
     for (DublinCoreCatalog event : eventList) {
-      Properties caProperties = new Properties();
-      updateCAProperties(caProperties, event);
       try {
-        updateCaptureAgentMetadata(Long.parseLong(event.getFirst(DublinCore.PROPERTY_IDENTIFIER)), caProperties);
+        updateCaptureAgentMetadata(new Properties(), tuple(getEventIdentifier(event), event));
       } catch (NotFoundException e) {
         // should not happen
         throw new IllegalStateException(e);
@@ -575,67 +618,34 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * java.util.Properties)
    */
   @Override
-  public void updateCaptureAgentMetadata(final Properties configuration, Long... eventIDs) throws NotFoundException,
-          SchedulerException {
-    for (long eventID : eventIDs) {
+  public void updateCaptureAgentMetadata(final Properties configuration, Tuple<Long, DublinCoreCatalog>... events)
+          throws NotFoundException, SchedulerException {
+    for (Tuple<Long, DublinCoreCatalog> e : events) {
+      final long eventId = e.getA();
+      final DublinCoreCatalog event = e.getB();
       // create clone and update with matching values from DC
       Properties properties = (Properties) configuration.clone();
-      DublinCoreCatalog catalog = getEventDublinCore(eventID);
-      updateCAProperties(properties, catalog);
+      properties.put("event.title", event.getFirst(DublinCore.PROPERTY_TITLE));
+      if (StringUtils.isNotBlank(event.getFirst(DublinCore.PROPERTY_IS_PART_OF))) {
+        properties.put("event.series", event.getFirst(DublinCore.PROPERTY_IS_PART_OF));
+      }
+      if (StringUtils.isNotBlank(event.getFirst(DublinCore.PROPERTY_SPATIAL))) {
+        properties.put("event.location", event.getFirst(DublinCore.PROPERTY_SPATIAL));
+      }
       // store
-      updateCaptureAgentMetadata(eventID, properties);
-    }
-  }
+      try {
+        persistence.updateEventWithMetadata(eventId, properties);
+      } catch (SchedulerServiceDatabaseException ex) {
+        logger.error("Failed to update capture agent configuration for event '{}': {}", eventId, ex.getMessage());
+        throw new SchedulerException(ex);
+      }
 
-  /**
-   * Stores capture agent properties.
-   * 
-   * @param id
-   *          of event for which properties should be stored
-   * @param properties
-   *          CA properties
-   * @throws NotFoundException
-   *           if event with given index does not exist
-   * @throws SchedulerException
-   *           if exception occurred
-   */
-  protected void updateCaptureAgentMetadata(long id, Properties properties) throws NotFoundException,
-          SchedulerException {
-    try {
-      persistence.updateEventWithMetadata(id, properties);
-    } catch (SchedulerServiceDatabaseException e) {
-      logger.error("Failed to update capture agent configuration for event '{}': {}", id, e.getMessage());
-      throw new SchedulerException(e);
-    }
-
-    try {
-      index.index(Long.toString(id), properties);
-    } catch (Exception e) {
-      logger.warn("Unable to update capture agent properties for event with ID '{}': {}", id, e.getMessage());
-      throw new SchedulerException(e);
-    }
-  }
-
-  /**
-   * Updates CA properties so that they match values from DC. Values that are updated this way are:
-   * <ul>
-   * <li>event.title (mapped from dc:title)</li>
-   * <li>event.series (mapped from dc:is_part_of)</li>
-   * <li>event.location (mapped from dc:spatial)</li>
-   * </ul>
-   * 
-   * @param properties
-   *          properties to be updated
-   * @param catalog
-   *          matching {@link DublinCoreCatalog}
-   */
-  protected void updateCAProperties(Properties properties, DublinCoreCatalog catalog) {
-    properties.put("event.title", catalog.getFirst(DublinCore.PROPERTY_TITLE));
-    if (StringUtils.isNotBlank(catalog.getFirst(DublinCore.PROPERTY_IS_PART_OF))) {
-      properties.put("event.series", catalog.getFirst(DublinCore.PROPERTY_IS_PART_OF));
-    }
-    if (StringUtils.isNotBlank(catalog.getFirst(DublinCore.PROPERTY_SPATIAL))) {
-      properties.put("event.location", catalog.getFirst(DublinCore.PROPERTY_SPATIAL));
+      try {
+        index.index(eventId, properties);
+      } catch (Exception ex) {
+        logger.warn("Unable to update capture agent properties for event with ID '{}': {}", eventId, ex.getMessage());
+        throw new SchedulerException(ex);
+      }
     }
   }
 
@@ -646,47 +656,52 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * DublinCoreCatalog)
    */
   @Override
-  public void updateEvent(final DublinCoreCatalog eventCatalog) throws NotFoundException, SchedulerException,
-          UnauthorizedException {
+  public void updateEvent(final long eventId, final DublinCoreCatalog eventCatalog)
+          throws NotFoundException, SchedulerException, UnauthorizedException {
     if (eventCatalog == null) {
       logger.warn("Cannot update <null> event.");
       return;
     }
+    updateEvent(setEventIdentifierImmutable(eventId, eventCatalog));
+  }
 
-    if (StringUtils.isBlank(eventCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER))) {
-      logger.error("Dublin core does not contain identifier, so event update is not possible.");
-      throw new SchedulerException("Missing event identifier");
-    }
-
-    final long eventID = Long.parseLong(eventCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER));
-
-    DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(eventCatalog.getFirst(DublinCore.PROPERTY_TEMPORAL));
+  /** Internal impl of an event update. The event DC _must_ have the identfier set. */
+  private void updateEvent(final DublinCoreCatalog event)
+          throws NotFoundException, SchedulerException, UnauthorizedException {
+    final DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(event.getFirst(DublinCore.PROPERTY_TEMPORAL));
     if (!period.hasEnd() || !period.hasStart()) {
       throw new IllegalArgumentException(
               "Dublin core field dc:temporal does not contain information about start and end of event");
     }
-    Date startDate = period.getStart();
-    Date endDate = period.getEnd();
-
+    final Date startDate = period.getStart();
+    final Date endDate = period.getEnd();
+    final long eventId = getEventIdentifier(event);
     try {
-      persistence.updateEvent(eventCatalog);
+      persistence.updateEvent(event);
     } catch (SchedulerServiceDatabaseException e) {
-      logger.error("Could not update event {} in persistent storage: {}", eventID, e.getMessage());
+      logger.error("Could not update event {} in persistent storage: {}", eventId, e.getMessage());
+      throw new SchedulerException(e);
+    }
+    try {
+      final Properties p = persistence.getEventMetadata(eventId);
+      updateCaptureAgentMetadata(p, tuple(eventId, event));
+    } catch (SchedulerServiceDatabaseException e) {
+      logger.error("Could not update event {} in persistent storage: {}", eventId, e.getMessage());
       throw new SchedulerException(e);
     }
 
     try {
-      index.index(eventCatalog);
+      index.index(event);
     } catch (Exception e) {
-      logger.warn("Unable to index event with ID '{}': {}", eventID, e.getMessage());
+      logger.warn("Unable to index event with ID '{}': {}", eventId, e.getMessage());
       throw new SchedulerException(e);
     }
 
     // update workflow
     try {
-      updateWorkflow(eventCatalog, startDate, endDate);
+      updateWorkflow(event, startDate, endDate);
     } catch (WorkflowException e) {
-      logger.error("Could not update workflow for event with ID '{}': {}", eventID, e.getMessage());
+      logger.error("Could not update workflow for event with ID '{}': {}", eventId, e.getMessage());
       throw new SchedulerException(e);
     }
   }
@@ -694,16 +709,19 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   /**
    * TODO: Update this function so that it uses a new service function with a single transaction so that it is not slow.
    */
-  public void updateEvents(List<String> idList, final DublinCoreCatalog eventCatalog) throws NotFoundException,
-          SchedulerException, UnauthorizedException {
+  @Override
+  public void updateEvents(List<Long> eventIds, final DublinCoreCatalog eventCatalog)
+          throws NotFoundException, SchedulerException, UnauthorizedException {
     SchedulerQuery q = new SchedulerQuery();
-    q.withIdInList(idList);
+    q.withIdInList(eventIds);
     q.withSort(Sort.EVENT_START);
     List<DublinCoreCatalog> catalogs = search(q).getCatalogList();
     for (int i = 0; i < catalogs.size(); i++) {
       DublinCoreCatalog cat = catalogs.get(i);
       for (EName prop : eventCatalog.getProperties()) {
-        if (!eventCatalog.get(prop).isEmpty()) {
+        if (DublinCore.PROPERTY_IDENTIFIER.equals(prop)) {
+          // skip
+        } else if (!eventCatalog.get(prop).isEmpty()) {
           List<DublinCoreValue> vals = eventCatalog.get(prop);
           if (DublinCore.PROPERTY_TITLE.equals(prop)) {
             List<DublinCoreValue> incrementedVals = new ArrayList<DublinCoreValue>();
@@ -717,7 +735,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
           }
         }
       }
-      updateEvent(cat);
+      updateEvent(getEventIdentifier(cat), cat);
     }
   }
 
@@ -814,19 +832,19 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * @see org.opencastproject.scheduler.api.SchedulerService#removeEvent(long)
    */
   @Override
-  public void removeEvent(final long eventID) throws SchedulerException, NotFoundException, UnauthorizedException {
+  public void removeEvent(final long eventId) throws SchedulerException, NotFoundException, UnauthorizedException {
     try {
-      stopWorkflowInstance(eventID);
-      persistence.deleteEvent(eventID);
+      stopWorkflowInstance(eventId);
+      persistence.deleteEvent(eventId);
     } catch (SchedulerServiceDatabaseException e) {
-      logger.error("Could not remove event '{}' from persistent storage: {}", eventID, e);
+      logger.error("Could not remove event '{}' from persistent storage: {}", eventId, e);
       throw new SchedulerException(e);
     }
 
     try {
-      index.delete(Long.toString(eventID));
+      index.delete(eventId);
     } catch (Exception e) {
-      logger.warn("Unable to delete event '{}' from index: {}", eventID, e);
+      logger.warn("Unable to delete event '{}' from index: {}", eventId, e);
       throw new SchedulerException(e);
     }
   }
@@ -837,11 +855,11 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * @see org.opencastproject.scheduler.api.SchedulerService#getEventDublinCore(long)
    */
   @Override
-  public DublinCoreCatalog getEventDublinCore(long eventID) throws NotFoundException, SchedulerException {
+  public DublinCoreCatalog getEventDublinCore(long eventId) throws NotFoundException, SchedulerException {
     try {
-      return index.getDublinCore(Long.toString(eventID));
+      return index.getDublinCore(eventId);
     } catch (SchedulerServiceDatabaseException e) {
-      logger.error("Could not retrieve Dublin Core for event with ID {}", eventID);
+      logger.error("Could not retrieve Dublin Core for event with ID {}", eventId);
       throw new SchedulerException(e);
     }
   }
@@ -852,11 +870,11 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * @see org.opencastproject.scheduler.api.SchedulerService#getEventCaptureAgentConfiguration(long)
    */
   @Override
-  public Properties getEventCaptureAgentConfiguration(long eventID) throws NotFoundException, SchedulerException {
+  public Properties getEventCaptureAgentConfiguration(long eventId) throws NotFoundException, SchedulerException {
     try {
-      return index.getCaptureAgentProperties(Long.toString(eventID));
+      return index.getCaptureAgentProperties(eventId);
     } catch (SchedulerServiceDatabaseException e) {
-      logger.error("Could not retrieve Capture Agent properties for event with ID {}", eventID);
+      logger.error("Could not retrieve Capture Agent properties for event with ID {}", eventId);
       throw new SchedulerException(e);
     }
   }
@@ -969,10 +987,10 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
     CalendarGenerator cal = new CalendarGenerator(seriesService);
     for (DublinCoreCatalog event : eventList) {
-      String id = event.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+      final long id = getEventIdentifier(event);
       Properties prop;
       try {
-        prop = getEventCaptureAgentConfiguration(Long.parseLong(id));
+        prop = getEventCaptureAgentConfiguration(id);
       } catch (NotFoundException e) {
         // should not happen
         throw new IllegalStateException(e);

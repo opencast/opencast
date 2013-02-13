@@ -33,12 +33,12 @@ import javax.persistence.Table;
   // Job queries
   @NamedQuery(name = "Event.findAll", query = "SELECT e FROM EventEntity e ")
 })
-@Table(name = "mh_scheduled_event")
+@Table(name = "scheduled_event")
 public class EventEntity {
 
   /** Event ID, primary key */
   @Id
-  @Column(name = "id")
+  @Column(name = "event_id")
   protected Long eventId;
 
   /** Serialized Dublin core */

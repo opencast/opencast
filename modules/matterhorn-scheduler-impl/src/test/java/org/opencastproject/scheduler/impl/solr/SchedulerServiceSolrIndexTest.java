@@ -15,6 +15,11 @@
  */
 package org.opencastproject.scheduler.impl.solr;
 
+import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -25,13 +30,6 @@ import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.scheduler.api.SchedulerQuery;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
-
-import junit.framework.Assert;
-
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -82,14 +80,14 @@ public class SchedulerServiceSolrIndexTest {
             EncodingSchemeUtils.encodePeriod(new DCMIPeriod(start, end), Precision.Second));
 
     index.index(catalog);
-    index.getDublinCore("1");
+    index.getDublinCore(1L);
 
     // SchedulerQuery q = new SchedulerQuery().setSpatial("Device one").setStartsTo(new Date());
     SchedulerQuery q = new SchedulerQuery().setSpatial("Device one").setStartsFrom(new Date());
     DublinCoreCatalogList result = index.search(q);
     Assert.assertEquals(1, result.size());
 
-    index.delete("1");
+    index.delete(1L);
   }
 
   @Test
@@ -171,11 +169,11 @@ public class SchedulerServiceSolrIndexTest {
     caProperties.put("test.properties", "test");
 
     index.index(firstCatalog);
-    index.index("1", caProperties);
-    Properties properties = index.getCaptureAgentProperties("1");
+    index.index(1L, caProperties);
+    Properties properties = index.getCaptureAgentProperties(1L);
     Assert.assertTrue("Incorrect CA properties", properties.containsKey("test.properties"));
     try {
-      index.index("2", caProperties);
+      index.index(2L, caProperties);
       Assert.fail("Should not be able to add CA metadata to nonexistent event");
     } catch (NotFoundException e) {
     }

@@ -31,7 +31,7 @@ public class SchedulerQuery {
   /** Identifier search */
   protected String identifier;
   /** ID Set */
-  protected List<String> idList;
+  protected List<Long> idList;
   /** Title search */
   protected String title;
   /** Series id search */
@@ -94,7 +94,7 @@ public class SchedulerQuery {
   /**
    * Set search by abstract
    * 
-   * @param seriesAbstract
+   * @param eventAbstract
    * @return
    */
   public SchedulerQuery setEventAbstract(String eventAbstract) {
@@ -268,7 +268,7 @@ public class SchedulerQuery {
   /**
    * Set search by end date of event.
    * 
-   * @param finishesFrom
+   * @param endsFrom
    * @return
    */
   public SchedulerQuery setEndsFrom(Date endsFrom) {
@@ -279,7 +279,7 @@ public class SchedulerQuery {
   /**
    * Set search by end date of event.
    * 
-   * @param finishesTo
+   * @param endsTo
    * @return
    */
   public SchedulerQuery setEndsTo(Date endsTo) {
@@ -332,7 +332,7 @@ public class SchedulerQuery {
    * @param ids
    * @return
    */
-  public SchedulerQuery withIdInList(List<String> ids) {
+  public SchedulerQuery withIdInList(List<Long> ids) {
     if (!ids.isEmpty()) {
       this.idList = ids;
     }
@@ -540,7 +540,7 @@ public class SchedulerQuery {
     return identifier;
   }
   
-  public List<String> getIdsList() {
+  public List<Long> getIdsList() {
     return idList;
   }
 
