@@ -67,7 +67,7 @@ Opencast.embedControlHide = (function ()
      */
     function initialize(time)
     { 
-        $.log('Initializing');
+        $.log('Initializing hiding controls');
         
         var hideControls = $.getURLParameter('hideControls');
         if((hideControls != null) && hideControls.toLowerCase() == "false")
@@ -98,10 +98,14 @@ Opencast.embedControlHide = (function ()
             setParams();
             _intvalParams = setInterval('Opencast.embedControlHide.setParams()', 1000);
             
-            //hide advanced Link
-            var advHeight = $('#oc-link-advanced-player img').outerHeight();
-            $('#oc_flash-player').css('marginTop', '-'+ (advHeight + 2)  +'px');
-            doHideAdvLinkFast();
+	    if(hideAPLogo) {
+		$('#oc-link-advanced-player').remove();
+	    } else {
+		//hide advanced Link
+		var advHeight = $('#oc-link-advanced-player img').outerHeight();
+		$('#oc_flash-player').css('marginTop', '-'+ (advHeight + 2)  +'px');
+		doHideAdvLinkFast();
+	    }
             
             //start interval to bind key and mouse actions
             bindActions();
@@ -110,10 +114,12 @@ Opencast.embedControlHide = (function ()
             {
 		$('#oc-link-advanced-player').css('marginLeft', '-'+_width+'px');
             }
-	} else
-	{
-            // doShowFast();
-            // $('#oc_flash-player').css('marginBottom', '-50px');
+	} else {
+	    $('#oc_flash-player').height($('#oc_flash-player').height() - 45);
+	}
+
+	if(hideAPLogo) {
+	    $('#oc-link-advanced-player').remove();
 	}
         
     }
