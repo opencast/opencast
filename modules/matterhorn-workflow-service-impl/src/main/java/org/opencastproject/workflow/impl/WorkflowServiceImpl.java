@@ -697,6 +697,15 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       throw new IllegalStateException("Cannot start a workflow in state '" + workflow.getState() + "'");
     }
 
+    // Avoid running multiple workflows with same media package id at same time
+    WorkflowSet workflowInstances = getWorkflowInstances(new WorkflowQuery()
+            .withMediaPackage(workflow.getMediaPackage().getIdentifier().toString()).withState(RUNNING)
+            .withState(PAUSED).withState(FAILING));
+    if (workflowInstances.size() > 0) {
+      logger.info("Delay to start {}, another workflow with same media package id is still active", workflow);
+      return null;
+    }
+
     // If this is a new workflow, move to the first operation
     workflow.setState(RUNNING);
     update(workflow);
