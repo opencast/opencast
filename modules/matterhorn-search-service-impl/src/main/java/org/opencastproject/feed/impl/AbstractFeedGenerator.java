@@ -112,7 +112,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    * Creates a new abstract feed generator.
    * <p>
    * <b>Note:</b> Subclasses using this constructor need to set required member variables prior to calling
-   * {@link #createFeed(org.opencastproject.feed.api.Feed.Type, String[])} for the first time.
+   * {@link #createFeed(org.opencastproject.feed.api.Feed.Type, String[], int)} for the first time.
    */
   protected AbstractFeedGenerator() {
     atomTrackFlavors = new HashSet<MediaPackageElementFlavor>();
@@ -277,13 +277,18 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    * {@inheritDoc}
    * 
    * @see org.opencastproject.feed.api.FeedGenerator#createFeed(org.opencastproject.feed.api.Feed.Type,
-   *      java.lang.String[])
+   *      java.lang.String[], int)
    */
-  public final Feed createFeed(Feed.Type type, String[] query) {
+  public final Feed createFeed(Feed.Type type, String[] query, int size) {
     SearchResult result = null;
 
     if (type == null)
       throw new IllegalArgumentException("Feed type must not be null");
+
+    if (size <= 0) {
+      logger.trace("Using the feed's configured size of {}", this.size);
+      size = this.size;
+    }
 
     // Check if the feed generator is correctly set up
     if (uri == null)
@@ -319,6 +324,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     // String rssFlavor = query.length > 1 ? query[query.length - 1] : null;
 
     // Iterate over the feed data and create the entries
+    int itemCount = 0;
     for (SearchResultItem resultItem : result.getItems()) {
       try {
         if (resultItem.getType().equals(SearchResultItemType.Series))
@@ -329,6 +335,9 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
         logger.error(
                 "Error creating entry with id " + resultItem.getId() + " for feed " + this + ": " + t.getMessage(), t);
       }
+      itemCount++;
+      if (itemCount >= size)
+        break;
     }
     return f;
   }
@@ -504,6 +513,9 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     if (d != null) {
       entry.setPublishedDate(d);
       dcExtension.setDate(d);
+    } else if (metadata.getModified() != null) {
+      entry.setPublishedDate(metadata.getModified());
+      dcExtension.setDate(metadata.getModified());
     }
 
     // TODO: Finish dc support

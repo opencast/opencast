@@ -112,7 +112,7 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
    * Creates a new abstract feed generator.
    * <p>
    * <b>Note:</b> Subclasses using this constructor need to set required member variables prior to calling
-   * {@link #createFeed(org.opencastproject.feed.api.Feed.Type, String[])} for the first time.
+   * {@link #createFeed(org.opencastproject.feed.api.Feed.Type, String[], int)} for the first time.
    */
   protected AbstractFeedService() {
     super();

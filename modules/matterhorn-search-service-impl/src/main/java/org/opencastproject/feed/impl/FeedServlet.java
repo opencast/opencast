@@ -21,6 +21,7 @@ import org.opencastproject.feed.api.FeedGenerator;
 
 import com.sun.syndication.io.SyndFeedOutput;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
@@ -57,6 +58,9 @@ public class FeedServlet extends HttpServlet {
 
   /** The serial version uid */
   private static final long serialVersionUID = -4623160106007127801L;
+
+  /** Name of the size parameter */
+  private static final String PARAM_SIZE = "size";
 
   /** Logging facility */
   private static Logger logger = LoggerFactory.getLogger(FeedServlet.class);
@@ -116,7 +120,7 @@ public class FeedServlet extends HttpServlet {
     Feed feed = null;
     for (FeedGenerator generator : feeds) {
       if (generator.accept(feedInfo.getQuery())) {
-        feed = generator.createFeed(feedInfo.getType(), feedInfo.getQuery());
+        feed = generator.createFeed(feedInfo.getType(), feedInfo.getQuery(), feedInfo.getSize());
         if (feed == null) {
           response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
           return;
@@ -181,7 +185,18 @@ public class FeedServlet extends HttpServlet {
     String[] query = new String[queryLength];
     for (int i = 0; i < queryLength; i++)
       query[i] = pathElements[i + 2];
-    return new FeedInfo(type, version, query);
+
+    String sizeParam = request.getParameter(PARAM_SIZE);
+    if (StringUtils.isNotBlank(sizeParam)) {
+      try {
+        return new FeedInfo(type, version, query, Integer.parseInt(sizeParam));
+      } catch (Exception e) {
+        logger.warn("Value of feed parameter 'size' is not an integer: '{}'", sizeParam);
+        return new FeedInfo(type, version, query);
+      }
+    } else {
+      return new FeedInfo(type, version, query);
+    }
   }
 
   /**

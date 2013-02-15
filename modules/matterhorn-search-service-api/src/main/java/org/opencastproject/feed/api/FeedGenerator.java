@@ -69,24 +69,26 @@ public interface FeedGenerator {
    *          the feed type
    * @param query
    *          the request
+   * @param size
+   *          the requested size of the feed
    * @return the feed or <code>null</code>
    */
-  Feed createFeed(Feed.Type type, String[] query);
-  
+  Feed createFeed(Feed.Type type, String[] query, int size);
+
   /**
    * Returns the copyright for the feed.
    * 
    * @return the feed
    */
   String getCopyright();
-  
+
   /**
    * Returns the url to the cover art.
    * 
    * @return the cover
    */
   String getCover();
-  
+
   /**
    * Initializes the feed generator using the following properties:
    * <ul>
@@ -107,15 +109,17 @@ public interface FeedGenerator {
    * <li><code>org.opencastproject.server.url</code> - this server's base URL</li>
    * </ul>
    * 
-   * @param properties used to initialize the feed
+   * @param properties
+   *          used to initialize the feed
    */
   void initialize(Properties properties);
 
   /**
-   * Sets the search service for this feed generator.  FIXME: This shouldn't be exposed in the API, but must be present
+   * Sets the search service for this feed generator. FIXME: This shouldn't be exposed in the API, but must be present
    * for the FeedRegistrationScanner to function.
    * 
-   * @param searchService The search service to use in finding data to expose in the feed
+   * @param searchService
+   *          The search service to use in finding data to expose in the feed
    */
   void setSearchService(SearchService searchService);
 
