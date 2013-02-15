@@ -21,9 +21,12 @@ import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryP
 
 import org.opencastproject.kernel.http.api.HttpClient;
 import org.opencastproject.kernel.http.impl.HttpClientFactory;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityConstants;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
+import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.apache.commons.lang.StringUtils;
@@ -124,7 +127,11 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   /** The maximum amount of time in seconds to wait in addition to the RETRY_BASE_DELAY. */
   private int retryMaximumVariableTime = 300;
 
+  /** The service registry */
   private ServiceRegistry serviceRegistry = null;
+
+  /** The security service */
+  protected SecurityService securityService = null;
 
   public void activate(ComponentContext cc) {
     logger.debug("activate");
@@ -157,6 +164,15 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    */
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
+  }
+
+  /**
+   * Sets the security service.
+   * 
+   * @param securityService
+   */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /**
@@ -282,6 +298,15 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
     if (serviceRegistry != null && serviceRegistry.getCurrentJob() != null)
       httpUriRequest.setHeader(CURRENT_JOB_HEADER, Long.toString(serviceRegistry.getCurrentJob().getId()));
+
+    // If a security service has been set, use it to pass the current security context on
+    logger.debug("Adding security context to request");
+    Organization organization = securityService.getOrganization();
+    if (organization != null)
+      httpUriRequest.setHeader(SecurityConstants.ORGANIZATION_HEADER, organization.getId());
+    User currentUser = securityService.getUser();
+    if (currentUser != null)
+      httpUriRequest.setHeader(SecurityConstants.USER_HEADER, currentUser.getUserName());
 
     if ("GET".equalsIgnoreCase(httpUriRequest.getMethod()) || "HEAD".equalsIgnoreCase(httpUriRequest.getMethod())) {
       // Set the user/pass
