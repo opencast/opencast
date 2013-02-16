@@ -218,6 +218,7 @@
               OSGI-INF/operations/inspect.xml,
               OSGI-INF/operations/prepare-av.xml,
               OSGI-INF/operations/publish.xml,
+              OSGI-INF/operations/republish.xml,
               OSGI-INF/operations/retract-download.xml,
               OSGI-INF/operations/retract-streaming.xml,
               OSGI-INF/operations/review.xml,
