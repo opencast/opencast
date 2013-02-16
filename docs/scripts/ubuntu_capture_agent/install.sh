@@ -91,7 +91,7 @@ export UBUNTU_11_04="Ubuntu 11.04 \n \l"
 export UBUNTU_11_04_PACKAGES_FILE="Ubuntu-11-04.packages"
 export UBUNTU_11_10="Ubuntu 11.10 \n \l"
 export UBUNTU_11_10_PACKAGES_FILE="Ubuntu-11-10.packages"
-export UBUNTU_12_04="Ubuntu 12.04.1 LTS \n \l"
+export UBUNTU_12_04="Ubuntu 12.04"
 export UBUNTU_12_04_PACKAGES_FILE="Ubuntu-12-04.packages"
 export PACKAGE_LIST_DEFAULT_FILE="default.packages"
 
