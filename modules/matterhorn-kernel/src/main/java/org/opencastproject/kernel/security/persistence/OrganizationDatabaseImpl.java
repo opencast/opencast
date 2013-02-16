@@ -18,15 +18,9 @@ package org.opencastproject.kernel.security.persistence;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
-
-import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -34,9 +28,11 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.spi.PersistenceProvider;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Implements {@link SeriesServiceDatabase}. Defines permanent storage for series.
+ * Implements {@link OrganizationDatabase}. Defines permanent storage for series.
  */
 public class OrganizationDatabaseImpl implements OrganizationDatabase {
 
@@ -203,18 +199,14 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
     }
   }
 
-  /**
-   * @see org.opencastproject.kernel.security.persistence.OrganizationDatabase#getOrganizationByUrl(java.net.URL)
-   */
   @Override
-  public Organization getOrganizationByUrl(URL url) throws OrganizationDatabaseException, NotFoundException {
-    String requestUrl = StringUtils.strip(url.getHost(), "/");
+  public Organization getOrganizationByHost(String host, int port) throws OrganizationDatabaseException, NotFoundException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      Query q = em.createNamedQuery("Organization.findByUrl");
-      q.setParameter("serverName", requestUrl);
-      q.setParameter("port", url.getPort());
+      Query q = em.createNamedQuery("Organization.findByHost");
+      q.setParameter("serverName", host);
+      q.setParameter("port", port);
       return (JpaOrganization) q.getSingleResult();
     } catch (NoResultException e) {
       throw new NotFoundException();

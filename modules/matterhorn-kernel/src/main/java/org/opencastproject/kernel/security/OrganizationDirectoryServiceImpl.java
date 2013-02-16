@@ -19,11 +19,11 @@ import org.apache.commons.lang.StringUtils;
 import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.kernel.security.persistence.OrganizationDatabase;
 import org.opencastproject.kernel.security.persistence.OrganizationDatabaseException;
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function0;
+import org.opencastproject.util.data.Tuple;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
@@ -36,9 +36,9 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import static org.opencastproject.util.data.Collections.getOrCreate;
+import static org.opencastproject.util.data.Tuple.tuple;
 
 /**
  * Implements the organizational directory. As long as no organizations are published in the service registry, the
@@ -78,15 +78,9 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
 
   protected OrganizationDatabase persistence;
 
-  /** The default organization */
-  private final Organization defaultOrganization = new DefaultOrganization();
-
-  /** The list of organizations to handle later */
-  private final Map<String, Dictionary> unhandledOrganizations = new HashMap<String, Dictionary>();
-
   // Local caches. Organizations change rarely so a simple hash map is sufficient.
   // No need to deal with soft references or an LRU map.
-  private final Map<URL, Organization> orgsByUrl = new HashMap<URL, Organization>();
+  private final Map<Tuple<String, Integer>, Organization> orgsByHost = new HashMap<Tuple<String, Integer>, Organization>();
   private final Map<String, Organization> orgsById = new HashMap<String, Organization>();
 
   /**
@@ -94,13 +88,6 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    */
   public void setOrgPersistence(OrganizationDatabase setOrgPersistence) {
     this.persistence = setOrgPersistence;
-    for (Entry<String, Dictionary> entry : unhandledOrganizations.entrySet()) {
-      try {
-        updated(entry.getKey(), entry.getValue());
-      } catch (ConfigurationException e) {
-        logger.error(e.getMessage());
-      }
-    }
   }
 
   /**
@@ -118,10 +105,6 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    */
   @Override
   public Organization getOrganization(final String id) throws NotFoundException {
-    if (persistence == null) {
-      logger.debug("No persistence available: Returning default organization for id {}", id);
-      return defaultOrganization;
-    }
     synchronized (orgsById) {
       return getOrCreate(orgsById, id, new Function0.X<Organization>() {
         @Override public Organization xapply() throws Exception {
@@ -138,14 +121,12 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    */
   @Override
   public Organization getOrganization(final URL url) throws NotFoundException {
-    if (persistence == null) {
-      logger.debug("No persistence available: Returning default organization for url {}", url);
-      return defaultOrganization;
-    }
-    synchronized (orgsByUrl) {
-      return getOrCreate(orgsByUrl, url, new Function0.X<Organization>() {
+    final String host = url.getHost();
+    final int port = url.getPort();
+    synchronized (orgsByHost) {
+      return getOrCreate(orgsByHost, tuple(host, port), new Function0.X<Organization>() {
         @Override public Organization xapply() throws Exception {
-          return persistence.getOrganizationByUrl(url);
+          return persistence.getOrganizationByHost(host, port);
         }
       });
     }
@@ -193,11 +174,6 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   @Override
   @SuppressWarnings("rawtypes")
   public void updated(String pid, Dictionary properties) throws ConfigurationException {
-    if (persistence == null) {
-      logger.debug("No persistence available: Ignoring organization update for pid='{}'", pid);
-      unhandledOrganizations.put(pid, properties);
-      return;
-    }
     logger.debug("Updating organization pid='{}'", pid);
 
     // Gather the properties
@@ -229,10 +205,13 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
       orgProperties.put(key.substring(ORG_PROPERTY_PREFIX.length()), (String) properties.get(key));
     }
 
-    JpaOrganization org = null;
+    // Clear cache so it gets updated later
+    orgsByHost.clear();
+    orgsById.clear();
 
     // Load the existing organization or create a new one
     try {
+      JpaOrganization org;
       try {
         org = (JpaOrganization) persistence.getOrganization(id);
         org.setName(name);

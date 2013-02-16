@@ -18,7 +18,6 @@ package org.opencastproject.kernel.security.persistence;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
 
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -58,17 +57,19 @@ public interface OrganizationDatabase {
   Organization getOrganization(String orgId) throws OrganizationDatabaseException, NotFoundException;
 
   /**
-   * Gets a single organization by its URL
+   * Gets a single organization by host and port.
    * 
-   * @param url
-   *          the organization's URL
+   * @param host
+   *          the organization's host
+   * @param port
+   *          the organization's port
    * @return the organization
    * @throws OrganizationDatabaseException
    *           if there is a problem communicating with the underlying data store
    * @throws NotFoundException
    *           if the organization with specified URL is not found
    */
-  Organization getOrganizationByUrl(URL url) throws OrganizationDatabaseException, NotFoundException;
+  Organization getOrganizationByHost(String host, int port) throws OrganizationDatabaseException, NotFoundException;
 
   /**
    * Removes an organization from persistent storage.
