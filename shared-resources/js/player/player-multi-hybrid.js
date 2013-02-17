@@ -1454,9 +1454,10 @@ Opencast.Player = (function ()
         var iFrameText = '';
         var advancedUrl = window.location.href;
         var embedUrl = advancedUrl.replace(/watch.html/g, "embed.html");
-	if($('#oc_embed-costum-hide-controls-checkbox').is(':checked'))
+	var hideControls = $('#oc_embed-costum-hide-controls-checkbox').is(':checked');
+	if(hideControls)
 	{
-	    embedUrl += "&hideControls=false";
+	    embedUrl += "&hideControls=false&hideAPLogo=true";
 	}
         $('#oc_embed-costum-width-textinput').val(width);
         $('#oc_embed-costum-height-textinput').val(height);
