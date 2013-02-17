@@ -42,7 +42,7 @@ import static org.opencastproject.util.data.Option.some;
  * Persists the last harvested time of a url.
  */
 @Entity
-@Table(name = "oaipmh_harvesting")
+@Table(name = "mh_oaipmh_harvesting")
 @NamedQueries({
     @NamedQuery(name = "findLastHarvested",
         query = "SELECT a.lastHarvested FROM LastHarvested a WHERE a.url = :url"),

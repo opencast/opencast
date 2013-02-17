@@ -38,7 +38,7 @@ import static org.opencastproject.util.persistence.PersistenceUtil.runUpdate;
 
 /** JPA link to {@link org.opencastproject.episode.impl.persistence.Asset}. */
 @Entity(name = "Asset")
-@Table(name = "episode_asset")
+@Table(name = "mh_episode_asset")
 @NamedQueries({
         @NamedQuery(name = "Asset.findByUri", query = "SELECT a FROM Asset a WHERE a.uri = :uri"),
         @NamedQuery(name = "Asset.findByChecksum", query = "SELECT a FROM Asset a WHERE a.checksum = :checksum"),
@@ -52,13 +52,13 @@ public final class AssetDto {
   @Column(name = "uri", length = 256, nullable = false)
   private String uri;
 
-  @Column(name = "organization_id", nullable = false, length = 128)
+  @Column(name = "organization", nullable = false, length = 128)
   private String organizationId;
 
-  @Column(name = "mediapackage_id", nullable = false, length = 128)
+  @Column(name = "mediapackage", nullable = false, length = 128)
   private String mediaPackageId;
 
-  @Column(name = "mediapackageelement_id", nullable = false, length = 128)
+  @Column(name = "mediapackageelement", nullable = false, length = 128)
   private String mediaPackageElementId;
 
   @Column(name = "version", nullable = false)

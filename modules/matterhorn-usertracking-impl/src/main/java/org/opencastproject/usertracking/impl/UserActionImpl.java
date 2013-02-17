@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.XmlType;
  * A JAXB-annotated implementation of {@link UserAction}
  */
 @Entity(name = "UserAction")
-@Table(name = "user_action")
+@Table(name = "mh_user_action")
 @NamedQueries({
         @NamedQuery(name = "findUserActions", query = "SELECT a FROM UserAction a"),
         @NamedQuery(name = "countSessionsGroupByMediapackage", query = "SELECT a.mediapackageId, COUNT(distinct a.sessionId), SUM(a.length) FROM UserAction a GROUP BY a.mediapackageId"),
@@ -74,14 +74,12 @@ public class UserActionImpl implements UserAction {
   private Long id;
 
   @Lob
-  //@Index
-  @Column(name = "mediapackage_id", length = 255)
+  @Column(name = "mediapackage", length = 128)
   @XmlElement(name = "mediapackageId")
   private String mediapackageId;
 
   @Lob
-  //@Index
-  @Column(name = "user_id", length = 255)
+  @Column(name = "user", length = 255)
   @XmlElement(name = "userId")
   private String userId;
 
@@ -91,7 +89,7 @@ public class UserActionImpl implements UserAction {
   private String userIp;
 
   @Lob
-  @Column(name = "session_id", length = 50)
+  @Column(name = "session", length = 50)
   @XmlElement(name = "sessionId")
   private String sessionId;
 
@@ -108,11 +106,11 @@ public class UserActionImpl implements UserAction {
   private int length;
 
   @Lob
-  @Column(name = "type", length = 50)
+  @Column(name = "type", length = 128)
   @XmlElement(name = "type")
   private String type;
 
-  @Column(name = "is_playing")
+  @Column(name = "playing")
   @XmlElement(name = "isPlaying")
   private boolean isPlaying;
 

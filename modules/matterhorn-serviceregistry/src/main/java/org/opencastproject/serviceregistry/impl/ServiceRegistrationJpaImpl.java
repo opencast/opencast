@@ -54,7 +54,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "service", namespace = "http://serviceregistry.opencastproject.org")
 @Entity(name = "ServiceRegistration")
 @Access(AccessType.PROPERTY)
-@Table(name = "service_registration", uniqueConstraints = @UniqueConstraint(columnNames = { "host_registration",
+@Table(name = "mh_service_registration", uniqueConstraints = @UniqueConstraint(columnNames = { "host_registration",
         "service_type" }))
 @NamedQueries({
         @NamedQuery(name = "ServiceRegistration.statistics", query = "SELECT job.processorServiceRegistration as serviceRegistration, job.status, "
@@ -165,7 +165,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
   }
 
   @Lob
-  @Column(name = "path", nullable = false, length = 65535)
+  @Column(name = "path", nullable = false, length = 255)
   @XmlElement(name = "path")
   @Override
   public String getPath() {

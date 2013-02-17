@@ -26,16 +26,16 @@ import javax.persistence.Table;
  * 
  */
 @Entity(name = "JobContext")
-@Table(name = "job_context")
+@Table(name = "mh_job_context")
 public class JobPropertyJpaImpl {
 
   @Id
-  @Column(name = "root_job")
+  @Column(name = "id")
   protected JobJpaImpl rootJob;
 
   @Id
-  @Column(name = "key_entry", length = 255)
-  protected String key;
+  @Column(name = "name", length = 255)
+  protected String name;
 
   @Lob
   @Column(name = "value", length = 65535)
@@ -52,14 +52,14 @@ public class JobPropertyJpaImpl {
    * 
    * @param job
    *          the root job
-   * @param key
-   *          the property key
+   * @param name
+   *          the property name
    * @param value
    *          the property value
    */
-  public JobPropertyJpaImpl(JobJpaImpl job, String key, String value) {
+  public JobPropertyJpaImpl(JobJpaImpl job, String name, String value) {
     this.rootJob = job;
-    this.key = key;
+    this.name = name;
     this.value = value;
   }
 
@@ -81,16 +81,16 @@ public class JobPropertyJpaImpl {
   /**
    * @return the key
    */
-  public String getKey() {
-    return key;
+  public String getName() {
+    return name;
   }
 
   /**
-   * @param key
-   *          the key to set
+   * @param name
+   *          the name to set
    */
-  public void setKey(String key) {
-    this.key = key;
+  public void setName(String name) {
+    this.name = name;
   }
 
   /**

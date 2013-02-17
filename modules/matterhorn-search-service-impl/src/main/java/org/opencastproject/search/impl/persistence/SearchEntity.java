@@ -31,7 +31,7 @@ import javax.persistence.TemporalType;
  * Entity object for storing search in persistence storage. Media package id is stored as primary key.
  */
 @Entity(name = "SearchEntity")
-@Table(name = "search")
+@Table(name = "mh_search")
 @NamedQueries({
         @NamedQuery(name = "Search.findAll", query = "SELECT s FROM SearchEntity s"),
         @NamedQuery(name = "Search.getCount", query = "SELECT COUNT(s) FROM SearchEntity s"),
@@ -40,11 +40,11 @@ public class SearchEntity {
 
   /** media package id, primary key */
   @Id
-  @Column(name = "mediapackage_id", length = 128)
+  @Column(name = "id", length = 128)
   private String mediaPackageId;
 
   /** Organization id */
-  @Column(name = "organization_id", length = 128)
+  @Column(name = "organization", length = 128)
   protected String organization;
 
   /** The media package deleted */
@@ -59,7 +59,7 @@ public class SearchEntity {
 
   /** Serialized media package */
   @Lob
-  @Column(name = "mediapackage", length = 65535)
+  @Column(name = "mediapackage_xml", length = 65535)
   private String mediaPackageXML;
 
   /** Serialized access control */

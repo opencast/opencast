@@ -31,13 +31,13 @@ import javax.persistence.Table;
  * 
  */
 @Entity
-@Table(name = "upload")
+@Table(name = "mh_upload")
 // FIXME @NamedQueries necessary with only one NamedQuery
 @NamedQueries({ @NamedQuery(name = "UploadJob.getByID", query = "SELECT o FROM UploadJob o WHERE o.id = :id") })
 public class UploadJob {
 
   @Id
-  @Column(name = "id")
+  @Column(name = "id", length = 128)
   private String id;
 
   @Lob

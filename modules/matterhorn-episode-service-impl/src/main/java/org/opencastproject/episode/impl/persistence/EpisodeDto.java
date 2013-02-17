@@ -45,7 +45,7 @@ import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResu
 
 /** JPA link to {@link Episode}. */
 @Entity(name = "Episode")
-@Table(name = "episode_episode")
+@Table(name = "mh_episode_episode")
 @NamedQueries({
                       @NamedQuery(name = "Episode.findAll", query = "SELECT e FROM Episode e"),
                       @NamedQuery(name = "Episode.findByIdAndVersion", query = "SELECT e FROM Episode e WHERE e.mediaPackageId=:mediaPackageId AND e.version=:version"),
@@ -57,14 +57,14 @@ import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResu
                       @NamedQuery(name = "Episode.findAllById", query = "SELECT e FROM Episode e WHERE e.mediaPackageId=:mediaPackageId") })
 public final class EpisodeDto {
   @Id
-  @Column(name = "mediapackage_id", length = 128)
+  @Column(name = "id", length = 128)
   private String mediaPackageId;
 
   @Id
   @Column(name = "version")
   private long version;
 
-  @Column(name = "organization_id", length = 128, nullable = false)
+  @Column(name = "organization", length = 128, nullable = false)
   private String organization;
 
   @Column(name = "deletion_date")
@@ -80,7 +80,7 @@ public final class EpisodeDto {
   private String accessControl;
 
   @Lob
-  @Column(name = "mediapackage", length = 65535, nullable = false)
+  @Column(name = "mediapackage_xml", length = 65535, nullable = false)
   private String mediaPackageXml;
 
   public static EpisodeDto create(Episode episode) {

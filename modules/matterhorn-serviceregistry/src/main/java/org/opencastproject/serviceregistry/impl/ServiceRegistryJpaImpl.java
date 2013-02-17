@@ -1128,7 +1128,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *          the entity manager
    */
   private void cancelAllChildren(JobJpaImpl job, EntityManager em) {
-    for (JobJpaImpl child : job.getChildrenJobs()) {
+    for (JobJpaImpl child : job.getChildJobs()) {
       em.refresh(child);
       if (Status.CANCELED.equals(job.getStatus()))
         continue;

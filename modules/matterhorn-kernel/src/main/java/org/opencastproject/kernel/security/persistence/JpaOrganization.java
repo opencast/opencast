@@ -38,7 +38,7 @@ import java.util.Map;
  */
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "organization")
+@Table(name = "mh_organization")
 @NamedQueries({
         @NamedQuery(name = "Organization.findAll", query = "Select o FROM JpaOrganization o"),
         @NamedQuery(name = "Organization.findById", query = "Select o FROM JpaOrganization o where o.id = :id"),
@@ -48,7 +48,7 @@ public class JpaOrganization implements Organization {
 
   /** The organizational identifier */
   @Id
-  @Column(name = "org_id", length = 128)
+  @Column(name = "id", length = 128)
   protected String id;
 
   /** The friendly name of the organization */
@@ -58,7 +58,7 @@ public class JpaOrganization implements Organization {
   @ElementCollection
   @MapKeyColumn(name = "name")
   @Column(name = "port")
-  @CollectionTable(name = "org_servers", joinColumns = @JoinColumn(name = "org_id"))
+  @CollectionTable(name = "mh_organization_node", joinColumns = @JoinColumn(name = "organization"))
   protected Map<String, Integer> servers;
 
   /** The local admin role name */
@@ -72,7 +72,7 @@ public class JpaOrganization implements Organization {
   @ElementCollection
   @MapKeyColumn(name = "name")
   @Column(name = "value")
-  @CollectionTable(name = "org_properties", joinColumns = @JoinColumn(name = "org_id"))
+  @CollectionTable(name = "mh_organization_property", joinColumns = @JoinColumn(name = "organization"))
   protected Map<String, String> properties;
 
   /**

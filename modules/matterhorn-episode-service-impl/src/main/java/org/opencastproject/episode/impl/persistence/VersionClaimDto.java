@@ -32,13 +32,13 @@ import static org.opencastproject.util.persistence.PersistenceUtil.runUpdate;
 
 /** Supports the determination of the next free version identifier. */
 @Entity(name = "VersionClaim")
-@Table(name = "episode_version_claim")
+@Table(name = "mh_episode_version_claim")
 @NamedQueries({
         @NamedQuery(name = "VersionClaim.last", query = "select a from VersionClaim a where a.mediaPackageId = :mediaPackageId"),
         @NamedQuery(name = "VersionClaim.update", query = "update VersionClaim a set a.lastClaimed = :lastClaimed where a.mediaPackageId = :mediaPackageId") })
 public final class VersionClaimDto {
   @Id
-  @Column(name = "media_package_id", length = 128)
+  @Column(name = "mediapackage", length = 128)
   private String mediaPackageId;
 
   @Column(name = "last_claimed", nullable = false)

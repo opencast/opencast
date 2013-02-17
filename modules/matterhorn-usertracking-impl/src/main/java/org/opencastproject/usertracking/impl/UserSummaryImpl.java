@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.XmlType;
  * A JAXB-annotated implementation of {@link UserSummary}
  */
 @Entity(name = "UserSummary")
-@Table(name = "user_action")
+@Table(name = "mh_user_action")
 @NamedQueries({ 
  @NamedQuery(name = "userSummaryByMediapackageByType", query = "SELECT a.userId, COUNT(distinct a.sessionId), COUNT(distinct a.mediapackageId), SUM(a.length), MAX(a.created) FROM UserAction a WHERE a.type = :type AND a.mediapackageId = :mediapackageId GROUP BY a.userId;") })
 @XmlType(name = "summary", namespace = "http://usertracking.opencastproject.org")
@@ -49,15 +49,15 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.NONE)
 public class UserSummaryImpl implements UserSummary {
   @Id
-  @Column(name = "user_id", length = 65535)
+  @Column(name = "user", length = 65535)
   @XmlElement(name = "userId")
   private String userId = "Empty UserId";
   
-  @Column(name = "session_id")
+  @Column(name = "session")
   @XmlElement(name = "sessionCount")
   private long sessionCount = 0;
   
-  @Column(name = "mediapackage_id")
+  @Column(name = "mediapackage", length = 128)
   @XmlElement(name = "uniqueMediapackages")
   private long uniqueMediapackages = 0;
   
