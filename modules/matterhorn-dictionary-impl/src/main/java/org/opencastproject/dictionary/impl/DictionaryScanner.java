@@ -93,7 +93,7 @@ public class DictionaryScanner implements ArtifactInstaller {
       // read csv file and fill dictionary index
       BufferedReader br = null;
       try {
-        br = new BufferedReader(new InputStreamReader(new FileInputStream(artifact)), 1024 * 1024);
+        br = new BufferedReader(new InputStreamReader(new FileInputStream(artifact), "utf-8"), 1024 * 1024);
         String wordLine;
         while ((wordLine = br.readLine()) != null) {
           if (wordLine.startsWith("#")) {
