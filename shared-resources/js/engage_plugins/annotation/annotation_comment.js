@@ -257,7 +257,7 @@ Opencast.Annotation_Comment = (function ()
         				   $('canvas[id^="slideComment"]').hide();
 					   
 					   //process position and set comment info box
-					   var left = $("#scrubber").offset().left + ($("#scrubber").width() / 2) ;
+					   var left = $("#draggable").offset().left + ($("#draggable").width() / 2) ;
 					   var top = $("#data").offset().top - 136;
 					   $("#comment-Info").css("left", left+"px");
 					   $("#comment-Info").css("top", top+"px");
