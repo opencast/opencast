@@ -15,9 +15,8 @@
  */
 package org.opencastproject.composer.impl;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.felix.fileinstall.ArtifactInstaller;
+import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
+
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.EncodingProfile.MediaType;
 import org.opencastproject.composer.api.EncodingProfileImpl;
@@ -25,6 +24,10 @@ import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.ReadinessIndicator;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-
-import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
 
 /**
  * This manager class tries to read encoding profiles from the classpath.
@@ -176,47 +177,48 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     String identifier = profile;
     List<String> defaultProperties = new ArrayList<String>(10);
 
-    Object name = getDefaultProperty(profile, PROP_NAME, properties, defaultProperties);
-    if (name == null || "".equals(name.toString().trim()))
-      throw new ConfigurationException("Distribution profile '" + profile
-              + "' is missing a name. (Check web.xml profiles.)");
+    String name = getDefaultProperty(profile, PROP_NAME, properties, defaultProperties);
+    if (name == null || "".equals(name))
+      throw new ConfigurationException("Distribution profile '" + profile + "' is missing a name (" + PROP_NAME
+              + "). (Check web.xml profiles.)");
 
-    EncodingProfileImpl df = new EncodingProfileImpl(identifier, name.toString().trim(), artifact);
+    EncodingProfileImpl df = new EncodingProfileImpl(identifier, name, artifact);
 
     // Output Type
-    Object type = getDefaultProperty(profile, PROP_OUTPUT, properties, defaultProperties);
-    if (StringUtils.isBlank(type.toString()))
-      throw new ConfigurationException("Output type of profile '" + profile + "' is missing");
+    String type = getDefaultProperty(profile, PROP_OUTPUT, properties, defaultProperties);
+    if (StringUtils.isBlank(type))
+      throw new ConfigurationException("Output type (" + PROP_OUTPUT + ") of profile '" + profile + "' is missing");
     try {
-      df.setOutputType(MediaType.parseString(StringUtils.trimToEmpty(type.toString())));
+      df.setOutputType(MediaType.parseString(StringUtils.trimToEmpty(type)));
     } catch (IllegalArgumentException e) {
-      throw new ConfigurationException("Output type '" + type + "' of profile '" + profile + "' is unknwon");
+      throw new ConfigurationException("Output type (" + PROP_OUTPUT + ") '" + type + "' of profile '" + profile
+              + "' is unknwon");
     }
 
     // Suffix
-    Object suffixObj = getDefaultProperty(profile, PROP_SUFFIX, properties, defaultProperties);
-    if (StringUtils.isBlank(suffixObj.toString()))
-      throw new ConfigurationException("Suffix of profile '" + profile + "' is missing");
-    df.setSuffix(StringUtils.trim(suffixObj.toString()));
+    String suffixObj = getDefaultProperty(profile, PROP_SUFFIX, properties, defaultProperties);
+    if (StringUtils.isBlank(suffixObj))
+      throw new ConfigurationException("Suffix (" + PROP_SUFFIX + ") of profile '" + profile + "' is missing");
+    df.setSuffix(StringUtils.trim(suffixObj));
 
     // Mimetype
-    Object mimeTypeObj = getDefaultProperty(profile, PROP_MIMETYPE, properties, defaultProperties);
-    if (mimeTypeObj != null && StringUtils.isNotBlank(mimeTypeObj.toString())) {
+    String mimeTypeObj = getDefaultProperty(profile, PROP_MIMETYPE, properties, defaultProperties);
+    if (StringUtils.isNotBlank(mimeTypeObj)) {
       MimeType mimeType;
       try {
-        mimeType = MimeTypes.parseMimeType(mimeTypeObj.toString());
+        mimeType = MimeTypes.parseMimeType(mimeTypeObj);
       } catch (Exception e) {
-        throw new ConfigurationException("Mime type " + mimeTypeObj.toString()
+        throw new ConfigurationException("Mime type (" + PROP_MIMETYPE + ") " + mimeTypeObj
                 + " could not be parsed as a mime type! Expressions are not allowed!");
       }
-      df.setMimeType(mimeType.asString());
+      df.setMimeType(mimeType.toString());
     }
 
     // Applicable to the following track categories
-    Object applicableObj = getDefaultProperty(profile, PROP_APPLICABLE, properties, defaultProperties);
-    if (StringUtils.isBlank(applicableObj.toString()))
-      throw new ConfigurationException("Input type of profile '" + profile + "' is missing");
-    df.setApplicableType(MediaType.parseString(StringUtils.trimToEmpty(applicableObj.toString())));
+    String applicableObj = getDefaultProperty(profile, PROP_APPLICABLE, properties, defaultProperties);
+    if (StringUtils.isBlank(applicableObj))
+      throw new ConfigurationException("Input type (" + PROP_APPLICABLE + ") of profile '" + profile + "' is missing");
+    df.setApplicableType(MediaType.parseString(StringUtils.trimToEmpty(applicableObj)));
 
     // Look for extensions
     String extensionKey = PROP_PREFIX + profile + ".";
@@ -281,7 +283,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
       }
       sumInstalledFiles++;
     } catch (Exception e) {
-      logger.error("Encoding profiles could not be read from " + artifact, e);
+      logger.error("Encoding profiles could not be read from {}: {}", artifact, e.getMessage());
     }
 
     // Determine the number of available profiles
