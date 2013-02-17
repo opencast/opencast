@@ -13,7 +13,7 @@
     <!-- scripts -->
     <script type="text/javascript" src="/engage/ui/js/jquery/jquery.js"></script>
     <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.utils.js"></script>
-    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.xslt.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.xslt.new.js"></script>
     <script type="text/javascript" src="/engage/ui/js/oc-pager.js"></script>
     <script type="text/javascript" src="/engage/ui/js/engage-ui.js"></script>
     <script type="text/javascript">
@@ -60,7 +60,8 @@
           restEndpoint = restEndpoint + "&offset=" + (page - 1) * 10;
 
           restEndpoint = restEndpoint + "&_=" + new Date().getTime(); // workaround for IE ajax caching problem
-          $('#stage').xslt(restEndpoint, "xsl/episodes.xsl", function ()
+
+          $('#stage').xslt({xmlUrl: restEndpoint, xslUrl: "xsl/episodes.xsl", dataTypeXML: true, callback: function (data)
           {
               Opencast.pager.renderPager();
               var total = $('#oc-episodes-total').html();
@@ -126,7 +127,7 @@
                   }
               }
 
-          });
+          }});
 
           if (searchQuery != null && searchQuery != "")
           {
