@@ -72,7 +72,6 @@ opencast.episode = (function() {
               },
               requirement: {
                 title: true,
-                creator: true
               },
               
               addCatalog: function(mp, catalog, catalogDCXML) {
