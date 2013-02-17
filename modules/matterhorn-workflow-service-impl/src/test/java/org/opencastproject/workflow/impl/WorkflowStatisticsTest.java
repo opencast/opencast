@@ -22,6 +22,7 @@ import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
@@ -282,6 +283,7 @@ public class WorkflowStatisticsTest {
     List<WorkflowInstance> instances = new ArrayList<WorkflowInstance>();
     for (WorkflowDefinition def : workflowDefinitions) {
       for (int j = 0; j < def.getOperations().size(); j++) {
+        mediaPackage.setIdentifier(new UUIDIdBuilderImpl().createNew());
         instances.add(service.start(def, mediaPackage));
         total++;
         paused++;

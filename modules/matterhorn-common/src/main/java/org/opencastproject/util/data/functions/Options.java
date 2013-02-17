@@ -15,14 +15,17 @@
  */
 package org.opencastproject.util.data.functions;
 
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.Option;
-
-import java.util.List;
-
+import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
+
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Function0;
+import org.opencastproject.util.data.Function2;
+import org.opencastproject.util.data.Option;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** {@link Option} related functions. */
 public final class Options {
@@ -31,7 +34,8 @@ public final class Options {
 
   public static <A> Function<Option<A>, List<A>> asList() {
     return new Function<Option<A>, List<A>>() {
-      @Override public List<A> apply(Option<A> a) {
+      @Override
+      public List<A> apply(Option<A> a) {
         return a.list();
       }
     };
@@ -56,10 +60,31 @@ public final class Options {
   }
 
   /** Function that turns <code>true</code> into <code>some(true)</code> and false into <code>none</code>. */
-  private static Function<Boolean, Option<Boolean>> toOption = new Function<Boolean, Option<Boolean>>() {
+  public static final Function<Boolean, Option<Boolean>> toOption = new Function<Boolean, Option<Boolean>>() {
     @Override
     public Option<Boolean> apply(Boolean a) {
       return a ? some(true) : Option.<Boolean> none();
     }
   };
+
+  /** Returns some(message) if predicate is false, none otherwise. */
+  public static Option<String> toOption(boolean predicate, String message) {
+    return predicate ? Option.<String> none() : some(message);
+  }
+
+  /** Sequence a list of options. [Option a] -&gt; Option [a] */
+  public static <A> Option<List<A>> sequenceOpt(List<Option<A>> as) {
+    final List<A> seq = mlist(as).foldl(new ArrayList<A>(), new Function2<List<A>, Option<A>, List<A>>() {
+      @Override
+      public List<A> apply(List<A> sum, Option<A> o) {
+        for (A a : o) {
+          sum.add(a);
+          return sum;
+        }
+        return sum;
+      }
+    });
+    return some(seq);
+  }
+
 }

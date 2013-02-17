@@ -44,9 +44,8 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.workflow.api.WorkflowDatabaseException;
+import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
@@ -251,10 +250,8 @@ public class WorkflowPermissionsUpdatedEventHandler implements EventHandler {
             workflowService.update(instance);
           }
 
-        } catch (WorkflowDatabaseException e) {
-          logger.warn("Unable to find mediapackages in workflow service: ", e.getMessage());
-        } catch (WorkflowParsingException e) {
-          logger.warn("Unable to parse mediapackages in workflow service: ", e.getMessage());
+        } catch (WorkflowException e) {
+          logger.warn(e.getMessage());
         } catch (UnauthorizedException e) {
           logger.warn(e.getMessage());
         } catch (MediaPackageException e) {

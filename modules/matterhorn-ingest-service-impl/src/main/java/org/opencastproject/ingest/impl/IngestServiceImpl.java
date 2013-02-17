@@ -32,6 +32,7 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.identifier.HandleException;
+import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
@@ -301,6 +302,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
       // Build the mediapackage
       MediaPackage mp = loadMediaPackageFromManifest(manifest);
+
+      if (mp.getIdentifier() == null || StringUtils.isBlank(mp.getIdentifier().toString()))
+        mp.setIdentifier(new UUIDIdBuilderImpl().createNew());
 
       if (mp.getTracks().length == 0)
         throw new IngestException("MediaPackage cannot be empty");

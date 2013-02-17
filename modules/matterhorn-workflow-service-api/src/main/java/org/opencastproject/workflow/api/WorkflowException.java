@@ -18,7 +18,7 @@ package org.opencastproject.workflow.api;
 /**
  * The superclass for any workflow related exceptions.
  */
-public abstract class WorkflowException extends Exception {
+public class WorkflowException extends Exception {
 
   /** The java.io.serialization class version */
   private static final long serialVersionUID = 1220788011273100329L;
@@ -50,8 +50,7 @@ public abstract class WorkflowException extends Exception {
   }
 
   /**
-   * Constructs a new workflow exception with a message and the throwable that caused this exception to be
-   * thrown.
+   * Constructs a new workflow exception with a message and the throwable that caused this exception to be thrown.
    * 
    * @param message
    *          the message describing the exception

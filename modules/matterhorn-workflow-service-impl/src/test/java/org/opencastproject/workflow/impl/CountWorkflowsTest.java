@@ -23,6 +23,7 @@ import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
@@ -191,6 +192,7 @@ public class CountWorkflowsTest {
     synchronized (listener) {
       workflow1 = service.start(def, mp, initialProps);
       listener.wait();
+      mp.setIdentifier(new UUIDIdBuilderImpl().createNew());
       service.start(def, mp, initialProps);
       listener.wait();
     }

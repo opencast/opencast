@@ -15,16 +15,16 @@
  */
 package org.opencastproject.util;
 
+import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Collections.toArray;
+import static org.opencastproject.util.data.Tuple.tuple;
+
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.data.Option;
 
 import java.util.List;
-
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Collections.toArray;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 /** Job related utility functions. */
 public final class JobUtil {
@@ -49,6 +49,34 @@ public final class JobUtil {
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, List<Job> jobs) {
     JobBarrier barrier = new JobBarrier(reg, toArray(jobs));
     return barrier.waitForJobs();
+  }
+
+  /**
+   * Returns <code>true</code> if the job is ready to be dispatched.
+   * 
+   * @param job
+   *          the job
+   * @return <code>true</code> whether the job is ready to be dispatched
+   * @throws IllegalStateException
+   *           if the job status is unknown
+   */
+  public static boolean isReadyToDispatch(Job job) throws IllegalStateException {
+    switch (job.getStatus()) {
+      case CANCELED:
+      case DELETED:
+      case FAILED:
+      case FINISHED:
+        return false;
+      case DISPATCHING:
+      case INSTANTIATED:
+      case PAUSED:
+      case QUEUED:
+      case RESTART:
+      case RUNNING:
+        return true;
+      default:
+        throw new IllegalStateException("Found job in unknown state '" + job.getStatus() + "'");
+    }
   }
 
   /** Check if <code>job</code> is not done yet and wait in case. */
