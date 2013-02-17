@@ -15,6 +15,12 @@
  */
 package org.opencastproject.scheduler.endpoint;
 
+import net.fortuna.ical4j.model.property.RRule;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
@@ -27,33 +33,15 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-
-import net.fortuna.ical4j.model.property.RRule;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Properties;
-import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -73,6 +61,18 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Properties;
+import java.util.TimeZone;
+
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Tuple.tuple;
 
 /**
  * REST Endpoint for Scheduler Service
@@ -140,7 +140,7 @@ public class SchedulerRestService {
   /**
    * Gets a XML with the Dublin Core metadata for the specified event.
    * 
-   * @param eventID
+   * @param eventId
    *          The unique ID of the event.
    * @return Dublin Core XML for the event
    */
@@ -167,7 +167,7 @@ public class SchedulerRestService {
   /**
    * Gets a Dublin Core metadata for the specified event as JSON.
    * 
-   * @param eventID
+   * @param eventId
    *          The unique ID of the event.
    * @return Dublin Core JSON for the event
    */
@@ -193,7 +193,7 @@ public class SchedulerRestService {
   /**
    * Gets java Properties file with technical metadata for the specified event.
    * 
-   * @param eventID
+   * @param eventId
    *          The unique ID of the event.
    * @return Java Properties File with the metadata for the event
    */
@@ -218,26 +218,10 @@ public class SchedulerRestService {
   }
 
   /**
-   * Creates new event(s) based on parameters. ALl times and dates are in milliseconds.
-   * 
-   * @param event
-   *          serialized Dublin Core for event
-   * @param properties
-   *          Capture agent properties (optional)
-   * @param recurrence
-   *          recurrence pattern (optionally)
-   * @param start
-   *          start of event, used if recurrence is specified (if null is sent, current time will be asumed)
-   * @param end
-   *          end of event, required for recurrent events
-   * @param duration
-   *          duration of each event, required for recurrent events
-   * @param agentTimeZone
-   *          time zone of the agent if it's different than scheduler's
-   * @return
+   * Creates new event(s) based on parameters. All times and dates are in milliseconds.
    */
   @POST
-  @Path("")
+  @Path("/")
   @RestQuery(name = "newrecordings", description = "Creates new event or group of event with specified parameters", returnDescription = "If events were successfully generated, status CREATED is returned, otherwise BAD REQUEST", restParameters = {
           @RestParameter(name = "dublincore", isRequired = true, type = Type.TEXT, description = "Dublin Core describing event", defaultValue = "${this.sampleDublinCore}"),
           @RestParameter(name = "agentparameters", isRequired = true, type = Type.TEXT, description = "Capture agent properties for event", defaultValue = "${this.sampleCAProperties}"),
@@ -279,13 +263,15 @@ public class SchedulerRestService {
         // try to create event and it's recurrences
         Long[] createdIDs = service.addReccuringEvent(eventCatalog);
         if (caProperties != null) {
-          service.updateCaptureAgentMetadata(caProperties, createdIDs);
+          for (long id : createdIDs) {
+            service.updateCaptureAgentMetadata(caProperties, tuple(id, service.getEventDublinCore(id)));
+          }
         }
         return Response.status(Status.CREATED).build();
       } else {
         Long id = service.addEvent(eventCatalog);
         if (caProperties != null) {
-          service.updateCaptureAgentMetadata(caProperties, id);
+          service.updateCaptureAgentMetadata(caProperties, tuple(id, eventCatalog));
         }
         return Response.status(Status.CREATED)
                 .header("Location", PathSupport.concat(new String[] { this.serverUrl, this.serviceUrl, id + ".xml" }))
@@ -328,11 +314,7 @@ public class SchedulerRestService {
     }
     if (!ids.isEmpty() && eventCatalog != null) {
       try {
-        ArrayList<String> stringIds = new ArrayList<String>();
-        for (int i = 0; i < ids.size(); i++) {
-          stringIds.add(Long.toString((Long) ids.get(i)));
-        }
-        service.updateEvents(stringIds, eventCatalog);
+        service.updateEvents(mlist(ids).map(Misc.<Object, Long>cast()).value(), eventCatalog);
         return Response.noContent().type("").build(); // remove content-type, no message-body.
       } catch (Exception e) {
         logger.warn("Unable to update event with id " + ids.toString() + ": {}", e);
@@ -347,7 +329,7 @@ public class SchedulerRestService {
    * 
    * Removes the specified event from the database. Returns true if the event was found and could be removed.
    * 
-   * @param eventID
+   * @param eventId
    *          The unique ID of the event.
    * @return true if the event was found and could be deleted.
    */
@@ -377,7 +359,7 @@ public class SchedulerRestService {
    * @param eventID
    *          id of event to be updated
    * 
-   * @param event
+   * @param catalogs
    *          serialized DC representing event
    * @return
    */
@@ -391,6 +373,7 @@ public class SchedulerRestService {
           @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Data is missing or invalid") })
   public Response updateEvent(@PathParam("id") String eventID, MultivaluedMap<String, String> catalogs) {
 
+    // Update CA properties from dublin core (event.title, etc)
     Long id;
     try {
       id = Long.parseLong(eventID);
@@ -416,6 +399,9 @@ public class SchedulerRestService {
     if (catalogs.containsKey("agentparameters")) {
       try {
         caProperties = parseProperties(catalogs.getFirst("agentparameters"));
+        if (caProperties.size() == 0) {
+          logger.info("Empty form param 'agentparameters'. This resets all CA parameters. Please make sure this is intended behaviour.");
+        }
       } catch (Exception e) {
         logger.warn("Could not parse capture agent properties: {}", catalogs.getFirst("agentparameters"));
         return Response.status(Status.BAD_REQUEST).build();
@@ -427,10 +413,10 @@ public class SchedulerRestService {
 
     try {
       if (eventCatalog != null) {
-        service.updateEvent(eventCatalog);
+        service.updateEvent(id, eventCatalog);
       }
       if (caProperties != null) {
-        service.updateCaptureAgentMetadata(caProperties, id);
+        service.updateCaptureAgentMetadata(caProperties, tuple(id, eventCatalog));
       }
       return Response.ok().build();
     } catch (NotFoundException e) {

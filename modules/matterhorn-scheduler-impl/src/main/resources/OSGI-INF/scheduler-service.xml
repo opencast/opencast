@@ -10,6 +10,8 @@
   </service>
   <reference name="scheduler-persistence" interface="org.opencastproject.scheduler.impl.SchedulerServiceDatabase"
     cardinality="1..1" policy="static" bind="setPersistence" />    
+  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+    cardinality="1..1" policy="static" bind="setWorkspace" />
   <reference name="scheduler-index" interface="org.opencastproject.scheduler.impl.SchedulerServiceIndex"
     cardinality="1..1" policy="static" bind="setIndex" />
   <reference name="series-service" interface="org.opencastproject.series.api.SeriesService"

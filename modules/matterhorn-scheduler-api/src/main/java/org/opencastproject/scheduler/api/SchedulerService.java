@@ -19,6 +19,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Tuple;
 
 import java.util.Date;
 import java.util.List;
@@ -61,16 +62,6 @@ public interface SchedulerService {
    * 
    * @param eventCatalog
    *          template {@link DublinCoreCatalog} used to create events
-   * @param recPattern
-   *          pattern of recurrence
-   * @param beginning
-   *          start date of event series
-   * @param end
-   *          end date of event series
-   * @param duration
-   *          duration of each event in milliseconds
-   * @param timeZone
-   *          time zone in which event will take place or null if local time zone should be used
    * @return array of events IDs that were created
    * @throws SchedulerException
    *           if events cannot be created
@@ -87,7 +78,7 @@ public interface SchedulerService {
    * <li>event.location (mapped from dc:spatial)</li>
    * </ul>
    * 
-   * @param eventIDs
+   * @param events
    *          array of events that should be updated
    * @param configuration
    *          Properties for capture agent
@@ -96,8 +87,8 @@ public interface SchedulerService {
    * @throws SchedulerException
    *           if update fails
    */
-  void updateCaptureAgentMetadata(Properties configuration, Long... eventIDs) throws NotFoundException,
-          SchedulerException;
+  void updateCaptureAgentMetadata(Properties configuration, Tuple<Long, DublinCoreCatalog>... events)
+          throws NotFoundException, SchedulerException;
 
   /**
    * Update event's DublinCore. Capture agent metadata will also be updated:
@@ -106,6 +97,7 @@ public interface SchedulerService {
    * <li>event.series (mapped from dc:is_part_of)</li>
    * <li>event.location (mapped from dc:spatial)</li>
    * </ul>
+   * Please note that the dublin core's identifier property is <em>not</em> used.
    * 
    * @param eventCatalog
    *          updated {@link DublinCoreCatalog}
@@ -116,24 +108,24 @@ public interface SchedulerService {
    * @throws UnauthorizedException
    *           if the caller is not authorized to take this action
    */
-  void updateEvent(DublinCoreCatalog eventCatalog) throws NotFoundException, SchedulerException, UnauthorizedException;
+  void updateEvent(long eventId, DublinCoreCatalog eventCatalog) throws NotFoundException, SchedulerException, UnauthorizedException;
 
   /**
    * Removes event with specified ID.
    * 
-   * @param eventID
+   * @param eventId
    *          event to be removed
    * @throws SchedulerException
    *           if exception occurred
    * @throws NotFoundException
    *           if event with specified ID cannot be found
    */
-  void removeEvent(long eventID) throws SchedulerException, NotFoundException, UnauthorizedException;
+  void removeEvent(long eventId) throws SchedulerException, NotFoundException, UnauthorizedException;
 
   /**
    * Retrieves DublinCore associated with specified event ID.
    * 
-   * @param eventID
+   * @param eventId
    *          ID of event for which DublinCore will be retrieved
    * @return {@link DublinCoreCatalog} for specified event
    * @throws NotFoundException
@@ -141,12 +133,12 @@ public interface SchedulerService {
    * @throws SchedulerException
    *           if exception occurred
    */
-  DublinCoreCatalog getEventDublinCore(long eventID) throws NotFoundException, SchedulerException;
+  DublinCoreCatalog getEventDublinCore(long eventId) throws NotFoundException, SchedulerException;
 
   /**
    * Retrieves capture agent configuration for specified event.
    * 
-   * @param eventID
+   * @param eventId
    *          ID of event for which capture agent configuration should be retrieved
    * @return Properties for capture agent
    * @throws NotFoundException
@@ -154,7 +146,7 @@ public interface SchedulerService {
    * @throws SchedulerException
    *           if exception occurred
    */
-  Properties getEventCaptureAgentConfiguration(long eventID) throws NotFoundException, SchedulerException;
+  Properties getEventCaptureAgentConfiguration(long eventId) throws NotFoundException, SchedulerException;
 
   /**
    * Retrieves all events matching given query object.
@@ -225,6 +217,7 @@ public interface SchedulerService {
    *           if exception occurred
    */
   Date getScheduleLastModified(SchedulerQuery filter) throws SchedulerException;
-  
-  void updateEvents(List<String> idList, final DublinCoreCatalog eventCatalog) throws NotFoundException, SchedulerException, UnauthorizedException;
+
+  /** Update all events with metadata from eventCatalog. */
+  void updateEvents(List<Long> eventIds, final DublinCoreCatalog eventCatalog) throws NotFoundException, SchedulerException, UnauthorizedException;
 }

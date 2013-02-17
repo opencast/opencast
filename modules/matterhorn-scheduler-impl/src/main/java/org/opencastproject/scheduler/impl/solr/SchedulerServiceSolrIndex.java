@@ -15,6 +15,18 @@
  */
 package org.opencastproject.scheduler.impl.solr;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -30,19 +42,6 @@ import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.SolrUtils;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrInputDocument;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +62,7 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static org.opencastproject.scheduler.impl.Util.getEventIdentifier;
 import static org.opencastproject.util.data.Option.option;
 
 /**
@@ -285,7 +285,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
     // check if we are updating
     // if that's the case retrieve CA properties and add them
-    SolrDocument retrievedDoc = retrieveDocumentById(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER));
+    SolrDocument retrievedDoc = retrieveDocumentById(getEventIdentifier(dc));
     final SolrInputDocument doc = createDocument(dc);
     if (retrievedDoc != null && retrievedDoc.containsKey(SolrFields.CA_PROPERTIES)) {
       doc.setField(SolrFields.CA_PROPERTIES, retrievedDoc.getFirstValue(SolrFields.CA_PROPERTIES));
@@ -323,7 +323,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#index(java.lang.String, java.util.Properties)
    */
   @Override
-  public void index(String eventId, Properties captureAgentProperties) throws NotFoundException,
+  public void index(long eventId, Properties captureAgentProperties) throws NotFoundException,
           SchedulerServiceDatabaseException {
     SolrDocument result = retrieveDocumentById(eventId);
     if (result == null) {
@@ -536,8 +536,8 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
    * @throws SchedulerServiceDatabaseException
    *           if exception occurred
    */
-  private SolrDocument retrieveDocumentById(String id) throws SchedulerServiceDatabaseException {
-    String solrQueryString = SolrFields.ID_KEY + ":" + ClientUtils.escapeQueryChars(id);
+  private SolrDocument retrieveDocumentById(long id) throws SchedulerServiceDatabaseException {
+    String solrQueryString = SolrFields.ID_KEY + ":" + ClientUtils.escapeQueryChars(Long.toString(id));
     SolrQuery q = new SolrQuery(solrQueryString);
     QueryResponse response;
     try {
@@ -659,9 +659,9 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
         sb.append(" AND ");
       }
       sb.append("(");
-      List<String> ids = query.getIdsList();
+      List<Long> ids = query.getIdsList();
       for (int i = 0; i < ids.size(); i++) {
-        String id = ids.get(i);
+        String id = Long.toString(ids.get(i));
         if (StringUtils.isNotEmpty(id)) {
           sb.append(SolrFields.ID_KEY);
           sb.append(":");
@@ -785,13 +785,13 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#delete(java.lang.String)
    */
   @Override
-  public void delete(final String id) throws SchedulerServiceDatabaseException {
+  public void delete(final long id) throws SchedulerServiceDatabaseException {
 
     if (synchronousIndexing) {
       try {
         synchronized (solrServer) {
           DublinCoreCatalog catalog = getDublinCore(id);
-          solrServer.deleteById(id);
+          solrServer.deleteById(Long.toString(id));
           solrServer.commit();
           if (catalog != null) {
             String spatial = catalog.getFirst(DublinCoreCatalog.PROPERTY_SPATIAL);
@@ -811,7 +811,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
           try {
             synchronized (solrServer) {
               DublinCoreCatalog catalog = getDublinCore(id);
-              solrServer.deleteById(id);
+              solrServer.deleteById(Long.toString(id));
               solrServer.commit();
               if (catalog != null) {
                 String spatial = catalog.getFirst(DublinCoreCatalog.PROPERTY_SPATIAL);
@@ -835,7 +835,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#getDublinCore(java.lang.String)
    */
   @Override
-  public DublinCoreCatalog getDublinCore(String eventId) throws SchedulerServiceDatabaseException, NotFoundException {
+  public DublinCoreCatalog getDublinCore(long eventId) throws SchedulerServiceDatabaseException, NotFoundException {
     SolrDocument result = retrieveDocumentById(eventId);
     if (result == null) {
       logger.info("No event exists with ID {}", eventId);
@@ -859,7 +859,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#getCaptureAgentProperties(java.lang.String)
    */
   @Override
-  public Properties getCaptureAgentProperties(String eventId) throws SchedulerServiceDatabaseException,
+  public Properties getCaptureAgentProperties(long eventId) throws SchedulerServiceDatabaseException,
           NotFoundException {
     SolrDocument result = retrieveDocumentById(eventId);
     if (result == null) {

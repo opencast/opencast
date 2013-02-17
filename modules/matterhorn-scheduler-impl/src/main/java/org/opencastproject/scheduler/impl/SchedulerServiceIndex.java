@@ -70,7 +70,7 @@ public interface SchedulerServiceIndex {
    * @throws SchedulerServiceDatabaseException
    *           if indexing failed
    */
-  void index(String eventId, Properties captureAgentProperties) throws NotFoundException,
+  void index(long eventId, Properties captureAgentProperties) throws NotFoundException,
           SchedulerServiceDatabaseException;
 
   /**
@@ -92,7 +92,7 @@ public interface SchedulerServiceIndex {
    * @throws SchedulerServiceDatabaseException
    *           if removal failed
    */
-  void delete(String id) throws SchedulerServiceDatabaseException;
+  void delete(long id) throws SchedulerServiceDatabaseException;
 
   /**
    * Retrieves Dublin core of event with specified ID.
@@ -105,7 +105,7 @@ public interface SchedulerServiceIndex {
    * @throws SchedulerServiceDatabaseException
    *           if exception occurred
    */
-  DublinCoreCatalog getDublinCore(String eventId) throws NotFoundException, SchedulerServiceDatabaseException;
+  DublinCoreCatalog getDublinCore(long eventId) throws NotFoundException, SchedulerServiceDatabaseException;
 
   /**
    * Retrieves capture agent properties for specified ID
@@ -118,7 +118,7 @@ public interface SchedulerServiceIndex {
    * @throws SchedulerServiceDatabaseException
    *           if exception occurred
    */
-  Properties getCaptureAgentProperties(String eventId) throws NotFoundException, SchedulerServiceDatabaseException;
+  Properties getCaptureAgentProperties(long eventId) throws NotFoundException, SchedulerServiceDatabaseException;
 
   /**
    * Returns date of last modification of event belonging to specified capture agent.
