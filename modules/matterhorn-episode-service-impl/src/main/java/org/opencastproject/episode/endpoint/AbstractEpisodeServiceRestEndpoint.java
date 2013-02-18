@@ -76,10 +76,12 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.episode.api.EpisodeQuery.query;
 import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
+import static org.opencastproject.util.RestUtil.R.noContent;
+import static org.opencastproject.util.RestUtil.R.notFound;
+import static org.opencastproject.util.RestUtil.R.serverError;
 import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
@@ -138,7 +140,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
     return handleException(new Function0<Response>() {
       @Override public Response apply() {
         getEpisodeService().add(mediaPackage);
-        return Response.noContent().build();
+        return noContent();
       }
     });
   }
@@ -156,9 +158,9 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
     return handleException(new Function0.X<Response>() {
       @Override public Response xapply() throws NotFoundException {
         if (mediaPackageId != null && getEpisodeService().delete(mediaPackageId))
-          return Response.noContent().build();
+          return noContent();
         else
-          throw new NotFoundException();
+          return notFound();
       }
     });
   }
@@ -379,7 +381,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
                                          some(fileName)).build();
         }
         // none
-        return chuck(new NotFoundException());
+        return notFound();
       }
     });
   }
@@ -396,13 +398,15 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
   public Response getMediapackage(@PathParam("mediaPackageID") final String mediaPackageId) {
     return handleException(new Function0<Response>() {
       @Override public Response apply() {
-        final EpisodeQuery idQuery = query(getSecurityService()).id(mediaPackageId);
-        for (SearchResultItem item : mlist(getEpisodeService().find(idQuery).getItems()).head()) {
-          final MediaPackage rewritten = rewriteUris(item.getMediaPackage(), rewriteUri.curry(item.getOcVersion()));
-          return Response.ok(rewritten).build();
-        }
-        // none
-        return chuck(new NotFoundException());
+        final EpisodeQuery idQuery = query(getSecurityService()).id(mediaPackageId).onlyLastVersion();
+        final List<SearchResultItem> result = getEpisodeService().find(idQuery).getItems();
+        if (result.size() > 1)
+          return serverError();
+        if (result.size() == 0)
+          return notFound();
+        final SearchResultItem item = result.get(0);
+        final MediaPackage rewritten = rewriteUris(item.getMediaPackage(), rewriteUri.curry(item.getOcVersion()));
+        return Response.ok(rewritten).build();
       }
     });
   }
