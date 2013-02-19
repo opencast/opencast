@@ -1751,6 +1751,30 @@
       </roles>
       <timezone>+2</timezone>
     </developer>
+    <developer>
+      <id>michellezee</id>
+      <name>Michelle Ziegmann</name>
+      <email>michelle@media.berkeley.edu</email>
+      <organization>UC Berkeley</organization>
+      <organizationUrl>http://berkeley.edu</organizationUrl>
+      <roles>
+        <role>community facilitator</role>
+        <role>tester</role>
+      </roles>
+      <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <id>judy</id>
+      <name>Judy Stern</name>
+      <email>jlstern@berkeley.edu</email>
+      <organization>UC Berkeley</organization>
+      <organizationUrl>http://berkeley.edu</organizationUrl>
+      <roles>
+        <role>community facilitator</role>
+        <role>tester</role>
+      </roles>
+      <timezone>-8</timezone>
+    </developer>
   </developers>
 
   <contributors><!-- TODO? -->
