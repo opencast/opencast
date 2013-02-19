@@ -39,7 +39,6 @@ Opencast.Initialize = (function ()
         clickLecturerSearchField = false,
         playerReady = false,
         locked = false,
-        controlsCheckboxSelected = false,
         formatOne = 0,
         formatTwo = 0,
         formatSingle = 0,
@@ -1240,22 +1239,25 @@ Opencast.Initialize = (function ()
 		}
 	    });
 
-	$('#oc_embed-costum-hide-controls-checkbox').unbind('click');
-	$('#oc_embed-costum-hide-controls-checkbox').bind('click', function() {
-	    Opencast.Initialize.setEmbedButtons();
-	    Opencast.Initialize.setEmbed();
-            var embedWidth = $('#oc_embed-costum-width-textinput').val();
-            var embedHeight = $('#oc_embed-costum-height-textinput').val();
-            if ($.isNumber(embedWidth) && $.isNumber(embedHeight)) {
-		if($('#oc_embed-costum-hide-controls-checkbox').is(':checked')) {
-		    embedHeight = parseInt(embedHeight) + OTHERDIVHEIGHT;
-		} else if(controlsCheckboxSelected) {
-		    embedHeight = parseInt(embedHeight) - OTHERDIVHEIGHT;
-		}
-		Opencast.Player.embedIFrame(embedWidth, embedHeight, true);
+	$('#oc_embed-costum-hide-controls-controlsVisible').unbind('click');
+	$('#oc_embed-costum-hide-controls-controlsNotVisible').unbind('click');
+	$('#oc_embed-costum-hide-controls-controlsVisible').bind('click', hideControlsRadioButtonClicked);
+	$('#oc_embed-costum-hide-controls-controlsNotVisible').bind('click', hideControlsRadioButtonClicked);
+    }
+
+    function hideControlsRadioButtonClicked() {
+	Opencast.Initialize.setEmbedButtons();
+	Opencast.Initialize.setEmbed();
+        var embedWidth = $('#oc_embed-costum-width-textinput').val();
+        var embedHeight = $('#oc_embed-costum-height-textinput').val();
+        if ($.isNumber(embedWidth) && $.isNumber(embedHeight)) {
+	    if($('#oc_embed-costum-hide-controls-controlsNotVisible').is(':checked')) {
+		embedHeight = parseInt(embedHeight) + OTHERDIVHEIGHT;
+	    } else {
+		embedHeight = parseInt(embedHeight) - OTHERDIVHEIGHT;
 	    }
-	    controlsCheckboxSelected = true;
-	});
+	    Opencast.Player.embedIFrame(embedWidth, embedHeight, true);
+	}
     }
 
     /**
@@ -1309,14 +1311,14 @@ Opencast.Initialize = (function ()
     }
 
     function getAspectRatioWidth(height) {
-	var newOtherDivHeight = $('#oc_embed-costum-hide-controls-checkbox').is(':checked') ? OTHERDIVHEIGHT : 0;
+	var newOtherDivHeight = $('#oc_embed-costum-hide-controls-controlsNotVisible').is(':checked') ? OTHERDIVHEIGHT : 0;
 	// new width = new height * original width / original height
         var width = Math.round(height * originalWidthMedia1 / originalHeightMedia1) + newOtherDivHeight;
 	return width;
     }
 
     function getAspectRatioHeight(width) {
-	var newOtherDivHeight = $('#oc_embed-costum-hide-controls-checkbox').is(':checked') ? OTHERDIVHEIGHT : 0;
+	var newOtherDivHeight = $('#oc_embed-costum-hide-controls-controlsNotVisible').is(':checked') ? OTHERDIVHEIGHT : 0;
 	// new height = original height / original width * new width
         var height = Math.round(originalHeightMedia1 / originalWidthMedia1 * width) + newOtherDivHeight;
 	return height;
@@ -1329,7 +1331,7 @@ Opencast.Initialize = (function ()
         var embedWidhtFour = 380;
         var embedWidhtFive = 300;
 	
-	var newOtherDivHeight = $('#oc_embed-costum-hide-controls-checkbox').is(':checked') ? OTHERDIVHEIGHT : 0;
+	var newOtherDivHeight = $('#oc_embed-costum-hide-controls-controlsNotVisible').is(':checked') ? OTHERDIVHEIGHT : 0;
 	
 	// new height = original height / original width * new width
 
