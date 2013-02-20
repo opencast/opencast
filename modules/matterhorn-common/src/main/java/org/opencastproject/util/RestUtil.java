@@ -17,17 +17,23 @@
 package org.opencastproject.util;
 
 import org.opencastproject.rest.RestConstants;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.osgi.service.component.ComponentContext;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import java.io.File;
 import java.io.InputStream;
+import java.util.regex.Pattern;
 
+import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.data.functions.Strings.split;
+import static org.opencastproject.util.data.functions.Strings.trimToNil;
 
 /** Utility functions for REST endpoints. */
 public final class RestUtil {
@@ -64,5 +70,55 @@ public final class RestUtil {
     for (Long l : streamLength) b.header("Content-Length", l);
     for (String fn : fileName) b.header("Content-Disposition", "attachment; filename=" + fn);
     return b;
+  }
+
+  /** Return JSON if <code>format</code> == json, XML else. */
+  public static MediaType getResponseFormat(String format) {
+    return "json".equalsIgnoreCase(format) ? MediaType.APPLICATION_JSON_TYPE : MediaType.APPLICATION_XML_TYPE;
+  }
+
+  private static final Function<String, String[]> CSV_SPLIT = split(Pattern.compile(","));
+
+  /**
+   * Split a comma separated request param into a list of trimmed strings discarding any blank parts.
+   * <p/>
+   * x=comma,separated,,%20value -&gt; ["comma", "separated", "value"]
+   */
+  public static Monadics.ListMonadic<String> splitCommaSeparatedParam(Option<String> param) {
+    for (String p : param) return mlist(CSV_SPLIT.apply(p)).bind(trimToNil);
+    return mlist();
+  }
+
+  public static final class R {
+    private R() {
+    }
+
+    public static Response ok() {
+      return Response.ok().build();
+    }
+
+    public static Response ok(Object entity) {
+      return Response.ok().entity(entity).build();
+    }
+
+    public static Response notFound() {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    public static Response serverError() {
+      return Response.serverError().build();
+    }
+
+    public static Response conflict() {
+      return Response.status(Response.Status.CONFLICT).build();
+    }
+
+    public static Response noContent() {
+      return Response.noContent().build();
+    }
+
+    public static Response badRequest() {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
   }
 }
