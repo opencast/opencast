@@ -1,6 +1,7 @@
 /* MediaPackageEditor Style */
 label.error { font-size: 10px; color: red; margin-left: -448px;}
 input#recordDate + label.error {margin-left: 0px;}
+div.loading {background-image: url(images/spinner.gif); width: 48px; height: 48px;display: none; margin:auto; margin-top: 5px;}
 button.rebind{width: 16px; height: 17px;background-image: url(images/ui-icons_ffffff_256x240.png);background-position: 0px -64px;background-color: #98BBBA;border: 1px solid #2D8F8B;margin-left:-16px;position:relative;top:-4px;padding: 5px;}
 .separation{border-top: 5px solid black;padding: 5px;color: white;background-color:olive;}
 div.disable div.form-box-head{background:grey;}
