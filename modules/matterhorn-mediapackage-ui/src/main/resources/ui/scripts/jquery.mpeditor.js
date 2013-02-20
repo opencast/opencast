@@ -348,6 +348,7 @@
                 if(catalogs == null) {
                     var newCatalog = new Catalog();
                     newCatalog.flavor = catalog.flavor;
+                    newCatalog.disable = true;
                     inMemoryMediaPackage.catalogs.push(newCatalog);
                     catalogs = new Array();
                     catalogs.push(newCatalog);
@@ -409,6 +410,11 @@
                         self.enableCatalog(tab, cat.disable);
                     })
 
+                    // Init enable checkbox
+                    if (cat.disable) {
+                        self.enableCatalog(tab, !cat.disable);
+                        tab.find(".form-box-head input[type='checkbox']").attr("checked","checked");
+                    }
 
                     if (value.required) {
                         tab.find(".form-box-head input[type='checkbox'],.form-box-head label").remove();
