@@ -27,7 +27,6 @@ import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
@@ -44,7 +43,6 @@ import org.opencastproject.scheduler.api.SchedulerQuery.Sort;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.series.endpoint.SeriesRestService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -72,7 +70,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
-import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -115,9 +112,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   /** The series service */
   protected SeriesService seriesService;
 
-  /** The series rest service */
-  protected SeriesRestService seriesRestService;
-
   /** The ingest service */
   protected IngestService ingestService;
 
@@ -149,11 +143,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    */
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
-  }
-
-  /** OSGi callback */
-  public void setSeriesRestService(SeriesRestService seriesRestService) {
-    this.seriesRestService = seriesRestService;
   }
 
   /** OSGi callback */
@@ -385,8 +374,10 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
     if (isBlank(mp.getSeries()) && isNotBlank(seriesId)) {
       // add series dc to mp
-      mp.add(new URI(seriesRestService.getSeriesXmlUrl(seriesId)), MediaPackageElement.Type.Catalog,
-              MediaPackageElements.SERIES);
+      // add the episode catalog
+      DublinCoreCatalog seriesCatalog = seriesService.getSeries(seriesId);
+      ingestService.addCatalog(IOUtils.toInputStream(seriesCatalog.toXmlString(), "UTF-8"), "dublincore.xml",
+              MediaPackageElements.SERIES, mp);
     } else if (isNotBlank(mp.getSeries()) && !mp.getSeries().equals(seriesId)) {
       // switch to new series dc and remove old
       for (Catalog c : mp.getCatalogs(MediaPackageElements.SERIES)) {
@@ -394,8 +385,9 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
                 .getIdentifier().toString());
         mp.remove(c);
       }
-      mp.add(new URI(seriesRestService.getSeriesXmlUrl(seriesId)), MediaPackageElement.Type.Catalog,
-              MediaPackageElements.SERIES);
+      DublinCoreCatalog seriesCatalog = seriesService.getSeries(seriesId);
+      ingestService.addCatalog(IOUtils.toInputStream(seriesCatalog.toXmlString(), "UTF-8"), "dublincore.xml",
+              MediaPackageElements.SERIES, mp);
     } else if (isNotBlank(mp.getSeries()) && isBlank(seriesId)) {
       // remove series dc
       for (Catalog c : mp.getCatalogs(MediaPackageElements.SERIES)) {
