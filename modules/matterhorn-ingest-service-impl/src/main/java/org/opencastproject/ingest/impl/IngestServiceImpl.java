@@ -85,6 +85,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
@@ -869,9 +870,16 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
         // Update
         workflowService.update(workflow);
+        
+        // Merge the properties
+        Map<String, String> mergedProperties = new HashMap<String, String>();
+        for (String property : workflow.getConfigurationKeys()) {
+          mergedProperties.put(property, workflow.getConfiguration(property));
+        }
+        mergedProperties.putAll(properties);
 
         // resume the workflow
-        workflowService.resume(workflowId.longValue(), properties);
+        workflowService.resume(workflowId.longValue(), mergedProperties);
 
         ingestStatistics.successful();
 

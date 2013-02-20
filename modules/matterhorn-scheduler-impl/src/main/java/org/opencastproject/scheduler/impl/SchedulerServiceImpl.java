@@ -15,14 +15,13 @@
  */
 package org.opencastproject.scheduler.impl;
 
-import net.fortuna.ical4j.model.DateList;
-import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Recur;
-import net.fortuna.ical4j.model.ValidationException;
-import net.fortuna.ical4j.model.parameter.Value;
-import net.fortuna.ical4j.model.property.RRule;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.opencastproject.scheduler.impl.Util.getEventIdentifier;
+import static org.opencastproject.scheduler.impl.Util.setEventIdentifierImmutable;
+import static org.opencastproject.scheduler.impl.Util.setEventIdentifierMutable;
+import static org.opencastproject.util.data.Tuple.tuple;
+
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -55,6 +54,16 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
+
+import net.fortuna.ical4j.model.DateList;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.ValidationException;
+import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.property.RRule;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -72,15 +81,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TimeZone;
-
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.opencastproject.scheduler.impl.Util.getEventIdentifier;
-import static org.opencastproject.scheduler.impl.Util.setEventIdentifierImmutable;
-import static org.opencastproject.scheduler.impl.Util.setEventIdentifierMutable;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 /**
  * Implementation of {@link SchedulerService}.
@@ -262,14 +265,16 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    *          start date of event
    * @param endDate
    *          end date of event
+   * @param wfProperties
+   *          the workflow configuration properties
    * @return {@link WorkflowInstance} of started worflow
    * @throws WorkflowException
    *           if exception occurred while starting worflow
    * @throws MediaPackageException
    *           if media package cannot be created
    */
-  protected WorkflowInstance startWorkflowInstance(DublinCoreCatalog event, Date startDate, Date endDate)
-          throws WorkflowException, MediaPackageException {
+  protected WorkflowInstance startWorkflowInstance(DublinCoreCatalog event, Date startDate, Date endDate,
+          Map<String, String> wfProperties) throws WorkflowException, MediaPackageException {
     // Build a mediapackage using the event metadata
     MediaPackage mediapackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     try {
@@ -282,13 +287,12 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     mediapackage.setDuration(endDate.getTime() - startDate.getTime());
 
     // Build a properties set for this event
-    Map<String, String> properties = new HashMap<String, String>();
-    properties.put(WORKFLOW_OPERATION_KEY_SCHEDULE_START, Long.toString(startDate.getTime()));
-    properties.put(WORKFLOW_OPERATION_KEY_SCHEDULE_STOP, Long.toString(endDate.getTime()));
-    properties.put(WORKFLOW_OPERATION_KEY_SCHEDULE_LOCATION, event.getFirst(DublinCore.PROPERTY_SPATIAL));
+    wfProperties.put(WORKFLOW_OPERATION_KEY_SCHEDULE_START, Long.toString(startDate.getTime()));
+    wfProperties.put(WORKFLOW_OPERATION_KEY_SCHEDULE_STOP, Long.toString(endDate.getTime()));
+    wfProperties.put(WORKFLOW_OPERATION_KEY_SCHEDULE_LOCATION, event.getFirst(DublinCore.PROPERTY_SPATIAL));
 
     // Start the workflow
-    return workflowService.start(getPreprocessingWorkflowDefinition(), mediapackage, properties);
+    return workflowService.start(getPreprocessingWorkflowDefinition(), mediapackage, wfProperties);
   }
 
   /**
@@ -300,6 +304,8 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    *          start date of event
    * @param endDate
    *          end date of event
+   * @param wfProperties
+   *          the workflow configuration properties
    * @throws SchedulerException
    *           if workflow is not in paused state or current operation is no longer 'schedule'
    * @throws NotFoundException
@@ -309,8 +315,8 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * @throws UnauthorizedException
    *           if the current user is not authorized to update the workflow
    */
-  protected void updateWorkflow(DublinCoreCatalog event, Date startDate, Date endDate) throws SchedulerException,
-          NotFoundException, WorkflowException, UnauthorizedException {
+  protected void updateWorkflow(DublinCoreCatalog event, Date startDate, Date endDate, Map<String, String> wfProperties)
+          throws SchedulerException, NotFoundException, WorkflowException, UnauthorizedException {
     WorkflowInstance workflow = workflowService.getWorkflowById(getEventIdentifier(event));
     WorkflowOperationInstance scheduleOperation = workflow.getCurrentOperation();
 
@@ -354,6 +360,10 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     // Set the location in the workflow as well, so that it shows up in the UI properly.
     workflow.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_LOCATION, event.getFirst(DublinCore.PROPERTY_SPATIAL));
 
+    for (Entry<String, String> property : wfProperties.entrySet()) {
+      workflow.setConfiguration(property.getKey(), property.getValue());
+    }
+
     // update the workflow
     workflowService.update(workflow);
   }
@@ -376,19 +386,21 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     if (isBlank(mp.getSeries()) && isNotBlank(seriesId)) {
       // add series dc to mp
       mp.add(new URI(seriesRestService.getSeriesXmlUrl(seriesId)), MediaPackageElement.Type.Catalog,
-             MediaPackageElements.SERIES);
+              MediaPackageElements.SERIES);
     } else if (isNotBlank(mp.getSeries()) && !mp.getSeries().equals(seriesId)) {
       // switch to new series dc and remove old
       for (Catalog c : mp.getCatalogs(MediaPackageElements.SERIES)) {
-        logger.debug("Deleting existing series dublin core {} from media package {}", c.getIdentifier(), mp.getIdentifier().toString());
+        logger.debug("Deleting existing series dublin core {} from media package {}", c.getIdentifier(), mp
+                .getIdentifier().toString());
         mp.remove(c);
       }
       mp.add(new URI(seriesRestService.getSeriesXmlUrl(seriesId)), MediaPackageElement.Type.Catalog,
-             MediaPackageElements.SERIES);
+              MediaPackageElements.SERIES);
     } else if (isNotBlank(mp.getSeries()) && isBlank(seriesId)) {
       // remove series dc
       for (Catalog c : mp.getCatalogs(MediaPackageElements.SERIES)) {
-        logger.debug("Deleting existing series dublin core {} from media package {}", c.getIdentifier(), mp.getIdentifier().toString());
+        logger.debug("Deleting existing series dublin core {} from media package {}", c.getIdentifier(), mp
+                .getIdentifier().toString());
         mp.remove(c);
       }
     }
@@ -420,15 +432,14 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     }
     // remove existing episodes
     for (Catalog c : mp.getCatalogs(MediaPackageElements.EPISODE)) {
-      logger.debug("Deleting existing episode dublin core {} from media package {}", c.getIdentifier(), mp.getIdentifier().toString());
+      logger.debug("Deleting existing episode dublin core {} from media package {}", c.getIdentifier(), mp
+              .getIdentifier().toString());
       mp.remove(c);
       workspace.delete(c.getURI());
     }
     // add the episode catalog
-    ingestService.addCatalog(IOUtils.toInputStream(dc.toXmlString(), "UTF-8"),
-                             "dublincore.xml",
-                             MediaPackageElements.EPISODE,
-                             mp);
+    ingestService.addCatalog(IOUtils.toInputStream(dc.toXmlString(), "UTF-8"), "dublincore.xml",
+            MediaPackageElements.EPISODE, mp);
   }
 
   /**
@@ -467,7 +478,8 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * , java.lang.String)
    */
   @Override
-  public Long addEvent(final DublinCoreCatalog eventCatalog) throws SchedulerException, UnauthorizedException {
+  public Long addEvent(DublinCoreCatalog eventCatalog, Map<String, String> wfProperties) throws SchedulerException,
+          UnauthorizedException {
     DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(eventCatalog.getFirst(DublinCore.PROPERTY_TEMPORAL));
     if (!period.hasEnd() || !period.hasStart()) {
       throw new IllegalArgumentException(
@@ -478,7 +490,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
     final long eventId;
     try {
-      eventId = startWorkflowInstance(eventCatalog, startDate, endDate).getId();
+      eventId = startWorkflowInstance(eventCatalog, startDate, endDate, wfProperties).getId();
     } catch (WorkflowException e) {
       logger.error("Could not start workflow: {}", e.getMessage());
       throw new SchedulerException(e);
@@ -530,7 +542,8 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * DublinCoreCatalog, java.lang.String, java.util.Date, java.util.Date, long)
    */
   @Override
-  public Long[] addReccuringEvent(DublinCoreCatalog templateCatalog) throws SchedulerException, UnauthorizedException {
+  public Long[] addReccuringEvent(DublinCoreCatalog templateCatalog, Map<String, String> wfProperties)
+          throws SchedulerException, UnauthorizedException {
     final List<DublinCoreCatalog> eventList;
     try {
       eventList = createEventCatalogsFromReccurence(templateCatalog);
@@ -551,7 +564,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
       WorkflowInstance instance;
       try {
-        instance = startWorkflowInstance(event, startDate, endDate);
+        instance = startWorkflowInstance(event, startDate, endDate, wfProperties);
       } catch (Exception e) {
         logger.error("Failed to start workflow for event: {}", e.getMessage());
         if (!eventsIDs.isEmpty()) {
@@ -656,18 +669,18 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * DublinCoreCatalog)
    */
   @Override
-  public void updateEvent(final long eventId, final DublinCoreCatalog eventCatalog)
+  public void updateEvent(final long eventId, final DublinCoreCatalog eventCatalog, Map<String, String> wfProperties)
           throws NotFoundException, SchedulerException, UnauthorizedException {
     if (eventCatalog == null) {
       logger.warn("Cannot update <null> event.");
       return;
     }
-    updateEvent(setEventIdentifierImmutable(eventId, eventCatalog));
+    updateEvent(setEventIdentifierImmutable(eventId, eventCatalog), wfProperties);
   }
 
   /** Internal impl of an event update. The event DC _must_ have the identfier set. */
-  private void updateEvent(final DublinCoreCatalog event)
-          throws NotFoundException, SchedulerException, UnauthorizedException {
+  private void updateEvent(final DublinCoreCatalog event, Map<String, String> wfProperties) throws NotFoundException,
+          SchedulerException, UnauthorizedException {
     final DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(event.getFirst(DublinCore.PROPERTY_TEMPORAL));
     if (!period.hasEnd() || !period.hasStart()) {
       throw new IllegalArgumentException(
@@ -699,7 +712,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
     // update workflow
     try {
-      updateWorkflow(event, startDate, endDate);
+      updateWorkflow(event, startDate, endDate, wfProperties);
     } catch (WorkflowException e) {
       logger.error("Could not update workflow for event with ID '{}': {}", eventId, e.getMessage());
       throw new SchedulerException(e);
@@ -710,8 +723,8 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * TODO: Update this function so that it uses a new service function with a single transaction so that it is not slow.
    */
   @Override
-  public void updateEvents(List<Long> eventIds, final DublinCoreCatalog eventCatalog)
-          throws NotFoundException, SchedulerException, UnauthorizedException {
+  public void updateEvents(List<Long> eventIds, final DublinCoreCatalog eventCatalog) throws NotFoundException,
+          SchedulerException, UnauthorizedException {
     SchedulerQuery q = new SchedulerQuery();
     q.withIdInList(eventIds);
     q.withSort(Sort.EVENT_START);
@@ -735,7 +748,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
           }
         }
       }
-      updateEvent(getEventIdentifier(cat), cat);
+      updateEvent(getEventIdentifier(cat), cat, new HashMap<String, String>());
     }
   }
 
@@ -812,7 +825,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       int numZeros = length - Integer.toString(i).length();
       StringBuilder sb = new StringBuilder();
       for (int j = 0; j < numZeros; j++) {
-    	  sb.append(0);
+        sb.append(0);
       }
       sb.append(i);
       event.set(DublinCore.PROPERTY_TITLE, template.getFirst(DublinCore.PROPERTY_TITLE) + " " + sb.toString());

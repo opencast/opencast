@@ -23,6 +23,7 @@ import org.opencastproject.util.data.Tuple;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -43,13 +44,16 @@ public interface SchedulerService {
    * 
    * @param eventCatalog
    *          {@link DublinCoreCatalog} used for creating event
+   * @param wfProperties
+   *          any properties to apply to the workflow definition
    * @return ID of created event
    * @throws SchedulerException
    *           if creating new events failed
    * @throws UnauthorizedException
    *           if the caller is not authorized to take this action
    */
-  Long addEvent(DublinCoreCatalog eventCatalog) throws SchedulerException, UnauthorizedException;
+  Long addEvent(DublinCoreCatalog eventCatalog, Map<String, String> wfProperties) throws SchedulerException,
+          UnauthorizedException;
 
   /**
    * Creates series of events using DublinCore as template and recurrence pattern. For each event default capture agent
@@ -62,13 +66,16 @@ public interface SchedulerService {
    * 
    * @param eventCatalog
    *          template {@link DublinCoreCatalog} used to create events
+   * @param wfProperties
+   *          any properties to apply to the workflow definition
    * @return array of events IDs that were created
    * @throws SchedulerException
    *           if events cannot be created
    * @throws UnauthorizedException
    *           if the caller is not authorized to take this action
    */
-  Long[] addReccuringEvent(DublinCoreCatalog eventCatalog) throws SchedulerException, UnauthorizedException;
+  Long[] addReccuringEvent(DublinCoreCatalog eventCatalog, Map<String, String> wfProperties) throws SchedulerException,
+          UnauthorizedException;
 
   /**
    * Updates existing events with capture agent metadata. Configuration will be updated from event's DublinCore:
@@ -101,6 +108,8 @@ public interface SchedulerService {
    * 
    * @param eventCatalog
    *          updated {@link DublinCoreCatalog}
+   * @param wfProperties
+   *          any properties to apply to the workflow definition
    * @throws NotFoundException
    *           if events with specified DublinCore ID cannot be found
    * @throws SchedulerException
@@ -108,7 +117,8 @@ public interface SchedulerService {
    * @throws UnauthorizedException
    *           if the caller is not authorized to take this action
    */
-  void updateEvent(long eventId, DublinCoreCatalog eventCatalog) throws NotFoundException, SchedulerException, UnauthorizedException;
+  void updateEvent(long eventId, DublinCoreCatalog eventCatalog, Map<String, String> wfProperties)
+          throws NotFoundException, SchedulerException, UnauthorizedException;
 
   /**
    * Removes event with specified ID.
@@ -219,5 +229,6 @@ public interface SchedulerService {
   Date getScheduleLastModified(SchedulerQuery filter) throws SchedulerException;
 
   /** Update all events with metadata from eventCatalog. */
-  void updateEvents(List<Long> eventIds, final DublinCoreCatalog eventCatalog) throws NotFoundException, SchedulerException, UnauthorizedException;
+  void updateEvents(List<Long> eventIds, final DublinCoreCatalog eventCatalog) throws NotFoundException,
+          SchedulerException, UnauthorizedException;
 }

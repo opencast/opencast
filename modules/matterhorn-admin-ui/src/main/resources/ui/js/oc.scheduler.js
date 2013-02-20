@@ -56,6 +56,11 @@ var ocScheduler = (function() {
     serializer: new ocAdmin.Serializer()
   });
   sched.catalogs.push(sched.capture);
+  sched.workflow = new ocAdmin.Catalog({ //Workflow Config Properties
+	  name: 'wfproperties',
+	  serializer: new ocAdmin.Serializer()
+  });
+  sched.catalogs.push(sched.workflow);
 
   sched.init = function init(){
 
@@ -329,7 +334,14 @@ var ocScheduler = (function() {
       }
 
       $.extend(true, sched.capture.components, ocScheduler.workflowComponents);
-
+      ocWorkflowPanel.registerComponents(ocScheduler.workflow.components);
+      
+      $.each(sched.workflow.components, function(name, elem) {
+    	  if (name.indexOf("org.opencastproject.workflow.config") == 0) {
+    		  elem.key = elem.key.substring("org.opencastproject.workflow.config.".length);
+    	  }
+      });
+      
       var errors = [];
       for (var i in sched.catalogs) {
         var serializedCatalog = sched.catalogs[i].serialize();
