@@ -120,17 +120,22 @@ opencast.episode = (function() {
 	         		return response;
 	          },
 	          deleteCatalog: function(catalog) {
-	          		var mp = this.getMediaPackage();
-	          		var doc = $.parseXML(mp);
-	          		var mpId = $(doc).find('mp|mediapackage').attr("id");
+	          		var mp = this.getMediaPackage(),
+	          			doc = $.parseXML(mp),
+	          			mpId = $(doc).find('mp|mediapackage').attr("id"),
+	          			response = false;
 	          		
-	          		var response = false;
 	          		$.ajax({
 	          			async: false,
 	          			url: "../files/mediapackage/"+mpId+"/"+catalog.id,
 	          			type: 'delete',
-	          			success: function(){
+	          			success: function () {
 	          				response = true;
+	          			},
+	          			error: function (jqXHR) {
+	          				if (jqXHR.status === 404) {
+	          					response = true;
+	          				}
 	          			}
 	          			
 	          		});	 
@@ -155,15 +160,16 @@ opencast.episode = (function() {
     
 	$("#mpe-editor").bind('succeeded', function(ev, mp) {
  		$.ajax({
- 			async: false,
+ 			async: true,
  			url: "../episode/add",
- 			dataType: "text",
  			data: {
  				mediapackage : mp
  			},
  			type: 'post',
  			success: function(){
  			  $("#mpe-editor").unbind();
+ 			  $("#mpe-editor").find(".loading").hide();
+ 			  $("#mpe-editor").parent().find("button#mpe-submit, button#mpe-cancel").removeAttr("disabled");
  			  $window.dialog("close");
  			},
  			error: function(request, errorText, thrownError){

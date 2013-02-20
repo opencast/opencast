@@ -225,7 +225,11 @@ MediaPackage = function(xmlMediaPackage){
 		// Add catalogs
 		var allCatalogs = cloneArray(self.catalogs);
 		allCatalogs.push(self.episodeCatalog);
-		allCatalogs.push(self.seriesCatalog);
+
+		if (self.seriesCatalog) {
+			allCatalogs.push(self.seriesCatalog);
+		}
+
 		$.each(self.episodeCatalogs, function(i, cat) {
 			allCatalogs.push(cat);
 		});
@@ -404,7 +408,21 @@ MediaPackage = function(xmlMediaPackage){
 	this.getCatalogIndex = function(catalog) {
 		var index = -1;
 		$.each(self.catalogs, function(idx, value){
-			if(value.id == catalog.id){
+			if(value.id === catalog.id){
+				index = idx;
+				return false;
+			}
+		});
+		return index;
+	}
+
+	/**
+	 * Gets the index of a series catalog in the mediapackage
+	 */
+	this.getSeriesCatalogIndex = function(catalog) {
+		var index = -1;
+		$.each(self.seriesCatalogs, function(idx, value){
+			if(value.id === catalog.id){
 				index = idx;
 				return false;
 			}
@@ -435,6 +453,23 @@ MediaPackage = function(xmlMediaPackage){
 		var index = self.getCatalogIndex(catalog);
 		if(index == -1) return;
 		self.catalogs.splice(index, 1);
+	}
+
+	/**
+	 * Deletes a series catalog from the mediapackage
+	 */
+	this.deleteSeriesCatalog = function(catalog) {
+		var index = self.getSeriesCatalogIndex(catalog);
+
+		if (catalog.id === self.seriesCatalog.id) {
+			self.deleteDCSeries();
+			delete self.seriesCatalog;
+		}
+
+		if (index == -1) {
+			return;
+		} 
+		self.seriesCatalogs.splice(index, 1);
 	}
 	
 	/**
@@ -584,8 +619,8 @@ MediaPackage = function(xmlMediaPackage){
 	  * Deletes the series catalog from the mediapackage
 	  */
 	 this.deleteDCSeries = function() {
-	  self.seriesId = '';
-	  self.seriesTitle = '';
+	  	self.seriesId = '';
+	  	self.seriesTitle = '';
 	 }
 	
 	if(xmlMediaPackage)
@@ -642,6 +677,12 @@ Catalog = function(url){
 	};
 	
 	this.equals = function(catalog) {
+		var valuesEquals = true,
+			sizeCurrentCatalog = 0,
+			sizeGivenCatalog = 0,
+			tmpValues,
+			tmpValue;
+
 		if(self.disable != catalog.disable)
 			return false;
 		if(self.url != catalog.url)
@@ -659,21 +700,36 @@ Catalog = function(url){
 		if(self.ref != catalog.ref)
 			return false;
 
-		var valuesEquals = true;
-		$.each(self.values, function(idx,values){
-			var tmpValues = catalog.values[idx];
-			if(tmpValues == undefined) {
-			  valuesEquals = false;
-			  return false;
+		// Compare each value from two catalog
+		$.each(self.values, function (idx, values) {
+			tmpValues = catalog.values[idx];
+			sizeCurrentCatalog++;
+
+			if (tmpValues === undefined) {
+			  return (valuesEquals = false);
 			}
 			
-			$.each(values,function(subidx,value){
-				var tmpValue = tmpValues[subidx];
-				if(value.value != tmpValue.value)valuesEquals=false;
-				if(value.lang != tmpValue.lang)valuesEquals=false;
-				if(value.type != tmpValue.type)valuesEquals=false;
+			// Go through each subvalues from a value and compare them
+			$.each(values, function (subidx, value) {
+				tmpValue = tmpValues[subidx];
+
+				if ((value.value !== tmpValue.value) || 
+				   (value.lang !== tmpValue.lang) || 
+				   (value.type !== tmpValue.type)) {
+				   	valuesEquals = false;
+				}
 			});
 		});
+
+		// Only to check given catalog size
+		for (var value in catalog.values) {
+			sizeGivenCatalog++;
+		}
+
+		if (sizeGivenCatalog !== sizeCurrentCatalog) {
+			valuesEquals = false;
+		}
+
 		$.each(self.tags, function(idx,value){
 			if(value != catalog.tags[idx]){
 				valuesEquals = false;
@@ -712,8 +768,8 @@ Catalog = function(url){
 		$(self.xml).find('dublincore').children().each(function(index,element){
 			
 			if(self.namespace=='') self.namespace = element.prefix;
-			if(elementName != element.localName.toLowerCase()){
-				elementName = element.localName.toLowerCase();
+			if(elementName != element.localName){
+				elementName = element.localName;
 				self.values[elementName] = new Array();
 			}
 			
