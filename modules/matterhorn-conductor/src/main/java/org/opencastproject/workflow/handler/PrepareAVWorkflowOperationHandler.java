@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -51,6 +52,8 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ComposeWorkflowOperationHandler.class);
+  private static final String PLUS = "+";
+  private static final String MINUS = "-";
 
   /** Name of the 'encode to a/v work copy' encoding profile */
   public static final String PREPARE_AV_PROFILE = "av.work";
@@ -161,6 +164,22 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     boolean promiscuousMuxing = "true".equalsIgnoreCase(StringUtils.trimToEmpty(operation
             .getConfiguration("promiscuous-audio-muxing")));
 
+    String[] targetTags = StringUtils.split(targetTrackTags, ",");
+
+    List<String> removeTags = new ArrayList<String>();
+    List<String> addTags = new ArrayList<String>();
+    List<String> overrideTags = new ArrayList<String>();
+
+    for (String tag : targetTags) {
+      if (tag.startsWith(MINUS)) {
+        removeTags.add(tag);
+      } else if (tag.startsWith(PLUS)) {
+        addTags.add(tag);
+      } else {
+        overrideTags.add(tag);
+      }
+    }
+
     // Make sure the source flavor is properly set
     if (sourceFlavorName == null)
       throw new IllegalStateException("Source flavor must be specified");
@@ -211,7 +230,8 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
           } else if (!track.hasAudio() && track.hasVideo()) {
             videoTrack = track;
           } else {
-            throw new WorkflowOperationException("Multiple tracks with competing audio/video streams and flavor '" + sourceFlavor + "' found");
+            throw new WorkflowOperationException("Multiple tracks with competing audio/video streams and flavor '"
+                    + sourceFlavor + "' found");
           }
         }
         break;
@@ -281,10 +301,21 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     logger.debug("Composed track has flavor '{}'", composedTrack.getFlavor());
 
     // Add the target tags
-    List<String> targetTags = asList(targetTrackTags);
-    for (String tag : targetTags) {
-      logger.trace("Tagging composed track with '{}'", tag);
-      composedTrack.addTag(tag);
+    if (overrideTags.size() > 0) {
+      composedTrack.clearTags();
+      for (String tag : overrideTags) {
+        logger.trace("Tagging composed track with '{}'", tag);
+        composedTrack.addTag(tag);
+      }
+    } else {
+      for (String tag : removeTags) {
+        logger.trace("Remove tagging '{}' from composed track", tag);
+        composedTrack.removeTag(tag.substring(MINUS.length()));
+      }
+      for (String tag : addTags) {
+        logger.trace("Add tagging '{}' to composed track", tag);
+        composedTrack.addTag(tag.substring(PLUS.length()));
+      }
     }
     return createResult(mediaPackage, Action.CONTINUE, timeInQueue);
   }
