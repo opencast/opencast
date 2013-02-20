@@ -25,7 +25,10 @@ import static org.easymock.classextension.EasyMock.replay;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.kernel.http.api.HttpClient;
 import org.opencastproject.kernel.http.impl.HttpClientFactory;
+import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClientException;
+import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import junit.framework.Assert;
@@ -57,6 +60,7 @@ public class TrustedHttpClientImplTest {
   private BasicHttpResponse digestResponse;
   private BasicHttpResponse nonceResponse;
   private ServiceRegistry serviceRegistry;
+  private SecurityService securityService;
 
   @Before
   public void setUp() throws Exception {
@@ -79,6 +83,11 @@ public class TrustedHttpClientImplTest {
     expect(currentJob.getId()).andReturn(currentJobId).anyTimes();
     replay(currentJob);
 
+    securityService = createNiceMock(SecurityService.class);
+    expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
+    expect(securityService.getUser()).andReturn(new User()).anyTimes();
+    replay(securityService);
+
     serviceRegistry = createNiceMock(ServiceRegistry.class);
     expect(serviceRegistry.getCurrentJob()).andReturn(currentJob).anyTimes();
     expect(serviceRegistry.getJob(currentJobId)).andReturn(currentJob).anyTimes();
@@ -86,6 +95,7 @@ public class TrustedHttpClientImplTest {
 
     client = new TrustedHttpClientImpl("matterhorn_system_account", "CHANGE_ME");
     client.setServiceRegistry(serviceRegistry);
+    client.setSecurityService(securityService);
     client.activate(componentContextMock);
     // Setup responses.
     String digestValue = "Digest realm=\"testrealm@host.com\"," + "qop=\"auth,auth-int\","
@@ -314,6 +324,7 @@ public class TrustedHttpClientImplTest {
     replay(componentContextMock);
     client = new TrustedHttpClientImpl("matterhorn_system_account", "CHANGE_ME");
     client.setServiceRegistry(serviceRegistry);
+    client.setSecurityService(securityService);
     client.activate(componentContextMock);
 
     HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
@@ -359,6 +370,7 @@ public class TrustedHttpClientImplTest {
     replay(componentContextMock);
     client = new TrustedHttpClientImpl("matterhorn_system_account", "CHANGE_ME");
     client.setServiceRegistry(serviceRegistry);
+    client.setSecurityService(securityService);
     client.activate(componentContextMock);
 
     HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
@@ -410,6 +422,7 @@ public class TrustedHttpClientImplTest {
     replay(componentContextMock);
     client = new TrustedHttpClientImpl("matterhorn_system_account", "CHANGE_ME");
     client.setServiceRegistry(serviceRegistry);
+    client.setSecurityService(securityService);
     client.activate(componentContextMock);
 
     HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
@@ -460,6 +473,7 @@ public class TrustedHttpClientImplTest {
     replay(componentContextMock);
     client = new TrustedHttpClientImpl("matterhorn_system_account", "CHANGE_ME");
     client.setServiceRegistry(serviceRegistry);
+    client.setSecurityService(securityService);
     client.activate(componentContextMock);
 
     HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
@@ -513,6 +527,7 @@ public class TrustedHttpClientImplTest {
     replay(componentContextMock);
     client = new TrustedHttpClientImpl("matterhorn_system_account", "CHANGE_ME");
     client.setServiceRegistry(serviceRegistry);
+    client.setSecurityService(securityService);
     client.activate(componentContextMock);
 
     HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
