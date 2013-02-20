@@ -1454,8 +1454,7 @@ Opencast.Player = (function ()
         var iFrameText = '';
         var advancedUrl = window.location.href;
         var embedUrl = advancedUrl.replace(/watch.html/g, "embed.html");
-	var hideControls = $('#oc_embed-costum-hide-controls-checkbox').is(':checked');
-	if(hideControls)
+	if($('#oc_embed-costum-hide-controls-controlsVisible').is(':checked'))
 	{
 	    embedUrl += "&hideControls=false&hideAPLogo=true";
 	}

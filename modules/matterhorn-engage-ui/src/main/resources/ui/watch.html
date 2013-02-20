@@ -558,8 +558,10 @@
     <!-- END #oc_time-chooser-layer -->
 
     <!-- Embed Dialog -->
-    <div id="oc_embed" title="Embed">
+    <div id="oc_embed" title="Create HTML Embed Code">
       <div id="oc_embed-left">
+	<label for="oc_embed-costum-choose-size" class="handcursor"><b>1. Choose size:</b></label>
+	<br/>
         <input id="oc_embed-icon-one" class="oc_embed-icon" type="submit" name="" alt="" title="" value="" />
         <input id="oc_embed-icon-two" class="oc_embed-icon" type="submit" name="" alt="" title="" value="" />
         <input id="oc_embed-icon-three" class="oc_embed-icon" type="submit" name="" alt="" title="" value="" />
@@ -567,40 +569,48 @@
         <input id="oc_embed-icon-five" class="oc_embed-icon" type="submit" name="" alt="" title="" value="" />
       </div>
       <div id="oc_embed-right">
+	<br/>
         <div id="oc_embed-custom-title">
           Custom size:
         </div>
         <label for="oc_embed-costum-width-textinput" class="handcursor">
           Width:
         </label>
-	&#160;
+	&nbsp;
         <input id="oc_embed-costum-width-textinput" maxlength="4" type="text" name="Costum width min 300px" alt="Costum width min 300px" title="Costum width min 300px" value="" />
         <div class="clear"></div>
         <label for="oc_embed-costum-height-textinput" class="handcursor">
           Height:
         </label>
-	&#160;
+	&nbsp;
         <input id="oc_embed-costum-height-textinput" maxlength="4" type="text" name="" alt="" title="" value="" />
+      </div>
 
-        <div class="clear"></div>
-        <label for="oc_embed-costum-hide-controls-checkbox" class="handcursor">
-          Controls:
-        </label>
-		&#160;
-        <input id="oc_embed-costum-hide-controls-checkbox" type="checkbox" name="Display controls" alt="Display controls" title="Display controls" value="" />
-	<br />
-        <label for="oc_embed-costum-hide-controls-checkbox" class="handcursor"></label>
+      <div class="clear"></div>
+      <br/>
+      <div>
+        <label for="oc_embed-costum-hide-controls-checkbox" class="handcursor"><b>2. Pick controls setting:</b></label>
+	<br/>
+	<input id="oc_embed-costum-hide-controls-controlsVisible" type="radio" name="group1" value="controlsVisible" />&nbsp;Controls always visible&nbsp;
+	<input id="oc_embed-costum-hide-controls-controlsNotVisible" type="radio" name="group1" value="controlsNotVisible" checked />&nbsp;Controls only visible when user hovers over video
+      </div>
 
+      <div class="clear"></div>
+      <br/>
+      <div>
+	<label for="oc_embed-textarea"><b>3. Copy the following text and paste it in the body of your html page:</b></label>
+	<br/>
+	<textarea id="oc_embed-textarea" class="oc_embed-textarea" rows="2" cols="1"></textarea>
+      </div>
+
+      <div class="clear"></div>
+      <br/>
+      <div>
         <a href="javascript:;"  id="oc_btn-leave-session-time" onclick="$('#oc_embed').dialog('close');" class="handcursor" title="Leave embed dialog" role="button">
           Leave embed dialog
         </a>
       </div>
 
-      <div class="clear"></div>
-      <label for="oc_embed-textarea">
-        Choose your embed size. Copy the text and paste it in your html page.
-      </label>
-      <textarea id="oc_embed-textarea" class="oc_embed-textarea" rows="2" cols="1"></textarea>
     </div>
     <!-- END #oc_embed -->
 
