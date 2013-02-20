@@ -302,11 +302,12 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     // If a security service has been set, use it to pass the current security context on
     logger.debug("Adding security context to request");
     Organization organization = securityService.getOrganization();
-    if (organization != null)
+    if (organization != null) {
       httpUriRequest.setHeader(SecurityConstants.ORGANIZATION_HEADER, organization.getId());
-    User currentUser = securityService.getUser();
-    if (currentUser != null)
-      httpUriRequest.setHeader(SecurityConstants.USER_HEADER, currentUser.getUserName());
+      User currentUser = securityService.getUser();
+      if (currentUser != null)
+        httpUriRequest.setHeader(SecurityConstants.USER_HEADER, currentUser.getUserName());
+    }
 
     if ("GET".equalsIgnoreCase(httpUriRequest.getMethod()) || "HEAD".equalsIgnoreCase(httpUriRequest.getMethod())) {
       // Set the user/pass
