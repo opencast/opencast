@@ -170,13 +170,15 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     List<String> addTags = new ArrayList<String>();
     List<String> overrideTags = new ArrayList<String>();
 
-    for (String tag : targetTags) {
-      if (tag.startsWith(MINUS)) {
-        removeTags.add(tag);
-      } else if (tag.startsWith(PLUS)) {
-        addTags.add(tag);
-      } else {
-        overrideTags.add(tag);
+    if (targetTags != null) {
+      for (String tag : targetTags) {
+        if (tag.startsWith(MINUS)) {
+          removeTags.add(tag);
+        } else if (tag.startsWith(PLUS)) {
+          addTags.add(tag);
+        } else {
+          overrideTags.add(tag);
+        }
       }
     }
 
