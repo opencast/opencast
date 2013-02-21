@@ -23,12 +23,12 @@ import org.opencastproject.textextractor.api.TextFrame;
 import org.opencastproject.util.ProcessExcecutorException;
 import org.opencastproject.util.ProcessExecutor;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +45,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(TesseractTextExtractor.class);
-  
+
   /** Default name of the tesseract binary */
   public static final String TESSERACT_BINARY_DEFAULT = "tesseract";
 
@@ -99,9 +99,9 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     if (binary == null)
       throw new IllegalStateException("Binary is not set");
 
-    final TextFrame textFrame;
+    InputStream is = null;
+    File outputFile = null;
     File outputFileBase = new File(image.getParentFile(), FilenameUtils.getBaseName(image.getName()));
-
     // Run tesseract
     try {
       ProcessExecutor<TextAnalyzerException> analyzer = new ProcessExecutor<TextAnalyzerException>(binary,
@@ -115,23 +115,19 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
         }
       };
       analyzer.execute();
+
+      // Read the tesseract output file
+      outputFile = new File(outputFileBase.getAbsolutePath() + ".txt");
+      is = new FileInputStream(outputFile);
+      return TesseractTextFrame.parse(is);
     } catch (ProcessExcecutorException e) {
       throw new TextExtractorException("Error running text extractor " + binary, e);
-    }
-
-    // Read the tesseract output file
-    InputStream is = null;
-    File outputFile = new File(outputFileBase.getAbsolutePath() + ".txt");
-    try {
-      is = new FileInputStream(outputFile);
-      textFrame = TesseractTextFrame.parse(is);
     } catch (IOException e) {
       throw new TextExtractorException(e);
     } finally {
       IOUtils.closeQuietly(is);
+      FileUtils.deleteQuietly(outputFile);
     }
-
-    return textFrame;
   }
 
   /**
@@ -156,7 +152,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
       this.binary = path;
     }
   }
-  
+
   public void activate(ComponentContext cc) {
     // Configure ffmpeg
     String path = (String) cc.getBundleContext().getProperty(TESSERACT_BINARY_CONFIG_KEY);

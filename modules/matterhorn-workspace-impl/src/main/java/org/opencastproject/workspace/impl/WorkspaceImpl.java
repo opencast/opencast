@@ -373,7 +373,10 @@ public class WorkspaceImpl implements Workspace {
     wfr.delete(mediaPackageID, mediaPackageElementID);
     File f = new File(PathSupport.concat(new String[] { wsRoot, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
             mediaPackageID, mediaPackageElementID }));
+    File mpDirectory = f.getParentFile();
     FileUtils.deleteQuietly(f);
+    if (mpDirectory.list().length == 0)
+      FileUtils.deleteDirectory(mpDirectory);
   }
 
   /**
@@ -545,7 +548,8 @@ public class WorkspaceImpl implements Workspace {
     String filename = FilenameUtils.getName(path);
     String collection = getCollection(collectionURI);
 
-    logger.debug("Moving {} from {} to {}/{}", new String[] { filename, collection, toMediaPackage, toMediaPackageElement });
+    logger.debug("Moving {} from {} to {}/{}", new String[] { filename, collection, toMediaPackage,
+            toMediaPackageElement });
 
     // Move the local file
     File original = getWorkspaceFile(collectionURI, false);
@@ -585,7 +589,10 @@ public class WorkspaceImpl implements Workspace {
     }
     File f = new File(PathSupport.concat(new String[] { wsRoot, WorkingFileRepository.COLLECTION_PATH_PREFIX,
             collectionId, fileName }));
+    File collectionDir = f.getParentFile();
     FileUtils.deleteQuietly(f);
+    if (collectionDir.list().length == 0)
+      FileUtils.deleteDirectory(collectionDir);
   }
 
   /**
