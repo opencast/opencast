@@ -15,74 +15,100 @@
  */
 package org.opencastproject.fileupload.api;
 
-import org.opencastproject.fileupload.api.job.FileUploadJob;
 import org.opencastproject.fileupload.api.exception.FileUploadException;
-import java.io.InputStream;
+import org.opencastproject.fileupload.api.job.FileUploadJob;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
-/** Interface for a Service that manages upload jobs and recieves and handles 
- *  file parts.
+import java.io.IOException;
+import java.io.InputStream;
+
+/**
+ * Interface for a Service that manages upload jobs and recieves and handles file parts.
  * 
  */
 public interface FileUploadService {
-  
-  /** Returns true is a job with the given ID exists.
+
+  /**
+   * Returns true is a job with the given ID exists.
    * 
-   * @param id ID of the job in question
+   * @param id
+   *          ID of the job in question
    * @return true if job exists, false otherwise
    */
   boolean hasJob(String id);
-  
-  /** Creates a new upload job with the given metadata.
+
+  /**
+   * Creates a new upload job with the given metadata.
    * 
-   * @param filename name of the file to be uploaded
-   * @param fileSize size of the file
-   * @param chunkSize size of the file parts that will be uploaded
-   * @param mp the mediapackage this file should belong to
+   * @param filename
+   *          name of the file to be uploaded
+   * @param fileSize
+   *          size of the file
+   * @param chunkSize
+   *          size of the file parts that will be uploaded
+   * @param mp
+   *          the mediapackage this file should belong to
    * @return FileUploadJob the job object
-   * @throws FileUploadException 
+   * @throws FileUploadException
    */
-  FileUploadJob createJob(String filename, long fileSize, int chunkSize, MediaPackage mp, MediaPackageElementFlavor flavor) throws FileUploadException;
-  
-  /** Returns the upload job with the given ID, throws <code>FileUploadException</code>
-   *  if the job can not be found.
+  FileUploadJob createJob(String filename, long fileSize, int chunkSize, MediaPackage mp,
+          MediaPackageElementFlavor flavor) throws FileUploadException;
+
+  /**
+   * Returns the upload job with the given ID, throws <code>FileUploadException</code> if the job can not be found.
    * 
-   * @param id ID of the upload job to retrieve
+   * @param id
+   *          ID of the upload job to retrieve
    * @return FileUploadJob the job object in question
-   * @throws FileUploadException 
+   * @throws FileUploadException
    */
   FileUploadJob getJob(String id) throws FileUploadException;
-  
-  /** Persists the given job object.
+
+  /**
+   * Cleans outdated jobs on the file system
+   */
+  void cleanOutdatedJobs() throws IOException;
+
+  /**
+   * Persists the given job object.
    * 
-   * @param job job object to persist
-   * @throws FileUploadException 
+   * @param job
+   *          job object to persist
+   * @throws FileUploadException
    */
   void storeJob(FileUploadJob job) throws FileUploadException;
-  
-  /** Deletes the job permanently, thus deleting persistent data.
+
+  /**
+   * Deletes the job permanently, thus deleting persistent data.
    * 
-   * @param id ID of the upload job to delete
-   * @throws FileUploadException 
+   * @param id
+   *          ID of the upload job to delete
+   * @throws FileUploadException
    */
   void deleteJob(String id) throws FileUploadException;
-  
-  /** Appends the next part to the payload and updates the upload job accordingly.
+
+  /**
+   * Appends the next part to the payload and updates the upload job accordingly.
    * 
-   * @param job the job object for the upload
-   * @param chunk the number of the chunk being transfered
-   * @param content the actual payload data
-   * @throws FileUploadException 
+   * @param job
+   *          the job object for the upload
+   * @param chunk
+   *          the number of the chunk being transfered
+   * @param content
+   *          the actual payload data
+   * @throws FileUploadException
    */
   void acceptChunk(FileUploadJob job, long chunk, InputStream content) throws FileUploadException;
-  
-  /** Returns an <code>InputStream</code> containing the data from the payload.
+
+  /**
+   * Returns an <code>InputStream</code> containing the data from the payload.
    * 
-   * @param job job to retrieve payload data from
+   * @param job
+   *          job to retrieve payload data from
    * @return InputStream the payload data
-   * @throws FileUploadException 
+   * @throws FileUploadException
    */
   InputStream getPayload(FileUploadJob job) throws FileUploadException;
-  
+
 }
