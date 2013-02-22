@@ -186,10 +186,12 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
   @Override
-  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     logger.debug("Running segments preview workflow operation on {}", workflowInstance);
 
     // Check if there is an mpeg-7 catalog containing video segments
@@ -217,11 +219,12 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
    * @throws ExecutionException
    * @throws InterruptedException
    * @throws NotFoundException
-   * @throws WorkflowOperationException 
+   * @throws WorkflowOperationException
    */
   protected WorkflowOperationResult extractVideoText(final MediaPackage mediaPackage,
           WorkflowOperationInstance operation) throws EncoderException, InterruptedException, ExecutionException,
-          IOException, NotFoundException, MediaPackageException, TextAnalyzerException, WorkflowOperationException, ServiceRegistryException {
+          IOException, NotFoundException, MediaPackageException, TextAnalyzerException, WorkflowOperationException,
+          ServiceRegistryException {
     long totalTimeInQueue = 0;
 
     List<String> sourceTagSet = asList(operation.getConfiguration("source-tags"));
@@ -274,7 +277,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
         if ((segment instanceof VideoSegment))
           videoSegments.add((VideoSegment) segment);
       }
-      
+
       // argument array for image extraction
       long[] times = new long[videoSegments.size()];
 
@@ -282,7 +285,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
         VideoSegment videoSegment = videoSegments.get(i);
         MediaTimePoint segmentTimePoint = videoSegment.getMediaTime().getMediaTimePoint();
         MediaDuration segmentDuration = videoSegment.getMediaTime().getMediaDuration();
-        
+
         // Choose a time
         MediaPackageReference reference = null;
         if (catalogRef == null)
@@ -291,15 +294,16 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
           reference = new MediaPackageReferenceImpl(catalogRef.getType(), catalogRef.getIdentifier());
         reference.setProperty("time", segmentTimePoint.toString());
 
-        // Have the time for ocr image created. To circumvent problems with slowly building slides, we take the image that is
+        // Have the time for ocr image created. To circumvent problems with slowly building slides, we take the image
+        // that is
         // almost at the end of the segment, it should contain the most content and is stable as well.
         long startTimeSeconds = segmentTimePoint.getTimeInMilliseconds() / 1000;
         long durationSeconds = segmentDuration.getDurationInMilliseconds() / 1000;
         times[i] = startTimeSeconds + durationSeconds - stabilityThreshold + 1;
       }
-        
+
       // Have the ocr image(s) created.
-      
+
       // TODO: Note that the way of having one image extracted after the other is suited for
       // the ffmpeg-based encoder. When switching to other encoding engines such as gstreamer, it might be preferable
       // to pass in all timepoints to the image extraction method at once.
@@ -313,7 +317,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
           throw new WorkflowOperationException("Extracting scene image from " + sourceTrack + " failed");
         for (Map.Entry<Long, Job> entry : extractImageJobs.entrySet()) {
           Job job = serviceRegistry.getJob(entry.getValue().getId());
-          Attachment image = (Attachment)MediaPackageElementParser.getFromXml(job.getPayload()); 
+          Attachment image = (Attachment) MediaPackageElementParser.getFromXml(job.getPayload());
           images.add(image);
           totalTimeInQueue += job.getQueueTime();
         }
@@ -335,7 +339,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
       if (!waitForStatus(jobs.values().toArray(new Job[jobs.size()])).isSuccess()) {
         throw new WorkflowOperationException("Text extraction failed on images from " + sourceTrack);
       }
-      
+
       // Remove images that were created for text extraction
       logger.debug("Removing temporary images");
       for (Attachment image : images) {
@@ -346,7 +350,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
       for (Map.Entry<VideoSegment, Job> entry : jobs.entrySet()) {
         Job job = serviceRegistry.getJob(entry.getValue().getId());
         totalTimeInQueue += job.getQueueTime();
-  
+
         VideoSegment videoSegment = entry.getKey();
         MediaDuration segmentDuration = videoSegment.getMediaTime().getMediaDuration();
         Catalog catalog = (Catalog) MediaPackageElementParser.getFromXml(job.getPayload());
@@ -357,14 +361,14 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
         Mpeg7Catalog videoTextCatalog = loadMpeg7Catalog(catalog);
         if (videoTextCatalog == null)
           throw new IllegalStateException("Text analysis service did not return a valid mpeg7");
-  
+
         // Add the spatiotemporal decompositions from the new catalog to the existing video segments
         Iterator<Video> videoTextContents = videoTextCatalog.videoContent();
         if (videoTextContents == null || !videoTextContents.hasNext()) {
           logger.debug("Text analysis was not able to extract any text from {}", job.getArguments().get(0));
           break;
         }
-  
+
         try {
           Video textVideoContent = videoTextContents.next();
           VideoSegment textVideoSegment = (VideoSegment) textVideoContent.getTemporalDecomposition().segments().next();
@@ -423,13 +427,16 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
     try {
       File f = workspace.get(catalog.getURI());
       in = new FileInputStream(f);
-      Mpeg7Catalog tmp = mpeg7CatalogService.load(in);
-      in.close();
-      return tmp;
+      return mpeg7CatalogService.load(in);
     } catch (NotFoundException e) {
       throw new IOException("Unable to open catalog " + catalog + ": " + e.getMessage());
     } finally {
       IOUtils.closeQuietly(in);
+      try {
+        workspace.delete(catalog.getURI());
+      } catch (NotFoundException e) {
+        throw new IOException(e);
+      }
     }
   }
 

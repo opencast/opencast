@@ -157,6 +157,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       File parentDirectory = f.getParentFile();
       logger.debug("Attempting to delete {}", parentDirectory.getAbsolutePath());
       FileUtils.forceDelete(parentDirectory);
+      if (parentDirectory.getParentFile().list().length == 0)
+        FileUtils.forceDelete(parentDirectory.getParentFile());
       return true;
     } catch (NotFoundException e) {
       logger.info("Unable to delete non existing object {}/{}", mediaPackageID, mediaPackageElementID);
@@ -579,6 +581,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     File source = getFileFromCollection(fromCollection, fromFileName);
     File sourceMd5 = getMd5File(source);
     File destDir = getElementDirectory(toMediaPackage, toMediaPackageElement);
+
+    logger.debug("Moving {} from {} to {}/{}", new String[] { fromFileName, fromCollection, toMediaPackage,
+            toMediaPackageElement });
     if (!destDir.exists()) {
       // we needed to create the directory, but couldn't
       try {
@@ -592,6 +597,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     File dest = null;
     try {
       dest = getFile(toMediaPackage, toMediaPackageElement);
+      logger.debug("Removing existing file from target location at {}", dest);
+      delete(toMediaPackage, toMediaPackageElement);
     } catch (NotFoundException e) {
       dest = new File(getElementDirectory(toMediaPackage, toMediaPackageElement), toFileName);
     }
@@ -635,15 +642,14 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       throw new IOException(f + " cannot be deleted");
 
     File parentDirectory = f.getParentFile();
-    String[] files = parentDirectory.list();
-    if (files.length == 0) {
-    	logger.debug("Attempting to delete empty collection directory {}", parentDirectory.getAbsolutePath());
-    	try {
-    		FileUtils.forceDelete(parentDirectory);
-    	} catch (IOException e) {
-    		logger.warn("Unable to delete empty collection directory {}", parentDirectory.getAbsolutePath());
-    		return false;
-    	}        
+    if (parentDirectory.list().length == 0) {
+      logger.debug("Attempting to delete empty collection directory {}", parentDirectory.getAbsolutePath());
+      try {
+        FileUtils.forceDelete(parentDirectory);
+      } catch (IOException e) {
+        logger.warn("Unable to delete empty collection directory {}", parentDirectory.getAbsolutePath());
+        return false;
+      }
     }
     return true;
   }

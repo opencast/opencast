@@ -27,6 +27,7 @@ import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
@@ -69,6 +70,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -446,9 +448,14 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    */
   protected void stopWorkflowInstance(long eventID) throws NotFoundException, UnauthorizedException {
     try {
-      workflowService.stop(eventID);
+      WorkflowInstance instance = workflowService.stop(eventID);
+      for (MediaPackageElement elem : instance.getMediaPackage().getElements()) {
+        workspace.delete(elem.getURI());
+      }
     } catch (WorkflowException e) {
       logger.warn("Can not stop workflow {}: {}", eventID, e.getMessage());
+    } catch (IOException e) {
+      logger.warn("Unable to delete mediapackage element {}", e.getMessage());
     }
   }
 
