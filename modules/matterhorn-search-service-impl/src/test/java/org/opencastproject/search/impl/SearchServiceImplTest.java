@@ -625,7 +625,7 @@ public class SearchServiceImplTest {
     // We should have nothing in the search index
     assertEquals(0, service.getByQuery(new SearchQuery()).size());
 
-    service.populateIndex();
+    service.populateIndex("System Admin");
 
     // This time we should have 10 results
     assertEquals(10, service.getByQuery(new SearchQuery()).size());

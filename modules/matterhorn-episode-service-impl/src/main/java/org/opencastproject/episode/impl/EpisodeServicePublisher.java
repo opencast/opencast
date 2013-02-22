@@ -16,8 +16,9 @@
 package org.opencastproject.episode.impl;
 
 import static org.opencastproject.util.data.Collections.cons;
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.util.data.functions.Booleans.ne;
 
 import org.opencastproject.episode.api.EpisodeService;
@@ -33,6 +34,7 @@ import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.solr.SolrServerFactory;
@@ -68,8 +70,6 @@ import java.util.Dictionary;
 import java.util.List;
 
 import javax.management.ObjectInstance;
-
-import static org.opencastproject.util.data.Tuple.tuple;
 
 public class EpisodeServicePublisher extends SimpleServicePublisher {
 
@@ -218,6 +218,7 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
                                                             seriesService,
                                                             mpeg7CatalogService,
                                                             securityService);
+    String systemUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
     episodeService = new EpisodeServiceImpl(solrRequester,
                                             solrIndex,
                                             securityService,
@@ -227,7 +228,8 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
                                             workflowService,
                                             mediaInspectionSvc,
                                             persistence,
-                                            elementStore);
+                                            elementStore,
+                                            systemUserName);
     elementStoreBean = new ElementStoreBean(elementStore);
     registeredMXBean = JmxUtil.registerMXBean(elementStoreBean, JMX_ELEMENT_STORE_TYPE);
     return tuple(list(registerService(cc, episodeService, EpisodeService.class, "Episode service")),

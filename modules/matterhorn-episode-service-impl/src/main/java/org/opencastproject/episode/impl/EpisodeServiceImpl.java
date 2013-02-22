@@ -15,7 +15,25 @@
  */
 package org.opencastproject.episode.impl;
 
-import org.apache.solr.client.solrj.SolrServerException;
+import static org.opencastproject.episode.api.EpisodeQuery.query;
+import static org.opencastproject.episode.impl.StoragePath.spath;
+import static org.opencastproject.episode.impl.elementstore.DeletionSelector.delAll;
+import static org.opencastproject.episode.impl.elementstore.Source.source;
+import static org.opencastproject.mediapackage.MediaPackageSupport.modify;
+import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.util.JobUtil.waitForJob;
+import static org.opencastproject.util.data.Collections.array;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Collections.mkString;
+import static org.opencastproject.util.data.Collections.nil;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.functions.Functions.constant;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import org.opencastproject.episode.api.ArchivedMediaPackageElement;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
@@ -46,6 +64,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Effect0;
@@ -58,6 +77,8 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
+
+import org.apache.solr.client.solrj.SolrServerException;
 import org.osgi.framework.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,25 +91,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import static org.opencastproject.episode.api.EpisodeQuery.query;
-import static org.opencastproject.episode.impl.StoragePath.spath;
-import static org.opencastproject.episode.impl.elementstore.DeletionSelector.delAll;
-import static org.opencastproject.episode.impl.elementstore.Source.source;
-import static org.opencastproject.mediapackage.MediaPackageSupport.modify;
-import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.util.JobUtil.waitForJob;
-import static org.opencastproject.util.data.Collections.array;
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.mkString;
-import static org.opencastproject.util.data.Collections.nil;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.functions.Functions.constant;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 public final class EpisodeServiceImpl implements EpisodeService {
   /** Log facility */
@@ -104,11 +106,12 @@ public final class EpisodeServiceImpl implements EpisodeService {
   private final EpisodeServiceDatabase persistence;
   private final ElementStore elementStore;
   private final MediaInspectionService mediaInspectionSvc;
+  private final String systemUserName;
 
   public EpisodeServiceImpl(SolrRequester solrRequester, SolrIndexManager solrIndex, SecurityService secSvc,
           AuthorizationService authSvc, OrganizationDirectoryService orgDir, ServiceRegistry svcReg,
           WorkflowService workflowSvc, MediaInspectionService mediaInspectionSvc, EpisodeServiceDatabase persistence,
-          ElementStore elementStore) {
+          ElementStore elementStore, String systemUserName) {
     this.solrRequester = solrRequester;
     this.solrIndex = solrIndex;
     this.secSvc = secSvc;
@@ -119,6 +122,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
     this.persistence = persistence;
     this.elementStore = elementStore;
     this.mediaInspectionSvc = mediaInspectionSvc;
+    this.systemUserName = systemUserName;
   }
 
   @Override
@@ -323,8 +327,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
 
           final Organization organization = orgDir.getOrganization(episode.getOrganization());
           secSvc.setOrganization(organization);
-          secSvc.setUser(new User(organization.getName(), organization.getId(), new String[] { organization
-                  .getAdminRole() }));
+          secSvc.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
           // The whole media package gets rewritten here. This is not the best approach since then
           // the media package is stored in the index with concrete URLs.
           // Just rewriting URLs on a per element basis does not work either since a media package element clone loses

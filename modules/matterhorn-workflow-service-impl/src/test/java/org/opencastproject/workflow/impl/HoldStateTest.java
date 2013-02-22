@@ -159,7 +159,7 @@ public class HoldStateTest {
     dao.setAuthorizationService(authzService);
     dao.setSecurityService(securityService);
     dao.setOrgDirectory(organizationDirectoryService);
-    dao.activate();
+    dao.activate("System Admin");
     service.setDao(dao);
     service.activate(null);
     service.setServiceRegistry(serviceRegistry);

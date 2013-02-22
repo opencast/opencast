@@ -15,7 +15,16 @@
  */
 package org.opencastproject.series.impl;
 
-import org.apache.commons.lang.StringUtils;
+import static org.opencastproject.event.EventAdminConstants.ID;
+import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
+import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
+import static org.opencastproject.event.EventAdminConstants.SERIES_TOPIC;
+import static org.opencastproject.util.EqualsUtil.bothNotNull;
+import static org.opencastproject.util.EqualsUtil.eqListSorted;
+import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
+import static org.opencastproject.util.RequireUtil.notNull;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -27,7 +36,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
@@ -36,6 +45,8 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.FunctionException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
+
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.event.Event;
@@ -50,16 +61,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import static org.opencastproject.event.EventAdminConstants.ID;
-import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
-import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
-import static org.opencastproject.event.EventAdminConstants.SERIES_TOPIC;
-import static org.opencastproject.util.EqualsUtil.bothNotNull;
-import static org.opencastproject.util.EqualsUtil.eqListSorted;
-import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
-import static org.opencastproject.util.RequireUtil.notNull;
-import static org.opencastproject.util.data.Option.some;
 
 /**
  * Implements {@link SeriesService}. Uses {@link SeriesServiceDatabase} for permanent storage and
@@ -117,12 +118,12 @@ public class SeriesServiceImpl implements SeriesService {
    */
   public void activate(ComponentContext cc) throws Exception {
     logger.info("Activating Series Service");
-
-    populateSolr();
+    String systemUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
+    populateSolr(systemUserName);
   }
 
   /** If the solr index is empty, but there are series in the database, populate the solr index. */
-  private void populateSolr() {
+  private void populateSolr(String systemUserName) {
     long instancesInSolr = 0L;
     try {
       instancesInSolr = index.count();
@@ -140,8 +141,7 @@ public class SeriesServiceImpl implements SeriesService {
             // Run as the superuser so we get all series, regardless of organization or role
             Organization organization = orgDirectory.getOrganization(series.getB());
             securityService.setOrganization(organization);
-            securityService.setUser(new User(organization.getName(), organization.getId(), new String[] { organization
-                    .getAdminRole() }));
+            securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
 
             index.updateIndex(series.getA());
             String id = series.getA().getFirst(DublinCore.PROPERTY_IDENTIFIER);
@@ -166,8 +166,9 @@ public class SeriesServiceImpl implements SeriesService {
   public DublinCoreCatalog updateSeries(final DublinCoreCatalog dc) throws SeriesException, UnauthorizedException {
     try {
       return isNew(notNull(dc, "dc")).map(new Function.X<DublinCoreCatalog, DublinCoreCatalog>() {
-        @Override public DublinCoreCatalog xapply(DublinCoreCatalog dc) throws
-                SeriesServiceDatabaseException, UnauthorizedException, IOException {
+        @Override
+        public DublinCoreCatalog xapply(DublinCoreCatalog dc) throws SeriesServiceDatabaseException,
+                UnauthorizedException, IOException {
           final String id = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
           logger.debug("Updating series {}", id);
           persistence.storeSeries(dc);
@@ -205,7 +206,7 @@ public class SeriesServiceImpl implements SeriesService {
     final String id = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
     if (id != null) {
       try {
-        return equals(persistence.getSeries(id), dc) ? Option.<DublinCoreCatalog>none() : some(dc);
+        return equals(persistence.getSeries(id), dc) ? Option.<DublinCoreCatalog> none() : some(dc);
       } catch (NotFoundException e) {
         return some(dc);
       }
@@ -271,13 +272,13 @@ public class SeriesServiceImpl implements SeriesService {
 
   /**
    * Sends an OSGI Event.
-   *
+   * 
    * @param topic
-   *         the event topic
+   *          the event topic
    * @param objectId
-   *         the series identifier
+   *          the series identifier
    * @param payload
-   *         the event payload
+   *          the event payload
    */
   private void sendEvent(String topic, String objectId, String payload) {
     Dictionary<String, String> eventProperties = new Hashtable<String, String>();
@@ -334,7 +335,7 @@ public class SeriesServiceImpl implements SeriesService {
       return index.getAccessControl(notNull(seriesID, "seriesID"));
     } catch (SeriesServiceDatabaseException e) {
       logger.error("Exception occurred while retrieving access control rules for series {}: {}", seriesID,
-                   e.getMessage());
+              e.getMessage());
       throw new SeriesException(e);
     }
   }
@@ -350,15 +351,14 @@ public class SeriesServiceImpl implements SeriesService {
   }
 
   /**
-   * Define equality on DublinCoreCatalogs.
-   * Two DublinCores are considered equal if they have the same properties and if each property
-   * has the same values in the same order.
+   * Define equality on DublinCoreCatalogs. Two DublinCores are considered equal if they have the same properties and if
+   * each property has the same values in the same order.
    * <p/>
-   * Note: As long as http://opencast.jira.com/browse/MH-8759 is not fixed, the encoding scheme of values
-   * is not considered.
+   * Note: As long as http://opencast.jira.com/browse/MH-8759 is not fixed, the encoding scheme of values is not
+   * considered.
    * <p/>
-   * Implementation Note: DublinCores should not be compared by their string serialization since the ordering
-   * of properties is not defined and cannot be guaranteed between serializations.
+   * Implementation Note: DublinCores should not be compared by their string serialization since the ordering of
+   * properties is not defined and cannot be guaranteed between serializations.
    */
   public static boolean equals(DublinCoreCatalog a, DublinCoreCatalog b) {
     final Map<EName, List<DublinCoreValue>> av = a.getValues();
@@ -375,8 +375,8 @@ public class SeriesServiceImpl implements SeriesService {
   }
 
   /**
-   * Define equality on AccessControlLists.
-   * Two AccessControlLists are considered equal if they contain the exact same entries no matter in which order.
+   * Define equality on AccessControlLists. Two AccessControlLists are considered equal if they contain the exact same
+   * entries no matter in which order.
    */
   public static boolean equals(AccessControlList a, AccessControlList b) {
     return bothNotNull(a, b) && eqListUnsorted(a.getEntries(), b.getEntries());

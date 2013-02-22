@@ -186,7 +186,7 @@ public class WorkflowStatisticsTest {
     dao.setServiceRegistry(serviceRegistry);
     dao.setAuthorizationService(authzService);
     dao.setOrgDirectory(organizationDirectoryService);
-    dao.activate();
+    dao.activate("System Admin");
     service.setDao(dao);
     service.activate(null);
     service.setServiceRegistry(serviceRegistry);
