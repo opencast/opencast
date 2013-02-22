@@ -7,7 +7,7 @@ CREATE TABLE SEQUENCE (
   SEQ_NAME VARCHAR(50) NOT NULL,
   SEQ_COUNT DECIMAL(38),
   PRIMARY KEY (SEQ_NAME)
-);
+) ENGINE=InnoDB;
 
 INSERT INTO SEQUENCE(SEQ_NAME, SEQ_COUNT) values ('SEQ_GEN', 0);
 
@@ -17,7 +17,7 @@ CREATE TABLE mh_organization (
   name VARCHAR(255),
   admin_role VARCHAR(255),
   PRIMARY KEY (id)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE mh_organization_node (
   organization VARCHAR(128) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE mh_organization_node (
   name VARCHAR(255),
   PRIMARY KEY (organization, port, name),
   CONSTRAINT FK_mh_organization_node_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_organization_node_pk ON mh_organization_node (organization);
 CREATE INDEX IX_mh_organization_node_name ON mh_organization_node (name);
@@ -37,7 +37,7 @@ CREATE TABLE mh_organization_property (
   value VARCHAR(255),
   PRIMARY KEY (organization, name),
   CONSTRAINT FK_mh_organization_property_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_organization_property_pk ON mh_organization_property (organization);
 
@@ -54,7 +54,7 @@ CREATE TABLE mh_annotation (
   value TEXT(65535),
   private TINYINT(1) DEFAULT 0,
   PRIMARY KEY (id)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_annotation_created ON mh_annotation (created);
 CREATE INDEX IX_mh_annotation_inpoint ON mh_annotation (inpoint);
@@ -71,7 +71,7 @@ CREATE TABLE mh_capture_agent_role (
   role VARCHAR(255),
   PRIMARY KEY (id, organization, role),
   CONSTRAINT FK_mh_capture_agent_role_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_capture_agent_role_pk ON mh_capture_agent_role (id, organization);
 
@@ -84,7 +84,7 @@ CREATE TABLE mh_capture_agent_state (
   url TEXT(65535),
   PRIMARY KEY (id, organization),
   CONSTRAINT FK_mh_capture_agent_state_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE mh_dictionary (
   text VARCHAR(255) NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE mh_dictionary (
   count BIGINT,
   stop_word TINYINT(1) DEFAULT 0,
   PRIMARY KEY (text, language)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_dictionary_weight ON mh_dictionary (weight);
 
@@ -106,7 +106,7 @@ CREATE TABLE mh_host_registration (
   max_jobs INTEGER NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT UNQ_mh_host_registration_0 UNIQUE (host)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_host_registration_online ON mh_host_registration (online);
 CREATE INDEX IX_mh_host_registration_active ON mh_host_registration (active);
@@ -127,7 +127,7 @@ CREATE TABLE mh_service_registration (
   PRIMARY KEY (id),
   CONSTRAINT UNQ_mh_service_registration_0 UNIQUE (host_registration, service_type),
   CONSTRAINT FK_service_registration_host_registration FOREIGN KEY (host_registration) REFERENCES mh_host_registration (id)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_service_registration_service_type ON mh_service_registration (service_type);
 CREATE INDEX IX_mh_service_registration_service_state ON mh_service_registration (service_state);
@@ -158,7 +158,7 @@ CREATE TABLE mh_job (
   CONSTRAINT FK_mh_job_parent FOREIGN KEY (parent) REFERENCES mh_job (id),
   CONSTRAINT FK_mh_job_root FOREIGN KEY (root) REFERENCES mh_job (id),
   CONSTRAINT FK_mh_job_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_job_parent ON mh_job (parent);
 CREATE INDEX IX_mh_job_root ON mh_job (root);
@@ -176,7 +176,7 @@ CREATE TABLE mh_job_argument (
   argument_index INTEGER,
   CONSTRAINT UNQ_job_argument_0 UNIQUE (id, argument_index),
   CONSTRAINT FK_job_argument_id FOREIGN KEY (id) REFERENCES mh_job (id)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_job_argument_id ON mh_job_argument (id);
 
@@ -186,7 +186,7 @@ CREATE TABLE mh_job_context (
   value TEXT(65535),
   CONSTRAINT UNQ_job_context_0 UNIQUE (id, name),
   CONSTRAINT FK_job_context_id FOREIGN KEY (id) REFERENCES mh_job (id)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_job_context_id ON mh_job_context (id);
 
@@ -196,7 +196,7 @@ CREATE TABLE mh_user (
   password TEXT(65535),
   PRIMARY KEY (username, organization),
   CONSTRAINT FK_mh_user_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE mh_role (
   username VARCHAR(128) NOT NULL,
@@ -204,7 +204,7 @@ CREATE TABLE mh_role (
   role TEXT(65535),
   CONSTRAINT FK_mh_role_username FOREIGN KEY (username, organization) REFERENCES mh_user (username, organization),
   CONSTRAINT FK_mh_role_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_role_pk ON mh_role (username, organization);
 
@@ -213,7 +213,7 @@ CREATE TABLE mh_scheduled_event (
   capture_agent_metadata TEXT(65535),
   dublin_core TEXT(65535),
   PRIMARY KEY (id)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE mh_search (
   id VARCHAR(128) NOT NULL,
@@ -224,7 +224,7 @@ CREATE TABLE mh_search (
   modification_date DATETIME,
   PRIMARY KEY (id),
   CONSTRAINT FK_mh_search_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_search_organization ON mh_search (organization);
 
@@ -235,7 +235,7 @@ CREATE TABLE mh_series (
   dublin_core TEXT(65535),
   PRIMARY KEY (id, organization),
   CONSTRAINT FK_mh_series_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE mh_upload (
   id VARCHAR(255) NOT NULL,
@@ -243,7 +243,7 @@ CREATE TABLE mh_upload (
   received BIGINT NOT NULL,
   filename TEXT(65535) NOT NULL,
   PRIMARY KEY (id)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE mh_user_action (
   id BIGINT NOT NULL,
@@ -258,7 +258,7 @@ CREATE TABLE mh_user_action (
   type VARCHAR(128),
   playing TINYINT(1) DEFAULT 0,
   PRIMARY KEY (id)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_user_action_created ON mh_user_action (created);
 CREATE INDEX IX_mh_user_action_inpoint ON mh_user_action (inpoint);
@@ -272,7 +272,7 @@ CREATE TABLE mh_oaipmh_harvesting (
   url VARCHAR(255) NOT NULL,
   last_harvested datetime,
   PRIMARY KEY (url)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE mh_episode_episode (
   id VARCHAR(128) NOT NULL,
@@ -284,7 +284,7 @@ CREATE TABLE mh_episode_episode (
   modification_date DATETIME,
   PRIMARY KEY (id, version, organization),
   CONSTRAINT FK_mh_episode_episode_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_episode_episode_mediapackage ON mh_episode_episode (id);
 CREATE INDEX IX_mh_episode_episode_version ON mh_episode_episode (version);
@@ -301,7 +301,7 @@ CREATE TABLE mh_episode_asset (
   CONSTRAINT UNQ_mh_episode_asset_0 UNIQUE (organization, mediapackage, mediapackageelement, version),
   CONSTRAINT FK_mh_episode_asset_organization FOREIGN KEY (organization) REFERENCES mh_organization (id),
   CONSTRAINT FK_mh_episode_asset_mediapackage FOREIGN KEY (mediapackage, version, organization) REFERENCES mh_episode_episode (id, version, organization)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_episode_asset_mediapackage ON mh_episode_asset (mediapackage);
 CREATE INDEX IX_mh_episode_asset_checksum ON mh_episode_asset (checksum);
@@ -311,7 +311,7 @@ CREATE TABLE mh_episode_version_claim (
  mediapackage VARCHAR(128) NOT NULL,
  last_claimed BIGINT(20) NOT NULL,
  PRIMARY KEY (mediapackage)
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX IX_mh_episode_version_claim_mediapackage ON mh_episode_version_claim (mediapackage);
 CREATE INDEX IX_mh_episode_version_claim_last_claimed ON mh_episode_version_claim (last_claimed);
