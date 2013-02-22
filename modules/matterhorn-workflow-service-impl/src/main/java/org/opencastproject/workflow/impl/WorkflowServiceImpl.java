@@ -1081,7 +1081,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     MediaPackage updatedMediaPackage = workflowInstance.getMediaPackage();
     populateMediaPackageMetadata(updatedMediaPackage);
     String seriesId = updatedMediaPackage.getSeries();
-    if (seriesId != null) {
+    if (seriesId != null && workflowInstance.getCurrentOperation() != null) {
       // If the mediapackage contains a series, find the series ACLs and add the security information to the
       // mediapackage
       try {

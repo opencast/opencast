@@ -355,10 +355,14 @@ public class WorkspaceImpl implements Workspace {
     File f = getWorkspaceFile(uri, false);
     if (f.isFile()) {
       synchronized (wsRoot) {
+        File mpElementDir = f.getParentFile();
         FileUtils.forceDelete(f);
-        if (f.getParentFile().list().length == 0) {
-          FileUtils.forceDelete(f.getParentFile());
-        }
+        if (mpElementDir.list().length == 0)
+          FileUtils.forceDelete(mpElementDir);
+
+        // Also delete mediapackage itself when empty
+        if (mpElementDir.getParentFile().list().length == 0)
+          FileUtils.forceDelete(mpElementDir.getParentFile());
       }
     }
 
