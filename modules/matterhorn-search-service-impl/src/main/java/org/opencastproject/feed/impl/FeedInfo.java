@@ -35,6 +35,9 @@ public class FeedInfo {
   /** Content query */
   private String[] query = null;
 
+  /** Number of entries in feed */
+  private int size = -1;
+
   private String romeVersion = null;
 
   /**
@@ -48,9 +51,26 @@ public class FeedInfo {
    *          the content query
    */
   public FeedInfo(Feed.Type type, float version, String[] query) {
+    this(type, version, query, -1);
+  }
+
+  /**
+   * Creates a new feed info.
+   * 
+   * @param type
+   *          the feed type
+   * @param version
+   *          the feed version
+   * @param query
+   *          the content query
+   * @param size
+   *          the number of entries
+   */
+  public FeedInfo(Feed.Type type, float version, String[] query, int size) {
     this.type = type;
     this.version = version;
     this.query = query;
+    this.size = size;
 
     // Use english locale to ensure the use of '.' as decimal separator.
     NumberFormat nf = NumberFormat.getNumberInstance(Locale.ENGLISH);
@@ -75,6 +95,25 @@ public class FeedInfo {
    */
   public float getVersion() {
     return version;
+  }
+
+  /**
+   * Sets the maximum number of entries that should be returned by this feed.
+   * 
+   * @param size
+   *          the maximum number of feed items
+   */
+  public void setSize(int size) {
+    this.size = size;
+  }
+
+  /**
+   * Returns the maximum number of feed entries or <code>-1</code> if no maximum size was specified.
+   * 
+   * @return the maximum number of entries in this feed
+   */
+  public int getSize() {
+    return size;
   }
 
   /**
