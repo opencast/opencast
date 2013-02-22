@@ -481,7 +481,25 @@
               <input type="hidden" id="recurrenceId" />
               <input type="hidden" id="recurrencePosition" />
               <input type="hidden" id="agentTimeZone" />
-            </li>
+
+              <input type="hidden" id="abstract" />
+              <input type="hidden" id="accessRights" />
+              <input type="hidden" id="available" />
+              <input type="hidden" id="coverage" />
+              <input type="hidden" id="created" />
+              <input type="hidden" id="date" />
+              <input type="hidden" id="extent" />
+              <input type="hidden" id="format" />
+              <input type="hidden" id="isReferencedBy" />
+              <input type="hidden" id="isReplacedBy" />
+              <input type="hidden" id="publisher" />
+              <input type="hidden" id="relation" />
+              <input type="hidden" id="replaces" />
+              <input type="hidden" id="rights" />
+              <input type="hidden" id="rightsHolder" />
+              <input type="hidden" id="source" />
+              <input type="hidden" id="type" />
+     	    </li>
             <li>
               <label class="scheduler-label">&nbsp;</label>
               <span class="scheduler-required-text">*</span><span id="i18n_required">Required</span>

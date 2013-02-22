@@ -847,6 +847,71 @@ var ocScheduler = (function() {
     dcComps.subject = new ocAdmin.Component(['subject'], {
       key: 'subject'
     });
+	dcComps.dc_abstract = new ocAdmin.Component([ 'abstract' ], {
+		key : 'abstract'
+	});
+	dcComps.accessRights = new ocAdmin.Component([ 'accessRights' ], {
+		key : 'accessRights'
+	});
+	dcComps.accessRights = new ocAdmin.Component([ 'available' ], {
+		key : 'available'
+	});
+	dcComps.coverage = new ocAdmin.Component([ 'coverage' ], {
+		key : 'coverage'
+	});
+	dcComps.created = new ocAdmin.Component([ 'created' ], {
+		key : 'created'
+	});
+	dcComps.date = new ocAdmin.Component([ 'date' ], {
+		key : 'date'
+	});
+	dcComps.extent = new ocAdmin.Component([ 'extent' ], {
+		key : 'extent'
+	});
+	dcComps.format = new ocAdmin.Component([ 'format' ], {
+		key : 'format'
+	});
+	dcComps.isReferencedBy = new ocAdmin.Component([ 'isReferencedBy' ], {
+		key : 'isReferencedBy'
+	});
+	dcComps.isReplacedBy = new ocAdmin.Component([ 'isReplacedBy' ], {
+		key : 'isReplacedBy'
+	});
+	dcComps.publisher = new ocAdmin.Component([ 'publisher' ], {
+		key : 'publisher'
+	});
+	dcComps.relation = new ocAdmin.Component([ 'relation' ], {
+		key : 'relation'
+	});
+	dcComps.replaces = new ocAdmin.Component([ 'replaces' ], {
+		key : 'replaces'
+	});
+	dcComps.rights = new ocAdmin.Component([ 'rights' ], {
+		key : 'rights'
+	});
+	dcComps.rightsHolder = new ocAdmin.Component([ 'rightsHolder' ], {
+		key : 'rightsHolder'
+	});
+	dcComps.source = new ocAdmin.Component([ 'source' ], {
+		key : 'source'
+	});
+	dcComps.type = new ocAdmin.Component([ 'type' ], {
+		key : 'type'
+	});
+	dcComps.license = new ocAdmin.Component(['licenseField'], {
+		label: 'licenseLabel', key: 'license', required: true,
+		errors: { missingRequired: new ocAdmin.Error('missingLicense', 'licenseLabel')	}
+	},{
+		getValue: function() { 
+		  return $('#licenseField').val();
+		},  
+		setValue: function(value) { 
+			if ($('#licenseField option[value="' + value + '"]').length == 0 ) {
+				$('#licenseField').append('<option value="' + value + '">' + value + '</option>');
+			} 
+			$("#licenseField option").each(function() { this.selected = (this.text == value); });
+		} 
+	});
     dcComps.language = new ocAdmin.Component(['language'], {
       key: 'language'
     });
