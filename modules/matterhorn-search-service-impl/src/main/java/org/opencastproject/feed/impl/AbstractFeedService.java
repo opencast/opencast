@@ -86,6 +86,9 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
 
   /** Property key for the feed entry link template */
   public static final String PROP_ENTRY = "feed.entry";
+  
+  /** Property key for the feed entry rel=self link template */
+  public static final String PROP_SELF = "feed.self";
 
   /** Property key for the feed rss media element flavor */
   public static final String PROP_RSSFLAVORS = "feed.rssflavors";
@@ -154,13 +157,17 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
       return false;
     }
     
+    //truncate uri, as it had to be and real uri not an id
+    
+    String id = extractId(uri);
+    
     // Check the uri
-    if (!query[0].equalsIgnoreCase(uri)) {
+    if (!query[0].equalsIgnoreCase(id)) {
       logger.debug("{} denies to handle request for {}", this, query);
       return false;
     }
     
-    // Check the selector
+    // Check the selector 
     if (selector != null && (query.length < 2 || !query[1].equalsIgnoreCase(selector))) {
       return false;
     }
@@ -169,7 +176,13 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
     return true;
   }
 
-  /**
+  protected String extractId(String uri) {
+	String id = uri.substring(uri.lastIndexOf("/") + 1);
+	if (id == null) return uri;
+	return id;
+}
+
+/**
    * {@inheritDoc}
    * 
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#loadFeedData(org.opencastproject.feed.api.Feed.Type,
@@ -184,7 +197,12 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
    */
   @Override
   public void initialize(Properties properties) {
-    uri = (String) properties.get(PROP_URI);
+    serverUrl = (String) properties.get("org.opencastproject.engage.ui.url");
+    if (serverUrl == null) serverUrl = (String) properties.get("org.opencastproject.server.url"); 
+    
+    uri = generateFeedUri((String) properties.get(PROP_URI)); 
+    
+
     String sizeAsString = (String) properties.get(PROP_SIZE);
     try {
       if (StringUtils.isNotBlank(sizeAsString)) {
@@ -199,10 +217,11 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
     name = (String) properties.get(PROP_NAME);
     description = (String) properties.get(PROP_DESCRIPTION);
     copyright = (String) properties.get(PROP_COPYRIGHT);
-    String serverUrl = (String) properties.get("org.opencastproject.server.url");
     home = ensureUrl(((String) properties.get(PROP_HOME)), serverUrl);
     cover = ensureUrl((String) properties.get(PROP_COVER), serverUrl);
     linkTemplate = ensureUrl((String) properties.get(PROP_ENTRY), serverUrl);
+    if (properties.get(PROP_SELF) != null) 
+       linkSelf = ensureUrl((String) properties.get(PROP_SELF), serverUrl);
     String rssFlavors = (String) properties.get(PROP_RSSFLAVORS);
     if (rssFlavors != null) {
       StringTokenizer tok = new StringTokenizer(rssFlavors, " ,;");
@@ -240,6 +259,10 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
     }
   }
   
+  protected String generateFeedUri(String feedId) {
+    return ensureUrl(feedId, serverUrl);
+  }
+
   /**
    * {@inheritDoc}
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#hashCode()
@@ -274,7 +297,8 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
       new URL(string);
       return string;
     } catch (MalformedURLException e) {
-      return baseUrl + string;
+      if (baseUrl.endsWith("/") || string.startsWith("/")) return baseUrl + string;
+      else return baseUrl + "/" + string;
     }
   }
 

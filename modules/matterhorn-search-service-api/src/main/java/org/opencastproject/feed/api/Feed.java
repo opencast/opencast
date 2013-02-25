@@ -391,5 +391,24 @@ public interface Feed {
    *          the module to add
    */
   void addModule(FeedExtension module);
+  
+  /**
+   * Returns the feed updated date.
+   * <p>
+   * This method is a convenience method, it maps to the Dublin Core module date.
+   * 
+   * @return the feed updated date, <b>null</b> if none
+   */
+  Date getUpdatedDate();
+
+  /**
+   * Sets the feed updated date, which is needed for a valid Atom feed. 
+   * <p>
+   * This method is a convenience method, it maps to the Dublin Core module date.
+   * 
+   * @param updatedDate
+   *          the feed updated date to set, <b>null</b> if none
+   */
+  void setUpdatedDate(Date updatedDate);
 
 }

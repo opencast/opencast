@@ -141,12 +141,12 @@
           if (searchQuery != null && searchQuery != "")
           {
               $('#rsslink').attr("href", "/feeds/rss/2.0/search/" + searchQuery);
-              $('#atomlink').attr("href", "/feeds/atom/0.3/search/" + searchQuery);
+              $('#atomlink').attr("href", "/feeds/atom/1.0/search/" + searchQuery);
           }
           else
           {
               $('#rsslink').attr("href", "/feeds/rss/2.0/latest");
-              $('#atomlink').attr("href", "/feeds/atom/0.3/latest");
+              $('#atomlink').attr("href", "/feeds/atom/1.0/latest");
           }
       });
     </script>
@@ -194,7 +194,7 @@
       document.write('<div class="oc-search-bar-holder fl-helper-clearfix">');
       document.write('&nbsp;');
       document.write('<div class="oc-search-bar">');
-      document.write('<span class="subscriptions"><a id="rsslink" href="/feeds/rss/2.0/latest">RSS</a>&nbsp;|&nbsp;<a id="atomlink" href="/feeds/atom/0.3/latest">ATOM</a></span>');
+      document.write('<span class="subscriptions"><a id="rsslink" href="/feeds/rss/2.0/latest">RSS</a>&nbsp;|&nbsp;<a id="atomlink" href="/feeds/atom/1.0/latest">ATOM</a></span>');
       document.write('<br/>');
       document.write('<span style="float:right">');
       document.write('<form action="index.html">');

@@ -42,7 +42,7 @@ public class FeedImplTest {
       FeedEntry entry = new FeedEntryImpl(feed, "test entry", new LinkImpl(
               "http://localhost:8080/feeds/rss/2.0/test/testentry"),
               "http://localhost:8080/feeds/rss/2.0/test/testentry");
-      entry.addEnclosure(new EnclosureImpl("http://www.example.com/video.mp4", "video/mp4", 12));
+      entry.addEnclosure(new EnclosureImpl("http://www.example.com/video.mp4", "video/mp4", "presenter/delivery", 12));
       feed.addEntry(entry);
 
       ITunesFeedExtension itunesmodule = new ITunesFeedExtension();

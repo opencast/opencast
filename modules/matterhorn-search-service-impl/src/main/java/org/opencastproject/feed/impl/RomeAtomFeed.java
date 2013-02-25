@@ -22,10 +22,10 @@ import org.opencastproject.feed.api.Enclosure;
 import org.opencastproject.feed.api.Feed;
 import org.opencastproject.feed.api.FeedEntry;
 import org.opencastproject.feed.api.FeedExtension;
-import org.opencastproject.feed.api.Image;
 import org.opencastproject.feed.api.Link;
 import org.opencastproject.feed.api.Person;
 
+import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.module.DCModule;
 import com.sun.syndication.feed.module.DCModuleImpl;
 import com.sun.syndication.feed.module.DCSubject;
@@ -36,30 +36,15 @@ import com.sun.syndication.feed.module.itunes.EntryInformationImpl;
 import com.sun.syndication.feed.module.itunes.FeedInformation;
 import com.sun.syndication.feed.module.itunes.FeedInformationImpl;
 import com.sun.syndication.feed.module.itunes.types.Duration;
-import com.sun.syndication.feed.synd.SyndCategory;
-import com.sun.syndication.feed.synd.SyndCategoryImpl;
-import com.sun.syndication.feed.synd.SyndContent;
-import com.sun.syndication.feed.synd.SyndContentImpl;
-import com.sun.syndication.feed.synd.SyndEnclosure;
-import com.sun.syndication.feed.synd.SyndEnclosureImpl;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndEntryImpl;
-import com.sun.syndication.feed.synd.SyndFeedImpl;
-import com.sun.syndication.feed.synd.SyndImage;
-import com.sun.syndication.feed.synd.SyndImageImpl;
-import com.sun.syndication.feed.synd.SyndLink;
-import com.sun.syndication.feed.synd.SyndLinkImpl;
-import com.sun.syndication.feed.synd.SyndPerson;
-import com.sun.syndication.feed.synd.SyndPersonImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Wrapper around the Rome feed implementation
+ * Wrapper around the Rome Atom feed implementation
  */
-public class RomeFeed extends SyndFeedImpl {
+public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
 
   /** Serial version UID */
   private static final long serialVersionUID = -2449605551424421096L;
@@ -72,7 +57,7 @@ public class RomeFeed extends SyndFeedImpl {
    * @param feedInfo
    *          the target feed information
    */
-  public RomeFeed(Feed feed, FeedInfo feedInfo) {
+  public RomeAtomFeed(Feed feed, FeedInfo feedInfo) {
     init(feed, feedInfo);
   }
 
@@ -93,40 +78,41 @@ public class RomeFeed extends SyndFeedImpl {
     setFeedType(feedInfo.toROMEVersion());
 
     // Convert fields
-    setAuthors(toRomePersons(originalFeed.getAuthors()));
-    setCategories(toRomeCategories(originalFeed.getCategories()));
-    setContributors(toRomePersons(originalFeed.getContributors()));
-    setDescriptionEx(toRomeContent(originalFeed.getDescription()));
-    setImage(toRomeImage(originalFeed.getImage()));
+    setAuthors(toRomeAtomPersons(originalFeed.getAuthors()));
+    setCategories(toRomeAtomCategories(originalFeed.getCategories()));
+    setContributors(toRomeAtomPersons(originalFeed.getContributors()));
+    setInfo(toRomeAtomContent(originalFeed.getDescription()));
     setLanguage(originalFeed.getLanguage());
-    setLinks(toRomeLinks(originalFeed.getLinks()));
-    setPublishedDate(originalFeed.getPublishedDate());
-    setTitleEx(toRomeContent(originalFeed.getTitle()));
+    setAlternateLinks(toRomeAtomLinks(originalFeed.getLinks()));
+    setUpdated(originalFeed.getUpdatedDate());
+    setTitleEx(toRomeAtomContent(originalFeed.getTitle()));
     setModules(toRomeModules(originalFeed.getModules()));
-    setUri(originalFeed.getUri());
-    setLink(originalFeed.getLink());
+    setId(originalFeed.getUri());
+    List <Link> otherLinks = new ArrayList <Link>();
+    otherLinks.add(new LinkImpl(originalFeed.getLink()));
+    setOtherLinks(toRomeAtomLinks(otherLinks));
 
     // Add SyndFeedEntries
     if (originalFeed.getEntries() != null) {
-      List<SyndEntry> romeEntries = new ArrayList<SyndEntry>();
+      List<Entry> romeEntries = new ArrayList<Entry>();
       for (FeedEntry entry : originalFeed.getEntries()) {
-        SyndEntryImpl e = new SyndEntryImpl();
-        e.setAuthors(toRomePersons(entry.getAuthors()));
-        e.setCategories(toRomeCategories(entry.getCategories()));
-        e.setContents(toRomeContents(entry.getContents()));
-        e.setContributors(toRomePersons(entry.getContributors()));
-        e.setDescription(toRomeContent(entry.getDescription()));
-        e.setEnclosures(toRomeEnclosures(entry.getEnclosures()));
-        e.setPublishedDate(entry.getPublishedDate());
-        e.setTitleEx(toRomeContent(entry.getTitle()));
-        e.setUpdatedDate(entry.getUpdatedDate());
+        Entry e = new Entry();
+        e.setAuthors(toRomeAtomPersons(entry.getAuthors()));
+        e.setCategories(toRomeAtomCategories(entry.getCategories()));
+        e.setContents(toRomeAtomContents(entry.getContents()));
+        e.setContributors(toRomeAtomPersons(entry.getContributors()));
+        e.setSummary(toRomeAtomContent(entry.getDescription()));
+        e.setPublished(entry.getPublishedDate());
+        e.setTitleEx(toRomeAtomContent(entry.getTitle()));
+        e.setUpdated(entry.getUpdatedDate());
         e.setModules(toRomeModules(entry.getModules()));
-        e.setUri(entry.getUri());
-        List<SyndLink> links = toRomeLinks(entry.getLinks());
-        e.setLinks(links);
+        e.setId(entry.getUri());
+        List<com.sun.syndication.feed.atom.Link> links = toRomeAtomLinks(entry.getLinks());
+        links.addAll(toRomeAtomEnclosures(entry.getEnclosures())); 
+        e.setOtherLinks(links);
         // todo this strategy seems to work but is unproven
-        if (links.size() > 0)
-          e.setLink(links.get(0).getHref());
+        //if (links.size() > 0)
+        //  e.setLink(links.get(0).getHref());
         romeEntries.add(e);
       }
       setEntries(romeEntries);
@@ -140,14 +126,14 @@ public class RomeFeed extends SyndFeedImpl {
    *          original categories
    * @return <code>ROME</code> category list
    */
-  private List<SyndCategory> toRomeCategories(List<Category> categories) {
+  private List<com.sun.syndication.feed.atom.Category> toRomeAtomCategories(List<Category> categories) {
     if (categories == null)
       return Collections.emptyList();
-    List<SyndCategory> romeCategories = new ArrayList<SyndCategory>(categories.size());
+    List<com.sun.syndication.feed.atom.Category> romeCategories = new ArrayList<com.sun.syndication.feed.atom.Category>(categories.size());
     for (Category category : categories) {
-      SyndCategoryImpl romeCategory = new SyndCategoryImpl();
-      romeCategory.setName(category.getName());
-      romeCategory.setTaxonomyUri(category.getTaxonomyUri());
+      com.sun.syndication.feed.atom.Category romeCategory = new com.sun.syndication.feed.atom.Category();
+      romeCategory.setLabel(category.getName());
+      romeCategory.setScheme(category.getTaxonomyUri());
       romeCategories.add(romeCategory);
     }
     return romeCategories;
@@ -160,10 +146,10 @@ public class RomeFeed extends SyndFeedImpl {
    *          original content
    * @return <code>ROME</code> content object
    */
-  private SyndContent toRomeContent(Content content) {
+  private com.sun.syndication.feed.atom.Content toRomeAtomContent(Content content) {
     if (content == null)
       return null;
-    SyndContentImpl romeContent = new SyndContentImpl();
+    com.sun.syndication.feed.atom.Content romeContent = new com.sun.syndication.feed.atom.Content();
     romeContent.setMode(content.getMode().toString().toLowerCase());
     romeContent.setType(content.getType());
     romeContent.setValue(content.getValue());
@@ -177,12 +163,12 @@ public class RomeFeed extends SyndFeedImpl {
    *          original contents
    * @return <code>ROME</code> content list
    */
-  private List<SyndContent> toRomeContents(List<Content> contents) {
+  private List<com.sun.syndication.feed.atom.Content> toRomeAtomContents(List<Content> contents) {
     if (contents == null)
       return Collections.emptyList();
-    List<SyndContent> romeContents = new ArrayList<SyndContent>(contents.size());
+    List<com.sun.syndication.feed.atom.Content> romeContents = new ArrayList<com.sun.syndication.feed.atom.Content>(contents.size());
     for (Content content : contents) {
-      romeContents.add(toRomeContent(content));
+      romeContents.add(toRomeAtomContent(content));
     }
     return romeContents;
   }
@@ -194,36 +180,20 @@ public class RomeFeed extends SyndFeedImpl {
    *          original enclosures
    * @return <code>ROME</code> enclosure list
    */
-  private List<SyndEnclosure> toRomeEnclosures(List<Enclosure> enclosures) {
+  private List<com.sun.syndication.feed.atom.Link> toRomeAtomEnclosures(List<Enclosure> enclosures) {
     if (enclosures == null)
       return Collections.emptyList();
-    List<SyndEnclosure> romeEnclosures = new ArrayList<SyndEnclosure>(enclosures.size());
+    List<com.sun.syndication.feed.atom.Link> romeEnclosures = new ArrayList<com.sun.syndication.feed.atom.Link>(enclosures.size());
     for (Enclosure enclosure : enclosures) {
-      SyndEnclosureImpl romeEnclosure = new SyndEnclosureImpl();
+      com.sun.syndication.feed.atom.Link romeEnclosure = new com.sun.syndication.feed.atom.Link();
       romeEnclosure.setLength(enclosure.getLength());
       romeEnclosure.setType(enclosure.getType());
-      romeEnclosure.setUrl(enclosure.getUrl());
+      romeEnclosure.setHref(enclosure.getUrl());
+      romeEnclosure.setTitle(enclosure.getFlavour());
+      romeEnclosure.setRel("enclosure");
       romeEnclosures.add(romeEnclosure);
     }
     return romeEnclosures;
-  }
-
-  /**
-   * Converts the image to a <code>ROME</code> object.
-   * 
-   * @param image
-   *          original image
-   * @return <code>ROME</code> image object
-   */
-  private SyndImage toRomeImage(Image image) {
-    if (image == null)
-      return null;
-    SyndImageImpl romeImage = new SyndImageImpl();
-    romeImage.setDescription(image.getDescription());
-    romeImage.setLink(image.getLink());
-    romeImage.setTitle(image.getTitle());
-    romeImage.setUrl(image.getUrl());
-    return romeImage;
   }
 
   /**
@@ -233,18 +203,20 @@ public class RomeFeed extends SyndFeedImpl {
    *          original links
    * @return <code>ROME</code> link list
    */
-  private List<SyndLink> toRomeLinks(List<Link> links) {
+  private List<com.sun.syndication.feed.atom.Link> toRomeAtomLinks(List<Link> links) {
     if (links == null)
       return Collections.emptyList();
-    List<SyndLink> romeLinks = new ArrayList<SyndLink>(links.size());
+    List<com.sun.syndication.feed.atom.Link> romeLinks = new ArrayList<com.sun.syndication.feed.atom.Link>(links.size());
     for (Link link : links) {
-      SyndLinkImpl romeLink = new SyndLinkImpl();
+      com.sun.syndication.feed.atom.Link romeLink = new com.sun.syndication.feed.atom.Link();
       romeLink.setHref(link.getHref());
       romeLink.setHreflang(link.getHreflang());
       romeLink.setLength(link.getLength());
       romeLink.setRel(link.getRel());
       romeLink.setTitle(link.getTitle());
       romeLink.setType(link.getType());
+      romeLink.setTitle(link.getFlavour());
+      romeLink.setLength(1);
       romeLinks.add(romeLink);
     }
     return romeLinks;
@@ -257,12 +229,12 @@ public class RomeFeed extends SyndFeedImpl {
    *          original persons
    * @return <code>ROME</code> person list
    */
-  private List<SyndPerson> toRomePersons(List<Person> persons) {
+  private List<com.sun.syndication.feed.atom.Person> toRomeAtomPersons(List<Person> persons) {
     if (persons == null)
       return Collections.emptyList();
-    List<SyndPerson> romePersons = new ArrayList<SyndPerson>(persons.size());
+    List<com.sun.syndication.feed.atom.Person> romePersons = new ArrayList<com.sun.syndication.feed.atom.Person>(persons.size());
     for (Person person : persons) {
-      SyndPersonImpl romePerson = new SyndPersonImpl();
+      com.sun.syndication.feed.atom.Person romePerson = new com.sun.syndication.feed.atom.Person();
       romePerson.setEmail(person.getEmail());
       romePerson.setName(person.getName());
       romePerson.setUri(person.getUri());

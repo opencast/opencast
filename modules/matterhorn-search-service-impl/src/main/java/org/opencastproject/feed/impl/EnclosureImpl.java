@@ -28,6 +28,9 @@ public class EnclosureImpl implements Enclosure {
 
   /** Enclosure type */
   private String type = null;
+  
+  /** Enclosure flavour */
+  private String flavour = null;
 
   /** Enclosure length */
   private long length = 0;
@@ -39,12 +42,15 @@ public class EnclosureImpl implements Enclosure {
    *          the enclosure's url
    * @param type
    *          the type
+   * @param flavour
+   *          the mediapackage element flavour         
    * @param length
    *          the lenght
    */
-  public EnclosureImpl(String url, String type, long length) {
+  public EnclosureImpl(String url, String type, String flavour, long length) {
     this.url = url;
     this.type = type;
+    this.flavour = flavour;
     this.length = length;
   }
 
@@ -88,6 +94,20 @@ public class EnclosureImpl implements Enclosure {
    */
   public void setUrl(String url) {
     this.url = url;
+  }
+
+  /**
+   * @see org.opencastproject.feed.api.Enclosure#getFlavour()
+   */
+  public String getFlavour() {
+    return flavour;
+  }
+
+  /**
+   * @see org.opencastproject.feed.api.Enclosure#setFlavour(java.lang.String)
+   */
+  public void setFlavour(String flavor) {
+    this.flavour = flavor;
   }
 
 }

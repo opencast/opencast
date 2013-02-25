@@ -20,6 +20,7 @@ import org.opencastproject.feed.api.Feed;
 import org.opencastproject.feed.api.FeedGenerator;
 
 import com.sun.syndication.io.SyndFeedOutput;
+import com.sun.syndication.io.WireFeedOutput;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.http.HttpContext;
@@ -99,7 +100,7 @@ public class FeedServlet extends HttpServlet {
    */
   protected void doGetWithBundleClassloader(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
-
+    logger.debug("Requesting RSS or Atom feed.");
     FeedInfo feedInfo = null;
 
     // Try to extract requested feed type and content
@@ -131,6 +132,7 @@ public class FeedServlet extends HttpServlet {
 
     // Have we found a feed generator?
     if (feed == null) {
+      logger.debug("RSS/Atom feed could not be generated");
       response.sendError(HttpServletResponse.SC_NOT_FOUND);
       return;
     }
@@ -138,14 +140,26 @@ public class FeedServlet extends HttpServlet {
     // Set character encoding
     response.setCharacterEncoding(feed.getEncoding());
 
-    // Write back feed using Romeo
-    SyndFeedOutput output = new SyndFeedOutput();
+    // Write back feed using Rome
     Writer responseWriter = response.getWriter();
-    try {
-      output.output(new RomeFeed(feed, feedInfo), responseWriter);
-    } catch (Exception e) {
-      logger.error("Error serializing feed", e);
-      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+    if (feedInfo.getType().equals(Feed.Type.RSS)) {
+      logger.debug("Creating RSS feed output.");
+      SyndFeedOutput output = new SyndFeedOutput();
+      try {
+        output.output(new RomeRssFeed(feed, feedInfo), responseWriter);
+      } catch (Exception e) {
+        logger.error("Error serializing RSS feed", e);
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+      }
+    } else {
+      logger.debug("Creating Atom feed output.");
+      WireFeedOutput output = new WireFeedOutput();
+      try {
+        output.output(new RomeAtomFeed(feed, feedInfo), responseWriter);
+      } catch (Exception e) {
+        logger.error("Error serializing Atom feed", e);
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+      }
     }
   }
 
