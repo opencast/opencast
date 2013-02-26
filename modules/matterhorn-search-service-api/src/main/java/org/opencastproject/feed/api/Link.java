@@ -113,5 +113,20 @@ public interface Link {
    *          The length to set
    */
   void setLength(long length);
+  
+  /**
+   * Returns the link mediapackage element flavour.
+   * 
+   * @return the link flavour, <b>null</b> if none
+   */
+  String getFlavour();
+    
+  /**
+   * Sets the link mediapackage element flavour.
+   * 
+   * @param flavour
+   *          the link flavour to set, <b>null</b> if none
+   */
+  void setFlavour(String flavor);  
 
 }

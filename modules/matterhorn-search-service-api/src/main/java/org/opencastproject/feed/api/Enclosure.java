@@ -68,5 +68,20 @@ public interface Enclosure {
    *          the enclosure type to set, <b>null</b> if none
    */
   void setType(String type);
+ 
+  /**
+   * Returns the enclosure mediapackage element flavor.
+   * 
+   * @return the enclosure flavor, <b>null</b> if none
+   */
+  String getFlavor();
+    
+  /**
+   * Sets the enclosure mediapackage element flavor.
+   * 
+   * @param flavor
+   *          the enclosure type to set, <b>null</b> if none
+   */
+  void setFlavor(String flavor);  
 
 }

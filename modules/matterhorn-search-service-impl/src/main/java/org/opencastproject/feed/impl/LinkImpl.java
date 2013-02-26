@@ -32,6 +32,8 @@ public class LinkImpl implements Link {
   private String hreflang = null;
 
   private String title = null;
+ 
+  private String flavour = null;
 
   private long length = -1;
 
@@ -128,5 +130,20 @@ public class LinkImpl implements Link {
   public void setType(String type) {
     this.type = type;
   }
+  
+  /**
+   * @see org.opencastproject.feed.api.Link#getFlavour()
+   */
+  public String getFlavour() {
+    return flavour;
+  }
+
+  /**
+   * @see org.opencastproject.feed.api.Link#setFlavour(java.lang.String)
+   */
+  public void setFlavour(String flavor) {
+    this.flavour = flavor;
+  }
+  
 
 }

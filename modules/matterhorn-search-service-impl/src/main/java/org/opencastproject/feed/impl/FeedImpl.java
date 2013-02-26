@@ -54,6 +54,9 @@ public class FeedImpl implements Feed {
 
   /** Dublin Core Publication date */
   private Date publishedDate = null;
+  
+  /** Date when the feed has bee updated */
+  private Date updatedDate = null;  
 
   /** Dublin core categories */
   private List<Category> categories = null;
@@ -307,6 +310,15 @@ public class FeedImpl implements Feed {
   public Date getPublishedDate() {
     return publishedDate;
   }
+  
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.feed.api.Feed#getUpdatedDate()
+   */
+  public Date getUpdatedDate() {
+    return updatedDate;
+  }  
 
   /**
    * {@inheritDoc}
@@ -443,6 +455,15 @@ public class FeedImpl implements Feed {
     this.publishedDate = publishedDate;
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.feed.api.Feed#setPublishedDate(java.util.Date)
+   */
+  public void setUpdatedDate(Date updatedDate) {
+    this.updatedDate = updatedDate;
+  }
+  
   /**
    * {@inheritDoc}
    * 

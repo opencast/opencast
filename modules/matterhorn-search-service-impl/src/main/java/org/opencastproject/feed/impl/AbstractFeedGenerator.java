@@ -68,6 +68,9 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /** Link to the user interface */
   protected String linkTemplate = null;
+  
+  /** Link to the user alternative interface */
+  protected String linkSelf = null;  
 
   /** The feed homepage */
   protected String home = null;
@@ -104,6 +107,10 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /** The feed description */
   protected String description = null;
+  
+  /** The URL of the server for valid URIs in the feeds */
+  protected String serverUrl = null; 
+
 
   /** the logging facility provided by log4j */
   private static final Logger logger = LoggerFactory.getLogger(AbstractFeedGenerator.class);
@@ -280,6 +287,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    *      java.lang.String[], int)
    */
   public final Feed createFeed(Feed.Type type, String[] query, int size) {
+    logger.debug("Started to create {} feed", type);
     SearchResult result = null;
 
     if (type == null)
@@ -411,28 +419,43 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
       return feed;
     }
 
+   String entryUri = null;
+    
     // For RSS feeds, create multiple entries (one per enclosure). For Atom, add all enclosures to the same item
     switch (feed.getType()) {
       case RSS:
+        entryUri = resultItem.getId();
         for (MediaPackageElement e : enclosures) {
           List<MediaPackageElement> enclosure = new ArrayList<MediaPackageElement>(1);
           enclosure.add(e);
-          FeedEntry entry = createEntry(feed, title, link, resultItem.getId());
+          FeedEntry entry = createEntry(feed, title, link, entryUri);
           entry = populateFeedEntry(entry, resultItem, enclosure);
           entry.setUri(entry.getUri() + "/" + e.getIdentifier());
           feed.addEntry(entry);
         }
         break;
       case Atom:
-        FeedEntry entry = createEntry(feed, title, link, resultItem.getId());
+        entryUri = generateEntryUri(resultItem.getId());
+        FeedEntry entry = createEntry(feed, title, link, entryUri);
         entry = populateFeedEntry(entry, resultItem, enclosures);
+        if (getLinkSelf() != null) {
+          LinkImpl self = new LinkImpl(getSelfLinkForEntry(feed, resultItem));
+          self.setRel("self");
+          entry.addLink(self);
+        }  
         feed.addEntry(entry);
+        if (feed.getUpdatedDate() == null) feed.setUpdatedDate(entry.getUpdatedDate());
+        else if (entry.getUpdatedDate().before(feed.getUpdatedDate())) feed.setUpdatedDate(entry.getUpdatedDate());
         break;
       default:
         throw new IllegalStateException("Unsupported feed type " + feed.getType());
     }
-
+    
     return feed;
+  }
+
+  protected String generateEntryUri(String id) {
+    return serverUrl + "/entry-uri/" + id;
   }
 
   /**
@@ -448,8 +471,9 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    */
   private FeedEntry populateFeedEntry(FeedEntry entry, SearchResultItem metadata, List<MediaPackageElement> enclosures) {
     Date d = metadata.getDcCreated();
+    Date updatedDate = metadata.getModified();
     String title = metadata.getDcTitle();
-
+    
     // Configure the iTunes extension
 
     ITunesFeedEntryExtension iTunesEntry = new ITunesFeedEntryExtension();
@@ -517,6 +541,10 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
       entry.setPublishedDate(metadata.getModified());
       dcExtension.setDate(metadata.getModified());
     }
+    
+    // Set the updated date
+    if (updatedDate == null) updatedDate = d;
+    entry.setUpdatedDate(updatedDate);
 
     // TODO: Finish dc support
 
@@ -548,6 +576,8 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
       if (trackLength <= 0)
         trackLength = metadata.getDcExtent();
 
+      String trackFlavor = element.getFlavor().toString();
+      
       String trackUrl = null;
       try {
         trackUrl = element.getURI().toURL().toExternalForm();
@@ -555,7 +585,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
         // Can't happen
       }
 
-      Enclosure enclosure = new EnclosureImpl(trackUrl, trackMimeType, trackLength);
+      Enclosure enclosure = new EnclosureImpl(trackUrl, trackMimeType, trackFlavor, trackLength);
       entry.addEnclosure(enclosure);
     }
 
@@ -850,6 +880,26 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   public String getLinkTemplate() {
     return linkTemplate;
   }
+  
+  /**
+   * Sets the entry's base url that will be used to form the alternate episode link in the feeds. If the url contains a
+   * placeholder in the form <code>{0}</code>, it will be replaced by the episode id.
+   * 
+   * @param url
+   *          the url
+   */
+  public void setLinkSelf(String url) {
+    linkSelf = url;
+  }
+
+  /**
+   * Returns the self link template to the default user interface.
+   * 
+   * @return the link to the ui
+   */
+  public String getLinkSelf() {
+    return linkSelf;
+  }
 
   /**
    * Generates a link for the current feed entry by using the entry identifier and the result of
@@ -866,6 +916,23 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     if (linkTemplate == null)
       throw new IllegalStateException("No template defined");
     return MessageFormat.format(linkTemplate, solrResultItem.getId());
+  }
+  
+  /**
+   * Generates a link for the current feed entry by using the entry identifier and the result of
+   * {@link #getLinkSelf()} to create the url. Overwrite this method to provide your own way of generating links to
+   * feed entries.
+   * 
+   * @param feed
+   *          the feed
+   * @param solrResultItem
+   *          solr search result for this feed entry
+   * @return the link to the ui
+   */
+  protected String getSelfLinkForEntry(Feed feed, SearchResultItem solrResultItem) {
+    if (linkSelf == null)
+      return linkSelf;
+    return MessageFormat.format(linkSelf, solrResultItem.getId());
   }
 
   /**
