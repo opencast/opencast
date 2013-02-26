@@ -576,7 +576,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
       if (trackLength <= 0)
         trackLength = metadata.getDcExtent();
 
-      String trackFlavour = element.getFlavor().toString();
+      String trackFlavor = element.getFlavor().toString();
       
       String trackUrl = null;
       try {
@@ -585,7 +585,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
         // Can't happen
       }
 
-      Enclosure enclosure = new EnclosureImpl(trackUrl, trackMimeType, trackFlavour, trackLength);
+      Enclosure enclosure = new EnclosureImpl(trackUrl, trackMimeType, trackFlavor, trackLength);
       entry.addEnclosure(enclosure);
     }
 

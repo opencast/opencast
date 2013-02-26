@@ -189,7 +189,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
       romeEnclosure.setLength(enclosure.getLength());
       romeEnclosure.setType(enclosure.getType());
       romeEnclosure.setHref(enclosure.getUrl());
-      romeEnclosure.setTitle(enclosure.getFlavour());
+      romeEnclosure.setTitle(enclosure.getFlavor());
       romeEnclosure.setRel("enclosure");
       romeEnclosures.add(romeEnclosure);
     }

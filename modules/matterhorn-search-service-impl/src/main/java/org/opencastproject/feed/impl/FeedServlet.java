@@ -50,10 +50,14 @@ import javax.servlet.http.HttpServletResponse;
  * like this: <code>/feeds/&lt;feed type&gt;/&lt;version&gt;/&lt;query&gt;</code>, e. g.
  * 
  * <pre>
- *     http://localhost/feeds/Atom/0.3/favorites
+ *     http://localhost/feeds/Atom/1.0/favorites
  * </pre>
  * 
- * which would indicate a requeste to an atom 0.3 feed with <tt>favourites</tt> being the query.
+ * which would indicate a requeste to an atom 1.0 feed with <tt>favourites</tt> being the query.
+ * 
+ * The servlet returns a HTTP status 200 with the feed data. 
+ * If the feed could not be found because the query is unknown a HTTP error 404 is returned
+ * If the feed could not be build (wrong RSS or Atom version, corrupt data, etc) an HTTP error 500 is returned. 
  */
 public class FeedServlet extends HttpServlet {
 

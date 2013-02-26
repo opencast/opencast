@@ -30,7 +30,7 @@ public class EnclosureImpl implements Enclosure {
   private String type = null;
   
   /** Enclosure flavour */
-  private String flavour = null;
+  private String flavor = null;
 
   /** Enclosure length */
   private long length = 0;
@@ -50,7 +50,7 @@ public class EnclosureImpl implements Enclosure {
   public EnclosureImpl(String url, String type, String flavour, long length) {
     this.url = url;
     this.type = type;
-    this.flavour = flavour;
+    this.flavor = flavour;
     this.length = length;
   }
 
@@ -97,17 +97,17 @@ public class EnclosureImpl implements Enclosure {
   }
 
   /**
-   * @see org.opencastproject.feed.api.Enclosure#getFlavour()
+   * @see org.opencastproject.feed.api.Enclosure#getFlavor()
    */
-  public String getFlavour() {
-    return flavour;
+  public String getFlavor() {
+    return flavor;
   }
 
   /**
-   * @see org.opencastproject.feed.api.Enclosure#setFlavour(java.lang.String)
+   * @see org.opencastproject.feed.api.Enclosure#setFlavor(java.lang.String)
    */
-  public void setFlavour(String flavor) {
-    this.flavour = flavor;
+  public void setFlavor(String flavor) {
+    this.flavor = flavor;
   }
 
 }
