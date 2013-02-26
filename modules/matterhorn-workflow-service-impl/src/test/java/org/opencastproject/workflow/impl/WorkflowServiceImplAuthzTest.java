@@ -200,7 +200,7 @@ public class WorkflowServiceImplAuthzTest {
     dao.setSecurityService(securityService);
     dao.setOrgDirectory(organizationDirectoryService);
     dao.solrRoot = sRoot + File.separator + "solr." + System.currentTimeMillis();
-    dao.activate();
+    dao.activate("System Admin");
     service.setDao(dao);
 
     // Activate

@@ -30,6 +30,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.solr.SolrServerFactory;
@@ -224,7 +225,8 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       logger.debug("Workflows will be added to the search index asynchronously");
       indexingExecutor = Executors.newSingleThreadExecutor();
     }
-    activate();
+    String systemUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
+    activate(systemUserName);
   }
 
   private long count() throws WorkflowDatabaseException {
@@ -239,7 +241,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   /**
    * Activates the index by configuring solr with the server url that must have been set previously.
    */
-  public void activate() {
+  public void activate(String systemUserName) {
     // Set up the solr server
     if (solrServerUrl != null) {
       solrServer = SolrServerFactory.newRemoteInstance(solrServerUrl);
@@ -283,8 +285,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
             instance = WorkflowParser.parseWorkflowInstance(job.getPayload());
             Organization organization = orgDirectory.getOrganization(job.getOrganization());
             securityService.setOrganization(organization);
-            securityService.setUser(new User(organization.getName(), organization.getId(), new String[] { organization
-                    .getAdminRole() }));
+            securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
             index(instance);
           } catch (WorkflowDatabaseException e) {
             logger.warn("Skipping restoring of workflow {}: {}", instance.getId(), e.getMessage());

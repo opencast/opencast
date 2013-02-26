@@ -152,7 +152,7 @@ public class PauseFinalOperationTest {
     dao.solrRoot = sRoot + File.separator + "solr";
     dao.setSecurityService(securityService);
     dao.setOrgDirectory(organizationDirectoryService);
-    dao.activate();
+    dao.activate("System Admin");
     service.setDao(dao);
     service.activate(null);
     service.setServiceRegistry(serviceRegistry);

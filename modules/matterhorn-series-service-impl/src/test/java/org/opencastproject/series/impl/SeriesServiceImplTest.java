@@ -49,6 +49,8 @@ import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 
@@ -128,7 +130,15 @@ public class SeriesServiceImplTest {
     seriesService.setEventAdmin(eventAdmin);
     seriesService.setSecurityService(securityService);
 
-    seriesService.activate(null);
+    BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
+    EasyMock.expect(bundleContext.getProperty((String) EasyMock.anyObject())).andReturn("System Admin");
+    EasyMock.replay(bundleContext);
+
+    ComponentContext componentContext = EasyMock.createNiceMock(ComponentContext.class);
+    EasyMock.expect(componentContext.getBundleContext()).andReturn(bundleContext).anyTimes();
+    EasyMock.replay(componentContext);
+
+    seriesService.activate(componentContext);
 
     InputStream in = null;
     try {

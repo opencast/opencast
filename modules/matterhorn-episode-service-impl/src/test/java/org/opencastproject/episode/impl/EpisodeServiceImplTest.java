@@ -254,7 +254,8 @@ public class EpisodeServiceImplTest {
     SeriesService seriesService = newSeriesService();
     service = new EpisodeServiceImpl(new SolrRequester(solrServer), new SolrIndexManager(solrServer, workspace,
             cell(Arrays.asList(mdService)), seriesService, mpeg7CatalogService, securityService), securityService,
-            authorizationService, orgDirectory, serviceRegistry, null, null, episodeDatabase, elementStore);
+            authorizationService, orgDirectory, serviceRegistry, null, null, episodeDatabase, elementStore,
+            "System Admin");
     EasyMock.replay(authorizationService);
   }
 

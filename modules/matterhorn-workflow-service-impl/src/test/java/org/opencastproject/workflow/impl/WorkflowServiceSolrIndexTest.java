@@ -99,7 +99,7 @@ public class WorkflowServiceSolrIndexTest {
     dao.setAuthorizationService(authzService);
     dao.setSecurityService(securityService);
     dao.setOrgDirectory(orgDirectroy);
-    dao.activate();
+    dao.activate("System Admin");
   }
 
   @After

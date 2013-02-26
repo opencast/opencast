@@ -41,6 +41,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -190,7 +191,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     indexManager = new SolrIndexManager(solrServer, workspace, mdServices, seriesService, mpeg7CatalogService,
             securityService);
 
-    populateIndex();
+    String systemUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
+    populateIndex(systemUserName);
   }
 
   /**
@@ -454,7 +456,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     }
   }
 
-  protected void populateIndex() {
+  protected void populateIndex(String systemUserName) {
     long instancesInSolr = 0L;
     try {
       instancesInSolr = indexManager.count();
@@ -471,8 +473,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
           Organization organization = organizationDirectory.getOrganization(mediaPackage.getB());
           securityService.setOrganization(organization);
-          securityService.setUser(new User(organization.getName(), organization.getId(), new String[] { organization
-                  .getAdminRole() }));
+          securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
 
           AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
           Date modificationDate = persistence.getModificationDate(mediaPackageId);
