@@ -294,8 +294,7 @@ CREATE TABLE "mh_episode_asset" (
   "version" bigint NOT NULL,
   PRIMARY KEY ("id"),
   CONSTRAINT "UNQ_mh_episode_asset_0" UNIQUE ("organization", "mediapackage", "mediapackageelement", "version"),
-  CONSTRAINT "FK_mh_episode_asset_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id"),
-  CONSTRAINT "FK_mh_episode_asset_mediapackage" FOREIGN KEY ("mediapackage", "version", "organization") REFERENCES "mh_episode_episode" ("id", "version", "organization")
+  CONSTRAINT "FK_mh_episode_asset_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
 );
 
 CREATE INDEX "IX_mh_episode_asset_mediapackage" ON "mh_episode_asset" ("mediapackage");
