@@ -99,9 +99,6 @@ public interface SearchResultItem {
   /** @return the dcLicense */
   String getDcLicense();
 
-  /** @return the mediapackage serialized to XML */
-  String getOcMediapackage();
-
   /** @return the acl serialized to XML */
   String getOcAcl();
 

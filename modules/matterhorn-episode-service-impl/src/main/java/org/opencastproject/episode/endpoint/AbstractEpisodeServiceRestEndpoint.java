@@ -21,13 +21,10 @@ import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.api.EpisodeServiceException;
 import org.opencastproject.episode.api.HttpMediaPackageElementProvider;
-import org.opencastproject.episode.api.JaxbSearchResultItem;
 import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultItem;
 import org.opencastproject.episode.api.UriRewriter;
 import org.opencastproject.episode.api.Version;
-import org.opencastproject.episode.impl.solr.Convert;
-import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageImpl;
@@ -36,7 +33,6 @@ import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
@@ -75,7 +71,6 @@ import java.util.Map;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.episode.api.EpisodeQuery.query;
-import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
 import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.serverError;
@@ -345,7 +340,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
 
         // Return the results using the requested format
         final String type = "json".equals(format) ? MediaType.APPLICATION_JSON : MediaType.APPLICATION_XML;
-        final SearchResult sr = rewriteForDelivery(getEpisodeService().find(search));
+        final SearchResult sr = getEpisodeService().find(search, rewriteUri);
         return Response.ok(sr).type(type).build();
       }
     });
@@ -399,14 +394,13 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
     return handleException(new Function0<Response>() {
       @Override public Response apply() {
         final EpisodeQuery idQuery = query(getSecurityService()).id(mediaPackageId).onlyLastVersion();
-        final List<SearchResultItem> result = getEpisodeService().find(idQuery).getItems();
+        final List<SearchResultItem> result = getEpisodeService().find(idQuery, rewriteUri).getItems();
         if (result.size() > 1)
           return serverError();
         if (result.size() == 0)
           return notFound();
         final SearchResultItem item = result.get(0);
-        final MediaPackage rewritten = rewriteUris(item.getMediaPackage(), rewriteUri.curry(item.getOcVersion()));
-        return Response.ok(rewritten).build();
+        return Response.ok(item.getMediaPackage()).build();
       }
     });
   }
@@ -430,35 +424,6 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
                  mpe.getElementType().toString().toLowerCase() + "." + mpe.getMimeType().getSuffix().getOrElse(".unknown"));
     }
   };
-
-  /** Rewrite all URIs of contained media package elements to point to the EpisodeService. */
-  public SearchResult rewriteForDelivery(final SearchResult result) {
-    return Convert.convert(new SearchResult() {
-      @Override public List<SearchResultItem> getItems() {
-        return mlist(result.getItems()).map(new Function<SearchResultItem, SearchResultItem>() {
-          @Override public SearchResultItem apply(SearchResultItem item) {
-            final JaxbSearchResultItem rewritten = Convert.convert(item);
-            rewritten.setMediaPackage(rewriteUris(item.getMediaPackage(), rewriteUri.curry(item.getOcVersion())));
-            return rewritten;
-          }
-        }).value();
-      }
-
-      @Override public String getQuery() { return result.getQuery(); }
-
-      @Override public long size() { return result.size(); }
-
-      @Override public long getTotalSize() { return result.getTotalSize(); }
-
-      @Override public long getOffset() { return result.getOffset(); }
-
-      @Override public long getLimit() { return result.getLimit(); }
-
-      @Override public long getSearchTime() { return result.getSearchTime(); }
-
-      @Override public long getPage() { return result.getPage(); }
-    });
-  }
 
   /** Unify exception handling. */
   public static <A> A handleException(final Function0<A> f) {

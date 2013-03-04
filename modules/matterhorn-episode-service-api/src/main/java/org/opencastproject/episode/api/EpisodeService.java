@@ -106,11 +106,13 @@ public interface EpisodeService {
    *
    * @param q
    *         The {@link EpisodeQuery} containing the details of the desired results
+   * @param rewriteUri
+   *         a function to rewrite media package element URLs
    * @return The search result
    * @throws EpisodeServiceException
    *         if an error occurs while searching for media packages
    */
-  SearchResult find(EpisodeQuery q) throws EpisodeServiceException;
+  SearchResult find(EpisodeQuery q, UriRewriter rewriteUri) throws EpisodeServiceException;
 
   /**
    * Finds search results across any organization, protected by any access control. This should be used for
@@ -118,11 +120,13 @@ public interface EpisodeService {
    *
    * @param q
    *         The {@link EpisodeQuery} containing the details of the desired results
+   * @param rewriteUri
+   *         a function to rewrite media package element URLs
    * @return The search result
    * @throws EpisodeServiceException
    *         if an error occurs while searching for media packages
    */
-  SearchResult findForAdministrativeRead(EpisodeQuery q) throws EpisodeServiceException;
+  SearchResult findForAdministrativeRead(EpisodeQuery q, UriRewriter rewriteUri) throws EpisodeServiceException;
 
   /** Get an archived media package element. */
   Option<ArchivedMediaPackageElement> get(String mediaPackageId, String mediaPackageElementId, Version version)

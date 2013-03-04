@@ -177,11 +177,6 @@ public final class Convert {
             return null;
           }
 
-          @Override public String getOcMediapackage() {
-            conv.setOcMediapackage(item.getOcMediapackage());
-            return null;
-          }
-
           @Override public String getOcAcl() {
             conv.setOcAcl(item.getOcAcl());
             return null;
@@ -381,11 +376,6 @@ public final class Convert {
 
           @Override public String getDcLicense() {
             conv.setDcLicense(Schema.getFirst(Schema.getDcLicense(doc), dfltString));
-            return null;
-          }
-
-          @Override public String getOcMediapackage() {
-            conv.setOcMediapackage(Schema.getOcMediapackage(doc));
             return null;
           }
 

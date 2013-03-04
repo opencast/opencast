@@ -16,6 +16,9 @@
 
 package org.opencastproject.oaipmh.matterhorn;
 
+import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
+import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.oaipmh.server.MetadataFormat;
 import org.opencastproject.oaipmh.server.MetadataProvider;
 import org.opencastproject.oaipmh.server.OaiPmhRepository;
@@ -23,18 +26,13 @@ import org.opencastproject.oaipmh.util.XmlGen;
 import org.opencastproject.search.api.SearchResultItem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * The Matterhorn metadata provider provides whole media packages.
@@ -76,16 +74,9 @@ public class MatterhornMetadataProvider implements MetadataProvider {
   public Element createMetadata(OaiPmhRepository repository, final SearchResultItem item) {
     final Document mp;
     try {
-      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      factory.setNamespaceAware(true);
-      DocumentBuilder builder = factory.newDocumentBuilder();
-      mp = builder.parse(new InputSource(new StringReader(item.getOcMediapackage())));
-    } catch (ParserConfigurationException e) {
-      throw new RuntimeException(e);
-    } catch (SAXException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+      mp = MediaPackageParser.getAsXml(item.getMediaPackage(), new DefaultMediaPackageSerializerImpl());
+    } catch (MediaPackageException e) {
+      return chuck(e);
     }
 
     XmlGen xml = new XmlGen() {

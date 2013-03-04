@@ -16,17 +16,16 @@
 
 package org.opencastproject.episode.impl;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.episode.api.EpisodeQuery.systemQuery;
-import static org.opencastproject.mediapackage.MediaPackageSupport.loadMediaPackageFromClassPath;
-import static org.opencastproject.util.UrlSupport.DEFAULT_BASE_URL;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.VCell.cell;
-import static org.opencastproject.util.data.functions.Misc.chuck;
-
+import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.solr.client.solrj.SolrServer;
+import org.easymock.EasyMock;
+import org.easymock.IAnswer;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.api.EpisodeServiceException;
@@ -75,18 +74,6 @@ import org.opencastproject.util.persistence.PersistenceEnv;
 import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workspace.api.Workspace;
 
-import junit.framework.Assert;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.solr.client.solrj.SolrServer;
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
@@ -99,6 +86,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.episode.api.EpisodeQuery.systemQuery;
+import static org.opencastproject.mediapackage.MediaPackageSupport.loadMediaPackageFromClassPath;
+import static org.opencastproject.util.UrlSupport.DEFAULT_BASE_URL;
+import static org.opencastproject.util.UrlSupport.uri;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.VCell.cell;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Tests the functionality of the search service.
@@ -133,6 +132,16 @@ public class EpisodeServiceImplTest {
   private EpisodeServiceDatabase episodeDatabase;
   private PersistenceEnv penv;
   private String storage;
+  private UriRewriter rewriter = new UriRewriter() {
+    @Override public URI apply(Version version, MediaPackageElement mpe) {
+      return uri("http://episodes",
+                 mpe.getMediaPackage().getIdentifier(),
+                 mpe.getIdentifier(),
+                 version,
+                 mpe.getElementType().toString().toLowerCase() + "." + mpe.getMimeType().getSuffix().getOrElse(".unknown"));
+
+    }
+  };
 
   private static class Responder<A> implements IAnswer<A> {
     private A response;
@@ -284,7 +293,7 @@ public class EpisodeServiceImplTest {
   /** Test whether an empty search index will work. */
   @Test
   public void testEmptySearchIndex() {
-    SearchResult result = service.find(systemQuery().id("foo"));
+    SearchResult result = service.find(systemQuery().id("foo"), rewriter);
     assertEquals(0, result.size());
   }
 
@@ -301,14 +310,18 @@ public class EpisodeServiceImplTest {
     // Make sure it's properly indexed and returned for authorized users
     EpisodeQuery q = systemQuery();
     q.id("10.0000/1");
-    SearchResult result = service.find(q);
-    assertEquals(1, result.size());
+    SearchResult result = service.find(q, rewriter);
+    assertEquals("Number of results", 1, result.size());
+    assertTrue("Number of media package elements", result.getItems().get(0).getMediaPackage().getElements().length > 0);
+    assertEquals("Rewritten URL",
+                 "http://episodes/10.0000/1/catalog-1/0/catalog.xml",
+                 result.getItems().get(0).getMediaPackage().getElements()[0].getURI().toString());
 
     service.delete(mediaPackage.getIdentifier().toString());
 
     q = systemQuery();
     q.id("10.0000/1");
-    result = service.find(q);
+    result = service.find(q, rewriter);
     assertEquals(0, result.size());
 
     acl.getEntries().clear();
@@ -323,7 +336,7 @@ public class EpisodeServiceImplTest {
     q = systemQuery();
     q.id("10.0000/1");
     try {
-      service.find(q).size();
+      service.find(q, rewriter).size();
       fail("This mediapackage should not be readable by the current user");
     } catch (EpisodeServiceException e) {
       assertTrue(e.isCauseNotAuthorized());
@@ -340,16 +353,16 @@ public class EpisodeServiceImplTest {
     service.add(mpSimple);
     service.add(mpSimple);
     service.add(mpSimple);
-    assertEquals(3, service.find(systemQuery().id("10.0000/1")).size());
+    assertEquals(3, service.find(systemQuery().id("10.0000/1"), rewriter).size());
     // modify mediapackage
     service.add(mpSimple);
     {
-      final SearchResult r = service.find(systemQuery().id("10.0000/1"));
+      final SearchResult r = service.find(systemQuery().id("10.0000/1"), rewriter);
       assertEquals(4, r.size());
       // check that each added media package has a unique version
       assertEquals(
               r.size(),
-              mlist(service.find(systemQuery().id("10.0000/1")).getItems()).foldl(Collections.<Version> set(),
+              mlist(service.find(systemQuery().id("10.0000/1"), rewriter).getItems()).foldl(Collections.<Version> set(),
                       new Function2<Set<Version>, SearchResultItem, Set<Version>>() {
                         @Override
                         public Set<Version> apply(Set<Version> sum, SearchResultItem item) {
@@ -359,7 +372,7 @@ public class EpisodeServiceImplTest {
                       }).size());
     }
     {
-      final SearchResult r = service.find(systemQuery().id("10.0000/1").onlyLastVersion());
+      final SearchResult r = service.find(systemQuery().id("10.0000/1").onlyLastVersion(), rewriter);
       assertEquals(1, r.size());
       // todo not good to make assumptions about versions...
       assertEquals(Version.version(3), r.getItems().get(0).getOcVersion());
@@ -373,8 +386,8 @@ public class EpisodeServiceImplTest {
     MediaPackage mediaPackage = loadMediaPackageFromClassPath("/manifest-full.xml");
     service.add(mediaPackage);
 
-    SearchResult episodeMetadataResult = service.find(systemQuery().text("Vegetation"));
-    SearchResult seriesMetadataResult = service.find(systemQuery().text("Atmospheric Science"));
+    SearchResult episodeMetadataResult = service.find(systemQuery().text("Vegetation"), rewriter);
+    SearchResult seriesMetadataResult = service.find(systemQuery().text("Atmospheric Science"), rewriter);
 
     assertEquals(1, episodeMetadataResult.getItems().size());
     assertEquals(1, seriesMetadataResult.getItems().size());
@@ -394,16 +407,16 @@ public class EpisodeServiceImplTest {
     // Make sure it's properly indexed and returned
     EpisodeQuery q = systemQuery();
     q.id("10.0000/1");
-    assertEquals(1, service.find(q).size());
+    assertEquals(1, service.find(q, rewriter).size());
 
     q = systemQuery();
 
-    assertEquals(1, service.find(q).size());
+    assertEquals(1, service.find(q, rewriter).size());
 
     // Test for various fields
     q = systemQuery();
     q.id("10.0000/1");
-    SearchResult result = service.find(q);
+    SearchResult result = service.find(q, rewriter);
     assertEquals(1, result.getTotalSize());
     SearchResultItem resultItem = result.getItems().get(0);
     assertNotNull(resultItem.getMediaPackage());
@@ -419,14 +432,14 @@ public class EpisodeServiceImplTest {
     service.add(mpSimple);
     service.add(mpSimple);
     // Make sure it's properly indexed and returned
-    assertEquals(2, service.find(systemQuery().id("10.0000/1")).size());
-    assertEquals(1, service.find(systemQuery().onlyLastVersion()).size());
+    assertEquals(2, service.find(systemQuery().id("10.0000/1"), rewriter).size());
+    assertEquals(1, service.find(systemQuery().onlyLastVersion(), rewriter).size());
     // add another media package
     final MediaPackage mpFull = loadMediaPackageFromClassPath("/manifest-full.xml");
     service.add(mpFull);
-    assertEquals(3, service.find(systemQuery()).size());
+    assertEquals(3, service.find(systemQuery(), rewriter).size());
     // now there must be two last versions
-    assertEquals(2, service.find(systemQuery().onlyLastVersion()).size());
+    assertEquals(2, service.find(systemQuery().onlyLastVersion(), rewriter).size());
   }
 
   /** Ads a simple media package that has a dublin core for the episode only. */
@@ -440,8 +453,8 @@ public class EpisodeServiceImplTest {
     service.add(mp);
 
     // Make sure it's properly indexed and returned
-    assertEquals(1, service.find(systemQuery().id("10.0000/2")).size());
-    assertEquals(1, service.find(systemQuery()).size());
+    assertEquals(1, service.find(systemQuery().id("10.0000/2"), rewriter).size());
+    assertEquals(1, service.find(systemQuery(), rewriter).size());
   }
 
   @Test
@@ -455,10 +468,10 @@ public class EpisodeServiceImplTest {
     service.add(mp1);
     service.add(mp2);
     assertTrue(service.delete(mpId));
-    assertEquals(1L, service.find(systemQuery().id(mpId).includeDeleted(true)).getTotalSize());
-    assertEquals(2L, service.find(systemQuery().includeDeleted(true)).getTotalSize());
-    assertEquals(1L, service.find(systemQuery().includeDeleted(false).deletedSince(new Date(0L))).getTotalSize());
-    assertEquals(1L, service.find(systemQuery()).getTotalSize());
+    assertEquals(1L, service.find(systemQuery().id(mpId).includeDeleted(true), rewriter).getTotalSize());
+    assertEquals(2L, service.find(systemQuery().includeDeleted(true), rewriter).getTotalSize());
+    assertEquals(1L, service.find(systemQuery().includeDeleted(false).deletedSince(new Date(0L)), rewriter).getTotalSize());
+    assertEquals(1L, service.find(systemQuery(), rewriter).getTotalSize());
   }
 
   /** Test removal from the search index. */
@@ -499,9 +512,9 @@ public class EpisodeServiceImplTest {
     userResponder.setResponse(defaultUser);
     organizationResponder.setResponse(defaultOrganization);
 
-    assertEquals(0, service.find(systemQuery().id("10.0000/1")).size());
-    assertEquals(0, service.find(systemQuery()).size());
-    assertEquals(1, service.find(systemQuery().deletedSince(deletedDate)).size());
+    assertEquals(0, service.find(systemQuery().id("10.0000/1"), rewriter).size());
+    assertEquals(0, service.find(systemQuery(), rewriter).size());
+    assertEquals(1, service.find(systemQuery().deletedSince(deletedDate), rewriter).size());
   }
 
   /**
@@ -538,7 +551,7 @@ public class EpisodeServiceImplTest {
     // Make sure it's properly indexed and returned
     EpisodeQuery q = systemQuery();
 
-    SearchResult result = service.find(q);
+    SearchResult result = service.find(q, rewriter);
     assertEquals(1, result.size());
     assertEquals("foobar-serie", result.getItems().get(0).getId());
   }
@@ -562,7 +575,7 @@ public class EpisodeServiceImplTest {
     episodeDatabase.storeEpisode(mpWithMpeg7, acl, new Date(), Version.FIRST);
 
     // We should have nothing in the search index
-    assertEquals(0, service.find(systemQuery()).size());
+    assertEquals(0, service.find(systemQuery(), rewriter).size());
 
     // todo
     service.populateIndex(new UriRewriter() {
@@ -578,7 +591,7 @@ public class EpisodeServiceImplTest {
     });
 
     // This time we should have 11 results
-    assertEquals(11, service.find(systemQuery()).size());
+    assertEquals(11, service.find(systemQuery(), rewriter).size());
   }
 
   @Test
@@ -587,9 +600,9 @@ public class EpisodeServiceImplTest {
     setReadWritePermissions();
     service.add(mp);
     final Date dayAhead = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000);
-    assertEquals(1, service.find(systemQuery().addedBefore(dayAhead)).size());
-    assertEquals(0, service.find(systemQuery().addedAfter(dayAhead)).size());
-    assertEquals(1, service.find(systemQuery().addedAfter(new Date(0)).addedBefore(dayAhead)).size());
+    assertEquals(1, service.find(systemQuery().addedBefore(dayAhead), rewriter).size());
+    assertEquals(0, service.find(systemQuery().addedAfter(dayAhead), rewriter).size());
+    assertEquals(1, service.find(systemQuery().addedAfter(new Date(0)).addedBefore(dayAhead), rewriter).size());
   }
 
   private void setReadWritePermissions() {
