@@ -378,6 +378,11 @@ var ocScheduler = (function() {
       
       var errors = [];
       for (var i in sched.catalogs) {
+      if (sched.catalogs[i].components.license){
+         if (sched.catalogs[i].components.license['key'] == "license") {
+            sched.catalogs[i].components.license.setValue($('#licenseField').val())
+         }
+      }
         var serializedCatalog = sched.catalogs[i].serialize();
         if (!serializedCatalog) {
           errors = errors.concat(sched.catalogs[i].getErrors());
