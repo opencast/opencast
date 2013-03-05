@@ -15,16 +15,12 @@
  */
 package org.opencastproject.event.handler;
 
-import static org.opencastproject.event.EventAdminConstants.ID;
-import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
-import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
-import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-
+import org.apache.commons.io.FilenameUtils;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.api.EpisodeServiceException;
+import org.opencastproject.episode.api.HttpMediaPackageElementProvider;
 import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultItem;
 import org.opencastproject.mediapackage.Attachment;
@@ -50,8 +46,6 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
-
-import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
@@ -61,6 +55,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static org.opencastproject.event.EventAdminConstants.ID;
+import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
+import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
+import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
 /**
  * Responds to series events by re-distributing metadata and security policy files to episodes.
@@ -93,6 +93,9 @@ public class EpisodesPermissionsUpdatedEventHandler implements EventHandler {
 
   /** Dublin core catalog service */
   protected DublinCoreCatalogService dublinCoreService = null;
+
+  /** HttpMediaPackagheElementProvider */
+  protected HttpMediaPackageElementProvider httpMediaPackageElementProvider = null;
 
   /** The workspace */
   protected Workspace workspace = null;
@@ -186,6 +189,11 @@ public class EpisodesPermissionsUpdatedEventHandler implements EventHandler {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  /** OSGi DI callback. */
+  public void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
+    this.httpMediaPackageElementProvider = httpMediaPackageElementProvider;
+  }
+
   /**
    * {@inheritDoc}
    * 
@@ -209,7 +217,7 @@ public class EpisodesPermissionsUpdatedEventHandler implements EventHandler {
           securityService.setUser(new User(systemAccount, defaultOrg.getId(), new String[] { GLOBAL_ADMIN_ROLE }));
 
           EpisodeQuery q = EpisodeQuery.systemQuery().seriesId(seriesId).onlyLastVersion();
-          SearchResult result = episodeService.findForAdministrativeRead(q);
+          SearchResult result = episodeService.findForAdministrativeRead(q, httpMediaPackageElementProvider.getUriRewriter());
 
           for (SearchResultItem item : result.getItems()) {
             String org = item.getOrganization();

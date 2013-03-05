@@ -16,17 +16,10 @@
 
 package org.opencastproject.mediapackage;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.opencastproject.util.IoSupport.withResource;
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.functions.Options.sequenceOpt;
-import static org.opencastproject.util.data.functions.Options.toOption;
-
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +29,12 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.opencastproject.util.IoSupport.withResource;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.functions.Options.sequenceOpt;
+import static org.opencastproject.util.data.functions.Options.toOption;
 
 /**
  * Utility class used for media package handling.
@@ -156,14 +155,18 @@ public final class MediaPackageSupport {
 
   /** Rewrite the URIs of all media package elements. Modifications are done on a copy of the given package. */
   public static MediaPackage rewriteUris(final MediaPackage mp, final Function<MediaPackageElement, URI> f) {
-    return modify(mp, new Effect<MediaPackage>() {
-      @Override
-      public void run(MediaPackage mp) {
+    return modify(mp, uriRewriter(f));
+  }
+
+  /** Returns a function to rewrite all media package elements in place. */
+  public static Effect<MediaPackage> uriRewriter(final Function<MediaPackageElement, URI> f) {
+    return new Effect<MediaPackage>() {
+      @Override protected void run(MediaPackage mp) {
         for (MediaPackageElement e : mp.getElements()) {
           e.setURI(f.apply(e));
         }
       }
-    });
+    };
   }
 
   /**

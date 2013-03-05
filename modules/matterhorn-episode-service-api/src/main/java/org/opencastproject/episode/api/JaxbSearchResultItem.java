@@ -135,9 +135,6 @@ public class JaxbSearchResultItem implements SearchResultItem {
   @XmlElement
   private String dcLicense = null;
 
-  /** Field oc_mediapackage */
-  private String ocMediapackage;
-
   /** Field oc_acl */
   private String ocAcl;
 
@@ -452,15 +449,6 @@ public class JaxbSearchResultItem implements SearchResultItem {
   @Override
   public SearchResultItemType getType() {
     return mediaType;
-  }
-
-  @Override
-  public String getOcMediapackage() {
-    return ocMediapackage;
-  }
-
-  public void setOcMediapackage(String mediapackage) {
-    this.ocMediapackage = mediapackage;
   }
 
   @Override

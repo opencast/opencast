@@ -77,6 +77,8 @@
 	    cardinality="1..1" policy="static" bind="setSeriesService" />
 	  <reference name="epidsodeService" interface="org.opencastproject.episode.api.EpisodeService"
 	    cardinality="1..1" policy="static" bind="setEpisodeService" />
+	  <reference name="httpMediaPackageElementProvider" interface="org.opencastproject.episode.api.HttpMediaPackageElementProvider"
+	    cardinality="1..1" policy="static" bind="setHttpMediaPackageElementProvider" />
 	  <reference name="distributionService" interface="org.opencastproject.distribution.api.DistributionService"
 	    cardinality="1..1" policy="static" target="(distribution.channel=download)" bind="setDistributionService" />
 	  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"

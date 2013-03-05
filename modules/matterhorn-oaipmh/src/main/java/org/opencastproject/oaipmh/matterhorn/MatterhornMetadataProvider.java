@@ -16,6 +16,7 @@
 
 package org.opencastproject.oaipmh.matterhorn;
 
+import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.oaipmh.server.MetadataFormat;
 import org.opencastproject.oaipmh.server.MetadataProvider;
 import org.opencastproject.oaipmh.server.OaiPmhRepository;
@@ -23,14 +24,7 @@ import org.opencastproject.oaipmh.util.XmlGen;
 import org.opencastproject.search.api.SearchResultItem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -74,20 +68,7 @@ public class MatterhornMetadataProvider implements MetadataProvider {
 
   @Override
   public Element createMetadata(OaiPmhRepository repository, final SearchResultItem item) {
-    final Document mp;
-    try {
-      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      factory.setNamespaceAware(true);
-      DocumentBuilder builder = factory.newDocumentBuilder();
-      mp = builder.parse(new InputSource(new StringReader(item.getOcMediapackage())));
-    } catch (ParserConfigurationException e) {
-      throw new RuntimeException(e);
-    } catch (SAXException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
+    final Document mp = MediaPackageParser.getAsXmlDocument(item.getMediaPackage());
     XmlGen xml = new XmlGen() {
       @Override
       public Element create() {

@@ -15,25 +15,7 @@
  */
 package org.opencastproject.episode.impl;
 
-import static org.opencastproject.episode.api.EpisodeQuery.query;
-import static org.opencastproject.episode.impl.StoragePath.spath;
-import static org.opencastproject.episode.impl.elementstore.DeletionSelector.delAll;
-import static org.opencastproject.episode.impl.elementstore.Source.source;
-import static org.opencastproject.mediapackage.MediaPackageSupport.modify;
-import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.util.JobUtil.waitForJob;
-import static org.opencastproject.util.data.Collections.array;
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.mkString;
-import static org.opencastproject.util.data.Collections.nil;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.functions.Functions.constant;
-import static org.opencastproject.util.data.functions.Misc.chuck;
-
+import org.apache.solr.client.solrj.SolrServerException;
 import org.opencastproject.episode.api.ArchivedMediaPackageElement;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
@@ -77,8 +59,6 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
-
-import org.apache.solr.client.solrj.SolrServerException;
 import org.osgi.framework.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,6 +71,26 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import static org.opencastproject.episode.api.EpisodeQuery.query;
+import static org.opencastproject.episode.impl.StoragePath.spath;
+import static org.opencastproject.episode.impl.elementstore.DeletionSelector.delAll;
+import static org.opencastproject.episode.impl.elementstore.Source.source;
+import static org.opencastproject.mediapackage.MediaPackageSupport.modify;
+import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
+import static org.opencastproject.mediapackage.MediaPackageSupport.uriRewriter;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.util.JobUtil.waitForJob;
+import static org.opencastproject.util.data.Collections.array;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Collections.mkString;
+import static org.opencastproject.util.data.Collections.nil;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.functions.Functions.constant;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 public final class EpisodeServiceImpl implements EpisodeService {
   /** Log facility */
@@ -246,14 +246,19 @@ public final class EpisodeServiceImpl implements EpisodeService {
   // maybe the resulting list should just be filterered
   // This approach has low performance since all result items are fetched from the index and filtered
   // afterwards. This is due to moving security checks from the subcomponents towards the EpisodeService.
+
   @Override
-  public SearchResult find(final EpisodeQuery q) throws EpisodeServiceException {
+  public SearchResult find(final EpisodeQuery q, final UriRewriter rewriter) throws EpisodeServiceException {
     return handleException(new Function0.X<SearchResult>() {
       @Override
       public SearchResult xapply() throws Exception {
         final SearchResult r = solrRequester.find(q);
-        // check if user is allowed to read each media package
-        mlist(r.getItems()).each(protectResultItem(READ_PERMISSION).toEffect());
+        for (SearchResultItem item : r.getItems()) {
+          // check if user is allowed to read media package
+          protectResultItem(READ_PERMISSION).apply(item);
+          // rewrite URIs in place
+          rewriteForDelivery(rewriter, item);
+        }
         return r;
       }
     });
@@ -279,7 +284,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
   }
 
   @Override
-  public SearchResult findForAdministrativeRead(final EpisodeQuery q) throws EpisodeServiceException {
+  public SearchResult findForAdministrativeRead(final EpisodeQuery q, final UriRewriter rewriter) throws EpisodeServiceException {
     return handleException(new Function0.X<SearchResult>() {
       @Override
       public SearchResult xapply() throws Exception {
@@ -287,8 +292,12 @@ public final class EpisodeServiceImpl implements EpisodeService {
         Organization organization = orgDir.getOrganization(user.getOrganization());
         if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(organization.getAdminRole()))
           throw new UnauthorizedException(user, getClass().getName() + ".getForAdministrativeRead");
-
-        return solrRequester.find(q);
+        final SearchResult r = solrRequester.find(q);
+        for (SearchResultItem item : r.getItems()) {
+          // rewrite URIs in place
+          rewriteForDelivery(rewriter, item);
+        }
+        return r;
       }
     });
   }
@@ -508,13 +517,13 @@ public final class EpisodeServiceImpl implements EpisodeService {
    * returns a single element list or the empty list.
    */
   private Function<SearchResultItem, List<WorkflowInstance>> applyWorkflow(final ConfiguredWorkflow workflow,
-          final UriRewriter rewriteUri) {
+          final UriRewriter rewriter) {
     return new Function<SearchResultItem, List<WorkflowInstance>>() {
       @Override
       public List<WorkflowInstance> apply(SearchResultItem item) {
         try {
-          final MediaPackage rewritten = rewriteUris(item.getMediaPackage(), rewriteUri.curry(item.getOcVersion()));
-          return list(workflowSvc.start(workflow.getWorkflowDefinition(), rewritten, workflow.getParameters()));
+          rewriteForDelivery(rewriter, item);
+          return list(workflowSvc.start(workflow.getWorkflowDefinition(), item.getMediaPackage(), workflow.getParameters()));
         } catch (WorkflowDatabaseException e) {
           logger.error("Error starting workflow", e);
         } catch (WorkflowParsingException e) {
@@ -523,6 +532,11 @@ public final class EpisodeServiceImpl implements EpisodeService {
         return nil();
       }
     };
+  }
+
+  /** In place rewriting of all media package element URLs. */
+  private static void rewriteForDelivery(UriRewriter rewriter, SearchResultItem item) {
+    uriRewriter(rewriter.curry(item.getOcVersion())).apply(item.getMediaPackage());
   }
 
   /** Apply a function if the current user is authorized to perform the given actions. */
