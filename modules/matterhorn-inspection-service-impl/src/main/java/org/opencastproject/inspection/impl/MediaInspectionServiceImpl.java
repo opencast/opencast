@@ -296,7 +296,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
               mimeType = MimeTypes.parseMimeType("audio/" + mimeType.getSubtype());
             }
           }
-          track.setMimeType(MimeTypes.fromURL(file.toURI().toURL()));
+          track.setMimeType(mimeType);
         } catch (Exception e) {
           logger.error("Unable to find mimetype for {}", file.getAbsolutePath());
         } finally {
