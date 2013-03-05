@@ -16,8 +16,6 @@
 
 package org.opencastproject.oaipmh.matterhorn;
 
-import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.oaipmh.server.MetadataFormat;
 import org.opencastproject.oaipmh.server.MetadataProvider;
@@ -31,8 +29,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * The Matterhorn metadata provider provides whole media packages.
@@ -72,13 +68,7 @@ public class MatterhornMetadataProvider implements MetadataProvider {
 
   @Override
   public Element createMetadata(OaiPmhRepository repository, final SearchResultItem item) {
-    final Document mp;
-    try {
-      mp = MediaPackageParser.getAsXml(item.getMediaPackage(), new DefaultMediaPackageSerializerImpl());
-    } catch (MediaPackageException e) {
-      return chuck(e);
-    }
-
+    final Document mp = MediaPackageParser.getAsXmlDocument(item.getMediaPackage());
     XmlGen xml = new XmlGen() {
       @Override
       public Element create() {
