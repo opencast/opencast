@@ -25,5 +25,6 @@
           <option value="All Rights Reserved">All Rights Reserved</option>
           <option value="Creative Commons 3.0: Attribution-NonCommercial-NoDerivs" selected="selected">Creative Commons 3.0: Attribution-NonCommercial-NoDerivs</option>
        </select>
+       <input id="license" name="license" class="oc-ui-form-field dc-metadata-field dcMetaField" type="hidden" />
      </li>
 </ul>
