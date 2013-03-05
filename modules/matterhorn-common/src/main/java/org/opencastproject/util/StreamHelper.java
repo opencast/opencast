@@ -30,6 +30,7 @@ import java.io.PrintWriter;
  * Helper class to handle Runtime.exec() output.
  */
 public class StreamHelper extends Thread {
+
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(StreamHelper.class);
 
@@ -135,30 +136,42 @@ public class StreamHelper extends Thread {
   /**
    * Thread run
    */
-  @Override
   public void run() {
-    BufferedReader reader = null;
+
+    BufferedReader bufferedReader = null;
+    InputStreamReader streamReader = null;
+
     try {
       if (outputStream != null) {
         writer = new PrintWriter(outputStream);
       }
-      reader = new BufferedReader(new InputStreamReader(inputStream));
-      String line = reader.readLine();
-      while (keepReading && line != null) {
+      streamReader = new InputStreamReader(inputStream);
+      bufferedReader = new BufferedReader(streamReader);
+      while (keepReading) {
+        while (!bufferedReader.ready()) {
+          try {
+            Thread.sleep(100);
+          } catch (InterruptedException e) {
+            logger.debug("Closing process stream");
+            return;
+          }
+          if (!keepReading)
+            return;
+        }
+        String line = bufferedReader.readLine();
         append(line);
         log(line);
-        line = null;
-        if (reader.ready())
-          line = reader.readLine();
       }
       if (writer != null)
         writer.flush();
     } catch (IOException e) {
-      logger.error("Error reading process stream: {}", e.getMessage(), e);
+      if (keepReading)
+        logger.error("Error reading process stream: {}", e.getMessage(), e);
     } catch (Throwable t) {
       logger.debug("Unknown error while reading from process input: {}", t.getMessage());
     } finally {
-      IoSupport.closeQuietly(reader);
+      IoSupport.closeQuietly(streamReader);
+      IoSupport.closeQuietly(bufferedReader);
       IoSupport.closeQuietly(writer);
     }
   }
