@@ -16,21 +16,21 @@
 package org.opencastproject.mediapackage;
 
 import org.opencastproject.util.DateTimeSupport;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Convenience implementation that supports serializing and deserializing media packages.
@@ -65,8 +65,35 @@ public final class MediaPackageParser {
     }
   }
 
+  /** Serializes a media package to a {@link Document} without any further processing. */
+  public static Document getAsXmlDocument(MediaPackage mp) {
+    try {
+      final Marshaller marshaller = MediaPackageImpl.context.createMarshaller();
+      final Document doc = newDocument();
+      marshaller.marshal(mp, doc);
+      return doc;
+    } catch (JAXBException e) {
+      return chuck(e);
+    }
+  }
+
+  /** Create a new DOM document. */
+  private static Document newDocument() {
+    final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    docBuilderFactory.setNamespaceAware(true);
+    try {
+      return docBuilderFactory.newDocumentBuilder().newDocument();
+    } catch (ParserConfigurationException e) {
+      return chuck(e);
+    }
+  }
+
   /**
    * Serializes the media package to a {@link org.w3c.dom.Document}.
+   * <p/>
+   * todo Implementation is currently defective since it misses various properties.
+   *   See http://opencast.jira.com/browse/MH-9489
+   *   Use {@link #getAsXmlDocument(MediaPackage)} instead if you do not need a serializer.
    * 
    * @param mediaPackage
    *          the mediapackage
