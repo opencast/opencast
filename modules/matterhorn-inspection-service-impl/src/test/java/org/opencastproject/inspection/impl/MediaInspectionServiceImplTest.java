@@ -38,7 +38,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import junit.framework.Assert;
 
-import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.audio.AudioParser;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -101,8 +101,7 @@ public class MediaInspectionServiceImplTest {
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
     service.setUserDirectoryService(userDirectoryService);
-
-    service.setTikaParser(new AutoDetectParser());
+    service.setTikaParser(new AudioParser());
 
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
@@ -149,9 +148,9 @@ public class MediaInspectionServiceImplTest {
       Track track = (Track) MediaPackageElementParser.getFromXml(job.getPayload());
       // test the returned values
       Checksum cs = Checksum.create(ChecksumType.fromString("md5"), "9d3523e464f18ad51f59564acde4b95a");
-      Assert.assertEquals(track.getChecksum(), cs);
-      Assert.assertEquals(track.getMimeType().getType(), "video");
-      Assert.assertEquals(track.getMimeType().getSubtype(), "quicktime");
+      Assert.assertEquals(cs, track.getChecksum());
+      Assert.assertEquals("video", track.getMimeType().getType());
+      Assert.assertEquals("quicktime", track.getMimeType().getSubtype());
       Assert.assertNotNull(track.getDuration());
       Assert.assertTrue(track.getDuration() > 0);
     } catch (IllegalStateException e) {
