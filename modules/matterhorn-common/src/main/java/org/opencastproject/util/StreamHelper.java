@@ -152,20 +152,27 @@ public class StreamHelper extends Thread {
       }
       streamReader = new InputStreamReader(inputStream);
       bufferedReader = new BufferedReader(streamReader);
-      while (keepReading) {
+      
+      // Whether any content has been read
+      boolean foundContent = false;
+
+      // Keep reading either until there is nothing more to read from or we are told to stop waiting
+      while (keepReading || foundContent) {
         while (!bufferedReader.ready()) {
           try {
+            foundContent = false;
             Thread.sleep(100);
           } catch (InterruptedException e) {
             logger.debug("Closing process stream");
             return;
           }
-          if (!keepReading)
+          if (!keepReading && !bufferedReader.ready())
             return;
         }
         String line = bufferedReader.readLine();
         append(line);
         log(line);
+        foundContent = true;
       }
       if (writer != null)
         writer.flush();
