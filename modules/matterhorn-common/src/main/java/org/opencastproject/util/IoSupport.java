@@ -16,10 +16,12 @@
 
 package org.opencastproject.util;
 
-import de.schlichtherle.io.FileWriter;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
+import static org.opencastproject.util.PathSupport.path;
+import static org.opencastproject.util.data.Either.left;
+import static org.opencastproject.util.data.Either.right;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.util.data.Effect0;
@@ -28,6 +30,12 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
+
+import de.schlichtherle.io.FileWriter;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,12 +52,6 @@ import java.io.RandomAccessFile;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.FileLock;
-
-import static org.opencastproject.util.PathSupport.path;
-import static org.opencastproject.util.data.Either.left;
-import static org.opencastproject.util.data.Either.right;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 /**
  * Contains operations concerning IO.
@@ -104,7 +106,11 @@ public final class IoSupport {
     if (s == null) {
       return false;
     }
-    s.stopReading();
+    try {
+      s.stopReading();
+    } catch (InterruptedException e) {
+      logger.warn("Interrupted while waiting for stream helper to stop reading");
+    }
     return true;
   }
 

@@ -127,10 +127,15 @@ public class StreamHelper extends Thread {
   }
 
   /**
-   * Tells the stream helper to stop reading and exit from the main loop.
+   * Tells the stream helper to stop reading and exit from the main loop, it then waits for the thread to die.
+   * 
+   * @see Thread#join()
+   * @throws InterruptedException
+   *           if the thread is interrupted while waiting for the main loop to come to an end
    */
-  public void stopReading() {
+  public void stopReading() throws InterruptedException {
     keepReading = false;
+    this.join();
   }
 
   /**

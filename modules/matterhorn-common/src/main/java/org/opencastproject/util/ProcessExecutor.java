@@ -111,11 +111,9 @@ public class ProcessExecutor<T extends Exception> {
       // handle the case where the process is done before the stream helper
       if (errorStreamHelper != null) {
         errorStreamHelper.stopReading();
-        errorStreamHelper.join();
       }
 
       inputStreamHelper.stopReading();
-      inputStreamHelper.join();
 
       // Allow subclasses to react to the process result
       onProcessFinished(exitCode);

@@ -70,6 +70,8 @@ public class TesseractTextExtractorTest {
       stdout = new StreamHelper(p.getInputStream());
       stderr = new StreamHelper(p.getErrorStream());
       int status = p.waitFor();
+      stdout.stopReading();
+      stderr.stopReading();
       if (status != 1)
         throw new IllegalStateException();
     } catch (Throwable t) {
