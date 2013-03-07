@@ -83,7 +83,10 @@ public class ComposerServiceTest {
       p = new ProcessBuilder(FFMPEG_BINARY, "-version").start();
       stdout = new StreamHelper(p.getInputStream());
       stderr = new StreamHelper(p.getErrorStream());
-      if (p.waitFor() != 0)
+      int status = p.waitFor();
+      stdout.stopReading();
+      stderr.stopReading();
+      if (status != 0)
         throw new IllegalStateException();
     } catch (Throwable t) {
       logger.warn("Skipping image composer service tests due to unsatisifed or erroneus ffmpeg installation");

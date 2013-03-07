@@ -76,6 +76,8 @@ public class MediaInspectionServiceImplTest {
       stdout = new StreamHelper(p.getInputStream());
       stderr = new StreamHelper(p.getErrorStream());
       int exitCode = p.waitFor();
+      stdout.stopReading();
+      stderr.stopReading();
       if (exitCode != 0 && exitCode != 141)
         throw new IllegalStateException("process returned " + exitCode);
     } catch (Throwable t) {

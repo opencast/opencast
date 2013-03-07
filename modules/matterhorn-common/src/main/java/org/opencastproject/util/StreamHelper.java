@@ -30,6 +30,7 @@ import java.io.PrintWriter;
  * Helper class to handle Runtime.exec() output.
  */
 public class StreamHelper extends Thread {
+
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(StreamHelper.class);
 
@@ -126,39 +127,63 @@ public class StreamHelper extends Thread {
   }
 
   /**
-   * Tells the stream helper to stop reading and exit from the main loop.
+   * Tells the stream helper to stop reading and exit from the main loop, it then waits for the thread to die.
+   * 
+   * @see Thread#join()
+   * @throws InterruptedException
+   *           if the thread is interrupted while waiting for the main loop to come to an end
    */
-  public void stopReading() {
+  public void stopReading() throws InterruptedException {
     keepReading = false;
+    this.join();
   }
 
   /**
    * Thread run
    */
-  @Override
   public void run() {
-    BufferedReader reader = null;
+
+    BufferedReader bufferedReader = null;
+    InputStreamReader streamReader = null;
+
     try {
       if (outputStream != null) {
         writer = new PrintWriter(outputStream);
       }
-      reader = new BufferedReader(new InputStreamReader(inputStream));
-      String line = reader.readLine();
-      while (keepReading && line != null) {
+      streamReader = new InputStreamReader(inputStream);
+      bufferedReader = new BufferedReader(streamReader);
+      
+      // Whether any content has been read
+      boolean foundContent = false;
+
+      // Keep reading either until there is nothing more to read from or we are told to stop waiting
+      while (keepReading || foundContent) {
+        while (!bufferedReader.ready()) {
+          try {
+            foundContent = false;
+            Thread.sleep(100);
+          } catch (InterruptedException e) {
+            logger.debug("Closing process stream");
+            return;
+          }
+          if (!keepReading && !bufferedReader.ready())
+            return;
+        }
+        String line = bufferedReader.readLine();
         append(line);
         log(line);
-        line = null;
-        if (reader.ready())
-          line = reader.readLine();
+        foundContent = true;
       }
       if (writer != null)
         writer.flush();
     } catch (IOException e) {
-      logger.error("Error reading process stream: {}", e.getMessage(), e);
+      if (keepReading)
+        logger.error("Error reading process stream: {}", e.getMessage(), e);
     } catch (Throwable t) {
       logger.debug("Unknown error while reading from process input: {}", t.getMessage());
     } finally {
-      IoSupport.closeQuietly(reader);
+      IoSupport.closeQuietly(streamReader);
+      IoSupport.closeQuietly(bufferedReader);
       IoSupport.closeQuietly(writer);
     }
   }
