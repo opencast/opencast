@@ -16,6 +16,7 @@
 package org.opencastproject.episode.api;
 
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.util.NotFoundException;
 
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
@@ -33,10 +34,15 @@ public class EpisodeServiceException extends RuntimeException {
     super(cause);
   }
 
-  /** Return true if the exception is caused by a {@link org.opencastproject.security.api.UnauthorizedException}. */
+  /** Returns true if the exception is caused by a {@link org.opencastproject.security.api.UnauthorizedException}. */
   // todo is an authorization failure really unrecoverable?
   public boolean isCauseNotAuthorized() {
     return getCause() instanceof UnauthorizedException;
+  }
+
+  /** Returns true if the exception is caused by a {@link org.opencastproject.util.NotFoundException}. */
+  public boolean isCauseNotFound() {
+    return getCause() instanceof NotFoundException;
   }
 
   /**

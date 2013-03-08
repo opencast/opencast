@@ -71,11 +71,13 @@ import java.util.Map;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.episode.api.EpisodeQuery.query;
+import static org.opencastproject.util.MimeTypeUtil.suffix;
 import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.serverError;
 import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
@@ -415,13 +417,14 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
    */
   private final UriRewriter rewriteUri = new UriRewriter() {
     @Override public URI apply(Version version, MediaPackageElement mpe) {
+      final String mimeType = option(mpe.getMimeType()).bind(suffix).getOrElse(".unknown");
       return uri(getServerUrl(),
                  getMountPoint(),
                  ARCHIVE_PATH_PREFIX,
                  mpe.getMediaPackage().getIdentifier(),
                  mpe.getIdentifier(),
                  version,
-                 mpe.getElementType().toString().toLowerCase() + "." + mpe.getMimeType().getSuffix().getOrElse(".unknown"));
+                 mpe.getElementType().toString().toLowerCase() + "." + mimeType);
     }
   };
 
@@ -432,11 +435,13 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
     } catch (EpisodeServiceException e) {
       if (e.isCauseNotAuthorized())
         throw new WebApplicationException(e, Response.Status.UNAUTHORIZED);
-      throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+      if (e.isCauseNotFound())
+        throw new WebApplicationException(e, Response.Status.NOT_FOUND);
+      throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
     } catch (Exception e) {
       if (e instanceof NotFoundException)
         throw new WebApplicationException(e, Response.Status.NOT_FOUND);
-      throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+      throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
 }
