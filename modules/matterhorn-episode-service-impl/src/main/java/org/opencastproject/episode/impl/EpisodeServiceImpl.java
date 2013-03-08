@@ -405,7 +405,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
     try {
       return f.apply();
     } catch (Exception e) {
-      logger.error(e.getMessage());
+      logger.error("An error occured", e);
       throw unwrapEpisodeServiceException(e).getOrElse(new EpisodeServiceException(e));
     }
   }
