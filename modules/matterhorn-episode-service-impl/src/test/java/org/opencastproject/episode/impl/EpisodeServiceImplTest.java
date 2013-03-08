@@ -301,46 +301,31 @@ public class EpisodeServiceImplTest {
   @Test
   public void testGetMediaPackage() throws Exception {
     MediaPackage mediaPackage = loadMediaPackageFromClassPath("/manifest-simple.xml");
-
     // Make sure our mocked ACL has the read and write permission
     setReadWritePermissions();
-
     service.add(mediaPackage);
-
     // Make sure it's properly indexed and returned for authorized users
-    EpisodeQuery q = systemQuery();
-    q.id("10.0000/1");
-    SearchResult result = service.find(q, rewriter);
+    SearchResult result = service.find(systemQuery().id("10.0000/1"), rewriter);
     assertEquals("Number of results", 1, result.size());
     assertTrue("Number of media package elements", result.getItems().get(0).getMediaPackage().getElements().length > 0);
     assertEquals("Rewritten URL",
                  "http://episodes/10.0000/1/catalog-1/0/catalog.xml",
                  result.getItems().get(0).getMediaPackage().getElements()[0].getURI().toString());
-
+    // delete mediapackage
     service.delete(mediaPackage.getIdentifier().toString());
-
-    q = systemQuery();
-    q.id("10.0000/1");
-    result = service.find(q, rewriter);
-    assertEquals(0, result.size());
-
+    assertEquals("Mediapackage has been deleted", 0, service.find(systemQuery().id("10.0000/1"), rewriter).size());
+    // add again
+    service.add(mediaPackage);
+    assertEquals("Number of mediapackages in archive", 1, service.find(systemQuery(), rewriter).size());
+    // only ROLE_UNKNOWN is allowed to read
     acl.getEntries().clear();
     acl.getEntries().add(new AccessControlEntry("ROLE_UNKNOWN", EpisodeService.READ_PERMISSION, true));
     acl.getEntries().add(
             new AccessControlEntry(userWithPermissions.getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
-
-    // Add the media package to the search index
+    // now add the mediapackage with this restrictive ACL to the search index
     service.add(mediaPackage);
-
-    // This mediapackage should not be readable by the current user (due to the lack of role ROLE_UNKNOWN)
-    q = systemQuery();
-    q.id("10.0000/1");
-    try {
-      service.find(q, rewriter).size();
-      fail("This mediapackage should not be readable by the current user");
-    } catch (EpisodeServiceException e) {
-      assertTrue(e.isCauseNotAuthorized());
-    }
+    assertEquals("Current user is not allowed to read the latest version but only the first",
+                 1, service.find(systemQuery(), rewriter).size());
   }
 
   @Test
