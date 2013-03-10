@@ -417,7 +417,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
    */
   private final UriRewriter rewriteUri = new UriRewriter() {
     @Override public URI apply(Version version, MediaPackageElement mpe) {
-      final String mimeType = option(mpe.getMimeType()).bind(suffix).getOrElse(".unknown");
+      final String mimeType = option(mpe.getMimeType()).bind(suffix).getOrElse("unknown");
       return uri(getServerUrl(),
                  getMountPoint(),
                  ARCHIVE_PATH_PREFIX,
