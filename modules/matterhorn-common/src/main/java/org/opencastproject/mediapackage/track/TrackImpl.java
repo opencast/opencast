@@ -25,13 +25,8 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -39,6 +34,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is the base implementation for a media track, which itself is part of a media package, representing e. g.
@@ -119,10 +117,12 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   /**
    * @see org.opencastproject.mediapackage.Track#getDuration()
    */
+  @Override
   public Long getDuration() {
     return duration;
   }
 
+  @Override
   public Stream[] getStreams() {
     List<Stream> streams = new ArrayList<Stream>(audio.size() + video.size());
     for (Stream s : audio)
@@ -190,7 +190,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
     Node node = super.toManifest(document, serializer);
 
     // duration
-    if (duration >= 0) {
+    if (duration != null && duration >= 0) {
       Node durationNode = document.createElement("duration");
       durationNode.appendChild(document.createTextNode(Long.toString(duration)));
       node.appendChild(durationNode);
