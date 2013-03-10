@@ -542,6 +542,26 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     } catch (UnauthorizedException e) {
       logger.warn("Can not update workflow: {}", e.getMessage());
     }
+
+    // Does the workflow exist?
+    if (workflowToUpdate == null) {
+      logger.warn("The workflow '{}' cannot be updated because it does not exist", recordingId);
+      return;
+    }
+
+    WorkflowState wfState = workflowToUpdate.getState();
+    switch (workflowToUpdate.getState()) {
+      case FAILED:
+      case FAILING:
+      case STOPPED:
+      case SUCCEEDED:
+        logger.debug("The workflow '{}' should not be updated because it is {}", recordingId, wfState.toString().toLowerCase());
+        return;
+      default:
+        break;
+
+    }
+
     try {
       if (state.endsWith("_error")) {
         workflowToUpdate.getCurrentOperation().setState(WorkflowOperationInstance.OperationState.FAILED);

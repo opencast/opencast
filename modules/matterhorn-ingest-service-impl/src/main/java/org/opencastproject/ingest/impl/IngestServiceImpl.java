@@ -51,9 +51,9 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
+import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -764,7 +764,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   public WorkflowInstance ingest(MediaPackage mp, String workflowDefinitionID, Map<String, String> properties,
           Long workflowId) throws IngestException, NotFoundException, UnauthorizedException {
     // If the workflow definition and instance ID are null, use the default, or throw if there is none
-    if (workflowDefinitionID == null && workflowId == null) {
+    if (StringUtils.isBlank(workflowDefinitionID) && workflowId == null) {
       if (this.defaultWorkflowDefinionId == null) {
         ingestStatistics.failed();
         throw new IllegalStateException(
@@ -779,21 +779,68 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     if (workflowId != null) {
       try {
         workflow = workflowService.getWorkflowById(workflowId.longValue());
-        if (workflow.getState().equals(WorkflowState.FAILED)) {
-          logger.warn("The workflow with id '{}' is failed, starting a new workflow for this recording",
-                  workflow.getId());
-          workflow = null;
-        } else if (workflow.getState().equals(WorkflowState.SUCCEEDED)) {
-          logger.warn("The workflow with id '{}' already succeeded, starting a new workflow for this recording",
-                  workflow.getId());
-          workflow = null;
-        }
-
       } catch (NotFoundException e) {
         logger.warn("Failed to find a workflow with id '{}'", workflowId);
       } catch (WorkflowDatabaseException e) {
         ingestStatistics.failed();
         throw new IngestException(e);
+      }
+    }
+
+    // Make sure the workflow is in an acceptable state to be continued. If not, start over, but use the workflow
+    // definition and recording properties from the original workflow, unless provded by the ingesting parties
+    boolean startOver = false;
+    if (workflow != null) {
+      switch (workflow.getState()) {
+        case FAILED:
+        case FAILING:
+        case STOPPED:
+          logger.info("The workflow with id '{}' is failed, starting a new workflow for this recording",
+                  workflow.getId());
+          startOver = true;
+          break;
+        case SUCCEEDED:
+          logger.info("The workflow with id '{}' already succeeded, starting a new workflow for this recording",
+                  workflow.getId());
+          startOver = true;
+          break;
+        case RUNNING:
+          logger.info("The workflow with id '{}' is already running, starting a new workflow for this recording",
+                  workflow.getId());
+          startOver = true;
+          break;
+        case INSTANTIATED:
+        case PAUSED:
+        default:
+          break;
+      }
+
+      // Is it ok to go with the given workflow or do we need to start over?
+      if (startOver) {
+        WorkflowDefinition workflowDef;
+        try {
+          workflowDef = workflowService.getWorkflowDefinitionById(workflow.getTemplate());
+          if (workflowDef == null)
+            throw new IngestException("Workflow definition '" + workflow.getTemplate() + "' does not exist anymore");
+
+          // Did the ingesting party provide the workflow configuration?
+          if (properties == null || properties.size() == 0) {
+            logger.debug("Restoring workflow properties from workflow {}", workflow.getId());
+            properties = new HashMap<String, String>();
+            for (String key : workflow.getConfigurationKeys()) {
+              properties.put(key, workflow.getConfiguration(key));
+            }
+          }
+          
+          // TODO: get metadata from old workflow (series and episode dc) if not provided by the ingesting party
+
+          ingestStatistics.successful();
+          return workflowService.start(workflowDef, mp, properties);
+        } catch (WorkflowDatabaseException e) {
+          throw new IngestException("Unable to start a new workflow", e);
+        } catch (WorkflowParsingException e) {
+          throw new IngestException("Unable to start a new workflow", e);
+        }
       }
     }
 
@@ -870,7 +917,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
         // Update
         workflowService.update(workflow);
-        
+
         // Merge the properties
         Map<String, String> mergedProperties = new HashMap<String, String>();
         for (String property : workflow.getConfigurationKeys()) {
