@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.episode.impl.solr;
+package org.opencastproject.episode.impl;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -25,6 +25,8 @@ import org.opencastproject.episode.api.MediaSegment;
 import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultItem;
 import org.opencastproject.episode.api.Version;
+import org.opencastproject.episode.impl.solr.DField;
+import org.opencastproject.episode.impl.solr.Schema;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
@@ -43,7 +45,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.opencastproject.util.ReflectionUtil.run;
+import static org.opencastproject.util.ReflectionUtil.xfer;
 import static org.opencastproject.util.data.Collections.filter;
 import static org.opencastproject.util.data.Collections.head;
 import static org.opencastproject.util.data.Monadics.mlist;
@@ -55,16 +57,19 @@ public final class Convert {
   private Convert() {
   }
 
-  public static JaxbSearchResultItem convertToJaxbSearchResultItem(Function<JaxbSearchResultItem, SearchResultItem> f) {
-    final JaxbSearchResultItem conv = new JaxbSearchResultItem();
-    // copy to conv
-    run(SearchResultItem.class, f.apply(conv));
-    return conv;
-  }
+  /** {@link #convert(org.opencastproject.episode.api.SearchResultItem)} as a function. */
+  public static final Function<SearchResultItem, JaxbSearchResultItem> convertToJaxbSearchResultItem =
+          new Function<SearchResultItem, JaxbSearchResultItem>() {
+            @Override public JaxbSearchResultItem apply(SearchResultItem item) {
+              return convert(item);
+            }
+          };
 
   /** Convert a {@link SearchResultItem} into its JAXB representation. */
   public static JaxbSearchResultItem convert(final SearchResultItem item) {
-    return convertToJaxbSearchResultItem(new Function<JaxbSearchResultItem, SearchResultItem>() {
+    if (item instanceof JaxbSearchResultItem)
+      return (JaxbSearchResultItem) item;
+    return xfer(new JaxbSearchResultItem(), SearchResultItem.class, new Function<JaxbSearchResultItem, SearchResultItem>() {
       @Override public SearchResultItem apply(final JaxbSearchResultItem conv) {
         return new SearchResultItem() {
           @Override public String getId() {
@@ -235,7 +240,7 @@ public final class Convert {
 
   /** Convert a {@link SolrDocument} into a {@link org.opencastproject.episode.api.JaxbSearchResultItem}. */
   public static JaxbSearchResultItem convert(final SolrDocument doc, final SolrQuery query) {
-    return convertToJaxbSearchResultItem(new Function<JaxbSearchResultItem, SearchResultItem>() {
+    return xfer(new JaxbSearchResultItem(), SearchResultItem.class, new Function<JaxbSearchResultItem, SearchResultItem>() {
       @Override public SearchResultItem apply(final JaxbSearchResultItem conv) {
         return new SearchResultItem() {
           private final String dfltString = null;
@@ -458,18 +463,44 @@ public final class Convert {
   }
 
   /** Convert a {@link SearchResult} into its JAXB representation. */
-  public static JaxbSearchResult convert(SearchResult a) {
-    final JaxbSearchResult r = new JaxbSearchResult();
-    r.setLimit(a.getLimit());
-    r.setOffset(a.getOffset());
-    r.setItems(mlist(a.getItems()).map(new Function<SearchResultItem, JaxbSearchResultItem>() {
-      @Override public JaxbSearchResultItem apply(SearchResultItem item) {
-        return convert(item);
+  public static JaxbSearchResult convert(final SearchResult source) {
+    return xfer(new JaxbSearchResult(), SearchResult.class, new Function<JaxbSearchResult, SearchResult>() {
+      @Override public SearchResult apply(final JaxbSearchResult jaxb) {
+        return new SearchResult() {
+          @Override public List<SearchResultItem> getItems() {
+            jaxb.setItems(mlist(source.getItems()).map(convertToJaxbSearchResultItem).value()); return null;
+          }
+
+          @Override public String getQuery() {
+            jaxb.setQuery(source.getQuery()); return null;
+          }
+
+          @Override public long size() {
+            return 0; // size is calculated from items list
+          }
+
+          @Override public long getTotalSize() {
+            jaxb.setTotalSize(source.getTotalSize()); return 0;
+          }
+
+          @Override public long getOffset() {
+            jaxb.setOffset(source.getOffset()); return 0;
+          }
+
+          @Override public long getLimit() {
+            jaxb.setLimit(source.getLimit()); return 0;
+          }
+
+          @Override public long getSearchTime() {
+            jaxb.setSearchTime(source.getSearchTime()); return 0;
+          }
+
+          @Override public long getPage() {
+            return 0; // calculated
+          }
+        };
       }
-    }).value());
-    r.setSearchTime(a.getSearchTime());
-    r.setTotalSize(a.getTotalSize());
-    return r;
+    });
   }
 
   //

@@ -143,6 +143,10 @@ public class JaxbSearchResult implements SearchResult {
     return query;
   }
 
+  public void setQuery(String query) {
+    this.query = query;
+  }
+
   @Override
   public long size() {
     return resultSet != null ? resultSet.size() : 0;

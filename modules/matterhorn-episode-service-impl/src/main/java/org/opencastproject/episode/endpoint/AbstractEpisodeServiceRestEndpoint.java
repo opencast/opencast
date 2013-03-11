@@ -25,6 +25,7 @@ import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultItem;
 import org.opencastproject.episode.api.UriRewriter;
 import org.opencastproject.episode.api.Version;
+import org.opencastproject.episode.impl.Convert;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageImpl;
@@ -343,7 +344,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
         // Return the results using the requested format
         final String type = "json".equals(format) ? MediaType.APPLICATION_JSON : MediaType.APPLICATION_XML;
         final SearchResult sr = getEpisodeService().find(search, rewriteUri);
-        return Response.ok(sr).type(type).build();
+        return Response.ok(Convert.convert(sr)).type(type).build();
       }
     });
   }
