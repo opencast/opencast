@@ -25,6 +25,7 @@ import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.JaxbSearchResult;
 import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultItem;
+import org.opencastproject.episode.impl.Convert;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.data.Option;
