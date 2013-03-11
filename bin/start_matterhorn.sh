@@ -17,7 +17,8 @@ fi
 if [ ! -z "$M2_REPO" ]; then
   M2_REPO="$M2_REPO"
 else
-  M2_REPO="/Users/johndoe/.m2/repository"
+    echo "Error: M2_REPO is not set."
+    exit 2
 fi
 
 if [ ! -z "$OPENCAST_LOGDIR" ]; then
