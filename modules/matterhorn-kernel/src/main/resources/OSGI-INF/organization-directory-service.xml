@@ -12,7 +12,7 @@
     <reference name="configAdmin" interface="org.osgi.service.cm.ConfigurationAdmin"
       cardinality="1..1" policy="static" bind="setConfigurationAdmin" />
     <reference name="persistence" interface="org.opencastproject.kernel.security.persistence.OrganizationDatabase"
-      cardinality="1..1" policy="static" bind="setOrgPersistence" />
+      cardinality="0..1" policy="dynamic" bind="setOrgPersistence" />
   </scr:component>
 
   <scr:component name="org.opencastproject.kernel.security.OrganizationEndpoint" immediate="true">
