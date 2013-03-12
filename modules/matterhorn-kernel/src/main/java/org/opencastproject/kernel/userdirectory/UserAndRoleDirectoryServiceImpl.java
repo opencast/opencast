@@ -25,11 +25,10 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.api.UserProvider;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -49,6 +48,9 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(UserAndRoleDirectoryServiceImpl.class);
+
+  /** A non-obvious password to allow a Spring User to be instantiated for CAS authenticated users having no password */
+  private static final String DEFAULT_PASSWORD = "4b3e4b30-718c-11e2-bcfd-0800200c9a66";
 
   /** The list of user providers */
   protected List<UserProvider> userProviders = new ArrayList<UserProvider>();
@@ -173,19 +175,22 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     } else {
       Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
       for (String role : user.getRoles()) {
-        authorities.add(new GrantedAuthorityImpl(role));
+        authorities.add(new SimpleGrantedAuthority(role));
       }
 
       // Add additional roles from role providers
       for (RoleProvider roleProvider : roleProviders) {
         String[] rolesForUser = roleProvider.getRolesForUser(userName);
         for (String role : rolesForUser)
-          authorities.add(new GrantedAuthorityImpl(role));
+          authorities.add(new SimpleGrantedAuthority(role));
       }
 
-      authorities.add(new GrantedAuthorityImpl(securityService.getOrganization().getAnonymousRole()));
-      return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(),
-              StringUtils.isNotBlank(user.getPassword()), true, true, true, authorities);
+      authorities.add(new SimpleGrantedAuthority(securityService.getOrganization().getAnonymousRole()));
+      // need a non null password to instantiate org.springframework.security.core.userdetails.User
+      // but CAS authenticated users have no password
+      String password = user.getPassword() == null ? DEFAULT_PASSWORD : user.getPassword();
+      return new org.springframework.security.core.userdetails.User(user.getUserName(), password, true, true, true,
+          true, authorities);
     }
   }
 

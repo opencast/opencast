@@ -13,7 +13,7 @@
   <properties>
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <spring-security.version>3.0.2.RELEASE</spring-security.version>
+    <spring-security.version>3.1.0.RELEASE</spring-security.version>
   </properties>
   <build>
     <plugins>

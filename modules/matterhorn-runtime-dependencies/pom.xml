@@ -521,11 +521,6 @@
       <version>3.1.12</version> 
     </dependency>
     <dependency>
-      <groupId>org.jasig.cas.client</groupId>
-      <artifactId>cas-client-core</artifactId>
-      <version>3.1.12</version>
-    </dependency>
-    <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>com.springsource.org.opensaml</artifactId>
       <version>1.1.0</version>

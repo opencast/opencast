@@ -197,6 +197,10 @@
     class="org.springframework.security.cas.web.CasAuthenticationFilter">
     <property name="authenticationManager" ref="authenticationManager"/>
     <property name="authenticationSuccessHandler" ref="authSuccessHandler" />
+    <property name="serviceProperties" ref="serviceProperties" />
+    <property name="authenticationDetailsSource">
+      <bean class="org.springframework.security.cas.web.authentication.ServiceAuthenticationDetailsSource"/>
+    </property>
   </bean>
 
   <bean id="casEntryPoint"
@@ -213,8 +217,12 @@
   
   <bean id="casAuthenticationProvider"
     class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
-    <property name="userDetailsService" ref="userDetailsService"/>
     <property name="serviceProperties" ref="serviceProperties" />
+    <property name="authenticationUserDetailsService">
+      <bean class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+          <constructor-arg ref="userDetailsService" />
+      </bean>
+    </property>
     <property name="ticketValidator">
       <bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
         <constructor-arg index="0" value="https://auth-test.berkeley.edu/cas" />
@@ -232,7 +240,7 @@
     <constructor-arg>
       <bean class= "org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
     </constructor-arg>
-    <property name="filterProcessesUrl" value="/j_spring_cas_security_logout"/>
+    <property name="filterProcessesUrl" value="/j_spring_security_logout"/>
   </bean>
 
   <!-- #################### -->
