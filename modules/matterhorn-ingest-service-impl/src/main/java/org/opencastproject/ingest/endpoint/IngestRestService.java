@@ -15,13 +15,6 @@
  */
 package org.opencastproject.ingest.endpoint;
 
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.util.Streams;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.json.simple.JSONObject;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -42,9 +35,28 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.util.Streams;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -65,16 +77,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Creates and augments Matterhorn MediaPackages using the api. Stores media into the Working File Repository.
@@ -100,7 +102,7 @@ public class IngestRestService {
 
   /** Key for the default maximum number of ingests in config.properties */
   protected static final String MAX_INGESTS_KEY = "org.opencastproject.ingest.max.concurrent";
-  
+
   /** The http request parameter used to provide the workflow instance id */
   protected static final String WORKFLOW_INSTANCE_ID_PARAM = "workflowInstanceId";
 
@@ -109,7 +111,7 @@ public class IngestRestService {
 
   /** The default workflow definition */
   private String defaultWorkflowDefinitionId = null;
-  
+
   private MediaPackageBuilderFactory factory = null;
   private IngestService ingestService = null;
   private Workspace workspace = null;
@@ -119,9 +121,9 @@ public class IngestRestService {
   protected EntityManagerFactory emf = null;
   // For the progress bar -1 bug workaround, keeping UploadJobs in memory rather than saving them using JPA
   private HashMap<String, UploadJob> jobs;
-  // The number of ingests this service can handle concurrently. 
+  // The number of ingests this service can handle concurrently.
   private int ingestLimit = -1;
-  
+
   public IngestRestService() {
     factory = MediaPackageBuilderFactory.newInstance();
     jobs = new HashMap<String, UploadJob>();
@@ -535,8 +537,7 @@ public class IngestRestService {
     logger.debug("addZippedMediaPackage(HttpRequest)");
     if (!isIngestLimitEnabled() || getIngestLimit() > 0) {
       return ingestZippedMediaPackage(request);
-    }
-    else {
+    } else {
       logger.warn("Delaying ingest because we have exceeded the maximum number of ingests this server is setup to do concurrently.");
       return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }
@@ -602,12 +603,12 @@ public class IngestRestService {
     } finally {
       IOUtils.closeQuietly(zipInputStream);
       try {
-        workspace.delete(zipFileUri);
+        if (zipFileUri != null)
+          workspace.delete(zipFileUri);
       } catch (NotFoundException nfe) {
-        // That's fine, we failed somewhere on the way
-        logger.debug("Error removing missing temporary ingest file " + COLLECTION_ID + "/" + zipFileUri, nfe);
+        logger.error("Error removing missing temporary ingest file " + COLLECTION_ID + "/" + zipFileUri, nfe);
       } catch (IOException ioe) {
-        logger.warn("Error removing temporary ingest file " + zipFileUri, ioe);
+        logger.error("Error removing temporary ingest file " + zipFileUri, ioe);
       }
       if (isIngestLimitEnabled()) {
         setIngestLimit(getIngestLimit() + 1);

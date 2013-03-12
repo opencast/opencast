@@ -20,6 +20,7 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.FileSupport;
+import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Function;
@@ -442,34 +443,33 @@ public class WorkspaceImpl implements Workspace {
     InputStream tee = null;
     File tempFile = null;
     FileOutputStream out = null;
-    synchronized (wsRoot) {
-      tempFile = getWorkspaceFile(uri, true);
-      FileUtils.touch(tempFile);
-      out = new FileOutputStream(tempFile);
-    }
-
-    // Try hard linking first and fall back to tee-ing to both the working file repository and the workspace
-    if (linkingEnabled) {
-      tee = in;
-      wfr.putInCollection(collectionId, fileName, tee);
-      FileUtils.forceMkdir(tempFile.getParentFile());
-      File workingFileRepoDirectory = new File(PathSupport.concat(new String[] { wfrRoot,
-              WorkingFileRepository.COLLECTION_PATH_PREFIX, collectionId }));
-      File workingFileRepoCopy = new File(workingFileRepoDirectory, safeFileName);
-      FileSupport.link(workingFileRepoCopy, tempFile, true);
-    } else {
-      tee = new TeeInputStream(in, out, true);
-      wfr.putInCollection(collectionId, fileName, tee);
-    }
-
-    // Cleanup
     try {
-      tee.close();
-      out.close();
-    } catch (IOException e) {
-      logger.warn("Unable to close file stream: " + e.getLocalizedMessage());
-    }
+      synchronized (wsRoot) {
+        tempFile = getWorkspaceFile(uri, true);
+        FileUtils.touch(tempFile);
+        out = new FileOutputStream(tempFile);
+      }
 
+      // Try hard linking first and fall back to tee-ing to both the working file repository and the workspace
+      if (linkingEnabled) {
+        tee = in;
+        wfr.putInCollection(collectionId, fileName, tee);
+        FileUtils.forceMkdir(tempFile.getParentFile());
+        File workingFileRepoDirectory = new File(PathSupport.concat(new String[] { wfrRoot,
+                WorkingFileRepository.COLLECTION_PATH_PREFIX, collectionId }));
+        File workingFileRepoCopy = new File(workingFileRepoDirectory, safeFileName);
+        FileSupport.link(workingFileRepoCopy, tempFile, true);
+      } else {
+        tee = new TeeInputStream(in, out, true);
+        wfr.putInCollection(collectionId, fileName, tee);
+      }
+    } catch (IOException e) {
+      FileUtils.deleteQuietly(tempFile);
+      throw e;
+    } finally {
+      IoSupport.closeQuietly(tee);
+      IoSupport.closeQuietly(out);
+    }
     return uri;
   }
 
