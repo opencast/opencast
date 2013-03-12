@@ -151,7 +151,6 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
-        <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
@@ -159,15 +158,14 @@
         <module>modules/matterhorn-ingest-service-impl</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-mediapackage-ui</module>
+        <module>modules/matterhorn-series-service-api</module>
+        <module>modules/matterhorn-series-service-impl</module>
         <module>modules/matterhorn-metadata-api</module>
+        <module>modules/matterhorn-serviceregistry</module>
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-series-service-impl</module>
-        <module>modules/matterhorn-solr</module>
-		    <module>modules/matterhorn-userdirectory-jpa</module>
+		<module>modules/matterhorn-userdirectory-jpa</module>
         <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -180,7 +178,6 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
-        <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
@@ -188,18 +185,21 @@
         <module>modules/matterhorn-ingest-service-impl</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-mediapackage-ui</module>
+        <module>modules/matterhorn-series-service-api</module>
+        <module>modules/matterhorn-series-service-remote</module>
         <module>modules/matterhorn-metadata-api</module>
+        <module>modules/matterhorn-serviceregistry</module>
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-series-service-remote</module>
-		    <module>modules/matterhorn-userdirectory-jpa</module>
+		<module>modules/matterhorn-userdirectory-jpa</module>
+		<module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
-        <module>modules/matterhorn-workflow-service-remote</module>
+        <module>modules/matterhorn-workflow-service-remote</module>   
         <module>modules/matterhorn-working-file-repository-service-api</module>
+        <module>modules/matterhorn-working-file-repository-service-impl</module>
         <module>modules/matterhorn-workspace-api</module>
+        <module>modules/matterhorn-workspace-impl</module>
       </modules>
     </profile>
 
