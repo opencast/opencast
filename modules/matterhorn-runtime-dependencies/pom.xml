@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.4-rc7</version>
+    <version>1.4-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -527,12 +527,6 @@
       <artifactId>com.springsource.org.jasig.cas.client</artifactId> 
       <version>3.1.12</version> 
     </dependency>
-    <dependency>
-      <groupId>org.jasig.cas.client</groupId>
-      <artifactId>cas-client-core</artifactId>
-      <version>3.1.12</version>
-    </dependency>
-
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>com.springsource.org.opensaml</artifactId>
