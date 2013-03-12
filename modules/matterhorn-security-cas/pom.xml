@@ -29,7 +29,8 @@
 
     <dependency>
       <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-cas-client</artifactId>
+      <artifactId>spring-security-cas</artifactId>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
     <dependency>
@@ -81,7 +82,8 @@
               org.jasig.cas.client.validation;resolution:=optional,
               org.springframework.security.cas;resolution:=optional,
               org.springframework.security.cas.authentication;resolution:=optional,
-              org.springframework.security.cas.web;resolution:=optional
+              org.springframework.security.cas.web;resolution:=optional,
+              org.springframework.security.cas.web.authentication;resolution:=optional
             </Import-Package>
             <Fragment-Host>matterhorn-kernel</Fragment-Host>
           </instructions>
