@@ -560,7 +560,7 @@ public class SeriesRestService {
    * @return sample ACL
    */
   public String getSampleAccessControlList() {
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><acl xmlns=\"org.opencastproject.security\"><ace><role>admin</role><action>delete</action><allow>true</allow></ace></acl>";
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><acl xmlns=\"http://org.opencastproject.security\"><ace><role>admin</role><action>delete</action><allow>true</allow></ace></acl>";
   }
 
 }
