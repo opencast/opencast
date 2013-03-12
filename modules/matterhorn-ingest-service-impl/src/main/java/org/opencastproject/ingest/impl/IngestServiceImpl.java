@@ -263,7 +263,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
     // Keep track of the zip file we use to store the zip stream
     File zipFile = null;
-
+    URI uri = null;
     try {
 
       // We don't need anybody to do the dispatching for us. Therefore we need to make sure that the job is never in
@@ -274,7 +274,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
       // locally unpack the mediaPackage
       // save inputStream to file
-      URI uri = workspace.putInCollection(COLLECTION_ID + job.getId(), job.getId() + ".zip", zipStream);
+      uri = workspace.putInCollection(COLLECTION_ID + job.getId(), job.getId() + ".zip", zipStream);
 
       zipFile = workspace.get(uri);
       logger.info("Ingesting zipped media package to {}", zipFile);
@@ -355,7 +355,14 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Job.Status.FAILED);
       throw e;
     } finally {
-      workspace.deleteFromCollection(COLLECTION_ID + job.getId(), job.getId() + ".zip");
+      if (uri != null)
+        try {
+          workspace.delete(uri);
+        } catch (NotFoundException nfe) {
+          logger.error("Error removing missing temporary ingest file " + COLLECTION_ID + "/" + uri, nfe);
+        } catch (IOException ioe) {
+          logger.error("Error removing temporary ingest file " + uri, ioe);
+        }
       if (zipFile != null)
         FileUtils.deleteQuietly(zipFile.getParentFile());
       try {
@@ -831,7 +838,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               properties.put(key, workflow.getConfiguration(key));
             }
           }
-          
+
           // TODO: get metadata from old workflow (series and episode dc) if not provided by the ingesting party
 
           ingestStatistics.successful();
