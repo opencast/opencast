@@ -15,7 +15,8 @@
  */
 package org.opencastproject.workflow.handler;
 
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.isBlank;
+
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -30,6 +31,8 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * Workflow operation for handling "publish" operations
@@ -92,7 +93,7 @@ public class PublishWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
     // Explicitly keep all security policies
     keep.addAll(Arrays.asList(mp.getAttachments(MediaPackageElements.XACML_POLICY)));
-    
+
     // Mark everything that is set for removal
     List<MediaPackageElement> removals = new ArrayList<MediaPackageElement>();
     for (MediaPackageElement element : mp.getElements()) {
@@ -152,15 +153,25 @@ public class PublishWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /** Media package must meet these criteria in order to be published. */
   private boolean isPublishable(MediaPackage mp) {
-    return !isBlank(mp.getTitle()) && mp.hasTracks();
+    boolean hasTitle = !isBlank(mp.getTitle());
+    if (!hasTitle)
+      logger.warn("Media package does not meet criteria for publication: There is no title");
+
+    boolean hasTracks = mp.hasTracks();
+    if (!hasTracks)
+      logger.warn("Media package does not meet criteria for publication: There are no tracks");
+
+    return hasTitle && hasTracks;
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
-  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     MediaPackage mediaPackageFromWorkflow = workflowInstance.getMediaPackage();
 
     // Check which tags have been configured
@@ -178,13 +189,14 @@ public class PublishWorkflowOperationHandler extends AbstractWorkflowOperationHa
         throw new WorkflowOperationException("Media package does not meet criteria for publication");
       }
       logger.info("Publishing media package {} to search index", mediaPackageForSearch);
-      
+
       // adding media package to the search index
       Job publishJob = null;
       try {
         publishJob = searchService.add(mediaPackageForSearch);
         if (!waitForStatus(publishJob).isSuccess()) {
-          throw new WorkflowOperationException("Mediapackage " + mediaPackageForSearch.getIdentifier() + " could not be published");
+          throw new WorkflowOperationException("Mediapackage " + mediaPackageForSearch.getIdentifier()
+                  + " could not be published");
         }
       } catch (SearchException e) {
         throw new WorkflowOperationException("Error publishing media package", e);
