@@ -35,7 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.List;
 
+import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 
@@ -92,6 +94,17 @@ public class SolrRequester {
     return result;
   }
 
+  private static final List<String> fullTextQueryFields =
+          list(Schema.DC_TITLE_SUM + ":(%s)^" + Schema.DC_TITLE_BOOST,
+               Schema.DC_IS_PART_OF + ":(%s)^" + Schema.DC_IS_PART_OF_BOOST,
+               Schema.DC_CREATOR_SUM + ":(%s)^" + Schema.DC_CREATOR_BOOST,
+               Schema.DC_SUBJECT_SUM + ":(%s)^" + Schema.DC_SUBJECT_BOOST,
+               Schema.DC_PUBLISHER_SUM + ":(%s)^" + Schema.DC_PUBLISHER_BOOST,
+               Schema.DC_CONTRIBUTOR_SUM + ":(%s)^" + Schema.DC_CONTRIBUTOR_BOOST,
+               Schema.DC_ABSTRACT_SUM + ":(%s)^" + Schema.DC_ABSTRACT_BOOST,
+               Schema.DC_DESCRIPTION_SUM + ":(%s)^" + Schema.DC_DESCRIPTION_BOOST,
+               Schema.FULLTEXT + ":(*%s*)^1.0");
+
   /**
    * Modifies the query such that certain fields are being boosted (meaning they gain some weight).
    * 
@@ -99,68 +112,14 @@ public class SolrRequester {
    *          The user query.
    * @return The boosted query
    */
-  public StringBuffer createBoostedFullTextQuery(String query) {
-    String uq = SolrUtils.clean(query);
-    StringBuffer sb = new StringBuffer();
-
+  public StringBuilder createBoostedFullTextQuery(String query) {
+    final String uq = SolrUtils.clean(query);
+    final StringBuilder sb = new StringBuilder();
     sb.append("(");
-
-    sb.append(Schema.DC_TITLE_PREFIX);
-    sb.append(":(");
-    sb.append(uq);
-    sb.append(")^");
-    sb.append(Schema.DC_TITLE_BOOST);
-    sb.append(" ");
-
-    sb.append(Schema.DC_CREATOR_PREFIX);
-    sb.append(":(");
-    sb.append(uq);
-    sb.append(")^");
-    sb.append(Schema.DC_CREATOR_BOOST);
-    sb.append(" ");
-
-    sb.append(Schema.DC_SUBJECT_PREFIX);
-    sb.append(":(");
-    sb.append(uq);
-    sb.append(")^");
-    sb.append(Schema.DC_SUBJECT_BOOST);
-    sb.append(" ");
-
-    sb.append(Schema.DC_PUBLISHER_PREFIX);
-    sb.append(":(");
-    sb.append(uq);
-    sb.append(")^");
-    sb.append(Schema.DC_PUBLISHER_BOOST);
-    sb.append(" ");
-
-    sb.append(Schema.DC_CONTRIBUTOR_PREFIX);
-    sb.append(":(");
-    sb.append(uq);
-    sb.append(")^");
-    sb.append(Schema.DC_CONTRIBUTOR_BOOST);
-    sb.append(" ");
-
-    sb.append(Schema.DC_ABSTRACT_PREFIX);
-    sb.append(":(");
-    sb.append(uq);
-    sb.append(")^");
-    sb.append(Schema.DC_ABSTRACT_BOOST);
-    sb.append(" ");
-
-    sb.append(Schema.DC_DESCRIPTION_PREFIX);
-    sb.append(":(");
-    sb.append(uq);
-    sb.append(")^");
-    sb.append(Schema.DC_DESCRIPTION_BOOST);
-    sb.append(" ");
-
-    sb.append(Schema.FULLTEXT);
-    sb.append(":(*");
-    sb.append(uq);
-    sb.append("*) ");
-
+    for (String f : fullTextQueryFields) {
+      sb.append(String.format(f, uq)).append(" ");
+    }
     sb.append(")");
-
     return sb;
   }
 
@@ -311,7 +270,7 @@ public class SolrRequester {
       case CREATOR:
         return Schema.DC_CREATOR_SORT;
       case SERIES_TITLE:
-        return Schema.DC_IS_PART_OF_SORT;
+        return Schema.S_DC_TITLE_SORT;
       default:
         return Schema.DC_CREATED;
     }

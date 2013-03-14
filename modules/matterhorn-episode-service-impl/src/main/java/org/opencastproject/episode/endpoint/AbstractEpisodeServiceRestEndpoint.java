@@ -34,9 +34,11 @@ import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.data.Collections;
+import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -65,7 +67,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -271,18 +272,15 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
     return handleException(new Function0<Response>() {
       @Override public Response apply() {
         // Prepare the flavors
-        List<MediaPackageElementFlavor> flavorSet = new ArrayList<MediaPackageElementFlavor>();
+        final EpisodeQuery search = query(getSecurityService());
         if (flavors != null) {
-          for (String f : flavors) {
-            try {
-              flavorSet.add(MediaPackageElementFlavor.parseFlavor(f));
-            } catch (IllegalArgumentException e) {
-              logger.debug("invalid flavor '{}' specified in query", f);
+          List<MediaPackageElementFlavor> fs = mlist(flavors).map(new Function<String, MediaPackageElementFlavor>() {
+            @Override public MediaPackageElementFlavor apply(String f) {
+              return MediaPackageElementFlavor.parseFlavor(f.trim());
             }
-          }
+          }).value();
+          search.elementFlavors(fs);
         }
-
-        final EpisodeQuery search = query(getSecurityService()).elementFlavors(flavorSet);
 
         if (limit != null)
           search.limit(limit);
@@ -291,31 +289,31 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
           search.offset(offset);
         
         if (tags != null)
-          search.elementTags(tags);
+          search.elementTags(mlist(tags).bind(Strings.trimToNil).value());
         
         if (StringUtils.isNotBlank(id))
-          search.id(id);
+          search.id(id.trim());
         
         if (StringUtils.isNotBlank(text))
-          search.text(StringUtils.trimToEmpty(text));
+          search.text(text.trim());
         
         if (StringUtils.isNotBlank(creator))
-          search.creator(creator);
+          search.creator(creator.trim());
         
         if (StringUtils.isNotBlank(contributor))
-          search.contributor(contributor);
+          search.contributor(contributor.trim());
         
         if (StringUtils.isNotBlank(language))
-          search.language(language);
+          search.language(language.trim());
         
         if (StringUtils.isNotBlank(series))
-          search.seriesId(series);
+          search.seriesId(series.trim());
         
         if (StringUtils.isNotBlank(license))
-          search.license(license);
+          search.license(license.trim());
         
         if (StringUtils.isNotBlank(title))
-          search.title(title);
+          search.title(title.trim());
 
         if (StringUtils.isNotBlank(sort)) {
           // Parse the sort field and direction

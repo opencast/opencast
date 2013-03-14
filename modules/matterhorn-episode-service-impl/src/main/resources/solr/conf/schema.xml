@@ -149,7 +149,8 @@
         Duplicate tokens at the same position (which may result from Stemmed Synonyms or
         WordDelim parts) are removed.
         -->
-    <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+    <fieldType name="text" class="solr.TextField" positionIncrementGap="100"
+               indexed="true" stored="true" omitNorms="true">
       <analyzer type="index">
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <!-- in this example, we will only use synonyms at query time
@@ -193,7 +194,8 @@
          that does not include some properties of the source text
       -->
     <fieldType name="alphaOnlySort" class="solr.TextField"
-               indexed="true" stored="true" multiValued="false" sortMissingLast="true" omitNorms="true">
+               indexed="true" stored="true" multiValued="false" omitNorms="true"
+               sortMissingLast="true">
       <analyzer>
         <!-- KeywordTokenizer does no actual tokenizing, so the entire
              input string is preserved as a single token
@@ -232,7 +234,9 @@
     <!-- The mediapackage id and the version. This is the unique identifier. -->
     <field name="id" type="string" indexed="true" stored="true" required="true" />
    
-    <!-- Dublin core fields. -->
+    <!-- Dublin core fields -->
+
+    <!-- Episode -->
 
     <!-- universal, i.e. localization independent fields -->
     <!-- these may be, e.g. fields containing an id, a date or follow some fixed vocabulary -->
@@ -242,13 +246,11 @@
     <field name="dc_language" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_temporal" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_is_part_of" type="text" indexed="true" stored="true" omitNorms="true"/>
-    <field name="dc_is_part_of-sort" type="alphaOnlySort"/>
     <field name="dc_replaces" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_type" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_available_from" type="date" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_available_to" type="date" indexed="true" stored="true" omitNorms="true"/>
 
-    <!-- localized fields -->
     <field name="dc_title-sum" type="text" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
     <dynamicField name="dc_title_*" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_title-sort" type="alphaOnlySort"/>
@@ -284,6 +286,12 @@
     <field name="dc_license-sum" type="text" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
     <dynamicField name="dc_license_*" type="text" indexed="true" stored="true" omitNorms="true"/>
 
+    <!-- Series -->
+
+    <field name="s_dc_title-sum" type="text" multiValued="true"/>
+    <dynamicField name="s_dc_title_*" type="text"/>
+    <field name="s_dc_title-sort" type="alphaOnlySort" />
+
     <!--  Opencast fields -->
 
     <field name="oc_mediatype" type="string" indexed="true" stored="true" omitNorms="true"/>
@@ -307,13 +315,11 @@
     <field name="fulltext" type="text" indexed="true" stored="false" multiValued="true"/>
   </fields>
 
-  <!-- Field to use to determine and enforce document uniqueness. 
-      Unless this field is marked with required="false", it will be a required field
-  -->
+  <!-- Field to use to determine and enforce document uniqueness.
+       Unless this field is marked with required="false", it will be a required field -->
   <uniqueKey>id</uniqueKey>
  
-  <!-- field for the QueryParser to use when an explicit fieldname is absent
-  -->
+  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
   <defaultSearchField>fulltext</defaultSearchField>
 
   <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
@@ -326,7 +332,6 @@
   <copyField source="dc_spatial_*" dest="dc_spatial-sum"/>
   <copyField source="dc_access_rights_*" dest="dc_access_rights-sum"/>
   <copyField source="dc_license_*" dest="dc_license-sum"/>
-
   <copyField source="dc_title_*" dest="fulltext"/>
   <copyField source="dc_title_*" dest="dc_title-sum"/>
   <copyField source="dc_subject_*" dest="fulltext"/>
@@ -341,14 +346,9 @@
   <copyField source="dc_publisher_*" dest="dc_publisher-sum"/>
   <copyField source="dc_contributor_*" dest="fulltext"/>
   <copyField source="dc_contributor_*" dest="dc_contributor-sum"/>
+
+  <copyField source="s_dc_title_*" dest="s_dc_title-sum"/>
+
   <copyField source="oc_keywords" dest="fulltext"/>
   <copyField source="oc_text_*" dest="fulltext"/>
-
-
-  <!-- Similarity is the scoring routine for each document vs. a query.
-      A custom similarity may be specified here, but the default is fine
-      for most applications.  -->
-  <!-- <similarity class="org.apache.lucene.search.DefaultSimilarity"/>
-  -->
-
 </schema>

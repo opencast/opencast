@@ -85,9 +85,9 @@ public final class Schema {
   public static final String DC_LICENSE_PREFIX = "dc_license_";
   public static final String DC_LICENSE_SUM = "dc_license-sum";
 
-  // Filters for audio and video files
-  public static final String HAS_AUDIO = "has_audio_file";
-  public static final String HAS_VIDEO = "has_video_file";
+  public static final String S_DC_TITLE_PREFIX = "s_dc_title_";
+  public static final String S_DC_TITLE_SUM = "s_dc_title-sum";
+  public static final String S_DC_TITLE_SORT = "s_dc_title-sort";
 
   // Suffixes
   public static final String SUFFIX_FROM = "from";
@@ -140,6 +140,8 @@ public final class Schema {
    */
   // TODO: move this to configuration file
   public static final float DC_TITLE_BOOST = 6.0f;
+  public static final float S_DC_TITLE_BOOST = 6.0f;
+  public static final float DC_IS_PART_OF_BOOST = 6.0f;
   public static final float DC_ABSTRACT_BOOST = 4.0f;
   public static final float DC_DESCRIPTION_BOOST = 4.0f;
   public static final float DC_CONTRIBUTOR_BOOST = 2.0f;
@@ -174,6 +176,7 @@ public final class Schema {
     List<DField<String>> getDcSpatial();
     List<DField<String>> getDcAccessRights();
     List<DField<String>> getDcLicense();
+    List<DField<String>> getSeriesDcTitle();
     Option<String> getOcMediatype();
     Option<String> getOcMediapackage();
     Option<String> getOcAcl();
@@ -256,6 +259,9 @@ public final class Schema {
       }
       @Override public List<DField<String>> getDcLicense() {
         for (DField<String> v : fields.getDcLicense()) setDcLicense(doc, v); return null;
+      }
+      @Override public List<DField<String>> getSeriesDcTitle() {
+        for (DField<String> v : fields.getSeriesDcTitle()) setSeriesDcTitle(doc, v); return null;
       }
       @Override public Option<String> getOcMediatype() {
         for (String a : fields.getOcMediatype()) setOcMediatype(doc, a); return null;
@@ -394,7 +400,6 @@ public final class Schema {
 
   public static void setDcIsPartOf(SolrInputDocument doc, String isPartOf) {
     doc.setField(DC_IS_PART_OF, isPartOf);
-    doc.setField(DC_IS_PART_OF_SORT, isPartOf);
   }
 
   public static String getDcReplaces(SolrDocument doc) {
@@ -439,6 +444,18 @@ public final class Schema {
     //   sorting has to be done on the dynamic title field but this requires
     //   the user language to be available which right now is not supported by Matterhorn.
     doc.setField(DC_TITLE_SORT, title.getValue());
+  }
+
+  public static List<DField<String>> getSeriesDcTitle(SolrDocument doc) {
+    return getDynamicStringValues(doc, S_DC_TITLE_PREFIX);
+  }
+
+  public static void setSeriesDcTitle(SolrInputDocument doc, DField<String> title) {
+    doc.setField(S_DC_TITLE_PREFIX + title.getSuffix(), title.getValue(), S_DC_TITLE_BOOST);
+    // todo Last title wins on sorting. In order to support multilingual fields
+    //   sorting has to be done on the dynamic title field but this requires
+    //   the user language to be available which right now is not supported by Matterhorn.
+    doc.setField(S_DC_TITLE_SORT, title.getValue());
   }
 
   public static List<DField<String>> getDcSubject(SolrDocument doc) {
