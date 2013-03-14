@@ -15,17 +15,17 @@
  */
 package org.opencastproject.episode.api;
 
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.nil;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.data.Option;
 
 import java.util.Date;
 import java.util.List;
+
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Collections.nil;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
 
 /**
  * Represents a query to find search results. Note that none of the methods takes null as argument.
@@ -55,7 +55,7 @@ public final class EpisodeQuery {
   private boolean includeDeleted = false;
 
   public enum Sort {
-    DATE_CREATED, TITLE, CREATOR, LANGUAGE, LICENSE, SUBJECT, MEDIA_PACKAGE_ID
+    DATE_CREATED, TITLE, SERIES_TITLE, CREATOR
   }
 
   private EpisodeQuery() {

@@ -192,7 +192,8 @@
          With various TokenFilterFactories to produce a sortable field
          that does not include some properties of the source text
       -->
-    <fieldType name="alphaOnlySort" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+    <fieldType name="alphaOnlySort" class="solr.TextField"
+               indexed="true" stored="true" multiValued="false" sortMissingLast="true" omitNorms="true">
       <analyzer>
         <!-- KeywordTokenizer does no actual tokenizing, so the entire
              input string is preserved as a single token
@@ -216,8 +217,7 @@
              http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/package-summary.html
           -->
         <filter class="solr.PatternReplaceFilterFactory"
-                pattern="([^a-z])" replacement="" replace="all"
-        />
+                pattern="([^a-z])" replacement="" replace="all" />
       </analyzer>
     </fieldType>
 
@@ -242,6 +242,7 @@
     <field name="dc_language" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_temporal" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_is_part_of" type="text" indexed="true" stored="true" omitNorms="true"/>
+    <field name="dc_is_part_of-sort" type="alphaOnlySort"/>
     <field name="dc_replaces" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_type" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_available_from" type="date" indexed="true" stored="true" omitNorms="true"/>
@@ -250,12 +251,14 @@
     <!-- localized fields -->
     <field name="dc_title-sum" type="text" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
     <dynamicField name="dc_title_*" type="text" indexed="true" stored="true" omitNorms="true"/>
+    <field name="dc_title-sort" type="alphaOnlySort"/>
 
     <field name="dc_subject-sum" type="text" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
     <dynamicField name="dc_subject_*" type="text" indexed="true" stored="true" omitNorms="true"/>
 
     <field name="dc_creator-sum" type="text" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
     <dynamicField name="dc_creator_*" type="text" indexed="true" stored="true" omitNorms="true"/>
+    <field name="dc_creator-sort" type="alphaOnlySort"/>
 
     <field name="dc_publisher-sum" type="text" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
     <dynamicField name="dc_publisher_*" type="text" indexed="true" stored="true" omitNorms="true"/>
