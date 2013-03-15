@@ -22,9 +22,7 @@ import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.mediapackage.Catalog;
-import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -45,7 +43,6 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.ZipUtil;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -57,7 +54,6 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -78,8 +74,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -88,8 +82,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Stack;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.management.ObjectInstance;
 
@@ -261,48 +256,53 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     // Start a job synchronously. We can't keep the open input stream waiting around.
     Job job = null;
 
-    // Keep track of the zip file we use to store the zip stream
-    File zipFile = null;
-    URI uri = null;
-    try {
+    if (workflowId != null)
+      logger.info("Ingesting zipped mediapackage for workflow {}", workflowId);
+    else
+      logger.info("Ingesting zipped mediapackage");
 
+    ZipInputStream zis = null;
+    Map<String, URI> elementUris = new HashMap<String, URI>();
+    try {
       // We don't need anybody to do the dispatching for us. Therefore we need to make sure that the job is never in
       // QUEUED state but set it to INSTANTIATED in the beginning and then manually switch it to RUNNING.
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_STREAM, null, null, false);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
 
-      // locally unpack the mediaPackage
-      // save inputStream to file
-      uri = workspace.putInCollection(COLLECTION_ID + job.getId(), job.getId() + ".zip", zipStream);
+      zis = new ZipInputStream(zipStream);
+      ZipEntry entry;
+      MediaPackage mp = null;
+      // While there are entries write them to a collection
+      while ((entry = zis.getNextEntry()) != null) {
+        try {
+          if (entry.isDirectory() || entry.getName().contains("__MACOSX"))
+            continue;
 
-      zipFile = workspace.get(uri);
-      logger.info("Ingesting zipped media package to {}", zipFile);
-
-      // unpack, cleanup will happen in the finally block
-      ZipUtil.unzip(zipFile, zipFile.getParentFile());
-
-      // check media package and write data to file repo
-      File manifest = getManifest(zipFile.getParentFile());
-      if (manifest == null) {
-        // try to find the manifest in a subdirectory, since the zip may
-        // have been constructed this way
-        File[] subDirs = zipFile.getParentFile().listFiles(new FileFilter() {
-          public boolean accept(File pathname) {
-            return pathname.isDirectory();
+          if (entry.getName().endsWith("manifest.xml") || entry.getName().endsWith("index.xml")) {
+            // Build the mediapackage
+            mp = loadMediaPackageFromManifest(new ZipEntryInputStream(zis));
+          } else {
+            logger.info("Storing zip entry {} in working file repository collection '{}'",
+                    job.getId() + entry.getName(), COLLECTION_ID);
+            URI contentUri = workspace.putInCollection(COLLECTION_ID,
+                    job.getId() + FilenameUtils.getName(entry.getName()), new ZipEntryInputStream(zis));
+            ingestStatistics.add(entry.getSize());
+            elementUris.put(FilenameUtils.getName(entry.getName()), contentUri);
+            logger.info("Zip entry {} stored at {}", job.getId() + entry.getName(), contentUri);
           }
-        });
-        for (File subdir : subDirs) {
-          manifest = getManifest(subdir);
-          if (manifest != null)
-            break;
+        } catch (Exception e) {
+          logger.warn("Unable to process zip entry {}: {}", entry.getName(), e.getMessage());
+          if (e instanceof MediaPackageException)
+            throw (MediaPackageException) e;
+          throw new MediaPackageException(e);
         }
-        if (manifest == null)
-          throw new MediaPackageException("no manifest found in this zip");
       }
 
-      // Build the mediapackage
-      MediaPackage mp = loadMediaPackageFromManifest(manifest);
+      if (mp == null)
+        throw new MediaPackageException("no manifest found in this zip");
+
+      logger.info("Ingesting media package is named '{}'", mp.getTitle());
 
       if (mp.getIdentifier() == null || StringUtils.isBlank(mp.getIdentifier().toString()))
         mp.setIdentifier(new UUIDIdBuilderImpl().createNew());
@@ -310,28 +310,30 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       if (mp.getTracks().length == 0)
         throw new IngestException("MediaPackage cannot be empty");
 
+      logger.info("Moving elements of zipped mediapackage into place");
       for (MediaPackageElement element : mp.elements()) {
         String elId = element.getIdentifier();
         if (elId == null) {
           elId = UUID.randomUUID().toString();
           element.setIdentifier(elId);
         }
-        String filename = element.getURI().toURL().getFile();
-        filename = filename.substring(filename.lastIndexOf("/"));
-        InputStream elementStream = null;
-        URI newUrl = null;
-        try {
-          elementStream = element.getURI().toURL().openStream();
-          newUrl = addContentToRepo(mp, elId, filename, elementStream);
-          elementStream.close();
-        } finally {
-          IOUtils.closeQuietly(elementStream);
-        }
+
+        String elementName = element.getURI().toString();
+        String filename = FilenameUtils.getName(elementName);
+
+        URI collectionUri = elementUris.get(elementName);
+        if (collectionUri == null)
+          throw new IngestException("MediaPackage element " + filename + " not found");
+
+        URI newUrl = workspace.moveTo(collectionUri, mp.getIdentifier().compact(), elId, filename);
         element.setURI(newUrl);
+        elementUris.remove(elementName);
+        logger.info("Ingested zipped media package element {} moved to {}", filename, newUrl);
 
         // if this is a series, update the series service
         // TODO: This should be triggered somehow instead of being handled here
         if (MediaPackageElements.SERIES.equals(element.getFlavor())) {
+          logger.info("Ingested mediapackage has updated series information");
           updateSeries(element.getURI());
         }
       }
@@ -339,10 +341,16 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       // Done, update the job status and return the created workflow instance
       WorkflowInstance workflowInstance = null;
       if (wd == null) {
+        logger.info("Starting a new workflow with ingested mediapackage based on workflow definition '{}'", wd);
         workflowInstance = ingest(mp);
-      } else {
+      } else if (workflowId != null) {
+        logger.info("Resuming workflow {} with ingested mediapackage", workflowId);
         workflowInstance = ingest(mp, wd, workflowConfig, workflowId);
+      } else {
+        throw new IllegalStateException("Ingested mediapackage needs one of workflow instance, workflow definition");
       }
+
+      logger.info("Ingest of mediapackage {} done", mp.getIdentifier());
       job.setStatus(Job.Status.FINISHED);
       return workflowInstance;
 
@@ -355,16 +363,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Job.Status.FAILED);
       throw e;
     } finally {
-      if (uri != null)
+      IOUtils.closeQuietly(zis);
+      for (URI elementUri : elementUris.values()) {
         try {
-          workspace.delete(uri);
-        } catch (NotFoundException nfe) {
-          logger.error("Error removing missing temporary ingest file " + COLLECTION_ID + "/" + uri, nfe);
-        } catch (IOException ioe) {
-          logger.error("Error removing temporary ingest file " + uri, ioe);
+          workspace.delete(elementUri);
+        } catch (NotFoundException e) {
+          // File was already moved to MP so deletion is not needed
+          logger.debug("Ingest Cleanup: Temporary File {} was already moved to MP, nothing to delete", elementUri);
         }
-      if (zipFile != null)
-        FileUtils.deleteQuietly(zipFile.getParentFile());
+      }
       try {
         serviceRegistry.updateJob(job);
       } catch (Exception e) {
@@ -373,62 +380,48 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
   }
 
-  public MediaPackage loadMediaPackageFromManifest(File manifest) throws IOException, MediaPackageException,
+  private MediaPackage loadMediaPackageFromManifest(InputStream manifest) throws IOException, MediaPackageException,
           IngestException {
-
-    MediaPackage mp = null;
-    MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
-    builder.setSerializer(new DefaultMediaPackageSerializerImpl(manifest.getParentFile()));
-    InputStream manifestStream = null;
-
+    // TODO: Uncomment the following line and remove the patch when the compatibility with pre-1.4 MediaPackages is
+    // discarded
+    //
+    // mp = builder.loadFromXml(manifestStream);
+    //
+    // =========================================================================================
+    // =================================== PATCH BEGIN =========================================
+    // =========================================================================================
+    ByteArrayOutputStream baos = null;
+    ByteArrayInputStream bais = null;
     try {
-      manifestStream = manifest.toURI().toURL().openStream();
+      Document domMP = new SAXBuilder().build(manifest);
+      String mpNSUri = "http://mediapackage.opencastproject.org";
 
-      // TODO: Uncomment the following line and remove the patch when the compatibility with pre-1.4 MediaPackages is
-      // discarded
-      //
-      // mp = builder.loadFromXml(manifestStream);
-      //
-      // =========================================================================================
-      // =================================== PATCH BEGIN =========================================
-      // =========================================================================================
-      ByteArrayOutputStream baos = null;
-      ByteArrayInputStream bais = null;
-      try {
-        Document domMP = new SAXBuilder().build(manifestStream);
-        String mpNSUri = "http://mediapackage.opencastproject.org";
+      Namespace oldNS = domMP.getRootElement().getNamespace();
+      Namespace newNS = Namespace.getNamespace(oldNS.getPrefix(), mpNSUri);
 
-        Namespace oldNS = domMP.getRootElement().getNamespace();
-        Namespace newNS = Namespace.getNamespace(oldNS.getPrefix(), mpNSUri);
-
-        if (!newNS.equals(oldNS)) {
-          @SuppressWarnings("rawtypes")
-          Iterator it = domMP.getDescendants(new ElementFilter(oldNS));
-          while (it.hasNext()) {
-            Element elem = (Element) it.next();
-            elem.setNamespace(newNS);
-          }
+      if (!newNS.equals(oldNS)) {
+        @SuppressWarnings("rawtypes")
+        Iterator it = domMP.getDescendants(new ElementFilter(oldNS));
+        while (it.hasNext()) {
+          Element elem = (Element) it.next();
+          elem.setNamespace(newNS);
         }
-
-        baos = new ByteArrayOutputStream();
-        new XMLOutputter().output(domMP, baos);
-        bais = new ByteArrayInputStream(baos.toByteArray());
-        mp = builder.loadFromXml(bais);
-      } catch (JDOMException e) {
-        throw new IngestException("Error unmarshalling mediapackage", e);
-      } finally {
-        IOUtils.closeQuietly(bais);
-        IOUtils.closeQuietly(baos);
       }
-      // =========================================================================================
-      // =================================== PATCH END ===========================================
-      // =========================================================================================
 
+      baos = new ByteArrayOutputStream();
+      new XMLOutputter().output(domMP, baos);
+      bais = new ByteArrayInputStream(baos.toByteArray());
+      return MediaPackageParser.getFromXml(IOUtils.toString(bais, "UTF-8"));
+    } catch (JDOMException e) {
+      throw new IngestException("Error unmarshalling mediapackage", e);
     } finally {
-      IOUtils.closeQuietly(manifestStream);
+      IOUtils.closeQuietly(bais);
+      IOUtils.closeQuietly(baos);
+      IOUtils.closeQuietly(manifest);
     }
-
-    return mp;
+    // =========================================================================================
+    // =================================== PATCH END ===========================================
+    // =========================================================================================
   }
 
   /**
@@ -1006,45 +999,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     mpe.setIdentifier(elementId);
     return mp;
   }
-
-  /**
-   * Returns the manifest from a media package directory or <code>null</code> if no manifest was found. Manifests are
-   * expected to be named <code>index.xml</code> or <code>manifest.xml</code>.
-   * 
-   * @param mediapackageDir
-   *          the potential mediapackage directory
-   * @return the manifest file
-   */
-  private File getManifest(File mediapackageDir) {
-    Stack<File> stack = new Stack<File>();
-    stack.push(mediapackageDir);
-    for (File f : mediapackageDir.listFiles()) {
-      if (f.isDirectory())
-        stack.push(f);
-    }
-    while (!stack.empty()) {
-      File dir = stack.pop();
-      File[] files = dir.listFiles(new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-          return pathname.getName().endsWith(".xml");
-        }
-      });
-      for (File f : files) {
-        if ("index.xml".equals(f.getName()) || "manifest.xml".equals(f.getName()))
-          return f;
-      }
-    }
-    return null;
-  }
-
-  // private File createDirectory(String dir) throws IOException {
-  // File f = new File(dir);
-  // if (!f.exists()) {
-  // FileUtils.forceMkdir(f);
-  // }
-  // return f;
-  // }
 
   // ---------------------------------------------
   // --------- bind and unbind bundles ---------
