@@ -446,7 +446,7 @@ public final class Schema {
     doc.setField(DC_TITLE_SORT, title.getValue());
   }
 
-  public static List<DField<String>> getSeriesDcTitle(SolrDocument doc) {
+  public static List<DField<String>> getDcSeriesTitle(SolrDocument doc) {
     return getDynamicStringValues(doc, S_DC_TITLE_PREFIX);
   }
 

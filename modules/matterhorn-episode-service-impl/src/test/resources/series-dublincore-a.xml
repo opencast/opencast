@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance/"
+  xsi:schemaLocation="http://www.opencastproject.org http://www.opencastproject.org/schema.xsd"
+  xmlns:dcterms="http://purl.org/dc/terms/">
+
+  <dcterms:title xml:lang="en">
+    French literature
+  </dcterms:title>
+  <dcterms:identifier>
+    series-a
+  </dcterms:identifier>
+</dublincore>

@@ -348,6 +348,7 @@
   <copyField source="dc_contributor_*" dest="dc_contributor-sum"/>
 
   <copyField source="s_dc_title_*" dest="s_dc_title-sum"/>
+  <copyField source="s_dc_title_*" dest="fulltext"/>
 
   <copyField source="oc_keywords" dest="fulltext"/>
   <copyField source="oc_text_*" dest="fulltext"/>

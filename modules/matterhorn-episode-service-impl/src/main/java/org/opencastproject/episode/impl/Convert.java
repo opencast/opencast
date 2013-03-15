@@ -46,8 +46,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.opencastproject.util.ReflectionUtil.xfer;
-import static org.opencastproject.util.data.Collections.filter;
-import static org.opencastproject.util.data.Collections.head;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.functions.Misc.chuck;
@@ -94,6 +92,11 @@ public final class Convert {
 
           @Override public String getDcTitle() {
             conv.setDcTitle(item.getDcTitle());
+            return null;
+          }
+
+          @Override public String getDcSeriesTitle() {
+            conv.setDcSeriesTitle(item.getDcSeriesTitle());
             return null;
           }
 
@@ -279,24 +282,25 @@ public final class Convert {
             return -1;
           }
 
+          private String getLanguageUndefinedOrFirst(final List<DField<String>> fields) {
+            return mlist(fields)
+                    .find(isLanguageUndefined)
+                    .map(getValue)
+                    .getOrElse(new Function0<String>() {
+                      @Override public String apply() {
+                        // ... since none is present return the first arbitrary title
+                        return Schema.getFirst(fields, dfltString);
+                      }
+                    });
+          }
+
           @Override public String getDcTitle() {
-            final List<DField<String>> titles = Schema.getDcTitle(doc);
-            // try to return the first title without any language information first...
-            final String title = head(filter(titles, new Predicate<DField<String>>() {
-              @Override public Boolean apply(DField<String> f) {
-                return f.getSuffix().equals(Schema.LANGUAGE_UNDEFINED);
-              }
-            })).map(new Function<DField<String>, String>() {
-              @Override public String apply(DField<String> f) {
-                return f.getValue();
-              }
-            }).getOrElse(new Function0<String>() {
-              @Override public String apply() {
-                // ... since none is present return the first arbitrary title
-                return Schema.getFirst(titles, dfltString);
-              }
-            });
-            conv.setDcTitle(title);
+            conv.setDcTitle(getLanguageUndefinedOrFirst(Schema.getDcTitle(doc)));
+            return null;
+          }
+
+          @Override public String getDcSeriesTitle() {
+            conv.setDcSeriesTitle(getLanguageUndefinedOrFirst(Schema.getDcSeriesTitle(doc)));
             return null;
           }
 
@@ -612,4 +616,16 @@ public final class Convert {
     else
       return "";
   }
+
+  private static Function<DField<String>, Boolean> isLanguageUndefined = new Predicate<DField<String>>() {
+    @Override public Boolean apply(DField<String> f) {
+      return f.getSuffix().equals(Schema.LANGUAGE_UNDEFINED);
+    }
+  };
+
+  private static Function<DField<String>, String> getValue = new Function<DField<String>, String>() {
+    @Override public String apply(DField<String> f) {
+      return f.getValue();
+    }
+  };
 }

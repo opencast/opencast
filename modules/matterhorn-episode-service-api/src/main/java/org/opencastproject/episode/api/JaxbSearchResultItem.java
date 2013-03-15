@@ -67,6 +67,10 @@ public class JaxbSearchResultItem implements SearchResultItem {
   @XmlElement
   private String dcTitle = null;
 
+  /** Dublin core field 'dc:title' */
+  @XmlElement
+  private String dcSeriesTitle = null;
+
   /** Dublin core field 'dc:subject' */
   @XmlElement
   private String dcSubject = null;
@@ -223,6 +227,19 @@ public class JaxbSearchResultItem implements SearchResultItem {
    */
   public void setDcTitle(String dcTitle) {
     this.dcTitle = dcTitle;
+  }
+
+  @Override
+  public String getDcSeriesTitle() {
+    return dcSeriesTitle;
+  }
+
+  /**
+   * @param dcTitle
+   *         the dcTitle to set
+   */
+  public void setDcSeriesTitle(String dcTitle) {
+    this.dcSeriesTitle = dcTitle;
   }
 
   @Override
