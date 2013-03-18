@@ -51,6 +51,9 @@ FELIX_FILEINSTALL_OPTS="-Dfelix.fileinstall.dir=$FELIX_CONFIG_DIR/load"
 
 FELIX_OPTS="$FELIX $FELIX_WORK $FELIX_CONFIG_OPTS $FELIX_FILEINSTALL_OPTS"
 
+# -1 for no limit
+JETTY_OPTS="-Dorg.mortbay.jetty.Request.maxFormContentSize=1000000"
+
 JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
 
 PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX_CONFIG_DIR"
@@ -90,4 +93,4 @@ fi
 
 # Finally start felix
 cd "$FELIX_HOME"
-java $DEBUG_OPTS $FELIX_OPTS $GRAPHICS_OPTS $MAVEN_ARG $JAVA_OPTS $PAX_CONFMAN_OPTS $LOG_OPTS $JMX_OPTS -jar "$FELIX_HOME/bin/felix.jar" "$FELIX_CACHE"
+java $DEBUG_OPTS $FELIX_OPTS $GRAPHICS_OPTS $MAVEN_ARG $JAVA_OPTS $PAX_CONFMAN_OPTS $LOG_OPTS $JMX_OPTS $JETTY_OPTS -jar "$FELIX_HOME/bin/felix.jar" "$FELIX_CACHE"
