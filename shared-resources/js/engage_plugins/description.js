@@ -97,8 +97,8 @@ Opencast.Description = (function ()
 			    // format date if date is available
 			    if (data['search-results'].result.dcCreated != defaultChar)
 			    {
-				var sd = $.dateStringToDate(data['search-results'].result.dcCreated);
-				data['search-results'].result.dcCreated = $.getDateString(sd) + ' - ' + $.getTimeString(sd);
+				var sd = Opencast.Date_Helper.dateStringToDate(data['search-results'].result.dcCreated);
+				data['search-results'].result.dcCreated = Opencast.Date_Helper.getDateString(sd) + ' - ' + Opencast.Date_Helper.getTimeString(sd);
 			    }
 			    // Request JSONP data (Stats)
 			    $.ajax(
