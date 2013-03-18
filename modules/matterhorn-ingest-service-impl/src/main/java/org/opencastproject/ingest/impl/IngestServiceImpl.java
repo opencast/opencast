@@ -339,17 +339,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
 
       // Done, update the job status and return the created workflow instance
-      WorkflowInstance workflowInstance = null;
-      if (wd == null) {
-        logger.info("Starting a new workflow with ingested mediapackage based on workflow definition '{}'", wd);
-        workflowInstance = ingest(mp);
-      } else if (workflowId != null) {
+      if (workflowId != null) {
         logger.info("Resuming workflow {} with ingested mediapackage", workflowId);
-        workflowInstance = ingest(mp, wd, workflowConfig, workflowId);
+      } else if (wd == null) {
+        logger.info("Starting a new workflow with ingested mediapackage based on the default workflow definition '{}'",
+                defaultWorkflowDefinionId);
       } else {
-        throw new IllegalStateException("Ingested mediapackage needs one of workflow instance, workflow definition");
+        logger.info("Starting a new workflow with ingested mediapackage based on workflow definition '{}'", wd);
       }
-
+      WorkflowInstance workflowInstance = ingest(mp, wd, workflowConfig, workflowId);
       logger.info("Ingest of mediapackage {} done", mp.getIdentifier());
       job.setStatus(Job.Status.FINISHED);
       return workflowInstance;

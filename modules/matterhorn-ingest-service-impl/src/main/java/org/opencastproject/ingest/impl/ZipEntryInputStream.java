@@ -37,7 +37,8 @@ public class ZipEntryInputStream extends FilterInputStream {
 
   @Override
   public void close() throws IOException {
-    // make sure ...
+    // This stream mustn't be closed because it handles the Zip entry parts of the given Zip input stream
+    // make sure the given zip input stream is closed after reading
   }
 
 }

@@ -550,6 +550,8 @@ public class IngestRestService {
           if (item.isFormField()) {
             if (WORKFLOW_INSTANCE_ID_PARAM.equals(item.getFieldName())) {
               String workflowIdAsString = IOUtils.toString(item.openStream(), "UTF-8");
+              if (StringUtils.isBlank(workflowIdAsString))
+                continue;
               try {
                 workflowInstanceIdAsLong = Long.parseLong(workflowIdAsString);
               } catch (NumberFormatException e) {
