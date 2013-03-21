@@ -15,6 +15,7 @@
  */
 package org.opencastproject.ingest.impl;
 
+import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.ingest.impl.jmx.IngestStatistics;
@@ -34,6 +35,8 @@ import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.scheduler.api.SchedulerException;
+import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
@@ -50,7 +53,6 @@ import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -82,6 +84,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -151,6 +154,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectoryService = null;
+
+  /** The scheduler service */
+  private SchedulerService schedulerService = null;
 
   /** The default workflow identifier, if one is configured */
   protected String defaultWorkflowDefinionId;
@@ -761,96 +767,57 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   public WorkflowInstance ingest(MediaPackage mp, String workflowDefinitionID, Map<String, String> properties,
           Long workflowId) throws IngestException, NotFoundException, UnauthorizedException {
-    // If the workflow definition and instance ID are null, use the default, or throw if there is none
-    if (StringUtils.isBlank(workflowDefinitionID) && workflowId == null) {
-      if (this.defaultWorkflowDefinionId == null) {
-        ingestStatistics.failed();
-        throw new IllegalStateException(
-                "Can not ingest a workflow without a workflow definition or an existing instance. No default definition is specified");
-      } else {
-        workflowDefinitionID = this.defaultWorkflowDefinionId;
-      }
-    }
+    try {
+      WorkflowDefinition workflowDef = getWorkflowDefinition(workflowDefinitionID, workflowId);
 
-    // Look for the workflow instance (if provided)
-    WorkflowInstance workflow = null;
-    if (workflowId != null) {
-      try {
-        workflow = workflowService.getWorkflowById(workflowId.longValue());
-      } catch (NotFoundException e) {
-        logger.warn("Failed to find a workflow with id '{}'", workflowId);
-      } catch (WorkflowDatabaseException e) {
-        ingestStatistics.failed();
-        throw new IngestException(e);
+      // Look for the workflow instance (if provided)
+      WorkflowInstance workflow = null;
+      if (workflowId != null) {
+        try {
+          workflow = workflowService.getWorkflowById(workflowId.longValue());
+        } catch (NotFoundException e) {
+          logger.warn("Failed to find a workflow with id '{}'", workflowId);
+        }
       }
-    }
 
-    // Make sure the workflow is in an acceptable state to be continued. If not, start over, but use the workflow
-    // definition and recording properties from the original workflow, unless provded by the ingesting parties
-    boolean startOver = false;
-    if (workflow != null) {
-      switch (workflow.getState()) {
-        case FAILED:
-        case FAILING:
-        case STOPPED:
-          logger.info("The workflow with id '{}' is failed, starting a new workflow for this recording",
-                  workflow.getId());
-          startOver = true;
-          break;
-        case SUCCEEDED:
-          logger.info("The workflow with id '{}' already succeeded, starting a new workflow for this recording",
-                  workflow.getId());
-          startOver = true;
-          break;
-        case RUNNING:
-          logger.info("The workflow with id '{}' is already running, starting a new workflow for this recording",
-                  workflow.getId());
-          startOver = true;
-          break;
-        case INSTANTIATED:
-        case PAUSED:
-        default:
-          break;
+      properties = mergeWorkflowConfiguration(properties, workflowId);
+
+      if (workflow == null) {
+        ingestStatistics.successful();
+        return workflowService.start(workflowDef, mp, properties);
       }
+
+      // Make sure the workflow is in an acceptable state to be continued. If not, start over, but use the workflow
+      // definition and recording properties from the original workflow, unless provided by the ingesting parties
+      boolean startOver = verifyWorkflowState(workflow);
+
+      WorkflowInstance workflowInstance;
 
       // Is it ok to go with the given workflow or do we need to start over?
       if (startOver) {
-        WorkflowDefinition workflowDef;
+        InputStream in = null;
         try {
-          workflowDef = workflowService.getWorkflowDefinitionById(workflow.getTemplate());
-          if (workflowDef == null)
-            throw new IngestException("Workflow definition '" + workflow.getTemplate() + "' does not exist anymore");
-
-          // Did the ingesting party provide the workflow configuration?
-          if (properties == null || properties.size() == 0) {
-            logger.debug("Restoring workflow properties from workflow {}", workflow.getId());
-            properties = new HashMap<String, String>();
-            for (String key : workflow.getConfigurationKeys()) {
-              properties.put(key, workflow.getConfiguration(key));
-            }
+          // Get episode dublincore from scheduler event if not provided by the ingesting party
+          Catalog[] catalogs = mp.getCatalogs(MediaPackageElements.EPISODE);
+          if (catalogs.length == 0 && schedulerService != null) {
+            logger.info("Try adding episode dublincore from capure event '{}' to ingesting mediapackage", workflowId);
+            DublinCoreCatalog dc = schedulerService.getEventDublinCore(workflowId);
+            in = IOUtils.toInputStream(dc.toXmlString(), "UTF-8");
+            mp = addCatalog(in, "dublincore.xml", MediaPackageElements.EPISODE, mp);
           }
-
-          // TODO: get metadata from old workflow (series and episode dc) if not provided by the ingesting party
-
-          ingestStatistics.successful();
-          return workflowService.start(workflowDef, mp, properties);
-        } catch (WorkflowDatabaseException e) {
-          throw new IngestException("Unable to start a new workflow", e);
-        } catch (WorkflowParsingException e) {
-          throw new IngestException("Unable to start a new workflow", e);
+        } catch (NotFoundException e) {
+          logger.info("No capture event found for id {}", workflowId);
+        } catch (SchedulerException e) {
+          logger.warn("Unable to get event dublin core from scheduler event {}: {}", workflowId, e.getMessage());
+        } catch (IOException e) {
+          throw new IngestException(e);
+        } finally {
+          IOUtils.closeQuietly(in);
         }
-      }
-    }
 
-    try {
-      if (workflow == null) {
-        WorkflowDefinition workflowDef = workflowService.getWorkflowDefinitionById(workflowDefinitionID);
-        ingestStatistics.successful();
-        return workflowService.start(workflowDef, mp, properties);
+        workflowInstance = workflowService.start(workflowDef, mp, properties);
       } else {
         // Ensure that we're in one of the pre-processing operations
-        WorkflowDefinition workflowDef = workflowService.getWorkflowDefinitionById(workflowDefinitionID);
-
         // The pre-processing workflow contains three operations: schedule, capture, and ingest. If we are not in the
         // last operation of the preprocessing workflow (due to the capture agent not reporting on its recording
         // status), we need to advance the workflow.
@@ -916,25 +883,103 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         // Update
         workflowService.update(workflow);
 
-        // Merge the properties
-        Map<String, String> mergedProperties = new HashMap<String, String>();
-        for (String property : workflow.getConfigurationKeys()) {
-          mergedProperties.put(property, workflow.getConfiguration(property));
-        }
-        mergedProperties.putAll(properties);
-
         // resume the workflow
-        workflowService.resume(workflowId.longValue(), mergedProperties);
-
-        ingestStatistics.successful();
-
-        // Return the updated workflow instance
-        return workflowService.getWorkflowById(workflowId.longValue());
+        workflowInstance = workflowService.resume(workflowId.longValue(), properties);
       }
+
+      ingestStatistics.successful();
+
+      // Return the updated workflow instance
+      return workflowInstance;
     } catch (WorkflowException e) {
       ingestStatistics.failed();
       throw new IngestException(e);
     }
+  }
+
+  private Map<String, String> mergeWorkflowConfiguration(Map<String, String> properties, Long workflowId) {
+    if (workflowId == null || schedulerService == null)
+      return properties;
+
+    HashMap<String, String> mergedProperties = new HashMap<String, String>();
+
+    try {
+      Properties recordingProperties = schedulerService.getEventCaptureAgentConfiguration(workflowId);
+      logger.debug("Restoring workflow properties from scheduler event {}", workflowId);
+      mergedProperties.putAll((Map) recordingProperties);
+    } catch (SchedulerException e) {
+      logger.warn("Unable to get workflow properties from scheduler event {}: {}", workflowId, e.getMessage());
+    } catch (NotFoundException e) {
+      logger.info("No capture event found for id {}", workflowId);
+    }
+
+    if (properties != null) {
+      // Merge the properties, this must be after adding the recording properties
+      logger.debug("Merge workflow properties with the one from the scheduler event {}", workflowId);
+      mergedProperties.putAll(properties);
+    }
+
+    return mergedProperties;
+  }
+
+  private WorkflowDefinition getWorkflowDefinition(String workflowDefinitionID, Long workflowId)
+          throws NotFoundException, WorkflowDatabaseException, IngestException {
+    // If the workflow definition and instance ID are null, use the default, or throw if there is none
+    if (StringUtils.isBlank(workflowDefinitionID) && workflowId != null && schedulerService != null) {
+      logger.info("Try to get the ingest workflow definition id from capture event {}", workflowId);
+      try {
+        Properties recordingProperties = schedulerService.getEventCaptureAgentConfiguration(workflowId);
+        workflowDefinitionID = (String) recordingProperties.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION);
+        if (workflowDefinitionID == null)
+          throw new IngestException("No value found for key '" + CaptureParameters.INGEST_WORKFLOW_DEFINITION
+                  + "' from capture event configuration of scheduler event '" + workflowId + "'");
+      } catch (NotFoundException e) {
+        logger.info("No capture event found for id {}", workflowId);
+      } catch (SchedulerException e) {
+        logger.warn("Unable to get the workflow definition id from scheduler event {}: {}", workflowId, e.getMessage());
+      }
+    }
+
+    if (StringUtils.isBlank(workflowDefinitionID) && defaultWorkflowDefinionId != null) {
+      logger.info("Use default workflow definition '{}' for ingest", defaultWorkflowDefinionId);
+      workflowDefinitionID = defaultWorkflowDefinionId;
+    } else if (StringUtils.isBlank(workflowDefinitionID) && defaultWorkflowDefinionId == null) {
+      ingestStatistics.failed();
+      throw new IllegalStateException(
+              "Can not ingest a workflow without a workflow definition or an existing instance. No default definition is specified");
+    }
+
+    WorkflowDefinition workflowDef = workflowService.getWorkflowDefinitionById(workflowDefinitionID);
+    if (workflowDef == null)
+      throw new IngestException("Workflow definition '" + workflowDefinitionID + "' does not exist anymore");
+    return workflowDef;
+  }
+
+  private boolean verifyWorkflowState(WorkflowInstance workflow) {
+    if (workflow != null) {
+      switch (workflow.getState()) {
+        case FAILED:
+        case FAILING:
+        case STOPPED:
+          logger.info("The workflow with id '{}' is failed, starting a new workflow for this recording",
+                  workflow.getId());
+          return true;
+        case SUCCEEDED:
+          logger.info("The workflow with id '{}' already succeeded, starting a new workflow for this recording",
+                  workflow.getId());
+          return true;
+        case RUNNING:
+          logger.info("The workflow with id '{}' is already running, starting a new workflow for this recording",
+                  workflow.getId());
+          return true;
+        case INSTANTIATED:
+        case PAUSED:
+          // This is the expected state
+        default:
+          break;
+      }
+    }
+    return false;
   }
 
   /**
@@ -1055,6 +1100,16 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
+  }
+
+  /**
+   * Callback for setting the scheduler service.
+   * 
+   * @param schedulerService
+   *          the scheduler service to set
+   */
+  public void setSchedulerService(SchedulerService schedulerService) {
+    this.schedulerService = schedulerService;
   }
 
   /**
