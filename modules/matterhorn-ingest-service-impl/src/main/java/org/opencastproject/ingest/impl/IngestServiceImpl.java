@@ -321,7 +321,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         String elementName = element.getURI().toString();
         String filename = FilenameUtils.getName(elementName);
 
-        URI collectionUri = elementUris.get(elementName);
+        URI collectionUri = elementUris.get(filename);
         if (collectionUri == null)
           throw new IngestException("MediaPackage element " + filename + " not found");
 
