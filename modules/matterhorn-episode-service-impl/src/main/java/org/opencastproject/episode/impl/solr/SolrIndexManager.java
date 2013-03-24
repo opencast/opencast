@@ -22,8 +22,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.params.SolrParams;
-import org.apache.solr.servlet.SolrRequestParsers;
 import org.opencastproject.episode.api.SearchResultItem.SearchResultItemType;
 import org.opencastproject.episode.api.Version;
 import org.opencastproject.episode.impl.persistence.EpisodeServiceDatabaseException;
@@ -63,11 +61,8 @@ import org.opencastproject.metadata.mpeg7.VideoText;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.data.Cell;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
@@ -93,7 +88,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static org.opencastproject.util.data.Collections.flatMap;
-import static org.opencastproject.util.data.Collections.head;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Collections.nil;
@@ -156,8 +150,6 @@ public class SolrIndexManager {
       @Override public List<StaticMetadataService> apply(List<StaticMetadataService> metadataSvcs) {
         return mlist(metadataSvcs).sort(priorityComparator).value();
       }
-
-      ;
     });
   }
 
@@ -356,11 +348,6 @@ public class SolrIndexManager {
     try {
       final SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl, version);
       Schema.setOcTimestamp(episodeDocument, now);
-
-      for (SolrInputDocument seriesDocument : createSeriesInputDocument(sourceMediaPackage.getSeries(), acl)) {
-        Schema.enrichFullText(episodeDocument, seriesDocument);
-        solrServer.add(seriesDocument);
-      }
       Schema.setOcLatestVersion(episodeDocument, true);
       resetFormerLatestVersion(sourceMediaPackage, new Version(version.value() - 1L));
       // Post everything to the search index
@@ -410,10 +397,6 @@ public class SolrIndexManager {
       Schema.setOcLatestVersion(episodeDocument, isLatestVersion);
       for (Date a : deletionDate) {
         Schema.setOcDeleted(episodeDocument, a);
-      }
-      for (SolrInputDocument seriesDocument : createSeriesInputDocument(sourceMediaPackage.getSeries(), acl)) {
-        Schema.enrichFullText(episodeDocument, seriesDocument);
-        solrServer.add(seriesDocument);
       }
       solrServer.add(episodeDocument);
       solrServer.commit();
@@ -467,41 +450,50 @@ public class SolrIndexManager {
       Schema.setOcCover(doc, cover[0].getURI().toString());
     }
 
-    // /
-    // Add standard dublin core fields
-    // naive approach. works as long as only setters, not adders are available in the schema
+    // episode fields
     for (StaticMetadata md : getMetadata(metadataSvcs.get(), mediaPackage)) {
       addEpisodeMetadata(doc, md);
     }
-    // /
-    // Add mpeg7
+    // series fields
+    for (DublinCoreCatalog dc : getSeriesDc(mediaPackage)) {
+      for (DField<String> a : fromDCValue(dc.get(DublinCore.PROPERTY_TITLE))) {
+        Schema.setSeriesDcTitle(doc, a);
+      }
+    }
+    // mpeg7 fields
     logger.debug("Looking for mpeg-7 catalogs containing segment texts");
     // TODO: merge the segments from each mpeg7 if there is more than one mpeg7 catalog
-    mlist(mediaPackage.getCatalogs(MediaPackageElements.TEXTS)).head()
-        .orElse(new Function0<Option<Catalog>>() {
-          @Override public Option<Catalog> apply() {
-            logger.debug("No text catalogs found, trying segments only");
-            return mlist(mediaPackage.getCatalogs(MediaPackageElements.SEGMENTS)).head();
-          }
-        })
-        .fold(new Option.Match<Catalog, Void>() {
-          @Override public Void some(final Catalog mpeg7) {
-            try {
-              // load catalog and add it to the solr input document
-              addMpeg7Metadata(doc, mediaPackage, loadMpeg7Catalog(mpeg7));
-            } catch (IOException e) {
-              return chuck(e);
-            }
-            return null;
-          }
+    mlist(mediaPackage.getCatalogs(MediaPackageElements.TEXTS))
+            .head()
+            .orElse(new Function0<Option<Catalog>>() {
+              @Override public Option<Catalog> apply() {
+                logger.debug("No text catalogs found, trying segments only");
+                return mlist(mediaPackage.getCatalogs(MediaPackageElements.SEGMENTS)).head();
+              }
+            })
+            .fold(new Option.EMatch<Catalog>() {
+              @Override public void esome(final Catalog mpeg7) {
+                // load catalog and add it to the solr input document
+                addMpeg7Metadata(doc, mediaPackage, loadMpeg7Catalog(mpeg7));
+              }
 
-          @Override public Void none() {
-            logger.debug("No segmentation catalog found");
-            return null;
-          }
-        });
+              @Override public void enone() {
+                logger.debug("No segmentation catalog found");
+              }
+            });
 
     return doc;
+  }
+
+  private Option<DublinCoreCatalog> getSeriesDc(MediaPackage mp) {
+    for (String id : option(mp.getSeries())) {
+      try {
+        return some(seriesSvc.getSeries(id));
+      } catch (Exception e) {
+        logger.debug("No series dublincore found for series id " + id, e);
+      }
+    }
+    return none();
   }
 
   static void addEpisodeMetadata(final SolrInputDocument doc, final StaticMetadata md) {
@@ -651,6 +643,10 @@ public class SolrIndexManager {
         return fromMValue(md.getLicenses());
       }
 
+      @Override public List<DField<String>> getSeriesDcTitle() {
+        return nil(); // set elsewhere
+      }
+
       @Override
       public Option<String> getOcMediatype() {
         return Option.none(); // set elsewhere
@@ -710,7 +706,7 @@ public class SolrIndexManager {
       public Option<Version> getOcVersion() {
         return Option.none(); // set elsewhere
       }
-      
+
       @Override
       public Option<Boolean> getOcLatestVersion() {
         return Option.none(); // set elsewhere
@@ -745,174 +741,19 @@ public class SolrIndexManager {
     return b.substring(0, b.length() - sep.length());
   }
 
-  private Mpeg7Catalog loadMpeg7Catalog(Catalog cat) throws IOException {
+  private Mpeg7Catalog loadMpeg7Catalog(Catalog cat) {
     InputStream in = null;
     try {
       File f = workspace.get(cat.getURI());
       in = new FileInputStream(f);
       return mpeg7CatalogSvc.load(in);
     } catch (NotFoundException e) {
-      throw new IOException("Unable to load metadata from mpeg7 catalog " + cat);
+      return chuck(new IOException("Unable to load metadata from mpeg7 catalog " + cat));
+    } catch (IOException e) {
+      return chuck(e);
     } finally {
       IOUtils.closeQuietly(in);
     }
-  }
-
-  /**
-   * Creates a solr input document for the series metadata of the media package.
-   *
-   * @param seriesId
-   *         the id of the series
-   * @param acl
-   *         the access control list for this mediapackage
-   * @return an input document ready to be posted to solr or null
-   */
-  private Option<SolrInputDocument> createSeriesInputDocument(String seriesId, AccessControlList acl) throws IOException,
-          UnauthorizedException {
-
-    if (seriesId == null)
-      return none();
-    DublinCoreCatalog dc;
-    try {
-      dc = seriesSvc.getSeries(seriesId);
-    } catch (SeriesException e) {
-      logger.debug("No series dublincore found for series id " + seriesId);
-      return null;
-    } catch (NotFoundException e) {
-      logger.debug("No series dublincore found for series id " + seriesId);
-      return null;
-    }
-
-    SolrInputDocument doc = new SolrInputDocument();
-
-    // Populate document with existing data
-    try {
-      StringBuffer query = new StringBuffer("q=");
-      query = query.append(Schema.ID).append(":").append(SolrUtils.clean(seriesId));
-      SolrParams params = SolrRequestParsers.parseQueryString(query.toString());
-      QueryResponse solrResponse = solrServer.query(params);
-      if (solrResponse.getResults().size() > 0) {
-        SolrDocument existingSolrDocument = solrResponse.getResults().get(0);
-        for (String fieldName : existingSolrDocument.getFieldNames()) {
-          doc.addField(fieldName, existingSolrDocument.getFieldValue(fieldName));
-        }
-      }
-    } catch (Exception e) {
-      logger.error("Error trying to load series " + seriesId, e);
-    }
-
-    // Fill document
-    Schema.setId(doc, seriesId);
-
-    // OC specific fields
-    Schema.setOrganization(doc, securitySvc.getOrganization().getId());
-    Schema.setOcMediatype(doc, SearchResultItemType.Series.toString());
-
-    // DC fields
-    addSeriesMetadata(doc, dc);
-
-    return some(doc);
-  }
-
-  /**
-   * Add the standard dublin core fields to a series document.
-   *
-   * @param doc
-   *         the solr document to fill
-   * @param dc
-   *         the dublin core catalog to get the data from
-   */
-  static void addSeriesMetadata(final SolrInputDocument doc, final DublinCoreCatalog dc) throws IOException {
-    Schema.fill(doc, new Schema.FieldCollector() {
-      @Override public Option<String> getId() { return Option.none(); }
-      @Override public Option<String> getOrganization() { return Option.none(); }
-      @Override public Option<String> getDcId() { return Option.some(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER)); }
-      @Override public Option<Date> getDcCreated() { return head(dc.get(DublinCore.PROPERTY_CREATED)).flatMap(toDateF); }
-      @Override public Option<Long> getDcExtent() { return head(dc.get(DublinCore.PROPERTY_EXTENT)).flatMap(toDurationF); }
-      @Override public Option<String> getDcLanguage() { return option(dc.getFirst(DublinCore.PROPERTY_LANGUAGE)); }
-      @Override public Option<String> getDcIsPartOf() { return option(dc.getFirst(DublinCore.PROPERTY_IS_PART_OF)); }
-      @Override public Option<String> getDcReplaces() { return option(dc.getFirst(DublinCore.PROPERTY_REPLACES)); }
-      @Override public Option<String> getDcType() { return option(dc.getFirst(DublinCore.PROPERTY_TYPE)); }
-      @Override public Option<Date> getDcAvailableFrom() {
-        return option(dc.getFirst(DublinCore.PROPERTY_AVAILABLE)).flatMap(new Function<String, Option<Date>>() {
-          @Override public Option<Date> apply(String s) {
-            return option(EncodingSchemeUtils.decodePeriod(s).getStart());
-          }
-        });
-      }
-      @Override public Option<Date> getDcAvailableTo() { return option(dc.getFirst(DublinCore.PROPERTY_AVAILABLE)).flatMap(new Function<String, Option<Date>>() {
-        @Override public Option<Date> apply(String s) {
-          return option(EncodingSchemeUtils.decodePeriod(s).getEnd());
-        }
-      });
-      }
-      @Override public List<DField<String>> getDcTitle() { return fromDCValue(dc.get(DublinCore.PROPERTY_TITLE)); }
-      @Override public List<DField<String>> getDcSubject() {
-        return fromDCValue(dc.get(DublinCore.PROPERTY_SUBJECT));
-      }
-      @Override public List<DField<String>> getDcCreator() {
-        return fromDCValue(dc.get(DublinCore.PROPERTY_CREATOR));
-      }
-      @Override public List<DField<String>> getDcPublisher() {
-        return fromDCValue(dc.get(DublinCore.PROPERTY_PUBLISHER));
-      }
-      @Override public List<DField<String>> getDcContributor() {
-        return fromDCValue(dc.get(DublinCore.PROPERTY_CONTRIBUTOR));
-
-      }
-      @Override public List<DField<String>> getDcDescription() {
-        return fromDCValue(dc.get(DublinCore.PROPERTY_DESCRIPTION));
-      }
-      @Override public List<DField<String>> getDcRightsHolder() {
-        return fromDCValue(dc.get(DublinCore.PROPERTY_RIGHTS_HOLDER));
-      }
-      @Override public List<DField<String>> getDcSpatial() {
-        return fromDCValue(dc.get(DublinCore.PROPERTY_SPATIAL));
-      }
-      @Override public List<DField<String>> getDcAccessRights() {
-        return fromDCValue(dc.get(DublinCore.PROPERTY_ACCESS_RIGHTS));
-      }
-      @Override public List<DField<String>> getDcLicense() {
-        return fromDCValue(dc.get(DublinCore.PROPERTY_LICENSE));
-      }
-      @Override public Option<String> getOcMediatype() {
-        return Option.none();
-      }
-      @Override public Option<String> getOcMediapackage() { return Option.none(); }
-      @Override public Option<String> getOcAcl() {
-        return Option.none();
-      }
-      @Override public Option<String> getOcKeywords() {
-        return Option.none();
-      }
-      @Override public Option<String> getOcCover() {
-        return Option.none();
-      }
-      @Override public Option<Date> getOcModified() {
-        return Option.none();
-      }
-      @Override public Option<Date> getOcDeleted() {
-        return Option.none();
-      }
-      @Override public Option<String> getOcElementtags() {
-        return Option.none();
-      }
-      @Override public Option<String> getOcElementflavors() {
-        return Option.none();
-      }
-      @Override public Option<Version> getOcVersion() {
-        return Option.none();
-      }
-      @Override public Option<Boolean> getOcLatestVersion() {
-        return Option.none();
-      }
-      @Override public List<DField<String>> getSegmentText() {
-        return nil();
-      }
-      @Override public List<DField<String>> getSegmentHint() {
-        return nil();
-      }
-    });
   }
 
   /**

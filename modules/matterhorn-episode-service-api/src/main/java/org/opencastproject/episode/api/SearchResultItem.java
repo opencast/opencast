@@ -48,6 +48,9 @@ public interface SearchResultItem {
   /** @return the dcTitle */
   String getDcTitle();
 
+  /** @return the dcTitle */
+  String getDcSeriesTitle();
+
   /** @return the dcSubject */
   String getDcSubject();
 

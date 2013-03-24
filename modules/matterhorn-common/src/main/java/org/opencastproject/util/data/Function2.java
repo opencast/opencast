@@ -39,6 +39,11 @@ public abstract class Function2<A, B, C> {
     return Functions.curry(this);
   }
 
+  /** Argument flipping. */
+  public Function2<B, A, C> flip() {
+    return Functions.flip(this);
+  }
+
   /** Turn this function into an effect by discarding its result. */
   public Effect2<A, B> toEffect() {
     return Functions.toEffect(this);

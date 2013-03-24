@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance/"
+  xsi:schemaLocation="http://www.opencastproject.org http://www.opencastproject.org/schema.xsd"
+  xmlns:dcterms="http://purl.org/dc/terms/">
+  <dcterms:title>World of Tiers</dcterms:title>
+  <dcterms:creator>Philip Jose Farmer</dcterms:creator>
+  <dcterms:created xsi:type="dcterms:W3CDTF">2002-04-12</dcterms:created>
+  <dcterms:language>eng</dcterms:language>
+  <dcterms:type>MovingImage/LectureRecording</dcterms:type>
+  <dcterms:identifier>mp-b</dcterms:identifier>
+  <dcterms:isPartOf>series-b</dcterms:isPartOf>
+</dublincore>

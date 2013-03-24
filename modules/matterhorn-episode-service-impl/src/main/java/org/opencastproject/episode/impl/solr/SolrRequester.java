@@ -19,7 +19,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.JaxbSearchResult;
@@ -28,16 +27,23 @@ import org.opencastproject.episode.api.SearchResultItem;
 import org.opencastproject.episode.impl.Convert;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.util.SolrUtils;
+import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Options;
 import org.opencastproject.util.data.functions.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.List;
 
+import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.Tuple.tuple;
 
 /** Class implementing <code>LookupRequester</code> to provide connection to solr indexing facility. */
 public class SolrRequester {
@@ -92,6 +98,18 @@ public class SolrRequester {
     return result;
   }
 
+  private static final List<Tuple<String, Float>> fullTextQueryFields =
+          list(tuple(Schema.DC_TITLE_SUM, Schema.DC_TITLE_BOOST),
+               tuple(Schema.S_DC_TITLE_SUM, Schema.S_DC_TITLE_BOOST),
+               tuple(Schema.DC_IS_PART_OF, Schema.DC_IS_PART_OF_BOOST),
+               tuple(Schema.DC_CREATOR_SUM, Schema.DC_CREATOR_BOOST),
+               tuple(Schema.DC_SUBJECT_SUM,Schema.DC_SUBJECT_BOOST),
+               tuple(Schema.DC_PUBLISHER_SUM,Schema.DC_PUBLISHER_BOOST),
+               tuple(Schema.DC_CONTRIBUTOR_SUM ,Schema.DC_CONTRIBUTOR_BOOST),
+               tuple(Schema.DC_ABSTRACT_SUM , Schema.DC_ABSTRACT_BOOST),
+               tuple(Schema.DC_DESCRIPTION_SUM , Schema.DC_DESCRIPTION_BOOST),
+               tuple(Schema.FULLTEXT, 1.0f));
+
   /**
    * Modifies the query such that certain fields are being boosted (meaning they gain some weight).
    * 
@@ -99,68 +117,11 @@ public class SolrRequester {
    *          The user query.
    * @return The boosted query
    */
-  public StringBuffer createBoostedFullTextQuery(String query) {
-    String uq = SolrUtils.clean(query);
-    StringBuffer sb = new StringBuffer();
-
-    sb.append("(");
-
-    sb.append(Schema.DC_TITLE_PREFIX);
-    sb.append(":(");
-    sb.append(uq);
-    sb.append(")^");
-    sb.append(Schema.DC_TITLE_BOOST);
-    sb.append(" ");
-
-    sb.append(Schema.DC_CREATOR_PREFIX);
-    sb.append(":(");
-    sb.append(uq);
-    sb.append(")^");
-    sb.append(Schema.DC_CREATOR_BOOST);
-    sb.append(" ");
-
-    sb.append(Schema.DC_SUBJECT_PREFIX);
-    sb.append(":(");
-    sb.append(uq);
-    sb.append(")^");
-    sb.append(Schema.DC_SUBJECT_BOOST);
-    sb.append(" ");
-
-    sb.append(Schema.DC_PUBLISHER_PREFIX);
-    sb.append(":(");
-    sb.append(uq);
-    sb.append(")^");
-    sb.append(Schema.DC_PUBLISHER_BOOST);
-    sb.append(" ");
-
-    sb.append(Schema.DC_CONTRIBUTOR_PREFIX);
-    sb.append(":(");
-    sb.append(uq);
-    sb.append(")^");
-    sb.append(Schema.DC_CONTRIBUTOR_BOOST);
-    sb.append(" ");
-
-    sb.append(Schema.DC_ABSTRACT_PREFIX);
-    sb.append(":(");
-    sb.append(uq);
-    sb.append(")^");
-    sb.append(Schema.DC_ABSTRACT_BOOST);
-    sb.append(" ");
-
-    sb.append(Schema.DC_DESCRIPTION_PREFIX);
-    sb.append(":(");
-    sb.append(uq);
-    sb.append(")^");
-    sb.append(Schema.DC_DESCRIPTION_BOOST);
-    sb.append(" ");
-
-    sb.append(Schema.FULLTEXT);
-    sb.append(":(*");
-    sb.append(uq);
-    sb.append("*) ");
-
-    sb.append(")");
-
+  public StringBuilder createBoostedFullTextQuery(String query) {
+    final StringBuilder sb = new StringBuilder();
+    for (Tuple<String, Float> f : fullTextQueryFields) {
+      appendFuzzyBoosted(sb, f.getA(), some(query), some(f.getB()), "OR");
+    }
     return sb;
   }
 
@@ -189,22 +150,13 @@ public class SolrRequester {
     final StringBuilder sb = new StringBuilder();
     for (String solrQueryRequest : q.getQuery())
       sb.append(solrQueryRequest);
-    for (String solrIdRequest : q.getId().bind(SolrUtils.clean)) {
-      if (sb.length() > 0)
-        sb.append(" AND ");
-      sb.append("(");
-      sb.append(Schema.DC_ID);
-      sb.append(":");
-      sb.append(solrIdRequest);
-      sb.append(")");
-    }
+    append(sb, Schema.DC_ID, q.getId());
 
     // full text query with boost
-    for (String solrTextRequest : q.getText().bind(SolrUtils.clean)) {
+    for (String solrTextRequest : q.getText()) {
       if (sb.length() > 0)
         sb.append(" AND ");
-      sb.append("*:");
-      sb.append(createBoostedFullTextQuery(solrTextRequest));
+      sb.append("(").append(createBoostedFullTextQuery(solrTextRequest)).append(")");
     }
 
     appendFuzzy(sb, Schema.DC_CREATOR_SUM, q.getCreator());
@@ -212,6 +164,7 @@ public class SolrRequester {
     append(sb, Schema.DC_LANGUAGE, q.getLanguage());
     appendFuzzy(sb, Schema.DC_LICENSE_SUM, q.getLicense());
     appendFuzzy(sb, Schema.DC_TITLE_SUM, q.getTitle());
+    appendFuzzy(sb, Schema.S_DC_TITLE_SUM, q.getSeriesTitle());
     append(sb, Schema.DC_IS_PART_OF, q.getSeriesId());
     append(sb, Schema.OC_ORGANIZATION, q.getOrganization());
 
@@ -227,7 +180,7 @@ public class SolrRequester {
         }
         tagBuilder.append(Schema.OC_ELEMENTTAGS);
         tagBuilder.append(":");
-        tagBuilder.append(tag);
+        tagBuilder.append(SolrUtils.clean(tag));
       }
       if (tagBuilder.length() > 0) {
         tagBuilder.append(") ");
@@ -311,7 +264,7 @@ public class SolrRequester {
       case CREATOR:
         return Schema.DC_CREATOR_SORT;
       case SERIES_TITLE:
-        return Schema.DC_IS_PART_OF_SORT;
+        return Schema.S_DC_TITLE_SORT;
       default:
         return Schema.DC_CREATED;
     }
@@ -332,9 +285,7 @@ public class SolrRequester {
     for (String val : value) {
       if (sb.length() > 0)
         sb.append(" AND ");
-      sb.append(key);
-      sb.append(":");
-      sb.append(ClientUtils.escapeQueryChars(val.toLowerCase()));
+      sb.append("(").append(key).append(":").append(SolrUtils.clean(val)).append(")");
     }
     return sb;
   }
@@ -352,18 +303,29 @@ public class SolrRequester {
    * @return the appended {@link StringBuilder}
    */
   private StringBuilder appendFuzzy(StringBuilder sb, String key, Option<String> value) {
+    return appendFuzzyBoosted(sb, key, value, none(0.0f), "AND");
+  }
+
+  private StringBuilder appendFuzzyBoosted(StringBuilder sb, String key, Option<String> value, Option<Float> boost, String join) {
     for (String val : value) {
       if (sb.length() > 0) {
-        sb.append(" AND ");
+        sb.append(" ").append(join).append(" ");
       }
+      final String boostSuffix = boost.map(mkBoost).getOrElse("");
       sb.append("(");
-      sb.append(key).append(":").append(ClientUtils.escapeQueryChars(val.toLowerCase()));
+      sb.append(key).append(":(").append(SolrUtils.clean(val)).append(")").append(boostSuffix);
       sb.append(" OR ");
-      sb.append(key).append(":*").append(ClientUtils.escapeQueryChars(val.toLowerCase())).append("*");
+      sb.append(key).append(":(*").append(SolrUtils.clean(val)).append("*)").append(boostSuffix);
       sb.append(")");
     }
     return sb;
   }
+
+  private static final Function<Float, String> mkBoost = new Function<Float, String>() {
+    @Override public String apply(Float boost) {
+      return "^" + Float.toString(boost);
+    }
+  };
 
   /**
    * Query the Solr index.

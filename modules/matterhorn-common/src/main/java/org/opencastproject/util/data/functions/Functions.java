@@ -159,6 +159,15 @@ public final class Functions {
     };
   }
 
+  /** Flip arguments of a function of arity 2. */
+  public static <A, B, C> Function2<B, A, C> flip(final Function2<A, B, C> f) {
+    return new Function2<B, A, C>() {
+      @Override public C apply(B b, A a) {
+        return f.apply(a, b);
+      }
+    };
+  }
+
   /** Turn a function of arity 0 into an effect by discarding its result. */
   public static <A> Effect0 toEffect(final Function0<A> f) {
     return new Effect0() {
