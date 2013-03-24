@@ -1463,7 +1463,7 @@ ocRecordings = new (function() {
             success: function(data){
               window.debug = data;
               creationSucceeded = true;
-              seriesComponent.fields.series.val($('dcterms\\:identifier',data).text());
+              seriesComponent.fields.series.val($('dcterms|identifier',data).text());
             },
             error: function() {
               creationSucceeded = false;
