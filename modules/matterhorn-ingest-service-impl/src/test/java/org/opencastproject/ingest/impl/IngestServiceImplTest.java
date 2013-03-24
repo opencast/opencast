@@ -15,8 +15,11 @@
  */
 package org.opencastproject.ingest.impl;
 
+import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
+import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -26,7 +29,9 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.workflow.api.WorkflowDefinition;
+import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -50,7 +55,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 public class IngestServiceImplTest {
   private IngestServiceImpl service = null;
@@ -167,6 +174,7 @@ public class IngestServiceImplTest {
 
     workflowInstance = EasyMock.createNiceMock(WorkflowInstance.class);
     EasyMock.expect(workflowInstance.getId()).andReturn(workflowInstanceID);
+    EasyMock.expect(workflowInstance.getState()).andReturn(WorkflowState.STOPPED);
 
     workflowService = EasyMock.createNiceMock(WorkflowService.class);
     EasyMock.expect(
@@ -178,8 +186,21 @@ public class IngestServiceImplTest {
     EasyMock.expect(
             workflowService.start((WorkflowDefinition) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject()))
             .andReturn(workflowInstance);
+    EasyMock.expect(workflowService.getWorkflowDefinitionById((String) EasyMock.anyObject())).andReturn(
+            new WorkflowDefinitionImpl());
+    EasyMock.expect(workflowService.getWorkflowById(EasyMock.anyLong())).andReturn(workflowInstance);
 
-    EasyMock.replay(workspace, workflowInstance, workflowService);
+    SchedulerService schedulerService = EasyMock.createNiceMock(SchedulerService.class);
+
+    Properties properties = new Properties();
+    properties.put(CaptureParameters.INGEST_WORKFLOW_DEFINITION, "sample");
+    properties.put("agent-name", "matterhorn-agent");
+    EasyMock.expect(schedulerService.getEventCaptureAgentConfiguration(EasyMock.anyLong())).andReturn(properties)
+            .anyTimes();
+    EasyMock.expect(schedulerService.getEventDublinCore(EasyMock.anyLong()))
+            .andReturn(new DublinCoreCatalogImpl(urlCatalog1.toURL().openStream())).anyTimes();
+
+    EasyMock.replay(workspace, workflowInstance, workflowService, schedulerService);
 
     User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
             new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
@@ -222,6 +243,7 @@ public class IngestServiceImplTest {
     service.setHttpClient(httpClient);
     service.setWorkspace(workspace);
     service.setWorkflowService(workflowService);
+    service.setSchedulerService(schedulerService);
     ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,
             userDirectoryService, organizationDirectoryService);
     serviceRegistry.registerService(service);
@@ -237,7 +259,6 @@ public class IngestServiceImplTest {
 
   @Test
   public void testThinClient() throws Exception {
-
     MediaPackage mediaPackage = null;
 
     mediaPackage = service.createMediaPackage();
@@ -291,6 +312,23 @@ public class IngestServiceImplTest {
       IOUtils.closeQuietly(packageStream);
     }
 
+  }
+
+  @Test
+  public void testStartOver() throws Exception {
+    MediaPackage mediaPackage = null;
+    Map<String, String> properties = new HashMap<String, String>();
+    properties.put("archive", "true");
+
+    mediaPackage = service.createMediaPackage();
+    mediaPackage = service.addTrack(urlTrack, null, mediaPackage);
+    mediaPackage = service.addAttachment(urlAttachment, MediaPackageElements.MEDIAPACKAGE_COVER_FLAVOR, mediaPackage);
+
+    service.ingest(mediaPackage, null, properties, 121L);
+
+    Assert.assertEquals(1, mediaPackage.getTracks().length);
+    Assert.assertEquals(1, mediaPackage.getCatalogs().length);
+    Assert.assertEquals(1, mediaPackage.getAttachments().length);
   }
 
 }
