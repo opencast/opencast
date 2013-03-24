@@ -16,7 +16,6 @@
 package org.opencastproject.ingest.endpoint;
 
 import org.opencastproject.ingest.api.IngestService;
-import org.opencastproject.ingest.impl.IngestServiceImplTest;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -24,7 +23,6 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
-import org.opencastproject.workspace.api.Workspace;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -51,7 +49,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -62,7 +59,6 @@ public class IngestRestServiceTest {
   private static final Logger logger = LoggerFactory.getLogger(IngestRestServiceTest.class);
   protected IngestRestService restService;
   private ComboPooledDataSource pooledDataSource = null;
-  private final File zipFile = new File(IngestServiceImplTest.class.getResource("/data.zip").getFile());
   private File testDir = null;
   private LimitVerifier limitVerifier;
 
@@ -255,7 +251,6 @@ public class IngestRestServiceTest {
     restService.setPersistenceProvider(new PersistenceProvider());
     restService.setPersistenceProperties(props);
     restService.setIngestService(setupAddZippedMediaPackageIngestService());
-    restService.setWorkspace(setupAddZippedMediaPackageWorkspace());
     restService.activate(setupAddZippedMediaPackageComponentContext(limit));
 
     limitVerifier = new LimitVerifier(numberOfIngests);
@@ -292,7 +287,8 @@ public class IngestRestServiceTest {
         Response response = restService.addZippedMediaPackage(setupAddZippedMediaPackageHttpServletRequest());
         if (response.getStatus() == Status.SERVICE_UNAVAILABLE.getStatusCode()) {
           unavailable++;
-          // Because there is no mock that gets called if the service is unavailable we will have to do the next request here.
+          // Because there is no mock that gets called if the service is unavailable we will have to do the next request
+          // here.
           getResponse();
         } else if (response.getStatus() == Status.OK.getStatusCode()) {
           ok++;
@@ -317,42 +313,6 @@ public class IngestRestServiceTest {
     private synchronized int getError() {
       return error;
     }
-  }
-
-  private Workspace setupAddZippedMediaPackageWorkspace() {
-    Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    try {
-      EasyMock.expect(
-              workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                      (InputStream) EasyMock.anyObject())).andReturn(zipFile.toURI());
-    } catch (IllegalArgumentException e) {
-      Assert.fail("Failed due to exception " + e.getMessage());
-    } catch (IOException e) {
-      Assert.fail("Failed due to exception " + e.getMessage());
-    }
-    try {
-      EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
-        public File answer() {
-          // Create temp file
-          File zipFile = new File(testDir, UUID.randomUUID().toString() + ".zip");
-          try {
-            zipFile.createNewFile();
-            // Start the next test before ending this ingest so that we can reach the limit.
-            limitVerifier.callback();
-            return zipFile;
-          } catch (IOException e) {
-            Assert.fail("Could not create zip test files at " + zipFile.getAbsolutePath() + " due to " + e.getMessage());
-            return null;
-          }
-        }
-      }).anyTimes();
-    } catch (NotFoundException e) {
-      Assert.fail("Failed due to exception " + e.getMessage());
-    } catch (IOException e) {
-      Assert.fail("Failed due to exception " + e.getMessage());
-    }
-    EasyMock.replay(workspace);
-    return workspace;
   }
 
   private ServletInputStream setupAddZippedMediaPackageServletInputStream() {
@@ -398,12 +358,17 @@ public class IngestRestServiceTest {
   private IngestService setupAddZippedMediaPackageIngestService() {
     // Create a mock ingest service
     IngestService ingestService = EasyMock.createNiceMock(IngestService.class);
-    WorkflowInstance workflowInstance = new WorkflowInstanceImpl();
     try {
       EasyMock.expect(
               ingestService.addZippedMediaPackage((InputStream) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                      (Map<String, String>) EasyMock.anyObject(), EasyMock.anyLong())).andReturn(workflowInstance)
-              .anyTimes();
+                      (Map<String, String>) EasyMock.anyObject(), EasyMock.anyLong()))
+              .andAnswer(new IAnswer<WorkflowInstance>() {
+                @Override
+                public WorkflowInstance answer() throws Throwable {
+                  limitVerifier.callback();
+                  return new WorkflowInstanceImpl();
+                }
+              }).anyTimes();
     } catch (Exception e) {
       Assert.fail("Threw exception " + e.getMessage());
     }

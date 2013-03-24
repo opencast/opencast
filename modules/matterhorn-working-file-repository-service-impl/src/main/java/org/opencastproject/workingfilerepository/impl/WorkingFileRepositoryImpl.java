@@ -605,9 +605,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
 
     try {
       FileUtils.moveFile(source, dest);
-      if (!sourceMd5.delete())
-        throw new IOException("Unable to delete " + sourceMd5.getAbsolutePath());
-      createMd5(dest);
+      FileUtils.moveFile(sourceMd5, getMd5File(dest));
     } catch (IOException e) {
       FileUtils.deleteDirectory(destDir);
       throw new IllegalStateException("unable to copy file" + e);

@@ -34,7 +34,6 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowParser;
-import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -49,14 +48,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -94,9 +90,6 @@ public class IngestRestService {
 
   private static final Logger logger = LoggerFactory.getLogger(IngestRestService.class);
 
-  /** The collection name used for temporarily storing uploaded zip files */
-  private static final String COLLECTION_ID = "ingest-temp";
-
   /** Key for the default workflow definition in config.properties */
   protected static final String DEFAULT_WORKFLOW_DEFINITION = "org.opencastproject.workflow.default.definition";
 
@@ -114,7 +107,6 @@ public class IngestRestService {
 
   private MediaPackageBuilderFactory factory = null;
   private IngestService ingestService = null;
-  private Workspace workspace = null;
   private DublinCoreCatalogService dublinCoreService;
   protected PersistenceProvider persistenceProvider;
   protected Map<String, Object> persistenceProperties;
@@ -151,10 +143,6 @@ public class IngestRestService {
 
   public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
     this.persistenceProvider = persistenceProvider;
-  }
-
-  public void setWorkspace(Workspace workspace) {
-    this.workspace = workspace;
   }
 
   public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
@@ -371,8 +359,7 @@ public class IngestRestService {
               mp = factory.newMediaPackageBuilder().loadFromXml(item.openStream());
             }
           } else {
-            // once the body gets read iter.hasNext must not be invoked
-            // or the stream can not be read
+            // once the body gets read iter.hasNext must not be invoked or the stream can not be read
             fileName = item.getName();
             in = item.openStream();
             isDone = true;
@@ -548,19 +535,23 @@ public class IngestRestService {
       setIngestLimit(getIngestLimit() - 1);
       logger.debug("An ingest has started so remaining ingest limit is " + getIngestLimit());
     }
-    FileInputStream zipInputStream = null;
-    String zipFileName = UUID.randomUUID().toString() + ".zip";
-    URI zipFileUri = null;
+    InputStream in = null;
+
+    logger.info("Received new request from {} to ingest a zipped mediapackage", request.getRemoteHost());
+
     try {
       String workflowDefinitionId = defaultWorkflowDefinitionId;
       Long workflowInstanceIdAsLong = null;
       Map<String, String> workflowConfig = new HashMap<String, String>();
       if (ServletFileUpload.isMultipartContent(request)) {
+        boolean isDone = false;
         for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
             if (WORKFLOW_INSTANCE_ID_PARAM.equals(item.getFieldName())) {
               String workflowIdAsString = IOUtils.toString(item.openStream(), "UTF-8");
+              if (StringUtils.isBlank(workflowIdAsString))
+                continue;
               try {
                 workflowInstanceIdAsLong = Long.parseLong(workflowIdAsString);
               } catch (NumberFormatException e) {
@@ -576,40 +567,27 @@ public class IngestRestService {
             }
           } else {
             logger.debug("Processing file item");
-            InputStream in = item.openStream();
-            try {
-              zipFileUri = workspace.putInCollection(COLLECTION_ID, zipFileName, in);
-            } finally {
-              IOUtils.closeQuietly(in);
-            }
+            // once the body gets read iter.hasNext must not be invoked or the stream can not be read
+            // MH-XXXX
+            in = item.openStream();
+            isDone = true;
           }
+          if (isDone)
+            break;
         }
       } else {
-        InputStream in = request.getInputStream();
-        try {
-          zipFileUri = workspace.putInCollection(COLLECTION_ID, zipFileName, in);
-        } finally {
-          IOUtils.closeQuietly(in);
-        }
+        logger.debug("Processing file item");
+        in = request.getInputStream();
       }
-      File zipFileFromWorkspace = workspace.get(zipFileUri);
-      zipInputStream = new FileInputStream(zipFileFromWorkspace);
-      WorkflowInstance workflow = ingestService.addZippedMediaPackage(zipInputStream, workflowDefinitionId,
-              workflowConfig, workflowInstanceIdAsLong);
+
+      WorkflowInstance workflow = ingestService.addZippedMediaPackage(in, workflowDefinitionId, workflowConfig,
+              workflowInstanceIdAsLong);
       return Response.ok(WorkflowParser.toXml(workflow)).build();
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     } finally {
-      IOUtils.closeQuietly(zipInputStream);
-      try {
-        if (zipFileUri != null)
-          workspace.delete(zipFileUri);
-      } catch (NotFoundException nfe) {
-        logger.error("Error removing missing temporary ingest file " + COLLECTION_ID + "/" + zipFileUri, nfe);
-      } catch (IOException ioe) {
-        logger.error("Error removing temporary ingest file " + zipFileUri, ioe);
-      }
+      IOUtils.closeQuietly(in);
       if (isIngestLimitEnabled()) {
         setIngestLimit(getIngestLimit() + 1);
         logger.debug("An ingest has finished so increased ingest limit to " + getIngestLimit());
@@ -938,11 +916,7 @@ public class IngestRestService {
   @Path("addDCCatalog")
   @RestQuery(name = "addDCCatalog", description = "Add a dublincore episode catalog to a given media package using an url", restParameters = {
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT),
-          @RestParameter(description = "DublinCore catalog as XML", isRequired = true, name = "dublinCore", type = RestParameter.Type.STRING), // TODO
-                                                                                                                                               // should
-                                                                                                                                               // this
-                                                                                                                                               // be
-                                                                                                                                               // TEXT??
+          @RestParameter(description = "DublinCore catalog as XML", isRequired = true, name = "dublinCore", type = RestParameter.Type.TEXT),
           @RestParameter(defaultValue = "dublincore/episode", description = "DublinCore Flavor", isRequired = false, name = "flavor", type = RestParameter.Type.STRING) }, reponses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
