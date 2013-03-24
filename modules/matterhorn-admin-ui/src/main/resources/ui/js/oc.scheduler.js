@@ -342,6 +342,7 @@ var ocScheduler = (function() {
     	  }
       });
       
+      window.checkForErrors = true;
       var errors = [];
       for (var i in sched.catalogs) {
       if (sched.catalogs[i].components.license){
@@ -356,10 +357,15 @@ var ocScheduler = (function() {
           payload[sched.catalogs[i].name] = serializedCatalog;
         }
       }
+      window.checkForErrors = false;
 
       if (errors.length > 0) {
         showUserMessages(errors);
       } else {
+	for (var i in sched.catalogs) {
+            var serializedCatalog = sched.catalogs[i].serialize();
+            payload[sched.catalogs[i].name] = serializedCatalog;
+        }
         $('#submitButton').attr('disabled', 'disabled');
         if (sched.type !== SINGLE_EVENT) {
           $('#submitModal').dialog(
@@ -772,6 +778,7 @@ var ocScheduler = (function() {
       createSeriesFromSearchText: function(){
         var series, seriesComponent, seriesId;
         var creationSucceeded = false;
+        if (window.checkForErrors) return true;
         if(this.fields.seriesSelect !== ''){
           series = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn"><dcterms:title xmlns="">' + this.fields.seriesSelect.val() + '</dcterms:title></dublincore>'
           seriesComponent = this;
