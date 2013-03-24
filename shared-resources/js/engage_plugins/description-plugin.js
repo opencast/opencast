@@ -36,6 +36,9 @@ Opencast.Description_Plugin = (function ()
                             '<span style="color:grey;">${result.dcCreator}</span><br />' +
                         '{/if}' +
                         'Description:&nbsp;<span style="color:grey;">${result.dcDescription}</span><br />' +
+                        '{if result.dcLicense != defaultChar}' +
+                            'License:&nbsp;<span style="color:grey;">${result.dcLicense}</span><br />' +
+                        '{/if}' +
                     '</div>' +
                     '<div style="clear: both">' + 
                     '</div>';
@@ -99,6 +102,7 @@ Opencast.Description_Plugin = (function ()
                    description_data.result.dcViews = description_data.result.dcViews || description_data.defaultChar;
                    description_data.result.dcSeriesTitle = description_data.result.dcSeriesTitle || description_data.defaultChar;
                    description_data.result.dcDescription = description_data.result.dcDescription || description_data.defaultChar;
+                   description_data.result.dcLicense = description_data.result.dcLicense || description_data.defaultChar;
                }
             processedTemplateData = template.process(description_data);
             element.html(processedTemplateData);
