@@ -335,7 +335,7 @@ public class SolrIndexManager {
    * Posts the media package to solr. Depending on what is referenced in the media package, the method might create one
    * or two entries: one for the episode and one for the series that the episode belongs to.
    *
-   * Media package element URIs need to be URLs pointing to existing locations.
+   * Note: Media package element URIs need to be URLs pointing to existing locations.
    *
    * @param sourceMediaPackage
    *         the media package to post
@@ -348,10 +348,10 @@ public class SolrIndexManager {
    * @throws SolrServerException
    *         if an errors occurs while talking to solr
    */
-  public boolean add(MediaPackage sourceMediaPackage,
-                     AccessControlList acl,
-                     Date now,
-                     Version version)
+  public void add(MediaPackage sourceMediaPackage,
+                  AccessControlList acl,
+                  Date now,
+                  Version version)
           throws SolrServerException {
     try {
       final SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl, version);
@@ -366,7 +366,6 @@ public class SolrIndexManager {
       // Post everything to the search index
       solrServer.add(episodeDocument);
       solrServer.commit();
-      return true;
     } catch (Exception e) {
       try {
         solrServer.rollback();
@@ -380,8 +379,9 @@ public class SolrIndexManager {
   /**
    * Posts the media package to solr. Depending on what is referenced in the media package, the method might create one
    * or two entries: one for the episode and one for the series that the episode belongs to.
+   * <p/>
+   * Note: Media package element URIs need to be URLs pointing to existing locations.
    *
-   * This implementation of the search service removes all references to non "engage/download" media tracks
    *
    * @param sourceMediaPackage
    *         the media package to post
@@ -389,22 +389,21 @@ public class SolrIndexManager {
    *         the access control list for this mediapackage
    * @param version
    *         the archive version
-   * @param deletionDate
-   *         the deletion date
    * @param modificationDate
    *         the modification date
+   * @param deletionDate
+   *         the deletion date
    * @param isLatestVersion
    *          the latest version flag
-   * @return <code>true</code> if successfully added
    * @throws SolrServerException
    *         if an errors occurs while talking to solr
    */
-  public boolean add(MediaPackage sourceMediaPackage,
-                     AccessControlList acl,
-                     Version version,
-                     Option<Date> deletionDate,
-                     Date modificationDate,
-                     boolean isLatestVersion) throws SolrServerException {
+  public void add(MediaPackage sourceMediaPackage,
+                  AccessControlList acl,
+                  Version version,
+                  Option<Date> deletionDate,
+                  Date modificationDate,
+                  boolean isLatestVersion) throws SolrServerException {
     try {
       final SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl, version);
       Schema.setOcTimestamp(episodeDocument, modificationDate);
@@ -418,7 +417,6 @@ public class SolrIndexManager {
       }
       solrServer.add(episodeDocument);
       solrServer.commit();
-      return true;
     } catch (Exception e) {
       try {
         solrServer.rollback();
@@ -446,7 +444,6 @@ public class SolrIndexManager {
                                                        AccessControlList acl,
                                                        final Version version)
           throws MediaPackageException, IOException {
-
     final SolrInputDocument doc = new SolrInputDocument();
     final String mediaPackageId = mediaPackage.getIdentifier().toString();
     // todo fix id generation ambiguity. currently tests are broken
@@ -473,9 +470,9 @@ public class SolrIndexManager {
     // /
     // Add standard dublin core fields
     // naive approach. works as long as only setters, not adders are available in the schema
-    for (StaticMetadata md : getMetadata(metadataSvcs.get(), mediaPackage))
+    for (StaticMetadata md : getMetadata(metadataSvcs.get(), mediaPackage)) {
       addEpisodeMetadata(doc, md);
-
+    }
     // /
     // Add mpeg7
     logger.debug("Looking for mpeg-7 catalogs containing segment texts");

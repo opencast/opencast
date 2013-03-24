@@ -294,17 +294,8 @@ public class SolrRequester {
     solr.setStart(q.getOffset());
 
     // sorting
-    // todo multiValued fields cannot be used for sorting -- need to have the language here
-    // if (q.getSort() != null) {
-    // ORDER order = q.isSortAscending() ? ORDER.asc : ORDER.desc;
-    // query.addSortField(getSortField(q.getSort()), order);
-    // }
-    // if (!EpisodeQuery.Sort.DATE_CREATED.equals(q.getSort())) {
-    // query.addSortField(getSortField(EpisodeQuery.Sort.DATE_CREATED), ORDER.desc);
-    // }
-    // query.addSortField(Schema.DC_CREATED, ORDER.desc);
-    // If the dublin core field dc:created has not been filled in...
-    // query.addSortField(Schema.OC_MODIFIED, ORDER.desc);
+    final SolrQuery.ORDER order = q.getSortAscending() ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc;
+    solr.addSortField(getSortField(q.getSort()), order);
 
     solr.setFields("* score");
 
@@ -314,21 +305,15 @@ public class SolrRequester {
   private static String getSortField(EpisodeQuery.Sort sort) {
     switch (sort) {
       case TITLE:
-        return Schema.DC_TITLE_SUM;
+        return Schema.DC_TITLE_SORT;
       case DATE_CREATED:
         return Schema.DC_CREATED;
       case CREATOR:
-        return Schema.DC_CREATOR_SUM;
-      case LANGUAGE:
-        return Schema.DC_LANGUAGE;
-      case LICENSE:
-        return Schema.DC_LICENSE_SUM;
-      case SUBJECT:
-        return Schema.DC_SUBJECT_SUM;
-      case MEDIA_PACKAGE_ID:
-        return Schema.DC_ID;
+        return Schema.DC_CREATOR_SORT;
+      case SERIES_TITLE:
+        return Schema.DC_IS_PART_OF_SORT;
       default:
-        throw new IllegalArgumentException("No mapping found between sort field and index");
+        return Schema.DC_CREATED;
     }
   }
 

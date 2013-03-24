@@ -159,11 +159,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
             final Function<MediaPackage, MediaPackage> index = new Function.X<MediaPackage, MediaPackage>() {
               @Override
               protected MediaPackage xapply(MediaPackage mediaPackage) throws Exception {
-                if (solrIndex.add(mediaPackage, acl, now, version)) {
-                  logger.info("Added mediapackage {} to the archive", mediaPackage.getIdentifier());
-                } else {
-                  logger.warn("Failed to add mediapackage {} to the archive", mediaPackage.getIdentifier());
-                }
+                solrIndex.add(mediaPackage, acl, now, version);
                 return mediaPackage;
               }
             };

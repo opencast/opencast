@@ -54,6 +54,7 @@ public final class Schema {
   public static final String DC_LANGUAGE = "dc_language";
   public static final String DC_TEMPORAL = "dc_temporal";
   public static final String DC_IS_PART_OF = "dc_is_part_of";
+  public static final String DC_IS_PART_OF_SORT = "dc_is_part_of-sort";
   public static final String DC_REPLACES = "dc_replaces";
   // Expand with #SUFFIX_FROM and #SUFFIX_TO
   public static final String DC_AVAILABLE_PREFIX = "dc_available_";
@@ -61,10 +62,12 @@ public final class Schema {
   // Localized fields
   public static final String DC_TITLE_PREFIX = "dc_title_";
   public static final String DC_TITLE_SUM = "dc_title-sum";
+  public static final String DC_TITLE_SORT = "dc_title-sort";
   public static final String DC_SUBJECT_PREFIX = "dc_subject_";
   public static final String DC_SUBJECT_SUM = "dc_subject-sum";
   public static final String DC_CREATOR_PREFIX = "dc_creator_";
   public static final String DC_CREATOR_SUM = "dc_creator-sum";
+  public static final String DC_CREATOR_SORT = "dc_creator-sort";
   public static final String DC_PUBLISHER_PREFIX = "dc_publisher_";
   public static final String DC_PUBLISHER_SUM = "dc_publisher-sum";
   public static final String DC_CONTRIBUTOR_PREFIX = "dc_contributor_";
@@ -391,6 +394,7 @@ public final class Schema {
 
   public static void setDcIsPartOf(SolrInputDocument doc, String isPartOf) {
     doc.setField(DC_IS_PART_OF, isPartOf);
+    doc.setField(DC_IS_PART_OF_SORT, isPartOf);
   }
 
   public static String getDcReplaces(SolrDocument doc) {
@@ -431,6 +435,10 @@ public final class Schema {
 
   public static void setDcTitle(SolrInputDocument doc, DField<String> title) {
     doc.setField(DC_TITLE_PREFIX + title.getSuffix(), title.getValue(), DC_TITLE_BOOST);
+    // todo Last title wins on sorting. In order to support multilingual fields
+    //   sorting has to be done on the dynamic title field but this requires
+    //   the user language to be available which right now is not supported by Matterhorn.
+    doc.setField(DC_TITLE_SORT, title.getValue());
   }
 
   public static List<DField<String>> getDcSubject(SolrDocument doc) {
@@ -447,6 +455,8 @@ public final class Schema {
 
   public static void setDcCreator(SolrInputDocument doc, DField<String> creator) {
     doc.setField(DC_CREATOR_PREFIX + creator.getSuffix(), creator.getValue(), DC_CREATOR_BOOST);
+    // todo see {@link #setDcTitle}
+    doc.setField(DC_CREATOR_SORT, creator.getValue());
   }
 
   public static List<DField<String>> getDcPublisher(SolrDocument doc) {
