@@ -367,8 +367,8 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     if (!StringUtils.isEmpty(resultItem.getDcTitle()))
       feed.setTitle(resultItem.getDcTitle());
 
-    if (!StringUtils.isEmpty(resultItem.getDcAbstract()))
-      feed.setDescription(resultItem.getDcAbstract());
+    if (!StringUtils.isEmpty(resultItem.getDcDescription()))
+      feed.setDescription(resultItem.getDcDescription());
 
     if (!StringUtils.isEmpty(resultItem.getDcCreator()))
       feed.addAuthor(new PersonImpl(resultItem.getDcCreator()));
