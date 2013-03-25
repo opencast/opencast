@@ -520,9 +520,9 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
       dcExtension.setRights(metadata.getDcAccessRights());
     }
 
-    // Set abstract
-    if (!StringUtils.isEmpty(metadata.getDcAbstract())) {
-      String summary = metadata.getDcAbstract();
+    // Set description
+    if (!StringUtils.isEmpty(metadata.getDcDescription())) {
+      String summary = metadata.getDcDescription();
       entry.setDescription(new ContentImpl(summary));
       iTunesEntry.setSummary(summary);
       dcExtension.setDescription(summary);
