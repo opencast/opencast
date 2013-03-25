@@ -113,7 +113,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
       try {
         serviceURL = new URL(cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL)).toExternalForm();
       } catch (MalformedURLException e) {
-        throw new ServiceException(OPT_SERVICE_REGISTRY_URL + " is malformed: " + cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL));
+        throw new ServiceException(OPT_SERVICE_REGISTRY_URL + " is malformed: " + StringUtils.trimToNull(cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL)));
       }
     }
   }
