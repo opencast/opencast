@@ -73,7 +73,7 @@ ocRecordings = new (function() {
     this.refresh = 5;
     this.doRefresh = 'true';
     this.sortField = 'Date';
-    this.sortOrder = 'ASC';
+    this.sortOrder = 'DESC';
     this.filterField = null;
     this.filterText = '';
     
