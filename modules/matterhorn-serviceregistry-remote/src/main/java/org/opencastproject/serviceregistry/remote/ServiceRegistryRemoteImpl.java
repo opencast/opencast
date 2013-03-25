@@ -96,17 +96,26 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    * @param context
    *          the component context
    */
-  protected void activate(ComponentContext context) {
-    String serviceURLProperty = StringUtils.trimToNull((String) context.getBundleContext().getProperty(
-            OPT_SERVICE_REGISTRY_URL));
-    if (serviceURLProperty == null)
-      throw new ServiceException("Remote service registry can't find " + OPT_SERVICE_REGISTRY_URL);
-    try {
-      serviceURL = new URL(serviceURLProperty).toExternalForm();
-    } catch (MalformedURLException e) {
-      throw new ServiceException(OPT_SERVICE_REGISTRY_URL + " is malformed: " + serviceURLProperty);
+  protected void activate(ComponentContext cc) {
+    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty("org.opencastproject.server.url"))) {
+      serverUrl = UrlSupport.DEFAULT_BASE_URL;
+    } else {
+      serverUrl = cc.getBundleContext().getProperty("org.opencastproject.server.url");
     }
-    serverUrl = context.getBundleContext().getProperty("org.opencastproject.server.url");
+
+    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL))) {
+      try {
+        serviceURL = new URL(serverUrl + "/services").toExternalForm();
+      } catch (MalformedURLException e) {
+        throw new ServiceException(OPT_SERVICE_REGISTRY_URL + " is missing, and fallback localhost url is malformed: " + serverUrl + "/services");
+      }
+    } else {
+      try {
+        serviceURL = new URL(cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL)).toExternalForm();
+      } catch (MalformedURLException e) {
+        throw new ServiceException(OPT_SERVICE_REGISTRY_URL + " is malformed: " + StringUtils.trimToNull(cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL)));
+      }
+    }
   }
 
   /**
