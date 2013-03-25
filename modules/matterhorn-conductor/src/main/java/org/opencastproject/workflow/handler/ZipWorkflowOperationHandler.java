@@ -29,6 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.FileSupport;
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.ZipUtil;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -88,7 +89,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   protected File tempStorageDir = null;
 
   /** The configuration properties */
-  protected SortedMap<String, String> configurationOptions = null; 
+  protected SortedMap<String, String> configurationOptions = null;
 
   /**
    * The workspace to use in retrieving and storing files.
@@ -137,10 +138,12 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
   @Override
-  public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     final WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
     String flavors = currentOperation.getConfiguration(INCLUDE_FLAVORS_PROPERTY);
@@ -196,6 +199,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     } catch (IOException e) {
       throw new WorkflowOperationException(e);
     }
+    attachment.setMimeType(MimeTypes.ZIP);
 
     // The zip file is safely in the archive, so it's now safe to attempt to remove the original zip
     try {
