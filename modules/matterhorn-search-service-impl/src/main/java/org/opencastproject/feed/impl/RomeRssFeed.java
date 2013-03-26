@@ -93,6 +93,7 @@ public class RomeRssFeed extends SyndFeedImpl {
     setFeedType(feedInfo.toROMEVersion());
 
     // Convert fields
+    setModules(toRomeModules(originalFeed.getModules()));
     setAuthors(toRomePersons(originalFeed.getAuthors()));
     setCategories(toRomeCategories(originalFeed.getCategories()));
     setContributors(toRomePersons(originalFeed.getContributors()));
@@ -102,7 +103,6 @@ public class RomeRssFeed extends SyndFeedImpl {
     setLinks(toRomeLinks(originalFeed.getLinks()));
     setPublishedDate(originalFeed.getPublishedDate());
     setTitleEx(toRomeContent(originalFeed.getTitle()));
-    setModules(toRomeModules(originalFeed.getModules()));
     setUri(originalFeed.getUri());
     setLink(originalFeed.getLink());
 
@@ -111,6 +111,7 @@ public class RomeRssFeed extends SyndFeedImpl {
       List<SyndEntry> romeEntries = new ArrayList<SyndEntry>();
       for (FeedEntry entry : originalFeed.getEntries()) {
         SyndEntryImpl e = new SyndEntryImpl();
+        e.setModules(toRomeModules(entry.getModules()));
         e.setAuthors(toRomePersons(entry.getAuthors()));
         e.setCategories(toRomeCategories(entry.getCategories()));
         e.setContents(toRomeContents(entry.getContents()));
@@ -120,7 +121,6 @@ public class RomeRssFeed extends SyndFeedImpl {
         e.setPublishedDate(entry.getPublishedDate());
         e.setTitleEx(toRomeContent(entry.getTitle()));
         e.setUpdatedDate(entry.getUpdatedDate());
-        e.setModules(toRomeModules(entry.getModules()));
         e.setUri(entry.getUri());
         List<SyndLink> links = toRomeLinks(entry.getLinks());
         e.setLinks(links);

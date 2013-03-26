@@ -78,6 +78,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
     setFeedType(feedInfo.toROMEVersion());
 
     // Convert fields
+    setModules(toRomeModules(originalFeed.getModules()));
     setAuthors(toRomeAtomPersons(originalFeed.getAuthors()));
     setCategories(toRomeAtomCategories(originalFeed.getCategories()));
     setContributors(toRomeAtomPersons(originalFeed.getContributors()));
@@ -86,7 +87,6 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
     setAlternateLinks(toRomeAtomLinks(originalFeed.getLinks()));
     setUpdated(originalFeed.getUpdatedDate());
     setTitleEx(toRomeAtomContent(originalFeed.getTitle()));
-    setModules(toRomeModules(originalFeed.getModules()));
     setId(originalFeed.getUri());
     List <Link> otherLinks = new ArrayList <Link>();
     otherLinks.add(new LinkImpl(originalFeed.getLink()));
@@ -97,6 +97,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
       List<Entry> romeEntries = new ArrayList<Entry>();
       for (FeedEntry entry : originalFeed.getEntries()) {
         Entry e = new Entry();
+        e.setModules(toRomeModules(entry.getModules()));
         e.setAuthors(toRomeAtomPersons(entry.getAuthors()));
         e.setCategories(toRomeAtomCategories(entry.getCategories()));
         e.setContents(toRomeAtomContents(entry.getContents()));
@@ -105,7 +106,6 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
         e.setPublished(entry.getPublishedDate());
         e.setTitleEx(toRomeAtomContent(entry.getTitle()));
         e.setUpdated(entry.getUpdatedDate());
-        e.setModules(toRomeModules(entry.getModules()));
         e.setId(entry.getUri());
         List<com.sun.syndication.feed.atom.Link> links = toRomeAtomLinks(entry.getLinks());
         links.addAll(toRomeAtomEnclosures(entry.getEnclosures())); 
