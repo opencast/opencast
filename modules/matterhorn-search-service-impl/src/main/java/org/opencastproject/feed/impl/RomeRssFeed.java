@@ -340,7 +340,8 @@ public class RomeRssFeed extends SyndFeedImpl {
     m.setBlock(ext.isBlocked());
     m.setCategories(ext.getCategories());
     m.setExplicit(ext.isExplicit());
-    m.setKeywords(ext.getKeywords().toArray(new String[ext.getKeywords().size()]));
+    if (ext.getKeywords() != null)
+      m.setKeywords(ext.getKeywords().toArray(new String[ext.getKeywords().size()]));
     m.setOwnerEmailAddress(ext.getOwnerEmail());
     m.setOwnerName(ext.getOwnerName());
     m.setSubtitle(ext.getSubtitle());

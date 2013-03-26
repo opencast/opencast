@@ -22,6 +22,7 @@ import org.opencastproject.feed.api.Enclosure;
 import org.opencastproject.feed.api.Feed;
 import org.opencastproject.feed.api.FeedEntry;
 import org.opencastproject.feed.api.FeedGenerator;
+import org.opencastproject.feed.api.FeedExtension;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -34,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -321,10 +323,9 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     f.setEncoding(ENCODING);
 
     // Set iTunes tags
-    // ITunesFeedExtension iTunesFeed = new ITunesFeedExtension();
-    // TODO: Set iTunes tags
-    // f.addModule(iTunesFeed);
-
+    ITunesFeedExtension iTunesFeed = new ITunesFeedExtension();
+    f.addModule(iTunesFeed);
+    
     // TODO: Set feed icon and other metadata
 
     // Check if a default format has been specified
@@ -363,15 +364,34 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    */
   protected Feed addSeries(Feed feed, String[] query, SearchResultItem resultItem) {
     Date d = resultItem.getDcCreated();
+    
+    // find iTunes module
+    ITunesFeedExtension iTunesFeed = null;
+    
+    for (FeedExtension extension : feed.getModules()) {
+      if (extension instanceof ITunesFeedExtension) {
+        iTunesFeed = (ITunesFeedExtension) extension;
+        break;
+      }
+    }
 
     if (!StringUtils.isEmpty(resultItem.getDcTitle()))
       feed.setTitle(resultItem.getDcTitle());
 
-    if (!StringUtils.isEmpty(resultItem.getDcDescription()))
+    if (!StringUtils.isEmpty(resultItem.getDcDescription())) {
       feed.setDescription(resultItem.getDcDescription());
+      if (iTunesFeed != null)
+        iTunesFeed.setSummary(resultItem.getDcDescription());
+    }
 
-    if (!StringUtils.isEmpty(resultItem.getDcCreator()))
-      feed.addAuthor(new PersonImpl(resultItem.getDcCreator()));
+    if (!StringUtils.isEmpty(resultItem.getDcCreator())) {
+      PersonImpl personImpl = new PersonImpl(resultItem.getDcCreator());
+      feed.addAuthor(personImpl);
+      if (iTunesFeed != null) {
+        iTunesFeed.setAuthor(personImpl.getName());
+        iTunesFeed.setOwnerName(personImpl.getName());
+      }
+    }
 
     if (!StringUtils.isEmpty(resultItem.getDcContributor()))
       feed.addContributor(new PersonImpl(resultItem.getDcContributor()));
@@ -393,6 +413,13 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     if (!StringUtils.isEmpty(resultItem.getCover())) {
       coverUrl = resultItem.getCover();
       feed.setImage(new ImageImpl(coverUrl, resultItem.getDcTitle()));
+      try {
+        if (iTunesFeed != null)
+          iTunesFeed.setImage(new URL(coverUrl));
+      } catch (MalformedURLException e) {
+          logger.error(
+                "Error creating cover URL from " + coverUrl);
+      }
     }
     return feed;
   }
