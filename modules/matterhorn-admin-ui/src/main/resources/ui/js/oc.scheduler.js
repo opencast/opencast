@@ -181,28 +181,8 @@ var ocScheduler = (function() {
       },
       change: function(event, ui){
         if($('#series').val() === '' && $('#seriesSelect').val() !== ''){
-          ocUtils.log("Searching for series in series endpoint");
-          $.ajax({
-            url : SERIES_SEARCH_URL,// + '?seriesTitle=' + $('#seriesSelect').val(),
-            type : 'get',
-            dataType : 'json',
-            success : function(data) {
-              var series_input = $('#seriesSelect').val(),
-              series_list = data["catalogs"],
-              series_title,
-              series_id;
-              $('#series').val('');
-              for (i in series_list) {
-                var series_title, series_id;
-                series_title = series_list[i][DUBLIN_CORE_NS_URI]["title"] ? series_list[i][DUBLIN_CORE_NS_URI]["title"][0].value : "";
-                series_id = series_list[i][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[i][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
-                if (series_title === series_input){
-                  $('#series').val(series_id);
-                  break;
-                }
-              }
-            }
-          });
+          // Detected a change in the seriesSelect box so check to see if the title matches an existing series.
+          sched.checkForExistingSeries();
         }
       },
       search: function(){
@@ -279,7 +259,7 @@ var ocScheduler = (function() {
       $('li#titleNote span.scheduler-instruction-text').removeClass('scheduler-instruction-text-hover');
     });
   }
-
+  
   sched.changeRecordingType = function changeRecordingType(recType){
     this.type = recType;
 
@@ -302,7 +282,7 @@ var ocScheduler = (function() {
       $('#seriesRequired').remove(); //Remove series required indicator.
       this.components.startDate.setValue(d.getTime().toString());
     }else{
-      // Multiple recordings have some differnt fields and different behaviors
+      // Multiple recordings have some different fields and different behaviors
       //show recurring_recording panel, hide single.
       $('#titleNote').show();
       $('#recurringRecordingPanel').show();
@@ -319,11 +299,46 @@ var ocScheduler = (function() {
     this.loadKnownAgents();
   };
 
+  /** Checks to see if there is an existing series who's title matches the one currently entered by the user.  
+      If it finds one it sets the series id to match the existing series and updates the dublin catalog. 
+      There is an optional parameter of a callback function that is called after checking for an existing series.**/
+  sched.checkForExistingSeries = function checkForExistingSeries(callback){
+    ocUtils.log("Searching for series in series endpoint");
+    $.ajax({
+      url : SERIES_SEARCH_URL,
+      type : 'get',
+      dataType : 'json',
+      success : function(data) {
+        var series_input = $('#seriesSelect').val(),
+        series_list = data["catalogs"],
+        series_title,
+        series_id;
+        $('#series').val('');
+        for (i in series_list) {
+          var series_title, series_id;
+          series_title = series_list[i][DUBLIN_CORE_NS_URI]["title"] ? series_list[i][DUBLIN_CORE_NS_URI]["title"][0].value : "";
+          series_id = series_list[i][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[i][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
+          if (series_title === series_input){
+            $('#series').val(series_id);
+            // Since we have found an existing series, update the catalogs with the id.
+            sched.registerCatalogs();
+            break;
+          }
+        }
+       
+        // If there is a callback function return the result from that. 
+        if(callback !== undefined) {
+          return callback();
+        }
+      }
+    });
+  };
+  
   sched.submitForm = function() {
     function submit() {
       var payload = {};
       var error = false;
-
+      
       hideUserMessages();
       sched.checkForConflictingEvents();
       if (ocScheduler.conflictingEvents) {
@@ -337,9 +352,9 @@ var ocScheduler = (function() {
       ocWorkflowPanel.registerComponents(ocScheduler.workflow.components);
       
       $.each(sched.workflow.components, function(name, elem) {
-    	  if (name.indexOf("org.opencastproject.workflow.config") == 0) {
-    		  elem.key = elem.key.substring("org.opencastproject.workflow.config.".length);
-    	  }
+        if (name.indexOf("org.opencastproject.workflow.config") == 0) {
+          elem.key = elem.key.substring("org.opencastproject.workflow.config.".length);
+        }
       });
       
       window.checkForErrors = true;
@@ -362,7 +377,7 @@ var ocScheduler = (function() {
       if (errors.length > 0) {
         showUserMessages(errors);
       } else {
-	for (var i in sched.catalogs) {
+        for (var i in sched.catalogs) {
             var serializedCatalog = sched.catalogs[i].serialize();
             payload[sched.catalogs[i].name] = serializedCatalog;
         }
@@ -400,7 +415,13 @@ var ocScheduler = (function() {
     }
 
     try {
-      return submit();
+      if($('#seriesSelect').val() !== ''){
+        // Series select wasn't empty so look for an existing series before a submit.
+        return sched.checkForExistingSeries(submit);
+      } else {
+        // Series select was empty so we don't need to look for an existing series.
+        return submit();
+      }
     } catch (e) {
       alert("Error submitting form: " + e);
       return false;
