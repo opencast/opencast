@@ -62,7 +62,10 @@ public class ConfigurationManagerTest {
     configManager.setItem("anything", "nothing");
     Assert.assertEquals("nothing", configManager.getItem("anything"));
     configManager.setItem(null, "this should work, but not put anything in the props");
-    Assert.assertEquals(1, configManager.getAllProperties().size());
+    Assert.assertEquals(3, configManager.getAllProperties().size());
+    Assert.assertNotNull(configManager.getAllProperties().get("capture.device.timezone.offset"));
+    Assert.assertNotNull(configManager.getAllProperties().get("capture.device.timezone"));
+    Assert.assertEquals("nothing", configManager.getAllProperties().get("anything"));
 
     Properties p = new Properties();
     InputStream is = getClass().getResourceAsStream("/config/capture.properties");

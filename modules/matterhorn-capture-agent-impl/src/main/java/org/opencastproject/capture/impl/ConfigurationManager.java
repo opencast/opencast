@@ -20,6 +20,7 @@ import org.opencastproject.util.XProperties;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -94,6 +95,15 @@ public class ConfigurationManager implements ManagedService {
     properties.setBundleContext(null);
   }
 
+   private void updateTimezone(XProperties properties) {
+    Calendar cal = Calendar.getInstance();
+    properties.setProperty(
+            "capture.device.timezone.offset",
+            Long.toString((cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET))
+                    / (1 * CaptureParameters.MINUTES * CaptureParameters.MILLISECONDS)));
+    properties.setProperty("capture.device.timezone", TimeZone.getDefault().getID());
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public void updated(Dictionary props) throws ConfigurationException {
@@ -114,13 +124,6 @@ public class ConfigurationManager implements ManagedService {
         properties.put(key, ((String)value).trim());
       }
     }
-
-    Calendar cal = Calendar.getInstance();
-    properties.setProperty(
-            "capture.device.timezone.offset",
-            Long.toString((cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET))
-                    / (1 * CaptureParameters.MINUTES * CaptureParameters.MILLISECONDS)));
-    properties.setProperty("capture.device.timezone", TimeZone.getDefault().getID());
 
     // Attempt to parse the location of the configuration server
     try {
@@ -255,6 +258,12 @@ public class ConfigurationManager implements ManagedService {
   public String getItem(String key) {
     if (key == null) {
       return null;
+    } else if (StringUtils.equals(key, "capture.device.timezone.offset")) {
+      Calendar cal = Calendar.getInstance();
+      return Long.toString((cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET))
+                      / (1 * CaptureParameters.MINUTES * CaptureParameters.MILLISECONDS));
+    } else if (StringUtils.equals(key, "capture.device.timezone")) {
+      return TimeZone.getDefault().getID();
     } else {
       return properties.getProperty(key);
     }
@@ -281,6 +290,12 @@ public class ConfigurationManager implements ManagedService {
   public String getUninterpretedItem(String key) {
     if (key == null) {
       return null;
+    } else if (StringUtils.equals(key, "capture.device.timezone.offset")) {
+      Calendar cal = Calendar.getInstance();
+      return Long.toString((cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET))
+                      / (1 * CaptureParameters.MINUTES * CaptureParameters.MILLISECONDS));
+    } else if (StringUtils.equals(key, "capture.device.timezone")) {
+      return TimeZone.getDefault().getID();
     } else {
       return properties.getUninterpretedProperty(key);
     }
@@ -370,7 +385,9 @@ public class ConfigurationManager implements ManagedService {
    * @return the key/value pair mapping.
    */
   public XProperties getAllProperties() {
-    return (XProperties) properties.clone();
+    XProperties cloneProps = (XProperties) properties.clone();
+    updateTimezone(cloneProps);
+    return cloneProps;
   }
 
   /**
