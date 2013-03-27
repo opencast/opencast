@@ -18,6 +18,8 @@ case "$ISSUE" in
     "$UBUNTU_10_10" )
       echo "Using Configuration of Ubuntu 10.10 for packages."
       PACKAGE_LIST_FILE=$UBUNTU_10_10_PACKAGES_FILE
+      DEFAULT_MIRROR=http://old-releases.ubuntu.com/ubuntu
+      DEFAULT_SECURITY=http://old-releases.ubuntu.com/ubuntu
       ;;
     "$UBUNTU_11_04" )
       echo "Using Configuration of Ubuntu 11.04 for packages"
