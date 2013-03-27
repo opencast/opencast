@@ -6,7 +6,7 @@
 HOME=`pwd`
 if [ "$MATTERHORN_SVN" = "" ];
   then
-  MATTERHORN_SVN="http://opencast.jira.com/svn/MH/trunk/"
+  MATTERHORN_SVN="https://opencast.jira.com/svn/MH/trunk/"
 fi
 echo "Building VM with using this SVN url: $MATTERHORN_SVN"
 #check for existance of mirror URL

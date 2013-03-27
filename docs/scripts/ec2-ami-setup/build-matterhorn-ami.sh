@@ -31,7 +31,7 @@ echo "export OC=/opt/matterhorn" >> /home/opencast/.bashrc
 echo "export FELIX_HOME=/opt/matterhorn/felix" >> /home/opencast/.bashrc
 echo "export MATTERHORN_SRC_HOME=/home/opencast/matterhorn_trunk" >> /home/opencast/.bashrc
 echo "export M2_REPO=/home/opencast/.m2/repository" >> /home/opencast/.bashrc
-echo "export OC_URL=http://opencast.jira.com/svn/MH/trunk/" >> /home/opencast/.bashrc
+echo "export OC_URL=https://opencast.jira.com/svn/MH/trunk/" >> /home/opencast/.bashrc
 echo "export FELIX_URL=http://apache.mirror.iweb.ca/felix/felix-framework-2.0.1.tar.gz" >> /home/opencast/.bashrc
 echo "export JAVA_HOME=/usr/lib/jvm/java-6-sun" >> /home/opencast/.bashrc
 echo "export MAVEN_OPTS=\"-Xms256m -Xmx512m -XX:PermSize=64m -XX:MaxPermSize=128m\"" >> /home/opencast/.bashrc
