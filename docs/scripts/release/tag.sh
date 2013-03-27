@@ -2,8 +2,8 @@
 
 #The comments in this file assume you are creating a tag from a branch
 #Eg:  The defaults in the comments here will take the current version of 
-#http://opencast.jira.com/svn/MH/branches/1.3.x and tag it as 
-#http://opencast.jira.com/svn/MH/tags/1.3-rc5
+#https://opencast.jira.com/svn/MH/branches/1.3.x and tag it as 
+#https://opencast.jira.com/svn/MH/tags/1.3-rc5
 
 #The name of the branch in SVN that we are looking to turn into a release
 #E.g. BRANCH_NAME=1.3.x

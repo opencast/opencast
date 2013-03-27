@@ -26,7 +26,7 @@ export START_PATH=$PWD
 export WORKING_DIR=/tmp/cainstallscript
 
 # Root for the source code repository
-export SVN_URL=http://opencast.jira.com/svn/MH
+export SVN_URL=https://opencast.jira.com/svn/MH
 # Extension for the SVN_URL to reach the trunk
 export TRUNK_URL=$SVN_URL/trunk
 # Extension for the SVN_URL to reach the branches
