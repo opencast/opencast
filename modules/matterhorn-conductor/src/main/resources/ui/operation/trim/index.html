@@ -880,13 +880,19 @@
             recordDate = recordDate * 1000; //back to milliseconds
             recordDate = ocUtils.toISODate(recordDate); // = (new Date(recordDate)).format("isoUTCdateTime");
           }
+          var $dcelm = false;    //$(DCmetadata.documentElement).find('dcterms\\:' + $field.attr('name'));
+          $(DCmetadata.documentElement).children().each(function(index, elm) {
+            if (elm.tagName == 'dcterms:' + fieldname) {
+               if ($field.val() == '' && !$field[0].disabled) {
+                 ocUtils.log("deleting " + $field.attr('name'));
+                 DCmetadata.documentElement.removeChild(elm);
+                 updateMPElement($field.attr('name'), $field.val());
+               } else if ($field.val() != '') {
+                 $dcelm = $(elm);
+               }
+            }
+          });
           if ($field.val() != '') {
-            var $dcelm = false;    //$(DCmetadata.documentElement).find('dcterms\\:' + $field.attr('name'));
-            $(DCmetadata.documentElement).children().each(function(index, elm) {
-              if (elm.tagName == 'dcterms:' + fieldname) {
-                $dcelm = $(elm);
-              }
-            });
             if ($dcelm !== false) {
               ocUtils.log("updating " + $field.attr('name') + " to: " + $field.val());
               $field.attr('name')==="created" ? $dcelm.text(recordDate) : $dcelm.text($field.val());
@@ -942,13 +948,22 @@
 
       function updateMPElement(MPname, value) {
         var $mpelm = $(mediapackage.documentElement).find(MPname);	
-        if ($mpelm.length != 0) {
-          ocUtils.log('Updating ' + MPname + ' in MediaPackage to ' + value);          
-          MPname==="start" ? $mpelm.text(recordDate) : $mpelm.text(value);
+        if (value == '' && $mpelm.length != 0){
+             ocUtils.log('Deleting ' + MPname);
+             if ($mpelm.parent()){
+                mediapackage.documentElement.removeChild($mpelm.parent()[0]);
+             } else {
+                mediapackage.documentElement.removeChild($mpelm[0]);
+             }
         } else {
-          ocUtils.log('Creating ' + MPname + ' in MediaPackage with value ' + value);
-          $newelm = MPname==="start" ?  $('<' + MPname + '/>').text(recordDate) : $('<' + MPname + '/>').text(value);
-          $newelm.appendTo(mediapackage.documentElement);
+           if ($mpelm.length != 0) {
+             ocUtils.log('Updating ' + MPname + ' in MediaPackage to ' + value);          
+             MPname==="start" ? $mpelm.text(recordDate) : $mpelm.text(value);
+           } else {
+             ocUtils.log('Creating ' + MPname + ' in MediaPackage with value ' + value);
+             $newelm = MPname==="start" ?  $('<' + MPname + '/>').text(recordDate) : $('<' + MPname + '/>').text(value);
+             $newelm.appendTo(mediapackage.documentElement);
+           }
         }
       }
 
