@@ -93,9 +93,11 @@ export UBUNTU_11_10="Ubuntu 11.10 \n \l"
 export UBUNTU_11_10_PACKAGES_FILE="Ubuntu-11-10.packages"
 export UBUNTU_12_04="Ubuntu 12.04"
 export UBUNTU_12_04_PACKAGES_FILE="Ubuntu-12-04.packages"
+export UBUNTU_12_10="Ubuntu 12.10"
+export UBUNTU_12_10_PACKAGES_FILE="Ubuntu-12-10.packages"
 export PACKAGE_LIST_DEFAULT_FILE="default.packages"
 
-PACKAGE_LISTS=("$UBUNTU_10_10_PACKAGES_FILE" "$UBUNTU_11_04_PACKAGES_FILE" "$UBUNTU_11_10_PACKAGES_FILE" "$UBUNTU_12_04_PACKAGES_FILE" "$PACKAGE_LIST_DEFAULT_FILE")
+PACKAGE_LISTS=("$UBUNTU_10_10_PACKAGES_FILE" "$UBUNTU_11_04_PACKAGES_FILE" "$UBUNTU_11_10_PACKAGES_FILE" "$UBUNTU_12_04_PACKAGES_FILE" "$UBUNTU_12_10_PACKAGES_FILE" "$PACKAGE_LIST_DEFAULT_FILE")
 
 # Packages that require the user approval to be installed (Please note the quotation mark at the end!!!)
 # There should be one package per line, but several packages may be included if they need to be treated 'as a block'
