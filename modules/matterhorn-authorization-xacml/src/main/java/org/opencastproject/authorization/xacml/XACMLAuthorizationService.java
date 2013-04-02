@@ -344,7 +344,9 @@ public class XACMLAuthorizationService implements AuthorizationService {
       }
 
       // Remove the old xacml file(s)
+      Attachment attachment = null;
       for (Attachment a : mediapackage.getAttachments(XACML_POLICY)) {
+        attachment = (Attachment) a.clone();
         try {
           workspace.delete(a.getURI());
         } catch (Exception e) {
@@ -355,8 +357,10 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
       // add attachment
       URI uri = workspace.getURI(mediapackage.getIdentifier().toString(), XACML_ELEMENT_ID, XACML_FILENAME);
-      Attachment attachment = (Attachment) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-              .elementFromURI(uri, Attachment.TYPE, XACML_POLICY);
+      if (attachment == null) {
+        attachment = (Attachment) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
+                .elementFromURI(uri, Attachment.TYPE, XACML_POLICY);
+      }
       attachment.setIdentifier(XACML_ELEMENT_ID);
       mediapackage.add(attachment);
 
