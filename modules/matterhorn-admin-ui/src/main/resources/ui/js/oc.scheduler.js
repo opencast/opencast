@@ -619,7 +619,11 @@ var ocScheduler = (function() {
           
             if (data[key] != "" && key != 'files') { //print text, not file names
               $('#field-'+key).css('display','block');
-              $('#field-'+key).children('.fieldValue').text(data[key].value);
+              if (key == 'seriesId'){
+                 $('#field-'+key).children('.fieldValue').text(data[key].fields['seriesSelect'].val());
+              } else {
+                 $('#field-'+key).children('.fieldValue').text(data[key].value);
+              }
             }
             if (key == "temporal" || key == "recurrence") {			
               $('#field-'+key).children('.fieldValue').text(data[key].asFriendlyString());
