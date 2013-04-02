@@ -1,0 +1,26 @@
+<!-- 
+	This operation will send a POST request containing the Mediapackage to an
+	external webservice.
+-->
+<operation
+	id="post-mediapackage"
+	fail-on-error="false"
+	exception-handler-workflow="error"
+	description="Sending MediaPackage to remote Host">
+	<configurations>
+		<!-- target url --> 
+		<configuration key="url">http://example.com:5000/</configuration>
+		<!-- either xml or json --> 
+		<configuration key="format">xml</configuration>
+		<!-- if enabled response body will be written to log --> 
+		<configuration key="debug">yes</configuration>
+		 <!-- enable authentication (simple/digest will be detected automatically) --> 
+		<configuration key="auth.enabled">yes</configuration>
+		 <!-- username for authentication --> 
+		<configuration key="auth.username">exportuser</configuration>
+		<!-- password for authentication --> 
+		<configuration key="auth.password">secret</configuration>
+		<!-- fields with keys beginning with + will be added to the message body --> 
+		<configuration key="+system">video.example.com</configuration>  
+	</configurations>
+</operation>
