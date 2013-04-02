@@ -1,3 +1,7 @@
 This Opencast Matterhorn workflowoperation handler can be used to send a POST
 request containing the currently processed Mediapackage to an external
 webservice.
+
+- Send Mediapackage to remote webservice
+- Handle HTTP Basic/Digest authentication
+- Send additional data
