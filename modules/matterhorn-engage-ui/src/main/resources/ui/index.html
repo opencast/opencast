@@ -16,6 +16,8 @@
     <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.xslt.new.js"></script>
     <script type="text/javascript" src="/engage/ui/js/oc-pager.js"></script>
     <script type="text/javascript" src="/engage/ui/js/engage-ui.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/ext/moment.min.js"></script>
+    <script type="text/javascript" src="/engage/ui/js/ext/date.helper.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
             
@@ -86,15 +88,8 @@
                       var timeDate = $(this).text();
                       if (timeDate)
                       {
-                          //JavaScript parseInt(string, radix)
-                          var sd = new Date();
-                          sd.setFullYear(parseInt(timeDate.substring(0, 4), 10));
-                          sd.setMonth(parseInt(timeDate.substring(5, 7), 10) - 1);
-                          sd.setDate(parseInt(timeDate.substring(8, 10), 10));
-                          sd.setHours(parseInt(timeDate.substring(11, 13), 10));
-                          sd.setMinutes(parseInt(timeDate.substring(14, 16), 10));
-                          sd.setSeconds(parseInt(timeDate.substring(17, 19), 10));
-                          $(this).html(sd.toLocaleString());
+                          var sd = Opencast.Date_Helper.dateStringToDate(timeDate);
+                          $(this).html(Opencast.Date_Helper.getDateString(sd) + ' - ' + Opencast.Date_Helper.getTimeString(sd));
                       }
                       else
                       {
