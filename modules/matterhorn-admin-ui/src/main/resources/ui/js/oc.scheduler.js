@@ -651,7 +651,7 @@ var ocScheduler = (function() {
           data = sched.catalogs[i].components;
           for (var key in data) {
           
-            if (data[key] != "" && key != 'files') { //print text, not file names
+            if (data[key] != "" && key != 'files' && key != 'type') { //print text, not file names. Don't show empty media type. 
               $('#field-'+key).css('display','block');
               if (key == 'seriesId'){
                  $('#field-'+key).children('.fieldValue').text(data[key].fields['seriesSelect'].val());
