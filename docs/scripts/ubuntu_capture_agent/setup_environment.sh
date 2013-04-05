@@ -61,14 +61,18 @@ if [[ "$config" ]]; then
     sed -i "s#^${SERVER_URL_KEY//./\\.}=.*\$#${SERVER_URL_KEY}=$ip#" "$GEN_PROPS"
 fi
 
-# Prompt for the URL where the core lives.
-# TODO: (or maybe not) Support a distributed core would mean to set different URLs separately, rather than this centralized one
-## Read default from the config file
-#DEFAULT_CORE_URL=$(grep "^${CORE_URL_KEY//./\\.}=.*$" $CAPTURE_PROPS | cut -d '=' -f 2)
-ask -d "$DEFAULT_CORE_URL" -f $VALID_URL_REGEX "Please enter the URL and port (if ingestion is not on port 80) of the machine hosting the ingestion service in the form of http://URL:PORT" core
+# Prompt for the URL where the admin lives.
+ask -d "$DEFAULT_CORE_URL" -f $VALID_URL_REGEX "Please enter the URL and port (if ingestion is not on port 80) of the machine hosting the ingestion service in the form of http://URL:PORT (this is the admin node in a distributed setup)" core
 sed -i "s#^${CORE_URL_KEY//./\\.}=.*\$#${CORE_URL_KEY}=$core#" "$CAPTURE_PROPS"
 #Use this value to update the location of the service registry, too                                                                                          
 sed -i "s%^#${SERVICE_REG_KEY//./\\.}=.*\$%${SERVICE_REG_KEY}=$core/$SERVICE_REG_SUFFIX%" "$GEN_PROPS"
+# Use this value to replace the admin node location in config.properties.
+sed -i "s%^#${ADMIN_KEY//./\\.}=.*\$%${SERVICE_REG_KEY}=$core%" "$GEN_PROPS"
+
+# Setup the engage node link for the capture agent. 
+ask -d "$core" -f $VALID_URL_REGEX "Please enter the URL and port of the machine hosting the engage service in the form of http://URL:PORT" engage
+# Use this value to replace the engage node location in config.properties.
+sed -i "s%^#${ENGAGE_KEY//./\\.}=.*\$%${SERVICE_REG_KEY}=$engage%" "$GEN_PROPS"
 
 # Prompt for the time between two updates of the recording schedule
 default_poll=$(grep "${SCHEDULE_POLL_KEY}" "$CAPTURE_PROPS" | cut -d '=' -f 2) #<-- This reads the default value from the config file
