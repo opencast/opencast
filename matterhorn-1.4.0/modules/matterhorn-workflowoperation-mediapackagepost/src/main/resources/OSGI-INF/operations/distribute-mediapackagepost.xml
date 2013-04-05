@@ -3,7 +3,7 @@
 	name="org.opencastproject.workflow.handler.mediapackagepost.MediaPackagePostOperationHandler" immediate="true" activate="activate">
 	<implementation class="org.opencastproject.workflow.handler.mediapackagepost.MediaPackagePostOperationHandler" />
 	<property name="service.description" value="Workflow Operation that POSTs MediaPackages via HTTP" />
-	<property name="workflow.operation" value="distribute-post-mediapackage" />
+	<property name="workflow.operation" value="post-mediapackage" />
 	<service>
 		<provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
 	</service>
