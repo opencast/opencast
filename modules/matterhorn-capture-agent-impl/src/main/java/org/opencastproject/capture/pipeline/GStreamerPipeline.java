@@ -212,7 +212,7 @@ public final class GStreamerPipeline {
     try {
       friendlyNames = getDeviceNames(props);
     } catch (InvalidCaptureDevicesSpecifiedException e) {
-      logger.error(e.getStackTrace().toString());
+      logger.error(e.getMessage());
       return null;
     }
 
@@ -249,7 +249,7 @@ public final class GStreamerPipeline {
     } else if (friendlyNames.length == 1) {
       // Java gives us an array even if the string being split is blank...
       if (StringUtils.isBlank(friendlyNames[0])) {
-        throw new InvalidCaptureDevicesSpecifiedException("Invalid capture device listed.  Aborting!");
+        throw new InvalidCaptureDevicesSpecifiedException("Invalid capture device listed in \"" + deviceNames + "\".  Aborting!");
       }
     }
 
