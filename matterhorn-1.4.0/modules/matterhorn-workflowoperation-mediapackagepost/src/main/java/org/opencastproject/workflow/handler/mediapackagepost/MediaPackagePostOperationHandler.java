@@ -18,6 +18,8 @@ package org.opencastproject.workflow.handler.mediapackagepost;
 
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URL;
@@ -27,11 +29,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamResult;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -44,7 +46,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 import org.json.XML;
 import org.opencastproject.job.api.JobContext;
-import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -96,17 +97,16 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
           + config.getFormat().name() + " to " + config.getUrl().toString());
 
       // serialize MediaPackage to target format
-      String mpStr = "";
-      Document mpXml = MediaPackageParser.getAsXml(mp, new DefaultMediaPackageSerializerImpl());
-      switch (config.getFormat()) {
-        case XML:
-          mpStr = xmlToString(mpXml);
-          break;
-        case JSON:
-          mpStr = xmlToJSONString(mpXml);
-          break;
-        default:
-          break;
+      OutputStream serOut = new ByteArrayOutputStream();
+      MediaPackageParser.getAsXml(mp, serOut, false);
+      String mpStr = serOut.toString();
+      serOut.close();
+      if (config.getFormat() == Configuration.Format.JSON) {
+         JSONObject json = XML.toJSONObject(mpStr);
+         mpStr = json.toString();
+         if (mpStr.startsWith("{\"ns2:")) {
+            mpStr = (new StringBuilder()).append("{\"").append(mpStr.substring(6)).toString();
+         }
       }
 
       // Log mediapackge
@@ -201,7 +201,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
     public static final String PROPERTY_URL = "url";
     public static final String PROPERTY_FORMAT = "format";
     public static final String PROPERTY_ENCODING = "encoding";
-    public static final String PROPERTY_AUTH = "auth";
+    public static final String PROPERTY_AUTH = "auth.enabled";
     public static final String PROPERTY_AUTHUSER = "auth.username";
     public static final String PROPERTY_AUTHPASSWD = "auth.password";
     public static final String PROPERTY_DEBUG = "debug";
