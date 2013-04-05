@@ -717,12 +717,12 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
     }
 
     // Nuke any existing zipfile, we want to recreate it if it already exists.
-    File outputZip = new File(recording.getBaseDir(), CaptureParameters.ZIP_NAME);
-    FileUtils.deleteQuietly(outputZip);
+    removeZipFile(recording);
 
     // Return a pointer to the zipped file
     File returnZip;
     try {
+      File outputZip = new File(recording.getBaseDir(), CaptureParameters.ZIP_NAME);
       returnZip = ZipUtil.zip(filesToZip.toArray(new File[filesToZip.size()]), outputZip, ZipUtil.NO_COMPRESSION);
     } catch (IOException e) {
       logger.error("An IOException has occurred while zipping the files for recording {}: {}", recID, e);
@@ -733,6 +733,16 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   }
 
+  /** 
+   * Removes the zip file associated with a recording.
+   * @param recording 
+   *          The recording to remove the zip file from.
+   */
+  public void removeZipFile(AgentRecording recording) {
+    File outputZip = new File(recording.getBaseDir(), CaptureParameters.ZIP_NAME);
+    FileUtils.deleteQuietly(outputZip);
+  }
+  
   // FIXME: Replace HTTP-based ingest with remote implementation of the Ingest Service. (jt)
   // See the ComposerServiceRemoteImpl to get an idea of the approach
   // The idea is to get the details of the HTTP interaction out of the client code
@@ -844,6 +854,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
     serializeRecording(recID);
     if (retValue == HttpURLConnection.HTTP_OK) {
+      removeZipFile(recording);
       completedRecordings.put(recID, recording);
       pendingRecordings.remove(recID);
     }
