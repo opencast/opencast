@@ -722,6 +722,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
     // Return a pointer to the zipped file
     File returnZip;
     try {
+      File outputZip = new File(recording.getBaseDir(), CaptureParameters.ZIP_NAME);
       returnZip = ZipUtil.zip(filesToZip.toArray(new File[filesToZip.size()]), outputZip, ZipUtil.NO_COMPRESSION);
     } catch (IOException e) {
       logger.error("An IOException has occurred while zipping the files for recording {}: {}", recID, e);
