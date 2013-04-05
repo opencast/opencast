@@ -7,6 +7,7 @@ button.rebind{width: 16px; height: 17px;background-image: url(images/ui-icons_ff
 div.disable div.form-box-head{background:grey;}
 div.collapse{float:left;}
 div.form-box-head input[type="checkbox"],div.form-box-head label{float: right;}
+div.form-box-content{text-align: left;}
 div.errors{color:red;font-weight: bold;float:left; margin-left: 5px;}
 div.info {
     background: #EEEEEE;

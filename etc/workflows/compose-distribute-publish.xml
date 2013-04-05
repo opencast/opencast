@@ -44,7 +44,7 @@
 	    </span>
 	  </li>
       </ul>
-    </fieldset>  
+    </fieldset>
     <fieldset>
       <legend>Distribution</legend>
       <ul class="oc-ui-form-list">
@@ -67,15 +67,15 @@
       var trimHold = $('input#trimHold');
 	  var captionHold = $('input#captionHold');
       var videoPreview = $('input#videoPreview');
-      
+
       var checkVideoPreview = function(){
       	var checkValue = trimHold.is(':checked') || captionHold.is(':checked');
       	videoPreview.attr('checked', checkValue);
       }
-      
+
       trimHold.click(checkVideoPreview);
 	  captionHold.click(checkVideoPreview);
-      
+
       ocWorkflowPanel.registerComponents = function(components){
         /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
          * into the workflow. The component's nodeKey must match the components array key.
@@ -87,31 +87,30 @@
 	  {key: 'org.opencastproject.workflow.config.trimHold'},
           {getValue: function(){ return this.fields.trimHold.is(":checked"); }
           });
-	  
+
         components['org.opencastproject.workflow.config.archiveOp'] = new ocAdmin.Component(
           ['archiveOp'],
 	  {key: 'org.opencastproject.workflow.config.archiveOp'},
           {getValue: function(){ return this.fields.archiveOp.is(":checked");}
           });
-          
+
         components['org.opencastproject.workflow.config.captionHold'] = new ocAdmin.Component(
           ['captionHold'],
 	  {key: 'org.opencastproject.workflow.config.captionHold'},
           {getValue: function(){ return this.fields.captionHold.is(":checked");}
           });
-	  
+
 	components['org.opencastproject.workflow.config.videoPreview'] = new ocAdmin.Component(
 	  ['videoPreview'],
 	  {key: 'org.opencastproject.workflow.config.videoPreview'},
 	  {getValue: function(){ return this.fields.videoPreview.is(":checked");}
 	  });
-	  
+
 	ocScheduler.dublinCore.components['license'] = new ocAdmin.Component(
           ['license'],
           {label: 'licenseLabel', key: 'license'}
 	  );
 
-          
           //etc...
       }
       ocWorkflowPanel.setComponentValues = function(values, components){
@@ -126,7 +125,6 @@
   </configuration_panel>
 
   <operations>
-	
 	<!-- Apply ACL from series to the mediapackage -->
 
     <operation
@@ -135,7 +133,7 @@
       exception-handler-workflow="error"
       description="Applying access control rules">
     </operation>
-    
+
     <!-- tag the incoming source material for archival -->
 
     <operation
@@ -148,7 +146,7 @@
     </operation>
 
     <!-- tag the dublin core catalogs so they will be distributed and added to search -->
-    
+
     <operation
       id="tag"
       description="Tagging dublin core catalogs for publishing">
@@ -156,10 +154,10 @@
         <configuration key="source-flavors">dublincore/*</configuration>
         <configuration key="target-tags">+engage</configuration>
       </configurations>
-    </operation> 
+    </operation>
 
     <!-- inspect the media -->
-    
+
     <operation
       id="inspect"
       fail-on-error="true"
@@ -210,7 +208,8 @@
       </configurations>
     </operation>
 
-    <!-- hold to trim media--> 
+    <!-- hold to trim media-->
+
     <operation
       id="trim"
       if="${trimHold}"
@@ -235,7 +234,18 @@
         <configuration key="target-tags">+archive</configuration>
       </configurations>
     </operation>
-    
+
+    <!-- tag the episode or serie catalog created during trim operation -->
+
+    <operation
+      id="tag"
+      description="Tagging trimmed media for archive">
+      <configurations>
+        <configuration key="source-flavors">dublincore/*</configuration>
+        <configuration key="target-tags">+archive,+engage</configuration>
+      </configurations>
+    </operation>
+
     <!-- hold for captions -->
     <operation
       id="caption"
@@ -249,7 +259,7 @@
     </operation>
 
    <!-- encode to engage player preview images -->
- 
+
     <operation
       id="image"
       fail-on-error="true"
@@ -319,11 +329,10 @@
         <configuration key="target-tags">engage</configuration>
         <configuration key="encoding-profile">flash-audio.http</configuration>
       </configurations>
-    </operation>   
-     
+    </operation>
 
     <!-- run the videosegmentation -->
-    
+
     <operation
       id="segment-video"
       fail-on-error="false"
@@ -380,7 +389,7 @@
         <configuration key="encoding-profiles">feed-m4a.http, feed-avi.http</configuration>
       </configurations>
     </operation>
-    
+
     <!-- encode to feed preview images -->
 
     <operation
@@ -414,7 +423,7 @@
     </operation>
 
     <!-- Generate segment previews -->
-    
+
     <operation
       id="segmentpreviews"
       fail-on-error="false"
@@ -446,7 +455,7 @@
     </operation>
 
     <!-- Distribute to download server -->
-    
+
     <operation
       id="distribute-download"
       max-attempts="2"
@@ -496,7 +505,7 @@
         <configuration key="source-tags">archive</configuration>
       </configurations>
     </operation>
- 
+
     <!-- Publish to engage search index -->
 
     <operation
@@ -508,9 +517,9 @@
         <configuration key="source-tags">publish</configuration>
       </configurations>
     </operation>
- 
+
     <!-- Cleanup the working file repository -->
- 
+
     <operation
       id="cleanup"
       fail-on-error="false"
