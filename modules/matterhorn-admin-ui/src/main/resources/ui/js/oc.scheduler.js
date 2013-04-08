@@ -177,7 +177,43 @@ var ocScheduler = (function() {
         });
       },
       select: function(event, ui){
-        $('#series').val(ui.item.id);
+          $('#series').val(ui.item.id);
+          $.ajax({
+              url: '/info/me.json',
+              type: 'GET',
+              dataType: 'json',
+              success: function(data){
+                  var prepopulate_enabled;
+                  if (data.org.properties["adminui.series_prepopulate.enable"]){
+                      prepopulate_enabled = data.org.properties["adminui.series_prepopulate.enable"];
+                      if(prepopulate_enabled === "true"){
+                          var url = "/series/" + ui.item.id + ".json";
+                          $.ajax({
+                              url: url,
+                              dataType: 'json',
+                              type: 'GET',
+                              success: function(data) {
+                                  var contributor = data[DUBLIN_CORE_NS_URI]["contributor"] ? data[DUBLIN_CORE_NS_URI]["contributor"]["0"].value : "",
+                                  subject = data[DUBLIN_CORE_NS_URI]["subject"] ? data[DUBLIN_CORE_NS_URI]["subject"]["0"].value : "",
+                                  language = data[DUBLIN_CORE_NS_URI]["language"] ? data[DUBLIN_CORE_NS_URI]["language"]["0"].value : "",
+                                  description = data[DUBLIN_CORE_NS_URI]["description"] ? data[DUBLIN_CORE_NS_URI]["description"]["0"].value : "",
+                                  license = data[DUBLIN_CORE_NS_URI]["license"] ? data[DUBLIN_CORE_NS_URI]["license"]["0"].value : "";
+                                  copyright = data[DUBLIN_CORE_NS_URI]["copyright"] ? data[DUBLIN_CORE_NS_URI]["copyright"]["0"].value : "";
+
+                                  $('#contributor').val(contributor);
+                                  $('#subject').val(subject);
+                                  $('#language').val(language);
+                                  $('#description').val(description);
+                                  $('#license').val(license);
+                                  $('#copyright').val(copyright);
+
+                                  $('.form-box-content').show();
+                              }
+                          });
+                      }
+                  }
+              }
+          });
       },
       change: function(event, ui){
         if($('#series').val() === '' && $('#seriesSelect').val() !== ''){
@@ -921,6 +957,9 @@ var ocScheduler = (function() {
     dcComps.description = new ocAdmin.Component(['description'], {
       key: 'description'
     });
+    dcComps.copyright = new ocAdmin.Component(['copyright'], {
+        key: 'copyright'
+      });
     agentComps.resources = new ocAdmin.Component([],
     {
       key: 'capture.device.names',
