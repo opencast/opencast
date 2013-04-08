@@ -540,7 +540,7 @@ public class IngestRestService {
     logger.info("Received new request from {} to ingest a zipped mediapackage", request.getRemoteHost());
 
     try {
-      String workflowDefinitionId = defaultWorkflowDefinitionId;
+      String workflowDefinitionId = null;
       Long workflowInstanceIdAsLong = null;
       Map<String, String> workflowConfig = new HashMap<String, String>();
       if (ServletFileUpload.isMultipartContent(request)) {
