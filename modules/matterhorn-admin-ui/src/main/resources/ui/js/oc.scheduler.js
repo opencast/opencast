@@ -1499,7 +1499,7 @@ var ocScheduler = (function() {
           var durationValid = ocScheduler.components.duration.validate();
           var error = [];
           if (startValid.length != 0) {
-            error.push(start.concat(startValid));
+            error.push(startValid);
           }
           if (durationValid.length != 0) {
             error.push(durationValid);
