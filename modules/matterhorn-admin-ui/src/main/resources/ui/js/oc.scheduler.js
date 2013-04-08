@@ -198,12 +198,14 @@ var ocScheduler = (function() {
                                   language = data[DUBLIN_CORE_NS_URI]["language"] ? data[DUBLIN_CORE_NS_URI]["language"]["0"].value : "",
                                   description = data[DUBLIN_CORE_NS_URI]["description"] ? data[DUBLIN_CORE_NS_URI]["description"]["0"].value : "",
                                   license = data[DUBLIN_CORE_NS_URI]["license"] ? data[DUBLIN_CORE_NS_URI]["license"]["0"].value : "";
+                                  copyright = data[DUBLIN_CORE_NS_URI]["copyright"] ? data[DUBLIN_CORE_NS_URI]["copyright"]["0"].value : "";
 
                                   $('#contributor').val(contributor);
                                   $('#subject').val(subject);
                                   $('#language').val(language);
                                   $('#description').val(description);
                                   $('#license').val(license);
+                                  $('#copyright').val(copyright);
 
                                   $('.form-box-content').show();
                               }
@@ -955,6 +957,9 @@ var ocScheduler = (function() {
     dcComps.description = new ocAdmin.Component(['description'], {
       key: 'description'
     });
+    dcComps.copyright = new ocAdmin.Component(['copyright'], {
+        key: 'copyright'
+      });
     agentComps.resources = new ocAdmin.Component([],
     {
       key: 'capture.device.names',
