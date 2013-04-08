@@ -2,8 +2,9 @@
   <head>
     <title>Hold for review</title>
     <link rel="stylesheet" type="text/css" href="/admin/css/jquery-ui/jquery-ui.css" />
-    <link rel="stylesheet" type="text/css" href="/admin/css/jquery-ui/jquery-ui-admin.css" />   
+    <link rel="stylesheet" type="text/css" href="/admin/css/jquery-ui/jquery-ui-admin.css" />
     <link rel="stylesheet" type="text/css" href="/admin/css/admin.css">
+
     <style type="text/css">
       #player-container {
         clear: both;
@@ -19,9 +20,9 @@
       input.pointInput {
         width: 60px;
         border: 0px solid white;
-       vertical-align: top;
-		margin-right: 6px;
-		margin-left: 6px;
+        vertical-align: top;
+		    margin-right: 6px;
+		    margin-left: 6px;
       }
 
       .actions {
@@ -61,1174 +62,123 @@
         margin: 0 auto;
       }
 
-      .formField-list label {
+      #trim-box .formField-list label {
         width: 30%;
         float: left;
         text-align: right;
         margin-right: 5px;
       }
-      
+
+      form#editForm {
+        margin-bottom: 20px;
+      }
+
       h3{
       	text-align: center;
       }
     </style>
-
+	<link rel="stylesheet" type="text/css" href="/mediapackage-editor/style/mediapackageeditor.css" />
     <script type="text/javascript" src="/admin/js/jquery/jquery.js"></script>
-    <script type="text/javascript" src="/admin/js/jquery/jquery-ui.js"></script>    
+    <script type="text/javascript" src="/admin/js/jquery/jquery-ui.js"></script>
     <script type="text/javascript" src="/admin/js/oc.utils.js"></script>
     <script type="text/javascript" src="/admin/js/itunes_categories.js"></script>
     <script type="text/javascript" src="/admin/js/oc.mediapackage.js"></script>
     <script type="text/javascript" src="/admin/js/jquery.jqote2.js"></script>
     <script type="text/javascript" src="/admin/js/jquery.xmlns.js"></script>
-    <script type="text/javascript">
-      var PLAYER_URL = '/admin/embed.html';
-      var DEFAULT_SERIES_CATALOG_ID = 'seriesCatalog';
-      var WORKFLOW_RESTSERVICE = '/workflow/instance/';
-      var DUBLIN_CORE_NS_URI  = 'http://purl.org/dc/terms/';
-            
-      var postData = {
-        'id': parent.document.getElementById("holdWorkflowId").value
-      };
-
-      var catalogUrl = '';
-      var mediapackage = null;
-      var DCmetadata = null;
-      var metadataChanged = false;
-      var seriesChanged = false;
-      var seriesServiceURL = false;
-
-      var inpoint = 0;
-      var outpoint = 0;
-            
-      // Variables for the "In point"- and "Out point"- increase-/decrease-Buttons
-      var secondsForward = 1;
-      var secondsBackward = 1;
-            
-      var intervalTimer = 0;
-      // Timeout of the Intervall Timer
-      var timerTimeout = 1500;
-      var timerSet = false; // -> temporary solution. clearInterval(timer) does not work properly
-      
-      function initCategories() {
-        var options = '';
-        $('#common-data').jqotesubtpl('common-data.tpl', {});
-        $('#additional-description').jqotesubtpl('additional-description.tpl', {});
-        for ( var key in iTunesCategories) {
-          options += '<option value="' + key + '">'
-            + iTunesCategories[key]['name']
-        }
-        $('#categorySelector').html(options);
-      }
-    	  
-      function changedCategory() {
-        var categoryId = $('#categorySelector').val();
-        var options = '';
-
-        var category = iTunesCategories[categoryId];
-        options += '<option value="' + categoryId + '">-- Choose a Subcategory --</option>';
-        for ( var i = 0; i < category['subCategories'].length; i++) {
-          var sub = category['subCategories'][i];
-          options += '<option value="' + sub.value + '">' + sub.name
-            + '</option>';
-        }
-        $("#category").html(options);
-        changedSubCategory();
-      }
-
-      function changedSubCategory() {
-        var subject = $('#category option:selected').index() == 0 ? $('#categorySelector option:selected').text() : $('#category option:selected').text();
-        $("#subject").val(subject);
-      }
-      
-      $(document).ready(function(){
-        var id = postData.id;
-        initCategories();
-        $('#categorySelector').change(function(){ changedCategory(); });
-        $('#category').change(function(){ changedSubCategory(); });
-        if(id == "") {
-          return;
-        }
-        var recordDate = null;
-        $('#recordDate').datepicker({
-          showOn: 'both',
-          buttonImage: '/admin/img/icons/calendar.gif',
-          buttonImageOnly: true,
-          dateFormat: 'yy-mm-dd'
-        });  		
-
-        $('.oc-ui-form-field').change(function() {
-          metadataChanged = true;
-        });
-                
-        // Set default Values for In point and Out point
-        $('#player-container').load(function(){
-          $('#inPoint').val("00:00:00");
-          // Set a Timer for the while-Loop
-          this.intervalTimer = window.setInterval(function(){
-            // Ask if a default Out Point has been set
-            if (setOutPointDefaultValue()) {
-              // Clear the Intervall
-              $('#continueBtn').button('enable');
-              window.clearInterval(this.intervalTimer);
-            }
-          }, timerTimeout);
-        });
-        
-        //load tracks
-        var tracks = {};
-        tracks.tracks = [];
-        
-        $.ajax({
-          url: WORKFLOW_RESTSERVICE + id + ".json",
-          async:false,
-          success: function(data) {
-            data = data.workflow.mediapackage.media.track;
-            for(i = 0; i< data.length; i++) {
-              if(data[i].type.indexOf("work") != -1) {
-                tracks.tracks.push(data[i]);
-              }
-            }
-          }
-        });
-        
-        $('#trackForm').append($('#template').jqote(tracks));
-        
-        $('input[id^="chk"]').click(function(event) {
-          if($("input:checked").length == 0) {
-            $('#trackError').show();
-            $(event.currentTarget).prop("checked", true);
-          } else {
-            $('#trackError').hide();
-          }
-        });
-        
-        // loading tracks ready
-                
-        /**
-         * Tries to set the default Out point value
-         */
-        function setOutPointDefaultValue(){
-          // If Duration has been set
-          if ($('#player-container')[0].contentWindow.Opencast != null &&
-            ($('#player-container')[0].contentWindow.Opencast.Player.getDuration() != 0) &&
-            !timerSet &&
-            ($('#player-container')[0].contentWindow.Opencast.Player.getDuration() != -1) &&
-            $('#player-container').contents().find('#oc_duration').text() != 'Initializing') {
-            $('#outPoint').val($('#player-container').contents().find('#oc_duration').text());
-            $('#newLength').val($('#player-container').contents().find('#oc_duration').text());
-            timerSet = true;
-            return true;
-          }
-                    
-          return false;
-        }
-                
-        //create Buttons
-        $('.ui-button').button();
-        //disable continue
-        $('#continueBtn').button('disable');
-                
-        //hide some stuff we don't want to see
-        window.parent.$('#uploadContainer').hide(0);
-        $('#trimming-hint').toggle();
-                
-        window.parent.$('#controlsTop').hide(0);
-        window.parent.$('#searchBox').hide(0);
-        window.parent.$('#tableContainer').hide(0);
-        window.parent.ocRecordings.disableRefresh();
-        window.parent.ocRecordings.stopStatisticsUpdate();
-        window.parent.$('#controlsFoot').hide(0);
-                
-        // Event edit link clicked
-        $('#edit-link').click(function(){
-          //parent.Recordings.retryRecording(id);
-          parent.location.href = "/admin/upload.html?retry=" + id;
-          return false;
-        });
-                
-        // Event set inpoint clicked
-        $('#set-trimin').click(function(){
-          $('#inPoint').val($('#player-container')[0].contentWindow.Opencast.Player.getCurrentTime());
-          checkInOutPoint();
-        });
-                
-        //Event set outpoint clicked
-        $('#set-trimout').click(function(){
-          $('#outPoint').val($('#player-container')[0].contentWindow.Opencast.Player.getCurrentTime());
-          checkInOutPoint();
-        });
-                
-        //Event forward one second (inpoint)
-        $('#step-in-forward').click(function(){
-          in_de_creaseObject($('#inPoint'), secondsForward);
-          checkInOutPoint();
-        });
-                
-        //Event backward one second (inpoint)
-        $('#step-in-backward').click(function(){
-          in_de_creaseObject($('#inPoint'), -secondsForward);
-          checkInOutPoint();
-        });
-                
-        //Event forward one second (outpoint)
-        $('#step-out-forward').click(function(){
-          in_de_creaseObject($('#outPoint'), secondsBackward);
-          checkInOutPoint();
-        });
-                
-        //Event backward one second (outpoint)
-        $('#step-out-backward').click(function(){
-          in_de_creaseObject($('#outPoint'), -secondsBackward);
-          checkInOutPoint();
-        });
-        
-        /**
-         * Checks if In point is bigger than Out point and prints an Error Message if this is the case
-         */
-        function checkInOutPoint(){
-          // Check if Out point is larger than the Video Duration
-          if (getTimeInMilliseconds($('#outPoint').val()) > getTimeInMilliseconds($('#player-container').contents().find('#oc_duration').text())) {
-            $('#outPoint').val($('#player-container').contents().find('#oc_duration').text());
-          }
-          // Check if In point is larger than the Video Duration
-          if (getTimeInMilliseconds($('#inPoint').val()) > getTimeInMilliseconds($('#player-container').contents().find('#oc_duration').text())) {
-            $('#inPoint').val($('#player-container').contents().find('#oc_duration').text());
-          }
-          if (getTimeInMilliseconds($('#inPoint').val()) >= getTimeInMilliseconds($('#outPoint').val())) {
-            $('div#errorMessage').html("Out point must be later than In point");
-            $('#trimming-hint').hide();
-            $('div#errorMessage').show();
-          }
-          else {
-            calculateNewLength();
-            $('div#errorMessage').hide();
-            $('#trimming-hint').show();
-          }
-        }
-                
-        function setValue(input, value){
-          $('#' + input).val(value);
-        }
-                
-        //start playing from current in point
-        $('#play-from-in').click(function(){
-          var videodisplay = $('#player-container')[0].contentWindow.Videodisplay;
-          videodisplay.pause();
-          var seekTime = getTimeInMilliseconds($('#inPoint').val());
-          videodisplay.seek(seekTime / 1000);
-          window.setTimeout(function(){
-            videodisplay.play();
-          }, 800);
-        });
-                
-        //play last 10 seconds to out
-        $('#play-to-out').click(function(){
-          var videodisplay = $('#player-container')[0].contentWindow.Videodisplay;
-          videodisplay.pause();
-          var seekTime = getTimeInMilliseconds($('#outPoint').val()) / 1000;
-          var timeOut = 10000;
-          // If Out point < 10 Seconds
-          if ((seekTime - 10) <= 0) {
-            videodisplay.seek(0);
-            timeOut = seekTime * 1000;
-          }
-          else {
-            videodisplay.seek(seekTime - 10);
-          }
-          window.setTimeout(function(){
-            videodisplay.play();
-            window.setTimeout(function(){
-              videodisplay.pause();
-            }, timeOut);
-                        
-          }, 800);
-        });
-                
-        // load preview player and metadata
-        $.ajax({
-          url: '/workflow/instance/' + id + '.xml',
-          dataType: 'xml', // or XML..
-          success: function(data){
-        	 $.xmlns["wf"] = "http://workflow.opencastproject.org";
-        	 $.xmlns["sec"] = "http://org.opencastproject.security";
-        	 $.xmlns["mp"] = "http://mediapackage.opencastproject.org";
-
-            // clone mediapackage for editing
-            mediapackage = ocUtils.createDoc('mediapackage', $.xmlns["mp"]);
-            var clone = $(data.documentElement).find("mp|mediapackage").clone();
-            $(clone).children().appendTo($(mediapackage.documentElement));
-            $(mediapackage.documentElement).attr('id',$(clone).attr('id'));
-            $(mediapackage.documentElement).attr('start',$(clone).attr('start'));
-            $(mediapackage.documentElement).attr('duration',$(clone).attr('duration'));
-
-            // populate series field if information present
-            var seriesid =  $(data.documentElement).find("mp|mediapackage > series").text();
-            if (seriesid != '') {
-              $('#isPartOf').val(seriesid);
-              $('#seriesSelect').val($(data.documentElement).find("mp|mediapackage > seriestitle").text());
-              $('#info-series')[0].innerHTML = $(data.documentElement).find("mp|mediapackage > seriestitle").text();
-            }
-
-            // load metadata from DC xml for editing
-            catalogUrl = $(data.documentElement).find("mp|mediapackage > mp|metadata > catalog[type='dublincore/episode'] > url").text();
-            $.ajax({
-              url: catalogUrl,
-              dataType: 'xml',
-              error: function(XMLHttpRequest, textStatus, errorThrown){
-                $('div#errorMessage').html('error: ' + textStatus);
-              },
-              success: function(data){
-                DCmetadata = data;
-                $(data.documentElement).children().each(function(index, elm){
-                  var tagName = elm.tagName.split(/:/)[1];
-                  if ($(elm).text() != '') {
-                    $('#' + tagName).val($(elm).text());
-		    if (tagName == 'license') {
-		       $('#' + tagName + 'Field').val($(elm).text());
-                    }
-                    if ($('#info-' + tagName).length>0) $('#info-' + tagName)[0].innerHTML = $(elm).text();        
-                    if ( tagName === "category") {
-                      value = $(elm).text();
-                      $('#categorySelector').val(value.substr(0,3));
-                      changedCategory();
-                      if(value.length > 3) {
-                        $('#category').val(value);
-                        changedSubCategory();
-                      }
-                    }
-                    if ( tagName === "created" ) {            
-                      $('#recordDate').datepicker('setDate',new Date($(elm).text()));
-                      $('#startTimeHour').val((new Date($(elm).text())).getHours()); 
-                      $('#startTimeMin').val((new Date($(elm).text())).getMinutes()); 
-                    }
-                  }                  
-                });
-
-                // save information that some metadata changed
-                $('.dcMetaField').change(function() {
-                  metadataChanged = true;
-                });
-                $('.ocMetaField').change(function() {
-                  metadataChanged = true;
-                });
-                parent.ocRecordings.adjustHoldActionPanelHeight();
-              }
-            });
-            
-            // get neccessary data to call the preview player
-            //var previewTag = $(data.documentElement).find("mediapackage > media > track > tags > tag:contains('engage')").first();
-            /*if (previewTag != null) {
-                     var videoUrl = $(previewTag).parent().parent().find('url').text();
-                     //alert("videoUrl: " + videoUrl);
-                     //$('#video-url-container').attr('href',videoUrl).text(videoUrl);
-                     var url = '/admin/embed.html?videoUrl=' + videoUrl;
-                     $('#player-container').attr('src', url);
-                     } else {
-                     $('#player-container').text('No preview encoded track found in MediaPackage');
-                     }*/
-
-	    var previewFilesTypes = new Array();
-            var previewFiles = new Array();
-                        
-            $(data.documentElement).find("mp|mediapackage > mp|media > track").each(function(index, elm){
-              if ($(elm).attr('type').split(/\//)[1] == 'preview') {
-	        previewFilesTypes.push($(elm).attr('type').split(/\//)[0]);
-                previewFiles.push($(elm).find('url').text());
-              }
-            });
-            if (previewFiles.length > 0) {
-              var url = PLAYER_URL + '?';
-              for (var i = 0; i < previewFiles.length; i++) {
-                if((previewFiles.length == 1) && (i == 0)) {
-                  url += 'videoUrl=';
-                }
-                else if ((i == 0) && (previewFilesTypes[i] == 'presenter')) {
-                  url += 'videoUrl=';
-                }
-                else if ((i == 1) && (previewFilesTypes[i] == 'presentation')) {
-                  url += '&videoUrl2=';
-                }
-                else if ((i == 0) && (previewFilesTypes[i] == 'presentation')) {
-                  url += 'videoUrl2=';
-                }
-                else if ((i == 1) && (previewFilesTypes[i] == 'presenter')) {
-                  url += '&videoUrl=';
-                }
-                else {
-                  url += '&videoUrl' + (i + 1) + '=';
-                }
-                 url += previewFiles[i];
-               }
-
-              $('#player-container').attr('src', url + "&play=false&preview=true&hideControls=false&hideAPLogo=true");
-            }
-            else {
-              $('#player-container').text("No preview media files found for this media package.");
-            }
-            // show links to source media
-            var singleFile = true;
-            $(data.documentElement).find("mp|mediapackage > mp|media > track").each(function(index, elm){
-              if ($(elm).attr('type').split(/\//)[1] == 'source') {
-                var link = document.createElement('a');
-                var url = $(elm).find('url').text();
-                $(link).attr('href', url);
-                var filename = url.split(/\//);
-                $(link).text(filename[filename.length - 1]).attr('title', 'Download ' + filename[filename.length - 1] + ' for editing');
-                if (singleFile) {
-                  singleFile = false;
-                }
-                else {
-                  $('#files').append($(document.createElement('span')).text(', '));
-                }
-                $('#files').append(link);
-              }
-            });
-          }
-        });
-
-        // Event: collapsable title clicked, de-/collapse collapsables
-        $('.collapse-control2').click(function() {
-          $(this).find('.ui-icon').toggleClass('ui-icon-triangle-1-e');
-          $(this).find('.ui-icon').toggleClass('ui-icon-triangle-1-s');
-          $(this).next('.collapsable').toggle();
-          parent.ocRecordings.adjustHoldActionPanelHeight();
-        });
-
-        // try to obtain URL of series service endpoint from service registry
-        // on success enable series input field / init autocomplete on it
-        // TODO: use JSONP here so we can call services provieded by other hosts in a distributed deployment
-        var thisHost = window.location.protocol + '//' + window.location.host;
-        $.ajax({
-          type: 'GET',
-          url: '/services/services.json',
-          data: { serviceType: 'org.opencastproject.series',  host: thisHost},
-          dataType : 'json',
-          success: function(data){                      // we are asking for a series service on the host this site comes from
-            if (data.services.service !== undefined) {  // so there should always be none or one instance returned (instead of  data.services beeing an array
-              seriesServiceURL = data.services.service.host + data.services.service.path;
-              $('#seriesSelect').removeAttr('disabled');
-              ocUtils.log('Initializing autocomplete for series field')
-              $('#seriesSelect').autocomplete({
-                source: function(request, response) {
-                  $.ajax({
-                    url: seriesServiceURL + '/series.json?q=' + request.term,
-                    dataType: 'json',
-                    type: 'GET',
-                    success: function(data) {
-                      var series_list = [];
-                      $.each(data.catalogs, function(){
-                        series_list.push({value: this[DUBLIN_CORE_NS_URI]['title'][0].value,
-                          id: this[DUBLIN_CORE_NS_URI]['identifier'][0].value});
-                      });
-                      response(series_list);
-                    }, 
-                    error: function() {
-                      ocUtils.log('could not retrieve series_data');
-                    }
-                  });
-                },
-                select: function(event, ui){
-                  $('#isPartOf').val(ui.item.id);
-                  seriesChanged = true;
-                },
-                change: function(event, ui){
-                  seriesChanged = true;
-                  if($('#isPartOf').val() === '' && $('#seriesSelect').val() !== ''){
-                    ocUtils.log("Searching for series in series endpoint");
-                    $.ajax({
-                      url : seriesServiceURL + '/series.json?seriesTitle=' + $('#seriesSelect').val(),
-                      type : 'get',
-                      dataType : 'json',
-                      success : function(data) {
-                        var series_input = $('#seriesSelect').val(),
-                        series_list = data["catalogs"],
-                        series_title,
-                        series_id;
-
-                        if(series_list.length !== 0){
-                          series_title = series_list[0][DUBLIN_CORE_NS_URI]["title"] ? series_list[0][DUBLIN_CORE_NS_URI]["title"][0].value : "";
-                          series_id = series_list[0][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[0][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
-                          $('#isPartOf').val(series_id);
-                        }
-                      }
-                    });
-                  } else if($('#isPartOf').val() === '' && $('#seriesSelect').val() === '') {
-                    $('#isPartOf').val('');
-                  }
-                },
-                search: function(){
-                  $('#isPartOf').val('');
-                }
-              });
-              //              $('#seriesSelect').autocomplete({
-              //                source: seriesServiceURL + '/search',
-              //                select: function(event, ui){
-              //                  $('#isPartOf').val(ui.item.id);
-              //                },
-              //                search: function(){
-              //                  $('#isPartOf').val('');
-              //                }
-              //              });
-              
-              // event handler: save information that series changed 
-              $('#seriesSelect').change(function() {
-                seriesChanged = true;
-              });
-            }
-          }
-        });
-
-        parent.ocRecordings.adjustHoldActionPanelHeight();
-      });
-
-     
-      /**
-       * Returns the Input Time in Milliseconds
-       * @param data Data in the Format ab:cd:ef
-       * @return Time from the Data in Milliseconds
-       */
-      function getTimeInMilliseconds(data){
-        var values = data.split(':');
-                
-        // If the Format is correct
-        if (values.length == 3) {
-          // Try to convert to Numbers
-          var val0 = values[0] * 1;
-          var val1 = values[1] * 1;
-          var val2 = values[2] * 1;
-          // Check and parse the Seconds
-          if (!isNaN(val0) && !isNaN(val1) && !isNaN(val2)) {
-            // Convert Hours, Minutes and Seconds to Milliseconds
-            val0 *= 60 * 60 * 1000; // 1 Hour = 60 Minutes = 60 * 60 Seconds = 60 * 60 * 1000 Milliseconds
-            val1 *= 60 * 1000; // 1 Minute = 60 Seconds = 60 * 1000 Milliseconds
-            val2 *= 1000; // 1 Second = 1000 Milliseconds
-            // Add the Milliseconds and return it
-            return val0 + val1 + val2;
-          }
-          else {
-            return 0;
-          }
-        }
-        else {
-          return 0;
-        }
-      }
-            
-      /**
-       * Increases or decreases the current In point by val
-       * @param obj Object with Function .val()
-       * @param val Value in Seconds to increase (val > 0) or decrease (val < 0), val < 20 Seconds
-       */
-      function in_de_creaseObject(obj, val){
-        if ((val != 0) && (Math.abs(val < 20))) {
-          // Get current In point data
-          var data = obj.val();
-          // If data contains something
-          if (data != '') {
-            var values = data.split(':');
-            if (values.length == 3) {
-              // Try to convert to Numbers
-              var val0 = values[0] * 1;
-              var val1 = values[1] * 1;
-              var val2 = values[2] * 1;
-              // Check and parse the Seconds
-              if (!isNaN(val0) && !isNaN(val1) && !isNaN(val2)) {
-                // Increase
-                if ((val > 0) && ((val0 >= 0) || (val1 >= 0) || (val2 >= 0))) {
-                  // If >= 59 Seconds
-                  if ((val2 + val) > 59) {
-                    // If >= 59 Minutes
-                    if ((val1 + 1) > 59) {
-                      // Increase Hours and set Minutes and Seconds to 0
-                      obj.val(getTimeString(val0 + 1, 0, Math.abs(val - (60 - val2))));
-                    }
-                    else {
-                      // Increase Minutes and set Seconds to the Difference
-                      obj.val(getTimeString(val0, val1 + 1, Math.abs(val - (60 - val2))));
-                    }
-                  }
-                  else {
-                    // Increase Seconds
-                    obj.val(getTimeString(val0, val1, val2 + val));
-                  }
-                }
-                // Decrease
-                else
-                  if ((val0 > 0) || (val1 > 0) || (val2 > 0)) {
-                    // If <= 0 Seconds
-                    if ((val2 + val) < 0) {
-                      // If <= 0 Minutes
-                      if ((val1 - 1) < 0) {
-                        // Decrease Hours and set Minutes and Seconds to 0
-                        obj.val(getTimeString(val0 - 1, 59, 60 - Math.abs(60 - Math.abs(val - (60 - val2)))));
-                      }
-                      else {
-                        // Decrease Minutes and set Seconds to 0
-                        obj.val(getTimeString(val0, val1 - 1, 60 - Math.abs(60 - Math.abs(val - (60 - val2)))));
-                      }
-                  }
-                  else {
-                    // Decrease Seconds
-                    obj.val(getTimeString(val0, val1, val2 + val));
-                  }
-                }
-                else {
-                  obj.val("00:00:00");
-                }
-              }
-              else {
-                obj.val("00:00:00");
-              }
-            }
-            else {
-              obj.val("00:00:00");
-            }
-          }
-        }
-      }
-      
-      /**
-       *calculates the new length of the media and shows the result
-       *in the according field
-       */
-      function calculateNewLength() {
-        inPoint = getTimeInMilliseconds($('#inPoint').val());
-        outPoint = getTimeInMilliseconds($('#outPoint').val());
-        newLength = (outPoint - inPoint) / 1000;
-        $('#newLength').val(getTimeString(Math.floor(newLength / 3600), Math.floor(newLength / 60), newLength % 60));
-      }
-            
-      /**
-       * Returns a correct formatted Time String in the Format ab:cd:ef
-       * @param val0 Hours element (0, 99)
-       * @param val0 Minutes element (0, 60)
-       * @param val0 Seconds element (0, 60)
-       * @return a correct formatted Time String in the Format ab:cd:ef
-       */
-      function getTimeString(val0, val1, val2){
-        if ((val0 >= 0) && (val0 < 100) && (val1 >= 0) && (val1 < 60) && (val2 >= 0) && (val2 < 60)) {
-          if (val0 <= 9) {
-            val0 = "0" + val0.toString();
-          }
-          if (val1 <= 9) {
-            val1 = "0" + val1.toString();
-          }
-          if (val2 <= 9) {
-            val2 = "0" + val2.toString();
-          }
-          return val0 + ":" + val1 + ":" + val2;
-        }
-        else {
-          return "00:00:00";
-        }
-      }
-            
-      /**
-       * Continues the Workflow
-       */
-      function continueWorkflow(){
-        // Get Video Duration
-        var videoDurationData = $('#player-container').contents().find('#oc_duration').text();
-        // Format 'Trim From'
-        var trimFromData = $('#inPoint').val();
-        trimFromData = ((trimFromData == '') || (trimFromData == null)) ? '00:00:00' : trimFromData;
-        // Format 'Trim To'
-        var trimToData = $('#outPoint').val();
-        trimToData = ((trimToData == '') || (trimToData == null)) ? videoDurationData : trimToData;
-
-        // if metadata was changed update DC catalog and mediapackage instance
-        if (metadataChanged) {
-          if ($('#title').val()) {
-            updateDCMetadata();
-            updateMediapackageMetadata();
-            saveDCMetadata();
-          } else {
-            alert("Field 'Title' must not be empty!");
-            return;
-          }
-        }
-
-        if (seriesChanged) {
-          if ($('#seriesSelect').val() == '') {
-            // remove series from mediapackage
-            ocUtils.log('Removing Series');
-            $(mediapackage.documentElement).find('series').remove();
-            $(mediapackage.documentElement).find('seriestitle').remove();
-            var $seriesCatalogRef = $(mediapackage.documentElement).find("mp|metadata > catalog[type='dublincore/series']");
-            if ($seriesCatalogRef.length > 0) {
-              // delete series DC xml from working file repo
-              var seriesCatalogUrl = $seriesCatalogRef.find('url').text();
-              $.ajax({
-                url : seriesCatalogUrl,
-                type : 'delete',
-                error: function() {
-                  ocUtils.log('Failed to removed Series DC XML');
-                },
-                success: function() {
-                  ocUtils.log('Removed Series DC XML');
-                }
-              });
-              $seriesCatalogRef.remove();
-            }
-          } else {
-            // update/add series data to mediapackage
-            var seriesDcXml = '';
-            if ($('#isPartOf').val() == '') {
-              // create series
-              ocUtils.log('Creating Series ' + $('#seriesSelect').val());
-              seriesXml = '<series><additionalMetadata><metadata><key>title</key><value>' + $('#seriesSelect').val() + '</value></metadata></additionalMetadata></series>';
-              $.ajax({
-                async: false,
-                type: 'PUT',
-                url: seriesServiceURL,
-                data: { series: seriesXml },
-                dataType : 'json',
-                success: function(data){
-                  $('#isPartOf').val(data.series.id);
-                }
-              });
-            }
-            // get seriesDcXml
-            ocUtils.log('Getting DC catalog for series ' + $('#isPartOf').val());
-            $.ajax({
-              url : seriesServiceURL + '/' + $('#isPartOf').val() + '.xml',
-              type : 'get',
-              async : false,
-              dataType : 'xml',
-              error : function() {
-                ocUtils.log('Could not retrieve series DC catalog for series ' + $('#isPartOf').val());
-              },
-              success : function(data) {
-                seriesDcXml = ocUtils.xmlToString(data);
-              }
-            });
-            
-            // find series dc ref in mediapackage
-            var seriesDcElm = $(mediapackage.documentElement).find("mp|metadata > catalog[type='dublincore/series']");
-            var seriesDcFileId = '';        // MediaPackageElementId of series DC catalog
-            if (seriesDcElm.length == 0) {
-              var seriesDcElm = $('<catalog></catalog>',mediapackage.documentElement).attr('id', DEFAULT_SERIES_CATALOG_ID).attr('type', 'dublincore/series');
-              $('<mimetype></mimetype>',mediapackage.documentElement).text('text/xml').appendTo(seriesDcElm);
-              $('<url></url>',mediapackage.documentElement).appendTo(seriesDcElm);
-              $(mediapackage.documentElement).find('mp|metadata').append(seriesDcElm);
-            }
-            // upload series dc xml
-            seriesDcFileId = seriesDcElm.attr('id');
-            var mediapackageId = $(mediapackage.documentElement).attr('id');
-            var url = '/files/mediapackage/' + mediapackageId + '/' + seriesDcFileId + '/dublincore.xml';
-            ocUtils.log('Saving Series DC Catalog to ' + url);
-            $.ajax({
-              url : url,
-              type : 'post',
-              async : false,
-              data: {content : seriesDcXml},
-              error: function() {
-                ocUtils.log('Failed to save DC metadata to ' + url);
-              },
-              success: function(data) {
-                ocUtils.log('Save DC metadata to ' + url);
-                seriesDcElm.find('url').text(data);
-              }
-            });
-            // finally update series in mediapackage instance
-            updateMPElement('seriestitle', $('#seriesSelect').val());
-            updateMPElement('series', $('#isPartOf').val());
-          }
-        }
-
-        // If Input < Output
-        if (trimFromData < trimToData) {
-          var newduration = getTimeInMilliseconds(trimToData) - getTimeInMilliseconds(trimFromData);
-          postData['trimin'] = getTimeInMilliseconds(trimFromData);
-          //postData['trimout'] = getTimeInMilliseconds(trimToData);
-          postData['newduration'] = newduration;
-          var trackChanged = $('input:checkbox:not(:checked)').length != $('input:checkbox').length;
-          if (metadataChanged || seriesChanged || trackChanged) {
-            var mp = ocUtils.xmlToString(mediapackage);
-            mp = mp.replace(/ xmlns="http:\/\/www\.w3\.org\/1999\/xhtml"/g,'');     // no luck with $(element).removeAttr('xmlns');
-            $.each($('input:checkbox:not(:checked)'), function(key, value) {
-              var trackId = $(value).prop("id");
-              trackId = trackId.split('/')[1];
-              mp = ocMediapackage.removeTrack(mp, trackId);
-            });
-            parent.ocRecordings.Hold.changedMediaPackage = mp;
-            //alert(mp);
-          }
-          parent.ocRecordings.continueWorkflow(postData);
-        }
-        else {
-          $('div#errorMessage').html("The In-Point must not be bigger than the Out-Point");
-        }
-      }
-            
-      function cancel(){
-        window.parent.location.href = "/admin";
-        // window.parent.location.href = window.parent.location.href;
-      }
-
-
-      function updateDCMetadata() {
-        ocUtils.log("Updating DC metadata");
-
-        $('.dcMetaField').each(function(){
-          var $field = $(this);
-          var fieldname = $field.attr('name');
-          if (fieldname==='created') {
-            recordDate = $('#recordDate').datepicker('getDate').getTime() / 1000;  	// Get date in milliseconds, convert to seconds.      
-            recordDate += $('#startTimeHour').val() * 3600; // convert hour to seconds, add to date.      
-            recordDate += $('#startTimeMin').val() * 60; //convert minutes to seconds, add to date.		
-            recordDate = recordDate * 1000; //back to milliseconds
-            recordDate = ocUtils.toISODate(recordDate); // = (new Date(recordDate)).format("isoUTCdateTime");
-          }
-          var $dcelm = false;    //$(DCmetadata.documentElement).find('dcterms\\:' + $field.attr('name'));
-          $(DCmetadata.documentElement).children().each(function(index, elm) {
-            if (elm.tagName == 'dcterms:' + fieldname) {
-               if ($field.val() == '' && !$field[0].disabled) {
-                 ocUtils.log("deleting " + $field.attr('name'));
-                 DCmetadata.documentElement.removeChild(elm);
-                 updateMPElement($field.attr('name'), $field.val());
-               } else if ($field.val() != '') {
-                 $dcelm = $(elm);
-               }
-            }
-          });
-          if ($field.val() != '') {
-            if ($dcelm !== false) {
-              ocUtils.log("updating " + $field.attr('name') + " to: " + $field.val());
-              $field.attr('name')==="created" ? $dcelm.text(recordDate) : $dcelm.text($field.val());
-            } else {
-              ocUtils.log("creating " + $field.attr('name') + " with value: " + $field.val());
-              $field.attr('name')==="created" ?  $('<dcterms:' + $field.attr('name') + '>').text(recordDate).appendTo(DCmetadata.documentElement) : $('<dcterms:' + $field.attr('name') + '>').text($field.val()).appendTo(DCmetadata.documentElement);
-            }
-          }
-        });
-        
-      }	
-		
-      // Update the MediaPackage instances metadata fields (see org.opencastproject.mediapackage.MediaPackageImpl)
-      function updateMediapackageMetadata() {
-        updateMetadataField('title','title');        
-        updateMetadataField('created','start');       
-        updateMetadataField('language','language');
-        updateMetadataField('keywords','keywords');
-        updateMetadataField('rightsholder','rightsholder');
-        updateMetadataField('license','license');
-        updateMetadataField('subject','subject');
-        updateMetadataGroupField('creator', 'creators', 'creator');
-        updateMetadataGroupField('contributor', 'contributors', 'contributor');
-
-        // update series
-        if ($('#seriesSelect').val() != '') {
-          if ($('#isPartOf').val() == '') {
-            createSeriesFromText();
-          }
-          updateMPElement('seriestitle', $('#seriesSelect').val());
-          updateMPElement('series', $('#isPartOf').val());  
-        }
-      }
-      
-      function createSeriesFromText() {
-        var dcDoc = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn"><dcterms:title xmlns="">' + $('#seriesSelect').val() + '</dcterms:title><dcterms:creator xmlns=""></dcterms:creator><dcterms:contributor xmlns=""></dcterms:contributor><dcterms:subject xmlns=""></dcterms:subject><dcterms:language xmlns=""></dcterms:language><dcterms:license xmlns=""></dcterms:license><dcterms:description xmlns=""></dcterms:description></dublincore>';
-        var acl = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="http://org.opencastproject.security"></acl>';
-        $.ajax({
-          type: 'POST',
-          url: '/series/',
-          async: false,
-          dataType: 'xml',
-          data: {
-            series: dcDoc,
-            acl: acl
-          },
-          success: function(data) {
-            id = data.getElementsByTagName('identifier')[0].textContent;
-            $('#isPartOf').val(id);
-          }
-        });
-      }
-
-      function updateMPElement(MPname, value) {
-        var $mpelm = $(mediapackage.documentElement).find(MPname);	
-        if (value == '' && $mpelm.length != 0){
-             ocUtils.log('Deleting ' + MPname);
-             if ($mpelm.parent()){
-                mediapackage.documentElement.removeChild($mpelm.parent()[0]);
-             } else {
-                mediapackage.documentElement.removeChild($mpelm[0]);
-             }
-        } else {
-           if ($mpelm.length != 0) {
-             ocUtils.log('Updating ' + MPname + ' in MediaPackage to ' + value);          
-             MPname==="start" ? $mpelm.text(recordDate) : $mpelm.text(value);
-           } else {
-             ocUtils.log('Creating ' + MPname + ' in MediaPackage with value ' + value);
-             $newelm = MPname==="start" ?  $('<' + MPname + '/>').text(recordDate) : $('<' + MPname + '/>').text(value);
-             $newelm.appendTo(mediapackage.documentElement);
-           }
-        }
-      }
-
-      function updateMetadataField(DCname, MPname) {
-        var $dcelm = $(DCmetadata.documentElement).find(DCname);
-        //dcterms:created ->
-        if ($dcelm.length != 0) {
-          updateMPElement(MPname, $dcelm.text());
-        }
-      }
-
-      function updateMetadataGroupField(DCname, MPgroupname, MPname) {
-        var $dcelms = $(DCmetadata.documentElement).find(DCname);
-        if ($dcelms.length != 0) {
-          $parent = $(mediapackage.documentElement).find(MPgroupname);
-          if ($parent.length > 0) {
-            $parent.empty();
-          } else {
-            $parent = $('<' + MPgroupname + '/>');
-            $(mediapackage.documentElement).append($parent);
-          }
-          $dcelms.each(function() {
-            $('<' + MPname + '/>').text($(this).text()).appendTo($parent);
-          });
-        }
-      }
-
-      function saveDCMetadata() {
-        $.ajax({
-          url: catalogUrl,
-          async: false,
-          type: 'post',
-          data: {content : ocUtils.xmlToString(DCmetadata)},
-          error: function() {
-            ocUtils.log('Failed to save DC metadata to ' + catalogUrl);
-          },
-          success: function() {
-            ocUtils.log('Save DC metadata to ' + catalogUrl);
-          }
-        });
-      }
-    </script>
+    <script type="text/javascript" src="/mediapackage-editor/scripts/jquery.mpeditor.js"></script>
+    <script type="text/javascript" src="/mediapackage-editor/scripts/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="/mediapackage-editor/scripts/jquery.boundinput.js"></script>
+    <script type="text/javascript" src="/mediapackage-editor/scripts/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/mediapackage-editor/scripts/mediaPackage.js"></script>
+    <script type="text/javascript" src="trim.js"></script>
   </head>
-  <body>
-    <div class="lectureInfo" style="">
-      <h2 id="info-title"></h2>
-      <h4 id="info-creator"></h4>
-      <h4 id="info-series"></h4>
-    </div>
 
-    <div class="holdStateUI" >
-      <h1>Review/Trim Media</h1>
-
-      <center>
-        <iframe id="player-container">
-        </iframe>
-        <div>
-          <label>
-            <span id="i18n_files_label">File(s)</span>:
-          </label>
-          <span id="files"></span>
+    <body>
+        <div class="lectureInfo" style="">
+            <h2 id="info-title"></h2>
+            <h4 id="info-creator"></h4>
+            <h4 id="info-series"></h4>
         </div>
-      </center>
-      
-     </div>
-      
-      <!-- Trim controls -->
-      <div class="form-box layout-centered ui-widget">
-	    <div class="form-box-content ui-widget-content ui-corner-all">
 
-		        <!-- control buttons -->
-		        <label for="inPoint" class="scheduler-label">
-		          In point
-		        </label>
-		        <input type="text" id="inPoint" readonly="readonly" class="pointInput"/><input type="button" style="width: 160px; background-color: #C7D7D7;" id="set-trimin" title="Set to current time" value="Set to current time" class="ui-button" /><input type="button" id="play-from-in" style="width: 160px; background-color: #C7D7D7;" title="Start playing at current In point" value="&gt; Play from In point" class="ui-button" /><input type="button" id="step-in-forward" style="background-color: #C7D7D7;" title="Increase In point by one second" value="&gt;&gt;" class="ui-button" /><input type="button" id="step-in-backward" style="background-color: #C7D7D7;" title="Decrease In point by one second" value="&lt;&lt;" class="ui-button" />
-		        <br/>
-		        <label for="outPoint" class="scheduler-label">
-		          Out point
-		        </label>
-		        <input type="text" id="outPoint" readonly="readonly" class="pointInput"/><input type="button" style="width: 160px; background-color: #C7D7D7;" id="set-trimout" title="Set to current time" value="Set to current time" class="ui-button" /><input type="button" id="play-to-out" style="width: 160px; background-color: #C7D7D7;" title="Play last 10 seconds to Out point" value="&gt; Play to Out point" class="ui-button" /><input type="button" id="step-out-forward" style="background-color: #C7D7D7;" title="Increase Out point by one second" value="&gt;&gt;" class="ui-button" /><input type="button" id="step-out-backward" style="background-color: #C7D7D7;" title="Decrease Out point by one second" value="&lt;&lt;" class="ui-button" />
-		        <br/>
-		        <hr class="rule"/>
-		        <label for="newLength" class="scheduler-label">
-		          New Length
-		        </label>
-		        <input type="text" id="newLength" readonly="readonly" class="pointInput" value="00:00:00"/><span style="margin-right: 34em;"> </span>
-		        <br/>
-		        
-		</div>
-      </div>
+        <div class="holdStateUI" >
+            <h1>Review/Trim Media</h1>
+            <center>
+                <iframe id="player-container"></iframe>
+                <div>
+                    <label>
+                        <span id="i18n_files_label">File(s)</span>:
+                    </label>
+                        <span id="files"></span>
+                </div>
+            </center>
+        </div>
+
+        <!-- Trim controls -->
+        <div class="form-box layout-centered ui-widget">
+	        <div class="form-box-content ui-widget-content ui-corner-all" id="trim-box">
+                <!-- control buttons -->
+                <label for="inPoint" class="scheduler-label">In point</label>
+                <input type="text" id="inPoint" readonly="readonly" class="pointInput"/><input type="button" style="width: 160px; background-color: #C7D7D7;" id="set-trimin" title="Set to current time" value="Set to current time" class="ui-button" /><input type="button" id="play-from-in" style="width: 160px; background-color: #C7D7D7;" title="Start playing at current In point" value="&gt; Play from In point" class="ui-button" /><input type="button" id="step-in-forward" style="background-color: #C7D7D7;" title="Increase In point by one second" value="&gt;&gt;" class="ui-button" /><input type="button" id="step-in-backward" style="background-color: #C7D7D7;" title="Decrease In point by one second" value="&lt;&lt;" class="ui-button" />
+                <br/>
+                <label for="outPoint" class="scheduler-label">Out point</label>
+                <input type="text" id="outPoint" readonly="readonly" class="pointInput"/><input type="button" style="width: 160px; background-color: #C7D7D7;" id="set-trimout" title="Set to current time" value="Set to current time" class="ui-button" /><input type="button" id="play-to-out" style="width: 160px; background-color: #C7D7D7;" title="Play last 10 seconds to Out point" value="&gt; Play to Out point" class="ui-button" /><input type="button" id="step-out-forward" style="background-color: #C7D7D7;" title="Increase Out point by one second" value="&gt;&gt;" class="ui-button" /><input type="button" id="step-out-backward" style="background-color: #C7D7D7;" title="Decrease Out point by one second" value="&lt;&lt;" class="ui-button" />
+                <br/>
+                <hr class="rule"/>
+                <label for="newLength" class="scheduler-label">New Length</label>
+                <input type="text" id="newLength" readonly="readonly" class="pointInput" value="00:00:00"/><span style="margin-right: 34em;"> </span>
+                <br/>
+		    </div>
+        </div>
 
 
-	
-      <div class="form-box layout-centered ui-widget">
-			
+        <div class="form-box layout-centered ui-widget">
 			<!-- Choose track -->
 	        <div class="form-box-head ui-widget-header ui-corner-top oc-ui-cursor collapse-control2">
-	          <div id="additional_icon" class="ui-icon ui-icon-triangle-1-e"></div>
-	          <div id="i18n_additional">Select Tracks</div>
-	          <div class="clear"></div>
+	            <div id="additional_icon" class="ui-icon ui-icon-triangle-1-e"></div>
+	            <div id="i18n_additional">Select Tracks</div>
+	            <div class="clear"></div>
 	        </div>
-	        <div class="form-box-content ui-widget-content ui-corner-bottom collapsable" style="display:none">
-	          <div class="ui-helper-hidden" id="trackError">
-	            At least one track needs to be selected
-	          </div>
-	          <form action="" id="trackForm">
-	
-	          </form>
-	        </div>
-	        
-	        <!-- Edit metadata -->
-	        <br/>
-	        <h3>Edit Metadata</h3>
-	        <br/>
-      
-	        <div class="form-box-content ui-widget-content ui-corner-all">
-	          <form action="">
-		    <div id="common-data"></div>
-                    <ul class="oc-ui-form-list">
-	              <li>
-	                <label class="scheduler-label" id="recordingDateLabel"><span id="i18n_date_label">Recording Date</span>:</label>
-	                <input type="text" size="10" id="recordDate" class="dcMetaField" name="created"/>
-	              </li> 
-	              <li>
-	                <label class="scheduler-label" id="startTimeLabel"><span id="i18n_starttime_label">Start Time</span>:</label>
-	                <select id="startTimeHour">
-	                  <option value="0">00</option>
-	                  <option value="1">01</option>
-	                  <option value="2">02</option>
-	                  <option value="3">03</option>
-	                  <option value="4">04</option>
-	                  <option value="5">05</option>
-	                  <option value="6">06</option>
-	                  <option value="7">07</option>
-	                  <option value="8">08</option>
-	                  <option value="9">09</option>
-	                  <option value="10">10</option>
-	                  <option value="11">11</option>
-	                  <option value="12">12</option>
-	                  <option value="13">13</option>
-	                  <option value="14">14</option>
-	                  <option value="15">15</option>
-	                  <option value="16">16</option>
-	                  <option value="17">17</option>
-	                  <option value="18">18</option>
-	                  <option value="19">19</option>
-	                  <option value="20">20</option>
-	                  <option value="21">21</option>
-	                  <option value="22">22</option>
-	                  <option value="23">23</option>
-	                </select>
-	                <select id="startTimeMin">
-	                  <option value="0">00</option>
-	                  <option value="1">01</option>
-	                  <option value="2">02</option>
-	                  <option value="3">03</option>
-	                  <option value="4">04</option>
-	                  <option value="5">05</option>
-	                  <option value="6">06</option>
-	                  <option value="7">07</option>
-	                  <option value="8">08</option>
-	                  <option value="9">09</option>
-	                  <option value="10">10</option>
-	                  <option value="11">11</option>
-	                  <option value="12">12</option>
-	                  <option value="13">13</option>
-	                  <option value="14">14</option>
-	                  <option value="15">15</option>
-	                  <option value="16">16</option>
-	                  <option value="17">17</option>
-	                  <option value="18">18</option>
-	                  <option value="19">19</option>
-	                  <option value="20">20</option>
-	                  <option value="21">21</option>
-	                  <option value="22">22</option>
-	                  <option value="23">23</option>
-	                  <option value="24">24</option>
-	                  <option value="25">25</option>
-	                  <option value="26">26</option>
-	                  <option value="27">27</option>
-	                  <option value="28">28</option>
-	                  <option value="29">29</option>
-	                  <option value="30">30</option>
-	                  <option value="31">31</option>
-	                  <option value="32">32</option>
-	                  <option value="33">33</option>
-	                  <option value="34">34</option>
-	                  <option value="35">35</option>
-	                  <option value="36">36</option>
-	                  <option value="37">37</option>
-	                  <option value="38">38</option>
-	                  <option value="39">39</option>
-	                  <option value="40">40</option>
-	                  <option value="41">41</option>
-	                  <option value="42">42</option>
-	                  <option value="43">43</option>
-	                  <option value="44">44</option>
-	                  <option value="45">45</option>
-	                  <option value="46">46</option>
-	                  <option value="47">47</option>
-	                  <option value="48">48</option>
-	                  <option value="49">49</option>
-	                  <option value="50">50</option>
-	                  <option value="51">51</option>
-	                  <option value="52">52</option>
-	                  <option value="53">53</option>
-	                  <option value="54">54</option>
-	                  <option value="55">55</option>
-	                  <option value="56">56</option>
-	                  <option value="57">57</option>
-	                  <option value="58">58</option>
-	                  <option value="59">59</option>
-	                </select>
-	              </li>
-	              
-	              	</ul>
-	        	</form>
-	         </div>
-	              
-			<br/>
-	                  
-	          <div class="form-box-head ui-widget-header ui-corner-top oc-ui-cursor collapse-control2">         
-	                <div class="ui-icon unfoldable-icon ui-icon-triangle-1-e"></div>          
-	                <div id="i18n_additional">Additional Description</div>          
-	                <div class="clear"></div>        
-	          </div>       
-	                 
-	         <div class="form-box-content ui-widget-content ui-corner-bottom collapsable" style="display:none">    
-		     <div id="additional-description"></div>
-	         </div>
-      </div>
 
-      <script type="text/x-jqote-template" id="template">
-        <![CDATA[
-        <table border="1">
-          <thead>
-            <tr>
-              <th class="ui-widget-header">Track</th>
-              <th class="ui-widget-header">selected</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% $.each(data[j].tracks, function(key, track ) { %>
-            <tr>
-              <td><%= track.type %></td>
-              <td class="right"><input type="checkbox" checked="checked" id="chk/<%= track.id %>"/></td>
-            </tr>
-            <% }); %>
-          </tbody>
-        </table>
-        ]]>
-      </script>
-      
-      <!-- Controls to continue the workflow -->
-      <div class="actions">
-      	<div id="errorMessage" class="error"></div>
-        
-        <div id="trimming-hint">
-          <p style="color:green;">
-            This Recording will be trimmed according to the In and Out points you have set when you continue.
-          </p>
+	        <div class="form-box-content ui-widget-content ui-corner-bottom collapsable" style="display:none">
+	            <div class="ui-helper-hidden" id="trackError">
+	               At least one track needs to be selected
+	            </div>
+	            <form action="" id="trackForm"></form>
+	        </div>
         </div>
-        
-        <input title="Continue processing this recording with any edits (metadata, trim points)" style="margin-left: 65px; margin-right: 16px; width: 160px;" onclick="continueWorkflow();" id="continueBtn" type="button" class="ui-button ui-corner-all" value="Continue processing" />
-        <a onclick="cancel()" title="Cancel" class="secondaryButton">Cancel</a>
-      </div>
-  </body>
+
+        <script type="text/x-jqote-template" id="template">
+            <![CDATA[
+                <table border="1">
+                  <thead>
+                    <tr>
+                      <th class="ui-widget-header">Track</th>
+                      <th class="ui-widget-header">selected</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% $.each(data[j].tracks, function(key, track ) { %>
+                    <tr>
+                      <td><%= track.type %></td>
+                      <td class="right"><input type="checkbox" checked="checked" id="chk/<%= track.id %>"/></td>
+                    </tr>
+                    <% }); %>
+                  </tbody>
+                </table>
+            ]]>
+        </script>
+
+        <!-- Controls to continue the workflow -->
+        <div class="actions">
+            <div id="errorMessage" class="error"></div>
+            <div id="trimming-hint">
+                <p style="color:green;">This Recording will be trimmed according to the In and Out points you have set when you continue.</p>
+            </div>
+            <div id="mpe-editor"></div>
+
+            <input title="Continue processing this recording with any edits (metadata, trim points)" style="margin-left: 65px; margin-right: 16px; width: 160px;" onclick="continueWorkflow();" id="continueBtn" type="button" class="ui-button ui-corner-all" value="Continue processing" />
+
+            <a onclick="cancel()" title="Cancel" class="secondaryButton">Cancel</a>
+        </div>
+    </body>
 </html>
