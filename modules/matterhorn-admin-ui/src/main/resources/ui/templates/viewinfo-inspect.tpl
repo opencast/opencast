@@ -188,7 +188,7 @@
       </tr>
       <% }); %>
     </table>
-    <% } %> <!-- endif -->
+    <% } %>
     <% if ($(data[j].workflow.mediapackage.attachments).size() > 0) { %>
     <br>
     <h3>Attachments</h3>
@@ -197,6 +197,42 @@
       <tr class="unfoldable-tr">
         <td class="td-key">
           <%= item.type %>
+        </td>
+        <td class="td-value">
+          <%= item.id %>
+          <div class="unfoldable-content">
+            <table class="subtable">
+              <% $.each(item, function(key, value) { %>
+              <% if (typeof value == 'string' || typeof value == 'number') { %>
+              <tr>
+                <td class="td-key">
+                  <%= key %>
+                </td>
+                <td class="td-value">
+                  <% if (key == 'url') { %>
+                  <a href="<%= value %>"><%= value %></a>
+                  <% } else { %>
+                  <%= value %>
+                  <% } %>
+                </td>
+              </tr>
+              <% } %>
+              <% }); %>
+            </table>
+          </div>
+        </td>
+      </tr>
+      <% }); %>
+    </table>
+    <% } %> <!-- endif -->
+    <% if ($(data[j].workflow.mediapackage.publications).size() > 0) { %>
+    <br />
+    <h3>Publications</h3>
+    <table class="kvtable">
+      <% $.each(data[j].workflow.mediapackage.publications, function(key, item) { %>
+      <tr class="unfoldable-tr">
+        <td class="td-key">
+          <%= item.channel %>
         </td>
         <td class="td-value">
           <%= item.id %>

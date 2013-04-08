@@ -1,0 +1,25 @@
+<mediapackage xmlns="http://mediapackage.opencastproject.org" start="2007-12-05T13:40:00" duration="1004400000"
+        id="mp-mediapackage-youtube.xml">
+  <media>
+    <track id="track-1" type="presentation/source">
+      <mimetype>video/mpeg</mimetype>
+      <url>@SAMPLES_URL@/screen.mpg</url>
+    </track>
+  </media>
+  <metadata>
+    <catalog id="catalog-1" type="dublincore/episode">
+      <mimetype>text/xml</mimetype>
+      <url>@SAMPLES_URL@/dc-1.xml</url>
+    </catalog>
+    <catalog id="catalog-2" type="dublincore/series">
+      <mimetype>text/xml</mimetype>
+      <url>@SAMPLES_URL@/dc-2.xml</url>
+    </catalog>
+  </metadata>
+  <publications>
+    <publication channel="youtube" id="bba95581-1848-4427-9ba9-d8551a6a87d5">
+        <mimetype>text/html</mimetype>
+        <url>https://www.youtube.com/watch?v=WEbzZP-_SscDew323</url>
+    </publication>
+  </publications>
+</mediapackage>

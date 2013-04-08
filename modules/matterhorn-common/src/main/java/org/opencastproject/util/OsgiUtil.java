@@ -17,6 +17,7 @@
 package org.opencastproject.util;
 
 import org.apache.commons.lang.StringUtils;
+import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
@@ -26,7 +27,6 @@ import org.osgi.service.component.ComponentContext;
 
 import java.util.Dictionary;
 
-import static org.opencastproject.util.data.Collections.mkString;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 
@@ -99,7 +99,7 @@ public final class OsgiUtil {
 
   /** Create a config info string suitable for logging purposes. */
   public static String showConfig(Tuple<String, ?>... cfg) {
-    return "Config\n" + mkString(
+    return "Config\n" + Collections.mkString(
             mlist(cfg).map(new Function<Tuple<String, ?>, String>() {
               @Override public String apply(Tuple<String, ?> t) {
                 return t.getA() + "=" + t.getB().toString();

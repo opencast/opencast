@@ -36,14 +36,31 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static org.opencastproject.util.data.Collections.find;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_ACCESS_RIGHTS;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_AVAILABLE;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CONTRIBUTOR;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CREATED;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CREATOR;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_DESCRIPTION;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_EXTENT;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IS_PART_OF;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_LANGUAGE;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_LICENSE;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_PUBLISHER;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_REPLACES;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_RIGHTS_HOLDER;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_SPATIAL;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_SUBJECT;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TYPE;
 import static org.opencastproject.util.data.Collections.head;
-import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 
@@ -93,40 +110,41 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
    */
   @Override
   public StaticMetadata getMetadata(final MediaPackage mp) {
-    List<Catalog> dcs = Arrays.asList(mp.getCatalogs(DublinCoreCatalog.ANY_DUBLINCORE));
-    return find(dcs, flavorPredicate(MediaPackageElements.EPISODE))
+    return mlist(list(mp.getCatalogs(DublinCoreCatalog.ANY_DUBLINCORE)))
+            .find(flavorPredicate(MediaPackageElements.EPISODE))
             .flatMap(loader)
             .map(new Function<DublinCoreCatalog, StaticMetadata>() {
               @Override
               public StaticMetadata apply(DublinCoreCatalog episode) {
                 return newStaticMetadataFromEpisode(episode);
               }
-            }).getOrElse((StaticMetadata) null);
+            })
+            .getOrElse((StaticMetadata) null);
   }
 
   private static StaticMetadata newStaticMetadataFromEpisode(DublinCoreCatalog episode) {
     // Ensure that the mandatory properties are present
-    final Option<String> id = option(episode.getFirst(DublinCore.PROPERTY_IDENTIFIER));
-    final Option<Date> created = option(episode.getFirst(DublinCore.PROPERTY_CREATED)).map(new Function<String, Date>() {
+    final Option<String> id = option(episode.getFirst(PROPERTY_IDENTIFIER));
+    final Option<Date> created = option(episode.getFirst(PROPERTY_CREATED)).map(new Function<String, Date>() {
       @Override
       public Date apply(String a) {
         final Date date = EncodingSchemeUtils.decodeDate(a);
         return date != null ? date : Misc.<Date>chuck(new RuntimeException(a + " does not conform to W3C-DTF encoding scheme."));
       }
     });
-    final Option<String> language = option(episode.getFirst(DublinCore.PROPERTY_LANGUAGE));
-    final Option<Long> extent = head(episode.get(DublinCore.PROPERTY_EXTENT)).map(new Function<DublinCoreValue, Long>() {
+    final Option<String> language = option(episode.getFirst(PROPERTY_LANGUAGE));
+    final Option<Long> extent = head(episode.get(PROPERTY_EXTENT)).map(new Function<DublinCoreValue, Long>() {
       @Override
       public Long apply(DublinCoreValue a) {
         final Long extent = EncodingSchemeUtils.decodeDuration(a);
         return extent != null ? extent : Misc.<Long>chuck(new RuntimeException(a + " does not conform to ISO8601 encoding scheme for durations."));
       }
     });
-    final Option<String> type = option(episode.getFirst(DublinCore.PROPERTY_TYPE));
+    final Option<String> type = option(episode.getFirst(PROPERTY_TYPE));
 
-    final Option<String> isPartOf = option(episode.getFirst(DublinCore.PROPERTY_IS_PART_OF));
-    final Option<String> replaces = option(episode.getFirst(DublinCore.PROPERTY_REPLACES));
-    final Option<Interval> available = head(episode.get(DublinCore.PROPERTY_AVAILABLE)).flatMap(
+    final Option<String> isPartOf = option(episode.getFirst(PROPERTY_IS_PART_OF));
+    final Option<String> replaces = option(episode.getFirst(PROPERTY_REPLACES));
+    final Option<Interval> available = head(episode.get(PROPERTY_AVAILABLE)).flatMap(
             new Function<DublinCoreValue, Option<Interval>>() {
               @Override
               public Option<Interval> apply(DublinCoreValue v) {
@@ -136,28 +154,26 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
                         : Misc.<Option<Interval>>chuck(new RuntimeException(v + " does not conform to W3C-DTF encoding scheme for periods"));
               }
             });
-    final NonEmptyList<MetadataValue<String>> titles = new NonEmptyList<MetadataValue<String>>(map(
-            episode.get(DublinCore.PROPERTY_TITLE), dc2mvString(DublinCore.PROPERTY_TITLE.getLocalName())));
-    final List<MetadataValue<String>> subjects = (List<MetadataValue<String>>) map(
-            episode.get(DublinCore.PROPERTY_SUBJECT), dc2mvString(DublinCore.PROPERTY_SUBJECT.getLocalName()));
-    final List<MetadataValue<String>> creators = (List<MetadataValue<String>>) map(
-            episode.get(DublinCore.PROPERTY_CREATOR), dc2mvString(DublinCore.PROPERTY_CREATOR.getLocalName()));
-    final List<MetadataValue<String>> publishers = (List<MetadataValue<String>>) map(
-            episode.get(DublinCore.PROPERTY_PUBLISHER), dc2mvString(DublinCore.PROPERTY_PUBLISHER.getLocalName()));
-    final List<MetadataValue<String>> contributors = (List<MetadataValue<String>>) map(
-            episode.get(DublinCore.PROPERTY_CONTRIBUTOR), dc2mvString(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName()));
-    final List<MetadataValue<String>> description = (List<MetadataValue<String>>) map(
-            episode.get(DublinCore.PROPERTY_DESCRIPTION), dc2mvString(DublinCore.PROPERTY_DESCRIPTION.getLocalName()));
-    final List<MetadataValue<String>> rightsHolders = (List<MetadataValue<String>>) map(
-            episode.get(DublinCore.PROPERTY_RIGHTS_HOLDER),
-            dc2mvString(DublinCore.PROPERTY_RIGHTS_HOLDER.getLocalName()));
-    final List<MetadataValue<String>> spatials = (List<MetadataValue<String>>) map(
-            episode.get(DublinCore.PROPERTY_SPATIAL), dc2mvString(DublinCore.PROPERTY_SPATIAL.getLocalName()));
-    final List<MetadataValue<String>> accessRights = (List<MetadataValue<String>>) map(
-            episode.get(DublinCore.PROPERTY_ACCESS_RIGHTS),
-            dc2mvString(DublinCore.PROPERTY_ACCESS_RIGHTS.getLocalName()));
-    final List<MetadataValue<String>> licenses = (List<MetadataValue<String>>) map(
-            episode.get(DublinCore.PROPERTY_LICENSE), dc2mvString(DublinCore.PROPERTY_LICENSE.getLocalName()));
+    final NonEmptyList<MetadataValue<String>> titles = new NonEmptyList<MetadataValue<String>>(
+            mlist(episode.get(PROPERTY_TITLE)).map(dc2mvString(PROPERTY_TITLE.getLocalName())).value());
+    final List<MetadataValue<String>> subjects =
+            mlist(episode.get(PROPERTY_SUBJECT)).map(dc2mvString(PROPERTY_SUBJECT.getLocalName())).value();
+    final List<MetadataValue<String>> creators =
+            mlist(episode.get(PROPERTY_CREATOR)).map(dc2mvString(PROPERTY_CREATOR.getLocalName())).value();
+    final List<MetadataValue<String>> publishers =
+            mlist(episode.get(PROPERTY_PUBLISHER)).map(dc2mvString(PROPERTY_PUBLISHER.getLocalName())).value();
+    final List<MetadataValue<String>> contributors =
+            mlist(episode.get(PROPERTY_CONTRIBUTOR)).map(dc2mvString(PROPERTY_CONTRIBUTOR.getLocalName())).value();
+    final List<MetadataValue<String>> description =
+            mlist(episode.get(PROPERTY_DESCRIPTION)).map(dc2mvString(PROPERTY_DESCRIPTION.getLocalName())).value();
+    final List<MetadataValue<String>> rightsHolders =
+            mlist(episode.get(PROPERTY_RIGHTS_HOLDER)).map(dc2mvString(PROPERTY_RIGHTS_HOLDER.getLocalName())).value();
+    final List<MetadataValue<String>> spatials =
+            mlist(episode.get(PROPERTY_SPATIAL)).map(dc2mvString(PROPERTY_SPATIAL.getLocalName())).value();
+    final List<MetadataValue<String>> accessRights =
+            mlist(episode.get(PROPERTY_ACCESS_RIGHTS)).map(dc2mvString(PROPERTY_ACCESS_RIGHTS.getLocalName())).value();
+    final List<MetadataValue<String>> licenses =
+            mlist(episode.get(PROPERTY_LICENSE)).map(dc2mvString(PROPERTY_LICENSE.getLocalName())).value();
 
     return new StaticMetadata() {
       @Override
@@ -297,5 +313,4 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
       IOUtils.closeQuietly(in);
     }
   }
-
 }

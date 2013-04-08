@@ -26,7 +26,7 @@ public final class Booleans {
   }
 
   /** Return a predicate function that always returns true. */
-  public static <A> Function<A, Boolean> all() {
+  public static <A> Function<A, Boolean> always() {
     return new Function<A, Boolean>() {
       @Override public Boolean apply(A a) {
         return true;
@@ -71,6 +71,22 @@ public final class Booleans {
     }
   };
 
+  public static <A, B> Function2<A, B, Boolean> and(final Function<A, Boolean> f, final Function<B, Boolean> g) {
+    return new Function2<A, B, Boolean>() {
+      @Override public Boolean apply(A a, B b) {
+        return f.apply(a) && g.apply(b);
+      }
+    };
+  }
+
+  public static <A> Function<A, Boolean> and(final Function<A, Boolean> f, final Function<A, Boolean> g) {
+    return new Function<A, Boolean>() {
+      @Override public Boolean apply(A a) {
+        return f.apply(a) && g.apply(a);
+      }
+    };
+  }
+
   /** A function that always returns true. */
   public static final Function0<Boolean> yes = new Function0<Boolean>() {
     @Override
@@ -98,7 +114,7 @@ public final class Booleans {
   };
 
   /** A function that always returns false. */
-  private static <A> Function<A, Boolean> no() {
+  public static <A> Function<A, Boolean> no() {
     return new Function<A, Boolean>() {
       @Override
       public Boolean apply(A a) {
@@ -107,7 +123,11 @@ public final class Booleans {
     };
   }
 
-  private static Function<Boolean, Boolean> negate = new Function<Boolean, Boolean>() {
+  public static <A> Function<A, Boolean> not(Function<A, Boolean> f) {
+    return not.o(f);
+  }
+
+  public static final Function<Boolean, Boolean> not = new Function<Boolean, Boolean>() {
     @Override
     public Boolean apply(Boolean a) {
       return !a;

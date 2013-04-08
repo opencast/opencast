@@ -60,6 +60,7 @@
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-metadata</module>
         <module>modules/matterhorn-mpeg7</module>
+        <module>modules/matterhorn-publication-service-api</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-scheduler-api</module>
@@ -222,12 +223,13 @@
         <module>modules/matterhorn-distribution-service-api</module>
         <module>modules/matterhorn-distribution-service-download</module>
         <module>modules/matterhorn-distribution-service-streaming</module>
-        <module>modules/matterhorn-distribution-service-youtube</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
+		<module>modules/matterhorn-publication-service-api</module>
+		<module>modules/matterhorn-publication-service-youtube</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-static</module>
@@ -251,12 +253,13 @@
         <module>modules/matterhorn-distribution-service-api</module>
         <module>modules/matterhorn-distribution-service-download-remote</module>
         <module>modules/matterhorn-distribution-service-streaming-remote</module>
-        <module>modules/matterhorn-distribution-service-youtube-remote</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
+		<module>modules/matterhorn-publication-service-api</module>
+		<module>modules/matterhorn-publication-service-youtube-remote</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-webconsole</module>
@@ -344,13 +347,14 @@
         <module>modules/matterhorn-distribution-service-api</module>
         <module>modules/matterhorn-distribution-service-download-remote</module>
         <module>modules/matterhorn-distribution-service-streaming-remote</module>
-        <module>modules/matterhorn-distribution-service-youtube-remote</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-lti</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
+		<module>modules/matterhorn-publication-service-api</module>
+		<module>modules/matterhorn-publication-service-youtube-remote</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-search-service-remote</module>

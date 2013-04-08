@@ -16,7 +16,7 @@
 package org.opencastproject.episode.impl.persistence;
 
 import org.opencastproject.episode.api.Version;
-import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.episode.impl.PartialMediaPackage;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.util.data.Option;
 
@@ -91,7 +91,7 @@ public interface EpisodeServiceDatabase {
   /**
    * Stores a new version of a media package
    *
-   * @param mediaPackage
+   * @param pmp
    *         the media package to store
    * @param acl
    *         the acl of the media package
@@ -102,7 +102,10 @@ public interface EpisodeServiceDatabase {
    * @throws EpisodeServiceDatabaseException
    *         if an error occurs
    */
-  void storeEpisode(MediaPackage mediaPackage, AccessControlList acl, Date now, Version version) throws EpisodeServiceDatabaseException;
+  void storeEpisode(PartialMediaPackage pmp,
+                    AccessControlList acl,
+                    Date now,
+                    Version version) throws EpisodeServiceDatabaseException;
 
   Option<Asset> findAssetByChecksum(String checksum) throws EpisodeServiceDatabaseException;
 }

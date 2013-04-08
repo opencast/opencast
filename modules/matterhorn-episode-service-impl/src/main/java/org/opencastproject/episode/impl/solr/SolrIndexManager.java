@@ -464,11 +464,11 @@ public class SolrIndexManager {
     logger.debug("Looking for mpeg-7 catalogs containing segment texts");
     // TODO: merge the segments from each mpeg7 if there is more than one mpeg7 catalog
     mlist(mediaPackage.getCatalogs(MediaPackageElements.TEXTS))
-            .head()
+            .headOpt()
             .orElse(new Function0<Option<Catalog>>() {
               @Override public Option<Catalog> apply() {
                 logger.debug("No text catalogs found, trying segments only");
-                return mlist(mediaPackage.getCatalogs(MediaPackageElements.SEGMENTS)).head();
+                return mlist(mediaPackage.getCatalogs(MediaPackageElements.SEGMENTS)).headOpt();
               }
             })
             .fold(new Option.EMatch<Catalog>() {

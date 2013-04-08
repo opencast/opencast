@@ -13,13 +13,10 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.util.data;
 
-import java.lang.reflect.Array;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -36,12 +33,11 @@ import static org.opencastproject.util.data.Option.some;
 
 /**
  * This class provides functions to ease and secure the handling of collections by supporting a type safe
- * -- at least to the extent Java's type system allows -- immutable and more functional style. You'll
- * find some of the usual suspects from FP here like <code>map</code>, <code>flatMap</code> and <code>filter</code>
- * but also simple helpers like <code>set</code>.
+ * -- at least to the extent Java's type system allows -- immutable and more functional style.
+ * <p/>
+ * Note that all functions do <i>not</i> mutate input collections unless otherwise stated.
  */
 public final class Collections {
-
   private Collections() {
   }
 
@@ -93,6 +89,7 @@ public final class Collections {
    *         the (empty) target collection
    * @param f
    *         the function to apply to each element of <code>as</code>
+   * @deprecated use {@link Monadics}
    */
   public static <A, B, M extends Collection<B>> M map(Collection<A> as, M bs, Function<A, B> f) {
     for (A x : as) {
@@ -105,6 +102,8 @@ public final class Collections {
    * Apply a binary function (operator) to a start value and all elements of the list in turn.
    * <p/>
    * Example: (+) 0 [1, 2, 3] -> (((0 + 1) + 2) + 3)
+   *
+   * @deprecated use {@link Monadics}
    */
   public static <A, B> B foldl(Collection<A> as, B start, Function2<B, A, B> f) {
     B fold = start;
@@ -126,6 +125,7 @@ public final class Collections {
    *
    * @throws RuntimeException
    *         if the target collection cannot be created
+   * @deprecated use {@link Monadics}
    */
   public static <A, B> Collection<B> map(Collection<A> as, Function<A, B> f) {
     Collection<B> b = buildFrom(as);
@@ -147,6 +147,7 @@ public final class Collections {
    *
    * @throws RuntimeException
    *         if the result collection cannot be created
+   * @deprecated use {@link Monadics}
    */
   public static <A, B> Collection<B> flatMap(Collection<A> as, Function<A, Collection<B>> f) {
     Collection<B> bs = buildFrom(as);
@@ -159,6 +160,8 @@ public final class Collections {
   /**
    * Exactly like {@link #flatMap(java.util.Collection, Function)} but you have to provide
    * the target collection yourself.
+   *
+   * @deprecated use {@link Monadics}
    */
   public static <A, B, M extends Collection<B>> M flatMap(Collection<A> as, M bs, Function<A, Collection<B>> f) {
     for (A a : as) {
@@ -167,7 +170,11 @@ public final class Collections {
     return bs;
   }
 
-  /** Returns the first element in <code>as</code> that satisfies a predicate <code>p</code>. */
+  /**
+   * Returns the first element in <code>as</code> that satisfies a predicate <code>p</code>.
+   *
+   * @deprecated use {@link Monadics}
+   */
   public static <A> Option<A> find(Collection<A> as, Predicate<A> p) {
     for (A x : as) {
       if (p.apply(x)) return some(x);
@@ -175,7 +182,11 @@ public final class Collections {
     return Option.none();
   }
 
-  /** Tests if at least one element in <code>as</code> satisfies predicate <code>p</code>. */
+  /**
+   * Tests if at least one element in <code>as</code> satisfies predicate <code>p</code>.
+   *
+   * @deprecated use {@link Monadics}
+   */
   public static <A> boolean exists(Collection<A> as, Predicate<A> p) {
     for (A a : as) {
       if (p.apply(a)) return true;
@@ -183,19 +194,26 @@ public final class Collections {
     return false;
   }
 
+  /**
+   * Return a new collection containing only the elements that satisfy predicate <code>p</code>.
+   * <p/>
+   * The type of collection <code>as</code> needs a parameterless constructor.
+   *
+   * @deprecated use {@link Monadics}
+   */
+  public static <A, M extends Collection<A>> M filter(M as, Predicate<A> p) {
+    final M filtered = (M) buildFrom(as);
+    for (A a : as) {
+      if (p.apply(a))
+        filtered.add(a);
+    }
+    return filtered;
+  }
+
   /** Return the head of list <code>as</code> or <code>none</code>. */
   public static <A> Option<A> head(List<A> as) {
     if (!as.isEmpty()) {
       return some(as.get(0));
-    } else {
-      return Option.none();
-    }
-  }
-
-  /** Return the head of array <code>as</code> or <code>none</code>. */
-  public static <A> Option<A> head(A[] as) {
-    if (as.length > 0) {
-      return some(as[0]);
     } else {
       return Option.none();
     }
@@ -211,62 +229,38 @@ public final class Collections {
     return as.length > 0 ? some(as[as.length - 1]) : Option.<A>none();
   }
 
-  /**
-   * Sort array <code>as</code> according to the natural ordering. Note that <code>as</code> gets
-   * mutated!
-   *
-   * @return <code>as</code>
-   * @see Arrays#sort(Object[])
-   */
-  public static <A> A[] sortArray(A[] as) {
-    Arrays.sort(as);
-    return as;
-  }
-
-  /**
-   * Return a new collection containing only the elements that satisfy predicate <code>p</code>.
-   * <p/>
-   * The type of collection <code>as</code> needs a parameterless constructor.
-   */
-  public static <A, M extends Collection<A>> M filter(M as, Predicate<A> p) {
-    M filtered = (M) buildFrom(as);
-    for (A a : as) {
-      if (p.apply(a))
-        filtered.add(a);
-    }
-    return filtered;
-  }
-
   /** Make a string from a collection separating each element by <code>sep</code>. */
   public static String mkString(Collection<?> as, String sep) {
     final StringBuilder b = new StringBuilder();
-    for (Object a : as) {
-      b.append(a).append(sep);
-    }
+    for (Object a : as) b.append(a).append(sep);
     return b.substring(0, Math.max(b.length() - sep.length(), 0));
   }
 
-  /** Make a string from a collection separating each element by <code>sep</code>. */
-  public static <A> String mkString(A[] as, String sep) {
-    final StringBuilder b = new StringBuilder();
-    for (Object a : as) {
-      b.append(a).append(sep);
-    }
-    return b.substring(0, Math.max(b.length() - sep.length(), 0));
-  }
-
-  /** Merge collections <code>a</code> and <code>b</code> into <code>target</code>. */
-  public static <A, M extends Collection<A>> M concat(M target, Collection<? extends A> a, Collection<? extends A> b) {
-    target.addAll(a);
-    target.addAll(b);
+  /** Append source collection <code>as</code> to <code>target</code>. */
+  public static <A, T extends Collection<A>, S extends Iterable<? extends A>> T appendTo(T target, S as) {
+    for (A a : as) target.add(a);
     return target;
   }
 
-  /** Concatenates two lists. */
-  public static <A> List<A> concat(List<? extends A> a, List<? extends A> b) {
+  /** Append source collections <code>as</code> to <code>target</code>. */
+  public static <A, T extends Collection<A>, S extends Iterable<? extends A>> T appendToM(T target, S... as) {
+    for (S s : as) {
+      for (A a : s) target.add(a);
+    }
+    return target;
+  }
+
+  /** Append source collections <code>as</code> to <code>target</code>. */
+  public static <A, T extends Collection<A>, X extends A> T appendToA(T target, X... as) {
+    java.util.Collections.addAll(target, as);
+    return target;
+  }
+
+  /** Concatenates two iterables into a new list. */
+  public static <A, M extends Iterable<? extends A>> List<A> concat(M as, M bs) {
     List<A> x = new ArrayList<A>();
-    x.addAll(a);
-    x.addAll(b);
+    for (A a : as) x.add(a);
+    for (A b : bs) x.add(b);
     return x;
   }
 
@@ -278,38 +272,20 @@ public final class Collections {
     return x;
   }
 
-  /** Create a new array by prepending <code>a</code> to <code>as</code>: <code>[a, as0, as1, .. asn]</code> */
-  public static <A> A[] cons(A a, A[] as) {
-    A[] x = (A[]) Array.newInstance(a.getClass(), as.length + 1);
-    x[0] = a;
-    System.arraycopy(as, 0, x, 1, as.length);
-    return x;
-  }
-
-  /** Create a new array by appending <code>a</code> to <code>as</code>: <code>[as0, as1, .. asn, a]</code>. */
-  public static <A> A[] append(A[] as, A a) {
-    List<A> xs = new ArrayList<A>(as.length + 1);
-    xs.add(a);
-    for (A y : as) xs.add(y);
-    return (A[]) xs.toArray(new Object[xs.size()]);
-  }
-
   /** Drain all elements of <code>as</code> into a list. */
-  public static <A> List<A> toList(Iterator<A> as) {
-    List<A> ax = new ArrayList<A>();
+  public static <A> List<A> toList(Iterator<? extends A> as) {
+    final List<A> t = new ArrayList<A>();
     while (as.hasNext()) {
-      ax.add(as.next());
+      t.add(as.next());
     }
-    return ax;
+    return t;
   }
 
   /** Drain all elements of <code>as</code> into a list. */
-  public static <A> List<A> toList(Collection<A> as) {
-    List<A> ax = new ArrayList<A>();
-    for (A a : as) {
-      ax.add(a);
-    }
-    return ax;
+  public static <A> List<A> toList(Collection<? extends A> as) {
+    final List<A> t = new ArrayList<A>();
+    t.addAll(as);
+    return t;
   }
 
   /** Return nil if <code>a</code> is null or a list containing <code>a</code> otherwise. */
@@ -324,7 +300,9 @@ public final class Collections {
 
   /** Create a list from an array. */
   public static <A> List<A> list(A... as) {
-    return Arrays.asList(as);
+    final List<A> t = new ArrayList<A>();
+    java.util.Collections.addAll(t, as);
+    return t;
   }
 
   /** The empty list. */
@@ -333,7 +311,7 @@ public final class Collections {
   }
 
   /** Construct a new list by prepending an element to a given list. */
-  public static <A> List<A> cons(A a, List<A> as) {
+  public static <A> List<A> cons(A a, List<? extends A> as) {
     final List<A> target = new ArrayList<A>(as.size() + 1);
     target.add(a);
     target.addAll(as);
@@ -342,9 +320,9 @@ public final class Collections {
 
   /** Create a set from an array. */
   public static <A> Set<A> set(A... as) {
-    Set<A> r = new HashSet<A>(as.length);
-    for (A a : as) r.add(a);
-    return r;
+    final Set<A> t = new HashSet<A>(as.length);
+    java.util.Collections.addAll(t, as);
+    return t;
   }
 
   /** Create a set from a list. */
@@ -355,18 +333,18 @@ public final class Collections {
   }
 
   /** Create a map from a list of tuples (K, V). */
-  public static <K, V> Map<K, V> map(Tuple<K, V>... ts) {
-    Map<K, V> map = new HashMap<K, V>(ts.length);
-    for (Tuple<K, V> t : ts) {
+  public static <K, V> Map<K, V> map(Tuple<? extends K, ? extends V>... ts) {
+    final Map<K, V> map = new HashMap<K, V>(ts.length);
+    for (Tuple<? extends K, ? extends V> t : ts) {
       map.put(t.getA(), t.getB());
     }
     return map;
   }
 
   /** Create a dictionary from a list of tuples (K, V). */
-  public static <K, V> Dictionary<K, V> dict(Tuple<K, V>... ts) {
-    Dictionary<K, V> dict = new Hashtable<K, V>(ts.length);
-    for (Tuple<K, V> t : ts) {
+  public static <K, V> Dictionary<K, V> dict(Tuple<? extends K, ? extends V>... ts) {
+    final Dictionary<K, V> dict = new Hashtable<K, V>(ts.length);
+    for (Tuple<? extends K, ? extends V> t : ts) {
       dict.put(t.getA(), t.getB());
     }
     return dict;
@@ -381,18 +359,13 @@ public final class Collections {
     return a;
   }
 
-  /** Create an array from the vararg parameter list. */
-  public static <A> A[] array(A... as) {
-    return as;
-  }
-
   /** Create an array from a list. */
   public static <A> A[] toArray(List<A> a) {
     return (A[]) a.toArray(new Object[a.size()]);
   }
 
   /** Create an iterator form an array. */
-  public static <A> Iterator<A> iterator(final A... as) {
+  public static <A, X extends A> Iterator<A> iterator(final X... as) {
     return new Iterator<A>() {
       private int i = 0;
 
@@ -418,7 +391,7 @@ public final class Collections {
   }
 
   /** Create an iterator that repeats <code>a</code> for the said times. */
-  public static <A> Iterator<A> repeat(final A a, final int times) {
+  public static <A, X extends A> Iterator<A> repeat(final X a, final int times) {
     return new Iterator<A>() {
       private int count = times;
 
@@ -492,34 +465,11 @@ public final class Collections {
     };
   }
 
-  public static <A> Function<A[], List<A>> arrayToList() {
-    return new Function<A[], List<A>>() {
-      @Override
-      public List<A> apply(A[] as) {
-        if (as != null) {
-          return Collections.list(as);
-        } else {
-          return nil();
-        }
-      }
-    };
-  }
-
   public static <A, B> Function<A[], List<B>> flatMapArrayToList(final Function<A, List<B>> f) {
     return new Function<A[], List<B>>() {
       @Override
       public List<B> apply(A[] as) {
         return Monadics.mlist(as).bind(f).value();
-      }
-    };
-  }
-
-  /** Turn a value into a single element array. */
-  public static <A> Function<A, A[]> singletonArray() {
-    return new Function<A, A[]>() {
-      @Override
-      public A[] apply(A a) {
-        return (A[]) new Object[]{a};
       }
     };
   }
@@ -534,32 +484,12 @@ public final class Collections {
     };
   }
 
-  /** Functional version of {@link org.opencastproject.util.data.Collections#head(Object[])}. */
-  public static <A> Function<A[], Option<A>> headArray() {
-    return new Function<A[], Option<A>>() {
-      @Override
-      public Option<A> apply(A[] as) {
-        return Collections.head(as);
-      }
-    };
-  }
-
-  /** Functional version of {@link org.opencastproject.util.data.Collections#head(Object[])}. */
+  /** Functional version of {@link org.opencastproject.util.data.Arrays#head(A[])}. */
   public static <A> Function<List<A>, Option<A>> head() {
     return new Function<List<A>, Option<A>>() {
       @Override
       public Option<A> apply(List<A> as) {
         return Collections.head(as);
-      }
-    };
-  }
-
-  /** Functional version of {@link org.opencastproject.util.data.Collections#sortArray}. */
-  public static <A> Function<A[], A[]> sortArray() {
-    return new Function<A[], A[]>() {
-      @Override
-      public A[] apply(A[] as) {
-        return Collections.sortArray(as);
       }
     };
   }

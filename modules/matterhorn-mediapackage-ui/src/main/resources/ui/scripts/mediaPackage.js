@@ -165,6 +165,11 @@ MediaPackage = function(xmlMediaPackage){
             self.attachments.push(tmpAttachment);
         });
 
+        // Get Publication elements
+        if($(self.xml).find('mp|publications').length > 0) {
+            self.publicationElements = $(self.xml).find('mp|publications')[0];
+        }
+
         // Get MediaPackage attributes
         self.id = $(self.xml).attr('id');
         self.duration = $(self.xml).attr('duration');
@@ -370,6 +375,11 @@ MediaPackage = function(xmlMediaPackage){
             });
         }
 
+        // Add publication element
+        if (typeof self.publicationElements !== "undefined") {
+            doc.documentElement.appendChild(self.publicationElements);
+        }
+
         return doc;
     }
 
@@ -384,6 +394,7 @@ MediaPackage = function(xmlMediaPackage){
         newMP.title = self.title;
         newMP.duration = self.duration;
         newMP.id = self.id;
+		newMP.publicationElements = self.publicationElements;
         newMP.seriesCatalogs = cloneArray(self.seriesCatalogs);
         newMP.seriesCatalog = self.seriesCatalog.clone();
         newMP.episodeCatalogs = cloneArray(self.episodeCatalogs);

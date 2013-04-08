@@ -16,6 +16,8 @@
 
 package org.opencastproject.inspection.impl;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.impl.api.AudioStreamMetadata;
 import org.opencastproject.inspection.impl.api.VideoStreamMetadata;
@@ -23,9 +25,6 @@ import org.opencastproject.inspection.impl.api.util.CmdlineMediaAnalyzerSupport;
 import org.opencastproject.mediapackage.track.BitRateMode;
 import org.opencastproject.mediapackage.track.FrameRateMode;
 import org.opencastproject.mediapackage.track.ScanType;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +41,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static org.opencastproject.util.data.Collections.array;
+import static org.opencastproject.util.data.Arrays.array;
 
 /**
  * This MediaAnalyzer implementation leverages MediaInfo (<a href="http://mediainfo.sourceforge.net/"

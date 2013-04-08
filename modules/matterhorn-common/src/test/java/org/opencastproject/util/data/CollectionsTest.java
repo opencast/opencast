@@ -29,29 +29,32 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.data.Collections.append;
-import static org.opencastproject.util.data.Collections.array;
+import static org.opencastproject.util.data.Arrays.append;
+import static org.opencastproject.util.data.Arrays.array;
+import static org.opencastproject.util.data.Collections.appendTo;
 import static org.opencastproject.util.data.Collections.concat;
-import static org.opencastproject.util.data.Collections.cons;
+import static org.opencastproject.util.data.Collections.filter;
+import static org.opencastproject.util.data.Collections.flatMap;
+import static org.opencastproject.util.data.Collections.foldl;
+import static org.opencastproject.util.data.Collections.head;
 import static org.opencastproject.util.data.Collections.iterator;
 import static org.opencastproject.util.data.Collections.join;
 import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Collections.repeat;
 import static org.opencastproject.util.data.Collections.toArray;
+import static org.opencastproject.util.data.Collections.toList;
 
 public class CollectionsTest {
 
-  private List<String> newList() {
-    List<String> l = new ArrayList<String>();
-    l.add("one");
-    l.add("two");
-    return l;
+  private List<String> newTestList() {
+    return list("one", "two");
   }
 
   @Test
   public void testMap() {
-    List<String> list = newList();
-    Collection<String> mapped = Collections.map(list, new Function<String, String>() {
+    List<String> list = newTestList();
+    Collection<String> mapped = map(list, new Function<String, String>() {
       @Override
       public String apply(String s) {
         return s + s;
@@ -68,8 +71,8 @@ public class CollectionsTest {
 
   @Test
   public void testFlatMap() {
-    List<String> list = newList();
-    Collection<String> mapped = Collections.flatMap(list, new Function<String, Collection<String>>() {
+    List<String> list = newTestList();
+    Collection<String> mapped = flatMap(list, new Function<String, Collection<String>>() {
       @Override
       public Collection<String> apply(String s) {
         return list(">", s);
@@ -85,8 +88,8 @@ public class CollectionsTest {
 
   @Test
   public void testFilter() {
-    List<String> list = newList();
-    Collection<String> filtered = Collections.filter(list, new Predicate<String>() {
+    List<String> list = newTestList();
+    Collection<String> filtered = filter(list, new Predicate<String>() {
       @Override
       public Boolean apply(String s) {
         return "one".equals(s);
@@ -100,7 +103,7 @@ public class CollectionsTest {
 
   @Test
   public void testHead() {
-    List<String> list = newList();
+    List<String> list = newTestList();
     Option.Match<String, Boolean> match = new Option.Match<String, Boolean>() {
       @Override
       public Boolean some(String s) {
@@ -112,28 +115,28 @@ public class CollectionsTest {
         return false;
       }
     };
-    assertTrue(Collections.head(list).fold(match));
+    assertTrue(head(list).fold(match));
     List<String> empty = list();
-    assertFalse(Collections.head(empty).fold(match));
+    assertFalse(head(empty).fold(match));
   }
 
   @Test
   public void testFoldl() {
     List<Integer> ints = list(1, 2, 3, 4);
-    assertTrue(10 == Collections.foldl(ints, 0, new Function2<Integer, Integer, Integer>() {
+    assertTrue(10 == foldl(ints, 0, new Function2<Integer, Integer, Integer>() {
       @Override
       public Integer apply(Integer a, Integer b) {
         return a + b;
       }
     }));
     List<String> strings = list("vaughn", "bodé", "andré", "franquin");
-    assertTrue(23 == Collections.foldl(strings, 0, new Function2<Integer, String, Integer>() {
+    assertTrue(23 == foldl(strings, 0, new Function2<Integer, String, Integer>() {
       @Override
       public Integer apply(Integer a, String s) {
         return a + s.length();
       }
     }));
-    assertTrue(5 == Collections.foldl(java.util.Collections.<Integer>emptyList(), 5, new Function2<Integer, Integer, Integer>() {
+    assertTrue(5 == foldl(java.util.Collections.<Integer>emptyList(), 5, new Function2<Integer, Integer, Integer>() {
       @Override
       public Integer apply(Integer a, Integer b) {
         return a + b;
@@ -148,25 +151,35 @@ public class CollectionsTest {
   }
   
   @Test
-  public void testList() {
-    List<Integer> i1 = Collections.toList(java.util.Collections.<Integer>emptyList().iterator());
+  public void testToList() {
+    List<Integer> i1 = toList(java.util.Collections.<Integer>emptyList().iterator());
     assertTrue(i1.isEmpty());
-    List<Integer> i2 = Collections.toList(list(1, 2, 3).iterator());
+    List<Integer> i2 = toList(list(1, 2, 3).iterator());
     assertEquals(3, i2.size());
+    List<Object> i3 = toList(list("1", 2, new Object()).iterator());
+    assertEquals(3, i3.size());
   }
-  
+
+  @Test
+  public void testList() {
+    // compile test
+    List<Object> x = list(1, new Object(), "hallo");
+    // does not compile
+    // List<String> y = list(1, new Object(), "hallo");
+  }
+
   @Test
   public void testRepeat() {
-    assertTrue(Collections.toList(repeat(1, 0)).isEmpty());
-    assertEquals(3, Collections.toList(repeat(1, 3)).size());
+    assertTrue(toList(repeat(1, 0)).isEmpty());
+    assertEquals(3, toList(repeat(1, 3)).size());
   }
   
   @Test
   public void testJoin() {
-    assertArrayEquals(array(1, 2, 3, 4, 5, 6), Collections.toArray(Collections.toList(join(list(1, 2, 3).iterator(), list(4, 5, 6).iterator()))));
-    assertArrayEquals(array(1, 2, 3), Collections.toArray(Collections.toList(join(list(1, 2, 3).iterator(), java.util.Collections.<Integer>emptyList().iterator()))));
-    assertArrayEquals(array(1, 2, 3), Collections.toArray(Collections.toList(join(java.util.Collections.<Integer>emptyList().iterator(), list(1, 2, 3).iterator()))));
-    assertEquals(0, Collections.toArray(Collections.toList(join(java.util.Collections.emptyList().iterator(), java.util.Collections.emptyList().iterator()))).length);
+    assertArrayEquals(array(1, 2, 3, 4, 5, 6), Collections.toArray(toList(join(list(1, 2, 3).iterator(), list(4, 5, 6).iterator()))));
+    assertArrayEquals(array(1, 2, 3), Collections.toArray(toList(join(list(1, 2, 3).iterator(), java.util.Collections.<Integer>emptyList().iterator()))));
+    assertArrayEquals(array(1, 2, 3), Collections.toArray(toList(join(java.util.Collections.<Integer>emptyList().iterator(), list(1, 2, 3).iterator()))));
+    assertEquals(0, Collections.toArray(toList(join(java.util.Collections.emptyList().iterator(), java.util.Collections.emptyList().iterator()))).length);
   }
   
   @Test(expected = NoSuchElementException.class)
@@ -193,8 +206,8 @@ public class CollectionsTest {
 
   @Test
   public void testConsArray() {
-    assertArrayEquals(new Integer[]{0, 1, 2, 3}, cons(0, array(1, 2, 3)));
-    String[] x = cons("0", array("1", "2", "3"));
+    assertArrayEquals(new Integer[]{0, 1, 2, 3}, Arrays.cons(0, array(1, 2, 3)));
+    String[] x = Arrays.cons("0", array("1", "2", "3"));
     assertArrayEquals(new String[]{"0", "1", "2", "3"}, x);
     assertArrayEquals(new Object[]{"0", "1", "2", "3"}, x);
   }
@@ -209,5 +222,19 @@ public class CollectionsTest {
     final List<List<Integer>> l = list(list(1), list(2, 3), Collections.<Integer>nil(), list(9, 2, 1));
     final List<Integer> c = concat(l);
     assertArrayEquals(array(1, 2, 3, 9, 2, 1), toArray(c));
+  }
+
+  @Test
+  public void testAppendTo() {
+    final List<Object> a = new ArrayList<Object>();
+    // compile check
+    final Collection<Object> b = appendTo(a, list(1));
+    appendTo(a, list("a"));
+  }
+
+  @Test
+  public void testCons() {
+    // compile check
+    List<Object> x = Collections.<Object>cons("1", list(1, 3));
   }
 }

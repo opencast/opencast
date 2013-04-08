@@ -16,10 +16,6 @@
 
 package org.opencastproject.distribution.download;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpHead;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
@@ -41,11 +37,15 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpHead;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -54,10 +54,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Distributes media to the local media delivery directory.
  */
-public class DownloadDistributionServiceImpl extends AbstractJobProducer implements DistributionService, DownloadDistributionService {
+public class DownloadDistributionServiceImpl extends AbstractJobProducer implements DistributionService,
+        DownloadDistributionService {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(DownloadDistributionServiceImpl.class);
@@ -129,7 +132,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
   }
 
   @Override
-  public Job distribute(MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException {
+  public Job distribute(MediaPackage mediapackage, String elementId) throws DistributionException,
+          MediaPackageException {
     return distribute(mediapackage, elementId, true);
   }
 
@@ -140,11 +144,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
     if (elementId == null)
       throw new MediaPackageException("Element ID must be specified");
     try {
-      return serviceRegistry.createJob(JOB_TYPE,
-                                       Operation.Distribute.toString(),
-                                       Arrays.asList(MediaPackageParser.getAsXml(mediapackage),
-                                                     elementId,
-                                                     Boolean.toString(checkAvailability)));
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Distribute.toString(),
+              Arrays.asList(MediaPackageParser.getAsXml(mediapackage), elementId, Boolean.toString(checkAvailability)));
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -153,14 +154,14 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
   /**
    * Distributes the mediapackage's element to the location that is returned by the concrete implementation. In
    * addition, a representation of the distributed element is added to the mediapackage.
-   *
+   * 
    * @see org.opencastproject.distribution.api.DistributionService#distribute(org.opencastproject.mediapackage.MediaPackage,
    *      String)
    * @throws org.opencastproject.distribution.api.DistributionException
    *           in case of an error
    */
-  protected MediaPackageElement distribute(Job job, MediaPackage mediapackage, String elementId, boolean checkAvailability)
-          throws DistributionException {
+  protected MediaPackageElement distribute(Job job, MediaPackage mediapackage, String elementId,
+          boolean checkAvailability) throws DistributionException {
     return distributeElement(mediapackage, elementId, checkAvailability);
   }
 
@@ -275,9 +276,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * Retract a media package element from the distribution channel. The retracted element must not necessarily be the
-   * one given as parameter <code>elementId</code>. Instead, the element's distribution URI will be calculated and then
-   * in turn be matched against each element of the package. This way you are able to retract elements by providing the
-   * "original" element here.
+   * one given as parameter <code>elementId</code>. Instead, the element's distribution URI will be calculated. This way
+   * you are able to retract elements by providing the "original" element here.
    * 
    * @param job
    *          the associated job
@@ -302,50 +302,29 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
     if (element == null)
       throw new IllegalStateException("No element " + elementId + " found in mediapackage");
 
-    // Find the element that has been created as part of the distribution process
-    String mediaPackageId = mediapackage.getIdentifier().compact();
-    URI distributedURI = null;
-    MediaPackageElement distributedElement = null;
-    try {
-      distributedURI = getDistributionUri(mediaPackageId, element);
-      for (MediaPackageElement e : mediapackage.getElements()) {
-        if (distributedURI.equals(e.getURI())) {
-          distributedElement = e;
-          break;
-        }
-      }
-    } catch (URISyntaxException e) {
-      throw new DistributionException("Retracted element produces an invalid URI", e);
-    }
-
-    // Has this element been distributed?
-    if (distributedElement == null)
-      return null;
-
     String mediapackageId = mediapackage.getIdentifier().compact();
     try {
-
       File mediapackageDir = getMediaPackageDirectory(mediapackageId);
       File elementDir = getDistributionFile(mediapackage, element);
-
-      logger.info("Retracting element {} from {}", distributedElement, elementDir);
 
       // Does the file exist? If not, the current element has not been distributed to this channel
       // or has been removed otherwise
       if (!elementDir.exists()) {
-        logger.warn("Unable to delete element from {}", elementDir);
-        return distributedElement;
+        logger.info(
+                "The element {} from {} has already been removed or has never been distributed to this distribution channel",
+                elementId, mediapackageId);
+        return element;
       }
+
+      logger.info("Retracting element {} from {}", element, elementDir);
 
       // Try to remove the file and - if possible - the parent folder
       FileUtils.forceDelete(elementDir.getParentFile());
-      if (mediapackageDir.list().length == 0) {
+      if (mediapackageDir.list().length == 0)
         FileSupport.delete(mediapackageDir);
-      }
 
       logger.info("Finished rectracting element {} of media package {}", elementId, mediapackageId);
-
-      return distributedElement;
+      return element;
     } catch (Exception e) {
       logger.warn("Error retracting element " + elementId + " of mediapackage " + mediapackageId, e);
       if (e instanceof DistributionException) {
@@ -401,11 +380,17 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
    * @return The file to copy the content to
    */
   protected File getDistributionFile(MediaPackage mediaPackage, MediaPackageElement element) {
-    String elementId = element.getIdentifier();
-    String fileName = FilenameUtils.getName(element.getURI().toString());
+    String destinationFileName;
+    String uriString = element.getURI().toString();
     String directoryName = distributionDirectory.getAbsolutePath();
-    String destinationFileName = PathSupport.concat(new String[] { directoryName,
-            mediaPackage.getIdentifier().compact(), elementId, fileName });
+    if (uriString.startsWith(serviceUrl)) {
+      String[] splitUrl = uriString.substring(serviceUrl.length() + 1).split("/");
+      destinationFileName = PathSupport.concat(new String[] { directoryName, splitUrl[0], splitUrl[1], splitUrl[2] });
+    } else {
+      String fileName = FilenameUtils.getName(uriString);
+      destinationFileName = PathSupport.concat(new String[] { directoryName, mediaPackage.getIdentifier().compact(),
+              element.getIdentifier(), fileName });
+    }
     return new File(destinationFileName);
   }
 

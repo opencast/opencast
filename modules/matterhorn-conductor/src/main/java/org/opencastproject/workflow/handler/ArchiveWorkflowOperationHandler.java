@@ -21,6 +21,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
+import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -88,7 +89,7 @@ public class ArchiveWorkflowOperationHandler extends AbstractWorkflowOperationHa
     Collection<MediaPackageElement> keep;
 
     if (tags.isEmpty() && sourceFlavors.length < 1) {
-      keep = Arrays.asList(current.getElementsByTags(tags));
+      keep = new ArrayList<MediaPackageElement>(Arrays.asList(current.getElementsByTags(tags)));
     } else {
       SimpleElementSelector simpleElementSelector = new SimpleElementSelector();
       for (String flavor : sourceFlavors) {
@@ -98,6 +99,11 @@ public class ArchiveWorkflowOperationHandler extends AbstractWorkflowOperationHa
         simpleElementSelector.addTag(tag);
       }
       keep = simpleElementSelector.select(current, false);
+    }
+
+    // Also archive the publication elements
+    for (Publication publication : current.getPublications()) {
+      keep.add(publication);
     }
 
     // Mark everything that is set for removal

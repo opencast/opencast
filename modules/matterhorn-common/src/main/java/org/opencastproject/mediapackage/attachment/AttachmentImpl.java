@@ -13,24 +13,18 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.mediapackage.attachment;
 
 import org.opencastproject.mediapackage.AbstractMediaPackageElement;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
-import java.net.URI;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
+import java.net.URI;
 
 /**
  * Basic implementation of an attachment.
@@ -119,16 +113,6 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
    */
   public static Attachment fromURI(URI uri) {
     return new AttachmentImpl(uri);
-  }
-
-  /**
-   * @see org.opencastproject.mediapackage.AbstractMediaPackageElement#toManifest(org.w3c.dom.Document,
-   *      org.opencastproject.mediapackage.MediaPackageSerializer)
-   */
-  @Override
-  public Node toManifest(Document document, MediaPackageSerializer serializer) {
-    Node node = super.toManifest(document, serializer);
-    return node;
   }
 
   public static class Adapter extends XmlAdapter<AttachmentImpl, Attachment> {

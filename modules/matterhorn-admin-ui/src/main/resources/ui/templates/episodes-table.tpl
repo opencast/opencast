@@ -25,7 +25,7 @@
       </div>
     </th>
     <th class="ui-widget-header">Process</th>
-    <th class="ui-widget-header">State</th>
+    <th class="ui-widget-header">Published</th>
     <th class="ui-widget-header"></th>
     <th class="ui-widget-header"></th>
   </tr>
@@ -46,9 +46,11 @@
           <% } %>
         </td>
         <td class="ui-state-active">
-          <% if (e.media.length == 0) { %>
-            retracted
-          <% } %>
+         <ul>
+         <% _.each(e.publications, function(publication) { %>
+            <li><%= publication.channel %></li>
+         <% }); %>
+         </ul>
         </td>
         <td class="ui-state-active">
           <a href="#" class="edit" data-eid="<%= e.id %>">Edit</a>

@@ -15,19 +15,13 @@
  */
 package org.opencastproject.ingest.scanner;
 
-import static java.lang.String.format;
-import static org.opencastproject.util.IoSupport.fileInputStream;
-import static org.opencastproject.util.IoSupport.withStream;
-import static org.opencastproject.util.data.Collections.append;
-
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +31,11 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static java.lang.String.format;
+import static org.opencastproject.util.IoSupport.fileInputStream;
+import static org.opencastproject.util.IoSupport.withStream;
+import static org.opencastproject.util.data.Arrays.append;
 
 /** Used by the {@link InboxScannerService} to do the actual ingest. */
 public class Ingestor {

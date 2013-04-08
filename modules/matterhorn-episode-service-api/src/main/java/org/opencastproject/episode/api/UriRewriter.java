@@ -22,7 +22,7 @@ import org.opencastproject.util.data.Function2;
 import java.net.URI;
 
 /**
- * Rewrite the URI of a media package element. Please <em>do not</em> modify the given media package element
+ * Create a URI for a media package element. Please <em>do not</em> modify the given media package element
  * but return the rewritten URI instead.
  */
 public abstract class UriRewriter extends Function2<Version, MediaPackageElement, URI> {
@@ -36,10 +36,11 @@ public abstract class UriRewriter extends Function2<Version, MediaPackageElement
   }
 
   /** {@link UriRewriter#fromFunction(org.opencastproject.util.data.Function2)} as a function. */
-  public static final Function<Function2<Version, MediaPackageElement, URI>, UriRewriter> fromFunction = new Function<Function2<Version, MediaPackageElement, URI>, UriRewriter>() {
-    @Override
-    public UriRewriter apply(Function2<Version, MediaPackageElement, URI> f) {
-      return fromFunction(f);
-    }
-  };
+  public static final Function<Function2<Version, MediaPackageElement, URI>, UriRewriter> fromFunction =
+          new Function<Function2<Version, MediaPackageElement, URI>, UriRewriter>() {
+            @Override
+            public UriRewriter apply(Function2<Version, MediaPackageElement, URI> f) {
+              return fromFunction(f);
+            }
+          };
 }
