@@ -256,16 +256,24 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *      java.util.Map, java.lang.Long)
    */
   @Override
-  public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String wd, Map<String, String> workflowConfig,
-          Long workflowId) throws MediaPackageException, IOException, IngestException, NotFoundException,
-          UnauthorizedException {
+  public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String workflowDefinitionId,
+          Map<String, String> workflowConfig, Long workflowInstanceId) throws MediaPackageException, IOException,
+          IngestException, NotFoundException, UnauthorizedException {
     // Start a job synchronously. We can't keep the open input stream waiting around.
     Job job = null;
 
-    if (workflowId != null)
-      logger.info("Ingesting zipped mediapackage for workflow {}", workflowId);
-    else
+    // Get hold of the workflow instance if specified
+    WorkflowInstance workflowInstance = null;
+    if (workflowInstanceId != null) {
+      logger.info("Ingesting zipped mediapackage for workflow {}", workflowInstanceId);
+      try {
+        workflowInstance = workflowService.getWorkflowById(workflowInstanceId);
+      } catch (WorkflowDatabaseException e) {
+        throw new IngestException(e);
+      }
+    } else {
       logger.info("Ingesting zipped mediapackage");
+    }
 
     ZipInputStream zis = null;
     Map<String, URI> elementUris = new HashMap<String, URI>();
@@ -306,17 +314,27 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
 
       if (mp == null)
-        throw new MediaPackageException("no manifest found in this zip");
+        throw new MediaPackageException("No manifest found in this zip");
 
-      logger.info("Ingesting media package is named '{}'", mp.getTitle());
+      // Determine the mediapackage identifier
+      String mediaPackageId = null;
+      if (workflowInstanceId != null) {
+        mediaPackageId = workflowInstance.getMediaPackage().getIdentifier().toString();
+        mp.setIdentifier(workflowInstance.getMediaPackage().getIdentifier());
+      } else {
+        if (mp.getIdentifier() == null || StringUtils.isBlank(mp.getIdentifier().toString()))
+          mp.setIdentifier(new UUIDIdBuilderImpl().createNew());
+        mediaPackageId = mp.getIdentifier().toString();
+      }
 
-      if (mp.getIdentifier() == null || StringUtils.isBlank(mp.getIdentifier().toString()))
-        mp.setIdentifier(new UUIDIdBuilderImpl().createNew());
+      logger.info("Ingesting mediapackage {} is named '{}'", mediaPackageId, mp.getTitle());
 
+      // Make sure there are tracks in the mediapackage
       if (mp.getTracks().length == 0)
-        throw new IngestException("MediaPackage cannot be empty");
+        throw new IngestException("Mediapackage " + mediaPackageId + " has no media tracks");
 
-      logger.info("Moving elements of zipped mediapackage into place");
+      // Move the package's elements into the correct place in the working file repository
+      logger.info("Moving elements of zipped mediapackage {} into place", mediaPackageId);
       for (MediaPackageElement element : mp.elements()) {
         String elId = element.getIdentifier();
         if (elId == null) {
@@ -334,27 +352,20 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         URI newUrl = workspace.moveTo(collectionUri, mp.getIdentifier().compact(), elId, filename);
         element.setURI(newUrl);
         elementUris.remove(elementName);
-        logger.info("Ingested zipped media package element {} moved to {}", filename, newUrl);
+        logger.info("Element {} of zipped mediapackage {} moved to {}",
+                new Object[] { filename, mediaPackageId, newUrl });
 
         // if this is a series, update the series service
         // TODO: This should be triggered somehow instead of being handled here
         if (MediaPackageElements.SERIES.equals(element.getFlavor())) {
-          logger.info("Ingested mediapackage has updated series information");
+          logger.info("Ingested mediapackage {} contains updated series information", mediaPackageId);
           updateSeries(element.getURI());
         }
       }
 
-      // Done, update the job status and return the created workflow instance
-      if (workflowId != null) {
-        logger.info("Resuming workflow {} with ingested mediapackage", workflowId);
-      } else if (wd == null) {
-        logger.info("Starting a new workflow with ingested mediapackage based on the default workflow definition '{}'",
-                defaultWorkflowDefinionId);
-      } else {
-        logger.info("Starting a new workflow with ingested mediapackage based on workflow definition '{}'", wd);
-      }
-      WorkflowInstance workflowInstance = ingest(mp, wd, workflowConfig, workflowId);
-      logger.info("Ingest of mediapackage {} done", mp.getIdentifier());
+      // Now that all elements are in place, start with ingest
+      workflowInstance = ingest(mp, workflowDefinitionId, workflowConfig, workflowInstanceId);
+      logger.info("Ingest of mediapackage {} done", mediaPackageId);
       job.setStatus(Job.Status.FINISHED);
       return workflowInstance;
 
@@ -372,8 +383,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         try {
           workspace.delete(elementUri);
         } catch (NotFoundException e) {
-          // File was already moved to MP so deletion is not needed
-          logger.debug("Ingest Cleanup: Temporary File {} was already moved to MP, nothing to delete", elementUri);
+          // File was already moved to mediapackage so deletion is not needed
+          logger.debug("Temporary file {} was already moved to mediapackage, nothing to delete", elementUri);
         }
       }
       try {
@@ -765,25 +776,48 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#ingest(org.opencastproject.mediapackage.MediaPackage,
    *      java.lang.String, java.util.Map, java.lang.Long)
    */
-  public WorkflowInstance ingest(MediaPackage mp, String workflowDefinitionID, Map<String, String> properties,
-          Long workflowId) throws IngestException, NotFoundException, UnauthorizedException {
-    try {
-      WorkflowDefinition workflowDef = getWorkflowDefinition(workflowDefinitionID, workflowId);
+  public WorkflowInstance ingest(MediaPackage mp, String workflowDefinitionId, Map<String, String> properties,
+          Long workflowInstanceId) throws IngestException, NotFoundException, UnauthorizedException {
 
+    // Done, update the job status and return the created workflow instance
+    if (workflowInstanceId != null) {
+      logger.info("Resuming workflow {} with ingested mediapackage {}", workflowInstanceId, mp);
+    } else if (workflowDefinitionId == null) {
+      logger.info(
+              "Starting a new workflow with ingested mediapackage {} based on the default workflow definition '{}'",
+              mp, defaultWorkflowDefinionId);
+    } else {
+      logger.info("Starting a new workflow with ingested mediapackage {} based on workflow definition '{}'", mp,
+              workflowDefinitionId);
+    }
+
+    try {
       // Look for the workflow instance (if provided)
       WorkflowInstance workflow = null;
-      if (workflowId != null) {
+      if (workflowInstanceId != null) {
         try {
-          workflow = workflowService.getWorkflowById(workflowId.longValue());
+          workflow = workflowService.getWorkflowById(workflowInstanceId.longValue());
         } catch (NotFoundException e) {
-          logger.warn("Failed to find a workflow with id '{}'", workflowId);
+          logger.warn("Failed to find a workflow with id '{}'", workflowInstanceId);
         }
       }
 
-      properties = mergeWorkflowConfiguration(properties, workflowId);
+      // Determine the workflow definition
+      WorkflowDefinition workflowDef = getWorkflowDefinition(workflowDefinitionId, workflowInstanceId, mp);
 
+      // Get the final set of workflow properties
+      properties = mergeWorkflowConfiguration(properties, workflowInstanceId);
+
+      // If the indicated workflow does not exist, start a new workflow with the given workflow definition
       if (workflow == null) {
         ingestStatistics.successful();
+        if (workflowDef != null) {
+          logger.info("Starting new workflow with ingested mediapackage '{}' using the specified template '{}'", mp
+                  .getIdentifier().toString(), workflowDefinitionId);
+        } else {
+          logger.info("Starting new workflow with ingested mediapackage '{}' using the default template '{}'", mp
+                  .getIdentifier().toString(), defaultWorkflowDefinionId);
+        }
         return workflowService.start(workflowDef, mp, properties);
       }
 
@@ -800,15 +834,16 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           // Get episode dublincore from scheduler event if not provided by the ingesting party
           Catalog[] catalogs = mp.getCatalogs(MediaPackageElements.EPISODE);
           if (catalogs.length == 0 && schedulerService != null) {
-            logger.info("Try adding episode dublincore from capure event '{}' to ingesting mediapackage", workflowId);
-            DublinCoreCatalog dc = schedulerService.getEventDublinCore(workflowId);
+            logger.info("Try adding episode dublincore from capure event '{}' to ingesting mediapackage",
+                    workflowInstanceId);
+            DublinCoreCatalog dc = schedulerService.getEventDublinCore(workflowInstanceId);
             in = IOUtils.toInputStream(dc.toXmlString(), "UTF-8");
             mp = addCatalog(in, "dublincore.xml", MediaPackageElements.EPISODE, mp);
           }
         } catch (NotFoundException e) {
-          logger.info("No capture event found for id {}", workflowId);
+          logger.info("No capture event found for id {}", workflowInstanceId);
         } catch (SchedulerException e) {
-          logger.warn("Unable to get event dublin core from scheduler event {}: {}", workflowId, e.getMessage());
+          logger.warn("Unable to get event dublin core from scheduler event {}: {}", workflowInstanceId, e.getMessage());
         } catch (IOException e) {
           throw new IngestException(e);
         } finally {
@@ -884,7 +919,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         workflowService.update(workflow);
 
         // resume the workflow
-        workflowInstance = workflowService.resume(workflowId.longValue(), properties);
+        workflowInstance = workflowService.resume(workflowInstanceId.longValue(), properties);
       }
 
       ingestStatistics.successful();
@@ -922,36 +957,63 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     return mergedProperties;
   }
 
-  private WorkflowDefinition getWorkflowDefinition(String workflowDefinitionID, Long workflowId)
-          throws NotFoundException, WorkflowDatabaseException, IngestException {
+  private WorkflowDefinition getWorkflowDefinition(String workflowDefinitionID, Long workflowId,
+          MediaPackage mediapackage) throws NotFoundException, WorkflowDatabaseException, IngestException {
     // If the workflow definition and instance ID are null, use the default, or throw if there is none
-    if (StringUtils.isBlank(workflowDefinitionID) && workflowId != null && schedulerService != null) {
-      logger.info("Try to get the ingest workflow definition id from capture event {}", workflowId);
-      try {
-        Properties recordingProperties = schedulerService.getEventCaptureAgentConfiguration(workflowId);
-        workflowDefinitionID = (String) recordingProperties.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION);
-        if (workflowDefinitionID == null)
-          throw new IngestException("No value found for key '" + CaptureParameters.INGEST_WORKFLOW_DEFINITION
-                  + "' from capture event configuration of scheduler event '" + workflowId + "'");
-      } catch (NotFoundException e) {
-        logger.info("No capture event found for id {}", workflowId);
-      } catch (SchedulerException e) {
-        logger.warn("Unable to get the workflow definition id from scheduler event {}: {}", workflowId, e.getMessage());
+    if (StringUtils.isBlank(workflowDefinitionID)) {
+
+      if (workflowId != null && schedulerService != null) {
+        logger.info("Determining workflow template for ingested mediapckage {} from capture event {}", mediapackage,
+                workflowId);
+        try {
+          Properties recordingProperties = schedulerService.getEventCaptureAgentConfiguration(workflowId);
+          workflowDefinitionID = (String) recordingProperties.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION);
+          logger.info("Ingested mediapackage {} will be processed using workflow template '{}'", mediapackage,
+                  workflowDefinitionID);
+          if (StringUtils.isBlank(workflowDefinitionID))
+            throw new IngestException("No value found for key '" + CaptureParameters.INGEST_WORKFLOW_DEFINITION
+                    + "' from capture event configuration of scheduler event '" + workflowId + "'");
+        } catch (NotFoundException e) {
+          logger.warn("Specified capture event {} was not found", workflowId);
+        } catch (SchedulerException e) {
+          logger.warn("Unable to get the workflow definition id from scheduler event {}: {}", workflowId,
+                  e.getMessage());
+          throw new IngestException(e);
+        }
+      } else if (workflowId == null) {
+        logger.info(
+                "No workflow id was specified, using default processing ingstructions for ingested mediapackage {}",
+                mediapackage);
+      } else if (schedulerService == null) {
+        logger.warn(
+                "Scheduler service not bound, unable to determine the workflow template to use for ingested mediapckage {}",
+                mediapackage);
       }
+
+    } else {
+      logger.info("Ingested mediapackage {} is processed using workflow template '{}', specified during ingest", mediapackage,
+              workflowDefinitionID);
     }
 
+    // Use the default workflow definition if nothing was determined
     if (StringUtils.isBlank(workflowDefinitionID) && defaultWorkflowDefinionId != null) {
-      logger.info("Use default workflow definition '{}' for ingest", defaultWorkflowDefinionId);
+      logger.info("Using default workflow definition '{}' to process ingested mediapackage {}",
+              defaultWorkflowDefinionId, mediapackage);
       workflowDefinitionID = defaultWorkflowDefinionId;
-    } else if (StringUtils.isBlank(workflowDefinitionID) && defaultWorkflowDefinionId == null) {
+    }
+
+    // Have we been able to find a workflow definition id?
+    if (StringUtils.isBlank(workflowDefinitionID)) {
       ingestStatistics.failed();
       throw new IllegalStateException(
               "Can not ingest a workflow without a workflow definition or an existing instance. No default definition is specified");
     }
 
+    // Let's make sure the workflow definition exists
     WorkflowDefinition workflowDef = workflowService.getWorkflowDefinitionById(workflowDefinitionID);
     if (workflowDef == null)
       throw new IngestException("Workflow definition '" + workflowDefinitionID + "' does not exist anymore");
+
     return workflowDef;
   }
 
