@@ -198,7 +198,7 @@ var ocScheduler = (function() {
                                   language = data[DUBLIN_CORE_NS_URI]["language"] ? data[DUBLIN_CORE_NS_URI]["language"]["0"].value : "",
                                   description = data[DUBLIN_CORE_NS_URI]["description"] ? data[DUBLIN_CORE_NS_URI]["description"]["0"].value : "",
                                   license = data[DUBLIN_CORE_NS_URI]["license"] ? data[DUBLIN_CORE_NS_URI]["license"]["0"].value : "";
-                                  copyright = data[DUBLIN_CORE_NS_URI]["copyright"] ? data[DUBLIN_CORE_NS_URI]["copyright"]["0"].value : "";
+                                  copyright = data[DUBLIN_CORE_NS_URI]["rights"] ? data[DUBLIN_CORE_NS_URI]["rights"]["0"].value : "";
 
                                   $('#contributor').val(contributor);
                                   $('#subject').val(subject);
@@ -958,7 +958,7 @@ var ocScheduler = (function() {
       key: 'description'
     });
     dcComps.copyright = new ocAdmin.Component(['copyright'], {
-        key: 'copyright'
+        key: 'rights'
       });
     agentComps.resources = new ocAdmin.Component([],
     {
