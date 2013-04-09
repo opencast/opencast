@@ -26,7 +26,11 @@
       </li>
       <li class="ui-helper-clearfix">
         <label class="scheduler-label"><span id="i18n_dc_license">License</span>:</label>
-        <input id="license" class="oc-ui-form-field dc-license-field" name="license" value="${catalog.getValue('license')}" />
+        <select id="license" name="license" class="oc-ui-form-field dc-metadata-field dcMetaField">
+          {{each(i,license) licenses}}
+          <option value="${license.name}" {{if license.selected}}selected="selected"{{/if}} >${license.name}</option>
+          {{/each}}
+       </select>
       </li>
       <li class="ui-helper-clearfix">
         <label class="scheduler-label"><span id="i18n_dc_copyright">Copyright</span>:</label>

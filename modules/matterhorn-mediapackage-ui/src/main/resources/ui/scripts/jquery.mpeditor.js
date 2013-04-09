@@ -374,7 +374,23 @@
                 var tab = element.find('#dublincore_episode_tab');
                 $.ajax({url: properties.baseUrl+'/mediapackage-editor/templates/dublincore.tmpl', dataType: 'text', async: false})
                 .success(function(template) {
-                    $.tmpl(template, {catalog: catalog}).appendTo(tab);
+                	var licenses = [
+                	        {
+                	        	name: "All Rights Reserved",
+                	        	selected: false
+                			},
+                			{
+                				name: "Creative Commons 3.0: Attribution-NonCommercial-NoDerivs",
+                				selected: false
+                			}
+                		];
+                	
+                	$.each(licenses, function (index, l) {
+                		if (l.name === catalog.getValue('license')) {
+                			l.selected = true;
+                		}
+                	});
+                    $.tmpl(template, {catalog: catalog, licenses: licenses}).appendTo(tab);
                 });
                 tab.show();
                 tab.find(".form-box-head input[type='checkbox']").click(function(event) {
