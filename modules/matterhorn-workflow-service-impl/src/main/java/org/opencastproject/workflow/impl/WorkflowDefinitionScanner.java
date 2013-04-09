@@ -31,9 +31,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,18 +51,20 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
   /** An internal collection of artifact id, bind the workflow definition files and their id */
   protected Map<File, String> artifactIds = new HashMap<File, String>();
 
+  /** List of artifact parsed with error */
+  protected List<File> artifactsWithError = new ArrayList<File>();
+
   /** OSGi bundle context */
   private BundleContext bundleCtx = null;
 
-  /** Sum of definition files currently installed */
-  private int sumInstalledFiles = 0;
-
   /** Tag to define if the the workflows definition have already been loaded */
-  private boolean areDefinitionsLoaded = false;
+  private boolean isWFSinitiliazed = false;
+
+  /** The current worklow definition being installed */
+  private WorkflowDefinition currentWFD = null;
 
   /**
-   * OSGi callback on component activation.
-   * private boolean initialized = true;
+   * OSGi callback on component activation. private boolean initialized = true;
    * 
    * /** OSGi callback on component activation.
    * 
@@ -77,21 +81,24 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
    * @see org.apache.felix.fileinstall.ArtifactInstaller#install(java.io.File)
    */
   public void install(File artifact) throws Exception {
+    WorkflowDefinition def = currentWFD;
+    
+    // If the current workflow definition is null, it means this is a first install and not an update...
+    if (def == null) {
+      // ... so we have to load the definition first
+      def = parseWorkflowDefinitionFile(artifact);
+      
+      if (def == null) {
+        logger.warn("Unable to install workflow from {}", artifact.getAbsolutePath());
+        artifactsWithError.add(artifact);
+        return;
+      }
+    } 
+
     logger.info("Installing workflow from file {}", artifact.getAbsolutePath());
-    InputStream stream = null;
-    try {
-      stream = new FileInputStream(artifact);
-      WorkflowDefinition def = WorkflowParser.parseWorkflowDefinition(stream);
-      if (def.getOperations().size() == 0)
-        logger.warn("Workflow '{}' has no operations", def.getId());
-      artifactIds.put(artifact, def.getId());
-      putWokflowDefinition(def.getId(), def);
-      sumInstalledFiles++;
-    } catch (Exception e) {
-      logger.warn("Unable to install workflow from {}, {}", artifact, e.getMessage());
-    } finally {
-      IOUtils.closeQuietly(stream);
-    }
+    artifactsWithError.remove(artifact);
+    artifactIds.put(artifact, def.getId());
+    putWokflowDefinition(def.getId(), def);
 
     // Determine the number of available profiles
     String[] filesInDirectory = artifact.getParentFile().list(new FilenameFilter() {
@@ -99,22 +106,17 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
         return name.endsWith(".xml");
       }
     });
-
+    
+    logger.info("Worfkflow definition '{}' from file {} installed", def.getId(), artifact.getAbsolutePath());
+    
     // Once all profiles have been loaded, announce readiness
-    if (filesInDirectory.length == sumInstalledFiles) {
+    if ((filesInDirectory.length - artifactsWithError.size()) == artifactIds.size() && !isWFSinitiliazed) {
+      logger.info("{} Workflow definitions loaded, activating Workflow service", filesInDirectory.length - artifactsWithError.size());
       Dictionary<String, String> properties = new Hashtable<String, String>();
-
-      if (!areDefinitionsLoaded) {
-        properties.put(ARTIFACT, "workflowdefinition");
-        logger.debug("Indicating readiness of workflow definitions");
-        bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
-        areDefinitionsLoaded = true;
-      }
-
-      logger.info("All {} workflow definitions installed", filesInDirectory.length);
-      sumInstalledFiles = 0;
-    } else {
-      logger.info("{} of {} workflow definitions installed", sumInstalledFiles, filesInDirectory.length);
+      properties.put(ARTIFACT, "workflowdefinition");
+      logger.debug("Indicating readiness of workflow definitions");
+      bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
+      isWFSinitiliazed = true;
     }
   }
 
@@ -125,8 +127,11 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
    */
   public void uninstall(File artifact) throws Exception {
     // Since the artifact is gone, we can't open it to read its ID. So we look in the local map.
-    WorkflowDefinition def = removeWofklowDefinition(artifactIds.remove(artifact));
-    logger.info("Uninstalling workflow '{}' from file {}", def.getId(), artifact.getAbsolutePath());
+    String id = artifactIds.remove(artifact);
+    if (id != null) {
+      WorkflowDefinition def = removeWofklowDefinition(id);
+      logger.info("Uninstalling workflow definition '{}' from file {}", def.getId(), artifact.getAbsolutePath());
+    }
   }
 
   /**
@@ -135,8 +140,36 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
    * @see org.apache.felix.fileinstall.ArtifactInstaller#update(java.io.File)
    */
   public void update(File artifact) throws Exception {
-    uninstall(artifact);
-    install(artifact);
+    currentWFD = parseWorkflowDefinitionFile(artifact);
+
+    if (currentWFD != null) {
+      uninstall(artifact);
+      install(artifact);
+      currentWFD = null;
+    }
+  }
+
+  /**
+   * Parse the given workflow definition file and return the related workflow definition
+   * 
+   * @param artifact
+   *          The workflow definition file to parse
+   * @return the workflow definition if the given contained a valid one, or null if the file can not be parsed.
+   */
+  public WorkflowDefinition parseWorkflowDefinitionFile(File artifact) {
+    InputStream stream = null;
+    try {
+      stream = new FileInputStream(artifact);
+      WorkflowDefinition def = WorkflowParser.parseWorkflowDefinition(stream);
+      if (def.getOperations().size() == 0)
+        logger.warn("Workflow '{}' has no operations", def.getId());
+      return def;
+    } catch (Exception e) {
+      logger.warn("Unable to parse workflow from file {}, {}", artifact.getAbsolutePath(), e.getMessage());
+      return null;
+    } finally {
+      IOUtils.closeQuietly(stream);
+    }
   }
 
   /**
