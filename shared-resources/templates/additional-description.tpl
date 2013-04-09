@@ -18,7 +18,7 @@
     </li>
     <li class="ui-helper-clearfix">
       <label class="scheduler-label"><span id="i18n_dc_copyright">Copyright</span>:</label>
-      <input id="copyright" class="oc-ui-form-field dc-metadata-field dc-copyright-field" name="copyright"/>
+      <input id="copyright" class="oc-ui-form-field dc-metadata-field dc-copyright-field" name="rights"/>
     </li>
   </ul>
 </form>
