@@ -1069,9 +1069,12 @@ ocRecordings = new (function() {
       if (ocUtils.exists(series['http://purl.org/dc/terms/'])) {
         series = series['http://purl.org/dc/terms/'];
         var item = {
-          label: series.title[0].value + ' - ' + series.creator[0].value,
+          label: series.title[0].value,
           value: series.title[0].value,
           id: series.identifier[0].value
+        }
+        if (typeof series.creator != 'undefined') {
+          item['label'] += ' - ' + series.creator[0].value;
         }
         source.push(item);
       }
