@@ -308,6 +308,7 @@
 
             </fieldset>
             
+<!-- Disabled for 1.4.x (MH-9045).  Does not currently work, please reenable once the core-side functions work.
             <fieldset class="upload-widget">
               <legend>Captions file</legend>
               <div class="informationText">
@@ -323,9 +324,9 @@
                   <input type="radio" class="file-source-select" name="fileSourceCaption" id="fileSourceAudioB" value="inbox">
                   <label for="fileSourceCaptionB" class="lbl_radio">Designated inbox on server</label>
                 </li>
-
+-->
                 <!-- field: Media File -->
-                <li class="ui-helper-clearfix" id="regularFileChooserCaptions">
+<!--                <li class="ui-helper-clearfix" id="regularFileChooserCaptions">
                   <label class="scheduler-label"><span class="i18n_upload_file">Media File</span>:</label>
                   <iframe class="uploadForm-container" frameborder="0" scrolling="no" src="../ingest/filechooser-local.html?elementType=catalog" class="uploadForm-container"></iframe>
                   <input type="hidden" class="track-flavor" value="captions/timedtext">
@@ -333,6 +334,7 @@
               </ul>
 
             </fieldset>
+-->
 
           </div>
           <!-- END OF MULTI FILE UPLOAD -->
