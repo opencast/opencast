@@ -176,6 +176,10 @@ export POLL_HELP="A too short value will cause excessive polls to the core, whil
 Testers should choose a value of 1 minute so that they can schedule recordings to start immediately"
 
 ## Keys for several properties in the config files
+# Url and port of the admin node (or all in one server) (config.properties)
+export ADMIN_KEY="org.opencastproject.admin.ui.url"
+# Url and port of the engage node (or all in one server) (config.properties)
+export ENGAGE_KEY="org.opencastproject.engage.ui.url"
 # Storage dir in the general felix config file (config.properties)
 export STORAGE_KEY="org.opencastproject.storage.dir"
 # CA's own url in the general felix config file (config.properties)
