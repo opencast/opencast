@@ -225,11 +225,11 @@
       <% }); %>
     </table>
     <% } %> <!-- endif -->
-    <% if ($(data[j].workflow.mediapackage.publications).size() > 0) { %>
+    <% if ($(data[j].workflow.mediapackage.publications.publication).size() > 0) { %>
     <br />
     <h3>Publications</h3>
     <table class="kvtable">
-      <% $.each(data[j].workflow.mediapackage.publications, function(key, item) { %>
+      <% $.each(data[j].workflow.mediapackage.publications.publication, function(key, item) { %>
       <tr class="unfoldable-tr">
         <td class="td-key">
           <%= item.channel %>
