@@ -293,6 +293,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
         switch (operation.getState()) {
           case FAILED:
             break;
+          case RETRY:
           case INSTANTIATED:
             if (SUCCEEDED.equals(previousState) || SKIPPED.equals(previousState) || FAILED.equals(previousState))
               currentOperation = operation;
@@ -326,6 +327,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
           case INSTANTIATED:
           case PAUSED:
           case RUNNING:
+          case RETRY:
             break;
           default:
             throw new IllegalStateException("Found operation in unknown state '" + currentOperation.getState() + "'");
