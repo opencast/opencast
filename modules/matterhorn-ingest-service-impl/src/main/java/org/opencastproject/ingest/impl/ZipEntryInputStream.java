@@ -23,16 +23,32 @@ import java.io.InputStream;
 
 public class ZipEntryInputStream extends FilterInputStream {
 
-  public ZipEntryInputStream(InputStream in) {
+  /** Length of the zip entry */
+  private long bytesToRead = 0;
+
+  /**
+   * Creates a wrapper around the input stream <code>in</code> and reads the given number of bytes from it.
+   * 
+   * @param in
+   *          the input stream
+   * @param length
+   *          the number of bytes to read
+   */
+  public ZipEntryInputStream(InputStream in, long length) {
     super(in);
+    bytesToRead = length;
     Preconditions.checkNotNull(in);
   }
 
   @Override
   public int read() throws IOException {
-    if (in.available() == 0)
+    if (bytesToRead == 0)
       return -1;
-    return in.read();
+    bytesToRead--;
+    int byteContent = in.read();
+    if (byteContent == -1)
+      throw new IOException("Zip entry is shorter than anticipated");
+    return byteContent;
   }
 
   @Override

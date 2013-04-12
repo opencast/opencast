@@ -56,6 +56,8 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -86,8 +88,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import javax.management.ObjectInstance;
 
@@ -268,6 +268,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.info("Ingesting zipped mediapackage for workflow {}", workflowInstanceId);
       try {
         workflowInstance = workflowService.getWorkflowById(workflowInstanceId);
+      } catch (NotFoundException e) {
+        logger.debug("Ingest target workflow not found, starting a new one");
       } catch (WorkflowDatabaseException e) {
         throw new IngestException(e);
       }
@@ -275,7 +277,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.info("Ingesting zipped mediapackage");
     }
 
-    ZipInputStream zis = null;
+    ZipArchiveInputStream zis = null;
     Map<String, URI> elementUris = new HashMap<String, URI>();
     try {
       // We don't need anybody to do the dispatching for us. Therefore we need to make sure that the job is never in
@@ -284,23 +286,23 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
 
-      zis = new ZipInputStream(zipStream);
-      ZipEntry entry;
+      zis = new ZipArchiveInputStream(zipStream);
+      ZipArchiveEntry entry;
       MediaPackage mp = null;
       // While there are entries write them to a collection
-      while ((entry = zis.getNextEntry()) != null) {
+      while ((entry = zis.getNextZipEntry()) != null) {
         try {
           if (entry.isDirectory() || entry.getName().contains("__MACOSX"))
             continue;
 
           if (entry.getName().endsWith("manifest.xml") || entry.getName().endsWith("index.xml")) {
             // Build the mediapackage
-            mp = loadMediaPackageFromManifest(new ZipEntryInputStream(zis));
+            mp = loadMediaPackageFromManifest(new ZipEntryInputStream(zis, entry.getSize()));
           } else {
             logger.info("Storing zip entry {} in working file repository collection '{}'",
                     job.getId() + entry.getName(), COLLECTION_ID);
             URI contentUri = workspace.putInCollection(COLLECTION_ID,
-                    job.getId() + FilenameUtils.getName(entry.getName()), new ZipEntryInputStream(zis));
+                    job.getId() + FilenameUtils.getName(entry.getName()), new ZipEntryInputStream(zis, entry.getSize()));
             ingestStatistics.add(entry.getSize());
             elementUris.put(FilenameUtils.getName(entry.getName()), contentUri);
             logger.info("Zip entry {} stored at {}", job.getId() + entry.getName(), contentUri);
@@ -318,7 +320,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
       // Determine the mediapackage identifier
       String mediaPackageId = null;
-      if (workflowInstanceId != null) {
+      if (workflowInstance != null) {
         mediaPackageId = workflowInstance.getMediaPackage().getIdentifier().toString();
         mp.setIdentifier(workflowInstance.getMediaPackage().getIdentifier());
       } else {
@@ -991,8 +993,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
 
     } else {
-      logger.info("Ingested mediapackage {} is processed using workflow template '{}', specified during ingest", mediapackage,
-              workflowDefinitionID);
+      logger.info("Ingested mediapackage {} is processed using workflow template '{}', specified during ingest",
+              mediapackage, workflowDefinitionID);
     }
 
     // Use the default workflow definition if nothing was determined
