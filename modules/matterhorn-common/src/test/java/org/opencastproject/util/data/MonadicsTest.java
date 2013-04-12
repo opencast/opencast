@@ -401,7 +401,7 @@ public class MonadicsTest {
     final List<Integer> a = mlist(1, 2, 3).concat(list(4, 5)).value();
     assertEquals(5, a.size());
     assertEquals(4, (Object) a.get(3)); // Object cast because of overloading ambiguity
-    final List<Object> b = mlist((Object) 1).concat(list("x")).value();
+    final List<Object> b = mlist((Object) 1).concat(Collections.<Object>list("x")).value();
     assertEquals(2, b.size());
     assertEquals(1, b.get(0));
     assertEquals("x", b.get(1));

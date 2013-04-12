@@ -365,7 +365,7 @@ public final class Collections {
   }
 
   /** Create an iterator form an array. */
-  public static <A, X extends A> Iterator<A> iterator(final X... as) {
+  public static <A> Iterator<A> iterator(final A... as) {
     return new Iterator<A>() {
       private int i = 0;
 

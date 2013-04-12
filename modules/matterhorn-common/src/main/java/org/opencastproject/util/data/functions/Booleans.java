@@ -71,7 +71,7 @@ public final class Booleans {
     }
   };
 
-  public static <A, B> Function2<A, B, Boolean> and(final Function<A, Boolean> f, final Function<B, Boolean> g) {
+  public static <A, B> Function2<A, B, Boolean> and2(final Function<A, Boolean> f, final Function<B, Boolean> g) {
     return new Function2<A, B, Boolean>() {
       @Override public Boolean apply(A a, B b) {
         return f.apply(a) && g.apply(b);
