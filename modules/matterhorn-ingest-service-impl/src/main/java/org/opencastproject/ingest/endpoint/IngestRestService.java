@@ -53,6 +53,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -104,6 +106,20 @@ public class IngestRestService {
 
   /** The default workflow definition */
   private String defaultWorkflowDefinitionId = null;
+
+  /** Dublin Core Terms: http://purl.org/dc/terms/ */
+  private static List<String> dcterms = Arrays.asList("abstract", "accessRights",
+      "accrualMethod", "accrualPeriodicity", "accrualPolicy", "alternative",
+      "audience", "available", "bibliographicCitation", "conformsTo",
+      "contributor", "coverage", "created", "creator", "date",
+      "dateAccepted", "dateCopyrighted", "dateSubmitted", "description",
+      "educationLevel", "extent", "format", "hasFormat", "hasPart",
+      "hasVersion", "identifier", "instructionalMethod", "isFormatOf",
+      "isPartOf", "isReferencedBy", "isReplacedBy", "isRequiredBy", "issued",
+      "isVersionOf", "language", "license", "mediator", "medium", "modified",
+      "provenance", "publisher", "references", "relation", "replaces",
+      "requires", "rights", "rightsHolder", "source", "spatial", "subject",
+      "tableOfContents", "temporal", "title", "type", "valid");
 
   private MediaPackageBuilderFactory factory = null;
   private IngestService ingestService = null;
@@ -476,6 +492,7 @@ public class IngestRestService {
     try {
       MediaPackage mp = ingestService.createMediaPackage();
       DublinCoreCatalog dcc = dublinCoreService.newInstance();
+      Map<String,String> workflowProperties = new HashMap<String, String>();
       if (ServletFileUpload.isMultipartContent(request)) {
         for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
@@ -483,10 +500,12 @@ public class IngestRestService {
             String fieldName = item.getFieldName();
             if ("flavor".equals(fieldName)) {
               flavor = MediaPackageElementFlavor.parseFlavor(Streams.asString(item.openStream()));
-            } else {
-              // TODO not all form fields should be treated as dublin core fields
+            } else if (dcterms.contains(fieldName)) {
               EName en = new EName(DublinCore.TERMS_NS_URI, fieldName);
               dcc.add(en, Streams.asString(item.openStream()));
+            } else {
+              /* Tread everything else as workflow properties */
+              workflowProperties.put(fieldName, Streams.asString(item.openStream()));
             }
           } else {
             ingestService.addTrack(item.openStream(), item.getName(), flavor, mp);
@@ -500,7 +519,7 @@ public class IngestRestService {
         if (wdID == null) {
           workflow = ingestService.ingest(mp);
         } else {
-          workflow = ingestService.ingest(mp, wdID);
+          workflow = ingestService.ingest(mp, wdID, workflowProperties);
         }
         return Response.ok(workflow).build();
       }
