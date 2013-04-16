@@ -37,6 +37,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
@@ -63,9 +64,13 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
+  
+  /** Option for rewriting existing metadata */
+  private static final String OPT_OVERWRITE = "overwrite";
 
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
+    CONFIG_OPTIONS.put(OPT_OVERWRITE, "Whether to rewrite existing metadata");
   }
 
   /** The inspection service */
@@ -125,13 +130,17 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
     // Inspect the tracks
     long totalTimeInQueue = 0;
     long timeToExecute = 0;
+    
+    WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
+    boolean rewrite = "true".equalsIgnoreCase(operation.getConfiguration(OPT_OVERWRITE));
+    
     for (Track track : mediaPackage.getTracks()) {
 
       logger.info("Inspecting track '{}' of {}", track.getIdentifier(), mediaPackage);
 
       Job inspectJob = null;
       try {
-        inspectJob = inspectionService.enrich(track, false);
+        inspectJob = inspectionService.enrich(track, rewrite);
         if (!waitForStatus(inspectJob).isSuccess()) {
           throw new WorkflowOperationException("Track " + track + " could not be inspected");
         }
