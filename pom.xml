@@ -188,9 +188,7 @@
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
 		<module>modules/matterhorn-scheduler-api</module>
-		<!-- Needed scheduler remote service
 		<module>modules/matterhorn-scheduler-remote</module>
-		-->
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-remote</module>
         <module>modules/matterhorn-metadata-api</module>

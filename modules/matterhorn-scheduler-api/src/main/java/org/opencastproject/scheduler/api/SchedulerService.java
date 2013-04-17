@@ -34,6 +34,11 @@ import java.util.Properties;
 public interface SchedulerService {
 
   /**
+   * Identifier for service registration and location
+   */
+  String JOB_TYPE = "org.opencastproject.scheduler";
+
+  /**
    * Creates new event using specified DublinCore. Default capture agent properties are created from DublinCore.
    * Following values are generated:
    * <ul>
