@@ -51,10 +51,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -108,18 +108,14 @@ public class IngestRestService {
   private String defaultWorkflowDefinitionId = null;
 
   /** Dublin Core Terms: http://purl.org/dc/terms/ */
-  private static List<String> dcterms = Arrays.asList("abstract", "accessRights",
-      "accrualMethod", "accrualPeriodicity", "accrualPolicy", "alternative",
-      "audience", "available", "bibliographicCitation", "conformsTo",
-      "contributor", "coverage", "created", "creator", "date",
-      "dateAccepted", "dateCopyrighted", "dateSubmitted", "description",
-      "educationLevel", "extent", "format", "hasFormat", "hasPart",
-      "hasVersion", "identifier", "instructionalMethod", "isFormatOf",
-      "isPartOf", "isReferencedBy", "isReplacedBy", "isRequiredBy", "issued",
-      "isVersionOf", "language", "license", "mediator", "medium", "modified",
-      "provenance", "publisher", "references", "relation", "replaces",
-      "requires", "rights", "rightsHolder", "source", "spatial", "subject",
-      "tableOfContents", "temporal", "title", "type", "valid");
+  private static List<String> dcterms = Arrays.asList("abstract", "accessRights", "accrualMethod",
+          "accrualPeriodicity", "accrualPolicy", "alternative", "audience", "available", "bibliographicCitation",
+          "conformsTo", "contributor", "coverage", "created", "creator", "date", "dateAccepted", "dateCopyrighted",
+          "dateSubmitted", "description", "educationLevel", "extent", "format", "hasFormat", "hasPart", "hasVersion",
+          "identifier", "instructionalMethod", "isFormatOf", "isPartOf", "isReferencedBy", "isReplacedBy",
+          "isRequiredBy", "issued", "isVersionOf", "language", "license", "mediator", "medium", "modified",
+          "provenance", "publisher", "references", "relation", "replaces", "requires", "rights", "rightsHolder",
+          "source", "spatial", "subject", "tableOfContents", "temporal", "title", "type", "valid");
 
   private MediaPackageBuilderFactory factory = null;
   private IngestService ingestService = null;
@@ -376,6 +372,7 @@ public class IngestRestService {
             }
           } else {
             // once the body gets read iter.hasNext must not be invoked or the stream can not be read
+            // MH-9579
             fileName = item.getName();
             in = item.openStream();
             isDone = true;
@@ -492,7 +489,7 @@ public class IngestRestService {
     try {
       MediaPackage mp = ingestService.createMediaPackage();
       DublinCoreCatalog dcc = dublinCoreService.newInstance();
-      Map<String,String> workflowProperties = new HashMap<String, String>();
+      Map<String, String> workflowProperties = new HashMap<String, String>();
       if (ServletFileUpload.isMultipartContent(request)) {
         for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
@@ -587,7 +584,7 @@ public class IngestRestService {
           } else {
             logger.debug("Processing file item");
             // once the body gets read iter.hasNext must not be invoked or the stream can not be read
-            // MH-XXXX
+            // MH-9579
             in = item.openStream();
             isDone = true;
           }
