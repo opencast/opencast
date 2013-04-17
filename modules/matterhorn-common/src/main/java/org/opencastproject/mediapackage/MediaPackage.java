@@ -18,12 +18,11 @@ package org.opencastproject.mediapackage;
 
 import org.opencastproject.mediapackage.identifier.Id;
 
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
-
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * Interface for a media package, which is a data container moving through the system, containing metadata, tracks and
@@ -393,6 +392,13 @@ public interface MediaPackage extends Cloneable {
    * @return the attachments with the specified reference
    */
   Attachment[] getAttachments(MediaPackageElementFlavor flavor, MediaPackageReference reference);
+
+  /**
+   * Returns the presentations that are part of this media package.
+   *
+   * @return the attachments
+   */
+  Publication[] getPublications();
 
   /**
    * Returns <code>true</code> if the media package contains attachments of any kind.

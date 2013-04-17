@@ -35,7 +35,6 @@ import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -61,8 +60,8 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.episode.api.EpisodeQuery.systemQuery;
+import static org.opencastproject.episode.impl.EpisodeServiceImpl.mkPartial;
 import static org.opencastproject.mediapackage.MediaPackageSupport.loadFromClassPath;
-import static org.opencastproject.mediapackage.MediaPackageSupport.loadMediaPackageFromClassPath;
 import static org.opencastproject.util.UrlSupport.DEFAULT_BASE_URL;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.functions.Booleans.and;
@@ -100,7 +99,7 @@ public class EpisodeServiceImplTest {
   /** Adds a simple media package that has a dublin core for the episode only. */
   @Test
   public void testGetMediaPackage() throws Exception {
-    MediaPackage mediaPackage = loadMediaPackageFromClassPath("/manifest-simple.xml");
+    MediaPackage mediaPackage = loadFromClassPath("/manifest-simple.xml");
     // Make sure our mocked ACL has the read and write permission
     env.setReadWritePermissions();
     env.getService().add(mediaPackage);
@@ -130,7 +129,7 @@ public class EpisodeServiceImplTest {
 
   @Test
   public void testOnlyLastVersion2() throws Exception {
-    final MediaPackage mpSimple = loadMediaPackageFromClassPath("/manifest-simple.xml");
+    final MediaPackage mpSimple = loadFromClassPath("/manifest-simple.xml");
 
     // Make sure our mocked ACL has the read and write permission
     env.setReadWritePermissions();
@@ -168,7 +167,7 @@ public class EpisodeServiceImplTest {
   @Test
   @Ignore
   public void testSearchForEpisodeWithSeriesMetadata() throws Exception {
-    MediaPackage mediaPackage = loadMediaPackageFromClassPath("/manifest-full.xml");
+    MediaPackage mediaPackage = loadFromClassPath("/manifest-full.xml");
     env.getService().add(mediaPackage);
 
     SearchResult episodeMetadataResult = env.getService().find(systemQuery().text("Vegetation"), env.getRewriter());
@@ -181,7 +180,7 @@ public class EpisodeServiceImplTest {
   /** Adds a simple media package that has a dublin core for the episode only. */
   @Test
   public void testAddSimpleMediaPackage() throws Exception {
-    MediaPackage mediaPackage = loadMediaPackageFromClassPath("/manifest-simple.xml");
+    MediaPackage mediaPackage = loadFromClassPath("/manifest-simple.xml");
 
     // Make sure our mocked ACL has the read and write permission
     env.setReadWritePermissions();
@@ -210,7 +209,7 @@ public class EpisodeServiceImplTest {
 
   @Test
   public void testOnlyLastVersion() throws Exception {
-    final MediaPackage mpSimple = loadMediaPackageFromClassPath("/manifest-simple.xml");
+    final MediaPackage mpSimple = loadFromClassPath("/manifest-simple.xml");
     // Make sure our mocked ACL has the read and write permission
     env.setReadWritePermissions();
     // Add the media package to the search index
@@ -220,7 +219,7 @@ public class EpisodeServiceImplTest {
     assertEquals(2, env.getService().find(systemQuery().id("10.0000/1"), env.getRewriter()).size());
     assertEquals(1, env.getService().find(systemQuery().onlyLastVersion(), env.getRewriter()).size());
     // add another media package
-    final MediaPackage mpFull = loadMediaPackageFromClassPath("/manifest-full.xml");
+    final MediaPackage mpFull = loadFromClassPath("/manifest-full.xml");
     env.getService().add(mpFull);
     assertEquals(3, env.getService().find(systemQuery(), env.getRewriter()).size());
     // now there must be two last versions
@@ -230,7 +229,7 @@ public class EpisodeServiceImplTest {
   /** Ads a simple media package that has a dublin core for the episode only. */
   @Test
   public void testAddFullMediaPackage() throws Exception {
-    MediaPackage mp = loadMediaPackageFromClassPath("/manifest-full.xml");
+    MediaPackage mp = loadFromClassPath("/manifest-full.xml");
     // Make sure our mocked ACL has the read and write permission
     env.setReadWritePermissions();
 
@@ -244,8 +243,8 @@ public class EpisodeServiceImplTest {
 
   @Test
   public void testDelete() throws Exception {
-    final MediaPackage mp1 = loadMediaPackageFromClassPath("/manifest-simple.xml");
-    final MediaPackage mp2 = loadMediaPackageFromClassPath("/manifest-full.xml");
+    final MediaPackage mp1 = loadFromClassPath("/manifest-simple.xml");
+    final MediaPackage mp2 = loadFromClassPath("/manifest-full.xml");
     final String mpId = mp1.getIdentifier().toString();
     // Make sure our mocked ACL has the read and write permission
     env.setReadWritePermissions();
@@ -262,7 +261,7 @@ public class EpisodeServiceImplTest {
   /** Test removal from the search index. */
   @Test
   public void testDeleteMediaPackage() throws Exception {
-    MediaPackage mediaPackage = loadMediaPackageFromClassPath("/manifest-simple.xml");
+    MediaPackage mediaPackage = loadFromClassPath("/manifest-simple.xml");
 
     // Make sure our mocked ACL has the read and write permission
     env.setReadWritePermissions();
@@ -352,12 +351,12 @@ public class EpisodeServiceImplTest {
     for (long i = 0; i < 10; i++) {
       final MediaPackage mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
       mediaPackage.setIdentifier(IdBuilderFactory.newInstance().newIdBuilder().createNew());
-      env.getEpisodeDatabase().storeEpisode(mediaPackage, env.getAcl(), new Date(), Version.FIRST);
+      env.getEpisodeDatabase().storeEpisode(mkPartial(mediaPackage), env.getAcl(), new Date(), Version.FIRST);
     }
     // load one with an mpeg7 catalog attached
-    final MediaPackage mpWithMpeg7 = EpisodeServiceImpl.rewriteForArchival(Version.FIRST).apply(
-            MediaPackageSupport.loadMediaPackageFromClassPath("/manifest-full.xml"));
-    env.getEpisodeDatabase().storeEpisode(mpWithMpeg7, env.getAcl(), new Date(), Version.FIRST);
+    final MediaPackage mpWithMpeg7 = loadFromClassPath("/manifest-full.xml");
+    EpisodeServiceImpl.rewriteAssetsForArchival(mkPartial(mpWithMpeg7), Version.FIRST);
+    env.getEpisodeDatabase().storeEpisode(mkPartial(mpWithMpeg7), env.getAcl(), new Date(), Version.FIRST);
 
     // We should have nothing in the search index
     assertEquals(0, env.getService().find(systemQuery(), env.getRewriter()).size());
@@ -381,7 +380,7 @@ public class EpisodeServiceImplTest {
 
   @Test
   public void testFindByDate() throws Exception {
-    final MediaPackage mp = loadMediaPackageFromClassPath("/manifest-full.xml");
+    final MediaPackage mp = loadFromClassPath("/manifest-full.xml");
     env.setReadWritePermissions();
     env.getService().add(mp);
     final Date dayAhead = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000);

@@ -189,7 +189,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
 //    final WorkflowDefinition wd = workflowDefinitionXmlPresent
 //            ? WorkflowParser.parseWorkflowDefinition(workflowDefinitionXml)
 //            : getWorkflowService().getWorkflowDefinitionById(workflowDefinitionId);
-//    getEpisodeService().applyWorkflow(workflow(wd), rewriteUri, mediaPackageId);
+//    getEpisodeService().applyWorkflow(workflow(wd), uriCreator, mediaPackageId);
 //    return Response.noContent().build();
 //  }
 
@@ -222,7 +222,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
                   }
                 });
         final WorkflowDefinition wfd = getWorkflowService().getWorkflowDefinitionById(wfId);
-        getEpisodeService().applyWorkflow(workflow(wfd, wfp), rewriteUri, mpIds);
+        getEpisodeService().applyWorkflow(workflow(wfd, wfp), uriRewriter, mpIds);
         return Response.noContent().build();
       }
     });
@@ -341,7 +341,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
 
         // Return the results using the requested format
         final String type = "json".equals(format) ? MediaType.APPLICATION_JSON : MediaType.APPLICATION_XML;
-        final SearchResult sr = getEpisodeService().find(search, rewriteUri);
+        final SearchResult sr = getEpisodeService().find(search, uriRewriter);
         return Response.ok(Convert.convert(sr)).type(type).build();
       }
     });
@@ -395,7 +395,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
     return handleException(new Function0<Response>() {
       @Override public Response apply() {
         final EpisodeQuery idQuery = query(getSecurityService()).id(mediaPackageId).onlyLastVersion();
-        final List<SearchResultItem> result = getEpisodeService().find(idQuery, rewriteUri).getItems();
+        final List<SearchResultItem> result = getEpisodeService().find(idQuery, uriRewriter).getItems();
         if (result.size() > 1)
           return serverError();
         if (result.size() == 0)
@@ -407,14 +407,14 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
   }
 
   @Override public UriRewriter getUriRewriter() {
-    return rewriteUri;
+    return uriRewriter;
   }
 
   /**
    * Function to rewrite media package element URIs so that they point to this REST endpoint.
    * The created URIs have to correspond with the parameter list of {@link #getElement(String, String, long, String)}.
    */
-  private final UriRewriter rewriteUri = new UriRewriter() {
+  private final UriRewriter uriRewriter = new UriRewriter() {
     @Override public URI apply(Version version, MediaPackageElement mpe) {
       final String mimeType = option(mpe.getMimeType()).bind(suffix).getOrElse("unknown");
       return uri(getServerUrl(),

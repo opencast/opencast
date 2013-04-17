@@ -16,13 +16,12 @@
 
 package org.opencastproject.mediapackage;
 
+import org.junit.After;
+import org.junit.Before;
 import org.opencastproject.mediapackage.identifier.Handle;
 import org.opencastproject.mediapackage.identifier.HandleBuilder;
 import org.opencastproject.mediapackage.identifier.HandleBuilderFactory;
 import org.opencastproject.util.FileSupport;
-
-import org.junit.After;
-import org.junit.Before;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,6 +39,9 @@ public abstract class AbstractMediaPackageTest {
 
   /** The media package builder */
   protected MediaPackageBuilder mediaPackageBuilder = null;
+
+  /** The media package element builder */
+  protected MediaPackageElementBuilder mediaPackageElementBuilder = null;
 
   /** The handle builder */
   protected HandleBuilder handleBuilder = null;
@@ -97,6 +99,8 @@ public abstract class AbstractMediaPackageTest {
     // Create a media package builder
     MediaPackageBuilderFactory builderFactory = MediaPackageBuilderFactory.newInstance();
     mediaPackageBuilder = builderFactory.newMediaPackageBuilder();
+
+    mediaPackageElementBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
 
     // Create a handle builder
     handleBuilder = HandleBuilderFactory.newInstance().newHandleBuilder();

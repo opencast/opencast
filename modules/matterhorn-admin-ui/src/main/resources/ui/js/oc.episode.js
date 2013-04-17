@@ -256,7 +256,15 @@ opencast.episode = (function() {
               mimetype: track.mimetype
             };
           })
-          .value()
+          .value(),
+      publications: _(A(json.mediapackage.publications.publication)).chain()
+          .map(function(publication) {
+    	    return {
+    	      url: publication.url,
+    	      channel: publication.channel,
+    	      mimetype: publication.mimetype
+    	    };
+          }).value()
     }
   }
 

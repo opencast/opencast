@@ -6,30 +6,71 @@
 	<tag>archive</tag>
   </tags>
   <description>Retract a media package from all distribution channels.</description>
+  <configuration_panel>
+  <![CDATA[
+    <fieldset>
+      <legend>Retraction</legend>
+      <ul class="oc-ui-form-list">
+        <li class="ui-helper-clearfix">
+          <label>Publication Channels:</label>
+          <span>
+            <input id="engage" name="engage" type="checkbox" checked="checked" class="configField" value="Matterhorn Engage Player" />
+            <span>&nbsp;Matterhorn Engage Player</span>
+            <input id="youtube" name="youtube" type="checkbox" checked="checked" class="configField" value="Youtube" />
+            <span>&nbsp;Youtube</span>
+          </span>
+        </li>
+      </ul>
+    </fieldset>
+
+    <script type="text/javascript">           
+      ocWorkflowPanel.registerComponents = function(components){
+        /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
+         * into the workflow. The component's nodeKey must match the components array key.
+         *
+         * Example:'org.opencastproject.workflow.config.myProperty' will be availible at ${my.property}
+         */
+        components['org.opencastproject.workflow.config.engage'] = new ocAdmin.Component(
+          ['engage'],
+	      {key: 'org.opencastproject.workflow.config.engage'},
+          {getValue: function(){ return this.fields.engage.is(":checked"); }
+          }
+        );
+        components['org.opencastproject.workflow.config.youtube'] = new ocAdmin.Component(
+          ['youtube'],
+	      {key: 'org.opencastproject.workflow.config.youtube'},
+          {getValue: function(){ return this.fields.youtube.is(":checked"); }
+          }
+        );
+        //etc...
+      }
+      ocWorkflowPanel.setComponentValues = function(values, components){
+        components['org.opencastproject.workflow.config.engage'].setValue(values['org.opencastproject.workflow.config.engage']);
+        components['org.opencastproject.workflow.config.youtube'].setValue(values['org.opencastproject.workflow.config.youtube']);
+      }
+    </script>
+  ]]>
+  </configuration_panel>
   <operations>
-
-    <!-- Remove from search index -->
-
-    <operation
-      id="searchindex-remove"
-      description="Remove media package from search index">
-    </operation>
   
-    <!-- Retract from distribution channels -->
+    <!-- Retract from engage player -->
 
     <operation
-      id="retract-download"
+      id="retract-engage"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="Retract media package from the download distribution channels">
+      if="${engage}"
+      description="Retract media package from the engage player">
     </operation>
 
+    <!-- Retract from youtube -->
+
     <operation
-      id="retract-streaming"
+      id="retract-youtube"
       fail-on-error="true"
       exception-handler-workflow="error"
-      if="${org.opencastproject.streaming.url}"
-      description="Retract media package from the streaming distribution channels">
+      if="${youtube}"
+      description="Retract media package from youtube">
     </operation>
 
     <!-- Archive the current state of the mediapackage -->
@@ -41,7 +82,16 @@
         description="Archived">
     </operation>
 
-    <!-- todo clean up the episode from the working file repository -->
+    <!-- Cleanup the working file repository -->
+ 
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+      <configurations>
+        <configuration key="preserve-flavors"></configuration>
+      </configurations>
+    </operation>
   
   </operations>
   

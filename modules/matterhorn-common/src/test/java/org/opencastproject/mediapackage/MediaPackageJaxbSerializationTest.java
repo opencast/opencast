@@ -15,17 +15,15 @@
  */
 package org.opencastproject.mediapackage;
 
+import junit.framework.Assert;
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
-
-import junit.framework.Assert;
-
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -130,6 +128,7 @@ public class MediaPackageJaxbSerializationTest {
       Assert.assertTrue(!mp.getTracks()[1].hasVideo());
       Assert.assertEquals(3, mp.getCatalogs().length);
       Assert.assertEquals(2, mp.getAttachments().length);
+      Assert.assertEquals(1, mp.getPublications().length);
     } finally {
       IOUtils.closeQuietly(in);
     }

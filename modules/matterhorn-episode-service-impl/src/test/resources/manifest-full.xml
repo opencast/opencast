@@ -1,20 +1,26 @@
 <mediapackage xmlns="http://mediapackage.opencastproject.org" id="10.0000/2"
-                                   start="2007-12-05T13:40:00" duration="1004400000">
-<metadata>
-  <catalog id="catalog-1" type="dublincore/episode">
-    <mimetype>text/xml</mimetype>
-    <url>dublincore.xml</url>
-    <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
-  </catalog>
-  <catalog id="catalog-2" type="dublincore/series" ref="series:foobar-series">
-    <mimetype>text/xml</mimetype>
-    <url>series-dublincore.xml</url>
-    <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
-  </catalog>
-  <catalog id="catalog-3" type="mpeg-7/text">
-    <mimetype>text/xml</mimetype>
-    <url>mpeg7.xml</url>
-    <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
-  </catalog>
-</metadata>
+              start="2007-12-05T13:40:00" duration="1004400000">
+  <metadata>
+    <catalog id="catalog-1" type="dublincore/episode">
+      <mimetype>text/xml</mimetype>
+      <url>dublincore.xml</url>
+      <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
+    </catalog>
+    <catalog id="catalog-2" type="dublincore/series" ref="series:foobar-series">
+      <mimetype>text/xml</mimetype>
+      <url>series-dublincore.xml</url>
+      <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
+    </catalog>
+    <catalog id="catalog-3" type="mpeg-7/text">
+      <mimetype>text/xml</mimetype>
+      <url>mpeg7.xml</url>
+      <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
+    </catalog>
+  </metadata>
+  <publications>
+    <publication id="presentation-1" channel="engage">
+      <url>engage.html?e=p-1</url>
+      <mimetype>text/html</mimetype>
+    </publication>
+  </publications>
 </mediapackage>

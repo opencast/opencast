@@ -2,3 +2,4 @@ AbstractMediaPackageElement
 MediaPackageElementFlavor
 MediaPackageImpl
 CatalogImpl
+PublicationImpl

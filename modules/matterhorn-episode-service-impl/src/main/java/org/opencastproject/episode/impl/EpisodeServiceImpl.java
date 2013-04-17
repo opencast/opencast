@@ -48,11 +48,11 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Predicate;
 import org.opencastproject.util.data.functions.Booleans;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -73,18 +73,20 @@ import java.util.List;
 import java.util.Map;
 
 import static org.opencastproject.episode.api.EpisodeQuery.query;
+import static org.opencastproject.episode.impl.PartialMediaPackage.partialMp;
 import static org.opencastproject.episode.impl.Protected.granted;
 import static org.opencastproject.episode.impl.Protected.rejected;
 import static org.opencastproject.episode.impl.StoragePath.spath;
 import static org.opencastproject.episode.impl.Util.filterItems;
 import static org.opencastproject.episode.impl.elementstore.DeletionSelector.delAll;
 import static org.opencastproject.episode.impl.elementstore.Source.source;
-import static org.opencastproject.mediapackage.MediaPackageSupport.modify;
-import static org.opencastproject.mediapackage.MediaPackageSupport.rewriteUris;
-import static org.opencastproject.mediapackage.MediaPackageSupport.uriRewriter;
+import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.hasNoChecksum;
+import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.isNotPublication;
+import static org.opencastproject.mediapackage.MediaPackageSupport.copy;
+import static org.opencastproject.mediapackage.MediaPackageSupport.updateElement;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.JobUtil.waitForJob;
-import static org.opencastproject.util.data.Collections.array;
+import static org.opencastproject.util.data.Arrays.array;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Collections.mkString;
 import static org.opencastproject.util.data.Collections.nil;
@@ -93,6 +95,7 @@ import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Functions.constant;
+import static org.opencastproject.util.data.functions.Functions.toPredicate;
 
 public final class EpisodeServiceImpl implements EpisodeService {
   /** Log facility */
@@ -128,64 +131,50 @@ public final class EpisodeServiceImpl implements EpisodeService {
   }
 
   @Override
-  // todo adding to the archive needs to be synchronized because of the index.
-  // It resets the oc_latest_version flag and this must not happen concurrently.
-  // This approach works as long as the archive is not distributed.
-  public synchronized void add(final MediaPackage mediaPackage) throws EpisodeServiceException {
+  /* todo adding to the archive needs to be synchronized because of the index.
+       It resets the oc_latest_version flag and this must not happen concurrently.
+       This approach works as long as the archive is not distributed. */
+  public synchronized void add(final MediaPackage mp) throws EpisodeServiceException {
     handleException(new Effect0.X() {
-      @Override
-      protected void xrun() throws Exception {
-        logger.debug("Attempting to add mediapackage {} to archive", mediaPackage.getIdentifier());
-        final AccessControlList acl = authSvc.getAccessControlList(mediaPackage);
+      @Override public void xrun() throws Exception {
+        logger.debug("Attempting to add mediapackage {} to archive", mp.getIdentifier());
+        final AccessControlList acl = authSvc.getAccessControlList(mp);
         protect(acl, list(WRITE_PERMISSION), new Effect0.X() {
-          @Override
-          public void xrun() throws Exception {
-            final Date now = new Date();
-
-            // FIXME error handling ?
-            final Version version = persistence.claimVersion(mediaPackage.getIdentifier().toString());
-            logger.info("Creating new version {} of mediapackage {}", version, mediaPackage);
-
-            // archive elements
-            final Function<MediaPackage, MediaPackage> archiveElements = new Function.X<MediaPackage, MediaPackage>() {
-              @Override
-              public MediaPackage xapply(MediaPackage mediaPackage) throws Exception {
-                archiveElements(mediaPackage, version);
-                return mediaPackage;
-              }
-            };
-
-            // persist in solr
-            final Function<MediaPackage, MediaPackage> index = new Function.X<MediaPackage, MediaPackage>() {
-              @Override
-              protected MediaPackage xapply(MediaPackage mediaPackage) throws Exception {
-                solrIndex.add(mediaPackage, acl, now, version);
-                return mediaPackage;
-              }
-            };
-
-            // persist in db
-            final Effect<MediaPackage> persist = new Effect.X<MediaPackage>() {
-              @Override
-              protected void xrun(MediaPackage mediaPackage) throws Exception {
-                try {
-                  persistence.storeEpisode(mediaPackage, acl, now, version);
-                } catch (EpisodeServiceDatabaseException e) {
-                  logger.error("Could not store episode {}: {}", mediaPackage.getIdentifier(), e);
-                  throw new EpisodeServiceException(e);
-                }
-              }
-            };
-
-            // todo url-rewritten media package cannot be stored in solr since the solrIndex
-            // accesses metadata catalogs via StaticMetadataService which in turn uses the workspace to download
-            // them. If the URL is already a URN this does not work.
-            // todo make archiving transactional
-            persist.o(rewriteForArchival(version)).o(index).o(archiveElements).apply(enrichChecksums(mediaPackage));
+          @Override public void xrun() throws Exception {
+            addInternal(copy(mp), acl);
           }
         });
       }
     });
+  }
+
+  // todo make archiving transactional
+  /** Mutates mp and its elements, so make sure to work on a copy. */
+  private void addInternal(final MediaPackage mp,
+                           final AccessControlList acl) throws Exception {
+    final Date now = new Date();
+    // claim a new version for the mediapackage
+    final String mpId = mp.getIdentifier().toString();
+    final Version version = persistence.claimVersion(mpId);
+    logger.info("Creating new version {} of mediapackage {}", version, mp);
+    final PartialMediaPackage pmp = mkPartial(mp);
+    // make sure they have a checksum
+    enrichAssetChecksums(pmp);
+    // download and archive elements
+    downloadAssets(pmp, version);
+    // store mediapackage in index
+    /* todo: Url-rewritten mediapackages cannot be stored in solr since the solr index
+         accesses metadata catalogs via StaticMetadataService which in turn uses the workspace to download
+         them. If the URL is already a URN this does not work. */
+    solrIndex.add(mp, acl, now, version);
+    // store mediapackage in db
+    try {
+      rewriteAssetsForArchival(pmp, version);
+      persistence.storeEpisode(pmp, acl, now, version);
+    } catch (EpisodeServiceDatabaseException e) {
+      logger.error("Could not store episode {}: {}", mpId, e);
+      throw new EpisodeServiceException(e);
+    }
   }
 
   // todo if the user is allowed to delete the whole set of versions is checked against the
@@ -213,15 +202,13 @@ public final class EpisodeServiceImpl implements EpisodeService {
     });
   }
 
-  // todo workflows are started until user is not authorized
   @Override
   public List<WorkflowInstance> applyWorkflow(final ConfiguredWorkflow workflow,
                                               final UriRewriter rewriteUri,
                                               final EpisodeQuery q)
           throws EpisodeServiceException {
     return handleException(new Function0.X<List<WorkflowInstance>>() {
-      @Override
-      public List<WorkflowInstance> xapply() throws Exception {
+      @Override public List<WorkflowInstance> xapply() throws Exception {
         // todo only the latest version is used, this should change when the UI supports versions
         q.onlyLastVersion();
         return mlist(solrRequester.find(q).getItems())
@@ -231,15 +218,13 @@ public final class EpisodeServiceImpl implements EpisodeService {
     });
   }
 
-  // todo workflows are started until user is not authorized
   @Override
   public List<WorkflowInstance> applyWorkflow(final ConfiguredWorkflow workflow,
                                               final UriRewriter rewriteUri,
                                               final List<String> mediaPackageIds)
           throws EpisodeServiceException {
     return handleException(new Function0.X<List<WorkflowInstance>>() {
-      @Override
-      public List<WorkflowInstance> xapply() throws Exception {
+      @Override public List<WorkflowInstance> xapply() throws Exception {
         return mlist(mediaPackageIds)
                 .bind(queryLatestMediaPackageById)
                 .bind(filterUnprotectedItemsForWrite)
@@ -258,7 +243,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
         final SearchResult r = filterItems(solrRequester.find(q), filterUnprotectedItemsForRead);
         for (SearchResultItem item : r.getItems()) {
           // rewrite URIs in place
-          rewriteForDelivery(rewriter, item);
+          rewriteAssetsForDelivery(rewriter, item);
         }
         return r;
       }
@@ -303,7 +288,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
         final SearchResult r = solrRequester.find(q);
         for (SearchResultItem item : r.getItems()) {
           // rewrite URIs in place
-          rewriteForDelivery(rewriter, item);
+          rewriteAssetsForDelivery(rewriter, item);
         }
         return r;
       }
@@ -313,7 +298,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
   //
 
   /**
-   * Since the index is populated from persitent storage where media package element URIs have been transformed to
+   * Since the index is populated from persistent storage where media package element URIs have been transformed to
    * location independend URNs these have to be rewritten to point to actual locations.
    */
   void populateIndex(UriRewriter uriRewriter) {
@@ -345,17 +330,15 @@ public final class EpisodeServiceImpl implements EpisodeService {
           final Organization organization = orgDir.getOrganization(episode.getOrganization());
           secSvc.setOrganization(organization);
           secSvc.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
-          // The whole media package gets rewritten here. This is not the best approach since then
-          // the media package is stored in the index with concrete URLs.
-          // Just rewriting URLs on a per element basis does not work either since a media package element clone loses
-          // the reference to its parent media package. Some rewriters like the one provided by the
-          // AbstractEpisodeServiceRestEndpoint need this reference though.
-          //
-          // However storing the concrete URLs in the index is not that problematic because
-          // URLs get rewritten on delivery anyway. See #add(..)
-          solrIndex.add(rewriteUris(episode.getMediaPackage(), uriRewriter.curry(episode.getVersion())),
-                  episode.getAcl(), episode.getVersion(), episode.getDeletionDate(), episode.getModificationDate(),
-                  isLatestVersion);
+          // mediapackage URIs need to be rewritten to concrete URLs for indexation to work
+          final PartialMediaPackage pmp = mkPartial(episode.getMediaPackage());
+          rewriteAssetUris(uriRewriter.curry(episode.getVersion()), pmp);
+          solrIndex.add(pmp.getMediaPackage(),
+                        episode.getAcl(),
+                        episode.getVersion(),
+                        episode.getDeletionDate(),
+                        episode.getModificationDate(),
+                        isLatestVersion);
         }
         logger.info("Finished populating episode search index");
       } catch (Exception e) {
@@ -406,25 +389,24 @@ public final class EpisodeServiceImpl implements EpisodeService {
     }
   }
 
-  /** Store all elements of <code>mp</code> under the given version if they match the filter. */
-  private void archiveElements(MediaPackage mp, final Version version) throws Exception {
-    final String mpId = mp.getIdentifier().toString();
+  /** Store all assets of <code>mp</code> under the given version. */
+  private void downloadAssets(PartialMediaPackage pmp, final Version version)
+          throws Exception {
+    final String mpId = pmp.getMediaPackage().getIdentifier().toString();
     final String orgId = getOrgId();
-    for (final MediaPackageElement e : mp.getElements()) {
+    for (final MediaPackageElement e : pmp.getPartial()) {
       logger.info("Archiving {} {} {}", array(e.getFlavor(), e.getMimeType(), e.getURI()));
-      findElementInVersions(e).fold(new Option.Match<StoragePath, Void>() {
-        @Override public Void some(StoragePath found) {
+      findElementInVersions(e).fold(new Option.EMatch<StoragePath>() {
+        @Override public void esome(StoragePath found) {
           if (!elementStore.copy(found, spath(orgId, mpId, version, e.getIdentifier())))
             throw new EpisodeServiceException("An element with checksum " + e.getChecksum().toString() + " has"
                                                       + " already been archived but trying to copy or link asset " + found
                                                       + " failed");
-          return null;
         }
 
-        @Override public Void none() {
+        @Override public void enone() {
           elementStore.put(spath(orgId, mpId, version, e.getIdentifier()),
                   source(e.getURI(), Option.some(e.getSize()), option(e.getMimeType())));
-          return null;
         }
       });
     }
@@ -445,35 +427,21 @@ public final class EpisodeServiceImpl implements EpisodeService {
     });
   }
 
-  /** Make sure each of the elements has a checksum available. */
-  public MediaPackage enrichChecksums(MediaPackage mp) {
-    return modify(mp, new Effect<MediaPackage>() {
-      @Override
-      public void run(final MediaPackage mp) {
-        mlist(mp.getElements()).bind(enrichIfNecessary(mediaInspectionSvc)).each(
-                updateElement(mp).o(payloadAsMediaPackageElement(svcReg)));
-      }
-    });
+  /** Make sure each of the asset elements has a checksum. */
+  public void enrichAssetChecksums(PartialMediaPackage pmp) {
+    mlist(pmp.getPartial())
+            .bind(newEnrichJob(mediaInspectionSvc, hasNoChecksum))
+            .map(payloadAsMediaPackageElement(svcReg))
+            .each(updateElement(pmp.getMediaPackage()));
   }
 
-  /** Update a mediapackage element of a mediapackage. */
-  public static Effect<MediaPackageElement> updateElement(final MediaPackage mp) {
-    return new Effect<MediaPackageElement>() {
-      @Override protected void run(MediaPackageElement e) {
-        mp.removeElementById(e.getIdentifier());
-        mp.add(e);
-      }
-    };
-  }
-
-  /** Enrich a mediapackage element if it does not have a checksum. */
-  public static Function<MediaPackageElement, List<Job>> enrichIfNecessary(final MediaInspectionService svc) {
-    return new Function.X<MediaPackageElement, List<Job>>() {
-      @Override
-      public List<Job> xapply(MediaPackageElement element) throws Exception {
-        if (element.getChecksum() == null)
-          return list(svc.enrich(element, true));
-        return nil();
+  /** Create a media inspection job for a mediapackage element if predicate <code>p</code> is true. */
+  public static Function<MediaPackageElement, Option<Job>> newEnrichJob(final MediaInspectionService svc,
+                                                                        final Function<MediaPackageElement, Boolean> p) {
+    return new Function.X<MediaPackageElement, Option<Job>>() {
+      @Override public Option<Job> xapply(MediaPackageElement e) throws Exception {
+        if (p.apply(e)) return some(svc.enrich(e, true));
+        else return none();
       }
     };
   }
@@ -494,12 +462,16 @@ public final class EpisodeServiceImpl implements EpisodeService {
     };
   }
 
-  public static URI createUrn(String mpId, String mpElemId, Version version) {
-    try {
-      return new URI("urn", "matterhorn:" + mpId + ":" + version + ":" + mpElemId, null);
-    } catch (URISyntaxException e) {
-      throw new Error(e);
-    }
+  public static Function<MediaPackageElement, URI> createUrn(final String mpId, final Version version) {
+    return new Function<MediaPackageElement, URI>() {
+      @Override public URI apply(MediaPackageElement mpe) {
+        try {
+          return new URI("urn", "matterhorn:" + mpId + ":" + version + ":" + mpe.getIdentifier(), null);
+        } catch (URISyntaxException e) {
+          throw new EpisodeServiceException(e);
+        }
+      }
+    };
   }
 
   /**
@@ -528,7 +500,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
       @Override
       public List<WorkflowInstance> apply(SearchResultItem item) {
         try {
-          rewriteForDelivery(rewriter, item);
+          rewriteAssetsForDelivery(rewriter, item);
           return list(workflowSvc.start(workflow.getWorkflowDefinition(), item.getMediaPackage(), workflow.getParameters()));
         } catch (WorkflowDatabaseException e) {
           logger.error("Error starting workflow", e);
@@ -540,33 +512,40 @@ public final class EpisodeServiceImpl implements EpisodeService {
     };
   }
 
-  /** Create a function to rewrite all media package element URIs for archival. */
-  public static Function<MediaPackage, MediaPackage> rewriteForArchival(final Version version) {
-    return new Function<MediaPackage, MediaPackage>() {
-      @Override
-      public MediaPackage apply(MediaPackage mp) {
-        return rewriteUris(mp, new Function<MediaPackageElement, URI>() {
-          @Override
-          public URI apply(MediaPackageElement mpe) {
-            return createUrn(mpe.getMediaPackage().getIdentifier().toString(), mpe.getIdentifier(), version);
-          }
-        });
-      }
-    };
+  /**
+   * Return a partial mediapackage filtering assets.
+   * Assets are elements the archive is going to manager, i.e. all non-publication elements.
+   */
+  public static PartialMediaPackage mkPartial(MediaPackage mp) {
+    return partialMp(mp, isAsset);
   }
 
-  /** In place rewriting of all media package element URLs. */
-  public static void rewriteForDelivery(UriRewriter rewriter, SearchResultItem item) {
-    uriRewriter(rewriter.curry(item.getOcVersion())).apply(item.getMediaPackage());
+  public static final Predicate<MediaPackageElement> isAsset = toPredicate(isNotPublication);
+
+  /** Rewrite URIs of all asset elements of a mediapackage. */
+  public static void rewriteAssetUris(Function<MediaPackageElement, URI> uriCreator, PartialMediaPackage pmp) {
+    for (MediaPackageElement mpe : pmp.getPartial()) {
+      mpe.setURI(uriCreator.apply(mpe));
+    }
+  }
+
+  /** Rewrite URIs of assets of mediapackage elements. */
+  public static void rewriteAssetsForArchival(PartialMediaPackage pmp, Version version) {
+    rewriteAssetUris(createUrn(pmp.getMediaPackage().getIdentifier().toString(), version), pmp);
+  }
+
+  /** Rewrite URIs of assets of a mediapackage contained in a search result item. */
+  public static void rewriteAssetsForDelivery(UriRewriter uriRewriter, SearchResultItem item) {
+    rewriteAssetUris(uriRewriter.curry(item.getOcVersion()), mkPartial(item.getMediaPackage()));
   }
 
   /** Query the latest version of a media package. */
-  private final Function<String, List<SearchResultItem>> queryLatestMediaPackageById = new Function.X<String, List<SearchResultItem>>() {
-    @Override
-    public List<SearchResultItem> xapply(String id) throws Exception {
-      return solrRequester.find(query(secSvc).id(id).onlyLastVersion()).getItems();
-    }
-  };
+  private final Function<String, List<SearchResultItem>> queryLatestMediaPackageById =
+          new Function.X<String, List<SearchResultItem>>() {
+            @Override public List<SearchResultItem> xapply(String id) throws Exception {
+              return solrRequester.find(query(secSvc).id(id).onlyLastVersion()).getItems();
+            }
+          };
 
   /** Apply a function if the current user is authorized to perform the given actions. */
   private <A> Protected<A> protect(final AccessControlList acl, List<String> actions, Function0<A> f) {

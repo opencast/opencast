@@ -137,7 +137,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    * @return the file suffix
    */
   public Option<String> getSuffix() {
-    return mlist(suffixes).head();
+    return mlist(suffixes).headOpt();
   }
 
   /**

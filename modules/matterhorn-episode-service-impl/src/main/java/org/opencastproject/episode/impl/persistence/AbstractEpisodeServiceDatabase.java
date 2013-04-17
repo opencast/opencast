@@ -16,7 +16,7 @@
 package org.opencastproject.episode.impl.persistence;
 
 import org.opencastproject.episode.api.Version;
-import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.episode.impl.PartialMediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.SecurityService;
@@ -156,14 +156,14 @@ public abstract class AbstractEpisodeServiceDatabase implements EpisodeServiceDa
   }
 
  @Override
-  public void storeEpisode(final MediaPackage mediaPackage, final AccessControlList acl, final Date now, final Version version)
+  public void storeEpisode(final PartialMediaPackage pmp, final AccessControlList acl, final Date now, final Version version)
           throws EpisodeServiceDatabaseException {
     final String orgId = getSecurityService().getOrganization().getId();
     tx(new Effect<EntityManager>() {
       @Override
       public void run(EntityManager em) {
         // Create new episode entity
-        final EpisodeDto episodeDto = EpisodeDto.create(new Episode(mediaPackage,
+        final EpisodeDto episodeDto = EpisodeDto.create(new Episode(pmp.getMediaPackage(),
                                                                     version,
                                                                     orgId,
                                                                     acl,
@@ -171,11 +171,10 @@ public abstract class AbstractEpisodeServiceDatabase implements EpisodeServiceDa
                                                                     Option.<Date>none()));
         em.persist(episodeDto);
         // create assets
-        for (MediaPackageElement e : mediaPackage.getElements()) {
-          final AssetDto a = AssetDto.create(e.getURI(), spath(orgId,
-                                                               mediaPackage.getIdentifier().toString(),
-                                                               version,
-                                                               e.getIdentifier()),
+        final String mpId = pmp.getMediaPackage().getIdentifier().toString();
+        for (MediaPackageElement e : pmp.getPartial()) {
+          final AssetDto a = AssetDto.create(e.getURI(),
+                                             spath(orgId, mpId, version, e.getIdentifier()),
                                              e.getChecksum().toString());
           em.persist(a);
         }

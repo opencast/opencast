@@ -69,4 +69,10 @@
       <oc:checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</oc:checksum>
     </oc:attachment>
   </oc:attachments>
+  <oc:publications>
+    <oc:publication id="p-1" channel="engage">
+      <oc:mimetype>text/html</oc:mimetype>
+      <oc:url>http://localhost/engage.html</oc:url>
+    </oc:publication>
+  </oc:publications>
 </oc:mediapackage>

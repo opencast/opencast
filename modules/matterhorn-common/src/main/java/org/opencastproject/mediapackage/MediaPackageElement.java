@@ -28,10 +28,10 @@ import java.util.Collection;
 public interface MediaPackageElement extends ManifestContributor, Comparable<MediaPackageElement>, Cloneable {
 
   /**
-   * The element type todo is the type definitly needed or can the flavor take its resposibilities?
+   * The element type todo is the type definitely needed or can the flavor take its responsibilities?
    */
   enum Type {
-    Manifest, Timeline, Track, Catalog, Attachment, Other
+    Manifest, Timeline, Track, Catalog, Attachment, Publication, Other
   }
 
   /**

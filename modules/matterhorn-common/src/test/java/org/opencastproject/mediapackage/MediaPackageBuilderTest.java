@@ -16,14 +16,22 @@
 
 package org.opencastproject.mediapackage;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.opencastproject.util.ConfigurationException;
+import org.opencastproject.util.MimeType;
+import org.opencastproject.util.MimeTypes;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -75,6 +83,40 @@ public class MediaPackageBuilderTest extends AbstractMediaPackageTest {
     } catch (FileNotFoundException e) {
       fail("Configuration exception while reading media package from manifest: " + e.getMessage());
     }
+  }
+  
+  @Test
+  public void testLoadPublicationElement() {
+	
+	String fileName = "/publicationElement.xml";
+	String id = "p-1";
+	String channel = "engage";
+	String uri = "http://localhost/engage.html";
+	MimeType mimeType = MimeTypes.parseMimeType("text/html");
+	
+	try {
+		File baseDir = new File(MediaPackageBuilderTest.class.getResource("/").toURI());
+		File xmlFile = new File(baseDir, fileName);
+		String xml = IOUtils.toString(new FileInputStream(xmlFile));
+		Publication pubElement = (Publication) MediaPackageElementParser.getFromXml(xml);
+	    assertNotNull(pubElement);
+	    
+	    assertEquals(id, pubElement.getIdentifier());
+	    assertEquals(channel, pubElement.getChannel());
+	    assertEquals(new URI(uri), pubElement.getURI());
+	    assertEquals(mimeType, pubElement.getMimeType());
+	    
+		
+	} catch (FileNotFoundException e) {
+		fail("Media package exception while reading media package from manifest: " + e.getMessage());
+	} catch (MediaPackageException e) {
+		fail("Media package exception while reading media package from manifest: " + e.getMessage());
+	} catch (IOException e) {
+		fail("Media package exception while reading media package from manifest: " + e.getMessage());
+	} catch (URISyntaxException e) {
+		fail("Not able to load xml file containing the publication element: " + e.getMessage());
+	}
+
   }
 
   /**

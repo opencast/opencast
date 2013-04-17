@@ -15,22 +15,13 @@
  */
 package org.opencastproject.distribution.download;
 
-import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -44,10 +35,23 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workspace.api.Workspace;
 
-import javax.servlet.http.HttpServletResponse;
+import junit.framework.Assert;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+
+import javax.servlet.http.HttpServletResponse;
 
 public class DownloadDistributionServiceImplTest {
 
@@ -152,9 +156,7 @@ public class DownloadDistributionServiceImplTest {
   }
 
   @Test
-  public void testRetract() throws Exception {
-    int elementCount = mp.getElements().length;
-
+  public void testRetractByOriginal() throws Exception {
     // Distribute the mediapackage and all of its elements
     Job job1 = service.distribute(mp, "track-1");
     Job job2 = service.distribute(mp, "catalog-1");
@@ -188,6 +190,56 @@ public class DownloadDistributionServiceImplTest {
     Job job6 = service.retract(mp, "catalog-1");
     Job job7 = service.retract(mp, "catalog-2");
     Job job8 = service.retract(mp, "notes");
+    jobBarrier = new JobBarrier(serviceRegistry, 500, job5, job6, job7, job8);
+    jobBarrier.waitForJobs();
+
+    Assert.assertFalse(service.getDistributionFile(mp, mp.getElementById("track-1")).isFile());
+    Assert.assertFalse(service.getDistributionFile(mp, mp.getElementById("catalog-1")).isFile());
+    Assert.assertFalse(service.getDistributionFile(mp, mp.getElementById("catalog-2")).isFile());
+    Assert.assertFalse(service.getDistributionFile(mp, mp.getElementById("notes")).isFile());
+  }
+
+  @Test
+  public void testRetractByDistributed() throws Exception {
+    int elementCount = mp.getElements().length;
+
+    // Distribute the mediapackage and all of its elements
+    Job job1 = service.distribute(mp, "track-1");
+    Job job2 = service.distribute(mp, "catalog-1");
+    Job job3 = service.distribute(mp, "catalog-2");
+    Job job4 = service.distribute(mp, "notes");
+    JobBarrier jobBarrier = new JobBarrier(serviceRegistry, 500, job1, job2, job3, job4);
+    jobBarrier.waitForJobs();
+
+    // Add the new elements to the mediapackage
+    MediaPackageElement job1Element = MediaPackageElementParser.getFromXml(job1.getPayload());
+    mp.add(job1Element);
+    MediaPackageElement job2Element = MediaPackageElementParser.getFromXml(job2.getPayload());
+    mp.add(job2Element);
+    MediaPackageElement job3Element = MediaPackageElementParser.getFromXml(job3.getPayload());
+    mp.add(job3Element);
+    MediaPackageElement job4Element = MediaPackageElementParser.getFromXml(job4.getPayload());
+    mp.add(job4Element);
+
+    File mpDir = new File(distributionRoot, mp.getIdentifier().compact());
+    File mediaDir = new File(mpDir, "track-1");
+    File metadata1Dir = new File(mpDir, "catalog-1");
+    File metadata2Dir = new File(mpDir, "catalog-2");
+    File attachmentsDir = new File(mpDir, "notes");
+    Assert.assertTrue(mediaDir.exists());
+    Assert.assertTrue(metadata1Dir.exists());
+    Assert.assertTrue(metadata2Dir.exists());
+    Assert.assertTrue(attachmentsDir.exists());
+    Assert.assertTrue(new File(mediaDir, "media.mov").exists()); // the filenames are changed to reflect the element ID
+    Assert.assertTrue(new File(metadata1Dir, "dublincore.xml").exists());
+    Assert.assertTrue(new File(metadata2Dir, "mpeg7.xml").exists());
+    Assert.assertTrue(new File(attachmentsDir, "attachment.txt").exists());
+
+    // Now retract the mediapackage and ensure that the distributed files have been removed
+    Job job5 = service.retract(mp, job1Element.getIdentifier());
+    Job job6 = service.retract(mp, job2Element.getIdentifier());
+    Job job7 = service.retract(mp, job3Element.getIdentifier());
+    Job job8 = service.retract(mp, job4Element.getIdentifier());
     jobBarrier = new JobBarrier(serviceRegistry, 500, job5, job6, job7, job8);
     jobBarrier.waitForJobs();
 

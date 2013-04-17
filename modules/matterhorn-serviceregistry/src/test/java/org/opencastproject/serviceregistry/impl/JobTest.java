@@ -50,7 +50,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.data.Collections.mkString;
+import static org.opencastproject.util.data.Arrays.mkString;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.functions.Booleans.eq;
 import static org.opencastproject.util.persistence.PersistenceUtil.newPersistenceEnvironment;

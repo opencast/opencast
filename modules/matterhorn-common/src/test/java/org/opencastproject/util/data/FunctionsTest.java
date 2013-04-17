@@ -24,6 +24,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.data.functions.Functions.contra;
 import static org.opencastproject.util.data.functions.Functions.identity;
+import static org.opencastproject.util.data.functions.Functions.toPredicate;
 
 public class FunctionsTest {
 
@@ -65,5 +66,15 @@ public class FunctionsTest {
         throw new IOException(s);
       }
     } .apply("error");
+  }
+
+  @Test
+  public void testToPredicate() {
+    Function<String, Boolean> p = toPredicate(new Function<String, Boolean>() {
+      @Override public Boolean apply(String s) {
+        return true;
+      }
+    });
+
   }
 }

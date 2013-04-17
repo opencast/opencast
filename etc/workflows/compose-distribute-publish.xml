@@ -453,42 +453,18 @@
       </configurations>
     </operation>
 
-    <!-- Distribute to download server -->
+    <!-- Distribute and publish to engage player -->
 
-    <operation
-      id="distribute-download"
+	<operation
+      id="publish-engage"
       max-attempts="2"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="Distributing to progressive downloads">
+      description="Distribute and publish to engage player">
       <configurations>
-        <configuration key="check-availability">true</configuration>
-        <configuration key="source-tags">engage,atom,rss,-publish</configuration>
-        <configuration key="target-tags">publish</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="distribute-streaming"
-      max-attempts="2"
-      fail-on-error="true"
-      if="${org.opencastproject.streaming.url}"
-      exception-handler-workflow="error"
-      description="Distributing to streaming server">
-      <configurations>
-        <configuration key="source-tags">engage,-publish</configuration>
-        <configuration key="target-tags">publish</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Remove archive tag from distributed material -->
-
-    <operation
-      id="tag"
-      description="Removing archive tag from distributed material">
-      <configurations>
-	    <configuration key="source-tags">publish</configuration>
-        <configuration key="target-tags">-archive</configuration>
+        <configuration key="download-tags">engage,atom,rss</configuration>
+		<configuration key="streaming-tags">engage</configuration>
+		<configuration key="check-availability">true</configuration>
       </configurations>
     </operation>
 
@@ -504,19 +480,7 @@
         <configuration key="source-tags">archive</configuration>
       </configurations>
     </operation>
-
-    <!-- Publish to engage search index -->
-
-    <operation
-      id="publish"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Publishing">
-      <configurations>
-        <configuration key="source-tags">publish</configuration>
-      </configurations>
-    </operation>
-
+ 
     <!-- Cleanup the working file repository -->
 
     <operation

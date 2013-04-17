@@ -28,12 +28,14 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.data.Collections.array;
+import static org.opencastproject.util.data.Arrays.array;
 import static org.opencastproject.util.data.Collections.iterator;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Collections.repeat;
 import static org.opencastproject.util.data.Monadics.IteratorMonadic;
 import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 public class MonadicsTest {
@@ -59,9 +61,8 @@ public class MonadicsTest {
 
   @Test
   public void testFlatMap() {
-    List<Integer> mapped = Monadics.mlist(new Integer[]{1, 2, 3}).flatMap(new Function<Integer, Collection<Integer>>() {
-      @Override
-      public Collection<Integer> apply(Integer a) {
+    List<Integer> mapped = mlist(new Integer[]{1, 2, 3}).flatMap(new Function<Integer, Collection<Integer>>() {
+      @Override public Collection<Integer> apply(Integer a) {
         return asList(a, a);
       }
     }).value();
@@ -72,8 +73,26 @@ public class MonadicsTest {
   }
 
   @Test
+  public void testFlatMap2() {
+    final List<Object> l = list((Object) 1);
+    final List<String> r1 = mlist(l).bind(new Function<Object, Option<String>>() {
+      @Override public Option<String> apply(Object o) {
+        return some("x");
+      }
+    }).value();
+    assertEquals(1, r1.size());
+    assertEquals("x", r1.get(0));
+    final List<String> r2 = mlist(l).bind(new Function<Object, Option<String>>() {
+      @Override public Option<String> apply(Object o) {
+        return none();
+      }
+    }).value();
+    assertEquals(0, r2.size());
+  }
+
+  @Test
   public void testFoldl() {
-    String fold = Monadics.mlist(new Integer[]{1, 2, 3}).foldl("", new Function2<String, Integer, String>() {
+    String fold = mlist(new Integer[]{1, 2, 3}).foldl("", new Function2<String, Integer, String>() {
       @Override
       public String apply(String s, Integer a) {
         return s + a + a;
@@ -84,7 +103,7 @@ public class MonadicsTest {
 
   @Test
   public void testReducel() {
-    String fold = Monadics.mlist(new String[]{"a", "b", "c"}).reducel(new Function2<String, String, String>() {
+    String fold = mlist("a", "b", "c").reducel(new Function2<String, String, String>() {
       @Override
       public String apply(String a, String b) {
         return a + "," + b;
@@ -95,7 +114,7 @@ public class MonadicsTest {
 
   @Test(expected = RuntimeException.class)
   public void testReducelError() {
-    Monadics.mlist(new String[]{}).reducel(new Function2<String, String, String>() {
+    mlist(new String[]{}).reducel(new Function2<String, String, String>() {
       @Override
       public String apply(String a, String b) {
         return a + "," + b;
@@ -106,14 +125,15 @@ public class MonadicsTest {
   @Test
   public void testFlatten() {
     List<Integer> mapped = mlist(list(list(1, 2), list(3, 4))).flatMap(Functions.<List<Integer>>identity()).value();
+    assertEquals(4, mapped.size());
   }
   
   @Test
   public void testTakeArray() {
-    assertTrue(Monadics.mlist(array(1, 2, 3, 4, 5)).take(0).value().isEmpty());
-    assertEquals(3, Monadics.mlist(array(1, 2, 3, 4, 5)).take(3).value().size());
-    assertEquals(5, Monadics.mlist(array(1, 2, 3, 4, 5)).take(5).value().size());
-    assertEquals(5, Monadics.mlist(array(1, 2, 3, 4, 5)).take(10).value().size());
+    assertTrue(mlist(array(1, 2, 3, 4, 5)).take(0).value().isEmpty());
+    assertEquals(3, mlist(array(1, 2, 3, 4, 5)).take(3).value().size());
+    assertEquals(5, mlist(array(1, 2, 3, 4, 5)).take(5).value().size());
+    assertEquals(5, mlist(array(1, 2, 3, 4, 5)).take(10).value().size());
   }
 
   @Test
@@ -126,10 +146,10 @@ public class MonadicsTest {
 
   @Test
   public void testTakeIterator() {
-    assertTrue(Monadics.mlist(asList(1, 2, 3, 4, 5).iterator()).take(0).value().isEmpty());
-    assertEquals(3, Monadics.mlist(asList(1, 2, 3, 4, 5).iterator()).take(3).value().size());
-    assertEquals(5, Monadics.mlist(asList(1, 2, 3, 4, 5).iterator()).take(5).value().size());
-    assertEquals(5, Monadics.mlist(asList(1, 2, 3, 4, 5).iterator()).take(10).value().size());
+    assertTrue(mlist(asList(1, 2, 3, 4, 5).iterator()).take(0).value().isEmpty());
+    assertEquals(3, mlist(asList(1, 2, 3, 4, 5).iterator()).take(3).value().size());
+    assertEquals(5, mlist(asList(1, 2, 3, 4, 5).iterator()).take(5).value().size());
+    assertEquals(5, mlist(asList(1, 2, 3, 4, 5).iterator()).take(10).value().size());
   }
 
   @Test
@@ -372,6 +392,19 @@ public class MonadicsTest {
       List<Tuple<String, Integer>> r = mlist(Collections.<String>nil().iterator()).zip(list(1, 2)).value();
       assertEquals(0, r.size());
     }
+  }
+
+  @Test
+  public void testConcat() {
+    // does not compile
+    // final List<Integer> a = mlist(1, 2, 3).concat(list(4, "5")).value();
+    final List<Integer> a = mlist(1, 2, 3).concat(list(4, 5)).value();
+    assertEquals(5, a.size());
+    assertEquals(4, (Object) a.get(3)); // Object cast because of overloading ambiguity
+    final List<Object> b = mlist((Object) 1).concat(Collections.<Object>list("x")).value();
+    assertEquals(2, b.size());
+    assertEquals(1, b.get(0));
+    assertEquals("x", b.get(1));
   }
 
   private static <A> Function<A, Iterator<A>> twice() {

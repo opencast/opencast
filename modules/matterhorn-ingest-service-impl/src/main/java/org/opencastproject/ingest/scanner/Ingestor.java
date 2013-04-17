@@ -34,7 +34,7 @@ import java.util.concurrent.Executors;
 import static java.lang.String.format;
 import static org.opencastproject.util.IoSupport.fileInputStream;
 import static org.opencastproject.util.IoSupport.withStream;
-import static org.opencastproject.util.data.Collections.append;
+import static org.opencastproject.util.data.Arrays.append;
 
 /** Used by the {@link InboxScannerService} to do the actual ingest. */
 public class Ingestor {

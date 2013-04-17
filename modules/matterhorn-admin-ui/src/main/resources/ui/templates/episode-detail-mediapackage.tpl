@@ -179,4 +179,41 @@
       <% }); %>
     </table>
   <% })); %>
+  
+  <% __(this.publications.publication).whole(opencast.episode.Utils.full(function(publication) { %>
+    <br>
+    <h3>Publications</h3>
+    <table class="kvtable">
+      <% _.each(publication, function(item) { %>
+        <tr class="unfoldable-tr">
+        <td class="td-key">
+          <%= item.channel %>
+        </td>
+        <td class="td-value">
+          <%= item.id %>
+          <div class="unfoldable-content">
+            <table class="subtable">
+              <% _.each(item, function(value, key) { %>
+                <% if (opencast.episode.Utils.isStringOrNumber(value)) { %>
+                  <tr>
+                    <td class="td-key">
+                      <%= key %>
+                    </td>
+                    <td class="td-value">
+                      <% if (key == 'url') { %>
+                        <a href="<%= value %>"><%= value %></a>
+                      <% } else { %>
+                        <%= value %>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% } %>
+              <% }); %>
+            </table>
+          </div>
+        </td>
+      </tr>
+      <% }); %>
+    </table>
+  <% })); %>
 </div>

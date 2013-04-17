@@ -121,6 +121,9 @@ Opencast.WorkflowInspect = (function() {
       if (mp.duration) {
         mp.duration = ocUtils.formatSeconds(mp.duration/ 1000)
       }
+      
+      // Publications
+      mp.publications.publication = Opencast.RenderUtils.ensureArray(mp.publications.publication);
 
       // Attachments
       mp.attachments = Opencast.RenderUtils.ensureArray(mp.attachments.attachment);
