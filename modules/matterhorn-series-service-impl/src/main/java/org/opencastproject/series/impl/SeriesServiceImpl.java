@@ -171,7 +171,6 @@ public class SeriesServiceImpl implements SeriesService {
                 UnauthorizedException, IOException {
           final String id = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
           logger.debug("Updating series {}", id);
-          persistence.storeSeries(dc);
           index.updateIndex(dc);
           try {
             final AccessControlList acl = persistence.getAccessControlList(id);
@@ -179,6 +178,8 @@ public class SeriesServiceImpl implements SeriesService {
               index.updateSecurityPolicy(id, acl);
           } catch (NotFoundException ignore) {
           }
+          // Make sure store to persistence comes after index
+          persistence.storeSeries(dc);
           sendEvent(SERIES_TOPIC, id, dc.toXmlString());
           return dc;
         }
@@ -230,17 +231,17 @@ public class SeriesServiceImpl implements SeriesService {
     if (needsUpdate(seriesId, accessControl)) {
       logger.debug("Updating ACL of series {}", seriesId);
       boolean updated;
-      // try updating it in persistence first - not found is thrown if it doesn't exist
+      // not found is thrown if it doesn't exist
       try {
-        updated = persistence.storeSeriesAccessControl(seriesId, accessControl);
+        index.updateSecurityPolicy(seriesId, accessControl);
       } catch (SeriesServiceDatabaseException e) {
         logger.error("Could not update series {} with access control rules: {}", seriesId, e.getMessage());
         throw new SeriesException(e);
       }
 
       try {
-        index.updateSecurityPolicy(seriesId, accessControl);
-      } catch (Exception e) {
+        updated = persistence.storeSeriesAccessControl(seriesId, accessControl);
+      } catch (SeriesServiceDatabaseException e) {
         logger.error("Could not update series {} with access control rules: {}", seriesId, e.getMessage());
         throw new SeriesException(e);
       }
