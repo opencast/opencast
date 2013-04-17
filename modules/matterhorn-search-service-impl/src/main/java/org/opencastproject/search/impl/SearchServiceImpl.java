@@ -333,19 +333,19 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     Date now = new Date();
 
     try {
-      persistence.storeMediaPackage(mediaPackage, acl, now);
-    } catch (SearchServiceDatabaseException e) {
-      logger.error("Could not store media package to search database {}: {}", mediaPackage.getIdentifier(), e);
-      throw new SearchException(e);
-    }
-
-    try {
       if (indexManager.add(mediaPackage, acl, now)) {
         logger.info("Added mediapackage {} to the search index", mediaPackage.getIdentifier());
       } else {
         logger.warn("Failed to add mediapackage {} to the search index", mediaPackage.getIdentifier());
       }
     } catch (SolrServerException e) {
+      throw new SearchException(e);
+    }
+
+    try {
+      persistence.storeMediaPackage(mediaPackage, acl, now);
+    } catch (SearchServiceDatabaseException e) {
+      logger.error("Could not store media package to search database {}: {}", mediaPackage.getIdentifier(), e);
       throw new SearchException(e);
     }
   }
