@@ -172,6 +172,12 @@ public final class MediaPackageSupport {
     for (MediaPackageElement e : es) mp.add(e);
   }
 
+  public static final Function<MediaPackageElement, String> getMediaPackageElementId = new Function<MediaPackageElement, String>() {
+    @Override public String apply(MediaPackageElement mediaPackageElement) {
+      return mediaPackageElement.getIdentifier();
+    }
+  };
+
   /** Contains filters and predicates to work with media package element collections. */
   public static final class Filters {
     private Filters() {

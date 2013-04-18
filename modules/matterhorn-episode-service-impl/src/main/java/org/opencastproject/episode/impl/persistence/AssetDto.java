@@ -73,7 +73,7 @@ public final class AssetDto {
     dto.uri = uri.toString();
     dto.organizationId = path.getOrganizationId();
     dto.mediaPackageId = path.getMediaPackageId();
-    dto.mediaPackageElementId = path.getMediaPackageElementId();
+    dto.mediaPackageElementId = path.getAssetId();
     dto.version = path.getVersion().value();
     dto.checksum = checksum;
     return dto;
