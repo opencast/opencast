@@ -317,7 +317,6 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         }
         entity.setSeries(seriesXML);
         em.merge(entity);
-        newSeries = dc;
       }
       tx.commit();
       return newSeries;

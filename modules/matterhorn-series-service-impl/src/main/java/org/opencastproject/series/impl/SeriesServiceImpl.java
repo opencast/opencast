@@ -41,7 +41,6 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.FunctionException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
@@ -163,27 +162,24 @@ public class SeriesServiceImpl implements SeriesService {
   }
 
   @Override
-  public DublinCoreCatalog updateSeries(final DublinCoreCatalog dc) throws SeriesException, UnauthorizedException {
+  public DublinCoreCatalog updateSeries(DublinCoreCatalog dc) throws SeriesException, UnauthorizedException {
     try {
-      return isNew(notNull(dc, "dc")).map(new Function.X<DublinCoreCatalog, DublinCoreCatalog>() {
-        @Override
-        public DublinCoreCatalog xapply(DublinCoreCatalog dc) throws SeriesServiceDatabaseException,
-                UnauthorizedException, IOException {
-          final String id = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-          logger.debug("Updating series {}", id);
-          index.updateIndex(dc);
-          try {
-            final AccessControlList acl = persistence.getAccessControlList(id);
-            if (acl != null)
-              index.updateSecurityPolicy(id, acl);
-          } catch (NotFoundException ignore) {
-          }
-          // Make sure store to persistence comes after index
-          persistence.storeSeries(dc);
-          sendEvent(SERIES_TOPIC, id, dc.toXmlString());
-          return dc;
+      for (DublinCoreCatalog dublinCore : isNew(notNull(dc, "dc"))) {
+        final String id = dublinCore.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+        logger.debug("Updating series {}", id);
+        index.updateIndex(dublinCore);
+        try {
+          final AccessControlList acl = persistence.getAccessControlList(id);
+          if (acl != null)
+            index.updateSecurityPolicy(id, acl);
+        } catch (NotFoundException ignore) {
         }
-      }).getOrElse(dc);
+        // Make sure store to persistence comes after index, return value can be null
+        DublinCoreCatalog updated = persistence.storeSeries(dublinCore);
+        sendEvent(SERIES_TOPIC, id, dublinCore.toXmlString());
+        return (updated == null) ? null : dublinCore;
+      }
+      return dc;
     } catch (Exception e) {
       throw rethrow(e);
     }
