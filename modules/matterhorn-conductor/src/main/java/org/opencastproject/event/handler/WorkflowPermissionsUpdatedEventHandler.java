@@ -18,11 +18,9 @@ package org.opencastproject.event.handler;
 import static org.opencastproject.event.EventAdminConstants.ID;
 import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
 import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
-import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
 import org.opencastproject.distribution.api.DistributionService;
-import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElements;
@@ -59,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -219,15 +218,6 @@ public class WorkflowPermissionsUpdatedEventHandler implements EventHandler {
 
             // Update the series XACML file
             if (SERIES_ACL_TOPIC.equals(event.getTopic())) {
-
-              // Remove the original xacml policy attachments
-              Attachment[] originalXacmlAttachments = mp.getAttachments(XACML_POLICY);
-              if (originalXacmlAttachments.length > 0) {
-                for (Attachment xacml : originalXacmlAttachments) {
-                  mp.remove(xacml);
-                }
-              }
-
               // Build a new XACML file for this mediapackage
               AccessControlList acl = AccessControlParser.parseAcl((String) event.getProperty(PAYLOAD));
               authorizationService.setAccessControl(mp, acl);
@@ -242,8 +232,9 @@ public class WorkflowPermissionsUpdatedEventHandler implements EventHandler {
             if (seriesCatalogs.length == 1) {
               Catalog c = seriesCatalogs[0];
               String filename = FilenameUtils.getName(c.getURI().toString());
-              workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
+              URI uri = workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
                       dublinCoreService.serialize(seriesDublinCore));
+              c.setURI(uri);
             }
 
             // Update the search index with the modified mediapackage
