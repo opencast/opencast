@@ -15,7 +15,11 @@
  */
 package org.opencastproject.event.handler;
 
-import org.apache.commons.io.FilenameUtils;
+import static org.opencastproject.event.EventAdminConstants.ID;
+import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
+import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
@@ -23,7 +27,6 @@ import org.opencastproject.episode.api.EpisodeServiceException;
 import org.opencastproject.episode.api.HttpMediaPackageElementProvider;
 import org.opencastproject.episode.api.SearchResult;
 import org.opencastproject.episode.api.SearchResultItem;
-import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElements;
@@ -46,6 +49,8 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
@@ -53,14 +58,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static org.opencastproject.event.EventAdminConstants.ID;
-import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
-import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
-import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
 /**
  * Responds to series events by re-distributing metadata and security policy files to episodes.
@@ -217,7 +217,8 @@ public class EpisodesPermissionsUpdatedEventHandler implements EventHandler {
           securityService.setUser(new User(systemAccount, defaultOrg.getId(), new String[] { GLOBAL_ADMIN_ROLE }));
 
           EpisodeQuery q = EpisodeQuery.systemQuery().seriesId(seriesId).onlyLastVersion();
-          SearchResult result = episodeService.findForAdministrativeRead(q, httpMediaPackageElementProvider.getUriRewriter());
+          SearchResult result = episodeService.findForAdministrativeRead(q,
+                  httpMediaPackageElementProvider.getUriRewriter());
 
           for (SearchResultItem item : result.getItems()) {
             String org = item.getOrganization();
@@ -232,15 +233,6 @@ public class EpisodesPermissionsUpdatedEventHandler implements EventHandler {
 
             // Update the series XACML file
             if (SERIES_ACL_TOPIC.equals(event.getTopic())) {
-
-              // Remove the original xacml policy attachments
-              Attachment[] originalXacmlAttachments = mp.getAttachments(XACML_POLICY);
-              if (originalXacmlAttachments.length > 0) {
-                for (Attachment xacml : originalXacmlAttachments) {
-                  mp.remove(xacml);
-                }
-              }
-
               // Build a new XACML file for this mediapackage
               AccessControlList acl = AccessControlParser.parseAcl((String) event.getProperty(PAYLOAD));
               authorizationService.setAccessControl(mp, acl);
@@ -255,8 +247,9 @@ public class EpisodesPermissionsUpdatedEventHandler implements EventHandler {
             if (seriesCatalogs.length == 1) {
               Catalog c = seriesCatalogs[0];
               String filename = FilenameUtils.getName(c.getURI().toString());
-              workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
+              URI uri = workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
                       dublinCoreService.serialize(seriesDublinCore));
+              c.setURI(uri);
             }
 
             try {
