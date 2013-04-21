@@ -289,6 +289,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       zis = new ZipArchiveInputStream(zipStream);
       ZipArchiveEntry entry;
       MediaPackage mp = null;
+      Map<String, URI> uris = new HashMap<String, URI>();
       // While there are entries write them to a collection
       while ((entry = zis.getNextZipEntry()) != null) {
         try {
@@ -304,6 +305,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             URI contentUri = workspace
                     .putInCollection(wfrCollectionId, job.getId() + FilenameUtils.getName(entry.getName()),
                             new ZipEntryInputStream(zis, entry.getSize()));
+            uris.put(FilenameUtils.getName(entry.getName()), contentUri);
             ingestStatistics.add(entry.getSize());
             elementUris.put(FilenameUtils.getName(entry.getName()), contentUri);
             logger.info("Zip entry {} stored at {}", job.getId() + entry.getName(), contentUri);
@@ -336,9 +338,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       if (mp.getTracks().length == 0)
         throw new IngestException("Mediapackage " + mediaPackageId + " has no media tracks");
 
-      // Update the series
-      // TODO: This should be triggered somehow instead of being handled here
+      // Update the element uris to point to their working file repository location
       for (MediaPackageElement element : mp.elements()) {
+        URI uri = uris.get(FilenameUtils.getName(element.getURI().toString()));
+        if (uri == null)
+          throw new IngestException("Unable to map element name '" + element.getURI() + "' to workspace uri");
+        logger.info("Ingested mediapackage element {}/{} is located at {}", new Object[] { mediaPackageId, element.getIdentifier(), uri });
+        element.setURI(uri);
+
+        // TODO: This should be triggered somehow instead of being handled here
         if (MediaPackageElements.SERIES.equals(element.getFlavor())) {
           logger.info("Ingested mediapackage {} contains updated series information", mediaPackageId);
           updateSeries(element.getURI());
