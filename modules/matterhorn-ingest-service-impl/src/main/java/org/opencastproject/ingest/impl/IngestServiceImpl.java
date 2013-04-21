@@ -275,7 +275,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
 
     ZipArchiveInputStream zis = null;
-    Map<String, URI> elementUris = new HashMap<String, URI>();
     try {
       // We don't need anybody to do the dispatching for us. Therefore we need to make sure that the job is never in
       // QUEUED state but set it to INSTANTIATED in the beginning and then manually switch it to RUNNING.
@@ -303,11 +302,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             logger.info("Storing zip entry {} in working file repository collection '{}'",
                     job.getId() + entry.getName(), wfrCollectionId);
             URI contentUri = workspace
-                    .putInCollection(wfrCollectionId, job.getId() + FilenameUtils.getName(entry.getName()),
+                    .putInCollection(wfrCollectionId, FilenameUtils.getName(entry.getName()),
                             new ZipEntryInputStream(zis, entry.getSize()));
             uris.put(FilenameUtils.getName(entry.getName()), contentUri);
             ingestStatistics.add(entry.getSize());
-            elementUris.put(FilenameUtils.getName(entry.getName()), contentUri);
             logger.info("Zip entry {} stored at {}", job.getId() + entry.getName(), contentUri);
           }
         } catch (Exception e) {
@@ -370,14 +368,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       throw e;
     } finally {
       IOUtils.closeQuietly(zis);
-      for (URI elementUri : elementUris.values()) {
-        try {
-          workspace.delete(elementUri);
-        } catch (NotFoundException e) {
-          // File was already moved to mediapackage so deletion is not needed
-          logger.debug("Temporary file {} was already moved to mediapackage, nothing to delete", elementUri);
-        }
-      }
       try {
         serviceRegistry.updateJob(job);
       } catch (Exception e) {
