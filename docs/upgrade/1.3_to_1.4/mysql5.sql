@@ -1,4 +1,70 @@
--- add new tables
+-- drop outdated constraints
+
+ALTER TABLE job DROP FOREIGN KEY FK_job_root_id;
+ALTER TABLE job DROP FOREIGN KEY FK_job_parent_id;
+ALTER TABLE job DROP FOREIGN KEY FK_job_creator_service;
+ALTER TABLE service_registration DROP FOREIGN KEY FK_service_registration_host_registration;
+
+-- change engine to innodb
+
+ALTER TABLE annotation ENGINE = InnoDB;
+ALTER TABLE capture_agent_role ENGINE = InnoDB;
+ALTER TABLE capture_agent_state ENGINE = InnoDB;
+ALTER TABLE dictionary ENGINE = InnoDB;
+ALTER TABLE host_registration ENGINE = InnoDB;
+ALTER TABLE service_registration ENGINE = InnoDB;
+ALTER TABLE job ENGINE = InnoDB;
+ALTER TABLE job_arguments ENGINE = InnoDB;
+ALTER TABLE job_context ENGINE = InnoDB;
+ALTER TABLE matterhorn_user ENGINE = InnoDB;
+ALTER TABLE matterhorn_role ENGINE = InnoDB;
+ALTER TABLE scheduled_event ENGINE = InnoDB;
+ALTER TABLE series ENGINE = InnoDB;
+ALTER TABLE upload ENGINE = InnoDB;
+ALTER TABLE user_action ENGINE = InnoDB;
+ALTER TABLE oaipmh_harvesting ENGINE = InnoDB;
+
+-- table naming convention has changed
+alter table dictionary rename to mh_dictionary;
+alter table host_registration rename to mh_host_registration;
+alter table job  rename to mh_job;
+alter table job_arguments rename to mh_job_argument;
+alter table matterhorn_role rename to mh_matterhorn_role;
+alter table scheduled_event rename to mh_scheduled_event;
+alter table series  rename to mh_series;
+alter table service_registration rename to mh_service_registration;
+alter table matterhorn_user rename to mh_matterhorn_user;
+alter table capture_agent_role rename to mh_capture_agent_role;
+alter table capture_agent_state rename to mh_capture_agent_state;
+alter table annotation rename to mh_annotation;
+alter table job_context rename to mh_job_context;
+alter table upload rename to mh_upload;
+alter table user_action rename to mh_user_action;
+alter table oaipmh_harvesting rename to mh_oaipmh_harvesting;
+
+
+-- how to handle user & role? May be in & in 1.4 ddl but not in 1.3 ddl now mh_user and mh_role
+CREATE TABLE IF NOT EXISTS mh_user (
+  username VARCHAR(128) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  password TEXT(65535),
+  PRIMARY KEY (username, organization),
+  CONSTRAINT FK_mh_user_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
+) ENGINE=InnoDB;
+
+CREATE TABLE  IF NOT EXISTS mh_role (
+  username VARCHAR(128) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  role TEXT(65535),
+  CONSTRAINT FK_mh_role_username FOREIGN KEY (username, organization) REFERENCES mh_user (username, organization),
+  CONSTRAINT FK_mh_role_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
+) ENGINE=InnoDB;
+
+CREATE INDEX IX_mh_role_pk ON mh_role (username, organization);
+
+-- new tables for Episode Serivice
+-- taken from the DDL script for 1.4
+-- Organization Tables
 
 CREATE TABLE mh_organization (
   id VARCHAR(128) NOT NULL,
@@ -15,33 +81,6 @@ CREATE TABLE mh_organization_node (
   PRIMARY KEY (organization, port, name),
   CONSTRAINT FK_mh_organization_node_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
 ) ENGINE=InnoDB;
-
-CREATE INDEX IX_mh_organization_node_pk ON mh_organization_node (organization);
-CREATE INDEX IX_mh_organization_node_name ON mh_organization_node (name);
-CREATE INDEX IX_mh_organization_node_port ON mh_organization_node (port);
-
-CREATE TABLE mh_organization_property (
-  organization VARCHAR(128) NOT NULL,
-  name VARCHAR(255),
-  value VARCHAR(255),
-  PRIMARY KEY (organization, name),
-  CONSTRAINT FK_mh_organization_property_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-) ENGINE=InnoDB;
-
-CREATE INDEX IX_mh_organization_property_pk ON mh_organization_property (organization);
-
-CREATE TABLE mh_search (
-  id VARCHAR(128) NOT NULL,
-  organization VARCHAR(128),
-  deletion_date DATETIME,
-  access_control TEXT(65535),
-  mediapackage_xml TEXT(65535),
-  modification_date DATETIME,
-  PRIMARY KEY (id),
-  CONSTRAINT FK_mh_search_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-) ENGINE=InnoDB;
-
-CREATE INDEX IX_mh_search_organization ON mh_search (organization);
 
 CREATE TABLE mh_episode_episode (
   id VARCHAR(128) NOT NULL,
@@ -84,50 +123,66 @@ CREATE TABLE mh_episode_version_claim (
 CREATE INDEX IX_mh_episode_version_claim_mediapackage ON mh_episode_version_claim (mediapackage);
 CREATE INDEX IX_mh_episode_version_claim_last_claimed ON mh_episode_version_claim (last_claimed);
 
--- drop outdated constraints
 
-ALTER TABLE job DROP FOREIGN KEY FK_job_root_id;
-ALTER TABLE job DROP FOREIGN KEY FK_job_parent_id;
-ALTER TABLE job DROP FOREIGN KEY FK_job_creator_service;
-ALTER TABLE service_registration DROP FOREIGN KEY FK_service_registration_host_registration;
+-- MH-8647
+CREATE TABLE mh_search (
+  id VARCHAR(128) NOT NULL,
+  organization VARCHAR(128),
+  deletion_date DATETIME,
+  access_control TEXT(65535),
+  mediapackage_xml TEXT(65535),
+  modification_date DATETIME,
+  PRIMARY KEY (id),
+  CONSTRAINT FK_mh_search_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
+) ENGINE=InnoDB;
 
--- change engine to innodb
 
-ALTER TABLE annotation ENGINE = InnoDB;
-ALTER TABLE capture_agent_role ENGINE = InnoDB;
-ALTER TABLE capture_agent_state ENGINE = InnoDB;
-ALTER TABLE dictionary ENGINE = InnoDB;
-ALTER TABLE host_registration ENGINE = InnoDB;
-ALTER TABLE service_registration ENGINE = InnoDB;
-ALTER TABLE job ENGINE = InnoDB;
-ALTER TABLE job_arguments ENGINE = InnoDB;
-ALTER TABLE job_context ENGINE = InnoDB;
-ALTER TABLE matterhorn_user ENGINE = InnoDB;
-ALTER TABLE matterhorn_role ENGINE = InnoDB;
-ALTER TABLE scheduled_event ENGINE = InnoDB;
-ALTER TABLE series ENGINE = InnoDB;
-ALTER TABLE upload ENGINE = InnoDB;
-ALTER TABLE user_action ENGINE = InnoDB;
-ALTER TABLE oaipmh_harvesting ENGINE = InnoDB;
 
--- rename tables
+-- MH-8648 UCB Features
+alter table mh_service_registration add column `ONLINE_FROM` DATETIME default NULL;
+alter table mh_service_registration add column `SERVICE_STATE` VARCHAR(32) NOT NULL default 'NORMAL';
+alter table mh_service_registration add column `STATE_CHANGED` DATETIME default NULL;
+alter table mh_service_registration add column `WARNING_STATE_TRIGGER` BIGINT default 0;
+alter table mh_service_registration add column `ERROR_STATE_TRIGGER` BIGINT default 0;
 
-ALTER TABLE annotation RENAME TO mh_annotation;
-ALTER TABLE capture_agent_role RENAME TO mh_capture_agent_role;
-ALTER TABLE capture_agent_state RENAME TO mh_capture_agent_state;
-ALTER TABLE dictionary RENAME TO mh_dictionary;
-ALTER TABLE host_registration RENAME TO mh_host_registration;
-ALTER TABLE service_registration RENAME TO mh_service_registration;
-ALTER TABLE job RENAME TO mh_job;
-ALTER TABLE job_arguments RENAME TO mh_job_argument;
-ALTER TABLE job_context RENAME TO mh_job_context;
-ALTER TABLE matterhorn_user RENAME TO mh_user;
-ALTER TABLE matterhorn_role RENAME TO mh_role;
-ALTER TABLE scheduled_event RENAME TO mh_scheduled_event;
-ALTER TABLE series RENAME TO mh_series;
-ALTER TABLE upload RENAME TO mh_upload;
-ALTER TABLE user_action RENAME TO mh_user_action;
-ALTER TABLE oaipmh_harvesting RENAME TO mh_oaipmh_harvesting;
+
+CREATE INDEX IX_mh_organization_node_pk ON mh_organization_node (organization);
+CREATE INDEX IX_mh_organization_node_name ON mh_organization_node (name);
+CREATE INDEX IX_mh_organization_node_port ON mh_organization_node (port);
+
+CREATE TABLE mh_organization_property (
+  organization VARCHAR(128) NOT NULL,
+  name VARCHAR(255),
+  value VARCHAR(255),
+  PRIMARY KEY (organization, name),
+  CONSTRAINT FK_mh_organization_property_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
+) ENGINE=InnoDB;
+
+CREATE INDEX IX_mh_organization_property_pk ON mh_organization_property (organization);
+
+
+
+-- job-service table
+-- note missing from default ddl script
+CREATE TABLE mh_job_mh_service_registration (
+  Job_id bigint(20) NOT NULL,
+  servicesRegistration_id bigint(20) NOT NULL,
+  PRIMARY KEY (`Job_id`,`servicesRegistration_id`),
+  KEY `mhjobmhservice_registrationservicesRegistration_id` (`servicesRegistration_id`),
+  CONSTRAINT `FK_mh_job_mh_service_registration_Job_id` FOREIGN KEY (`Job_id`) REFERENCES `mh_job` (`id`),
+  CONSTRAINT `mhjobmhservice_registrationservicesRegistration_id` FOREIGN KEY (`servicesRegistration_id`) REFERENCES `mh_service_registration` (`id`)
+) ENGINE=InnoDB;
+
+-- MH-8854 user_action text fields
+
+alter table mh_user_action change column user_ip user_ip varchar(255);
+alter table mh_user_action change column mediapackage_id mediapackage_id varchar(255);
+alter table mh_user_action change column session_id session_id varchar(255);
+alter table mh_user_action change column user_id user_id varchar(255);
+alter table mh_user_action change column type type varchar(255);
+
+create index user_action_session_type_i on mh_user_action(session_id, type);
+
 
 -- rename fields
 
@@ -164,6 +219,7 @@ ALTER TABLE mh_service_registration ADD COLUMN state_changed DATETIME;
 ALTER TABLE mh_service_registration ADD COLUMN warning_state_trigger BIGINT;
 ALTER TABLE mh_service_registration ADD COLUMN error_state_trigger BIGINT;
 ALTER TABLE mh_service_registration ADD COLUMN online_from DATETIME;
+
 
 -- add primary keys
 
@@ -224,3 +280,6 @@ CREATE INDEX IX_mh_user_action_mediapackage ON mh_user_action (mediapackage);
 CREATE INDEX IX_mh_user_action_user ON mh_user_action (user);
 CREATE INDEX IX_mh_user_action_session ON mh_user_action (session);
 CREATE INDEX IX_mh_user_action_type ON mh_user_action (type);
+
+
+
