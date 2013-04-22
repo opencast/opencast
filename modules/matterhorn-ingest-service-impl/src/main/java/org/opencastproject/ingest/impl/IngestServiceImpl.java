@@ -96,9 +96,6 @@ import javax.management.ObjectInstance;
  */
 public class IngestServiceImpl extends AbstractJobProducer implements IngestService {
 
-  /** The collection name used for temporarily storing uploaded zip files */
-  private static final String COLLECTION_ID = "ingest-temp";
-
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(IngestServiceImpl.class);
 
@@ -278,7 +275,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
 
     ZipArchiveInputStream zis = null;
-    Map<String, URI> elementUris = new HashMap<String, URI>();
     try {
       // We don't need anybody to do the dispatching for us. Therefore we need to make sure that the job is never in
       // QUEUED state but set it to INSTANTIATED in the beginning and then manually switch it to RUNNING.
@@ -286,9 +282,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
 
+      // Create the working file target collection for this ingest operation
+      String wfrCollectionId = Long.toString(job.getId());
+
       zis = new ZipArchiveInputStream(zipStream);
       ZipArchiveEntry entry;
       MediaPackage mp = null;
+      Map<String, URI> uris = new HashMap<String, URI>();
       // While there are entries write them to a collection
       while ((entry = zis.getNextZipEntry()) != null) {
         try {
@@ -300,11 +300,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             mp = loadMediaPackageFromManifest(new ZipEntryInputStream(zis, entry.getSize()));
           } else {
             logger.info("Storing zip entry {} in working file repository collection '{}'",
-                    job.getId() + entry.getName(), COLLECTION_ID);
-            URI contentUri = workspace.putInCollection(COLLECTION_ID,
-                    job.getId() + FilenameUtils.getName(entry.getName()), new ZipEntryInputStream(zis, entry.getSize()));
+                    job.getId() + entry.getName(), wfrCollectionId);
+            URI contentUri = workspace
+                    .putInCollection(wfrCollectionId, FilenameUtils.getName(entry.getName()),
+                            new ZipEntryInputStream(zis, entry.getSize()));
+            uris.put(FilenameUtils.getName(entry.getName()), contentUri);
             ingestStatistics.add(entry.getSize());
-            elementUris.put(FilenameUtils.getName(entry.getName()), contentUri);
             logger.info("Zip entry {} stored at {}", job.getId() + entry.getName(), contentUri);
           }
         } catch (Exception e) {
@@ -335,29 +336,14 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       if (mp.getTracks().length == 0)
         throw new IngestException("Mediapackage " + mediaPackageId + " has no media tracks");
 
-      // Move the package's elements into the correct place in the working file repository
-      logger.info("Moving elements of zipped mediapackage {} into place", mediaPackageId);
+      // Update the element uris to point to their working file repository location
       for (MediaPackageElement element : mp.elements()) {
-        String elId = element.getIdentifier();
-        if (elId == null) {
-          elId = UUID.randomUUID().toString();
-          element.setIdentifier(elId);
-        }
+        URI uri = uris.get(FilenameUtils.getName(element.getURI().toString()));
+        if (uri == null)
+          throw new IngestException("Unable to map element name '" + element.getURI() + "' to workspace uri");
+        logger.info("Ingested mediapackage element {}/{} is located at {}", new Object[] { mediaPackageId, element.getIdentifier(), uri });
+        element.setURI(uri);
 
-        String elementName = element.getURI().toString();
-        String filename = FilenameUtils.getName(elementName);
-
-        URI collectionUri = elementUris.get(filename);
-        if (collectionUri == null)
-          throw new IngestException("MediaPackage element " + filename + " not found");
-
-        URI newUrl = workspace.moveTo(collectionUri, mp.getIdentifier().compact(), elId, filename);
-        element.setURI(newUrl);
-        elementUris.remove(elementName);
-        logger.info("Element {} of zipped mediapackage {} moved to {}",
-                new Object[] { filename, mediaPackageId, newUrl });
-
-        // if this is a series, update the series service
         // TODO: This should be triggered somehow instead of being handled here
         if (MediaPackageElements.SERIES.equals(element.getFlavor())) {
           logger.info("Ingested mediapackage {} contains updated series information", mediaPackageId);
@@ -366,6 +352,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
 
       // Now that all elements are in place, start with ingest
+      logger.info("Initiating processing of ingested mediapackage {}", mediaPackageId);
       workflowInstance = ingest(mp, workflowDefinitionId, workflowConfig, workflowInstanceId);
       logger.info("Ingest of mediapackage {} done", mediaPackageId);
       job.setStatus(Job.Status.FINISHED);
@@ -381,14 +368,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       throw e;
     } finally {
       IOUtils.closeQuietly(zis);
-      for (URI elementUri : elementUris.values()) {
-        try {
-          workspace.delete(elementUri);
-        } catch (NotFoundException e) {
-          // File was already moved to mediapackage so deletion is not needed
-          logger.debug("Temporary file {} was already moved to mediapackage, nothing to delete", elementUri);
-        }
-      }
       try {
         serviceRegistry.updateJob(job);
       } catch (Exception e) {
