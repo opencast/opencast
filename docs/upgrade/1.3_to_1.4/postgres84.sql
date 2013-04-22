@@ -1,4 +1,25 @@
--- add new tables
+
+-- table naming convention has changed
+alter table dictionary rename to mh_dictionary;
+alter table host_registration rename to mh_host_registration;
+alter table job  rename to mh_job;
+alter table job_arguments rename to mh_job_argument;
+alter table matterhorn_role rename to mh_matterhorn_role;
+alter table scheduled_event rename to mh_scheduled_event;
+alter table series  rename to mh_series;
+alter table service_registration rename to mh_service_registration;
+alter table matterhorn_user rename to mh_matterhorn_user;
+alter table capture_agent_role rename to mh_capture_agent_role;
+alter table capture_agent_state rename to mh_capture_agent_state;
+alter table annotation rename to mh_annotation;
+alter table job_context rename to mh_job_context;
+alter table upload rename to mh_upload;
+alter table user_action rename to mh_user_action;
+alter table oaipmh_harvesting rename to mh_oaipmh_harvesting;
+
+-- new tables for Episode Serivice
+-- taken from the DDL script for 1.4
+-- Organization Tables
 
 CREATE TABLE "mh_organization" (
   "id" character varying(128) NOT NULL,
@@ -20,28 +41,6 @@ CREATE INDEX "IX_mh_organization_node_pk" ON "mh_organization_node" ("organizati
 CREATE INDEX "IX_mh_organization_node_name" ON "mh_organization_node" ("name");
 CREATE INDEX "IX_mh_organization_node_port" ON "mh_organization_node" ("port");
 
-CREATE TABLE "mh_organization_property" (
-  "organization" character varying(128) NOT NULL,
-  "name" character varying(255) NOT NULL,
-  "value" character varying(255),
-  PRIMARY KEY ("organization", "name"),
-  CONSTRAINT "FK_mh_organization_property_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
-);
-
-CREATE INDEX "IX_mh_organization_property_pk" ON "mh_organization_property" ("organization");
-
-CREATE TABLE "mh_search" (
-  "id" character varying(128) NOT NULL,
-  "organization" character varying(128),
-  "deletion_date" timestamp,
-  "access_control" text,
-  "mediapackage_xml" text,
-  "modification_date" timestamp,
-  PRIMARY KEY ("id"),
-  CONSTRAINT "FK_mh_search_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
-);
-
-CREATE INDEX "IX_mh_search_organization" ON "mh_search" ("organization");
 
 CREATE TABLE "mh_episode_episode" (
   "id" character varying(128) NOT NULL,
@@ -84,26 +83,75 @@ CREATE TABLE "mh_episode_version_claim" (
 CREATE INDEX "IX_mh_episode_version_claim_mediapackage" ON "mh_episode_version_claim" ("mediapackage");
 CREATE INDEX "IX_mh_episode_version_claim_last_claimed" ON "mh_episode_version_claim" ("last_claimed");
 
--- rename tables
 
-ALTER TABLE "annotation" RENAME TO "mh_annotation";
-ALTER TABLE "capture_agent_role" RENAME TO "mh_capture_agent_role";
-ALTER TABLE "capture_agent_state" RENAME TO "mh_capture_agent_state";
-ALTER TABLE "dictionary" RENAME TO "mh_dictionary";
-ALTER TABLE "host_registration" RENAME TO "mh_host_registration";
-ALTER TABLE "service_registration" RENAME TO "mh_service_registration";
-ALTER TABLE "job" RENAME TO "mh_job";
-ALTER TABLE "job_arguments" RENAME TO "mh_job_argument";
-ALTER TABLE "job_context" RENAME TO "mh_job_context";
-ALTER TABLE "matterhorn_user" RENAME TO "mh_user";
-ALTER TABLE "matterhorn_role" RENAME TO "mh_role";
-ALTER TABLE "scheduled_event" RENAME TO "mh_scheduled_event";
-ALTER TABLE "series" RENAME TO "mh_series";
-ALTER TABLE "upload" RENAME TO "mh_upload";
-ALTER TABLE "user_action" RENAME TO "mh_user_action";
-ALTER TABLE "oaipmh_harvesting" RENAME TO "mh_oaipmh_harvesting";
+
+-- how to handle user & role? May be in & in 1.4 ddl but not in 1.3 ddl now mh_user and mh_role
+CREATE TABLE IF NOT EXISTS "mh_user" (
+  "username" character varying(128) NOT NULL,
+  "organization" character varying(128) NOT NULL,
+  "password" text,
+  PRIMARY KEY ("username", "organization"),
+  CONSTRAINT "FK_mh_user_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+);
+
+CREATE TABLE IF NOT EXISTS "mh_role" (
+  "username" character varying(128) NOT NULL,
+  "organization" character varying(128) NOT NULL,
+  "role" text,
+  CONSTRAINT "FK_mh_role_username" FOREIGN KEY ("username", "organization") REFERENCES "mh_user" ("username", "organization"),
+  CONSTRAINT "FK_mh_role_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+);
+
+CREATE INDEX "IX_mh_role_pk" ON "mh_role" ("username", "organization");
+
+
+-- MH-8647
+CREATE TABLE "mh_search" (
+  "id" character varying(128) NOT NULL,
+  "organization" character varying(128),
+  "deletion_date" timestamp,
+  "access_control" text,
+  "mediapackage_xml" text,
+  "modification_date" timestamp,
+  PRIMARY KEY ("id"),
+  CONSTRAINT "FK_mh_search_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+);
+
+
+
+
+
+-- MH-8648 UCB Features
+ALTER TABLE "mh_annotation" ADD COLUMN "private" boolean DEFAULT FALSE;
+ALTER TABLE "mh_host_registration" ADD COLUMN "active" boolean DEFAULT TRUE;
+ALTER TABLE "mh_service_registration" ADD COLUMN "active" boolean DEFAULT TRUE;
+ALTER TABLE "mh_service_registration" ADD COLUMN "service_state" integer NOT NULL;
+ALTER TABLE "mh_service_registration" ADD COLUMN "state_changed" timestamp;
+ALTER TABLE "mh_service_registration" ADD COLUMN "warning_state_trigger" bigint;
+ALTER TABLE "mh_service_registration" ADD COLUMN "error_state_trigger" bigint;
+ALTER TABLE "mh_service_registration" ADD COLUMN "online_from" timestamp;
+
+
+
+CREATE INDEX IX_mh_organization_node_pk ON mh_organization_node (organization);
+CREATE INDEX IX_mh_organization_node_name ON mh_organization_node (name);
+CREATE INDEX IX_mh_organization_node_port ON mh_organization_node (port);
+
+CREATE TABLE mh_organization_property (
+  organization VARCHAR(128) NOT NULL,
+  name VARCHAR(255),
+  value VARCHAR(255),
+  PRIMARY KEY (organization, name),
+  CONSTRAINT FK_mh_organization_property_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
+);
+
+CREATE INDEX IX_mh_organization_property_pk ON mh_organization_property (organization);
+
+
+
 
 -- rename fields
+
 
 ALTER TABLE "mh_annotation" RENAME COLUMN "mediapackage_id" TO "mediapackage";
 ALTER TABLE "mh_annotation" RENAME COLUMN "session_id" TO "session";
@@ -135,6 +183,7 @@ ALTER TABLE "mh_service_registration" ADD COLUMN "state_changed" timestamp;
 ALTER TABLE "mh_service_registration" ADD COLUMN "warning_state_trigger" bigint;
 ALTER TABLE "mh_service_registration" ADD COLUMN "error_state_trigger" bigint;
 ALTER TABLE "mh_service_registration" ADD COLUMN "online_from" timestamp;
+
 
 -- add primary keys
 
@@ -195,3 +244,6 @@ CREATE INDEX "IX_mh_user_action_mediapackage" ON "mh_user_action" ("mediapackage
 CREATE INDEX "IX_mh_user_action_user" ON "mh_user_action" ("user");
 CREATE INDEX "IX_mh_user_action_session" ON "mh_user_action" ("session");
 CREATE INDEX "IX_mh_user_action_type" ON "mh_user_action" ("type");
+
+
+
