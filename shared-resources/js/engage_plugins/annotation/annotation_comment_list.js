@@ -507,7 +507,7 @@ Opencast.Annotation_Comment_List = (function ()
 			if(replyCount === 1){
 			    line += replyCount+ " reply";
 			}else{
-			    line += replyCount+ " replys";
+			    line += replyCount+ " replies";
 			}
 			$("#oc-comments-list-header-bottom").html(line);
 			
