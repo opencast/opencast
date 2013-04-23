@@ -44,6 +44,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
@@ -211,6 +212,9 @@ public class WorkflowPermissionsUpdatedEventHandler implements EventHandler {
           WorkflowSet result = workflowService.getWorkflowInstancesForAdministrativeRead(q);
 
           for (WorkflowInstance instance : result.getItems()) {
+            if (!isActive(instance))
+              continue;
+
             Organization org = instance.getOrganization();
             securityService.setOrganization(org);
 
@@ -235,6 +239,8 @@ public class WorkflowPermissionsUpdatedEventHandler implements EventHandler {
               URI uri = workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
                       dublinCoreService.serialize(seriesDublinCore));
               c.setURI(uri);
+              // setting the URI to a new source so the checksum will most like be invalid
+              c.setChecksum(null);
             }
 
             // Update the search index with the modified mediapackage
@@ -262,4 +268,14 @@ public class WorkflowPermissionsUpdatedEventHandler implements EventHandler {
       }
     });
   }
+
+  private boolean isActive(WorkflowInstance workflowInstance) {
+    if (WorkflowState.INSTANTIATED.equals(workflowInstance.getState())
+            || WorkflowState.RUNNING.equals(workflowInstance.getState())
+            || WorkflowState.PAUSED.equals(workflowInstance.getState())) {
+      return true;
+    }
+    return false;
+  }
+
 }
