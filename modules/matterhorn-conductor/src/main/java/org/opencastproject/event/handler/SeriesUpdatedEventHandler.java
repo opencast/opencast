@@ -257,8 +257,6 @@ public class SeriesUpdatedEventHandler implements EventHandler {
               URI uri = workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
                       dublinCoreService.serialize(seriesDublinCore));
               c.setURI(uri);
-              // setting the URI to a new source so the checksum will most like be invalid
-              c.setChecksum(null);
 
               // Distribute the updated series dc
               Job distributionJob = distributionService.distribute(mp, c.getIdentifier());
