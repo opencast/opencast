@@ -250,6 +250,8 @@ public class EpisodesPermissionsUpdatedEventHandler implements EventHandler {
               URI uri = workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
                       dublinCoreService.serialize(seriesDublinCore));
               c.setURI(uri);
+              // setting the URI to a new source so the checksum will most like be invalid
+              c.setChecksum(null);
             }
 
             try {
