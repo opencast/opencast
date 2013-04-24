@@ -609,8 +609,22 @@ Opencast.Annotation_Comment = (function ()
                 if ((data !== undefined) || (data['username'] !== undefined))
                 {   
                      if(data.username === "anonymous"){
-                         //TODO: what is to do if user not logged in, example: deactivate feature
-                         setModus("public");
+                        setModus("public");
+                        //set default name and read cookie
+                        cm_username = default_name;
+                        var nameEQ = cookieName + "=";
+                        var ca = document.cookie.split(';');
+                        for(var i = 0; i < ca.length; i++) {
+                          var c = ca[i];
+                          while(c.charAt(0) == ' ')
+                          {
+                            c = c.substring(1, c.length);
+                          }
+                          if(c.indexOf(nameEQ) == 0)
+                          {
+                            cm_username = c.substring(nameEQ.length, c.length);
+                          }
+                        }
                      }else{
                          cm_username = data.username;
                      }
