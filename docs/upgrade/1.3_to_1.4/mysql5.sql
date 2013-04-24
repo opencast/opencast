@@ -43,25 +43,6 @@ alter table user_action rename to mh_user_action;
 alter table oaipmh_harvesting rename to mh_oaipmh_harvesting;
 
 
--- how to handle user & role? May be in & in 1.4 ddl but not in 1.3 ddl now mh_user and mh_role
-CREATE TABLE IF NOT EXISTS mh_user (
-  username VARCHAR(128) NOT NULL,
-  organization VARCHAR(128) NOT NULL,
-  password TEXT(65535),
-  PRIMARY KEY (username, organization),
-  CONSTRAINT FK_mh_user_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-) ENGINE=InnoDB;
-
-CREATE TABLE  IF NOT EXISTS mh_role (
-  username VARCHAR(128) NOT NULL,
-  organization VARCHAR(128) NOT NULL,
-  role TEXT(65535),
-  CONSTRAINT FK_mh_role_username FOREIGN KEY (username, organization) REFERENCES mh_user (username, organization),
-  CONSTRAINT FK_mh_role_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-) ENGINE=InnoDB;
-
-CREATE INDEX IX_mh_role_pk ON mh_role (username, organization);
-
 -- new tables for Episode Serivice
 -- taken from the DDL script for 1.4
 -- Organization Tables
@@ -123,6 +104,22 @@ CREATE TABLE mh_episode_version_claim (
 CREATE INDEX IX_mh_episode_version_claim_mediapackage ON mh_episode_version_claim (mediapackage);
 CREATE INDEX IX_mh_episode_version_claim_last_claimed ON mh_episode_version_claim (last_claimed);
 
+-- how to handle user & role? May be in & in 1.4 ddl but not in 1.3 ddl now mh_user and mh_role
+CREATE TABLE IF NOT EXISTS mh_user (
+  username VARCHAR(128) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  password TEXT(65535),
+  PRIMARY KEY (username, organization)  
+) ENGINE=InnoDB;
+
+CREATE TABLE  IF NOT EXISTS mh_role (
+  username VARCHAR(128) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  role TEXT(65535)
+) ENGINE=InnoDB;
+
+CREATE INDEX IX_mh_role_pk ON mh_role (username, organization);
+
 
 -- MH-8647
 CREATE TABLE mh_search (
@@ -139,11 +136,16 @@ CREATE TABLE mh_search (
 
 
 -- MH-8648 UCB Features
-alter table mh_service_registration add column `ONLINE_FROM` DATETIME default NULL;
-alter table mh_service_registration add column `SERVICE_STATE` VARCHAR(32) NOT NULL default 'NORMAL';
-alter table mh_service_registration add column `STATE_CHANGED` DATETIME default NULL;
-alter table mh_service_registration add column `WARNING_STATE_TRIGGER` BIGINT default 0;
-alter table mh_service_registration add column `ERROR_STATE_TRIGGER` BIGINT default 0;
+alter table mh_service_registration add column online_from DATETIME default NULL;
+alter table mh_service_registration add column service_state int NULL;
+alter table mh_service_registration add column state_changed DATETIME default NULL;
+alter table mh_service_registration add column warning_state_trigger BIGINT default 0;
+alter table mh_service_registration add column error_state_trigger BIGINT default 0;
+ALTER TABLE mh_service_registration ADD COLUMN active TINYINT(1) DEFAULT 1;
+
+
+
+
 
 
 CREATE INDEX IX_mh_organization_node_pk ON mh_organization_node (organization);
@@ -213,12 +215,7 @@ ALTER TABLE mh_user_action CHANGE type type VARCHAR(128);
 
 ALTER TABLE mh_annotation ADD COLUMN private TINYINT(1) DEFAULT 1;
 ALTER TABLE mh_host_registration ADD COLUMN active TINYINT(1) DEFAULT 1;
-ALTER TABLE mh_service_registration ADD COLUMN active TINYINT(1) DEFAULT 1;
-ALTER TABLE mh_service_registration ADD COLUMN service_state VARCHAR(32) NOT NULL default 'NORMAL';
-ALTER TABLE mh_service_registration ADD COLUMN state_changed DATETIME;
-ALTER TABLE mh_service_registration ADD COLUMN warning_state_trigger BIGINT;
-ALTER TABLE mh_service_registration ADD COLUMN error_state_trigger BIGINT;
-ALTER TABLE mh_service_registration ADD COLUMN online_from DATETIME;
+
 
 
 -- add primary keys
@@ -228,6 +225,7 @@ ALTER TABLE mh_capture_agent_role ADD PRIMARY KEY (id, organization, role);
 -- add constraints
 
 ALTER TABLE mh_capture_agent_role ADD CONSTRAINT FK_mh_capture_agent_role_organization FOREIGN KEY (organization) REFERENCES mh_organization (id);
+-- this fails ....
 ALTER TABLE mh_capture_agent_state ADD CONSTRAINT FK_mh_capture_agent_state_organization FOREIGN KEY (organization) REFERENCES mh_organization (id);
 ALTER TABLE mh_host_registration ADD CONSTRAINT UNQ_mh_host_registration_0 UNIQUE (host);
 ALTER TABLE mh_service_registration ADD CONSTRAINT FK_service_registration_host_registration FOREIGN KEY (host_registration) REFERENCES mh_host_registration (id);
@@ -238,6 +236,7 @@ ALTER TABLE mh_job ADD CONSTRAINT FK_mh_job_root FOREIGN KEY (root) REFERENCES m
 ALTER TABLE mh_job ADD CONSTRAINT FK_mh_job_organization FOREIGN KEY (organization) REFERENCES mh_organization (id);
 ALTER TABLE mh_job_argument ADD CONSTRAINT FK_mh_job_argument_id FOREIGN KEY (id) REFERENCES mh_job (id);
 ALTER TABLE mh_job_context ADD CONSTRAINT FK_mh_job_context_id FOREIGN KEY (id) REFERENCES mh_job (id);
+-- -- these will fail if the table is created by this script
 ALTER TABLE mh_user ADD CONSTRAINT FK_mh_user_organization FOREIGN KEY (organization) REFERENCES mh_organization (id);
 ALTER TABLE mh_role ADD CONSTRAINT FK_mh_role_username FOREIGN KEY (username, organization) REFERENCES mh_user (username, organization);
 ALTER TABLE mh_role ADD CONSTRAINT FK_mh_role_organization FOREIGN KEY (organization) REFERENCES mh_organization (id);
@@ -272,7 +271,6 @@ CREATE INDEX IX_mh_job_dispatchable ON mh_job (dispatchable);
 CREATE INDEX IX_mh_job_operation ON mh_job (operation);
 CREATE INDEX IX_mh_job_argument_id ON mh_job_argument (id);
 CREATE INDEX IX_mh_job_context_id ON mh_job_context (id);
-CREATE INDEX IX_mh_role_pk ON mh_role (username, organization);
 CREATE INDEX IX_mh_user_action_created ON mh_user_action (created);
 CREATE INDEX IX_mh_user_action_inpoint ON mh_user_action (inpoint);
 CREATE INDEX IX_mh_user_action_outpoint ON mh_user_action (outpoint);
