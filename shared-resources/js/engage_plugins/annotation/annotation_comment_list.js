@@ -191,12 +191,35 @@ Opencast.Annotation_Comment_List = (function ()
                 if ((data !== undefined) || (data['username'] !== undefined))
                 {   
                      if(data.username === "anonymous"){
-                         //TODO: what is to do if user not logged in, example: deactivate feature
-                         setModus("public");
+                        setModus("public");
+                        //set default name and read cookie
+                        cm_username = default_name;
+                        var nameEQ = cookieName + "=";
+                        var ca = document.cookie.split(';');
+                        for(var i = 0; i < ca.length; i++) {
+                          var c = ca[i];
+                          while(c.charAt(0) == ' ')
+                          {
+                            c = c.substring(1, c.length);
+                          }
+                          if(c.indexOf(nameEQ) == 0)
+                          {
+                            cm_username = c.substring(nameEQ.length, c.length);
+                          }
+                        }
+                        $.log("Comment Plugin set username to: "+cm_username);
+                        //change name box settings to public features
+                        $("#oc-comments-list-namebox").val(cm_username);
+                        $("#oc-comments-list-namebox").removeAttr("disabled");
+                        $("#oc-comments-list-namebox").click(function(){        
+                        $("#oc-comments-list-namebox").focus();
+                        $("#oc-comments-list-namebox").select();          
+          }); 
                      }else{
                          cm_username = data.username;
                          $.log("Comment Plugin set username to: "+cm_username);
                          $("#oc-comments-list-namebox").val(cm_username);
+                         $("#oc-comments-list-namebox").attr("disabled","disabled");
                      }
                 }  
             }
