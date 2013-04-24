@@ -90,16 +90,13 @@ CREATE TABLE IF NOT EXISTS "mh_user" (
   "username" character varying(128) NOT NULL,
   "organization" character varying(128) NOT NULL,
   "password" text,
-  PRIMARY KEY ("username", "organization"),
-  CONSTRAINT "FK_mh_user_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+  PRIMARY KEY ("username", "organization")
 );
 
 CREATE TABLE IF NOT EXISTS "mh_role" (
   "username" character varying(128) NOT NULL,
   "organization" character varying(128) NOT NULL,
-  "role" text,
-  CONSTRAINT "FK_mh_role_username" FOREIGN KEY ("username", "organization") REFERENCES "mh_user" ("username", "organization"),
-  CONSTRAINT "FK_mh_role_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+  "role" text
 );
 
 CREATE INDEX "IX_mh_role_pk" ON "mh_role" ("username", "organization");
@@ -130,6 +127,7 @@ ALTER TABLE "mh_service_registration" ADD COLUMN "state_changed" timestamp;
 ALTER TABLE "mh_service_registration" ADD COLUMN "warning_state_trigger" bigint;
 ALTER TABLE "mh_service_registration" ADD COLUMN "error_state_trigger" bigint;
 ALTER TABLE "mh_service_registration" ADD COLUMN "online_from" timestamp;
+
 
 
 
@@ -172,18 +170,6 @@ ALTER TABLE "mh_user_action" RENAME COLUMN "mediapackage_id" TO "mediapackage";
 ALTER TABLE "mh_user_action" RENAME COLUMN "session_id" TO "session";
 ALTER TABLE "mh_user_action" RENAME COLUMN "user_id" TO "user";
 ALTER TABLE "mh_user_action" RENAME COLUMN "is_playing" TO "playing";
-
--- add fields
-
-ALTER TABLE "mh_annotation" ADD COLUMN "private" boolean DEFAULT FALSE;
-ALTER TABLE "mh_host_registration" ADD COLUMN "active" boolean DEFAULT TRUE;
-ALTER TABLE "mh_service_registration" ADD COLUMN "active" boolean DEFAULT TRUE;
-ALTER TABLE "mh_service_registration" ADD COLUMN "service_state" integer NOT NULL;
-ALTER TABLE "mh_service_registration" ADD COLUMN "state_changed" timestamp;
-ALTER TABLE "mh_service_registration" ADD COLUMN "warning_state_trigger" bigint;
-ALTER TABLE "mh_service_registration" ADD COLUMN "error_state_trigger" bigint;
-ALTER TABLE "mh_service_registration" ADD COLUMN "online_from" timestamp;
-
 
 -- add primary keys
 
@@ -236,7 +222,6 @@ CREATE INDEX "IX_mh_job_dispatchable" ON "mh_job" ("dispatchable");
 CREATE INDEX "IX_mh_job_operation" ON "mh_job" ("operation");
 CREATE INDEX "IX_mh_job_argument_id" ON "mh_job_argument" ("id");
 CREATE INDEX "IX_mh_job_context_id" ON "mh_job_context" ("id");
-CREATE INDEX "IX_mh_role_pk" ON "mh_role" ("username", "organization");
 CREATE INDEX "IX_mh_user_action_created" ON "mh_user_action" ("created");
 CREATE INDEX "IX_mh_user_action_inpoint" ON "mh_user_action" ("inpoint");
 CREATE INDEX "IX_mh_user_action_outpoint" ON "mh_user_action" ("outpoint");
