@@ -31,8 +31,8 @@ public class SearchQuery {
   protected String seriesId;
   protected String text;
   protected String query;
-  protected int limit = -1;
-  protected int offset = -1;
+  protected int limit = 20;
+  protected int offset = 0;
   protected String[] tags = null;
   protected MediaPackageElementFlavor[] flavors = null;
   protected Date deletedDate = null;

@@ -129,12 +129,12 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "Any series that matches this free-text query. If the additional boolean parameter \"episodes\" is \"true\", "
                   + "the result set will include this series episodes.", isRequired = false, name = "q", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "false", description = "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".", isRequired = false, name = "episodes", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "false", description = "Whether to include this series information itself. This can be used in combination with \"id\" or \"q\".", isRequired = false, name = "series", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "true", description = "Whether to include this series information itself. This can be used in combination with \"id\" or \"q\".", isRequired = false, name = "series", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.BOOLEAN) }, reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json.")
   public Response getEpisodeAndSeriesById(@QueryParam("id") String id, @QueryParam("q") String text,
-          @QueryParam("episodes") boolean includeEpisodes, @QueryParam("series") boolean includeSeries,
+          @QueryParam("episodes") boolean includeEpisodes, @QueryParam("series") String includeSeries,
           @QueryParam("limit") int limit, @QueryParam("offset") int offset, @QueryParam("admin") boolean admin,
           @PathParam("format") String format) throws SearchException, UnauthorizedException {
 
@@ -145,7 +145,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       query.withId(id);
 
     // Include series data in the results?
-    query.includeSeries(includeSeries);
+    query.includeSeries(includeSeries == null || !"false".equals(includeSeries.toLowerCase()));
 
     // Include episodes in the result?
     query.includeEpisodes(includeEpisodes);
