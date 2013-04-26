@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-var ocWorkflow = {} || ocWorkflow;
+var ocWorkflow = ocWorkflow || {};
 
 ocWorkflow.init = function(selectElm, configContainer, tags) {
   ocWorkflow.container = configContainer;
