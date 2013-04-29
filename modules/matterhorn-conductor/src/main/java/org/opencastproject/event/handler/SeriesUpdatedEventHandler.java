@@ -22,6 +22,7 @@ import static org.opencastproject.job.api.Job.Status.FINISHED;
 import static org.opencastproject.mediapackage.MediaPackageElementParser.getFromXml;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.workflow.handler.EngagePublicationChannel.CHANNEL_ID;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
@@ -233,7 +234,7 @@ public class SeriesUpdatedEventHandler implements EventHandler {
               Attachment fileRepoCopy = mp.getAttachments(XACML_POLICY)[0];
 
               // Distribute the updated XACML file
-              Job distributionJob = distributionService.distribute(mp, fileRepoCopy.getIdentifier());
+              Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, fileRepoCopy.getIdentifier());
               JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
               Result jobResult = barrier.waitForJobs();
               if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
@@ -261,7 +262,7 @@ public class SeriesUpdatedEventHandler implements EventHandler {
               c.setChecksum(null);
 
               // Distribute the updated series dc
-              Job distributionJob = distributionService.distribute(mp, c.getIdentifier());
+              Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, c.getIdentifier());
               JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
               Result jobResult = barrier.waitForJobs();
               if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {

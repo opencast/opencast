@@ -145,11 +145,11 @@
       </configurations>
     </operation>
 
-    <!-- tag the dublin core catalogs so they will be distributed and added to search -->
+    <!-- tag the incoming metadata catalogs for publishing -->
 
     <operation
       id="tag"
-      description="Tagging dublin core catalogs for publishing">
+      description="Tagging source metadata for publishing">
       <configurations>
         <configuration key="source-flavors">dublincore/*</configuration>
         <configuration key="target-tags">+engage</configuration>
@@ -157,7 +157,7 @@
     </operation>
 
     <!-- inspect the media -->
-
+    
     <operation
       id="inspect"
       fail-on-error="true"

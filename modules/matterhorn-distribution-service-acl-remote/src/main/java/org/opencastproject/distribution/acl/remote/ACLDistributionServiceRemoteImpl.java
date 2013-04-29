@@ -62,16 +62,12 @@ public class ACLDistributionServiceRemoteImpl extends RemoteBase implements Dist
     super.serviceType = REMOTE_SERVICE_TYPE_PREFIX + this.distributionChannel;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.distribution.api.DistributionService#distribute(org.opencastproject.mediapackage.MediaPackage,
-   *      java.lang.String)
-   */
-  public Job distribute(MediaPackage mediaPackage, String elementId) throws DistributionException {
+  @Override
+  public Job distribute(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
     params.add(new BasicNameValuePair("elementId", elementId));
+    params.add(new BasicNameValuePair("channelId", channelId));
     HttpPost post = new HttpPost();
     HttpResponse response = null;
     try {
@@ -96,16 +92,12 @@ public class ACLDistributionServiceRemoteImpl extends RemoteBase implements Dist
             + " using a remote distribution service proxy.");
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.distribution.api.DistributionService#retract(MediaPackage, String)
-   */
   @Override
-  public Job retract(MediaPackage mediaPackage, String elementId) throws DistributionException {
+  public Job retract(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
     params.add(new BasicNameValuePair("elementId", elementId));
+    params.add(new BasicNameValuePair("channelId", channelId));
     HttpPost post = new HttpPost("/retract");
     HttpResponse response = null;
     try {

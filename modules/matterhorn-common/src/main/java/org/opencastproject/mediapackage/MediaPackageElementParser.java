@@ -86,7 +86,7 @@ public final class MediaPackageElementParser {
               .parse(IOUtils.toInputStream(xml, "UTF-8"));
       MediaPackageElement element = MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
               .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
-      return (AbstractMediaPackageElement) element;
+      return element;
     } catch (Exception e) {
       throw new MediaPackageException(e);
     }

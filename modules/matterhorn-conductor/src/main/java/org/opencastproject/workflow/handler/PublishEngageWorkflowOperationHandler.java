@@ -15,11 +15,8 @@
  */
 package org.opencastproject.workflow.handler;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.functions.Strings.toBool;
-import static org.opencastproject.util.data.functions.Strings.trimToNone;
-
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URIUtils;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
@@ -46,9 +43,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URIUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -67,6 +61,12 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.functions.Strings.toBool;
+import static org.opencastproject.util.data.functions.Strings.trimToNone;
+import static org.opencastproject.workflow.handler.EngagePublicationChannel.CHANNEL_ID;
+
 /**
  * The workflow definition for handling "engage publication" operations
  */
@@ -79,9 +79,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String SERVER_URL_PROPERTY = "org.opencastproject.server.url";
   private static final String ENGAGE_URL_PROPERTY = "org.opencastproject.engage.ui.url";
   private static final String STREAMING_URL_PROPERTY = "org.opencastproject.streaming.url";
-
-  /** The channel name */
-  public static final String CHANNEL_NAME = "engage-player";
 
   /** Workflow configuration option keys */
   private static final String DOWNLOAD_FLAVORS = "download-flavors";
@@ -192,6 +189,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
+  @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     logger.debug("Running engage publication workflow operation");
@@ -267,14 +265,14 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       List<Job> jobs = new ArrayList<Job>();
       try {
         for (String elementId : downloadElementIds) {
-          Job job = downloadDistributionService.distribute(mediaPackage, elementId, checkAvailability);
+          Job job = downloadDistributionService.distribute(CHANNEL_ID, mediaPackage, elementId, checkAvailability);
           if (job == null)
             continue;
           jobs.add(job);
         }
         if (distributeStreaming) {
           for (String elementId : streamingElementIds) {
-            Job job = streamingDistributionService.distribute(mediaPackage, elementId);
+            Job job = streamingDistributionService.distribute(CHANNEL_ID, mediaPackage, elementId);
             if (job == null)
               continue;
             jobs.add(job);
@@ -296,7 +294,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       // Create new distribution element
       URI engageUri = URIUtils.resolve(engageBaseUrl.toURI(), "/engage/ui/watch.html?id="
               + mediaPackage.getIdentifier().compact());
-      Publication publicationElement = PublicationImpl.publication(UUID.randomUUID().toString(), CHANNEL_NAME,
+      Publication publicationElement = PublicationImpl.publication(UUID.randomUUID().toString(), CHANNEL_ID,
               engageUri, MimeTypes.parseMimeType("text/html"));
       mediaPackage.add(publicationElement);
 
@@ -348,7 +346,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     // All the jobs have passed, let's update the mediapackage with references to the distributed elements
     for (Job entry : jobs) {
       Job job = serviceRegistry.getJob(entry.getId());
-      String elementId = job.getArguments().get(1);
+      String elementId = job.getArguments().get(2);
       MediaPackageElement element = mp.getElementById(elementId);
 
       // If there is no payload, then the item has not been distributed.

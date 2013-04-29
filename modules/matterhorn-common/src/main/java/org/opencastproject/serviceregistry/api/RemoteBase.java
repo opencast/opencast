@@ -23,6 +23,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.opencastproject.util.data.Option.some;
 
 /**
  * Base class serving as a convenience implementation for remote services.
@@ -85,9 +89,19 @@ public class RemoteBase {
     this.remoteServiceManager = remoteServiceManager;
   }
 
+  protected <A> Option<A> runRequest(HttpRequestBase req, Function<HttpResponse, A> f) {
+    HttpResponse res = null;
+    try {
+      res = getResponse(req);
+      return res != null ? some(f.apply(res)) : Option.<A>none();
+    } finally {
+      closeConnection(res);
+    }
+  }
+
   /**
    * Makes a request to all available remote services and returns the response as soon as the first of them returns the
-   * {@link HttpStatus.SC_OK} as the status code.
+   * {@link HttpStatus#SC_OK} as the status code.
    * 
    * @param httpRequest
    *          the http request. If the URI is specified, it should include only the path beyond the service endpoint.
@@ -194,7 +208,8 @@ public class RemoteBase {
    * Closes any http connections kept open by this http response.
    */
   protected void closeConnection(HttpResponse response) {
-    client.close(response);
+    if (response != null)
+      client.close(response);
   }
 
   /**
