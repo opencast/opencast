@@ -483,7 +483,8 @@ public class IngestRestService {
           @RestParameter(description = "Metadata value", isRequired = false, name = "subject", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "temporal", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "title", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "type", type = RestParameter.Type.STRING) }, bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
+          @RestParameter(description = "Metadata value", isRequired = false, name = "type", type = RestParameter.Type.STRING), 
+          @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING), }, bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
@@ -503,6 +504,9 @@ public class IngestRestService {
             } else if (dcterms.contains(fieldName)) {
               EName en = new EName(DublinCore.TERMS_NS_URI, fieldName);
               dcc.add(en, Streams.asString(item.openStream()));
+            } else if ("seriesDCCatalogUri".equals(fieldName)) {
+              URI dcurl = new URI(Streams.asString(item.openStream()));
+              ingestService.addCatalog(dcurl, MediaPackageElements.SERIES, mp);
             } else {
               /* Tread everything else as workflow properties */
               workflowProperties.put(fieldName, Streams.asString(item.openStream()));
