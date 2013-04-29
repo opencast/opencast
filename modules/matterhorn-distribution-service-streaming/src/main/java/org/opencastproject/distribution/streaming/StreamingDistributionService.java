@@ -13,12 +13,11 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.distribution.streaming;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import static java.lang.String.format;
+import static org.opencastproject.util.PathSupport.path;
+
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -37,6 +36,10 @@ import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,8 +50,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.opencastproject.util.PathSupport.path;
 
 /**
  * Distributes media to the local media delivery directory.
@@ -128,7 +129,8 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.distribution.api.DistributionService#distribute(String, org.opencastproject.mediapackage.MediaPackage, String)
+   * @see org.opencastproject.distribution.api.DistributionService#distribute(String,
+   *      org.opencastproject.mediapackage.MediaPackage, String)
    */
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException,
@@ -148,9 +150,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Distribute.toString(),
-                                       Arrays.asList(channelId,
-                                                     MediaPackageParser.getAsXml(mediapackage),
-                                                     elementId));
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), elementId));
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -240,8 +240,8 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.distribution.api.DistributionService#retract(String, org.opencastproject.mediapackage.MediaPackage, String)
-   *      java.lang.String)
+   * @see org.opencastproject.distribution.api.DistributionService#retract(String,
+   *      org.opencastproject.mediapackage.MediaPackage, String) java.lang.String)
    */
   @Override
   public Job retract(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
@@ -258,9 +258,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(),
-                                       Arrays.asList(channelId,
-                                                     MediaPackageParser.getAsXml(mediaPackage),
-                                                     elementId));
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediaPackage), elementId));
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -343,15 +341,27 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    * 
    * @return The file to copy the content to
    */
-  protected File getDistributionFile(String channelId, MediaPackage mediaPackage, MediaPackageElement element) {
-    final String elementId = element.getIdentifier();
-    final String fileName = FilenameUtils.getName(element.getURI().toString());
-    return new File(distributionDirectory, path(channelId, mediaPackage.getIdentifier().compact(), elementId, fileName));
+  protected File getDistributionFile(String channelId, MediaPackage mp, MediaPackageElement element) {
+    final String uriString = element.getURI().toString();
+    final String directoryName = distributionDirectory.getAbsolutePath();
+    if (uriString.startsWith(streamingUrl)) {
+      String[] splitUrl = uriString.substring(streamingUrl.length() + 1).split("/");
+      if (splitUrl.length < 4) {
+        logger.warn(format(
+                "Malformed URI %s. Must be of format .../{channelId}/{mediapackageId}/{elementId}/{fileName}."
+                        + " Trying URI without channelId", uriString));
+        return new File(path(directoryName, splitUrl[0], splitUrl[1], splitUrl[2]));
+      } else {
+        return new File(path(directoryName, splitUrl[0], splitUrl[1], splitUrl[2], splitUrl[3]));
+      }
+    }
+    return new File(path(directoryName, channelId, mp.getIdentifier().compact(), element.getIdentifier(),
+            FilenameUtils.getName(uriString)));
   }
 
   /**
    * Gets the directory containing the distributed files for this mediapackage.
-   *
+   * 
    * @return the filesystem directory
    */
   protected File getMediaPackageDirectory(String channelId, MediaPackage mediaPackage) {
@@ -365,11 +375,12 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    * @throws URISyntaxException
    *           if the concrete implementation tries to create a malformed uri
    */
-  protected URI getDistributionUri(String channelId, MediaPackage mp, MediaPackageElement element) throws URISyntaxException {
+  protected URI getDistributionUri(String channelId, MediaPackage mp, MediaPackageElement element)
+          throws URISyntaxException {
     String elementId = element.getIdentifier();
     String fileName = FilenameUtils.getBaseName(element.getURI().toString());
     String tag = FilenameUtils.getExtension(element.getURI().toString()) + ":";
-    
+
     // In the odd case the file does not have a extension
     if (":".equals(tag))
       tag = "";

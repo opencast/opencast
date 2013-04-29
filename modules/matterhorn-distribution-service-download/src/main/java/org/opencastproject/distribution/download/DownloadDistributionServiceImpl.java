@@ -13,13 +13,12 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.distribution.download;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpHead;
+import static java.lang.String.format;
+import static org.opencastproject.util.PathSupport.path;
+import static org.opencastproject.util.RequireUtil.notNull;
+
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
@@ -40,11 +39,15 @@ import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpHead;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -52,9 +55,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.lang.String.format;
-import static org.opencastproject.util.PathSupport.path;
-import static org.opencastproject.util.RequireUtil.notNull;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Distributes media to the local media delivery directory.
@@ -132,8 +133,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
   }
 
   @Override
-  public Job distribute(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
+  public Job distribute(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException,
+          MediaPackageException {
     return distribute(channelId, mediapackage, elementId, true);
   }
 
@@ -144,11 +145,11 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
     notNull(elementId, "elementId");
     notNull(channelId, "channelId");
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Distribute.toString(),
-                                       Arrays.asList(channelId,
-                                                     MediaPackageParser.getAsXml(mediapackage),
-                                                     elementId,
-                                                     Boolean.toString(checkAvailability)));
+      return serviceRegistry.createJob(
+              JOB_TYPE,
+              Operation.Distribute.toString(),
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), elementId,
+                      Boolean.toString(checkAvailability)));
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -168,8 +169,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
    *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
    *           cannot be copied or another unexpected exception occurs.
    */
-  public MediaPackageElement distributeElement(String channelId, MediaPackage mediapackage, String elementId, boolean checkAvailability)
-          throws DistributionException {
+  public MediaPackageElement distributeElement(String channelId, MediaPackage mediapackage, String elementId,
+          boolean checkAvailability) throws DistributionException {
     notNull(mediapackage, "mediapackage");
     notNull(elementId, "elementId");
     notNull(channelId, "channelId");
@@ -198,8 +199,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
       } catch (IOException e) {
         throw new DistributionException("Unable to create " + destination.getParentFile(), e);
       }
-      logger.info(format("Distributing %s@%s for publication channel %s to %s",
-                         elementId, mediapackageId, channelId, destination));
+      logger.info(format("Distributing %s@%s for publication channel %s to %s", elementId, mediapackageId, channelId,
+              destination));
 
       try {
         FileSupport.link(source, destination, true);
@@ -216,8 +217,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
       }
       distributedElement.setIdentifier(null);
 
-      logger.info(format("Finished distributing element %s@%s for publication channel %s",
-                         elementId, mediapackageId, channelId));
+      logger.info(format("Finished distributing element %s@%s for publication channel %s", elementId, mediapackageId,
+              channelId));
       URI uri = distributedElement.getURI();
       long now = 0L;
       while (checkAvailability) {
@@ -255,9 +256,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
     notNull(channelId, "channelId");
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(),
-                                       Arrays.asList(channelId,
-                                                     MediaPackageParser.getAsXml(mediapackage),
-                                                     elementId));
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), elementId));
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -296,8 +295,9 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
       // Does the file exist? If not, the current element has not been distributed to this channel
       // or has been removed otherwise
       if (!elementFile.exists()) {
-        logger.info(format("Element %s@%s has already been removed or has never been distributed for publication channel %s",
-                           elementId, mediapackageId, channelId));
+        logger.info(format(
+                "Element %s@%s has already been removed or has never been distributed for publication channel %s",
+                elementId, mediapackageId, channelId));
         return element;
       }
 
@@ -308,18 +308,19 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
       if (mediapackageDir.isDirectory() && mediapackageDir.list().length == 0)
         FileSupport.delete(mediapackageDir);
 
-      logger.info(format("Finished retracting element %s@%s for publication channel %s",
-                         elementId, mediapackageId, channelId));
+      logger.info(format("Finished retracting element %s@%s for publication channel %s", elementId, mediapackageId,
+              channelId));
       return element;
     } catch (Exception e) {
-      logger.warn(format("Error retracting element %s@%s for publication channel %s", elementId, mediapackageId, channelId), e);
+      logger.warn(
+              format("Error retracting element %s@%s for publication channel %s", elementId, mediapackageId, channelId),
+              e);
       if (e instanceof DistributionException) {
         throw (DistributionException) e;
       } else {
         throw new DistributionException(e);
       }
     }
-
   }
 
   /**
@@ -340,7 +341,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
       switch (op) {
         case Distribute:
           Boolean checkAvailability = Boolean.parseBoolean(arguments.get(3));
-          MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, elementId, checkAvailability);
+          MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, elementId,
+                  checkAvailability);
           return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
         case Retract:
           MediaPackageElement retractedElement = retractElement(channelId, mediapackage, elementId);
@@ -359,7 +361,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * Gets the destination file to copy the contents of a mediapackage element.
-   *
+   * 
    * @return The file to copy the content to
    */
   protected File getDistributionFile(String channelId, MediaPackage mp, MediaPackageElement element) {
@@ -368,23 +370,21 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
     if (uriString.startsWith(serviceUrl)) {
       String[] splitUrl = uriString.substring(serviceUrl.length() + 1).split("/");
       if (splitUrl.length < 4) {
-        logger.warn(format("Malformed URI %s. Must be of format .../{channelId}/{mediapackageId}/{elementId}/{fileName}."
-                                   + " Trying URI without channelId", uriString));
+        logger.warn(format(
+                "Malformed URI %s. Must be of format .../{channelId}/{mediapackageId}/{elementId}/{fileName}."
+                        + " Trying URI without channelId", uriString));
         return new File(path(directoryName, splitUrl[0], splitUrl[1], splitUrl[2]));
       } else {
         return new File(path(directoryName, splitUrl[0], splitUrl[1], splitUrl[2], splitUrl[3]));
       }
     }
-    return new File(path(directoryName,
-                         channelId,
-                         mp.getIdentifier().compact(),
-                         element.getIdentifier(),
-                         FilenameUtils.getName(uriString)));
+    return new File(path(directoryName, channelId, mp.getIdentifier().compact(), element.getIdentifier(),
+            FilenameUtils.getName(uriString)));
   }
 
   /**
    * Gets the directory containing the distributed files for this mediapackage.
-   *
+   * 
    * @return the filesystem directory
    */
   protected File getMediaPackageDirectory(String channelId, MediaPackage mp) {
