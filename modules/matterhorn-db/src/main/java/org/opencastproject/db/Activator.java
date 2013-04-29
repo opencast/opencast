@@ -94,6 +94,7 @@ public class Activator implements BundleActivator {
 
     Connection connection = null;
     try {
+      logger.info("Testing connectivity to database at {}", jdbcUrl);
       connection = pooledDataSource.getConnection();
       datasourceRegistration = bundleContext.registerService(DataSource.class.getName(), pooledDataSource, null);
     } catch (SQLException e) {
@@ -125,6 +126,8 @@ public class Activator implements BundleActivator {
     // Listen for bundles with persistence units restarting
     jpaClientBundleListener = new JpaClientBundleListener();
     bundleContext.addBundleListener(jpaClientBundleListener);
+    
+    logger.info("Database connection pool established at {}", jdbcUrl);
   }
 
   /**

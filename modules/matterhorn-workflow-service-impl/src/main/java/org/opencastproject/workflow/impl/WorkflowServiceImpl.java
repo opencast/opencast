@@ -410,9 +410,14 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     } catch (InvalidSyntaxException e) {
       throw new IllegalStateException(e);
     }
-    for (ServiceReference ref : refs) {
-      WorkflowOperationHandler handler = (WorkflowOperationHandler) componentContext.getBundleContext().getService(ref);
-      set.add(new HandlerRegistration((String) ref.getProperty(WORKFLOW_OPERATION_PROPERTY), handler));
+    if (refs != null) {
+      for (ServiceReference ref : refs) {
+        WorkflowOperationHandler handler = (WorkflowOperationHandler) componentContext.getBundleContext().getService(
+                ref);
+        set.add(new HandlerRegistration((String) ref.getProperty(WORKFLOW_OPERATION_PROPERTY), handler));
+      }
+    } else {
+      logger.warn("No registered workflow operation handlers found");
     }
     return set;
   }
