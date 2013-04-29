@@ -1660,6 +1660,11 @@ var ocScheduler = (function() {
     }
     this.dublinCore.components = dcComps;
     this.components = compositeComps;
+    if (this.capture.components.resources){
+	if (this.capture.components.resources.getValue() != null && this.capture.components.resources.getValue() != '') {
+            agentComps = this.capture.components;
+	}
+    }
     this.capture.components = agentComps;
     if(typeof ocWorkflowPanel != 'undefined') {
       ocWorkflowPanel.registerComponents(ocScheduler.capture.components);
