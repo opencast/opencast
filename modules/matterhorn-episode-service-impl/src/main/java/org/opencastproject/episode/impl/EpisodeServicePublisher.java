@@ -89,9 +89,6 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
   /** File system element store JMX type */
   private static final String JMX_ELEMENT_STORE_TYPE = "ElementStore";
 
-  /** The JMX file system element store bean */
-  private ElementStoreBean elementStoreBean;
-
   /** The JMX bean object instance */
   private ObjectInstance registeredMXBean;
 
@@ -224,11 +221,13 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
                                             orgDirectory,
                                             serviceRegistry,
                                             workflowService,
+                                            workspace,
                                             mediaInspectionSvc,
                                             persistence,
                                             elementStore,
                                             systemUserName);
-    elementStoreBean = new ElementStoreBean(elementStore);
+    // the JMX file system element store bean
+    final ElementStoreBean elementStoreBean = new ElementStoreBean(elementStore);
     registeredMXBean = JmxUtil.registerMXBean(elementStoreBean, JMX_ELEMENT_STORE_TYPE);
     return tuple(list(registerService(cc, episodeService, EpisodeService.class, "Episode service")),
             (Effect0) new Effect0() {

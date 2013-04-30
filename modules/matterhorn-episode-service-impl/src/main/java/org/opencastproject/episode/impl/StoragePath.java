@@ -20,31 +20,31 @@ import org.opencastproject.util.EqualsUtil;
 
 import static org.opencastproject.util.EqualsUtil.eqObj;
 
-/** A vector that uniquely identifies a stored media package element. */
+/** A vector that uniquely identifies a stored media package asset. */
 public final class StoragePath {
   private final String mediaPackageId;
-  private final String mediaPackageElementId;
+  private final String assetId;
   private final String organizationId;
   private final Version version;
 
-  public StoragePath(String organizationId, String mediaPackageId, Version version, String mediaPackageElementId) {
+  public StoragePath(String organizationId, String mediaPackageId, Version version, String assetId) {
     this.mediaPackageId = mediaPackageId;
-    this.mediaPackageElementId = mediaPackageElementId;
+    this.assetId = assetId;
     this.organizationId = organizationId;
     this.version = version;
   }
 
   public static StoragePath spath(String organizationId, String mediaPackageId, Version version,
-                                  String mediaPackageElementId) {
-    return new StoragePath(organizationId, mediaPackageId, version, mediaPackageElementId);
+                                  String assetId) {
+    return new StoragePath(organizationId, mediaPackageId, version, assetId);
   }
 
   public String getMediaPackageId() {
     return mediaPackageId;
   }
 
-  public String getMediaPackageElementId() {
-    return mediaPackageElementId;
+  public String getAssetId() {
+    return assetId;
   }
 
   public String getOrganizationId() {
@@ -62,21 +62,21 @@ public final class StoragePath {
 
   private boolean eqFields(StoragePath that) {
     return eqObj(this.mediaPackageId, that.mediaPackageId)
-            && eqObj(this.mediaPackageElementId, that.mediaPackageElementId)
+            && eqObj(this.assetId, that.assetId)
             && eqObj(this.organizationId, that.organizationId)
             && eqObj(this.version, that.version);
   }
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(mediaPackageId, mediaPackageElementId, organizationId, version);
+    return EqualsUtil.hash(mediaPackageId, assetId, organizationId, version);
   }
 
   @Override public String toString() {
     return "[StoragePath orgId=" + organizationId
             + " mpId=" + mediaPackageId
             + " version=" + version
-            + " mpeId=" + mediaPackageElementId
+            + " mpeId=" + assetId
             + "]";
   }
 }

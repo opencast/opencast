@@ -168,6 +168,11 @@ public class FileSystemElementStore implements ElementStore {
     });
   }
 
+  @Override
+  public boolean contains(StoragePath path) throws ElementStoreException {
+    return findStoragePathFile(path).isSome();
+  }
+
   /** @see org.opencastproject.episode.impl.elementstore.ElementStore#delete(DeletionSelector) */
   @Override
   public boolean delete(DeletionSelector sel) throws ElementStoreException {
@@ -240,8 +245,8 @@ public class FileSystemElementStore implements ElementStore {
             p.getOrganizationId(),
             p.getMediaPackageId(),
             p.getVersion().toString(),
-            extension.isSome() ? p.getMediaPackageElementId() + EXTENSION_SEPARATOR + extension.get() : p
-                    .getMediaPackageElementId());
+            extension.isSome() ? p.getAssetId() + EXTENSION_SEPARATOR + extension.get() : p
+                    .getAssetId());
   }
 
   /**
@@ -255,7 +260,7 @@ public class FileSystemElementStore implements ElementStore {
     final FilenameFilter filter = new FilenameFilter() {
       @Override
       public boolean accept(File dir, String name) {
-        return FilenameUtils.getBaseName(name).equals(storagePath.getMediaPackageElementId());
+        return FilenameUtils.getBaseName(name).equals(storagePath.getAssetId());
       }
     };
     final File containerDir = createFile(storagePath, none("")).getParentFile();
@@ -264,14 +269,12 @@ public class FileSystemElementStore implements ElementStore {
       public Option<File> apply(File[] files) {
         switch (files.length) {
           case 0:
-            logger.warn("Cannot find media package element " + storagePath.getMediaPackageElementId()
-                        + " in " + containerDir.getAbsolutePath());
             return none();
           case 1:
             return some(files[0]);
           default:
             throw new ElementStoreException("Storage path " + files[0].getParent()
-                    + "contains multiple files with the same element id!: " + storagePath.getMediaPackageElementId());
+                    + "contains multiple files with the same element id!: " + storagePath.getAssetId());
         }
       }
     });

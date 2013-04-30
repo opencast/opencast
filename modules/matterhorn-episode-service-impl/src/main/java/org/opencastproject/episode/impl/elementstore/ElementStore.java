@@ -42,6 +42,9 @@ public interface ElementStore extends StorageUsage {
   /** Get an input stream to a resource. */
   Option<InputStream> get(StoragePath path) throws ElementStoreException;
 
+  /** Check if a resource exists. */
+  boolean contains(StoragePath path) throws ElementStoreException;
+
   /**
    * Delete all selected resources.
    * 

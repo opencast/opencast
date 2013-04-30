@@ -16,6 +16,8 @@
 
 package org.opencastproject.util;
 
+import org.apache.commons.io.IOUtils;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -25,6 +27,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -171,13 +174,20 @@ public final class Checksum implements Serializable {
    *           if the file cannot be accessed
    */
   public static Checksum create(ChecksumType type, File file) throws IOException {
+    return create(type, new BufferedInputStream(new FileInputStream(file)));
+  }
+
+  /**
+   * Creates a checksum of type <code>type</code> from the given input stream.
+   * The stream gets closed afterwards.
+   */
+  public static Checksum create(ChecksumType type, InputStream is) throws IOException {
     MessageDigest checksum;
     try {
       checksum = MessageDigest.getInstance(type.getName());
     } catch (NoSuchAlgorithmException e) {
       throw new IllegalStateException("This system does not support checksums of type " + type.getName());
     }
-    BufferedInputStream is = new BufferedInputStream(new FileInputStream(file));
     try {
       byte[] bytes = new byte[1024];
       int len = 0;
@@ -185,9 +195,13 @@ public final class Checksum implements Serializable {
         checksum.update(bytes, 0, len);
       }
     } finally {
-      is.close();
+      IoSupport.closeQuietly(is);
     }
     return new Checksum(convertToHex(checksum.digest()), type);
   }
 
+  /** Create a checksum of type <code>type</code> for the given <code>string</code>. */
+  public static Checksum createFor(ChecksumType type, String string) throws IOException {
+    return create(type, IOUtils.toInputStream(string, "UTF-8"));
+  }
 }

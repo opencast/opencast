@@ -15,6 +15,7 @@
  */
 package org.opencastproject.episode.impl;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.opencastproject.episode.api.ArchivedMediaPackageElement;
 import org.opencastproject.episode.api.EpisodeQuery;
@@ -37,6 +38,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlUtil;
@@ -48,6 +50,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
@@ -59,6 +62,7 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
+import org.opencastproject.workspace.api.Workspace;
 import org.osgi.framework.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +75,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import static java.lang.String.format;
 import static org.opencastproject.episode.api.EpisodeQuery.query;
 import static org.opencastproject.episode.impl.PartialMediaPackage.partialMp;
 import static org.opencastproject.episode.impl.Protected.granted;
@@ -83,10 +89,10 @@ import static org.opencastproject.episode.impl.elementstore.Source.source;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.hasNoChecksum;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.isNotPublication;
 import static org.opencastproject.mediapackage.MediaPackageSupport.copy;
+import static org.opencastproject.mediapackage.MediaPackageSupport.getMediaPackageElementId;
 import static org.opencastproject.mediapackage.MediaPackageSupport.updateElement;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.JobUtil.waitForJob;
-import static org.opencastproject.util.data.Arrays.array;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Collections.mkString;
 import static org.opencastproject.util.data.Collections.nil;
@@ -108,15 +114,24 @@ public final class EpisodeServiceImpl implements EpisodeService {
   private final OrganizationDirectoryService orgDir;
   private final ServiceRegistry svcReg;
   private final WorkflowService workflowSvc;
+  private final Workspace workspace;
   private final EpisodeServiceDatabase persistence;
   private final ElementStore elementStore;
   private final MediaInspectionService mediaInspectionSvc;
   private final String systemUserName;
 
-  public EpisodeServiceImpl(SolrRequester solrRequester, SolrIndexManager solrIndex, SecurityService secSvc,
-          AuthorizationService authSvc, OrganizationDirectoryService orgDir, ServiceRegistry svcReg,
-          WorkflowService workflowSvc, MediaInspectionService mediaInspectionSvc, EpisodeServiceDatabase persistence,
-          ElementStore elementStore, String systemUserName) {
+  public EpisodeServiceImpl(SolrRequester solrRequester,
+                            SolrIndexManager solrIndex,
+                            SecurityService secSvc,
+                            AuthorizationService authSvc,
+                            OrganizationDirectoryService orgDir,
+                            ServiceRegistry svcReg,
+                            WorkflowService workflowSvc,
+                            Workspace workspace,
+                            MediaInspectionService mediaInspectionSvc,
+                            EpisodeServiceDatabase persistence,
+                            ElementStore elementStore,
+                            String systemUserName) {
     this.solrRequester = solrRequester;
     this.solrIndex = solrIndex;
     this.secSvc = secSvc;
@@ -124,6 +139,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
     this.orgDir = orgDir;
     this.svcReg = svcReg;
     this.workflowSvc = workflowSvc;
+    this.workspace = workspace;
     this.persistence = persistence;
     this.elementStore = elementStore;
     this.mediaInspectionSvc = mediaInspectionSvc;
@@ -161,7 +177,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
     // make sure they have a checksum
     enrichAssetChecksums(pmp);
     // download and archive elements
-    downloadAssets(pmp, version);
+    storeAssets(pmp, version);
     // store mediapackage in index
     /* todo: Url-rewritten mediapackages cannot be stored in solr since the solr index
          accesses metadata catalogs via StaticMetadataService which in turn uses the workspace to download
@@ -175,6 +191,9 @@ public final class EpisodeServiceImpl implements EpisodeService {
       logger.error("Could not store episode {}: {}", mpId, e);
       throw new EpisodeServiceException(e);
     }
+    // save manifest to element store
+    // this is done at the end after the media package element ids have been rewritten to neutral URNs
+    storeManifest(pmp, version);
   }
 
   // todo if the user is allowed to delete the whole set of versions is checked against the
@@ -325,7 +344,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
             latestVersion = latestEpisode.get().getVersion();
             maps.put(episodeId, latestVersion);
           }
-          boolean isLatestVersion = episode.getVersion().equals(latestVersion) ? true : false;
+          boolean isLatestVersion = episode.getVersion().equals(latestVersion);
 
           final Organization organization = orgDir.getOrganization(episode.getOrganization());
           secSvc.setOrganization(organization);
@@ -390,25 +409,56 @@ public final class EpisodeServiceImpl implements EpisodeService {
   }
 
   /** Store all assets of <code>mp</code> under the given version. */
-  private void downloadAssets(PartialMediaPackage pmp, final Version version)
+  private void storeAssets(final PartialMediaPackage pmp, final Version version)
           throws Exception {
     final String mpId = pmp.getMediaPackage().getIdentifier().toString();
     final String orgId = getOrgId();
     for (final MediaPackageElement e : pmp.getPartial()) {
-      logger.info("Archiving {} {} {}", array(e.getFlavor(), e.getMimeType(), e.getURI()));
-      findElementInVersions(e).fold(new Option.EMatch<StoragePath>() {
+      logger.info(format("Archiving %s %s %s", e.getFlavor(), e.getMimeType(), e.getURI()));
+      final StoragePath storagePath = spath(orgId, mpId, version, e.getIdentifier());
+      findAssetInVersions(e.getIdentifier(), e.getChecksum().toString()).fold(new Option.EMatch<StoragePath>() {
         @Override public void esome(StoragePath found) {
-          if (!elementStore.copy(found, spath(orgId, mpId, version, e.getIdentifier())))
-            throw new EpisodeServiceException("An element with checksum " + e.getChecksum().toString() + " has"
+          if (!elementStore.copy(found, storagePath))
+            throw new EpisodeServiceException("An asset with checksum " + e.getChecksum().toString() + " has"
                                                       + " already been archived but trying to copy or link asset " + found
                                                       + " failed");
         }
 
         @Override public void enone() {
-          elementStore.put(spath(orgId, mpId, version, e.getIdentifier()),
-                  source(e.getURI(), Option.some(e.getSize()), option(e.getMimeType())));
+          elementStore.put(storagePath, source(e.getURI(), Option.some(e.getSize()), option(e.getMimeType())));
         }
       });
+    }
+  }
+
+  private void storeManifest(final PartialMediaPackage pmp, final Version version) throws Exception {
+    final String mpId = pmp.getMediaPackage().getIdentifier().toString();
+    final String orgId = getOrgId();
+    // store the manifest.xml
+    // todo make use of checksums
+    logger.info(format("Archiving manifest of mediapackage %s", mpId));
+    final String manifestFileName = UUID.randomUUID().toString() + ".xml";
+    final URI manifestTmpUri = workspace.putInCollection(
+            "episode-service",
+            manifestFileName,
+            IOUtils.toInputStream(MediaPackageParser.getAsXml(pmp.getMediaPackage()), "UTF-8"));
+    elementStore.put(spath(orgId, mpId, version, manifestAssetId(pmp, "manifest")),
+                     source(manifestTmpUri, Option.<Long>none(), Option.some(MimeTypes.XML)));
+    workspace.deleteFromCollection("episode-service", manifestFileName);
+  }
+
+  /**
+   * Create a unique id for the manifest xml. This is to avoid an id collision in
+   * the rare case that the mediapackage contains an XML element with the id used for the manifest.
+   * A UUID could also be used but this is far less readable.
+   *
+   * @param seedId the id to start with
+   */
+  private String manifestAssetId(PartialMediaPackage pmp, String seedId) {
+    if (mlist(pmp.getPartial()).map(getMediaPackageElementId).value().contains(seedId)) {
+      return manifestAssetId(pmp, seedId + "_");
+    } else {
+      return seedId;
     }
   }
 
@@ -417,11 +467,11 @@ public final class EpisodeServiceImpl implements EpisodeService {
   }
 
   /** Check if element <code>e</code> is already part of the history. */
-  private Option<StoragePath> findElementInVersions(final MediaPackageElement e) throws Exception {
-    return persistence.findAssetByChecksum(e.getChecksum().toString()).map(new Function<Asset, StoragePath>() {
+  private Option<StoragePath> findAssetInVersions(final String assetId, final String checksum) throws Exception {
+    return persistence.findAssetByChecksum(checksum).map(new Function<Asset, StoragePath>() {
       @Override
       public StoragePath apply(Asset asset) {
-        logger.info("Content of {} with checksum {} has been archived before", e.getIdentifier(), e.getChecksum());
+        logger.info("Content of {} with checksum {} has been archived before", assetId, checksum);
         return asset.getStoragePath();
       }
     });

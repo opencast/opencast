@@ -275,6 +275,7 @@ public final class EpisodeServiceTestEnv {
                                      orgDirectory,
                                      serviceRegistry,
                                      null,
+                                     workspace,
                                      mediaInspectionService,
                                      episodeDatabase,
                                      elementStore,
