@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-ocUsers = ocUsers || {};
+var ocUsers = ocUsers || {};
 ocUsers.users = [];
 
 ocUsers.init = function () {
