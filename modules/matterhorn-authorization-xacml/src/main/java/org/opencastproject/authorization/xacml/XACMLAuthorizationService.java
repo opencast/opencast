@@ -27,6 +27,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
@@ -85,6 +86,9 @@ public class XACMLAuthorizationService implements AuthorizationService {
   /** The security service */
   protected SecurityService securityService;
 
+  /** The series service */
+  protected SeriesService seriesService;
+
   /**
    * {@inheritDoc}
    * 
@@ -104,13 +108,20 @@ public class XACMLAuthorizationService implements AuthorizationService {
       if (xacmlAttachments.length == 0) {
         logger.debug("No XACML attachment found in {}", mediapackage);
 
-        // TODO: We need a configuration option for open vs. closed by default
-        if (StringUtils.isBlank(mediapackage.getSeries())) {
-          // Right now, rights management is based on series. Here we make sure that
-          // objects not belonging to a series are world readable
-          String anonymousRole = securityService.getOrganization().getAnonymousRole();
-          acl.add(new AccessControlEntry(anonymousRole, READ_PERMISSION, true));
+        if (StringUtils.isNotBlank(mediapackage.getSeries())) {
+          logger.info("Falling back to using default acl from series");
+          try {
+            return seriesService.getSeriesAccessControl(mediapackage.getSeries());
+          } catch (Exception e) {
+            logger.warn("Unable to get default acl from series '{}': {}", mediapackage.getSeries(), e.getMessage());
+          }
         }
+
+        // TODO: We need a configuration option for open vs. closed by default
+        // Right now, rights management is based on series. Here we make sure that
+        // objects not belonging to a series are world readable
+        String anonymousRole = securityService.getOrganization().getAnonymousRole();
+        acl.add(new AccessControlEntry(anonymousRole, READ_PERMISSION, true));
         return accessControlList;
       } else if (xacmlAttachments.length > 1) {
         // try to find the source policy. Some may be copies sent to distribution channels.
@@ -397,6 +408,16 @@ public class XACMLAuthorizationService implements AuthorizationService {
    */
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * Declarative services callback to set the series service.
+   * 
+   * @param seriesService
+   *          the series service
+   */
+  protected void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
   }
 
 }
