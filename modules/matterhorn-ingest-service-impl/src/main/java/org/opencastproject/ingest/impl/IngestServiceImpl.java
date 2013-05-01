@@ -54,7 +54,7 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workspace.api.Workspace;
+import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -128,8 +128,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The workflow service */
   private WorkflowService workflowService;
 
-  /** The workspace */
-  private Workspace workspace;
+  /** The working file repository */
+  private WorkingFileRepository workingFileRepository;
 
   /** The http client */
   private TrustedHttpClient httpClient;
@@ -301,9 +301,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           } else {
             logger.info("Storing zip entry {} in working file repository collection '{}'",
                     job.getId() + entry.getName(), wfrCollectionId);
-            URI contentUri = workspace
-                    .putInCollection(wfrCollectionId, FilenameUtils.getName(entry.getName()),
-                            new ZipEntryInputStream(zis, entry.getSize()));
+            URI contentUri = workingFileRepository.putInCollection(wfrCollectionId,
+                    FilenameUtils.getName(entry.getName()), new ZipEntryInputStream(zis, entry.getSize()));
             uris.put(FilenameUtils.getName(entry.getName()), contentUri);
             ingestStatistics.add(entry.getSize());
             logger.info("Zip entry {} stored at {}", job.getId() + entry.getName(), contentUri);
@@ -341,7 +340,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         URI uri = uris.get(FilenameUtils.getName(element.getURI().toString()));
         if (uri == null)
           throw new IngestException("Unable to map element name '" + element.getURI() + "' to workspace uri");
-        logger.info("Ingested mediapackage element {}/{} is located at {}", new Object[] { mediaPackageId, element.getIdentifier(), uri });
+        logger.info("Ingested mediapackage element {}/{} is located at {}",
+                new Object[] { mediaPackageId, element.getIdentifier(), uri });
         element.setURI(uri);
 
         // TODO: This should be triggered somehow instead of being handled here
@@ -1035,11 +1035,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   public void discardMediaPackage(MediaPackage mp) throws IOException {
     String mediaPackageId = mp.getIdentifier().compact();
     for (MediaPackageElement element : mp.getElements()) {
-      try {
-        workspace.delete(mediaPackageId, element.getIdentifier());
-      } catch (NotFoundException e) {
-        logger.warn("Unable to find (and hence, delete), this mediapackage element", e);
-      }
+      if (!workingFileRepository.delete(mediaPackageId, element.getIdentifier()))
+        logger.warn("Unable to find (and hence, delete), this mediapackage element");
     }
   }
 
@@ -1075,7 +1072,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         ingestStatistics.add(totalNumBytesRead - oldTotalNumBytesRead);
       }
     });
-    return workspace.put(mp.getIdentifier().compact(), elementId, filename, progressInputStream);
+    return workingFileRepository.put(mp.getIdentifier().compact(), elementId, filename, progressInputStream);
   }
 
   private MediaPackage addContentToMediaPackage(MediaPackage mp, String elementId, URI uri,
@@ -1093,8 +1090,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     this.workflowService = workflowService;
   }
 
-  public void setWorkspace(Workspace workspace) {
-    this.workspace = workspace;
+  public void setWorkingFileRepository(WorkingFileRepository workingFileRepository) {
+    this.workingFileRepository = workingFileRepository;
   }
 
   public void setSeriesService(SeriesService seriesService) {

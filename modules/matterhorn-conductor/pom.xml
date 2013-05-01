@@ -73,6 +73,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-working-file-repository-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-workspace-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -214,6 +219,7 @@
               OSGI-INF/operations/failing.xml,
               OSGI-INF/operations/image.xml,
               OSGI-INF/operations/ingest.xml,
+              OSGI-INF/operations/ingest-download.xml,
               OSGI-INF/operations/inspect.xml,
               OSGI-INF/operations/prepare-av.xml,
               OSGI-INF/operations/republish.xml,
@@ -227,8 +233,7 @@
               OSGI-INF/operations/tag.xml,
               OSGI-INF/operations/trim.xml,
               OSGI-INF/operations/zip.xml,
-              OSGI-INF/operations/watermark.xml,
-              <!-- OSGI-INF/operations/distribute-itunesu.xml -->
+              OSGI-INF/operations/watermark.xml
             </Service-Component>
           </instructions>
         </configuration>

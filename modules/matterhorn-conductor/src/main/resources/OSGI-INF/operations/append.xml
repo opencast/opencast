@@ -11,5 +11,7 @@
   
   <reference cardinality="1..1" interface="org.opencastproject.workflow.api.WorkflowService"
     name="Workspace" policy="static" bind="setWorkflowService"/>
+  <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    policy="static" bind="setServiceRegistry" />
 
 </scr:component>

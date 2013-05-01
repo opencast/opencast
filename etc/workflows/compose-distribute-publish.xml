@@ -490,6 +490,7 @@
       description="Cleaning up">
       <configurations>
         <configuration key="preserve-flavors"></configuration>
+        <configuration key="delete-external">true</configuration>
       </configurations>
     </operation>
   </operations>
