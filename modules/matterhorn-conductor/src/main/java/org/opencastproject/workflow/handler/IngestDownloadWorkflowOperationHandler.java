@@ -116,22 +116,7 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
 
     String baseUrl = workspace.getBaseUri().toString();
 
-    // Find all external working file repository base Urls
-    List<String> externalWfrBaseUrls = new ArrayList<String>();
-    if (deleteExternal) {
-      try {
-        for (ServiceRegistration reg : serviceRegistry
-                .getServiceRegistrationsByType(WorkingFileRepository.SERVICE_TYPE)) {
-          if (baseUrl.startsWith(reg.getHost()))
-            continue;
-          externalWfrBaseUrls.add(UrlSupport.concat(reg.getHost(), reg.getPath()));
-        }
-      } catch (ServiceRegistryException e) {
-        logger.error("Unable to load WFR services from service registry: {}", e.getMessage());
-        throw new WorkflowOperationException(e);
-      }
-    }
-
+    List<URI> externalUris = new ArrayList<URI>();
     for (MediaPackageElement element : mediaPackage.getElements()) {
       if (element.getURI() == null)
         continue;
@@ -139,6 +124,9 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
       String elementUri = element.getURI().toString();
       if (elementUri.startsWith(baseUrl))
         continue;
+
+      // Store origianl URI for deletion
+      externalUris.add(element.getURI());
 
       // Download the external URI
       File file;
@@ -162,9 +150,27 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
       } finally {
         IOUtils.closeQuietly(in);
       }
+    }
 
-      if (!deleteExternal)
-        continue;
+    if (!deleteExternal)
+      return createResult(mediaPackage, Action.CONTINUE);
+
+    // Find all external working file repository base Urls
+    List<String> externalWfrBaseUrls = new ArrayList<String>();
+    try {
+      for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByType(WorkingFileRepository.SERVICE_TYPE)) {
+        if (baseUrl.startsWith(reg.getHost()))
+          continue;
+        externalWfrBaseUrls.add(UrlSupport.concat(reg.getHost(), reg.getPath()));
+      }
+    } catch (ServiceRegistryException e) {
+      logger.error("Unable to load WFR services from service registry: {}", e.getMessage());
+      throw new WorkflowOperationException(e);
+    }
+
+    for (URI uri : externalUris) {
+
+      String elementUri = uri.toString();
 
       // Delete external working file repository URI's
       String wfrBaseUrl = null;
@@ -174,8 +180,11 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
           break;
         }
       }
-      if (wfrBaseUrl == null)
+
+      if (wfrBaseUrl == null) {
+        logger.info("Unable to delete external URI {}, no working file repository found", elementUri);
         continue;
+      }
 
       HttpDelete delete;
       if (elementUri.startsWith(UrlSupport.concat(wfrBaseUrl, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX))) {
@@ -184,7 +193,7 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
       } else if (elementUri.startsWith(UrlSupport.concat(wfrBaseUrl, WorkingFileRepository.COLLECTION_PATH_PREFIX))) {
         delete = new HttpDelete(elementUri);
       } else {
-        logger.info("Unable to handle URI {}", elementUri);
+        logger.info("Unable to handle working file repository URI {}", elementUri);
         continue;
       }
 
