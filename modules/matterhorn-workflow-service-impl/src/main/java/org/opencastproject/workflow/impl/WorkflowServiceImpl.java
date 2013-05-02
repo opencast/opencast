@@ -1682,6 +1682,9 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       } catch (IndexOutOfBoundsException e) {
         throw new ServiceRegistryException("This argument list for operation '" + op + "' does not meet expectations",
                 e);
+      } catch (NotFoundException e) {
+        logger.warn(e.getMessage());
+        updateOperationJob(job.getId(), OperationState.FAILED);
       }
       return null;
     } catch (Exception e) {
