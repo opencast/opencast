@@ -33,7 +33,7 @@ import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workspace.api.Workspace;
+import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import junit.framework.Assert;
 
@@ -63,7 +63,7 @@ public class IngestServiceImplTest {
   private IngestServiceImpl service = null;
   private WorkflowService workflowService = null;
   private WorkflowInstance workflowInstance = null;
-  private Workspace workspace = null;
+  private WorkingFileRepository wfr = null;
   private static URI baseDir;
   private static URI urlTrack;
   private static URI urlTrack1;
@@ -104,73 +104,55 @@ public class IngestServiceImplTest {
     FileUtils.forceMkdir(ingestTempDir);
 
     // set up service and mock workspace
-    workspace = EasyMock.createNiceMock(Workspace.class);
+    wfr = EasyMock.createNiceMock(WorkingFileRepository.class);
     EasyMock.expect(
-            workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlTrack);
     EasyMock.expect(
-            workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlCatalog);
     EasyMock.expect(
-            workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlAttachment);
     EasyMock.expect(
-            workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlTrack1);
     EasyMock.expect(
-            workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlTrack2);
     EasyMock.expect(
-            workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlCatalog1);
     EasyMock.expect(
-            workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlCatalog2);
     EasyMock.expect(
-            workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlCatalog);
 
     EasyMock.expect(
-            workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlTrack1);
     EasyMock.expect(
-            workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlTrack2);
     EasyMock.expect(
-            workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlCatalog1);
     EasyMock.expect(
-            workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlCatalog2);
     EasyMock.expect(
-            workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlCatalog);
 
     EasyMock.expect(
-            workspace.moveTo((URI) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (String) EasyMock.anyObject())).andReturn(urlTrack1);
-    EasyMock.expect(
-            workspace.moveTo((URI) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (String) EasyMock.anyObject())).andReturn(urlTrack2);
-    EasyMock.expect(
-            workspace.moveTo((URI) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (String) EasyMock.anyObject())).andReturn(urlCatalog1);
-    EasyMock.expect(
-            workspace.moveTo((URI) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (String) EasyMock.anyObject())).andReturn(urlCatalog2);
-    EasyMock.expect(
-            workspace.moveTo((URI) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (String) EasyMock.anyObject())).andReturn(urlCatalog);
-
-    EasyMock.expect(
-            workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlPackage);
 
     EasyMock.expect(
-            workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(urlPackageOld);
-
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(packageFile).anyTimes();
 
     workflowInstance = EasyMock.createNiceMock(WorkflowInstance.class);
     EasyMock.expect(workflowInstance.getId()).andReturn(workflowInstanceID);
@@ -200,7 +182,7 @@ public class IngestServiceImplTest {
     EasyMock.expect(schedulerService.getEventDublinCore(EasyMock.anyLong()))
             .andReturn(new DublinCoreCatalogImpl(urlCatalog1.toURL().openStream())).anyTimes();
 
-    EasyMock.replay(workspace, workflowInstance, workflowService, schedulerService);
+    EasyMock.replay(wfr, workflowInstance, workflowService, schedulerService);
 
     User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
             new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
@@ -241,7 +223,7 @@ public class IngestServiceImplTest {
 
     service = new IngestServiceImpl();
     service.setHttpClient(httpClient);
-    service.setWorkspace(workspace);
+    service.setWorkingFileRepository(wfr);
     service.setWorkflowService(workflowService);
     service.setSchedulerService(schedulerService);
     ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,

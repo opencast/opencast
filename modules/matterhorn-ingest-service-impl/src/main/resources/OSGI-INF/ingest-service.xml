@@ -10,8 +10,8 @@
   </service>
   <reference name="workflowService" interface="org.opencastproject.workflow.api.WorkflowService"
     cardinality="1..1" policy="static" bind="setWorkflowService" />
-  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
-    cardinality="1..1" policy="static" bind="setWorkspace" />
+  <reference name="workspace" interface="org.opencastproject.workingfilerepository.api.WorkingFileRepository"
+    cardinality="1..1" policy="static" bind="setWorkingFileRepository" />
   <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
     cardinality="1..1" policy="static" bind="setHttpClient" />
   <reference name="dc" interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"

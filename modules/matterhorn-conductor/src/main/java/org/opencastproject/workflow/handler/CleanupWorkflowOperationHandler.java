@@ -19,14 +19,24 @@ import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.security.api.TrustedHttpClientException;
+import org.opencastproject.serviceregistry.api.ServiceRegistration;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpDelete;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +47,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
 
 /**
  * Removes all files in the working file repository for mediapackage elements that don't match one of the
@@ -51,6 +60,9 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /** The element flavors to maintain in the original mediapackage. All others will be removed */
   public static final String PRESERVE_FLAVOR_PROPERTY = "preserve-flavors";
 
+  /** Deleting external URI's config key */
+  public static final String DELETE_EXTERNAL = "delete-external";
+
   /** The configuration properties */
   protected SortedMap<String, String> configurationOptions = null;
 
@@ -59,8 +71,8 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
    */
   protected Workspace workspace;
 
-  /** The thread pool */
-  protected ExecutorService executorService;
+  /** The http client to use when connecting to remote servers */
+  protected TrustedHttpClient client = null;
 
   /** The default no-arg constructor builds the configuration options set */
   public CleanupWorkflowOperationHandler() {
@@ -68,6 +80,8 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
     configurationOptions.put(PRESERVE_FLAVOR_PROPERTY,
             "The configuration key that specifies the flavors to preserve.  If not specified, this operation will not"
                     + "remove any files.");
+    configurationOptions.put(DELETE_EXTERNAL,
+            "Whether to try to delete external working file repository URIs. Default is false.");
   }
 
   /**
@@ -78,6 +92,16 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
+  }
+
+  /**
+   * Sets the trusted http client
+   * 
+   * @param client
+   *          the trusted http client
+   */
+  public void setTrustedHttpClient(TrustedHttpClient client) {
+    this.client = client;
   }
 
   /**
@@ -95,6 +119,8 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
     String flavors = currentOperation.getConfiguration(PRESERVE_FLAVOR_PROPERTY);
     final List<MediaPackageElementFlavor> flavorsToPreserve = new ArrayList<MediaPackageElementFlavor>();
 
+    boolean deleteExternal = BooleanUtils.toBoolean(currentOperation.getConfiguration(DELETE_EXTERNAL));
+
     // If the configuration does not specify flavors, remove them all
     for (String flavor : asList(flavors)) {
       flavorsToPreserve.add(MediaPackageElementFlavor.parseFlavor(flavor));
@@ -102,14 +128,73 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
     String baseUrl = workspace.getBaseUri().toString();
 
+    // Find all external working file repository base Urls
+    List<String> externalWfrBaseUrls = new ArrayList<String>();
+    if (deleteExternal) {
+      try {
+        for (ServiceRegistration reg : serviceRegistry
+                .getServiceRegistrationsByType(WorkingFileRepository.SERVICE_TYPE)) {
+          if (baseUrl.startsWith(reg.getHost()))
+            continue;
+          externalWfrBaseUrls.add(UrlSupport.concat(reg.getHost(), reg.getPath()));
+        }
+      } catch (ServiceRegistryException e) {
+        logger.error("Unable to load WFR services from service registry: {}", e.getMessage());
+        throw new WorkflowOperationException(e);
+      }
+    }
+
     // Some URIs are shared by multiple elements. If one of these elements should be deleted but another should not, we
     // must keep the file.
     Set<URI> urisToDelete = new HashSet<URI>();
     Set<URI> urisToKeep = new HashSet<URI>();
     for (MediaPackageElement element : mediaPackage.getElements()) {
-      if (element.getURI() == null || !element.getURI().toString().startsWith(baseUrl)) {
+      if (element.getURI() == null)
+        continue;
+
+      String elementUri = element.getURI().toString();
+      if (!elementUri.startsWith(baseUrl)) {
+        if (deleteExternal) {
+
+          String wfrBaseUrl = null;
+          for (String url : externalWfrBaseUrls) {
+            if (element.getURI().toString().startsWith(url)) {
+              wfrBaseUrl = url;
+              break;
+            }
+          }
+          if (wfrBaseUrl == null)
+            continue;
+
+          HttpDelete delete;
+          if (elementUri.startsWith(UrlSupport.concat(wfrBaseUrl, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX))) {
+            String wfrDeleteUrl = elementUri.substring(0, elementUri.lastIndexOf("/"));
+            delete = new HttpDelete(wfrDeleteUrl);
+          } else if (elementUri.startsWith(UrlSupport.concat(wfrBaseUrl, WorkingFileRepository.COLLECTION_PATH_PREFIX))) {
+            delete = new HttpDelete(elementUri);
+          } else {
+            logger.info("Unable to handle URI {}", elementUri);
+            continue;
+          }
+
+          try {
+            HttpResponse response = client.execute(delete);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode == HttpStatus.SC_NO_CONTENT || statusCode == HttpStatus.SC_OK) {
+              logger.info("Sucessfully deleted external URI {}", delete.getURI());
+            } else if (statusCode == HttpStatus.SC_NOT_FOUND) {
+              logger.info("External URI {} has already been deleted", delete.getURI());
+            } else {
+              logger.info("Unable to delete external URI {}, status code '{}' returned", delete.getURI(), statusCode);
+            }
+          } catch (TrustedHttpClientException e) {
+            logger.warn("Unable to execute DELETE request on external URI {}", delete.getURI());
+            throw new WorkflowOperationException(e);
+          }
+        }
         continue;
       }
+
       // remove the element if it doesn't match the flavors to preserve
       boolean remove = true;
       for (MediaPackageElementFlavor flavor : flavorsToPreserve) {
