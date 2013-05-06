@@ -617,14 +617,13 @@ ocUpload.Ingest = (function() {
     ocUtils.log('Uploading ' + filename.replace("C:\\fakepath\\", "") + ' (' + track.id + ')');
     ocUpload.UI.setProgress("Uploading " + filename.replace("C:\\fakepath\\", ""));
 
-    var checkBox = $('input.file-source-select:checked');
-    var checkBoxId = $(checkBox).attr('id');
+    var uploaderType = $uploader.contents().find('#uploader-type').val();
 
     // set flavor and mediapackage in upload form before submit
     $uploader.contents().find('#flavor').val(track.flavor);
     $uploader.contents().find('#mediapackage').val(MediaPackage.document);
     
-    if(checkBoxId == 'fileSourceSingleA') {
+    if(uploaderType == 'upload') {
     	track.id = createUploadJob($uploader);
     	track.flavor = $uploader.parent().find('input.track-flavor').val();
     	
@@ -641,7 +640,7 @@ ocUpload.Ingest = (function() {
     	
     	ocUpload.Listener.startProgressUpdate(track.id);
     }
-    else if(checkBoxId == 'fileSourceSingleB') {
+    else if(uploaderType == 'inbox') {
     	$uploader.contents().find('#uploadForm').submit();
     }
   }
