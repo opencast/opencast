@@ -15,6 +15,11 @@
  */
 package org.opencastproject.distribution.download.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.ws.rs.core.Response.status;
+import static org.opencastproject.util.RestUtil.R.ok;
+import static org.opencastproject.util.RestUtil.R.serverError;
+
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
@@ -28,6 +33,7 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +45,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.opencastproject.util.RestUtil.R.ok;
-import static org.opencastproject.util.RestUtil.R.serverError;
+import javax.ws.rs.core.Response.Status;
 
 /**
  * Rest endpoint for distributing media to the local distribution channel.
@@ -126,6 +129,9 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
       final MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       final Job job = service.distribute(channelId, mediapackage, elementId, checkAvailability);
       return ok(new JaxbJob(job));
+    } catch (IllegalArgumentException e) {
+      logger.debug("Unable to distribute element: {}", e.getMessage());
+      return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
       logger.warn("Error distributing element", e);
       return serverError();
@@ -160,6 +166,9 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
       final MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       final Job job = service.retract(channelId, mediapackage, elementId);
       return ok(new JaxbJob(job));
+    } catch (IllegalArgumentException e) {
+      logger.debug("Unable to retract element: {}", e.getMessage());
+      return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
       logger.warn("Unable to retract mediapackage '{}' from download channel: {}", new Object[] { mediaPackageXml, e });
       return serverError();
