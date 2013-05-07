@@ -217,7 +217,12 @@ public class MediaInfoAnalyzer extends CmdlineMediaAnalyzerSupport {
   }
 
   static Long convertDuration(String value) {
-    return new Long(value);
+    try {
+      return new Long(value);
+    } catch (NumberFormatException e) {
+      //I'm so, so sorry
+      return new Long(new Double(value).longValue());
+    }
   }
 
   static URL convertUrl(String value) throws MalformedURLException {

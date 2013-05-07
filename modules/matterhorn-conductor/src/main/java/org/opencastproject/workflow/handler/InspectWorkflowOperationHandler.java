@@ -64,7 +64,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
-  
+
   /** Option for rewriting existing metadata */
   private static final String OPT_OVERWRITE = "overwrite";
 
@@ -130,10 +130,10 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
     // Inspect the tracks
     long totalTimeInQueue = 0;
     long timeToExecute = 0;
-    
+
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     boolean rewrite = "true".equalsIgnoreCase(operation.getConfiguration(OPT_OVERWRITE));
-    
+
     for (Track track : mediaPackage.getTracks()) {
 
       logger.info("Inspecting track '{}' of {}", track.getIdentifier(), mediaPackage);
@@ -199,16 +199,14 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
       DublinCoreCatalog dublinCore = loadDublinCoreCatalog(dcCatalogs[0]);
 
       // Extent
-      if (!dublinCore.hasValue(DublinCore.PROPERTY_EXTENT)) {
+      if (mediaPackage.getDuration() != null && !dublinCore.hasValue(DublinCore.PROPERTY_EXTENT)) {
         DublinCoreValue extent = EncodingSchemeUtils.encodeDuration(mediaPackage.getDuration());
-        if (mediaPackage.getDuration() != null) {
-          dublinCore.set(DublinCore.PROPERTY_EXTENT, extent);
-          logger.debug("Setting dc:extent to '{}'", extent.getValue());
-        }
+        dublinCore.set(DublinCore.PROPERTY_EXTENT, extent);
+        logger.debug("Setting dc:extent to '{}'", extent.getValue());
       }
 
       // Date created
-      if (!dublinCore.hasValue(DublinCore.PROPERTY_CREATED)) {
+      if (mediaPackage.getDate() != null && !dublinCore.hasValue(DublinCore.PROPERTY_CREATED)) {
         DublinCoreValue date = EncodingSchemeUtils.encodeDate(mediaPackage.getDate(), Precision.Minute);
         dublinCore.set(DublinCore.PROPERTY_CREATED, date);
         logger.debug("Setting dc:date to '{}'", date.getValue());
