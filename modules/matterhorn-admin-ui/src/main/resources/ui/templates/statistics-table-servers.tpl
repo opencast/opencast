@@ -17,6 +17,7 @@
       <% $.each(server.services, function(key, service) { %>
       <tr valign="top">
         <td class="ui-state-active">
+          <img style="vertical-align:middle; margin-right:5px;" src=<% if (service.online) { %><% if (service.maintenance) { %>"/admin/img/icons/maintenance.png" title="Maintenance Mode"<% } else { %> "/admin/img/icons/available.png" title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/>
           <% if (service.state != "NORMAL") { %>
 		  <img style="vertical-align:middle; margin-right:5px;" src=<% if (service.state == "WARNING") { %>"/admin/img/icons/lightbulb.png" title="Warning State" <% } else { %> "/admin/img/icons/exclamation.png" title="Error State" <% } %>/>
 		  <a class="service-sanitize" title="Sanitize" style="vertical-align:middle; margin-right: 5px;" href="host=<%= server.host %>&serviceType=<%= service.type %>">Sanitize</a>

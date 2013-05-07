@@ -237,6 +237,8 @@ ocStatistics = new (function() {
       singleService.queued = serviceInstance.queued;
       duration = ocUtils.getDuration(serviceInstance.meanqueuetime);
       singleService.meanQueueTime = duration.substring(duration.indexOf(':')+1);
+      singleService.online = reg.online;
+      singleService.maintenance = reg.maintenance;
       singleService.state = reg.service_state;
       singleService.type = reg.type;
     });
