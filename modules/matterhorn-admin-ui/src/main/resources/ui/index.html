@@ -73,7 +73,7 @@
           <a href="#users" title="Users" id="i18n_tab_users">Users</a>
         </li>
         <li>
-          <a href="#statistics" title="Statistics" id="i18n_tab_statistics">Statistics</a>
+          <a href="#statistics" title="Statistics" id="i18n_tab_statistics">Statistics</a><span id="statistics_badge" class="badge"></span>
         </li>
         <li>
           <a href="#metrics" title="Metrics" id="i18n_tab_metrics">Metrics</a>
@@ -85,6 +85,9 @@
       $.ajaxSetup({
         cache: false
       });
+      
+      var STATISTICS_DELAY = 30000;    // time interval for statistics update (all 30 seconds)
+
       var defaultPath = "/recordings", // the path to use when the base page directory is requested
           meJsonUrl = "/info/me.json", // path to the RuntimeInfo REST endpoint
           linkSelector = "#tabsWrapper ul:first a",
@@ -246,6 +249,32 @@
         });
         return $html;
       }
+      
+      /** Load the service statistics from the endpoint
+       */
+      function updateServiceStatisticsBadge() {
+        var url = '/services/statistics.json';
+        $.ajax(
+        {
+          url: url,
+          dataType: 'json',
+          success: function (data)
+          {
+            var servicesInWarningState = 0;
+            var badge = $('#statistics_badge');
+            $.each(data.statistics.service, function(index, serviceInstance) {
+         		if (serviceInstance.serviceRegistration.service_state != 'NORMAL') {
+                  servicesInWarningState ++;
+         		}
+            });
+            if (servicesInWarningState > 0) {
+                badge.html(servicesInWarningState);
+            } else {
+          	  badge.empty();
+            }
+          }
+        });
+      }
 
       /** DOM ready
        */
@@ -295,6 +324,11 @@
             })
             .history(true);
       });
+
+      // Start polling of the service statistics
+      updateServiceStatisticsBadge();
+      window.setInterval(updateServiceStatisticsBadge, STATISTICS_DELAY);
+
     </script>
   </head>
   <body>

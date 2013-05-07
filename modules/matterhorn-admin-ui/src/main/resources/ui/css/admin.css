@@ -259,3 +259,37 @@ a.secondaryButton:hover, a.secondaryButton:focus {
   top: -10000px;
   display: block !important;  
 }
+
+/* Badges */
+
+
+.badge {
+ display: inline-block;
+ padding: 2px 4px;
+ font-size: 10px;
+ font-weight: bold;
+ line-height: 12px;
+ color: #ffffff;
+ vertical-align: baseline;
+ white-space: nowrap;
+ text-shadow: 0 -1px 0 
+ rgba(0, 0, 0, 0.25);
+ background-color: #b94a48;
+ padding-left: 8px;
+ padding-right: 9px;
+ -webkit-border-radius: 9px;
+ -moz-border-radius: 9px;
+ border-radius: 9px;
+ margin: 2px 2px 0 -2px;
+}
+
+.badge:empty {
+ display: none;
+}
+
+a.badge:hover,
+a.badge:focus {
+ color: #ffffff;
+ text-decoration: none;
+ cursor: pointer;
+}
