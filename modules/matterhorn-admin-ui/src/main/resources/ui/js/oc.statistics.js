@@ -62,7 +62,7 @@ ocStatistics = new (function() {
 
     // default configuration
     this.state = 'servers';
-    this.refresh = 5000;
+    this.refresh = 5;
     this.doRefresh = 'true';
     this.sortField = null;
     this.sortOrder = null;
@@ -343,6 +343,7 @@ ocStatistics = new (function() {
 	  $('#refreshInterval').attr('disabled', 'true');
 	  $('#refreshControlsContainer span').css('color', 'silver');
 	}
+
 	$('#refreshInterval').val(ocStatistics.Configuration.refresh);
 	  
 	// attatch event handlers
@@ -356,6 +357,7 @@ ocStatistics = new (function() {
 	  }
 	  ocStatistics.updateRefreshInterval($(this).is(':checked'), $('#refreshInterval').val());
 	});
+
 	$('#refreshInterval').change(function() {
 	  ocStatistics.updateRefreshInterval($('#refreshEnabled').is(':checked'), $(this).val());
 	});
