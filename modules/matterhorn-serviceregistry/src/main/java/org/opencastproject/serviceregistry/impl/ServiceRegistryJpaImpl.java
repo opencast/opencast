@@ -100,10 +100,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Id of the workflow start operation, need to match the corresponding enum value in WorkflowServiceImpl */
   public static final String START_WORKFLOW = "START_WORKFLOW";
 
+  /** Identifier for the workflow service */
+  public static final String TYPE_WORKFLOW = "org.opencastproject.workflow";
+
   static final Logger logger = LoggerFactory.getLogger(ServiceRegistryJpaImpl.class);
 
   /** The list of registered JMX beans */
-  private List<ObjectInstance> jmxBeans = new ArrayList<ObjectInstance>();
+  protected List<ObjectInstance> jmxBeans = new ArrayList<ObjectInstance>();
 
   /** Hosts statistics JMX type */
   private static final String JMX_HOSTS_STATISTICS_TYPE = "HostsStatistics";
@@ -1214,21 +1217,30 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * Gets all host registrations
    * 
-   * @param em
-   *          the current entity manager
    * @return the list of host registrations
    */
   @Override
-  @SuppressWarnings("unchecked")
   public List<HostRegistration> getHostRegistrations() {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      return em.createNamedQuery("HostRegistration.getAll").getResultList();
+      return getHostRegistrations(em);
     } finally {
       if (em != null)
         em.close();
     }
+  }
+
+  /**
+   * Gets all host registrations
+   * 
+   * @param em
+   *          the current entity manager
+   * @return the list of host registrations
+   */
+  @SuppressWarnings("unchecked")
+  protected List<HostRegistration> getHostRegistrations(EntityManager em) {
+    return em.createNamedQuery("HostRegistration.getAll").getResultList();
   }
 
   /**
@@ -1560,8 +1572,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     try {
       em = emf.createEntityManager();
       Map<String, Integer> loadByHost = getHostLoads(em, true);
+      List<HostRegistration> hostRegistrations = getHostRegistrations();
       List<ServiceRegistration> serviceRegistrations = getServiceRegistrationsByType(serviceType);
-      return filterAndSortServiceRegistrations(serviceRegistrations, serviceType, loadByHost);
+      return getServiceRegistrationsByLoad(serviceType, serviceRegistrations, hostRegistrations, loadByHost);
     } finally {
       if (em != null)
         em.close();
@@ -1595,6 +1608,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     for (Object result : q.getResultList()) {
       Object[] resultArray = (Object[]) result;
       ServiceRegistrationJpaImpl service = (ServiceRegistrationJpaImpl) resultArray[0];
+
+      // Workflow related jobs are not counting. Workflows are load balanced by the workflow service directly
+      if (TYPE_WORKFLOW.equals(service.getServiceType()))
+        continue;
+
       Job.Status status = (Status) resultArray[1];
       int count = ((Number) resultArray[2]).intValue();
 
@@ -1802,7 +1820,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           throws ServiceRegistryException {
 
     if (services.size() == 0) {
-      logger.debug("No service is available to handle jobs of type '" + job.getJobType() + "'");
+      logger.debug("No service is currently available to handle jobs of type '" + job.getJobType() + "'");
       return null;
     }
 
@@ -2168,47 +2186,99 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Returns a filtered list of service registrations, containing only those that are online, not in maintenance mode,
+   * and with a specific service type that are running on a host which is not already maxed out.
+   * 
+   * @param serviceRegistrations
+   *          the complete list of service registrations
+   * @param hostRegistrations
+   *          the complete list of host registrations
+   * @param loadByHost
+   *          the map of hosts to the number of running jobs
+   * @param job
+   *          the job which for the services registrations are filtered
+   */
+  protected List<ServiceRegistration> getServiceRegistrationsWithCapacity(String jobType,
+          List<ServiceRegistration> serviceRegistrations, List<HostRegistration> hostRegistrations,
+          final Map<String, Integer> loadByHost) {
+
+    List<ServiceRegistration> filteredList = new ArrayList<ServiceRegistration>();
+
+    for (ServiceRegistration service : serviceRegistrations) {
+
+      // We are only interested in specific types of services
+      if (!jobType.equals(service.getServiceType()))
+        continue;
+
+      // Determine the maximum load for this host
+      Integer hostLoadMax = null;
+      for (HostRegistration host : hostRegistrations) {
+        if (host.getBaseUrl().equals(service.getHost())) {
+          hostLoadMax = host.getMaxJobs();
+          break;
+        }
+      }
+      if (hostLoadMax == null)
+        logger.warn("Unable to determine max load for host {}", service.getHost());
+
+      // Determine the current load for this host
+      Integer hostLoad = loadByHost.get(service.getHost());
+      if (hostLoad == null)
+        logger.warn("Unable to determine current load for host {}", service.getHost());
+
+      boolean canAcceptJobs = service.isOnline() && !service.isInMaintenanceMode()
+              && service.getServiceState() != ServiceState.ERROR;
+      boolean hasCapacity = hostLoad == null || hostLoadMax == null || hostLoad < hostLoadMax;
+
+      // Is this host suited for processing?
+      if (canAcceptJobs && hasCapacity) {
+        logger.trace("Adding candidate service for processing of jobs of type '{}'", jobType);
+        filteredList.add(service);
+      }
+    }
+
+    // Sort the list by capacity
+    Collections.sort(filteredList, new LoadComparator(loadByHost));
+
+    return filteredList;
+  }
+
+  /**
+   * Returns a filtered list of service registrations, containing only those that are online, not in maintenance mode,
    * and with a specific service type, ordered by load.
    * 
    * @param serviceRegistrations
-   *          the complete list of service registrations.
-   * @param job
-   *          the job which for the services registrations are filtered
+   *          the complete list of service registrations
+   * @param hostRegistrations
+   *          the complete list of host registrations
    * @param loadByHost
    *          the map of hosts to the number of running jobs
+   * @param job
+   *          the job which for the services registrations are filtered
    */
-  protected List<ServiceRegistration> filterAndSortServiceRegistrations(List<ServiceRegistration> serviceRegistrations,
-          String jobType, final Map<String, Integer> loadByHost) {
+  protected List<ServiceRegistration> getServiceRegistrationsByLoad(String jobType,
+          List<ServiceRegistration> serviceRegistrations, List<HostRegistration> hostRegistrations,
+          final Map<String, Integer> loadByHost) {
+
     List<ServiceRegistration> filteredList = new ArrayList<ServiceRegistration>();
 
-    for (ServiceRegistration reg : serviceRegistrations) {
+    for (ServiceRegistration service : serviceRegistrations) {
 
-      if (reg.isOnline() && !reg.isInMaintenanceMode() && jobType.equals(reg.getServiceType())
-              && reg.getServiceState() != ServiceState.ERROR) {
-        filteredList.add(reg);
+      // We are only interested in specific types of services
+      if (!jobType.equals(service.getServiceType()))
+        continue;
+
+      boolean canAcceptJobs = service.isOnline() && !service.isInMaintenanceMode()
+              && service.getServiceState() != ServiceState.ERROR;
+
+      // Is this host suited for processing?
+      if (canAcceptJobs) {
+        logger.trace("Adding candidate service for processing of jobs of type '{}'", jobType);
+        filteredList.add(service);
       }
     }
-    Comparator<ServiceRegistration> comparator = new Comparator<ServiceRegistration>() {
-      @Override
-      public int compare(ServiceRegistration reg1, ServiceRegistration reg2) {
-        String host1 = reg1.getHost();
-        String host2 = reg2.getHost();
-        int compare = loadByHost.get(reg1.getHost()) - loadByHost.get(host2);
 
-        // If host loads are equal prefer NORMAL service state
-        if (compare == 0) {
-          if (reg1.getServiceState() == reg2.getServiceState())
-            return compare;
-          else if (reg1.getServiceState() == ServiceState.NORMAL)
-            return 1;
-          else
-            return -1;
-        }
-        return loadByHost.get(host1) - loadByHost.get(host2);
-      }
-    };
-
-    Collections.sort(filteredList, comparator);
+    // Sort the list by capacity
+    Collections.sort(filteredList, new LoadComparator(loadByHost));
 
     return filteredList;
   }
@@ -2251,8 +2321,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       try {
         em = emf.createEntityManager();
         List<Job> jobsToDispatch = getDispatchableJobs(em);
-        Map<String, Integer> hostLoads = getHostLoads(em, true);
-        List<ServiceRegistration> serviceRegistrations = getServiceRegistrations(em);
         List<String> undispatchableJobTypes = new ArrayList<String>();
 
         jobsStatistics.updateAvg(getAvgOperations(em));
@@ -2260,10 +2328,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
         for (Job job : jobsToDispatch) {
 
+          // Remember the job type
+          String jobType = job.getJobType();
+
           // Skip jobs that we already know can't be dispatched
-          String jobSiganture = new StringBuilder(job.getJobType()).append('@').append(job.getOperation()).toString();
+          String jobSiganture = new StringBuilder(jobType).append('@').append(job.getOperation()).toString();
           if (undispatchableJobTypes.contains(jobSiganture)) {
-            logger.trace("Skipping dispatching of job {} with type '{}'", job.getId(), job.getJobType());
+            logger.trace("Skipping dispatching of job {} with type '{}'", job.getId(), jobType);
             continue;
           }
 
@@ -2291,8 +2362,33 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
           // Start dispatching
           try {
-            String hostAcceptingJob = dispatchJob(em, job,
-                    filterAndSortServiceRegistrations(serviceRegistrations, job.getJobType(), hostLoads));
+
+            Map<String, Integer> hostLoads = getHostLoads(em, true);
+            List<ServiceRegistration> services = getServiceRegistrations(em);
+            List<HostRegistration> hosts = getHostRegistrations(em);
+            List<ServiceRegistration> candidateServices = null;
+
+            // Depending on whether this running job is trying to reach out to other services or whether this is an
+            // attempt to execute the next operation in a workflow, choose either from a limited or from the full list
+            // of services
+            Job parentJob = null;
+            try {
+              parentJob = getJob(job.getParentJobId());
+            } catch (NotFoundException e) {
+              // That's ok
+            }
+
+            if (parentJob == null || TYPE_WORKFLOW.equals(jobType)) {
+              logger.trace("Using limited list of services for dispatching of {} to a service of type '{}'", job, jobType);
+              candidateServices = getServiceRegistrationsWithCapacity(jobType, services, hosts, hostLoads);
+            } else {
+              logger.trace("Using full list of services for dispatching of {} to a service of type '{}'", job, jobType);
+              candidateServices = getServiceRegistrationsByLoad(jobType, services, hosts, hostLoads);
+            }
+
+            // Try to dispatch the job
+            String hostAcceptingJob = dispatchJob(em, job, candidateServices);
+
             if (hostAcceptingJob == null) {
               undispatchableJobTypes.add(jobSiganture);
               ServiceRegistryJpaImpl.logger.debug("Job {} could not be dispatched and is put back into queue",
@@ -2407,6 +2503,44 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
 
       logger.debug("Finished checking for unresponsive services");
+    }
+
+  }
+
+  /**
+   * Comparator that will sort service registrations depending on their capacity, wich is defined by the number of jobs
+   * the service's host is already running. The lower that number, the bigger the capacity.
+   */
+  private static final class LoadComparator implements Comparator<ServiceRegistration> {
+
+    private Map<String, Integer> loadByHost = null;
+
+    /**
+     * Creates a new comparator which is using the given map of host names and loads.
+     * 
+     * @param loadByHost
+     *          the current work load by host
+     */
+    public LoadComparator(Map<String, Integer> loadByHost) {
+      this.loadByHost = loadByHost;
+    }
+
+    @Override
+    public int compare(ServiceRegistration serviceA, ServiceRegistration serviceB) {
+      String hostA = serviceA.getHost();
+      String hostB = serviceB.getHost();
+      int compare = loadByHost.get(serviceA.getHost()) - loadByHost.get(hostB);
+
+      // If host loads are equal prefer NORMAL service state
+      if (compare == 0) {
+        if (serviceA.getServiceState() == serviceB.getServiceState())
+          return compare;
+        else if (serviceA.getServiceState() == ServiceState.NORMAL)
+          return 1;
+        else
+          return -1;
+      }
+      return loadByHost.get(hostA) - loadByHost.get(hostB);
     }
 
   }

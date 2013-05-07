@@ -16,8 +16,10 @@
 package org.opencastproject.serviceregistry.impl;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.jmx.JmxUtil;
 
 import org.easymock.classextension.EasyMock;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
@@ -28,6 +30,7 @@ import org.osgi.service.component.ComponentContext;
 import java.util.ArrayList;
 import java.util.Map;
 
+import javax.management.ObjectInstance;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -60,7 +63,14 @@ public class ServiceRegistryJpaImplTest {
     // Setup test object.
     setUpServiceRegistryJpaImpl();
   }
-
+  
+  @After
+  public void tearDown() {
+    for (ObjectInstance mbean : serviceRegistryJpaImpl.jmxBeans) {
+      JmxUtil.unregisterMXBean(mbean);
+    }
+  }
+  
   public void setUpQuery() {
     query = EasyMock.createNiceMock(Query.class);
     EasyMock.expect(query.getSingleResult()).andReturn(new HostRegistrationJpaImpl("http://localhost:8080", 9, true, false));
