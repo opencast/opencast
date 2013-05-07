@@ -333,6 +333,7 @@ ocRecordings = new (function() {
     ocRecordings.refreshingStats = false;
     var stats = {
       all: 0,
+      instantiated:0,
       upcoming:0,
       capturing:0,
       processing:0,
@@ -351,7 +352,7 @@ ocRecordings = new (function() {
       }
     }
     
-    stats.all = stats.upcoming + stats.capturing + stats.processing + stats.finished + stats.failed + stats.hold;
+    stats.all = stats.instantiated + stats.upcoming + stats.capturing + stats.processing + stats.finished + stats.failed + stats.hold;
     if (ocRecordings.statistics != null
       && ocRecordings.statistics[ocRecordings.Configuration.state] != stats[ocRecordings.Configuration.state]) {
       refresh();
@@ -375,6 +376,7 @@ ocRecordings = new (function() {
         }
       });
     } else {
+      stats.instantiated += parseInt(definition.instantiated);
       stats.processing += parseInt(definition.running);
       stats.finished += parseInt(definition.finished);
       stats.hold += parseInt(definition.paused);
