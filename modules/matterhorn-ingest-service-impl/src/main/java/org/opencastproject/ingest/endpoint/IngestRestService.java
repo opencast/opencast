@@ -51,10 +51,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -108,18 +108,14 @@ public class IngestRestService {
   private String defaultWorkflowDefinitionId = null;
 
   /** Dublin Core Terms: http://purl.org/dc/terms/ */
-  private static List<String> dcterms = Arrays.asList("abstract", "accessRights",
-      "accrualMethod", "accrualPeriodicity", "accrualPolicy", "alternative",
-      "audience", "available", "bibliographicCitation", "conformsTo",
-      "contributor", "coverage", "created", "creator", "date",
-      "dateAccepted", "dateCopyrighted", "dateSubmitted", "description",
-      "educationLevel", "extent", "format", "hasFormat", "hasPart",
-      "hasVersion", "identifier", "instructionalMethod", "isFormatOf",
-      "isPartOf", "isReferencedBy", "isReplacedBy", "isRequiredBy", "issued",
-      "isVersionOf", "language", "license", "mediator", "medium", "modified",
-      "provenance", "publisher", "references", "relation", "replaces",
-      "requires", "rights", "rightsHolder", "source", "spatial", "subject",
-      "tableOfContents", "temporal", "title", "type", "valid");
+  private static List<String> dcterms = Arrays.asList("abstract", "accessRights", "accrualMethod",
+          "accrualPeriodicity", "accrualPolicy", "alternative", "audience", "available", "bibliographicCitation",
+          "conformsTo", "contributor", "coverage", "created", "creator", "date", "dateAccepted", "dateCopyrighted",
+          "dateSubmitted", "description", "educationLevel", "extent", "format", "hasFormat", "hasPart", "hasVersion",
+          "identifier", "instructionalMethod", "isFormatOf", "isPartOf", "isReferencedBy", "isReplacedBy",
+          "isRequiredBy", "issued", "isVersionOf", "language", "license", "mediator", "medium", "modified",
+          "provenance", "publisher", "references", "relation", "replaces", "requires", "rights", "rightsHolder",
+          "source", "spatial", "subject", "tableOfContents", "temporal", "title", "type", "valid");
 
   private MediaPackageBuilderFactory factory = null;
   private IngestService ingestService = null;
@@ -376,6 +372,7 @@ public class IngestRestService {
             }
           } else {
             // once the body gets read iter.hasNext must not be invoked or the stream can not be read
+            // MH-9579
             fileName = item.getName();
             in = item.openStream();
             isDone = true;
@@ -454,8 +451,13 @@ public class IngestRestService {
   @Produces(MediaType.TEXT_XML)
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addMediaPackage/{wdID}")
-  @RestQuery(name = "addMediaPackage", description = "Create media package from a media tracks and optional Dublin Core metadata fields", pathParameters = { @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, restParameters = {
-          @RestParameter(description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+  @RestQuery(name = "addMediaPackage", 
+      description = "Create and ingest media package from media tracks and optional Dublin Core metadata fields", 
+      pathParameters = { 
+          @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, 
+      restParameters = {
+          @RestParameter(description = "The kind of media track. This has to be specified in the request prior to each media track",
+              isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "abstract", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "accessRights", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "available", type = RestParameter.Type.STRING),
@@ -484,7 +486,9 @@ public class IngestRestService {
           @RestParameter(description = "Metadata value", isRequired = false, name = "temporal", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "title", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "type", type = RestParameter.Type.STRING), 
-          @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING), }, bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
+          @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING), },
+      bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), 
+      reponses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
@@ -493,7 +497,7 @@ public class IngestRestService {
     try {
       MediaPackage mp = ingestService.createMediaPackage();
       DublinCoreCatalog dcc = dublinCoreService.newInstance();
-      Map<String,String> workflowProperties = new HashMap<String, String>();
+      Map<String, String> workflowProperties = new HashMap<String, String>();
       if (ServletFileUpload.isMultipartContent(request)) {
         for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
@@ -512,6 +516,10 @@ public class IngestRestService {
               workflowProperties.put(fieldName, Streams.asString(item.openStream()));
             }
           } else {
+            if (flavor == null) {
+              /* A flavor has to be specified in the request prior the video file */
+              return Response.serverError().status(Status.BAD_REQUEST).build();
+            }
             ingestService.addTrack(item.openStream(), item.getName(), flavor, mp);
           }
         }
@@ -591,7 +599,7 @@ public class IngestRestService {
           } else {
             logger.debug("Processing file item");
             // once the body gets read iter.hasNext must not be invoked or the stream can not be read
-            // MH-XXXX
+            // MH-9579
             in = item.openStream();
             isDone = true;
           }
