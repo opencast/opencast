@@ -17,14 +17,6 @@ ocStatistics = new (function() {
   this.refreshingStats = false; // indicates if ajax requesting statistics data is in progress
   this.refreshInterval = null;
   this.statsInterval = null;
-  
-  /** Default configuration for page refresh
-   */
-  this.Configuration = new (function() {
-    this.refresh = 5;
-    this.doRefresh = 'true';
-    return this;
-  })();
 
   this.disableRefresh = function() {
     if (self.refreshInterval !== null) {
@@ -68,9 +60,10 @@ ocStatistics = new (function() {
    */
   this.Configuration = new (function() {
 
-    // default configuartion
+    // default configuration
     this.state = 'servers';
     this.refresh = 5000;
+    this.doRefresh = 'true';
     this.sortField = null;
     this.sortOrder = null;
 
@@ -337,7 +330,7 @@ ocStatistics = new (function() {
     })
     
     //set refresh
-	ocStatistics.updateRefreshInterval(this.Configuration.doRefresh, this.Configuration.refresh);
+	ocStatistics.updateRefreshInterval(ocStatistics.Configuration.doRefresh, ocStatistics.Configuration.refresh);
 	
 	// Refresh Controls
 	// set values according to config
@@ -350,7 +343,7 @@ ocStatistics = new (function() {
 	  $('#refreshInterval').attr('disabled', 'true');
 	  $('#refreshControlsContainer span').css('color', 'silver');
 	}
-	$('#refreshInterval').val(this.Configuration.refresh);
+	$('#refreshInterval').val(ocStatistics.Configuration.refresh);
 	  
 	// attatch event handlers
 	$('#refreshEnabled').change(function() {
