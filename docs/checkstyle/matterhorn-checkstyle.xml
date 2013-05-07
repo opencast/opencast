@@ -191,9 +191,6 @@
       <property name="severity" value="error" />
     </module>
     -->
-    <module name="DoubleCheckedLocking">
-      <property name="severity" value="error" />
-    </module>
     <module name="EmptyStatement">
       <property name="severity" value="error" />
     </module>
