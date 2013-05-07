@@ -15,6 +15,7 @@
  */
 package org.opencastproject.workflow.handler;
 
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
@@ -35,8 +36,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +47,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import static org.opencastproject.workflow.handler.EngagePublicationChannel.CHANNEL_ID;
 
 /**
  * The workflow definition for handling "distribute" operations
@@ -103,6 +104,7 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
+  @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     logger.debug("Running distribution workflow operation");
@@ -175,7 +177,7 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
       Map<String, Job> jobs = new HashMap<String, Job>(elementIds.size());
       try {
         for (String elementId : elementIds) {
-          Job job = distributionService.distribute(mediaPackage, elementId);
+          Job job = distributionService.distribute(CHANNEL_ID, mediaPackage, elementId);
           if (job == null)
             continue;
           jobs.put(elementId, job);

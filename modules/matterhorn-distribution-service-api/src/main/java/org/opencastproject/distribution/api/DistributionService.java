@@ -27,7 +27,7 @@ public interface DistributionService {
   /**
    * A prefix used by distribution service implementations to indicate the types of distribution channels they manage.
    */
-  String JOB_TYPE_PREFIX = "org.opencastproject.distribution.";
+  String JOB_TYPE_PREFIX = "org.opencastproject.distribution";
 
   /**
    * Distribute a media package element.
@@ -43,7 +43,7 @@ public interface DistributionService {
    * @throws MediaPackageException
    *           if there was a problem with the mediapackage element
    */
-  Job distribute(MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException;
+  Job distribute(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException;
 
   /**
    * Retract a media package element from the distribution channel.
@@ -55,6 +55,6 @@ public interface DistributionService {
    * @throws DistributionException
    *           if there was a problem retracting the mediapackage
    */
-  Job retract(MediaPackage mediaPackage, String elementId) throws DistributionException;
+  Job retract(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException;
 
 }

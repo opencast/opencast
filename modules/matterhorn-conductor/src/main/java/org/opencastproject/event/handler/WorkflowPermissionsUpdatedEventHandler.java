@@ -20,7 +20,6 @@ import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
 import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
-import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElements;
@@ -75,9 +74,6 @@ public class WorkflowPermissionsUpdatedEventHandler implements EventHandler {
 
   /** The series service */
   protected SeriesService seriesService = null;
-
-  /** The distribution service */
-  protected DistributionService distributionService = null;
 
   /** The workflow service */
   protected WorkflowService workflowService = null;
@@ -144,14 +140,6 @@ public class WorkflowPermissionsUpdatedEventHandler implements EventHandler {
    */
   public void setDublinCoreCatalogService(DublinCoreCatalogService dublinCoreService) {
     this.dublinCoreService = dublinCoreService;
-  }
-
-  /**
-   * @param distributionService
-   *          the distributionService to set
-   */
-  public void setDistributionService(DistributionService distributionService) {
-    this.distributionService = distributionService;
   }
 
   /**

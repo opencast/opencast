@@ -13,16 +13,8 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.distribution.api;
+package org.opencastproject.workflow.handler;
 
-import org.opencastproject.job.api.Job;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageException;
-
-/**
- * Distributes elements from MediaPackages to distribution channels.
- */
-public interface DownloadDistributionService extends DistributionService {
-  Job distribute(String channelId, MediaPackage mediapackage, String elementId, boolean checkAvailability)
-          throws DistributionException, MediaPackageException;
+public interface EngagePublicationChannel {
+  String CHANNEL_ID = "engage-player";
 }

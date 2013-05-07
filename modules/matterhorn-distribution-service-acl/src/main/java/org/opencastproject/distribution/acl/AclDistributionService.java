@@ -48,9 +48,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.opencastproject.util.RequireUtil.notNull;
 
 /**
  * Distributes an access control list to control media to the local media delivery directory.
@@ -117,34 +118,24 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
     logger.info("Download distribution directory is {}", distributionDirectory);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.distribution.api.DistributionService#distribute(org.opencastproject.mediapackage.MediaPackage,
-   *      java.lang.String)
-   */
-  public Job distribute(MediaPackage mediapackage, String elementId) throws DistributionException,
-          MediaPackageException {
-
-    if (mediapackage == null)
-      throw new MediaPackageException("Mediapackage must be specified");
-    if (elementId == null)
-      throw new MediaPackageException("Element ID must be specified");
+  @Override
+  public Job distribute(String channelId, MediaPackage mediapackage, String elementId)
+          throws DistributionException, MediaPackageException {
+    notNull(mediapackage, "mediapackage");
+    notNull(elementId, "elementId");
+    notNull(channelId, "channelId");
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Distribute.toString(),
-              Arrays.asList(MediaPackageParser.getAsXml(mediapackage), elementId));
+                                       Arrays.asList(channelId,
+                                                     MediaPackageParser.getAsXml(mediapackage),
+                                                     elementId));
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
   }
 
-  /**
-   * Distributes an access control list from the media package to the location of a media package element. 
-   * 
-   * @see org.opencastproject.distribution.api.DistributionService#distribute(String, MediaPackageElement)
-   */
-  protected MediaPackageElement distribute(Job job, MediaPackage mediaPackage, String elementId)
+  protected MediaPackageElement distributeElement(String channelId, MediaPackage mediaPackage, String elementId)
           throws DistributionException, MediaPackageException {
     try {
       File source = getAclXmlAttachmentFile(mediaPackage);
@@ -213,22 +204,16 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
     return aclSourceFile;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.distribution.api.DistributionService#retract(org.opencastproject.mediapackage.MediaPackage,
-   *      java.lang.String)
-   */
-  public Job retract(MediaPackage mediaPackage, String elementId) throws DistributionException {
-    if (mediaPackage == null)
-      throw new IllegalArgumentException("Mediapackage must be specified");
-    if (elementId == null)
-      throw new IllegalArgumentException("Element ID must be specified");
+  @Override
+  public Job retract(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException {
+    notNull(mediapackage, "mediapackage");
+    notNull(elementId, "elementId");
+    notNull(channelId, "channelId");
     try {
-      List<String> arguments = new ArrayList<String>();
-      arguments.add(MediaPackageParser.getAsXml(mediaPackage));
-      arguments.add(elementId);
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(), arguments);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(),
+                                       Arrays.asList(channelId,
+                                                     MediaPackageParser.getAsXml(mediapackage),
+                                                     elementId));
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -262,11 +247,12 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
     List<String> arguments = job.getArguments();
     try {
       op = Operation.valueOf(operation);
-      MediaPackage mediapackage = MediaPackageParser.getFromXml(arguments.get(0));
-      String elementId = arguments.get(1);
+      String channelId = arguments.get(0);
+      MediaPackage mediapackage = MediaPackageParser.getFromXml(arguments.get(1));
+      String elementId = arguments.get(2);
       switch (op) {
         case Distribute:
-          MediaPackageElement distributedElement = distribute(job, mediapackage, elementId);
+          MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, elementId);
           return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
         case Retract:
           MediaPackageElement retractedElement = retract(job, mediapackage, elementId);

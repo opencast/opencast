@@ -47,8 +47,6 @@
 	    cardinality="1..1" policy="static" bind="setSeriesService" />
 	  <reference name="workflowService" interface="org.opencastproject.workflow.api.WorkflowService"
 	    cardinality="1..1" policy="static" bind="setWorkflowService" />
-	  <reference name="distributionService" interface="org.opencastproject.distribution.api.DistributionService"
-	    cardinality="1..1" policy="static" target="(distribution.channel=download)" bind="setDistributionService" />
 	  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
 	    cardinality="1..1" policy="static" bind="setSecurityService" />
 	  <reference name="authorizationService" interface="org.opencastproject.security.api.AuthorizationService"
@@ -79,8 +77,6 @@
 	    cardinality="1..1" policy="static" bind="setEpisodeService" />
 	  <reference name="httpMediaPackageElementProvider" interface="org.opencastproject.episode.api.HttpMediaPackageElementProvider"
 	    cardinality="1..1" policy="static" bind="setHttpMediaPackageElementProvider" />
-	  <reference name="distributionService" interface="org.opencastproject.distribution.api.DistributionService"
-	    cardinality="1..1" policy="static" target="(distribution.channel=download)" bind="setDistributionService" />
 	  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
 	    cardinality="1..1" policy="static" bind="setSecurityService" />
 	  <reference name="authorizationService" interface="org.opencastproject.security.api.AuthorizationService"

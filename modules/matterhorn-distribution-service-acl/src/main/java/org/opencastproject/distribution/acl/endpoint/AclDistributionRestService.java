@@ -47,7 +47,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * Rest endpoint for distributing media to the local distribution channel.
  */
-@Path("")
+@Path("/")
 @RestService(name = "localdistributionservice", title = "Local Distribution Service",
   abstractText = "This service distributes access control lists to the Matterhorn feed and engage services.", 
   notes = {
@@ -100,15 +100,18 @@ public class AclDistributionRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "distribute", description = "Distribute an access control list to control a media package element to this distribution channel", returnDescription = "The job that can be used to track the distribution", restParameters = {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
+          @RestParameter(name = "channelId", isRequired = true, description = "The publication channel id", type = Type.TEXT),
           @RestParameter(name = "elementId", isRequired = true, description = "The element to distribute", type = Type.STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job"),
           @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "The given mediapackage could not be distributed") })
-  public Response distribute(@FormParam("mediapackage") String mediaPackageXml, @FormParam("elementId") String elementId)
+  public Response distribute(@FormParam("mediapackage") String mediaPackageXml,
+                             @FormParam("channelId") String channelId,
+                             @FormParam("elementId") String elementId)
           throws Exception {
     Job job = null;
     try {
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
-      job = service.distribute(mediapackage, elementId);
+      job = service.distribute(channelId, mediapackage, elementId);
     } catch (Exception e) {
       logger.warn("Error distributing element", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
@@ -121,15 +124,18 @@ public class AclDistributionRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "retract", description = "Retract an access control list to control a media package element from this distribution channel", returnDescription = "The job that can be used to track the retraction", restParameters = {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
+          @RestParameter(name = "channelId", isRequired = true, description = "The publication channel id", type = Type.TEXT),
           @RestParameter(name = "elementId", isRequired = true, description = "The element to retract", type = Type.STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job"),
           @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "The given mediapackage could not be retracted") })
-  public Response retract(@FormParam("mediapackage") String mediaPackageXml, @FormParam("elementId") String elementId)
+  public Response retract(@FormParam("mediapackage") String mediaPackageXml,
+                          @FormParam("channelId") String channelId,
+                          @FormParam("elementId") String elementId)
           throws Exception {
     Job job = null;
     try {
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
-      job = service.retract(mediapackage, elementId);
+      job = service.retract(channelId, mediapackage, elementId);
     } catch (Exception e) {
       logger.warn("Unable to retract mediapackage '{}' from download channel: {}", new Object[] { mediaPackageXml, e });
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();

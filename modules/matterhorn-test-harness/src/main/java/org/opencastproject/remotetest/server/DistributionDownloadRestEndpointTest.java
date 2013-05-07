@@ -83,6 +83,7 @@ public class DistributionDownloadRestEndpointTest {
     
     HttpPost post = new HttpPost(BASE_URL + "/distribution/download");
     List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+    formParams.add(new BasicNameValuePair("channelId", "engage-player"));
     formParams.add(new BasicNameValuePair("mediapackage", mediapackage));
     formParams.add(new BasicNameValuePair("elementId", trackId));
     post.setEntity(new UrlEncodedFormEntity(formParams, "UTF-8"));
