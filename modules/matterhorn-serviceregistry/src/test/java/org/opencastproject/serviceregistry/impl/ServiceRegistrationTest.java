@@ -15,12 +15,15 @@
  */
 package org.opencastproject.serviceregistry.impl;
 
+import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.util.UrlSupport;
 
@@ -90,6 +93,10 @@ public class ServiceRegistrationTest {
     EasyMock.replay(securityService);
     serviceRegistry.setSecurityService(securityService);
 
+    // The service registry will automatically register this host with the available number of processors.
+    // This is potentially ruining our test setup.
+    serviceRegistry.unregisterHost(LOCALHOST);
+
     // register the hosts
     serviceRegistry.registerHost(LOCALHOST, 1);
     serviceRegistry.registerHost(REMOTEHOST_1, 1);
@@ -110,6 +117,31 @@ public class ServiceRegistrationTest {
     serviceRegistry.unRegisterService(JOB_TYPE_1, REMOTEHOST_2);
     serviceRegistry.deactivate();
     pooledDataSource.close();
+  }
+
+  @Test
+  public void testHostCapacity() throws Exception {
+    List<ServiceRegistration> services = serviceRegistry.getServiceRegistrations();
+    List<HostRegistration> hosts = serviceRegistry.getHostRegistrations();
+    Map<String, Integer> hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager(), true);
+    List<ServiceRegistration> availableServices = serviceRegistry.getServiceRegistrationsWithCapacity(JOB_TYPE_1,
+            services, hosts, hostLoads);
+
+    // Make sure all hosts are available for processing
+    Assert.assertEquals(3, availableServices.size());
+
+    // Create a job and mark it as running.
+    Job job = serviceRegistry.createJob(regType1Localhost.getHost(), regType1Localhost.getServiceType(), OPERATION_NAME_1, null,
+            null, false, null);
+    job.setStatus(Job.Status.RUNNING);
+    serviceRegistry.updateJob(job);
+
+    // Recalculate the number of available services
+    hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager(), true);
+    availableServices = serviceRegistry.getServiceRegistrationsWithCapacity(JOB_TYPE_1, services, hosts, hostLoads);
+
+    // Since host 1 is now maxed out, only two more hosts should show up
+    Assert.assertEquals(2, availableServices.size());
   }
 
   @Test
