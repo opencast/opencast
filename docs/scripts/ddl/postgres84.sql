@@ -19,7 +19,7 @@ CREATE TABLE "mh_organization_node" (
   "port" integer,
   "name" character varying(255),
   PRIMARY KEY ("organization", "port", "name"),
-  CONSTRAINT "FK_mh_organization_node_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+  CONSTRAINT "FK_mh_organization_node_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id") ON DELETE CASCADE
 );
 
 CREATE INDEX "IX_mh_organization_node_pk" ON "mh_organization_node" ("organization");
@@ -31,7 +31,7 @@ CREATE TABLE "mh_organization_property" (
   "name" character varying(255) NOT NULL,
   "value" character varying(255),
   PRIMARY KEY ("organization", "name"),
-  CONSTRAINT "FK_mh_organization_property_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+  CONSTRAINT "FK_mh_organization_property_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id") ON DELETE CASCADE
 );
 
 CREATE INDEX "IX_mh_organization_property_pk" ON "mh_organization_property" ("organization");
@@ -65,7 +65,7 @@ CREATE TABLE "mh_capture_agent_role" (
   "organization" character varying(128) NOT NULL,
   "role" character varying(255),
   PRIMARY KEY ("id", "organization", "role"),
-  CONSTRAINT "FK_mh_capture_agent_role_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+  CONSTRAINT "FK_mh_capture_agent_role_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id") ON DELETE CASCADE
 );
 
 CREATE INDEX "IX_mh_capture_agent_role" ON "mh_capture_agent_role" ("id", "organization");
@@ -78,7 +78,7 @@ CREATE TABLE "mh_capture_agent_state" (
   "last_heard_from" bigint NOT NULL,
   "url" text,
   PRIMARY KEY ("id", "organization"),
-  CONSTRAINT "FK_mh_capture_agent_state_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+  CONSTRAINT "FK_mh_capture_agent_state_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id") ON DELETE CASCADE
 );
 
 CREATE TABLE "mh_dictionary" (
@@ -121,7 +121,7 @@ CREATE TABLE "mh_service_registration" (
   "host_registration" bigint NOT NULL,
   PRIMARY KEY ("id"),
   CONSTRAINT "UNQ_mh_service_registration_0" UNIQUE ("host_registration", "service_type"),
-  CONSTRAINT "FK_service_registration_host_registration" FOREIGN KEY ("host_registration") REFERENCES "mh_host_registration" ("id")
+  CONSTRAINT "FK_service_registration_host_registration" FOREIGN KEY ("host_registration") REFERENCES "mh_host_registration" ("id") ON DELETE CASCADE
 );
 
 CREATE INDEX "IX_mh_service_registration_service_type" ON "mh_service_registration" ("service_type");
@@ -148,11 +148,11 @@ CREATE TABLE "mh_job" (
   "parent" bigint,
   "root" bigint,
   PRIMARY KEY ("id"),
-  CONSTRAINT "FK_mh_job_creator_service" FOREIGN KEY ("creator_service") REFERENCES "mh_service_registration" ("id"),
-  CONSTRAINT "FK_mh_job_processor_service" FOREIGN KEY ("processor_service") REFERENCES "mh_service_registration" ("id"),
-  CONSTRAINT "FK_mh_job_parent" FOREIGN KEY ("parent") REFERENCES "mh_job" ("id"),
-  CONSTRAINT "FK_mh_job_root" FOREIGN KEY ("root") REFERENCES "mh_job" ("id"),
-  CONSTRAINT "FK_mh_job_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+  CONSTRAINT "FK_mh_job_creator_service" FOREIGN KEY ("creator_service") REFERENCES "mh_service_registration" ("id") ON DELETE CASCADE,
+  CONSTRAINT "FK_mh_job_processor_service" FOREIGN KEY ("processor_service") REFERENCES "mh_service_registration" ("id") ON DELETE CASCADE,
+  CONSTRAINT "FK_mh_job_parent" FOREIGN KEY ("parent") REFERENCES "mh_job" ("id") ON DELETE CASCADE,
+  CONSTRAINT "FK_mh_job_root" FOREIGN KEY ("root") REFERENCES "mh_job" ("id") ON DELETE CASCADE,
+  CONSTRAINT "FK_mh_job_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id") ON DELETE CASCADE
 );
 
 CREATE INDEX "IX_mh_job_parent" ON "mh_job" ("parent");
@@ -170,7 +170,7 @@ CREATE TABLE "mh_job_argument" (
   "argument" text,
   "argument_index" bigint,
   CONSTRAINT "UNQ_mh_job_argument_0" UNIQUE ("id", "argument_index"),
-  CONSTRAINT "FK_mh_job_argument_id" FOREIGN KEY ("id") REFERENCES "mh_job" ("id")
+  CONSTRAINT "FK_mh_job_argument_id" FOREIGN KEY ("id") REFERENCES "mh_job" ("id") ON DELETE CASCADE
 );
 
 CREATE INDEX "IX_mh_job_argument_id" ON "mh_job_argument" ("id");
@@ -180,7 +180,7 @@ CREATE TABLE "mh_job_context" (
   "name" character varying(255) NOT NULL,
   "value" text,
   CONSTRAINT "UNQ_mh_job_context_name" UNIQUE ("id", "name"),
-  CONSTRAINT "FK_mh_job_context_id" FOREIGN KEY ("id") REFERENCES "mh_job" ("id")
+  CONSTRAINT "FK_mh_job_context_id" FOREIGN KEY ("id") REFERENCES "mh_job" ("id") ON DELETE CASCADE
 );
 
 CREATE INDEX "IX_mh_job_context_id" ON "mh_job_context" ("id");
@@ -190,15 +190,15 @@ CREATE TABLE "mh_user" (
   "organization" character varying(128) NOT NULL,
   "password" text,
   PRIMARY KEY ("username", "organization"),
-  CONSTRAINT "FK_mh_user_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+  CONSTRAINT "FK_mh_user_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id") ON DELETE CASCADE
 );
 
 CREATE TABLE "mh_role" (
   "username" character varying(128) NOT NULL,
   "organization" character varying(128) NOT NULL,
   "role" text,
-  CONSTRAINT "FK_mh_role_username" FOREIGN KEY ("username", "organization") REFERENCES "mh_user" ("username", "organization"),
-  CONSTRAINT "FK_mh_role_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+  CONSTRAINT "FK_mh_role_username" FOREIGN KEY ("username", "organization") REFERENCES "mh_user" ("username", "organization") ON DELETE CASCADE,
+  CONSTRAINT "FK_mh_role_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id") ON DELETE CASCADE
 );
 
 CREATE INDEX "IX_mh_role_pk" ON "mh_role" ("username", "organization");
@@ -218,7 +218,7 @@ CREATE TABLE "mh_search" (
   "mediapackage_xml" text,
   "modification_date" timestamp,
   PRIMARY KEY ("id"),
-  CONSTRAINT "FK_mh_search_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+  CONSTRAINT "FK_mh_search_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id") ON DELETE CASCADE
 );
 
 CREATE INDEX "IX_mh_search_organization" ON "mh_search" ("organization");
@@ -229,7 +229,7 @@ CREATE TABLE "mh_series" (
   "access_control" text,
   "dublin_core" text,
   PRIMARY KEY ("id", "organization"),
-  CONSTRAINT "FK_mh_series_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+  CONSTRAINT "FK_mh_series_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id") ON DELETE CASCADE
 );
 
 CREATE TABLE "mh_upload" (
@@ -278,7 +278,7 @@ CREATE TABLE "mh_episode_episode" (
   "mediapackage_xml" text,
   "modification_date" timestamp,
   PRIMARY KEY ("id", "version", "organization"),
-  CONSTRAINT "FK_mh_episode_episode_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+  CONSTRAINT "FK_mh_episode_episode_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id") ON DELETE CASCADE
 );
 
 CREATE INDEX "IX_mh_episode_episode_mediapackage" ON "mh_episode_episode" ("id");
@@ -294,7 +294,7 @@ CREATE TABLE "mh_episode_asset" (
   "version" bigint NOT NULL,
   PRIMARY KEY ("id"),
   CONSTRAINT "UNQ_mh_episode_asset_0" UNIQUE ("organization", "mediapackage", "mediapackageelement", "version"),
-  CONSTRAINT "FK_mh_episode_asset_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id")
+  CONSTRAINT "FK_mh_episode_asset_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id") ON DELETE CASCADE
 );
 
 CREATE INDEX "IX_mh_episode_asset_mediapackage" ON "mh_episode_asset" ("mediapackage");
