@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-var ocUploadListener = {} || ocUploadListener;
+var ocUploadListener = ocUploadListener || {};
 
 ocUploadListener.jobId = "";
 ocUploadListener.shortFilename = "";
