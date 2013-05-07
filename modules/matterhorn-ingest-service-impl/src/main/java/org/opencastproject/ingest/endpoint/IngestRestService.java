@@ -451,8 +451,13 @@ public class IngestRestService {
   @Produces(MediaType.TEXT_XML)
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addMediaPackage/{wdID}")
-  @RestQuery(name = "addMediaPackage", description = "Create media package from a media tracks and optional Dublin Core metadata fields", pathParameters = { @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, restParameters = {
-          @RestParameter(description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+  @RestQuery(name = "addMediaPackage", 
+      description = "Create and ingest media package from media tracks and optional Dublin Core metadata fields", 
+      pathParameters = { 
+          @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, 
+      restParameters = {
+          @RestParameter(description = "The kind of media track. This has to be specified in the request prior to each media track",
+              isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "abstract", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "accessRights", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "available", type = RestParameter.Type.STRING),
@@ -481,7 +486,9 @@ public class IngestRestService {
           @RestParameter(description = "Metadata value", isRequired = false, name = "temporal", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "title", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "type", type = RestParameter.Type.STRING), 
-          @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING), }, bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
+          @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING), },
+      bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), 
+      reponses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
@@ -509,6 +516,10 @@ public class IngestRestService {
               workflowProperties.put(fieldName, Streams.asString(item.openStream()));
             }
           } else {
+            if (flavor == null) {
+              /* A flavor has to be specified in the request prior the video file */
+              return Response.serverError().status(Status.BAD_REQUEST).build();
+            }
             ingestService.addTrack(item.openStream(), item.getName(), flavor, mp);
           }
         }
