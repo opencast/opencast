@@ -42,7 +42,7 @@ ocCaptureAgent = new (function ()
           }	
         });
       }
-      if (ocCaptureAgent.agentsCount == ocCaptureAgent.dispAgCount) showAgentsStatus();		
+      showAgentsStatus();		
     }
 
     function processOneAgent(agent){
@@ -112,7 +112,7 @@ ocCaptureAgent = new (function ()
         ocCaptureAgent.agentsObj.agents = $(agent).toArray();
       });
       ocCaptureAgent.agentsCount = ocCaptureAgent.agentsObj.agents.length;	
-    //showAgentsStatus();									
+      showAgentsStatus();									
     }		
 
     function showAgentsStatus(){
