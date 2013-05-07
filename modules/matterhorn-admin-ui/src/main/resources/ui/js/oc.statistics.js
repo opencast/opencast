@@ -11,9 +11,38 @@ ocStatistics = new (function() {
   this.servicesView = {};
 
   // components
+  var self = this; // keep ocStatistics context
 
   var refreshing = false;      // indicates if ajax requesting recording data is in progress
   this.refreshingStats = false; // indicates if ajax requesting statistics data is in progress
+  this.refreshInterval = null;
+  this.statsInterval = null;
+  
+  /** Default configuration for page refresh
+   */
+  this.Configuration = new (function() {
+    this.refresh = 5;
+    this.doRefresh = 'true';
+    return this;
+  })();
+
+  this.disableRefresh = function() {
+    if (self.refreshInterval !== null) {
+      window.clearInterval(self.refreshInterval);
+    }
+  }
+
+  this.updateRefreshInterval = function(enable, delay) {
+    delay = delay < 5 ? 5 : delay;
+    self.Configuration.refresh = delay;
+    ocUtils.log('Setting Refresh to ' + enable + " - " + delay + " sec");
+    self.Configuration.doRefresh = enable;
+    self.disableRefresh();
+    if (enable) {
+    	self.refreshInterval = window.setInterval(refresh, delay * 1000);
+    }
+  }
+  
 
   /**
    * The labels for the UI.  TODO: i18n
@@ -69,6 +98,8 @@ ocStatistics = new (function() {
   function refresh() {
     if (!refreshing) {
       refreshing = true;
+      ocStatistics.serversView = {};
+      ocStatistics.servicesView = {};
       var url = SERVERS_STATS_URL;
       $.ajax(
       {
@@ -100,6 +131,24 @@ ocStatistics = new (function() {
     		success: $.proxy(function(data, textStatus, jqXHR) {
     			$(this).prev().remove();
     			$(this).remove();
+		        $.ajax({
+		          url: SERVERS_STATS_URL,
+		          dataType: 'json',
+		          success: function (data) {
+		            var servicesInWarningState = 0;
+		            var badge = $('#statistics_badge');
+		            $.each(data.statistics.service, function(index, serviceInstance) {
+		         		if (serviceInstance.serviceRegistration.service_state != 'NORMAL') {
+		                  servicesInWarningState ++;
+		         		}
+		            });
+		            if (servicesInWarningState > 0) {
+		                badge.html(servicesInWarningState);
+		            } else {
+		          	  badge.empty();
+		            }
+		          }
+		        });
     		}, this)
     	});
     });
@@ -273,8 +322,8 @@ ocStatistics = new (function() {
   }
 
   /** $(document).ready()
- *
- */
+   *
+   */
   this.init = function() {
     
     $('#addHeader').jqotesubtpl('templates/statistics-header.tpl', {});
@@ -287,8 +336,36 @@ ocStatistics = new (function() {
       ocStatistics.reload();
     })
     
-    // set up ui update
-    //window.setInterval(refresh, STATISTICS_DELAY);
+    //set refresh
+	ocStatistics.updateRefreshInterval(this.Configuration.doRefresh, this.Configuration.refresh);
+	
+	// Refresh Controls
+	// set values according to config
+	if (ocStatistics.Configuration.doRefresh == 'true') {		
+	  $('#refreshEnabled').attr('checked', 'checked');
+	  $('#refreshInterval').removeAttr('disabled');
+	  $('#refreshControlsContainer span').removeAttr('style');
+	} else {
+	  $('#refreshEnabled').removeAttr('checked');
+	  $('#refreshInterval').attr('disabled', 'true');
+	  $('#refreshControlsContainer span').css('color', 'silver');
+	}
+	$('#refreshInterval').val(this.Configuration.refresh);
+	  
+	// attatch event handlers
+	$('#refreshEnabled').change(function() {
+	  if ($(this).is(':checked')) {
+	    $('#refreshInterval').removeAttr('disabled');
+	    $('#refreshControlsContainer span').removeAttr('style');
+	  } else {
+	    $('#refreshInterval').attr('disabled', 'true');
+	    $('#refreshControlsContainer span').css('color', 'silver');
+	  }
+	  ocStatistics.updateRefreshInterval($(this).is(':checked'), $('#refreshInterval').val());
+	});
+	$('#refreshInterval').change(function() {
+	  ocStatistics.updateRefreshInterval($('#refreshEnabled').is(':checked'), $(this).val());
+	});
 
     refresh();    // load and render data for currently set configuration
 
