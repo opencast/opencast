@@ -14,8 +14,8 @@
  *
  */
 var ocSeriesList = ocSeriesList || {};
-var ocSeriesList.views = ocSeriesList.views || {};
-var ocSeriesList.views.seriesView = ocSeriesList.seriesView || {};
+ocSeriesList.views = ocSeriesList.views || {};
+ocSeriesList.views.seriesView = ocSeriesList.seriesView || {};
 
 ocSeriesList.Configuration = new (function(){
   //default configuration
