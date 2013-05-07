@@ -299,7 +299,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
         // almost at the end of the segment, it should contain the most content and is stable as well.
         long startTimeSeconds = segmentTimePoint.getTimeInMilliseconds() / 1000;
         long durationSeconds = segmentDuration.getDurationInMilliseconds() / 1000;
-        times[i] = startTimeSeconds + durationSeconds - stabilityThreshold + 1;
+        times[i] = Math.max(startTimeSeconds + durationSeconds - stabilityThreshold + 1, 0);
       }
 
       // Have the ocr image(s) created.
