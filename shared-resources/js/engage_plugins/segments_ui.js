@@ -223,9 +223,12 @@ Opencast.segments_ui = (function ()
                     }
                     $.log("Videomode: " + (videoModeStream ? "Streaming if possible" : "Progressive"));
                     // Check if Segments + Segments Text is available
-                    var segmentsAvailable = (data['search-results'].result !== undefined) && (data['search-results'].result.segments !== undefined) && (data['search-results'].result.segments.segment.length > 0);
+                    var segmentsAvailable = (data['search-results'].result !== undefined) && (data['search-results'].result.segments !== undefined) && ((data['search-results'].result.segments.segment.length > 0) || !$.isArray(data['search-results'].result.segments.segment));
                     if (segmentsAvailable)
                     {
+                        if (!$.isArray(data['search-results'].result.segments.segment)) {
+                          data['search-results'].result.segments.segment = [data['search-results'].result.segments.segment];
+                        }
                         $.log("Segments available");
                         data['search-results'].result.segments.currentTime = $.getTimeInMilliseconds(Opencast.Player.getCurrentTime());
                         // Get the complete Track Duration // TODO: handle more clever
