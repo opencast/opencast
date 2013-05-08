@@ -16,17 +16,37 @@
 
 package org.opencastproject.mediapackage;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.presentations;
+import static org.opencastproject.util.data.Monadics.mlist;
+
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdBuilder;
 import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.IoSupport;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -44,32 +64,13 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.presentations;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 /**
  * Default implementation for a media media package.
  */
-@XmlType(name = "mediapackage",
-         namespace = "http://mediapackage.opencastproject.org",
-         propOrder = {"title", "series",
-                 "seriesTitle", "creators", "contributors", "subjects", "license", "language",
-                 "tracks", "catalogs", "attachments", "publications"})
+@XmlType(name = "mediapackage", namespace = "http://mediapackage.opencastproject.org", propOrder = { "title", "series",
+        "seriesTitle", "creators", "contributors", "subjects", "license", "language", "tracks", "catalogs",
+        "attachments", "publications" })
 @XmlRootElement(name = "mediapackage", namespace = "http://mediapackage.opencastproject.org")
 @XmlAccessorType(XmlAccessType.NONE)
 public final class MediaPackageImpl implements MediaPackage {
@@ -291,19 +292,13 @@ public final class MediaPackageImpl implements MediaPackage {
    */
   @Override
   public MediaPackageElement getElementByReference(MediaPackageReference reference) {
-    MediaPackageElement[] e = getElementsByReference(reference, false);
-    return (e != null && e.length > 0) ? e[0] : null;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.mediapackage.MediaPackage#getElementsByReference(org.opencastproject.mediapackage.MediaPackageReference,
-   *      boolean)
-   */
-  @Override
-  public MediaPackageElement[] getElementsByReference(MediaPackageReference reference, boolean includeDerived) {
-    return getElements(reference, includeDerived);
+    for (MediaPackageElement e : this.elements) {
+      if (!reference.getType().equalsIgnoreCase(e.getElementType().toString()))
+        continue;
+      if (reference.getIdentifier().equals(e.getIdentifier()))
+        return e;
+    }
+    return null;
   }
 
   /**
@@ -1072,7 +1067,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.mediapackage.MediaPackage#getAttachments()
    */
   @XmlElementWrapper(name = "publications")
@@ -1361,8 +1356,7 @@ public final class MediaPackageImpl implements MediaPackage {
     // Check (uniqueness of) catalog identifier
     String id = catalog.getIdentifier();
     if (id == null || contains(id)) {
-      id = createElementIdentifier("catalog", getCatalogs().length + 1);
-      catalog.setIdentifier(id);
+      catalog.setIdentifier(createElementIdentifier());
     }
     integrate(catalog);
   }
@@ -1378,8 +1372,7 @@ public final class MediaPackageImpl implements MediaPackage {
     // Check (uniqueness of) track identifier
     String id = track.getIdentifier();
     if (id == null || contains(id)) {
-      id = createElementIdentifier("track", getTracks().length + 1);
-      track.setIdentifier(id);
+      track.setIdentifier(createElementIdentifier());
     }
     duration = null;
     integrate(track);
@@ -1396,8 +1389,7 @@ public final class MediaPackageImpl implements MediaPackage {
     // Check (uniqueness of) attachment identifier
     String id = attachment.getIdentifier();
     if (id == null || contains(id)) {
-      id = createElementIdentifier("attachment", getAttachments().length + 1);
-      attachment.setIdentifier(id);
+      attachment.setIdentifier(createElementIdentifier());
     }
     integrate(attachment);
   }
@@ -1412,13 +1404,8 @@ public final class MediaPackageImpl implements MediaPackage {
    *          the number
    * @return the element identifier
    */
-  private String createElementIdentifier(String prefix, int count) {
-    prefix = prefix + "-";
-    String id = prefix + count;
-    while (getElementById(id) != null) {
-      id = prefix + (++count);
-    }
-    return id;
+  private String createElementIdentifier() {
+    return UUID.randomUUID().toString();
   }
 
   /**
@@ -1788,46 +1775,6 @@ public final class MediaPackageImpl implements MediaPackage {
         return e;
     }
     return null;
-  }
-
-  /**
-   * Returns the media package elements that contain the specified reference.
-   * 
-   * @param reference
-   *          the reference
-   * @return the tracks
-   */
-  MediaPackageElement[] getElements(MediaPackageReference reference, boolean includeDerived) {
-    if (reference == null)
-      throw new IllegalArgumentException("Unable to filter by null reference");
-
-    // Go through tracks and remove those that don't match
-    Collection<MediaPackageElement> elements = new ArrayList<MediaPackageElement>();
-    elements.addAll(this.elements);
-    List<MediaPackageElement> candidates = new ArrayList<MediaPackageElement>(tracks);
-    for (MediaPackageElement e : elements) {
-      MediaPackageReference r = e.getReference();
-      if (!reference.matches(r)) {
-        boolean indirectHit = false;
-
-        // Create a reference that will match regardless of properties
-        MediaPackageReference elementRef = new MediaPackageReferenceImpl(reference.getType(), reference.getIdentifier());
-
-        // Try to find a derived match if possible
-        while (includeDerived && r != null) {
-          if (r.matches(elementRef)) {
-            indirectHit = true;
-            break;
-          }
-          r = getElement(r).getReference();
-        }
-
-        if (!indirectHit)
-          candidates.remove(e);
-      }
-    }
-
-    return candidates.toArray(new MediaPackageElement[candidates.size()]);
   }
 
   /**
