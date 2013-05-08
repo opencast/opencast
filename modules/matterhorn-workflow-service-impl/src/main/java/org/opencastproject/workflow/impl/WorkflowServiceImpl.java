@@ -1013,7 +1013,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         props.store(out, null);
         List<String> newArguments = new ArrayList<String>(operationJob.getArguments());
-        newArguments.add(new String(out.toByteArray(), "ISO-8859-1"));
+        newArguments.add(new String(out.toByteArray(), "UTF-8"));
         operationJob.setArguments(newArguments);
       }
       serviceRegistry.updateJob(operationJob);
