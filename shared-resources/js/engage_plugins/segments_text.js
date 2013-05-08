@@ -95,6 +95,9 @@ Opencast.segments_text = (function ()
 			    } else
 			    {
 				$.log("Segments Text AJAX call: Data available");
+				if (!$.isArray(data['search-results'].result.segments.segment)) {
+  				data['search-results'].result.segments.segment = [data['search-results'].result.segments.segment];
+				}
 				data['search-results'].result.segments.currentTime = $.getTimeInMilliseconds(Opencast.Player.getCurrentTime());
 				// Set Duration until this Segment ends
 				var completeDuration = 0;
