@@ -543,25 +543,77 @@ public class IngestRestService {
   }
 
   @POST
-  @Path("addZippedMediaPackage")
+  @Path("addZippedMediaPackage/{workflowDefinitionId}")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "addZippedMediaPackage", description = "Create media package from a compressed file containing a manifest.xml document and all media tracks, metadata catalogs and attachments", restParameters = {
-          @RestParameter(description = "The workflow definition ID to run on this mediapackage", isRequired = false, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING),
-          @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) }, bodyParameter = @RestParameter(description = "The compressed (application/zip) media package file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
+  @RestQuery(name = "addZippedMediaPackage", 
+      description = "Create media package from a compressed file containing a manifest.xml document and all media tracks, metadata catalogs and attachments", 
+      pathParameters = { 
+        @RestParameter(description = "Workflow definition id", 
+          isRequired = true, 
+          name = WORKFLOW_DEFINITION_ID_PARAM,
+          type = RestParameter.Type.STRING) },
+      restParameters = {
+        @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage", 
+          isRequired = false, 
+          name = WORKFLOW_INSTANCE_ID_PARAM, 
+          type = RestParameter.Type.STRING) }, 
+      bodyParameter = @RestParameter(
+        description = "The compressed (application/zip) media package file", 
+        isRequired = true, name = "BODY", 
+        type = RestParameter.Type.FILE), 
+      reponses = {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
-  public Response addZippedMediaPackage(@Context HttpServletRequest request) {
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) },
+      returnDescription = "")
+  public Response addZippedMediaPackage(@Context HttpServletRequest request, @PathParam("workflowDefinitionId") String wdID, @QueryParam("id") String wiID) {
     logger.debug("addZippedMediaPackage(HttpRequest)");
     if (!isIngestLimitEnabled() || getIngestLimit() > 0) {
-      return ingestZippedMediaPackage(request);
+      return ingestZippedMediaPackage(request, wdID, wiID);
     } else {
       logger.warn("Delaying ingest because we have exceeded the maximum number of ingests this server is setup to do concurrently.");
       return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }
   }
 
-  private Response ingestZippedMediaPackage(HttpServletRequest request) {
+  @POST
+  @Path("addZippedMediaPackage")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "addZippedMediaPackage", 
+      description = "Create media package from a compressed file containing a manifest.xml document and all media tracks, metadata catalogs and attachments", 
+      restParameters = {
+        @RestParameter(description = "The workflow definition ID to run on this mediapackage. "
+            + "This parameter has to be set in the request prior to the zipped mediapackage "
+            + "(This parameter is deprecated. Please use /addZippedMediaPackage/{workflowDefinitionId} instead)",
+          isRequired = false, 
+          name = WORKFLOW_DEFINITION_ID_PARAM, 
+          type = RestParameter.Type.STRING),
+        @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage. "
+            + "This parameter has to be set in the request prior to the zipped mediapackage "
+            + "(This parameter is deprecated. Please use /addZippedMediaPackage/{workflowDefinitionId} with a path parameter instead)",
+          isRequired = false, 
+          name = WORKFLOW_INSTANCE_ID_PARAM, 
+          type = RestParameter.Type.STRING) }, 
+      bodyParameter = @RestParameter(
+        description = "The compressed (application/zip) media package file", 
+        isRequired = true, name = "BODY", 
+        type = RestParameter.Type.FILE), 
+      reponses = {
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) },
+      returnDescription = "")
+  public Response addZippedMediaPackage(@Context HttpServletRequest request) {
+    logger.debug("addZippedMediaPackage(HttpRequest)");
+    if (!isIngestLimitEnabled() || getIngestLimit() > 0) {
+      return ingestZippedMediaPackage(request, null, null);
+    } else {
+      logger.warn("Delaying ingest because we have exceeded the maximum number of ingests this server is setup to do concurrently.");
+      return Response.status(Status.SERVICE_UNAVAILABLE).build();
+    }
+  }
+
+  private Response ingestZippedMediaPackage(HttpServletRequest request, String wdID, String wiID) {
     if (isIngestLimitEnabled()) {
       setIngestLimit(getIngestLimit() - 1);
       logger.debug("An ingest has started so remaining ingest limit is " + getIngestLimit());
@@ -571,7 +623,8 @@ public class IngestRestService {
     logger.info("Received new request from {} to ingest a zipped mediapackage", request.getRemoteHost());
 
     try {
-      String workflowDefinitionId = null;
+      String workflowDefinitionId   = wdID;
+      String workflowIdAsString     = wiID;
       Long workflowInstanceIdAsLong = null;
       Map<String, String> workflowConfig = new HashMap<String, String>();
       if (ServletFileUpload.isMultipartContent(request)) {
@@ -580,18 +633,11 @@ public class IngestRestService {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
             if (WORKFLOW_INSTANCE_ID_PARAM.equals(item.getFieldName())) {
-              String workflowIdAsString = IOUtils.toString(item.openStream(), "UTF-8");
-              if (StringUtils.isBlank(workflowIdAsString))
-                continue;
-              try {
-                workflowInstanceIdAsLong = Long.parseLong(workflowIdAsString);
-              } catch (NumberFormatException e) {
-                logger.warn("{} '{}' is not numeric", WORKFLOW_INSTANCE_ID_PARAM, workflowIdAsString);
-              }
+              workflowIdAsString = IOUtils.toString(item.openStream(), "UTF-8");
+              continue;
             } else if (WORKFLOW_DEFINITION_ID_PARAM.equals(item.getFieldName())) {
               workflowDefinitionId = IOUtils.toString(item.openStream(), "UTF-8");
-              if (StringUtils.isBlank(workflowDefinitionId))
-                workflowDefinitionId = defaultWorkflowDefinitionId;
+              continue;
             } else {
               logger.debug("Processing form field: " + item.getFieldName());
               workflowConfig.put(item.getFieldName(), IOUtils.toString(item.openStream(), "UTF-8"));
@@ -609,6 +655,18 @@ public class IngestRestService {
       } else {
         logger.debug("Processing file item");
         in = request.getInputStream();
+      }
+
+      /* Try to convert the workflowId to integer */
+      if (!StringUtils.isBlank(workflowIdAsString)) {
+        try {
+          workflowInstanceIdAsLong = Long.parseLong(workflowIdAsString);
+        } catch (NumberFormatException e) {
+          logger.warn("{} '{}' is not numeric", WORKFLOW_INSTANCE_ID_PARAM, workflowIdAsString);
+        }
+      }
+      if (StringUtils.isBlank(workflowDefinitionId)) {
+        workflowDefinitionId = defaultWorkflowDefinitionId;
       }
 
       WorkflowInstance workflow = ingestService.addZippedMediaPackage(in, workflowDefinitionId, workflowConfig,
