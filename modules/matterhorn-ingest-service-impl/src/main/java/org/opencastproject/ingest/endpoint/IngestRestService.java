@@ -662,8 +662,7 @@ public class IngestRestService {
         try {
           workflowInstanceIdAsLong = Long.parseLong(workflowIdAsString);
         } catch (NumberFormatException e) {
-          logger.error("{} '{}' is not numeric", WORKFLOW_INSTANCE_ID_PARAM, workflowIdAsString);
-          return Response.serverError().status(Status.BAD_REQUEST).build();
+          logger.warn("{} '{}' is not numeric", WORKFLOW_INSTANCE_ID_PARAM, workflowIdAsString);
         }
       }
       if (StringUtils.isBlank(workflowDefinitionId)) {
