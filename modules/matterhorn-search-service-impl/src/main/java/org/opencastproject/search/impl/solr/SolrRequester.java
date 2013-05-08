@@ -412,13 +412,14 @@ public class SolrRequester {
           int segmentHits = 0;
           int textLength = segmentText.length();
           for (String t : queryTerms) {
+            String strippedTerm = StringUtils.strip(t, "*");
             int startIndex = 0;
             while (startIndex < textLength - 1) {
-              int foundAt = segmentText.indexOf(t, startIndex);
+              int foundAt = segmentText.indexOf(strippedTerm, startIndex);
               if (foundAt < 0)
                 break;
               segmentHits++;
-              startIndex = foundAt + t.length();
+              startIndex = foundAt + strippedTerm.length();
             }
           }
 
