@@ -410,7 +410,8 @@ public class IngestRestService {
   @Produces(MediaType.TEXT_XML)
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addMediaPackage")
-  @RestQuery(name = "addMediaPackage", description = "Create media package from a media tracks and optional Dublin Core metadata fields", restParameters = {
+  @RestQuery(name = "addMediaPackage", description = "Create media package from a media tracks and optional Dublin Core metadata fields", 
+      restParameters = {
           @RestParameter(description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "abstract", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "accessRights", type = RestParameter.Type.STRING),
@@ -439,10 +440,16 @@ public class IngestRestService {
           @RestParameter(description = "Metadata value", isRequired = false, name = "subject", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "temporal", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = true, name = "title", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "type", type = RestParameter.Type.STRING) }, bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
+          @RestParameter(description = "Metadata value", isRequired = false, name = "type", type = RestParameter.Type.STRING),
+          @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog", type = RestParameter.Type.STRING),
+          @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING), },
+      bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
+      reponses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, 
+      returnDescription = "")
   public Response addMediaPackage(@Context HttpServletRequest request) {
     return addMediaPackage(request, null);
   }
@@ -486,7 +493,9 @@ public class IngestRestService {
           @RestParameter(description = "Metadata value", isRequired = false, name = "temporal", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "title", type = RestParameter.Type.STRING),
           @RestParameter(description = "Metadata value", isRequired = false, name = "type", type = RestParameter.Type.STRING), 
-          @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING), },
+          @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog", type = RestParameter.Type.STRING),
+          @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING), },
       bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), 
       reponses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
@@ -498,31 +507,80 @@ public class IngestRestService {
       MediaPackage mp = ingestService.createMediaPackage();
       DublinCoreCatalog dcc = dublinCoreService.newInstance();
       Map<String, String> workflowProperties = new HashMap<String, String>();
+      int seriesDCCatalogNumber = 0;
+      boolean hasMedia = false;
       if (ServletFileUpload.isMultipartContent(request)) {
         for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
             String fieldName = item.getFieldName();
+
+            /* “Remember” the flavor for the next media. */
             if ("flavor".equals(fieldName)) {
               flavor = MediaPackageElementFlavor.parseFlavor(Streams.asString(item.openStream()));
+
+            /* Fields for DC catalog */
             } else if (dcterms.contains(fieldName)) {
               EName en = new EName(DublinCore.TERMS_NS_URI, fieldName);
               dcc.add(en, Streams.asString(item.openStream()));
+
+            /* Series by URL */
             } else if ("seriesDCCatalogUri".equals(fieldName)) {
-              URI dcurl = new URI(Streams.asString(item.openStream()));
+              URI dcurl;
+              try {
+                dcurl = new URI(Streams.asString(item.openStream()));
+              } catch (java.net.URISyntaxException e) {
+                /* Parameter was not a valid URL: Return 400 Bad Request */
+                logger.warn(e.getMessage(), e);
+                return Response.serverError().status(Status.BAD_REQUEST).build();
+              }
               ingestService.addCatalog(dcurl, MediaPackageElements.SERIES, mp);
+
+            /* Series DC catalog (XML) as string */
+            } else if ("seriesDCCatalog".equals(fieldName)) {
+              String fileName = "series" + seriesDCCatalogNumber + ".xml";
+              seriesDCCatalogNumber += 1;
+              ingestService.addCatalog(item.openStream(), fileName, MediaPackageElements.SERIES, mp);
+
+            /* Add media files by URL */
+            } else if ("mediaUri".equals(fieldName)) {
+              if (flavor == null) {
+                /* A flavor has to be specified in the request prior the media file */
+                return Response.serverError().status(Status.BAD_REQUEST).build();
+              }
+              URI mediaUrl;
+              try {
+                mediaUrl = new URI(Streams.asString(item.openStream()));
+              } catch (java.net.URISyntaxException e) {
+                /* Parameter was not a valid URL: Return 400 Bad Request */
+                logger.warn(e.getMessage(), e);
+                return Response.serverError().status(Status.BAD_REQUEST).build();
+              }
+              ingestService.addTrack(mediaUrl, flavor, mp);
+              hasMedia = true;
+
             } else {
               /* Tread everything else as workflow properties */
               workflowProperties.put(fieldName, Streams.asString(item.openStream()));
             }
+
+          /* Media files as request parameter */
           } else {
             if (flavor == null) {
               /* A flavor has to be specified in the request prior the video file */
               return Response.serverError().status(Status.BAD_REQUEST).build();
             }
             ingestService.addTrack(item.openStream(), item.getName(), flavor, mp);
+            hasMedia = true;
           }
         }
+
+        /* Check if we got any media. Fail if not. */
+        if (!hasMedia) {
+          logger.warn("Rejected ingest without actual media.");
+          return Response.serverError().status(Status.BAD_REQUEST).build();
+        }
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         dcc.toXml(out, true);
         InputStream in = new ByteArrayInputStream(out.toByteArray());
