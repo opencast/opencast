@@ -119,7 +119,7 @@ CREATE TABLE mh_service_registration (
   online TINYINT(1) DEFAULT 1 NOT NULL,
   active TINYINT(1) DEFAULT 1 NOT NULL,
   online_from DATETIME,
-  service_state VARCHAR(32) NOT NULL,
+  service_state int NOT NULL,
   state_changed DATETIME,
   warning_state_trigger BIGINT,
   error_state_trigger BIGINT,
