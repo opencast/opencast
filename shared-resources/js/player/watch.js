@@ -858,7 +858,7 @@ Opencast.Watch = (function ()
         case "Linux":
             break;
         }
-		$('#oc_client_shortcuts').append('<a href="javascript: " id="oc_btn-leave_shortcut" onclick="$(\'#oc_shortcut-button\').trigger(\'click\');" class="handcursor" title="Leave shortcut dialog" role="button">Leave embed dialog</a>');
+		$('#oc_client_shortcuts').append('<a href="javascript: " id="oc_btn-leave_shortcut" onclick="$(\'#oc_shortcut-button\').trigger(\'click\');" class="handcursor" title="Leave shortcut dialog" role="button">Leave shortcut dialog</a>');
     }
 
     return {
