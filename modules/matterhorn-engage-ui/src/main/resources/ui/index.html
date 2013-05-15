@@ -42,7 +42,8 @@
         if ($.getURLParameter('series') != "" && $.getURLParameter('series') != null) {
           restEndpoint += "sid=" + $.getURLParameter('series') + "&";
         }
-        
+       
+        var org_data;
         //check whether a user is logged in and show logout link 
         $.ajax({
           url: '/info/me.json',
@@ -54,8 +55,24 @@
                   {
                       $('#logout').show();
                   }
+                  org_data=data;
               }
           });
+
+        $.ajax({
+          url: '/info/components.json',
+          type: 'GET',
+          dataType: 'json',
+          success: function(components)
+              {
+                  var admin_role = org_data.org.adminRole;
+                  if ($.inArray(admin_role, org_data.roles) == -1) {
+                    $('a#logolink').attr('href', components.engage + '/engage/ui');
+                  }
+              }
+          });
+                  
+
 
           restEndpoint = restEndpoint + "limit=10";
 
@@ -148,7 +165,7 @@
     <!-- LOGO -->
     <div id="header">
       <div id="logotitle">
-        <a href="/welcome.html" title="Back to Opencast Matterhorn Welcome page"><img src="/engage/ui/img/mh_logos/MatterhornLogo.png" alt="Matterhorn Home Page" title="Matterhorn Home Page" width="104" height="72" align="left"></a><h1>Media Module</h1>
+        <a id="logolink" href="/welcome.html" title="Back to Opencast Matterhorn Welcome page"><img src="/engage/ui/img/mh_logos/MatterhornLogo.png" alt="Matterhorn Home Page" title="Matterhorn Home Page" width="104" height="72" align="left"></a><h1>Media Module</h1>
       </div>
       <div id="oclogo">
         <a href="http://www.opencastproject.org"><img src="/engage/ui/img/mh_logos/OpencastLogo.png" width="143" height="38" alt="Opencast Community Project" title="Opencast Community Project"></a>
