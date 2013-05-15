@@ -381,11 +381,11 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     String fileName = FilenameUtils.getBaseName(element.getURI().toString());
     String tag = FilenameUtils.getExtension(element.getURI().toString()) + ":";
 
-    // In the odd case the file does not have a extension
-    if (":".equals(tag))
+    // removes the tag for flv files, but keeps it for all others (mp4 needs it)
+    if ("flv:".equals(tag))
       tag = "";
 
-    return new URI(UrlSupport.concat(streamingUrl, channelId, tag + mp.getIdentifier().compact(), elementId, fileName));
+    return new URI(UrlSupport.concat(streamingUrl, tag + channelId, mp.getIdentifier().compact(), elementId, fileName));
   }
 
   /**
