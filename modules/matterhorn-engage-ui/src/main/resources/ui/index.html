@@ -42,7 +42,8 @@
         if ($.getURLParameter('series') != "" && $.getURLParameter('series') != null) {
           restEndpoint += "sid=" + $.getURLParameter('series') + "&";
         }
-        
+       
+        var org_data;
         //check whether a user is logged in and show logout link 
         $.ajax({
           url: '/info/me.json',
@@ -54,17 +55,24 @@
                   {
                       $('#logout').show();
                   }
+                  org_data=data;
               }
           });
-        
+
         $.ajax({
           url: '/info/components.json',
           type: 'GET',
           dataType: 'json',
-          success: function(components) {
-        	  $('a#logolink').attr('href', components.admin + '/welcome.html');
-          }
-        });
+          success: function(components)
+              {
+                  var admin_role = org_data.org.adminRole;
+                  if ($.inArray(admin_role, org_data.roles) == -1) {
+                    $('a#logolink').attr('href', components.engage + '/engage/ui');
+                  }
+              }
+          });
+                  
+
 
           restEndpoint = restEndpoint + "limit=10";
 
