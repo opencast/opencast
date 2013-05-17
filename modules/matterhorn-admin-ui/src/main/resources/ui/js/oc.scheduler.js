@@ -810,7 +810,7 @@ var ocScheduler = (function() {
             error.push(this.errors.seriesError); //failed to create series for some reason.
           }
         }
-        if(this.fields.series.val() === '' && this.required) {
+        if(this.fields.series.val() === '' && !window.checkForErrors && this.required) {
           error.push(this.errors.missingRequired);
         }
         return error;
