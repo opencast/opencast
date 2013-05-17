@@ -288,7 +288,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       } catch (NoSuchAlgorithmException e1) {
         logger.error("Unable to create md5 message digest");
       }
-      
+
       // Store the hash
       String md5 = DigestUtils.md5Hex(dis.getMessageDigest().digest());
       File md5File = null;
@@ -581,7 +581,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       } catch (NoSuchAlgorithmException e1) {
         logger.error("Unable to create md5 message digest");
       }
-      
+
       // Store the hash
       String md5 = DigestUtils.md5Hex(dis.getMessageDigest().digest());
       File md5File = null;
@@ -629,7 +629,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     }
     File destFile;
     try {
-      destFile = new File(destDir, toFileName);
+      destFile = new File(destDir, PathSupport.toSafeName(toFileName));
       FileSupport.link(source, destFile);
       createMd5(destFile);
     } catch (Exception e) {
@@ -669,7 +669,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       logger.debug("Removing existing file from target location at {}", dest);
       delete(toMediaPackage, toMediaPackageElement);
     } catch (NotFoundException e) {
-      dest = new File(getElementDirectory(toMediaPackage, toMediaPackageElement), toFileName);
+      dest = new File(getElementDirectory(toMediaPackage, toMediaPackageElement), PathSupport.toSafeName(toFileName));
     }
 
     try {
