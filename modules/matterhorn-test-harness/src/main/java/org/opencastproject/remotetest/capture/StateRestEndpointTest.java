@@ -113,7 +113,7 @@ public class StateRestEndpointTest {
 
     HttpDelete deleteRecordingRequest = new HttpDelete(BASE_URL + "/capture-admin/recordings/" + recordingId);
     HttpResponse deleteRecordingResponse = client.execute(deleteRecordingRequest);
-
+    Thread.sleep(500);
     Assert.assertEquals(200, deleteRecordingResponse.getStatusLine().getStatusCode());
     Thread.sleep(3000);
   }

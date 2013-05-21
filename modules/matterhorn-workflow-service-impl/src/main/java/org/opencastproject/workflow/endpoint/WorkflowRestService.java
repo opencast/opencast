@@ -556,7 +556,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   }
 
   @POST
-  @Path("start")
+  @Path("startById")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "startbydefid", description = "Start a new workflow instance.", returnDescription = "An XML representation of the new workflow instance", restParameters = {
           @RestParameter(name = "definitionId", isRequired = true, description = "The workflow definition id", type = STRING),
