@@ -63,12 +63,14 @@ import javax.xml.bind.Unmarshaller;
 public class FileUploadServiceImpl implements FileUploadService {
 
   final String PROPKEY_STORAGE_DIR = "org.opencastproject.storage.dir";
+  final String PROPKEY_CLEANER_MAXTTL = "org.opencastproject.upload.cleaner.maxttl";
   final String DIRNAME_WORK_ROOT = "fileupload-tmp";
   final String UPLOAD_COLLECTION = "uploaded";
   final String FILEEXT_DATAFILE = ".payload";
   final String FILENAME_CHUNKFILE = "chunk.part";
   final String FILENAME_JOBFILE = "job.xml";
   final int READ_BUFFER_LENGTH = 512;
+  final int DEFAULT_CLEANER_MAXTTL = 6;
   private static final Logger log = LoggerFactory.getLogger(FileUploadServiceImpl.class);
   private File workRoot;
   private IngestService ingestService;
@@ -78,6 +80,7 @@ public class FileUploadServiceImpl implements FileUploadService {
   private HashMap<String, FileUploadJob> jobCache = new HashMap<String, FileUploadJob>();
   private byte[] readBuffer = new byte[READ_BUFFER_LENGTH];
   private FileUploadServiceCleaner cleaner;
+  private int jobMaxTTL;
 
   // <editor-fold defaultstate="collapsed" desc="OSGi Service Stuff" >
   protected void activate(ComponentContext cc) throws Exception {
@@ -97,11 +100,19 @@ public class FileUploadServiceImpl implements FileUploadService {
     JAXBContext jctx = JAXBContext.newInstance("org.opencastproject.fileupload.api.job", cl);
     jobMarshaller = jctx.createMarshaller();
     jobUnmarshaller = jctx.createUnmarshaller();
-
-    log.info("File Upload Service activated. Storage directory is {}", workRoot.getAbsolutePath());
-
+    
+    // try to get time-to-live threshold for jobs, use default if not configured
+    try {
+      jobMaxTTL = Integer.parseInt(cc.getBundleContext().getProperty(PROPKEY_CLEANER_MAXTTL));
+    } catch (Exception e) {
+      jobMaxTTL = DEFAULT_CLEANER_MAXTTL;
+    }
+    
     cleaner = new FileUploadServiceCleaner(this);
     cleaner.schedule();
+    
+    log.info("File Upload Service activated. Storage directory is {}. Jobs will be deleted when older than {} hours.", 
+            workRoot.getAbsolutePath(), jobMaxTTL);
   }
 
   protected void deactivate(ComponentContext cc) {
@@ -129,17 +140,20 @@ public class FileUploadServiceImpl implements FileUploadService {
           MediaPackageElementFlavor flavor) throws FileUploadException {
     FileUploadJob job = new FileUploadJob(filename, filesize, chunksize, mp, flavor);
     log.info("Creating new upload job: {}", job);
+    
     try {
-      File jobDir = getJobDir(job.getId()); // create working dir
+      File jobDir = getJobDir(job.getId());      // create working dir
       FileUtils.forceMkdir(jobDir);
       ensureExists(getPayloadFile(job.getId())); // create empty payload file
-      storeJob(job); // create job file
+      storeJob(job);                             // create job file
+    
     } catch (FileUploadException e) {
       deleteJob(job.getId());
       String message = new StringBuilder("Could not create job file in ").append(workRoot.getAbsolutePath())
               .append(": ").append(e.getMessage()).toString();
       log.error(message, e);
       throw new FileUploadException(message, e);
+    
     } catch (IOException e) {
       deleteJob(job.getId());
       String message = new StringBuilder("Could not create upload job directory in ")
@@ -184,6 +198,7 @@ public class FileUploadServiceImpl implements FileUploadService {
         synchronized (this) {
           File jobFile = getJobFile(id);
           FileUploadJob job = (FileUploadJob) jobUnmarshaller.unmarshal(jobFile);
+          job.setLastModified(jobFile.lastModified());
           return job;
         }
       } catch (Exception e) {
@@ -200,20 +215,23 @@ public class FileUploadServiceImpl implements FileUploadService {
    */
   @Override
   public void cleanOutdatedJobs() throws IOException {
-    for (File f : workRoot.listFiles()) {
-      if (f.getParentFile().equals(workRoot) && f.isDirectory()) {
-        FileUploadJob job = jobCache.get(f.getName());
-        if (job == null) {
-          FileUtils.forceDelete(f);
-          log.info("Deleted outdated job {}", f.getName());
-        } else {
-          Calendar cal = Calendar.getInstance();
-          cal.add(Calendar.HOUR, -6);
-          if (f.lastModified() < cal.getTimeInMillis()) {
-            FileUtils.forceDelete(f);
-            jobCache.remove(job.getId());
-            log.info("Deleted outdated job {}", job);
+    for (File dir : workRoot.listFiles()) {
+      if (dir.getParentFile().equals(workRoot) && dir.isDirectory()) {
+        try {
+          String id = dir.getName();    // assuming that the dir name is the ID of a job..
+          if (!isLocked(id)) {          // ..true if not in cache or job is in cache and not locked
+            FileUploadJob job = getJob(id);
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.HOUR, -jobMaxTTL);
+            if (job.lastModified() < cal.getTimeInMillis()) {  
+              FileUtils.forceDelete(dir);
+              jobCache.remove(id);
+              log.info("Deleted outdated job {}", id);
+            } 
           }
+        } catch (Exception e) {        // something went wrong, so we assume the job is corrupted
+          FileUtils.forceDelete(dir);  // ..and delete it right away
+          log.info("Deleted corrupted job {}", dir.getName());
         }
       }
     }
@@ -249,7 +267,7 @@ public class FileUploadServiceImpl implements FileUploadService {
       if (isLocked(id)) {
         jobCache.remove(id);
       }
-      File jobDir = new File(workRoot.getAbsolutePath() + File.separator + id);
+      File jobDir = getJobDir(id);
       FileUtils.forceDelete(jobDir);
     } catch (Exception e) {
       log.warn("Error while deleting upload job: " + e.getMessage());
@@ -382,8 +400,6 @@ public class FileUploadServiceImpl implements FileUploadService {
     if (isLocked(job.getId())) {
       throw new FileUploadException(
               "Job is locked. Download is only permitted while no upload to this job is in progress.");
-    } else {
-      lock(job);
     }
 
     try {
