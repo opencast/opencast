@@ -24,6 +24,7 @@ import org.opencastproject.remotetest.util.TrustedHttpClient;
 import junit.framework.Assert;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -85,7 +86,9 @@ public class WorkflowRestEndpointTest {
     postStart.setEntity(new UrlEncodedFormEntity(formParams, "UTF-8"));
 
     // Grab the new workflow instance from the response
-    String postResponse = EntityUtils.toString(client.execute(postStart).getEntity());
+    HttpResponse r = client.execute(postStart);
+    Assert.assertEquals(200, r.getStatusLine().getStatusCode());
+    String postResponse = EntityUtils.toString(r.getEntity());
     String id = getWorkflowInstanceId(postResponse);
 
     // Ensure we can retrieve the workflow instance from the rest endpoint
