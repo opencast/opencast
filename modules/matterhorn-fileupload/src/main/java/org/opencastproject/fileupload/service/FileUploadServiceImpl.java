@@ -191,17 +191,17 @@ public class FileUploadServiceImpl implements FileUploadService {
    */
   @Override
   public FileUploadJob getJob(String id) throws FileUploadException {
-    if (jobCache.containsKey(id)) {
-      return jobCache.get(id);
-    } else {
-      try {
+    if (jobCache.containsKey(id)) {          // job already cached?
+      return jobCache.get(id);               
+    } else {                                 // job not in cache?
+      try {                                  // try to load job from filesystem
         synchronized (this) {
           File jobFile = getJobFile(id);
           FileUploadJob job = (FileUploadJob) jobUnmarshaller.unmarshal(jobFile);
-          job.setLastModified(jobFile.lastModified());
+          job.setLastModified(jobFile.lastModified());  // get last modified time from job file
           return job;
-        }
-      } catch (Exception e) {
+        }                                    // if loading from fs also fails 
+      } catch (Exception e) {                // we could not find the job and throw an Exception
         log.warn("Failed to load job " + id + " from file.");
         throw new FileUploadException("Error retrieving job " + id, e);
       }
@@ -229,7 +229,7 @@ public class FileUploadServiceImpl implements FileUploadService {
               log.info("Deleted outdated job {}", id);
             } 
           }
-        } catch (Exception e) {        // something went wrong, so we assume the job is corrupted
+        } catch (Exception e) {        // something went wrong, so we assume the dir is corrupted
           FileUtils.forceDelete(dir);  // ..and delete it right away
           log.info("Deleted corrupted job {}", dir.getName());
         }
