@@ -71,7 +71,7 @@ public class FileUploadServiceCleaner {
    * Set the schedule and start or restart the scheduler.
    */
   public void schedule() {
-    logger.info("File upload job cleaner is run every hour.");
+    logger.debug("File upload job cleaner is run every hour.");
     try {
       final Trigger trigger = TriggerUtils.makeHourlyTrigger();
       trigger.setStartTime(new Date());

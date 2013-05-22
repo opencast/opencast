@@ -49,18 +49,21 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 
 /**
  * A service for big file uploads via HTTP.
  * 
  */
-public class FileUploadServiceImpl implements FileUploadService {
+public class FileUploadServiceImpl implements FileUploadService, ManagedService {
 
   final String PROPKEY_STORAGE_DIR = "org.opencastproject.storage.dir";
   final String PROPKEY_CLEANER_MAXTTL = "org.opencastproject.upload.cleaner.maxttl";
@@ -80,10 +83,10 @@ public class FileUploadServiceImpl implements FileUploadService {
   private HashMap<String, FileUploadJob> jobCache = new HashMap<String, FileUploadJob>();
   private byte[] readBuffer = new byte[READ_BUFFER_LENGTH];
   private FileUploadServiceCleaner cleaner;
-  private int jobMaxTTL;
+  private int jobMaxTTL = DEFAULT_CLEANER_MAXTTL;
 
   // <editor-fold defaultstate="collapsed" desc="OSGi Service Stuff" >
-  protected void activate(ComponentContext cc) throws Exception {
+  protected synchronized void activate(ComponentContext cc) throws Exception {
     // ensure existence of working directory
     String dirname = cc.getBundleContext().getProperty(PROPKEY_STORAGE_DIR);
     if (dirname != null) {
@@ -101,23 +104,27 @@ public class FileUploadServiceImpl implements FileUploadService {
     jobMarshaller = jctx.createMarshaller();
     jobUnmarshaller = jctx.createUnmarshaller();
     
-    // try to get time-to-live threshold for jobs, use default if not configured
-    try {
-      jobMaxTTL = Integer.parseInt(cc.getBundleContext().getProperty(PROPKEY_CLEANER_MAXTTL));
-    } catch (Exception e) {
-      jobMaxTTL = DEFAULT_CLEANER_MAXTTL;
-    }
-    
     cleaner = new FileUploadServiceCleaner(this);
     cleaner.schedule();
     
-    log.info("File Upload Service activated. Storage directory is {}. Jobs will be deleted when older than {} hours.", 
-            workRoot.getAbsolutePath(), jobMaxTTL);
+    log.info("File Upload Service activated. Storage directory is {}.", workRoot.getAbsolutePath());
   }
 
   protected void deactivate(ComponentContext cc) {
     log.info("File Upload Service deactivated");
     cleaner.shutdown();
+  }
+  
+  @Override
+  public synchronized void updated(Dictionary properties) throws ConfigurationException {
+    // try to get time-to-live threshold for jobs, use default if not configured
+    try {
+      jobMaxTTL = Integer.parseInt(((String)properties.get(PROPKEY_CLEANER_MAXTTL)).trim());
+    } catch (Exception e) {
+      jobMaxTTL = DEFAULT_CLEANER_MAXTTL;
+      log.warn("Unable to update configuration. {}", e.getMessage());
+    }
+    log.info("Configuration updated. Jobs older than {} hours are deleted.", jobMaxTTL);
   }
 
   protected void setWorkspace(Workspace workspace) {

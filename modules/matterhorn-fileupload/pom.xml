@@ -84,7 +84,10 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Export-Package> org.opencastproject.fileupload.api;version=${project.version} </Export-Package>
+            <Export-Package> 
+              org.opencastproject.fileupload.api;version=${project.version},
+              org.opencastproject.fileupload.service;version=${project.version} 
+            </Export-Package>
             <Import-Package>
                org.opencastproject.workspace.api;version=${project.version},
               *;resolution:=optional
