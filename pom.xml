@@ -787,8 +787,8 @@
         </executions>
       </plugin>
       <!-- Attach sources for all builds -->
-      <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-source-plugin</artifactId> <executions> 
-        <execution> <id>attach-sources</id> <phase>verify</phase> <goals> <goal>jar-no-fork</goal> <goal>test-jar-no-fork</goal> 
+      <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-source-plugin</artifactId> <executions>
+        <execution> <id>attach-sources</id> <phase>verify</phase> <goals> <goal>jar-no-fork</goal> <goal>test-jar-no-fork</goal>
         </goals> </execution> </executions> </plugin> -->
       <!-- Run tests and display test output in the console -->
       <plugin>
@@ -1076,7 +1076,7 @@
         <artifactId>solr-solrj</artifactId>
         <version>1.4.1</version>
       </dependency>
-      
+
       <dependency>
         <groupId>com.googlecode.guava-osgi</groupId>
         <artifactId>guava-osgi</artifactId>
@@ -1488,9 +1488,9 @@
     <developer>
       <id>ruben.perez</id>
       <name>Ruben Perez Vazquez</name>
-      <email>rubenperez@uvigo.es</email>
-      <organization>Universidade de Vigo</organization>
-      <organizationUrl>http://www.uvigo.es</organizationUrl>
+      <email>rubenperez@teltek.es</email>
+      <organization>Teltek</organization>
+      <organizationUrl>http://www.teltek.es</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1619,9 +1619,9 @@
     <developer>
       <id>twunden</id>
       <name>Tobias Wunden</name>
-      <email>tobias.wunden@id.ethz.ch</email>
-      <organization>ETH Zürich</organization>
-      <organizationUrl>http://www.ethz.ch</organizationUrl>
+      <email>tobias@entwinemedia.com</email>
+      <organization>Entwine</organization>
+      <organizationUrl>http://entwinemedia.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1729,7 +1729,8 @@
       <id>cedriessen</id>
       <name>Christoph Driessen</name>
       <email>christoph@entwinemedia.com</email>
-      <url>http://entwinemedia.com</url>
+      <organization>Entwine</organization>
+      <organizationUrl>http://entwinemedia.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1768,7 +1769,7 @@
       </roles>
       <timezone>+2</timezone>
     </developer>
- <developer>
+ 	<developer>
       <id>nbirnbaum</id>
       <name>Nils H. Birnbaum</name>
       <email>nbirnbau@uni-osnabrueck.de</email>
@@ -1778,6 +1779,63 @@
         <role>Documentation and QA</role>
       </roles>
       <timezone>+1</timezone>
+    </developer>
+ 	<developer>
+      <id>lrohner</id>
+      <name>Lukas Rohner</name>
+      <email>lukas@entwinemedia.com</email>
+      <organization>Entwine</organization>
+      <organizationUrl>http://entwinemedia.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>xavier.butty</id>
+      <name>Xavier Butty</name>
+      <email>xavier@entwinemedia.com</email>
+      <organization>Entwine</organization>
+      <organizationUrl>http://entwinemedia.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>etmoyo</id>
+      <name>Edmore Moyo</name>
+      <email>edmore.moyo@uct.ac.za</email>
+      <organization>University of Cape Town</organization>
+      <organizationUrl>http://www.uct.ac.za</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+2</timezone>
+    </developer>
+    <developer>
+      <id>michellezee</id>
+      <name>Michelle Ziegmann</name>
+      <email>michelle@media.berkeley.edu</email>
+      <organization>UC Berkeley</organization>
+      <organizationUrl>http://berkeley.edu</organizationUrl>
+      <roles>
+        <role>community facilitator</role>
+        <role>tester</role>
+      </roles>
+      <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <id>judy</id>
+      <name>Judy Stern</name>
+      <email>jlstern@berkeley.edu</email>
+      <organization>UC Berkeley</organization>
+      <organizationUrl>http://berkeley.edu</organizationUrl>
+      <roles>
+        <role>community facilitator</role>
+        <role>tester</role>
+      </roles>
+      <timezone>-8</timezone>
     </developer>
   </developers>
 
@@ -1812,7 +1870,7 @@
     <url>http://opencast.jira.com</url>
   </issueManagement>
 
-  <!-- These should be the right locations for opencast maven 2 distribution, make sure you have <scm> defined for your sub 
+  <!-- These should be the right locations for opencast maven 2 distribution, make sure you have <scm> defined for your sub
     project -->
   <distributionManagement>
     <snapshotRepository>
@@ -1948,10 +2006,10 @@
       </releases>
     </pluginRepository>
     <!-- these are here as a backup in case the matterhorn nexus is down -->
-    <!-- <pluginRepository> <id>ops4j.releases</id> <url>http://repository.ops4j.org/maven2</url> <snapshots> <enabled>false</enabled> 
-      </snapshots> </pluginRepository> <pluginRepository> <id>apache Snapshots</id> <url>http://people.apache.org/repo/m2-snapshot-repository</url> 
-      <snapshots> <enabled>true</enabled> </snapshots> <releases> <enabled>false</enabled> </releases> </pluginRepository> <pluginRepository> 
-      <id>sonatype-repository</id> <name>Sonatype Public Repo</name> <url>http://repository.sonatype.org/content/groups/public/</url> 
+    <!-- <pluginRepository> <id>ops4j.releases</id> <url>http://repository.ops4j.org/maven2</url> <snapshots> <enabled>false</enabled>
+      </snapshots> </pluginRepository> <pluginRepository> <id>apache Snapshots</id> <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+      <snapshots> <enabled>true</enabled> </snapshots> <releases> <enabled>false</enabled> </releases> </pluginRepository> <pluginRepository>
+      <id>sonatype-repository</id> <name>Sonatype Public Repo</name> <url>http://repository.sonatype.org/content/groups/public/</url>
       </pluginRepository> -->
   </pluginRepositories>
 
@@ -1995,18 +2053,18 @@
       <url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
     </repository>
     <!-- these are here as a backup in case the matterhorn nexus repository is down -->
-    <!-- <repository> <id>com.springsource.repository.bundles.release</id> <name>SpringSource Enterprise Bundle Repository 
-      - SpringSource Bundle Releases</name> <url>http://repository.springsource.com/maven/bundles/release</url> <releases> <enabled>true</enabled> 
-      </releases> </repository> <repository> <id>com.springsource.repository.bundles.external</id> <name>SpringSource Enterprise 
-      Bundle Repository - External Bundle Releases</name> <url>http://repository.springsource.com/maven/bundles/external</url> 
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>ops4j</id> <name>OPS4J Repository</name> <url>http://repository.ops4j.org/maven2</url> 
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>apache.incubating</id> <name>Apache Incubating 
-      Repository</name> <url>http://people.apache.org/repo/m2-incubating-repository</url> <releases> <enabled>true</enabled> </releases> 
-      </repository> <repository> <id>codehaus-release-repo</id> <name>Codehaus Release Repo</name> <url>http://repository.codehaus.org</url> 
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>modularity-releases</id> <name>Modularity Releases 
-      Repository</name> <url>http://m2.modularity.net.au/releases</url> <releases> <enabled>true</enabled> </releases> </repository> 
-      <repository> <id>sonatype-repository</id> <name>Sonatype Public Repo</name> <url>http://repository.sonatype.org/content/groups/public/</url> 
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>EclipseLink Repo</id> <url>http://mirrors.ibiblio.org/pub/mirrors/eclipse/rt/eclipselink/maven.repo</url> 
+    <!-- <repository> <id>com.springsource.repository.bundles.release</id> <name>SpringSource Enterprise Bundle Repository
+      - SpringSource Bundle Releases</name> <url>http://repository.springsource.com/maven/bundles/release</url> <releases> <enabled>true</enabled>
+      </releases> </repository> <repository> <id>com.springsource.repository.bundles.external</id> <name>SpringSource Enterprise
+      Bundle Repository - External Bundle Releases</name> <url>http://repository.springsource.com/maven/bundles/external</url>
+      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>ops4j</id> <name>OPS4J Repository</name> <url>http://repository.ops4j.org/maven2</url>
+      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>apache.incubating</id> <name>Apache Incubating
+      Repository</name> <url>http://people.apache.org/repo/m2-incubating-repository</url> <releases> <enabled>true</enabled> </releases>
+      </repository> <repository> <id>codehaus-release-repo</id> <name>Codehaus Release Repo</name> <url>http://repository.codehaus.org</url>
+      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>modularity-releases</id> <name>Modularity Releases
+      Repository</name> <url>http://m2.modularity.net.au/releases</url> <releases> <enabled>true</enabled> </releases> </repository>
+      <repository> <id>sonatype-repository</id> <name>Sonatype Public Repo</name> <url>http://repository.sonatype.org/content/groups/public/</url>
+      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>EclipseLink Repo</id> <url>http://mirrors.ibiblio.org/pub/mirrors/eclipse/rt/eclipselink/maven.repo</url>
       <releases> <enabled>true</enabled> </releases> </repository> -->
   </repositories>
 </project>
