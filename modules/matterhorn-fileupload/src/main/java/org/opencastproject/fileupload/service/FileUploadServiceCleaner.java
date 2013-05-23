@@ -1,3 +1,18 @@
+/**
+ *  Copyright 2009, 2010 The Regents of the University of California
+ *  Licensed under the Educational Community License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance
+ *  with the License. You may obtain a copy of the License at
+ *
+ *  http://www.osedu.org/licenses/ECL-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an "AS IS"
+ *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ *  or implied. See the License for the specific language governing
+ *  permissions and limitations under the License.
+ *
+ */
 package org.opencastproject.fileupload.service;
 
 import org.opencastproject.fileupload.api.FileUploadService;
@@ -56,7 +71,7 @@ public class FileUploadServiceCleaner {
    * Set the schedule and start or restart the scheduler.
    */
   public void schedule() {
-    logger.info("Run file upload cleaner job every four hours");
+    logger.debug("File upload job cleaner is run every hour.");
     try {
       final Trigger trigger = TriggerUtils.makeHourlyTrigger();
       trigger.setStartTime(new Date());

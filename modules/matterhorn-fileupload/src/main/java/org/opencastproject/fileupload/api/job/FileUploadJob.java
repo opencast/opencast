@@ -51,6 +51,7 @@ public class FileUploadJob {
   private String id; // this jobs identifier
   @XmlAttribute()
   private JobState state = JobState.READY; // this jobs state
+  private long modified;  // time of last modification
   @XmlElement(name = "payload")
   private Payload payload; // information about this jobs payload
   @XmlElement(name = "chunksize")
@@ -62,18 +63,20 @@ public class FileUploadJob {
 
   public FileUploadJob() {
     this.id = UUID.randomUUID().toString();
+    this.modified = System.currentTimeMillis();
     this.payload = new Payload("unknown", -1, null, null);
   }
 
   public FileUploadJob(String filename, long filesize, int chunksize, MediaPackage mp, MediaPackageElementFlavor flavor) {
     this.id = UUID.randomUUID().toString();
+    this.modified = System.currentTimeMillis();
     this.chunksize = chunksize;
-    if (chunksize == -1) {
-      chunksTotal = 1;
-    } else {
-      chunksTotal = filesize / chunksize;
-      if (filesize % chunksize != 0) {
-        chunksTotal++;
+    if (chunksize == -1) {           // indicates ordinary HTTP upload
+      chunksTotal = 1;               // ..so we have only one chunk
+    } else {                         // chunked upload
+      chunksTotal = filesize / chunksize;  // compute number of chunks
+      if (filesize % chunksize != 0) {     // if file size is not a multiple of chunk size
+        chunksTotal++;                     // ..add one chunk for the rest
       }
     }
     this.payload = new Payload(filename, filesize, mp, flavor);
@@ -88,7 +91,16 @@ public class FileUploadJob {
   }
 
   public synchronized void setState(JobState state) {
+    setLastModified(System.currentTimeMillis());
     this.state = state;
+  }
+  
+  public void setLastModified(long time) {
+    this.modified = time;
+  }
+  
+  public long lastModified() {
+    return this.modified;
   }
 
   public Payload getPayload() {
@@ -108,6 +120,7 @@ public class FileUploadJob {
   }
 
   public void setCurrentChunk(Chunk currentChunk) {
+    setLastModified(System.currentTimeMillis());
     this.currentChunk = currentChunk;
   }
 

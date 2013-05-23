@@ -49,26 +49,31 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 
 /**
  * A service for big file uploads via HTTP.
  * 
  */
-public class FileUploadServiceImpl implements FileUploadService {
+public class FileUploadServiceImpl implements FileUploadService, ManagedService {
 
   final String PROPKEY_STORAGE_DIR = "org.opencastproject.storage.dir";
+  final String PROPKEY_CLEANER_MAXTTL = "org.opencastproject.upload.cleaner.maxttl";
   final String DIRNAME_WORK_ROOT = "fileupload-tmp";
   final String UPLOAD_COLLECTION = "uploaded";
   final String FILEEXT_DATAFILE = ".payload";
   final String FILENAME_CHUNKFILE = "chunk.part";
   final String FILENAME_JOBFILE = "job.xml";
   final int READ_BUFFER_LENGTH = 512;
+  final int DEFAULT_CLEANER_MAXTTL = 6;
   private static final Logger log = LoggerFactory.getLogger(FileUploadServiceImpl.class);
   private File workRoot;
   private IngestService ingestService;
@@ -78,9 +83,10 @@ public class FileUploadServiceImpl implements FileUploadService {
   private HashMap<String, FileUploadJob> jobCache = new HashMap<String, FileUploadJob>();
   private byte[] readBuffer = new byte[READ_BUFFER_LENGTH];
   private FileUploadServiceCleaner cleaner;
+  private int jobMaxTTL = DEFAULT_CLEANER_MAXTTL;
 
   // <editor-fold defaultstate="collapsed" desc="OSGi Service Stuff" >
-  protected void activate(ComponentContext cc) throws Exception {
+  protected synchronized void activate(ComponentContext cc) throws Exception {
     // ensure existence of working directory
     String dirname = cc.getBundleContext().getProperty(PROPKEY_STORAGE_DIR);
     if (dirname != null) {
@@ -97,16 +103,28 @@ public class FileUploadServiceImpl implements FileUploadService {
     JAXBContext jctx = JAXBContext.newInstance("org.opencastproject.fileupload.api.job", cl);
     jobMarshaller = jctx.createMarshaller();
     jobUnmarshaller = jctx.createUnmarshaller();
-
-    log.info("File Upload Service activated. Storage directory is {}", workRoot.getAbsolutePath());
-
+    
     cleaner = new FileUploadServiceCleaner(this);
     cleaner.schedule();
+    
+    log.info("File Upload Service activated. Storage directory is {}.", workRoot.getAbsolutePath());
   }
 
   protected void deactivate(ComponentContext cc) {
     log.info("File Upload Service deactivated");
     cleaner.shutdown();
+  }
+  
+  @Override
+  public synchronized void updated(Dictionary properties) throws ConfigurationException {
+    // try to get time-to-live threshold for jobs, use default if not configured
+    try {
+      jobMaxTTL = Integer.parseInt(((String)properties.get(PROPKEY_CLEANER_MAXTTL)).trim());
+    } catch (Exception e) {
+      jobMaxTTL = DEFAULT_CLEANER_MAXTTL;
+      log.warn("Unable to update configuration. {}", e.getMessage());
+    }
+    log.info("Configuration updated. Jobs older than {} hours are deleted.", jobMaxTTL);
   }
 
   protected void setWorkspace(Workspace workspace) {
@@ -129,17 +147,20 @@ public class FileUploadServiceImpl implements FileUploadService {
           MediaPackageElementFlavor flavor) throws FileUploadException {
     FileUploadJob job = new FileUploadJob(filename, filesize, chunksize, mp, flavor);
     log.info("Creating new upload job: {}", job);
+    
     try {
-      File jobDir = getJobDir(job.getId()); // create working dir
+      File jobDir = getJobDir(job.getId());      // create working dir
       FileUtils.forceMkdir(jobDir);
       ensureExists(getPayloadFile(job.getId())); // create empty payload file
-      storeJob(job); // create job file
+      storeJob(job);                             // create job file
+    
     } catch (FileUploadException e) {
       deleteJob(job.getId());
       String message = new StringBuilder("Could not create job file in ").append(workRoot.getAbsolutePath())
               .append(": ").append(e.getMessage()).toString();
       log.error(message, e);
       throw new FileUploadException(message, e);
+    
     } catch (IOException e) {
       deleteJob(job.getId());
       String message = new StringBuilder("Could not create upload job directory in ")
@@ -177,16 +198,17 @@ public class FileUploadServiceImpl implements FileUploadService {
    */
   @Override
   public FileUploadJob getJob(String id) throws FileUploadException {
-    if (jobCache.containsKey(id)) {
-      return jobCache.get(id);
-    } else {
-      try {
+    if (jobCache.containsKey(id)) {          // job already cached?
+      return jobCache.get(id);               
+    } else {                                 // job not in cache?
+      try {                                  // try to load job from filesystem
         synchronized (this) {
           File jobFile = getJobFile(id);
           FileUploadJob job = (FileUploadJob) jobUnmarshaller.unmarshal(jobFile);
+          job.setLastModified(jobFile.lastModified());  // get last modified time from job file
           return job;
-        }
-      } catch (Exception e) {
+        }                                    // if loading from fs also fails 
+      } catch (Exception e) {                // we could not find the job and throw an Exception
         log.warn("Failed to load job " + id + " from file.");
         throw new FileUploadException("Error retrieving job " + id, e);
       }
@@ -200,20 +222,23 @@ public class FileUploadServiceImpl implements FileUploadService {
    */
   @Override
   public void cleanOutdatedJobs() throws IOException {
-    for (File f : workRoot.listFiles()) {
-      if (f.getParentFile().equals(workRoot) && f.isDirectory()) {
-        FileUploadJob job = jobCache.get(f.getName());
-        if (job == null) {
-          FileUtils.forceDelete(f);
-          log.info("Deleted outdated job {}", f.getName());
-        } else {
-          Calendar cal = Calendar.getInstance();
-          cal.add(Calendar.HOUR, -6);
-          if (f.lastModified() < cal.getTimeInMillis()) {
-            FileUtils.forceDelete(f);
-            jobCache.remove(job.getId());
-            log.info("Deleted outdated job {}", job);
+    for (File dir : workRoot.listFiles()) {
+      if (dir.getParentFile().equals(workRoot) && dir.isDirectory()) {
+        try {
+          String id = dir.getName();    // assuming that the dir name is the ID of a job..
+          if (!isLocked(id)) {          // ..true if not in cache or job is in cache and not locked
+            FileUploadJob job = getJob(id);
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.HOUR, -jobMaxTTL);
+            if (job.lastModified() < cal.getTimeInMillis()) {  
+              FileUtils.forceDelete(dir);
+              jobCache.remove(id);
+              log.info("Deleted outdated job {}", id);
+            } 
           }
+        } catch (Exception e) {        // something went wrong, so we assume the dir is corrupted
+          FileUtils.forceDelete(dir);  // ..and delete it right away
+          log.info("Deleted corrupted job {}", dir.getName());
         }
       }
     }
@@ -249,7 +274,7 @@ public class FileUploadServiceImpl implements FileUploadService {
       if (isLocked(id)) {
         jobCache.remove(id);
       }
-      File jobDir = new File(workRoot.getAbsolutePath() + File.separator + id);
+      File jobDir = getJobDir(id);
       FileUtils.forceDelete(jobDir);
     } catch (Exception e) {
       log.warn("Error while deleting upload job: " + e.getMessage());
@@ -382,8 +407,6 @@ public class FileUploadServiceImpl implements FileUploadService {
     if (isLocked(job.getId())) {
       throw new FileUploadException(
               "Job is locked. Download is only permitted while no upload to this job is in progress.");
-    } else {
-      lock(job);
     }
 
     try {
