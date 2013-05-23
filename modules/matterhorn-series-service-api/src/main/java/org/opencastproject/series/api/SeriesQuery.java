@@ -84,7 +84,7 @@ public class SeriesQuery {
    */
   public SeriesQuery setLicense(String license) {
     if (StringUtils.isNotBlank(license)) {
-      this.license = license;
+      this.license = license.trim();
     }
     return this;
   }
@@ -97,7 +97,7 @@ public class SeriesQuery {
    */
   public SeriesQuery setSeriesAbstract(String seriesAbstract) {
     if (StringUtils.isNotBlank(seriesAbstract)) {
-      this.seriesAbstract = seriesAbstract;
+      this.seriesAbstract = seriesAbstract.trim();
     }
     return this;
   }
@@ -154,7 +154,7 @@ public class SeriesQuery {
    */
   public SeriesQuery setText(String text) {
     if (StringUtils.isNotBlank(text)) {
-      this.text = text;
+      this.text = text.trim();
     }
     return this;
   }
@@ -167,7 +167,7 @@ public class SeriesQuery {
    */
   public SeriesQuery setSeriesId(String seriesId) {
     if (StringUtils.isNotBlank(seriesId)) {
-      this.seriesId = seriesId;
+      this.seriesId = seriesId.trim();
     }
     return this;
   }
@@ -180,7 +180,7 @@ public class SeriesQuery {
    */
   public SeriesQuery setSeriesTitle(String seriesTitle) {
     if (StringUtils.isNotBlank(seriesTitle)) {
-      this.seriesTitle = seriesTitle;
+      this.seriesTitle = seriesTitle.trim();
     }
     return this;
   }
@@ -193,7 +193,7 @@ public class SeriesQuery {
    */
   public SeriesQuery setCreator(String creator) {
     if (StringUtils.isNotBlank(creator)) {
-      this.creator = creator;
+      this.creator = creator.trim();
     }
     return this;
   }
@@ -206,7 +206,7 @@ public class SeriesQuery {
    */
   public SeriesQuery setContributor(String contributor) {
     if (StringUtils.isNotBlank(contributor)) {
-      this.contributor = contributor;
+      this.contributor = contributor.trim();
     }
     return this;
   }
@@ -219,7 +219,7 @@ public class SeriesQuery {
    */
   public SeriesQuery setLanguage(String language) {
     if (StringUtils.isNotBlank(language)) {
-      this.language = language;
+      this.language = language.trim();
     }
     return this;
   }
@@ -232,7 +232,7 @@ public class SeriesQuery {
    */
   public SeriesQuery setSubject(String subject) {
     if (StringUtils.isNotBlank(subject)) {
-      this.subject = subject;
+      this.subject = subject.trim();
     }
     return this;
   }
@@ -245,7 +245,7 @@ public class SeriesQuery {
    */
   public SeriesQuery setPublisher(String publisher) {
     if (StringUtils.isNotBlank(subject)) {
-      this.publisher = publisher;
+      this.publisher = publisher.trim();
     }
     return this;
   }
@@ -258,7 +258,7 @@ public class SeriesQuery {
    */
   public SeriesQuery setDescription(String description) {
     if (StringUtils.isNotBlank(subject)) {
-      this.description = description;
+      this.description = description.trim();
     }
     return this;
   }
@@ -293,7 +293,7 @@ public class SeriesQuery {
    */
   public SeriesQuery setRightsHolder(String rightsHolder) {
     if (StringUtils.isNotBlank(subject)) {
-      this.rightsHolder = rightsHolder;
+      this.rightsHolder = rightsHolder.trim();
     }
     return this;
   }

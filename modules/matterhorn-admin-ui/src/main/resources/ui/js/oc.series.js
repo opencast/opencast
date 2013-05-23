@@ -432,7 +432,8 @@ ocSeries.SubmitForm = function(){
 
 ocSeries.checkFields = function() {
   var error = false;
-  if($('#title').val() == "") {
+  var title = $.trim($('#title').val())
+  if(title == "") {
     error = true;
     $('#item-title').show();
   } else {
@@ -444,13 +445,13 @@ ocSeries.checkFields = function() {
       url: SERIES_SERVICE_URL + "/series.json",
       async: false,
       data: {
-        seriesTitle: $('#title').val()
+        seriesTitle: title
       },
       success: function(data) {
         if(data.totalCount != 0) {
           $.each(data.catalogs, function(key, value) {
-            if(value[DUBLINCORE_NS_URI].title[0].value == $('#title').val() 
-              && ocSeries.seriesTitle != $('#title').val()) {
+            if(value[DUBLINCORE_NS_URI].title[0].value == title
+              && ocSeries.seriesTitle != title) {
               error = true;
               $('#item-title-existing').show();
             } else {
