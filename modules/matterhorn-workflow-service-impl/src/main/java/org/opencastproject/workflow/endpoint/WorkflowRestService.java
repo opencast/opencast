@@ -533,53 +533,35 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Path("start")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "start", description = "Start a new workflow instance.", returnDescription = "An XML representation of the new workflow instance", restParameters = {
-          @RestParameter(name = "definition", isRequired = true, description = "The XML representation of a workflow definition", type = TEXT, defaultValue = "${this.sampleWorkflowDefinition}", jaxbClass = WorkflowDefinitionImpl.class),
-          @RestParameter(name = "mediapackage", isRequired = true, description = "The XML representation of a mediapackage", type = TEXT, defaultValue = "${this.sampleMediaPackage}", jaxbClass = MediaPackageImpl.class),
+          @RestParameter(name = "definition", isRequired = true, description = "The workflow definition ID or an XML representation of a workflow definition", type = TEXT, 
+                  defaultValue = "${this.sampleWorkflowDefinition}", jaxbClass = WorkflowDefinitionImpl.class),
+          @RestParameter(name = "mediapackage", isRequired = true, description = "The XML representation of a mediapackage", type = TEXT, 
+                  defaultValue = "${this.sampleMediaPackage}", jaxbClass = MediaPackageImpl.class),
           @RestParameter(name = "parent", isRequired = false, description = "An optional parent workflow instance identifier", type = STRING),
           @RestParameter(name = "properties", isRequired = false, description = "An optional set of key=value\\n properties", type = TEXT) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the new workflow instance."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "If the parent workflow does not exist") })
-  public WorkflowInstanceImpl start(@FormParam("definition") String workflowDefinitionXml,
+  public WorkflowInstanceImpl start(@FormParam("definition") String workflowDefinitionXmlOrId,
           @FormParam("mediapackage") MediaPackageImpl mp, @FormParam("parent") String parentWorkflowId,
           @FormParam("properties") LocalHashMap localMap) {
-    if (mp == null || StringUtils.isBlank(workflowDefinitionXml))
+    if (mp == null || StringUtils.isBlank(workflowDefinitionXmlOrId))
       throw new WebApplicationException(Status.BAD_REQUEST);
 
     WorkflowDefinition workflowDefinition;
     try {
-      workflowDefinition = WorkflowParser.parseWorkflowDefinition(workflowDefinitionXml);
-    } catch (WorkflowParsingException e) {
-      throw new WebApplicationException(e, Status.BAD_REQUEST);
+      workflowDefinition = service.getWorkflowDefinitionById(workflowDefinitionXmlOrId);
+    } catch (Exception e) {
+      // Not an ID. Let's try if it's an XML definition
+      try {
+        workflowDefinition = WorkflowParser.parseWorkflowDefinition(workflowDefinitionXmlOrId);
+      } catch (WorkflowParsingException wpe) {
+        throw new WebApplicationException(wpe, Status.BAD_REQUEST);
+      }
     }
-
+    
     return startWorkflow(workflowDefinition, mp, parentWorkflowId, localMap);
   }
 
-  @POST
-  @Path("startById")
-  @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "startbydefid", description = "Start a new workflow instance.", returnDescription = "An XML representation of the new workflow instance", restParameters = {
-          @RestParameter(name = "definitionId", isRequired = true, description = "The workflow definition id", type = STRING),
-          @RestParameter(name = "mediapackage", isRequired = true, description = "The XML representation of a mediapackage", type = TEXT, defaultValue = "${this.sampleMediaPackage}", jaxbClass = MediaPackageImpl.class),
-          @RestParameter(name = "parent", isRequired = false, description = "An optional parent workflow instance identifier", type = STRING),
-          @RestParameter(name = "properties", isRequired = false, description = "An optional set of key=value\\n properties", type = TEXT) }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "An XML representation of the new workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the workflow definition was not found or the parent workflow does not exist") })
-  public WorkflowInstanceImpl startByDefId(@FormParam("definitionId") String workflowDefinitionId,
-          @FormParam("mediapackage") MediaPackageImpl mp, @FormParam("parent") String parentWorkflowId,
-          @FormParam("properties") LocalHashMap localMap) throws NotFoundException {
-    if (mp == null)
-      throw new WebApplicationException(Status.BAD_REQUEST);
-
-    WorkflowDefinition workflowDefinition = null;
-    try {
-      workflowDefinition = service.getWorkflowDefinitionById(workflowDefinitionId);
-    } catch (WorkflowDatabaseException e) {
-      throw new WebApplicationException(e);
-    }
-
-    return startWorkflow(workflowDefinition, mp, parentWorkflowId, localMap);
-  }
 
   private WorkflowInstanceImpl startWorkflow(WorkflowDefinition workflowDefinition, MediaPackageImpl mp,
           String parentWorkflowId, LocalHashMap localMap) {
