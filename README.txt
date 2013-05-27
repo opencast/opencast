@@ -14,7 +14,7 @@ For the impatient, experienced, and brave, here's the short version:
 
 4) Start felix using <felix home>/bin/start_matterhorn.sh and navigate to http://localhost:8080
 
-Logging configuration can be customized by modifying <felix home>/conf/services/org.ops4j.pax.logging.properties.
+Logging configuration can be customized by modifying <felix home>/etc/services/org.ops4j.pax.logging.properties.
 
-Detailed instructions for a variety of platforms and topologies are available at http://opencast.jira.com/wiki/display/MH/Installation+and+Configuration+%28Trunk%29
-Questions should go to the Matterhorn list (matterhorn-users@opencastproject.org, see http://lists.opencastproject.org/mailman/listinfo/matterhorn-users for archives and registration) or the #opencast IRC channel at irc.freenode.net
+Detailed instructions for a variety of platforms and topologies are available at https://opencast.jira.com/wiki/display/MHTRUNK/Install
+Questions should go to the Matterhorn list (matterhorn-users@opencast.org, see http://opencast.org/matterhorn/community for archives and registration) or the #opencast IRC channel at irc.freenode.net
