@@ -3,7 +3,7 @@
     <li><a href="#instance">Workflow Instance</a></li>
     <li><a href="#mediapackage">Mediapackage</a></li>
     <li><a href="#operations">Operations</a></li>
-    <li><a href="#performance">Performance</a></li>
+<!--    <li><a href="#performance">Performance</a></li> -->
   </ul>
 
   <div id="instance">
@@ -329,13 +329,6 @@
     </table>
   </div>     
 
-
-
-
-
-
-
-
-  <div id="performance">
-    <div id="graph" style="width: 760px; height: 400px"></div>  </div>
+<!--  <div id="performance">
+    <div id="graph" style="width: 760px; height: 400px"></div>  </div> -->
 </div>
