@@ -160,7 +160,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       File parentDirectory = f.getParentFile();
       logger.debug("Attempting to delete {}", parentDirectory.getAbsolutePath());
       FileUtils.forceDelete(parentDirectory);
-      if (parentDirectory.getParentFile().list().length == 0)
+      File parentsParentDirectory = parentDirectory.getParentFile();
+      if (parentsParentDirectory.isDirectory() && parentsParentDirectory.list().length == 0)
         FileUtils.forceDelete(parentDirectory.getParentFile());
       return true;
     } catch (NotFoundException e) {
@@ -709,7 +710,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       throw new IOException(f + " cannot be deleted");
 
     File parentDirectory = f.getParentFile();
-    if (parentDirectory.list().length == 0) {
+    if (parentDirectory.isDirectory() && parentDirectory.list().length == 0) {
       logger.debug("Attempting to delete empty collection directory {}", parentDirectory.getAbsolutePath());
       try {
         FileUtils.forceDelete(parentDirectory);

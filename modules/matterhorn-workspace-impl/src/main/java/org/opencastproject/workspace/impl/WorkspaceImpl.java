@@ -358,7 +358,7 @@ public class WorkspaceImpl implements Workspace {
       synchronized (wsRoot) {
         File mpElementDir = f.getParentFile();
         FileUtils.forceDelete(f);
-        if (mpElementDir.list().length == 0)
+        if (mpElementDir.isDirectory() && mpElementDir.list().length == 0)
           FileUtils.forceDelete(mpElementDir);
 
         // Also delete mediapackage itself when empty
@@ -380,7 +380,7 @@ public class WorkspaceImpl implements Workspace {
             mediaPackageID, mediaPackageElementID }));
     File mpDirectory = f.getParentFile();
     FileUtils.deleteQuietly(f);
-    if (mpDirectory.list().length == 0)
+    if (mpDirectory.isDirectory() && mpDirectory.list().length == 0)
       FileUtils.deleteDirectory(mpDirectory);
   }
 
@@ -595,7 +595,7 @@ public class WorkspaceImpl implements Workspace {
             collectionId, fileName }));
     File collectionDir = f.getParentFile();
     FileUtils.deleteQuietly(f);
-    if (collectionDir.list().length == 0)
+    if (collectionDir.isDirectory() && collectionDir.list().length == 0)
       FileUtils.deleteDirectory(collectionDir);
   }
 

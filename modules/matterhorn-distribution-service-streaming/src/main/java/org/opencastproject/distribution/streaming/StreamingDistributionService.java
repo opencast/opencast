@@ -314,7 +314,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
       // Try to remove the file and - if possible - the parent folder
       FileUtils.forceDelete(elementFile);
-      if (mediapackageDir.list().length == 0) {
+      if (mediapackageDir.isDirectory() && mediapackageDir.list().length == 0) {
         FileSupport.delete(mediapackageDir.getParentFile());
       }
 

@@ -351,7 +351,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     // Test for the existence of the index. Note that an empty index directory will prevent solr from
     // completing normal setup.
     File solrIndexDir = new File(solrDataDir, "index");
-    if (solrIndexDir.exists() && solrIndexDir.list().length == 0) {
+    if (solrIndexDir.isDirectory() && solrIndexDir.list().length == 0) {
       FileUtils.deleteDirectory(solrIndexDir);
     }
 
