@@ -70,12 +70,6 @@
     
     <dependency>
       <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.prefs</artifactId>
-      <version>1.0.4</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.metatype</artifactId>
     </dependency>
 
@@ -87,18 +81,6 @@
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.fileinstall</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.ops4j.pax.web</groupId>
-      <artifactId>pax-web-jsp</artifactId>
-      <version>1.1.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.webconsole</artifactId>
-      <version>3.1.8</version>
     </dependency>
 
     <!-- Start level 2 -->
@@ -436,11 +418,6 @@
     </dependency>
     
     <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-parsers</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
     </dependency>
@@ -520,12 +497,6 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-ldap</artifactId>
-      <version>3.1.0.RELEASE</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>org.springframework.jdbc</artifactId>
       <version>3.1.0.RELEASE</version>
     </dependency>
 
