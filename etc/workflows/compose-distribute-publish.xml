@@ -125,7 +125,8 @@
   </configuration_panel>
 
   <operations>
-	<!-- Apply ACL from series to the mediapackage -->
+
+	  <!-- Apply ACL from series to the mediapackage -->
 
     <operation
       id="apply-acl"
@@ -152,7 +153,7 @@
       description="Tagging source metadata for publishing">
       <configurations>
         <configuration key="source-flavors">dublincore/*</configuration>
-        <configuration key="target-tags">+engage</configuration>
+        <configuration key="target-tags">+engage-download</configuration>
       </configurations>
     </operation>
 
@@ -242,7 +243,7 @@
       description="Tagging trimmed media for archive">
       <configurations>
         <configuration key="source-flavors">dublincore/*</configuration>
-        <configuration key="target-tags">+archive,+engage</configuration>
+        <configuration key="target-tags">+archive,+engage-download</configuration>
       </configurations>
     </operation>
 
@@ -254,7 +255,7 @@
       exception-handler-workflow="error"
       description="Waiting for user to upload captions">
       <configurations>
-        <configuration key="target-tags">engage,archive</configuration>
+        <configuration key="target-tags">engage-download,archive</configuration>
       </configurations>
     </operation>
 
@@ -269,7 +270,7 @@
         <configuration key="source-flavor">presenter/trimmed</configuration>
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presenter/player+preview</configuration>
-        <configuration key="target-tags">engage</configuration>
+        <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
         <configuration key="time">1</configuration>
       </configurations>
@@ -284,7 +285,7 @@
         <configuration key="source-flavor">presentation/trimmed</configuration>
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presentation/player+preview</configuration>
-        <configuration key="target-tags">engage</configuration>
+        <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
         <configuration key="time">1</configuration>
       </configurations>
@@ -300,7 +301,7 @@
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>
         <configuration key="target-flavor">presenter/delivery</configuration>
-        <configuration key="target-tags">engage</configuration>
+        <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">flash.http</configuration>
       </configurations>
     </operation>
@@ -313,7 +314,7 @@
       <configurations>
         <configuration key="source-flavor">presentation/trimmed</configuration>
         <configuration key="target-flavor">presentation/delivery</configuration>
-        <configuration key="target-tags">engage</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming</configuration>
         <configuration key="encoding-profile">flash-vga.http</configuration>
       </configurations>
     </operation>
@@ -326,7 +327,7 @@
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>
         <configuration key="target-flavor">presenter/delivery</configuration>
-        <configuration key="target-tags">engage</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming</configuration>
         <configuration key="encoding-profile">flash-audio.http</configuration>
       </configurations>
     </operation>
@@ -354,7 +355,7 @@
         <configuration key="source-flavor">presenter/trimmed</configuration>
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presenter/search+preview</configuration>
-        <configuration key="target-tags">engage</configuration>
+        <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">search-cover.http</configuration>
         <configuration key="time">1</configuration>
       </configurations>
@@ -369,7 +370,7 @@
         <configuration key="source-flavor">presentation/trimmed</configuration>
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presentation/search+preview</configuration>
-        <configuration key="target-tags">engage</configuration>
+        <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">search-cover.http</configuration>
         <configuration key="time">1</configuration>
       </configurations>
@@ -385,8 +386,8 @@
       <configurations>
         <configuration key="source-flavor">*/trimmed</configuration>
         <configuration key="target-flavor">*/delivery</configuration>
-        <configuration key="target-tags">rss, atom</configuration>
-        <configuration key="encoding-profiles">feed-m4a.http, feed-avi.http</configuration>
+        <configuration key="target-tags">rss,atom</configuration>
+        <configuration key="encoding-profiles">feed-m4a.http,feed-avi.http</configuration>
       </configurations>
     </operation>
 
@@ -401,7 +402,7 @@
         <configuration key="source-flavor">presenter/trimmed</configuration>
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presenter/feed+preview</configuration>
-        <configuration key="target-tags">rss, atom</configuration>
+        <configuration key="target-tags">rss,atom</configuration>
         <configuration key="encoding-profile">feed-cover.http</configuration>
         <configuration key="time">1</configuration>
       </configurations>
@@ -416,7 +417,7 @@
         <configuration key="source-flavor">presentation/trimmed</configuration>
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presentation/feed+preview</configuration>
-        <configuration key="target-tags">rss, atom</configuration>
+        <configuration key="target-tags">rss,atom</configuration>
         <configuration key="encoding-profile">feed-cover.http</configuration>
         <configuration key="time">1</configuration>
       </configurations>
@@ -434,8 +435,8 @@
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presentation/segment+preview</configuration>
         <configuration key="reference-flavor">presentation/delivery</configuration>
-        <configuration key="reference-tags">engage</configuration>
-        <configuration key="target-tags">engage</configuration>
+        <configuration key="reference-tags">engage-download</configuration>
+        <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-slides.http</configuration>
       </configurations>
     </operation>
@@ -450,7 +451,7 @@
       <configurations>
         <configuration key="source-flavor">presentation/trimmed</configuration>
         <configuration key="source-tags"></configuration>
-        <configuration key="target-tags">engage,archive</configuration>
+        <configuration key="target-tags">engage-download,archive</configuration>
       </configurations>
     </operation>
 
@@ -463,8 +464,8 @@
       exception-handler-workflow="error"
       description="Distribute and publish to engage player">
       <configurations>
-        <configuration key="download-source-tags">engage,atom,rss</configuration>
-        <configuration key="streaming-source-tags">engage</configuration>
+        <configuration key="download-source-tags">engage-download,atom,rss</configuration>
+        <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="check-availability">true</configuration>
       </configurations>
     </operation>
