@@ -1497,6 +1497,17 @@
       <timezone>+1</timezone>
     </developer>
     <developer>
+      <id>edu.alonso</id>
+      <name>Eduardo Alonso Gil</name>
+      <email>ealonso@uvigo.es</email>
+      <organization>University of Vigo</organization>
+      <organizationUrl>http://www.uvigo.es</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
       <id>k.amundson</id>
       <name>Kristofor Amundson</name>
       <email>kta719@mail.usask.ca</email>
