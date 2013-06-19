@@ -27,11 +27,11 @@
     '.ui-searchbox select .withsep {border-top:1px solid black;}',    // TODO make separator style configurable
 
     _markup :
-    '<span class="searchbox-search-icon ui-icon" style="float:left;cursor:pointer;margin-right:3px;"></span>' +
     '<span class="searchbox-text-container ui-corner-all ui-helper-clearfix" style="float:left;">' +
     '  <input type="text" class="searchbox-text-input ui-corner-all" style="float:left;border:none;">' +
     '  <span class="searchbox-clear-icon ui-icon" style="float:right;"></span>' +
-    '</span>',
+    '</span>' +
+    '<span class="searchbox-search-icon ui-icon" style="float:left;cursor:pointer;margin-right:3px;"></span>',
 
     clear : function() {
       if (this.options.clear !== undefined) {
