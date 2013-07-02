@@ -331,7 +331,7 @@
                     properties.addCatalog = options.addCatalog;
                 if($.isFunction(options.changeCatalog))
                     properties.changeCatalog = options.changeCatalog;
-                if($.isFunction(options.addCatalog))
+                if($.isFunction(options.deleteCatalog))
                     properties.deleteCatalog = options.deleteCatalog;
                 if(!$.isEmptyObject(options.baseUrl))
                     properties.baseUrl = options.baseUrl;
