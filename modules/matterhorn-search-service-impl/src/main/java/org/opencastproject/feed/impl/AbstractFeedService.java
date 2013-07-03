@@ -218,7 +218,12 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
     description = (String) properties.get(PROP_DESCRIPTION);
     copyright = (String) properties.get(PROP_COPYRIGHT);
     home = ensureUrl(((String) properties.get(PROP_HOME)), serverUrl);
-    cover = ensureUrl((String) properties.get(PROP_COVER), serverUrl);
+    // feed.cover can be unset if no branding is required
+    if (StringUtils.isBlank((String)properties.get(PROP_COVER))) {
+      cover = null;
+    } else {
+      cover = ensureUrl((String) properties.get(PROP_COVER), serverUrl);
+    }
     linkTemplate = ensureUrl((String) properties.get(PROP_ENTRY), serverUrl);
     if (properties.get(PROP_SELF) != null) 
        linkSelf = ensureUrl((String) properties.get(PROP_SELF), serverUrl);

@@ -326,7 +326,8 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     ITunesFeedExtension iTunesFeed = new ITunesFeedExtension();
     f.addModule(iTunesFeed);
     
-    // TODO: Set feed icon and other metadata
+    if (cover != null)
+      f.setImage(new ImageImpl(cover, "Feed Image"));
 
     // Check if a default format has been specified
     // TODO: Parse flavor and set member variable rssTrackFlavor
