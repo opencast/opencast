@@ -266,6 +266,7 @@ public class JaxbJob implements Job {
    * @param arguments
    *          the arguments to set
    */
+  @Override
   public void setArguments(List<String> arguments) {
     this.arguments = arguments;
   }
