@@ -15,16 +15,8 @@
  */
 package org.opencastproject.episode.filesystem;
 
-import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.easymock.classextension.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.opencastproject.episode.impl.elementstore.Source.source;
+
 import org.opencastproject.episode.api.Version;
 import org.opencastproject.episode.impl.StoragePath;
 import org.opencastproject.episode.impl.elementstore.DeletionSelector;
@@ -32,6 +24,18 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Option;
+
+import junit.framework.Assert;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -39,8 +43,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
-
-import static org.opencastproject.episode.impl.elementstore.Source.source;
 
 public class FileSystemElementStoreTest {
 

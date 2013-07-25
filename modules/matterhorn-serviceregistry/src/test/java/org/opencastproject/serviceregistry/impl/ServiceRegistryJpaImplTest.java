@@ -18,7 +18,7 @@ package org.opencastproject.serviceregistry.impl;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.jmx.JmxUtil;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

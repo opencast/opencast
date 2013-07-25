@@ -15,10 +15,10 @@
  */
 package org.opencastproject.capture.impl.jobs;
 
+import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.verify;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.impl.CaptureAgentImpl;
