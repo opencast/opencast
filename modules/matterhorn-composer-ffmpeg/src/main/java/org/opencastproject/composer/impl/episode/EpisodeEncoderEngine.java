@@ -161,6 +161,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
       try {
         monitorFrequency = Long.parseLong((String) properties.get(OPT_EPISODE_MONITOR_FREQUENCY));
       } catch (Exception e) {
+        logger.warn("Unable to set monitorFrequency, are you sure the property is String value that can be parsed to a long?  Ignoring and continuing.");
       }
       logger.debug("Engine updates are gathered every " + monitorFrequency + " s");
 

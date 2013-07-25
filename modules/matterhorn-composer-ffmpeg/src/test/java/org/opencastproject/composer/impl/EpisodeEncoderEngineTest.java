@@ -119,7 +119,6 @@ public class EpisodeEncoderEngineTest {
     }
   }
 
-  @Ignore
   @Test
   public void testConfigureProperties() throws Exception {
     try {
@@ -131,14 +130,17 @@ public class EpisodeEncoderEngineTest {
       p.put(EpisodeEncoderEngine.OPT_XMLRPC_PATH, "/dogfood");
       method.invoke(episodeEngine, (Object) p);
       // still here? let's add some more
-      p.put(EpisodeEncoderEngine.OPT_EPISODE_MONITOR_FREQUENCY, "20.0");
-      //p.put(EpisodeEncoderEngine.OPT_MONITORTYPE, "monitortype");
-      // p.put(EpisodeEncoderEngine.OPT_XMLRPC_HOST , "24.64.64.64");
-      // p.put(EpisodeEncoderEngine.OPT_XMLRPC_PASSWORD , "a dog eats cat food");
-      // p.put(EpisodeEncoderEngine.OPT_XMLRPC_PORT, 40000);
+      p.put(EpisodeEncoderEngine.OPT_EPISODE_MONITOR_FREQUENCY, "20");
+      p.put(EpisodeEncoderEngine.OPT_MONITORTYPE, "monitortype");
+      p.put(EpisodeEncoderEngine.OPT_XMLRPC_HOST , "24.64.64.64");
+      p.put(EpisodeEncoderEngine.OPT_XMLRPC_PASSWORD , "a dog eats cat food");
+      p.put(EpisodeEncoderEngine.OPT_XMLRPC_PORT, "40000");
       method.invoke(episodeEngine, (Object) p);
       // lets see if we get those values back
       Assert.assertEquals(episodeEngine.getMonitoringFrequency(), 20);
+      Assert.assertEquals(episodeEngine.getXmlrpcHost(), "24.64.64.64");
+      Assert.assertEquals(episodeEngine.getXmlrpcPath(), "/dogfood");
+      Assert.assertEquals(episodeEngine.getXmlrpcPort(), 40000);
     } catch (Exception e) {
       e.printStackTrace();
       Assert.fail();
