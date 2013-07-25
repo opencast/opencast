@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
@@ -223,6 +224,8 @@ public class UserTrackingRestService {
         return (ReportImpl) usertrackingService.getReport(from, to, offset, limit);
     } catch (UserTrackingException e) {
       throw new WebApplicationException(e);
+    } catch (ParseException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST);
     }
   }
 
