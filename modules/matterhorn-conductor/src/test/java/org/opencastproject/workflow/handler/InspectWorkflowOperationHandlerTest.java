@@ -113,12 +113,12 @@ public class InspectWorkflowOperationHandlerTest {
     // EasyMock.expect(dc.getIdentifier()).andReturn("123");
     EasyMock.replay(dc);
 
-    dcService = org.easymock.classextension.EasyMock.createNiceMock(DublinCoreCatalogService.class);
-    org.easymock.classextension.EasyMock.expect(dcService.getMetadata((MediaPackage) EasyMock.anyObject())).andReturn(
+    dcService = EasyMock.createNiceMock(DublinCoreCatalogService.class);
+    EasyMock.expect(dcService.getMetadata((MediaPackage) EasyMock.anyObject())).andReturn(
             metadata);
-    org.easymock.classextension.EasyMock.expect(
-            dcService.load((InputStream) org.easymock.classextension.EasyMock.anyObject())).andReturn(dc);
-    org.easymock.classextension.EasyMock.replay(dcService);
+    EasyMock.expect(
+            dcService.load((InputStream) EasyMock.anyObject())).andReturn(dc);
+    EasyMock.replay(dcService);
     operationHandler.setDublincoreService(dcService);
 
     // set up mock receipt and inspect service providing it
