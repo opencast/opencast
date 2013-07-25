@@ -150,15 +150,15 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
 
     // The file does not seem to be inside the local filesystem.
     // Let's download it and log a warning, since this shouldn't happen.
-    logger.warn("Downloading track " + track + " to temp directory");
-    File f = File.createTempFile(track.getURI().toString(), null);
+    logger.warn("Downloading track " + track.getURI().toString() + " to temp directory");
+    // File f = File.createTempFile(track.getURI().toString(), null);
+    File f = File.createTempFile("opencast", null);
+    logger.info("Temporary file created at " + f.toString());
     FileOutputStream fos = new FileOutputStream(f);
     InputStream is = track.getURI().toURL().openStream();
     byte[] bytes = new byte[2048];
-    int offset = 0;
-    int len = 0;
-    while (is.read(bytes, offset, len) >= 0) {
-      fos.write(bytes, offset, len);
+    while (is.read(bytes) >= 0) {
+      fos.write(bytes);
     }
     fos.flush();
     fos.close();
