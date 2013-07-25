@@ -84,7 +84,7 @@ public class EncodingProfileTest {
   @Test
   public void testInitializationFromProperties() {
     assertNotNull(profiles);
-    assertEquals(9, profiles.size());
+    assertEquals(10, profiles.size());
   }
 
   /**

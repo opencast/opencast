@@ -200,6 +200,8 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
       return serviceRegistry.createJob(JOB_TYPE, Operation.Inspect.toString(), Arrays.asList(uri.toString()));
     } catch (ServiceRegistryException e) {
       throw new MediaInspectionException(e);
+    } catch (NullPointerException npe) {
+      throw new MediaInspectionException(npe);
     }
   }
 
