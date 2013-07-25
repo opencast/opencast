@@ -123,6 +123,10 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
    */
   private void configure(Properties properties) throws ConfigurationException {
     try {
+      // Verify properties is an object
+      if (properties == null)
+        throw new ConfigurationException("Properties must not be null");
+
       // Xmlrpc hostname
       xmlrpcHostname = (String) properties.get(OPT_XMLRPC_HOST);
       logger.debug("Episode xmlrpc host is " + xmlrpcHostname);
@@ -257,7 +261,8 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
    *      org.opencastproject.composer.api.EncodingProfile, java.util.Map)
    */
   @Override
-  public Option<File> encode(File mediaSource, EncodingProfile format, Map<String, String> properties) throws EncoderException {
+  public Option<File> encode(File mediaSource, EncodingProfile format, Map<String, String> properties)
+          throws EncoderException {
     return mux(null, mediaSource, format, properties);
   }
 
@@ -280,8 +285,8 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
    *      org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
    */
   @Override
-  public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
-          throws EncoderException {
+  public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration,
+          Map<String, String> properties) throws EncoderException {
     // TODO: Implement
     throw new UnsupportedOperationException("Not yet implemented");
   }
