@@ -342,7 +342,7 @@ public class CaptureAgentStateRestService {
 
   @POST
   @Path("recordings/{id}")
-  @RestQuery(name = "setRecordingState", description = "Set the status of a given recording, registering it if it is new", pathParameters = { @RestParameter(description = "The ID of a given recording", isRequired = true, name = "id", type = Type.STRING) }, restParameters = { @RestParameter(description = "The state of the recording", isRequired = true, name = "state", type = Type.STRING) }, reponses = {
+  @RestQuery(name = "setRecordingState", description = "Set the status of a given recording, registering it if it is new", pathParameters = { @RestParameter(description = "The ID of a given recording", isRequired = true, name = "id", type = Type.STRING) }, restParameters = { @RestParameter(description = "The state of the recording. Must be one of the following: unknown, capturing, capture_finished, capture_error, manifest, manifest_error, manifest_finished, compressing, compressing_error, uploading, upload_finished, upload_error.", isRequired = true, name = "state", type = Type.STRING) }, reponses = {
           @RestResponse(description = "{id} set to {state}", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "{id} or state {state} is empty or the {state} is not known", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "If no capture agent state service is available", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
