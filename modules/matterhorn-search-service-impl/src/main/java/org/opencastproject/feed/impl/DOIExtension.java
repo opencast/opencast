@@ -26,7 +26,7 @@ public class DOIExtension implements FeedExtension {
   /**
    * The DOI module uri
    */
-  public static final String URI = "http://www.doi.org";
+      public static final String URI = "http://www.doi.org";
 
   private String doi;
   private String structuralType;
