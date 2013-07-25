@@ -161,6 +161,16 @@ public class MediaInspectionServiceImplTest {
   }
 
   @Test
+  // check for NPE on null input
+  public void testNPE() throws Exception {
+    try {
+      service.inspect(null);
+    } catch (Exception e) {
+      Assert.assertFalse(e instanceof NullPointerException);
+    }
+  }
+
+  @Test
   public void testEnrichment() throws Exception {
     if (!mediainfoInstalled)
       return;
