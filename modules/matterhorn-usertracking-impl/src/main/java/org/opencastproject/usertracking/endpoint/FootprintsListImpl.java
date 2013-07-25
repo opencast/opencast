@@ -37,10 +37,10 @@ import javax.xml.bind.annotation.XmlType;
 public class FootprintsListImpl implements FootprintList {
 
   @XmlAttribute(name = "total")
-  protected int total;
+  private int total;
 
   @XmlElement(name = "footprint")
-  protected List<FootprintImpl> footprints;
+  private List<FootprintImpl> footprints;
 
   /**
    * A no-arg constructor needed by JAXB
@@ -52,5 +52,13 @@ public class FootprintsListImpl implements FootprintList {
   public void add(Footprint footprint) {
     footprints.add((FootprintImpl) footprint);
     total = footprints.size();
+  }
+
+  public List<FootprintImpl> getFootprints() {
+    return footprints;
+  }
+
+  public int getTotal() {
+    return total;
   }
 }

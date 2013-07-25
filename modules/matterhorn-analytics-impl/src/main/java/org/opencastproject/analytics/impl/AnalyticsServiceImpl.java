@@ -870,7 +870,6 @@ public class AnalyticsServiceImpl {
       UserSummaryList current = userTrackingService.getUserSummaryByTypeAndMediaPackage(type, episode.getId());
       result.add(current.getUserSummaries());
     }
-    result.setTotal(result.getUserSummaries().size());
     return Response.ok(result).type(mediaType).build();
   }
   
