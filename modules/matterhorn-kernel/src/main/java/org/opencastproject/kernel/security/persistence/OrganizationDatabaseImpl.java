@@ -18,9 +18,13 @@ package org.opencastproject.kernel.security.persistence;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
+
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -28,8 +32,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.spi.PersistenceProvider;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Implements {@link OrganizationDatabase}. Defines permanent storage for series.
@@ -111,7 +113,7 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
-      JpaOrganization organization = getOrganizationEntity(orgId);
+      JpaOrganization organization = getOrganizationEntity(orgId, em);
       if (organization == null)
         throw new NotFoundException("Organization " + orgId + " does not exist");
 
@@ -142,7 +144,7 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
-      JpaOrganization organizationEntity = getOrganizationEntity(org.getId());
+      JpaOrganization organizationEntity = getOrganizationEntity(org.getId(), em);
       if (organizationEntity == null) {
         JpaOrganization organization = new JpaOrganization(org.getId(), org.getName(), org.getServers(),
                 org.getAdminRole(), org.getAnonymousRole(), org.getProperties());
@@ -173,10 +175,17 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
    */
   @Override
   public Organization getOrganization(String id) throws NotFoundException, OrganizationDatabaseException {
-    JpaOrganization entity = getOrganizationEntity(id);
-    if (entity == null)
-      throw new NotFoundException();
-    return entity;
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      JpaOrganization entity = getOrganizationEntity(id, em);
+      if (entity == null)
+        throw new NotFoundException();
+      return entity;
+    } finally {
+      if (em != null)
+        em.close();
+    }
   }
 
   /**
@@ -200,7 +209,8 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
   }
 
   @Override
-  public Organization getOrganizationByHost(String host, int port) throws OrganizationDatabaseException, NotFoundException {
+  public Organization getOrganizationByHost(String host, int port) throws OrganizationDatabaseException,
+          NotFoundException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
@@ -242,8 +252,15 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
    */
   @Override
   public boolean containsOrganization(String orgId) throws OrganizationDatabaseException {
-    JpaOrganization organization = getOrganizationEntity(orgId);
-    return organization != null ? true : false;
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      JpaOrganization organization = getOrganizationEntity(orgId, em);
+      return organization != null ? true : false;
+    } finally {
+      if (em != null)
+        em.close();
+    }
   }
 
   /**
@@ -251,24 +268,21 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
    * 
    * @param id
    *          the organization id
+   * @param em
+   *          an open entity manager
    * @return the organization or <code>null</code> if not found
    * @throws OrganizationDatabaseException
    *           if there is a problem communicating with the underlying data store
    */
-  private JpaOrganization getOrganizationEntity(String id) throws OrganizationDatabaseException {
-    EntityManager em = null;
+  private JpaOrganization getOrganizationEntity(String id, EntityManager em) throws OrganizationDatabaseException {
+    Query q = em.createNamedQuery("Organization.findById");
+    q.setParameter("id", id);
     try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("Organization.findById");
-      q.setParameter("id", id);
       return (JpaOrganization) q.getSingleResult();
     } catch (NoResultException e) {
       return null;
     } catch (Exception e) {
       throw new OrganizationDatabaseException(e);
-    } finally {
-      if (em != null)
-        em.close();
     }
   }
 }
