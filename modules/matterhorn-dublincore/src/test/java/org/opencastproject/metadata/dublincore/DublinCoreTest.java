@@ -492,4 +492,104 @@ public class DublinCoreTest {
     assertEquals(ENC_SCHEME_URI, dc.get(PROPERTY_LICENSE).get(0).getEncodingScheme());
   }
 
+  // test that exceptions are thrown correctly
+  @Test
+  public void testEncodingSchemeUtilsExceptions() {
+    DCMIPeriod period = new DCMIPeriod(new java.util.Date(), new java.util.Date());
+    Precision precision = Precision.Year;
+    try {
+      EncodingSchemeUtils.encodePeriod(null, precision);
+      Assert.fail("Exceptions should be thrown on null values.");
+    } catch (Exception e) {
+      Assert.assertFalse(e instanceof NullPointerException);
+    }
+    try {
+      EncodingSchemeUtils.encodePeriod(period, null);
+      Assert.fail("Exceptions should be thrown on null values.");
+    } catch (Exception e) {
+      Assert.assertFalse(e instanceof NullPointerException);
+    }
+    try {
+      EncodingSchemeUtils.encodePeriod(null, null);
+      Assert.fail("Exceptions should be thrown on null values.");
+    } catch (Exception e) {
+      Assert.assertFalse(e instanceof NullPointerException);
+    }
+  }
+
+  @Test
+  @Ignore
+  // this test should verify serialization/deserialization works for a fairly minimal case
+  // waiting on https://opencast.jira.com/browse/MH-9733
+  public void testSerializationDeserializationOfCatalogs() throws Exception {
+    DublinCoreCatalogImpl impl = new DublinCoreCatalogImpl();
+    impl.addTag("bob");
+    impl.set(impl.PROPERTY_PUBLISHER, "test");
+    DublinCoreCatalogService service = new DublinCoreCatalogService();
+    DublinCoreCatalog newImpl = service.load(service.serialize(impl));
+    Assert.assertEquals(impl, newImpl);
+  }
+
+  @Test
+  // test for null values on various methods on the DublinCoreCatalogImpl, they should
+  // generally return an exception
+  public void testForNullsInDublinCoreCatalogImpl() throws Exception {
+    DublinCoreCatalogImpl impl = new DublinCoreCatalogImpl();
+    try {
+      DublinCoreValue val = null;
+      impl.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), val);
+    } catch (Exception e) {
+      // throw assertion if it happens to be a nullpointer, never a null pointer!
+      Assert.assertFalse(e instanceof NullPointerException);
+    }
+    try {
+      DublinCoreValue val = null;
+      impl.add(null, EasyMock.createNiceMock(DublinCoreValue.class));
+    } catch (Exception e) {
+      // throw assertion if it happens to be a nullpointer, never a null pointer!
+      Assert.assertFalse(e instanceof NullPointerException);
+    }
+    try {
+      DublinCoreValue val = null;
+      String val2 = null;
+      impl.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), val2);
+    } catch (Exception e) {
+      // throw assertion if it happens to be a nullpointer, never a null pointer!
+      Assert.assertFalse(e instanceof NullPointerException);
+    }
+    try {
+      DublinCoreValue val = null;
+      String val2 = null;
+      impl.add(null, "");
+    } catch (Exception e) {
+      // throw assertion if it happens to be a nullpointer, never a null pointer!
+      Assert.assertFalse(e instanceof NullPointerException);
+    }
+    try {
+      DublinCoreValue val = null;
+      String val2 = null;
+      impl.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), val2, val2);
+    } catch (Exception e) {
+      // throw assertion if it happens to be a nullpointer, never a null pointer!
+      Assert.assertFalse(e instanceof NullPointerException);
+    }
+    try {
+      DublinCoreValue val = null;
+      String val2 = null;
+      impl.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), "", val2);
+    } catch (Exception e) {
+      // throw assertion if it happens to be a nullpointer, never a null pointer!
+      Assert.assertFalse(e instanceof NullPointerException);
+    }
+    try {
+      DublinCoreValue val = null;
+      String val2 = null;
+      impl.add(null, "", "");
+    } catch (Exception e) {
+      // throw assertion if it happens to be a nullpointer, never a null pointer!
+      Assert.assertFalse(e instanceof NullPointerException);
+    }
+
+  }
+
 }
