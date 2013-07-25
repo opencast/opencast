@@ -44,7 +44,6 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -238,7 +237,6 @@ public class ComposerServiceTest {
     }
   }
 
-  @Ignore
   @Test
   public void testEncode2() throws Exception {
     if (!ffmpegInstalled)
@@ -271,7 +269,7 @@ public class ComposerServiceTest {
     try {
       composerService.encode(null, sourceTrackVideo, sourceTrackAudio, "av.work", null);
     } catch (EncoderException e) {
-      assertTrue("test complete".equals(e.getMessage()));
+      assertTrue("The Job parameter must not be null".equals(e.getMessage()));
     }
   }
 

@@ -165,7 +165,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    */
   protected Option<Track> encode(Job job, Track videoTrack, Track audioTrack, String profileId,
           Map<String, String> properties) throws EncoderException, MediaPackageException {
-
+    if (job == null) {
+      throw new EncoderException("The Job parameter must not be null");
+    }
     final String targetTrackId = idBuilder.createNew().toString();
     try {
       // Get the tracks and make sure they exist
