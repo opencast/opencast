@@ -689,6 +689,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     final Date endDate = period.getEnd();
     final long eventId = getEventIdentifier(event);
     try {
+      verifyActive(eventId);
       persistence.updateEvent(event);
     } catch (SchedulerServiceDatabaseException e) {
       logger.error("Could not update event {} in persistent storage: {}", eventId, e.getMessage());
@@ -724,6 +725,8 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   @Override
   public void updateEvents(List<Long> eventIds, final DublinCoreCatalog eventCatalog) throws NotFoundException,
           SchedulerException, UnauthorizedException {
+    StringBuffer errors = new StringBuffer();
+    int errorCount = 0;
     SchedulerQuery q = new SchedulerQuery();
     q.withIdInList(eventIds);
     q.withSort(Sort.EVENT_START);
@@ -747,7 +750,21 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
           }
         }
       }
-      updateEvent(getEventIdentifier(cat), cat, new HashMap<String, String>());
+      try {
+        updateEvent(getEventIdentifier(cat), cat, new HashMap<String, String>());
+      } catch (SchedulerException se) {
+        // TODO: Instead of logging and continuing, should all updates fail if one is in the past?
+        errors.append((errors.length() > 0 ? " " : "") + se.getMessage());
+        errorCount++;
+        logger.error("Could not update catalog for event with ID '{}': {}", getEventIdentifier(cat), se.getMessage());
+      }
+    }
+    // After updating what is possible, throw error on found issues
+    if (errors.length() > 0) {
+      // Already logged above, but allow information to be thrown to client
+      // TODO: convert to an SchedulerEventEndedException
+      throw new SchedulerException("Could not update " + errorCount + " of " + catalogs.size() + " events: "
+              + errors.toString());
     }
   }
 
@@ -813,7 +830,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       // Adjust for DST, if start of event
       if (tz.inDaylightTime(seed)) { // Event starts in DST
         if (!tz.inDaylightTime(d)) { // Date not in DST?
-          d.setTime(d.getTime() + tz.getDSTSavings()); // Ajust for Fall back one hour
+          d.setTime(d.getTime() + tz.getDSTSavings()); // Adjust for Fall back one hour
         }
       } else { // Event doesn't start in DST
         if (tz.inDaylightTime(d)) {
@@ -965,7 +982,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       // Adjust for DST, if start of event
       if (tz.inDaylightTime(seed)) { // Event starts in DST
         if (!tz.inDaylightTime(d)) { // Date not in DST?
-          d.setTime(d.getTime() + tz.getDSTSavings()); // Ajust for Fall back one hour
+          d.setTime(d.getTime() + tz.getDSTSavings()); // Adjust for Fall back one hour
         }
       } else { // Event doesn't start in DST
         if (tz.inDaylightTime(d)) {
@@ -1036,5 +1053,45 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       logger.error("Failed to retrieve last modified for CA {}: {}", filter, e.getMessage());
       throw new SchedulerException(e);
     }
+  }
+
+  /**
+   * Verifies if existing event is found and has not already ended
+   * 
+   * @param eventId
+   * @throws SchedulerException
+   *           if event has ended, or NotFoundException if event it not found
+   */
+  private void verifyActive(Long eventId) throws SchedulerException {
+    DublinCoreCatalog dcc;
+    try {
+      dcc = getEventDublinCore(eventId);
+      final DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(dcc.getFirst(DublinCore.PROPERTY_TEMPORAL));
+      if (!period.hasEnd() || !period.hasStart()) {
+        // Unlikely to get this error since catalog was already in index
+        throw new IllegalArgumentException("Dublin core field dc:temporal for event ID " + eventId
+                + " does not contain information about start and end of event");
+      }
+      final Date endDate = period.getEnd();
+      // TODO: Assumption of no TimeZone adjustment because catalog temporal is local to server
+      if (getCurrentDate().after(endDate)) {
+        String msg = "Event ID " + eventId + " has already ended";
+        logger.info(msg);
+        throw new SchedulerException(msg);
+      }
+    } catch (NotFoundException e) {
+      logger.info("Event ID {} is not found", eventId);
+      throw new SchedulerException(e);
+    }
+  }
+
+  /**
+   * Returns current system Date. Enables date to be mocked to simulate the future and the past for testing. Reference:
+   * http://neovibrant.com/2011/08/05/junit-with-new-date/
+   * 
+   * @return current system date
+   */
+  public Date getCurrentDate() {
+    return new Date();
   }
 }
