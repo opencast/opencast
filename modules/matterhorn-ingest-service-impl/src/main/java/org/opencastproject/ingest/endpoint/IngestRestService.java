@@ -34,6 +34,8 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowParser;
+import org.opencastproject.mediapackage.identifier.IdImpl;
+import org.opencastproject.mediapackage.Catalog;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -410,7 +412,8 @@ public class IngestRestService {
   @Produces(MediaType.TEXT_XML)
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addMediaPackage")
-  @RestQuery(name = "addMediaPackage", description = "Create media package from a media tracks and optional Dublin Core metadata fields", 
+  @RestQuery(name = "addMediaPackage",
+      description = "Create and ingest media package from media tracks with additional Dublin Core metadata. Notice: It is mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a DC catalog with a title included.", 
       restParameters = {
           @RestParameter(description = "The kind of media track. This has to be specified in the request prior to each media track",
               isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
@@ -463,7 +466,7 @@ public class IngestRestService {
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addMediaPackage/{wdID}")
   @RestQuery(name = "addMediaPackage", 
-      description = "Create and ingest media package from media tracks and optional Dublin Core metadata fields", 
+      description = "Create and ingest media package from media tracks with additional Dublin Core metadata. Notice: It is mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a DC catalog with a title included.", 
       pathParameters = { 
           @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, 
       restParameters = {
@@ -522,23 +525,32 @@ public class IngestRestService {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
             String fieldName = item.getFieldName();
+            String value = Streams.asString(item.openStream());
+            /* Ignore empty fields */
+            if ("".equals(value)) {
+              continue;
+            }
 
             /* “Remember” the flavor for the next media. */
             if ("flavor".equals(fieldName)) {
-              flavor = MediaPackageElementFlavor.parseFlavor(Streams.asString(item.openStream()));
+              flavor = MediaPackageElementFlavor.parseFlavor(value);
 
             /* Fields for DC catalog */
             } else if (dcterms.contains(fieldName)) {
+              if ("identifier".equals(fieldName)) {
+                /* Use the identifier for the mediapackage */
+                mp.setIdentifier(new IdImpl(value));
+              }
               EName en = new EName(DublinCore.TERMS_NS_URI, fieldName);
               if (dcc == null) {
                 dcc = dublinCoreService.newInstance();
               }
-              dcc.add(en, Streams.asString(item.openStream()));
+              dcc.add(en, value);
 
             /* Episode metadata by URL */
             } else if ("episodeDCCatalogUri".equals(fieldName)) {
               try {
-                URI dcurl = new URI(Streams.asString(item.openStream()));
+                URI dcurl = new URI(value);
                 ingestService.addCatalog(dcurl, MediaPackageElements.EPISODE, mp);
                 episodeDCCatalogNumber += 1;
               } catch (java.net.URISyntaxException e) {
@@ -551,12 +563,13 @@ public class IngestRestService {
             } else if ("episodeDCCatalog".equals(fieldName)) {
               String fileName = "episode" + episodeDCCatalogNumber + ".xml";
               episodeDCCatalogNumber += 1;
-              ingestService.addCatalog(item.openStream(), fileName, MediaPackageElements.EPISODE, mp);
+              InputStream is = new ByteArrayInputStream(value.getBytes("UTF-8"));
+              ingestService.addCatalog(is, fileName, MediaPackageElements.EPISODE, mp);
 
             /* Series by URL */
             } else if ("seriesDCCatalogUri".equals(fieldName)) {
               try {
-                URI dcurl = new URI(Streams.asString(item.openStream()));
+                URI dcurl = new URI(value);
                 ingestService.addCatalog(dcurl, MediaPackageElements.SERIES, mp);
               } catch (java.net.URISyntaxException e) {
                 /* Parameter was not a valid URL: Return 400 Bad Request */
@@ -568,7 +581,8 @@ public class IngestRestService {
             } else if ("seriesDCCatalog".equals(fieldName)) {
               String fileName = "series" + seriesDCCatalogNumber + ".xml";
               seriesDCCatalogNumber += 1;
-              ingestService.addCatalog(item.openStream(), fileName, MediaPackageElements.SERIES, mp);
+              InputStream is = new ByteArrayInputStream(value.getBytes("UTF-8"));
+              ingestService.addCatalog(is, fileName, MediaPackageElements.SERIES, mp);
 
             /* Add media files by URL */
             } else if ("mediaUri".equals(fieldName)) {
@@ -578,7 +592,7 @@ public class IngestRestService {
               }
               URI mediaUrl;
               try {
-                mediaUrl = new URI(Streams.asString(item.openStream()));
+                mediaUrl = new URI(value);
               } catch (java.net.URISyntaxException e) {
                 /* Parameter was not a valid URL: Return 400 Bad Request */
                 logger.warn(e.getMessage(), e);
@@ -589,7 +603,7 @@ public class IngestRestService {
 
             } else {
               /* Tread everything else as workflow properties */
-              workflowProperties.put(fieldName, Streams.asString(item.openStream()));
+              workflowProperties.put(fieldName, value);
             }
 
           /* Media files as request parameter */
@@ -607,6 +621,15 @@ public class IngestRestService {
         if (!hasMedia) {
           logger.warn("Rejected ingest without actual media.");
           return Response.serverError().status(Status.BAD_REQUEST).build();
+        }
+
+        Catalog[] dccs = mp.getCatalogs(MediaPackageElements.EPISODE);
+        for (int i = 0; i < dccs.length; i++) {
+          EName en = new EName(DublinCore.TERMS_NS_URI, "identifier");
+          String id = ((DublinCoreCatalog) dccs[i]).getFirst(en);
+          if (id != null) {
+            mp.setIdentifier(new IdImpl(id));
+          }
         }
 
         /* Add episode mediapackage if metadata were send separately */
