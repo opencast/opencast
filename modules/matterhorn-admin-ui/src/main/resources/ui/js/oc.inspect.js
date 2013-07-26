@@ -96,6 +96,10 @@ Opencast.WorkflowInspect = (function() {
       }
     });
     out.operations = ops;
+    if(out.operations[0].configurations['schedule.start'] && out.operations[0].configurations['schedule.stop']) {
+	out.config['schedule.start'] = out.operations[0].configurations['schedule.start'];
+	out.config['schedule.stop'] = out.operations[0].configurations['schedule.stop'];
+    }
 
     if (workflow.mediapackage) {
       var mp = workflow.mediapackage;
