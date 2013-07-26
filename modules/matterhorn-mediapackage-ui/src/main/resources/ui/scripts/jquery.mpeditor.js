@@ -122,17 +122,9 @@
 
             // Add, update or remove other dublin core catalogs
             $.each(inMemoryMediaPackage.catalogs, function(index, catalog) {
-
-                var found = false;
-                $.each(properties.catalogs, function(index, cat) {
-                    if(catalog.flavor == cat.flavor)
-                        found = true;
-                });
-
                 var compareCatalog = originalMediaPackage.getCatalogById(catalog.id);
-                if(!found || catalog.disable) {
-                    if(compareCatalog != null)
-                        self.deleteCatalog(catalog);
+                if(catalog.disable && compareCatalog != null) {
+                    self.deleteCatalog(catalog);
                 } else {
                     if(compareCatalog == null && !$.isEmptyObject(catalog.values)) {
                         self.addCatalog(catalog);
@@ -331,7 +323,7 @@
                     properties.addCatalog = options.addCatalog;
                 if($.isFunction(options.changeCatalog))
                     properties.changeCatalog = options.changeCatalog;
-                if($.isFunction(options.addCatalog))
+                if($.isFunction(options.deleteCatalog))
                     properties.deleteCatalog = options.deleteCatalog;
                 if(!$.isEmptyObject(options.baseUrl))
                     properties.baseUrl = options.baseUrl;
