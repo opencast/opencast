@@ -727,7 +727,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     fromDb.setDispatchable(job.isDispatchable());
     fromDb.setVersion(job.getVersion());
     fromDb.setOperation(job.getOperation());
-    fromDb.setArguments(job.getArguments());
     if (job.getDateCreated() == null) {
       job.setDateCreated(now);
       fromDb.setDateCreated(now);
