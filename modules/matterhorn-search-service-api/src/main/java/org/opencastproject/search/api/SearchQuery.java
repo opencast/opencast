@@ -31,7 +31,7 @@ public class SearchQuery {
   protected String seriesId;
   protected String text;
   protected String query;
-  protected int limit = 20;
+  protected int limit = 0;
   protected int offset = 0;
   protected String[] tags = null;
   protected MediaPackageElementFlavor[] flavors = null;
@@ -71,7 +71,7 @@ public class SearchQuery {
     this.text = text;
     return this;
   }
-  
+
   public SearchQuery withSeriesId(String seriesId) {
     this.seriesId = seriesId;
     return this;
@@ -100,7 +100,7 @@ public class SearchQuery {
   public String getSeriesId() {
     return seriesId;
   }
-  
+
   public boolean isIncludeEpisodes() {
     return includeEpisode;
   }
