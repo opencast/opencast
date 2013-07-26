@@ -437,7 +437,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
         track.setIdentifier(originalTrack.getIdentifier());
         track.setMimeType(originalTrack.getMimeType());
         track.setReference(originalTrack.getReference());
-        track.setSize(originalTrack.getSize());
+        track.setSize(file.length());
         track.setURI(originalTrackUrl);
         for (String tag : originalTrack.getTags()) {
           track.addTag(tag);

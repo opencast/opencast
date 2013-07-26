@@ -425,7 +425,13 @@ public final class EpisodeServiceImpl implements EpisodeService {
         }
 
         @Override public void enone() {
-          elementStore.put(storagePath, source(e.getURI(), Option.some(e.getSize()), option(e.getMimeType())));
+          Option<Long> size = null;
+          if (e.getSize() > 0) {
+            size = Option.some(e.getSize());
+          } else {
+            size = Option.<Long> none();
+          }
+          elementStore.put(storagePath, source(e.getURI(), size, option(e.getMimeType())));
         }
       });
     }
