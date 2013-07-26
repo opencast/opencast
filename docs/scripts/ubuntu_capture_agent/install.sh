@@ -136,7 +136,7 @@ export DEPLOY_DIR=matterhorn
 export JAVA_PREFIX=/usr/lib/jvm
 # A regexp to filter the right jvm directory from among all the installed ones
 # The chosen JAVA_HOME will be $JAVA_PREFIX/`ls $JAVA_PREFIX | grep $JAVA_PATTERN`
-export JAVA_PATTERNS="java-6-sun java-7-oracle java-6-openjdk java-6-openjdk-i386 java-6-openjdk-amd64"
+export JAVA_PATTERNS="java-6-sun java-7-oracle java-6-openjdk java-6-openjdk-i386 java-6-openjdk-amd64 java-7-openjdk-i386 java-7-openjdk-amd64"
                            
 # Path to the maven2 repository, under the user home
 export M2_SUFFIX=.m2/repository
@@ -147,7 +147,7 @@ export DEFAULT_NTP_SERVER=ntp.ubuntu.com
 export NTP_CONF=/etc/ntp.conf
 
 # Location of the jv4linfo jar
-export JV4LINFO_URL=http://luniks.net/luniksnet/download/java/jv4linfo
+export JV4LINFO_URL=http://aifile.usask.ca/matterhorn/mirror/thirdparty/
 # Name of the jv4linfo file
 export JV4LINFO_JAR=jv4linfo-0.2.1-src.jar
 # Shared object required by the jv4linfo jar to function
