@@ -169,7 +169,14 @@ public class MigrationService {
       securityService.setOrganization(defaultOrg);
       securityService.setUser(new User(systemAccount, defaultOrg.getId(), new String[] { GLOBAL_ADMIN_ROLE }));
 
-      SearchResult result = searchService.getForAdministrativeRead(new SearchQuery());
+      SearchResult result = searchService.getForAdministrativeRead(new SearchQuery().withLimit(Integer.MAX_VALUE));
+
+      // to keep track of the number of items migrated
+      int totalMigrated = 0;
+      int failed = 0;
+      long totalRecords = result.getTotalSize();
+
+      logger.info("Found {} total items to migrate", totalRecords);
 
       for (SearchResultItem item : result.getItems()) {
         MediaPackage mediaPackage = parseOldMediaPackage(item.getOcMediapackage());
@@ -204,11 +211,25 @@ public class MigrationService {
         }
 
         // Write mediapackage to DB and update the index
-        AccessControlList acl = authorizationService.getAccessControlList(mediaPackage);
-        searchService.getSolrIndexManager().add(mediaPackage, acl, item.getModified());
-        searchServiceDatabase.storeMediaPackage(mediaPackage, acl, item.getModified());
+        try {
+          AccessControlList acl = authorizationService.getAccessControlList(mediaPackage);
+          searchService.getSolrIndexManager().add(mediaPackage, acl, item.getModified());
+          searchServiceDatabase.storeMediaPackage(mediaPackage, acl, item.getModified());
+          // increment the number of items migrated
+          totalMigrated++;
+          logger.info("Successfully migrated {} ({}/{}", new Object[] { mediaPackage.getIdentifier(), totalMigrated,
+                  totalRecords });
+        } catch (SolrServerException e) {
+          logger.error(e.getMessage(), e);
+          failed++;
+        } catch (SearchServiceDatabaseException e) {
+          logger.error(e.getMessage(), e);
+          failed++;
+        }
       }
-      logger.info("Finished migration 1.3 search index to 1.4 index and DB");
+      logger.info(
+              "Finished migration 1.3 search index to 1.4 index and DB. {} entries migrated. {} items couldn't be migrated. Check logs for errors",
+              new Object[] { totalMigrated, failed });
     } catch (SearchException e) {
       logger.error(e.getMessage());
     } catch (UnauthorizedException e) {
@@ -216,10 +237,6 @@ public class MigrationService {
     } catch (MediaPackageException e) {
       logger.error(e.getMessage());
     } catch (IOException e) {
-      logger.error(e.getMessage());
-    } catch (SolrServerException e) {
-      logger.error(e.getMessage());
-    } catch (SearchServiceDatabaseException e) {
       logger.error(e.getMessage());
     } catch (NotFoundException e) {
       logger.error("Streaming or Download directory hasn't been migrated to 'engage-player' channel, aborting migration!");
