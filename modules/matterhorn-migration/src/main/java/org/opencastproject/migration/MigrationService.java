@@ -15,8 +15,7 @@
  */
 package org.opencastproject.migration;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-
+import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
@@ -33,10 +32,16 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Tuple;
+import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowParser;
+import org.opencastproject.workflow.api.WorkflowParsingException;
+import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
@@ -49,6 +54,7 @@ import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +65,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class provides migration index and DB migrations to Matterhorn.
@@ -81,6 +88,9 @@ public class MigrationService {
 
   /** The workspace */
   private Workspace workspace = null;
+
+  /** The service registry */
+  private ServiceRegistry serviceRegistry = null;
 
   /** Flag describing if steaming directory migration has been made */
   private boolean validateStreaming = false;
@@ -138,8 +148,19 @@ public class MigrationService {
     this.workspace = workspace;
   }
 
-  public void activate(ComponentContext cc) {
+  /**
+   * Callback for setting the service registry
+   * 
+   * @param serviceRegistry
+   *          the service registry to set
+   */
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  public void activate(ComponentContext cc) throws IOException {
     migrateSearchIndex13(cc);
+    migrateWorkflowIndex13(cc);
   }
 
   /**
@@ -167,7 +188,7 @@ public class MigrationService {
 
       DefaultOrganization defaultOrg = new DefaultOrganization();
       securityService.setOrganization(defaultOrg);
-      securityService.setUser(new User(systemAccount, defaultOrg.getId(), new String[] { GLOBAL_ADMIN_ROLE }));
+      securityService.setUser(SecurityUtil.createSystemUser(systemAccount, defaultOrg));
 
       SearchResult result = searchService.getForAdministrativeRead(new SearchQuery().withLimit(Integer.MAX_VALUE));
 
@@ -176,7 +197,7 @@ public class MigrationService {
       int failed = 0;
       long totalRecords = result.getTotalSize();
 
-      logger.info("Found {} total items to migrate", totalRecords);
+      logger.info("Found {} total search service items to migrate", totalRecords);
 
       for (SearchResultItem item : result.getItems()) {
         MediaPackage mediaPackage = parseOldMediaPackage(item.getOcMediapackage());
@@ -243,6 +264,101 @@ public class MigrationService {
     } finally {
       securityService.setOrganization(null);
       securityService.setUser(null);
+    }
+  }
+
+  /**
+   * Migrates Matterhorn 1.3 workflow index to a 1.4 index and DB
+   */
+  private void migrateWorkflowIndex13(ComponentContext cc) throws IOException {
+    // this may be a new index, so get all of the existing workflows and index them
+    List<Job> jobs = null;
+    try {
+      jobs = serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null);
+    } catch (ServiceRegistryException e) {
+      logger.error("Unable to load the workflows jobs: {}", e.getMessage());
+      throw new ServiceException(e.getMessage());
+    }
+
+    if (jobs.size() > 0) {
+      logger.info("Found {} total workflow service items to migrate", jobs.size());
+      int totalMigrated = 0;
+      int failed = 0;
+      for (Job job : jobs) {
+        if (job.getPayload() == null) {
+          totalMigrated++;
+          logger.info("Skiped migrating null payload job '{}' ({}/{}",
+                  new Object[] { job.getId(), totalMigrated, jobs.size() });
+          continue;
+        }
+        WorkflowInstance instance = null;
+        try {
+          instance = parseOldWorkflowInstance(job.getPayload());
+          job.setPayload(WorkflowParser.toXml(instance));
+          serviceRegistry.updateJob(job);
+          totalMigrated++;
+          logger.info("Successfully migrated {} ({}/{}", new Object[] { instance.getId(), totalMigrated, jobs.size() });
+        } catch (WorkflowParsingException e) {
+          logger.error("Unable to parse workflow job {}: {}", instance.getId(), e.getMessage());
+          failed++;
+        } catch (NotFoundException e) {
+          throw new IllegalStateException("Previous loaded job can not be found: " + job.getId());
+        } catch (ServiceRegistryException e) {
+          logger.error("Unable to update workflow job {}: {}", job.getId(), e.getMessage());
+          failed++;
+        }
+      }
+      logger.info(
+              "Finished migration of 1.3 workflow DB to 1.4 workflow DB. {} entries migrated. {} items couldn't be migrated. Check logs for errors",
+              new Object[] { totalMigrated, failed });
+    } else {
+      logger.info("Finished migration of 1.3 workflow DB to 1.4 workflow DB. Nothing found to migrate");
+    }
+  }
+
+  /**
+   * Parse an old 1.3 workflow instance
+   * 
+   * @param workflowInstance
+   *          the 1.3 workflow instance XML
+   * @return the 1.4 workflow instance
+   */
+  @SuppressWarnings("unchecked")
+  private static WorkflowInstance parseOldWorkflowInstance(String workflowInstance) throws IOException,
+          WorkflowParsingException {
+    ByteArrayOutputStream baos = null;
+    ByteArrayInputStream bais = null;
+    InputStream manifest = null;
+    try {
+      manifest = IOUtils.toInputStream(workflowInstance, "UTF-8");
+      Document domMP = new SAXBuilder().build(manifest);
+
+      Namespace wfNs = Namespace.getNamespace("http://workflow.opencastproject.org");
+      Namespace secNs = Namespace.getNamespace("http://org.opencastproject.security");
+      Namespace mpNs = Namespace.getNamespace("http://mediapackage.opencastproject.org");
+
+      Iterator<Element> it = domMP.getDescendants(new ElementFilter());
+      while (it.hasNext()) {
+        Element elem = it.next();
+        if ("mediapackage".equals(elem.getName())) {
+          elem.setNamespace(mpNs);
+        } else if ("creator".equals(elem.getName()) || "organization".equals(elem.getName())) {
+          elem.setNamespace(secNs);
+        } else if ("workflow".equals(elem.getName())) {
+          elem.setNamespace(wfNs);
+        }
+      }
+
+      baos = new ByteArrayOutputStream();
+      new XMLOutputter().output(domMP, baos);
+      bais = new ByteArrayInputStream(baos.toByteArray());
+      return WorkflowParser.parseWorkflowInstance(IOUtils.toString(bais, "UTF-8"));
+    } catch (JDOMException e) {
+      throw new WorkflowParsingException("Error unmarshalling workflow", e);
+    } finally {
+      IOUtils.closeQuietly(bais);
+      IOUtils.closeQuietly(baos);
+      IOUtils.closeQuietly(manifest);
     }
   }
 
