@@ -238,7 +238,7 @@ public class MigrationService {
           searchServiceDatabase.storeMediaPackage(mediaPackage, acl, item.getModified());
           // increment the number of items migrated
           totalMigrated++;
-          logger.info("Successfully migrated {} ({}/{}", new Object[] { mediaPackage.getIdentifier(), totalMigrated,
+          logger.info("Successfully migrated {} ({}/{})", new Object[] { mediaPackage.getIdentifier(), totalMigrated,
                   totalRecords });
         } catch (SolrServerException e) {
           logger.error(e.getMessage(), e);
@@ -271,7 +271,6 @@ public class MigrationService {
    * Migrates Matterhorn 1.3 workflow index to a 1.4 index and DB
    */
   private void migrateWorkflowIndex13(ComponentContext cc) throws IOException {
-    // this may be a new index, so get all of the existing workflows and index them
     List<Job> jobs = null;
     try {
       jobs = serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null);
@@ -287,7 +286,7 @@ public class MigrationService {
       for (Job job : jobs) {
         if (job.getPayload() == null) {
           totalMigrated++;
-          logger.info("Skiped migrating null payload job '{}' ({}/{}",
+          logger.info("Skiped migrating null payload job '{}' ({}/{})",
                   new Object[] { job.getId(), totalMigrated, jobs.size() });
           continue;
         }
@@ -297,7 +296,7 @@ public class MigrationService {
           job.setPayload(WorkflowParser.toXml(instance));
           serviceRegistry.updateJob(job);
           totalMigrated++;
-          logger.info("Successfully migrated {} ({}/{}", new Object[] { instance.getId(), totalMigrated, jobs.size() });
+          logger.info("Successfully migrated {} ({}/{})", new Object[] { instance.getId(), totalMigrated, jobs.size() });
         } catch (WorkflowParsingException e) {
           logger.error("Unable to parse workflow job {}: {}", instance.getId(), e.getMessage());
           failed++;
@@ -324,7 +323,7 @@ public class MigrationService {
    * @return the 1.4 workflow instance
    */
   @SuppressWarnings("unchecked")
-  private static WorkflowInstance parseOldWorkflowInstance(String workflowInstance) throws IOException,
+  private WorkflowInstance parseOldWorkflowInstance(String workflowInstance) throws IOException,
           WorkflowParsingException {
     ByteArrayOutputStream baos = null;
     ByteArrayInputStream bais = null;
@@ -340,13 +339,25 @@ public class MigrationService {
       Iterator<Element> it = domMP.getDescendants(new ElementFilter());
       while (it.hasNext()) {
         Element elem = it.next();
-        if ("mediapackage".equals(elem.getName())) {
-          elem.setNamespace(mpNs);
-        } else if ("creator".equals(elem.getName()) || "organization".equals(elem.getName())) {
-          elem.setNamespace(secNs);
-        } else if ("workflow".equals(elem.getName())) {
-          elem.setNamespace(wfNs);
-        }
+        elem.setNamespace(wfNs);
+      }
+      it = domMP.getDescendants(new ElementFilter("organization"));
+      while (it.hasNext()) {
+        Element orgElem = it.next();
+        setNamespaceToAllChildren(orgElem, secNs);
+        orgElem.setNamespace(secNs);
+      }
+      it = domMP.getDescendants(new ElementFilter("creator"));
+      while (it.hasNext()) {
+        Element creatorElem = it.next();
+        setNamespaceToAllChildren(creatorElem, secNs);
+        creatorElem.setNamespace(secNs);
+      }
+      it = domMP.getDescendants(new ElementFilter("mediapackage"));
+      while (it.hasNext()) {
+        Element mpElem = it.next();
+        setNamespaceToAllChildren(mpElem, mpNs);
+        mpElem.setNamespace(mpNs);
       }
 
       baos = new ByteArrayOutputStream();
@@ -359,6 +370,15 @@ public class MigrationService {
       IOUtils.closeQuietly(bais);
       IOUtils.closeQuietly(baos);
       IOUtils.closeQuietly(manifest);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void setNamespaceToAllChildren(Element elem, Namespace namespace) {
+    Iterator<Element> children = elem.getDescendants(new ElementFilter());
+    while (children.hasNext()) {
+      Element child = children.next();
+      child.setNamespace(namespace);
     }
   }
 
