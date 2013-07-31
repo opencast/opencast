@@ -75,7 +75,7 @@ public class AnnotationImpl implements Annotation {
   @XmlElement(name = "mediapackageId")
   private String mediapackageId;
 
-  @Column(name = "user", length = 255)
+  @Column(name = "user_id", length = 255)
   @XmlElement(name = "userId")
   private String userId;
 

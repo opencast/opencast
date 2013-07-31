@@ -49,7 +49,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.NONE)
 public class UserSummaryImpl implements UserSummary {
   @Id
-  @Column(name = "user", length = 65535)
+  @Column(name = "user_id", length = 65535)
   @XmlElement(name = "userId")
   private String userId = "Empty UserId";
   
