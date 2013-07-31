@@ -48,7 +48,7 @@ CREATE TABLE mh_annotation (
   mediapackage VARCHAR(128),
   session VARCHAR(128),
   created DATETIME,
-  user_id VARCHAR(255),
+  user VARCHAR(255),
   length INTEGER,
   type VARCHAR(128),
   value TEXT(65535),
@@ -61,7 +61,7 @@ CREATE INDEX IX_mh_annotation_inpoint ON mh_annotation (inpoint);
 CREATE INDEX IX_mh_annotation_outpoint ON mh_annotation (outpoint);
 CREATE INDEX IX_mh_annotation_mediapackage ON mh_annotation (mediapackage);
 CREATE INDEX IX_mh_annotation_private ON mh_annotation (private);
-CREATE INDEX IX_mh_annotation_user ON mh_annotation (user_id);
+CREATE INDEX IX_mh_annotation_user ON mh_annotation (user);
 CREATE INDEX IX_mh_annotation_session ON mh_annotation (session);
 CREATE INDEX IX_mh_annotation_type ON mh_annotation (type);
 
@@ -253,7 +253,7 @@ CREATE TABLE mh_user_action (
   mediapackage VARCHAR(128),
   session VARCHAR(128),
   created DATETIME,
-  user_id VARCHAR(255),
+  user VARCHAR(255),
   length INTEGER,
   type VARCHAR(128),
   playing TINYINT(1) DEFAULT 0,
@@ -264,7 +264,7 @@ CREATE INDEX IX_mh_user_action_created ON mh_user_action (created);
 CREATE INDEX IX_mh_user_action_inpoint ON mh_user_action (inpoint);
 CREATE INDEX IX_mh_user_action_outpoint ON mh_user_action (outpoint);
 CREATE INDEX IX_mh_user_action_mediapackage_id ON mh_user_action (mediapackage);
-CREATE INDEX IX_mh_user_action_user_id ON mh_user_action (user_id);
+CREATE INDEX IX_mh_user_action_user_id ON mh_user_action (user);
 CREATE INDEX IX_mh_user_action_session_id ON mh_user_action (session);
 CREATE INDEX IX_mh_user_action_type ON mh_user_action (type);
 

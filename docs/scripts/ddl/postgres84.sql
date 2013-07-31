@@ -43,7 +43,7 @@ CREATE TABLE "mh_annotation" (
   "mediapackage" character varying(128),
   "session" character varying(128),
   "created" timestamp,
-  "user_id"  character varying(255),
+  "user"  character varying(255),
   "length" bigint,
   "type" character varying(128),
   "value" text,
@@ -56,7 +56,7 @@ CREATE INDEX "IX_mh_annotation_inpoint" ON "mh_annotation" ("inpoint");
 CREATE INDEX "IX_mh_annotation_outpoint" ON "mh_annotation" ("outpoint");
 CREATE INDEX "IX_mh_annotation_mediapackage" ON "mh_annotation" ("mediapackage");
 CREATE INDEX "IX_mh_annotation_private" ON "mh_annotation" ("private");
-CREATE INDEX "IX_mh_annotation_user" ON "mh_annotation" ("user_id");
+CREATE INDEX "IX_mh_annotation_user" ON "mh_annotation" ("user");
 CREATE INDEX "IX_mh_annotation_session" ON "mh_annotation" ("session");
 CREATE INDEX "IX_mh_annotation_type" ON "mh_annotation" ("type");
 
@@ -248,7 +248,7 @@ CREATE TABLE "mh_user_action" (
   "mediapackage" character varying(128),
   "session" character varying(128),
   "created" timestamp,
-  "user_id" character varying(255),
+  "user" character varying(255),
   "length" bigint,
   "type" character varying(128),
   "playing" boolean DEFAULT FALSE,
@@ -259,7 +259,7 @@ CREATE INDEX "IX_mh_user_action_created" ON "mh_user_action" ("created");
 CREATE INDEX "IX_mh_user_action_inpoint" ON "mh_user_action" ("inpoint");
 CREATE INDEX "IX_mh_user_action_outpoint" ON "mh_user_action" ("outpoint");
 CREATE INDEX "IX_mh_user_action_mediapackage" ON "mh_user_action" ("mediapackage");
-CREATE INDEX "IX_mh_user_action_user" ON "mh_user_action" ("user_id");
+CREATE INDEX "IX_mh_user_action_user" ON "mh_user_action" ("user");
 CREATE INDEX "IX_mh_user_action_session" ON "mh_user_action" ("session");
 CREATE INDEX "IX_mh_user_action_type" ON "mh_user_action" ("type");
 
