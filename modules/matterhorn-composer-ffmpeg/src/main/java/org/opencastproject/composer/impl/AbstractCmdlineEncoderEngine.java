@@ -17,6 +17,7 @@
 package org.opencastproject.composer.impl;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.composer.api.EncoderEngine;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncoderListener;
@@ -31,12 +32,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
@@ -376,12 +378,31 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
    * @throws EncoderException
    *           in case of any error
    */
-  protected List<String> buildArgumentList(EncodingProfile format) throws EncoderException {
-    String optionString = processParameters(cmdlineOptions);
-    String[] options = optionString.split(" ");
-    List<String> arguments = new ArrayList<String>(options.length);
-    arguments.addAll(Arrays.asList(options));
-    return arguments;
+  protected List<String> buildArgumentList(final EncodingProfile format) throws EncoderException {
+    final String optionString = processParameters(cmdlineOptions);
+    return splitCommandArgsWithCare(optionString);
+  }
+
+  /**
+   * @param commandline Never null
+   * @return Split string on spaces, except if between quotes (i.e. treat \“hello world\” as one token)
+   */
+  private List<String> splitCommandArgsWithCare(final String commandline) {
+    final List<String> list = new LinkedList<String>();
+    final Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(commandline);
+    while (m.find()) {
+      String next = StringUtils.trimToNull(m.group(1));
+      if (next != null) {
+        final String[] removeTheseBookends = new String[] { "\"", "'" };
+        for (final String removeThisBookend : removeTheseBookends) {
+          if (next.startsWith(removeThisBookend) && next.endsWith(removeThisBookend)) {
+            next = next.substring(1, next.length() - 1);
+          }
+        }
+        list.add(next);
+      }
+    }
+    return list;
   }
 
   /**
