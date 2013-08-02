@@ -21,6 +21,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.IoSupport.withFile;
 import static org.opencastproject.util.RestUtil.fileResponse;
+import static org.opencastproject.util.RestUtil.partialFileResponse;
 import static org.opencastproject.util.RestUtil.streamResponse;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
@@ -274,7 +275,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGet(@PathParam("mediaPackageID") String mediaPackageID,
           @PathParam("mediaPackageElementID") String mediaPackageElementID, @PathParam("fileName") String fileName,
-          @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException {
+          @HeaderParam("If-None-Match") String ifNoneMatch, @HeaderParam("Range") String range) throws NotFoundException {
     String md5 = null;
     // Check the If-None-Match header first
     try {
@@ -287,12 +288,31 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
               fileName });
     }
 
-    // No If-Non-Match header provided, or the file changed in the meantime
-    try {
-      return fileResponse(getFile(mediaPackageID, mediaPackageElementID), mimeMap.getContentType(fileName),
-              some(fileName)).tag(md5).build();
-    } catch (IllegalStateException e) {
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    if (StringUtils.isNotBlank(range)) {
+      logger.debug("trying to retrieve range: {}", range);
+      try {
+        Response response = partialFileResponse(getFile(mediaPackageID, mediaPackageElementID),
+            mimeMap.getContentType(fileName), some(fileName), range).tag(md5).build();
+//        response = fileResponse(getFile(mediaPackageID, mediaPackageElementID),
+//            mimeMap.getContentType(fileName), some(fileName)).tag(md5).build();
+
+        return response;
+      } catch (IllegalStateException e) {
+        logger.error(e.getMessage(), e);
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+      } catch (IOException e) {
+        logger.error(e.getMessage(), e);
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+      }
+    } else {
+      // No If-Non-Match header provided, or the file changed in the meantime
+      try {
+        return fileResponse(getFile(mediaPackageID, mediaPackageElementID),
+            mimeMap.getContentType(fileName), some(fileName)).tag(md5).build();
+      } catch (IllegalStateException e) {
+        logger.error(e.getMessage());
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+      }
     }
   }
 
