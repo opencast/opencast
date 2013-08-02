@@ -1,5 +1,3 @@
-
-drop schema if exists matterhorn;
 create schema matterhorn DEFAULT CHARACTER SET = 'utf8';
 use matterhorn;
 
