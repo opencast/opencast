@@ -16,17 +16,18 @@
 
 package org.opencastproject.search.impl.solr;
 
+import static org.opencastproject.util.data.Collections.head;
+
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import static org.opencastproject.util.data.Collections.head;
 
 /**
  * This class reflects the solr schema.xml. Note that all getters returning simple values may always return null. Please
@@ -86,8 +87,6 @@ public final class Schema {
   public static final String OC_MEDIATYPE = "oc_mediatype";
   public static final String OC_ELEMENTTAGS = "oc_elementtags";
   public static final String OC_ELEMENTFLAVORS = "oc_elementflavors";
-  public static final String OC_TEXT_PREFIX = "oc_text_";
-  public static final String OC_HINT_PREFIX = "oc_hint_";
   public static final String OC_ACL_PREFIX = "oc_acl_";
 
   /**
@@ -520,14 +519,6 @@ public final class Schema {
 
   public static void setOcElementflavors(SolrInputDocument doc, String elementflavors) {
     doc.setField(OC_ELEMENTFLAVORS, elementflavors);
-  }
-
-  public static List<DField<String>> getOcText(SolrDocument doc) {
-    return getDynamicStringValues(doc, OC_TEXT_PREFIX);
-  }
-
-  public static List<DField<String>> getOcHint(SolrDocument doc) {
-    return getDynamicStringValues(doc, OC_HINT_PREFIX);
   }
 
   public static List<DField<String>> getOcAcl(SolrDocument doc) {
