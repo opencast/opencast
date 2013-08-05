@@ -142,8 +142,8 @@ ocMetrics = new (function() {
 	    function createChart(options, mbeans) {
         	var decimals = options.decimals === undefined ? 0 : options.decimals;
         	var div = options.dividing === undefined ? 1 : options.dividing;
-        	var decPoint = options.decPoint === undefined ? ',' : options.decPoint;
-        	var thousandsSep = options.thousandsSep === undefined ? "'" : options.thousandsSep;
+        	var decPoint = options.decPoint === undefined ? '.' : options.decPoint;
+        	var thousandsSep = options.thousandsSep === undefined ? "," : options.thousandsSep;
         	var typeShort = options.typeShort === undefined ? '' : options.typeShort;
 	    	
 	        return new Highcharts.Chart({
@@ -157,6 +157,7 @@ ocMetrics = new (function() {
 	            xAxis: { type: 'datetime' },
 	            yAxis: {
 	                title: { text: options.type },
+                        allowDecimals: decimals?true:false,
 	                labels: {
 	                    formatter: function() {
 	                    	return Highcharts.numberFormat(this.value / div, decimals, decPoint, thousandsSep) + typeShort;
@@ -193,8 +194,8 @@ ocMetrics = new (function() {
 	    function createStackChart(options, mbeans) {
         	var decimals = options.decimals === undefined ? 0 : options.decimals;
         	var div = options.dividing === undefined ? 1 : options.dividing;
-        	var decPoint = options.decPoint === undefined ? ',' : options.decPoint;
-        	var thousandsSep = options.thousandsSep === undefined ? "'" : options.thousandsSep;
+        	var decPoint = options.decPoint === undefined ? '.' : options.decPoint;
+        	var thousandsSep = options.thousandsSep === undefined ? "," : options.thousandsSep;
         	var typeShort = options.typeShort === undefined ? '' : options.typeShort;
 	    	
 	    	return new Highcharts.Chart({
@@ -210,6 +211,7 @@ ocMetrics = new (function() {
 	    		},
 	    		yAxis: {
 	    			title: { text: options.type },
+                                allowDecimals: decimals?true:false,
 	    			labels: {
 	    				formatter: function() {
 	    					return Highcharts.numberFormat(this.value / div, decimals, decPoint, thousandsSep) + typeShort;
@@ -247,8 +249,8 @@ ocMetrics = new (function() {
 	    function createPlotLineChart(options, mbeans) {
         	var decimals = options.decimals === undefined ? 0 : options.decimals;
         	var div = options.dividing === undefined ? 1 : options.dividing;
-        	var decPoint = options.decPoint === undefined ? ',' : options.decPoint;
-        	var thousandsSep = options.thousandsSep === undefined ? "'" : options.thousandsSep;
+        	var decPoint = options.decPoint === undefined ? '.' : options.decPoint;
+        	var thousandsSep = options.thousandsSep === undefined ? "," : options.thousandsSep;
         	var typeShort = options.typeShort === undefined ? '' : options.typeShort;
         	
 	    	return new Highcharts.Chart({
@@ -262,6 +264,7 @@ ocMetrics = new (function() {
 	    		xAxis: { type: 'datetime' },
 	    		yAxis: {
 	    			title: { text: options.type },
+                                allowDecimals: decimals?true:false,
 	    			labels: {
 	    				formatter: function() {
 	    					return Highcharts.numberFormat(this.value / div, decimals, decPoint, thousandsSep) + typeShort;
@@ -313,8 +316,8 @@ ocMetrics = new (function() {
 	    function createPercentageAreaChart(options, mbeans) {
         	var decimals = options.decimals === undefined ? 0 : options.decimals;
         	var div = options.dividing === undefined ? 1 : options.dividing;
-        	var decPoint = options.decPoint === undefined ? ',' : options.decPoint;
-        	var thousandsSep = options.thousandsSep === undefined ? "'" : options.thousandsSep;
+        	var decPoint = options.decPoint === undefined ? '.' : options.decPoint;
+        	var thousandsSep = options.thousandsSep === undefined ? "," : options.thousandsSep;
         	var typeShort = options.typeShort === undefined ? '' : options.typeShort;
         	
 	    	return new Highcharts.Chart({
@@ -404,7 +407,7 @@ ocMetrics = new (function() {
   	    factory.createPlotLine({
   				title: "System Load Average",
   				type: "Load",
-  				decimals: 3
+  				decimals: 1
 			}, [{
 	  	    	container: 'os',
 	  	    	name: 'java.lang:type=OperatingSystem',
@@ -521,8 +524,7 @@ ocMetrics = new (function() {
 	  			title: "Workspace Storage",
 	  			type: "GBytes",
 	  	  		typeShort: " GB",
-	  	  		dividing: 1073741824,
-	  	  		decimals: 4
+	  	  		dividing: 1073741824
 			},[{
   	        	container: 'matterhorn',
   	      	    name: 'org.opencastproject.matterhorn:type=Workspace',
@@ -543,8 +545,7 @@ ocMetrics = new (function() {
 	  			title: "Working File Repository Storage",
 	  			type: "GBytes",
 	  			typeShort: " GB",
-	  			dividing: 1073741824,
-	  			decimals: 4
+	  			dividing: 1073741824
 			},[{
             	container: 'matterhorn',
             	name: 'org.opencastproject.matterhorn:type=WorkingFileRepository',
@@ -565,8 +566,7 @@ ocMetrics = new (function() {
 	  	    	title: "Archive Storage",
 	  	    	type: "GBytes",
 	  	    	typeShort: " GB",
-	  	    	dividing: 1073741824,
-	  	    	decimals: 4
+	  	    	dividing: 1073741824
 	  	    },[{
 	  	    	container: 'matterhorn',
 	  	    	name: 'org.opencastproject.matterhorn:type=ElementStore',
