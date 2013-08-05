@@ -319,8 +319,13 @@ public final class EpisodeServiceImpl implements EpisodeService {
   /**
    * Since the index is populated from persistent storage where media package element URIs have been transformed to
    * location independend URNs these have to be rewritten to point to actual locations.
+   * 
+   * @param uriRewriter
+   *          facility used to point mediapackage element URIs to the episode service
+   * @param waitForRestService
+   *          <code>true</code> to add 10s wait in order to make sure the episode REST service is online and working
    */
-  void populateIndex(final UriRewriter uriRewriter) {
+  void populateIndex(final UriRewriter uriRewriter, final boolean waitForRestService) {
 
     long instancesInSolr;
     try {
@@ -342,52 +347,114 @@ public final class EpisodeServiceImpl implements EpisodeService {
       public void run() {
         // The episode service REST methods are being published by the REST publisher service, and currently there is
         // no way to figure out when that registration was done, hence the stupid "sleep 5000".
-        try {
-          logger.debug("Waiting 10s for episode REST service to be available");
-          Thread.sleep(10000);
-        } catch (InterruptedException e1) {
-          logger.warn("Error waiting 5s");
-        }
 
-        try {
-          Map<String, Version> maps = new HashMap<String, Version>();
-          Iterator<Episode> episodes = persistence.getAllEpisodes();
-          while (episodes.hasNext()) {
-            final Episode episode = episodes.next();
-            String episodeId = episode.getMediaPackage().getIdentifier().toString();
-
-            Version latestVersion = maps.get(episodeId);
-            if (latestVersion == null) {
-              Option<Episode> latestEpisode = persistence.getLatestEpisode(episodeId);
-              if (latestEpisode.isNone())
-                throw new EpisodeServiceException("Latest episode from existing episode identifier not found!");
-              latestVersion = latestEpisode.get().getVersion();
-              maps.put(episodeId, latestVersion);
-            }
-            boolean isLatestVersion = episode.getVersion().equals(latestVersion);
-
-            final Organization organization = orgDir.getOrganization(episode.getOrganization());
-            secSvc.setOrganization(organization);
-            secSvc.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
-            // mediapackage URIs need to be rewritten to concrete URLs for indexation to work
-            final PartialMediaPackage pmp = mkPartial(episode.getMediaPackage());
-            rewriteAssetUris(uriRewriter.curry(episode.getVersion()), pmp);
-            solrIndex.add(pmp.getMediaPackage(), episode.getAcl(), episode.getVersion(), episode.getDeletionDate(),
-                    episode.getModificationDate(), isLatestVersion);
+        if (waitForRestService) {
+          try {
+            logger.debug("Waiting 10s for episode REST service to be available");
+            Thread.sleep(10000);
+          } catch (InterruptedException e1) {
+            logger.warn("Error waiting 5s");
           }
-          logger.info("Finished populating episode search index");
-        } catch (Exception e) {
-          logger.warn("Unable to index series instances: {}", e);
-          throw new ServiceException(e.getMessage());
-        } finally {
-          secSvc.setOrganization(null);
-          secSvc.setUser(null);
         }
+        populateIndex(uriRewriter);
       }
 
     }).start();
 
   }
+  
+  /**
+   * Since the index is populated from persistent storage where media package element URIs have been transformed to
+   * location independend URNs these have to be rewritten to point to actual locations.
+   * 
+   * @param uriRewriter
+   *          facility used to point mediapackage element URIs to the episode service
+   * @param waitForRestService
+   *          <code>true</code> to add 10s wait in order to make sure the episode REST service is online and working
+   */
+  void populateTestIndex(final UriRewriter uriRewriter, final boolean waitForRestService) {
+
+    long instancesInSolr;
+    try {
+      instancesInSolr = solrIndex.count();
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
+
+    if (instancesInSolr > 0L) {
+      logger.debug("No need to populate episode search index");
+      return;
+    }
+
+    new Thread(new Runnable() {
+
+      @Override
+      public void run() {
+        // The episode service REST methods are being published by the REST publisher service, and currently there is
+        // no way to figure out when that registration was done, hence the stupid "sleep 5000".
+
+        if (waitForRestService) {
+          try {
+            logger.debug("Waiting 10s for episode REST service to be available");
+            Thread.sleep(10000);
+          } catch (InterruptedException e1) {
+            logger.warn("Error waiting 5s");
+          }
+        }
+        
+        // Finally get the work done
+        populateIndex(uriRewriter);
+      }
+
+    }).start();
+  }
+  
+  /**
+   * Since the index is populated from persistent storage where media package element URIs have been transformed to
+   * location independend URNs these have to be rewritten to point to actual locations.
+   * 
+   * @param uriRewriter
+   *          facility used to point mediapackage element URIs to the episode service
+   */
+  void populateIndex(final UriRewriter uriRewriter) {
+    logger.info("Start populating episode search index");
+
+    try {
+      Map<String, Version> maps = new HashMap<String, Version>();
+      Iterator<Episode> episodes = persistence.getAllEpisodes();
+      while (episodes.hasNext()) {
+        final Episode episode = episodes.next();
+        String episodeId = episode.getMediaPackage().getIdentifier().toString();
+  
+        Version latestVersion = maps.get(episodeId);
+        if (latestVersion == null) {
+          Option<Episode> latestEpisode = persistence.getLatestEpisode(episodeId);
+          if (latestEpisode.isNone())
+            throw new EpisodeServiceException("Latest episode from existing episode identifier not found!");
+          latestVersion = latestEpisode.get().getVersion();
+          maps.put(episodeId, latestVersion);
+        }
+        boolean isLatestVersion = episode.getVersion().equals(latestVersion);
+  
+        final Organization organization = orgDir.getOrganization(episode.getOrganization());
+        secSvc.setOrganization(organization);
+        secSvc.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
+        // mediapackage URIs need to be rewritten to concrete URLs for indexation to work
+        final PartialMediaPackage pmp = mkPartial(episode.getMediaPackage());
+        rewriteAssetUris(uriRewriter.curry(episode.getVersion()), pmp);
+        solrIndex.add(pmp.getMediaPackage(), episode.getAcl(), episode.getVersion(), episode.getDeletionDate(),
+                episode.getModificationDate(), isLatestVersion);
+      }
+      logger.info("Finished populating episode search index");
+    } catch (Exception e) {
+      logger.warn("Unable to index series instances: {}", e.getMessage());
+      throw new ServiceException(e.getMessage());
+    } finally {
+      secSvc.setOrganization(null);
+      secSvc.setUser(null);
+    }
+  }
+
 
   /**
    * Returns a single element list containing the SearchResultItem if access is granted for write action

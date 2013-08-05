@@ -112,7 +112,7 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
   public synchronized void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
     // Populate the search index if it is empty
     // bad approach but episode service and its rest endpoint are in a cyclic dependency
-    episodeService.populateIndex(httpMediaPackageElementProvider.getUriRewriter());
+    episodeService.populateIndex(httpMediaPackageElementProvider.getUriRewriter(), true);
   }
 
   public void unsetHttpMediaPackageElementProvider(HttpMediaPackageElementProvider ingore) {
