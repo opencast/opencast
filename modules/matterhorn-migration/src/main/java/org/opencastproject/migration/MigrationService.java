@@ -92,9 +92,6 @@ public class MigrationService {
   /** The service registry */
   private ServiceRegistry serviceRegistry = null;
 
-  /** Flag describing if steaming directory migration has been made */
-  private boolean validateStreaming = false;
-
   /** Flag describing if download directory migration has been made */
   private boolean validateDownload = false;
 
@@ -206,6 +203,7 @@ public class MigrationService {
         for (MediaPackageElement e : mediaPackage.getElements()) {
           URI newUri = null;
           String uri = e.getURI().toString();
+
           if (StringUtils.isNotBlank(downloadUrl) && uri.startsWith(downloadUrl)) {
             String path = uri.substring(downloadUrl.length());
             newUri = URI.create(UrlSupport.concat(downloadUrl, "engage-player", path));
@@ -218,12 +216,6 @@ public class MigrationService {
           } else if (StringUtils.isNotBlank(streamingUrl) && uri.startsWith(streamingUrl)) {
             String path = uri.substring(streamingUrl.length());
             newUri = URI.create(UrlSupport.concat(streamingUrl, "engage-player", path));
-
-            // Validate if streaming directory has been migrated
-            if (!validateStreaming) {
-              workspace.get(newUri);
-              validateStreaming = true;
-            }
           } else {
             newUri = e.getURI();
             logger.error("Unable to migrate URI '{}' from mediapackage '{}'! DO IT MANUALLY", uri, mediaPackage);
