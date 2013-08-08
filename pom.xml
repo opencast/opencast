@@ -390,6 +390,7 @@
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
+        <module>modules/matterhorn-series-service-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
