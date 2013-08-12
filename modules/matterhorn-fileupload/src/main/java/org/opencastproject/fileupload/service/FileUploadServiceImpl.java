@@ -65,9 +65,10 @@ import org.osgi.service.cm.ManagedService;
  */
 public class FileUploadServiceImpl implements FileUploadService, ManagedService {
 
-  final String PROPKEY_STORAGE_DIR = "org.opencastproject.storage.dir";
+  final String PROPKEY_STORAGE_DIR    = "org.opencastproject.storage.dir";
   final String PROPKEY_CLEANER_MAXTTL = "org.opencastproject.upload.cleaner.maxttl";
-  final String DIRNAME_WORK_ROOT = "fileupload-tmp";
+  final String PROPKEY_UPLOAD_WORKDIR = "org.opencastproject.upload.workdir";
+  final String DEFAULT_UPLOAD_WORKDIR = "fileupload-tmp"; /* The default location is the storage dir */
   final String UPLOAD_COLLECTION = "uploaded";
   final String FILEEXT_DATAFILE = ".payload";
   final String FILENAME_CHUNKFILE = "chunk.part";
@@ -75,7 +76,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   final int READ_BUFFER_LENGTH = 512;
   final int DEFAULT_CLEANER_MAXTTL = 6;
   private static final Logger log = LoggerFactory.getLogger(FileUploadServiceImpl.class);
-  private File workRoot;
+  private File workRoot = null;
   private IngestService ingestService;
   private Workspace workspace;
   private Marshaller jobMarshaller;
@@ -87,15 +88,17 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   // <editor-fold defaultstate="collapsed" desc="OSGi Service Stuff" >
   protected synchronized void activate(ComponentContext cc) throws Exception {
-    // ensure existence of working directory
-    String dirname = cc.getBundleContext().getProperty(PROPKEY_STORAGE_DIR);
-    if (dirname != null) {
-      workRoot = new File(dirname + File.separator + DIRNAME_WORK_ROOT);
-      if (!workRoot.exists()) {
-        FileUtils.forceMkdir(workRoot);
+    /* Ensure a working directory is set */
+    if (workRoot == null) {
+	 /* Use the default location: STORAGE_DIR / DEFAULT_UPLOAD_WORKDIR */
+      String dir = cc.getBundleContext().getProperty(PROPKEY_STORAGE_DIR);
+      if (dir == null) {
+        throw new RuntimeException("Storage directory not defined. "
+            + "Use " + PROPKEY_STORAGE_DIR + " to set the property.");
       }
-    } else {
-      throw new RuntimeException("Storage directory must be defined with framework property " + PROPKEY_STORAGE_DIR);
+      dir += File.separator + DEFAULT_UPLOAD_WORKDIR;
+      workRoot = new File(dir);
+      log.info("Storage directory set to {}.", workRoot.getAbsolutePath());
     }
 
     // set up de-/serialization
@@ -107,7 +110,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     cleaner = new FileUploadServiceCleaner(this);
     cleaner.schedule();
     
-    log.info("File Upload Service activated. Storage directory is {}.", workRoot.getAbsolutePath());
+    log.info("File Upload Service activated.");
   }
 
   protected void deactivate(ComponentContext cc) {
@@ -118,6 +121,11 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   @Override
   public synchronized void updated(Dictionary properties) throws ConfigurationException {
     // try to get time-to-live threshold for jobs, use default if not configured
+    String dir = (String) properties.get(PROPKEY_UPLOAD_WORKDIR);
+    if (dir != null) {
+      workRoot = new File(dir);
+      log.info("Configuration updated. Upload working directory set to {}.", dir);
+    }
     try {
       jobMaxTTL = Integer.parseInt(((String)properties.get(PROPKEY_CLEANER_MAXTTL)).trim());
     } catch (Exception e) {
