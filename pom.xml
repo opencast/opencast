@@ -1857,10 +1857,10 @@
   <mailingLists>
     <mailingList>
       <name>Matterhorn Mailing List</name>
-      <subscribe>http://lists.opencastproject.org/mailman/listinfo/matterhorn</subscribe>
-      <unsubscribe>http://lists.opencastproject.org/mailman/listinfo/matterhorn</unsubscribe>
-      <post>matterhorn@opencastproject.org</post>
-      <archive>http://n2.nabble.com/matterhorn-Matterhorn-f2233301.html</archive>
+      <subscribe>https://groups.google.com/a/opencast.org/forum/#!forum/matterhorn</subscribe>
+      <unsubscribe>https://groups.google.com/a/opencast.org/forum/#!forum/matterhorn</unsubscribe>
+      <post>matterhorn@opencast.org</post>
+      <archive>https://groups.google.com/a/opencast.org/forum/#!forum/matterhorn</archive>
     </mailingList>
   </mailingLists>
 
@@ -1872,14 +1872,14 @@
   </licenses>
 
   <scm>
-    <connection>scm:svn:http://source.opencastproject.org/svn/products/matterhorn/trunk</connection>
-    <developerConnection>scm:svn:https://source.opencastproject.org/svn/products/matterhorn/trunk</developerConnection>
-    <url>http://source.opencastproject.org/svn/products/matterhorn/trunk</url>
+    <connection>scm:svn:https://opencastproject.jira.com/svn/products/matterhorn/trunk</connection>
+    <developerConnection>scm:svn:https://opencastproject.jira.com/svn/products/matterhorn/trunk</developerConnection>
+    <url>https://opencastproject.jira.com/svn/products/matterhorn/trunk</url>
   </scm>
 
   <issueManagement>
     <system>jira</system>
-    <url>http://opencast.jira.com</url>
+    <url>https://opencast.jira.com</url>
   </issueManagement>
 
   <!-- These should be the right locations for opencast maven 2 distribution, make sure you have <scm> defined for your sub
