@@ -182,6 +182,8 @@ public class MigrationService {
       String systemAccount = cc.getBundleContext().getProperty("org.opencastproject.security.digest.user");
       String downloadUrl = cc.getBundleContext().getProperty("org.opencastproject.download.url");
       String streamingUrl = cc.getBundleContext().getProperty("org.opencastproject.streaming.url");
+      String wfrUrl = UrlSupport.concat(cc.getBundleContext().getProperty("org.opencastproject.server.url"), "files",
+              "mediapackage");
 
       DefaultOrganization defaultOrg = new DefaultOrganization();
       securityService.setOrganization(defaultOrg);
@@ -216,6 +218,9 @@ public class MigrationService {
           } else if (StringUtils.isNotBlank(streamingUrl) && uri.startsWith(streamingUrl)) {
             String path = uri.substring(streamingUrl.length());
             newUri = URI.create(UrlSupport.concat(streamingUrl, "engage-player", path));
+          } else if (uri.startsWith(wfrUrl) && uri.endsWith("security-policy/xacml.xml")) {
+            String path = uri.substring(wfrUrl.length());
+            newUri = URI.create(UrlSupport.concat(downloadUrl, "engage-player", path));
           } else {
             newUri = e.getURI();
             logger.error("Unable to migrate URI '{}' from mediapackage '{}'! DO IT MANUALLY", uri, mediaPackage);
