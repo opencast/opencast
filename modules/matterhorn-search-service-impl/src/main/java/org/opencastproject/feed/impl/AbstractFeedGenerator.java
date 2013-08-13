@@ -43,6 +43,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.opencastproject.mediapackage.AudioStream;
+import org.opencastproject.mediapackage.VideoStream;
+import org.opencastproject.mediapackage.track.TrackImpl;
 
 /**
  * This class provides basic functionality for creating feeds and is used as the base implementation for the default
@@ -601,9 +604,26 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
       String trackMimeType = element.getMimeType().toString();
       long trackLength = element.getSize();
-      if (trackLength <= 0)
-        trackLength = metadata.getDcExtent();
-
+      if (trackLength <= 0) {
+        // filesize unset so estimate from duration and bitrate
+        trackLength = 0;
+        if (((TrackImpl)element).hasVideo()) {
+          List<VideoStream> video = ((TrackImpl)element).getVideo();
+          trackLength += metadata.getDcExtent() / 1000 * video.get(0).getBitRate() / 8;
+        }
+        
+        if (((TrackImpl)element).hasAudio()) {
+          List<AudioStream> audio = ((TrackImpl)element).getAudio();
+          trackLength += metadata.getDcExtent() / 1000 * audio.get(0).getBitRate() / 8;
+        }
+        
+        // if no bitrate data default to value of duration which is probably within an 
+        // order of magnitude correct 
+        if (trackLength == 0) {
+          trackLength = metadata.getDcExtent();
+        }
+      }
+      
       String trackFlavor = element.getFlavor().toString();
       
       String trackUrl = null;
