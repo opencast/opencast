@@ -1849,6 +1849,28 @@
       </roles>
       <timezone>-8</timezone>
     </developer>
+    <developer>
+      <id>jamesp</id>
+      <name>James Perrin</name>
+      <email>james.perrin@manchester.ac.uk</email>
+      <organization>University of Manchester</organization>
+      <organizationUrl>http://www.manchester.ac.uk</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>0</timezone>
+    </developer>
+    <developer>
+      <id>ts23</id>
+      <name>Tobias Schiebeck</name>
+      <email>tobias.schiebeck@manchester.ac.uk</email>
+      <organization>University of Manchester</organization>
+      <organizationUrl>http://www.manchester.ac.uk</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>0</timezone>
+    </developer>
   </developers>
 
   <contributors><!-- TODO? -->
