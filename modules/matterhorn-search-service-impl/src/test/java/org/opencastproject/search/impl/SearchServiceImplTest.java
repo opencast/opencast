@@ -275,7 +275,7 @@ public class SearchServiceImplTest {
    */
   @Test
   public void testEmptySearchIndex() {
-    SearchResult result = service.getByQuery(new SearchQuery().withId("foo"));
+    SearchResult result = service.getByQuery(new SearchQuery().seriesId("foo").includeSeries(false));
     assertEquals(0, result.size());
   }
 
@@ -298,9 +298,7 @@ public class SearchServiceImplTest {
 
     // Make sure it's properly indexed and returned for authorized users
     SearchQuery q = new SearchQuery();
-    q.includeEpisodes(true);
-    q.includeSeries(false);
-    q.withId("10.0000/1");
+    q.episodeId("10.0000/1");
     assertEquals(1, service.getByQuery(q).size());
 
     acl.getEntries().clear();
@@ -315,9 +313,7 @@ public class SearchServiceImplTest {
 
     // This mediapackage should not be readable by the current user (due to the lack of role ROLE_UNKNOWN)
     q = new SearchQuery();
-    q.includeEpisodes(true);
-    q.includeSeries(false);
-    q.withId("10.0000/1");
+    q.episodeId("10.0000/1");
     assertEquals(0, service.getByQuery(q).size());
   }
 
@@ -417,9 +413,7 @@ public class SearchServiceImplTest {
 
     // Make sure it's properly indexed and returned
     SearchQuery q = new SearchQuery();
-    q.includeEpisodes(true);
-    q.includeSeries(false);
-    q.withId("10.0000/1");
+    q.episodeId("10.0000/1");
     assertEquals(1, service.getByQuery(q).size());
 
     q = new SearchQuery();
@@ -432,7 +426,7 @@ public class SearchServiceImplTest {
     q = new SearchQuery();
     q.includeEpisodes(true);
     q.includeSeries(false);
-    q.withId("10.0000/1");
+    q.episodeId("10.0000/1");
     SearchResult result = service.getByQuery(q);
     assertEquals(1, result.getTotalSize());
     SearchResultItem resultItem = result.getItems()[0];
@@ -474,9 +468,9 @@ public class SearchServiceImplTest {
     SearchQuery q = new SearchQuery();
     q.includeEpisodes(true);
     q.includeSeries(false);
-    q.withId("10.0000/2");
+    q.episodeId("10.0000/2");
     assertEquals(1, service.getByQuery(q).size());
-    q.withId(null); // Clear the ID requirement
+    q.episodeId(null); // Clear the ID requirement
     assertEquals(1, service.getByQuery(q).size());
   }
 
@@ -530,9 +524,9 @@ public class SearchServiceImplTest {
     SearchQuery q = new SearchQuery();
     q.includeEpisodes(true);
     q.includeSeries(false);
-    q.withId("10.0000/1");
+    q.episodeId("10.0000/1");
     assertEquals(0, service.getByQuery(q).size());
-    q.withId(null); // Clear the ID requirement
+    q.episodeId(null); // Clear the ID requirement
     assertEquals(0, service.getByQuery(q).size());
 
     q = new SearchQuery();

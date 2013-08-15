@@ -189,11 +189,14 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
     StringBuilder url = new StringBuilder();
     List<NameValuePair> queryStringParams = new ArrayList<NameValuePair>();
 
-    if (q.getSeriesId() != null || q.getElementFlavors() != null || q.getElementTags() != null) {
+    if (q.isIncludeEpisodes() && !q.isIncludeSeries() && q.seriesId() == null) {
       url.append("/episode.xml?");
 
-      if (q.getSeriesId() != null)
-        queryStringParams.add(new BasicNameValuePair("sid", q.getSeriesId()));
+		 if (q.episodeId() != null)
+			queryStringParams.add(new BasicNameValuePair("id", q.episodeId()));
+
+      if (q.partOf() != null)
+        queryStringParams.add(new BasicNameValuePair("sid", q.partOf()));
 
       if (q.getElementFlavors() != null) {
         for (MediaPackageElementFlavor f : q.getElementFlavors()) {
@@ -210,14 +213,14 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
       url.append("/series.xml?");
       queryStringParams.add(new BasicNameValuePair("series", Boolean.toString(q.isIncludeSeries())));
       queryStringParams.add(new BasicNameValuePair("episodes", Boolean.toString(q.isIncludeEpisodes())));
+
+		 if (q.seriesId() != null)
+			queryStringParams.add(new BasicNameValuePair("id", q.seriesId()));
     }
 
     // General query parameters
     if (q.getText() != null)
       queryStringParams.add(new BasicNameValuePair("q", q.getText()));
-
-    if (q.getId() != null)
-      queryStringParams.add(new BasicNameValuePair("id", q.getId()));
 
     if (admin) {
       queryStringParams.add(new BasicNameValuePair("admin", Boolean.TRUE.toString()));

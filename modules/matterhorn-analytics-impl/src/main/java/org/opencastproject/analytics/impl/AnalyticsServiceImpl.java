@@ -254,7 +254,7 @@ public class AnalyticsServiceImpl {
     boolean permitted = false;
     SearchQuery search = new SearchQuery();
     search.withLimit(MAXIMUM_EPISODES).withOffset(0);
-    search.withId(episodeID);
+    search.episodeId(episodeID);
     SearchResult searchResult = searchService.getByQuery(search);
     if (searchResult.getItems().length > 0) {
       String episodeSeries = searchResult.getItems()[0].getDcIsPartOf();
@@ -283,7 +283,7 @@ public class AnalyticsServiceImpl {
     boolean permitted = false;
     SearchQuery search = new SearchQuery();
     search.withLimit(MAXIMUM_EPISODES).withOffset(0);
-    search.withId(episodeID);
+    search.episodeId(episodeID);
     SearchResult searchResult = searchService.getByQuery(search);
     if (searchResult.getItems().length > 0) {
       String episodeSeries = searchResult.getItems()[0].getDcIsPartOf();
@@ -310,7 +310,7 @@ public class AnalyticsServiceImpl {
     if (permitted) {
       SearchQuery search = new SearchQuery();
       search.withLimit(MAXIMUM_EPISODES).withOffset(0);
-      search.withSeriesId(seriesID);
+      search.partOf(seriesID);
       return searchService.getByQuery(search);
     } else {
       return new SearchResultImpl();
