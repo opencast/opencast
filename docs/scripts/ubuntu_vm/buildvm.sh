@@ -18,7 +18,7 @@ echo "Using ubuntu mirror at: $UBUNTU_MIRROR"
 
 USERNAME="opencast"
 PASSWORD="matterhorn"
-RELEASE="lucid"
+RELEASE="precise"
 
 export M2=`pwd`/m2/
 export JAVA_HOME=`mvn --version | grep "Java home" | awk '{print $3}'`
