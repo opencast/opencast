@@ -34,7 +34,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
@@ -138,19 +137,6 @@ public class SearchMigrationService {
    */
   public void activate(ComponentContext cc) throws IOException {
     logger.info("Start migration 1.3 search index to 1.4 index and DB");
-
-    Iterator<Tuple<MediaPackage, String>> mps;
-    try {
-      mps = searchServiceDatabase.getAllMediaPackages();
-      if (mps.hasNext()) {
-        logger.info("No search index migration needed, search DB already available!");
-        return;
-      }
-    } catch (SearchServiceDatabaseException e) {
-      logger.warn("No search database table available, create structure manually");
-      return;
-    }
-
     try {
       String systemAccount = cc.getBundleContext().getProperty("org.opencastproject.security.digest.user");
       String downloadUrl = cc.getBundleContext().getProperty("org.opencastproject.download.url");
@@ -172,16 +158,31 @@ public class SearchMigrationService {
       logger.info("Found {} total search service items to migrate", totalRecords);
 
       for (SearchResultItem item : result.getItems()) {
-        MediaPackage mediaPackage = parseOldMediaPackage(item.getOcMediapackage());
+        MediaPackage mediaPackage;
+        if (item.getMediaPackage() != null && item.getMediaPackage().getTitle() != null) {
+          mediaPackage = item.getMediaPackage();
+        } else {
+          mediaPackage = parseOldMediaPackage(item.getOcMediapackage());
+        }
+
+        boolean mediapackageChanged = false;
 
         // migration distribution URL's!
         for (MediaPackageElement e : mediaPackage.getElements()) {
           URI newUri = null;
           String uri = e.getURI().toString();
 
+          logger.debug("Looking to migrate '{}'", uri);
+
+          if (uri.indexOf("engage-player") > 0) {
+            logger.debug("Mediapackage element {}/{} has already been migrated");
+            continue;
+          }
+
           if (StringUtils.isNotBlank(downloadUrl) && uri.startsWith(downloadUrl)) {
             String path = uri.substring(downloadUrl.length());
             newUri = URI.create(UrlSupport.concat(downloadUrl, "engage-player", path));
+            mediapackageChanged = true;
 
             // Validate if download directory has been migrated
             if (!validateDownload) {
@@ -191,14 +192,24 @@ public class SearchMigrationService {
           } else if (StringUtils.isNotBlank(streamingUrl) && uri.startsWith(streamingUrl)) {
             String path = uri.substring(streamingUrl.length());
             newUri = URI.create(UrlSupport.concat(streamingUrl, "engage-player", path));
-          } else if (uri.startsWith(wfrUrl) && uri.endsWith("security-policy/xacml.xml")) {
+            mediapackageChanged = true;
+          } else if (StringUtils.isNotBlank(downloadUrl) && uri.startsWith(wfrUrl)
+                  && uri.endsWith("security-policy/xacml.xml")) {
             String path = uri.substring(wfrUrl.length());
             newUri = URI.create(UrlSupport.concat(downloadUrl, "engage-player", path));
+            mediapackageChanged = true;
           } else {
             newUri = e.getURI();
             logger.error("Unable to migrate URI '{}' from mediapackage '{}'! DO IT MANUALLY", uri, mediaPackage);
           }
           e.setURI(newUri);
+        }
+
+        String mediaPackageId = mediaPackage.getIdentifier().toString();
+
+        if (!mediapackageChanged) {
+          logger.info("Mediapackage {} has already been migrated", mediaPackageId);
+          continue;
         }
 
         // Write mediapackage to DB and update the index
@@ -211,10 +222,10 @@ public class SearchMigrationService {
           logger.info("Successfully migrated {} ({}/{})", new Object[] { mediaPackage.getIdentifier(), totalMigrated,
                   totalRecords });
         } catch (SolrServerException e) {
-          logger.error(e.getMessage(), e);
+          logger.error("Mediapackage {} could not be migrated: {}", mediaPackageId, e.getMessage());
           failed++;
         } catch (SearchServiceDatabaseException e) {
-          logger.error(e.getMessage(), e);
+          logger.error("Mediapackage {} could not be migrated: {}", mediaPackageId, e.getMessage());
           failed++;
         }
       }
@@ -230,7 +241,7 @@ public class SearchMigrationService {
     } catch (IOException e) {
       logger.error(e.getMessage());
     } catch (NotFoundException e) {
-      logger.error("Streaming or Download directory hasn't been migrated to 'engage-player' channel, aborting migration!");
+      logger.error("Download directory hasn't been migrated to 'engage-player' channel, aborting migration!");
     } finally {
       securityService.setOrganization(null);
       securityService.setUser(null);

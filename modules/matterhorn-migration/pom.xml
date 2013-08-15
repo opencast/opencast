@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.5-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -103,7 +103,8 @@
               org.opencastproject.migration;version=${project.version}
             </Export-Package>
             <Service-Component>
-              OSGI-INF/migration-service.xml
+              OSGI-INF/search-migration-service.xml,
+              OSGI-INF/workflow-migration-service.xml
             </Service-Component>
           </instructions>
         </configuration>
