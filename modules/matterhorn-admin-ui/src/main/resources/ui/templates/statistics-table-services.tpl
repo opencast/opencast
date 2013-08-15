@@ -1,6 +1,6 @@
 <div>
   <% $.each(data[j].servicesView, function(key, service) { %>
-  <h2><% if (ocStatistics.labels[service.id]) { %><%= ocStatistics.labels[service.id]%> <% } else { %><%= service.id %><% } %></h2>
+  <h2><%= ocStatistics.labelName(service.id) %></h2>
   <table id="statsTable" class="ui-widget" cellspacing="0" width="100%">
     <thead>
       <tr>
