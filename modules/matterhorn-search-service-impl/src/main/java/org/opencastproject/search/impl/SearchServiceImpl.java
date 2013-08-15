@@ -386,7 +386,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           NotFoundException {
     SearchResult result;
     try {
-      result = solrRequester.getForWrite(new SearchQuery().withId(mediaPackageId));
+      result = solrRequester.getForWrite(new SearchQuery().id(mediaPackageId));
       if (result.getItems().length == 0) {
         logger.warn(
                 "Can not delete mediapackage {}, which is not available for the current user to delete from the search index.",

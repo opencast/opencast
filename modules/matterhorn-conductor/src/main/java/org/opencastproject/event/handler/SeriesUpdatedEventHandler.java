@@ -217,7 +217,7 @@ public class SeriesUpdatedEventHandler implements EventHandler {
           securityService.setOrganization(defaultOrg);
           securityService.setUser(new User(systemAccount, defaultOrg.getId(), new String[] { GLOBAL_ADMIN_ROLE }));
 
-          SearchQuery q = new SearchQuery().withId(seriesId);
+          SearchQuery q = new SearchQuery().id(seriesId);
           SearchResult result = searchService.getForAdministrativeRead(q);
 
           for (SearchResultItem item : result.getItems()) {
