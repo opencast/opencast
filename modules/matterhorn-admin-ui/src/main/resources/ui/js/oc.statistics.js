@@ -34,14 +34,13 @@ ocStatistics = new (function() {
     	self.refreshInterval = window.setInterval(refresh, delay * 1000);
     }
   }
-  
 
   /**
    * The labels for the UI.  TODO: i18n
    */
   this.labels = {
     "org_opencastproject_caption"                : "Captioning",
-    "org_opencastproject_textanalyzer"           : "Text analysis",
+//    "org_opencastproject_textanalyzer"           : "Text analysis",
     "org_opencastproject_videosegmenter"         : "Video segmentation",
     "org_opencastproject_composer"               : "Encoding, image extraction, and trimming",
     "org_opencastproject_distribution_acl"       : "Media distribution (Access Control Lists)",
@@ -53,6 +52,11 @@ ocStatistics = new (function() {
     "org_opencastproject_inspection"             : "Media inspection",
     "org_opencastproject_workflow"               : "Workflow",
     "org_opencastproject_search"                 : "Engage"
+  };
+
+  this.labelName = function(serviceId) {
+    var name = self.labels[serviceId];
+    return name != undefined ? name : serviceId;
   };
 
   /** Executed when directly when script is loaded: parses url parameters and

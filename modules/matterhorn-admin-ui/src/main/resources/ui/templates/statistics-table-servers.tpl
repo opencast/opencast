@@ -22,7 +22,7 @@
 		  <img style="vertical-align:middle; margin-right:5px;" src=<% if (service.state == "WARNING") { %>"/admin/img/icons/lightbulb.png" title="Warning State" <% } else { %> "/admin/img/icons/exclamation.png" title="Error State" <% } %>/>
 		  <a class="service-sanitize" title="Sanitize" style="vertical-align:middle; margin-right: 5px;" href="host=<%= server.host %>&serviceType=<%= service.type %>">Sanitize</a>
 		  <% } %>
-          <span style="vertical-align:middle;"><%= ocStatistics.labels[service.id] %></span>
+          <span style="vertical-align:middle;"><%= ocStatistics.labelName(service.id) %></span>
         </td>
         <td class="ui-state-active center">
           <%= service.finished %>
