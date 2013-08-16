@@ -645,7 +645,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @return the updated job
    * @throws PersistenceException
    *           if there is an exception thrown while persisting the job via JPA
-   * @throws ServiceRegistryException
    * @throws IllegalArgumentException
    */
   protected Job updateInternal(EntityManager em, Job job) throws PersistenceException {
@@ -677,12 +676,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * 
    * @param em
    *          the current entity manager
-   * @param job
+   * @param registration
    *          the service registration to update
    * @return the updated service registration
    * @throws PersistenceException
    *           if there is an exception thrown while persisting the job via JPA
-   * @throws ServiceRegistryException
    * @throws IllegalArgumentException
    */
   private ServiceRegistration updateServiceState(EntityManager em, ServiceRegistrationJpaImpl registration)
@@ -727,6 +725,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     fromDb.setDispatchable(job.isDispatchable());
     fromDb.setVersion(job.getVersion());
     fromDb.setOperation(job.getOperation());
+    fromDb.setArguments(job.getArguments());
     if (job.getDateCreated() == null) {
       job.setDateCreated(now);
       fromDb.setDateCreated(now);
@@ -1810,8 +1809,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *          the current entity manager
    * @param job
    *          the job to dispatch
-   * @param hostLoads
-   *          a map containing each host and the number of jobs
+   * @param services
+   *          a list of service registrations
    * @return the host that accepted the dispatched job, or <code>null</code> if no services took the job.
    * @throws ServiceRegistryException
    *           if the service registrations are unavailable
@@ -1915,12 +1914,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * Update the jobs failure history and the service status with the given information. All these data are then use for
    * the jobs failover strategy. Only the terminated job (with FAILED or FINISHED status) are taken into account.
    * 
-   * @param succeded
-   *          whether the job succeeded or not
    * @param job
    *          the current job that failed/succeeded
-   * @param registration
-   *          the service on which the run has run
    * @throws ServiceRegistryException
    * @throws IllegalArgumentException
    */

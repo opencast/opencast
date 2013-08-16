@@ -20,15 +20,8 @@ import org.opencastproject.job.api.JaxbJobContext;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -53,7 +46,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -62,6 +54,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A long running, asynchronously executed job. This concrete implementations adds JPA annotations to {@link JaxbJob}.
@@ -291,8 +288,7 @@ public class JobJpaImpl extends JaxbJob {
   @Column(name = "argument", length = 2147483647)
   @OrderColumn(name = "argument_index")
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "mh_job_argument", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"), uniqueConstraints = @UniqueConstraint(columnNames = {
-          "id", "argument_index" }))
+  @CollectionTable(name = "mh_job_argument", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"))
   @XmlElement(name = "arg")
   @XmlElementWrapper(name = "args")
   @Override
