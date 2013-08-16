@@ -29,7 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class SeriesMigrationServiceTests {
+public class SeriesMigrationServiceTest {
 
   /** The series acl name for 1.3 */
   private String seriesAcl13 = "/series_acl_13.xml";

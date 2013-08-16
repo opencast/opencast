@@ -16,10 +16,14 @@
 package org.opencastproject.migration;
 
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.Attachment;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowParser;
@@ -27,6 +31,7 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -43,6 +48,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 
@@ -55,6 +61,12 @@ public class WorkflowMigrationService {
 
   /** The service registry */
   private ServiceRegistry serviceRegistry = null;
+
+  /** working file repository URL */
+  protected String wfrUrl;
+
+  /** The download URL */
+  protected String downloadUrl;
 
   /**
    * Callback for setting the service registry
@@ -70,6 +82,10 @@ public class WorkflowMigrationService {
    * Migrates Matterhorn 1.3 workflow index to a 1.4 index and DB
    */
   public void activate(ComponentContext cc) throws IOException {
+    downloadUrl = cc.getBundleContext().getProperty("org.opencastproject.download.url");
+    wfrUrl = UrlSupport.concat(cc.getBundleContext().getProperty("org.opencastproject.server.url"), "files",
+            "mediapackage");
+
     logger.info("Start migration 1.3 workflow DB to 1.4 workflow DB");
     List<Job> jobs = null;
     try {
@@ -132,7 +148,7 @@ public class WorkflowMigrationService {
    * @return the 1.4 workflow instance
    */
   @SuppressWarnings("unchecked")
-  private WorkflowInstance parseOldWorkflowInstance(String workflowInstance, String organization) throws IOException,
+  protected WorkflowInstance parseOldWorkflowInstance(String workflowInstance, String organization) throws IOException,
           WorkflowParsingException {
     ByteArrayOutputStream baos = null;
     ByteArrayInputStream bais = null;
@@ -175,6 +191,7 @@ public class WorkflowMigrationService {
       WorkflowInstanceImpl instance = WorkflowParser.parseWorkflowInstance(IOUtils.toString(bais, "UTF-8"));
       if (instance.getOrganization() == null)
         instance.setOrganization(new JaxbOrganization(organization));
+      migrateSecurityPolicy(instance);
       return instance;
     } catch (JDOMException e) {
       throw new WorkflowParsingException("Error unmarshalling workflow", e);
@@ -182,6 +199,19 @@ public class WorkflowMigrationService {
       IOUtils.closeQuietly(bais);
       IOUtils.closeQuietly(baos);
       IOUtils.closeQuietly(manifest);
+    }
+  }
+
+  private void migrateSecurityPolicy(WorkflowInstanceImpl instance) {
+    MediaPackage mp = instance.getMediaPackage();
+    Attachment[] xacmlAttachments = mp.getAttachments(MediaPackageElements.XACML_POLICY);
+    for (Attachment a : xacmlAttachments) {
+      String uriString = a.getURI().toString();
+      if (StringUtils.isNotBlank(downloadUrl) && uriString.startsWith(wfrUrl)) {
+        String path = uriString.substring(wfrUrl.length());
+        URI newUri = URI.create(UrlSupport.concat(downloadUrl, "engage-player", path));
+        a.setURI(newUri);
+      }
     }
   }
 
