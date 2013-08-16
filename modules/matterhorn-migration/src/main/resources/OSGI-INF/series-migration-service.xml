@@ -2,11 +2,15 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
   name="org.opencastproject.migration.SeriesMigrationService" immediate="true" activate="activate">
   <implementation class="org.opencastproject.migration.SeriesMigrationService" />
-  <property name="service.description" value="Migration Service" />
+  <property name="service.description" value="Series Migration Service" />
   <reference name="seriesService" interface="org.opencastproject.series.impl.SeriesServiceDatabase"
-    cardinality="1..1" policy="static" bind="setSerieService" />
+    cardinality="1..1" policy="static" bind="setSeriesService" />
   <reference name="persistence" interface="javax.persistence.spi.PersistenceProvider"
     cardinality="1..1" policy="static" bind="setPersistenceProvider" />    
   <reference name="props" interface="java.util.Map"
     cardinality="1..1" policy="static" target="(type=persistence)" bind="setPersistenceProperties" />
+  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="orgDirectoryService" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+    cardinality="1..1" policy="static" bind="setOrgDirectoryService" />
 </scr:component>

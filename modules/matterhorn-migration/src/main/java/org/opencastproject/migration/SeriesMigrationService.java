@@ -18,12 +18,17 @@ package org.opencastproject.migration;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlParsingException;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.impl.SeriesServiceDatabase;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.series.impl.persistence.SeriesEntity;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -60,6 +65,12 @@ public class SeriesMigrationService {
   /** Series service set by OSGi */
   private SeriesServiceDatabase seriesService = null;
 
+  /** The security service */
+  private SecurityService securityService = null;
+
+  /** The organization directory service */
+  private OrganizationDirectoryService orgDirectoryService = null;
+
   /** Persistence provider set by OSGi */
   protected PersistenceProvider persistenceProvider;
 
@@ -77,6 +88,26 @@ public class SeriesMigrationService {
    */
   public void setSeriesService(SeriesServiceDatabase seriesService) {
     this.seriesService = seriesService;
+  }
+
+  /**
+   * Callback for setting the security service.
+   * 
+   * @param securityService
+   *          the security service to set
+   */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
+  /**
+   * Callback for setting the organization directory service.
+   * 
+   * @param orgDirectoryService
+   *          the organization directory service to set
+   */
+  public void setOrgDirectoryService(OrganizationDirectoryService orgDirectoryService) {
+    this.orgDirectoryService = orgDirectoryService;
   }
 
   /**
@@ -104,7 +135,7 @@ public class SeriesMigrationService {
             persistenceProperties);
 
     try {
-      migrateSeriesAcl();
+      migrateSeriesAcl(cc);
     } catch (SeriesServiceDatabaseException e) {
       logger.error("Coud not terminate the migration correctly: {}", e);
     } catch (IOException e) {
@@ -113,8 +144,9 @@ public class SeriesMigrationService {
   }
 
   @SuppressWarnings("unchecked")
-  public void migrateSeriesAcl() throws SeriesServiceDatabaseException, IOException {
+  public void migrateSeriesAcl(ComponentContext cc) throws SeriesServiceDatabaseException, IOException {
     logger.info("Start series ACL database migration from 1.3 to 1.4");
+    String systemAccount = cc.getBundleContext().getProperty("org.opencastproject.security.digest.user");
 
     EntityManager em = emf.createEntityManager();
     Query query = em.createNamedQuery("Series.findAll");
@@ -134,14 +166,24 @@ public class SeriesMigrationService {
       int totalMigrated = 0;
       int failed = 0;
       for (SeriesEntity entity : seriesEntities) {
+
         // Check if the series ACL has already been migrated
-        if (entity.getAccessControl().contains(NEW_NAMESPACE)) {
-          totalMigrated++;
-          logger.info("Skiped migrating already migrated series '{}' ({}/{})", new Object[] { entity.getSeriesId(),
-                  totalMigrated, seriesEntities.size() });
-          continue;
+        if (entity.getAccessControl() != null) {
+          try {
+            if (AccessControlParser.parseAcl(entity.getAccessControl()).getEntries().size() > 0) {
+              totalMigrated++;
+              logger.info("Skiped migrating already migrated series '{}' ({}/{})", new Object[] { entity.getSeriesId(),
+                      totalMigrated, seriesEntities.size() });
+              continue;
+            }
+          } catch (AccessControlParsingException e) {
+            // Parsing a 1.3 ACL with the 1.4 code could be throw an exception, so ignore it
+          }
         }
         try {
+          Organization organization = orgDirectoryService.getOrganization(entity.getOrganization());
+          securityService.setOrganization(organization);
+          securityService.setUser(SecurityUtil.createSystemUser(systemAccount, organization));
           seriesService.storeSeriesAccessControl(entity.getSeriesId(), parse13Acl(entity.getAccessControl()));
           totalMigrated++;
           logger.info("Successfully migrated ACL of series {}: {}/{}", new Object[] { entity.getSeriesId(),
@@ -153,6 +195,9 @@ public class SeriesMigrationService {
         } catch (AccessControlParsingException e) {
           failed++;
           logger.error("Could not parse the ACL from series {}: {}", entity.getSeriesId(), e.getMessage());
+        } finally {
+          securityService.setOrganization(null);
+          securityService.setUser(null);
         }
       }
       logger.info(
@@ -174,6 +219,9 @@ public class SeriesMigrationService {
    */
   @SuppressWarnings("unchecked")
   protected AccessControlList parse13Acl(String serializedForm) throws IOException, AccessControlParsingException {
+    if (StringUtils.isBlank(serializedForm))
+      return new AccessControlList();
+
     ByteArrayOutputStream baos = null;
     ByteArrayInputStream bais = null;
     InputStream finalAcl = null;
