@@ -36,6 +36,12 @@
     
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-series-service-impl</artifactId>
+      <version>1.4.0</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-search-service-impl</artifactId>
       <!-- This should be replaced by 1.4.1 -->
       <version>${project.version}</version>
@@ -77,11 +83,26 @@
     </dependency>
 
     <!-- Logging -->
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- Tests -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
         
   </dependencies>
@@ -104,6 +125,7 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/search-migration-service.xml,
+              OSGI-INF/series-migration-service.xml,
               OSGI-INF/workflow-migration-service.xml
             </Service-Component>
           </instructions>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<acl xmlns="http://org.opencastproject.security">
+    <ace>
+        <role>cde15c50-8c52-4b24-8470-425c5f74b23c_Learner</role>
+        <action>read</action>
+        <allow>true</allow>
+    </ace>
+    <ace>
+        <role>cde15c50-8c52-4b24-8470-425c5f74b23c_Instructor</role>
+        <action>read</action>
+        <allow>true</allow>
+    </ace>
+    <ace>
+        <role>cde15c50-8c52-4b24-8470-425c5f74b23c_Instructor</role>
+        <action>write</action>
+        <allow>true</allow>
+    </ace>
+</acl>
