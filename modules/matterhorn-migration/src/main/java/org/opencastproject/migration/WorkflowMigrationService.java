@@ -70,6 +70,7 @@ public class WorkflowMigrationService {
    * Migrates Matterhorn 1.3 workflow index to a 1.4 index and DB
    */
   public void activate(ComponentContext cc) throws IOException {
+    logger.info("Start migration 1.3 workflow DB to 1.4 workflow DB");
     List<Job> jobs = null;
     try {
       jobs = serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null);

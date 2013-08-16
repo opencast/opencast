@@ -49,7 +49,7 @@ public class SeriesMigrationServiceTests {
   /**
    * Test class for the series ACL migration service
    */
-  private SeriesMigrationService seriesMigrationService = null;
+  private SeriesMigrationService seriesMigrationService = new SeriesMigrationService();
 
   /**
    * @throws java.lang.Exception
@@ -87,7 +87,7 @@ public class SeriesMigrationServiceTests {
       // the paseAcl for the matterhorn 1.3 acl should returns an empty ACL
       Assert.assertEquals(0, AccessControlParser.parseAcl(seriesAcl13Content).getEntries().size());
 
-      AccessControlList acl = SeriesMigrationService.parse13Acl(seriesAcl13Content);
+      AccessControlList acl = seriesMigrationService.parse13Acl(seriesAcl13Content);
       AccessControlList aclBase = AccessControlParser.parseAcl(seriesAcl14Content);
 
       Assert.assertEquals(3, acl.getEntries().size());

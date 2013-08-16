@@ -114,8 +114,7 @@ public class SeriesMigrationService {
 
   @SuppressWarnings("unchecked")
   public void migrateSeriesAcl() throws SeriesServiceDatabaseException, IOException {
-
-    logger.info("Start series ACL migration from 1.3 to 1.4");
+    logger.info("Start series ACL database migration from 1.3 to 1.4");
 
     EntityManager em = emf.createEntityManager();
     Query query = em.createNamedQuery("Series.findAll");
@@ -126,35 +125,42 @@ public class SeriesMigrationService {
       logger.error("Could not retrieve all series: {}", e.getMessage());
       throw new SeriesServiceDatabaseException(e);
     } finally {
-      em.close();
+      if (em != null)
+        em.close();
     }
 
-    logger.info("{} series ACL to migrate", seriesEntities.size());
-    int index = 0;
-
-    for (SeriesEntity entity : seriesEntities) {
-
+    if (seriesEntities.size() > 0) {
+      logger.info("Found {} series ACL to migrate", seriesEntities.size());
+      int totalMigrated = 0;
+      int failed = 0;
+      for (SeriesEntity entity : seriesEntities) {
+        // Check if the series ACL has already been migrated
+        if (entity.getAccessControl().contains(NEW_NAMESPACE)) {
+          totalMigrated++;
+          logger.info("Skiped migrating already migrated series '{}' ({}/{})", new Object[] { entity.getSeriesId(),
+                  totalMigrated, seriesEntities.size() });
+          continue;
+        }
+        try {
+          seriesService.storeSeriesAccessControl(entity.getSeriesId(), parse13Acl(entity.getAccessControl()));
+          totalMigrated++;
+          logger.info("Successfully migrated ACL of series {}: {}/{}", new Object[] { entity.getSeriesId(),
+                  totalMigrated, seriesEntities.size() });
+        } catch (NotFoundException e) {
+          failed++;
+          logger.error("Could not retrieve series {}: {}", entity.getSeriesId(), e.getMessage());
+          throw new SeriesServiceDatabaseException(e);
+        } catch (AccessControlParsingException e) {
+          failed++;
+          logger.error("Could not parse the ACL from series {}: {}", entity.getSeriesId(), e.getMessage());
+        }
+      }
       logger.info(
-              "migration of ACL from series {}: {}/{}",
-              new String[] { entity.getSeriesId(), Integer.toString(++index, 10),
-                      Integer.toString(seriesEntities.size()) });
-
-      // Check if the series ACL has already been migrated
-      if (entity.getAccessControl().contains(NEW_NAMESPACE)) {
-        logger.info("Skip series {} has already been migrated", entity.getSeriesId());
-        continue;
-      }
-      try {
-        seriesService.storeSeriesAccessControl(entity.getSeriesId(), parse13Acl(entity.getAccessControl()));
-      } catch (NotFoundException e) {
-        logger.error("Could not retrieve series {}: {}", entity.getSeriesId(), e.getMessage());
-        throw new SeriesServiceDatabaseException(e);
-      } catch (AccessControlParsingException e) {
-        logger.error("Could not parse the ACL from series {}: {}", entity.getSeriesId(), e.getMessage());
-      }
+              "Finished database migration of series ACL from 1.3 to 1.4. {} entries migrated. {} items couldn't be migrated. Check logs for errors",
+              new Object[] { totalMigrated, failed });
+    } else {
+      logger.info("Finished database migration of series ACL from of 1.3 to 1.4. Nothing found to migrate");
     }
-
-    logger.info("Series ACL migration ended correctly");
   }
 
   /**
@@ -166,7 +172,8 @@ public class SeriesMigrationService {
    * @throws IOException
    * @throws AccessControlParsingException
    */
-  public static AccessControlList parse13Acl(String serializedForm) throws IOException, AccessControlParsingException {
+  @SuppressWarnings("unchecked")
+  protected AccessControlList parse13Acl(String serializedForm) throws IOException, AccessControlParsingException {
     ByteArrayOutputStream baos = null;
     ByteArrayInputStream bais = null;
     InputStream finalAcl = null;
