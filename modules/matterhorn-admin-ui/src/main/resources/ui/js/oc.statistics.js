@@ -40,7 +40,7 @@ ocStatistics = new (function() {
    */
   this.labels = {
     "org_opencastproject_caption"                : "Captioning",
-//    "org_opencastproject_textanalyzer"           : "Text analysis",
+    "org_opencastproject_textanalyzer"           : "Text analysis",
     "org_opencastproject_videosegmenter"         : "Video segmentation",
     "org_opencastproject_composer"               : "Encoding, image extraction, and trimming",
     "org_opencastproject_distribution_acl"       : "Media distribution (Access Control Lists)",
