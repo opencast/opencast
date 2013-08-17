@@ -1881,6 +1881,7 @@
         <role>developer</role>
       </roles>
       <timezone>-8</timezone>
+    </developer>
   </developers>
 
   <contributors><!-- TODO? -->
