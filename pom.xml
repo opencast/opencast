@@ -1871,6 +1871,16 @@
       </roles>
       <timezone>0</timezone>
     </developer>
+    <developer>
+      <id>jaimeg</id>
+      <name>Jaime Gago</name>
+      <email>jaime@entwinemedia.com</email>
+      <organization>Entwine</organization>
+      <organizationUrl>http://entwinemedia.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>-8</timezone>
   </developers>
 
   <contributors><!-- TODO? -->
