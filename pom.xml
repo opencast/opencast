@@ -1882,6 +1882,17 @@
       </roles>
       <timezone>-8</timezone>
     </developer>
+    <developer>
+      <id>karen</id>
+      <name>Karen Dolan</name>
+      <email>kdolan@dce.harvard.edu</email>
+      <organization>Harvard University, Division of Continuing Education</organization>
+      <organizationUrl>http://www.dce.harvard.edu</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>-5</timezone>
+    </developer>
   </developers>
 
   <contributors><!-- TODO? -->
