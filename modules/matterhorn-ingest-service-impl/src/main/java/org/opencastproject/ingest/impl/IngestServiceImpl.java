@@ -289,6 +289,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       ZipArchiveEntry entry;
       MediaPackage mp = null;
       Map<String, URI> uris = new HashMap<String, URI>();
+      // Sequential number to append to file names so that, if two files have the same
+      // name, one does not overwrite the other
+      int seq = 1;
       // While there are entries write them to a collection
       while ((entry = zis.getNextZipEntry()) != null) {
         try {
@@ -301,9 +304,16 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           } else {
             logger.info("Storing zip entry {} in working file repository collection '{}'",
                     job.getId() + entry.getName(), wfrCollectionId);
-            URI contentUri = workingFileRepository.putInCollection(wfrCollectionId,
-                    FilenameUtils.getName(entry.getName()), new ZipEntryInputStream(zis, entry.getSize()));
-            uris.put(FilenameUtils.getName(entry.getName()), contentUri);
+            // Since the directory structure is not being mirrored, makes sure the file
+            // name is different than the previous one(s) by adding a sequential number
+            String fileName = FilenameUtils.getBaseName(entry.getName()) + "_" + seq++ + "."
+                    + FilenameUtils.getExtension(entry.getName());
+            URI contentUri = workingFileRepository.putInCollection(wfrCollectionId, fileName, new ZipEntryInputStream(
+                    zis, entry.getSize()));
+            // Each entry name starts with zip file name; discard it so that the map key will match the media package
+            // element uri
+            String key = entry.getName().substring(entry.getName().indexOf('/') + 1);
+            uris.put(key, contentUri);
             ingestStatistics.add(entry.getSize());
             logger.info("Zip entry {} stored at {}", job.getId() + entry.getName(), contentUri);
           }
@@ -337,12 +347,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
       // Update the element uris to point to their working file repository location
       for (MediaPackageElement element : mp.elements()) {
-        URI uri = uris.get(FilenameUtils.getName(element.getURI().toString()));
+        URI uri = uris.get(element.getURI().toString());
+
         if (uri == null)
           throw new IngestException("Unable to map element name '" + element.getURI() + "' to workspace uri");
         logger.info("Ingested mediapackage element {}/{} is located at {}",
                 new Object[] { mediaPackageId, element.getIdentifier(), uri });
-        element.setURI(uri);
+        URI dest = workingFileRepository.moveTo(wfrCollectionId, uri.toString(), mediaPackageId,
+                element.getIdentifier(), FilenameUtils.getName(element.getURI().toString()));
+        element.setURI(dest);
 
         // TODO: This should be triggered somehow instead of being handled here
         if (MediaPackageElements.SERIES.equals(element.getFlavor())) {
