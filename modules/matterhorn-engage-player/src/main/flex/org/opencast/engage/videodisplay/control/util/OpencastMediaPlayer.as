@@ -701,6 +701,23 @@ package org.opencast.engage.videodisplay.control.util
 		}
 
 		/**
+		 * setBufferTime
+		 * Set the buffer size
+		 * @param Number value:Number [description]
+		 */
+		public function setBufferTime(value:Number):void
+		{
+			if (videoState == VideoState.SINGLE) {
+				mediaPlayerSingle.bufferTime = value;
+			}
+			else if (videoState == VideoState.MULTI)
+			{
+				mediaPlayerOne.bufferTime = value;
+				mediaPlayerTwo.bufferTime = value;
+			}
+		}
+
+		/**
 		 * muteChange
 		 * When the player is mute or unmute.
 		 * @eventType AudioEvent event
@@ -879,8 +896,6 @@ package org.opencast.engage.videodisplay.control.util
 			ExternalInterface.call(ExternalFunction.SETDURATION, event.time);
 			ExternalInterface.call(ExternalFunction.SETTOTALTIME, model.currentDurationString);
 			ExternalInterface.call(ExternalFunction.SETVOLUMESLIDER, 100);
-
-			
 		}
 
 		/**

@@ -21,6 +21,7 @@ var Videodisplay = Videodisplay || {};
  */
 Videodisplay = (function ()
 {
+
   var b_Videodisplay_root,
   initD = false;
   var volSliderArgs,
@@ -41,8 +42,9 @@ Videodisplay = (function ()
   heightMediaOne,
   widthMediaTwo,
   heightMediaTwo,
-  contLeft;
-        
+  contLeft,
+  bufferTime;
+
   /**
      * @memberOf Videodisplay
      * @description Initialize the "root" object. This represents the actual "Videodisplay mxml" flex application
@@ -86,7 +88,7 @@ Videodisplay = (function ()
     }
     if (covOne)
     {
-      setMediaURL(covOne, covTwo, strOne, strTwo, mimOne, mimTwo, plStyle, slideLen);
+      setMediaURL(covOne, covTwo, strOne, strTwo, mimOne, mimTwo, plStyle, slideLen, bufferTime);
     }
     if (capURL)
     {
@@ -486,9 +488,10 @@ Videodisplay = (function ()
      * @param argMimetypeTwo
      * @param argPlayerstyle
      * @param slideLength
+     * @param bufferTime
      * @return false if something went wrong
      */
-  function setMediaURL(argCoverOne, argCoverTwo, argStringOne, argStringTwo, argMimetypeOne, argMimetypeTwo, argPlayerstyle, slideLength)
+  function setMediaURL(argCoverOne, argCoverTwo, argStringOne, argStringTwo, argMimetypeOne, argMimetypeTwo, argPlayerstyle, slideLength, argBufferTime)
   {
     if(argMimetypeOne == "")
     {
@@ -505,13 +508,14 @@ Videodisplay = (function ()
     $.log("argMimetypeTwo: " + argMimetypeTwo);
     $.log("argPlayerstyle: " + argPlayerstyle);
     $.log("slideLength: " + slideLength);
+    $.log("BufferTime: " + argBufferTime);
     $.log("-----");
 
     try
     {
       if (initialized())
       {
-        var v = b_Videodisplay_root.setMediaURL(argCoverOne, argCoverTwo, argStringOne, argStringTwo, argMimetypeOne, argMimetypeTwo, argPlayerstyle, slideLength);
+        var v = b_Videodisplay_root.setMediaURL(argCoverOne, argCoverTwo, argStringOne, argStringTwo, argMimetypeOne, argMimetypeTwo, argPlayerstyle, slideLength, argBufferTime);
         return v;
       }
       else
@@ -524,6 +528,7 @@ Videodisplay = (function ()
         mimTwo = argMimetypeTwo;
         plStyle = argPlayerstyle;
         slideLen = slideLength;
+        bufferTime = argBufferTime;
       }
     }
     catch (err)
