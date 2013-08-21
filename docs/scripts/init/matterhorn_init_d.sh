@@ -70,6 +70,9 @@ LOG_OPTS="$PAX_LOGGING_OPTS $MATTERHORN_LOGGING_OPTS $ECLIPSELINK_LOGGING_OPTS $
 GRAPHICS_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
 JAVA_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
 
+#Added in response to MH-9831
+LIBRARY_OPTS="-Dnet.sf.ehcache.skipUpdateCheck=true -Dorg.terracotta.quartz.skipUpdateCheck=true"
+
 # The following lines are required to run Matterhorn as a service in Redhat.
 # These lines should remain commented out.
 # It is necessary to run "chkconfig matterhorn on" to enable matterhorn service management with Redhat.
@@ -123,7 +126,7 @@ case "$1" in
 
 # starting felix
 
-    su -c "java -Dgosh.args='--noshutdown -c noop=true' $DEBUG_OPTS $FELIX_OPTS $GRAPHICS_OPTS $TEMP_OPTS $MAVEN_ARG $JAVA_OPTS $PAX_CONFMAN_OPTS $LOG_OPTS $JMX_OPTS $JETTY_OPTS -jar $FELIX_HOME/bin/felix.jar $FELIX_CACHE 2>&1 > /dev/null &" $MATTERHORN_USER
+    su -c "java -Dgosh.args='--noshutdown -c noop=true' $DEBUG_OPTS $FELIX_OPTS $GRAPHICS_OPTS $LIBRARY_OPTS $TEMP_OPTS $MAVEN_ARG $JAVA_OPTS $PAX_CONFMAN_OPTS $LOG_OPTS $JMX_OPTS $JETTY_OPTS -jar $FELIX_HOME/bin/felix.jar $FELIX_CACHE 2>&1 > /dev/null &" $MATTERHORN_USER
     echo "done."
     ;;
   stop)
