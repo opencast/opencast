@@ -138,6 +138,15 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   }
 
   /**
+   * Return the solr index manager
+   * 
+   * @return indexManager
+   */
+  public SolrIndexManager getSolrIndexManager() {
+    return indexManager;
+  }
+
+  /**
    * Service activator, called via declarative services configuration. If the solr server url is configured, we try to
    * connect to it. If not, the solr data directory with an embedded Solr server is used.
    * 

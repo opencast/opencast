@@ -138,7 +138,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
         }
         if (xacmlUri == null) {
           logger.warn(
-                  "Multiple XACML policies are attached to {}, and none seem to be authoritative.  The ACL will be empty",
+                  "Multiple XACML policies are attached to {}, and none seem to be authoritative. The ACL will be empty",
                   mediapackage);
           return accessControlList;
         }
@@ -149,9 +149,11 @@ public class XACMLAuthorizationService implements AuthorizationService {
       try {
         xacmlPolicyFile = workspace.get(xacmlUri);
       } catch (NotFoundException e) {
-        logger.warn("XACML policy file not found", e);
+        logger.warn("XACML policy file not found '{}'. The ACL will be empty.", xacmlUri);
+        return accessControlList;
       } catch (IOException e) {
-        logger.warn("Unable to access XACML policy file {}", xacmlPolicyFile, e);
+        logger.error("Unable to access XACML policy file, the ACL will be empty. {}", xacmlPolicyFile, e);
+        return accessControlList;
       }
 
       FileInputStream in;
