@@ -20,8 +20,15 @@ import org.opencastproject.job.api.JaxbJobContext;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -54,11 +61,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A long running, asynchronously executed job. This concrete implementations adds JPA annotations to {@link JaxbJob}.
@@ -483,8 +485,8 @@ public class JobJpaImpl extends JaxbJob {
     if (processorServiceRegistration == null) {
       logger.debug("processor service registration is null");
     } else {
-      super.processingHost = creatorServiceRegistration.getHost();
-      super.jobType = creatorServiceRegistration.getServiceType();
+      super.processingHost = processorServiceRegistration.getHost();
+      super.jobType = processorServiceRegistration.getServiceType();
     }
     context = new JaxbJobContext();
     if (rootJob != null) {
