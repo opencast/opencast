@@ -366,11 +366,11 @@ package org.opencast.engage.videodisplay.business
 		 * setMediaURL
 		 * Set media URL. Call the event InitMediaPlayerEvent.
 		 * Developer: You can change your own urls here.
-		 * @param String coverURLOne, String coverURLTwo, String mediaURLOne, String mediaURLTwo, String mimetypeOne, String mimetypeTwo, String playerMode
+		 * @param String coverURLOne, String coverURLTwo, String mediaURLOne, String mediaURLTwo, String mimetypeOne, String mimetypeTwo, String playerMode,
 		 */
-		public function setMediaURL(coverURLOne:String, coverURLTwo:String, mediaURLOne:String, mediaURLTwo:String, mimetypeOne:String, mimetypeTwo:String, playerMode:String, slideLength:int):void
+		public function setMediaURL(coverURLOne:String, coverURLTwo:String, mediaURLOne:String, mediaURLTwo:String, mimetypeOne:String, mimetypeTwo:String, playerMode:String, slideLength:int, bufferTime:Number):void
 		{
-			Swiz.dispatchEvent(new InitMediaPlayerEvent(coverURLOne, coverURLTwo, mediaURLOne, mediaURLTwo, mimetypeOne, mimetypeTwo, playerMode, slideLength));
+			Swiz.dispatchEvent(new InitMediaPlayerEvent(coverURLOne, coverURLTwo, mediaURLOne, mediaURLTwo, mimetypeOne, mimetypeTwo, playerMode, slideLength, bufferTime));
 		}
 
 		/**
