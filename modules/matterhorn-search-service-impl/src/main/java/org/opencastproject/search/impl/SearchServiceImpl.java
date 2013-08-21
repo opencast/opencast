@@ -487,10 +487,17 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
     if (instancesInSolr == 0L) {
       logger.info("No search index found");
+      logger.info("Starting population of search index from database");
+      Iterator<Tuple<MediaPackage, String>> mediaPackages;
       try {
-        logger.info("Starting population of search index from database");
-        Iterator<Tuple<MediaPackage, String>> mediaPackages = persistence.getAllMediaPackages();
-        while (mediaPackages.hasNext()) {
+        mediaPackages = persistence.getAllMediaPackages();
+      } catch (SearchServiceDatabaseException e) {
+        logger.error("Unable to load the search entries: {}", e.getMessage());
+        throw new ServiceException(e.getMessage());
+      }
+      int errors = 0;
+      while (mediaPackages.hasNext()) {
+        try {
           Tuple<MediaPackage, String> mediaPackage = mediaPackages.next();
 
           String mediaPackageId = mediaPackage.getA().getIdentifier().toString();
@@ -504,15 +511,17 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           Date deletionDate = persistence.getDeletionDate(mediaPackageId);
 
           indexManager.add(mediaPackage.getA(), acl, deletionDate, modificationDate);
+        } catch (Exception e) {
+          logger.error("Unable to index search instances: {}", e);
+          errors++;
+        } finally {
+          securityService.setOrganization(null);
+          securityService.setUser(null);
         }
-        logger.info("Finished populating search index");
-      } catch (Exception e) {
-        logger.warn("Unable to index search instances: {}", e.getMessage());
-        throw new ServiceException(e.getMessage());
-      } finally {
-        securityService.setOrganization(null);
-        securityService.setUser(null);
       }
+      if (errors > 0)
+        logger.error("Skipped {} erroneous search entries while populating the search index", errors);
+      logger.info("Finished populating search index");
     }
   }
 
