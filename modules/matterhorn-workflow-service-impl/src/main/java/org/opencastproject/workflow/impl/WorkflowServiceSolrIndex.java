@@ -82,6 +82,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -268,6 +269,14 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       List<Job> jobs = null;
       try {
         jobs = serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null);
+        Iterator<Job> ji = jobs.iterator();
+        while (ji.hasNext()) {
+          Job job = ji.next();
+          if (WorkflowServiceImpl.Operation.START_WORKFLOW.toString().equals(job.getOperation())) {
+            logger.debug("Removing unrelated job {} of type {}", job.getId(), job.getOperation());
+            ji.remove();
+          }
+        }
       } catch (ServiceRegistryException e) {
         logger.error("Unable to load the workflows jobs: {}", e.getMessage());
         throw new ServiceException(e.getMessage());
@@ -277,8 +286,10 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
         logger.info("The workflow search index is empty. Populating it now with {} workflows.", jobs.size());
         int errors = 0;
         for (Job job : jobs) {
-          if (job.getPayload() == null)
+          if (job.getPayload() == null) {
+            logger.warn("Skipping restoring of workflow {}: Payload is empty", job.getId());
             continue;
+          }
           WorkflowInstance instance = null;
           boolean erroneousWorkflowJob = false;
           try {
