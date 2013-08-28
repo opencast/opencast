@@ -234,15 +234,13 @@ public class MediaInspector {
 
       // Make sure the file has an extension. Otherwise, tools like ffmpeg will not work.
       // TODO: Try to guess the extension from the container's metadata
-      if (StringUtils.trimToNull(FilenameUtils.getExtension(file.getName())) == null) {
-        throw new MediaInspectionException("Element " + file + " has no file extension");
+      if ("".equals(FilenameUtils.getExtension(file.getName()))) {
+        throw new MediaInspectionException("Can not inspect files without a filename extension");
       }
 
       MediaContainerMetadata metadata = getFileMetadata(file);
       if (metadata == null) {
         throw new MediaInspectionException("Unable to acquire media metadata for " + originalTrackUrl);
-      } else if (metadata.getAudioStreamMetadata().size() == 0 && metadata.getVideoStreamMetadata().size() == 0) {
-        throw new MediaInspectionException("File at " + originalTrackUrl + " does not seem to be a/v media");
       } else {
         TrackImpl track = null;
         try {
