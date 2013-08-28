@@ -15,7 +15,6 @@
  */
 package org.opencastproject.inspection.impl;
 
-import junit.framework.Assert;
 import org.apache.tika.parser.audio.AudioParser;
 import org.easymock.EasyMock;
 import org.junit.BeforeClass;
