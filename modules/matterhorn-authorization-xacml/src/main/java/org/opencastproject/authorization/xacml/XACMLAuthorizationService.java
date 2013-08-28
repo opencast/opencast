@@ -196,6 +196,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
         logger.warn("Unable to get default acl from series '{}': {}", mediapackage.getSeries(), e.getMessage());
       }
     }
+    logger.trace("Falling back to using default public acl for mediapackage '{}'", mediapackage);
     // TODO: We need a configuration option for open vs. closed by default
     // Right now, rights management is based on series. Here we make sure that
     // objects not belonging to a series are world readable
