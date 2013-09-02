@@ -17,6 +17,7 @@ package org.opencastproject.workingfilerepository.impl;
 
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.Checksum;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
@@ -291,7 +292,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       }
 
       // Store the hash
-      String md5 = DigestUtils.md5Hex(dis.getMessageDigest().digest());
+      String md5 = Checksum.convertToHex(dis.getMessageDigest().digest());
       File md5File = null;
       try {
         md5File = getMd5File(f);
@@ -584,7 +585,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       }
 
       // Store the hash
-      String md5 = DigestUtils.md5Hex(dis.getMessageDigest().digest());
+      String md5 = Checksum.convertToHex(dis.getMessageDigest().digest());
       File md5File = null;
       try {
         md5File = getMd5File(f);
