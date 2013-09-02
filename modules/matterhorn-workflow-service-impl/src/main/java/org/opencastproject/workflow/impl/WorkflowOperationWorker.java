@@ -157,15 +157,15 @@ final class WorkflowOperationWorker {
     } catch (Exception e) {
       Throwable t = e.getCause();
       if (t != null) {
-        logger.error("Workflow operation '" + handler + "' failed", t);
+        logger.error("Workflow operation '" + operation + "' failed", t);
       } else {
-        logger.error("Workflow operation '" + handler + "' failed", e);
+        logger.error("Workflow operation '" + operation + "' failed", e);
       }
       try {
         workflow = service.handleOperationException(workflow, new WorkflowOperationException(e, operation));
       } catch (Exception e2) {
-        logger.error("Error handling workflow operation '{}' failure: {}",
-                new Object[] { handler, e2.getMessage(), e2 });
+        logger.error("Error handling workflow operation '{}' failure: {}", new Object[] { operation, e2.getMessage(),
+                e2 });
       }
     }
     return workflow;
