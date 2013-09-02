@@ -15,6 +15,7 @@
  */
 package org.opencastproject.workflow.impl;
 
+import static org.apache.solr.client.solrj.util.ClientUtils.escapeQueryChars;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.workflow.api.WorkflowService.READ_PERMISSION;
@@ -64,7 +65,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -570,21 +570,21 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
     // Consider the workflow state
     if (state != null) {
-      query.append(STATE_KEY).append(":").append(state.toString());
+      query.append(STATE_KEY).append(":").append(escapeQueryChars(state.toString()));
     }
 
     // Consider the current operation
     if (StringUtils.isNotBlank(operation)) {
       if (query.length() > 0)
         query.append(" AND ");
-      query.append(OPERATION_KEY).append(":").append(operation);
+      query.append(OPERATION_KEY).append(":").append(escapeQueryChars(operation));
     }
 
     // We want all available workflows for this organization
     String orgId = securityService.getOrganization().getId();
     if (query.length() > 0)
       query.append(" AND ");
-    query.append(ORG_KEY).append(":").append(orgId);
+    query.append(ORG_KEY).append(":").append(escapeQueryChars(orgId));
 
     appendSolrAuthFragment(query, READ_PERMISSION);
 
@@ -618,7 +618,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     // Get all definitions and then query for the numbers and the current operation per definition
     try {
       String orgId = securityService.getOrganization().getId();
-      StringBuilder queryString = new StringBuilder().append(ORG_KEY).append(":").append(orgId);
+      StringBuilder queryString = new StringBuilder().append(ORG_KEY).append(":").append(escapeQueryChars(orgId));
       appendSolrAuthFragment(queryString, WRITE_PERMISSION);
       SolrQuery solrQuery = new SolrQuery(queryString.toString());
       solrQuery.addFacetField(WORKFLOW_DEFINITION_KEY);
@@ -654,7 +654,8 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
               OperationReport operationReport = new OperationReport();
               operationReport.setId(operation.getName());
 
-              StringBuilder baseSolrQuery = new StringBuilder().append(ORG_KEY).append(":").append(orgId);
+              StringBuilder baseSolrQuery = new StringBuilder().append(ORG_KEY).append(":")
+                      .append(escapeQueryChars(orgId));
               appendSolrAuthFragment(baseSolrQuery, WRITE_PERMISSION);
               solrQuery = new SolrQuery(baseSolrQuery.toString());
               solrQuery.addFacetField(STATE_KEY);
@@ -778,9 +779,9 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     sb.append(key);
     sb.append(":");
     if (toLowerCase)
-      sb.append(ClientUtils.escapeQueryChars(value.toLowerCase()));
+      sb.append(escapeQueryChars(value.toLowerCase()));
     else
-      sb.append(ClientUtils.escapeQueryChars(value));
+      sb.append(escapeQueryChars(value));
     return sb;
   }
 
@@ -804,9 +805,9 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       sb.append(" AND ");
     }
     sb.append("(");
-    sb.append(key).append(":").append(ClientUtils.escapeQueryChars(value.toLowerCase()));
+    sb.append(key).append(":").append(escapeQueryChars(value.toLowerCase()));
     sb.append(" OR ");
-    sb.append(key).append(":*").append(ClientUtils.escapeQueryChars(value.toLowerCase())).append("*");
+    sb.append(key).append(":*").append(escapeQueryChars(value.toLowerCase())).append("*");
     sb.append(")");
     return sb;
   }
@@ -852,7 +853,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   protected String createQuery(WorkflowQuery query, String action, boolean applyPermissions)
           throws WorkflowDatabaseException {
     String orgId = securityService.getOrganization().getId();
-    StringBuilder sb = new StringBuilder().append(ORG_KEY).append(":").append(orgId);
+    StringBuilder sb = new StringBuilder().append(ORG_KEY).append(":").append(escapeQueryChars(orgId));
     append(sb, ID_KEY, query.getId(), false);
     append(sb, MEDIAPACKAGE_KEY, query.getMediaPackageId(), false);
     append(sb, SERIES_ID_KEY, query.getSeriesId(), false);
@@ -889,13 +890,14 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       throw new WorkflowDatabaseException(e);
     }
     if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(organization.getAdminRole())) {
-      sb.append(" AND ").append(ORG_KEY).append(":").append(securityService.getOrganization().getId());
+      sb.append(" AND ").append(ORG_KEY).append(":")
+              .append(escapeQueryChars(securityService.getOrganization().getId()));
       String[] roles = user.getRoles();
       if (roles.length > 0) {
-        sb.append(" AND (").append(WORKFLOW_CREATOR_KEY).append(":").append(user.getUserName());
+        sb.append(" AND (").append(WORKFLOW_CREATOR_KEY).append(":").append(escapeQueryChars(user.getUserName()));
         for (String role : roles) {
           sb.append(" OR ");
-          sb.append(ACL_KEY_PREFIX).append(action).append(":").append(role);
+          sb.append(ACL_KEY_PREFIX).append(action).append(":").append(escapeQueryChars(role));
         }
         sb.append(")");
       }
@@ -975,7 +977,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       }
       sb.append(key);
       sb.append(":");
-      sb.append(ClientUtils.escapeQueryChars(term.getValue().toLowerCase()));
+      sb.append(escapeQueryChars(term.getValue().toLowerCase()));
     }
     if (!positiveTerm) {
       sb.append(" AND *:*");

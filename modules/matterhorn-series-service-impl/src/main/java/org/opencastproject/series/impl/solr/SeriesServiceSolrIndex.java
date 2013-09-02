@@ -81,7 +81,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /** Configuration key for an embedded solr configuration and data directory */
   public static final String CONFIG_SOLR_ROOT = "org.opencastproject.series.solr.dir";
-  
+
   /** the default series index suffix */
   public static final String SOLR_ROOT_SUFFIX = "/seriesindex";
 
@@ -583,7 +583,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Appends a multivalued query parameter to a solr query
-   *
+   * 
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -807,7 +807,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     }
 
     List<DublinCoreCatalog> result;
-    
+
     try {
       QueryResponse response = solrServer.query(solrQuery);
       SolrDocumentList items = response.getResults();
@@ -920,7 +920,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
   protected SolrDocument getSolrDocumentByID(String id) throws SeriesServiceDatabaseException {
     String orgId = securityService.getOrganization().getId();
     StringBuilder solrQueryString = new StringBuilder(SolrFields.COMPOSITE_ID_KEY).append(":").append(
-            getCompositeKey(id, orgId));
+            ClientUtils.escapeQueryChars(getCompositeKey(id, orgId)));
 
     SolrQuery q = new SolrQuery(solrQueryString.toString());
     QueryResponse response;
