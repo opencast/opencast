@@ -78,6 +78,11 @@
       <artifactId>joda-time</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>com.googlecode.guava-osgi</groupId>
+      <artifactId>guava-osgi</artifactId>
+    </dependency>
+
     <!-- OSGi -->
     <dependency>
       <groupId>org.osgi</groupId>

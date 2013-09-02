@@ -213,7 +213,7 @@ public class MonadicsTest {
               }
             })
             .eval();
-    assertArrayEquals(array(1, 4, 9, 1, 4, 9), Collections.toArray(eval));
+    assertArrayEquals(array(1, 4, 9, 1, 4, 9), Collections.toArray(Integer.class, eval));
   }
 
   @Test
@@ -236,7 +236,7 @@ public class MonadicsTest {
               }
             })
             .eval();
-    assertArrayEquals(array(1, 4, 9, 1, 4, 9), Collections.toArray(eval));
+    assertArrayEquals(array(1, 4, 9, 1, 4, 9), Collections.toArray(Integer.class, eval));
   }
 
   @Test

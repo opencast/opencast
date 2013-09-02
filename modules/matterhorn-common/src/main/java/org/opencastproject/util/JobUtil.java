@@ -55,12 +55,12 @@ public final class JobUtil {
   }
 
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, long timeout, List<Job> jobs) {
-    JobBarrier barrier = new JobBarrier(reg, toArray(jobs));
+    JobBarrier barrier = new JobBarrier(reg, toArray(Job.class, jobs));
     return barrier.waitForJobs(timeout);
   }
 
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, List<Job> jobs) {
-    JobBarrier barrier = new JobBarrier(reg, toArray(jobs));
+    JobBarrier barrier = new JobBarrier(reg, toArray(Job.class, jobs));
     return barrier.waitForJobs();
   }
 
@@ -107,6 +107,27 @@ public final class JobUtil {
           return waitForJobs(reg, t, job);
         return waitForJobs(reg, job);
     }
+  }
+
+  /**
+   * {@link #waitForJob(org.opencastproject.serviceregistry.api.ServiceRegistry, org.opencastproject.util.data.Option, org.opencastproject.job.api.Job)}
+   * as a function.
+   */
+  public static Function<Job, JobBarrier.Result> waitForJob(final ServiceRegistry reg, final Option<Long> timeout) {
+    return new Function<Job, JobBarrier.Result>() {
+      @Override public JobBarrier.Result apply(Job job) {
+        return waitForJob(reg, timeout, job);
+      }
+    };
+  }
+
+  /** Wait for the job to complete and return the success value. */
+  public static Function<Job, Boolean> waitForJobSuccess(final ServiceRegistry reg, final Option<Long> timeout) {
+    return new Function<Job, Boolean>() {
+      @Override public Boolean apply(Job job) {
+        return waitForJob(reg, timeout, job).isSuccess();
+      }
+    };
   }
 
   /**
