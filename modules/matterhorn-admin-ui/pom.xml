@@ -298,9 +298,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>
-              org.opencastproject.rest;version=${project.version},
-              org.osgi.framework.*,
-              org.slf4j.*
+              org.opencastproject.rest;version=${project.version}
             </Import-Package>
             <Private-Package>ui.*, uitests.*</Private-Package>
             <Http-Alias>/admin</Http-Alias>
