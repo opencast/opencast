@@ -262,12 +262,13 @@ public class CalendarGenerator {
     try {
       seriesDC = seriesService.getSeries(seriesID);
     } catch (SeriesException e) {
-      logger.error("Error loading DublinCoreCatalog for Series: {}", e.getMessage());
+      logger.error("Error loading DublinCoreCatalog for series '{}': {}", seriesID, e.getMessage());
       return null;
     } catch (NotFoundException e) {
       logger.warn("Could not find series '" + seriesID + "'");
       return null;
     }
+
     return getDublinCoreAsString(seriesDC);
   }
 
