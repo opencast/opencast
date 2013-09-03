@@ -272,7 +272,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
         Iterator<Job> ji = jobs.iterator();
         while (ji.hasNext()) {
           Job job = ji.next();
-          if (WorkflowServiceImpl.Operation.START_WORKFLOW.toString().equals(job.getOperation())) {
+          if (!WorkflowServiceImpl.Operation.START_WORKFLOW.toString().equals(job.getOperation())) {
             logger.debug("Removing unrelated job {} of type {}", job.getId(), job.getOperation());
             ji.remove();
           }
