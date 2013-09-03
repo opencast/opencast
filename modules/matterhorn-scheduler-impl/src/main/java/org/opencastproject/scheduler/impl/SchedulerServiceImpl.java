@@ -1017,22 +1017,31 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     CalendarGenerator cal = new CalendarGenerator(seriesService);
     for (DublinCoreCatalog event : eventList) {
       final long id = getEventIdentifier(event);
+
+      // Load the even properties, skip the event if fails
       Properties prop;
       try {
         prop = getEventCaptureAgentConfiguration(id);
       } catch (NotFoundException e) {
-        // should not happen
-        throw new IllegalStateException(e);
+        logger.warn("Properties for event '{}' can't be found, event is not recorded", event);
+        continue;
       }
-      cal.addEvent(event, prop);
+
+      // Add the entry to the calendar, skip it with a warning if adding fails
+      try {
+        cal.addEvent(event, prop);
+      } catch (Exception e) {
+        logger.warn("Error adding event '{}' to calendar: {}. Event is not recorded", event, e.getMessage());
+        continue;
+      }
     }
 
-    // Only validate calendars with events. Without any events, the icalendar won't validate
+    // Only validate calendars with events. Without any events, the iCalendar won't validate
     if (cal.getCalendar().getComponents().size() > 0) {
       try {
         cal.getCalendar().validate();
       } catch (ValidationException e1) {
-        logger.warn("Could not validate Calendar: {}", e1.getMessage());
+        logger.warn("Could not validate recording calendar '{}': {}", filter, e1.getMessage());
       }
     }
 
