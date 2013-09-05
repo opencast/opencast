@@ -265,6 +265,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     }
 
     if (instancesInSolr == 0) {
+      logger.info("The workflow index is empty, looking for workflows to index");
       // this may be a new index, so get all of the existing workflows and index them
       List<Job> jobs = null;
       try {
@@ -283,7 +284,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       }
 
       if (jobs.size() > 0) {
-        logger.info("The workflow search index is empty. Populating it now with {} workflows.", jobs.size());
+        logger.info("Populating the workflow index with {} workflows", jobs.size());
         int errors = 0;
         for (Job job : jobs) {
           if (job.getPayload() == null) {
