@@ -300,11 +300,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     // Prepare the new document
     final SolrInputDocument doc;
     String serializedCAProperties = null;
-    if (retrievedDoc != null) {
-      doc = ClientUtils.toSolrInputDocument(retrievedDoc);
-    } else {
-      doc = createDocument(dc);
-    }
+    doc = createDocument(dc);
 
     // Use updated capture agent properties if available. Otherwise, read from the existing doc
     if (captureAgentProperties != null) {
