@@ -51,6 +51,7 @@ ocStatistics = new (function() {
     "org_opencastproject_gstreamer"              : "GStreamer Launch Service",
     "org_opencastproject_inspection"             : "Media inspection",
     "org_opencastproject_workflow"               : "Workflow",
+    "org_opencastproject_ingest  "               : "Ingest",
     "org_opencastproject_search"                 : "Engage"
   };
 

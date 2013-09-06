@@ -317,11 +317,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             ingestStatistics.add(entry.getSize());
             logger.info("Zip entry {} stored at {}", job.getId() + entry.getName(), contentUri);
           }
-        } catch (Exception e) {
+        } catch (IOException e) {
           logger.warn("Unable to process zip entry {}: {}", entry.getName(), e.getMessage());
-          if (e instanceof MediaPackageException)
-            throw (MediaPackageException) e;
-          throw new MediaPackageException(e);
+          throw e;
         }
       }
 
@@ -343,14 +341,14 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
       // Make sure there are tracks in the mediapackage
       if (mp.getTracks().length == 0)
-        throw new IngestException("Mediapackage " + mediaPackageId + " has no media tracks");
+        throw new MediaPackageException("Mediapackage " + mediaPackageId + " has no media tracks");
 
       // Update the element uris to point to their working file repository location
       for (MediaPackageElement element : mp.elements()) {
         URI uri = uris.get(element.getURI().toString());
 
         if (uri == null)
-          throw new IngestException("Unable to map element name '" + element.getURI() + "' to workspace uri");
+          throw new MediaPackageException("Unable to map element name '" + element.getURI() + "' to workspace uri");
         logger.info("Ingested mediapackage element {}/{} is located at {}",
                 new Object[] { mediaPackageId, element.getIdentifier(), uri });
         URI dest = workingFileRepository.moveTo(wfrCollectionId, uri.toString(), mediaPackageId,
@@ -373,12 +371,14 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
-    } catch (IOException e) {
-      job.setStatus(Job.Status.FAILED);
-      throw e;
     } catch (MediaPackageException e) {
-      job.setStatus(Job.Status.FAILED);
+      job.setStatus(Job.Status.FAILED, Job.FailureReason.DATA);
       throw e;
+    } catch (Exception e) {
+      job.setStatus(Job.Status.FAILED);
+      if (e instanceof IngestException)
+        throw (IngestException) e;
+      throw new IngestException(e);
     } finally {
       IOUtils.closeQuietly(zis);
       try {
