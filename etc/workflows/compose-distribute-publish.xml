@@ -300,7 +300,7 @@
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>
         <configuration key="target-flavor">presenter/delivery</configuration>
-        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming</configuration>
         <configuration key="encoding-profile">flash.http</configuration>
       </configurations>
     </operation>
