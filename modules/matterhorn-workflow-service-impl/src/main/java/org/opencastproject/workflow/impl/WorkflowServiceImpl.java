@@ -127,7 +127,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   private static final Logger logger = LoggerFactory.getLogger(WorkflowServiceImpl.class);
 
   /** List of available operations on jobs */
-  private enum Operation {
+  enum Operation {
     START_WORKFLOW, RESUME, START_OPERATION
   };
 
