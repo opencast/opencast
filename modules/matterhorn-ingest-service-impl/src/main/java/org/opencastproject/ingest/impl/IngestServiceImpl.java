@@ -877,6 +877,27 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               logger.info(
                       "Mediapackage {} already contains a catalog with flavor {}.  Skipping the conflicting ingested catalog",
                       existingMediaPackage, catalogFlavor);
+
+              boolean containsElementId = false;
+              for (MediaPackageElement existingElem : existingCatalogs) {
+                if (existingElem.getIdentifier().equals(element.getIdentifier())) {
+                  containsElementId = true;
+                  break;
+                }
+              }
+              if (containsElementId) {
+                logger.info(
+                        "Mediapackage's {} catalog with flavor {} and element id {} has already been overwritten by the ingested one, because both having the same element identifier!",
+                        new String[] { existingMediaPackage.getIdentifier().compact(), catalogFlavor.toString(),
+                                element.getIdentifier() });
+              } else {
+                try {
+                  workingFileRepository.delete(mp.getIdentifier().compact(), element.getIdentifier());
+                  logger.debug("Deleted the unused catalog {}", element.getIdentifier());
+                } catch (IOException e) {
+                  logger.warn("Unable to delete unused catalog {}", element.getIdentifier());
+                }
+              }
               continue;
             }
           }
