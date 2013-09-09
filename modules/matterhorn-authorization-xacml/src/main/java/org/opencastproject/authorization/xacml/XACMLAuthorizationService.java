@@ -101,28 +101,11 @@ public class XACMLAuthorizationService implements AuthorizationService {
     ClassLoader originalClassLoader = currentThread.getContextClassLoader();
     try {
       currentThread.setContextClassLoader(XACMLAuthorizationService.class.getClassLoader());
-      AccessControlList accessControlList = new AccessControlList();
-      List<AccessControlEntry> acl = accessControlList.getEntries();
       Attachment[] xacmlAttachments = mediapackage.getAttachments(MediaPackageElements.XACML_POLICY);
       URI xacmlUri = null;
       if (xacmlAttachments.length == 0) {
         logger.debug("No XACML attachment found in {}", mediapackage);
-
-        if (StringUtils.isNotBlank(mediapackage.getSeries())) {
-          logger.info("Falling back to using default acl from series");
-          try {
-            return seriesService.getSeriesAccessControl(mediapackage.getSeries());
-          } catch (Exception e) {
-            logger.warn("Unable to get default acl from series '{}': {}", mediapackage.getSeries(), e.getMessage());
-          }
-        }
-
-        // TODO: We need a configuration option for open vs. closed by default
-        // Right now, rights management is based on series. Here we make sure that
-        // objects not belonging to a series are world readable
-        String anonymousRole = securityService.getOrganization().getAnonymousRole();
-        acl.add(new AccessControlEntry(anonymousRole, READ_PERMISSION, true));
-        return accessControlList;
+        return getFallbackAcl(mediapackage);
       } else if (xacmlAttachments.length > 1) {
         // try to find the source policy. Some may be copies sent to distribution channels.
         for (Attachment a : xacmlAttachments) {
@@ -130,17 +113,14 @@ public class XACMLAuthorizationService implements AuthorizationService {
             if (xacmlUri == null) {
               xacmlUri = a.getURI();
             } else {
-              logger.warn("More than one non-referenced XACML policy is attached to {}, ACL will be empty",
-                      mediapackage);
-              return accessControlList;
+              logger.warn("More than one non-referenced XACML policy is attached to {}.", mediapackage);
+              return getFallbackAcl(mediapackage);
             }
           }
         }
         if (xacmlUri == null) {
-          logger.warn(
-                  "Multiple XACML policies are attached to {}, and none seem to be authoritative. The ACL will be empty",
-                  mediapackage);
-          return accessControlList;
+          logger.warn("Multiple XACML policies are attached to {}, and none seem to be authoritative.", mediapackage);
+          return getFallbackAcl(mediapackage);
         }
       } else {
         xacmlUri = xacmlAttachments[0].getURI();
@@ -149,11 +129,11 @@ public class XACMLAuthorizationService implements AuthorizationService {
       try {
         xacmlPolicyFile = workspace.get(xacmlUri);
       } catch (NotFoundException e) {
-        logger.warn("XACML policy file not found '{}'. The ACL will be empty.", xacmlUri);
-        return accessControlList;
+        logger.warn("XACML policy file not found '{}'.", xacmlUri);
+        return getFallbackAcl(mediapackage);
       } catch (IOException e) {
-        logger.error("Unable to access XACML policy file, the ACL will be empty. {}", xacmlPolicyFile, e);
-        return accessControlList;
+        logger.error("Unable to access XACML policy file. {}", xacmlPolicyFile, e);
+        return getFallbackAcl(mediapackage);
       }
 
       FileInputStream in;
@@ -172,6 +152,8 @@ public class XACMLAuthorizationService implements AuthorizationService {
       } finally {
         IoSupport.closeQuietly(in);
       }
+      AccessControlList accessControlList = new AccessControlList();
+      List<AccessControlEntry> acl = accessControlList.getEntries();
       for (Object object : policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition()) {
         if (object instanceof RuleType) {
           RuleType rule = (RuleType) object;
@@ -203,6 +185,26 @@ public class XACMLAuthorizationService implements AuthorizationService {
     } finally {
       Thread.currentThread().setContextClassLoader(originalClassLoader);
     }
+  }
+
+  private AccessControlList getFallbackAcl(MediaPackage mediapackage) {
+    if (StringUtils.isNotBlank(mediapackage.getSeries())) {
+      logger.info("Falling back to using default acl from series for mediapackage '{}'", mediapackage);
+      try {
+        return seriesService.getSeriesAccessControl(mediapackage.getSeries());
+      } catch (Exception e) {
+        logger.warn("Unable to get default acl from series '{}': {}", mediapackage.getSeries(), e.getMessage());
+      }
+    }
+    logger.trace("Falling back to using default public acl for mediapackage '{}'", mediapackage);
+    // TODO: We need a configuration option for open vs. closed by default
+    // Right now, rights management is based on series. Here we make sure that
+    // objects not belonging to a series are world readable
+    AccessControlList accessControlList = new AccessControlList();
+    List<AccessControlEntry> acl = accessControlList.getEntries();
+    String anonymousRole = securityService.getOrganization().getAnonymousRole();
+    acl.add(new AccessControlEntry(anonymousRole, READ_PERMISSION, true));
+    return accessControlList;
   }
 
   /**
