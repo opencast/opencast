@@ -54,6 +54,8 @@ import java.io.InputStream;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import static java.lang.String.format;
+
 /**
  * Workflow operation used to inspect all tracks of a media package.
  */
@@ -163,8 +165,12 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
       } catch (MediaPackageException e) {
         throw new WorkflowOperationException("Unable to parse track from job " + inspectJob.getId(), e);
       }
-      if (inspectedTrack == null)
+      if (inspectedTrack == null) {
         throw new WorkflowOperationException("Track " + track + " could not be inspected");
+      }
+      if (inspectedTrack.getStreams().length == 0) {
+        throw new WorkflowOperationException(format("Track %s does not contain any streams", track));
+      }
 
       // Replace the original track with the inspected one
       try {
