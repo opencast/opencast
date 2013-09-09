@@ -164,7 +164,7 @@ public class Ingestor {
     return new Function<Exception, Exception>() {
       @Override
       public Exception apply(Exception e) {
-        logger.warn(msg, append(args, e.getMessage()));
+        logger.warn(msg, append(Object.class, args, e.getMessage()));
         return e;
       }
     };

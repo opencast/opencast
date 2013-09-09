@@ -176,10 +176,10 @@ public class CollectionsTest {
   
   @Test
   public void testJoin() {
-    assertArrayEquals(array(1, 2, 3, 4, 5, 6), Collections.toArray(toList(join(list(1, 2, 3).iterator(), list(4, 5, 6).iterator()))));
-    assertArrayEquals(array(1, 2, 3), Collections.toArray(toList(join(list(1, 2, 3).iterator(), java.util.Collections.<Integer>emptyList().iterator()))));
-    assertArrayEquals(array(1, 2, 3), Collections.toArray(toList(join(java.util.Collections.<Integer>emptyList().iterator(), list(1, 2, 3).iterator()))));
-    assertEquals(0, Collections.toArray(toList(join(java.util.Collections.emptyList().iterator(), java.util.Collections.emptyList().iterator()))).length);
+    assertArrayEquals(array(1, 2, 3, 4, 5, 6), toArray(Integer.class, toList(join(list(1, 2, 3).iterator(), list(4, 5, 6).iterator()))));
+    assertArrayEquals(array(1, 2, 3), toArray(Integer.class, toList(join(list(1, 2, 3).iterator(), java.util.Collections.<Integer>emptyList().iterator()))));
+    assertArrayEquals(array(1, 2, 3), toArray(Integer.class, toList(join(java.util.Collections.<Integer>emptyList().iterator(), list(1, 2, 3).iterator()))));
+    assertEquals(0, toArray(Object.class, toList(join(java.util.Collections.emptyList().iterator(), java.util.Collections.emptyList().iterator()))).length);
   }
   
   @Test(expected = NoSuchElementException.class)
@@ -206,22 +206,22 @@ public class CollectionsTest {
 
   @Test
   public void testConsArray() {
-    assertArrayEquals(new Integer[]{0, 1, 2, 3}, Arrays.cons(0, array(1, 2, 3)));
-    String[] x = Arrays.cons("0", array("1", "2", "3"));
+    assertArrayEquals(new Integer[]{0, 1, 2, 3}, Arrays.cons(Integer.class, 0, array(1, 2, 3)));
+    String[] x = Arrays.cons(String.class, "0", array("1", "2", "3"));
     assertArrayEquals(new String[]{"0", "1", "2", "3"}, x);
     assertArrayEquals(new Object[]{"0", "1", "2", "3"}, x);
   }
 
   @Test
   public void testAppendArray() {
-    Object[] as = append(new String[]{"a", "b"}, new Exception());
+    Object[] as = append(Object.class, new String[]{"a", "b"}, new Exception());
   }
 
   @Test
   public void testConcat() {
     final List<List<Integer>> l = list(list(1), list(2, 3), Collections.<Integer>nil(), list(9, 2, 1));
     final List<Integer> c = concat(l);
-    assertArrayEquals(array(1, 2, 3, 9, 2, 1), toArray(c));
+    assertArrayEquals(array(1, 2, 3, 9, 2, 1), toArray(Integer.class, c));
   }
 
   @Test
@@ -236,5 +236,11 @@ public class CollectionsTest {
   public void testCons() {
     // compile check
     List<Object> x = Collections.<Object>cons("1", list(1, 3));
+  }
+
+  @Test
+  public void testToArray() {
+    final String[] a = toArray(String.class, Collections.<String>list());
+    assertEquals(0, a.length);
   }
 }

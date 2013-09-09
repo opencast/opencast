@@ -19,6 +19,7 @@ package org.opencastproject.util.data;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -125,6 +126,12 @@ public final class Monadics {
 
     /** Return the head of the list. */
     public abstract A head();
+
+    /** Return the last element of the list. */
+    public abstract A last();
+
+    /** Return the last element of the list. */
+    public abstract Option<A> lastOpt();
 
     /** Turn the list into an option only if it contains exactly one element. */
     public abstract Option<A> option();
@@ -293,6 +300,11 @@ public final class Monadics {
 
   // -- constructors
 
+  /** Constructor for collections. */
+  public static <A> ListMonadic<A> mlist(final Collection<A> as) {
+    return mlist(new ArrayList<A>(as));
+  }
+
   /** Constructor function optimized for lists. */
   public static <A> ListMonadic<A> mlist(final List<A> as) {
     return new ListMonadic<A>() {
@@ -368,6 +380,14 @@ public final class Monadics {
 
       @Override public A head() {
         return as.get(0);
+      }
+
+      @Override public A last() {
+        return as.get(as.size() - 1);
+      }
+
+      @Override public Option<A> lastOpt() {
+        return !as.isEmpty() ? some(last()) : Option.<A>none();
       }
 
       @Override public Option<A> option() {
@@ -542,6 +562,14 @@ public final class Monadics {
         return as[0];
       }
 
+      @Override public A last() {
+        return as[as.length - 1];
+      }
+
+      @Override public Option<A> lastOpt() {
+        return as.length > 0 ? some(last()) : Option.<A>none();
+      }
+
       @Override
       public Option<A> option() {
         return as.length == 1 ? some(as[0]) : Option.<A>none();
@@ -567,7 +595,7 @@ public final class Monadics {
 
       @Override
       public <X extends A> ListMonadic<A> cons(X a) {
-        return mlist(Arrays.<A>cons(a, as));
+        return mlist(Collections.<A, List>concat(Collections.<A>list(a), Collections.<A>list(as)));
       }
 
       @Override
@@ -719,6 +747,14 @@ public final class Monadics {
       }
 
       @Override public A head() {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override public A last() {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override public Option<A> lastOpt() {
         throw new UnsupportedOperationException();
       }
 

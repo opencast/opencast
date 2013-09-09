@@ -16,7 +16,6 @@
 package org.opencastproject.util.data;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.opencastproject.util.data.Option.some;
@@ -47,19 +46,21 @@ public final class Arrays {
   }
 
   /** Create a new array by prepending <code>a</code> to <code>as</code>: <code>[a, as0, as1, .. asn]</code> */
-  public static <A> A[] cons(A a, A[] as) {
-    final A[] x = (A[]) Array.newInstance(a.getClass(), as.length + 1);
+  public static <A> A[] cons(Class<A> type, A a, A[] as) {
+    @SuppressWarnings("unchecked")
+    final A[] x = (A[]) Array.newInstance(type, as.length + 1);
     x[0] = a;
     System.arraycopy(as, 0, x, 1, as.length);
     return x;
   }
 
   /** Create a new array by appending <code>a</code> to <code>as</code>: <code>[as0, as1, .. asn, a]</code>. */
-  public static <A> A[] append(A[] as, A a) {
-    final List<A> xs = new ArrayList<A>(as.length + 1);
-    xs.add(a);
-    for (A y : as) xs.add(y);
-    return (A[]) xs.toArray(new Object[xs.size()]);
+  public static <A> A[] append(Class<A> type, A[] as, A a) {
+    @SuppressWarnings("unchecked")
+    final A[] x = (A[]) Array.newInstance(type, as.length + 1);
+    System.arraycopy(as, 0, x, 0, as.length);
+    x[as.length] = a;
+    return x;
   }
 
   /** Create an array from the vararg parameter list. */
@@ -81,11 +82,14 @@ public final class Arrays {
   }
 
   /** Turn a value into a single element array. */
-  public static <A> Function<A, A[]> singleton() {
+  public static <A> Function<A, A[]> singleton(final Class<A> type) {
     return new Function<A, A[]>() {
       @Override
       public A[] apply(A a) {
-        return (A[]) new Object[]{a};
+        @SuppressWarnings("unchecked")
+        final A[] as = (A[]) Array.newInstance(type, 1);
+        as[0] = a;
+        return as;
       }
     };
   }

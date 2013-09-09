@@ -15,6 +15,9 @@
  */
 package org.opencastproject.util.data;
 
+import com.google.common.collect.Multimap;
+
+import java.lang.reflect.Array;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +31,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import static org.opencastproject.util.data.Option.some;
 
@@ -41,6 +46,7 @@ public final class Collections {
   private Collections() {
   }
 
+  @SuppressWarnings("unchecked")
   private static <A, B> Collection<A> buildFrom(Collection<B> as) {
     try {
       return as.getClass().newInstance();
@@ -65,8 +71,7 @@ public final class Collections {
   }
 
   /**
-   * Get a value from a map, creating and adding a new one, if the value is missing, i.e. it is null. This happens
-   * synchronized on the map.
+   * Get a value from a map, creating and adding a new one, if the value is missing, i.e. it is null.
    */
   public static <K, V> V getOrCreate(Map<K, V> map, K key, Function0<V> f) {
     V v = map.get(key);
@@ -202,6 +207,7 @@ public final class Collections {
    * @deprecated use {@link Monadics}
    */
   public static <A, M extends Collection<A>> M filter(M as, Predicate<A> p) {
+    @SuppressWarnings("unchecked")
     final M filtered = (M) buildFrom(as);
     for (A a : as) {
       if (p.apply(a))
@@ -272,6 +278,14 @@ public final class Collections {
     return x;
   }
 
+  /** Merge two sets into one. <code>b</code> takes precedence over <code>a</code>. */
+  public static <A> Set<A> merge(Set<? extends A> a, Set<? extends A> b) {
+    final Set<A> x = new HashSet<A>();
+    x.addAll(a);
+    x.addAll(b);
+    return x;
+  }
+
   /** Drain all elements of <code>as</code> into a list. */
   public static <A> List<A> toList(Iterator<? extends A> as) {
     final List<A> t = new ArrayList<A>();
@@ -282,13 +296,12 @@ public final class Collections {
   }
 
   /** Drain all elements of <code>as</code> into a list. */
-  public static <A> List<A> toList(Collection<? extends A> as) {
-    final List<A> t = new ArrayList<A>();
-    t.addAll(as);
-    return t;
+  public static <A> List<A> toList(Collection<A> as) {
+    return new ArrayList<A>(as);
   }
 
   /** Return nil if <code>a</code> is null or a list containing <code>a</code> otherwise. */
+  @SuppressWarnings("unchecked")
   public static <A> List<A> toList(A a) {
     return a != null ? list(a) : Collections.<A>nil();
   }
@@ -306,7 +319,14 @@ public final class Collections {
   }
 
   /** The empty list. */
+  @SuppressWarnings("unchecked")
   public static <A> List<A> nil() {
+    return java.util.Collections.EMPTY_LIST;
+  }
+
+  /** The empty list. */
+  @SuppressWarnings("unchecked")
+  public static <A> List<A> nil(Class<A> type) {
     return java.util.Collections.EMPTY_LIST;
   }
 
@@ -341,6 +361,15 @@ public final class Collections {
     return map;
   }
 
+  /** Create a sorted map from a list of tuples (K, V) based on the natural ordering of K. */
+  public static <K, V> SortedMap<K, V> smap(Tuple<? extends K, ? extends V>... ts) {
+    final SortedMap<K, V> map = new TreeMap<K, V>();
+    for (Tuple<? extends K, ? extends V> t : ts) {
+      map.put(t.getA(), t.getB());
+    }
+    return map;
+  }
+
   /** Create a dictionary from a list of tuples (K, V). */
   public static <K, V> Dictionary<K, V> dict(Tuple<? extends K, ? extends V>... ts) {
     final Dictionary<K, V> dict = new Hashtable<K, V>(ts.length);
@@ -359,9 +388,67 @@ public final class Collections {
     return a;
   }
 
-  /** Create an array from a list. */
-  public static <A> A[] toArray(List<A> a) {
-    return (A[]) a.toArray(new Object[a.size()]);
+  /**
+   * Partition a list after some predicate <code>group</code> into <code>map</code>.
+   */
+  public static <K, V> Multimap<K, V> groupBy(Multimap<K, V> map, List<V> values, Function<V, K> group) {
+    for (V value : values) {
+      final K key = group.apply(value);
+      map.put(key, value);
+    }
+    return map;
+  }
+
+  /** Partition a list in chunks of size <code>size</code>. The last chunk may be smaller. */
+  public static <A> List<List<A>> grouped(List<A> as, int size) {
+    final List<List<A>> grouped = new ArrayList<List<A>>((as.size() / size) + 1);
+    List<A> group = new ArrayList<A>(size);
+    grouped.add(group);
+    int count = size;
+    for (A a : as) {
+      if (count == 0) {
+        group = new ArrayList<A>(size);
+        grouped.add(group);
+        count = size;
+      }
+      group.add(a);
+      count--;
+    }
+    return grouped;
+  }
+
+  /**
+   * Partition a list after some predicate <code>keyGen</code>. The partition function
+   * has to make sure that keys are unique per list element because each key holds
+   * only one value. Later values overwrite newer ones.
+   * <p/>
+   * The resulting map is a {@link java.util.HashMap}.
+   *
+   * @see #asMap(java.util.Map, java.util.List, Function)
+   */
+  public static <K, V> Map<K, V> asMap(List<V> values, Function<V, K> keyGen) {
+    return asMap(new HashMap<K, V>(), values, keyGen);
+  }
+
+  /**
+   * Partition a list after some predicate <code>keyGen</code> into <code>map</code>.
+   * The partition function has to make sure that keys are unique per list element because each key holds
+   * only one value. Later values overwrite newer ones.
+   *
+   * @see #asMap(java.util.List, Function)
+   */
+  public static <K, V> Map<K, V> asMap(Map<K, V> map, List<V> values, Function<V, K> keyGen) {
+    for (V value : values) {
+      final K key = keyGen.apply(value);
+      map.put(key, value);
+    }
+    return map;
+  }
+
+  /** Create an array from a collection. */
+  @SuppressWarnings("unchecked")
+  public static <A, B extends A> A[] toArray(Class<A> elemType, Collection<B> a) {
+    return a.toArray((A[]) Array.newInstance(elemType, a.size()));
   }
 
   /** Create an iterator form an array. */
