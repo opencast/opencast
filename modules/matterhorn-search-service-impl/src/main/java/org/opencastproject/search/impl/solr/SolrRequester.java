@@ -570,7 +570,7 @@ public class SolrRequester {
     solrIdRequest = StringUtils.trimToNull(q.seriesId());
     if (solrIdRequest != null) {
       String request;
-      request  = "(";
+      request = "(";
       request += Schema.ID + ":" + SolrUtils.clean(solrIdRequest);
       request += " AND ";
       request += Schema.OC_MEDIATYPE + ":" + SearchResultItemType.Series;
@@ -588,7 +588,7 @@ public class SolrRequester {
     solrIdRequest = StringUtils.trimToNull(q.episodeId());
     if (solrIdRequest != null) {
       String request;
-      request  = "(";
+      request = "(";
       request += Schema.ID + ":" + SolrUtils.clean(solrIdRequest);
       request += " AND ";
       request += Schema.OC_MEDIATYPE + ":" + SearchResultItemType.AudioVisual;
@@ -617,7 +617,7 @@ public class SolrRequester {
       for (int i = 0; i < q.getElementTags().length; i++) {
         String tag = SolrUtils.clean(q.getElementTags()[i]);
         if (!StringUtils.isEmpty(tag)) {
-          tags.add(Schema.OC_ELEMENTTAGS + ":" + tag);
+          tags.add(Schema.OC_ELEMENTTAGS + ":" + SolrUtils.clean(tag));
         }
       }
       if (tags.size() > 0) {
@@ -633,7 +633,7 @@ public class SolrRequester {
       for (int i = 0; i < q.getElementFlavors().length; i++) {
         String flavor = SolrUtils.clean(q.getElementFlavors()[i].toString());
         if (!StringUtils.isEmpty(flavor)) {
-          flavors.add(Schema.OC_ELEMENTFLAVORS + ':' + flavor);
+          flavors.add(Schema.OC_ELEMENTFLAVORS + ':' + SolrUtils.clean(flavor));
         }
       }
       if (flavors.size() > 0) {
@@ -643,13 +643,11 @@ public class SolrRequester {
       }
     }
 
-
     if (q.getDeletedDate() != null) {
       if (sb.length() > 0)
         sb.append(" AND ");
       sb.append(Schema.OC_DELETED + ":"
-              + SolrUtils.serializeDateRange(option(q.getDeletedDate()),
-                Option.<Date> none()));
+              + SolrUtils.serializeDateRange(option(q.getDeletedDate()), Option.<Date> none()));
     }
 
     if (sb.length() == 0) {
@@ -657,7 +655,8 @@ public class SolrRequester {
     }
 
     if (applyPermissions) {
-      sb.append(" AND ").append(Schema.OC_ORGANIZATION).append(":").append(securityService.getOrganization().getId());
+      sb.append(" AND ").append(Schema.OC_ORGANIZATION).append(":")
+              .append(SolrUtils.clean(securityService.getOrganization().getId()));
       User user = securityService.getUser();
       String[] roles = user.getRoles();
       boolean userHasAnonymousRole = false;
@@ -667,7 +666,7 @@ public class SolrRequester {
         for (String role : roles) {
           if (roleList.length() > 0)
             roleList.append(" OR ");
-          roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":").append(role);
+          roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":").append(SolrUtils.clean(role));
           if (role.equalsIgnoreCase(securityService.getOrganization().getAnonymousRole())) {
             userHasAnonymousRole = true;
           }
@@ -676,7 +675,7 @@ public class SolrRequester {
           if (roleList.length() > 0)
             roleList.append(" OR ");
           roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":")
-                  .append(securityService.getOrganization().getAnonymousRole());
+                  .append(SolrUtils.clean(securityService.getOrganization().getAnonymousRole()));
         }
 
         sb.append(roleList.toString());

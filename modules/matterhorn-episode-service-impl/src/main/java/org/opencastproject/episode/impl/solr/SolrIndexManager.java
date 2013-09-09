@@ -15,13 +15,16 @@
  */
 package org.opencastproject.episode.impl.solr;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrInputDocument;
+import static org.opencastproject.util.data.Collections.flatMap;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Collections.nil;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import org.opencastproject.episode.api.SearchResultItem.SearchResultItemType;
 import org.opencastproject.episode.api.Version;
 import org.opencastproject.episode.impl.persistence.EpisodeServiceDatabaseException;
@@ -68,6 +71,15 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,16 +98,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import static org.opencastproject.util.data.Collections.flatMap;
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Collections.nil;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /** Utility class used to manage the search index. */
 public class SolrIndexManager {
@@ -131,23 +133,20 @@ public class SolrIndexManager {
 
   /**
    * Creates a new management instance for the search index.
-   *
+   * 
    * @param solrServer
-   *         connection to the database
+   *          connection to the database
    */
-  public SolrIndexManager(SolrServer solrServer,
-                          Workspace workspace,
-                          Cell<List<StaticMetadataService>> metadataSvcs,
-                          SeriesService seriesSvc,
-                          Mpeg7CatalogService mpeg7CatalogSvc,
-                          SecurityService securitySvc) {
+  public SolrIndexManager(SolrServer solrServer, Workspace workspace, Cell<List<StaticMetadataService>> metadataSvcs,
+          SeriesService seriesSvc, Mpeg7CatalogService mpeg7CatalogSvc, SecurityService securitySvc) {
     this.solrServer = solrServer;
     this.workspace = workspace;
     this.seriesSvc = seriesSvc;
     this.mpeg7CatalogSvc = mpeg7CatalogSvc;
     this.securitySvc = securitySvc;
     this.metadataSvcs = metadataSvcs.lift(new Function<List<StaticMetadataService>, List<StaticMetadataService>>() {
-      @Override public List<StaticMetadataService> apply(List<StaticMetadataService> metadataSvcs) {
+      @Override
+      public List<StaticMetadataService> apply(List<StaticMetadataService> metadataSvcs) {
         return mlist(metadataSvcs).sort(priorityComparator).value();
       }
     });
@@ -193,9 +192,9 @@ public class SolrIndexManager {
 
   /**
    * Clears the search index. Make sure you know what you are doing.
-   *
+   * 
    * @throws SolrServerException
-   *         if an errors occurs while talking to solr
+   *           if an errors occurs while talking to solr
    */
   public void clear() throws SolrServerException {
     try {
@@ -208,10 +207,10 @@ public class SolrIndexManager {
 
   /**
    * Returns number of episodes in search index, across all organizations.
-   *
+   * 
    * @return number of episodes in search index
    * @throws EpisodeServiceDatabaseException
-   *         if count cannot be retrieved
+   *           if count cannot be retrieved
    */
   public long count() throws EpisodeServiceDatabaseException {
     try {
@@ -224,20 +223,21 @@ public class SolrIndexManager {
 
   /**
    * Set the deleted flag of all versions of the media package with the given id.
-   *
+   * 
    * @param id
-   *         identifier of the series or episode to delete
+   *          identifier of the series or episode to delete
    * @param deletionDate
-   *         the deletion date
+   *          the deletion date
    * @throws SolrServerException
-   *         if an errors occurs while talking to solr
+   *           if an errors occurs while talking to solr
    */
   public boolean delete(String id, Date deletionDate) throws SolrServerException {
     try {
       // Load the existing episode
       QueryResponse solrResponse = null;
       try {
-        SolrQuery query = new SolrQuery(Schema.DC_ID + ":" + id + " AND -" + Schema.OC_DELETED + ":[* TO *]");
+        SolrQuery query = new SolrQuery(Schema.DC_ID + ":" + ClientUtils.escapeQueryChars(id) + " AND -"
+                + Schema.OC_DELETED + ":[* TO *]");
         solrResponse = solrServer.query(query);
       } catch (Exception e1) {
         throw new SolrServerException(e1);
@@ -272,7 +272,7 @@ public class SolrIndexManager {
       // Load the existing episode
       QueryResponse solrResponse = null;
       try {
-        SolrQuery query = new SolrQuery(Schema.DC_ID + ":" + id);
+        SolrQuery query = new SolrQuery(Schema.DC_ID + ":" + ClientUtils.escapeQueryChars(id));
         // + " AND -" + Schema.OC_DELETED + ":[* TO *]"
         // + " AND " + Schema.OC_LOCKED + ":" + (!locked));
         solrResponse = solrServer.query(query);
@@ -302,9 +302,10 @@ public class SolrIndexManager {
   }
 
   /** Set the "latestVersion" flag of an index entry. */
-  private void resetFormerLatestVersion(MediaPackage sourceMediaPackage, Version version)
-          throws SolrServerException, IOException {
-    final SolrQuery query = new SolrQuery(Schema.ID + ":" + sourceMediaPackage.getIdentifier() + version);
+  private void resetFormerLatestVersion(MediaPackage sourceMediaPackage, Version version) throws SolrServerException,
+          IOException {
+    final SolrQuery query = new SolrQuery(Schema.ID + ":"
+            + ClientUtils.escapeQueryChars(sourceMediaPackage.getIdentifier() + version.toString()));
     QueryResponse response = solrServer.query(query);
 
     // Did we find the episode?
@@ -326,24 +327,21 @@ public class SolrIndexManager {
   /**
    * Posts the media package to solr. Depending on what is referenced in the media package, the method might create one
    * or two entries: one for the episode and one for the series that the episode belongs to.
-   *
+   * 
    * Note: Media package element URIs need to be URLs pointing to existing locations.
-   *
+   * 
    * @param sourceMediaPackage
-   *         the media package to post
+   *          the media package to post
    * @param acl
-   *         the access control list for this mediapackage
+   *          the access control list for this mediapackage
    * @param now
-   *         current date
+   *          current date
    * @param version
-   *         the archive version
+   *          the archive version
    * @throws SolrServerException
-   *         if an errors occurs while talking to solr
+   *           if an errors occurs while talking to solr
    */
-  public void add(MediaPackage sourceMediaPackage,
-                  AccessControlList acl,
-                  Date now,
-                  Version version)
+  public void add(MediaPackage sourceMediaPackage, AccessControlList acl, Date now, Version version)
           throws SolrServerException {
     try {
       final SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl, version);
@@ -368,29 +366,25 @@ public class SolrIndexManager {
    * or two entries: one for the episode and one for the series that the episode belongs to.
    * <p/>
    * Note: Media package element URIs need to be URLs pointing to existing locations.
-   *
-   *
+   * 
+   * 
    * @param sourceMediaPackage
-   *         the media package to post
+   *          the media package to post
    * @param acl
-   *         the access control list for this mediapackage
+   *          the access control list for this mediapackage
    * @param version
-   *         the archive version
+   *          the archive version
    * @param modificationDate
-   *         the modification date
+   *          the modification date
    * @param deletionDate
-   *         the deletion date
+   *          the deletion date
    * @param isLatestVersion
    *          the latest version flag
    * @throws SolrServerException
-   *         if an errors occurs while talking to solr
+   *           if an errors occurs while talking to solr
    */
-  public void add(MediaPackage sourceMediaPackage,
-                  AccessControlList acl,
-                  Version version,
-                  Option<Date> deletionDate,
-                  Date modificationDate,
-                  boolean isLatestVersion) throws SolrServerException {
+  public void add(MediaPackage sourceMediaPackage, AccessControlList acl, Version version, Option<Date> deletionDate,
+          Date modificationDate, boolean isLatestVersion) throws SolrServerException {
     try {
       final SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl, version);
       Schema.setOcTimestamp(episodeDocument, modificationDate);
@@ -412,27 +406,25 @@ public class SolrIndexManager {
 
   /**
    * Creates a solr input document for the episode metadata of the media package.
-   *
+   * 
    * @param mediaPackage
-   *         the media package
+   *          the media package
    * @param acl
-   *         the access control list for this mediapackage
+   *          the access control list for this mediapackage
    * @param version
-   *         the archive version
+   *          the archive version
    * @return an input document ready to be posted to solr
    * @throws MediaPackageException
-   *         if serialization of the media package fails
+   *           if serialization of the media package fails
    */
-  private SolrInputDocument createEpisodeInputDocument(final MediaPackage mediaPackage,
-                                                       AccessControlList acl,
-                                                       final Version version)
-          throws MediaPackageException, IOException {
+  private SolrInputDocument createEpisodeInputDocument(final MediaPackage mediaPackage, AccessControlList acl,
+          final Version version) throws MediaPackageException, IOException {
     final SolrInputDocument doc = new SolrInputDocument();
     final String mediaPackageId = mediaPackage.getIdentifier().toString();
     // todo fix id generation ambiguity. currently tests are broken
-//    if (mediaPackageId.contains("#"))
-//      throw new Error("Media package id must not contain '#' characters: " + mediaPackageId);
-//    Schema.setId(doc, mediaPackageId + "#" + version);
+    // if (mediaPackageId.contains("#"))
+    // throw new Error("Media package id must not contain '#' characters: " + mediaPackageId);
+    // Schema.setId(doc, mediaPackageId + "#" + version);
     Schema.setId(doc, mediaPackageId + version);
     Schema.setDcId(doc, mediaPackageId);
     // /
@@ -463,24 +455,24 @@ public class SolrIndexManager {
     // mpeg7 fields
     logger.debug("Looking for mpeg-7 catalogs containing segment texts");
     // TODO: merge the segments from each mpeg7 if there is more than one mpeg7 catalog
-    mlist(mediaPackage.getCatalogs(MediaPackageElements.TEXTS))
-            .headOpt()
-            .orElse(new Function0<Option<Catalog>>() {
-              @Override public Option<Catalog> apply() {
-                logger.debug("No text catalogs found, trying segments only");
-                return mlist(mediaPackage.getCatalogs(MediaPackageElements.SEGMENTS)).headOpt();
-              }
-            })
-            .fold(new Option.EMatch<Catalog>() {
-              @Override public void esome(final Catalog mpeg7) {
-                // load catalog and add it to the solr input document
-                addMpeg7Metadata(doc, mediaPackage, loadMpeg7Catalog(mpeg7));
-              }
+    mlist(mediaPackage.getCatalogs(MediaPackageElements.TEXTS)).headOpt().orElse(new Function0<Option<Catalog>>() {
+      @Override
+      public Option<Catalog> apply() {
+        logger.debug("No text catalogs found, trying segments only");
+        return mlist(mediaPackage.getCatalogs(MediaPackageElements.SEGMENTS)).headOpt();
+      }
+    }).fold(new Option.EMatch<Catalog>() {
+      @Override
+      public void esome(final Catalog mpeg7) {
+        // load catalog and add it to the solr input document
+        addMpeg7Metadata(doc, mediaPackage, loadMpeg7Catalog(mpeg7));
+      }
 
-              @Override public void enone() {
-                logger.debug("No segmentation catalog found");
-              }
-            });
+      @Override
+      public void enone() {
+        logger.debug("No segmentation catalog found");
+      }
+    });
 
     return doc;
   }
@@ -643,7 +635,8 @@ public class SolrIndexManager {
         return fromMValue(md.getLicenses());
       }
 
-      @Override public List<DField<String>> getSeriesDcTitle() {
+      @Override
+      public List<DField<String>> getSeriesDcTitle() {
         return nil(); // set elsewhere
       }
 
@@ -715,13 +708,12 @@ public class SolrIndexManager {
   }
 
   static List<DField<String>> fromMValue(List<MetadataValue<String>> as) {
-    return map(as, new ArrayList<DField<String>>(),
-               new Function<MetadataValue<String>, DField<String>>() {
-                 @Override
-                 public DField<String> apply(MetadataValue<String> v) {
-                   return new DField<String>(v.getValue(), v.getLanguage());
-                 }
-               });
+    return map(as, new ArrayList<DField<String>>(), new Function<MetadataValue<String>, DField<String>>() {
+      @Override
+      public DField<String> apply(MetadataValue<String> v) {
+        return new DField<String>(v.getValue(), v.getLanguage());
+      }
+    });
   }
 
   static List<DField<String>> fromDCValue(List<DublinCoreValue> as) {
@@ -758,11 +750,11 @@ public class SolrIndexManager {
 
   /**
    * Add the mpeg 7 catalog data to the solr document.
-   *
+   * 
    * @param doc
-   *         the input document to the solr index
+   *          the input document to the solr index
    * @param mpeg7
-   *         the mpeg7 catalog
+   *          the mpeg7 catalog
    */
   @SuppressWarnings("unchecked")
   static void addMpeg7Metadata(SolrInputDocument doc, MediaPackage mediaPackage, Mpeg7Catalog mpeg7) {
@@ -900,7 +892,7 @@ public class SolrIndexManager {
 
   /**
    * Generates a string with the most important kewords from the text annotation.
-   *
+   * 
    * @param sortedAnnotations
    * @return The keyword string.
    */
@@ -938,7 +930,7 @@ public class SolrIndexManager {
           // here the importance value is calculated
           // from relevance, confidence and frequency of occurence.
           imp = (RELEVANCE_BOOST * getMaxRelevance(keyword, sortedAnnotations) + getMaxConfidence(keyword,
-                                                                                                  sortedAnnotations)) * (occ + 1);
+                  sortedAnnotations)) * (occ + 1);
           importance.put(keyword, imp);
         }
       }
@@ -974,7 +966,7 @@ public class SolrIndexManager {
 
   /**
    * Gets the maximum confidence for a given keyword in the text annotation.
-   *
+   * 
    * @param keyword
    * @param sortedAnnotations
    * @return The maximum confidence value.
@@ -1002,7 +994,7 @@ public class SolrIndexManager {
 
   /**
    * Gets the maximum relevance for a given keyword in the text annotation.
-   *
+   * 
    * @param keyword
    * @param sortedAnnotations
    * @return The maximum relevance value.
@@ -1031,13 +1023,13 @@ public class SolrIndexManager {
   /** Get metadata from all registered metadata services. */
   static List<StaticMetadata> getMetadata(final List<StaticMetadataService> mdServices, final MediaPackage mp) {
     return flatMap(mdServices, new ArrayList<StaticMetadata>(),
-                   new Function<StaticMetadataService, Collection<StaticMetadata>>() {
-                     @Override
-                     public Collection<StaticMetadata> apply(StaticMetadataService s) {
-                       StaticMetadata md = s.getMetadata(mp);
-                       return md != null ? list(md) : Collections.EMPTY_LIST;
-                     }
-                   });
+            new Function<StaticMetadataService, Collection<StaticMetadata>>() {
+              @Override
+              public Collection<StaticMetadata> apply(StaticMetadataService s) {
+                StaticMetadata md = s.getMetadata(mp);
+                return md != null ? list(md) : Collections.EMPTY_LIST;
+              }
+            });
   }
 
   /** Return all media package tags as a space separated string. */
