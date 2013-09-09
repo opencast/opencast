@@ -370,19 +370,24 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       return workflowInstance;
 
     } catch (ServiceRegistryException e) {
+      if (job != null)
+        job.setStatus(Job.Status.FAILED);
       throw new IngestException(e);
     } catch (MediaPackageException e) {
-      job.setStatus(Job.Status.FAILED, Job.FailureReason.DATA);
+      if (job != null)
+        job.setStatus(Job.Status.FAILED, Job.FailureReason.DATA);
       throw e;
     } catch (Exception e) {
-      job.setStatus(Job.Status.FAILED);
+      if (job != null)
+        job.setStatus(Job.Status.FAILED);
       if (e instanceof IngestException)
         throw (IngestException) e;
       throw new IngestException(e);
     } finally {
       IOUtils.closeQuietly(zis);
       try {
-        serviceRegistry.updateJob(job);
+        if (job != null)
+          serviceRegistry.updateJob(job);
       } catch (Exception e) {
         throw new IngestException("Unable to update job", e);
       }
@@ -480,8 +485,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
+      if (job != null)
+        job.setStatus(Job.Status.FAILED);
       throw new IngestException(e);
     } catch (NotFoundException e) {
+      if (job != null)
+        job.setStatus(Job.Status.FAILED);
       throw new IngestException("Unable to update ingest job", e);
     } finally {
       try {
@@ -519,12 +528,17 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
+      if (job != null)
+        job.setStatus(Job.Status.FAILED);
       throw new IngestException(e);
     } catch (NotFoundException e) {
+      if (job != null)
+        job.setStatus(Job.Status.FAILED);
       throw new IngestException("Unable to update ingest job", e);
     } finally {
       try {
-        serviceRegistry.updateJob(job);
+        if (job != null)
+          serviceRegistry.updateJob(job);
       } catch (Exception e) {
         throw new IngestException("Unable to update ingest job", e);
       }
@@ -560,12 +574,17 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
+      if (job != null)
+        job.setStatus(Job.Status.FAILED);
       throw new IngestException(e);
     } catch (NotFoundException e) {
+      if (job != null)
+        job.setStatus(Job.Status.FAILED);
       throw new IngestException("Unable to update ingest job", e);
     } finally {
       try {
-        serviceRegistry.updateJob(job);
+        if (job != null)
+          serviceRegistry.updateJob(job);
       } catch (Exception e) {
         throw new IngestException("Unable to update ingest job", e);
       }
@@ -630,12 +649,17 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
+      if (job != null)
+        job.setStatus(Job.Status.FAILED);
       throw new IngestException(e);
     } catch (NotFoundException e) {
+      if (job != null)
+        job.setStatus(Job.Status.FAILED);
       throw new IngestException("Unable to update ingest job", e);
     } finally {
       try {
-        serviceRegistry.updateJob(job);
+        if (job != null)
+          serviceRegistry.updateJob(job);
       } catch (Exception e) {
         throw new IngestException("Unable to update ingest job", e);
       }
@@ -667,12 +691,17 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
+      if (job != null)
+        job.setStatus(Job.Status.FAILED);
       throw new IngestException(e);
     } catch (NotFoundException e) {
+      if (job != null)
+        job.setStatus(Job.Status.FAILED);
       throw new IngestException("Unable to update ingest job", e);
     } finally {
       try {
-        serviceRegistry.updateJob(job);
+        if (job != null)
+          serviceRegistry.updateJob(job);
       } catch (Exception e) {
         throw new IngestException("Unable to update ingest job", e);
       }
@@ -703,12 +732,17 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
+      if (job != null)
+        job.setStatus(Job.Status.FAILED);
       throw new IngestException(e);
     } catch (NotFoundException e) {
+      if (job != null)
+        job.setStatus(Job.Status.FAILED);
       throw new IngestException("Unable to update ingest job", e);
     } finally {
       try {
-        serviceRegistry.updateJob(job);
+        if (job != null)
+          serviceRegistry.updateJob(job);
       } catch (Exception e) {
         throw new IngestException("Unable to update ingest job", e);
       }
