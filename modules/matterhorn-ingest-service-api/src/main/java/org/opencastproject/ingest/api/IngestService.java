@@ -15,6 +15,7 @@
  */
 package org.opencastproject.ingest.api;
 
+import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
@@ -32,7 +33,7 @@ import java.util.Map;
 /**
  * Generates {@link MediaPackage}s from media, metadata, and attachments.
  */
-public interface IngestService {
+public interface IngestService extends JobProducer {
 
   /**
    * Ingests the compressed mediapackage and starts the default workflow as defined by the

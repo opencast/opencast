@@ -47,6 +47,11 @@ public interface Job {
     }
   }
 
+  /** Reason for failure */
+  public static enum FailureReason {
+    NONE, DATA, PROCESSING
+  }
+
   /**
    * Gets the job identifier.
    *
@@ -132,12 +137,31 @@ public interface Job {
   Status getStatus();
 
   /**
+   * In the case of failure, returns whether the failure had to do with data or with processing. Depending on the
+   * reason, processing services might be marked not to accept new jobs.
+   * 
+   * @return the failure reason
+   */
+  FailureReason getFailureReason();
+
+  /**
    * Sets the receipt's current {@link Status}.
    *
    * @param status
    *         the status to set
    */
   void setStatus(Status status);
+
+  /**
+   * Sets the receipt's current {@link Status} along with the {@link FailureReason} to indicate why - in the case of
+   * failure - the job failed.
+   * 
+   * @param status
+   *          the status to set
+   * @param the
+   *          failure reason
+   */
+  void setStatus(Status status, FailureReason reason);
 
   /**
    * Gets the host that created this job.

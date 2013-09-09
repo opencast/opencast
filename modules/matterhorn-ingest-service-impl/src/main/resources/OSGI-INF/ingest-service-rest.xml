@@ -6,7 +6,7 @@
 
   <property name="opencast.service.type" value="org.opencastproject.ingest" />
   <property name="opencast.service.path" value="/ingest" />
-  <property name="opencast.service.jobproducer" value="false" /> <!-- This should be true.  Update Java first. -->
+  <property name="opencast.service.jobproducer" value="true" />
 
   <service>
     <provide interface="org.opencastproject.ingest.endpoint.IngestRestService" />
@@ -20,4 +20,6 @@
     cardinality="1..1" policy="static" bind="setPersistenceProvider" />
   <reference name="props" interface="java.util.Map"
     cardinality="1..1" policy="static" target="(type=persistence)" bind="setPersistenceProperties" />
+  <reference name="serviceregistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry" 
+    cardinality="1..1" policy="static" bind="setServiceRegistry" />
 </scr:component>
