@@ -202,20 +202,22 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }
+
     if (instancesInSolr == 0L) {
       try {
         DublinCoreCatalog[] events = persistence.getAllEvents();
         if (events.length != 0) {
-          logger.info("The event index is empty. Populating it now with {} events", Integer.valueOf(events.length));
+          logger.info("The recording event index is empty. Populating it with {} events",
+                  Integer.valueOf(events.length));
+
           for (DublinCoreCatalog event : events) {
-            index.index(event);
             final long id = getEventIdentifier(event);
             Properties properties = persistence.getEventMetadata(id);
-            if (properties != null) {
-              index.index(id, properties);
-            }
+            logger.debug("Adding recording event '{}' to the scheduler search index", id);
+            index.index(event, properties);
           }
-          logger.info("Finished populating event search index");
+
+          logger.info("Finished populating recording event index");
         }
       } catch (Exception e) {
         logger.warn("Unable to index event instances: {}", e.getMessage());
