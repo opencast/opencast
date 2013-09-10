@@ -870,12 +870,12 @@ Opencast.Initialize = (function ()
                 dataType: 'xml',
                 success: function (xml)
                 {
-                    $(xml).find('attachment').each(function ()
+                    $(xml).find('ns2\\:attachment, attachment').each(function ()
                     {
                         coverType = $(this).attr('type');
                         if (coverType.search(/player/) !== -1)
                         {
-                            coverUrl = $(this).find('url').text();
+                            coverUrl = $(this).find('ns2\\:url, url').text();
                         }
                     }); //close each(
                     $('#oc_image').attr("src", coverUrl);
