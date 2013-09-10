@@ -136,7 +136,8 @@ ocStatistics = new (function() {
 		            var servicesInWarningState = 0;
 		            var badge = $('#statistics_badge');
 		            $.each(data.statistics.service, function(index, serviceInstance) {
-		         		if (serviceInstance.serviceRegistration.service_state != 'NORMAL') {
+                        var serviceState = serviceInstance.serviceRegistration.service_state;
+                        if (serviceState != null && serviceState != 'NORMAL') {
 		                  servicesInWarningState ++;
 		         		}
 		            });
