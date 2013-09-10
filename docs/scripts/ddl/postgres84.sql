@@ -169,7 +169,6 @@ CREATE TABLE "mh_job_argument" (
   "id" bigint NOT NULL,
   "argument" text,
   "argument_index" bigint,
-  CONSTRAINT "UNQ_mh_job_argument_0" UNIQUE ("id", "argument_index"),
   CONSTRAINT "FK_mh_job_argument_id" FOREIGN KEY ("id") REFERENCES "mh_job" ("id") ON DELETE CASCADE
 );
 
