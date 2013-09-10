@@ -123,7 +123,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>
-              org.opencastproject.search.impl.*;version=${project.version},
+              org.opencastproject.search.impl;version=${project.version},
               *;resolution:=optional
             </Import-Package>
             <Export-Package>

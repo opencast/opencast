@@ -62,8 +62,10 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Export-Package> org.opencastproject.inspection.remote;${project.version} </Export-Package>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Export-Package>
+            	org.opencastproject.inspection.remote;version="${project.version}"
+            </Export-Package>
             <Service-Component>
               OSGI-INF/inspection-service-remote.xml
             </Service-Component>

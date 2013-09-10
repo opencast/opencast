@@ -73,8 +73,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Export-Package>
-              org.opencastproject.speechrecognition.api;version=${project.version},
-              org.opencastproject.speechrecognition.api.util;version=${project.version}
+              org.opencastproject.speechrecognition.api;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>
