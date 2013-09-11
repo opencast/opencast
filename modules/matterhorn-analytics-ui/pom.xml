@@ -233,7 +233,6 @@
               org.osgi.framework.*,
               org.slf4j.*
             </Import-Package>
-            <Private-Package>ui.*, uitests.*</Private-Package>
             <Http-Alias>/analytics</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>

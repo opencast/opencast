@@ -63,8 +63,8 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>
               org.opencastproject.episode.api;version=${project.version},
-              org.opencastproject.episode.impl.*;version=${project.version},
-              org.opencastproject.episode.impl.elementstore.*;version=${project.version},
+              org.opencastproject.episode.impl;version=${project.version},
+              org.opencastproject.episode.impl.elementstore;version=${project.version},
               *;resolution:=optional
             </Import-Package>
             <Export-Package>
