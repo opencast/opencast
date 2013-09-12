@@ -172,7 +172,6 @@ CREATE TABLE mh_job_argument (
   id BIGINT NOT NULL,
   argument TEXT(2147483647),
   argument_index INTEGER,
-  CONSTRAINT UNQ_job_argument_0 UNIQUE (id, argument_index),
   CONSTRAINT FK_job_argument_id FOREIGN KEY (id) REFERENCES mh_job (id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
