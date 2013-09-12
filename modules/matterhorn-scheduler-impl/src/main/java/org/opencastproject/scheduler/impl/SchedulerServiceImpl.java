@@ -1042,8 +1042,8 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     if (cal.getCalendar().getComponents().size() > 0) {
       try {
         cal.getCalendar().validate();
-      } catch (ValidationException e1) {
-        logger.warn("Could not validate recording calendar '{}': {}", filter, e1.getMessage());
+      } catch (ValidationException e) {
+        logger.warn("Recording calendar '{}' could not be validated (returning it anyways): {}", filter, e.getMessage());
       }
     }
 
