@@ -5,15 +5,25 @@
         <link rel="shortcut icon" href="img/favicon.ico" />
         <title>Opencast Matterhorn - Login Page</title>
         <link href="style.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="js/jquery/jquery.js"></script>
         <script type="text/javascript">
-            <!--
             function startup(){
+            	$.get("info/me.json",
+            		    function (json)
+            		    {
+            		        if (json.org.properties["login.display_defaults"] == 'true') {
+            		            $("#defaults").show();
+            		        } else {
+            		            $("#defaults").hide();
+            		        }
+            		    },
+            		    "json");
+
                 document.f.j_username.focus();
                 if (window.location.search.substring(1) == 'error') {
                     document.getElementById('error').style.display = 'block';
                 }
             }
-            // -->
         </script>
     </head>	
     <body onload='startup()'>
@@ -34,7 +44,7 @@
                            <table>
                                <tr><td>User:</td><td><input type='text' name='j_username' value=''></td></tr>
                                <tr><td>Password:</td><td><input type='password' name='j_password'/></td></tr>
-                               <tr><td>Default</td><td>admin / opencast</td></tr>	
+                               <tr id="defaults"><td>Default</td><td>admin / opencast</td></tr>	
                                <tr><td><input type='checkbox' name='_spring_security_remember_me'/></td><td>Remember me on this computer.</td></tr>
                                <tr><td><input name="submit" type="submit" value="Login"/></td><td><input name="reset" type="reset"/></td></tr>
                            </table>
