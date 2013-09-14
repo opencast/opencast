@@ -26,6 +26,8 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
+import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -43,7 +45,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -146,25 +147,57 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
           WorkflowOperationException {
 
     // Read the configuration properties
-    String sourceVideoFlavor = StringUtils.trimToNull(operation.getConfiguration("source-flavor"));
-    String sourceTags = StringUtils.trimToNull(operation.getConfiguration("source-tags"));
+    String sourceFlavorOption = StringUtils.trimToNull(operation.getConfiguration("source-flavor"));
+    String sourceFlavorsOption = StringUtils.trimToNull(operation.getConfiguration("source-flavors"));
+    String sourceTagsOption = StringUtils.trimToNull(operation.getConfiguration("source-tags"));
     String targetImageTags = StringUtils.trimToNull(operation.getConfiguration("target-tags"));
     String targetImageFlavor = StringUtils.trimToNull(operation.getConfiguration("target-flavor"));
     String encodingProfileName = StringUtils.trimToNull(operation.getConfiguration("encoding-profile"));
     String timeConfiguration = StringUtils.trimToNull(operation.getConfiguration("time"));
+
+    AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
+
+    // Make sure either one of tags or flavors are provided
+    if (StringUtils.isBlank(sourceTagsOption) && StringUtils.isBlank(sourceFlavorOption)
+            && StringUtils.isBlank(sourceFlavorsOption)) {
+      logger.info("No source tags or flavors have been specified, not matching anything");
+      return createResult(mediaPackage, Action.CONTINUE);
+    }
+
+    // Select the source flavors
+    for (String flavor : asList(sourceFlavorsOption)) {
+      try {
+        elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
+      } catch (IllegalArgumentException e) {
+        throw new WorkflowOperationException("Source flavor '" + flavor + "' is malformed");
+      }
+    }
+
+    // Support legacy "source-flavor" option
+    if (StringUtils.isNotBlank(sourceFlavorOption)) {
+      String flavor = StringUtils.trim(sourceFlavorOption);
+      try {
+        elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
+      } catch (IllegalArgumentException e) {
+        throw new WorkflowOperationException("Source flavor '" + flavor + "' is malformed");
+      }
+    }
+
+    // Select the source tags
+    for (String tag : asList(sourceTagsOption)) {
+      elementSelector.addTag(tag);
+    }
 
     // Find the encoding profile
     EncodingProfile profile = composerService.getProfile(encodingProfileName);
     if (profile == null)
       throw new IllegalStateException("Encoding profile '" + encodingProfileName + "' was not found");
 
-    List<String> sourceTagSet = asList(sourceTags);
-
-    // Select the tracks based on source flavors and tags
+    // Select the tracks based on source flavors and tags and skip those that don't have video
     Set<Track> videoTracks = new HashSet<Track>();
-    for (Track track : mediaPackage.getTracksByTags(sourceTagSet)) {
-      if (sourceVideoFlavor == null
-              || (track.getFlavor() != null && sourceVideoFlavor.equals(track.getFlavor().toString()))) {
+    for (Track track : elementSelector.select(mediaPackage, true)) {
+      if (sourceFlavorsOption == null
+              || (track.getFlavor() != null && sourceFlavorsOption.equals(track.getFlavor().toString()))) {
         if (track.hasVideo()) {
           videoTracks.add(track);
         }
@@ -173,7 +206,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
     if (videoTracks.size() == 0) {
       logger.debug("Mediapackage {} has no suitable tracks to extract images based on tags {} and flavor {}",
-              new Object[] { mediaPackage, sourceTags, sourceVideoFlavor });
+              new Object[] { mediaPackage, sourceTagsOption, sourceFlavorsOption });
       return createResult(mediaPackage, Action.CONTINUE);
     }
 
@@ -212,10 +245,18 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
       if (composedImage == null)
         throw new IllegalStateException("Composer service did not return an image");
 
-      // Add the flavor, either from the operation configuration or from the composer
-      if (targetImageFlavor != null)
-        composedImage.setFlavor(MediaPackageElementFlavor.parseFlavor(targetImageFlavor));
-      logger.debug("image has flavor '{}'", composedImage.getFlavor());
+      // Adjust the target flavor. Make sure to account for partial updates
+      if (targetImageFlavor != null) {
+        MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(targetImageFlavor);
+        String flavorType = targetFlavor.getType();
+        String flavorSubtype = targetFlavor.getSubtype();
+        if ("*".equals(flavorType))
+          flavorType = t.getFlavor().getType();
+        if ("*".equals(flavorSubtype))
+          flavorSubtype = t.getFlavor().getSubtype();
+        composedImage.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
+        logger.debug("Resulting image has flavor '{}'", composedImage.getFlavor());
+      }
 
       // Set the mimetype
       if (profile.getMimeType() != null)
