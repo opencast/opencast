@@ -18,6 +18,7 @@ package org.opencastproject.feed.impl;
 
 import org.opencastproject.feed.api.Feed.Type;
 import org.opencastproject.feed.api.FeedGenerator;
+import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.impl.solr.Schema;
 
@@ -66,7 +67,9 @@ public class AggregationFeedService extends AbstractFeedService implements FeedG
    */
   protected SearchResult loadFeedData(Type type, String[] query, int limit, int offset) {
     try {
-      return searchService.getByQuery(solrQuery, limit, offset);
+      SearchQuery q = createBaseQuery(type, limit, offset);
+      q.withQuery(solrQuery);
+      return searchService.getByQuery(q);
     } catch (Exception e) {
       logger.error("Cannot retrieve result for aggregated feed", e);
       return null;
