@@ -18,21 +18,20 @@ package org.opencastproject.feed.impl;
 
 import org.opencastproject.feed.api.Feed.Type;
 import org.opencastproject.feed.api.FeedGenerator;
-import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchResult;
-import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.search.api.MediaSegment;
 import org.opencastproject.search.api.MediaSegmentImpl;
+import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResult;
+import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchResultItemImpl;
 
-import java.util.Properties;
 import java.util.Date;
-
+import java.util.Properties;
 
 /**
  * This feed generator implements a feed for series. The series argument is taken from the first url parameter after the
@@ -58,43 +57,30 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
     // Build the series id, first parameter is the selector. Note that if the series identifier
     // contained slashes (e. g. in the case of a handle or doi), we need to reassemble the
     // identifier
-    StringBuffer id = new StringBuffer();
+    StringBuffer seriesId = new StringBuffer();
     int idparts = query.length - 1;
     if (idparts < 1)
       return false;
     for (int i = 1; i <= idparts; i++) {
-      if (id.length() > 0)
-        id.append("/");
-      id.append(query[i]);
+      if (seriesId.length() > 0)
+        seriesId.append("/");
+      seriesId.append(query[i]);
     }
+
+    // Remember the series id
+    series.set(seriesId.toString());
 
     try {
       // To check if we can accept the query it is enough to query for just one result
-      SearchQuery q = new SearchQuery();
-      q.includeEpisodes(true);
-      q.includeSeries(true);
-      q.id(id.toString());
-      q.withLimit(size);
-      q.withCreationDateSort(true);
-      SearchResult result = searchService.getByQuery(q);
-      if (result != null && result.size() > 0) {
-        series.set(id.toString());
+      // Check the series service to see if the series exists
+      // but has not yet had anything published from it
+      SearchResult result = findSeries(seriesId.toString());
+      if (result != null)
         seriesData.set(result);
-        return true;
-      } else {
-        // Check the series service to see if the series exists
-        // but has not yet had anything published from it
-        result = findSeries(id.toString());
-        if (result != null && result.size() > 0) {
-          series.set(id.toString());
-          seriesData.set(result);
-          return true;
-        }
-      }
+      return result != null && result.size() > 0;
     } catch (Exception e) {
       return false;
     }
-    return false;
   }
 
   /**
@@ -137,7 +123,11 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
    *      java.lang.String[], int, int)
    */
   protected SearchResult loadFeedData(Type type, String[] query, int limit, int offset) {
-    return seriesData.get();
+    SearchQuery q = createBaseQuery(type, limit, offset);
+    q.includeEpisodes(true);
+    q.includeSeries(false);
+    q.partOf(series.get());
+    return searchService.getByQuery(q);
   }
 
   /**
@@ -151,21 +141,20 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
     // Clear the selector, since super.accept() relies on the fact that it's not set
     selector = null;
   }
-  
+
   /**
-   * Find if a series exists in the seriesService and return it's dublinCore as a 
-   * search result. This call should be used when searchService returns null as a
-   * series may exist but not have had any episodes yet published.
+   * Find if a series exists in the seriesService and return it's dublinCore as a search result. This call should be
+   * used when searchService returns null as a series may exist but not have had any episodes yet published.
    * 
    * @param id
    *          the series to lookup
-   * @return search result, null if series not found 
+   * @return search result, null if series not found
    */
   private SearchResult findSeries(String id) {
     try {
       final DublinCoreCatalog seriesDublinCore = seriesService.getSeries(id);
       SearchResultImpl result = new SearchResultImpl();
-      
+
       // Response either finds the one series or nothing at all
       result.setLimit(1);
       result.setOffset(0);
@@ -329,7 +318,6 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
           return new MediaSegmentImpl[0];
         }
       });
-
 
       result.addItem(item);
       return result;
