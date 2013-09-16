@@ -184,7 +184,7 @@ Opencast.Initialize = (function ()
                     Opencast.Player.doToggleMute();
                 }
                 if (event.which === KEY_0 ||
-                    event.which === KEY_0 ||
+                    event.which === KEY_1 ||
                     event.which === KEY_2 ||
                     event.which === KEY_3 ||
                     event.which === KEY_4 ||
