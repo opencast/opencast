@@ -696,7 +696,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   protected Job runWorkflow(WorkflowInstance workflow) throws WorkflowException, UnauthorizedException {
     if (!INSTANTIATED.equals(workflow.getState())) {
       if (RUNNING.equals(workflow.getState())) {
-        logger.info("Ignoring to start {}, it is already in RUNNING state", workflow);
+        logger.debug("Not starting workflow {}, it is already in running state", workflow);
         return null;
       }
       throw new IllegalStateException("Cannot start a workflow in state '" + workflow.getState() + "'");
@@ -707,7 +707,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
             .withMediaPackage(workflow.getMediaPackage().getIdentifier().toString()).withState(RUNNING)
             .withState(PAUSED).withState(FAILING));
     if (workflowInstances.size() > 0) {
-      logger.info("Delay to start {}, another workflow with same media package id is still active", workflow);
+      logger.info("Delaying start of workflow {}, another workflow with same media package id is still running",
+              workflow);
       return null;
     }
 
@@ -724,6 +725,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       throw new IllegalStateException("Current operation expected to be first");
 
     try {
+      logger.info("Scheduling workflow {} for execution", workflow.getId());
       Job job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
               Arrays.asList(Long.toString(workflow.getId())), null, false, null);
       operation.setId(job.getId());
