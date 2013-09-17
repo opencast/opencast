@@ -100,6 +100,9 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   public static final String WORKFLOW_DEFINITION_ID_KEY = "org.opencastproject.workflow.definition";
 
   /** The schedule workflow operation identifier */
+  public static final String CAPTURE_OPERATION_ID = "capture";
+
+  /** The schedule workflow operation identifier */
   public static final String SCHEDULE_OPERATION_ID = "schedule";
 
   /** The workflow operation property that stores the event start time, as milliseconds since 1970 */
@@ -311,15 +314,18 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   protected void updateWorkflow(DublinCoreCatalog event, Date startDate, Date endDate, Map<String, String> wfProperties)
           throws SchedulerException, NotFoundException, WorkflowException, UnauthorizedException {
     WorkflowInstance workflow = workflowService.getWorkflowById(getEventIdentifier(event));
-    WorkflowOperationInstance scheduleOperation = workflow.getCurrentOperation();
+    WorkflowOperationInstance operation = workflow.getCurrentOperation();
+    String operationId = operation.getTemplate();
 
-    // if the workflow is not in the hold state with 'schedule' as the current operation, we can't update the event
-    if (!WorkflowInstance.WorkflowState.PAUSED.equals(workflow.getState())) {
-      throw new SchedulerException("The workflow is not in the paused state, so it can not be updated");
+    // if the workflow is not in a hold state or in any of 'schedule' or 'capture' as the current operation, we can't
+    // update the event
+    if (!SCHEDULE_OPERATION_ID.equals(operationId) && !CAPTURE_OPERATION_ID.equals(operationId)) {
+      boolean isPaused = WorkflowInstance.WorkflowState.PAUSED.equals(workflow.getState());
+      boolean isInstantiated = WorkflowInstance.WorkflowState.INSTANTIATED.equals(workflow.getState());
+      if (!isPaused && !isInstantiated)
+        throw new SchedulerException("Workflow " + workflow + " is not in the paused state, so it can not be updated");
     }
-    if (!SCHEDULE_OPERATION_ID.equals(scheduleOperation.getTemplate())) {
-      throw new SchedulerException("The current worflow operation is not 'schedule', so it can not be updated");
-    }
+
     MediaPackage mediapackage = workflow.getMediaPackage();
 
     // removes old values
@@ -346,10 +352,9 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     mediapackage.setDuration(endDate.getTime() - startDate.getTime());
 
     // Update the properties
-    scheduleOperation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_START, Long.toString(startDate.getTime()));
-    scheduleOperation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_STOP, Long.toString(endDate.getTime()));
-    scheduleOperation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_LOCATION,
-            event.getFirst(DublinCore.PROPERTY_SPATIAL));
+    operation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_START, Long.toString(startDate.getTime()));
+    operation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_STOP, Long.toString(endDate.getTime()));
+    operation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_LOCATION, event.getFirst(DublinCore.PROPERTY_SPATIAL));
     // Set the location in the workflow as well, so that it shows up in the UI properly.
     workflow.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_LOCATION, event.getFirst(DublinCore.PROPERTY_SPATIAL));
 
