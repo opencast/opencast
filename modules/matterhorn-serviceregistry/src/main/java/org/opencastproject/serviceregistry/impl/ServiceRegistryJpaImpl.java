@@ -1861,7 +1861,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         String jobXml = JobParser.toXml(jpaJob);
         List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
         params.add(new BasicNameValuePair("job", jobXml));
-        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params);
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
         post.setEntity(entity);
       } catch (IOException e) {
         logger.warn("Job parsing error on job {}", job, e);
