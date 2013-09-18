@@ -15,6 +15,7 @@
  */
 package org.opencastproject.scheduler.remote;
 
+import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 
@@ -28,20 +29,41 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
+import org.opencastproject.util.doc.rest.RestService;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
+import javax.ws.rs.Path;
+
 /**
- * A proxy to a remote scheduler service.
+ * A proxy to a remote series service.
  */
+@Path("/")
+@RestService(name = "schedulerservice", title = "Scheduler Service Remote", abstractText = "Scheduler service manages events (creates new, updates already existing and removes events).", notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+        "If the service is down or not working it will return a status 503, this means the the underlying service is "
+                + "not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
+                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerService {
 
   private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceRemoteImpl.class);
@@ -53,7 +75,50 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   @Override
   public Long addEvent(DublinCoreCatalog eventCatalog, Map<String, String> wfProperties) throws SchedulerException,
           UnauthorizedException {
-    throw new UnsupportedOperationException();
+    HttpPost post = new HttpPost("/");
+    logger.debug("Start adding a new event {} through remote Schedule Service",
+            eventCatalog.get(DublinCoreCatalog.PROPERTY_IDENTIFIER));
+
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("dublincore", eventCatalog.toXmlString()));
+
+      String wfPropertiesString = "";
+      for (Map.Entry<String, String> entry : wfProperties.entrySet())
+        wfPropertiesString += entry.getKey() + "=" + entry.getValue() + "\n";
+
+      // Add an empty agentparameters as it is required by the Rest Endpoint
+      params.add(new BasicNameValuePair("agentparameters", "remote.scheduler.empty.parameter"));
+      params.add(new BasicNameValuePair("wfproperties", wfPropertiesString));
+
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to assemble a remote scheduler request for adding an event " + eventCatalog,
+              e);
+    }
+
+    HttpResponse response = getResponse(post, SC_CREATED);
+    try {
+      if (response != null && SC_CREATED == response.getStatusLine().getStatusCode()) {
+        Header header = response.getFirstHeader("Location");
+        if (header != null) {
+          String idString = FilenameUtils.getBaseName(header.getValue());
+          if (StringUtils.isNotEmpty(idString)) {
+            Long id = Long.parseLong(idString);
+            logger.info("Successfully added event {} to the scheduler service with id {}", eventCatalog, id);
+            return id;
+          }
+        }
+        throw new SchedulerException("Event " + eventCatalog
+                + " added to the scheduler service but got not event id in response.");
+      } else {
+        throw new SchedulerException("Unable to add event " + eventCatalog + " to the scheduler service");
+      }
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to add event " + eventCatalog + " to the scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
   }
 
   @Override
@@ -65,18 +130,115 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   @Override
   public void updateCaptureAgentMetadata(Properties configuration, Tuple<Long, DublinCoreCatalog>... events)
           throws NotFoundException, SchedulerException {
-    throw new UnsupportedOperationException();
+    logger.debug("Start updating {} events with following capture agent metadata: {}", events.length, configuration);
+    for (Tuple<Long, DublinCoreCatalog> event : events) {
+      final long eventId = event.getA();
+      final DublinCoreCatalog eventCatalog = event.getB();
+
+      logger.debug("Start updating event {} with capture agent metadata", eventId);
+
+      String propertiesString = "";
+      for (Entry<Object, Object> entry : configuration.entrySet())
+        propertiesString += (String) entry.getKey() + "=" + (String) entry.getValue() + "\n";
+
+      HttpPut put = new HttpPut("/" + eventId);
+
+      try {
+        List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+        params.add(new BasicNameValuePair("dublincore", eventCatalog.toXmlString()));
+        params.add(new BasicNameValuePair("agentproperties", propertiesString));
+
+        put.setEntity(new UrlEncodedFormEntity(params));
+      } catch (Exception e) {
+        throw new SchedulerException("Unable to assemble a remote scheduler request for adding an event "
+                + eventCatalog, e);
+      }
+
+      HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND);
+      try {
+        if (response != null) {
+          if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+            logger.warn("Event {} was not found by the scheduler service", eventId);
+          } else if (SC_OK == response.getStatusLine().getStatusCode()) {
+            logger.info("Event {} successfully updated with capture agent metadata.", eventId);
+          } else {
+            throw new SchedulerException("Unexpected status code " + response.getStatusLine());
+          }
+          return;
+        }
+      } catch (Exception e) {
+        throw new SchedulerException("Unable to update event " + eventId + " to the scheduler service: " + e);
+      } finally {
+        closeConnection(response);
+      }
+      throw new SchedulerException("Unable to update  event " + eventId);
+    }
   }
 
   @Override
   public void updateEvent(long eventId, DublinCoreCatalog eventCatalog, Map<String, String> wfProperties)
           throws NotFoundException, SchedulerException, UnauthorizedException {
-    throw new UnsupportedOperationException();
+    logger.debug("Start updating event {}.", eventId);
+    HttpPut put = new HttpPut("/" + eventId);
+
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+
+      if (eventCatalog != null)
+        params.add(new BasicNameValuePair("dublincore", eventCatalog.toXmlString()));
+
+      String wfPropertiesString = "";
+      for (Map.Entry<String, String> entry : wfProperties.entrySet())
+        wfPropertiesString += entry.getKey() + "=" + entry.getValue() + "\n";
+
+      params.add(new BasicNameValuePair("wfproperties", wfPropertiesString));
+
+      put.setEntity(new UrlEncodedFormEntity(params));
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to assemble a remote scheduler request for updating event " + eventCatalog,
+              e);
+    }
+
+    HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND);
+    try {
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          logger.warn("Event {} was not found by the scheduler service", eventId);
+        } else if (SC_OK == response.getStatusLine().getStatusCode()) {
+          logger.info("Event {} successfully updated with capture agent metadata.", eventId);
+        } else {
+          throw new SchedulerException("Unexpected status code " + response.getStatusLine());
+        }
+        return;
+      }
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to update event " + eventId + " to the scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new SchedulerException("Unable to update  event " + eventId);
   }
 
   @Override
   public void removeEvent(long eventId) throws SchedulerException, NotFoundException, UnauthorizedException {
-    throw new UnsupportedOperationException();
+    logger.debug("Start removing event {} from scheduling service.", eventId);
+    HttpDelete delete = new HttpDelete("/" + eventId);
+
+    HttpResponse response = getResponse(delete, SC_OK, SC_NOT_FOUND);
+    try {
+      if (response != null && SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        logger.warn("Event {} was not found by the scheduler service", eventId);
+        return;
+      } else if (response != null && SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        logger.info("Event {} removed from scheduling service.", eventId);
+        return;
+      }
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to remove event " + eventId + " from the scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new SchedulerException("Unable to remove  event " + eventId);
   }
 
   @Override

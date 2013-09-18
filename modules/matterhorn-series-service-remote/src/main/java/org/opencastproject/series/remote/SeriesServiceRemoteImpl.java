@@ -20,6 +20,7 @@ import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_OK;
 
+import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
@@ -80,33 +81,35 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
 
   @Override
   public DublinCoreCatalog updateSeries(DublinCoreCatalog dc) throws SeriesException, UnauthorizedException {
+    String seriesId = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+
     HttpPost post = new HttpPost("/");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("series", dc.toXmlString()));
       post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
-      throw new SeriesException("Unable to assemble a remote series request for updating a series " + dc, e);
+      throw new SeriesException("Unable to assemble a remote series request for updating series " + seriesId, e);
     }
 
     HttpResponse response = getResponse(post, SC_NO_CONTENT, SC_CREATED);
     try {
       if (response != null) {
         if (SC_NO_CONTENT == response.getStatusLine().getStatusCode()) {
-          logger.info("Successfully updated series {} to the series service", dc);
+          logger.info("Successfully updated series {} in the series service", seriesId);
           return null;
         } else {
           DublinCoreCatalogImpl catalogImpl = new DublinCoreCatalogImpl(response.getEntity().getContent());
-          logger.info("Successfully created series {} to the series service", catalogImpl);
+          logger.info("Successfully created series {} in the series service", seriesId);
           return catalogImpl;
         }
       }
     } catch (Exception e) {
-      throw new SeriesException("Unable to update series " + dc + " using the remote series services: " + e);
+      throw new SeriesException("Unable to update series " + seriesId + " using the remote series services: " + e);
     } finally {
       closeConnection(response);
     }
-    throw new SeriesException("Unable to update series " + dc + " using the remote series services");
+    throw new SeriesException("Unable to update series " + seriesId + " using the remote series services");
   }
 
   @Override
@@ -184,10 +187,10 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     try {
       if (response != null) {
         if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-          throw new NotFoundException("Series " + seriesID + " not found on remote series index!");
+          throw new NotFoundException("Series " + seriesID + " not found in remote series index!");
         } else {
           DublinCoreCatalog dublinCoreCatalog = new DublinCoreCatalogImpl(response.getEntity().getContent());
-          logger.info("Successfully get series {} from the remote series index", seriesID);
+          logger.debug("Successfully received series {} from the remote series index", seriesID);
           return dublinCoreCatalog;
         }
       }
