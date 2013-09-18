@@ -23,7 +23,7 @@ audio/x-aifc		aifc
 audio/x-aiff            aif aiff
 audio/x-mpeg		mpeg mpg
 audio/x-wav             wav
-auido/mpeg              mp3
+audio/mpeg              mp3
 video/mpeg		mpeg mpg mpe
 video/quicktime		qt mov
 video/x-msvideo		avi
