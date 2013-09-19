@@ -566,7 +566,7 @@ public class SolrRequester {
       sb.append(Schema.ID);
       sb.append(":");
       sb.append(cleanSolrIdRequest);
-      if (q.isIncludeEpisodes()) {
+      if (q.isIncludeEpisodes() && q.isIncludeSeries()) {
         sb.append(" OR ");
         sb.append(Schema.DC_IS_PART_OF);
         sb.append(":");
