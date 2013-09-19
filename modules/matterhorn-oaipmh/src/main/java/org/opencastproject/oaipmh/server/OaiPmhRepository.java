@@ -188,7 +188,7 @@ public abstract class OaiPmhRepository {
             @Override
             public XmlGen some(final MetadataProvider metadataProvider) {
               // query search index with identifier
-              SearchResult res = getSearchService().getByQuery(new SearchQuery().id(p.getIdentifier().get()));
+              SearchResult res = getSearchService().getByQuery(new SearchQuery().withId(p.getIdentifier().get()));
               SearchResultItem[] items = res.getItems();
               switch (items.length) {
                 case 0:
@@ -244,7 +244,7 @@ public abstract class OaiPmhRepository {
 
   private XmlGen handleListMetadataFormats(final Params p) {
     if (p.getIdentifier().isSome()) {
-      SearchResult res = getSearchService().getByQuery(new SearchQuery().id(p.getIdentifier().get()));
+      SearchResult res = getSearchService().getByQuery(new SearchQuery().withId(p.getIdentifier().get()));
       if (res.getItems().length != 1)
         return createIdDoesNotExistResponse(p.getIdentifier().get());
     }

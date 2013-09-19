@@ -136,7 +136,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     try {
       List<Job> jobs = new ArrayList<Job>();
 
-      SearchQuery query = new SearchQuery().id(mediaPackage.getIdentifier().toString());
+      SearchQuery query = new SearchQuery().withId(mediaPackage.getIdentifier().toString());
       SearchResult result = searchService.getByQuery(query);
       if (result.size() == 0) {
         logger.info("The search service doesn't know mediapackage {}", mediaPackage);
