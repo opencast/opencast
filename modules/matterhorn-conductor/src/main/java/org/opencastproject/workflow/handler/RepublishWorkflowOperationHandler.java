@@ -133,7 +133,7 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
     // If merge, load current mediapackage from search service
     MediaPackage publishedMediaPackage = null;
     if (merge || onlyExisting) {
-      SearchQuery query = new SearchQuery().id(mId.toString());
+      SearchQuery query = new SearchQuery().withId(mId.toString());
       SearchResult result = searchService.getByQuery(query);
       if (result.size() == 0) {
         logger.info("The search service doesn't know mediapackage {}", mId);

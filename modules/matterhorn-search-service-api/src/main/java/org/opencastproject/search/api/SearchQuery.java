@@ -27,7 +27,7 @@ public class SearchQuery {
   protected boolean includeSeries = false;
   protected boolean sortByCreationDate = false;
   protected boolean sortByPublicationDate = false;
-  protected String episodeId;
+  protected String id;
   protected String seriesId;
   protected String text;
   protected String query;
@@ -36,26 +36,6 @@ public class SearchQuery {
   protected String[] tags = null;
   protected MediaPackageElementFlavor[] flavors = null;
   protected Date deletedDate = null;
-  protected String partOf;
-  protected String id;
-
-  public SearchQuery id(String id) {
-    this.id = id;
-    return this;
-  }
-
-  public String id() {
-    return id;
-  }
-
-  public SearchQuery partOf(String partOf) {
-    this.partOf = partOf;
-    return this;
-  }
-
-  public String partOf() {
-    return partOf;
-  }
 
   public SearchQuery includeEpisodes(boolean includeEpisode) {
     this.includeEpisode = includeEpisode;
@@ -67,8 +47,8 @@ public class SearchQuery {
     return this;
   }
 
-  public SearchQuery episodeId(String id) {
-    this.episodeId = id;
+  public SearchQuery withId(String id) {
+    this.id = id;
     return this;
   }
 
@@ -92,13 +72,13 @@ public class SearchQuery {
     return this;
   }
 
-  public SearchQuery seriesId(String seriesId) {
+  public SearchQuery withSeriesId(String seriesId) {
     this.seriesId = seriesId;
     return this;
   }
 
-  public String episodeId() {
-    return episodeId;
+  public String getId() {
+    return id;
   }
 
   public int getLimit() {
@@ -117,7 +97,7 @@ public class SearchQuery {
     return text;
   }
 
-  public String seriesId() {
+  public String getSeriesId() {
     return seriesId;
   }
 

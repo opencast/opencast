@@ -123,51 +123,16 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   @GET
   @Path("series.{format:xml|json}")
   @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-  @RestQuery(
-      name = "series",
-      description = "Search for series matching the query parameters.",
-      pathParameters = {
-        @RestParameter(
-          description = "The output format (json or xml) of the response body.",
-          isRequired = true, name = "format", type = RestParameter.Type.STRING)
-      },
-      restParameters = {
-        @RestParameter(
-          description = "The series ID. If the additional boolean parameter \"episodes\" is \"true\", "
-              + "the result set will include this series episodes.",
-          isRequired = false, name = "id", type = RestParameter.Type.STRING),
-        @RestParameter(
-          description = "Any series that matches this free-text query. If the additional boolean parameter \"episodes\" is \"true\", "
-              + "the result set will include this series episodes.",
-          isRequired = false, name = "q", type = RestParameter.Type.STRING),
-        @RestParameter(
-          description = "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".",
-          defaultValue = "false", isRequired = false, name = "episodes",
-          type = RestParameter.Type.STRING),
-        @RestParameter(
-          description = "Whether to include this series information itself. This can be used in combination with \"id\" or \"q\".",
-          defaultValue = "true", isRequired = false, name = "series",
-          type = RestParameter.Type.STRING),
-        @RestParameter(
-          description = "The maximum number of items to return per page.",
-          defaultValue = "20", isRequired = false, name = "limit",
-          type = RestParameter.Type.STRING),
-        @RestParameter(
-          description = "The page number.",
-          defaultValue = "0", isRequired = false, name = "offset",
-          type = RestParameter.Type.STRING),
-        @RestParameter(
-          description = "Whether this is an administrative query",
-          defaultValue = "false", isRequired = false, name = "admin",
-          type = RestParameter.Type.BOOLEAN)
-      },
-      reponses = {
-        @RestResponse(
-          description = "The request was processed succesfully.",
-          responseCode = HttpServletResponse.SC_OK)
-      },
-      returnDescription = "The search results, expressed as xml or json."
-  )
+  @RestQuery(name = "series", description = "Search for series matching the query parameters.", pathParameters = { @RestParameter(description = "The output format (json or xml) of the response body.", isRequired = true, name = "format", type = RestParameter.Type.STRING) }, restParameters = {
+          @RestParameter(description = "The series ID. If the additional boolean parameter \"episodes\" is \"true\", "
+                  + "the result set will include this series episodes.", isRequired = false, name = "id", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Any series that matches this free-text query. If the additional boolean parameter \"episodes\" is \"true\", "
+                  + "the result set will include this series episodes.", isRequired = false, name = "q", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "false", description = "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".", isRequired = false, name = "episodes", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "true", description = "Whether to include this series information itself. This can be used in combination with \"id\" or \"q\".", isRequired = false, name = "series", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "20", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.BOOLEAN) }, reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json.")
   public Response getEpisodeAndSeriesById(@QueryParam("id") String id, @QueryParam("q") String text,
           @QueryParam("episodes") boolean includeEpisodes, @QueryParam("series") String includeSeries,
           @QueryParam("limit") int limit, @QueryParam("offset") int offset, @QueryParam("admin") boolean admin,
@@ -175,30 +140,16 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
     SearchQuery query = new SearchQuery();
 
+    // If id is specified, do a search based on id
+    if (StringUtils.isNotBlank(id))
+      query.withId(id);
+
     // Include series data in the results?
-    if (includeSeries == null || !"false".equals(includeSeries.toLowerCase())) {
-      query.includeSeries(true);
+    query.includeSeries(includeSeries == null || !"false".equals(includeSeries.toLowerCase()));
 
-      // If id is specified, do a search based on id
-      if (StringUtils.isNotBlank(id))
-        query.seriesId(id);
-    }
+    // Include episodes in the result?
+    query.includeEpisodes(includeEpisodes);
 
-    if (includeEpisodes) {
-      // Include episodes in the result?
-      query.includeEpisodes(true);
-
-      /**
-       * The documentation for series states:
-       * id: …If the additional boolean parameter "episodes" is "true", the
-       *     result set will include this series episodes
-       * So, if episodes are enabled, we also set id as partOf id:
-       **/
-      if (StringUtils.isNotBlank(id))
-        query.partOf(id);
-    } else {
-      query.includeEpisodes(false);
-    }
     // Include free-text search?
     if (StringUtils.isNotBlank(text))
       query.withText(text);
@@ -229,49 +180,21 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   @GET
   @Path("episode.{format:xml|json}")
   @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-  @RestQuery(
-      name = "episodes",
-      description = "Search for episodes matching the query parameters.",
-      pathParameters = {
-        @RestParameter(
-          description = "The output format (json or xml) of the response body.",
-          isRequired = true, name = "format", type = RestParameter.Type.STRING)
-      },
-      restParameters = {
-        @RestParameter(
-          description = "The ID of the single episode to be returned, if it exists.",
-          isRequired = false, name = "id", type = RestParameter.Type.STRING),
-        @RestParameter(
-          description = "Any episode that matches this free-text query.",
-          isRequired = false, name = "q", type = RestParameter.Type.STRING),
-        @RestParameter(
-          description = "Any episode that belongs to specified series id.",
-          isRequired = false, name = "sid", type = RestParameter.Type.STRING),
-        @RestParameter(
-          description = "The maximum number of items to return per page.",
-          defaultValue = "20", isRequired = false, name = "limit",
-          type = RestParameter.Type.STRING),
-        @RestParameter(
-          description = "The page number.", 
-          defaultValue = "0", isRequired = false, name = "offset",
-          type = RestParameter.Type.STRING),
-        @RestParameter(
-            description = "Whether this is an administrative query", 
-            defaultValue = "false", isRequired = false, name = "admin",
-            type = RestParameter.Type.BOOLEAN)
-      },
-      reponses = {
-        @RestResponse(
-          description = "The request was processed succesfully.",
-          responseCode = HttpServletResponse.SC_OK)
-      },
-      returnDescription = "The search results, expressed as xml or json."
-  )
+  @RestQuery(name = "episodes", description = "Search for episodes matching the query parameters.", pathParameters = { @RestParameter(description = "The output format (json or xml) of the response body.", isRequired = true, name = "format", type = RestParameter.Type.STRING) }, restParameters = {
+          @RestParameter(description = "The ID of the single episode to be returned, if it exists.", isRequired = false, name = "id", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Any episode that matches this free-text query.", isRequired = false, name = "q", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Any episode that belongs to specified series id.", isRequired = false, name = "sid", type = RestParameter.Type.STRING),
+          // @RestParameter(defaultValue = "false", description =
+          // "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".",
+          // isRequired = false, name = "episodes", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "20", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.BOOLEAN) }, reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json.")
   public Response getEpisode(@QueryParam("id") String id, @QueryParam("q") String text,
           @QueryParam("sid") String seriesId, @QueryParam("tag") String[] tags, @QueryParam("flavor") String[] flavors,
           @QueryParam("limit") int limit, @QueryParam("offset") int offset, @QueryParam("admin") boolean admin,
           @PathParam("format") String format) throws SearchException, UnauthorizedException {
-
+    // CHECKSTYLE:ON
     // Prepare the flavors
     List<MediaPackageElementFlavor> flavorSet = new ArrayList<MediaPackageElementFlavor>();
     if (flavors != null) {
@@ -285,12 +208,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     SearchQuery search = new SearchQuery();
-    search.episodeId(id);
-    search.partOf(seriesId);
-    search.withElementFlavors(flavorSet.toArray(new MediaPackageElementFlavor[flavorSet.size()]));
-    search.withElementTags(tags);
-    search.withLimit(limit);
-    search.withOffset(offset);
+    search.withId(id).withSeriesId(seriesId)
+            .withElementFlavors(flavorSet.toArray(new MediaPackageElementFlavor[flavorSet.size()]))
+            .withElementTags(tags).withLimit(limit).withOffset(offset);
 
     if (StringUtils.isNotBlank(text)) {
       search.withText(text);

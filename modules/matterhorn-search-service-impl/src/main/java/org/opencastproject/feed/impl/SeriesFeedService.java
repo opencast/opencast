@@ -126,7 +126,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
     SearchQuery q = createBaseQuery(type, limit, offset);
     q.includeEpisodes(true);
     q.includeSeries(false);
-    q.partOf(series.get());
+    q.withSeriesId(series.get());
     return searchService.getByQuery(q);
   }
 

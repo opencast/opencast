@@ -557,89 +557,91 @@ public class SolrRequester {
     if (StringUtils.isNotBlank(q.getQuery()))
       sb.append(q.getQuery());
 
-    ArrayList<String> idRequests = new ArrayList<String>();
-    String solrIdRequest;
-
-    /* Check for general IDs */
-    solrIdRequest = StringUtils.trimToNull(q.id());
+    String solrIdRequest = StringUtils.trimToNull(q.getId());
     if (solrIdRequest != null) {
-      idRequests.add(Schema.ID + ':' + SolrUtils.clean(solrIdRequest));
-    }
-
-    /* Check for series by Id */
-    solrIdRequest = StringUtils.trimToNull(q.seriesId());
-    if (solrIdRequest != null) {
-      String request;
-      request = "(";
-      request += Schema.ID + ":" + SolrUtils.clean(solrIdRequest);
-      request += " AND ";
-      request += Schema.OC_MEDIATYPE + ":" + SearchResultItemType.Series;
-      request += ")";
-      idRequests.add(request);
-    }
-
-    /* Check if something is part of a series with a given Id */
-    solrIdRequest = StringUtils.trimToNull(q.partOf());
-    if (solrIdRequest != null) {
-      idRequests.add(Schema.DC_IS_PART_OF + ":" + SolrUtils.clean(solrIdRequest));
-    }
-
-    /* Check for episodes by Id */
-    solrIdRequest = StringUtils.trimToNull(q.episodeId());
-    if (solrIdRequest != null) {
-      String request;
-      request = "(";
-      request += Schema.ID + ":" + SolrUtils.clean(solrIdRequest);
-      request += " AND ";
-      request += Schema.OC_MEDIATYPE + ":" + SearchResultItemType.AudioVisual;
-      request += ")";
-      idRequests.add(request);
-    }
-
-    /* join the Id requests. Get all of them */
-    if (idRequests.size() > 0) {
+      String cleanSolrIdRequest = SolrUtils.clean(solrIdRequest);
       if (sb.length() > 0)
         sb.append(" AND ");
-      sb.append('(' + StringUtils.join(idRequests.toArray(), " OR ") + ')');
+      sb.append("(");
+      sb.append(Schema.ID);
+      sb.append(":");
+      sb.append(cleanSolrIdRequest);
+      if (q.isIncludeEpisodes() && q.isIncludeSeries()) {
+        sb.append(" OR ");
+        sb.append(Schema.DC_IS_PART_OF);
+        sb.append(":");
+        sb.append(cleanSolrIdRequest);
+      }
+      sb.append(")");
     }
 
-    /* Handle freetext search */
+    String solrSeriesIdRequest = StringUtils.trimToNull(q.getSeriesId());
+    if (solrSeriesIdRequest != null) {
+      String cleanSolrSeriesIdRequest = SolrUtils.clean(solrSeriesIdRequest);
+      if (sb.length() > 0) {
+        sb.append(" AND ");
+      }
+      sb.append("(");
+      sb.append(Schema.DC_IS_PART_OF);
+      sb.append(":");
+      sb.append(cleanSolrSeriesIdRequest);
+      sb.append(")");
+    }
+
     String solrTextRequest = StringUtils.trimToNull(q.getText());
     if (solrTextRequest != null) {
+      String cleanSolrTextRequest = SolrUtils.clean(q.getText());
+      if (StringUtils.isNotEmpty(cleanSolrTextRequest)) {
+        if (sb.length() > 0)
+          sb.append(" AND ");
+        sb.append("*:");
+        sb.append(boost(cleanSolrTextRequest));
+      }
+    }
+
+    if (q.getElementTags() != null && q.getElementTags().length > 0) {
       if (sb.length() > 0)
         sb.append(" AND ");
-      sb.append("*:" + boost(SolrUtils.clean(q.getText())));
-    }
-
-    /* Search for tags */
-    if (q.getElementTags() != null && q.getElementTags().length > 0) {
-      ArrayList<String> tags = new ArrayList<String>();
+      StringBuilder tagBuilder = new StringBuilder();
       for (int i = 0; i < q.getElementTags().length; i++) {
         String tag = SolrUtils.clean(q.getElementTags()[i]);
-        if (!StringUtils.isEmpty(tag)) {
-          tags.add(Schema.OC_ELEMENTTAGS + ":" + SolrUtils.clean(tag));
+        if (StringUtils.isEmpty(tag))
+          continue;
+        if (tagBuilder.length() == 0) {
+          tagBuilder.append("(");
+        } else {
+          tagBuilder.append(" OR ");
         }
+        tagBuilder.append(Schema.OC_ELEMENTTAGS);
+        tagBuilder.append(":");
+        tagBuilder.append(tag);
       }
-      if (tags.size() > 0) {
-        if (sb.length() > 0)
-          sb.append(" AND ");
-        sb.append("(" + StringUtils.join(tags.toArray(), " OR ") + ')');
+      if (tagBuilder.length() > 0) {
+        tagBuilder.append(") ");
+        sb.append(tagBuilder);
       }
     }
 
-    /* Search for specific flavors */
     if (q.getElementFlavors() != null && q.getElementFlavors().length > 0) {
-      ArrayList<String> flavors = new ArrayList<String>();
+      if (sb.length() > 0)
+        sb.append(" AND ");
+      StringBuilder flavorBuilder = new StringBuilder();
       for (int i = 0; i < q.getElementFlavors().length; i++) {
         String flavor = SolrUtils.clean(q.getElementFlavors()[i].toString());
-        if (!StringUtils.isEmpty(flavor)) {
-          flavors.add(Schema.OC_ELEMENTFLAVORS + ':' + SolrUtils.clean(flavor));
+        if (StringUtils.isEmpty(flavor))
+          continue;
+        if (flavorBuilder.length() == 0) {
+          flavorBuilder.append("(");
+        } else {
+          flavorBuilder.append(" OR ");
         }
+        flavorBuilder.append(Schema.OC_ELEMENTFLAVORS);
+        flavorBuilder.append(":");
+        flavorBuilder.append(flavor);
       }
-      if (flavors.size() > 0) {
-        if (sb.length() > 0)
-          sb.append(" AND ");
-        sb.append("(" + StringUtils.join(flavors.toArray(), " OR ") + ')');
+      if (flavorBuilder.length() > 0) {
+        flavorBuilder.append(") ");
+        sb.append(flavorBuilder);
       }
     }
 
@@ -650,9 +652,8 @@ public class SolrRequester {
               + SolrUtils.serializeDateRange(option(q.getDeletedDate()), Option.<Date> none()));
     }
 
-    if (sb.length() == 0) {
+    if (sb.length() == 0)
       sb.append("*:*");
-    }
 
     if (applyPermissions) {
       sb.append(" AND ").append(Schema.OC_ORGANIZATION).append(":")
