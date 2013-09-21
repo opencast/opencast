@@ -176,17 +176,16 @@ public class CaptureAgentStateRestService {
   @Path("agents.{type:xml|json}")
   @RestQuery(name = "getKnownAgents", description = "Return all of the known capture agents on the system", pathParameters = { @RestParameter(description = "The Document type", isRequired = true, name = "type", type = Type.STRING) }, restParameters = {}, reponses = { @RestResponse(description = "An XML representation of the agent capabilities", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response getKnownAgents(@PathParam("type") String type) {
+    if (service == null)
+      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
+
     logger.debug("Returning list of known agents...");
     LinkedList<AgentStateUpdate> update = new LinkedList<AgentStateUpdate>();
-    if (service != null) {
-      Map<String, Agent> data = service.getKnownAgents();
-      logger.debug("Agents: {}", data);
-      // Run through and build a map of updates (rather than states)
-      for (Entry<String, Agent> e : data.entrySet()) {
-        update.add(new AgentStateUpdate(e.getValue()));
-      }
-    } else {
-      logger.info("Service was null for getKnownAgents");
+    Map<String, Agent> data = service.getKnownAgents();
+    logger.debug("Agents: {}", data);
+    // Run through and build a map of updates (rather than states)
+    for (Entry<String, Agent> e : data.entrySet()) {
+      update.add(new AgentStateUpdate(e.getValue()));
     }
 
     if ("json".equals(type)) {
