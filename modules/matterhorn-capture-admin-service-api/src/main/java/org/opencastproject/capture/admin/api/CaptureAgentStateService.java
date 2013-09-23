@@ -15,35 +15,49 @@
  */
 package org.opencastproject.capture.admin.api;
 
+import org.opencastproject.util.NotFoundException;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 /**
- * API for the capture-admin service (MH-1336, MH-1394, MH-1457, MH-1475 and MH-1476).
+ * API for the capture-admin service.
  */
 public interface CaptureAgentStateService {
-
-  /** Return value for successful operations */
-  int OK = 0;
-
-  /** Return value for methods where an non-existent agent is specified */
-  int NO_SUCH_AGENT = -1;
-
-  /** Return value for methods where an incorrect parameter is specified */
-  int BAD_PARAMETER = -2;
 
   /** Defines the name of the key in the properties file which is used to define the list of sticky agents */
   String STICKY_AGENTS = "capture.admin.sticky.agents";
 
   /**
-   * Returns the last known state of a given agent.
+   * Returns an agent by its name
    * 
    * @param agentName
    *          The name of the agent.
-   * @return The agent with a value for both its last checkin time and its last known state.
+   * @return The agent
+   * @throws NotFoundException
+   *           if no agent with the given name has been found
    */
-  Agent getAgentState(String agentName);
+  Agent getAgent(String agentName) throws NotFoundException;
+
+  /**
+   * Updates an agent
+   * 
+   * @param agent
+   *          the agent to update
+   */
+  void updateAgent(Agent agent);
+
+  /**
+   * Returns the last known agent state by its name
+   * 
+   * @param agentName
+   *          The name of the agent.
+   * @return The agent state
+   * @throws NotFoundException
+   *           if no agent with the given name has been found
+   */
+  String getAgentState(String agentName) throws NotFoundException;
 
   /**
    * Sets a given agent's state. Note that this will create the agent if it does not already exist. The state should be
@@ -55,18 +69,28 @@ public interface CaptureAgentStateService {
    *          The current state of the agent.
    * @see AgentState
    */
-  int setAgentState(String agentName, String state);
+  boolean setAgentState(String agentName, String state);
 
-  boolean setAgentUrl(String agentName, String agentUrl);
+  /**
+   * 
+   * @param agentName
+   *          The name of the agent.
+   * @param agentUrl
+   *          The url of the agent.
+   * @throws NotFoundException
+   *           if no agent with the given name has been found
+   */
+  boolean setAgentUrl(String agentName, String agentUrl) throws NotFoundException;
 
   /**
    * Remove an agent from the system, if the agent exists.
    * 
    * @param agentName
    *          The name of the agent.
-   * 
+   * @throws NotFoundException
+   *           if no agent with the given name has been found
    */
-  int removeAgent(String agentName);
+  void removeAgent(String agentName) throws NotFoundException;
 
   /**
    * Returns the list of known agents that the current user is authorized to schedule.
@@ -79,15 +103,19 @@ public interface CaptureAgentStateService {
    * Returns the list of known agent capabilities.
    * 
    * @return A {@link java.util.Properties} of name-value capability pairs.
+   * @throws NotFoundException
+   *           if no agent with the given name has been found
    */
-  Properties getAgentCapabilities(String agentName);
+  Properties getAgentCapabilities(String agentName) throws NotFoundException;
 
   /**
    * Returns the list of known agent configurations.
    * 
    * @return A {@link java.util.Properties} of name-value configuration pairs.
+   * @throws NotFoundException
+   *           if no agent with the given name has been found
    */
-  Properties getAgentConfiguration(String agentName);
+  Properties getAgentConfiguration(String agentName) throws NotFoundException;
 
   /**
    * Sets the capabilities for the specified agent
@@ -96,7 +124,7 @@ public interface CaptureAgentStateService {
    * @param capabilities
    * @return One of the constants defined in this class
    */
-  int setAgentConfiguration(String agentName, Properties capabilities);
+  boolean setAgentConfiguration(String agentName, Properties capabilities);
 
   /**
    * Gets the state of a recording, if it exists.
@@ -106,8 +134,10 @@ public interface CaptureAgentStateService {
    * @return The state of the recording, or null if it does not exist. This should be defined from
    *         {@link org.opencastproject.capture.admin.api.RecordingState}.
    * @see RecordingState
+   * @throws NotFoundException
+   *           if the recording with the given id has not been found
    */
-  Recording getRecordingState(String id);
+  Recording getRecordingState(String id) throws NotFoundException;
 
   /**
    * Updates the state of a recording with the given state, if it exists.
@@ -126,8 +156,10 @@ public interface CaptureAgentStateService {
    * 
    * @param id
    *          The id of the recording to remove.
+   * @throws NotFoundException
+   *           if the recording with the given id has not been found
    */
-  boolean removeRecording(String id);
+  void removeRecording(String id) throws NotFoundException;
 
   /**
    * Gets the state of all recordings in the system.

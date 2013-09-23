@@ -16,6 +16,7 @@
 package org.opencastproject.capture.admin.endpoint;
 
 import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.capture.admin.api.AgentState;
 import org.opencastproject.capture.admin.api.AgentStateUpdate;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.capture.admin.api.Recording;
@@ -28,6 +29,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -87,6 +89,9 @@ public class CaptureAgentStateRestService {
     this.service = null;
   }
 
+  public CaptureAgentStateRestService() {
+  }
+
   @GET
   @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
   @Path("agents/{name}.{format:xml|json}")
@@ -102,20 +107,13 @@ public class CaptureAgentStateRestService {
     if (service == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
 
-    Agent ret = service.getAgentState(agentName);
-
-    if (ret != null) {
-      logger.debug("Returning agent state for {}", agentName);
-      if ("json".equals(format)) {
-        return Response.ok(new AgentStateUpdate(ret)).type(MediaType.APPLICATION_JSON).build();
-      } else {
-        return Response.ok(new AgentStateUpdate(ret)).type(MediaType.APPLICATION_XML).build();
-      }
+    Agent ret = service.getAgent(agentName);
+    logger.debug("Returning agent state for {}", agentName);
+    if ("json".equals(format)) {
+      return Response.ok(new AgentStateUpdate(ret)).type(MediaType.APPLICATION_JSON).build();
     } else {
-      logger.debug("No such agent name: {}", agentName);
-      throw new NotFoundException();
+      return Response.ok(new AgentStateUpdate(ret)).type(MediaType.APPLICATION_XML).build();
     }
-
   }
 
   @POST
@@ -135,30 +133,26 @@ public class CaptureAgentStateRestService {
     if (service == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
 
-    logger.debug("Agents URL: {}", address);
-
-    int result = service.setAgentState(agentName, state);
+    if (StringUtils.isBlank(state) || !AgentState.KNOWN_STATES.contains(state)) {
+      logger.debug("'{}' is not a valid state", state);
+      return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
+    }
 
     if (StringUtils.isEmpty(address))
       address = request.getRemoteHost();
 
-    if (!service.setAgentUrl(agentName, address))
-      throw new NotFoundException();
+    logger.debug("Agents URL: {}", address);
 
-    switch (result) {
-      case CaptureAgentStateService.OK:
-        logger.debug("{}'s state successfully set to {}", agentName, state);
-        return Response.ok(agentName + " set to " + state).build();
-      case CaptureAgentStateService.BAD_PARAMETER:
-        logger.debug("{} is not a valid state", state);
-        return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
-      case CaptureAgentStateService.NO_SUCH_AGENT:
-        logger.debug("The agent {} is not registered in the system");
-        throw new NotFoundException();
-      default:
-        logger.error("Unexpected server error in setAgent endpoint");
-        return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    boolean agentStateUpdated = service.setAgentState(agentName, state);
+    boolean agentUrlUpdated = service.setAgentUrl(agentName, address);
+
+    if (!agentStateUpdated && !agentUrlUpdated) {
+      logger.debug("{}'s state '{}' and url '{}' has not changed, nothing has been updated", new String[] { agentName,
+              state, address });
+      return Response.ok().build();
     }
+    logger.debug("{}'s state successfully set to {}", agentName, state);
+    return Response.ok(agentName + " set to " + state).build();
   }
 
   @DELETE
@@ -168,23 +162,13 @@ public class CaptureAgentStateRestService {
           @RestResponse(description = "{agentName} removed", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The agent {agentname} does not exist", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
   public Response removeAgent(@PathParam("name") String agentName) throws NotFoundException {
-    if (service == null) {
+    if (service == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
-    }
 
-    int result = service.removeAgent(agentName);
+    service.removeAgent(agentName);
 
-    switch (result) {
-      case CaptureAgentStateService.OK:
-        logger.debug("The agent {} was successfully removed", agentName);
-        return Response.ok(agentName + " removed").build();
-      case CaptureAgentStateService.NO_SUCH_AGENT:
-        logger.debug("The agent {} is not registered in the system", agentName);
-        throw new NotFoundException();
-      default:
-        logger.error("Unexpected server error in removeAgent endpoint");
-        return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).build();
-    }
+    logger.debug("The agent {} was successfully removed", agentName);
+    return Response.ok(agentName + " removed").build();
   }
 
   @GET
@@ -221,20 +205,14 @@ public class CaptureAgentStateRestService {
           @RestResponse(description = "The agent {name} does not exist in the system", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
   public Response getCapabilities(@PathParam("name") String agentName, @PathParam("type") String type)
           throws NotFoundException {
-    if (service == null) {
+    if (service == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
-    }
 
-    try {
-      PropertiesResponse r = new PropertiesResponse(service.getAgentCapabilities(agentName));
-      if ("json".equals(type)) {
-        return Response.ok(r).type(MediaType.APPLICATION_JSON).build();
-      } else {
-        return Response.ok(r).type(MediaType.TEXT_XML).build();
-      }
-    } catch (NullPointerException e) {
-      logger.debug("The agent {} is not registered in the system", agentName);
-      throw new NotFoundException();
+    PropertiesResponse r = new PropertiesResponse(service.getAgentCapabilities(agentName));
+    if ("json".equals(type)) {
+      return Response.ok(r).type(MediaType.APPLICATION_JSON).build();
+    } else {
+      return Response.ok(r).type(MediaType.TEXT_XML).build();
     }
   }
 
@@ -248,65 +226,51 @@ public class CaptureAgentStateRestService {
           @RestResponse(description = "The agent {name} does not exist in the system", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
   public Response getConfiguration(@PathParam("name") String agentName, @PathParam("type") String type)
           throws NotFoundException {
-    if (service == null) {
+    if (service == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
-    }
 
     PropertiesResponse r = new PropertiesResponse(service.getAgentConfiguration(agentName));
-    try {
-      logger.debug("Returning configuration for the agent {}", agentName);
+    logger.debug("Returning configuration for the agent {}", agentName);
 
-      if ("json".equals(type)) {
-        return Response.ok(r).type(MediaType.APPLICATION_JSON).build();
-      } else {
-        return Response.ok(r).type(MediaType.TEXT_XML).build();
-      }
-    } catch (NullPointerException e) {
-      logger.debug("The agent {} is not registered in the system", agentName);
-      throw new NotFoundException();
+    if ("json".equals(type)) {
+      return Response.ok(r).type(MediaType.APPLICATION_JSON).build();
+    } else {
+      return Response.ok(r).type(MediaType.TEXT_XML).build();
     }
   }
 
   @POST
-  // @Consumes(MediaType.TEXT_XML)
   @Produces(MediaType.TEXT_XML)
   @Path("agents/{name}/configuration")
   @RestQuery(name = "setAgentStateConfiguration", description = "Set the configuration of a given capture agent, registering it if it does not exist", pathParameters = { @RestParameter(description = "The name of a given capture agent", isRequired = true, name = "name", type = Type.STRING) }, restParameters = { @RestParameter(description = "An XML representation of the capabilities, as specified in http://java.sun.com/dtd/properties.dtd (friendly names as keys, device locations as their corresponding values)", type = Type.TEXT, isRequired = true, name = "configuration") }, reponses = {
-          @RestResponse(description = "{agentName} set to {state}", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "{name} set to {state}", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The configuration format is incorrect OR the agent name is blank or null", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response setConfiguration(@PathParam("name") String agentName, @FormParam("configuration") String configuration) {
-    if (service == null) {
+    if (service == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
-    }
 
-    if (configuration == null) {
+    if (StringUtils.isBlank(configuration)) {
       logger.debug("The configuration data cannot be blank");
       return Response.serverError().status(Response.Status.BAD_REQUEST).build();
     }
 
     Properties caps = new Properties();
+    ByteArrayInputStream bais = null;
     try {
-      ByteArrayInputStream bais = new ByteArrayInputStream(configuration.getBytes());
+      bais = new ByteArrayInputStream(configuration.getBytes());
       caps.loadFromXML(bais);
-      int result = service.setAgentConfiguration(agentName, caps);
+      if (!service.setAgentConfiguration(agentName, caps))
+        logger.debug("'{}''s configuration has not been updated because nothing has been changed", agentName);
 
       // Prepares the value to return
       PropertiesResponse r = new PropertiesResponse(caps);
-
-      switch (result) {
-        case CaptureAgentStateService.OK:
-          logger.debug("{}'s configuration updated", agentName);
-          return Response.ok(r).build();
-        case CaptureAgentStateService.BAD_PARAMETER:
-          logger.debug("The agent name cannot be blank or null");
-          return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
-        default:
-          logger.error("Unexpected server error in setConfiguration endpoint");
-          return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR).build();
-      }
+      logger.debug("{}'s configuration updated", agentName);
+      return Response.ok(r).build();
     } catch (IOException e) {
       logger.debug("Unexpected I/O Exception when unmarshalling the capabilities: {}", e.getMessage());
       return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
+    } finally {
+      IOUtils.closeQuietly(bais);
     }
   }
 
@@ -320,22 +284,16 @@ public class CaptureAgentStateRestService {
           @RestResponse(description = "The recording with the specified ID does not exist", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
   public Response getRecordingState(@PathParam("id") String id, @PathParam("type") String type)
           throws NotFoundException {
-    if (service == null) {
+    if (service == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
-    }
 
     Recording rec = service.getRecordingState(id);
 
-    if (rec != null) {
-      logger.debug("Submitting state for recording {}", id);
-      if ("json".equals(type)) {
-        return Response.ok(new RecordingStateUpdate(rec)).type(MediaType.APPLICATION_JSON).build();
-      } else {
-        return Response.ok(new RecordingStateUpdate(rec)).type(MediaType.TEXT_XML).build();
-      }
+    logger.debug("Submitting state for recording {}", id);
+    if ("json".equals(type)) {
+      return Response.ok(new RecordingStateUpdate(rec)).type(MediaType.APPLICATION_JSON).build();
     } else {
-      logger.debug("No such recording: {}", id);
-      throw new NotFoundException();
+      return Response.ok(new RecordingStateUpdate(rec)).type(MediaType.TEXT_XML).build();
     }
   }
 
@@ -373,11 +331,8 @@ public class CaptureAgentStateRestService {
     if (StringUtils.isEmpty(id))
       return Response.serverError().status(Response.Status.BAD_REQUEST).build();
 
-    if (service.removeRecording(id)) {
-      return Response.ok(id + " removed").build();
-    } else {
-      throw new NotFoundException();
-    }
+    service.removeRecording(id);
+    return Response.ok(id + " removed").build();
   }
 
   @GET
@@ -398,6 +353,4 @@ public class CaptureAgentStateRestService {
     return update;
   }
 
-  public CaptureAgentStateRestService() {
-  }
 }

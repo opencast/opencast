@@ -58,7 +58,11 @@ public final class EqualsUtil {
     }
   }
 
-  /** Compare the elements of two lists one by one. */
+  /**
+   * Compare the elements of two lists one by one.
+   *
+   * @deprecated use {@link #eqObj(Object, Object)} or {@link java.util.List#equals(Object)}
+   */
   public static boolean eqListSorted(List<?> as, List<?> bs) {
     if (as != null && bs != null && as.size() == bs.size()) {
       final Iterator<?> asi = as.iterator();
@@ -73,7 +77,11 @@ public final class EqualsUtil {
     }
   }
 
-  /** Compare two maps. */
+  /**
+   * Compare two maps.
+   *
+   * @deprecated use {@link #eqObj(Object, Object)} or {@link java.util.Map#equals(Object)}
+   */
   public static boolean eqMap(Map<?, ?> as, Map<?, ?> bs) {
     for (Map.Entry<?, ?> ae : as.entrySet()) {
       final Object bv = bs.get(ae.getKey());

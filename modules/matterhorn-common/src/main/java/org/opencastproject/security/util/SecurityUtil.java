@@ -22,6 +22,7 @@ import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -32,6 +33,8 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
+
+import java.net.URL;
 
 /** Matterhorn security helpers. */
 public final class SecurityUtil {
@@ -119,5 +122,10 @@ public final class SecurityUtil {
     } finally {
       sec.setOrganization(null);
     }
+  }
+
+  /** Extract hostname and port number from a URL. */
+  public static Tuple<String, Integer> hostAndPort(URL url) {
+    return tuple(StringUtils.strip(url.getHost(), "/"), url.getPort());
   }
 }
