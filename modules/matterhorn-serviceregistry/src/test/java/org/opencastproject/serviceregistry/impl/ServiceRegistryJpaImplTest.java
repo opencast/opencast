@@ -63,17 +63,18 @@ public class ServiceRegistryJpaImplTest {
     // Setup test object.
     setUpServiceRegistryJpaImpl();
   }
-  
+
   @After
   public void tearDown() {
     for (ObjectInstance mbean : serviceRegistryJpaImpl.jmxBeans) {
       JmxUtil.unregisterMXBean(mbean);
     }
   }
-  
+
   public void setUpQuery() {
     query = EasyMock.createNiceMock(Query.class);
-    EasyMock.expect(query.getSingleResult()).andReturn(new HostRegistrationJpaImpl("http://localhost:8080", 9, true, false));
+    EasyMock.expect(query.getSingleResult()).andReturn(
+            new HostRegistrationJpaImpl("http://localhost:8080", 9, true, false));
     EasyMock.expect(query.getResultList()).andReturn(new ArrayList<Object>()).anyTimes();
     EasyMock.replay(query);
   }
@@ -84,10 +85,11 @@ public class ServiceRegistryJpaImplTest {
 
   public void setUpEntityManager() {
     em = EasyMock.createNiceMock(EntityManager.class);
-    EasyMock.expect(em.getTransaction()).andReturn(tx);
+    EasyMock.expect(em.getTransaction()).andReturn(tx).anyTimes();
     EasyMock.expect(em.createNamedQuery("HostRegistration.byHostName")).andReturn(query);
     EasyMock.expect(em.createNamedQuery("ServiceRegistration.statistics")).andReturn(query);
     EasyMock.expect(em.createNamedQuery("ServiceRegistration.getAll")).andReturn(query);
+    EasyMock.expect(em.createNamedQuery("Job.undispatchable.status")).andReturn(query);
     EasyMock.replay(em);
   }
 

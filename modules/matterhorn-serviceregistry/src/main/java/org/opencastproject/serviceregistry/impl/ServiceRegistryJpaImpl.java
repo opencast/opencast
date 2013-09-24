@@ -230,6 +230,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     // Set up persistence
     emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.serviceregistry", persistenceProperties);
 
+    // Clean all undispatchable jobs
+    cleanUndispatchableJobs();
+
     // Find this host's url
     if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty("org.opencastproject.server.url"))) {
       hostName = UrlSupport.DEFAULT_BASE_URL;
@@ -1061,6 +1064,40 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     setOnlineStatus(serviceType, baseUrl, null, false, null);
 
     cleanRunningJobs(serviceType, baseUrl);
+  }
+
+  /**
+   * Find all undispatchable jobs and set them to CANCELED.
+   */
+  private void cleanUndispatchableJobs() {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      Query query = em.createNamedQuery("Job.undispatchable.status");
+      List<Status> statuses = new ArrayList<Job.Status>();
+      statuses.add(Status.INSTANTIATED);
+      statuses.add(Status.RUNNING);
+      query.setParameter("statuses", statuses);
+      @SuppressWarnings("unchecked")
+      List<JobJpaImpl> undispatchableJobs = query.getResultList();
+      for (JobJpaImpl job : undispatchableJobs) {
+        logger.info("Marking undispatchable job {} as canceled", job);
+        job.setStatus(Status.CANCELED);
+        em.merge(job);
+      }
+      tx.commit();
+    } catch (Exception e) {
+      logger.error("Unable to clean undispatchable jobs! {}", e.getMessage());
+      if (tx != null && tx.isActive()) {
+        tx.rollback();
+      }
+    } finally {
+      if (em != null)
+        em.close();
+    }
   }
 
   /**
