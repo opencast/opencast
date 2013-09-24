@@ -15,6 +15,8 @@
  */
 package org.opencastproject.workflow.handler;
 
+import static java.lang.String.format;
+
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
@@ -53,8 +55,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import static java.lang.String.format;
 
 /**
  * Workflow operation used to inspect all tracks of a media package.
@@ -243,7 +243,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
       in = new FileInputStream(f);
       return dcService.load(in);
     } catch (NotFoundException e) {
-      throw new IOException("Unable to open catalog " + catalog + ": " + e.getMessage());
+      throw new IOException("Unable to open catalog " + catalog, e);
     } finally {
       IOUtils.closeQuietly(in);
     }

@@ -125,16 +125,13 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
       if (elementUri.startsWith(baseUrl))
         continue;
 
-      // Store origianl URI for deletion
-      externalUris.add(element.getURI());
-
       // Download the external URI
       File file;
       try {
         file = workspace.get(element.getURI());
       } catch (Exception e) {
-        logger.warn("Unable to download the external URI {}", element.getURI());
-        continue;
+        logger.warn("Unable to download the external element {}", element.getURI());
+        throw new WorkflowOperationException("Unable to download the external element " + element.getURI(), e);
       }
 
       // Put to working file repository and rewrite URI on element
@@ -145,14 +142,19 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
                 FilenameUtils.getName(element.getURI().getPath()), in);
         element.setURI(uri);
       } catch (Exception e) {
-        logger.warn("Unable to store downloaded URI '{}': {}", element.getURI(), e.getMessage());
-        continue;
+        logger.warn("Unable to store downloaded element '{}': {}", element.getURI(), e.getMessage());
+        throw new WorkflowOperationException("Unable to store downloaded element " + element.getURI(), e);
       } finally {
         IOUtils.closeQuietly(in);
       }
+
+      logger.info("Downloaded the external element {}");
+
+      // Store origianl URI for deletion
+      externalUris.add(element.getURI());
     }
 
-    if (!deleteExternal)
+    if (!deleteExternal || externalUris.size() == 0)
       return createResult(mediaPackage, Action.CONTINUE);
 
     // Find all external working file repository base Urls
