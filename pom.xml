@@ -1498,6 +1498,17 @@
       <timezone>+1</timezone>
     </developer>
     <developer>
+      <id>edu.alonso</id>
+      <name>Eduardo Alonso Gil</name>
+      <email>ealonso@uvigo.es</email>
+      <organization>University of Vigo</organization>
+      <organizationUrl>http://www.uvigo.es</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
       <id>k.amundson</id>
       <name>Kristofor Amundson</name>
       <email>kta719@mail.usask.ca</email>
@@ -1837,6 +1848,50 @@
         <role>tester</role>
       </roles>
       <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <id>jamesp</id>
+      <name>James Perrin</name>
+      <email>james.perrin@manchester.ac.uk</email>
+      <organization>University of Manchester</organization>
+      <organizationUrl>http://www.manchester.ac.uk</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>0</timezone>
+    </developer>
+    <developer>
+      <id>ts23</id>
+      <name>Tobias Schiebeck</name>
+      <email>tobias.schiebeck@manchester.ac.uk</email>
+      <organization>University of Manchester</organization>
+      <organizationUrl>http://www.manchester.ac.uk</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>0</timezone>
+    </developer>
+    <developer>
+      <id>jaimeg</id>
+      <name>Jaime Gago</name>
+      <email>jaime@entwinemedia.com</email>
+      <organization>Entwine</organization>
+      <organizationUrl>http://entwinemedia.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <id>karen</id>
+      <name>Karen Dolan</name>
+      <email>kdolan@dce.harvard.edu</email>
+      <organization>Harvard University, Division of Continuing Education</organization>
+      <organizationUrl>http://www.dce.harvard.edu</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>-5</timezone>
     </developer>
   </developers>
 
