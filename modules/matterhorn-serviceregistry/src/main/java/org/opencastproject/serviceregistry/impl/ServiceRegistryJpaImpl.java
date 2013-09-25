@@ -79,6 +79,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -2553,6 +2554,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     private Map<String, Integer> loadByHost = null;
 
+    /** Create a random number generator */
+    private Random randomGenerator = new Random();
+
     /**
      * Creates a new comparator which is using the given map of host names and loads.
      * 
@@ -2571,8 +2575,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       // If host loads are equal prefer NORMAL service state
       if (compare == 0) {
+        // If the service state is the same, randomly swap the order to achieve evenly distributed load
         if (serviceA.getServiceState() == serviceB.getServiceState())
-          return compare;
+          return randomGenerator.nextInt(2);
         else if (serviceA.getServiceState() == NORMAL)
           return 1;
         else
