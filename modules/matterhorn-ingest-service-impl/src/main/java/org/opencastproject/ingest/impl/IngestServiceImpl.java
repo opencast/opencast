@@ -51,6 +51,7 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowService;
@@ -340,8 +341,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.info("Ingesting mediapackage {} is named '{}'", mediaPackageId, mp.getTitle());
 
       // Make sure there are tracks in the mediapackage
-      if (mp.getTracks().length == 0)
-        throw new MediaPackageException("Mediapackage " + mediaPackageId + " has no media tracks");
+      if (mp.getTracks().length == 0) {
+        logger.warn("Mediapackage {} has no media tracks", mediaPackageId);
+      }
 
       // Update the element uris to point to their working file repository location
       for (MediaPackageElement element : mp.elements()) {
@@ -373,9 +375,29 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       throw new IngestException(e);
     } catch (MediaPackageException e) {
       job.setStatus(Job.Status.FAILED, Job.FailureReason.DATA);
+      if (workflowInstance != null) {
+        workflowInstance.getCurrentOperation().setState(OperationState.FAILED);
+        workflowInstance.setState(WorkflowState.FAILED);
+        try {
+          logger.info("Marking related workflow {} as failed", workflowInstance);
+          workflowService.update(workflowInstance);
+        } catch (WorkflowException e1) {
+          logger.error("Error updating workflow instance {} with ingest failure: {}", workflowInstance, e1.getMessage());
+        }
+      }
       throw e;
     } catch (Exception e) {
       job.setStatus(Job.Status.FAILED);
+      if (workflowInstance != null) {
+        workflowInstance.getCurrentOperation().setState(OperationState.FAILED);
+        workflowInstance.setState(WorkflowState.FAILED);
+        try {
+          logger.info("Marking related workflow {} as failed", workflowInstance);
+          workflowService.update(workflowInstance);
+        } catch (WorkflowException e1) {
+          logger.error("Error updating workflow instance {} with ingest failure: {}", workflowInstance, e1.getMessage());
+        }
+      }
       if (e instanceof IngestException)
         throw (IngestException) e;
       throw new IngestException(e);
