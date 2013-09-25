@@ -70,9 +70,13 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /** Option for rewriting existing metadata */
   private static final String OPT_OVERWRITE = "overwrite";
 
+  /** Option to adjust whether mediapackages without media should be accepted */
+  private static final String OPT_ACCEPT_NO_MEDIA = "accept-no-media";
+
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put(OPT_OVERWRITE, "Whether to rewrite existing metadata");
+    CONFIG_OPTIONS.put(OPT_ACCEPT_NO_MEDIA, "Whether mediapackages with no media tracks should be accepted");
   }
 
   /** The inspection service */
@@ -131,10 +135,17 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
     MediaPackage mediaPackage = (MediaPackage) workflowInstance.getMediaPackage().clone();
     // Inspect the tracks
     long totalTimeInQueue = 0;
-    long timeToExecute = 0;
 
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     boolean rewrite = "true".equalsIgnoreCase(operation.getConfiguration(OPT_OVERWRITE));
+    boolean acceptNoMedia = "true".equalsIgnoreCase(operation.getConfiguration(OPT_ACCEPT_NO_MEDIA));
+
+    // Test if there are tracks in the mediapackage
+    if (mediaPackage.getTracks().length == 0) {
+      logger.warn("Recording {} contains no media", mediaPackage);
+      if (!acceptNoMedia)
+        throw new WorkflowOperationException("Mediapackage " + mediaPackage + " contains no media");
+    }
 
     for (Track track : mediaPackage.getTracks()) {
 
@@ -156,21 +167,18 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
       long timeInQueue = inspectJob.getQueueTime() == null ? 0 : inspectJob.getQueueTime();
       totalTimeInQueue += timeInQueue;
 
-      long timeRunning = inspectJob.getRunTime() == null ? 0 : inspectJob.getRunTime();
-      timeToExecute += timeRunning;
-
       Track inspectedTrack;
       try {
         inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectJob.getPayload());
       } catch (MediaPackageException e) {
         throw new WorkflowOperationException("Unable to parse track from job " + inspectJob.getId(), e);
       }
-      if (inspectedTrack == null) {
+
+      if (inspectedTrack == null)
         throw new WorkflowOperationException("Track " + track + " could not be inspected");
-      }
-      if (inspectedTrack.getStreams().length == 0) {
+
+      if (inspectedTrack.getStreams().length == 0)
         throw new WorkflowOperationException(format("Track %s does not contain any streams", track));
-      }
 
       // Replace the original track with the inspected one
       try {
@@ -180,6 +188,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
         logger.error("Error adding {} to media package", inspectedTrack, e);
       }
     }
+
     // Update dublin core with metadata
     try {
       updateDublinCore(mediaPackage);
@@ -243,7 +252,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
       in = new FileInputStream(f);
       return dcService.load(in);
     } catch (NotFoundException e) {
-      throw new IOException("Unable to open catalog " + catalog, e);
+      throw new IOException("Unable to open catalog " + catalog + ": " + e.getMessage());
     } finally {
       IOUtils.closeQuietly(in);
     }
