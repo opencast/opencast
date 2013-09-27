@@ -80,7 +80,7 @@ public class UserActionImpl implements UserAction {
   private String mediapackageId;
 
   @Lob
-  @Column(name = "user", length = 255)
+  @Column(name = "user_id", length = 255)
   @XmlElement(name = "userId")
   private String userId;
 
