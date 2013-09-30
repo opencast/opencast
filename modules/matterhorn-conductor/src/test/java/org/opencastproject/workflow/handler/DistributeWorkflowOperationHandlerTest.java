@@ -15,7 +15,6 @@
  */
 package org.opencastproject.workflow.handler;
 
-import org.junit.Ignore;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
@@ -50,6 +49,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URI;
@@ -233,7 +233,7 @@ public class DistributeWorkflowOperationHandlerTest {
     }
 
     @Override
-    public boolean acceptJob(Job job) throws ServiceRegistryException {
+    public void acceptJob(Job job) throws ServiceRegistryException {
       MediaPackage mp = null;
       MediaPackageElement element = null;
       try {
@@ -247,11 +247,19 @@ public class DistributeWorkflowOperationHandlerTest {
       job.setStatus(Status.FINISHED);
       try {
         serviceRegistry.updateJob(job);
-        return true;
       } catch (NotFoundException e) {
         // not possible
       }
-      return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.opencastproject.job.api.JobProducer#isReadyToAcceptJobs(String)
+     */
+    @Override
+    public boolean isReadyToAcceptJobs(String operation) throws ServiceRegistryException {
+      return true;
     }
 
     /**

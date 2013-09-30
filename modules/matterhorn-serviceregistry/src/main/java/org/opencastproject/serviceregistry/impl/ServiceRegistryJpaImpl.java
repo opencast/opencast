@@ -51,6 +51,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.jmx.JmxUtil;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -1856,13 +1857,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @return the host that accepted the dispatched job, or <code>null</code> if no services took the job.
    * @throws ServiceRegistryException
    *           if the service registrations are unavailable
+   * @throws ServiceUnavailableException
+   *           if no service is available or if all available services refuse to take on more work
+   * @throws UndispatchableJobException
+   *           if the current job cannot be processed
    */
   protected String dispatchJob(EntityManager em, Job job, List<ServiceRegistration> services)
-          throws ServiceRegistryException {
+          throws ServiceRegistryException, ServiceUnavailableException, UndispatchableJobException {
 
     if (services.size() == 0) {
       logger.debug("No service is currently available to handle jobs of type '" + job.getJobType() + "'");
-      return null;
+      throw new ServiceUnavailableException("No service of type " + job.getJobType() + " available");
     }
 
     // Try the service registrations, after the first one finished, we quit
@@ -1882,7 +1887,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         // specific APIs, we just catch Exception.
         logger.debug("Unable to dispatch {}.  This is likely caused by another service registry dispatching the job",
                 job);
-        return null;
+        throw new UndispatchableJobException("Job " + job.getId() + " is already being dispatched");
       }
 
       triedDispatching = true;
@@ -1920,16 +1925,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         response = client.execute(post);
         responseStatusCode = response.getStatusLine().getStatusCode();
         if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
-
           return registration.getHost();
         } else if (responseStatusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
-          logger.debug("Service {} refused to accept {}", registration, job);
+          logger.debug("Service {} is currently refusing to accept jobs of type {}", registration, job.getOperation());
           continue;
+        } else if (responseStatusCode == HttpStatus.SC_PRECONDITION_FAILED) {
+          logger.debug("Service {} refused to accept {}", registration, job);
+          throw new UndispatchableJobException(IOUtils.toString(response.getEntity().getContent()));
         } else {
           logger.warn("Service {} failed ({}) accepting {}", new Object[] { registration, responseStatusCode, job });
           continue;
         }
-
+      } catch (UndispatchableJobException e) {
+        throw e;
       } catch (Exception e) {
         logger.warn("Unable to dispatch job {}", jpaJob.getId(), e);
       } finally {
@@ -2372,7 +2380,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           // Skip jobs that we already know can't be dispatched
           String jobSiganture = new StringBuilder(jobType).append('@').append(job.getOperation()).toString();
           if (undispatchableJobTypes.contains(jobSiganture)) {
-            logger.trace("Skipping dispatching of job {} with type '{}'", job.getId(), jobType);
+            logger.trace("Skipping dispatching of jobs {} with type '{}' for this round of dispatching", job.getId(),
+                    jobType);
             continue;
           }
 
@@ -2426,21 +2435,26 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
             }
 
             // Try to dispatch the job
-            String hostAcceptingJob = dispatchJob(em, job, candidateServices);
-
-            if (hostAcceptingJob == null) {
+            String hostAcceptingJob = null;
+            try {
+              hostAcceptingJob = dispatchJob(em, job, candidateServices);
+            } catch (ServiceUnavailableException e) {
+              ServiceRegistryJpaImpl.logger.debug("Jobs of type {} currently cannot be dispatched", job.getOperation());
               undispatchableJobTypes.add(jobSiganture);
-              ServiceRegistryJpaImpl.logger.debug("Job {} could not be dispatched and is put back into queue",
-                      job.getId());
-            } else {
-              ServiceRegistryJpaImpl.logger.debug("Job {} dispatched to {}", job.getId(), hostAcceptingJob);
-              if (hostLoads.containsKey(hostAcceptingJob)) {
-                Integer previousServiceLoad = hostLoads.get(hostAcceptingJob);
-                hostLoads.put(hostAcceptingJob, ++previousServiceLoad);
-              } else {
-                hostLoads.put(hostAcceptingJob, 1);
-              }
+              continue;
+            } catch (UndispatchableJobException e) {
+              ServiceRegistryJpaImpl.logger.debug("Job {} currently cannot be dispatched", job.getId());
+              continue;
             }
+
+            ServiceRegistryJpaImpl.logger.debug("Job {} dispatched to {}", job.getId(), hostAcceptingJob);
+            if (hostLoads.containsKey(hostAcceptingJob)) {
+              Integer previousServiceLoad = hostLoads.get(hostAcceptingJob);
+              hostLoads.put(hostAcceptingJob, ++previousServiceLoad);
+            } else {
+              hostLoads.put(hostAcceptingJob, 1);
+            }
+
           } catch (ServiceRegistryException e) {
             Throwable cause = (e.getCause() != null) ? e.getCause() : e;
             ServiceRegistryJpaImpl.logger.error("Error dispatching job " + job, cause);

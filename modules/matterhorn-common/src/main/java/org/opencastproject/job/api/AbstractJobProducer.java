@@ -86,19 +86,24 @@ public abstract class AbstractJobProducer implements JobProducer {
    * @see org.opencastproject.job.api.JobProducer#acceptJob(org.opencastproject.job.api.Job)
    */
   @Override
-  public boolean acceptJob(Job job) throws ServiceRegistryException {
-    if (isReadyToAccept(job)) {
-      try {
-        job.setStatus(Job.Status.RUNNING);
-        getServiceRegistry().updateJob(job);
-      } catch (NotFoundException e) {
-        throw new IllegalStateException(e);
-      }
-      executor.submit(new JobRunner(job, getServiceRegistry().getCurrentJob()));
-      return true;
-    } else {
-      return false;
+  public void acceptJob(Job job) throws ServiceRegistryException {
+    try {
+      job.setStatus(Job.Status.RUNNING);
+      getServiceRegistry().updateJob(job);
+    } catch (NotFoundException e) {
+      throw new IllegalStateException(e);
     }
+    executor.submit(new JobRunner(job, getServiceRegistry().getCurrentJob()));
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.job.api.JobProducer#isReadyToAcceptJobs(String)
+   */
+  @Override
+  public boolean isReadyToAcceptJobs(String operation) throws ServiceRegistryException {
+    return true;
   }
 
   /**
