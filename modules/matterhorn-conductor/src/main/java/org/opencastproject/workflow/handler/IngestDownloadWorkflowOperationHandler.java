@@ -121,9 +121,11 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
       if (element.getURI() == null)
         continue;
 
-      String elementUri = element.getURI().toString();
-      if (elementUri.startsWith(baseUrl))
+      URI originalElementUri = element.getURI();
+      if (originalElementUri.toString().startsWith(baseUrl)) {
+        logger.info("Skipping downloading already existing element {}", originalElementUri);
         continue;
+      }
 
       // Download the external URI
       File file;
@@ -146,25 +148,34 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
         throw new WorkflowOperationException("Unable to store downloaded element " + element.getURI(), e);
       } finally {
         IOUtils.closeQuietly(in);
+        try {
+          workspace.delete(originalElementUri);
+        } catch (Exception e) {
+          logger.warn("Unable to delete ingest-downloaded element {}: {}", element.getURI(), e);
+        }
       }
 
-      logger.info("Downloaded the external element {}");
+      logger.info("Downloaded the external element {}", originalElementUri);
 
       // Store origianl URI for deletion
-      externalUris.add(element.getURI());
+      externalUris.add(originalElementUri);
     }
 
     if (!deleteExternal || externalUris.size() == 0)
       return createResult(mediaPackage, Action.CONTINUE);
 
     // Find all external working file repository base Urls
+    logger.debug("Assembling list of external working file repositories");
     List<String> externalWfrBaseUrls = new ArrayList<String>();
     try {
       for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByType(WorkingFileRepository.SERVICE_TYPE)) {
-        if (baseUrl.startsWith(reg.getHost()))
+        if (baseUrl.startsWith(reg.getHost())) {
+          logger.trace("Skpping local working file repository");
           continue;
+        }
         externalWfrBaseUrls.add(UrlSupport.concat(reg.getHost(), reg.getPath()));
       }
+      logger.debug("{} external working file repositories found", externalWfrBaseUrls.size());
     } catch (ServiceRegistryException e) {
       logger.error("Unable to load WFR services from service registry: {}", e.getMessage());
       throw new WorkflowOperationException(e);

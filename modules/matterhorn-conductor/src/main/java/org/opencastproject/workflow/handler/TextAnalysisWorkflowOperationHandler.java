@@ -247,166 +247,189 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
     // Loop over all existing segment catalogs
     for (Entry<Catalog, Mpeg7Catalog> mapEntry : catalogs.entrySet()) {
-      Catalog segmentCatalog = mapEntry.getKey();
-      MediaPackageReference catalogRef = segmentCatalog.getReference();
-
-      // Make sure we can figure out the source track
-      if (catalogRef == null) {
-        logger.info("Skipping catalog {} since we can't determine the source track", segmentCatalog);
-      } else if (mediaPackage.getElementByReference(catalogRef) == null) {
-        logger.info("Skipping catalog {} since we can't determine the source track", segmentCatalog);
-      } else if (!(mediaPackage.getElementByReference(catalogRef) instanceof Track)) {
-        logger.info("Skipping catalog {} since it's source was not a track", segmentCatalog);
-      }
-
-      logger.info("Analyzing mpeg-7 segments catalog {} for text", segmentCatalog);
-
-      // Create a copy that will contain the segments enriched with the video text elements
-      Mpeg7Catalog textCatalog = mapEntry.getValue().clone();
-      Track sourceTrack = (Track) mediaPackage.getTrack(catalogRef.getIdentifier());
-
-      // Load the temporal decomposition (segments)
-      Video videoContent = textCatalog.videoContent().next();
-      TemporalDecomposition<? extends Segment> decomposition = videoContent.getTemporalDecomposition();
-      Iterator<? extends Segment> segmentIterator = decomposition.segments();
-
-      // For every segment, try to find the still image and run text analysis on it
-      List<VideoSegment> videoSegments = new LinkedList<VideoSegment>();
-      while (segmentIterator.hasNext()) {
-        Segment segment = segmentIterator.next();
-        if ((segment instanceof VideoSegment))
-          videoSegments.add((VideoSegment) segment);
-      }
-
-      // argument array for image extraction
-      long[] times = new long[videoSegments.size()];
-
-      for (int i = 0; i < videoSegments.size(); i++) {
-        VideoSegment videoSegment = videoSegments.get(i);
-        MediaTimePoint segmentTimePoint = videoSegment.getMediaTime().getMediaTimePoint();
-        MediaDuration segmentDuration = videoSegment.getMediaTime().getMediaDuration();
-
-        // Choose a time
-        MediaPackageReference reference = null;
-        if (catalogRef == null)
-          reference = new MediaPackageReferenceImpl();
-        else
-          reference = new MediaPackageReferenceImpl(catalogRef.getType(), catalogRef.getIdentifier());
-        reference.setProperty("time", segmentTimePoint.toString());
-
-        // Have the time for ocr image created. To circumvent problems with slowly building slides, we take the image
-        // that is
-        // almost at the end of the segment, it should contain the most content and is stable as well.
-        long startTimeSeconds = segmentTimePoint.getTimeInMilliseconds() / 1000;
-        long durationSeconds = segmentDuration.getDurationInMilliseconds() / 1000;
-        times[i] = Math.max(startTimeSeconds + durationSeconds - stabilityThreshold + 1, 0);
-      }
-
-      // Have the ocr image(s) created.
-
-      // TODO: Note that the way of having one image extracted after the other is suited for
-      // the ffmpeg-based encoder. When switching to other encoding engines such as gstreamer, it might be preferable
-      // to pass in all timepoints to the image extraction method at once.
-      SortedMap<Long, Job> extractImageJobs = new TreeMap<Long, Job>();
-      List<Attachment> images = new LinkedList<Attachment>();
-      try {
-        for (long time : times) {
-          extractImageJobs.put(time, composer.image(sourceTrack, IMAGE_EXTRACTION_PROFILE, time));
-        }
-        if (!waitForStatus(extractImageJobs.values().toArray(new Job[extractImageJobs.size()])).isSuccess())
-          throw new WorkflowOperationException("Extracting scene image from " + sourceTrack + " failed");
-        for (Map.Entry<Long, Job> entry : extractImageJobs.entrySet()) {
-          Job job = serviceRegistry.getJob(entry.getValue().getId());
-          Attachment image = (Attachment) MediaPackageElementParser.getFromXml(job.getPayload());
-          images.add(image);
-          totalTimeInQueue += job.getQueueTime();
-        }
-      } catch (EncoderException e) {
-        logger.error("Error creating still image(s) from {}", sourceTrack);
-        throw e;
-      }
-
-      // Run text extraction on each of the images
       Map<VideoSegment, Job> jobs = new HashMap<VideoSegment, Job>();
-      Iterator<VideoSegment> it = videoSegments.iterator();
-      for (MediaPackageElement element : images) {
-        Attachment image = (Attachment) element;
-        VideoSegment videoSegment = it.next();
-        jobs.put(videoSegment, analysisService.extract(image));
-      }
+      List<Attachment> images = new LinkedList<Attachment>();
+      Catalog segmentCatalog = mapEntry.getKey();
+      try {
+        MediaPackageReference catalogRef = segmentCatalog.getReference();
 
-      // Wait for all jobs to be finished
-      if (!waitForStatus(jobs.values().toArray(new Job[jobs.size()])).isSuccess()) {
-        throw new WorkflowOperationException("Text extraction failed on images from " + sourceTrack);
-      }
-
-      // Remove images that were created for text extraction
-      logger.debug("Removing temporary images");
-      for (Attachment image : images) {
-        workspace.delete(image.getURI());
-      }
-
-      // Process the text extraction results
-      for (Map.Entry<VideoSegment, Job> entry : jobs.entrySet()) {
-        Job job = serviceRegistry.getJob(entry.getValue().getId());
-        totalTimeInQueue += job.getQueueTime();
-
-        VideoSegment videoSegment = entry.getKey();
-        MediaDuration segmentDuration = videoSegment.getMediaTime().getMediaDuration();
-        Catalog catalog = (Catalog) MediaPackageElementParser.getFromXml(job.getPayload());
-        if (catalog == null) {
-          logger.warn("Text analysis did not return a valid mpeg7 for segment {}", videoSegment);
-          continue;
+        // Make sure we can figure out the source track
+        if (catalogRef == null) {
+          logger.info("Skipping catalog {} since we can't determine the source track", segmentCatalog);
+        } else if (mediaPackage.getElementByReference(catalogRef) == null) {
+          logger.info("Skipping catalog {} since we can't determine the source track", segmentCatalog);
+        } else if (!(mediaPackage.getElementByReference(catalogRef) instanceof Track)) {
+          logger.info("Skipping catalog {} since it's source was not a track", segmentCatalog);
         }
-        Mpeg7Catalog videoTextCatalog = loadMpeg7Catalog(catalog);
-        if (videoTextCatalog == null)
-          throw new IllegalStateException("Text analysis service did not return a valid mpeg7");
 
-        // Add the spatiotemporal decompositions from the new catalog to the existing video segments
-        Iterator<Video> videoTextContents = videoTextCatalog.videoContent();
-        if (videoTextContents == null || !videoTextContents.hasNext()) {
-          logger.debug("Text analysis was not able to extract any text from {}", job.getArguments().get(0));
-          break;
+        logger.info("Analyzing mpeg-7 segments catalog {} for text", segmentCatalog);
+
+        // Create a copy that will contain the segments enriched with the video text elements
+        Mpeg7Catalog textCatalog = mapEntry.getValue().clone();
+        Track sourceTrack = (Track) mediaPackage.getTrack(catalogRef.getIdentifier());
+
+        // Load the temporal decomposition (segments)
+        Video videoContent = textCatalog.videoContent().next();
+        TemporalDecomposition<? extends Segment> decomposition = videoContent.getTemporalDecomposition();
+        Iterator<? extends Segment> segmentIterator = decomposition.segments();
+
+        // For every segment, try to find the still image and run text analysis on it
+        List<VideoSegment> videoSegments = new LinkedList<VideoSegment>();
+        while (segmentIterator.hasNext()) {
+          Segment segment = segmentIterator.next();
+          if ((segment instanceof VideoSegment))
+            videoSegments.add((VideoSegment) segment);
         }
+
+        // argument array for image extraction
+        long[] times = new long[videoSegments.size()];
+
+        for (int i = 0; i < videoSegments.size(); i++) {
+          VideoSegment videoSegment = videoSegments.get(i);
+          MediaTimePoint segmentTimePoint = videoSegment.getMediaTime().getMediaTimePoint();
+          MediaDuration segmentDuration = videoSegment.getMediaTime().getMediaDuration();
+
+          // Choose a time
+          MediaPackageReference reference = null;
+          if (catalogRef == null)
+            reference = new MediaPackageReferenceImpl();
+          else
+            reference = new MediaPackageReferenceImpl(catalogRef.getType(), catalogRef.getIdentifier());
+          reference.setProperty("time", segmentTimePoint.toString());
+
+          // Have the time for ocr image created. To circumvent problems with slowly building slides, we take the image
+          // that is
+          // almost at the end of the segment, it should contain the most content and is stable as well.
+          long startTimeSeconds = segmentTimePoint.getTimeInMilliseconds() / 1000;
+          long durationSeconds = segmentDuration.getDurationInMilliseconds() / 1000;
+          times[i] = Math.max(startTimeSeconds + durationSeconds - stabilityThreshold + 1, 0);
+        }
+
+        // Have the ocr image(s) created.
+
+        // TODO: Note that the way of having one image extracted after the other is suited for
+        // the ffmpeg-based encoder. When switching to other encoding engines such as gstreamer, it might be preferable
+        // to pass in all timepoints to the image extraction method at once.
+        SortedMap<Long, Job> extractImageJobs = new TreeMap<Long, Job>();
 
         try {
-          Video textVideoContent = videoTextContents.next();
-          VideoSegment textVideoSegment = (VideoSegment) textVideoContent.getTemporalDecomposition().segments().next();
-          VideoText[] videoTexts = textVideoSegment.getSpatioTemporalDecomposition().getVideoText();
-          SpatioTemporalDecomposition std = videoSegment.createSpatioTemporalDecomposition(true, false);
-          for (VideoText videoText : videoTexts) {
-            MediaTime mediaTime = new MediaTimeImpl(new MediaRelTimePointImpl(0), segmentDuration);
-            SpatioTemporalLocator locator = new SpatioTemporalLocatorImpl(mediaTime);
-            videoText.setSpatioTemporalLocator(locator);
-            std.addVideoText(videoText);
+          for (long time : times) {
+            extractImageJobs.put(time, composer.image(sourceTrack, IMAGE_EXTRACTION_PROFILE, time));
           }
+          if (!waitForStatus(extractImageJobs.values().toArray(new Job[extractImageJobs.size()])).isSuccess())
+            throw new WorkflowOperationException("Extracting scene image from " + sourceTrack + " failed");
+          for (Map.Entry<Long, Job> entry : extractImageJobs.entrySet()) {
+            Job job = serviceRegistry.getJob(entry.getValue().getId());
+            Attachment image = (Attachment) MediaPackageElementParser.getFromXml(job.getPayload());
+            images.add(image);
+            totalTimeInQueue += job.getQueueTime();
+          }
+        } catch (EncoderException e) {
+          logger.error("Error creating still image(s) from {}", sourceTrack);
+          throw e;
+        }
+
+        // Run text extraction on each of the images
+        Iterator<VideoSegment> it = videoSegments.iterator();
+        for (MediaPackageElement element : images) {
+          Attachment image = (Attachment) element;
+          VideoSegment videoSegment = it.next();
+          jobs.put(videoSegment, analysisService.extract(image));
+        }
+
+        // Wait for all jobs to be finished
+        if (!waitForStatus(jobs.values().toArray(new Job[jobs.size()])).isSuccess()) {
+          throw new WorkflowOperationException("Text extraction failed on images from " + sourceTrack);
+        }
+
+        // Process the text extraction results
+        for (Map.Entry<VideoSegment, Job> entry : jobs.entrySet()) {
+          Job job = serviceRegistry.getJob(entry.getValue().getId());
+          totalTimeInQueue += job.getQueueTime();
+
+          VideoSegment videoSegment = entry.getKey();
+          MediaDuration segmentDuration = videoSegment.getMediaTime().getMediaDuration();
+          Catalog catalog = (Catalog) MediaPackageElementParser.getFromXml(job.getPayload());
+          if (catalog == null) {
+            logger.warn("Text analysis did not return a valid mpeg7 for segment {}", videoSegment);
+            continue;
+          }
+          Mpeg7Catalog videoTextCatalog = loadMpeg7Catalog(catalog);
+          if (videoTextCatalog == null)
+            throw new IllegalStateException("Text analysis service did not return a valid mpeg7");
+
+          // Add the spatiotemporal decompositions from the new catalog to the existing video segments
+          Iterator<Video> videoTextContents = videoTextCatalog.videoContent();
+          if (videoTextContents == null || !videoTextContents.hasNext()) {
+            logger.debug("Text analysis was not able to extract any text from {}", job.getArguments().get(0));
+            break;
+          }
+
+          try {
+            Video textVideoContent = videoTextContents.next();
+            VideoSegment textVideoSegment = (VideoSegment) textVideoContent.getTemporalDecomposition().segments()
+                    .next();
+            VideoText[] videoTexts = textVideoSegment.getSpatioTemporalDecomposition().getVideoText();
+            SpatioTemporalDecomposition std = videoSegment.createSpatioTemporalDecomposition(true, false);
+            for (VideoText videoText : videoTexts) {
+              MediaTime mediaTime = new MediaTimeImpl(new MediaRelTimePointImpl(0), segmentDuration);
+              SpatioTemporalLocator locator = new SpatioTemporalLocatorImpl(mediaTime);
+              videoText.setSpatioTemporalLocator(locator);
+              std.addVideoText(videoText);
+            }
+          } catch (Exception e) {
+            logger.warn("The mpeg-7 structure returned by the text analyzer is not what is expected", e);
+            continue;
+          }
+        }
+
+        // Put the catalog into the workspace and add it to the media package
+        MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+        Catalog catalog = (Catalog) builder.newElement(MediaPackageElement.Type.Catalog, MediaPackageElements.TEXTS);
+        catalog.setIdentifier(null);
+        catalog.setReference(segmentCatalog.getReference());
+        mediaPackage.add(catalog); // the catalog now has an ID, so we can store the file properly
+        InputStream in = mpeg7CatalogService.serialize(textCatalog);
+        String filename = "slidetext.xml";
+        URI workspaceURI = workspace
+                .put(mediaPackage.getIdentifier().toString(), catalog.getIdentifier(), filename, in);
+        catalog.setURI(workspaceURI);
+
+        // Since we've enriched and stored the mpeg7 catalog, remove the original
+        mediaPackage.remove(segmentCatalog);
+
+        // Add flavor and target tags
+        catalog.setFlavor(MediaPackageElements.TEXTS);
+        for (String tag : targetTagSet) {
+          catalog.addTag(tag);
+        }
+      } finally {
+        try {
+          workspace.delete(segmentCatalog.getURI());
         } catch (Exception e) {
-          logger.warn("The mpeg-7 structure returned by the text analyzer is not what is expected", e);
-          continue;
+          logger.warn("Unable to delete segment catalog {}: {}", segmentCatalog.getURI(), e);
+        }
+        // Remove images that were created for text extraction
+        logger.debug("Removing temporary images");
+        for (Attachment image : images) {
+          try {
+            workspace.delete(image.getURI());
+          } catch (Exception e) {
+            logger.warn("Unable to delete temporary image {}: {}", image.getURI(), e);
+          }
+        }
+        // Remove the temporary text
+        for (Job j : jobs.values()) {
+          Catalog catalog = null;
+          try {
+            Job job = serviceRegistry.getJob(j.getId());
+            catalog = (Catalog) MediaPackageElementParser.getFromXml(job.getPayload());
+            workspace.delete(catalog.getURI());
+          } catch (Exception e) {
+            logger.warn("Unable to delete temporary text file {}: {}", catalog.getURI(), e);
+          }
         }
       }
-
-      // Put the catalog into the workspace and add it to the media package
-      MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-      Catalog catalog = (Catalog) builder.newElement(MediaPackageElement.Type.Catalog, MediaPackageElements.TEXTS);
-      catalog.setIdentifier(null);
-      catalog.setReference(segmentCatalog.getReference());
-      mediaPackage.add(catalog); // the catalog now has an ID, so we can store the file properly
-      InputStream in = mpeg7CatalogService.serialize(textCatalog);
-      String filename = "slidetext.xml";
-      URI workspaceURI = workspace.put(mediaPackage.getIdentifier().toString(), catalog.getIdentifier(), filename, in);
-      catalog.setURI(workspaceURI);
-
-      // Since we've enriched and stored the mpeg7 catalog, remove the original
-      mediaPackage.remove(segmentCatalog);
-      workspace.delete(segmentCatalog.getURI());
-
-      // Add flavor and target tags
-      catalog.setFlavor(MediaPackageElements.TEXTS);
-      for (String tag : targetTagSet) {
-        catalog.addTag(tag);
-      }
-
     }
 
     logger.debug("Text analysis completed");
