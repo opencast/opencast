@@ -45,11 +45,21 @@ public interface JobProducer {
    * 
    * @param job
    *          the job being dispatched
-   * @return <code>true</code> if the job was accepted
    * @throws ServiceRegistryException
    *           if the producer was unable to start work as requested
    */
-  boolean acceptJob(Job job) throws ServiceRegistryException;
+  void acceptJob(Job job) throws ServiceRegistryException;
+
+  /**
+   * Whether new jobs can be accepted in general.
+   * 
+   * @param operation
+   *          operation
+   * @throws ServiceRegistryException
+   *           if the producer was unable to start work as requested
+   * @return whether the service is ready to accept jobs
+   */
+  boolean isReadyToAcceptJobs(String operation) throws ServiceRegistryException;
 
   /**
    * Whether the job can be accepted.

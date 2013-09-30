@@ -357,13 +357,12 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
       if (registration.isJobProducer()) {
         ServiceRegistrationInMemoryImpl inMemoryRegistration = (ServiceRegistrationInMemoryImpl) registration;
         JobProducer service = inMemoryRegistration.getService();
+        if (!service.isReadyToAcceptJobs(job.getOperation()))
+          continue;
         if (!service.isReadyToAccept(job))
           continue;
-        else if (service.acceptJob(job)) {
-          return true;
-        } else {
-          continue;
-        }
+        service.acceptJob(job);
+        return true;
       } else {
         logger.warn("This implementation of the service registry doesn't support dispatching to remote services");
         // TODO: Add remote dispatching
