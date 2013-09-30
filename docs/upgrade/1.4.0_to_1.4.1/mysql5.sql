@@ -20,3 +20,5 @@ set @exist := (select count(*) from information_schema.statistics where TABLE_NA
 set @sqlstmt := if( @exist > 0, 'DROP INDEX UNQ_job_argument_0 on mh_job_argument;', 'SELECT "1.3.x upgraded schema detected"' );
 PREPARE stmt FROM @sqlstmt;
 EXECUTE stmt;
+
+ALTER TABLE mh_organization_property MODIFY name VARCHAR(255) NOT NULL;

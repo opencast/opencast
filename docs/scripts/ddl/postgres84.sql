@@ -38,13 +38,13 @@ CREATE INDEX "IX_mh_organization_property_pk" ON "mh_organization_property" ("or
 
 CREATE TABLE "mh_annotation" (
   "id" bigint NOT NULL,
-  "inpoint" bigint,
-  "outpoint" bigint,
+  "inpoint" integer,
+  "outpoint" integer,
   "mediapackage" character varying(128),
   "session" character varying(128),
   "created" timestamp,
   "user_id"  character varying(255),
-  "length" bigint,
+  "length" integer,
   "type" character varying(128),
   "value" text,
   "private" boolean,
@@ -95,10 +95,10 @@ CREATE INDEX "IX_mh_dictionary_weight" ON "mh_dictionary" ("weight");
 CREATE TABLE "mh_host_registration" (
   "id" bigint NOT NULL,
   "host" character varying(255) NOT NULL,
-  "maintenance" boolean NOT NULL,
+  "maintenance" boolean NOT NULL DEFAULT FALSE,
   "online" boolean NOT NULL DEFAULT TRUE,
   "active" boolean NOT NULL DEFAULT TRUE,
-  "max_jobs" bigint NOT NULL,
+  "max_jobs" integer NOT NULL,
   PRIMARY KEY ("id"),
   CONSTRAINT "UNQ_mh_host_registration_0" UNIQUE ("host")
 );
@@ -109,7 +109,7 @@ CREATE INDEX "IX_mh_host_registration_active" ON "mh_host_registration" ("active
 CREATE TABLE "mh_service_registration" (
   "id" bigint NOT NULL,
   "path" character varying(255) NOT NULL,
-  "job_producer" boolean NOT NULL,
+  "job_producer" boolean NOT NULL DEFAULT FALSE,
   "service_type" character varying(255) NOT NULL,
   "online" boolean NOT NULL DEFAULT TRUE,
   "active" boolean NOT NULL DEFAULT TRUE,
@@ -118,7 +118,7 @@ CREATE TABLE "mh_service_registration" (
   "state_changed" timestamp,
   "warning_state_trigger" bigint,
   "error_state_trigger" bigint,
-  "host_registration" bigint NOT NULL,
+  "host_registration" bigint,
   PRIMARY KEY ("id"),
   CONSTRAINT "UNQ_mh_service_registration_0" UNIQUE ("host_registration", "service_type"),
   CONSTRAINT "FK_service_registration_host_registration" FOREIGN KEY ("host_registration") REFERENCES "mh_host_registration" ("id") ON DELETE CASCADE
@@ -168,7 +168,7 @@ CREATE INDEX "IX_mh_job_operation" ON "mh_job" ("operation");
 CREATE TABLE "mh_job_argument" (
   "id" bigint NOT NULL,
   "argument" text,
-  "argument_index" bigint,
+  "argument_index" integer,
   CONSTRAINT "FK_mh_job_argument_id" FOREIGN KEY ("id") REFERENCES "mh_job" ("id") ON DELETE CASCADE
 );
 
@@ -241,14 +241,14 @@ CREATE TABLE "mh_upload" (
 
 CREATE TABLE "mh_user_action" (
   "id" bigint NOT NULL,
-  "user_ip" text,
-  "inpoint" bigint,
-  "outpoint" bigint,
+  "user_ip" character varying(255),
+  "inpoint" integer,
+  "outpoint" integer,
   "mediapackage" character varying(128),
   "session" character varying(128),
   "created" timestamp,
   "user_id" character varying(255),
-  "length" bigint,
+  "length" integer,
   "type" character varying(128),
   "playing" boolean DEFAULT FALSE,
   PRIMARY KEY ("id")
