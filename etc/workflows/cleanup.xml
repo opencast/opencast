@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>cleanup</id>
+  <description>Cleanup the temporary files from the working file repository</description>
+  <operations>
+
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+    </operation>
+  
+  </operations>
+  
+</definition>

@@ -85,9 +85,11 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.management.ObjectInstance;
@@ -276,6 +278,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
 
     ZipArchiveInputStream zis = null;
+    Set<String> collectionFilenames = new HashSet<String>();
     try {
       // We don't need anybody to do the dispatching for us. Therefore we need to make sure that the job is never in
       // QUEUED state but set it to INSTANTIATED in the beginning and then manually switch it to RUNNING.
@@ -311,6 +314,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
                     + FilenameUtils.getExtension(entry.getName());
             URI contentUri = workingFileRepository.putInCollection(wfrCollectionId, fileName, new ZipEntryInputStream(
                     zis, entry.getSize()));
+            collectionFilenames.add(fileName);
             // Each entry name starts with zip file name; discard it so that the map key will match the media package
             // element uri
             String key = entry.getName().substring(entry.getName().indexOf('/') + 1);
@@ -403,6 +407,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       throw new IngestException(e);
     } finally {
       IOUtils.closeQuietly(zis);
+      for (String filename : collectionFilenames) {
+        workingFileRepository.deleteFromCollection(Long.toString(job.getId()), filename);
+      }
       try {
         serviceRegistry.updateJob(job);
       } catch (Exception e) {
