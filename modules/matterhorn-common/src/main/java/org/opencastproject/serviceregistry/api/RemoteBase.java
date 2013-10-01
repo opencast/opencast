@@ -15,35 +15,34 @@
  */
 package org.opencastproject.serviceregistry.api;
 
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static org.opencastproject.util.data.Option.some;
 
 /**
  * Base class serving as a convenience implementation for remote services.
  */
 public class RemoteBase {
 
-  private static final int TIMEOUT = 5000;
+  private static final int TIMEOUT = 10000;
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(RemoteBase.class);
@@ -57,6 +56,7 @@ public class RemoteBase {
   /** The http client */
   protected ServiceRegistry remoteServiceManager = null;
 
+  /** A list of known http statuses */
   private static final List<Integer> knownHttpStatuses = Arrays.asList(HttpStatus.SC_SERVICE_UNAVAILABLE);
 
   /**
@@ -93,7 +93,7 @@ public class RemoteBase {
     HttpResponse res = null;
     try {
       res = getResponse(req);
-      return res != null ? some(f.apply(res)) : Option.<A>none();
+      return res != null ? some(f.apply(res)) : Option.<A> none();
     } finally {
       closeConnection(res);
     }
@@ -126,17 +126,26 @@ public class RemoteBase {
    * @return the response object, or null if we can not connect to any services
    */
   protected HttpResponse getResponse(HttpRequestBase httpRequest, Integer... expectedHttpStatus) {
+
+    boolean warnedUnavailability = false;
+
     // Try forever
     while (true) {
 
       List<ServiceRegistration> remoteServices = null;
+      List<String> servicesInWarningState = new ArrayList<String>();
 
       // Find available services
       while (remoteServices == null || remoteServices.size() == 0) {
+        boolean warned = false;
         try {
           remoteServices = remoteServiceManager.getServiceRegistrationsByLoad(serviceType);
           if (remoteServices == null || remoteServices.size() == 0) {
-            logger.debug("No services of type '{}' found, waiting...", serviceType);
+            if (!warned) {
+              logger.warn("No services of type '{}' found, waiting...", serviceType);
+              warned = true;
+            }
+            logger.debug("Still no services of type '{}' found, waiting...", serviceType);
             try {
               Thread.sleep(TIMEOUT);
             } catch (InterruptedException e) {
@@ -150,7 +159,6 @@ public class RemoteBase {
         }
       }
 
-      Map<String, String> hostErrors = new HashMap<String, String>();
       URI originalUri = httpRequest.getURI();
       String uriSuffix = null;
       if (originalUri != null && StringUtils.isNotBlank(originalUri.toString())) {
@@ -175,16 +183,19 @@ public class RemoteBase {
           response = client.execute(httpRequest);
           StatusLine status = response.getStatusLine();
           if (Arrays.asList(expectedHttpStatus).contains(status.getStatusCode())) {
+            if (servicesInWarningState.contains(fullUrl)) {
+              logger.warn("Service at {} is back to normal with expected status code {}", fullUrl,
+                      status.getStatusCode());
+            }
             return response;
           } else {
-            if (!knownHttpStatuses.contains(status.getStatusCode())) {
+            if (!knownHttpStatuses.contains(status.getStatusCode()) && !servicesInWarningState.contains(fullUrl)) {
               logger.warn("Service at {} returned unexpected response code {}", fullUrl, status.getStatusCode());
+              servicesInWarningState.add(fullUrl);
             }
-            hostErrors.put(httpRequest.getMethod() + " " + uri.toString(), status.toString());
             closeConnection(response);
           }
         } catch (Exception e) {
-          hostErrors.put(httpRequest.getMethod() + " " + remoteService + uriSuffix, e.getMessage());
           closeConnection(response);
         }
       }
@@ -193,7 +204,13 @@ public class RemoteBase {
       httpRequest.setURI(originalUri);
 
       // If none of them accepted the request, let's wait and retry
-      logger.warn("No service of type '{}' is currently readily available", serviceType);
+      if (!warnedUnavailability) {
+        logger.warn("No service of type '{}' is currently readily available", serviceType);
+        warnedUnavailability = true;
+      } else {
+        logger.debug("All services of type '{}' are still unavailable", serviceType);
+      }
+
       try {
         Thread.sleep(TIMEOUT);
       } catch (InterruptedException e) {
