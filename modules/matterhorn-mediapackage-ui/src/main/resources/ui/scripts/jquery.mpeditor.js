@@ -492,7 +492,7 @@
             // Fill start date time
             var date;
             if(!$.isEmptyObject(inMemoryMediaPackage.episodeCatalog.getValue('created'))) {
-                date = fromUTCDateString(inMemoryMediaPackage.episodeCatalog.getValue('created'));
+                date = new Date(inMemoryMediaPackage.episodeCatalog.getValue('created'));
             } else {
                 date = new Date();
             }
