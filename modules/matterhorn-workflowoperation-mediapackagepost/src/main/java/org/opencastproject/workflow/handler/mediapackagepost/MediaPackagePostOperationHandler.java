@@ -57,6 +57,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.opencastproject.search.api.SearchService;
+import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResult;
 
 /**
  * Workflow Operation for POSTing a MediaPackage via HTTP
@@ -65,6 +68,13 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(MediaPackagePostOperationHandler.class);
+
+  /** search service **/
+  private SearchService searchService;
+
+  public void setSearchService(SearchService searchService) {
+    this.searchService = searchService;
+  }
 
   /**
    * {@inheritDoc}
@@ -90,6 +100,20 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
     Configuration config = new Configuration(currentOperation);
 
     MediaPackage mp = workflowInstance.getMediaPackage();
+
+    /* Check if we need to replace the Mediapackage we got with the published
+     * Mediapackage from the Search Service */
+    if (config.mpFromSearch) {
+      SearchQuery searchQuery = new SearchQuery();
+      searchQuery.withId(mp.getIdentifier().toString());
+      SearchResult result = searchService.getByQuery(searchQuery);
+      if (result.size() != 1) {
+          throw new WorkflowOperationException("Received multiple results for identifier"
+              + "\"" + mp.getIdentifier().toString() + "\" from search service. ");
+      }
+      logger.info("Getting Mediapackage from Search Service");
+      mp = result.getItems()[0].getMediaPackage();
+    }
 
     try {
 
@@ -127,10 +151,10 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
       DefaultHttpClient client = new DefaultHttpClient();
 
       // Handle authentication
-      if (config.authenticate())
-      {
+      if (config.authenticate()) {
         URL targetUrl = config.getUrl().toURL();
-        client.getCredentialsProvider().setCredentials(new AuthScope(targetUrl.getHost(), targetUrl.getPort()), config.getCredentials());
+        client.getCredentialsProvider().setCredentials(
+            new AuthScope(targetUrl.getHost(), targetUrl.getPort()), config.getCredentials());
       }
 
       HttpResponse response = client.execute(post);
@@ -205,6 +229,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
     public static final String PROPERTY_AUTHUSER = "auth.username";
     public static final String PROPERTY_AUTHPASSWD = "auth.password";
     public static final String PROPERTY_DEBUG = "debug";
+    public static final String PROPERTY_MEDIAPACKAGE_TYPE = "mediapackage.type";
     public static final TreeMap<String, String> OPTIONS;
 
     static {
@@ -223,6 +248,8 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
           "The password to use for authentication");
       OPTIONS.put(Configuration.PROPERTY_DEBUG, 
           "If this options is set the message body returned by target host is dumped to log (default: no)");
+      OPTIONS.put(Configuration.PROPERTY_MEDIAPACKAGE_TYPE, 
+          "Type of Mediapackage to send (workflow, search; default: search)");
     }
 
     // Configuration values
@@ -233,6 +260,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
     private UsernamePasswordCredentials credentials = null;
     private List<NameValuePair> additionalFields = new ArrayList<NameValuePair>();
     private boolean debug = false;
+    private boolean mpFromSearch = true;
 
     public Configuration(WorkflowOperationInstance operation) throws WorkflowOperationException {
       try {
@@ -270,10 +298,17 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
         }
 
         // Configure debug mode
-        if (keys.contains("debug"))
+        if (keys.contains(PROPERTY_DEBUG))
         {
-          String debugstr = operation.getConfiguration("debug").trim().toUpperCase();
+          String debugstr = operation.getConfiguration(PROPERTY_DEBUG).trim().toUpperCase();
           debug = "YES".equals(debugstr) || "TRUE".equals(debugstr);
+        }
+
+        // Configure debug mode
+        if (keys.contains(PROPERTY_MEDIAPACKAGE_TYPE))
+        {
+          String cfgval = operation.getConfiguration(PROPERTY_MEDIAPACKAGE_TYPE).trim().toUpperCase();
+          mpFromSearch = "SEARCH".equals(cfgval);
         }
 
         // get additional form fields
@@ -315,6 +350,10 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
 
     public boolean debug() {
       return debug;
+    }
+
+    public boolean mpFromSearch() {
+      return mpFromSearch;
     }
   }
 
