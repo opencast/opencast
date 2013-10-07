@@ -55,6 +55,9 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
   /** Name of the configuration key that specifies the flavor of the track to analyze */
   private static final String PROP_ANALYSIS_TRACK_FLAVOR = "source-flavor";
 
+  /** Name of the configuration key that specifies the flavor of the track to analyze */
+  private static final String PROP_TARGET_TAGS = "target-tags";
+
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
 
@@ -62,6 +65,7 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put(PROP_ANALYSIS_TRACK_FLAVOR,
             "The flavor of the track to analyze. If multiple tracks match this flavor, the first will be used.");
+    CONFIG_OPTIONS.put(PROP_TARGET_TAGS, "The tags to apply to the resulting mpeg-7 segments catalog");
   }
 
   /** The composer service */
@@ -83,9 +87,11 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
-  public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     logger.debug("Running video segmentation on workflow {}", workflowInstance.getId());
 
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
@@ -93,6 +99,7 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
 
     // Find movie track to analyze
     String trackFlavor = StringUtils.trimToNull(operation.getConfiguration(PROP_ANALYSIS_TRACK_FLAVOR));
+    List<String> targetTags = asList(operation.getConfiguration(PROP_TARGET_TAGS));
     List<Track> candidates = new ArrayList<Track>();
     if (trackFlavor != null)
       candidates.addAll(Arrays.asList(mediaPackage.getTracks(MediaPackageElementFlavor.parseFlavor(trackFlavor))));
@@ -132,6 +139,10 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
       mpeg7Catalog.setURI(workspace.moveTo(mpeg7Catalog.getURI(), mediaPackage.getIdentifier().toString(),
               mpeg7Catalog.getIdentifier(), "segments.xml"));
       mpeg7Catalog.setReference(new MediaPackageReferenceImpl(track));
+      // Add target tags
+      for (String tag : targetTags) {
+        mpeg7Catalog.addTag(tag);
+      }
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
