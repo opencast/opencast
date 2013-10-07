@@ -429,6 +429,7 @@
       description="Detecting slide transitions in presentation track">
       <configurations>
         <configuration key="source-flavor">presentation/trimmed</configuration>
+        <configuration key="target-tags">engage-download</configuration>
       </configurations>
     </operation>
 
