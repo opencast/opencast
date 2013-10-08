@@ -487,13 +487,13 @@ public class JobJpaImpl extends JaxbJob {
       payload.getBytes(); // force the clob to load
     }
     if (creatorServiceRegistration == null) {
-      logger.warn("creator service registration is null");
+      logger.warn("creator service registration for job '{}' is null", id);
     } else {
       super.createdHost = creatorServiceRegistration.getHost();
       super.jobType = creatorServiceRegistration.getServiceType();
     }
     if (processorServiceRegistration == null) {
-      logger.debug("processor service registration is null");
+      logger.debug("processor service registration for job '{}' is null", id);
     } else {
       super.processingHost = processorServiceRegistration.getHost();
       super.jobType = processorServiceRegistration.getServiceType();
