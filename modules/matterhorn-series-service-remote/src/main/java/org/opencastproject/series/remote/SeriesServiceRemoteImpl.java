@@ -19,6 +19,7 @@ import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -92,18 +93,23 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       throw new SeriesException("Unable to assemble a remote series request for updating series " + seriesId, e);
     }
 
-    HttpResponse response = getResponse(post, SC_NO_CONTENT, SC_CREATED);
+    HttpResponse response = getResponse(post, SC_NO_CONTENT, SC_CREATED, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        if (SC_NO_CONTENT == response.getStatusLine().getStatusCode()) {
+        int statusCode = response.getStatusLine().getStatusCode();
+        if (SC_NO_CONTENT == statusCode) {
           logger.info("Successfully updated series {} in the series service", seriesId);
           return null;
-        } else {
+        } else if (SC_UNAUTHORIZED == statusCode) {
+          throw new UnauthorizedException("Not authorized to update series " + seriesId);
+        } else if (SC_CREATED == statusCode) {
           DublinCoreCatalogImpl catalogImpl = new DublinCoreCatalogImpl(response.getEntity().getContent());
           logger.info("Successfully created series {} in the series service", seriesId);
           return catalogImpl;
         }
       }
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       throw new SeriesException("Unable to update series " + seriesId + " using the remote series services: " + e);
     } finally {
@@ -125,7 +131,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       throw new SeriesException("Unable to assemble a remote series request for updating an ACL " + accessControl, e);
     }
 
-    HttpResponse response = getResponse(post, SC_NO_CONTENT, SC_CREATED, SC_NOT_FOUND);
+    HttpResponse response = getResponse(post, SC_NO_CONTENT, SC_CREATED, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
         int status = response.getStatusLine().getStatusCode();
@@ -134,6 +140,8 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         } else if (SC_NO_CONTENT == status) {
           logger.info("Successfully updated ACL of {} to the series service", seriesID);
           return true;
+        } else if (SC_UNAUTHORIZED == status) {
+          throw new UnauthorizedException("Not authorized to update series ACL of " + seriesID);
         } else if (SC_CREATED == status) {
           logger.info("Successfully created ACL of {} to the series service", seriesID);
           return false;
@@ -148,12 +156,15 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @Override
   public void deleteSeries(String seriesID) throws SeriesException, NotFoundException, UnauthorizedException {
     HttpDelete del = new HttpDelete(seriesID);
-    HttpResponse response = getResponse(del, SC_OK, SC_NOT_FOUND);
+    HttpResponse response = getResponse(del, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        int statusCode = response.getStatusLine().getStatusCode();
+        if (SC_NOT_FOUND == statusCode) {
           throw new NotFoundException("Series not found: " + seriesID);
-        } else {
+        } else if (SC_UNAUTHORIZED == statusCode) {
+          throw new UnauthorizedException("Not authorized to delete series " + seriesID);
+        } else if (SC_OK == statusCode) {
           logger.info("Successfully deleted {} from the remote series index", seriesID);
           return;
         }
@@ -167,13 +178,15 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{seriesID:.+}.json")
-  public Response getSeriesJSON(@PathParam("seriesID") String seriesID) {
+  public Response getSeriesJSON(@PathParam("seriesID") String seriesID) throws UnauthorizedException {
     logger.debug("Series Lookup: {}", seriesID);
     try {
       DublinCoreCatalog dc = getSeries(seriesID);
       return Response.ok(dc.toJson()).build();
     } catch (NotFoundException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       logger.error("Could not retrieve series: {}", e.getMessage());
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -183,17 +196,21 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @Override
   public DublinCoreCatalog getSeries(String seriesID) throws SeriesException, NotFoundException, UnauthorizedException {
     HttpGet get = new HttpGet(seriesID + ".xml");
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
+    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
         if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
           throw new NotFoundException("Series " + seriesID + " not found in remote series index!");
+        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+          throw new UnauthorizedException("Not authorized to get series " + seriesID);
         } else {
           DublinCoreCatalog dublinCoreCatalog = new DublinCoreCatalogImpl(response.getEntity().getContent());
           logger.debug("Successfully received series {} from the remote series index", seriesID);
           return dublinCoreCatalog;
         }
       }
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -231,10 +248,13 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("series.json")
-  public Response getSeriesAsJson(@QueryParam("startPage") long startPage, @QueryParam("count") long count) {
+  public Response getSeriesAsJson(@QueryParam("startPage") long startPage, @QueryParam("count") long count)
+          throws UnauthorizedException {
     try {
       DublinCoreCatalogList result = getSeries(new SeriesQuery().setStartPage(startPage).setCount(count));
       return Response.ok(result.getResultsAsJson()).build();
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       logger.warn("Could not perform search query: {}", e.getMessage());
     }
@@ -244,13 +264,20 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @Override
   public DublinCoreCatalogList getSeries(SeriesQuery query) throws SeriesException, UnauthorizedException {
     HttpGet get = new HttpGet(getSeriesUrl(query));
-    HttpResponse response = getResponse(get);
+    HttpResponse response = getResponse(get, SC_OK, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        DublinCoreCatalogList list = DublinCoreCatalogList.parse(EntityUtils.toString(response.getEntity(), "UTF-8"));
-        logger.info("Successfully get series dublin core catalog list from the remote series index");
-        return list;
+        int statusCode = response.getStatusLine().getStatusCode();
+        if (SC_OK == statusCode) {
+          DublinCoreCatalogList list = DublinCoreCatalogList.parse(EntityUtils.toString(response.getEntity(), "UTF-8"));
+          logger.info("Successfully get series dublin core catalog list from the remote series index");
+          return list;
+        } else if (SC_UNAUTHORIZED == statusCode) {
+          throw new UnauthorizedException("Not authorized to get series from query");
+        }
       }
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       throw new SeriesException("Unable to get series from query from remote series index: " + e);
     } finally {
