@@ -32,6 +32,7 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -44,6 +45,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -124,7 +126,51 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   @Override
   public Long[] addReccuringEvent(DublinCoreCatalog eventCatalog, Map<String, String> wfProperties)
           throws SchedulerException, UnauthorizedException {
-    throw new UnsupportedOperationException();
+    HttpPost post = new HttpPost("/");
+    logger.debug("Start adding new events through remote Schedule Service");
+
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("dublincore", eventCatalog.toXmlString()));
+
+      String wfPropertiesString = "";
+      for (Map.Entry<String, String> entry : wfProperties.entrySet())
+        wfPropertiesString += entry.getKey() + "=" + entry.getValue() + "\n";
+
+      // Add an empty agentparameters as it is required by the Rest Endpoint
+      params.add(new BasicNameValuePair("agentparameters", "remote.scheduler.empty.parameter"));
+      params.add(new BasicNameValuePair("wfproperties", wfPropertiesString));
+
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to assemble a remote scheduler request for adding events " + eventCatalog, e);
+    }
+
+    HttpResponse response = getResponse(post, SC_CREATED);
+    try {
+      if (response != null && SC_CREATED == response.getStatusLine().getStatusCode()) {
+
+        try {
+          String idsStr = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+          List<Long> ids = new ArrayList<Long>();
+
+          for (String id : StringUtils.split(idsStr, ",")) {
+            ids.add(Long.parseLong(id));
+          }
+
+          return ids.toArray(new Long[ids.size()]);
+        } catch (IOException e) {
+          throw new SchedulerException("Unable to parse the events ids from the reponse creation.");
+        }
+      } else {
+        throw new SchedulerException("Unable to add event " + eventCatalog + " to the scheduler service");
+      }
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to add event " + eventCatalog + " to the scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+
   }
 
   @Override

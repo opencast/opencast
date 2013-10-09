@@ -283,7 +283,7 @@ public class SchedulerRestService {
         for (long id : createdIDs) {
           service.updateCaptureAgentMetadata(caProperties, tuple(id, service.getEventDublinCore(id)));
         }
-        return Response.status(Status.CREATED).build();
+        return Response.status(Status.CREATED).entity(StringUtils.join(createdIDs, ",")).build();
       } else {
         Long id = service.addEvent(eventCatalog, wfProperties);
         service.updateCaptureAgentMetadata(caProperties, tuple(id, eventCatalog));
