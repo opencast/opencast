@@ -226,8 +226,8 @@
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-publication-service-api</module>
-        <module>modules/matterhorn-publication-service-youtube</module>
+		<module>modules/matterhorn-publication-service-api</module>
+		<module>modules/matterhorn-publication-service-youtube</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
@@ -258,8 +258,8 @@
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-publication-service-api</module>
-        <module>modules/matterhorn-publication-service-youtube-remote</module>
+		<module>modules/matterhorn-publication-service-api</module>
+		<module>modules/matterhorn-publication-service-youtube-remote</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
@@ -354,8 +354,8 @@
         <module>modules/matterhorn-lti</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-publication-service-api</module>
-        <module>modules/matterhorn-publication-service-youtube-remote</module>
+		<module>modules/matterhorn-publication-service-api</module>
+		<module>modules/matterhorn-publication-service-youtube-remote</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-search-service-remote</module>
@@ -1441,7 +1441,7 @@
       <dependency>
         <groupId>org.apache.felix</groupId>
         <artifactId>org.apache.felix.http.bundle</artifactId>
-        <version>2.2.1</version>
+        <version>2.2.0</version>
       </dependency>
 
       <!-- testing -->
