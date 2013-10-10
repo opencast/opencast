@@ -210,8 +210,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       try {
         DublinCoreCatalog[] events = persistence.getAllEvents();
         if (events.length != 0) {
-          logger.info("The recording event index is empty. Populating it with {} events",
-                  Integer.valueOf(events.length));
+          logger.info("The event index is empty. Populating it with {} events", Integer.valueOf(events.length));
 
           for (DublinCoreCatalog event : events) {
             final long id = getEventIdentifier(event);
@@ -220,7 +219,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
             index.index(event, properties);
           }
 
-          logger.info("Finished populating recording event index");
+          logger.info("Finished populating event search index");
         }
       } catch (Exception e) {
         logger.warn("Unable to index event instances: {}", e.getMessage());
@@ -292,7 +291,10 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   }
 
   /**
-   * Updates workflow for event, which values where updated.
+   * Updates workflow for the given event.
+   * <p>
+   * This method will only allow updates to workflows that are either in the "schedule" operation or are in instantiated
+   * or paused state.
    * 
    * @param event
    *          {@link DublinCoreCatalog} of updated event
@@ -303,7 +305,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * @param wfProperties
    *          the workflow configuration properties
    * @throws SchedulerException
-   *           if workflow is not in paused state or current operation is no longer 'schedule'
+   *           if workflow is not in paused or instantiated state and current operation is not 'schedule'
    * @throws NotFoundException
    *           if workflow with ID from DublinCore cannot be found
    * @throws WorkflowException
