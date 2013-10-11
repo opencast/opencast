@@ -202,7 +202,7 @@ public class CalendarGenerator {
       event.getProperties().add(agentsAttachment);
 
     } catch (Exception e) {
-      logger.error("Unable to add event '{}' to recording calendar: {} ", eventId, e.getMessage());
+      logger.error("Unable to add event '{}' to recording calendar: {} ", eventId, e);
       return false;
     }
 

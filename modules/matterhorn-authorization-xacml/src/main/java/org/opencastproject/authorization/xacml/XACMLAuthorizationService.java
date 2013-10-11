@@ -132,7 +132,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
         logger.warn("XACML policy file not found '{}'.", xacmlUri);
         return getFallbackAcl(mediapackage);
       } catch (IOException e) {
-        logger.error("Unable to access XACML policy file. {}", xacmlPolicyFile, e);
+        logger.error("Unable to access XACML policy file '{}': {}", xacmlUri, e);
         return getFallbackAcl(mediapackage);
       }
 

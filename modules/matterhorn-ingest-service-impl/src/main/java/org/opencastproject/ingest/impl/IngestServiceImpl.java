@@ -323,7 +323,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             logger.info("Zip entry {} stored at {}", job.getId() + entry.getName(), contentUri);
           }
         } catch (IOException e) {
-          logger.warn("Unable to process zip entry {}: {}", entry.getName(), e.getMessage());
+          logger.warn("Unable to process zip entry {}: {}", entry.getName(), e);
           throw e;
         }
       }
