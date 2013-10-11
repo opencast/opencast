@@ -209,6 +209,38 @@
     </profile>
 
     <profile>
+      <id>dist-standalone</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-authorization-xacml</module>
+        <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-db</module>
+        <module>modules/matterhorn-distribution-service-acl</module>
+        <module>modules/matterhorn-distribution-service-api</module>
+        <module>modules/matterhorn-distribution-service-download</module>
+        <module>modules/matterhorn-distribution-service-streaming</module>
+        <module>modules/matterhorn-dublincore</module>
+        <module>modules/matterhorn-json</module>
+        <module>modules/matterhorn-kernel</module>
+        <module>modules/matterhorn-metadata-api</module>
+        <module>modules/matterhorn-mpeg7</module>
+		<module>modules/matterhorn-publication-service-api</module>
+		<module>modules/matterhorn-publication-service-youtube</module>
+        <module>modules/matterhorn-runtime-dependencies</module>
+        <module>modules/matterhorn-runtime-info-ui</module>
+        <module>modules/matterhorn-series-service-api</module>
+        <module>modules/matterhorn-series-service-remote</module>
+        <module>modules/matterhorn-static</module>
+        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-webconsole</module>
+        <module>modules/matterhorn-workflow-service-api</module>
+        <module>modules/matterhorn-workspace-api</module>
+      </modules>
+    </profile>
+
+    <profile>
       <id>dist</id>
       <activation>
         <activeByDefault>true</activeByDefault>
