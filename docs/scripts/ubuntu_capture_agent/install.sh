@@ -26,16 +26,10 @@ export START_PATH=$PWD
 export WORKING_DIR=/tmp/cainstallscript
 
 # Root for the source code repository
-export SVN_URL=https://opencast.jira.com/svn/MH
-# Extension for the SVN_URL to reach the trunk
-export TRUNK_URL=$SVN_URL/trunk
-# Extension for the SVN_URL to reach the branches
-export BRANCHES_URL=$SVN_URL/branches/1.4.x
-# Extension for the SVN_URL to reach the tags
-export TAGS_URL=$SVN_URL/tags
+export GIT_URL=https://bitbucket.org/opencast-community/matterhorn.git
 
 # Default URL from where scripts and java source will be dowloaded
-export SRC_DEFAULT=$TRUNK_URL
+export SRC_DEFAULT=$GIT_URL
 
 # File containing the rules to be applied by udev to the configured devices -- not a pun!
 export DEV_RULES=/etc/udev/rules.d/matterhorn.rules
@@ -264,7 +258,7 @@ virtual="$(cat /proc/cpuinfo | grep -m 1 'siblings' | cut -d ':' -f 2)"
 echo "$model_name ($physical physical core(s), $virtual virtual cores)" >> $LOG_FILE
 
 
-# Check for the necessary scripts and download them from the svn location
+# Check for the necessary scripts
 unset missing
 for f in "${REQUIRED[@]}"; do
     # Check if the script is in the directory where the install.sh script was launched
