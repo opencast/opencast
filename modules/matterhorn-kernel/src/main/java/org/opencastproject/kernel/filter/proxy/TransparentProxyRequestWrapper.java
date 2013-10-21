@@ -50,4 +50,15 @@ class TransparentProxyRequestWrapper extends HttpServletRequestWrapper {
     return originalIP;
   }
 
+  /**
+   * Overwrites the original behavior by returning the address transported in the <code>X-FORWARDED-FOR</code> request
+   * header instead of the proxy's hostname.
+   * 
+   * @see javax.servlet.ServletRequestWrapper#getRemoteHost()
+   */
+  @Override
+  public String getRemoteHost() {
+    return originalIP;
+  }
+
 }
