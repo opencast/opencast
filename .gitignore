@@ -9,7 +9,7 @@ logs/*
 work/*
 
 # ignore maven target directories
-*/target/*
+target
 
 # ignore Eclipse project data
 */.project
@@ -23,3 +23,5 @@ work/*
 # just in case.. ignore SVN subdir
 */.svn/*
 
+# Ignore all temporary editor files
+.*.swp
