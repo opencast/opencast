@@ -207,7 +207,6 @@ public class SchedulerServiceImplTest {
     schedSvc.setSeriesService(seriesService);
     schedSvc.setIndex(index);
     schedSvc.setPersistence(schedulerDatabase);
-    schedSvc.setIngestService(ingestService);
 
     schedSvc.activate(null);
   }
@@ -579,7 +578,6 @@ public class SchedulerServiceImplTest {
     schedSvc2.setSeriesService(seriesService);
     schedSvc2.setIndex(index);
     schedSvc2.setPersistence(schedulerDatabase);
-    schedSvc2.setIngestService(ingestService);
 
     schedSvc2.activate(null);
 
