@@ -14,10 +14,9 @@ fi
 
 while [[ true ]]; do
     echo
-    ask -d "${SRC_DEFAULT}" "Enter develop (for trunk), or the name of the tag or branch you would like to install" url
+    ask "Enter develop (for trunk), or the name of the tag or branch you would like to install" branch
 
-    echo -n "Attempting to download matterhorn source from $url... "
-    git checkout $url
+    git checkout $branch
 
     if [[ $? -eq 0 ]]; then
         break
