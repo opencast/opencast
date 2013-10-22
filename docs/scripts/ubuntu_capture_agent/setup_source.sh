@@ -14,12 +14,20 @@ fi
 
 while [[ true ]]; do
     echo
-    ask -d "${SRC_DEFAULT}" "Enter develop (for trunk), or the name of the tag or branch you would like to install" url
+    ask "Enter develop (for trunk), or the name of the tag or branch you would like to install" branch
 
-    echo -n "Attempting to download matterhorn source from $url... "
-    git checkout $url
+    pushd . > /dev/null
+    if [[ ! $copied ]]; then
+      cp -rv $PARENT_CHECKOUT_DIR $FELIX_HOME > /dev/null
+      copied=true
+    fi
+    cd $FELIX_HOME
+    git reset --hard
+    git checkout $branch
+    checkoutVal=$?
+    popd > /dev/null
 
-    if [[ $? -eq 0 ]]; then
+    if [[ $checkoutVal -eq 0 ]]; then
         break
     else
         ## Error

@@ -27,9 +27,10 @@ export WORKING_DIR=/tmp/cainstallscript
 
 # Root for the source code repository
 export GIT_URL=https://bitbucket.org/opencast-community/matterhorn.git
-
 # Default URL from where scripts and java source will be dowloaded
 export SRC_DEFAULT=$GIT_URL
+# The current checkout location
+export PARENT_CHECKOUT_DIR=$(echo `pwd` | sed 's/\(.*\/.*\)\/docs\/scripts\/ubuntu_capture_agent/\1/g')
 
 # File containing the rules to be applied by udev to the configured devices -- not a pun!
 export DEV_RULES=/etc/udev/rules.d/matterhorn.rules
