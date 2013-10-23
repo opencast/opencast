@@ -211,7 +211,7 @@
     <profile>
       <id>dist-standalone</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
