@@ -3,12 +3,14 @@
 # e.g. to override the mirror to use, you could do something like:
 #    UBUNTU_MIRROR=http://aifile.usask.ca/apt-mirror/mirror/archive.ubuntu.com/ubuntu/ ./buildvm.sh
 
+#Bring in some useful shell magic
+FUNCTION_FILE="../ubuntu_capture_agent/functions.sh"
+${FUNCTION_FILE}
+
 HOME=`pwd`
-if [ "$MATTERHORN_SVN" = "" ];
-  then
-  MATTERHORN_SVN="https://opencast.jira.com/svn/MH/trunk/"
-fi
-echo "Building VM with using this SVN url: $MATTERHORN_SVN"
+MATTERHORN_GIT="https://bitbucket.org/opencast-community/matterhorn.git"
+
+echo "Building VM with using this SVN url: $MATTERHORN_GIT"
 #check for existance of mirror URL
 if [ "$UBUNTU_MIRROR" = "" ];
   then
@@ -75,7 +77,7 @@ if [ ! -e vmbackup ]; then
   --addpkg acpid \
   --addpkg openjdk-6-jre --addpkg gstreamer0.10-plugins* \
   --addpkg gstreamer0.10-ffmpeg --addpkg gstreamer-tools \
-  --addpkg wget --addpkg ntp --addpkg nano --addpkg subversion
+  --addpkg wget --addpkg ntp --addpkg nano --addpkg git
 
   echo "change the vm to use nat networking instead of bridged"
   sed -i 's/bridged/nat/g' ubuntu-vmw6/opencast.vmx
@@ -119,7 +121,7 @@ sudo mkdir mnt/opt/matterhorn
 
 sudo cp matterhorn_setup.sh mnt/home/$USERNAME/matterhorn_setup.sh
 #change matterhorn_setup.sh to use the correct svn repo path"
-sudo sed -i "s'OC_URL=.*$'OC_URL=$MATTERHORN_SVN'" mnt/home/$USERNAME/matterhorn_setup.sh
+sudo sed -i "s'OC_URL=.*$'OC_URL=$MATTERHORN_GIT'" mnt/home/$USERNAME/matterhorn_setup.sh
 sudo echo "if [ -e /home/$USERNAME/matterhorn_setup.sh -a ! -e /home/$USERNAME/.matterhorn_setup.complete ]; then" >> mnt/home/$USERNAME/.bashrc
 sudo echo "  /home/$USERNAME/matterhorn_setup.sh && touch /home/$USERNAME/.matterhorn_setup.complete" >> mnt/home/$USERNAME/.bashrc
 sudo echo "fi" >> mnt/home/$USERNAME/.bashrc
@@ -131,10 +133,29 @@ echo "=========================="
 #check out svn
 if [ -e matterhorn_source ]; then
   cd matterhorn_source
-  svn up
+  git pull
   cd ..
 else
-  svn co $MATTERHORN_SVN matterhorn_source
+  git clone $MATTERHORN_GIT matterhorn_source
+  cd matterhorn_source
+  while [[ true ]]; do
+    echo
+    ask "Which branch or tag would you like to build a VM for?" branch
+
+    git reset --hard
+    git checkout $branch
+    checkoutVal=$?
+
+    if [[ $checkoutVal -eq 0 ]]; then
+	break
+    else
+	## Error
+	echo "Error! Couldn't check out the matterhorn code. Please check to ensure you have the correct checkout name."
+	yesno -d yes "Do you wish to retry?" retry
+	[[ "$retry" ]] || exit 1
+    fi
+  done
+  cd ..
 fi
 
 sudo cp -r matterhorn_source mnt/opt/matterhorn/
@@ -175,7 +196,7 @@ echo "export OC=/opt/matterhorn" >> mnt/home/$USERNAME/.bashrc
 echo "export MATTERHORN_HOME=/opt/matterhorn" >> mnt/home/$USERNAME/.bashrc
 echo "export FELIX_HOME=\$MATTERHORN_HOME/felix" >> mnt/home/$USERNAME/.bashrc
 echo "export M2_REPO=/home/$USERNAME/.m2/repository" >> mnt/home/$USERNAME/.bashrc
-echo "export OC_URL=$MATTERHORN_SVN" >> mnt/home/$USERNAME/.bashrc
+echo "export OC_URL=$MATTERHORN_GIT" >> mnt/home/$USERNAME/.bashrc
 echo "export JAVA_HOME=/usr/lib/jvm/default-java" >> mnt/home/$USERNAME/.bashrc
 echo "export MAVEN_OPTS=\"-Xms256m -Xmx512m -XX:PermSize=64m -XX:MaxPermSize=128m\"" >> mnt/home/$USERNAME/.bashrc
 
@@ -206,6 +227,12 @@ echo "==========================================================="
 echo "================Compression Complete, signing=============="
 echo "=====This is optional, kill the process to skip signing===="
 echo "==========================================================="
+
+echo "Executing the following, manual parallelization is recommended!"
+echo "gpg --armor -b opencast-$OC_REV.zip"
+echo "gpg --armor -b opencast-$OC_REV.7z"
+echo "md5sum opencast-$OC_REV* > opencast-$OC_REV.md5"
+echo "gpg --armor -b opencast-$OC_REV.md5"
 
 gpg --armor -b opencast-$OC_REV.zip
 gpg --armor -b opencast-$OC_REV.7z
