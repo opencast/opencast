@@ -1,0 +1,8 @@
+work
+logs
+lib
+target
+.classpath
+.settings
+.project
+.nbproject

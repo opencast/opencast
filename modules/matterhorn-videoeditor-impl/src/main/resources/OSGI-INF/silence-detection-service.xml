@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+  <scr:component name="org.opencastproject.videoeditor.silencedetection.impl.SilenceDetectionServiceImpl" 
+                 immediate="true" activate="activate" deactivate="deactivate">
+
+    <implementation class="org.opencastproject.videoeditor.silencedetection.impl.SilenceDetectionServiceImpl" />
+    <property name="service.description" value="Silence Detection Service" />
+    
+    <service>
+      <provide interface="org.opencastproject.videoeditor.silencedetection.api.SilenceDetectionService" />
+      <provide interface="org.osgi.service.cm.ManagedService" />
+    </service>
+    
+    <reference name="service-registry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+               policy="static" cardinality="1..1" bind="setServiceRegistry" />
+    <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+               policy="static" cardinality="1..1" bind="setWorkspace" />
+    <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+               policy="static" cardinality="1..1" bind="setSecurityService" />
+    <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"
+               policy="static" cardinality="1..1" bind="setUserDirectoryService" />
+    <reference name="organization-directory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+               policy="static" cardinality="1..1" bind="setOrganizationDirectoryService" />
+    <reference name="smil-service" interface="org.opencastproject.smil.api.SmilService"
+               policy="static" cardinality="1..1" bind="setSmilService" />
+  </scr:component>
+  
+  <scr:component name="org.opencastproject.videoeditor.silencedetection.endpoint.SilenceDetectionServiceEndpoint" immediate="true">
+
+    <implementation class="org.opencastproject.videoeditor.silencedetection.endpoint.SilenceDetectionServiceEndpoint" />
+    <property name="service.description" value="Silence Detection Service REST Endpoint" />
+    <property name="opencast.service.type" value="org.opencastproject.videoeditor.silencedetection" />
+    <property name="opencast.service.path" value="/silencedetection" />
+    <property name="opencast.service.jobproducer" value="true" />
+
+    <service>
+      <provide interface="org.opencastproject.videoeditor.silencedetection.endpoint.SilenceDetectionServiceEndpoint" />
+    </service>
+    
+    <reference name="service-registry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+               policy="static" cardinality="1..1" bind="setServiceRegistry" />
+    <reference name="silence-detection-service" interface="org.opencastproject.videoeditor.silencedetection.api.SilenceDetectionService"
+               policy="static" cardinality="1..1" bind="setSilenceDetectionService" />
+  </scr:component>
+</scr:components>

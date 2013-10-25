@@ -23,7 +23,7 @@
         <li class="ui-helper-clearfix">
           <span id="trimholdconfig">
             <input id="trimHold" name="trimHold" type="checkbox" class="configField holdCheckbox" value="true" />
-            <span id="i18n_hold_for_trim">&nbsp;Review / Trim before encoding (with option to edit info)</span>
+            <span id="i18n_hold_for_trim">&nbsp;Videoeditor (with option to edit info)</span>
           </span>
         </li>
         <li class="ui-helper-clearfix">
@@ -174,7 +174,7 @@
       <configurations>
         <configuration key="source-flavor">presenter/source</configuration>
         <configuration key="target-flavor">presenter/work</configuration>
-        <configuration key="rewrite">false</configuration>
+        <configuration key="rewrite">true</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
       </configurations>
     </operation>
@@ -187,39 +187,78 @@
       <configurations>
         <configuration key="source-flavor">presentation/source</configuration>
         <configuration key="target-flavor">presentation/work</configuration>
-        <configuration key="rewrite">false</configuration>
+        <configuration key="rewrite">true</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
       </configurations>
     </operation>
-
-    <!-- encode to hold preview player formats -->
-
+    
+    <!-- encode trim preview as webm video -->
     <operation
       id="compose"
-      if="${videoPreview}"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Encoding presenter (camera) video for preview">
-      <configurations>
-        <configuration key="source-flavor">*/work</configuration>
-        <configuration key="target-flavor">*/preview</configuration>
-        <configuration key="encoding-profile">flash-preview.http</configuration>
-      </configurations>
-    </operation>
-
-    <!-- hold to trim media-->
-
-    <operation
-      id="trim"
       if="${trimHold}"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="Waiting for user to review / trim recording">
+      description="Encoding presenter (camera) video for videoeditor preview">
       <configurations>
         <configuration key="source-flavor">*/work</configuration>
+        <configuration key="target-flavor">*/preview</configuration>
+        <configuration key="target-tags">webm</configuration>
+        <configuration key="encoding-profile">webm-preview.http</configuration>
+      </configurations>
+    </operation>
+    
+    <!-- extract audio from video in wave format for waveform -->
+    <operation
+      id="compose"
+      if="${trimHold}"
+      fail-on-error="false"
+      description="Extracting audio for waveform generation">
+      <configurations>
+        <configuration key="source-flavor">presenter/work</configuration>
+        <configuration key="target-flavor">audio/waveform</configuration>
+        <configuration key="target-tags">waveform</configuration>
+        <configuration key="encoding-profile">audio-waveform.http</configuration>
+      </configurations>
+    </operation>
+    
+    <!-- generate waveform from wav file -->
+    <operation
+      id="waveform"
+      if="${trimHold}"
+      fail-on-error="false"
+      description="Generating waveform">
+      <configurations>
+        <configuration key="source-flavor">audio/waveform</configuration>
+        <configuration key="target-flavor">image/waveform</configuration>
+      </configurations>
+    </operation>
+    
+    <!-- let SilenceDetection detect some silence -->
+    <operation
+      id="silence"
+      if="${trimHold}"
+      fail-on-error="false"
+      description="Executing SilenceDetection">
+      <configurations>
+        <configuration key="source-flavor">audio/waveform</configuration>
+        <configuration key="target-flavor">smil/smil</configuration>
+      </configurations>
+    </operation>
+
+    <!-- hold to edit media--> 
+    <!-- produce trimmed and muxed videos -->
+
+    <operation
+      id="editor"
+      if="${trimHold}"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Waiting for user to review / video edit recording">
+      <configurations>
+        <configuration key="source-flavors">*/work</configuration>
+        <configuration key="preview-flavors">*/preview</configuration>
+        <configuration key="smil-flavor">smil/smil</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>
-        <configuration key="encoding-profile">trim.work</configuration>
-        <!-- configuration key="duration-threshold">1000</configuration -->
       </configurations>
     </operation>
 

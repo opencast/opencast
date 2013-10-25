@@ -98,6 +98,16 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-smil-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-videoeditor-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-dublincore</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -208,6 +218,7 @@
               OSGI-INF/operations/cleanup.xml,
               OSGI-INF/operations/compose.xml,
               OSGI-INF/operations/coverart.xml,
+              OSGI-INF/operations/editor.xml,
               OSGI-INF/operations/distribute-acl.xml,
               OSGI-INF/operations/download-dvd.xml,
               OSGI-INF/operations/email.xml,
@@ -229,10 +240,12 @@
               OSGI-INF/operations/searchindex-remove.xml,
               OSGI-INF/operations/schedule.xml,
               OSGI-INF/operations/segmentpreviews.xml,
+              OSGI-INF/operations/silence.xml,
               OSGI-INF/operations/speech-recognition.xml,
               OSGI-INF/operations/tag.xml,
               OSGI-INF/operations/trim.xml,
               OSGI-INF/operations/zip.xml,
+              OSGI-INF/operations/waveform.xml,
               OSGI-INF/operations/watermark.xml
             </Service-Component>
           </instructions>
