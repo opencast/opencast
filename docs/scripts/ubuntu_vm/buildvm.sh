@@ -1,16 +1,16 @@
-#!/bin/sh
+#!/bin/bash
 # To set variables before calling this script just include them directly on the command line.
 # e.g. to override the mirror to use, you could do something like:
 #    UBUNTU_MIRROR=http://aifile.usask.ca/apt-mirror/mirror/archive.ubuntu.com/ubuntu/ ./buildvm.sh
 
 #Bring in some useful shell magic
 FUNCTION_FILE="../ubuntu_capture_agent/functions.sh"
-${FUNCTION_FILE}
+. ${FUNCTION_FILE}
 
 HOME=`pwd`
 MATTERHORN_GIT="https://bitbucket.org/opencast-community/matterhorn.git"
 
-echo "Building VM with using this SVN url: $MATTERHORN_GIT"
+echo "Building VM with using this Git url: $MATTERHORN_GIT"
 #check for existance of mirror URL
 if [ "$UBUNTU_MIRROR" = "" ];
   then
@@ -29,7 +29,7 @@ export JAVA_HOME=`mvn --version | grep "Java home" | awk '{print $3}'`
 #for each param in $# evaluate $i as an item
 
 #install extras that we need if running this script
-sudo apt-get -y install ubuntu-vm-builder subversion zip git-core maven2
+sudo apt-get -y install ubuntu-vm-builder git-core zip git-core maven2
 
 #check to see if the vmware disk mounting tool is there
 if which vmware-mount >/dev/null; then
@@ -120,7 +120,7 @@ sudo ln -s /opt/matterhorn/felix/docs/scripts/init/matterhorn_init_d.sh mnt/etc/
 sudo mkdir mnt/opt/matterhorn
 
 sudo cp matterhorn_setup.sh mnt/home/$USERNAME/matterhorn_setup.sh
-#change matterhorn_setup.sh to use the correct svn repo path"
+#change matterhorn_setup.sh to use the correct git repo path"
 sudo sed -i "s'OC_URL=.*$'OC_URL=$MATTERHORN_GIT'" mnt/home/$USERNAME/matterhorn_setup.sh
 sudo echo "if [ -e /home/$USERNAME/matterhorn_setup.sh -a ! -e /home/$USERNAME/.matterhorn_setup.complete ]; then" >> mnt/home/$USERNAME/.bashrc
 sudo echo "  /home/$USERNAME/matterhorn_setup.sh && touch /home/$USERNAME/.matterhorn_setup.complete" >> mnt/home/$USERNAME/.bashrc
@@ -130,33 +130,34 @@ echo "=========================="
 echo "=====Fetching Opencast===="
 echo "=========================="
 
-#check out svn
+#check out git
 if [ -e matterhorn_source ]; then
   cd matterhorn_source
   git pull
   cd ..
 else
   git clone $MATTERHORN_GIT matterhorn_source
-  cd matterhorn_source
-  while [[ true ]]; do
-    echo
-    ask "Which branch or tag would you like to build a VM for?" branch
-
-    git reset --hard
-    git checkout $branch
-    checkoutVal=$?
-
-    if [[ $checkoutVal -eq 0 ]]; then
-	break
-    else
-	## Error
-	echo "Error! Couldn't check out the matterhorn code. Please check to ensure you have the correct checkout name."
-	yesno -d yes "Do you wish to retry?" retry
-	[[ "$retry" ]] || exit 1
-    fi
-  done
-  cd ..
 fi
+
+cd matterhorn_source
+while [[ true ]]; do
+  echo
+  ask "Which branch or tag would you like to build a VM for?" branch
+
+  git reset --hard
+  git checkout $branch
+  checkoutVal=$?
+
+  if [[ $checkoutVal -eq 0 ]]; then
+    break
+  else
+    ## Error
+    echo "Error! Couldn't check out the matterhorn code. Please check to ensure you have the correct checkout name."
+    yesno -d yes "Do you wish to retry?" retry
+    [[ "$retry" ]] || exit 1
+  fi
+done
+cd ..
 
 sudo cp -r matterhorn_source mnt/opt/matterhorn/
 sudo ln -s /opt/matterhorn/matterhorn_source mnt/opt/matterhorn/felix
@@ -164,7 +165,9 @@ sudo ln -s /opt/matterhorn/matterhorn_source mnt/opt/matterhorn/felix
 #Nuke the existing config
 sudo sed -i "s/\$USER/$USERNAME/g" mnt/opt/matterhorn/matterhorn_source/docs/scripts/init/matterhorn_init_d.sh
 sudo chown -R $USER:$USER mnt/opt/matterhorn/matterhorn_source
-export OC_REV=`svn info matterhorn_source | awk /Revision/ | cut -d " " -f 2`
+cd matterhorn_source
+export OC_REV=`git log -n 1 | grep commit | sed 's/commit \(.*\)/\1/'`
+cd ..
 
 echo "=========================="
 echo "=====Building Opencast===="
@@ -220,20 +223,17 @@ sudo chown -R `id -u`:`id -g` ubuntu-vmw6
 mv ubuntu-vmw6 opencast-$OC_REV
 echo "Console Username: $USERNAME" > opencast-$OC_REV/README
 echo "Console Password: $PASSWORD" >> opencast-$OC_REV/README
-zip -db -r -9 opencast-$OC_REV.zip opencast-$OC_REV
-7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on opencast-$OC_REV.7z opencast-$OC_REV
-
-echo "==========================================================="
-echo "================Compression Complete, signing=============="
-echo "=====This is optional, kill the process to skip signing===="
-echo "==========================================================="
 
 echo "Executing the following, manual parallelization is recommended!"
+echo "zip -db -r -9 opencast-$OC_REV.zip opencast-$OC_REV"
+echo "7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on opencast-$OC_REV.7z opencast-$OC_REV"
 echo "gpg --armor -b opencast-$OC_REV.zip"
 echo "gpg --armor -b opencast-$OC_REV.7z"
 echo "md5sum opencast-$OC_REV* > opencast-$OC_REV.md5"
 echo "gpg --armor -b opencast-$OC_REV.md5"
 
+zip -db -r -9 opencast-$OC_REV.zip opencast-$OC_REV
+7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on opencast-$OC_REV.7z opencast-$OC_REV
 gpg --armor -b opencast-$OC_REV.zip
 gpg --armor -b opencast-$OC_REV.7z
 md5sum opencast-$OC_REV* > opencast-$OC_REV.md5
