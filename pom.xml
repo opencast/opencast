@@ -1925,6 +1925,17 @@
       </roles>
       <timezone>-5</timezone>
     </developer>
+    <developer>
+      <id>lkiesow</id>
+      <name>Lars Kiesow</name>
+      <email>lkiesow@uos.de</email>
+      <organization>Fraunhofer IAIS, University of Osnabrueck</organization>
+      <organizationUrl>http://www.uos.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
 
   <contributors><!-- TODO? -->
