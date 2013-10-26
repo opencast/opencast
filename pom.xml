@@ -1473,6 +1473,7 @@
       <dependency>
         <groupId>org.apache.felix</groupId>
         <artifactId>org.apache.felix.http.bundle</artifactId>
+        <classifier>opencast</classifier>
         <version>2.2.0</version>
       </dependency>
 
