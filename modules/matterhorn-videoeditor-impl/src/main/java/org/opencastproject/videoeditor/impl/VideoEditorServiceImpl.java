@@ -77,7 +77,6 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
    * The logging instance
    */
   private static final Logger logger = LoggerFactory.getLogger(VideoEditorServiceImpl.class);
-  private static final String JOB_TYPE = "org.opencastproject.videoeditor";
   private static final String COLLECTION_ID = "videoeditor";
   private static final String SINK_FLAVOR_SUBTYPE = "trimmed";
 

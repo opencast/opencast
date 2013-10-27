@@ -20,7 +20,12 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.smil.entity.api.Smil;
 
 public interface VideoEditorService {
-    
+
+  /**
+   * ServiceRegistry job type.
+   */
+  String JOB_TYPE = "org.opencastproject.videoeditor";
+
   /**
    * Create {@see org.opencastproject.smil.entity.Smil} processing 
    * {@see org.opencastproject.job.api.Job}s to edit Tracks.

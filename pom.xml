@@ -68,13 +68,13 @@
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
+        <module>modules/matterhorn-smil-api</module>
+        <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static</module>
         <module>modules/matterhorn-solr</module>
-        <module>modules/matterhorn-smil-api</module>
-        <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-videoeditor-api</module>
-        <module>modules/matterhorn-videoeditor-impl</module>
+        <module>modules/matterhorn-videoeditor-remote</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-userdirectory-jpa</module>
         <module>modules/matterhorn-videosegmenter-api</module>
@@ -394,6 +394,8 @@
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
+        <module>modules/matterhorn-smil-api</module>
+        <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
@@ -402,6 +404,10 @@
         <module>modules/matterhorn-textextractor-ocropus</module>
         -->
         <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-smil-api</module>
+        <module>modules/matterhorn-smil-impl</module>
+        <module>modules/matterhorn-videoeditor-api</module>
+        <module>modules/matterhorn-videoeditor-impl</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-impl</module>
         <module>modules/matterhorn-webconsole</module>
@@ -435,6 +441,8 @@
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-remote</module>
+        <module>modules/matterhorn-smil-api</module>
+        <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
@@ -443,6 +451,8 @@
         <module>modules/matterhorn-textextractor-ocropus</module>
         -->
         <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-videoeditor-api</module>
+        <module>modules/matterhorn-videoeditor-impl</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-impl</module>
         <module>modules/matterhorn-webconsole</module>
@@ -469,10 +479,14 @@
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
+        <module>modules/matterhorn-smil-api</module>
+        <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-remote</module>
+        <module>modules/matterhorn-videoeditor-api</module>
+        <module>modules/matterhorn-videoeditor-remote</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-remote</module>
         <module>modules/matterhorn-webconsole</module>
