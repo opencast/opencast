@@ -21,9 +21,14 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.videoeditor.api.ProcessFailedException;
 
 /**
- *
+ * SilenceDetectionService detect silent seqences in audio tracks.
  */
 public interface SilenceDetectionService {
+  
+  /**
+   * ServiceRegistry job type.
+   */
+  String JOB_TYPE = "org.opencastproject.videoeditor.silencedetection";
   
   /**
    * Run silence detection on audio (visual) file.

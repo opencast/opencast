@@ -56,7 +56,6 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
 	 * The logging instance
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(SilenceDetectionServiceImpl.class);
-	private static final String JOB_TYPE = "org.opencastproject.videoeditor.silencedetection";
 
 	private static enum Operation {
 
