@@ -1,0 +1,11 @@
+#videojs_wrapper{
+  padding: 15px 0px 15px 0px;
+}
+
+#videoDisplay1{
+	float: left;
+	margin-left: -5%;
+}
+#videoDisplay2{
+  margin-left: 50%;
+}

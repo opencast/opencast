@@ -1,0 +1,141 @@
+<div id="navigation_wrapper">
+    <div id="navigation_control">
+        <div id="backward_button" class="controlbutton">
+            <img src="<%= plugin_path %>/images/backward.png" />
+        </div>
+        <div id="playpause_controls" class="controlbutton">
+            <img id="play_button" class="playpause_btn" src="<%= plugin_path %>/images/play.png" /> 
+            <img id="pause_button" class="playpause_btn" style="display: none;" src="<%= plugin_path %>/images/pause.png" />
+        </div>
+        <div id="forward_button" class="controlbutton">
+            <img src="<%= plugin_path %>/images/forward.png" />
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <div id="volume"></div>
+    <div class="volume_icon" id="volumeIcon">
+        <img id="unmuted_button" class="mute_btn" src="<%= plugin_path %>/images/volume.png" />
+        <img id="muted_button" class="mute_btn" style="display: none;" src="<%= plugin_path %>/images/volumeMuted.png" /> 
+    </div>
+
+    <div id="navigation_time">
+        <% if((typeof startTime !== "undefined") && (typeof duration !== "undefined")) { %>
+        <input id="navigation_time_current" type="text" value="<%= startTime %>" /><span> / <span id="navigation_time_duration"><%= duration %></span></span>
+        <% } else { %>
+        <input id="navigation_time_current" type="text" value="00:00:00" /><span> / <span id="navigation_time_duration">00:00:00</span></span>
+        <% } %>
+    </div>
+
+    <!-- ##### Logo ##### -->
+
+    <div id="navigation_logo">
+        <% if(typeof logoLink !== "undefined") { %>
+        <a href="<%= logoLink %>">
+            <% } %>
+            <img src="<%= plugin_path %>/images/logo.png" />
+            <% if(typeof logoLink !== "undefined") { %>
+        </a>
+        <% } %>
+    </div>
+
+    <!-- ##### Navigation ##### -->
+
+    <div id="menu">
+
+        <a id="fullscreen_button" class="btn btn-small">
+            <img src="<%= plugin_path %>/images/fullscreen.png" />
+        </a>
+
+        <!--
+        <div class="btn-group">
+            <a class="btn btn-small dropdown-toggle" data-toggle="dropdown"
+               href="#"> <img src="<%= plugin_path %>/images/gear.png" /> <span
+                    class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li class="disabled"><a href="#">Quality</a></li>
+                <li class="divider"></li>
+                <li><a href="#">low</a></li>
+                <li><a href="#">medium</a></li>
+                <li><a href="#">high</a></li>
+                <li><a href="#">HD</a></li>
+            </ul>
+        </div>
+        -->
+
+        <!--
+        <div class="btn-group" style="margin: 0px;">
+            <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                <img src="<%= plugin_path %>/images/share.png" /> <span
+                    class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li class="disabled"><a href="#">Share</a></li>
+                <li class="divider"></li>
+                <li><a href="#">embed</a></li>
+                <li><a href="#">email</a></li>
+                <li><a href="#">video at current time</a></li>
+            </ul>
+        </div>
+        -->
+
+        <!--
+        <a class="btn btn-small" id="shortcuts" href="#openShortcuts"
+           role="button" data-toggle="modal"> <img
+                src="<%= plugin_path %>/images/shortcuts.png" />
+        </a> <a class="btn btn-small"> <img
+                src="<%= plugin_path %>/images/logout.png" />
+        </a>
+        -->
+    </div>
+
+    <div class="clear"></div>
+
+    <!-- ##### Slider ##### -->
+
+    <div id="slider"></div>
+
+    <div id="segment_wrapper">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="row-fluid">
+                    <!--
+                    <a class="span3 segment segment1" data-original-title="00:00:00"
+                       data-content="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
+                       data-placement="bottom"></a> <a class="span2 segment segment2"
+                       data-original-title="00:09:10"
+                       data-content="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
+                       data-placement="bottom"></a> <a class="span1 segment segment3"
+                       data-original-title="00:18:25"
+                       data-content="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
+                       data-placement="bottom"></a> <a class="span3 segment segment4"
+                       data-original-title="00:23:54"
+                       data-content="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
+                       data-placement="bottom"></a> <a class="span1 segment segment5"
+                       data-original-title="00:27:57"
+                       data-content="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
+                       data-placement="bottom"></a> <a class="span2 segment segment6"
+                       data-original-title="00:30:11"
+                       data-content="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
+                       data-placement="bottom"></a>
+                    -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ##### Expanded Content ##### -->
+    <!-- 
+            <div class="expanded_content">
+                    <img src="<%= plugin_path %>/images/statistic.png" />
+                    <div class="clear"></div>
+            </div>
+    
+            <div class="expand_button">
+                    <img class="pulldown_image"
+                            src="<%= plugin_path %>/images/pulldown.png" />
+            </div>
+    -->
+</div>
+<!-- end Navigation -->

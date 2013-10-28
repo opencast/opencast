@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.engage.theodul.manager.EngagePluginManagerRestService" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.engage.theodul.manager.impl.EngagePluginManagerRestService" />
+  <property name="service.description" value="Engage Plugin Manager REST Endpoint" />
+  <property name="opencast.service.type" value="org.opencastproject.engage.plugin.manager" />
+  <property name="opencast.service.path" value="/engage/theodul/manager" />
+  <service>
+    <provide interface="org.opencastproject.engage.theodul.manager.impl.EngagePluginManagerRestService" />
+  </service>
+  <reference name="engage-plugin-manager" interface="org.opencastproject.engage.theodul.api.EngagePluginManager"
+    cardinality="1..1" policy="static" bind="setPluginManager"/>
+</scr:component>
