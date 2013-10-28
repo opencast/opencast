@@ -74,7 +74,6 @@
         <module>modules/matterhorn-static</module>
         <module>modules/matterhorn-solr</module>
         <module>modules/matterhorn-videoeditor-api</module>
-        <module>modules/matterhorn-videoeditor-remote</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-userdirectory-jpa</module>
         <module>modules/matterhorn-videosegmenter-api</module>
@@ -85,7 +84,7 @@
         <module>modules/matterhorn-workspace-api</module>
       </modules>
     </profile>
-    
+
     <profile>
       <id>analytics</id>
       <activation>
@@ -134,7 +133,7 @@
       </modules>
     </profile>
 
-     <profile>
+    <profile>
       <id>export-all-in-one</id>
       <activation>
         <activeByDefault>false</activeByDefault>
@@ -163,8 +162,8 @@
         <module>modules/matterhorn-ingest-service-impl</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
-		<module>modules/matterhorn-scheduler-api</module>
-		<module>modules/matterhorn-scheduler-impl</module>
+        <module>modules/matterhorn-scheduler-api</module>
+        <module>modules/matterhorn-scheduler-impl</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -172,7 +171,7 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
-		<module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory-jpa</module>
         <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -192,8 +191,8 @@
         <module>modules/matterhorn-ingest-service-impl</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
-		<module>modules/matterhorn-scheduler-api</module>
-		<module>modules/matterhorn-scheduler-remote</module>
+        <module>modules/matterhorn-scheduler-api</module>
+        <module>modules/matterhorn-scheduler-remote</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-remote</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -201,10 +200,10 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
-		<module>modules/matterhorn-userdirectory-jpa</module>
-		<module>modules/matterhorn-webconsole</module>
+        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
-        <module>modules/matterhorn-workflow-service-remote</module>   
+        <module>modules/matterhorn-workflow-service-remote</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-working-file-repository-service-impl</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -230,8 +229,8 @@
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-		<module>modules/matterhorn-publication-service-api</module>
-		<module>modules/matterhorn-publication-service-youtube</module>
+        <module>modules/matterhorn-publication-service-api</module>
+        <module>modules/matterhorn-publication-service-youtube</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
@@ -262,8 +261,8 @@
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-		<module>modules/matterhorn-publication-service-api</module>
-		<module>modules/matterhorn-publication-service-youtube-remote</module>
+        <module>modules/matterhorn-publication-service-api</module>
+        <module>modules/matterhorn-publication-service-youtube-remote</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
@@ -358,8 +357,8 @@
         <module>modules/matterhorn-lti</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-		<module>modules/matterhorn-publication-service-api</module>
-		<module>modules/matterhorn-publication-service-youtube-remote</module>
+        <module>modules/matterhorn-publication-service-api</module>
+        <module>modules/matterhorn-publication-service-youtube-remote</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-search-service-remote</module>
@@ -2064,7 +2063,7 @@
       <releases>
         <enabled>true</enabled>
       </releases>
-    </repository>    
+    </repository>
     <repository>
       <id>eclipselink</id>
       <name>Eclipselink Repo</name>
