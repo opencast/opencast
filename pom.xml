@@ -1960,9 +1960,9 @@
   </licenses>
 
   <scm>
-    <connection>scm:svn:https://opencastproject.jira.com/svn/products/matterhorn/trunk</connection>
-    <developerConnection>scm:svn:https://opencastproject.jira.com/svn/products/matterhorn/trunk</developerConnection>
-    <url>https://opencastproject.jira.com/svn/products/matterhorn/trunk</url>
+    <connection>scm:git:https://bitbucket.org/opencast-community/matterhorn.git</connection>
+    <developerConnection>scm:git:git@bitbucket.org:opencast-community/matterhorn.git</developerConnection>
+    <url>https://bitbucket.org/opencast-community</url>
   </scm>
 
   <issueManagement>
