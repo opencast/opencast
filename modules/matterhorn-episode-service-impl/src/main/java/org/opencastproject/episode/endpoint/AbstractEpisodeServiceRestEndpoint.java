@@ -242,7 +242,6 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
                                 @RestParameter(name = "series", isRequired = false, description = "Filter results by mediapackage's series identifier.", type = STRING),
                                 @RestParameter(name = "license", isRequired = false, description = "Filter results by mediapackage's license.", type = STRING),
                                 @RestParameter(name = "title", isRequired = false, description = "Filter results by mediapackage's title.", type = STRING),
-                                @RestParameter(name = "tag", isRequired = false, decription = "Filter results by tag.", type = STRING),
                                 @RestParameter(name = "limit", type = RestParameter.Type.STRING, defaultValue = "10", description = "The maximum number of items to return per page. Values less than 0 set no limit. Non-integer values cause \"not found\".", isRequired = false),
                                 @RestParameter(name = "offset", type = RestParameter.Type.STRING, defaultValue = "0", description = "The page number.", isRequired = false),
                                 @RestParameter(name = "sort", type = RestParameter.Type.STRING, description = "The sort order.  May include any "
