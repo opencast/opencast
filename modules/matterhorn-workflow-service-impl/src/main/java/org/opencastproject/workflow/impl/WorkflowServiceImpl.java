@@ -750,7 +750,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
           throws WorkflowException, UnauthorizedException {
     WorkflowOperationInstance processingOperation = workflow.getCurrentOperation();
     if (processingOperation == null)
-      throw new IllegalStateException("No operation to run, workflow is " + workflow.getState());
+      throw new IllegalStateException("Workflow '" + workflow + "' has no operation to run");
 
     // Keep the current state for later reference, it might have been changed from the outside
     WorkflowState initialState = workflow.getState();
@@ -1288,6 +1288,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
                   ERROR_RESOLUTION_HANDLER_ID, "Error Resolution Operation", "error", true);
           WorkflowOperationInstanceImpl errorResolutionInstance = new WorkflowOperationInstanceImpl(
                   errorResolutionDefinition, currentOperation.getPosition());
+          errorResolutionInstance.setExceptionHandlingWorkflow(currentOperation.getExceptionHandlingWorkflow());
           operations.add(currentOperation.getPosition(), errorResolutionInstance);
           workflow.setOperations(operations);
           break;
