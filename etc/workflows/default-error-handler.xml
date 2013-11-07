@@ -8,12 +8,13 @@
 
     <operation
       id="zip"
-      description="Cleaning up after failure"
+      description="Creating zipped recording archive"
       fail-on-error="true"
       exception-handler-workflow="cleanup">
       <configurations>
         <configuration key="zip-collection">failed.zips</configuration>
         <configuration key="include-flavors">*/source,dublincore/*</configuration>
+        <configuration key="target-flavor">archive/zip</configuration>
         <configuration key="compression">false</configuration>
       </configurations>
     </operation>
@@ -24,6 +25,9 @@
       id="cleanup"
       fail-on-error="false"
       description="Cleaning up">
+      <configurations>
+        <configuration key="preserve-flavors">archive/zip</configuration>
+      </configurations>
     </operation>
   
   </operations>
