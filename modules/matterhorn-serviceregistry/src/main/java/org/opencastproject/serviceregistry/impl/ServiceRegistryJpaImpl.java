@@ -1930,6 +1930,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           logger.debug("Service {} is currently refusing to accept jobs of type {}", registration, job.getOperation());
           continue;
         } else if (responseStatusCode == HttpStatus.SC_PRECONDITION_FAILED) {
+          jpaJob.setStatus(Status.FAILED);
+          updateJob(jpaJob);
           logger.debug("Service {} refused to accept {}", registration, job);
           throw new UndispatchableJobException(IOUtils.toString(response.getEntity().getContent()));
         } else {
