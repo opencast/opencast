@@ -30,6 +30,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
@@ -75,6 +76,7 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -180,6 +182,9 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /** The thread pool to use for firing listeners and handling dispatched jobs */
   protected ThreadPoolExecutor executorService;
+
+  /** The workspace */
+  protected Workspace workspace = null;
 
   /** The service registry */
   protected ServiceRegistry serviceRegistry = null;
@@ -890,6 +895,19 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
           UnauthorizedException {
     WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
     instance.setState(STOPPED);
+
+    // Remove
+    logger.info("Removing temporary files for stopped workflow {}", workflowInstanceId);
+    for (MediaPackageElement elem : instance.getMediaPackage().getElements()) {
+      try {
+        logger.debug("Removing temporary file {} for stopped workflow {}", elem.getURI(), workflowInstanceId);
+        workspace.delete(elem.getURI());
+      } catch (IOException e) {
+        logger.warn("Unable to delete mediapackage element {}", e.getMessage());
+      }
+    }
+
+    // Update the workflow instance
     update(instance);
     return instance;
   }
@@ -1884,6 +1902,16 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       sb.append("\n");
     }
     return sb.toString();
+  }
+
+  /**
+   * Callback for the OSGi environment to register with the <code>Workspace</code>.
+   * 
+   * @param workspace
+   *          the workspace
+   */
+  protected void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
   }
 
   /**
