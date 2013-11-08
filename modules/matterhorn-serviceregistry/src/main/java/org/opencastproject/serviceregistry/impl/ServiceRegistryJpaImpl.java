@@ -44,6 +44,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.opencastproject.serviceregistry.api.SystemLoad;
+import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.serviceregistry.impl.jmx.HostsStatistics;
 import org.opencastproject.serviceregistry.impl.jmx.JobsStatistics;
 import org.opencastproject.serviceregistry.impl.jmx.ServicesStatistics;

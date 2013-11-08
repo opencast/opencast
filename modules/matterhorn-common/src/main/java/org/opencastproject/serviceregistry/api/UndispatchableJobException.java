@@ -16,7 +16,10 @@
 package org.opencastproject.serviceregistry.api;
 
 /**
- * Exception that is thrown during service lookups.
+ * Exception that is thrown if a job is not dispatchable by any service that would normally accept this type of work.
+ * <p>
+ * The exception indicates that there may be something wrong with the job or that the job cannot be dispatched because
+ * of related circumstances.
  */
 public class UndispatchableJobException extends Exception {
 
