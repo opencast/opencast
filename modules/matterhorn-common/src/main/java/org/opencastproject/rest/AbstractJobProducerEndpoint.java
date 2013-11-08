@@ -20,6 +20,7 @@ import org.opencastproject.job.api.JobParser;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,8 +68,13 @@ public abstract class AbstractJobProducerEndpoint {
     }
 
     // See if the service has strong feelings about this particular job
-    if (!service.isReadyToAccept(job)) {
-      logger.debug("Service {} refused to accept job {}", service, job);
+    try {
+      if (!service.isReadyToAccept(job)) {
+        logger.debug("Service {} temporarily refused to accept job {}", service, job);
+        return Response.status(Status.SERVICE_UNAVAILABLE).build();
+      }
+    } catch (UndispatchableJobException e) {
+      logger.warn("Service {} permanently refused to accept job {}", service, job);
       return Response.status(Status.PRECONDITION_FAILED).build();
     }
 

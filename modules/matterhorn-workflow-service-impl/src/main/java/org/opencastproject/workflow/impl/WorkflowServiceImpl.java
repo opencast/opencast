@@ -48,6 +48,7 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
@@ -1590,7 +1591,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * @see org.opencastproject.job.api.AbstractJobProducer#isReadyToAccept(org.opencastproject.job.api.Job)
    */
   @Override
-  public boolean isReadyToAccept(Job job) throws ServiceRegistryException {
+  public boolean isReadyToAccept(Job job) throws ServiceRegistryException, UndispatchableJobException {
     String operation = job.getOperation();
 
     // Only restrict execution of new jobs
@@ -1611,7 +1612,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
           }
         }
       } catch (WorkflowParsingException e) {
-        throw new IllegalStateException(job + " is not a proper job to start a workflow");
+        throw new UndispatchableJobException(job + " is not a proper job to start a workflow", e);
       }
     }
 
@@ -1631,13 +1632,13 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       logger.error(
               "Trying to start workflow with id {} but no corresponding instance is available from the workflow service",
               job.getId());
-      return false;
-    } catch (WorkflowDatabaseException e) {
-      logger.error("Error loading workflow instance {}: {}", job.getId(), e.getMessage());
-      return false;
+      throw new UndispatchableJobException(e);
     } catch (UnauthorizedException e) {
       logger.error("Authorization denied while requesting to loading workflow instance {}: {}", job.getId(),
               e.getMessage());
+      throw new UndispatchableJobException(e);
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Error loading workflow instance {}: {}", job.getId(), e.getMessage());
       return false;
     }
 
@@ -1647,7 +1648,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     // Make sure we are not excluding ourselves
     toomany |= workflowInstances.size() == 1 && workflow.getId() != workflowInstances.getItems()[0].getId();
 
-    // Avoid running multiple workflows with same media package id at same time
+    // Avoid running multiple workflows with same media package id at the same time
     if (toomany) {
       if (!delayedWorkflows.contains(workflow.getId())) {
         logger.info("Delaying start of workflow {}, another workflow on media package {} is still running",
