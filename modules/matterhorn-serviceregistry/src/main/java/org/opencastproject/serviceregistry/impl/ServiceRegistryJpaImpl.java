@@ -44,6 +44,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.opencastproject.serviceregistry.api.SystemLoad;
+import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.serviceregistry.impl.jmx.HostsStatistics;
 import org.opencastproject.serviceregistry.impl.jmx.JobsStatistics;
 import org.opencastproject.serviceregistry.impl.jmx.ServicesStatistics;
@@ -1930,6 +1931,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           logger.debug("Service {} is currently refusing to accept jobs of type {}", registration, job.getOperation());
           continue;
         } else if (responseStatusCode == HttpStatus.SC_PRECONDITION_FAILED) {
+          jpaJob.setStatus(Status.FAILED);
+          updateJob(jpaJob);
           logger.debug("Service {} refused to accept {}", registration, job);
           throw new UndispatchableJobException(IOUtils.toString(response.getEntity().getContent()));
         } else {

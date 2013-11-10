@@ -413,6 +413,8 @@ public class SolrRequester {
           int textLength = segmentText.length();
           for (String t : queryTerms) {
             String strippedTerm = StringUtils.strip(t, "*");
+            if (StringUtils.isBlank(strippedTerm))
+              continue;
             int startIndex = 0;
             while (startIndex < textLength - 1) {
               int foundAt = segmentText.indexOf(strippedTerm, startIndex);

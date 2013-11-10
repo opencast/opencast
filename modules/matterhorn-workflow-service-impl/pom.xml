@@ -145,6 +145,7 @@
               org.opencastproject.workflow.api;version=${project.version},
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.mediapackage;version=${project.version},
+              org.opencastproject.workspace.api;version=${project.version},
               *;resolution:=optional
             </Import-Package>
             <Export-Package>
