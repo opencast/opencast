@@ -868,6 +868,26 @@
         <artifactId>maven-clover2-plugin</artifactId>
         <version>3.1.5</version>
       </plugin>
+<!--      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <version>2.5.3-SNAPSHOT</version>
+        <configuration>
+          <failOnError>true</failOnError>
+          <skip>true</skip>
+          <!- -<timeout>30000</timeout>- ->
+          <!- -<effort>Max</effort>- ->
+          <!- -<threshold>Low</threshold>- ->
+        </configuration>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>-->
     </plugins>
     <pluginManagement>
       <plugins>
@@ -996,7 +1016,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>2.0.1</version>
+          <version>3.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -1032,6 +1052,23 @@
               <id>performance-test</id>
               <goals>
                 <goal>jmeter</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>1.7</version>
+          <configuration>
+            <sources>
+              <source>${basedir}/src/main/resources/</source>
+            </sources>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>add-source</goal>
               </goals>
             </execution>
           </executions>
@@ -2003,6 +2040,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
         <version>2.5</version>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -2014,7 +2054,7 @@
           <!-- <detectLinks>true</detectLinks> -->
           <!-- http://jira.codehaus.org/browse/MJAVADOC-273 -->
           <detectJavaApiLink>true</detectJavaApiLink>
-          <javadocVersion>1.6</javadocVersion>
+          <javadocVersion>1.7</javadocVersion>
           <maxmemory>512m</maxmemory>
           <quiet>true</quiet>
         </configuration>
@@ -2023,6 +2063,13 @@
             <id>default</id>
             <reports>
               <report>javadoc</report>
+            </reports>
+          </reportSet>
+          <reportSet>
+            <id>aggregate</id>
+            <inherited>false</inherited>
+            <reports>
+              <report>aggregate</report>
             </reports>
           </reportSet>
         </reportSets>
@@ -2036,6 +2083,15 @@
           <inputEncoding>UTF-8</inputEncoding>
           <outputEncoding>UTF-8</outputEncoding>
         </configuration>
+        <reportSets>
+          <reportSet>
+            <id>aggregate</id>
+            <inherited>false</inherited>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -2044,18 +2100,42 @@
         <configuration>
           <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
         </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>cim</report>
+              <report>dependencies</report>
+              <report>dependency-convergence</report>
+              <report>dependency-info</report>
+              <report>dependency-management</report>
+              <report>distribution-management</report>
+              <report>index</report>
+              <report>issue-tracking</report>
+<!--              <report>license</report>-->
+              <report>mailing-list</report>
+              <report>modules</report>
+              <report>plugin-management</report>
+              <report>plugins</report>
+              <report>project-team</report>
+              <report>scm</report>
+              <report>summary</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
-      <!-- findbugs crashes the build too much -AZ -->
-      <!-- <plugin> -->
-      <!-- <groupId>org.codehaus.mojo</groupId> -->
-      <!-- <artifactId>findbugs-maven-plugin</artifactId> -->
-      <!-- <version>2.3</version> -->
-      <!-- <configuration> -->
-      <!-- <failOnError>false</failOnError> -->
-      <!-- <timeout>30000</timeout> -->
-      <!-- </configuration> -->
-      <!-- </plugin> -->
-      <plugin>
+<!--      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <version>2.5.3-SNAPSHOT</version>
+        <configuration>
+          <failOnError>true</failOnError>
+          <xmlOutput>true</xmlOutput>
+          <!- -<timeout>30000</timeout>- ->
+          <!- -<effort>Max</effort>- ->
+          <!- -<threshold>Low</threshold>- ->
+        </configuration>
+      </plugin>-->
+      <!--<plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
         <version>2.4</version>
@@ -2068,17 +2148,30 @@
           </tags>
         </configuration>
       </plugin>
-      <!-- WARNING: this plugin is beta only, we should maybe not use it -AZ -->
+      <!- - WARNING: this plugin is beta only, we should maybe not use it -AZ - ->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jdepend-maven-plugin</artifactId>
         <version>2.0-beta-2</version>
       </plugin>
+      -->
       <!-- <plugin> -->
       <!-- <groupId>org.codehaus.mojo</groupId> -->
       <!-- <artifactId>cobertura-maven-plugin</artifactId> -->
       <!-- <version>2.3</version> -->
       <!-- </plugin> -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.0.1</version>
+        <configuration>
+          <aggregate>true</aggregate>
+          <!--<includeTests>true</includeTests>-->
+          <typeResolution>true</typeResolution>
+          <language>java</language>
+          <targetJdk>1.6</targetJdk>
+        </configuration>
+      </plugin>
     </plugins>
   </reporting>
   <!-- defines the various repositories -->
