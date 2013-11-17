@@ -23,3 +23,15 @@ nbproject/
 # just in case.. ignore SVN subdir
 .svn/
 
+# OS X: related files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# OS X: Thumbnails
+._*
+
+# OS X: Files that might appear on external disk
+.Spotlight-V100
+.Trashes
