@@ -16,8 +16,10 @@
 package org.opencastproject.workflow.handler;
 
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.kernel.mail.EmailDocData;
 import org.opencastproject.kernel.mail.SmtpService;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -45,8 +47,11 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   private SmtpService smptService = null;
 
   // Configuration properties used in the workflow definition
-  private static final String TO_PROPERTY = "to";
-  private static final String SUBJECT_PROPERTY = "subject";
+  public static final String TO_PROPERTY = "to";
+  public static final String SUBJECT_PROPERTY = "subject";
+
+  public static final String BODY_PROPERTY = "body";
+  public static final String BODY_TEMPLATE_FILE_PROPERTY = "body-template-file";
 
   /*
    * (non-Javadoc)
@@ -59,7 +64,10 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   protected void activate(ComponentContext cc) {
     super.activate(cc);
     addConfigurationOption(TO_PROPERTY, "The mail address to send to");
+
     addConfigurationOption(SUBJECT_PROPERTY, "The subject line");
+    addConfigurationOption(BODY_PROPERTY, "The email body text (or Freemarker template)");
+    addConfigurationOption(BODY_TEMPLATE_FILE_PROPERTY, "The file name of the Freemarker template for the email body");
   }
 
   /**
@@ -77,11 +85,33 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // MediaPackage from previous workflow operations
     MediaPackage srcPackage = workflowInstance.getMediaPackage();
 
-    // Lookup the name of the to, from, and subject
-    String to = operation.getConfiguration(TO_PROPERTY);
-    String subject = operation.getConfiguration(SUBJECT_PROPERTY);
-    // Set the body of the message to be the ID of the media package
-    String body = srcPackage.getTitle() + "(" + srcPackage.getIdentifier().toString() + ")";
+    String body = operation.getConfiguration(BODY_PROPERTY);
+    String bodyTemplateFile = operation.getConfiguration(BODY_TEMPLATE_FILE_PROPERTY);
+
+    // Templates are cached, use as template name: the template file name or, if in-line, the
+    // workflow name + the operation number + body/to/subject
+    String templateName = bodyTemplateFile;
+    if (templateName == null) {
+      templateName = workflowInstance.getTitle() + "_" + operation.getPosition();
+    }
+
+    // To and subject can also be Freemarker templates
+    String to = DocUtil.generate(new EmailDocData(templateName + "_to", workflowInstance),
+            operation.getConfiguration(TO_PROPERTY));
+    String subject = DocUtil.generate(new EmailDocData(templateName + "_subject", workflowInstance),
+            operation.getConfiguration(SUBJECT_PROPERTY));
+
+    String bodyText = null;
+    // Body informed? If not, use the default.
+    if (body == null && bodyTemplateFile == null) {
+      // Set the body of the message to be the ID of the media package
+      bodyText = srcPackage.getTitle() + "(" + srcPackage.getIdentifier().toString() + ")";
+    } else if (body != null) {
+      bodyText = DocUtil.generate(new EmailDocData(templateName + "_body", workflowInstance), body);
+    } else {
+      String template = null; // TO DO: LOAD TEMPLATE HERE!!!!
+      bodyText = DocUtil.generate(new EmailDocData(templateName, workflowInstance), template);
+    }
 
     // Create the mail message
     MimeMessage message = smptService.createMessage();
@@ -89,7 +119,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     try {
       message.addRecipient(RecipientType.TO, new InternetAddress(to));
       message.setSubject(subject);
-      message.setText(body);
+      message.setText(bodyText);
       message.saveChanges();
 
       logger.debug("Sending e-mail notification to {}", to);
