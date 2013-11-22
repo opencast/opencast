@@ -2,6 +2,7 @@ acpid
 alsa-utils
 curl
 gcc
+git-core
 gstreamer0.10-alsa
 gstreamer0.10-plugins-base
 gstreamer0.10-plugins-good
@@ -15,6 +16,5 @@ maven2
 ntp
 openssh-server
 openjdk-6-jdk
-subversion
 v4l-conf
 wget

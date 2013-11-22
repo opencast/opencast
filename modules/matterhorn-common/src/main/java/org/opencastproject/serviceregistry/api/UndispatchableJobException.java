@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.serviceregistry.impl;
+package org.opencastproject.serviceregistry.api;
 
 /**
  * Exception that is thrown if a job is not dispatchable by any service that would normally accept this type of work.
@@ -23,11 +23,23 @@ package org.opencastproject.serviceregistry.impl;
  */
 public class UndispatchableJobException extends Exception {
 
-  /** The serial version UID */
-  private static final long serialVersionUID = 6255027328266035849L;
+  /** Serial version UID */
+  private static final long serialVersionUID = 5006552593095889618L;
 
   /**
-   * Creates an exception with an error message.
+   * Creates a new undispatchable job exception
+   * 
+   * @param message
+   *          the error message
+   * @param t
+   *          the exception causing the error
+   */
+  public UndispatchableJobException(String message, Throwable t) {
+    super(message, t);
+  }
+
+  /**
+   * Creates a new undispatchable job exception
    * 
    * @param message
    *          the error message
@@ -37,25 +49,13 @@ public class UndispatchableJobException extends Exception {
   }
 
   /**
-   * Creates an exception with a cause.
+   * Creates a new undispatchable job exception
    * 
-   * @param cause
-   *          the original cause for failure
+   * @param t
+   *          the exception causing the error
    */
-  public UndispatchableJobException(Throwable cause) {
-    super(cause);
-  }
-
-  /**
-   * Creates an exception with an error message and a cause.
-   * 
-   * @param message
-   *          the error message
-   * @param cause
-   *          the original cause
-   */
-  public UndispatchableJobException(String message, Throwable cause) {
-    super(message, cause);
+  public UndispatchableJobException(Throwable t) {
+    super(t);
   }
 
 }

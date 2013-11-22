@@ -492,7 +492,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
                   + "the workflow instance, with mediapackage elements, workflow and workflow operation configurations and "
                   + "non-current operations removed.", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow set.") })
   public Response getWorkflowsAsJson(@QueryParam("state") List<String> states, @QueryParam("q") String text,
-          @QueryParam("seriesid") String seriesId, @QueryParam("seriestitle") String seriesTitle,
+          @QueryParam("seriesId") String seriesId, @QueryParam("seriesTitle") String seriesTitle,
           @QueryParam("creator") String creator, @QueryParam("contributor") String contributor,
           @QueryParam("fromdate") String fromDate, @QueryParam("todate") String toDate,
           @QueryParam("language") String language, @QueryParam("license") String license,

@@ -294,8 +294,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       MediaPackage mp = null;
       Map<String, URI> uris = new HashMap<String, URI>();
       // Sequential number to append to file names so that, if two files have the same
-      // name, one does not overwrite the other
+      // name, one does not overwrite the other (see MH-9688)
       int seq = 1;
+      // Folder name to compare with next one to figure out if there's a root folder
+      String folderName = null;
+      // Indicates if zip has a root folder or not, initialized as true
+      boolean hasRootFolder = true;      
       // While there are entries write them to a collection
       while ((entry = zis.getNextZipEntry()) != null) {
         try {
@@ -306,8 +310,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             // Build the mediapackage
             mp = loadMediaPackageFromManifest(new ZipEntryInputStream(zis, entry.getSize()));
           } else {
-            logger.info("Storing zip entry {} in working file repository collection '{}'",
-                    job.getId() + entry.getName(), wfrCollectionId);
+            logger.info("Storing zip entry {}/{} in working file repository collection '{}'",
+                    new Object[] { job.getId(), entry.getName(), wfrCollectionId });
             // Since the directory structure is not being mirrored, makes sure the file
             // name is different than the previous one(s) by adding a sequential number
             String fileName = FilenameUtils.getBaseName(entry.getName()) + "_" + seq++ + "."
@@ -315,12 +319,23 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             URI contentUri = workingFileRepository.putInCollection(wfrCollectionId, fileName, new ZipEntryInputStream(
                     zis, entry.getSize()));
             collectionFilenames.add(fileName);
-            // Each entry name starts with zip file name; discard it so that the map key will match the media package
-            // element uri
-            String key = entry.getName().substring(entry.getName().indexOf('/') + 1);
+            // Key is the zip entry name as it is
+            String key = entry.getName();
             uris.put(key, contentUri);
             ingestStatistics.add(entry.getSize());
-            logger.info("Zip entry {} stored at {}", job.getId() + entry.getName(), contentUri);
+            logger.info("Zip entry {}/{} stored at {}", new Object[] { job.getId(), entry.getName(), contentUri });
+            // Figures out if there's a root folder. Does entry name starts with a folder?
+            int pos = entry.getName().indexOf('/');
+            if (pos == -1) {
+              // No, we can conclude there's no root folder
+              hasRootFolder = false;
+            } else if (hasRootFolder && folderName != null && !folderName.equals(entry.getName().substring(0, pos))) {
+              // Folder name different from previous so there's no root folder 
+              hasRootFolder = false;
+            } else if (folderName == null) {
+              // Just initialize folder name
+              folderName = entry.getName().substring(0, pos);
+            }
           }
         } catch (IOException e) {
           logger.warn("Unable to process zip entry {}: {}", entry.getName(), e);
@@ -351,7 +366,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
       // Update the element uris to point to their working file repository location
       for (MediaPackageElement element : mp.elements()) {
-        URI uri = uris.get(element.getURI().toString());
+        // Key has root folder name if there is one
+        URI uri = uris.get((hasRootFolder ? folderName + "/" : "") + element.getURI().toString());
 
         if (uri == null)
           throw new MediaPackageException("Unable to map element name '" + element.getURI() + "' to workspace uri");

@@ -9,13 +9,13 @@ logs/*
 work/*
 
 # ignore maven target directories
-target
+target/
 
 # ignore Eclipse project data
-*/.project
-*/.classpath
-*/.metadata
-*/.settings/*
+.project
+.classpath
+.metadata/
+.settings/
 
 # ignore NetBeans project data
 */nbproject/*
