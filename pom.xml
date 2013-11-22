@@ -2083,7 +2083,7 @@
           <inputEncoding>UTF-8</inputEncoding>
           <outputEncoding>UTF-8</outputEncoding>
         </configuration>
-        <reportSets>
+        <!--<reportSets>
           <reportSet>
             <id>aggregate</id>
             <inherited>false</inherited>
@@ -2091,7 +2091,7 @@
               <report>aggregate</report>
             </reports>
           </reportSet>
-        </reportSets>
+        </reportSets>-->
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -2106,14 +2106,14 @@
               <report>cim</report>
               <report>dependencies</report>
               <report>dependency-convergence</report>
-              <report>dependency-info</report>
+<!--3.3              <report>dependency-info</report>-->
               <report>dependency-management</report>
-              <report>distribution-management</report>
+<!--3.3              <report>distribution-management</report>-->
               <report>index</report>
               <report>issue-tracking</report>
 <!--              <report>license</report>-->
               <report>mailing-list</report>
-              <report>modules</report>
+<!--3.3              <report>modules</report>-->
               <report>plugin-management</report>
               <report>plugins</report>
               <report>project-team</report>
