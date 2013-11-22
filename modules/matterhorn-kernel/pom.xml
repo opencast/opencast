@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.4.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -317,7 +317,8 @@
               org.opencastproject.kernel.http;version=${project.version},
               org.opencastproject.kernel.http.api;version=${project.version},
               org.opencastproject.kernel.http.impl;version=${project.version},
-              org.opencastproject.kernel.https;version=${project.version},
+              org.opencastproject.kernel.filter.https;version=${project.version},
+              org.opencastproject.kernel.filter.proxy;version=${project.version},
               org.opencastproject.kernel.mail;version=${project.version},
               org.opencastproject.kernel.pingback;version=${project.version},
               org.opencastproject.kernel.rest;version=${project.version},
@@ -346,9 +347,10 @@
               OSGI-INF/rest.xml,
               OSGI-INF/security-service.xml,
               OSGI-INF/smtp-service.xml,
-              OSGI-INF/user-and-role-directory-service.xml,
               OSGI-INF/remote-user-and-role-filter.xml,
-              OSGI-INF/security-config-scanner.xml
+              OSGI-INF/security-config-scanner.xml,
+              OSGI-INF/transparentproxy-filter.xml, 
+              OSGI-INF/user-and-role-directory-service.xml
             </Service-Component>
             <JPA-PersistenceUnits>
               org.opencastproject.kernel

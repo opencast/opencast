@@ -1,68 +1,65 @@
 #!/bin/bash
 
-#The comments in this file assume you are creating a tag from a branch
-#Eg:  The defaults in the comments here will take the current version of 
-#https://opencast.jira.com/svn/MH/branches/1.3.x and tag it as 
-#https://opencast.jira.com/svn/MH/tags/1.3-rc5
+FUNCTIONS="functions.sh"
+. ${FUNCTIONS}
 
-#The name of the branch in SVN that we are looking to turn into a release
-#E.g. BRANCH_NAME=1.3.x
-BRANCH_NAME=
+#The comments in this file assume you are creating a tag from a release branch
+#This script does *not* push any changes, so it should be safe to experiment with locally
 
-#The version the POMs are in the development branch.
+#The version the POMs are in the develop branch.
 #E.g. BRANCH_POM_VER=1.3-SNAPSHOT
 BRANCH_POM_VER=
 
-#The new version of our release as it will show up in the tags directory
+#The new version of our release as it will show up in the tags
 #E.g. RELEASE_VER=1.3-rc5
 RELEASE_VER=
 
 #The jira ticket this work is being done under (must be open)
 JIRA_TICKET=
 
-#The scratch directory where the work is performed.  Make sure you have enough
-#space.  Should not already include a subdirectory of $WORK_DIR/$JIRA_TICKET
-WORK_DIR=/tmp/
-
 #=======You should not need to modify anything below this line=================
+
+WORK_DIR=$(echo `pwd` | sed 's/\(.*\/.*\)\/docs\/scripts\/release/\1/g')
+
+#Reset this script so that the modifications do not get committed
+git checkout -- tag.sh
+
+#Get the current branch name
+curBranch=`git status | grep "On branch" | sed 's/\# On branch \(.*\)/\1/'`
+
+choose -t "Are you cutting an RC, or a final release of $curBranch?" "RC" "Final Release" RELEASE_TYPE
 
 #The version we want the poms to be, usually the same as RELEASE_VER
 TAG_POM_VER=$RELEASE_VER
 
-#The actual working dir
-WORK_DIR=$WORK_DIR/$JIRA_TICKET
-
-#Matterhorn base URL
-SVN_URL=https://opencast.jira.com/svn/MH
-
-BRANCH_URL=$SVN_URL/branches/$BRANCH_NAME
-TAG_URL=$SVN_URL/tags/$RELEASE_VER
-
-#TODO: We should use an svn switch instead because while we are working on this
-#tag to get it ready people might think it has been released.
-echo "Creating new tag by copying $BRANCH_URL to $TAG_URL."
-svn copy $BRANCH_URL $TAG_URL -m "$JIRA_TICKET Creating $TAG_NAME Tag"
-
-echo "Creating scratch dir and checking out release sources"
-pushd .
-rm -rf $WORK_DIR
-mkdir $WORK_DIR
-cd $WORK_DIR
-svn co $TAG_URL .
-
 echo "Replacing POM file version in main POM."
 sed -i "s/<version>$BRANCH_POM_VER/<version>$TAG_POM_VER/" $WORK_DIR/pom.xml
 
-for i in modules/matterhorn-*
+for i in $WORK_DIR/modules/matterhorn-*
 do
     echo " Module: $i"
-    if [ -f $WORK_DIR/$i/pom.xml ]; then
-        sed -i "s/<version>$BRANCH_POM_VER/<version>$TAG_POM_VER/" $WORK_DIR/$i/pom.xml
-        sleep 1
+    if [ -f $i/pom.xml ]; then
+        sed -i "s/<version>$BRANCH_POM_VER/<version>$TAG_POM_VER/" $i/pom.xml
     fi
 done
-svn commit -m "$JIRA_TICKET Updated pom.xml files to reflect correct version.  Done via docs/scripts/release/tag.sh"
+case "$RELEASE_TYPE" in
+0)
+    # Release candidate
+    git checkout -b r/$RELEASE_VER
+    git commit -a -m "Creating $RELEASE_VER branch to contain POM changes and tag"
+    git tag -s $RELEASE_VER -m "Creating $RELEASE_VER branch and tag as part of $JIRA_TICKET"
+    git checkout $curBranch
+    ;;
+1)
+    #Final release
+    git commit -a -m "Committing $RELEASE_VER directly to $curBranch in preparation for git flow release command."
+    yesno -d no "We are about to push the changes we just made to the public repo, do you wish to proceed?  Kiling this script and rerunning it with the same options is safe, if you want to look around first." cont
+    if [[ ! "$cont" ]]; then 
+      exit 1
+    fi
+    git push --all
+    git flow release finish `echo $curBranch | sed 's/r\/\(.*\)/\1/'`
+    ;;
+esac
 
-#Return to previous environment and cleanup
-popd
-rm -rf $WORK_DIR
+echo "Please verify that things look correct, and then push the new branch and tag upstream!"

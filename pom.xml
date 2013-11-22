@@ -4,7 +4,7 @@
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
   <packaging>pom</packaging>
-  <version>1.5-SNAPSHOT</version>
+  <version>1.4.1</version>
   <name>matterhorn</name>
   <description>The Opencast Project's Matterhorn software is a media capture, processing, and distribution system</description>
   <url>http://opencastproject.org</url>
@@ -81,7 +81,7 @@
         <module>modules/matterhorn-workspace-api</module>
       </modules>
     </profile>
-    
+
     <profile>
       <id>analytics</id>
       <activation>
@@ -130,7 +130,7 @@
       </modules>
     </profile>
 
-     <profile>
+    <profile>
       <id>export-all-in-one</id>
       <activation>
         <activeByDefault>false</activeByDefault>
@@ -159,8 +159,8 @@
         <module>modules/matterhorn-ingest-service-impl</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
-		    <module>modules/matterhorn-scheduler-api</module>
-		    <module>modules/matterhorn-scheduler-impl</module>
+        <module>modules/matterhorn-scheduler-api</module>
+        <module>modules/matterhorn-scheduler-impl</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -168,7 +168,7 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
-		    <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory-jpa</module>
         <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -188,8 +188,8 @@
         <module>modules/matterhorn-ingest-service-impl</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
-		<module>modules/matterhorn-scheduler-api</module>
-		<module>modules/matterhorn-scheduler-remote</module>
+        <module>modules/matterhorn-scheduler-api</module>
+        <module>modules/matterhorn-scheduler-remote</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-remote</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -197,8 +197,8 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
-		    <module>modules/matterhorn-userdirectory-jpa</module>
-		    <module>modules/matterhorn-webconsole</module>
+        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-workflow-service-remote</module>   
         <module>modules/matterhorn-working-file-repository-service-api</module>
@@ -211,7 +211,7 @@
     <profile>
       <id>dist-standalone</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -226,8 +226,8 @@
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-		<module>modules/matterhorn-publication-service-api</module>
-		<module>modules/matterhorn-publication-service-youtube</module>
+        <module>modules/matterhorn-publication-service-api</module>
+        <module>modules/matterhorn-publication-service-youtube</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
@@ -258,8 +258,8 @@
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-		<module>modules/matterhorn-publication-service-api</module>
-		<module>modules/matterhorn-publication-service-youtube</module>
+        <module>modules/matterhorn-publication-service-api</module>
+        <module>modules/matterhorn-publication-service-youtube</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
@@ -290,8 +290,8 @@
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-		<module>modules/matterhorn-publication-service-api</module>
-		<module>modules/matterhorn-publication-service-youtube-remote</module>
+        <module>modules/matterhorn-publication-service-api</module>
+        <module>modules/matterhorn-publication-service-youtube-remote</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
@@ -386,8 +386,8 @@
         <module>modules/matterhorn-lti</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-		<module>modules/matterhorn-publication-service-api</module>
-		<module>modules/matterhorn-publication-service-youtube-remote</module>
+        <module>modules/matterhorn-publication-service-api</module>
+        <module>modules/matterhorn-publication-service-youtube-remote</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-search-service-remote</module>
@@ -674,25 +674,25 @@
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
               <execution>
-            <id>integration-tests</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <target if="harness">
-            <java classname="org.opencastproject.remotetest.Main" fork="true">
-              <classpath>
-                <pathelement path="modules/matterhorn-test-harness/target/matterhorn-test-harness-${project.version}-jar-with-dependencies.jar"/>
-              </classpath>
-              <arg value="--with${harness}" />
-            </java>
-              </target>
-            </configuration>
-          </execution>
-        </executions>
+                <id>integration-tests</id>
+                <phase>validate</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target if="harness">
+                    <java classname="org.opencastproject.remotetest.Main" fork="true">
+                      <classpath>
+                        <pathelement path="modules/matterhorn-test-harness/target/matterhorn-test-harness-${project.version}-jar-with-dependencies.jar"/>
+                      </classpath>
+                      <arg value="--with${harness}" />
+                    </java>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
-          </plugins>
+        </plugins>
       </build>
     </profile>
 
@@ -1473,6 +1473,7 @@
       <dependency>
         <groupId>org.apache.felix</groupId>
         <artifactId>org.apache.felix.http.bundle</artifactId>
+        <classifier>opencast</classifier>
         <version>2.2.0</version>
       </dependency>
 
@@ -1813,7 +1814,7 @@
       </roles>
       <timezone>+2</timezone>
     </developer>
- 	<developer>
+    <developer>
       <id>nbirnbaum</id>
       <name>Nils H. Birnbaum</name>
       <email>nbirnbau@uni-osnabrueck.de</email>
@@ -1824,7 +1825,7 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
- 	<developer>
+    <developer>
       <id>lrohner</id>
       <name>Lukas Rohner</name>
       <email>lukas@entwinemedia.com</email>
@@ -1925,6 +1926,17 @@
       </roles>
       <timezone>-5</timezone>
     </developer>
+    <developer>
+      <id>lkiesow</id>
+      <name>Lars Kiesow</name>
+      <email>lkiesow@uos.de</email>
+      <organization>Fraunhofer IAIS, University of Osnabrueck</organization>
+      <organizationUrl>http://www.uos.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
 
   <contributors><!-- TODO? -->
@@ -1948,9 +1960,9 @@
   </licenses>
 
   <scm>
-    <connection>scm:svn:https://opencastproject.jira.com/svn/products/matterhorn/trunk</connection>
-    <developerConnection>scm:svn:https://opencastproject.jira.com/svn/products/matterhorn/trunk</developerConnection>
-    <url>https://opencastproject.jira.com/svn/products/matterhorn/trunk</url>
+    <connection>scm:git:https://bitbucket.org/opencast-community/matterhorn.git</connection>
+    <developerConnection>scm:git:git@bitbucket.org:opencast-community/matterhorn.git</developerConnection>
+    <url>https://bitbucket.org/opencast-community</url>
   </scm>
 
   <issueManagement>

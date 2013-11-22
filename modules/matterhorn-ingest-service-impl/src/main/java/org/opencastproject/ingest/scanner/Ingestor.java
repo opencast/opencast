@@ -136,12 +136,12 @@ public class Ingestor {
     };
   }
 
-  /** Return true if the passed artifact can be handled by this ingestor, i.e. it lies in its inbox. */
+  /** Return true if the passed artifact can be handled by this ingestor, i.e. it lies in its inbox and its name does not start with a ".". */
   public boolean canHandle(final File artifact) {
     logger.debug("CanHandle {}, {}", myInfo(), artifact.getAbsolutePath());
     File dir = artifact.getParentFile();
     try {
-      return dir != null && inbox.getCanonicalPath().equals(dir.getCanonicalPath());
+      return dir != null && inbox.getCanonicalPath().equals(dir.getCanonicalPath()) && !artifact.getName().startsWith(".");
     } catch (IOException e) {
       logger.warn("Unable to determine canonical path of {} ", artifact.getAbsolutePath());
       return false;

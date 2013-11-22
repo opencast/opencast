@@ -136,8 +136,8 @@ public class RemoteBase {
       List<String> servicesInWarningState = new ArrayList<String>();
 
       // Find available services
+      boolean warned = false;
       while (remoteServices == null || remoteServices.size() == 0) {
-        boolean warned = false;
         try {
           remoteServices = remoteServiceManager.getServiceRegistrationsByLoad(serviceType);
           if (remoteServices == null || remoteServices.size() == 0) {

@@ -23,6 +23,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
 
@@ -112,7 +113,7 @@ public abstract class AbstractJobProducer implements JobProducer {
    * @see org.opencastproject.job.api.JobProducer#isReadyToAccept(org.opencastproject.job.api.Job)
    */
   @Override
-  public boolean isReadyToAccept(Job job) throws ServiceRegistryException {
+  public boolean isReadyToAccept(Job job) throws ServiceRegistryException, UndispatchableJobException {
     return true;
   }
 

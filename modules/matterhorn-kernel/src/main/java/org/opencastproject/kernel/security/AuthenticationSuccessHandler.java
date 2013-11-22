@@ -70,7 +70,7 @@ public class AuthenticationSuccessHandler implements
 
     // If there are no configured welcome pages, send the user to /
     if (welcomePages == null || welcomePages.isEmpty()) {
-      response.sendRedirect(welcomePages.get(ROOT));
+      response.sendRedirect(ROOT);
       return;
     }
 
@@ -87,7 +87,7 @@ public class AuthenticationSuccessHandler implements
     if (welcomePages.containsKey(WILDCARD)) {
       response.sendRedirect(welcomePages.get(WILDCARD));
     } else {
-      response.sendRedirect(welcomePages.get(ROOT));
+      response.sendRedirect(ROOT);
     }
   }
 
