@@ -72,7 +72,7 @@ import org.opencastproject.capture.impl.jobs.PollCalendarJob;
 import org.opencastproject.capture.impl.jobs.SerializeJob;
 import org.opencastproject.capture.impl.jobs.StartCaptureJob;
 import org.opencastproject.capture.impl.jobs.StopCaptureJob;
-import org.opencastproject.capture.pipeline.GStreamerPipeline;
+import org.opencastproject.capture.pipeline.GStreamerPipelineTools;
 import org.opencastproject.capture.pipeline.InvalidCaptureDevicesSpecifiedException;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -1585,7 +1585,7 @@ class Event {
   private boolean mediaFilesExist() {
     try {
       XProperties properties = captureAgent.getConfigService().getAllProperties();
-      String[] deviceNames = GStreamerPipeline.getDeviceNames(properties);
+      String[] deviceNames = GStreamerPipelineTools.getDeviceNames(properties);
       if (deviceNames != null && deviceNames.length != 0 && deviceNames[0].contains("=")) {
         deviceNames[0] = deviceNames[0].split("=")[1];
       }
