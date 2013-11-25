@@ -897,6 +897,9 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
     instance.setState(STOPPED);
 
+    // Update the workflow instance
+    update(instance);
+
     // Remove
     logger.info("Removing temporary files for stopped workflow {}", workflowInstanceId);
     for (MediaPackageElement elem : instance.getMediaPackage().getElements()) {
@@ -907,9 +910,6 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
         logger.warn("Unable to delete mediapackage element {}", e.getMessage());
       }
     }
-
-    // Update the workflow instance
-    update(instance);
     return instance;
   }
 
