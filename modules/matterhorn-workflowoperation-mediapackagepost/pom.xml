@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>org.opencastproject</groupId>
 		<artifactId>base</artifactId>
-		<version>MH_VERSION</version>
+		<version>1.5-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<properties>
