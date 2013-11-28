@@ -8,28 +8,30 @@ FUNCTIONS="functions.sh"
 
 #The version the POMs are in the develop branch.
 #E.g. BRANCH_VER=1.3-SNAPSHOT
-BRANCH_VER=
+BRANCH_VER=1.5-SNAPSHOT
 
 #The new version of our release as it will show up in the tags
 #E.g. RELEASE_VER=1.3-rc5
-RELEASE_VER=
+RELEASE_VER=1.5.0-rc1
 
 #The next version that will be going into development.  This is only relevant for final releases!
 #E.g. NEXT_VER=1.4-SNAPSHOT
-NEXT_VER=
+NEXT_VER=1.6-SNAPSHOT
 
 #The jira ticket this work is being done under (must be open)
-JIRA_TICKET=
+JIRA_TICKET=000000
 
 #=======You should not need to modify anything below this line=================
 
-WORK_DIR=$(echo `pwd` | sed 's/\(.*\/.*\)\/docs\/scripts\/release/\1/g')
+WORK_DIR=../../../
+
+yesno -d no "We need a GPG key available.  If you have one setup please continue, otherwise create one.  Do you have a GPG key ready to go?" has_key
+if [[ ! "$has_key" ]]; then 
+  exit 1
+fi
 
 #Reset this script so that the modifications do not get committed
 git checkout -- tag.sh
-
-#Get the current branch name
-curBranch=`git status | grep "On branch" | sed 's/\# On branch \(.*\)/\1/'`
 
 choose -t "Are you cutting an RC, or a final release of $curBranch?" "RC" "Final Release" RELEASE_TYPE
 
@@ -39,62 +41,65 @@ TAG_VER=$RELEASE_VER
 echo "Replacing POM file version in main POM."
 sed -i "s/<version>$BRANCH_VER/<version>$TAG_VER/" $WORK_DIR/pom.xml
 
-#TODO: Make this into a function, wrap the has_checked in a loop to prevent premature exits
-for i in $WORK_DIR/modules/matterhorn-*
-do
-    echo " Module: $i"
-    if [ -f $i/pom.xml ]; then
-        sed -i "s/<version>$BRANCH_VER/<version>$TAG_VER/" $i/pom.xml
-    fi
+while [[ true ]]; do
+  yesno -d no "NOTE: This script has made changes to your POM files.  Please ensure that it only made changes to the Matterhorn version number.  In rare cases some of the dependencies have the same version numbers, and the modification done above does *not* understand that it should not also change those versions.  Manual inspection of the changeset is required before continuing.  Have you finished checking all of the modifications?" has_checked
+  if [[ "$has_checked" ]]; then 
+      break
+  fi
 done
-
-yesno -d no "NOTE: This script has made changes to your POM files.  Please ensure that it only made changes to the Matterhorn version number.  In rare cases some of the dependencies have the same version numbers, and the modification done above does *not* understand that it should not also change those versions.  Manual inspection of the changeset is required before continuing.  Have you finished checking all of the modifications?" has_checked
-if [[ ! "$has_checked" ]]; then 
-    exit 1
-fi
 
 case "$RELEASE_TYPE" in
 0)
     # Release candidate
     git checkout -b r/$RELEASE_VER
-    git commit -a -m "Creating $RELEASE_VER branch to contain POM changes and tag"
-    git tag -s $RELEASE_VER -m "Creating $RELEASE_VER branch and tag as part of $JIRA_TICKET"
-    git checkout $curBranch
+    git commit -a -m "$JIRA_TICKET: Creating $RELEASE_VER branch to contain POM changes and tag"
+    git tag -s $RELEASE_VER -m "Release $RELEASE_VER"
+
+    echo "Summary:"
+    echo "-Created r/$RELEASE_VER"
+    echo "-Modified pom files, and tagged $RELEASE_VER"
+    echo "We can push these changes to the public repo if you want."
+    yesno -d no "Do you want this script to do that automatically for you?" push
+    if [[ "$push" ]]; then
+        git push origin r/$RELEASE_VER
+        git push --tags origin
+    fi
     ;;
 1)
     #Final release
-    git commit -a -m "Committing $RELEASE_VER directly to $curBranch in preparation for git flow release command."
-    yesno -d no "We need to push the changes we just made to the public repo so that the git flow command to finish the release will succeed, do you wish to proceed?  Answering no and rerunning this script with the same options is safe, if you want to look around first." cont
-    if [[ ! "$cont" ]]; then 
-      exit 1
-    fi
-    git push --all
+    git commit -a -m "$JIRA_TICKET: Committing $RELEASE_VER directly to $curBranch in preparation for final release."
 
-    echo "Now we are going to finish the release.  Nothing further will be automatically pushed by this script, so again it is now safe to stop at any point."
-    yesno -d no "We do, however need a GPG key available.  If you have one setup please continue, otherwise create one.  Do you have a GPG key ready to go?" has_key
-    if [[ ! "$has_key" ]]; then 
-      exit 1
-    fi
+    git tag -s $TAG_VER -m "Release $TAG_VER"
 
-    git flow release finish -s -m "Finishing release $TAG_VER" $TAG_VER
+    git checkout master
+    git merge --no-ff r/$RELEASE_VER
+    git checkout develop
+    git merge --no-ff r/$RELEASE_VER
+    git branch -d r/$RELEASE_VER
 
     echo "Replacing POM file version in main POM."
     sed -i "s/<version>$RELEASE_VER/<version>$NEXT_VER/" $WORK_DIR/pom.xml
 
-    for i in $WORK_DIR/modules/matterhorn-*
-    do
-        echo " Module: $i"
-        if [ -f $i/pom.xml ]; then
-            sed -i "s/<version>$RELEASE_VER/<version>$NEXT_VER/" $i/pom.xml
-        fi
+    while [[ true ]]; do
+      yesno -d no "NOTE: This script has made changes to your POM files.  Please ensure that it only made changes to the Matterhorn version number.  In rare cases some of the dependencies have the same version numbers, and the modification done above does *not* understand that it should not also change those versions.  Manual inspection of the changeset is required before continuing.  Have you finished checking all of the modifications?" has_checked
+      if [[ "$has_checked" ]]; then 
+          break
+      fi
     done
-    yesno -d no "NOTE: This script has made changes to your POM files.  Please ensure that it only made changes to the Matterhorn version number.  In rare cases some of the dependencies have the same version numbers, and the modification done above does *not* understand that it should not also change those versions.  Manual inspection of the changeset is required before continuing.  Have you finished checking all of the modifications?" has_checked
-    if [[ ! "$has_checked" ]]; then 
-        exit 1
+    git commit -a -m "$JIRA_TICKET: Updating POM versions to $NEXT_VER in develop"
+
+    echo "Summary:"
+    echo "-Merged r/$RELEASE_VER into master"
+    echo "-Merged r/$RELEASE_VER into develop"
+    echo "-Deleted local r/$RELEASE_VER"
+    echo "-Updated local develop POMs to $NEXT_VER"
+    echo "We can push these changes to the public repo, and delete the remote branch for you as well."
+    yesno -d no "Do you want this script to do that automatically for you?" push
+    if [[ "$push" ]]; then
+        git push origin develop
+        git push origin master
+        git push --tags origin
+        git push origin :r/$RELEASE_VER
     fi
-    git commit -a -m "Updating POM versions to $NEXT_VER as part of $JIRA_TICKET"
     ;;
 esac
-
-echo "Please verify that things look correct, and then push the new branch and tag upstream!"
-echo "Run: git push --all && git push --tags"
