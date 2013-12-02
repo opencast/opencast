@@ -9,7 +9,7 @@
             <tr class="search-item">
                     <td style="vertical-align: middle; text-align: center; width: 180px; height: 140px;">
                         <a class="itemtitle">
-                            <xsl:attribute name="href">watch.html?id=<xsl:value-of
+                            <xsl:attribute name="href">../theodul/ui/core.html?id=<xsl:value-of
                                 select="ns2:mediapackage/@id" /></xsl:attribute>
                                 <img class="thumb" alt="">
                                     <xsl:for-each select="ns2:mediapackage/ns2:attachments/ns2:attachment">
@@ -31,7 +31,7 @@
                                  <xsl:when test="ns2:mediapackage/ns2:media/ns2:track/ns2:mimetype[.='video/x-flv'] or ns2:mediapackage/ns2:media/ns2:track/ns2:mimetype[.='video/mp4'] or ns2:mediapackage/ns2:media/ns2:track/ns2:mimetype[.='audio/x-adpcm']">
                                     <b>
                                         <a class="itemtitle">
-                                            <xsl:attribute name="href">watch.html?id=<xsl:value-of
+                                            <xsl:attribute name="href">../theodul/ui/core.html?id=<xsl:value-of
                                                 select="ns2:mediapackage/@id" /></xsl:attribute>
                                             <xsl:value-of select='substring(dcTitle, 0, 80)' />
                                             <xsl:if test='string-length(dcTitle)>80'>
