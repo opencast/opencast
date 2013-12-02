@@ -369,17 +369,17 @@ public class WorkspaceImpl implements Workspace {
 
     // Remove the file and optionally its parent directory if empty
     File f = getWorkspaceFile(uri, false);
-    synchronized (wsRoot) {
-      File mpElementDir = f.getParentFile();
-      if (f.isFile())
+    if (f.isFile()) {
+      synchronized (wsRoot) {
+        File mpElementDir = f.getParentFile();
         FileUtils.forceDelete(f);
+        if (mpElementDir.isDirectory() && mpElementDir.list().length == 0)
+          FileUtils.forceDelete(mpElementDir);
 
-      if (mpElementDir.isDirectory() && mpElementDir.list().length == 0)
-        FileUtils.forceDelete(mpElementDir);
-
-      // Also delete mediapackage itself when empty
-      if (mpElementDir.getParentFile().list().length == 0)
-        FileUtils.forceDelete(mpElementDir.getParentFile());
+        // Also delete mediapackage itself when empty
+        if (mpElementDir.getParentFile().list().length == 0)
+          FileUtils.forceDelete(mpElementDir.getParentFile());
+      }
     }
 
   }
