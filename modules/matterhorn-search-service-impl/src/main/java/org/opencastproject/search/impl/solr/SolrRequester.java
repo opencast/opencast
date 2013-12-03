@@ -596,8 +596,13 @@ public class SolrRequester {
       if (StringUtils.isNotEmpty(cleanSolrTextRequest)) {
         if (sb.length() > 0)
           sb.append(" AND ");
-        sb.append("*:");
+        sb.append("( *:");
         sb.append(boost(cleanSolrTextRequest));
+        sb.append(" OR (");
+        sb.append(Schema.ID);
+        sb.append(":");
+        sb.append(cleanSolrTextRequest);
+        sb.append(") )");
       }
     }
 
