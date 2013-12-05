@@ -203,7 +203,7 @@ public class WorkspaceImpl implements Workspace {
    */
   public File get(final URI uri) throws NotFoundException, IOException {
     final String urlString = uri.toString();
-    final File f = getWorkspaceFile(uri, false);
+    final File f = getWorkspaceFile(uri, true);
 
     // Does the file exist and is it up to date?
     Long workspaceFileLastModified = new Long(0); // make sure this is not null, otherwise the requested file can not be
@@ -636,7 +636,8 @@ public class WorkspaceImpl implements Workspace {
     }
     String wsDirectoryPath = PathSupport.concat(wsRoot, serverPath);
     File wsDirectory = new File(wsDirectoryPath);
-    wsDirectory.mkdirs();
+    if (createDirectories)
+      wsDirectory.mkdirs();
 
     String safeFileName = PathSupport.toSafeName(FilenameUtils.getName(uriString));
     return new File(wsDirectory, safeFileName);
