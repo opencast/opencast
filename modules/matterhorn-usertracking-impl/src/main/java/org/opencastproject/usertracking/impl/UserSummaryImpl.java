@@ -43,13 +43,13 @@ import javax.xml.bind.annotation.XmlType;
 @Entity(name = "UserSummary")
 @Table(name = "mh_user_action")
 @NamedQueries({ 
- @NamedQuery(name = "userSummaryByMediapackageByType", query = "SELECT a.userId, COUNT(distinct a.sessionId), COUNT(distinct a.mediapackageId), SUM(a.length), MAX(a.created) FROM UserAction a WHERE a.type = :type AND a.mediapackageId = :mediapackageId GROUP BY a.userId;") })
+ @NamedQuery(name = "userSummaryByMediapackageByType", query = "SELECT a.userId, COUNT(distinct a.sessionId), COUNT(distinct a.mediapackageId), SUM(a.length), MAX(a.created) FROM UserAction a WHERE a.type = :type AND a.mediapackageId = :mediapackageId GROUP BY a.userId") })
 @XmlType(name = "summary", namespace = "http://usertracking.opencastproject.org")
 @XmlRootElement(name = "summary", namespace = "http://usertracking.opencastproject.org")
 @XmlAccessorType(XmlAccessType.NONE)
 public class UserSummaryImpl implements UserSummary {
   @Id
-  @Column(name = "user", length = 65535)
+  @Column(name = "user_id", length = 65535)
   @XmlElement(name = "userId")
   private String userId = "Empty UserId";
   

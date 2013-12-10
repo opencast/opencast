@@ -24,8 +24,6 @@ import java.util.List;
  */
 public interface UserSummaryList {
   
-  void setTotal(int total);
-  
   void add(UserSummary userSummary);
   
   void add(Collection<UserSummary> userSummaries);

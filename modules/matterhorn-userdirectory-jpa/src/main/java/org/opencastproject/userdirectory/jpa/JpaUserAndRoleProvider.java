@@ -31,6 +31,9 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.common.base.Function;
+import com.google.common.collect.MapMaker;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -44,6 +47,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -82,11 +87,20 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   /** Encoding expected from all inputs */
   public static final String ENCODING = "UTF-8";
 
+  /** The delimiter for the User cache */
+  private static final String DELIMITER = ";==;";
+
   /** The JPA provider */
   protected PersistenceProvider persistenceProvider = null;
 
   /** The security service */
   protected SecurityService securityService = null;
+
+  /** A cache of users, which lightens the load on the SQL server */
+  private ConcurrentMap<String, Object> cache = null;
+
+  /** A token to store in the miss cache */
+  protected Object nullToken = new Object();
 
   /**
    * @param persistenceProvider
@@ -125,6 +139,16 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   public void activate(ComponentContext cc) {
     logger.debug("activate");
+
+    // Setup the caches
+    cache = new MapMaker().expireAfterWrite(1, TimeUnit.MINUTES).makeComputingMap(new Function<String, Object>() {
+      public Object apply(String id) {
+        String[] key = id.split(DELIMITER);
+        logger.trace("Loading user '{}':'{}' from database", key[0], key[1]);
+        User user = loadUser(key[0], key[1]);
+        return user == null ? nullToken : user;
+      }
+    });
 
     // Set up persistence
     emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.userdirectory", persistenceProperties);
@@ -168,7 +192,12 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   @Override
   public User loadUser(String userName) {
     String orgId = securityService.getOrganization().getId();
-    return loadUser(userName, orgId);
+    Object user = cache.get(userName.concat(DELIMITER).concat(orgId));
+    if (user == nullToken) {
+      return null;
+    } else {
+      return (User) user;
+    }
   }
 
   /**
@@ -266,8 +295,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   @Path("{username}.json")
   @RestQuery(name = "user", description = "Returns a user", returnDescription = "Returns a JSON representation of a user", pathParameters = { @RestParameter(description = "The username.", isRequired = true, name = "username", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user account.") })
   public Response getUserAsJson(@PathParam("username") String username) {
-    String org = securityService.getOrganization().getId();
-    User user = loadUser(username, org);
+    User user = loadUser(username);
     if (user == null) {
       return null;
     } else {
@@ -312,7 +340,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
         tx.rollback();
       }
       if (em != null)
-      em.close();
+        em.close();
     }
   }
 

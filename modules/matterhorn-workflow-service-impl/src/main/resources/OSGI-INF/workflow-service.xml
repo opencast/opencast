@@ -10,6 +10,8 @@
   </service>
   <reference name="index" interface="org.opencastproject.workflow.impl.WorkflowServiceIndex" cardinality="1..1"
     policy="static" bind="setDao" />
+  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+    cardinality="1..1" policy="static" bind="setWorkspace" />
   <reference name="metadata" interface="org.opencastproject.metadata.api.MediaPackageMetadataService"
     cardinality="1..n" policy="dynamic" bind="addMetadataService" unbind="removeMetadataService" />
   <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"

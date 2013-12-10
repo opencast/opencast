@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -20,6 +20,10 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-workflow-service-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.guava-osgi</groupId>
+      <artifactId>guava-osgi</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -119,7 +123,7 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>2.5.1</version>
+      <version>3.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

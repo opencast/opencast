@@ -43,6 +43,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.opencastproject.security.util.SecurityUtil.getUserAndOrganization;
 import static org.opencastproject.util.data.Collections.dict;
@@ -79,6 +82,9 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   /** The configuration key to use for determining the workflow definition to use for ingest */
   public static final String WORKFLOW_DEFINITION = "workflow.definition";
 
+  /** The configuration key to use for determining the workflow configuration to use for ingest */
+  public static final String WORKFLOW_CONFIG = "workflow.config";
+
   /** The configuration key to use for determining the inbox path */
   public static final String INBOX_PATH = "inbox.path";
 
@@ -114,6 +120,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     final String orgId = getCfg(properties, USER_ORG);
     final String userId = getCfg(properties, USER_NAME);
     final String workflowDefinition = getCfg(properties, WORKFLOW_DEFINITION);
+    final Map<String, String> workflowConfig = getCfgAsMap(properties, WORKFLOW_CONFIG);
     final int interval = getCfgAsInt(properties, INBOX_POLL);
     final File inbox = new File(getCfg(properties, INBOX_PATH));
     if (!inbox.isDirectory()) {
@@ -138,13 +145,8 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
       // set up new file install config
       fileInstallCfg = some(configureFileInstall(cc.getBundleContext(), inbox, interval));
       // create new scanner
-      ingestor = some(new Ingestor(
-              ingestService,
-              workingFileRepository,
-              secCtx.get(),
-              workflowDefinition,
-              inbox,
-              maxthreads));
+      ingestor = some(new Ingestor(ingestService, workingFileRepository, secCtx.get(), workflowDefinition,
+              workflowConfig, inbox, maxthreads));
       logger.info("Now watching inbox {}", inbox.getAbsolutePath());
     } else {
       logger.warn("Cannot create security context for user {}, organization {}. "
@@ -266,6 +268,16 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     if (StringUtils.isBlank(ps))
       throw new ConfigurationException(key, "is blank");
     return ps;
+  }
+
+  public static Map<String, String> getCfgAsMap(Dictionary<String, String> d, String key) throws ConfigurationException {
+    HashMap<String, String> config = new HashMap<String, String>();
+    for (Enumeration<String> e = d.keys(); e.hasMoreElements();) {
+      String dKey = (String) e.nextElement();
+      if (dKey.startsWith(key))
+        config.put(dKey.substring(key.length() + 1), (String) d.get(dKey));
+    }
+    return config;
   }
 
   /**

@@ -283,7 +283,7 @@ public class SchedulerRestService {
         for (long id : createdIDs) {
           service.updateCaptureAgentMetadata(caProperties, tuple(id, service.getEventDublinCore(id)));
         }
-        return Response.status(Status.CREATED).build();
+        return Response.status(Status.CREATED).entity(StringUtils.join(createdIDs, ",")).build();
       } else {
         Long id = service.addEvent(eventCatalog, wfProperties);
         service.updateCaptureAgentMetadata(caProperties, tuple(id, eventCatalog));
@@ -385,6 +385,7 @@ public class SchedulerRestService {
           @RestParameter(name = "wfproperties", isRequired = false, description = "Workflow configuration properties", type = Type.TEXT) }, reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
           @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
+          @RestResponse(responseCode = HttpServletResponse.SC_FORBIDDEN, description = "Event with specified ID cannot be updated"),
           @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Data is missing or invalid") })
   public Response updateEvent(@PathParam("id") String eventID, @FormParam("dublincore") String dublinCoreXml,
           @FormParam("agentparameters") String agentParameters, @FormParam("wfproperties") String workflowProperties) {
@@ -442,6 +443,10 @@ public class SchedulerRestService {
         service.updateCaptureAgentMetadata(caProperties, tuple(id, eventCatalog));
 
       return Response.ok().build();
+    } catch (SchedulerException e) {
+      logger.warn("{}", e.getMessage());
+      //TODO: send the reason message in response body
+      return Response.status(Status.FORBIDDEN).build();
     } catch (NotFoundException e) {
       logger.warn("Event with id '{}' does not exist.", id);
       return Response.status(Status.NOT_FOUND).build();

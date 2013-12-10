@@ -42,6 +42,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +74,12 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   /** The element flavors to include in the zip file */
   public static final String INCLUDE_FLAVORS_PROPERTY = "include-flavors";
 
+  /** The zip archive's target element flavor */
+  public static final String TARGET_FLAVOR_PROPERTY = "target-flavor";
+
+  /** The zip archive's target tags */
+  public static final String TARGET_TAGS_PROPERTY = "target-tags";
+
   /** The property indicating whether to apply compression to the archive */
   public static final String COMPRESS_PROPERTY = "compression";
 
@@ -82,8 +89,9 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   /** The temporary location to use when building an archive */
   public static final String ARCHIVE_TEMP_DIR = "archive-temp";
 
-  /** The flavor to use for a mediapackage archive */
-  public static final MediaPackageElementFlavor ARCHIVE_FLAVOR = MediaPackageElementFlavor.parseFlavor("archive/zip");
+  /** The default flavor to use for a mediapackage archive */
+  public static final MediaPackageElementFlavor DEFAULT_ARCHIVE_FLAVOR = MediaPackageElementFlavor
+          .parseFlavor("archive/zip");
 
   /** The temporary storage location */
   protected File tempStorageDir = null;
@@ -105,6 +113,11 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
             "The configuration key that specifies whether to compress the zip archive.  Defaults to false.");
     configurationOptions.put(INCLUDE_FLAVORS_PROPERTY,
             "The configuration key that specifies the element flavors to include in the zipped mediapackage archive");
+    configurationOptions.put(TARGET_FLAVOR_PROPERTY, "The target flavor for the zip archive element, defaulting to '"
+            + DEFAULT_ARCHIVE_FLAVOR + "'");
+    configurationOptions.put(TARGET_FLAVOR_PROPERTY, "The target flavor for the zip archive element, defaulting to '"
+            + DEFAULT_ARCHIVE_FLAVOR + "'");
+    configurationOptions.put(TARGET_TAGS_PROPERTY, "The target tags for the zip archive element");
   }
 
   /**
@@ -148,6 +161,20 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     final WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
     String flavors = currentOperation.getConfiguration(INCLUDE_FLAVORS_PROPERTY);
     final List<MediaPackageElementFlavor> flavorsToZip = new ArrayList<MediaPackageElementFlavor>();
+    MediaPackageElementFlavor targetFlavor = DEFAULT_ARCHIVE_FLAVOR;
+
+    // Read the target flavor
+    String targetFlavorOption = currentOperation.getConfiguration(TARGET_FLAVOR_PROPERTY);
+    try {
+      targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
+      logger.trace("Using '{}' as the target flavor for the zip archive of recording {}", targetFlavor, mediaPackage);
+    } catch (IllegalArgumentException e) {
+      throw new WorkflowOperationException("Flavor '" + targetFlavorOption + "' is not valid", e);
+    }
+
+    // Read the target tags
+    String targetTagsOption = StringUtils.trimToEmpty(currentOperation.getConfiguration(TARGET_TAGS_PROPERTY));
+    String[] targetTags = StringUtils.split(targetTagsOption, ",");
 
     // If the configuration does not specify flavors, just zip them all
     if (flavors == null) {
@@ -166,6 +193,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     // Zip the contents of the mediapackage
     File zip = null;
     try {
+      logger.info("Creating zipped archive of recording {}", mediaPackage);
       zip = zip(mediaPackage, flavorsToZip, compress);
     } catch (Exception e) {
       throw new WorkflowOperationException("Unable to create a zip archive from mediapackage " + mediaPackage, e);
@@ -176,13 +204,15 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     String collectionId = configuredCollectionId == null ? DEFAULT_ZIP_COLLECTION : configuredCollectionId;
 
     // Add the zip as an attachment to the mediapackage
-    logger.info("Adding zipped mediapackage {} to the {} archive", mediaPackage, collectionId);
+    logger.info("Moving zipped archive of recording {} to the working file repository collection '{}'", mediaPackage,
+            collectionId);
 
     InputStream in = null;
     URI uri = null;
     try {
       in = new FileInputStream(zip);
       uri = workspace.putInCollection(collectionId, mediaPackage.getIdentifier().compact() + ".zip", in);
+      logger.info("Zipped archive of recording {} is available from {}", mediaPackage, uri);
     } catch (FileNotFoundException e) {
       throw new WorkflowOperationException("zip file " + zip + " not found", e);
     } catch (IOException e) {
@@ -190,14 +220,20 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     } finally {
       IOUtils.closeQuietly(in);
     }
-    logger.info("Zipped mediapackage {} moved to the {} archive", mediaPackage, collectionId);
 
     Attachment attachment = (Attachment) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-            .elementFromURI(uri, Type.Attachment, ARCHIVE_FLAVOR);
+            .elementFromURI(uri, Type.Attachment, targetFlavor);
     try {
       attachment.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, zip));
     } catch (IOException e) {
       throw new WorkflowOperationException(e);
+    }
+    attachment.setMimeType(MimeTypes.ZIP);
+
+    // Apply the target tags
+    for (String tag : targetTags) {
+      attachment.addTag(tag);
+      logger.trace("Tagging the archive of recording '{}' with '{}'", mediaPackage, tag);
     }
     attachment.setMimeType(MimeTypes.ZIP);
 

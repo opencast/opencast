@@ -252,10 +252,6 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     if (channelId == null)
       throw new IllegalArgumentException("Channel ID must be specified");
 
-    if (distributionDirectory == null)
-      throw new IllegalStateException(
-              "Streaming distribution directory must be set (org.opencastproject.streaming.directory)");
-
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(),
               Arrays.asList(channelId, MediaPackageParser.getAsXml(mediaPackage), elementId));
@@ -318,7 +314,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
       // Try to remove the file and - if possible - the parent folder
       FileUtils.forceDelete(elementFile);
-      if (mediapackageDir.list().length == 0) {
+      if (mediapackageDir.isDirectory() && mediapackageDir.list().length == 0) {
         FileSupport.delete(mediapackageDir.getParentFile());
       }
 
@@ -408,7 +404,10 @@ public class StreamingDistributionService extends AbstractJobProducer implements
           MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, elementId);
           return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
         case Retract:
-          MediaPackageElement retractedElement = retractElement(channelId, mediapackage, elementId);
+          MediaPackageElement retractedElement = null;
+          if (distributionDirectory != null && StringUtils.isNotBlank(streamingUrl)) {
+            retractedElement = retractElement(channelId, mediapackage, elementId);
+          }
           return (retractedElement != null) ? MediaPackageElementParser.getAsXml(retractedElement) : null;
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");

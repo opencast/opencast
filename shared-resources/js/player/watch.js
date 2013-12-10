@@ -39,6 +39,7 @@ Opencast.Watch = (function ()
         slideLength = 0,
         timeoutTime = 400,
         duration = 0,
+        bufferTime = parseInt(getURLParameter("bt")),
         mediaPackageIdAvailable = true,
         durationSetSuccessfully = false,
         mediaPackageId;
@@ -523,7 +524,7 @@ Opencast.Watch = (function ()
             // init the segements_text
             Opencast.segments_text.initialize();
             slideLength = Opencast.segments.getSlideLength();
-            Opencast.Player.setMediaURL(coverUrlOne, coverUrlTwo, mediaUrlOne, mediaUrlTwo, mimetypeOne, mimetypeTwo, PLAYERSTYLE, slideLength);
+            Opencast.Player.setMediaURL(coverUrlOne, coverUrlTwo, mediaUrlOne, mediaUrlTwo, mimetypeOne, mimetypeTwo, PLAYERSTYLE, slideLength, bufferTime);
             if (mediaUrlOne !== '' && mediaUrlTwo !== '')
             {
 		$.log('Both media URLs are not empty, setting up a multiplayer');
@@ -558,7 +559,7 @@ Opencast.Watch = (function ()
             {
                 slideLength = 0;
             }
-            Opencast.Player.setMediaURL(coverUrlOne, coverUrlTwo, mediaUrlOne, mediaUrlTwo, mimetypeOne, mimetypeTwo, PLAYERSTYLE, slideLength);
+            Opencast.Player.setMediaURL(coverUrlOne, coverUrlTwo, mediaUrlOne, mediaUrlTwo, mimetypeOne, mimetypeTwo, PLAYERSTYLE, slideLength, bufferTime);
             if (mediaUrlOne !== '' && mediaUrlTwo !== '')
             {
 		if(displayOneVideo)
@@ -859,6 +860,15 @@ Opencast.Watch = (function ()
             break;
         }
 		$('#oc_client_shortcuts').append('<a href="javascript: " id="oc_btn-leave_shortcut" onclick="$(\'#oc_shortcut-button\').trigger(\'click\');" class="handcursor" title="Leave shortcut dialog" role="button">Leave shortcut dialog</a>');
+    }
+
+    /**
+     * Get the url parameter with the given name
+     * @param  {String} name The name of the url parameter
+     * @return {String}      The value of the url parameter
+     */
+    function getURLParameter(name) {
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
     }
 
     return {

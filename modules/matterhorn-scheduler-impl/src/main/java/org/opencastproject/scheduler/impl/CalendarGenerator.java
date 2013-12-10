@@ -121,7 +121,9 @@ public class CalendarGenerator {
    * @return true if the event could be added.
    */
   public boolean addEvent(DublinCoreCatalog catalog, Properties captureAgentMetadata) {
-    logger.debug("Creating iCal VEvent from SchedulerEvent: {}", catalog.getFirst(DublinCore.PROPERTY_IDENTIFIER));
+    String eventId = catalog.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+
+    logger.debug("Creating iCaleandar VEvent from scheduled event '{}'", eventId);
 
     DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(catalog.getFirst(DublinCore.PROPERTY_TEMPORAL));
     if (!period.hasStart()) {
@@ -149,7 +151,7 @@ public class CalendarGenerator {
       for (DublinCoreValue creator : catalog.get(DublinCore.PROPERTY_CREATOR)) {
         pl.add(new Cn(creator.getValue()));
       }
-      event.getProperties().add(new Uid(catalog.getFirst(DublinCore.PROPERTY_IDENTIFIER)));
+      event.getProperties().add(new Uid(eventId));
 
       // TODO Organizer should be URI (email-address?) created fake address
       if (StringUtils.isNotEmpty(catalog.getFirst(DublinCore.PROPERTY_CREATOR))) {
@@ -178,8 +180,7 @@ public class CalendarGenerator {
 
       String seriesDC = getSeriesDublinCoreAsString(seriesID);
       if (seriesDC != null) {
-        logger.debug("Attaching series {} information to event {}", seriesID,
-                catalog.getFirst(DublinCore.PROPERTY_IDENTIFIER));
+        logger.debug("Attaching series {} information to event {}", seriesID, eventId);
         ParameterList sDcParameters = new ParameterList();
         sDcParameters.add(new FmtType("application/xml"));
         sDcParameters.add(Value.BINARY);
@@ -188,7 +189,7 @@ public class CalendarGenerator {
         Attach seriesAttachment = new Attach(sDcParameters, seriesDC.getBytes("UTF-8"));
         event.getProperties().add(seriesAttachment);
       } else {
-        logger.debug("No series provided for event {}.", catalog.getFirst(DublinCore.PROPERTY_IDENTIFIER));
+        logger.debug("No series provided for event {}.", eventId);
       }
 
       ParameterList caParameters = new ParameterList();
@@ -200,11 +201,11 @@ public class CalendarGenerator {
               .getBytes("UTF-8"));
       event.getProperties().add(agentsAttachment);
 
-    } catch (Exception e1) {
-      logger.error("could not create Calendar entry for Event {}. Reason : {} ",
-              catalog.getFirst(DublinCore.PROPERTY_IDENTIFIER), e1);
+    } catch (Exception e) {
+      logger.error("Unable to add event '{}' to recording calendar: {} ", eventId, e);
       return false;
     }
+
     cal.getComponents().add(event);
 
     logger.debug("new VEvent = {} ", event.toString());
@@ -249,8 +250,10 @@ public class CalendarGenerator {
    * @return DC serialized to string or null
    * @throws UnauthorizedException
    *           if the current user is not allowed to view this series
+   * @throws NotFoundException
+   *           if the series cannot be found
    */
-  private String getSeriesDublinCoreAsString(String seriesID) throws UnauthorizedException {
+  private String getSeriesDublinCoreAsString(String seriesID) throws UnauthorizedException, NotFoundException {
     if (StringUtils.isBlank(seriesID))
       return null;
     if (seriesService == null) {
@@ -262,12 +265,10 @@ public class CalendarGenerator {
     try {
       seriesDC = seriesService.getSeries(seriesID);
     } catch (SeriesException e) {
-      logger.error("Error loading DublinCoreCatalog for Series: {}", e.getMessage());
-      return null;
-    } catch (NotFoundException e) {
-      logger.warn("Could not find series '" + seriesID + "': {}", e);
+      logger.error("Error loading DublinCoreCatalog for series '{}': {}", seriesID, e.getMessage());
       return null;
     }
+
     return getDublinCoreAsString(seriesDC);
   }
 

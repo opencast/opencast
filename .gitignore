@@ -1,8 +1,27 @@
-work
-logs
-lib
-target
-.classpath
-.settings
+# Ignore file for Opencast Matterhorn project
+#
+
+# ignore runtime artifacts
+lib/matterhorn/*
+lib/ext/*
+inbox/*
+logs/*
+work/*
+
+# ignore maven target directories
+target/
+
+# ignore Eclipse project data
 .project
-.nbproject
+.classpath
+.metadata/
+.settings/
+
+# ignore NetBeans project data
+*/nbproject/*
+
+# just in case.. ignore SVN subdir
+*/.svn/*
+
+# Ignore all temporary editor files
+.*.swp

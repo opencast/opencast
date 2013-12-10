@@ -221,6 +221,9 @@ var ocScheduler = (function() {
         }
       },
       search: function(){
+      	// This executes pre-search when content has changed in the seriesSelect
+    	// When it fires, it fires before the above change event fires 
+    	// ref: http://jqueryui.com/autocomplete/
         $('#series').val('');
       }
     });
@@ -336,12 +339,18 @@ var ocScheduler = (function() {
 
   /** Checks to see if there is an existing series who's title matches the one currently entered by the user.  
       If it finds one it sets the series id to match the existing series and updates the dublin catalog. 
-      There is an optional parameter of a callback function that is called after checking for an existing series.**/
+      There is an optional parameter of a callback function that is called after checking for an existing series.
+      This method protections against creating a new series when a title is typed into the select box
+      instead of selected from the drop down. **/
   sched.checkForExistingSeries = function checkForExistingSeries(callback){
     ocUtils.log("Searching for series in series endpoint");
+    var series_title = $('#seriesSelect').val();
     $.ajax({
       url : SERIES_SEARCH_URL,
       type : 'get',
+      data: {
+          q: series_title
+       },
       dataType : 'json',
       success : function(data) {
         var series_input = $('#seriesSelect').val(),
@@ -450,8 +459,8 @@ var ocScheduler = (function() {
     }
 
     try {
-      if($('#seriesSelect').val() !== ''){
-        // Series select wasn't empty so look for an existing series before a submit.
+      if($('#seriesSelect').val() !== '' && $('#series').val() === ''){
+        // Series select wasn't empty, but series id is, so look for an existing series before a submit.
         return sched.checkForExistingSeries(submit);
       } else {
         // Series select was empty so we don't need to look for an existing series.

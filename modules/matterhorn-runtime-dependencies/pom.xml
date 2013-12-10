@@ -8,14 +8,12 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <springsecurity.version>3.1.0.RELEASE</springsecurity.version>
-    <eclipselink.version>2.0.2</eclipselink.version>
     <servicemix-specs.version>1.9.0</servicemix-specs.version>
   </properties>
 
@@ -26,7 +24,6 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
-      <version>4.2.0</version>
     </dependency>
 
     <dependency>
@@ -73,38 +70,18 @@
     
     <dependency>
       <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.prefs</artifactId>
-      <version>1.0.4</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.metatype</artifactId>
-      <version>1.0.4</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.http.bundle</artifactId>
-      <version>2.2.0</version>
+      <classifier>opencast</classifier>
     </dependency>
 
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.fileinstall</artifactId>
-      <version>3.1.10</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.ops4j.pax.web</groupId>
-      <artifactId>pax-web-jsp</artifactId>
-      <version>1.1.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.webconsole</artifactId>
-      <version>3.1.8</version>
     </dependency>
 
     <!-- Start level 2 -->
@@ -150,37 +127,31 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
-      <version>1.5</version>
     </dependency>
 
     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
-      <version>1.2.1</version>
     </dependency>
 
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.1</version>
     </dependency>
 
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
-      <version>2.6</version>
     </dependency>
 
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <version>1.6</version>
     </dependency>
 
     <dependency>
       <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>
-      <version>1.5.3</version>
     </dependency>
 
     <dependency>
@@ -192,7 +163,6 @@
     <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
-      <version>3.2.1</version>
     </dependency>
 
     <dependency>
@@ -216,7 +186,6 @@
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
-      <version>3.1_7</version>
     </dependency>
     
     <dependency>
@@ -228,8 +197,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>com.springsource.org.apache.commons.beanutils</artifactId>
-      <version>1.7.0</version>
-    </dependency>    
+    </dependency>
 
     <dependency>
       <groupId>org.apache.neethi</groupId>
@@ -246,7 +214,6 @@
     <dependency>
       <groupId>com.googlecode.guava-osgi</groupId>
       <artifactId>guava-osgi</artifactId>
-      <version>9.0.0</version>
     </dependency>
 
     <dependency>
@@ -276,7 +243,6 @@
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.xerces</artifactId>
-      <version>2.9.1_3</version>
     </dependency>
     
     <dependency>
@@ -294,13 +260,11 @@
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-bundle-jaxrs</artifactId>
-      <version>2.2.9</version>
     </dependency>
 
     <dependency>
       <groupId>net.sourceforge.nekohtml</groupId>
       <artifactId>com.springsource.org.cyberneko.html</artifactId>
-      <version>1.9.13</version>
     </dependency>
 
     <dependency>
@@ -330,7 +294,6 @@
     <dependency>
       <groupId>org.jdom</groupId>
       <artifactId>com.springsource.org.jdom</artifactId>
-      <version>1.0.0</version>
     </dependency>
 
     <dependency>
@@ -348,73 +311,73 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
-      <version>${springsecurity.version}</version>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
-      <version>${springsecurity.version}</version>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
-      <version>${springsecurity.version}</version>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-config</artifactId>
-      <version>${springsecurity.version}</version>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
-      <version>${springsecurity.version}</version>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-asm</artifactId>
-      <version>${springsecurity.version}</version>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-aop</artifactId>
-      <version>${springsecurity.version}</version>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
-      <version>${springsecurity.version}</version>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-expression</artifactId>
-      <version>${springsecurity.version}</version>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
-      <version>${springsecurity.version}</version>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
-      <version>${springsecurity.version}</version>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context-support</artifactId>
-      <version>${springsecurity.version}</version>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
     <dependency>
@@ -438,67 +401,51 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore-osgi</artifactId>
-      <version>4.1.4</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient-osgi</artifactId>
-      <version>4.1.3</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-bundle</artifactId>
-      <version>1.1</version>
     </dependency>
     
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-core</artifactId>
-      <version>1.1</version>
     </dependency>
     
     <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-parsers</artifactId>
-      <version>1.1</version>
-    </dependency>
-
-    <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-      <version>1.6</version>
     </dependency>
  
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>javax.persistence</artifactId>
-      <version>2.0.3</version>
     </dependency>
 
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.core</artifactId>
-      <version>${eclipselink.version}</version>
     </dependency>
  
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.jpa</artifactId>
-      <version>${eclipselink.version}</version>
     </dependency>
  
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.asm</artifactId>
-      <version>${eclipselink.version}</version>
     </dependency>
  
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.antlr</artifactId>
-      <version>${eclipselink.version}</version>
     </dependency>
 
     <dependency>
@@ -512,13 +459,12 @@
     <dependency>
       <groupId>org.openid4java</groupId>
       <artifactId>com.springsource.org.openid4java</artifactId>
-      <version>0.9.5</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-openid</artifactId>
-      <version>${springsecurity.version}</version>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
     <!--  Optional: CAS -->
@@ -526,17 +472,14 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-cas</artifactId>
-      <version>${springsecurity.version}</version>
     </dependency>
     <dependency> 
       <groupId>org.jasig.cas</groupId> 
       <artifactId>com.springsource.org.jasig.cas.client</artifactId> 
-      <version>3.1.12</version> 
     </dependency>
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>com.springsource.org.opensaml</artifactId>
-      <version>1.1.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.xml</groupId>
@@ -555,13 +498,7 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-ldap</artifactId>
-      <version>${springsecurity.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>org.springframework.jdbc</artifactId>
-      <version>${springsecurity.version}</version>
+      <version>3.1.0.RELEASE</version>
     </dependency>
 
   </dependencies>

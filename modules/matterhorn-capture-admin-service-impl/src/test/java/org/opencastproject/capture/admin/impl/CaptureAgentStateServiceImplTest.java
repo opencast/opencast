@@ -13,13 +13,11 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.capture.admin.impl;
 
 import static junit.framework.Assert.fail;
 import static org.opencastproject.capture.admin.api.AgentState.IDLE;
 import static org.opencastproject.capture.admin.api.AgentState.UNKNOWN;
-import static org.opencastproject.capture.admin.api.CaptureAgentStateService.BAD_PARAMETER;
 import static org.opencastproject.capture.admin.api.RecordingState.CAPTURING;
 import static org.opencastproject.capture.admin.api.RecordingState.UPLOADING;
 import static org.opencastproject.capture.admin.api.RecordingState.UPLOAD_FINISHED;
@@ -30,6 +28,7 @@ import org.opencastproject.capture.admin.api.Recording;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
@@ -114,8 +113,12 @@ public class CaptureAgentStateServiceImplTest {
 
   @Test
   public void nonExistantAgent() {
-    Agent agent = service.getAgentState("doesNotExist");
-    Assert.assertNull(agent);
+    try {
+      service.getAgent("doesNotExist");
+      Assert.fail("Agent has been found");
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
   }
 
   @Test
@@ -124,36 +127,69 @@ public class CaptureAgentStateServiceImplTest {
   }
 
   @Test
-  public void badAgentStates() {
-    service.setAgentState(null, "something");
-    Assert.assertEquals(0, service.getKnownAgents().size());
-    service.setAgentState("", "something");
-    Assert.assertEquals(0, service.getKnownAgents().size());
-    service.setAgentState("something", null);
-    Assert.assertEquals(0, service.getKnownAgents().size());
+  public void badAgentStates() throws NotFoundException {
+    try {
+      service.setAgentState(null, "something");
+      Assert.assertEquals(0, service.getKnownAgents().size());
+      Assert.fail("IllegalArgument not thrown!");
+    } catch (IllegalArgumentException e) {
+      Assert.assertNotNull(e);
+    }
+
+    try {
+      Assert.assertEquals(0, service.getKnownAgents().size());
+      service.setAgentState("", "something");
+      Assert.fail("IllegalArgument not thrown!");
+    } catch (IllegalArgumentException e) {
+      Assert.assertNotNull(e);
+    }
+
+    try {
+      Assert.assertEquals(0, service.getKnownAgents().size());
+      service.setAgentState("something", null);
+      Assert.fail("IllegalArgument not thrown!");
+    } catch (IllegalArgumentException e) {
+      Assert.assertNotNull(e);
+    }
   }
 
   @Test
   public void badAgentCapabilities() {
-    Assert.assertEquals(BAD_PARAMETER, service.setAgentConfiguration(null, capabilities));
+    try {
+      service.setAgentConfiguration(null, capabilities);
+      Assert.fail("Null agent name accepted");
+    } catch (IllegalArgumentException e) {
+      Assert.assertNotNull(e);
+    }
     Assert.assertEquals(0, service.getKnownAgents().size());
 
-    service.setAgentConfiguration("", capabilities);
+    try {
+      service.setAgentConfiguration("", capabilities);
+      Assert.fail("Empty agent name accepted");
+    } catch (IllegalArgumentException e) {
+      Assert.assertNotNull(e);
+    }
     Assert.assertEquals(0, service.getKnownAgents().size());
 
-    service.setAgentState("something", null);
+    try {
+      service.setAgentState("something", null);
+      Assert.fail("Null agent state accepted");
+    } catch (IllegalArgumentException e) {
+      Assert.assertNotNull(e);
+    }
     Assert.assertEquals(0, service.getKnownAgents().size());
   }
 
   private void verifyAgent(String name, String state, Properties caps) {
-    Agent agent = service.getAgentState(name);
-
-    if (agent != null) {
+    try {
+      Agent agent = service.getAgent(name);
       Assert.assertEquals(name, agent.getName());
       Assert.assertEquals(state, agent.getState());
       Assert.assertEquals(caps, agent.getCapabilities());
-    } else if (state != null)
-      Assert.fail();
+    } catch (NotFoundException e) {
+      if (state != null)
+        Assert.fail();
+    }
   }
 
   @Test
@@ -203,13 +239,22 @@ public class CaptureAgentStateServiceImplTest {
     verifyAgent("agent1", UNKNOWN, capabilities);
     verifyAgent("agent2", UPLOADING, capabilities);
 
-    service.removeAgent("agent1");
-    Assert.assertEquals(1, service.getKnownAgents().size());
-    verifyAgent("notAnAgent", null, capabilities);
-    verifyAgent("agent1", null, capabilities);
-    verifyAgent("agent2", UPLOADING, capabilities);
+    try {
+      service.removeAgent("agent1");
+      Assert.assertEquals(1, service.getKnownAgents().size());
+      verifyAgent("notAnAgent", null, capabilities);
+      verifyAgent("agent1", null, capabilities);
+      verifyAgent("agent2", UPLOADING, capabilities);
+    } catch (NotFoundException e) {
+      Assert.fail();
+    }
 
-    service.removeAgent("notAnAgent");
+    try {
+      service.removeAgent("notAnAgent");
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
     Assert.assertEquals(1, service.getKnownAgents().size());
     verifyAgent("notAnAgent", null, capabilities);
     verifyAgent("agent1", null, capabilities);
@@ -218,11 +263,33 @@ public class CaptureAgentStateServiceImplTest {
 
   @Test
   public void agentCapabilities() {
-    Assert.assertNull(service.getAgentCapabilities("agent"));
-    Assert.assertNull(service.getAgentCapabilities("NotAgent"));
+    try {
+      service.getAgentCapabilities("agent");
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
+    try {
+      service.getAgentCapabilities("NotAgent");
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
+
     service.setAgentConfiguration("agent", capabilities);
-    Assert.assertEquals(service.getAgentCapabilities("agent"), capabilities);
-    Assert.assertNull(service.getAgentCapabilities("NotAgent"));
+    Properties agentCapabilities;
+    try {
+      agentCapabilities = service.getAgentCapabilities("agent");
+      Assert.assertEquals(capabilities, agentCapabilities);
+    } catch (NotFoundException e) {
+      Assert.fail();
+    }
+    try {
+      service.getAgentCapabilities("NotAgent");
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
   }
 
   @Test
@@ -249,13 +316,23 @@ public class CaptureAgentStateServiceImplTest {
 
     // Make sure they're set right
     Assert.assertEquals(cap1, service.getAgentCapabilities("sticky1"));
-    Assert.assertEquals(IDLE, service.getAgentState("sticky1").getState());
+    Assert.assertEquals(IDLE, service.getAgent("sticky1").getState());
     Assert.assertEquals(cap2, service.getAgentCapabilities("sticky2"));
-    Assert.assertEquals(CAPTURING, service.getAgentState("sticky2").getState());
+    Assert.assertEquals(CAPTURING, service.getAgent("sticky2").getState());
     Assert.assertEquals(cap3, service.getAgentCapabilities("sticky3"));
-    Assert.assertEquals(UPLOADING, service.getAgentState("sticky3").getState());
-    Assert.assertNull(service.getAgentCapabilities("sticky4"));
-    Assert.assertNull(service.getAgentState("sticky4"));
+    Assert.assertEquals(UPLOADING, service.getAgent("sticky3").getState());
+    try {
+      service.getAgentCapabilities("sticky4");
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
+    try {
+      service.getAgent("sticky4");
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
 
     // Shut down the service completely
     service.deactivate();
@@ -268,28 +345,54 @@ public class CaptureAgentStateServiceImplTest {
 
     // The agents should still be there
     Assert.assertEquals(cap1, service.getAgentCapabilities("sticky1"));
-    Assert.assertEquals(IDLE, service.getAgentState("sticky1").getState());
+    Assert.assertEquals(IDLE, service.getAgent("sticky1").getState());
     Assert.assertEquals(cap2, service.getAgentCapabilities("sticky2"));
-    Assert.assertEquals(CAPTURING, service.getAgentState("sticky2").getState());
+    Assert.assertEquals(CAPTURING, service.getAgent("sticky2").getState());
     Assert.assertEquals(cap3, service.getAgentCapabilities("sticky3"));
-    Assert.assertEquals(UPLOADING, service.getAgentState("sticky3").getState());
-    Assert.assertNull(service.getAgentCapabilities("sticky4"));
-    Assert.assertNull(service.getAgentState("sticky4"));
+    Assert.assertEquals(UPLOADING, service.getAgent("sticky3").getState());
+    try {
+      service.getAgentCapabilities("sticky4");
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
+    try {
+      service.getAgent("sticky4");
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
   }
 
   @Test
   public void nonExistantRecording() {
-    Recording recording = service.getRecordingState("doesNotExist");
-    Assert.assertNull(recording);
+    try {
+      service.getRecordingState("doesNotExist");
+      Assert.fail("Non existing recording has been found");
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
   }
 
   @Test
   public void badRecordingData() {
-    service.setRecordingState(null, CAPTURING);
+    try {
+      service.setRecordingState(null, CAPTURING);
+      Assert.fail();
+    } catch (IllegalArgumentException e) {
+      Assert.assertNotNull(e);
+    }
     Assert.assertEquals(0, service.getKnownRecordings().size());
-    service.setRecordingState("", IDLE);
+
+    try {
+      service.setRecordingState("", IDLE);
+      Assert.fail();
+    } catch (IllegalArgumentException e) {
+      Assert.assertNotNull(e);
+    }
     Assert.assertEquals(0, service.getKnownRecordings().size());
-    service.setRecordingState("something", "bad_state");
+
+    Assert.assertFalse(service.setRecordingState("something", "bad_state"));
     Assert.assertEquals(0, service.getKnownRecordings().size());
   }
 
@@ -299,13 +402,22 @@ public class CaptureAgentStateServiceImplTest {
   }
 
   private void verifyRecording(String id, String state) {
-    Recording recording = service.getRecordingState(id);
-
-    if (state != null) {
-      Assert.assertEquals(id, recording.getID());
-      Assert.assertEquals(state, recording.getState());
-    } else
-      Assert.assertNull(recording);
+    if (state == null) {
+      try {
+        service.getRecordingState(id);
+        Assert.fail("");
+      } catch (NotFoundException e) {
+        Assert.assertNotNull(e);
+      }
+    } else {
+      try {
+        Recording recording = service.getRecordingState(id);
+        Assert.assertEquals(id, recording.getID());
+        Assert.assertEquals(state, recording.getState());
+      } catch (NotFoundException e) {
+        Assert.fail("");
+      }
+    }
   }
 
   @Test
@@ -334,8 +446,17 @@ public class CaptureAgentStateServiceImplTest {
     verifyRecording("Recording1", CAPTURING);
     verifyRecording("Recording2", UPLOADING);
 
-    Assert.assertTrue(service.removeRecording("Recording1"));
-    Assert.assertFalse(service.removeRecording("asdfasdf"));
+    try {
+      service.removeRecording("Recording1");
+    } catch (NotFoundException e) {
+      Assert.fail();
+    }
+    try {
+      service.removeRecording("asdfasdf");
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
     Assert.assertEquals(1, service.getKnownRecordings().size());
     verifyRecording("notAnRecording", null);
     verifyRecording("Recording1", null);
@@ -354,7 +475,7 @@ public class CaptureAgentStateServiceImplTest {
     // Set the roles allowed to use this agent
     Set<String> roles = new HashSet<String>();
     roles.add("a_role_we_do_not_have");
-    AgentImpl agent = service.getAgent(agentName);
+    AgentImpl agent = (AgentImpl) service.getAgent(agentName);
     agent.setSchedulerRoles(roles);
     service.updateAgentInDatabase(agent);
 

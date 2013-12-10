@@ -196,14 +196,15 @@
     <property name="authHandler">
       <bean class="org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler">
         <constructor-arg index="0" ref="userDetailsService" />
-	      <!-- Uncomment to allow the included keys to be trusted to provide known user details
-	      <constructor-arg index="1">
-	        <list>
+        <!-- Uncomment to allow the included keys to be trusted to provide known user details
+        <constructor-arg index="1" ref="securityService" />
+        <constructor-arg index="2">
+          <list>
             <value>trustedKey</value>
             <value>trustedKey2</value>
           </list>
-	      </constructor-arg>
-	      -->
+        </constructor-arg>
+        -->
       </bean>
     </property>
   </bean>

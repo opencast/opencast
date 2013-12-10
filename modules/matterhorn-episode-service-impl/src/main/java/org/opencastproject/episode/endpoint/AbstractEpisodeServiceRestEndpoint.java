@@ -242,15 +242,14 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
                                 @RestParameter(name = "series", isRequired = false, description = "Filter results by mediapackage's series identifier.", type = STRING),
                                 @RestParameter(name = "license", isRequired = false, description = "Filter results by mediapackage's license.", type = STRING),
                                 @RestParameter(name = "title", isRequired = false, description = "Filter results by mediapackage's title.", type = STRING),
-                                @RestParameter(name = "episodes", type = RestParameter.Type.STRING, defaultValue = "false", description = "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".", isRequired = false),
-                                @RestParameter(name = "limit", type = RestParameter.Type.STRING, defaultValue = "0", description = "The maximum number of items to return per page.", isRequired = false),
+                                @RestParameter(name = "limit", type = RestParameter.Type.STRING, defaultValue = "10", description = "The maximum number of items to return per page. Values less than 0 set no limit. Non-integer values cause \"not found\".", isRequired = false),
                                 @RestParameter(name = "offset", type = RestParameter.Type.STRING, defaultValue = "0", description = "The page number.", isRequired = false),
-                                @RestParameter(name = "admin", type = RestParameter.Type.STRING, defaultValue = "false", description = "Whether this is an administrative query", isRequired = false),
                                 @RestParameter(name = "sort", type = RestParameter.Type.STRING, description = "The sort order.  May include any "
                                   + "of the following: DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, "
                                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", isRequired = false),
                                 @RestParameter(name = "onlyLatest", type = Type.BOOLEAN, defaultValue = "false", description = "Filter results by only latest version of the archive", isRequired = false) },
-             reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) },
+             reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK),
+                          @RestResponse(description = "The request did not find a result.", responseCode = HttpServletResponse.SC_NOT_FOUND) },
              returnDescription = "The search results, expressed as xml or json.")
   // CHECKSTYLE:OFF -- more than 7 parameters
   public Response findEpisode(@QueryParam("id") final String id,
@@ -282,7 +281,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
           search.elementFlavors(fs);
         }
 
-        if (limit != null)
+        if ((limit != null) && (limit > 0))
           search.limit(limit);
 
         if (offset != null)

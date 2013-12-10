@@ -10,6 +10,5 @@
 		<provide interface="org.osgi.service.cm.ManagedService" />
 	</service>
 	<reference name="persistence" interface="javax.persistence.spi.PersistenceProvider" cardinality="1..1" policy="static" bind="setPersistenceProvider" />
-  <reference name="props" interface="java.util.Map" cardinality="1..1" policy="static" target="(type=persistence)" bind="setPersistenceProperties" />
-	<reference name="searchService" interface="org.opencastproject.search.api.SearchService" cardinality="1..1" policy="static" bind="setSearchService"/>
+    <reference name="props" interface="java.util.Map" cardinality="1..1" policy="static" target="(type=persistence)" bind="setPersistenceProperties" />
 </scr:component>

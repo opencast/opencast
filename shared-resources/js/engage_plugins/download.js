@@ -23,6 +23,20 @@ Opencast.download = (function() {
 
     var that = {};
 
+
+    /** If obj is an array just returns obj else returns Array with obj as content.
+     *  If obj === undefined returns empty Array.
+     *
+     */
+    function ensureArray(obj) {
+      if (obj === undefined) return [];
+      if ($.isArray(obj)) {
+        return obj;
+      } else {
+        return [obj];
+      }
+    }
+
     /**
      * @memberOf Opencast.download
      * @description Shows download links for files
@@ -38,7 +52,7 @@ Opencast.download = (function() {
             success: function(data)
             {
                 var i,
-                    tracks = data["search-results"] ? data["search-results"]["result"]["mediapackage"]["media"]["track"] : [],
+                    tracks = data["search-results"] ? ensureArray(data["search-results"]["result"]["mediapackage"]["media"]["track"]) : [],
                     video_files = [],
                     audio_files = [],
                     video_markup = "",

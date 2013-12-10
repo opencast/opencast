@@ -26,16 +26,11 @@ export START_PATH=$PWD
 export WORKING_DIR=/tmp/cainstallscript
 
 # Root for the source code repository
-export SVN_URL=https://opencast.jira.com/svn/MH
-# Extension for the SVN_URL to reach the trunk
-export TRUNK_URL=$SVN_URL/trunk
-# Extension for the SVN_URL to reach the branches
-export BRANCHES_URL=$SVN_URL/branches/1.4.x
-# Extension for the SVN_URL to reach the tags
-export TAGS_URL=$SVN_URL/tags/1.4.0
-
+export GIT_URL=https://bitbucket.org/opencast-community/matterhorn.git
 # Default URL from where scripts and java source will be dowloaded
-export SRC_DEFAULT=$TAGS_URL
+export SRC_DEFAULT=$GIT_URL
+# The current checkout location
+export PARENT_CHECKOUT_DIR=$(echo `pwd` | sed 's/\(.*\/.*\)\/docs\/scripts\/ubuntu_capture_agent/\1/g')
 
 # File containing the rules to be applied by udev to the configured devices -- not a pun!
 export DEV_RULES=/etc/udev/rules.d/matterhorn.rules
@@ -147,7 +142,7 @@ export DEFAULT_NTP_SERVER=ntp.ubuntu.com
 export NTP_CONF=/etc/ntp.conf
 
 # Location of the jv4linfo jar
-export JV4LINFO_URL=http://luniks.net/luniksnet/download/java/jv4linfo
+export JV4LINFO_URL=http://aifile.usask.ca/matterhorn/mirror/thirdparty/
 # Name of the jv4linfo file
 export JV4LINFO_JAR=jv4linfo-0.2.1-src.jar
 # Shared object required by the jv4linfo jar to function
@@ -264,7 +259,7 @@ virtual="$(cat /proc/cpuinfo | grep -m 1 'siblings' | cut -d ':' -f 2)"
 echo "$model_name ($physical physical core(s), $virtual virtual cores)" >> $LOG_FILE
 
 
-# Check for the necessary scripts and download them from the svn location
+# Check for the necessary scripts
 unset missing
 for f in "${REQUIRED[@]}"; do
     # Check if the script is in the directory where the install.sh script was launched

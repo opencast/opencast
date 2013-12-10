@@ -167,8 +167,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
     if (!image.getURI().getPath().endsWith(".tif")) {
       try {
         logger.info("Converting " + image + " to tif format");
-        Job conversionJob;
-        conversionJob = composerService.convertImage(image, TIFF_CONVERSION_PROFILE);
+        Job conversionJob = composerService.convertImage(image, TIFF_CONVERSION_PROFILE);
         JobBarrier barrier = new JobBarrier(serviceRegistry, conversionJob);
         Result result = barrier.waitForJobs();
         if (!result.isSuccess()) {
@@ -189,12 +188,12 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
       imageUrl = attachment.getURI();
     }
 
+    File imageFile = null;
     try {
       Mpeg7CatalogImpl mpeg7 = Mpeg7CatalogImpl.newInstance();
 
       logger.info("Starting text extraction from {}", imageUrl);
 
-      File imageFile;
       try {
         imageFile = workspace.get(imageUrl);
       } catch (NotFoundException e) {
@@ -242,6 +241,12 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
         throw (TextAnalyzerException) e;
       } else {
         throw new TextAnalyzerException(e);
+      }
+    } finally {
+      try {
+        workspace.delete(imageUrl);
+      } catch (Exception e) {
+        logger.warn("Unable to delete temporary text analysis image {}: {}", imageUrl, e);
       }
     }
   }

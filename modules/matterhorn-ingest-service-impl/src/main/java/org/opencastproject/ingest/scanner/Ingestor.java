@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -53,6 +54,8 @@ public class Ingestor {
 
   private final String workflowDefinition;
 
+  private Map<String, String> workflowConfig;
+
   private final File inbox;
 
   /** Thread pool to run the ingest worker. */
@@ -60,31 +63,30 @@ public class Ingestor {
 
   /**
    * Create new ingestor.
-   *
+   * 
    * @param ingestService
-   *         media packages are passed to the ingest service
+   *          media packages are passed to the ingest service
    * @param workingFileRepository
-   *         inbox files are put in the working file repository collection {@link #WFR_COLLECTION}.
+   *          inbox files are put in the working file repository collection {@link #WFR_COLLECTION}.
    * @param secCtx
-   *         security context needed for ingesting with the IngestService or for putting files
-   *         into the working file repository
+   *          security context needed for ingesting with the IngestService or for putting files into the working file
+   *          repository
    * @param workflowDefinition
-   *         workflow to apply to ingested media packages
+   *          workflow to apply to ingested media packages
+   * @param workflowConfig
+   *          the workflow definition configuration
    * @param inbox
-   *         inbox directory to watch
+   *          inbox directory to watch
    * @param maxThreads
-   *         maximum worker threads doing the actual ingest
+   *          maximum worker threads doing the actual ingest
    */
-  public Ingestor(IngestService ingestService,
-                  WorkingFileRepository workingFileRepository,
-                  SecurityContext secCtx,
-                  String workflowDefinition,
-                  File inbox,
-                  int maxThreads) {
+  public Ingestor(IngestService ingestService, WorkingFileRepository workingFileRepository, SecurityContext secCtx,
+          String workflowDefinition, Map<String, String> workflowConfig, File inbox, int maxThreads) {
     this.workingFileRepository = workingFileRepository;
     this.ingestService = ingestService;
     this.secCtx = secCtx;
     this.workflowDefinition = workflowDefinition;
+    this.workflowConfig = workflowConfig;
     this.inbox = inbox;
     this.executorService = Executors.newFixedThreadPool(maxThreads);
   }
@@ -103,28 +105,26 @@ public class Ingestor {
           @Override
           protected void run() {
             boolean ignore = "zip".equalsIgnoreCase(FilenameUtils.getExtension(artifact.getName()))
-                    &&
-                    withStream(fileInputStream(artifact),
-                               logWarn("Unable to ingest mediapackage '{}', {}", artifact.getAbsolutePath()),
-                               new Function.X<InputStream, Boolean>() {
-                                 @Override
-                                 public Boolean xapply(InputStream in) throws Exception {
-                                   ingestService.addZippedMediaPackage(in, workflowDefinition);
-                                   logger.info("Ingested {} as a mediapackage", artifact.getAbsolutePath());
-                                   return true;
-                                 }
-                               }).isRight()
-                    ||
-                    withStream(fileInputStream(artifact),
-                               logWarn("Unable to process inbox file '{}', {}", artifact.getAbsolutePath()),
-                               new Function.X<InputStream, Boolean>() {
-                                 @Override
-                                 public Boolean xapply(InputStream in) throws Exception {
-                                   workingFileRepository.putInCollection(WFR_COLLECTION, artifact.getName(), in);
-                                   logger.info("Ingested {} as an inbox file", artifact.getAbsolutePath());
-                                   return true;
-                                 }
-                               }).isRight();
+                    && withStream(fileInputStream(artifact),
+                            logWarn("Unable to ingest mediapackage '{}', {}", artifact.getAbsolutePath()),
+                            new Function.X<InputStream, Boolean>() {
+                              @Override
+                              public Boolean xapply(InputStream in) throws Exception {
+                                ingestService.addZippedMediaPackage(in, workflowDefinition, workflowConfig);
+                                logger.info("Ingested {} as a mediapackage", artifact.getAbsolutePath());
+                                return true;
+                              }
+                            }).isRight()
+                    || withStream(fileInputStream(artifact),
+                            logWarn("Unable to process inbox file '{}', {}", artifact.getAbsolutePath()),
+                            new Function.X<InputStream, Boolean>() {
+                              @Override
+                              public Boolean xapply(InputStream in) throws Exception {
+                                workingFileRepository.putInCollection(WFR_COLLECTION, artifact.getName(), in);
+                                logger.info("Ingested {} as an inbox file", artifact.getAbsolutePath());
+                                return true;
+                              }
+                            }).isRight();
             try {
               FileUtils.forceDelete(artifact);
             } catch (IOException e) {
@@ -136,12 +136,12 @@ public class Ingestor {
     };
   }
 
-  /** Return true if the passed artifact can be handled by this ingestor, i.e. it lies in its inbox. */
+  /** Return true if the passed artifact can be handled by this ingestor, i.e. it lies in its inbox and its name does not start with a ".". */
   public boolean canHandle(final File artifact) {
     logger.debug("CanHandle {}, {}", myInfo(), artifact.getAbsolutePath());
     File dir = artifact.getParentFile();
     try {
-      return dir != null && inbox.getCanonicalPath().equals(dir.getCanonicalPath());
+      return dir != null && inbox.getCanonicalPath().equals(dir.getCanonicalPath()) && !artifact.getName().startsWith(".");
     } catch (IOException e) {
       logger.warn("Unable to determine canonical path of {} ", artifact.getAbsolutePath());
       return false;
@@ -154,17 +154,17 @@ public class Ingestor {
 
   /**
    * Create a function that logs a warning.
-   *
+   * 
    * @param msg
-   *         a message string to be used with {@link org.slf4j.Logger}
+   *          a message string to be used with {@link org.slf4j.Logger}
    * @param args
-   *         args for the Logger. The function argument (the exception) will be the last arg.
+   *          args for the Logger. The function argument (the exception) will be the last arg.
    */
   public static Function<Exception, Exception> logWarn(final String msg, final Object... args) {
     return new Function<Exception, Exception>() {
       @Override
       public Exception apply(Exception e) {
-        logger.warn(msg, append(args, e.getMessage()));
+        logger.warn(msg, append(Object.class, args, e.getMessage()));
         return e;
       }
     };

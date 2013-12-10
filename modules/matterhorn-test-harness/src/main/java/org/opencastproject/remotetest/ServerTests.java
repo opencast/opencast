@@ -35,6 +35,7 @@ import org.opencastproject.remotetest.server.ScheduledCaptureTest;
 import org.opencastproject.remotetest.server.UnscheduledCaptureTest;
 import org.opencastproject.remotetest.server.UploadTest;
 import org.opencastproject.remotetest.server.WorkflowRestEndpointTest;
+import org.opencastproject.remotetest.server.SeriesFeedTest;
 
 /**
  * Runs the server-side tests
@@ -57,7 +58,8 @@ import org.opencastproject.remotetest.server.WorkflowRestEndpointTest;
   UploadTest.class,
   MaintenanceModeTest.class,
   OaiPmhServerTest.class,
-  LtiAuthenticationTest.class
+  LtiAuthenticationTest.class,
+  SeriesFeedTest.class
 })
 
 public class ServerTests {

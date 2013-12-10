@@ -15,12 +15,15 @@
  */
 package org.opencastproject.loadtest.impl;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+
 import org.opencastproject.security.api.TrustedHttpClient;
 
 import junit.framework.Assert;
-import static org.easymock.EasyMock.*;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

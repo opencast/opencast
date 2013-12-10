@@ -186,6 +186,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       else
         return Response.status(HttpStatus.SC_NOT_FOUND).build();
     } catch (Exception e) {
+      logger.error("Unable to delete element '{}' from mediapackage '{}': {}", new Object[] { mediaPackageElementID,
+              mediaPackageID, e });
       return Response.serverError().entity(e.getMessage()).build();
     }
   }
@@ -205,6 +207,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       else
         return Response.status(SC_NOT_FOUND).build();
     } catch (Exception e) {
+      logger.error("Unable to delete element '{}' from collection '{}': {}", new Object[] { fileName, collectionId, e });
       return Response.serverError().entity(e.getMessage()).build();
     }
   }
@@ -219,11 +222,11 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGet(@PathParam("mediaPackageID") final String mediaPackageID,
           @PathParam("mediaPackageElementID") final String mediaPackageElementID,
-          @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException, IOException {
-
+          @HeaderParam("If-None-Match") String ifNoneMatch) throws NotFoundException {
     // Check the If-None-Match header first
+    String md5 = null;
     try {
-      final String md5 = getMediaPackageElementDigest(mediaPackageID, mediaPackageElementID);
+      md5 = getMediaPackageElementDigest(mediaPackageID, mediaPackageElementID);
       if (StringUtils.isNotBlank(ifNoneMatch) && md5.equals(ifNoneMatch)) {
         return Response.notModified(md5).build();
       }
@@ -239,7 +242,9 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
         }
       }).orError(new NotFoundException()).get();
     } catch (IllegalStateException e) {
-      throw new NotFoundException();
+      logger.error("Unable to provide element '{}' from mediapackage '{}': {}", new Object[] { mediaPackageElementID,
+              mediaPackageID, e });
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
 
@@ -275,7 +280,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGet(@PathParam("mediaPackageID") String mediaPackageID,
           @PathParam("mediaPackageElementID") String mediaPackageElementID, @PathParam("fileName") String fileName,
-          @HeaderParam("If-None-Match") String ifNoneMatch, @HeaderParam("Range") String range) throws NotFoundException {
+          @HeaderParam("If-None-Match") String ifNoneMatch, @HeaderParam("Range") String range)
+          throws NotFoundException {
     String md5 = null;
     // Check the If-None-Match header first
     try {
@@ -288,29 +294,21 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
               fileName });
     }
 
-    if (StringUtils.isNotBlank(range)) {
-      logger.debug("trying to retrieve range: {}", range);
-      try {
-        Response response = partialFileResponse(getFile(mediaPackageID, mediaPackageElementID),
-            mimeMap.getContentType(fileName), some(fileName), range).tag(md5).build();
+    try {
+      if (StringUtils.isNotBlank(range)) {
+        logger.debug("trying to retrieve range: {}", range);
+        return partialFileResponse(getFile(mediaPackageID, mediaPackageElementID), mimeMap.getContentType(fileName),
+                some(fileName), range).tag(md5).build();
 
-        return response;
-      } catch (IllegalStateException e) {
-        logger.error(e.getMessage(), e);
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-      } catch (IOException e) {
-        logger.error(e.getMessage(), e);
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+      } else {
+        // No If-Non-Match header provided, or the file changed in the meantime
+        return fileResponse(getFile(mediaPackageID, mediaPackageElementID), mimeMap.getContentType(fileName),
+                some(fileName)).tag(md5).build();
       }
-    } else {
-      // No If-Non-Match header provided, or the file changed in the meantime
-      try {
-        return fileResponse(getFile(mediaPackageID, mediaPackageElementID),
-            mimeMap.getContentType(fileName), some(fileName)).tag(md5).build();
-      } catch (IllegalStateException e) {
-        logger.error(e.getMessage());
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-      }
+    } catch (Exception e) {
+      logger.error("Unable to provide element '{}' from mediapackage '{}': {}", new Object[] { mediaPackageElementID,
+              mediaPackageID, e });
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
 
@@ -322,7 +320,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_OK, description = "File returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGetFromCollection(@PathParam("collectionId") String collectionId,
-          @PathParam("fileName") String fileName) throws NotFoundException, IOException {
+          @PathParam("fileName") String fileName) throws NotFoundException {
     return fileResponse(getFileFromCollection(collectionId, fileName), mimeMap.getContentType(fileName), some(fileName))
             .build();
   }
@@ -369,16 +367,12 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_OK, description = "URLs returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Collection not found") })
   public Response restGetCollectionContents(@PathParam("collectionId") String collectionId) throws NotFoundException {
-    try {
-      URI[] uris = super.getCollectionContents(collectionId);
-      JSONArray jsonArray = new JSONArray();
-      for (URI uri : uris) {
-        jsonArray.add(uri.toString());
-      }
-      return Response.ok(jsonArray.toJSONString()).build();
-    } catch (Exception e) {
-      return Response.serverError().entity(e.getMessage()).build();
+    URI[] uris = super.getCollectionContents(collectionId);
+    JSONArray jsonArray = new JSONArray();
+    for (URI uri : uris) {
+      jsonArray.add(uri.toString());
     }
+    return Response.ok(jsonArray.toJSONString()).build();
   }
 
   @POST
@@ -393,11 +387,14 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_NOT_FOUND, description = "File to copy not found") })
   public Response restCopyTo(@PathParam("fromCollection") String fromCollection,
           @PathParam("fromFileName") String fromFileName, @PathParam("toMediaPackage") String toMediaPackage,
-          @PathParam("toMediaPackageElement") String toMediaPackageElement, @PathParam("toFileName") String toFileName) {
+          @PathParam("toMediaPackageElement") String toMediaPackageElement, @PathParam("toFileName") String toFileName)
+          throws NotFoundException {
     try {
       URI uri = super.copyTo(fromCollection, fromFileName, toMediaPackage, toMediaPackageElement, toFileName);
       return Response.ok().entity(uri.toString()).build();
-    } catch (Exception e) {
+    } catch (IOException e) {
+      logger.error("Unable to copy file '{}' from collection '{}' to mediapackage {}/{}: {}", new Object[] {
+              fromFileName, fromCollection, toMediaPackage, toMediaPackageElement, e });
       return Response.serverError().entity(e.getMessage()).build();
     }
   }
@@ -414,11 +411,14 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_NOT_FOUND, description = "File to move not found") })
   public Response restMoveTo(@PathParam("fromCollection") String fromCollection,
           @PathParam("fromFileName") String fromFileName, @PathParam("toMediaPackage") String toMediaPackage,
-          @PathParam("toMediaPackageElement") String toMediaPackageElement, @PathParam("toFileName") String toFileName) {
+          @PathParam("toMediaPackageElement") String toMediaPackageElement, @PathParam("toFileName") String toFileName)
+          throws NotFoundException {
     try {
       URI uri = super.moveTo(fromCollection, fromFileName, toMediaPackage, toMediaPackageElement, toFileName);
       return Response.ok().entity(uri.toString()).build();
-    } catch (Exception e) {
+    } catch (IOException e) {
+      logger.error("Unable to move file '{}' from collection '{}' to mediapackage {}/{}: {}", new Object[] {
+              fromFileName, fromCollection, toMediaPackage, toMediaPackageElement, e });
       return Response.serverError().entity(e.getMessage()).build();
     }
   }

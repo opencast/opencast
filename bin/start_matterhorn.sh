@@ -68,6 +68,9 @@ LOG_OPTS="$PAX_LOGGING_OPTS $MATTERHORN_LOGGING_OPTS $ECLIPSELINK_LOGGING_OPTS $
 GRAPHICS_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
 JAVA_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
 
+#Added in response to MH-9831
+LIBRARY_OPTS="-Dnet.sf.ehcache.skipUpdateCheck=true -Dorg.terracotta.quartz.skipUpdateCheck=true"
+
 #!/bin/sh
 # If this computer is OS X and $DYLD_FALLBACK_LIBRARY_PATH environment variable
 # is not defined, then set it to /opt/local/lib. 
@@ -93,4 +96,4 @@ fi
 
 # Finally start felix
 cd "$FELIX_HOME"
-java $DEBUG_OPTS $FELIX_OPTS $GRAPHICS_OPTS $MAVEN_ARG $JAVA_OPTS $PAX_CONFMAN_OPTS $LOG_OPTS $JMX_OPTS $JETTY_OPTS -jar "$FELIX_HOME/bin/felix.jar" "$FELIX_CACHE"
+java $DEBUG_OPTS $FELIX_OPTS $GRAPHICS_OPTS $LIBRARY_OPTS $MAVEN_ARG $JAVA_OPTS $PAX_CONFMAN_OPTS $LOG_OPTS $JMX_OPTS $JETTY_OPTS -jar "$FELIX_HOME/bin/felix.jar" "$FELIX_CACHE"

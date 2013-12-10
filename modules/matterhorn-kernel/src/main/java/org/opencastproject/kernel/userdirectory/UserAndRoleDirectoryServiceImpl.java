@@ -16,6 +16,7 @@
 package org.opencastproject.kernel.userdirectory;
 
 import static org.opencastproject.security.api.UserProvider.ALL_ORGANIZATIONS;
+import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.RoleDirectoryService;
@@ -24,6 +25,10 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.util.Cache;
+import org.opencastproject.util.Caches;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Tuple;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +65,8 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   /** The security service */
   protected SecurityService securityService = null;
+
+  private Cache<Tuple<String, String>, User> cache = Caches.lru(200, 60000);
 
   /**
    * Adds a user provider.
@@ -141,32 +148,40 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     if (org == null) {
       throw new IllegalStateException("No organization is set");
     }
-    String orgId = org.getId();
-    // Collect all of the roles known from each of the user providers for this user
-    User user = null;
-    for (UserProvider userProvider : userProviders) {
-      String providerOrgId = userProvider.getOrganization();
-      if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !orgId.equals(providerOrgId)) {
-        continue;
-      }
-      User providerUser = userProvider.loadUser(userName);
-      if (providerUser == null) {
-        continue;
-      }
-      if (user == null) {
-        user = providerUser;
-      } else {
-        user = mergeUsers(user, providerUser);
-      }
-    }
-    return user;
+    return cache.get(tuple(org.getId(), userName), loadUser);
   }
+
+  /** Load a user of an organization. */
+  private final Function<Tuple<String, String>, User> loadUser = new Function<Tuple<String, String>, User>() {
+    @Override
+    public User apply(Tuple<String, String> orgUser) {
+      // Collect all of the roles known from each of the user providers for this user
+      User user = null;
+      for (UserProvider userProvider : userProviders) {
+        String providerOrgId = userProvider.getOrganization();
+        if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !orgUser.getA().equals(providerOrgId)) {
+          continue;
+        }
+        User providerUser = userProvider.loadUser(orgUser.getB());
+        if (providerUser == null) {
+          continue;
+        }
+        if (user == null) {
+          user = providerUser;
+        } else {
+          user = mergeUsers(user, providerUser);
+        }
+      }
+      return user;
+    }
+  };
 
   /**
    * {@inheritDoc}
    * 
    * @see org.springframework.security.core.userdetails.UserDetailsService#loadUserByUsername(java.lang.String)
    */
+  @Override
   public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException,
           org.springframework.dao.DataAccessException {
     User user = loadUser(userName);

@@ -122,9 +122,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * OSGi callback on component activation.
-   *
+   * 
    * @param ctx
-   *         the bundle context
+   *          the bundle context
    */
   void activate(BundleContext ctx) {
     logger.info("Activating composer service");
@@ -132,7 +132,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.composer.api.ComposerService#encode(org.opencastproject.mediapackage.Track,
    *      java.lang.String)
    */
@@ -140,7 +140,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   public Job encode(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Encode.toString(),
-                                       Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId));
+              Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId));
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -149,24 +149,25 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /**
    * Encodes audio and video track to a file. If both an audio and a video track are given, they are muxed together into
    * one movie container.
-   *
+   * 
    * @param videoTrack
-   *         the video track
+   *          the video track
    * @param audioTrack
-   *         the audio track
+   *          the audio track
    * @param profileId
-   *         the encoding profile
+   *          the encoding profile
    * @param properties
-   *         encoding properties
-   * @return the encoded track or none if the operation does not return a track. This may happen for example when
-   *         doing two pass encodings where the first pass only creates metadata for the second one
+   *          encoding properties
+   * @return the encoded track or none if the operation does not return a track. This may happen for example when doing
+   *         two pass encodings where the first pass only creates metadata for the second one
    * @throws EncoderException
-   *         if encoding fails
+   *           if encoding fails
    */
   protected Option<Track> encode(Job job, Track videoTrack, Track audioTrack, String profileId,
-                                 Map<String, String> properties)
-          throws EncoderException, MediaPackageException {
-
+          Map<String, String> properties) throws EncoderException, MediaPackageException {
+    if (job == null) {
+      throw new EncoderException("The Job parameter must not be null");
+    }
     final String targetTrackId = idBuilder.createNew().toString();
     try {
       // Get the tracks and make sure they exist
@@ -207,14 +208,14 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       }
 
       if (audioTrack != null && videoTrack != null)
-        logger.info("Muxing audio track {} and video track {} into {}", new String[]{audioTrack.getIdentifier(),
-                videoTrack.getIdentifier(), targetTrackId});
+        logger.info("Muxing audio track {} and video track {} into {}", new String[] { audioTrack.getIdentifier(),
+                videoTrack.getIdentifier(), targetTrackId });
       else if (audioTrack == null)
-        logger.info("Encoding video track {} to {} using profile '{}'", new String[]{videoTrack.getIdentifier(),
-                targetTrackId, profileId});
+        logger.info("Encoding video track {} to {} using profile '{}'", new String[] { videoTrack.getIdentifier(),
+                targetTrackId, profileId });
       else if (videoTrack == null)
-        logger.info("Encoding audio track {} to {} using profile '{}'", new String[]{audioTrack.getIdentifier(),
-                targetTrackId, profileId});
+        logger.info("Encoding audio track {} to {} using profile '{}'", new String[] { audioTrack.getIdentifier(),
+                targetTrackId, profileId });
 
       // Do the work
       for (File encodingOutput : encoderEngine.mux(audioFile, videoFile, profile, properties)) {
@@ -224,7 +225,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         try {
           in = new FileInputStream(encodingOutput);
           returnURL = workspace.putInCollection(COLLECTION,
-                                                job.getId() + "." + FilenameUtils.getExtension(encodingOutput.getAbsolutePath()), in);
+                  job.getId() + "." + FilenameUtils.getExtension(encodingOutput.getAbsolutePath()), in);
           logger.info("Copied the encoded file to the workspace at {}", returnURL);
           if (encodingOutput.delete()) {
             logger.info("Deleted the local copy of the encoded file at {}", encodingOutput.getAbsolutePath());
@@ -271,7 +272,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.composer.api.ComposerService#trim(org.opencastproject.mediapackage.Track,
    *      java.lang.String, long, long)
    */
@@ -283,7 +284,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
               JOB_TYPE,
               Operation.Trim.toString(),
               Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId, Long.toString(start),
-                            Long.toString(duration)));
+                      Long.toString(duration)));
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -292,24 +293,24 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /**
    * Trims the given track using the encoding profile <code>profileId</code> and the given starting point and duration
    * in miliseconds.
-   *
+   * 
    * @param job
-   *         the associated job
+   *          the associated job
    * @param sourceTrack
-   *         the source track
+   *          the source track
    * @param profileId
-   *         the encoding profile identifier
+   *          the encoding profile identifier
    * @param start
-   *         the trimming in-point
+   *          the trimming in-point
    * @param duration
-   *         the trimming duration
-   * @return the trimmed track or none if the operation does not return a track. This may happen for example when
-   *         doing two pass encodings where the first pass only creates metadata for the second one
+   *          the trimming duration
+   * @return the trimmed track or none if the operation does not return a track. This may happen for example when doing
+   *         two pass encodings where the first pass only creates metadata for the second one
    * @throws EncoderException
-   *         if trimming fails
+   *           if trimming fails
    */
-  protected Option<Track> trim(Job job, Track sourceTrack, String profileId, long start,
-                               long duration) throws EncoderException {
+  protected Option<Track> trim(Job job, Track sourceTrack, String profileId, long start, long duration)
+          throws EncoderException {
     try {
       String targetTrackId = idBuilder.createNew().toString();
 
@@ -343,7 +344,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         try {
           in = new FileInputStream(encodingOutput);
           returnURL = workspace.putInCollection(COLLECTION,
-                                                job.getId() + "." + FilenameUtils.getExtension(encodingOutput.getAbsolutePath()), in);
+                  job.getId() + "." + FilenameUtils.getExtension(encodingOutput.getAbsolutePath()), in);
           logger.info("Copied the trimmed file to the workspace at {}", returnURL);
           encodingOutput.delete();
           logger.info("Deleted the local copy of the trimmed file at {}", encodingOutput.getAbsolutePath());
@@ -389,7 +390,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.composer.api.ComposerService#mux(org.opencastproject.mediapackage.Track,
    *      org.opencastproject.mediapackage.Track, java.lang.String)
    */
@@ -400,7 +401,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
               JOB_TYPE,
               Operation.Mux.toString(),
               Arrays.asList(MediaPackageElementParser.getAsXml(videoTrack),
-                            MediaPackageElementParser.getAsXml(audioTrack), profileId));
+                      MediaPackageElementParser.getAsXml(audioTrack), profileId));
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -408,29 +409,29 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Muxes the audio and video track into one movie container.
-   *
+   * 
    * @param job
-   *         the associated job
+   *          the associated job
    * @param videoTrack
-   *         the video track
+   *          the video track
    * @param audioTrack
-   *         the audio track
+   *          the audio track
    * @param profileId
-   *         the profile identifier
+   *          the profile identifier
    * @return the muxed track
    * @throws EncoderException
-   *         if encoding fails
+   *           if encoding fails
    * @throws MediaPackageException
-   *         if serializing the mediapackage elements fails
+   *           if serializing the mediapackage elements fails
    */
-  protected Option<Track> mux(Job job, Track videoTrack, Track audioTrack, String profileId)
-          throws EncoderException, MediaPackageException {
+  protected Option<Track> mux(Job job, Track videoTrack, Track audioTrack, String profileId) throws EncoderException,
+          MediaPackageException {
     return encode(job, videoTrack, audioTrack, profileId, null);
   }
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.composer.api.ComposerService#listProfiles()
    */
   @Override
@@ -441,7 +442,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.composer.api.ComposerService#getProfile(java.lang.String)
    */
   @Override
@@ -451,8 +452,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.composer.api.ComposerService#image(org.opencastproject.mediapackage.Track, String, long...)
+   * 
+   * @see org.opencastproject.composer.api.ComposerService#image(org.opencastproject.mediapackage.Track, String,
+   *      long...)
    */
   @Override
   public Job image(Track sourceTrack, String profileId, long... times) throws EncoderException, MediaPackageException {
@@ -481,18 +483,18 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Extracts an image from <code>sourceTrack</code> at the given point in time.
-   *
+   * 
    * @param job
-   *         the associated job
+   *          the associated job
    * @param sourceTrack
-   *         the source track
+   *          the source track
    * @param profileId
-   *         the identifer of the encoding profile to use
+   *          the identifer of the encoding profile to use
    * @param times
-   *         (one or more) times in miliseconds
+   *          (one or more) times in miliseconds
    * @return the image as an attachment element
    * @throws EncoderException
-   *         if extracting the image fails
+   *           if extracting the image fails
    */
   protected List<Attachment> image(Job job, Track sourceTrack, String profileId, long... times)
           throws EncoderException, MediaPackageException {
@@ -526,7 +528,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           throw new EncoderException("Unable to extract an image from a track with unknown duration");
         if (time < 0 || time > sourceTrack.getDuration()) {
           throw new EncoderException("Can not extract an image at time " + Long.valueOf(time)
-                                             + " from a track with duration " + Long.valueOf(sourceTrack.getDuration()));
+                  + " from a track with duration " + Long.valueOf(sourceTrack.getDuration()));
         }
       }
 
@@ -562,7 +564,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         try {
           in = new FileInputStream(output);
           URI returnURL = workspace.putInCollection(COLLECTION,
-                                                    job.getId() + "_" + i + "." + FilenameUtils.getExtension(output.getAbsolutePath()), in);
+                  job.getId() + "_" + i + "." + FilenameUtils.getExtension(output.getAbsolutePath()), in);
           logger.debug("Copied image file to the workspace at {}", returnURL);
           workspaceURIs.add(returnURL);
         } catch (Exception e) {
@@ -598,7 +600,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.composer.api.ComposerService#convertImage(org.opencastproject.mediapackage.Attachment,
    *      java.lang.String)
    */
@@ -620,20 +622,20 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Converts an image from <code>sourceImage</code> to a new format.
-   *
+   * 
    * @param job
-   *         the associated job
+   *          the associated job
    * @param sourceImage
-   *         the source image
+   *          the source image
    * @param profileId
-   *         the identifer of the encoding profile to use
-   * @return the image as an attachment or none if the operation does not return an image. This may happen for example when
-   *         doing two pass encodings where the first pass only creates metadata for the second one
+   *          the identifer of the encoding profile to use
+   * @return the image as an attachment or none if the operation does not return an image. This may happen for example
+   *         when doing two pass encodings where the first pass only creates metadata for the second one
    * @throws EncoderException
-   *         if converting the image fails
+   *           if converting the image fails
    */
-  protected Option<Attachment> convertImage(Job job, Attachment sourceImage, String profileId)
-          throws EncoderException, MediaPackageException {
+  protected Option<Attachment> convertImage(Job job, Attachment sourceImage, String profileId) throws EncoderException,
+          MediaPackageException {
 
     if (sourceImage == null)
       throw new EncoderException("SourceImage cannot be null");
@@ -676,7 +678,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         try {
           in = new FileInputStream(conversionOutput);
           workspaceURI = workspace.putInCollection(COLLECTION,
-                                                   job.getId() + "." + FilenameUtils.getExtension(conversionOutput.getAbsolutePath()), in);
+                  job.getId() + "." + FilenameUtils.getExtension(conversionOutput.getAbsolutePath()), in);
           logger.debug("Copied image file to the workspace at {}", workspaceURI);
         } catch (Exception e) {
           cleanup(conversionOutput);
@@ -709,14 +711,14 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * Supports inserting captions in QuickTime files.
-   *
-   * @see org.opencastproject.composer.api.ComposerService#captions(org.opencastproject.mediapackage.Track, org.opencastproject.mediapackage.Catalog[])
+   * 
+   * @see org.opencastproject.composer.api.ComposerService#captions(org.opencastproject.mediapackage.Track,
+   *      org.opencastproject.mediapackage.Catalog[])
    */
   @Override
-  public Job captions(final Track mediaTrack,
-                      final Catalog[] captions) throws EmbedderException, MediaPackageException {
+  public Job captions(final Track mediaTrack, final Catalog[] captions) throws EmbedderException, MediaPackageException {
 
     List<String> args = new ArrayList<String>();
     args.set(0, MediaPackageElementParser.getAsXml(mediaTrack));
@@ -733,16 +735,16 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Adds the closed captions contained in the <code>captions</code> catalog collection to <code>mediaTrack</code>.
-   *
+   * 
    * @param job
-   *         the associated job
+   *          the associated job
    * @param mediaTrack
-   *         the source track
+   *          the source track
    * @param captions
-   *         the caption catalogs
+   *          the caption catalogs
    * @return the captioned track
    * @throws EmbedderException
-   *         if embedding captions into the track fails
+   *           if embedding captions into the track fails
    */
   protected Track captions(Job job, Track mediaTrack, Catalog[] captions) throws EmbedderException {
     try {
@@ -818,7 +820,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       try {
         in = new FileInputStream(output);
         returnURL = workspace.putInCollection(COLLECTION,
-                                              job.getId() + "." + FilenameUtils.getExtension(output.getAbsolutePath()), in);
+                job.getId() + "." + FilenameUtils.getExtension(output.getAbsolutePath()), in);
         logger.info("Copied the encoded file to the workspace at {}", returnURL);
       } catch (Exception e) {
         throw new EmbedderException("Unable to put the encoded file into the workspace", e);
@@ -858,9 +860,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Helper function that iterates tags and returns language from tag in form lang:&lt;lang&gt;
-   *
+   * 
    * @param tags
-   *         catalog tags
+   *          catalog tags
    * @return language or null if no corresponding tag was found
    */
   protected String getLanguageFromTags(String[] tags) {
@@ -874,9 +876,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Deletes any valid file in the list.
-   *
+   * 
    * @param encodingOutput
-   *         list of files to be deleted
+   *          list of files to be deleted
    */
   protected void cleanup(File... encodingOutput) {
     for (File file : encodingOutput) {
@@ -903,7 +905,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -930,7 +932,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         case Encode:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
           encodingProfile = arguments.get(1);
-          serialized = encode(job, firstTrack, null, encodingProfile, null).map(MediaPackageElementParser.<Track>getAsXml()).getOrElse("");
+          serialized = encode(job, firstTrack, null, encodingProfile, null).map(
+                  MediaPackageElementParser.<Track> getAsXml()).getOrElse("");
           break;
         case Image:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
@@ -945,26 +948,30 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         case ImageConversion:
           Attachment sourceImage = (Attachment) MediaPackageElementParser.getFromXml(arguments.get(0));
           encodingProfile = arguments.get(1);
-          serialized = convertImage(job, sourceImage, encodingProfile).map(MediaPackageElementParser.<Attachment>getAsXml()).getOrElse("");
+          serialized = convertImage(job, sourceImage, encodingProfile).map(
+                  MediaPackageElementParser.<Attachment> getAsXml()).getOrElse("");
           break;
         case Mux:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
           secondTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));
           encodingProfile = arguments.get(2);
-          serialized = mux(job, firstTrack, secondTrack, encodingProfile).map(MediaPackageElementParser.<Track>getAsXml()).getOrElse("");
+          serialized = mux(job, firstTrack, secondTrack, encodingProfile).map(
+                  MediaPackageElementParser.<Track> getAsXml()).getOrElse("");
           break;
         case Trim:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
           encodingProfile = arguments.get(1);
           long start = Long.parseLong(arguments.get(2));
           long duration = Long.parseLong(arguments.get(3));
-          serialized = trim(job, firstTrack, encodingProfile, start, duration).map(MediaPackageElementParser.<Track>getAsXml()).getOrElse("");
+          serialized = trim(job, firstTrack, encodingProfile, start, duration).map(
+                  MediaPackageElementParser.<Track> getAsXml()).getOrElse("");
           break;
         case Watermark:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
           String watermark = arguments.get(1);
           encodingProfile = arguments.get(2);
-          serialized = watermark(job, firstTrack, watermark, encodingProfile).map(MediaPackageElementParser.<Track>getAsXml()).getOrElse("");
+          serialized = watermark(job, firstTrack, watermark, encodingProfile).map(
+                  MediaPackageElementParser.<Track> getAsXml()).getOrElse("");
           break;
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
@@ -982,9 +989,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Sets the media inspection service
-   *
+   * 
    * @param mediaInspectionService
-   *         an instance of the media inspection service
+   *          an instance of the media inspection service
    */
   protected void setMediaInspectionService(MediaInspectionService mediaInspectionService) {
     this.inspectionService = mediaInspectionService;
@@ -992,9 +999,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Sets the encoder engine factory
-   *
+   * 
    * @param encoderEngineFactory
-   *         The encoder engine factory
+   *          The encoder engine factory
    */
   protected void setEncoderEngineFactory(EncoderEngineFactory encoderEngineFactory) {
     this.encoderEngineFactory = encoderEngineFactory;
@@ -1002,9 +1009,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Sets the embedder engine factoy
-   *
+   * 
    * @param embedderEngineFactory
-   *         The embedder engine factory
+   *          The embedder engine factory
    */
   protected void setEmbedderEngineFactory(EmbedderEngineFactory embedderEngineFactory) {
     this.embedderEngineFactory = embedderEngineFactory;
@@ -1012,9 +1019,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Sets the workspace
-   *
+   * 
    * @param workspace
-   *         an instance of the workspace
+   *          an instance of the workspace
    */
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
@@ -1022,9 +1029,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Sets the service registry
-   *
+   * 
    * @param serviceRegistry
-   *         the service registry
+   *          the service registry
    */
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
@@ -1032,7 +1039,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -1042,9 +1049,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Sets the profile scanner.
-   *
+   * 
    * @param scanner
-   *         the profile scanner
+   *          the profile scanner
    */
   protected void setProfileScanner(EncodingProfileScanner scanner) {
     this.profileScanner = scanner;
@@ -1052,9 +1059,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Callback for setting the security service.
-   *
+   * 
    * @param securityService
-   *         the securityService to set
+   *          the securityService to set
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
@@ -1062,9 +1069,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Callback for setting the user directory service.
-   *
+   * 
    * @param userDirectoryService
-   *         the userDirectoryService to set
+   *          the userDirectoryService to set
    */
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
@@ -1072,9 +1079,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Sets a reference to the organization directory service.
-   *
+   * 
    * @param organizationDirectory
-   *         the organization directory
+   *          the organization directory
    */
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
@@ -1082,7 +1089,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -1092,7 +1099,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -1102,7 +1109,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override
@@ -1115,7 +1122,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           MediaPackageException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Watermark.toString(),
-                                       Arrays.asList(MediaPackageElementParser.getAsXml(mediaTrack), watermark, profileId));
+              Arrays.asList(MediaPackageElementParser.getAsXml(mediaTrack), watermark, profileId));
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -1123,17 +1130,17 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Encodes a video track with a watermark.
-   *
+   * 
    * @param mediaTrack
-   *         the video track
+   *          the video track
    * @param watermark
-   *         the watermark image
+   *          the watermark image
    * @param encodingProfile
-   *         the encoding profile
+   *          the encoding profile
    * @return the watermarked track or none if the operation does not return a track. This may happen for example when
    *         doing two pass encodings where the first pass only creates metadata for the second one
    * @throws EncoderException
-   *         if encoding fails
+   *           if encoding fails
    */
   protected Option<Track> watermark(Job job, Track mediaTrack, String watermark, String encodingProfile)
           throws EncoderException, MediaPackageException {

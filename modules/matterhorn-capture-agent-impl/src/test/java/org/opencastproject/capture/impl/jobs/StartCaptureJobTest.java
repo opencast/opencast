@@ -23,7 +23,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 
 import junit.framework.Assert;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.quartz.JobDataMap;

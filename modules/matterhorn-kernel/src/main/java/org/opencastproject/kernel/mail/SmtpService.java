@@ -41,7 +41,7 @@ public class SmtpService implements ManagedService {
 
   /** Parameter prefix common to all "mail" properties */
   private static final String OPT_MAIL_PREFIX = "mail.";
-  
+
   /** Parameter name for the transport protocol */
   private static final String OPT_MAIL_TRANSPORT = "mail.transport.protocol";
 
@@ -89,10 +89,10 @@ public class SmtpService implements ManagedService {
 
   /** The mail password */
   private String mailPassword = null;
-  
+
   /** The default mail session */
   private Session defaultMailSession = null;
-  
+
   /** The current mail transport protocol */
   private String mailTransport = null;
 
@@ -142,7 +142,7 @@ public class SmtpService implements ManagedService {
       logger.debug("Mail server port is '{}'", mailPort);
     }
     mailProperties.put(propName, mailPort);
-    
+
     // TSL over SMTP support
     propName = OPT_MAIL_PREFIX + mailTransport + OPT_MAIL_TLS_ENABLE_SUFFIX;
     String smtpStartTLSStr = StringUtils.trimToNull((String) properties.get(propName));
@@ -193,7 +193,7 @@ public class SmtpService implements ManagedService {
 
     defaultMailSession = null;
     logger.info("Mail service configured with {}", mailHost);
-    
+
     Properties props = getSession().getProperties();
     for (String key : props.stringPropertyNames())
       logger.info("{}: {}", key, props.getProperty(key));
@@ -206,6 +206,14 @@ public class SmtpService implements ManagedService {
         sendTestMessage(mailFrom);
       } catch (MessagingException e) {
         logger.error("Error sending test message to " + mailFrom + ": " + e.getMessage());
+        while (e.getNextException() != null) {
+          Exception ne = e.getNextException();
+          logger.error("Error sending test message to " + mailFrom + ": " + ne.getMessage());
+          if (ne instanceof MessagingException)
+            e = (MessagingException) ne;
+          else
+            break;
+        }
         throw new ConfigurationException(OPT_MAIL_PREFIX + mailTransport + OPT_MAIL_HOST_SUFFIX,
                 "Failed to send test message to " + mailFrom);
       }
@@ -251,7 +259,7 @@ public class SmtpService implements ManagedService {
       t.sendMessage(message, message.getAllRecipients());
     } finally {
       t.close();
-    } 
+    }
   }
 
   /**
@@ -268,5 +276,5 @@ public class SmtpService implements ManagedService {
     message.saveChanges();
     send(message);
   }
-  
+
 }

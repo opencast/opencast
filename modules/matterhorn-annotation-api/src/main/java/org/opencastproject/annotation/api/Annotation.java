@@ -62,4 +62,8 @@ public interface Annotation {
 
   void setCreated(Date created);
 
+  Boolean getPrivate();
+
+  void setPrivate(Boolean isPrivate);
+
 }

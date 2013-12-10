@@ -96,6 +96,10 @@ Opencast.WorkflowInspect = (function() {
       }
     });
     out.operations = ops;
+    if(out.operations[0].configurations['schedule.start'] && out.operations[0].configurations['schedule.stop']) {
+	out.config['schedule.start'] = out.operations[0].configurations['schedule.start'];
+	out.config['schedule.stop'] = out.operations[0].configurations['schedule.stop'];
+    }
 
     if (workflow.mediapackage) {
       var mp = workflow.mediapackage;
@@ -394,7 +398,7 @@ Opencast.WorkflowInspect = (function() {
           val = "";
         }
     	
-    	if ( (val.length == 13 && parseInt(val) != NaN) || (typeof(val) == "number" && val > 1000000000000)) {
+    	if ( (val.length == 13 && !isNaN(parseInt(val))) || (typeof(val) == "number" && val > 1000000000000)) {
     		  out[member.key] = ocUtils.makeLocaleDateString(val);  } 
     	else {
     		out[member.key] = val;

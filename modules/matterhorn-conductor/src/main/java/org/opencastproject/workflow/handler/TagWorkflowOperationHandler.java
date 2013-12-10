@@ -50,19 +50,19 @@ public class TagWorkflowOperationHandler extends ResumableWorkflowOperationHandl
   private static final SortedMap<String, String> CONFIG_OPTIONS;
 
   /** Name of the configuration option that provides the source flavors we are looking for */
-  private static final String SOURCE_FLAVORS_PROPERTY = "source-flavors";
+  public static final String SOURCE_FLAVORS_PROPERTY = "source-flavors";
 
   /** Name of the configuration option that provides the source tags we are looking for */
-  private static final String SOURCE_TAGS_PROPERTY = "source-tags";
+  public static final String SOURCE_TAGS_PROPERTY = "source-tags";
 
   /** Name of the configuration option that provides the target flavors we are looking for */
-  private static final String TARGET_FLAVOR_PROPERTY = "target-flavor";
+  public static final String TARGET_FLAVOR_PROPERTY = "target-flavor";
 
   /** Name of the configuration option that provides the target tags we are looking for */
-  private static final String TARGET_TAGS_PROPERTY = "target-tags";
+  public static final String TARGET_TAGS_PROPERTY = "target-tags";
 
   /** Name of the configuration option that provides the copy boolean we are looking for */
-  private static final String COPY_PROPERTY = "copy";
+  public static final String COPY_PROPERTY = "copy";
 
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();

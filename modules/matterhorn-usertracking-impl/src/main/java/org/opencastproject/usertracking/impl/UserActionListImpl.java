@@ -39,16 +39,16 @@ import javax.xml.bind.annotation.XmlType;
 public class UserActionListImpl implements UserActionList {
 
   @XmlAttribute(name = "total")
-  protected int total;
+  private int total;
 
   @XmlAttribute(name = "offset")
-  protected int offset;
+  private int offset;
 
   @XmlAttribute(name = "limit")
-  protected int limit;
+  private int limit;
 
   @XmlElement(name = "action", namespace = "http://usertracking.opencastproject.org")
-  protected List<UserActionImpl> actions;
+  private List<UserActionImpl> actions;
 
   public void add(UserAction annotation) {
     actions.add((UserActionImpl) annotation);
@@ -56,7 +56,7 @@ public class UserActionListImpl implements UserActionList {
 
   public void add(Collection<UserAction> userActions) {
     for (UserAction userAction : userActions) {
-      actions.add((UserActionImpl)userAction);
+      add((UserActionImpl)userAction);
     }
   }
   
@@ -78,7 +78,7 @@ public class UserActionListImpl implements UserActionList {
   public void setOffset(int offset) {
     this.offset = offset;
   }
-  
+
   public int getTotal() {
     return total;
   }

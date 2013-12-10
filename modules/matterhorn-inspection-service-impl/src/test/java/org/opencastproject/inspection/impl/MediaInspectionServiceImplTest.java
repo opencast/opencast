@@ -15,53 +15,41 @@
  */
 package org.opencastproject.inspection.impl;
 
-import static org.opencastproject.util.MimeType.mimeType;
-
-import org.opencastproject.job.api.Job;
-import org.opencastproject.job.api.JobBarrier;
-import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.apache.tika.parser.audio.AudioParser;
+import org.easymock.EasyMock;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.User;
-import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.StreamHelper;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
-
-import junit.framework.Assert;
-
-import org.apache.tika.parser.audio.AudioParser;
-import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
+
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.util.MimeType.mimeType;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 public class MediaInspectionServiceImplTest {
-
-  private MediaInspectionServiceImpl service = null;
-  private Workspace workspace = null;
-  private ServiceRegistry serviceRegistry = null;
-
-  private URI uriTrack;
-
   private static final Logger logger = LoggerFactory.getLogger(MediaInspectionServiceImplTest.class);
 
   /** True to run the tests */
-  private static boolean mediainfoInstalled = true;
+  private static Option<String> mediainfoPath;
 
   @BeforeClass
   public static void setupClass() {
@@ -69,7 +57,7 @@ public class MediaInspectionServiceImplTest {
     StreamHelper stderr = null;
     Process p = null;
     try {
-      // Mediainfo requires a track in order to return a status code of 0, indicating that it is workinng as expected
+      // Mediainfo requires a track in order to return a status code of 0, indicating that it is working as expected
       URI uriTrack = MediaInspectionServiceImpl.class.getResource("/av.mov").toURI();
       File f = new File(uriTrack);
       p = new ProcessBuilder(MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT, f.getAbsolutePath()).start();
@@ -80,9 +68,10 @@ public class MediaInspectionServiceImplTest {
       stderr.stopReading();
       if (exitCode != 0 && exitCode != 141)
         throw new IllegalStateException("process returned " + exitCode);
+      mediainfoPath = some(MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT);
     } catch (Throwable t) {
-      logger.warn("Skipping media inspection tests due to unsatisifed mediainfo installation: " + t.getMessage());
-      mediainfoInstalled = false;
+      logger.warn("Skipping media inspection tests due to unsatisfied mediainfo installation: " + t.getMessage());
+      mediainfoPath = none();
     } finally {
       IoSupport.closeQuietly(stdout);
       IoSupport.closeQuietly(stderr);
@@ -90,117 +79,99 @@ public class MediaInspectionServiceImplTest {
     }
   }
 
-  @Before
-  public void setUp() throws Exception {
-    uriTrack = MediaInspectionServiceImpl.class.getResource("/av.mov").toURI();
-    File f = new File(uriTrack);
-    // set up services and mock objects
-    service = new MediaInspectionServiceImpl();
-
-    User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
-            new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
-    UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
-    EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
-    EasyMock.replay(userDirectoryService);
-    service.setUserDirectoryService(userDirectoryService);
-    service.setTikaParser(new AudioParser());
-
-    Organization organization = new DefaultOrganization();
-    OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
-    EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
-            .andReturn(organization).anyTimes();
-    EasyMock.replay(organizationDirectoryService);
-    service.setOrganizationDirectoryService(organizationDirectoryService);
-
-    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    EasyMock.expect(securityService.getUser()).andReturn(anonymous).anyTimes();
-    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
-    EasyMock.replay(securityService);
-    service.setSecurityService(securityService);
-
-    serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
-            organizationDirectoryService);
-    service.setServiceRegistry(serviceRegistry);
-
-    workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get(uriTrack)).andReturn(f);
-    EasyMock.expect(workspace.get(uriTrack)).andReturn(f);
-    EasyMock.expect(workspace.get(uriTrack)).andReturn(f);
-    EasyMock.replay(workspace);
-    service.setWorkspace(workspace);
+  /** Setup test. */
+  @Ignore
+  private Option<MediaInspector> init(URI resource) throws Exception {
+    for (String binary : mediainfoPath) {
+      final File f = new File(resource);
+      Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+      EasyMock.expect(workspace.get(resource)).andReturn(f);
+      EasyMock.expect(workspace.get(resource)).andReturn(f);
+      EasyMock.expect(workspace.get(resource)).andReturn(f);
+      EasyMock.replay(workspace);
+      return some(new MediaInspector(workspace, new AudioParser(), binary));
+    }
+    return none();
   }
 
-  @After
-  public void tearDown() throws Exception {
-    ((ServiceRegistryInMemoryImpl) serviceRegistry).dispose();
+  private URI getResource(String resource) {
+    try {
+      return MediaInspectionServiceImpl.class.getResource(resource).toURI();
+    } catch (URISyntaxException e) {
+      return chuck(e);
+    }
   }
 
   @Test
   public void testInspection() throws Exception {
-    if (!mediainfoInstalled)
-      return;
-
-    try {
-      Job job = service.inspect(uriTrack);
-      JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
-      barrier.waitForJobs();
-
-      Assert.assertEquals(Job.Status.FINISHED, job.getStatus());
-      Assert.assertNotNull(job.getPayload());
-      Track track = (Track) MediaPackageElementParser.getFromXml(job.getPayload());
+    final URI trackUri = getResource("/av.mov");
+    for (MediaInspector mi : init(trackUri)) {
+      Track track = mi.inspectTrack(trackUri);
       // test the returned values
       Checksum cs = Checksum.create(ChecksumType.fromString("md5"), "9d3523e464f18ad51f59564acde4b95a");
-      Assert.assertEquals(cs, track.getChecksum());
-      Assert.assertEquals("video", track.getMimeType().getType());
-      Assert.assertEquals("quicktime", track.getMimeType().getSubtype());
-      Assert.assertNotNull(track.getDuration());
-      Assert.assertTrue(track.getDuration() > 0);
-    } catch (IllegalStateException e) {
-      System.err.println("Skipped MediaInspectionServiceImplTest#testInspection");
+      assertEquals(cs, track.getChecksum());
+      assertEquals("video", track.getMimeType().getType());
+      assertEquals("quicktime", track.getMimeType().getSubtype());
+      assertNotNull(track.getDuration());
+      assertTrue(track.getDuration() > 0);
+    }
+  }
+
+  @Test
+  public void testInspectionEmptyContainer() throws Exception {
+    final URI trackUri = getResource("/nostreams.mp4");
+    for (MediaInspector mi : init(trackUri)) {
+      final Track track = mi.inspectTrack(trackUri);
+      assertEquals(0, track.getStreams().length);
+      assertEquals("mp4", track.getMimeType().getSubtype());
+      assertEquals(null, track.getDuration());
     }
   }
 
   @Test
   public void testEnrichment() throws Exception {
-    if (!mediainfoInstalled)
-      return;
-
-    try {
-      // init a track with inspect
-      Job job = service.inspect(uriTrack);
-      JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
-      barrier.waitForJobs();
-
-      Assert.assertEquals(Job.Status.FINISHED, job.getStatus());
-      Assert.assertNotNull(job.getPayload());
-      Track track = (Track) MediaPackageElementParser.getFromXml(job.getPayload());
+    final URI trackUri = getResource("/av.mov");
+    for (MediaInspector mi : init(trackUri)) {
+      Track track = mi.inspectTrack(trackUri);
       // make changes to metadata
       Checksum cs = track.getChecksum();
       track.setChecksum(null);
       MimeType mt = mimeType("video", "flash");
       track.setMimeType(mt);
       // test the enrich scenario
-      Job newJob = service.enrich(track, false);
-      barrier = new JobBarrier(serviceRegistry, newJob);
-      barrier.waitForJobs();
-
-      Track newTrack = (Track) MediaPackageElementParser.getFromXml(newJob.getPayload());
-      Assert.assertEquals(newTrack.getChecksum(), cs);
-      Assert.assertEquals(newTrack.getMimeType(), mt);
-      Assert.assertNotNull(newTrack.getDuration());
-      Assert.assertTrue(newTrack.getDuration() > 0);
+      Track newTrack = (Track) mi.enrich(track, false);
+      assertEquals(newTrack.getChecksum(), cs);
+      assertEquals(newTrack.getMimeType(), mt);
+      assertNotNull(newTrack.getDuration());
+      assertTrue(newTrack.getDuration() > 0);
       // test the override scenario
-      newJob = service.enrich(track, true);
-      barrier = new JobBarrier(serviceRegistry, newJob);
-      barrier.waitForJobs();
-
-      newTrack = (Track) MediaPackageElementParser.getFromXml(newJob.getPayload());
-      Assert.assertEquals(newTrack.getChecksum(), cs);
-      Assert.assertNotSame(newTrack.getMimeType(), mt);
-      Assert.assertTrue(newTrack.getDuration() > 0);
-    } catch (IllegalStateException e) {
-      System.err.println("Skipped MediaInspectionServiceImplTest#testInspection");
+      newTrack = (Track) mi.enrich(track, true);
+      assertEquals(newTrack.getChecksum(), cs);
+      assertNotSame(newTrack.getMimeType(), mt);
+      assertTrue(newTrack.getDuration() > 0);
     }
   }
 
+  @Test
+  public void testEnrichmentEmptyContainer() throws Exception {
+    final URI trackUri = getResource("/nostreams.mp4");
+    for (MediaInspector mi : init(trackUri)) {
+      Track track = mi.inspectTrack(trackUri);
+      // make changes to metadata
+      Checksum cs = track.getChecksum();
+      track.setChecksum(null);
+      MimeType mt = mimeType("video", "flash");
+      track.setMimeType(mt);
+      // test the enrich scenario
+      Track newTrack = (Track) mi.enrich(track, false);
+      assertEquals(newTrack.getChecksum(), cs);
+      assertEquals(newTrack.getMimeType(), mt);
+      assertNull(newTrack.getDuration());
+      // test the override scenario
+      newTrack = (Track) mi.enrich(track, true);
+      assertEquals(newTrack.getChecksum(), cs);
+      assertNotSame(newTrack.getMimeType(), mt);
+      assertNull(newTrack.getDuration());
+    }
+  }
 }
