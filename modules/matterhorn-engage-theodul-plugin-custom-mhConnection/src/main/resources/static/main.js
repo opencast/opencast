@@ -66,6 +66,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                                 model.attributes.description = mediaPackage.dcDescription;
                             if (mediaPackage.dcSubject)
                                 model.attributes.subject = mediaPackage.dcSubject;
+                            if (mediaPackage.dcContributor)
+                                model.attributes.contributor = mediaPackage.dcContributor;
+                            if (mediaPackage.mediapackage.seriestitle)
+                                model.attributes.series = mediaPackage.mediapackage.seriestitle;
                         }
                         model.trigger("change"); //one change event
                     } else {

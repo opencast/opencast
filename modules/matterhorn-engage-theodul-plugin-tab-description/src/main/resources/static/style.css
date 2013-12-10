@@ -1,0 +1,15 @@
+.engage_description_tab_entry {
+  
+}
+#engage_description_tab_content{
+	width: 60%;
+}
+
+#engage_description_tab_left {
+  float: left;
+  padding: 0px 0px 0px 10px;
+}
+#engage_description_tab_right {
+  float: right;
+  padding: 0px 0px 0px 10px;
+}
