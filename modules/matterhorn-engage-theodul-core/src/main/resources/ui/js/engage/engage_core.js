@@ -89,6 +89,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
           }
         });
       });
+      //describe timeline extensions
+      $(".expand_button").click(function() {
+        $(".expanded_content").slideToggle("fast");
+        $(".pulldown_image").toggleClass("rotate180");
+      });
       // load plugins done, hide loading and show content
       this.dispatcher.on("Core:plugin_load_done", function () {
         $(".loading").hide();
