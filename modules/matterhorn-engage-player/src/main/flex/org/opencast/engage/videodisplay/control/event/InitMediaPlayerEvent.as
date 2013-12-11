@@ -26,7 +26,7 @@ package org.opencast.engage.videodisplay.control.event
 		/**
 		 * Constructor
 		 */
-		public function InitMediaPlayerEvent(coverURLOne:String, coverURLTwo:String, mediaURLOne:String, mediaURLTwo:String, mimetypeOne:String, mimetypeTwo:String, playerMode:String, slideLength:int, bubbles:Boolean=false, cancelable:Boolean=false)
+		public function InitMediaPlayerEvent(coverURLOne:String, coverURLTwo:String, mediaURLOne:String, mediaURLTwo:String, mimetypeOne:String, mimetypeTwo:String, playerMode:String, slideLength:int, bufferTime:Number, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(EVENT_NAME, bubbles, cancelable);
 			_mediaURLOne=mediaURLOne;
@@ -37,6 +37,7 @@ package org.opencast.engage.videodisplay.control.event
 			_mimetypeTwo=mimetypeTwo;
 			_playerMode=playerMode;
 			_slideLength=slideLength;
+			_bufferTime=bufferTime;
 		}
 
 		private var _coverURLOne:String;
@@ -55,6 +56,8 @@ package org.opencast.engage.videodisplay.control.event
 
 		private var _slideLength:int;
 
+		private var _bufferTime:Number;
+
 		/**
 		 * clone
 		 * Override the inherited clone() method.
@@ -62,7 +65,7 @@ package org.opencast.engage.videodisplay.control.event
 		 */
 		override public function clone():Event
 		{
-			return new InitMediaPlayerEvent(coverURLOne, coverURLTwo, mediaURLOne, mediaURLTwo, mimetypeOne, mimetypeTwo, playerMode, slideLength, bubbles, cancelable);
+			return new InitMediaPlayerEvent(coverURLOne, coverURLTwo, mediaURLOne, mediaURLTwo, mimetypeOne, mimetypeTwo, playerMode, slideLength, bufferTime, bubbles, cancelable);
 		}
 
 		/**
@@ -143,6 +146,16 @@ package org.opencast.engage.videodisplay.control.event
 		public function get slideLength():int
 		{
 			return _slideLength;
+		}
+
+		/**
+		 * bufferTime
+		 * Get the bufferTime
+		 * @return _bufferTime
+		 */
+		public function get bufferTime():Number
+		{
+			return _bufferTime;
 		}
 	}
 }

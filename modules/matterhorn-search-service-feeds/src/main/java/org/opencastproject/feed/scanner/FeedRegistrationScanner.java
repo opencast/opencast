@@ -19,6 +19,7 @@ import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
 
 import org.opencastproject.feed.api.FeedGenerator;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.ReadinessIndicator;
 
 import org.apache.commons.io.IOUtils;
@@ -54,6 +55,9 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
 
   /** The search service to use in each feed generator */
   protected SearchService searchService;
+  
+  /** The series service to be used by the series feeds */
+  protected SeriesService seriesService;
 
   /** The bundle context for this osgi component */
   protected BundleContext bundleContext;
@@ -66,6 +70,11 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
     this.searchService = searchService;
   }
 
+  /** Sets the series service */
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
+  }
+  
   /**
    * Activates the component
    * 
@@ -114,6 +123,7 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
     Class<?> clazz = getClass().getClassLoader().loadClass(props.getProperty(FEED_CLASS));
     FeedGenerator generator = (FeedGenerator) clazz.newInstance();
     generator.setSearchService(searchService);
+    generator.setSeriesService(seriesService);
     generator.initialize(props);
     ServiceRegistration reg = bundleContext.registerService(FeedGenerator.class.getName(), generator, null);
     generators.put(artifact, reg);

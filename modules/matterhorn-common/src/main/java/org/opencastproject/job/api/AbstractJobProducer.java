@@ -23,6 +23,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
 
@@ -86,19 +87,24 @@ public abstract class AbstractJobProducer implements JobProducer {
    * @see org.opencastproject.job.api.JobProducer#acceptJob(org.opencastproject.job.api.Job)
    */
   @Override
-  public boolean acceptJob(Job job) throws ServiceRegistryException {
-    if (isReadyToAccept(job)) {
-      try {
-        job.setStatus(Job.Status.RUNNING);
-        getServiceRegistry().updateJob(job);
-      } catch (NotFoundException e) {
-        throw new IllegalStateException(e);
-      }
-      executor.submit(new JobRunner(job, getServiceRegistry().getCurrentJob()));
-      return true;
-    } else {
-      return false;
+  public void acceptJob(Job job) throws ServiceRegistryException {
+    try {
+      job.setStatus(Job.Status.RUNNING);
+      getServiceRegistry().updateJob(job);
+    } catch (NotFoundException e) {
+      throw new IllegalStateException(e);
     }
+    executor.submit(new JobRunner(job, getServiceRegistry().getCurrentJob()));
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.job.api.JobProducer#isReadyToAcceptJobs(String)
+   */
+  @Override
+  public boolean isReadyToAcceptJobs(String operation) throws ServiceRegistryException {
+    return true;
   }
 
   /**
@@ -107,7 +113,7 @@ public abstract class AbstractJobProducer implements JobProducer {
    * @see org.opencastproject.job.api.JobProducer#isReadyToAccept(org.opencastproject.job.api.Job)
    */
   @Override
-  public boolean isReadyToAccept(Job job) throws ServiceRegistryException {
+  public boolean isReadyToAccept(Job job) throws ServiceRegistryException, UndispatchableJobException {
     return true;
   }
 

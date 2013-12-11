@@ -44,7 +44,6 @@ import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
@@ -53,6 +52,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
+import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerQuery;
 import org.opencastproject.scheduler.endpoint.SchedulerRestService;
 import org.opencastproject.scheduler.impl.persistence.SchedulerServiceDatabaseImpl;
@@ -72,6 +72,7 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowService;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -99,7 +100,9 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -114,6 +117,10 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 public class SchedulerServiceImplTest {
+
+  private WorkflowService workflowService;
+  private SeriesService seriesService;
+  private Workspace workspace;
 
   private String persistenceStorage;
   private SchedulerServiceImpl schedSvc;
@@ -170,7 +177,7 @@ public class SchedulerServiceImplTest {
 
     WorkflowInstance workflowInstance = getSampleWorkflowInstance();
     // workflow service
-    WorkflowService workflowService = EasyMock.createMock(WorkflowService.class);
+    workflowService = EasyMock.createMock(WorkflowService.class);
     EasyMock.expect(
             workflowService.start((WorkflowDefinition) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject(),
                     (Map<String, String>) EasyMock.anyObject())).andAnswer(new IAnswer<WorkflowInstance>() {
@@ -188,19 +195,24 @@ public class SchedulerServiceImplTest {
     seriesIdentifier = Long.toString(System.currentTimeMillis());
     DublinCoreCatalog seriesCatalog = getSampleSeriesDublinCoreCatalog(seriesIdentifier);
 
-    SeriesService seriesService = EasyMock.createMock(SeriesService.class);
+    seriesService = EasyMock.createMock(SeriesService.class);
     EasyMock.expect(seriesService.getSeries(EasyMock.eq(seriesIdentifier))).andReturn(seriesCatalog).anyTimes();
 
-    IngestService ingestService = EasyMock.createNiceMock(IngestService.class);
+    workspace = EasyMock.createNiceMock(Workspace.class);
+    EasyMock.expect(
+            workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    (InputStream) EasyMock.anyObject())).andReturn(new URI("http://localhost:8080/test")).anyTimes();
 
-    EasyMock.replay(workflowService, seriesService, ingestService);
+    EasyMock.replay(workflowService, seriesService, workspace);
 
     schedSvc = new SchedulerServiceImpl();
+
+    // Set the mocked interfaces
     schedSvc.setWorkflowService(workflowService);
     schedSvc.setSeriesService(seriesService);
     schedSvc.setIndex(index);
     schedSvc.setPersistence(schedulerDatabase);
-    schedSvc.setIngestService(ingestService);
+    schedSvc.setWorkspace(workspace);
 
     schedSvc.activate(null);
   }
@@ -548,6 +560,79 @@ public class SchedulerServiceImplTest {
             currentTime + 10 * 1000), new Date(currentTime + 3610000));
     schedSvc.updateEvents(list(eventId), updatedEvent2);
     checkEvent(eventId, initalCaProps, expectedTitle2);
+  }
+
+  @Test
+  /**
+   * Test for failure updating past events
+   *  This test construct new SchedulerService to mock the getCurrentDate method
+   * @throws Exception
+   */
+  public void testUpdateExpiredEvent() throws Exception {
+
+    SchedulerServiceImpl schedSvc2 = EasyMock.createMockBuilder(SchedulerServiceImpl.class)
+            .addMockedMethod("getCurrentDate").createMock();
+
+    // Mock the getCurrentDate method to skip to the future
+    long currentTime = System.currentTimeMillis();
+    Date futureSystemDate = new Date(currentTime + 6610000);
+    EasyMock.expect(schedSvc2.getCurrentDate()).andReturn(futureSystemDate).anyTimes();
+    EasyMock.replay(schedSvc2);
+
+    // Set the mocked interfaces
+    schedSvc2.setWorkflowService(workflowService);
+    schedSvc2.setSeriesService(seriesService);
+    schedSvc2.setIndex(index);
+    schedSvc2.setPersistence(schedulerDatabase);
+    schedSvc2.setWorkspace(workspace);
+
+    schedSvc2.activate(null);
+
+    final String initialTitle = "Recording 1";
+    final DublinCoreCatalog initalEvent = generateEvent("Device A", none(0L), some(initialTitle), new Date(
+            currentTime + 10 * 1000), new Date(currentTime + 3610000));
+    Long eventId = null;
+    try {
+      eventId = schedSvc2.addEvent(initalEvent, wfProperties);
+      schedSvc2.updateCaptureAgentMetadata(
+              properties(tuple("org.opencastproject.workflow.config.archiveOp", "true"),
+                      tuple("org.opencastproject.workflow.definition", "full")), tuple(eventId, initalEvent));
+
+    } catch (Exception e) {
+      System.out.println("Exception " + e.getClass().getCanonicalName() + " message " + e.getMessage());
+    }
+
+    final Properties initalCaProps = schedSvc.getEventCaptureAgentConfiguration(eventId);
+    System.out.println("Added event " + eventId);
+    checkEvent(eventId, initalCaProps, initialTitle);
+
+    // test single update
+    try {
+      final String updatedTitle1 = "Recording 2";
+      final DublinCoreCatalog updatedEvent1 = generateEvent("Device A", some(eventId), some(updatedTitle1), new Date(
+              currentTime + 10 * 1000), new Date(currentTime + 3610000));
+      schedSvc2.updateEvent(eventId, updatedEvent1, wfPropertiesUpdated);
+      checkEvent(eventId, initalCaProps, updatedTitle1);
+
+      Assert.fail("Schedule should not update a recording that has ended (single)");
+    } catch (SchedulerException e) {
+      System.out.println("Expected exception: " + e.getMessage());
+    }
+
+    try { // test bulk update
+      final String updatedTitle2 = "Recording 3";
+      final String expectedTitle2 = "Recording 3 1";
+      final DublinCoreCatalog updatedEvent2 = generateEvent("Device A", none(0L), some(updatedTitle2), new Date(
+              currentTime + 10 * 1000), new Date(currentTime + 3610000));
+      schedSvc2.updateEvents(list(eventId), updatedEvent2);
+      checkEvent(eventId, initalCaProps, expectedTitle2);
+
+      Assert.fail("Schedule should not update a recording that has ended (multi)");
+    } catch (SchedulerException e) {
+      System.out.println("Expected exception: " + e.getMessage());
+    } finally {
+      schedSvc2 = null;
+    }
   }
 
   private void checkEvent(long eventId, Properties initialCaProps, String title) throws Exception {

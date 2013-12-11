@@ -16,11 +16,13 @@
 package org.opencastproject.workflow.handler;
 
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,9 @@ public class ErrorResolutionWorkflowOperationHandler extends ResumableWorkflowOp
 
   /** Path to the caption upload ui resources */
   private static final String HOLD_UI_PATH = "/ui/operation/retry-strategy/index.html";
+
+  /** Parameter name */
+  private static final String OPT_STRATEGY = "retryStrategy";
 
   /**
    * {@inheritDoc}
@@ -60,7 +65,30 @@ public class ErrorResolutionWorkflowOperationHandler extends ResumableWorkflowOp
   @Override
   public WorkflowOperationResult resume(WorkflowInstance workflowInstance, JobContext context,
           Map<String, String> properties) throws WorkflowOperationException {
-    return createResult(null, properties, Action.CONTINUE, 0);
+
+    String strategyValue = properties.get(OPT_STRATEGY);
+    if (StringUtils.isBlank(strategyValue)) {
+      logger.warn("No retry strategy submitted for workflow '{}', holding again", workflowInstance);
+      return createResult(null, properties, Action.PAUSE, 0);
+    }
+
+    try {
+      RetryStrategy s = RetryStrategy.valueOf(strategyValue);
+      switch (s) {
+        case NONE:
+          logger.info("Error resolution 'fail' was triggered for workflow '{}'", workflowInstance);
+          return createResult(null, properties, Action.CONTINUE, 0);
+        case RETRY:
+          logger.info("Error resolution 'retry' was triggered for workflow '{}'", workflowInstance);
+          return createResult(null, properties, Action.CONTINUE, 0);
+        default:
+          logger.warn("Unknown retry strategy '{}' submitted for workflow '{}'", strategyValue, workflowInstance);
+          return createResult(null, properties, Action.PAUSE, 0);
+      }
+    } catch (IllegalArgumentException e) {
+      logger.warn("Unknown retry strategy '{}' submitted for workflow '{}'", strategyValue, workflowInstance);
+      return createResult(null, properties, Action.PAUSE, 0);
+    }
   }
 
 }

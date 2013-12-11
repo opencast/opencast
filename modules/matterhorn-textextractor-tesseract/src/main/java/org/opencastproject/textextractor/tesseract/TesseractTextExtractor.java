@@ -113,6 +113,14 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
             throw new TextAnalyzerException("Text analyzer " + binary + " exited with code " + exitCode);
           }
         }
+
+        @Override
+        protected boolean onStderr(String line) {
+          if ("Page 0".equals(line.trim()))
+            return false;
+          return super.onStderr(line);
+        }
+
       };
       analyzer.execute();
 

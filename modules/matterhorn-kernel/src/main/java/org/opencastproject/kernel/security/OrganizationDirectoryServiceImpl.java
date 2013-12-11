@@ -15,7 +15,9 @@
  */
 package org.opencastproject.kernel.security;
 
-import static org.opencastproject.util.data.Collections.getOrCreate;
+import static org.opencastproject.security.util.SecurityUtil.hostAndPort;
+import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Collections.toList;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.kernel.security.persistence.JpaOrganization;
@@ -25,7 +27,6 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.lang.StringUtils;
@@ -91,16 +92,12 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    */
   private final Map<String, Dictionary> unhandledOrganizations = new HashMap<String, Dictionary>();
 
-  // Local caches. Organizations change rarely so a simple hash map is sufficient.
-  // No need to deal with soft references or an LRU map.
-  private final Map<Tuple<String, Integer>, Organization> orgsByHost = new HashMap<Tuple<String, Integer>, Organization>();
-  private final Map<String, Organization> orgsById = new HashMap<String, Organization>();
+  private OrgCache cache;
 
-  /**
-   * OSGi callback to set the security service.
-   */
+  /** OSGi DI */
   public void setOrgPersistence(OrganizationDatabase setOrgPersistence) {
     this.persistence = setOrgPersistence;
+    this.cache = new OrgCache(60000, persistence);
     for (Entry<String, Dictionary> entry : unhandledOrganizations.entrySet()) {
       try {
         updated(entry.getKey(), entry.getValue());
@@ -118,58 +115,33 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
     this.configAdmin = configAdmin;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.security.api.OrganizationDirectoryService#getOrganization(java.lang.String)
-   */
   @Override
   public Organization getOrganization(final String id) throws NotFoundException {
     if (persistence == null) {
       logger.debug("No persistence available: Returning default organization for id {}", id);
       return defaultOrganization;
     }
-    synchronized (orgsById) {
-      return getOrCreate(orgsById, id, new Function0.X<Organization>() {
-        @Override
-        public Organization xapply() throws Exception {
-          return persistence.getOrganization(id);
-        }
-      });
-    }
+    Organization org = cache.get(id);
+    if (org == null)
+      throw new NotFoundException();
+    return org;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.security.api.OrganizationDirectoryService#getOrganization(java.net.URL)
-   */
   @Override
   public Organization getOrganization(final URL url) throws NotFoundException {
     if (persistence == null) {
       logger.debug("No persistence available: Returning default organization for url {}", url);
       return defaultOrganization;
     }
-    final String host = url.getHost();
-    final int port = url.getPort();
-    synchronized (orgsByHost) {
-      return getOrCreate(orgsByHost, tuple(host, port), new Function0.X<Organization>() {
-        @Override
-        public Organization xapply() throws Exception {
-          return persistence.getOrganizationByHost(host, port);
-        }
-      });
-    }
+    Organization org = cache.get(url);
+    if (org == null)
+      throw new NotFoundException();
+    return org;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.security.api.OrganizationDirectoryService#getOrganizations()
-   */
   @Override
   public List<Organization> getOrganizations() {
-    return persistence.getOrganizations();
+    return cache.getAll();
   }
 
   /**
@@ -186,21 +158,11 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
     persistence.storeOrganization(organization);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.osgi.service.cm.ManagedServiceFactory#getName()
-   */
   @Override
   public String getName() {
     return PID;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.osgi.service.cm.ManagedServiceFactory#updated(java.lang.String, java.util.Dictionary)
-   */
   @Override
   @SuppressWarnings("rawtypes")
   public void updated(String pid, Dictionary properties) throws ConfigurationException {
@@ -212,9 +174,9 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
     logger.debug("Updating organization pid='{}'", pid);
 
     // Gather the properties
-    String id = (String) properties.get(ORG_ID_KEY);
-    String name = (String) properties.get(ORG_NAME_KEY);
-    String server = (String) properties.get(ORG_SERVER_KEY);
+    final String id = (String) properties.get(ORG_ID_KEY);
+    final String name = (String) properties.get(ORG_NAME_KEY);
+    final String server = (String) properties.get(ORG_SERVER_KEY);
 
     // Make sure the configuration meets the minimum requirements
     if (StringUtils.isBlank(id))
@@ -222,27 +184,20 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
     if (StringUtils.isBlank(server))
       throw new ConfigurationException(ORG_SERVER_KEY, ORG_SERVER_KEY + " must be set");
 
-    String portAsString = StringUtils.trimToNull((String) properties.get(ORG_PORT_KEY));
-    int port = 80;
-    if (portAsString != null) {
-      port = Integer.parseInt(portAsString);
-    }
-    String adminRole = (String) properties.get(ORG_ADMIN_ROLE_KEY);
-    String anonRole = (String) properties.get(ORG_ANONYMOUS_ROLE_KEY);
+    final String portAsString = StringUtils.trimToNull((String) properties.get(ORG_PORT_KEY));
+    final int port = portAsString != null ? Integer.parseInt(portAsString) : 80;
+    final String adminRole = (String) properties.get(ORG_ADMIN_ROLE_KEY);
+    final String anonRole = (String) properties.get(ORG_ANONYMOUS_ROLE_KEY);
 
     // Build the properties map
-    Map<String, String> orgProperties = new HashMap<String, String>();
+    final Map<String, String> orgProperties = new HashMap<String, String>();
     for (Enumeration<?> e = properties.keys(); e.hasMoreElements();) {
-      String key = (String) e.nextElement();
+      final String key = (String) e.nextElement();
       if (!key.startsWith(ORG_PROPERTY_PREFIX)) {
         continue;
       }
       orgProperties.put(key.substring(ORG_PROPERTY_PREFIX.length()), (String) properties.get(key));
     }
-
-    // Clear cache so it gets updated later
-    orgsByHost.clear();
-    orgsById.clear();
 
     // Load the existing organization or create a new one
     try {
@@ -260,23 +215,84 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
         logger.info("Updating organization '{}'", id);
       }
       persistence.storeOrganization(org);
+      cache.invalidate();
     } catch (OrganizationDatabaseException e) {
       logger.error("Unable to register organization '{}': {}", id, e);
     }
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.osgi.service.cm.ManagedServiceFactory#deleted(java.lang.String)
-   */
   @Override
   public void deleted(String pid) {
     try {
       persistence.deleteOrganization(pid);
+      cache.invalidate();
     } catch (NotFoundException e) {
       logger.warn("Can't delete organization with id {}, organization not found.", pid);
     }
   }
 
+  /**
+   * Very simple cache that does a <em>complete</em> refresh after a given interval. This type of cache is only suitable
+   * for small sets.
+   */
+  private static final class OrgCache {
+    private final Object lock = new Object();
+
+    // A simple hash map is sufficient here.
+    // No need to deal with soft references or an LRU map since the number of organizations
+    // will be quite low.
+    private final Map<Tuple<String, Integer>, Organization> byHost = map();
+    private final Map<String, Organization> byId = map();
+    private final long refreshInterval;
+    private long lastRefresh;
+
+    private final OrganizationDatabase persistence;
+
+    public OrgCache(long refreshInterval, OrganizationDatabase persistence) {
+      this.refreshInterval = refreshInterval;
+      this.persistence = persistence;
+      invalidate();
+    }
+
+    public Organization get(URL url) {
+      synchronized (lock) {
+        refresh();
+        return byHost.get(hostAndPort(url));
+      }
+    }
+
+    public Organization get(String id) {
+      synchronized (lock) {
+        refresh();
+        return byId.get(id);
+      }
+    }
+
+    public List<Organization> getAll() {
+      synchronized (lock) {
+        refresh();
+        return toList(byId.values());
+      }
+    }
+
+    public void invalidate() {
+      this.lastRefresh = System.currentTimeMillis() - 2 * refreshInterval;
+    }
+
+    private void refresh() {
+      final long now = System.currentTimeMillis();
+      if (now - lastRefresh > refreshInterval) {
+        byId.clear();
+        byHost.clear();
+        for (Organization org : persistence.getOrganizations()) {
+          byId.put(org.getId(), org);
+          // (host, port)
+          for (Map.Entry<String, Integer> server : org.getServers().entrySet()) {
+            byHost.put(tuple(server.getKey(), server.getValue()), org);
+          }
+        }
+        lastRefresh = now;
+      }
+    }
+  }
 }

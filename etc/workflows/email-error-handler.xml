@@ -15,28 +15,25 @@
 		<configuration key="subject">Failure processing a mediapackage</configuration>
       </configurations>
     </operation>
-    
-    <!-- Cleanup the temporary files from the working file repository -->
-    <operation
-      id="cleanup"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Cleaning up">
-      <configurations>
-        <configuration key="preserve-flavors">*/source,dublincore/*</configuration>
-      </configurations>
-    </operation>
 
     <!-- Zip the mediapackage -->
 
     <operation
       id="zip"
+      fail-on-error="true"
+      exception-handler-workflow="cleanup"
       description="Cleaning up after failure">
       <configurations>
         <configuration key="zip-collection">failed.zips</configuration>
         <configuration key="include-flavors">*/source,dublincore/*</configuration>
         <configuration key="compression">false</configuration>
       </configurations>
+    </operation>
+
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
     </operation>
   
   </operations>

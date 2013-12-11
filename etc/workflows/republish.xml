@@ -47,6 +47,12 @@
       </configurations>
     </operation>
 
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+    </operation>
+
   </operations>
 
 </definition>

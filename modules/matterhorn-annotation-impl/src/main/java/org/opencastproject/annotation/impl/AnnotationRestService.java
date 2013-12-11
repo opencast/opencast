@@ -173,9 +173,11 @@ public class AnnotationRestService {
           @RestParameter(name = "type", description = "The type of annotation", isRequired = true, type = Type.STRING),
           @RestParameter(name = "value", description = "The value of the annotation", isRequired = true, type = Type.TEXT),
           @RestParameter(name = "in", description = "The time, or inpoint, of the annotation", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "out", description = "The optional outpoint of the annotation", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_CREATED, description = "The URL to this annotation is returned in the Location header, and an XML representation of the annotation itelf is returned in the response body.") })
+          @RestParameter(name = "out", description = "The optional outpoint of the annotation", isRequired = false, type = Type.STRING),
+          @RestParameter(name = "isPrivate", description = "True if the annotation is private", isRequired = false, type = Type.BOOLEAN) }, 
+        reponses = { @RestResponse(responseCode = SC_CREATED, description = "The URL to this annotation is returned in the Location header, and an XML representation of the annotation itelf is returned in the response body.") })
   public Response add(@FormParam("episode") String mediapackageId, @FormParam("in") int inpoint,
-          @FormParam("out") int outpoint, @FormParam("type") String type, @FormParam("value") String value,
+          @FormParam("out") int outpoint, @FormParam("type") String type, @FormParam("value") String value, @FormParam("isPrivate") boolean isPrivate,
           @Context HttpServletRequest request) {
     String sessionId = request.getSession().getId();
     Annotation a = new AnnotationImpl();
@@ -185,6 +187,7 @@ public class AnnotationRestService {
     a.setOutpoint(outpoint);
     a.setType(type);
     a.setValue(value);
+    a.setPrivate(isPrivate);
     a = annotationService.addAnnotation(a);
     URI uri;
     try {

@@ -115,6 +115,7 @@ Opencast.embedControlHide = (function ()
 		$('#oc-link-advanced-player').css('marginLeft', '-'+_width+'px');
             }
 	} else {
+	    $('#oc-link-advanced-player img').css({position: 'absolute'});
 	    $('#oc_flash-player').height($('#oc_flash-player').height() - 45);
 	}
 

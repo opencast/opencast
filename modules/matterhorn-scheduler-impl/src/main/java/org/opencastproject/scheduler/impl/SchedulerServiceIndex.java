@@ -59,6 +59,18 @@ public interface SchedulerServiceIndex {
   void index(DublinCoreCatalog dc) throws SchedulerServiceDatabaseException;
 
   /**
+   * Index event catalog.
+   * 
+   * @param dc
+   *          {@link DublinCoreCatalog} describing event
+   * @param captureAgentProperties
+   *          properties for capture agent
+   * @throws SchedulerServiceDatabaseException
+   *           if indexing failed
+   */
+  void index(DublinCoreCatalog dc, Properties captureAgentProperties) throws SchedulerServiceDatabaseException;
+
+  /**
    * Index CA properties for existing event.
    * 
    * @param eventId

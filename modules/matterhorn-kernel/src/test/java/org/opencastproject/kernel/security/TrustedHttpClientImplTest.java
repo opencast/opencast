@@ -15,12 +15,12 @@
  */
 package org.opencastproject.kernel.security;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.createNiceMock;
-import static org.easymock.classextension.EasyMock.replay;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.kernel.http.api.HttpClient;
@@ -42,8 +42,8 @@ import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 import org.apache.http.params.HttpParams;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;

@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -233,7 +233,6 @@
               org.osgi.framework.*,
               org.slf4j.*
             </Import-Package>
-            <Private-Package>ui.*, uitests.*</Private-Package>
             <Http-Alias>/analytics</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>

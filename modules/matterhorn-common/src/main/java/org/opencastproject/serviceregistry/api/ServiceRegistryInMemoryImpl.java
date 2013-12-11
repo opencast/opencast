@@ -349,7 +349,8 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    * @throws ServiceRegistryException
    *           if the service registrations are unavailable or dispatching of the job fails
    */
-  protected boolean dispatchJob(Job job) throws ServiceUnavailableException, ServiceRegistryException {
+  protected boolean dispatchJob(Job job) throws ServiceUnavailableException, ServiceRegistryException,
+          UndispatchableJobException {
     List<ServiceRegistration> registrations = getServiceRegistrationsByLoad(job.getJobType());
     if (registrations.size() == 0)
       throw new ServiceUnavailableException("No service is available to handle jobs of type '" + job.getJobType() + "'");
@@ -357,13 +358,12 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
       if (registration.isJobProducer()) {
         ServiceRegistrationInMemoryImpl inMemoryRegistration = (ServiceRegistrationInMemoryImpl) registration;
         JobProducer service = inMemoryRegistration.getService();
+        if (!service.isReadyToAcceptJobs(job.getOperation()))
+          continue;
         if (!service.isReadyToAccept(job))
           continue;
-        else if (service.acceptJob(job)) {
-          return true;
-        } else {
-          continue;
-        }
+        service.acceptJob(job);
+        return true;
       } else {
         logger.warn("This implementation of the service registry doesn't support dispatching to remote services");
         // TODO: Add remote dispatching

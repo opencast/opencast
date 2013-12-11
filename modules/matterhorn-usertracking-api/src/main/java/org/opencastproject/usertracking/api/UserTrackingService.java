@@ -17,6 +17,8 @@ package org.opencastproject.usertracking.api;
 
 import org.opencastproject.util.NotFoundException;
 
+import java.text.ParseException;
+
 
 
 /**
@@ -189,7 +191,7 @@ public interface UserTrackingService {
    * @throws UserTrackingException
    *           if the user tracking service encounters an error
    */
-  Report getReport(String from, String to, int offset, int limit) throws UserTrackingException;
+  Report getReport(String from, String to, int offset, int limit) throws UserTrackingException, ParseException;
 
   /**
    * Returns a report

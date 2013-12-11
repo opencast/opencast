@@ -15,6 +15,8 @@
  */
 package org.opencastproject.usertracking.api;
 
+import java.util.List;
+
 /**
  * A List of {@link Footprint}s
  * 
@@ -22,4 +24,6 @@ package org.opencastproject.usertracking.api;
 public interface FootprintList {
 
   void add(Footprint footprint);
+  List<? extends Footprint> getFootprints();
+  int getTotal();
 }

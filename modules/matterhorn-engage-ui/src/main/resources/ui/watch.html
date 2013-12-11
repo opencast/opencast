@@ -16,6 +16,21 @@
     <link rel="stylesheet" type="text/css" href="/engage/ui/css/player/watch.css" ></link>
     <link rel="stylesheet" type="text/css" href="/engage/ui/css/annotation/oc.comments.css"></link>
     <link rel="stylesheet" type="text/css" href="/engage/ui/css/annotation/oc.comment.list.css"></link>
+    
+    <!-- Set Coocke if we get a session via URL parameter -->
+    <script type="text/javascript">
+
+      if ( window.location.pathname.match(/.*;jsessionid=.*/)) {
+        sid = window.location.pathname.split('=')[1];
+        url = window.location.href.replace(/;jsessionid=[^?]*[?$]/, '?');
+        /* Set the session id as cookie */
+        document.cookie = 'JSESSIONID=' + sid + ';Path=/';
+        /* Redirect to page without URL session id */
+        window.location.href = url;
+      }
+
+    </script>
+
     <!-- Javascript includes -->
     <script type="text/javascript" src="/engage/ui/js/jquery/jquery.js"></script>
     <script type="text/javascript" src="/engage/ui/js/ext/moment.min.js"></script>
@@ -284,7 +299,8 @@
 		 aria-labelledby="Play: Control + Alt + P" />
           <input id="oc_btn-skip-forward" 
 		 class="oc_btn-skip-forward" 
-		 type="image" src="/engage/ui/img/misc/space.png" 
+		 type="image"
+		 src="/engage/ui/img/misc/space.png" 
 		 alt="Jump To The Next Slide" 
 		 title="Jump To The Next Slide" 
 		 value="Jump To The Next Slide" 
@@ -332,7 +348,7 @@
                     <span class="load-progress" value="0"></span>
                     <span id="play-progress" class="play-progress" value="0"></span>
                     <span id="scubber-channel" class="scrubber-channel">
-                      <input id="scrubber" type="image" src="/engage/ui/img/misc/space.png" class="scrubber-button" role="slider" />
+                      <input id="scrubber" type="text" src="/engage/ui/img/misc/space.png" class="scrubber-button" role="slider" />
                       <div id="draggable" class="ui-widget-content"></div>
                     </span>
                   </div>
@@ -484,6 +500,8 @@
 	      <textarea id="oc-comments-list-textbox" rows="4" cols="30"></textarea>
 	      <input id="oc-comments-list-submit" value="Add comment" role="button" type="button" />
 	      <input id="oc-comments-list-submit-timed" value="Add comment at 00:00:00" role="button" type="button" />
+        <label id="oc-comments-list-private-label" for="oc-comments-list-private" style="float:right; margin-top: 10px;">Private Comment</label>
+        <input id="oc-comments-list-private" type="checkbox" name="Private Comment" title="Private Comment" style="float:right; margin-top: 10px;">
 	    </div>
 	  </div>
 	  <div id="oc-comments-list-header">
@@ -635,7 +653,7 @@
     <div id="comment-Info" class="oc-comment-Info">
        <div id="cm-info-box" class="oc-comment-box">
             <div id="oc-comment-info-header" class="oc-comment-header">
-                <span class="ui-icon ui-icon-closethick oc-comment-exit" style="float:right;-moz-user-select: none;">X</span>
+                <span class="ui-icon ui-icon-closethick oc-comment-exit" unselectable="on" style="float:right;-moz-user-select: none;">X</span>
                 <div id="oc-comment-info-header-text" class="oc-comment-header-text"></div>                   
             </div>
             <div id="oc-comment-info-value-wrapper">

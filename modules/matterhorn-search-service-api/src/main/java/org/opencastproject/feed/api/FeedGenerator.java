@@ -17,6 +17,7 @@
 package org.opencastproject.feed.api;
 
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.series.api.SeriesService;
 
 import java.util.Properties;
 
@@ -123,4 +124,13 @@ public interface FeedGenerator {
    */
   void setSearchService(SearchService searchService);
 
+  /**
+   * Sets the series service for this feed generator. FIXME: This shouldn't be exposed in the API, but must be present
+   * for the FeedRegistrationScanner to function.
+   * 
+   * @param seriesService
+   *          The series service to use in finding data to expose in the feed
+   */
+  void setSeriesService(SeriesService seriesService);
+  
 }

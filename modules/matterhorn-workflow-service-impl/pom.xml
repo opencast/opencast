@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -105,13 +105,7 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>2.5.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymockclassextension</artifactId>
-      <version>2.5.2</version>
+      <version>3.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -151,6 +145,7 @@
               org.opencastproject.workflow.api;version=${project.version},
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.mediapackage;version=${project.version},
+              org.opencastproject.workspace.api;version=${project.version},
               *;resolution:=optional
             </Import-Package>
             <Export-Package>

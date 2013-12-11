@@ -41,6 +41,10 @@ public class JaxbServiceStatistics implements ServiceStatistics {
   /** The mean queue time for jobs **/
   @XmlAttribute(name = "meanqueuetime")
   protected long meanQueueTime;
+  
+  /** The number of finished jobs **/
+  @XmlAttribute(name = "finished")
+  protected int finishedJobs;
 
   /** The number of currently running jobs **/
   @XmlAttribute(name = "running")
@@ -78,11 +82,12 @@ public class JaxbServiceStatistics implements ServiceStatistics {
    * @param queuedJobs
    */
   public JaxbServiceStatistics(JaxbServiceRegistration serviceRegistration, long meanRunTime, long meanQueueTime,
-          int runningJobs, int queuedJobs) {
+          int runningJobs, int queuedJobs, int finishedJobs) {
     this(serviceRegistration);
     this.meanRunTime = meanRunTime;
     this.meanQueueTime = meanQueueTime;
     this.runningJobs = runningJobs;
+    this.finishedJobs = finishedJobs;
     this.queuedJobs = queuedJobs;
   }
 
@@ -124,6 +129,26 @@ public class JaxbServiceStatistics implements ServiceStatistics {
    */
   public void setMeanRunTime(long meanRunTime) {
     this.meanRunTime = meanRunTime;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.ServiceStatistics#getFinishedJobs()
+   */
+  @Override
+  public int getFinishedJobs() {
+    return finishedJobs;
+  }
+
+  /**
+   * Sets the number of finished jobs
+   * 
+   * @param finishedJobs
+   *          the number of finished jobs
+   */
+  public void setFinishedJobs(int finishedJobs) {
+    this.finishedJobs = finishedJobs;
   }
 
   /**

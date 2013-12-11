@@ -18,6 +18,7 @@ package org.opencastproject.feed.impl;
 
 import org.opencastproject.feed.api.Feed.Type;
 import org.opencastproject.feed.api.FeedGenerator;
+import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
 
 import org.slf4j.Logger;
@@ -73,14 +74,21 @@ public class CustomFeedService extends AbstractFeedService implements FeedGenera
           args[i - 1] = query[i];
         q = MessageFormat.format(solrQuery, args);
       }
-      
+
       // Make sure there are no remaining arguments
       if (q.matches(".*\\{[\\d]+\\}.*")) {
         logger.warn("Feed has been called with an insufficient number of parameters");
         return null;
       }
-      
-      return searchService.getByQuery(q, limit, offset);
+
+      // Create the query
+      SearchQuery searchQuery = createBaseQuery(type, limit, offset);
+      searchQuery.includeEpisodes(true);
+      searchQuery.includeSeries(false);
+      searchQuery.withQuery(q);
+      searchService.getByQuery(searchQuery);
+
+      return searchService.getByQuery(searchQuery);
     } catch (Exception e) {
       logger.error("Cannot retrieve result for aggregated feed", e);
       return null;

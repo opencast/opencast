@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -296,12 +296,9 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-Activator>org.opencastproject.adminui.Activator</Bundle-Activator>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>
-              org.opencastproject.rest;version=${project.version},
-              org.osgi.framework.*,
-              org.slf4j.*
+              org.opencastproject.rest;version=${project.version}
             </Import-Package>
             <Private-Package>ui.*, uitests.*</Private-Package>
             <Http-Alias>/admin</Http-Alias>

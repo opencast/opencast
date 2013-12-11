@@ -17,6 +17,7 @@ package org.opencastproject.workingfilerepository.impl;
 
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.Checksum;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
@@ -160,7 +161,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       File parentDirectory = f.getParentFile();
       logger.debug("Attempting to delete {}", parentDirectory.getAbsolutePath());
       FileUtils.forceDelete(parentDirectory);
-      if (parentDirectory.getParentFile().list().length == 0)
+      File parentsParentDirectory = parentDirectory.getParentFile();
+      if (parentsParentDirectory.isDirectory() && parentsParentDirectory.list().length == 0)
         FileUtils.forceDelete(parentDirectory.getParentFile());
       return true;
     } catch (NotFoundException e) {
@@ -290,7 +292,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       }
 
       // Store the hash
-      String md5 = DigestUtils.md5Hex(dis.getMessageDigest().digest());
+      String md5 = Checksum.convertToHex(dis.getMessageDigest().digest());
       File md5File = null;
       try {
         md5File = getMd5File(f);
@@ -583,7 +585,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       }
 
       // Store the hash
-      String md5 = DigestUtils.md5Hex(dis.getMessageDigest().digest());
+      String md5 = Checksum.convertToHex(dis.getMessageDigest().digest());
       File md5File = null;
       try {
         md5File = getMd5File(f);
@@ -709,7 +711,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       throw new IOException(f + " cannot be deleted");
 
     File parentDirectory = f.getParentFile();
-    if (parentDirectory.list().length == 0) {
+    if (parentDirectory.isDirectory() && parentDirectory.list().length == 0) {
       logger.debug("Attempting to delete empty collection directory {}", parentDirectory.getAbsolutePath());
       try {
         FileUtils.forceDelete(parentDirectory);

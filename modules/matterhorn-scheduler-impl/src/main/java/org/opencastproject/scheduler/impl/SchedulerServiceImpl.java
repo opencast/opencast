@@ -22,12 +22,12 @@ import static org.opencastproject.scheduler.impl.Util.setEventIdentifierImmutabl
 import static org.opencastproject.scheduler.impl.Util.setEventIdentifierMutable;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
@@ -72,6 +72,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -83,6 +84,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.UUID;
 
 /**
  * Implementation of {@link SchedulerService}.
@@ -100,6 +102,9 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   public static final String WORKFLOW_DEFINITION_ID_KEY = "org.opencastproject.workflow.definition";
 
   /** The schedule workflow operation identifier */
+  public static final String CAPTURE_OPERATION_ID = "capture";
+
+  /** The schedule workflow operation identifier */
   public static final String SCHEDULE_OPERATION_ID = "schedule";
 
   /** The workflow operation property that stores the event start time, as milliseconds since 1970 */
@@ -113,9 +118,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /** The series service */
   protected SeriesService seriesService;
-
-  /** The ingest service */
-  protected IngestService ingestService;
 
   /** The workflow service */
   protected WorkflowService workflowService;
@@ -150,11 +152,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   /** OSGi callback */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  /** OSGi callback */
-  public void setIngestService(IngestService ingestService) {
-    this.ingestService = ingestService;
   }
 
   /**
@@ -202,19 +199,20 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }
+
     if (instancesInSolr == 0L) {
       try {
         DublinCoreCatalog[] events = persistence.getAllEvents();
         if (events.length != 0) {
-          logger.info("The event index is empty. Populating it now with {} events", Integer.valueOf(events.length));
+          logger.info("The event index is empty. Populating it with {} events", Integer.valueOf(events.length));
+
           for (DublinCoreCatalog event : events) {
-            index.index(event);
             final long id = getEventIdentifier(event);
             Properties properties = persistence.getEventMetadata(id);
-            if (properties != null) {
-              index.index(id, properties);
-            }
+            logger.debug("Adding recording event '{}' to the scheduler search index", id);
+            index.index(event, properties);
           }
+
           logger.info("Finished populating event search index");
         }
       } catch (Exception e) {
@@ -287,7 +285,10 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   }
 
   /**
-   * Updates workflow for event, which values where updated.
+   * Updates workflow for the given event.
+   * <p>
+   * This method will only allow updates to workflows that are either in the "schedule" operation or are in instantiated
+   * or paused state.
    * 
    * @param event
    *          {@link DublinCoreCatalog} of updated event
@@ -298,7 +299,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * @param wfProperties
    *          the workflow configuration properties
    * @throws SchedulerException
-   *           if workflow is not in paused state or current operation is no longer 'schedule'
+   *           if workflow is not in paused or instantiated state and current operation is not 'schedule'
    * @throws NotFoundException
    *           if workflow with ID from DublinCore cannot be found
    * @throws WorkflowException
@@ -309,15 +310,18 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   protected void updateWorkflow(DublinCoreCatalog event, Date startDate, Date endDate, Map<String, String> wfProperties)
           throws SchedulerException, NotFoundException, WorkflowException, UnauthorizedException {
     WorkflowInstance workflow = workflowService.getWorkflowById(getEventIdentifier(event));
-    WorkflowOperationInstance scheduleOperation = workflow.getCurrentOperation();
+    WorkflowOperationInstance operation = workflow.getCurrentOperation();
+    String operationId = operation.getTemplate();
 
-    // if the workflow is not in the hold state with 'schedule' as the current operation, we can't update the event
-    if (!WorkflowInstance.WorkflowState.PAUSED.equals(workflow.getState())) {
-      throw new SchedulerException("The workflow is not in the paused state, so it can not be updated");
+    // if the workflow is not in a hold state or in any of 'schedule' or 'capture' as the current operation, we can't
+    // update the event
+    if (!SCHEDULE_OPERATION_ID.equals(operationId) && !CAPTURE_OPERATION_ID.equals(operationId)) {
+      boolean isPaused = WorkflowInstance.WorkflowState.PAUSED.equals(workflow.getState());
+      boolean isInstantiated = WorkflowInstance.WorkflowState.INSTANTIATED.equals(workflow.getState());
+      if (!isPaused && !isInstantiated)
+        throw new SchedulerException("Workflow " + workflow + " is not in the paused state, so it can not be updated");
     }
-    if (!SCHEDULE_OPERATION_ID.equals(scheduleOperation.getTemplate())) {
-      throw new SchedulerException("The current worflow operation is not 'schedule', so it can not be updated");
-    }
+
     MediaPackage mediapackage = workflow.getMediaPackage();
 
     // removes old values
@@ -344,10 +348,9 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     mediapackage.setDuration(endDate.getTime() - startDate.getTime());
 
     // Update the properties
-    scheduleOperation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_START, Long.toString(startDate.getTime()));
-    scheduleOperation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_STOP, Long.toString(endDate.getTime()));
-    scheduleOperation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_LOCATION,
-            event.getFirst(DublinCore.PROPERTY_SPATIAL));
+    operation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_START, Long.toString(startDate.getTime()));
+    operation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_STOP, Long.toString(endDate.getTime()));
+    operation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_LOCATION, event.getFirst(DublinCore.PROPERTY_SPATIAL));
     // Set the location in the workflow as well, so that it shows up in the UI properly.
     workflow.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_LOCATION, event.getFirst(DublinCore.PROPERTY_SPATIAL));
 
@@ -369,7 +372,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    *          {@link DublinCoreCatalog} for event
    */
   private void populateMediapackageWithStandardDCFields(MediaPackage mp, DublinCoreCatalog dc) throws Exception {
-    final String seriesId = dc.getFirst(DublinCore.PROPERTY_IS_PART_OF);
+    String seriesId = dc.getFirst(DublinCore.PROPERTY_IS_PART_OF);
     mp.setTitle(dc.getFirst(DublinCore.PROPERTY_TITLE));
     mp.setLanguage(dc.getFirst(DublinCore.PROPERTY_LANGUAGE));
     mp.setLicense(dc.getFirst(DublinCore.PROPERTY_LICENSE));
@@ -378,7 +381,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       // add series dc to mp
       // add the episode catalog
       DublinCoreCatalog seriesCatalog = seriesService.getSeries(seriesId);
-      ingestService.addCatalog(IOUtils.toInputStream(seriesCatalog.toXmlString(), "UTF-8"), "dublincore.xml",
+      addCatalog(IOUtils.toInputStream(seriesCatalog.toXmlString(), "UTF-8"), "dublincore.xml",
               MediaPackageElements.SERIES, mp);
     } else if (isNotBlank(mp.getSeries()) && !mp.getSeries().equals(seriesId)) {
       // switch to new series dc and remove old
@@ -386,9 +389,11 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
         logger.debug("Deleting existing series dublin core {} from media package {}", c.getIdentifier(), mp
                 .getIdentifier().toString());
         mp.remove(c);
+        workspace.delete(c.getURI());
       }
+      seriesId = mp.getSeries();
       DublinCoreCatalog seriesCatalog = seriesService.getSeries(seriesId);
-      ingestService.addCatalog(IOUtils.toInputStream(seriesCatalog.toXmlString(), "UTF-8"), "dublincore.xml",
+      addCatalog(IOUtils.toInputStream(seriesCatalog.toXmlString(), "UTF-8"), "dublincore.xml",
               MediaPackageElements.SERIES, mp);
     } else if (isNotBlank(mp.getSeries()) && isBlank(seriesId)) {
       // remove series dc
@@ -396,8 +401,12 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
         logger.debug("Deleting existing series dublin core {} from media package {}", c.getIdentifier(), mp
                 .getIdentifier().toString());
         mp.remove(c);
+        workspace.delete(c.getURI());
       }
     }
+
+    // set series id
+    mp.setSeries(seriesId);
 
     // set series title
     if (isNotBlank(seriesId)) {
@@ -411,9 +420,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     } else {
       mp.setSeriesTitle(null);
     }
-
-    // set series id
-    mp.setSeries(seriesId);
 
     for (DublinCoreValue value : dc.get(DublinCore.PROPERTY_CREATOR)) {
       mp.addCreator(value.getValue());
@@ -432,8 +438,36 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       workspace.delete(c.getURI());
     }
     // add the episode catalog
-    ingestService.addCatalog(IOUtils.toInputStream(dc.toXmlString(), "UTF-8"), "dublincore.xml",
-            MediaPackageElements.EPISODE, mp);
+    addCatalog(IOUtils.toInputStream(dc.toXmlString(), "UTF-8"), "dublincore.xml", MediaPackageElements.EPISODE, mp);
+  }
+
+  /**
+   * Adds a catalog to the working file repository.
+   * 
+   * @param in
+   *          the catalog's input stream
+   * @param fileName
+   *          the catalog file name
+   * @param flavor
+   *          the catalog's flavor
+   * @param mediaPackage
+   *          the parent mediapackage
+   * @return the modified mediapackage
+   * @throws IOException
+   *           if the catalog cannot be stored in the working file repository
+   */
+  private MediaPackage addCatalog(InputStream in, String fileName, MediaPackageElementFlavor flavor,
+          MediaPackage mediaPackage) throws IOException {
+    try {
+      String elementId = UUID.randomUUID().toString();
+      URI catalogUrl = workspace.put(mediaPackage.getIdentifier().compact(), elementId, fileName, in);
+      logger.info("Adding catalog with flavor {} to mediapackage {}", flavor, mediaPackage);
+      MediaPackageElement mpe = mediaPackage.add(catalogUrl, MediaPackageElement.Type.Catalog, flavor);
+      mpe.setIdentifier(elementId);
+      return mediaPackage;
+    } catch (IOException e) {
+      throw e;
+    }
   }
 
   /**
@@ -689,6 +723,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     final Date endDate = period.getEnd();
     final long eventId = getEventIdentifier(event);
     try {
+      verifyActive(eventId);
       persistence.updateEvent(event);
     } catch (SchedulerServiceDatabaseException e) {
       logger.error("Could not update event {} in persistent storage: {}", eventId, e.getMessage());
@@ -724,6 +759,8 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   @Override
   public void updateEvents(List<Long> eventIds, final DublinCoreCatalog eventCatalog) throws NotFoundException,
           SchedulerException, UnauthorizedException {
+    StringBuffer errors = new StringBuffer();
+    int errorCount = 0;
     SchedulerQuery q = new SchedulerQuery();
     q.withIdInList(eventIds);
     q.withSort(Sort.EVENT_START);
@@ -747,7 +784,21 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
           }
         }
       }
-      updateEvent(getEventIdentifier(cat), cat, new HashMap<String, String>());
+      try {
+        updateEvent(getEventIdentifier(cat), cat, new HashMap<String, String>());
+      } catch (SchedulerException se) {
+        // TODO: Instead of logging and continuing, should all updates fail if one is in the past?
+        errors.append((errors.length() > 0 ? " " : "") + se.getMessage());
+        errorCount++;
+        logger.error("Could not update catalog for event with ID '{}': {}", getEventIdentifier(cat), se.getMessage());
+      }
+    }
+    // After updating what is possible, throw error on found issues
+    if (errors.length() > 0) {
+      // Already logged above, but allow information to be thrown to client
+      // TODO: convert to an SchedulerEventEndedException
+      throw new SchedulerException("Could not update " + errorCount + " of " + catalogs.size() + " events: "
+              + errors.toString());
     }
   }
 
@@ -813,7 +864,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       // Adjust for DST, if start of event
       if (tz.inDaylightTime(seed)) { // Event starts in DST
         if (!tz.inDaylightTime(d)) { // Date not in DST?
-          d.setTime(d.getTime() + tz.getDSTSavings()); // Ajust for Fall back one hour
+          d.setTime(d.getTime() + tz.getDSTSavings()); // Adjust for Fall back one hour
         }
       } else { // Event doesn't start in DST
         if (tz.inDaylightTime(d)) {
@@ -965,7 +1016,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       // Adjust for DST, if start of event
       if (tz.inDaylightTime(seed)) { // Event starts in DST
         if (!tz.inDaylightTime(d)) { // Date not in DST?
-          d.setTime(d.getTime() + tz.getDSTSavings()); // Ajust for Fall back one hour
+          d.setTime(d.getTime() + tz.getDSTSavings()); // Adjust for Fall back one hour
         }
       } else { // Event doesn't start in DST
         if (tz.inDaylightTime(d)) {
@@ -1000,22 +1051,31 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     CalendarGenerator cal = new CalendarGenerator(seriesService);
     for (DublinCoreCatalog event : eventList) {
       final long id = getEventIdentifier(event);
+
+      // Load the even properties, skip the event if fails
       Properties prop;
       try {
         prop = getEventCaptureAgentConfiguration(id);
       } catch (NotFoundException e) {
-        // should not happen
-        throw new IllegalStateException(e);
+        logger.warn("Properties for event '{}' can't be found, event is not recorded", event);
+        continue;
       }
-      cal.addEvent(event, prop);
+
+      // Add the entry to the calendar, skip it with a warning if adding fails
+      try {
+        cal.addEvent(event, prop);
+      } catch (Exception e) {
+        logger.warn("Error adding event '{}' to calendar: {}. Event is not recorded", event, e.getMessage());
+        continue;
+      }
     }
 
-    // Only validate calendars with events. Without any events, the icalendar won't validate
+    // Only validate calendars with events. Without any events, the iCalendar won't validate
     if (cal.getCalendar().getComponents().size() > 0) {
       try {
         cal.getCalendar().validate();
-      } catch (ValidationException e1) {
-        logger.warn("Could not validate Calendar: {}", e1.getMessage());
+      } catch (ValidationException e) {
+        logger.warn("Recording calendar '{}' could not be validated (returning it anyways): {}", filter, e.getMessage());
       }
     }
 
@@ -1036,5 +1096,45 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       logger.error("Failed to retrieve last modified for CA {}: {}", filter, e.getMessage());
       throw new SchedulerException(e);
     }
+  }
+
+  /**
+   * Verifies if existing event is found and has not already ended
+   * 
+   * @param eventId
+   * @throws SchedulerException
+   *           if event has ended, or NotFoundException if event it not found
+   */
+  private void verifyActive(Long eventId) throws SchedulerException {
+    DublinCoreCatalog dcc;
+    try {
+      dcc = getEventDublinCore(eventId);
+      final DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(dcc.getFirst(DublinCore.PROPERTY_TEMPORAL));
+      if (!period.hasEnd() || !period.hasStart()) {
+        // Unlikely to get this error since catalog was already in index
+        throw new IllegalArgumentException("Dublin core field dc:temporal for event ID " + eventId
+                + " does not contain information about start and end of event");
+      }
+      final Date endDate = period.getEnd();
+      // TODO: Assumption of no TimeZone adjustment because catalog temporal is local to server
+      if (getCurrentDate().after(endDate)) {
+        String msg = "Event ID " + eventId + " has already ended";
+        logger.info(msg);
+        throw new SchedulerException(msg);
+      }
+    } catch (NotFoundException e) {
+      logger.info("Event ID {} is not found", eventId);
+      throw new SchedulerException(e);
+    }
+  }
+
+  /**
+   * Returns current system Date. Enables date to be mocked to simulate the future and the past for testing. Reference:
+   * http://neovibrant.com/2011/08/05/junit-with-new-date/
+   * 
+   * @return current system date
+   */
+  public Date getCurrentDate() {
+    return new Date();
   }
 }

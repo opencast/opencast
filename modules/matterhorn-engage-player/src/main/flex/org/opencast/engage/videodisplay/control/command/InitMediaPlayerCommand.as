@@ -86,7 +86,6 @@ package org.opencast.engage.videodisplay.control.command
 				model.coverURLSingle=event.coverURLOne;
 			}
 
-			
 			// Single Video/Audio
 			if (event.mediaURLOne != '' && (event.mediaURLTwo == '' || event.mediaURLTwo == ' '))
 			{
@@ -145,6 +144,10 @@ package org.opencast.engage.videodisplay.control.command
 						errorMessage("Error", "TRACK COULD NOT BE FOUND");
 						break;
 				}
+
+				if (event.bufferTime != NaN) {
+					model.mediaPlayer.setBufferTime(event.bufferTime);
+				}
 			}
 			else if (event.mediaURLOne != '' && event.mediaURLTwo != '')
 			{
@@ -202,6 +205,10 @@ package org.opencast.engage.videodisplay.control.command
 				//model.mediaPlayer.setMediaElementTwo( mediaElementVideoTwo );
 
 				model.mediaPlayer.setMediaElement(mediaElementVideoOne, mediaElementVideoTwo);
+
+				if (event.bufferTime != NaN) {
+					model.mediaPlayer.setBufferTime(event.bufferTime);
+				}
 			}
 			else
 			{

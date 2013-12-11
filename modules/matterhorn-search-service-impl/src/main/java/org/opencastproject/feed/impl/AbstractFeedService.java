@@ -19,6 +19,7 @@ import org.opencastproject.feed.api.Feed.Type;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.series.api.SeriesService;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ import java.util.StringTokenizer;
  * Convenience implementation that is intended to serve as a base implementation for feed generator services. It handles
  * service activation, reads a default set of properties (see below) and can be configured to track the opencast
  * {@link SearchService} by using {@link #setSearchService(SearchService)}.
+ * {@link SeriesService} by using {@link #setSeriesService(SeriesService)}.
  * <p>
  * By using this implementation as the basis for feed services, only the two methods accept and loadFeedData need to be
  * implemented by subclasses.
@@ -110,6 +112,9 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
 
   /** The search service */
   protected SearchService searchService = null;
+
+  /** The search service */
+  protected SeriesService seriesService = null;
 
   /**
    * Creates a new abstract feed generator.
@@ -218,7 +223,12 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
     description = (String) properties.get(PROP_DESCRIPTION);
     copyright = (String) properties.get(PROP_COPYRIGHT);
     home = ensureUrl(((String) properties.get(PROP_HOME)), serverUrl);
-    cover = ensureUrl((String) properties.get(PROP_COVER), serverUrl);
+    // feed.cover can be unset if no branding is required
+    if (StringUtils.isBlank((String)properties.get(PROP_COVER))) {
+      cover = null;
+    } else {
+      cover = ensureUrl((String) properties.get(PROP_COVER), serverUrl);
+    }
     linkTemplate = ensureUrl((String) properties.get(PROP_ENTRY), serverUrl);
     if (properties.get(PROP_SELF) != null) 
        linkSelf = ensureUrl((String) properties.get(PROP_SELF), serverUrl);
@@ -319,6 +329,25 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
    */
   protected SearchService getSearchService() {
     return searchService;
+  }
+  
+  /**
+   * Sets the series service.
+   * 
+   * @param seriesService
+   *          the series service
+   */
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
+  }
+
+  /**
+   * Returns the series service.
+   * 
+   * @return the series services
+   */
+  protected SeriesService getSeriesService() {
+    return seriesService;
   }
 
 }

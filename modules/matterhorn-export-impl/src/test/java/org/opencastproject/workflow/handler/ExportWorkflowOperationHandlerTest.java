@@ -37,7 +37,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import junit.framework.Assert;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.gstreamer.Gst;
 import org.junit.Before;
 import org.junit.BeforeClass;

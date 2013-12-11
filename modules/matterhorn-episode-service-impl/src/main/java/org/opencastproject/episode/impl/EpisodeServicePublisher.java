@@ -15,12 +15,12 @@
  */
 package org.opencastproject.episode.impl;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
+import static org.opencastproject.util.data.Collections.cons;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.data.functions.Booleans.ne;
+
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.api.HttpMediaPackageElementProvider;
 import org.opencastproject.episode.impl.elementstore.ElementStore;
@@ -47,13 +47,19 @@ import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.util.osgi.SimpleServicePublisher;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.ObjectInstance;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -63,11 +69,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
 
-import static org.opencastproject.util.data.Collections.cons;
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Tuple.tuple;
-import static org.opencastproject.util.data.functions.Booleans.ne;
+import javax.management.ObjectInstance;
 
 public class EpisodeServicePublisher extends SimpleServicePublisher {
 
@@ -110,7 +112,7 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
   public synchronized void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
     // Populate the search index if it is empty
     // bad approach but episode service and its rest endpoint are in a cyclic dependency
-    episodeService.populateIndex(httpMediaPackageElementProvider.getUriRewriter());
+    episodeService.populateIndex(httpMediaPackageElementProvider.getUriRewriter(), true);
   }
 
   public void unsetHttpMediaPackageElementProvider(HttpMediaPackageElementProvider ingore) {
@@ -279,7 +281,7 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
     // Test for the existence of the index. Note that an empty index directory will prevent solr from
     // completing normal setup.
     File solrIndexDir = new File(solrDataDir, "index");
-    if (solrIndexDir.exists() && solrIndexDir.list().length == 0) {
+    if (solrIndexDir.isDirectory() && solrIndexDir.list().length == 0) {
       FileUtils.deleteDirectory(solrIndexDir);
     }
 

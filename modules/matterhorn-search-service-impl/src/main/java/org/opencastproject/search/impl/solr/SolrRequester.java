@@ -413,6 +413,8 @@ public class SolrRequester {
           int textLength = segmentText.length();
           for (String t : queryTerms) {
             String strippedTerm = StringUtils.strip(t, "*");
+            if (StringUtils.isBlank(strippedTerm))
+              continue;
             int startIndex = 0;
             while (startIndex < textLength - 1) {
               int foundAt = segmentText.indexOf(strippedTerm, startIndex);
@@ -424,7 +426,10 @@ public class SolrRequester {
           }
 
           // for now, just store the number of hits, but keep track of the maximum hit count
-          segment.setRelevance(segmentHits);
+          if (segmentHits > 0) {
+            segment.setHit(true);
+            segment.setRelevance(segmentHits);
+          }
           if (segmentHits > maxHits)
             maxHits = segmentHits;
         }
@@ -563,7 +568,7 @@ public class SolrRequester {
       sb.append(Schema.ID);
       sb.append(":");
       sb.append(cleanSolrIdRequest);
-      if (q.isIncludeEpisodes()) {
+      if (q.isIncludeEpisodes() && q.isIncludeSeries()) {
         sb.append(" OR ");
         sb.append(Schema.DC_IS_PART_OF);
         sb.append(":");
@@ -653,7 +658,8 @@ public class SolrRequester {
       sb.append("*:*");
 
     if (applyPermissions) {
-      sb.append(" AND ").append(Schema.OC_ORGANIZATION).append(":").append(securityService.getOrganization().getId());
+      sb.append(" AND ").append(Schema.OC_ORGANIZATION).append(":")
+              .append(SolrUtils.clean(securityService.getOrganization().getId()));
       User user = securityService.getUser();
       String[] roles = user.getRoles();
       boolean userHasAnonymousRole = false;
@@ -663,7 +669,7 @@ public class SolrRequester {
         for (String role : roles) {
           if (roleList.length() > 0)
             roleList.append(" OR ");
-          roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":").append(role);
+          roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":").append(SolrUtils.clean(role));
           if (role.equalsIgnoreCase(securityService.getOrganization().getAnonymousRole())) {
             userHasAnonymousRole = true;
           }
@@ -672,7 +678,7 @@ public class SolrRequester {
           if (roleList.length() > 0)
             roleList.append(" OR ");
           roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":")
-                  .append(securityService.getOrganization().getAnonymousRole());
+                  .append(SolrUtils.clean(securityService.getOrganization().getAnonymousRole()));
         }
 
         sb.append(roleList.toString());
@@ -701,9 +707,9 @@ public class SolrRequester {
     SolrQuery query = new SolrQuery(sb.toString());
 
     if (q.getLimit() > 0) {
-        query.setRows(q.getLimit());
+      query.setRows(q.getLimit());
     } else {
-        query.setRows(Integer.MAX_VALUE);
+      query.setRows(Integer.MAX_VALUE);
     }
 
     if (q.getOffset() > 0)

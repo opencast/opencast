@@ -76,6 +76,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.SolrParams;
@@ -224,7 +225,8 @@ public class SolrIndexManager {
       // Load the existing episode
       QueryResponse solrResponse = null;
       try {
-        SolrQuery query = new SolrQuery(Schema.ID + ":" + id + " AND -" + Schema.OC_DELETED + ":[* TO *]");
+        SolrQuery query = new SolrQuery(Schema.ID + ":" + ClientUtils.escapeQueryChars(id) + " AND -"
+                + Schema.OC_DELETED + ":[* TO *]");
         solrResponse = solrServer.query(query);
       } catch (Exception e1) {
         throw new SolrServerException(e1);

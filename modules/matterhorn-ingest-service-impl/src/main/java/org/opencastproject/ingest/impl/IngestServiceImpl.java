@@ -51,6 +51,7 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowService;
@@ -84,9 +85,11 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.management.ObjectInstance;
@@ -275,6 +278,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
 
     ZipArchiveInputStream zis = null;
+    Set<String> collectionFilenames = new HashSet<String>();
     try {
       // We don't need anybody to do the dispatching for us. Therefore we need to make sure that the job is never in
       // QUEUED state but set it to INSTANTIATED in the beginning and then manually switch it to RUNNING.
@@ -289,6 +293,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       ZipArchiveEntry entry;
       MediaPackage mp = null;
       Map<String, URI> uris = new HashMap<String, URI>();
+      // Sequential number to append to file names so that, if two files have the same
+      // name, one does not overwrite the other (see MH-9688)
+      int seq = 1;
+      // Folder name to compare with next one to figure out if there's a root folder
+      String folderName = null;
+      // Indicates if zip has a root folder or not, initialized as true
+      boolean hasRootFolder = true;      
       // While there are entries write them to a collection
       while ((entry = zis.getNextZipEntry()) != null) {
         try {
@@ -299,19 +310,36 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             // Build the mediapackage
             mp = loadMediaPackageFromManifest(new ZipEntryInputStream(zis, entry.getSize()));
           } else {
-            logger.info("Storing zip entry {} in working file repository collection '{}'",
-                    job.getId() + entry.getName(), wfrCollectionId);
-            URI contentUri = workingFileRepository.putInCollection(wfrCollectionId,
-                    FilenameUtils.getName(entry.getName()), new ZipEntryInputStream(zis, entry.getSize()));
-            uris.put(FilenameUtils.getName(entry.getName()), contentUri);
+            logger.info("Storing zip entry {}/{} in working file repository collection '{}'",
+                    new Object[] { job.getId(), entry.getName(), wfrCollectionId });
+            // Since the directory structure is not being mirrored, makes sure the file
+            // name is different than the previous one(s) by adding a sequential number
+            String fileName = FilenameUtils.getBaseName(entry.getName()) + "_" + seq++ + "."
+                    + FilenameUtils.getExtension(entry.getName());
+            URI contentUri = workingFileRepository.putInCollection(wfrCollectionId, fileName, new ZipEntryInputStream(
+                    zis, entry.getSize()));
+            collectionFilenames.add(fileName);
+            // Key is the zip entry name as it is
+            String key = entry.getName();
+            uris.put(key, contentUri);
             ingestStatistics.add(entry.getSize());
-            logger.info("Zip entry {} stored at {}", job.getId() + entry.getName(), contentUri);
+            logger.info("Zip entry {}/{} stored at {}", new Object[] { job.getId(), entry.getName(), contentUri });
+            // Figures out if there's a root folder. Does entry name starts with a folder?
+            int pos = entry.getName().indexOf('/');
+            if (pos == -1) {
+              // No, we can conclude there's no root folder
+              hasRootFolder = false;
+            } else if (hasRootFolder && folderName != null && !folderName.equals(entry.getName().substring(0, pos))) {
+              // Folder name different from previous so there's no root folder 
+              hasRootFolder = false;
+            } else if (folderName == null) {
+              // Just initialize folder name
+              folderName = entry.getName().substring(0, pos);
+            }
           }
-        } catch (Exception e) {
-          logger.warn("Unable to process zip entry {}: {}", entry.getName(), e.getMessage());
-          if (e instanceof MediaPackageException)
-            throw (MediaPackageException) e;
-          throw new MediaPackageException(e);
+        } catch (IOException e) {
+          logger.warn("Unable to process zip entry {}: {}", entry.getName(), e);
+          throw e;
         }
       }
 
@@ -332,17 +360,22 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.info("Ingesting mediapackage {} is named '{}'", mediaPackageId, mp.getTitle());
 
       // Make sure there are tracks in the mediapackage
-      if (mp.getTracks().length == 0)
-        throw new IngestException("Mediapackage " + mediaPackageId + " has no media tracks");
+      if (mp.getTracks().length == 0) {
+        logger.warn("Mediapackage {} has no media tracks", mediaPackageId);
+      }
 
       // Update the element uris to point to their working file repository location
       for (MediaPackageElement element : mp.elements()) {
-        URI uri = uris.get(FilenameUtils.getName(element.getURI().toString()));
+        // Key has root folder name if there is one
+        URI uri = uris.get((hasRootFolder ? folderName + "/" : "") + element.getURI().toString());
+
         if (uri == null)
-          throw new IngestException("Unable to map element name '" + element.getURI() + "' to workspace uri");
+          throw new MediaPackageException("Unable to map element name '" + element.getURI() + "' to workspace uri");
         logger.info("Ingested mediapackage element {}/{} is located at {}",
                 new Object[] { mediaPackageId, element.getIdentifier(), uri });
-        element.setURI(uri);
+        URI dest = workingFileRepository.moveTo(wfrCollectionId, uri.toString(), mediaPackageId,
+                element.getIdentifier(), FilenameUtils.getName(element.getURI().toString()));
+        element.setURI(dest);
 
         // TODO: This should be triggered somehow instead of being handled here
         if (MediaPackageElements.SERIES.equals(element.getFlavor())) {
@@ -360,14 +393,39 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
-    } catch (IOException e) {
-      job.setStatus(Job.Status.FAILED);
-      throw e;
     } catch (MediaPackageException e) {
-      job.setStatus(Job.Status.FAILED);
+      job.setStatus(Job.Status.FAILED, Job.FailureReason.DATA);
+      if (workflowInstance != null) {
+        workflowInstance.getCurrentOperation().setState(OperationState.FAILED);
+        workflowInstance.setState(WorkflowState.FAILED);
+        try {
+          logger.info("Marking related workflow {} as failed", workflowInstance);
+          workflowService.update(workflowInstance);
+        } catch (WorkflowException e1) {
+          logger.error("Error updating workflow instance {} with ingest failure: {}", workflowInstance, e1.getMessage());
+        }
+      }
       throw e;
+    } catch (Exception e) {
+      job.setStatus(Job.Status.FAILED);
+      if (workflowInstance != null) {
+        workflowInstance.getCurrentOperation().setState(OperationState.FAILED);
+        workflowInstance.setState(WorkflowState.FAILED);
+        try {
+          logger.info("Marking related workflow {} as failed", workflowInstance);
+          workflowService.update(workflowInstance);
+        } catch (WorkflowException e1) {
+          logger.error("Error updating workflow instance {} with ingest failure: {}", workflowInstance, e1.getMessage());
+        }
+      }
+      if (e instanceof IngestException)
+        throw (IngestException) e;
+      throw new IngestException(e);
     } finally {
       IOUtils.closeQuietly(zis);
+      for (String filename : collectionFilenames) {
+        workingFileRepository.deleteFromCollection(Long.toString(job.getId()), filename);
+      }
       try {
         serviceRegistry.updateJob(job);
       } catch (Exception e) {
@@ -864,6 +922,27 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               logger.info(
                       "Mediapackage {} already contains a catalog with flavor {}.  Skipping the conflicting ingested catalog",
                       existingMediaPackage, catalogFlavor);
+
+              boolean containsElementId = false;
+              for (MediaPackageElement existingElem : existingCatalogs) {
+                if (existingElem.getIdentifier().equals(element.getIdentifier())) {
+                  containsElementId = true;
+                  break;
+                }
+              }
+              if (containsElementId) {
+                logger.info(
+                        "Mediapackage's {} catalog with flavor {} and element id {} has already been overwritten by the ingested one, because both having the same element identifier!",
+                        new String[] { existingMediaPackage.getIdentifier().compact(), catalogFlavor.toString(),
+                                element.getIdentifier() });
+              } else {
+                try {
+                  workingFileRepository.delete(mp.getIdentifier().compact(), element.getIdentifier());
+                  logger.debug("Deleted the unused catalog {}", element.getIdentifier());
+                } catch (IOException e) {
+                  logger.warn("Unable to delete unused catalog {}", element.getIdentifier());
+                }
+              }
               continue;
             }
           }

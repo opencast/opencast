@@ -15,7 +15,6 @@
  */
 package org.opencastproject.usertracking.impl;
 
-import org.opencastproject.search.api.SearchService;
 import org.opencastproject.usertracking.api.Footprint;
 import org.opencastproject.usertracking.api.FootprintList;
 import org.opencastproject.usertracking.api.Report;
@@ -30,11 +29,14 @@ import org.opencastproject.usertracking.endpoint.ReportImpl;
 import org.opencastproject.usertracking.endpoint.ReportItemImpl;
 import org.opencastproject.util.NotFoundException;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
@@ -60,20 +62,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
 
   private static final Logger logger = LoggerFactory.getLogger(UserTrackingServiceImpl.class);
 
-  @SuppressWarnings("unused")
-  private SearchService searchService;
-
   private boolean detailedTracking = false;
-
-  /**
-   * Sets the search service
-   * 
-   * @param searchService
-   *          the search service to set
-   */
-  public void setSearchService(SearchService searchService) {
-    this.searchService = searchService;
-  }
 
   /**
    * @param persistenceProvider
@@ -165,6 +154,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
                 && last.getOutpoint() == a.getInpoint()) {
           last.setOutpoint(a.getOutpoint());
           a = last;
+          a.setId(last.getId());
         } else {
           em.persist(a);
         }
@@ -444,46 +434,6 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     }
   }
   
-  /*@SuppressWarnings("unchecked")
-  public UserActionList getUserActionsByTypeAndDay(String type, String day, int offset, int limit) {
-    UserActionList result = new UserActionListImpl();
-
-    int year = Integer.parseInt(day.substring(0, 4));
-    int month = Integer.parseInt(day.substring(4, 6)) - 1;
-    int date = Integer.parseInt(day.substring(6, 8));
-
-    Calendar calBegin = new GregorianCalendar();
-    calBegin.set(year, month, date, 0, 0);
-    Calendar calEnd = new GregorianCalendar();
-    calEnd.set(year, month, date, 23, 59);
-
-    result.setTotal(getTotal(type, calBegin, calEnd));
-    result.setOffset(offset);
-    result.setLimit(limit);
-
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      em.createQuery(arg0);
-      Query q = em.createNamedQuery("findUserActionsByTypeAndIntervall");
-      q.setParameter("type", type);
-      q.setParameter("begin", calBegin, TemporalType.TIMESTAMP);
-      q.setParameter("end", calEnd, TemporalType.TIMESTAMP);
-      q.setFirstResult(offset);
-      q.setMaxResults(limit);
-      Collection<UserAction> userActions = q.getResultList();
-
-      for (UserAction a : userActions) {
-        result.add(a);
-      }
-      return result;
-    } finally {
-      if (em != null && em.isOpen()) {
-        em.close();
-      }
-    }
-  }*/
-  
   private int getTotal(String type, Calendar calBegin, Calendar calEnd) {
     EntityManager em = null;
     try {
@@ -568,21 +518,6 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     }
   }
 
-  private int getDistinctEpisodeIdTotal(Calendar calBegin, Calendar calEnd) {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("findDistinctEpisodeIdTotalByIntervall");
-      q.setParameter("begin", calBegin, TemporalType.TIMESTAMP);
-      q.setParameter("end", calEnd, TemporalType.TIMESTAMP);
-      return ((Long) q.getSingleResult()).intValue();
-    } finally {
-      if (em != null && em.isOpen()) {
-        em.close();
-      }
-    }
-  }
-
   public Report getReport(int offset, int limit) {
     Report report = new ReportImpl();
     report.setLimit(limit);
@@ -614,53 +549,38 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     }
   }
 
-  public Report getReport(String from, String to, int offset, int limit) {
+  public Report getReport(String from, String to, int offset, int limit) throws ParseException {
     Report report = new ReportImpl();
     report.setLimit(limit);
     report.setOffset(offset);
 
     Calendar calBegin = new GregorianCalendar();
     Calendar calEnd = new GregorianCalendar();
-    
-    // Expecting a date in the format 20121231 or 201212312359
-    if (from.length() == 8 && to.length() == 8) {
-    	int year = Integer.parseInt(from.substring(0, 4));
-        int month = Integer.parseInt(from.substring(4, 6)) - 1;
-        int date = Integer.parseInt(from.substring(6, 8));
-        calBegin.set(year, month, date, 0, 0);
+    SimpleDateFormat complex = new SimpleDateFormat("yyyyMMddhhmm");
+    SimpleDateFormat simple = new SimpleDateFormat("yyyyMMdd");
 
-        year = Integer.parseInt(to.substring(0, 4));
-        month = Integer.parseInt(to.substring(4, 6)) - 1;
-        date = Integer.parseInt(to.substring(6, 8));
-        calEnd.set(year, month, date, 23, 59);
-    } else {
-    	int year = Integer.parseInt(from.substring(0, 4));
-        int month = Integer.parseInt(from.substring(4, 6)) - 1;
-        int date = Integer.parseInt(from.substring(6, 8));
-        int hour = Integer.parseInt(from.substring(8, 10));
-        int minute = Integer.parseInt(from.substring(10, 12));
-        calBegin.set(year, month, date, hour, minute);
-
-        year = Integer.parseInt(to.substring(0, 4));
-        month = Integer.parseInt(to.substring(4, 6)) - 1;
-        date = Integer.parseInt(to.substring(6, 8));
-        hour = Integer.parseInt(to.substring(8, 10));
-        minute = Integer.parseInt(to.substring(10, 12));
-        calEnd.set(year, month, date, hour, minute);
+    //Try to parse the from calendar
+    try {
+      calBegin.setTime(complex.parse(from));
+    } catch (ParseException e) {
+      calBegin.setTime(simple.parse(from));
     }
-    
-    
 
-    report.setTotal(getDistinctEpisodeIdTotal(calBegin, calEnd));
+    //Try to parse the to calendar
+    try {
+      calEnd.setTime(complex.parse(to));
+    } catch (ParseException e) {
+      calEnd.setTime(simple.parse(to));
+    }
 
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
       Query q = em.createNamedQuery("countSessionsGroupByMediapackageByIntervall");
-      q.setParameter("begin", calBegin, TemporalType.TIMESTAMP);
-      q.setParameter("end", calEnd, TemporalType.TIMESTAMP);
       q.setFirstResult(offset);
       q.setMaxResults(limit);
+      q.setParameter("begin", calBegin, TemporalType.TIMESTAMP);
+      q.setParameter("end", calEnd, TemporalType.TIMESTAMP);
 
       @SuppressWarnings("unchecked")
       List<Object[]> result = q.getResultList();
@@ -685,7 +605,13 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      Query q = em.createNamedQuery("findUserActionsByTypeAndMediapackageIdOrderByOutpointDESC");
+      Query q = null;
+      if (StringUtils.trimToNull(userId) == null) {
+        q = em.createNamedQuery("findUserActionsByTypeAndMediapackageIdOrderByOutpointDESC");
+      } else {
+        q = em.createNamedQuery("findUserActionsByTypeAndMediapackageIdByUserOrderByOutpointDESC");
+        q.setParameter("userid", userId);
+      }
       q.setParameter("type", FOOTPRINT_KEY);
       q.setParameter("mediapackageId", mediapackageId);
       @SuppressWarnings("unchecked")
@@ -707,7 +633,6 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       FootprintList list = new FootprintsListImpl();
       int current = -1;
       int last = -1;
-      int lastPositionAdded = -1;
       for (int i = 0; i < resultArray.length; i++) {
         current = resultArray[i];
         if (last != current) {
@@ -715,7 +640,6 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
           footprint.setPosition(i);
           footprint.setViews(current);
           list.add(footprint);
-          lastPositionAdded = i;
         }
         last = current;
       }

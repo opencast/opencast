@@ -52,8 +52,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.series.impl.SeriesServiceImpl;
-import org.opencastproject.series.impl.solr.SeriesServiceSolrIndex;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.PathSupport;
@@ -219,8 +217,11 @@ public class SearchServiceImplTest {
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
             organizationDirectoryService);
 
+    // Mock the series service
     StaticMetadataService mdService = newStaticMetadataService(workspace);
-    SeriesService seriesService = newSeriesService();
+    SeriesService seriesService = EasyMock.createNiceMock(SeriesService.class);
+    EasyMock.replay(seriesService);
+
     service.setStaticMetadataService(mdService);
     service.setWorkspace(workspace);
     service.setMpeg7CatalogService(mpeg7CatalogService);
@@ -249,12 +250,6 @@ public class SearchServiceImplTest {
   private StaticMetadataService newStaticMetadataService(Workspace workspace) {
     StaticMetadataServiceDublinCoreImpl service = new StaticMetadataServiceDublinCoreImpl();
     service.setWorkspace(workspace);
-    return service;
-  }
-
-  private SeriesService newSeriesService() {
-    SeriesServiceImpl service = new SeriesServiceImpl();
-    service.setIndex(new SeriesServiceSolrIndex());
     return service;
   }
 

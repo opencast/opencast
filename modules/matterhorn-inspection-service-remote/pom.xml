@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -50,7 +50,7 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>2.5.2</version>
+      <version>3.1</version>
     </dependency>
   </dependencies>
   <build>
@@ -62,8 +62,10 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Export-Package> org.opencastproject.inspection.remote;${project.version} </Export-Package>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Export-Package>
+            	org.opencastproject.inspection.remote;version="${project.version}"
+            </Export-Package>
             <Service-Component>
               OSGI-INF/inspection-service-remote.xml
             </Service-Component>

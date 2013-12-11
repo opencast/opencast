@@ -19,7 +19,7 @@ import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.pipeline.GStreamerPipeline;
 import org.opencastproject.util.XProperties;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.gstreamer.Gst;
 import org.junit.Before;
 import org.junit.Test;

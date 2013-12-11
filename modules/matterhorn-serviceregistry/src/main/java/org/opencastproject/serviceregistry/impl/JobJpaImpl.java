@@ -53,7 +53,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -61,6 +60,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -80,6 +80,8 @@ import javax.xml.bind.annotation.XmlType;
                 + "where j.status = :status order by j.dateCreated"),
         @NamedQuery(name = "Job.all", query = "SELECT j FROM Job j order by j.dateCreated"),
         @NamedQuery(name = "Job.dispatchable.status", query = "SELECT j FROM Job j where j.dispatchable = true and "
+                + "j.status in :statuses order by j.dateCreated"),
+        @NamedQuery(name = "Job.undispatchable.status", query = "SELECT j FROM Job j where j.dispatchable = false and "
                 + "j.status in :statuses order by j.dateCreated"),
         @NamedQuery(name = "Job.processinghost.status", query = "SELECT j FROM Job j "
                 + "where j.status = :status and j.processorServiceRegistration is not null and "
@@ -257,6 +259,13 @@ public class JobJpaImpl extends JaxbJob {
     return status;
   }
 
+  @Transient
+  @XmlTransient
+  @Override
+  public FailureReason getFailureReason() {
+    return failureReason;
+  }
+
   /**
    * {@inheritDoc}
    * 
@@ -291,8 +300,7 @@ public class JobJpaImpl extends JaxbJob {
   @Column(name = "argument", length = 2147483647)
   @OrderColumn(name = "argument_index")
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "mh_job_argument", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"), uniqueConstraints = @UniqueConstraint(columnNames = {
-          "id", "argument_index" }))
+  @CollectionTable(name = "mh_job_argument", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"))
   @XmlElement(name = "arg")
   @XmlElementWrapper(name = "args")
   @Override
@@ -479,16 +487,16 @@ public class JobJpaImpl extends JaxbJob {
       payload.getBytes(); // force the clob to load
     }
     if (creatorServiceRegistration == null) {
-      logger.warn("creator service registration is null");
+      logger.warn("creator service registration for job '{}' is null", id);
     } else {
       super.createdHost = creatorServiceRegistration.getHost();
       super.jobType = creatorServiceRegistration.getServiceType();
     }
     if (processorServiceRegistration == null) {
-      logger.debug("processor service registration is null");
+      logger.debug("processor service registration for job '{}' is null", id);
     } else {
-      super.processingHost = creatorServiceRegistration.getHost();
-      super.jobType = creatorServiceRegistration.getServiceType();
+      super.processingHost = processorServiceRegistration.getHost();
+      super.jobType = processorServiceRegistration.getServiceType();
     }
     context = new JaxbJobContext();
     if (rootJob != null) {

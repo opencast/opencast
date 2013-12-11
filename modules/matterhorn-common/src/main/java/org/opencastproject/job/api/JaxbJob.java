@@ -15,6 +15,8 @@
  */
 package org.opencastproject.job.api;
 
+import static org.opencastproject.job.api.Job.FailureReason.NONE;
+
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +27,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -67,6 +70,9 @@ public class JaxbJob implements Job {
 
   /** The job status */
   protected Status status;
+
+  /** The failure reason */
+  protected FailureReason failureReason = NONE;
 
   /** The date this job was created */
   protected Date dateCreated;
@@ -137,6 +143,7 @@ public class JaxbJob implements Job {
     this.operation = job.getOperation();
     this.arguments = job.getArguments();
     this.status = job.getStatus();
+    this.failureReason = job.getFailureReason();
     if (job.getContext() != null)
       this.context = new JaxbJobContext(job.getContext());
     this.parentJobId = job.getParentJobId();
@@ -211,6 +218,32 @@ public class JaxbJob implements Job {
   /**
    * {@inheritDoc}
    * 
+   * @see org.opencastproject.job.api.Job#setStatus(org.opencastproject.job.api.Job.Status,
+   *      org.opencastproject.job.api.Job.FailureReason)
+   */
+  @Override
+  public void setStatus(Status status, FailureReason reason) {
+    setStatus(status);
+    if (reason == null)
+      this.failureReason = NONE;
+    else
+      this.failureReason = reason;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.job.api.Job#getFailureReason()
+   */
+  @XmlTransient
+  @Override
+  public FailureReason getFailureReason() {
+    return failureReason;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
    * @see org.opencastproject.job.api.Job#getType()
    */
   @XmlAttribute(name = "type")
@@ -266,6 +299,7 @@ public class JaxbJob implements Job {
    * @param arguments
    *          the arguments to set
    */
+  @Override
   public void setArguments(List<String> arguments) {
     this.arguments = arguments;
   }

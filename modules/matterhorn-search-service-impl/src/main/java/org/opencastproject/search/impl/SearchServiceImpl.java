@@ -138,6 +138,15 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   }
 
   /**
+   * Return the solr index manager
+   * 
+   * @return indexManager
+   */
+  public SolrIndexManager getSolrIndexManager() {
+    return indexManager;
+  }
+
+  /**
    * Service activator, called via declarative services configuration. If the solr server url is configured, we try to
    * connect to it. If not, the solr data directory with an embedded Solr server is used.
    * 
@@ -147,10 +156,13 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   public void activate(final ComponentContext cc) throws IllegalStateException {
     final String solrServerUrlConfig = StringUtils.trimToNull(cc.getBundleContext().getProperty(CONFIG_SOLR_URL));
 
+    logger.info("Setting up solr server");
+
     solrServer = new Object() {
       SolrServer create() {
         if (solrServerUrlConfig != null) {
           try {
+            logger.info("Setting up solr server at {}", solrServerUrlConfig);
             URL solrServerUrl = new URL(solrServerUrlConfig);
             return setupSolr(solrServerUrl);
           } catch (MalformedURLException e) {
@@ -159,6 +171,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
         } else if (cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT) != null) {
           String solrRoot = cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT);
           try {
+            logger.debug("Setting up solr server at {}", solrRoot);
             return setupSolr(new File(solrRoot));
           } catch (IOException e) {
             throw connectError(solrServerUrlConfig, e);
@@ -171,6 +184,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
             throw new IllegalStateException("Storage dir must be set (org.opencastproject.storage.dir)");
           String solrRoot = PathSupport.concat(storageDir, "searchindex");
           try {
+            logger.debug("Setting up solr server at {}", solrRoot);
             return setupSolr(new File(solrRoot));
           } catch (IOException e) {
             throw connectError(solrServerUrlConfig, e);
@@ -181,6 +195,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
       }
 
       IllegalStateException connectError(String target, Exception e) {
+        logger.error("Unable to connect to solr at {}: {}", target, e.getMessage());
         return new IllegalStateException("Unable to connect to solr at " + target, e);
       }
       // CHECKSTYLE:OFF
@@ -237,7 +252,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     // Test for the existence of the index. Note that an empty index directory will prevent solr from
     // completing normal setup.
     File solrIndexDir = new File(solrDataDir, "index");
-    if (solrIndexDir.exists() && solrIndexDir.list().length == 0) {
+    if (solrIndexDir.isDirectory() && solrIndexDir.list().length == 0) {
       FileUtils.deleteDirectory(solrIndexDir);
     }
 
@@ -458,15 +473,31 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   protected void populateIndex(String systemUserName) {
     long instancesInSolr = 0L;
+
     try {
       instancesInSolr = indexManager.count();
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }
+
+    if (instancesInSolr > 0) {
+      logger.debug("Search index found");
+      return;
+    }
+
     if (instancesInSolr == 0L) {
+      logger.info("No search index found");
+      logger.info("Starting population of search index from database");
+      Iterator<Tuple<MediaPackage, String>> mediaPackages;
       try {
-        Iterator<Tuple<MediaPackage, String>> mediaPackages = persistence.getAllMediaPackages();
-        while (mediaPackages.hasNext()) {
+        mediaPackages = persistence.getAllMediaPackages();
+      } catch (SearchServiceDatabaseException e) {
+        logger.error("Unable to load the search entries: {}", e.getMessage());
+        throw new ServiceException(e.getMessage());
+      }
+      int errors = 0;
+      while (mediaPackages.hasNext()) {
+        try {
           Tuple<MediaPackage, String> mediaPackage = mediaPackages.next();
 
           String mediaPackageId = mediaPackage.getA().getIdentifier().toString();
@@ -480,15 +511,17 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           Date deletionDate = persistence.getDeletionDate(mediaPackageId);
 
           indexManager.add(mediaPackage.getA(), acl, deletionDate, modificationDate);
+        } catch (Exception e) {
+          logger.error("Unable to index search instances: {}", e);
+          errors++;
+        } finally {
+          securityService.setOrganization(null);
+          securityService.setUser(null);
         }
-        logger.info("Finished populating search index");
-      } catch (Exception e) {
-        logger.warn("Unable to index search instances: {}", e);
-        throw new ServiceException(e.getMessage());
-      } finally {
-        securityService.setOrganization(null);
-        securityService.setUser(null);
       }
+      if (errors > 0)
+        logger.error("Skipped {} erroneous search entries while populating the search index", errors);
+      logger.info("Finished populating search index");
     }
   }
 

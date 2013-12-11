@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -122,7 +122,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>org.opencastproject.rest;version=${project.version}</Import-Package>
-            <Private-Package>ui.*, uitests.*</Private-Package>
+            <Private-Package>ui.*</Private-Package>
             <Http-Alias>/mediapackage-editor</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>

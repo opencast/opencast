@@ -6,6 +6,8 @@
   <service>
     <provide interface="org.apache.felix.fileinstall.ArtifactInstaller" />
   </service>
-  <reference name="service-impl" interface="org.opencastproject.search.api.SearchService" cardinality="1..1"
+  <reference name="search-service-impl" interface="org.opencastproject.search.api.SearchService" cardinality="1..1"
     policy="static" bind="setSearchService" />
+  <reference name="series-service-impl" interface="org.opencastproject.series.api.SeriesService" cardinality="1..1"
+    policy="static" bind="setSeriesService" />
 </scr:component>

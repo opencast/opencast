@@ -35,12 +35,12 @@ ocCaptureAgent = new (function ()
       }				
       if (ocCaptureAgent.polling_time > 0) {	
         $.each(ocCaptureAgent.agentsObj["agents"],function(i,item){
-                // Added a 5 second slack to account for overheard processing the http request.
-		if ((item.name == agent_name) && (item["time-since-last-update"] > (ocCaptureAgent.polling_time + 5) * 1000 )) {						
+        // Added a 5 second slack to account for overheard processing the http request.
+		if ((item.name == agent_name) && (item["state"] == "shutting_down" || item["time-since-last-update"] > (ocCaptureAgent.polling_time + 5) * 1000 )) {						
             item.state = "offline";
             return false;
           }	
-        });
+		});
       }
       showAgentsStatus();		
     }
@@ -52,7 +52,11 @@ ocCaptureAgent = new (function ()
           if (property=="") property="#";
           else if(property.lastIndexOf("http://")!=0 && property.lastIndexOf("https://")!=0)
             property = "http://"+property;
-        }			
+        }
+        if (b=="state") {
+          if (property=="shutting_down")
+            property="offline"
+        }
         if (b==="name") {
           $.ajax({
             dataType : 'json',

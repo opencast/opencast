@@ -1,29 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <definition xmlns="http://workflow.opencastproject.org">
+	
   <id>error</id>
-  <description>Notifies the logs that an error occurred</description>
+  <description>Cleanup after a processing failure</description>
   <operations>
   
-    <!-- Cleanup the temporary files from the working file repository -->
-    <operation
-      id="cleanup"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Cleaning up">
-      <configurations>
-        <configuration key="preserve-flavors">*/source,dublincore/*</configuration>
-      </configurations>
-    </operation>
-
     <!-- Zip the mediapackage -->
 
     <operation
       id="zip"
-      description="Cleaning up after failure">
+      fail-on-error="false"
+      description="Creating zipped recording archive">
       <configurations>
         <configuration key="zip-collection">failed.zips</configuration>
         <configuration key="include-flavors">*/source,dublincore/*</configuration>
+        <configuration key="target-flavor">archive/zip</configuration>
         <configuration key="compression">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Cleanup the temporary files from the working file repository -->
+
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+      <configurations>
+        <configuration key="preserve-flavors">archive/zip</configuration>
       </configurations>
     </operation>
   

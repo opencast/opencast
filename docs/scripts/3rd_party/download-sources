@@ -11,6 +11,7 @@ download .            || exit 1
 download base_libs    || exit 1
 download ffmpeg_libs  || exit 1
 download ffmpeg       || exit 1
+download gstreamer    || exit 1
 download mediainfo    || exit 1
 download tesseract    || exit 1
 download ocropus_libs || exit 1

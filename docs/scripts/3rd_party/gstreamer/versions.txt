@@ -1,0 +1,10 @@
+Gstreamer versions as of 18-Sep-2012:
+
+			Ubuntu 10.04	Ubuntu 12.04	CentOS 5.x	CentOS 6.x	Mac OS X 10.7
+gstreamer 		(as below)	(as below)	0.10.20		0.10.29		0.10.36	
+gstreamer-tools		0.10.28		0.10.36		0.10.20		0.10.29		(as above)
+gst-plugins-base	0.10.28		0.10.36		0.10.20		0.10.29		0.10.36
+gst-plugins-good	0.10.21		0.10.31		0.10.9		0.10.23		0.10.31
+gst-plugins-bad		0.10.18		0.10.22		0.10.8		0.10.19		0.10.23
+gst-plugins-ugly	0.10.14		0.10.18		0.10.11		0.10.16		0.10.19
+gst-ffmpeg		0.10.10		0.10.13		0.10.6		0.10.11		0.10.13

@@ -20,6 +20,7 @@ import org.opencastproject.job.api.JobParser;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ import javax.ws.rs.core.Response.Status;
  * Base implementation for job producer REST endpoints.
  */
 public abstract class AbstractJobProducerEndpoint {
+
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(AbstractJobProducerEndpoint.class);
 
@@ -49,23 +51,36 @@ public abstract class AbstractJobProducerEndpoint {
   public Response dispatchJob(@FormParam("job") String jobXml) throws ServiceRegistryException {
     final JobProducer service = getService();
     if (service == null)
-      throw new WebApplicationException(Status.PRECONDITION_FAILED);
+      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
 
     final Job job;
     try {
       job = JobParser.parseJob(jobXml);
     } catch (IOException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST);
+      return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
     }
 
-    // Try to execute the job.
-    if (service.isReadyToAccept(job)) {
-      service.acceptJob(job);
-      return Response.noContent().build();
-    } else {
-      logger.debug("Service {} refused to accept job {}", service, job);
-      throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+    // See if the service is ready to accept anything
+    String operation = job.getOperation();
+    if (!service.isReadyToAcceptJobs(operation)) {
+      logger.debug("Service {} is not ready to accept jobs with operation {}", new Object[] { service, job, operation });
+      return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }
+
+    // See if the service has strong feelings about this particular job
+    try {
+      if (!service.isReadyToAccept(job)) {
+        logger.debug("Service {} temporarily refused to accept job {}", service, job);
+        return Response.status(Status.SERVICE_UNAVAILABLE).build();
+      }
+    } catch (UndispatchableJobException e) {
+      logger.warn("Service {} permanently refused to accept job {}", service, job);
+      return Response.status(Status.PRECONDITION_FAILED).build();
+    }
+
+    service.acceptJob(job);
+    return Response.noContent().build();
+
   }
 
   @HEAD

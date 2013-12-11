@@ -256,7 +256,7 @@ public class WorkspaceImpl implements Workspace {
             throw new NotFoundException(uri + " does not exist");
           } else if (HttpServletResponse.SC_NOT_MODIFIED == response.getStatusLine().getStatusCode()) {
             logger.debug("{} has not been modified.", urlString);
-            return f;
+            return file;
           } else if (HttpServletResponse.SC_ACCEPTED == response.getStatusLine().getStatusCode()) {
             logger.debug("{} is not ready, try again in one minute.", urlString);
             String token = response.getHeaders("token")[0].getValue();
@@ -268,24 +268,40 @@ public class WorkspaceImpl implements Workspace {
                 throw new NotFoundException(uri + " does not exist");
               } else if (HttpServletResponse.SC_NOT_MODIFIED == response.getStatusLine().getStatusCode()) {
                 logger.debug("{} has not been modified.", urlString);
-                return f;
-              } else if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_ACCEPTED) {
+                return file;
+              } else if (HttpServletResponse.SC_ACCEPTED == response.getStatusLine().getStatusCode()) {
                 logger.debug("{} is not ready, try again in one minute.", urlString);
                 Thread.sleep(60000);
+              } else if (HttpServletResponse.SC_OK == response.getStatusLine().getStatusCode()) {
+                logger.info("Downloading {} to {}", urlString, file.getAbsolutePath());
+                file.createNewFile();
+                in = response.getEntity().getContent();
+                out = new FileOutputStream(file);
+                IOUtils.copyLarge(in, out);
+                return file;
               } else {
                 logger.warn("Received unexpected response status {} while trying to download from {}", response
                         .getStatusLine().getStatusCode(), urlString);
-                break;
+                FileUtils.deleteQuietly(file);
+                return chuck(new NotFoundException("Unexpected response status "
+                        + response.getStatusLine().getStatusCode()));
               }
             }
+          } else if (HttpServletResponse.SC_OK == response.getStatusLine().getStatusCode()) {
+            logger.info("Downloading {} to {}", urlString, file.getAbsolutePath());
+            file.createNewFile();
+            in = response.getEntity().getContent();
+            out = new FileOutputStream(file);
+            IOUtils.copyLarge(in, out);
+            return file;
+          } else {
+            logger.warn("Received unexpected response status {} while trying to download from {}", response
+                    .getStatusLine().getStatusCode(), urlString);
+            FileUtils.deleteQuietly(file);
+            return chuck(new NotFoundException("Unexpected response status " + response.getStatusLine().getStatusCode()));
           }
-          logger.info("Downloading {} to {}", urlString, f.getAbsolutePath());
-          file.createNewFile();
-          in = response.getEntity().getContent();
-          out = new FileOutputStream(f);
-          IOUtils.copyLarge(in, out);
         } catch (Exception e) {
-          logger.warn("Could not copy {} to {}: {}", new String[] { urlString, f.getAbsolutePath(), e.getMessage() });
+          logger.warn("Could not copy {} to {}: {}", new String[] { urlString, file.getAbsolutePath(), e.getMessage() });
           FileUtils.deleteQuietly(file);
           return chuck(new NotFoundException(e));
         } finally {
@@ -293,7 +309,6 @@ public class WorkspaceImpl implements Workspace {
           IOUtils.closeQuietly(out);
           trustedHttpClient.close(response);
         }
-        return file;
       }
     });
   }
@@ -358,7 +373,7 @@ public class WorkspaceImpl implements Workspace {
       synchronized (wsRoot) {
         File mpElementDir = f.getParentFile();
         FileUtils.forceDelete(f);
-        if (mpElementDir.list().length == 0)
+        if (mpElementDir.isDirectory() && mpElementDir.list().length == 0)
           FileUtils.forceDelete(mpElementDir);
 
         // Also delete mediapackage itself when empty
@@ -380,7 +395,7 @@ public class WorkspaceImpl implements Workspace {
             mediaPackageID, mediaPackageElementID }));
     File mpDirectory = f.getParentFile();
     FileUtils.deleteQuietly(f);
-    if (mpDirectory.list().length == 0)
+    if (mpDirectory.isDirectory() && mpDirectory.list().length == 0)
       FileUtils.deleteDirectory(mpDirectory);
   }
 
@@ -595,7 +610,7 @@ public class WorkspaceImpl implements Workspace {
             collectionId, fileName }));
     File collectionDir = f.getParentFile();
     FileUtils.deleteQuietly(f);
-    if (collectionDir.list().length == 0)
+    if (collectionDir.isDirectory() && collectionDir.list().length == 0)
       FileUtils.deleteDirectory(collectionDir);
   }
 

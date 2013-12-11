@@ -28,6 +28,9 @@ public interface ServiceStatistics {
   /** The number of milliseconds a job sits in a queue, on average **/
   long getMeanQueueTime();
 
+  /** The number of jobs that this service has successfully finished**/
+  int getFinishedJobs();
+  
   /** The number of job that this service is currently running **/
   int getRunningJobs();
 

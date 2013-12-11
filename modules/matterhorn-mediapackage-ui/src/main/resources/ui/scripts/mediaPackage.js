@@ -662,15 +662,15 @@ Catalog = function(url){
     this.xml;
 
     this.getXML = function(url){
-
-      $.ajax({
-         url: url,
-         dataType: "xml",
-         async: false,
-         success: function(data){
-          self.parseXML(data);
-         }
-      });
+        url = window.location.protocol + url.substring(url.indexOf('/'));
+        $.ajax({
+            url: url,
+            dataType: "xml",
+            async: false,
+            success: function(data){
+                self.parseXML(data);
+            }
+        });
     };
 
     this.clone = function(){

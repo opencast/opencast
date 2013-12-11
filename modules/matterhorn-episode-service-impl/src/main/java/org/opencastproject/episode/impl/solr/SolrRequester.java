@@ -15,11 +15,13 @@
  */
 package org.opencastproject.episode.impl.solr;
 
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.Tuple.tuple;
+
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.JaxbSearchResult;
 import org.opencastproject.episode.api.SearchResult;
@@ -32,18 +34,18 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Options;
 import org.opencastproject.util.data.functions.Strings;
+
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
-
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 /** Class implementing <code>LookupRequester</code> to provide connection to solr indexing facility. */
 public class SolrRequester {
@@ -98,17 +100,14 @@ public class SolrRequester {
     return result;
   }
 
-  private static final List<Tuple<String, Float>> fullTextQueryFields =
-          list(tuple(Schema.DC_TITLE_SUM, Schema.DC_TITLE_BOOST),
-               tuple(Schema.S_DC_TITLE_SUM, Schema.S_DC_TITLE_BOOST),
-               tuple(Schema.DC_IS_PART_OF, Schema.DC_IS_PART_OF_BOOST),
-               tuple(Schema.DC_CREATOR_SUM, Schema.DC_CREATOR_BOOST),
-               tuple(Schema.DC_SUBJECT_SUM,Schema.DC_SUBJECT_BOOST),
-               tuple(Schema.DC_PUBLISHER_SUM,Schema.DC_PUBLISHER_BOOST),
-               tuple(Schema.DC_CONTRIBUTOR_SUM ,Schema.DC_CONTRIBUTOR_BOOST),
-               tuple(Schema.DC_ABSTRACT_SUM , Schema.DC_ABSTRACT_BOOST),
-               tuple(Schema.DC_DESCRIPTION_SUM , Schema.DC_DESCRIPTION_BOOST),
-               tuple(Schema.FULLTEXT, 1.0f));
+  private static final List<Tuple<String, Float>> fullTextQueryFields = list(
+          tuple(Schema.DC_TITLE_SUM, Schema.DC_TITLE_BOOST), tuple(Schema.S_DC_TITLE_SUM, Schema.S_DC_TITLE_BOOST),
+          tuple(Schema.DC_IS_PART_OF, Schema.DC_IS_PART_OF_BOOST),
+          tuple(Schema.DC_CREATOR_SUM, Schema.DC_CREATOR_BOOST), tuple(Schema.DC_SUBJECT_SUM, Schema.DC_SUBJECT_BOOST),
+          tuple(Schema.DC_PUBLISHER_SUM, Schema.DC_PUBLISHER_BOOST),
+          tuple(Schema.DC_CONTRIBUTOR_SUM, Schema.DC_CONTRIBUTOR_BOOST),
+          tuple(Schema.DC_ABSTRACT_SUM, Schema.DC_ABSTRACT_BOOST),
+          tuple(Schema.DC_DESCRIPTION_SUM, Schema.DC_DESCRIPTION_BOOST), tuple(Schema.FULLTEXT, 1.0f));
 
   /**
    * Modifies the query such that certain fields are being boosted (meaning they gain some weight).
@@ -200,7 +199,7 @@ public class SolrRequester {
         }
         flavorBuilder.append(Schema.OC_ELEMENTFLAVORS);
         flavorBuilder.append(":");
-        flavorBuilder.append(flavor);
+        flavorBuilder.append(ClientUtils.escapeQueryChars(flavor));
       }
       if (flavorBuilder.length() > 0) {
         flavorBuilder.append(") ");
@@ -306,7 +305,8 @@ public class SolrRequester {
     return appendFuzzyBoosted(sb, key, value, none(0.0f), "AND");
   }
 
-  private StringBuilder appendFuzzyBoosted(StringBuilder sb, String key, Option<String> value, Option<Float> boost, String join) {
+  private StringBuilder appendFuzzyBoosted(StringBuilder sb, String key, Option<String> value, Option<Float> boost,
+          String join) {
     for (String val : value) {
       if (sb.length() > 0) {
         sb.append(" ").append(join).append(" ");
@@ -322,7 +322,8 @@ public class SolrRequester {
   }
 
   private static final Function<Float, String> mkBoost = new Function<Float, String>() {
-    @Override public String apply(Float boost) {
+    @Override
+    public String apply(Float boost) {
       return "^" + Float.toString(boost);
     }
   };

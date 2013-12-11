@@ -11,6 +11,7 @@ ocRecordings = new (function() {
   var STATISTICS_DELAY = 3000;     // time interval for statistics update
 
   var UPCOMMING_EVENTS_GRACE_PERIOD = 30 * 1000;
+  var END_OF_CAPTURE_GRACE_PERIOD = 3600 * 1000;
   
   
 
@@ -516,6 +517,18 @@ ocRecordings = new (function() {
           if (parseInt(start) < now) {
             self.error = 'It seems the core system did not receive proper status updates from the Capture Agent that should have conducted this recording.';
             self.state = 'WARNING : Recording may have failed to start or ingest!';
+            recordingActions.push('ignore');
+          }
+        }
+      });
+    } else if (this.state == 'Capturing') {
+      $.each(wf.configurations.configuration, function(index, elm) {
+        if (elm.key == 'schedule.stop') {
+          var stop = elm['$'];
+          var now = new Date().getTime() - END_OF_CAPTURE_GRACE_PERIOD;
+          if (parseInt(stop) < now) {
+            self.error = 'It seems the core system did not receive proper status updates from the Capture Agent that should have conducted this recording.';
+            self.state = 'WARNING : Recording failed to ingest!';
             recordingActions.push('ignore');
           }
         }

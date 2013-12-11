@@ -109,6 +109,9 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
    *          the supported profiles
    */
   void setSupportedProfiles(Map<String, EncodingProfile> profiles) {
+    if (profiles == null) {
+      profiles = new HashMap<String, EncodingProfile>();
+    }
     this.supportedProfiles = profiles;
   }
 
@@ -139,20 +142,22 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
    * 
    */
   protected File download(Track track) throws IOException {
+    if (track == null || track.getURI() == null) {
+      throw new IOException("Caller provided either a null track or a track without a URI");
+    }
     if ("file".equals(track.getURI().getScheme()))
       return new File(track.getURI().getPath());
 
     // The file does not seem to be inside the local filesystem.
     // Let's download it and log a warning, since this shouldn't happen.
-    logger.warn("Downloading track " + track + " to temp directory");
+    logger.warn("Downloading track " + track.getURI().toString() + " to temp directory");
     File f = File.createTempFile(track.getURI().toString(), null);
+    logger.info("Temporary file created at " + f.toString());
     FileOutputStream fos = new FileOutputStream(f);
     InputStream is = track.getURI().toURL().openStream();
     byte[] bytes = new byte[2048];
-    int offset = 0;
-    int len = 0;
-    while (is.read(bytes, offset, len) >= 0) {
-      fos.write(bytes, offset, len);
+    while (is.read(bytes) >= 0) {
+      fos.write(bytes);
     }
     fos.flush();
     fos.close();

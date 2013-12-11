@@ -19,6 +19,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.opencastproject.composer.api.EncoderException;
+import org.opencastproject.inspection.api.MediaInspectionException;
+import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
@@ -48,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,8 +60,10 @@ import java.util.List;
  * Tests the {@link ComposerServiceImpl}.
  */
 public class ComposerServiceTest {
-  /** The source file to test with */
+  /** The sources file to test with */
   private File source = null;
+  private File sourceVideoOnly = null;
+  private File sourceAudioOnly = null;
 
   /** The composer service to test */
   private ComposerServiceImpl composerService = null;
@@ -107,6 +113,18 @@ public class ComposerServiceTest {
     File f = new File("src/test/resources/slidechanges.mov");
     source = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mov");
     FileUtils.copyFile(f, source);
+    f = null;
+
+    // Create another video only file
+    f = new File("src/test/resources/video.mp4");
+    sourceVideoOnly = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mp4");
+    FileUtils.copyFile(f, sourceVideoOnly);
+    f = null;
+
+    // Create another audio only file
+    f = new File("src/test/resources/audio.mp3");
+    sourceAudioOnly = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mp3");
+    FileUtils.copyFile(f, sourceAudioOnly);
     f = null;
 
     // create the needed mocks
@@ -186,4 +204,73 @@ public class ComposerServiceTest {
       assertEquals(Job.Status.FINISHED, job.getStatus());
     }
   }
+
+  @Test
+  public void testEncode() throws Exception {
+    if (!ffmpegInstalled)
+      return;
+
+    assertTrue(sourceVideoOnly.isFile());
+    assertTrue(sourceAudioOnly.isFile());
+
+    // Need different media files
+    Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(sourceVideoOnly).anyTimes();
+    EasyMock.expect(
+            workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    (InputStream) EasyMock.anyObject())).andReturn(sourceVideoOnly.toURI()).anyTimes();
+    composerService.setWorkspace(workspace);
+    MediaInspectionService inspect = EasyMock.createNiceMock(MediaInspectionService.class);
+    EasyMock.expect(inspect.inspect((URI) EasyMock.anyObject()))
+            .andThrow(new MediaInspectionException("test complete")).anyTimes();
+    EasyMock.replay(workspace, inspect);
+
+    // build a single media package to test with
+    String sourceTrackXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
+            + "       <track type='presentation/source'" + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
+            + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
+    Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
+    try {
+      composerService.encode(sourceTrack, "av.work");
+    } catch (EncoderException e) {
+      assertTrue("test complete".equals(e.getMessage()));
+    }
+  }
+
+  @Test
+  public void testEncode2() throws Exception {
+    if (!ffmpegInstalled)
+      return;
+
+    assertTrue(sourceVideoOnly.isFile());
+    assertTrue(sourceAudioOnly.isFile());
+
+    // Need different media files
+    Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(sourceVideoOnly).anyTimes();
+    EasyMock.expect(
+            workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    (InputStream) EasyMock.anyObject())).andReturn(sourceVideoOnly.toURI()).anyTimes();
+    composerService.setWorkspace(workspace);
+    MediaInspectionService inspect = EasyMock.createNiceMock(MediaInspectionService.class);
+    EasyMock.expect(inspect.inspect((URI) EasyMock.anyObject()))
+            .andThrow(new MediaInspectionException("test complete")).anyTimes();
+    EasyMock.replay(workspace, inspect);
+
+    String sourceTrackVideoXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
+            + "       <track type='presentation/source'" + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
+            + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
+    Track sourceTrackVideo = (Track) MediaPackageElementParser.getFromXml(sourceTrackVideoXml);
+    String sourceTrackAudioXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
+            + "       <track type='presentation/source'" + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2b'>"
+            + "       <mimetype>audio/mp3</mimetype>" + "       <url>audio.mp3</url>" + "       </track>";
+    Track sourceTrackAudio = (Track) MediaPackageElementParser.getFromXml(sourceTrackAudioXml);
+
+    try {
+      composerService.encode(null, sourceTrackVideo, sourceTrackAudio, "av.work", null);
+    } catch (EncoderException e) {
+      assertTrue("The Job parameter must not be null".equals(e.getMessage()));
+    }
+  }
+
 }

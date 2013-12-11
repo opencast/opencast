@@ -15,18 +15,9 @@
  */
 package org.opencastproject.scheduler.impl.solr;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrInputDocument;
+import static org.opencastproject.scheduler.impl.Util.getEventIdentifier;
+import static org.opencastproject.util.data.Option.option;
+
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -42,6 +33,19 @@ import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.SolrUtils;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,9 +66,6 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.opencastproject.scheduler.impl.Util.getEventIdentifier;
-import static org.opencastproject.util.data.Option.option;
-
 /**
  * Implements {@link SchedulerServiceIndex}.
  */
@@ -78,7 +79,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /** Configuration key for an embedded solr configuration and data directory */
   public static final String CONFIG_SOLR_ROOT = "org.opencastproject.scheduler.solr.dir";
-  
+
   /** the default scheduler index suffix */
   public static final String SOLR_ROOT_SUFFIX = "/schedulerindex";
 
@@ -239,7 +240,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     // Test for the existence of the index. Note that an empty index directory will prevent solr from
     // completing normal setup.
     File solrIndexDir = new File(solrDataDir, "index");
-    if (solrIndexDir.exists() && solrIndexDir.list().length == 0) {
+    if (solrIndexDir.isDirectory() && solrIndexDir.list().length == 0) {
       FileUtils.deleteDirectory(solrIndexDir);
     }
 
@@ -282,14 +283,39 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
    */
   @Override
   public void index(DublinCoreCatalog dc) throws SchedulerServiceDatabaseException {
+    index(dc, null);
+  }
 
-    // check if we are updating
-    // if that's the case retrieve CA properties and add them
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#index(org.opencastproject.metadata.dublincore.
+   * DublinCoreCatalog)
+   */
+  public void index(DublinCoreCatalog dc, Properties captureAgentProperties) throws SchedulerServiceDatabaseException {
+
+    // See if we are updating
     SolrDocument retrievedDoc = retrieveDocumentById(getEventIdentifier(dc));
-    final SolrInputDocument doc = createDocument(dc);
-    if (retrievedDoc != null && retrievedDoc.containsKey(SolrFields.CA_PROPERTIES)) {
-      doc.setField(SolrFields.CA_PROPERTIES, retrievedDoc.getFirstValue(SolrFields.CA_PROPERTIES));
+
+    // Prepare the new document
+    final SolrInputDocument doc;
+    String serializedCAProperties = null;
+    doc = createDocument(dc);
+
+    // Use updated capture agent properties if available. Otherwise, read from the existing doc
+    if (captureAgentProperties != null) {
+      try {
+        serializedCAProperties = serializeProperties(captureAgentProperties);
+      } catch (IOException e) {
+        logger.error("Error serializing capture agent properties: {}", e.getMessage());
+        throw new SchedulerServiceDatabaseException(e);
+      }
+    } else if (retrievedDoc != null) {
+      serializedCAProperties = (String) retrievedDoc.getFirstValue(SolrFields.CA_PROPERTIES);
     }
+
+    doc.setField(SolrFields.CA_PROPERTIES, serializedCAProperties);
+    doc.setField(SolrFields.LAST_MODIFIED, new Date());
 
     if (synchronousIndexing) {
       try {
@@ -323,20 +349,29 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#index(java.lang.String, java.util.Properties)
    */
   @Override
-  public void index(long eventId, Properties captureAgentProperties) throws NotFoundException,
+  public void index(final long eventId, Properties captureAgentProperties) throws NotFoundException,
           SchedulerServiceDatabaseException {
+
     SolrDocument result = retrieveDocumentById(eventId);
     if (result == null) {
       logger.warn("No event exists with event ID {}", eventId);
       throw new NotFoundException("Event with ID " + eventId + " does not exist.");
     }
 
-    String serializedCA;
-    try {
-      serializedCA = serializeProperties(captureAgentProperties);
-    } catch (IOException e) {
-      throw new SchedulerServiceDatabaseException(e);
+    String serializedCA = null;
+
+    // Use updated capture agent properties if available. Otherwise, read from the existing doc
+    if (captureAgentProperties != null) {
+      try {
+        serializedCA = serializeProperties(captureAgentProperties);
+      } catch (IOException e) {
+        logger.error("Error serializing capture agent properties for event '{}': {}", eventId, e.getMessage());
+        throw new SchedulerServiceDatabaseException(e);
+      }
+    } else {
+      serializedCA = (String) result.getFirstValue(SolrFields.CA_PROPERTIES);
     }
+
     final SolrInputDocument doc = ClientUtils.toSolrInputDocument(result);
     doc.setField(SolrFields.CA_PROPERTIES, serializedCA);
     doc.setField(SolrFields.LAST_MODIFIED, new Date());
@@ -360,8 +395,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
               solrServer.commit();
             }
           } catch (Exception e) {
-            logger.warn("Unable to index event {} capture agent metadata: {}", doc.getFieldValue(SolrFields.ID_KEY),
-                    e.getMessage());
+            logger.warn("Unable to update event {} capture agent metadata: {}", eventId, e.getMessage());
           }
         }
       });
@@ -653,7 +687,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     append(sb, SolrFields.CREATED_KEY, query.getCreatedFrom(), query.getCreatedTo());
     append(sb, SolrFields.STARTS_KEY, query.getStartsFrom(), query.getStartsTo());
     append(sb, SolrFields.ENDS_KEY, query.getEndsFrom(), query.getEndsTo());
-    
+
     if (query.getIdsList() != null) {
       if (sb.length() > 0) {
         sb.append(" AND ");
@@ -692,46 +726,46 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
    */
   protected String getSortField(SchedulerQuery.Sort sort) {
     switch (sort) {
-    case ABSTRACT:
-      return SolrFields.ABSTRACT_KEY;
-    case ACCESS:
-      return SolrFields.ACCESS_RIGHTS_KEY;
-    case AVAILABLE_FROM:
-      return SolrFields.AVAILABLE_FROM_KEY;
-    case AVAILABLE_TO:
-      return SolrFields.AVAILABLE_TO_KEY;
-    case CONTRIBUTOR:
-      return SolrFields.CONTRIBUTOR_KEY;
-    case CREATED:
-      return SolrFields.CREATED_KEY;
-    case CREATOR:
-      return SolrFields.CREATOR_KEY;
-    case DESCRIPTION:
-      return SolrFields.DESCRIPTION_KEY;
-    case IS_PART_OF:
-      return SolrFields.IS_PART_OF_KEY;
-    case LANGUAGE:
-      return SolrFields.LANGUAGE_KEY;
-    case LICENCE:
-      return SolrFields.LICENSE_KEY;
-    case PUBLISHER:
-      return SolrFields.PUBLISHER_KEY;
-    case REPLACES:
-      return SolrFields.REPLACES_KEY;
-    case RIGHTS_HOLDER:
-      return SolrFields.RIGHTS_HOLDER_KEY;
-    case SPATIAL:
-      return SolrFields.SPATIAL_KEY;
-    case SUBJECT:
-      return SolrFields.SUBJECT_KEY;
-    case TITLE:
-      return SolrFields.TITLE_KEY;
-    case TYPE:
-      return SolrFields.TYPE_KEY;
-    case EVENT_START:
-      return SolrFields.STARTS_KEY;
-    default:
-      throw new IllegalArgumentException("No mapping found between sort field and index");
+      case ABSTRACT:
+        return SolrFields.ABSTRACT_KEY;
+      case ACCESS:
+        return SolrFields.ACCESS_RIGHTS_KEY;
+      case AVAILABLE_FROM:
+        return SolrFields.AVAILABLE_FROM_KEY;
+      case AVAILABLE_TO:
+        return SolrFields.AVAILABLE_TO_KEY;
+      case CONTRIBUTOR:
+        return SolrFields.CONTRIBUTOR_KEY;
+      case CREATED:
+        return SolrFields.CREATED_KEY;
+      case CREATOR:
+        return SolrFields.CREATOR_KEY;
+      case DESCRIPTION:
+        return SolrFields.DESCRIPTION_KEY;
+      case IS_PART_OF:
+        return SolrFields.IS_PART_OF_KEY;
+      case LANGUAGE:
+        return SolrFields.LANGUAGE_KEY;
+      case LICENCE:
+        return SolrFields.LICENSE_KEY;
+      case PUBLISHER:
+        return SolrFields.PUBLISHER_KEY;
+      case REPLACES:
+        return SolrFields.REPLACES_KEY;
+      case RIGHTS_HOLDER:
+        return SolrFields.RIGHTS_HOLDER_KEY;
+      case SPATIAL:
+        return SolrFields.SPATIAL_KEY;
+      case SUBJECT:
+        return SolrFields.SUBJECT_KEY;
+      case TITLE:
+        return SolrFields.TITLE_KEY;
+      case TYPE:
+        return SolrFields.TYPE_KEY;
+      case EVENT_START:
+        return SolrFields.STARTS_KEY;
+      default:
+        throw new IllegalArgumentException("No mapping found between sort field and index");
     }
   }
 
@@ -859,8 +893,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#getCaptureAgentProperties(java.lang.String)
    */
   @Override
-  public Properties getCaptureAgentProperties(long eventId) throws SchedulerServiceDatabaseException,
-          NotFoundException {
+  public Properties getCaptureAgentProperties(long eventId) throws SchedulerServiceDatabaseException, NotFoundException {
     SolrDocument result = retrieveDocumentById(eventId);
     if (result == null) {
       logger.info("No event exists with ID {}", eventId);

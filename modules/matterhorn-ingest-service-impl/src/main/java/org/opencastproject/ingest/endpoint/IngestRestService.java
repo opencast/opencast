@@ -16,17 +16,23 @@
 package org.opencastproject.ingest.endpoint;
 
 import org.opencastproject.ingest.api.IngestService;
+import org.opencastproject.job.api.JobProducer;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.rest.AbstractJobProducerEndpoint;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -88,7 +94,7 @@ import javax.ws.rs.core.Response.Status;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                 + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
-public class IngestRestService {
+public class IngestRestService extends AbstractJobProducerEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(IngestRestService.class);
 
@@ -119,6 +125,7 @@ public class IngestRestService {
 
   private MediaPackageBuilderFactory factory = null;
   private IngestService ingestService = null;
+  private ServiceRegistry serviceRegistry = null;
   private DublinCoreCatalogService dublinCoreService;
   protected PersistenceProvider persistenceProvider;
   protected Map<String, Object> persistenceProperties;
@@ -133,32 +140,33 @@ public class IngestRestService {
     jobs = new HashMap<String, UploadJob>();
   }
 
+  /**
+   * Returns the maximum number of concurrent ingest operations or <code>-1</code> if no limit is enforced.
+   * 
+   * @return the maximum number of concurrent ingest operations
+   * @see #isIngestLimitEnabled()
+   */
   protected synchronized int getIngestLimit() {
     return ingestLimit;
   }
 
+  /**
+   * Sets the maximum number of concurrent ingest operations. Use <code>-1</code> to indicate no limit.
+   * 
+   * @param ingestLimit
+   *          the limit
+   */
   private synchronized void setIngestLimit(int ingestLimit) {
     this.ingestLimit = ingestLimit;
   }
 
+  /**
+   * Returns <code>true</code> if a maximum number of concurrent ingest operations has been defined.
+   * 
+   * @return <code>true</code> if there is a maximum number of concurrent ingests
+   */
   protected synchronized boolean isIngestLimitEnabled() {
     return ingestLimit >= 0;
-  }
-
-  public void setIngestService(IngestService ingestService) {
-    this.ingestService = ingestService;
-  }
-
-  public void setDublinCoreService(DublinCoreCatalogService dcService) {
-    this.dublinCoreService = dcService;
-  }
-
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
-  }
-
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
   }
 
   /**
@@ -410,47 +418,44 @@ public class IngestRestService {
   @Produces(MediaType.TEXT_XML)
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addMediaPackage")
-  @RestQuery(name = "addMediaPackage", description = "Create media package from a media tracks and optional Dublin Core metadata fields", 
-      restParameters = {
-          @RestParameter(description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "abstract", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "accessRights", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "available", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "contributor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "coverage", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "created", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "creator", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "date", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "description", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "extent", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "format", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "identifier", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "isPartOf", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "isReferencedBy", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "isReplacedBy", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "language", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "license", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "publisher", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "relation", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "replaces", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "rights", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "rightsHolder", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "source", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "spatial", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "subject", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "temporal", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = true, name = "title", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "type", type = RestParameter.Type.STRING),
+  @RestQuery(name = "addMediaPackage", description = "Create and ingest media package from media tracks with additional Dublin Core metadata. Notice: It is mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a DC catalog with a title included.", restParameters = {
+          @RestParameter(description = "The kind of media track. This has to be specified in the request prior to each media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "abstract", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "accessRights", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "available", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "contributor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "coverage", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "created", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "creator", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "date", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "description", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "extent", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "format", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "identifier", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isPartOf", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isReferencedBy", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isReplacedBy", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "language", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "license", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "publisher", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "relation", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "replaces", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "rights", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "rightsHolder", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "source", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "spatial", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "subject", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "temporal", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "title", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "type", type = RestParameter.Type.STRING),
+          @RestParameter(description = "URL of episode DublinCore Catalog", isRequired = false, name = "episodeDCCatalogUri", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode DublinCore Catalog", isRequired = false, name = "episodeDCCatalog", type = RestParameter.Type.STRING),
           @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
           @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog", type = RestParameter.Type.STRING),
-          @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING),
-      },
-      bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
-      reponses = {
+          @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING), }, bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, 
-      returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response addMediaPackage(@Context HttpServletRequest request) {
     return addMediaPackage(request, null);
   }
@@ -459,47 +464,41 @@ public class IngestRestService {
   @Produces(MediaType.TEXT_XML)
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addMediaPackage/{wdID}")
-  @RestQuery(name = "addMediaPackage", 
-      description = "Create and ingest media package from media tracks and optional Dublin Core metadata fields", 
-      pathParameters = { 
-          @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, 
-      restParameters = {
-          @RestParameter(description = "The kind of media track. This has to be specified in the request prior to each media track",
-              isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "abstract", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "accessRights", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "available", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "contributor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "coverage", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "created", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "creator", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "date", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "description", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "extent", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "format", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "identifier", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "isPartOf", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "isReferencedBy", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "isReplacedBy", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "language", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "license", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "publisher", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "relation", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "replaces", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "rights", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "rightsHolder", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "source", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "spatial", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "subject", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "temporal", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "title", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Metadata value", isRequired = false, name = "type", type = RestParameter.Type.STRING), 
+  @RestQuery(name = "addMediaPackage", description = "Create and ingest media package from media tracks with additional Dublin Core metadata. Notice: It is mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a DC catalog with a title included.", pathParameters = { @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, restParameters = {
+          @RestParameter(description = "The kind of media track. This has to be specified in the request prior to each media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "abstract", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "accessRights", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "available", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "contributor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "coverage", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "created", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "creator", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "date", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "description", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "extent", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "format", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "identifier", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isPartOf", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isReferencedBy", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isReplacedBy", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "language", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "license", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "publisher", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "relation", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "replaces", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "rights", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "rightsHolder", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "source", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "spatial", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "subject", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "temporal", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "title", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "type", type = RestParameter.Type.STRING),
+          @RestParameter(description = "URL of episode DublinCore Catalog", isRequired = false, name = "episodeDCCatalogUri", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode DublinCore Catalog", isRequired = false, name = "episodeDCCatalog", type = RestParameter.Type.STRING),
           @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
           @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog", type = RestParameter.Type.STRING),
-          @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING)
-      },
-      bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), 
-      reponses = {
+          @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING) }, bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
@@ -507,44 +506,76 @@ public class IngestRestService {
     MediaPackageElementFlavor flavor = null;
     try {
       MediaPackage mp = ingestService.createMediaPackage();
-      DublinCoreCatalog dcc = dublinCoreService.newInstance();
+      DublinCoreCatalog dcc = null;
       Map<String, String> workflowProperties = new HashMap<String, String>();
       int seriesDCCatalogNumber = 0;
+      int episodeDCCatalogNumber = 0;
       boolean hasMedia = false;
       if (ServletFileUpload.isMultipartContent(request)) {
         for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
             String fieldName = item.getFieldName();
+            String value = Streams.asString(item.openStream());
+            /* Ignore empty fields */
+            if ("".equals(value)) {
+              continue;
+            }
 
             /* “Remember” the flavor for the next media. */
             if ("flavor".equals(fieldName)) {
-              flavor = MediaPackageElementFlavor.parseFlavor(Streams.asString(item.openStream()));
+              flavor = MediaPackageElementFlavor.parseFlavor(value);
 
-            /* Fields for DC catalog */
+              /* Fields for DC catalog */
             } else if (dcterms.contains(fieldName)) {
+              if ("identifier".equals(fieldName)) {
+                /* Use the identifier for the mediapackage */
+                mp.setIdentifier(new IdImpl(value));
+              }
               EName en = new EName(DublinCore.TERMS_NS_URI, fieldName);
-              dcc.add(en, Streams.asString(item.openStream()));
+              if (dcc == null) {
+                dcc = dublinCoreService.newInstance();
+              }
+              dcc.add(en, value);
 
-            /* Series by URL */
-            } else if ("seriesDCCatalogUri".equals(fieldName)) {
-              URI dcurl;
+              /* Episode metadata by URL */
+            } else if ("episodeDCCatalogUri".equals(fieldName)) {
               try {
-                dcurl = new URI(Streams.asString(item.openStream()));
+                URI dcurl = new URI(value);
+                ingestService.addCatalog(dcurl, MediaPackageElements.EPISODE, mp);
+                episodeDCCatalogNumber += 1;
               } catch (java.net.URISyntaxException e) {
                 /* Parameter was not a valid URL: Return 400 Bad Request */
                 logger.warn(e.getMessage(), e);
                 return Response.serverError().status(Status.BAD_REQUEST).build();
               }
-              ingestService.addCatalog(dcurl, MediaPackageElements.SERIES, mp);
 
-            /* Series DC catalog (XML) as string */
+              /* Episode metadata DC catalog (XML) as string */
+            } else if ("episodeDCCatalog".equals(fieldName)) {
+              String fileName = "episode" + episodeDCCatalogNumber + ".xml";
+              episodeDCCatalogNumber += 1;
+              InputStream is = new ByteArrayInputStream(value.getBytes("UTF-8"));
+              ingestService.addCatalog(is, fileName, MediaPackageElements.EPISODE, mp);
+
+              /* Series by URL */
+            } else if ("seriesDCCatalogUri".equals(fieldName)) {
+              try {
+                URI dcurl = new URI(value);
+                ingestService.addCatalog(dcurl, MediaPackageElements.SERIES, mp);
+              } catch (java.net.URISyntaxException e) {
+                /* Parameter was not a valid URL: Return 400 Bad Request */
+                logger.warn(e.getMessage(), e);
+                return Response.serverError().status(Status.BAD_REQUEST).build();
+              }
+
+              /* Series DC catalog (XML) as string */
             } else if ("seriesDCCatalog".equals(fieldName)) {
               String fileName = "series" + seriesDCCatalogNumber + ".xml";
               seriesDCCatalogNumber += 1;
-              ingestService.addCatalog(item.openStream(), fileName, MediaPackageElements.SERIES, mp);
+              InputStream is = new ByteArrayInputStream(value.getBytes("UTF-8"));
+              ingestService.addCatalog(is, fileName, MediaPackageElements.SERIES, mp);
 
-            /* Add media files by URL */
+              /* Add media files by URL */
             } else if ("mediaUri".equals(fieldName)) {
               if (flavor == null) {
                 /* A flavor has to be specified in the request prior the media file */
@@ -552,7 +583,7 @@ public class IngestRestService {
               }
               URI mediaUrl;
               try {
-                mediaUrl = new URI(Streams.asString(item.openStream()));
+                mediaUrl = new URI(value);
               } catch (java.net.URISyntaxException e) {
                 /* Parameter was not a valid URL: Return 400 Bad Request */
                 logger.warn(e.getMessage(), e);
@@ -563,10 +594,10 @@ public class IngestRestService {
 
             } else {
               /* Tread everything else as workflow properties */
-              workflowProperties.put(fieldName, Streams.asString(item.openStream()));
+              workflowProperties.put(fieldName, value);
             }
 
-          /* Media files as request parameter */
+            /* Media files as request parameter */
           } else {
             if (flavor == null) {
               /* A flavor has to be specified in the request prior the video file */
@@ -583,16 +614,30 @@ public class IngestRestService {
           return Response.serverError().status(Status.BAD_REQUEST).build();
         }
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        dcc.toXml(out, true);
-        InputStream in = new ByteArrayInputStream(out.toByteArray());
-        ingestService.addCatalog(in, "dublincore.xml", MediaPackageElements.EPISODE, mp);
-        WorkflowInstance workflow;
-        if (wdID == null) {
-          workflow = ingestService.ingest(mp);
-        } else {
-          workflow = ingestService.ingest(mp, wdID, workflowProperties);
+        Catalog[] dccs = mp.getCatalogs(MediaPackageElements.EPISODE);
+        for (int i = 0; i < dccs.length; i++) {
+          EName en = new EName(DublinCore.TERMS_NS_URI, "identifier");
+          String id = ((DublinCoreCatalog) dccs[i]).getFirst(en);
+          if (id != null) {
+            mp.setIdentifier(new IdImpl(id));
+          }
         }
+
+        /* Add episode mediapackage if metadata were send separately */
+        if (dcc != null) {
+          ByteArrayOutputStream out = new ByteArrayOutputStream();
+          dcc.toXml(out, true);
+          InputStream in = new ByteArrayInputStream(out.toByteArray());
+          ingestService.addCatalog(in, "dublincore.xml", MediaPackageElements.EPISODE, mp);
+
+          /* Check if we have metadata for the episode */
+        } else if (episodeDCCatalogNumber == 0) {
+          logger.warn("Rejected ingest without episode metadata. At least provide a title.");
+          return Response.serverError().status(Status.BAD_REQUEST).build();
+        }
+
+        WorkflowInstance workflow = (wdID == null) ? ingestService.ingest(mp) : ingestService.ingest(mp, wdID,
+                workflowProperties);
         return Response.ok(workflow).build();
       }
       return Response.serverError().status(Status.BAD_REQUEST).build();
@@ -605,28 +650,12 @@ public class IngestRestService {
   @POST
   @Path("addZippedMediaPackage/{workflowDefinitionId}")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "addZippedMediaPackage", 
-      description = "Create media package from a compressed file containing a manifest.xml document and all media tracks, metadata catalogs and attachments", 
-      pathParameters = { 
-        @RestParameter(description = "Workflow definition id", 
-          isRequired = true, 
-          name = WORKFLOW_DEFINITION_ID_PARAM,
-          type = RestParameter.Type.STRING) },
-      restParameters = {
-        @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage", 
-          isRequired = false, 
-          name = WORKFLOW_INSTANCE_ID_PARAM, 
-          type = RestParameter.Type.STRING) }, 
-      bodyParameter = @RestParameter(
-        description = "The compressed (application/zip) media package file", 
-        isRequired = true, name = "BODY", 
-        type = RestParameter.Type.FILE), 
-      reponses = {
+  @RestQuery(name = "addZippedMediaPackage", description = "Create media package from a compressed file containing a manifest.xml document and all media tracks, metadata catalogs and attachments", pathParameters = { @RestParameter(description = "Workflow definition id", isRequired = true, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING) }, restParameters = { @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) }, bodyParameter = @RestParameter(description = "The compressed (application/zip) media package file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) },
-      returnDescription = "")
-  public Response addZippedMediaPackage(@Context HttpServletRequest request, @PathParam("workflowDefinitionId") String wdID, @QueryParam("id") String wiID) {
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
+  public Response addZippedMediaPackage(@Context HttpServletRequest request,
+          @PathParam("workflowDefinitionId") String wdID, @QueryParam("id") String wiID) {
     logger.debug("addZippedMediaPackage(HttpRequest)");
     if (!isIngestLimitEnabled() || getIngestLimit() > 0) {
       return ingestZippedMediaPackage(request, wdID, wiID);
@@ -639,30 +668,16 @@ public class IngestRestService {
   @POST
   @Path("addZippedMediaPackage")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "addZippedMediaPackage", 
-      description = "Create media package from a compressed file containing a manifest.xml document and all media tracks, metadata catalogs and attachments", 
-      restParameters = {
-        @RestParameter(description = "The workflow definition ID to run on this mediapackage. "
-            + "This parameter has to be set in the request prior to the zipped mediapackage "
-            + "(This parameter is deprecated. Please use /addZippedMediaPackage/{workflowDefinitionId} instead)",
-          isRequired = false, 
-          name = WORKFLOW_DEFINITION_ID_PARAM, 
-          type = RestParameter.Type.STRING),
-        @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage. "
-            + "This parameter has to be set in the request prior to the zipped mediapackage "
-            + "(This parameter is deprecated. Please use /addZippedMediaPackage/{workflowDefinitionId} with a path parameter instead)",
-          isRequired = false, 
-          name = WORKFLOW_INSTANCE_ID_PARAM, 
-          type = RestParameter.Type.STRING) }, 
-      bodyParameter = @RestParameter(
-        description = "The compressed (application/zip) media package file", 
-        isRequired = true, name = "BODY", 
-        type = RestParameter.Type.FILE), 
-      reponses = {
+  @RestQuery(name = "addZippedMediaPackage", description = "Create media package from a compressed file containing a manifest.xml document and all media tracks, metadata catalogs and attachments", restParameters = {
+          @RestParameter(description = "The workflow definition ID to run on this mediapackage. "
+                  + "This parameter has to be set in the request prior to the zipped mediapackage "
+                  + "(This parameter is deprecated. Please use /addZippedMediaPackage/{workflowDefinitionId} instead)", isRequired = false, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING),
+          @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage. "
+                  + "This parameter has to be set in the request prior to the zipped mediapackage "
+                  + "(This parameter is deprecated. Please use /addZippedMediaPackage/{workflowDefinitionId} with a path parameter instead)", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) }, bodyParameter = @RestParameter(description = "The compressed (application/zip) media package file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) },
-      returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
   public Response addZippedMediaPackage(@Context HttpServletRequest request) {
     logger.debug("addZippedMediaPackage(HttpRequest)");
     if (!isIngestLimitEnabled() || getIngestLimit() > 0) {
@@ -683,8 +698,8 @@ public class IngestRestService {
     logger.info("Received new request from {} to ingest a zipped mediapackage", request.getRemoteHost());
 
     try {
-      String workflowDefinitionId   = wdID;
-      String workflowIdAsString     = wiID;
+      String workflowDefinitionId = wdID;
+      String workflowIdAsString = wiID;
       Long workflowInstanceIdAsLong = null;
       Map<String, String> workflowConfig = new HashMap<String, String>();
       if (ServletFileUpload.isMultipartContent(request)) {
@@ -732,6 +747,9 @@ public class IngestRestService {
       WorkflowInstance workflow = ingestService.addZippedMediaPackage(in, workflowDefinitionId, workflowConfig,
               workflowInstanceIdAsLong);
       return Response.ok(WorkflowParser.toXml(workflow)).build();
+    } catch (MediaPackageException e) {
+      logger.warn(e.getMessage());
+      return Response.serverError().status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
@@ -1129,4 +1147,65 @@ public class IngestRestService {
     out.put("received", Long.toString(job.getBytesReceived()));
     return Response.ok(out.toJSONString()).header("Content-Type", MediaType.APPLICATION_JSON).build();
   }
+
+  @Override
+  public JobProducer getService() {
+    return ingestService;
+  }
+
+  @Override
+  public ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
+  }
+
+  /**
+   * OSGi Declarative Services callback to set the reference to the ingest service.
+   * 
+   * @param ingestService
+   *          the ingest service
+   */
+  void setIngestService(IngestService ingestService) {
+    this.ingestService = ingestService;
+  }
+
+  /**
+   * OSGi Declarative Services callback to set the reference to the service registry.
+   * 
+   * @param serviceRegistry
+   *          the service registry
+   */
+  void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  /**
+   * OSGi Declarative Services callback to set the reference to the dublin core service.
+   * 
+   * @param dcService
+   *          the dublin core service
+   */
+  void setDublinCoreService(DublinCoreCatalogService dcService) {
+    this.dublinCoreService = dcService;
+  }
+
+  /**
+   * OSGi Declarative Services callback to set the reference to the persistence provider.
+   * 
+   * @param persistenceProvider
+   *          the persistence provider
+   */
+  void setPersistenceProvider(PersistenceProvider persistenceProvider) {
+    this.persistenceProvider = persistenceProvider;
+  }
+
+  /**
+   * OSGi Declarative Services callback to set the reference to the persistence properties.
+   * 
+   * @param persistenceProperties
+   *          the persistence properties
+   */
+  void setPersistenceProperties(Map<String, Object> persistenceProperties) {
+    this.persistenceProperties = persistenceProperties;
+  }
+
 }

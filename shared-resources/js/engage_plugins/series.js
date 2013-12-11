@@ -217,9 +217,9 @@ Opencast.Series = (function ()
                                     if (data['search-results'].result.length > 1)
                                     {
                                         $('#oc_player-head-see-more').show();
-                                    	$("#oc_player-series").html("<div>" + data['search-results'].result[0].mediapackage.seriestitle + "</div>" );
+                                    	$("#oc_player-series").html("<div>" + data['search-results'].result[0].dcTitle + "</div>" );
                                     } else {
-                                    	$("#oc_player-series").html("<div>" + data['search-results'].result.mediapackage.seriestitle + "</div>" );
+                                    	$("#oc_player-series").html("<div>" + data['search-results'].result.dcTitle + "</div>" );
                                     }
                                     $('#oc_player-series').show();
                                 }

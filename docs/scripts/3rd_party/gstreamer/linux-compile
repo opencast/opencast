@@ -1,0 +1,81 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-linux ] && exit 0
+#
+case `os` in
+  CentOS | RHEL )
+    sudox yum -y install gstreamer        # gst-launch-0.10
+    [ $? -ne 0 ] && exit 1
+    sudox yum -y install gstreamer-tools  # gst-launch
+    [ $? -ne 0 ] && exit 1
+    sudox yum -y install gstreamer-plugins-base
+    [ $? -ne 0 ] && exit 1
+    sudox yum -y install gstreamer-plugins-good
+    [ $? -ne 0 ] && exit 1
+    sudox yum -y install gstreamer-plugins-bad
+    [ $? -ne 0 ] && exit 1
+    case `os_ver` in
+      5.* )
+        ./install-plugins-ugly-centos-5.x
+        [ $? -ne 0 ] && exit 1
+        ;;
+      * )
+        sudox yum -y install gstreamer-plugins-ugly
+        [ $? -ne 0 ] && exit 1
+        ;;
+    esac
+    sudox yum -y install gstreamer-ffmpeg
+    [ $? -ne 0 ] && exit 1
+    ;;
+  Ubuntu )
+    sudox apt-get -y install gstreamer0.10-tools  # gst-launch-0.10
+    [ $? -ne 0 ] && exit 1
+    sudox apt-get -y install gstreamer0.10-plugins-base
+    [ $? -ne 0 ] && exit 1
+    sudox apt-get -y install gstreamer0.10-plugins-good
+    [ $? -ne 0 ] && exit 1
+    sudox apt-get -y install gstreamer0.10-plugins-bad
+    [ $? -ne 0 ] && exit 1
+    sudox apt-get -y install gstreamer0.10-plugins-ugly
+    [ $? -ne 0 ] && exit 1
+    sudox apt-get -y install gstreamer0.10-ffmpeg
+    [ $? -ne 0 ] && exit 1
+    ;;
+   openSUSE )
+    sudox zypper  --non-interactive install gstreamer        # gst-launch-0.10
+    [ $? -ne 0 ] && exit 1
+    sudox zypper  --non-interactive install gstreamer-plugins-base
+    [ $? -ne 0 ] && exit 1
+    sudox zypper  --non-interactive install gstreamer-plugins-good
+    [ $? -ne 0 ] && exit 1
+    sudox zypper  --non-interactive install gstreamer-plugins-bad
+    [ $? -ne 0 ] && exit 1
+    ;;
+  * )
+    echo "Unsupported operating system: `os`" 1>&2
+    exit 1
+    ;;
+esac
+#
+# Fix gst launch, if version independent launcher is not installed
+#
+for file in gst-feedback gst-inspect gst-launch gst-typefind gst-xmlinspect gst-xmllaunch; do
+  which $file >/dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    FP=`which ${file}-0.10`
+    [ -z "$FP" ] && exit 1
+    DIR="${FP%/*}"
+    sudox ln -fs "$DIR/${file}-0.10" "$DIR/$file"
+    [ $? -ne 0 ] && exit 1
+  fi
+done
+#
+touch ../.done-linux
+[ $? -ne 0 ] && exit 1
+exit 0

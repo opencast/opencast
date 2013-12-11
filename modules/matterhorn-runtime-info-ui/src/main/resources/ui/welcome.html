@@ -2,17 +2,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
-	<link rel="shortcut icon" href="img/favicon.ico" /> 
-    <title>Opencast Matterhorn - Release 1.4.0: The Maquignaz Ascent!</title>
+  <link rel="shortcut icon" href="img/favicon.ico" /> 
+    <title>Opencast Matterhorn - Release 1.4.1: Schwarzsee</title>
     
     <script type="text/javascript" src="js/jquery/jquery.js"></script>
     <script type="text/javascript">
     $(document).ready(function() {
       $.getJSON("/info/components.json", function(data) {
         var contentDiv = $("#content");
-		var capt = false,
-		confMon = false, 
-		analytics = false;
+        var capt = false,
+        confMon = false, 
+        analytics = false;
         $.each(data, function(section) {
             if("rest" == section) {
                $.each(data.rest, function(i) {
@@ -22,21 +22,18 @@
                      col = $('#docs2');
                   }*/
                   var col = $('#docs1');
-                  col.append("<li>" + data.rest[i].description + " <a href='" + data.rest[i].docs + "'>Docs</a></li>");
-
-				  if(data.rest[i].description.toLowerCase() == "Capture REST Endpoint".toLowerCase())
-				  {
-					  $('#col3m').append('<br /><a class="redbutton" id="captureLink" href="/capture">Go to Capture</a>');
-					  capt = true;
-				  } else if(data.rest[i].description.toLowerCase() == "Confidence Monitoring REST Endpoint".toLowerCase())
-				  {
-					  $('#col4m').append('<br /><a class="redbutton" id="confidenceMonitoringLink" href="/confidence-monitoring">Go to Confidence Monitoring</a>');
-					  confMon = true;
-				  } else if (data.rest[i].description.toLowerCase() == "Analytics REST Endpoint".toLowerCase())
-                                  {
-                                          $('#col5m').append('<br /><a class="redbutton" id="analyticsLink" href="/analytics">Go to Analytics</a>');
-					  analytics = true;
-                                  }
+                  var pathToDocs = data.rest[i].docs.replace(/^.*\/\/[^\/]+/, '');
+                  col.append("<li>" + data.rest[i].description + " <a href='" + pathToDocs + "'>Docs</a></li>");
+				          if(data.rest[i].description.toLowerCase() == "Capture REST Endpoint".toLowerCase()) {
+				            $('#col3m').append('<br /><a class="redbutton" id="captureLink" href="/capture">Go to Capture</a>');
+				            capt = true;
+				          } else if(data.rest[i].description.toLowerCase() == "Confidence Monitoring REST Endpoint".toLowerCase()) {
+				            $('#col4m').append('<br /><a class="redbutton" id="confidenceMonitoringLink" href="/confidence-monitoring">Go to Confidence Monitoring</a>');
+				            confMon = true;
+				          } else if (data.rest[i].description.toLowerCase() == "Analytics REST Endpoint".toLowerCase()) {
+                    $('#col5m').append('<br /><a class="redbutton" id="analyticsLink" href="/analytics">Go to Analytics</a>');
+                    analytics = true;
+                  }
                })
             } else if("engage" == section) {
                $('#engagelink').attr('href', data.engage + '/engage/ui');
@@ -44,18 +41,15 @@
                $('#adminlink').attr('href', data.admin + '/admin/');
             }
           });
-		  if(!capt)
-		  {
-			  $('#col3m').hide();
-		  }
-		  if(!confMon)
-		  {
-			  $('#col4m').hide();
-		  }
-                  if(!analytics)
-		  {
-			  $('#col5m').hide();
-		  }
+		      if(!capt) {
+		        $('#col3m').hide();
+		      }
+		      if(!confMon) {
+		        $('#col4m').hide();
+		      }
+		      if(!analytics) {
+		        $('#col5m').hide();
+		      }
         });
       });
     </script>
@@ -66,7 +60,7 @@
       <div id="topbanner">
         <div id="matterhornlogo"><img src="img/mh_logos/MatterhornLogo_large.png" alt="Matterhorn logo" width="260" height="182" class="matterhornlogo" /></div>
         <div id="opencastlogo"><a href="http://www.opencastproject.org"><img src="img/mh_logos/OpencastLogo.png" alt="Opencast" width="143" height="38" hspace="20" vspace="5" border="0" /></a></div>
-        <h1>Release 1.4.0: The Maquignaz Ascent!</h1>
+        <h1>Release 1.4.1: Schwarzsee</h1>
         <div id="promotext">
           <p>Matterhorn is a free, open-source   system that provides a lecture capture solution and an enterprise media infrastructure for educational audio and video content.</p>
           <p>Learn more about the features of Matterhorn by taking the <a href="http://opencast.org/matterhorn/product-tour">Product Tour</a> or viewing an <a href="http://opencast.org/matterhorn/features">Overview of Features</a>. </p>
@@ -83,7 +77,7 @@
               distribution.</li>
             <li> Monitor progress of recording through media pipeline.</li>
           </ul>
-		  <br />
+          <br />
           <a class="redbutton" id="adminlink">Go to Admin Tools</a>
         </div>
         <div id="col2m">
@@ -95,7 +89,7 @@
             <li>Search for Video by keyword</li>
             <li>Accessible media player</li>
           </ul>
-		  <br />
+          <br />
           <a class="redbutton" id="engagelink"> Go to  Media Module</a>        
         </div>
       </div>
@@ -106,7 +100,7 @@
           <p>These tools enable you to capture immediately and to modify the capture settings:</p>
           <ul>
             <li>Start and stop capturing</li>
-			<li>Test new configurations</li>
+            <li>Test new configurations</li>
           </ul>
         </div>
         <div id="col4m">
@@ -115,7 +109,7 @@
           <p>These tools enable you to watch the status of the capture devices:</p>
           <ul>
             <li>Preview image of video and VGA</li>
-			<li>VU-meter for audio</li>
+            <li>VU-meter for audio</li>
           </ul>
         </div>
       </div>
@@ -143,16 +137,16 @@
           <h2>Release Notes</h2>
           <p>Covers &quot;what&#39;s new&quot;, install/build instructions, known issues, and frequently asked questions .  Please read these notes and the bug/feature reporting instructions before reporting any issues.</p>
           <ul>
-            <li><a href="https://opencast.jira.com/wiki/display/mh14/Release+1.4">Release Documentation</a></li>
+            <li><a href="https://opencast.jira.com/wiki/display/mh14/">Release Documentation</a></li>
             <li><a href="https://opencast.jira.com/wiki/display/mh14/Release+Notes">Release Notes</a></li>
-            <li><a href="https://opencast.jira.com/wiki/display/mh14/FAQ">1.4 FAQ</a></li>
+            <li><a href="https://opencast.jira.com/wiki/display/MHDOC/FAQ">FAQ</a></li>
           </ul>
 
-            <h2>Community Resources</h2>
-            <ul class="links">
-              <li><a href="https://opencast.jira.com/wiki/display/MH/Communication">Mailing Lists and Communication</a></li>
-              <li><a href="https://opencast.jira.com/browse/MH">Issue Tracker</a> (report a bug, request a feature)</li>
-            </ul>
+          <h2>Community Resources</h2>
+          <ul class="links">
+            <li><a href="https://opencast.jira.com/wiki/display/MH/Communication">Mailing Lists and Communication</a></li>
+            <li><a href="https://opencast.jira.com/browse/MH">Issue Tracker</a> (report a bug, request a feature)</li>
+          </ul>
 
         </div>
 
@@ -174,5 +168,5 @@
         All other (non-code) intellectual propery is licensed under a <a href="http://creativecommons.org/licenses/by/3.0/us/" rel="license">Creative Commons Attribution 3.0 United States License</a>.<br />Permissions beyond the scope of this license may be available <a href="http://www.opencastproject.org/contact" rel="cc:morePermissions">on request</a>.</p>
       </div>  
     </div>
-</body>
+  </body>
 </html>

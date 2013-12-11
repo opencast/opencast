@@ -17,7 +17,6 @@ package org.opencastproject.series.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -160,7 +159,6 @@ public class SeriesRestService {
   @RestQuery(name = "getAsXml", description = "Returns the series with the given identifier", returnDescription = "Returns the series dublin core XML document", pathParameters = { @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "The series dublin core."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
-          @RestResponse(responseCode = SC_FORBIDDEN, description = "You do not have permission to view this series."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to view this series. Maybe you need to authenticate.") })
   public Response getSeriesXml(@PathParam("seriesID") String seriesID) {
     logger.debug("Series Lookup: {}", seriesID);
@@ -184,7 +182,8 @@ public class SeriesRestService {
   @Path("{seriesID:.+}.json")
   @RestQuery(name = "getAsJson", description = "Returns the series with the given identifier", returnDescription = "Returns the series dublin core JSON document", pathParameters = { @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "The series dublin core."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found.") })
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to view this series. Maybe you need to authenticate.") })
   public Response getSeriesJSON(@PathParam("seriesID") String seriesID) {
     logger.debug("Series Lookup: {}", seriesID);
     try {
@@ -192,6 +191,10 @@ public class SeriesRestService {
       return Response.ok(dc.toJson()).build();
     } catch (NotFoundException e) {
       return Response.status(Response.Status.NOT_FOUND).build();
+    } catch (UnauthorizedException e) {
+      logger.warn("permission exception retrieving series");
+      // TODO this should be an 403 (Forbidden) if the user is logged in
+      throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     } catch (Exception e) {
       logger.error("Could not retrieve series: {}", e.getMessage());
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -245,8 +248,10 @@ public class SeriesRestService {
           @RestParameter(name = "acl", isRequired = false, defaultValue = "${this.sampleAccessControlList}", description = "The access control list for the series", type = TEXT) }, reponses = {
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
           @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
           @RestResponse(responseCode = SC_CREATED, description = "The access control list has been created.") })
-  public Response addOrUpdateSeries(@FormParam("series") String series, @FormParam("acl") String accessControl) {
+  public Response addOrUpdateSeries(@FormParam("series") String series, @FormParam("acl") String accessControl)
+          throws UnauthorizedException {
     if (series == null) {
       logger.warn("series that should be added is null");
       return Response.status(BAD_REQUEST).build();
@@ -281,6 +286,8 @@ public class SeriesRestService {
       logger.debug("Created series {} ", id);
       return Response.status(CREATED).header("Location", getSeriesXmlUrl(id)).header("Location", getSeriesJsonUrl(id))
               .entity(newSeries.toXmlString()).build();
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       logger.warn("Could not add/update series: {}", e.getMessage());
     }
@@ -293,6 +300,7 @@ public class SeriesRestService {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
           @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
           @RestResponse(responseCode = SC_CREATED, description = "The access control list has been created."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required path or form params were missing in the request.") })
   public Response updateAccessControl(@PathParam("seriesID") String seriesID, @FormParam("acl") String accessControl)
           throws UnauthorizedException {
@@ -325,6 +333,7 @@ public class SeriesRestService {
   @Path("/{seriesID:.+}")
   @RestQuery(name = "delete", description = "Delete a series", returnDescription = "No content.", pathParameters = { @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
           @RestResponse(responseCode = SC_NO_CONTENT, description = "The series was deleted.") })
   public Response deleteSeries(@PathParam("seriesID") String seriesID) throws UnauthorizedException {
     try {
@@ -373,7 +382,9 @@ public class SeriesRestService {
           @RestParameter(name = "description", isRequired = false, description = "The series description", type = STRING),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any of the following: TITLE, SUBJECT, CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, TEMPORAL, IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING),
           @RestParameter(name = "startPage", isRequired = false, description = "The page offset", type = STRING),
-          @RestParameter(name = "count", isRequired = false, description = "Results per page (max 100)", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The access control list.") })
+          @RestParameter(name = "count", isRequired = false, description = "Results per page (max 100)", type = STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "The access control list."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   // CHECKSTYLE:OFF
   public Response getSeriesAsJson(@QueryParam("q") String text, @QueryParam("seriesId") String seriesId,
           @QueryParam("edit") Boolean edit, @QueryParam("seriesTitle") String seriesTitle,
@@ -383,13 +394,15 @@ public class SeriesRestService {
           @QueryParam("language") String language, @QueryParam("license") String license,
           @QueryParam("subject") String subject, @QueryParam("abstract") String seriesAbstract,
           @QueryParam("description") String description, @QueryParam("sort") String sort,
-          @QueryParam("startPage") String startPage, @QueryParam("count") String count) {
+          @QueryParam("startPage") String startPage, @QueryParam("count") String count) throws UnauthorizedException {
     // CHECKSTYLE:ON
     try {
       DublinCoreCatalogList result = getSeries(text, seriesId, edit, seriesTitle, creator, contributor, publisher,
               rightsHolder, createdFrom, createdTo, language, license, subject, seriesAbstract, description, sort,
               startPage, count);
       return Response.ok(result.getResultsAsJson()).build();
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       logger.warn("Could not perform search query: {}", e.getMessage());
     }
@@ -417,7 +430,9 @@ public class SeriesRestService {
           @RestParameter(name = "description", isRequired = false, description = "The series description", type = STRING),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any of the following: TITLE, SUBJECT, CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, TEMPORAL, IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING),
           @RestParameter(name = "startPage", isRequired = false, description = "The page offset", type = STRING),
-          @RestParameter(name = "count", isRequired = false, description = "Results per page (max 100)", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The access control list.") })
+          @RestParameter(name = "count", isRequired = false, description = "Results per page (max 100)", type = STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "The access control list."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   // CHECKSTYLE:OFF
   public Response getSeriesAsXml(@QueryParam("q") String text, @QueryParam("seriesId") String seriesId,
           @QueryParam("edit") Boolean edit, @QueryParam("seriesTitle") String seriesTitle,
@@ -427,13 +442,15 @@ public class SeriesRestService {
           @QueryParam("language") String language, @QueryParam("license") String license,
           @QueryParam("subject") String subject, @QueryParam("abstract") String seriesAbstract,
           @QueryParam("description") String description, @QueryParam("sort") String sort,
-          @QueryParam("startPage") String startPage, @QueryParam("count") String count) {
+          @QueryParam("startPage") String startPage, @QueryParam("count") String count) throws UnauthorizedException {
     // CHECKSTYLE:ON
     try {
       DublinCoreCatalogList result = getSeries(text, seriesId, edit, seriesTitle, creator, contributor, publisher,
               rightsHolder, createdFrom, createdTo, language, license, subject, seriesAbstract, description, sort,
               startPage, count);
       return Response.ok(result.getResultsAsXML()).build();
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       logger.warn("Could not perform search query: {}", e.getMessage());
     }

@@ -63,6 +63,9 @@ public class ReportImpl implements Report {
 
   public void add(ReportItem reportItem) {
     reportItems.add((ReportItemImpl) reportItem);
+    total = reportItems.size();
+    played += reportItem.getPlayed();
+    views += reportItem.getViews();
   }
 
   /**
