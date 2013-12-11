@@ -12,7 +12,7 @@
   </oc:subjects>
   <oc:license>cc</oc:license>
   <oc:media>
-    <oc:track id="track-1" type="presentation/source">
+    <oc:track transport="FILE" id="track-1" type="presentation/source">
       <oc:mimetype>video/quicktime</oc:mimetype>
       <oc:url>tracks/vonly.mov</oc:url>
       <oc:checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</oc:checksum>
@@ -26,7 +26,7 @@
         <oc:frameRate>2</oc:frameRate>
       </oc:video>
     </oc:track>
-    <oc:track id="track-2" type="presenter/source">
+    <oc:track transport="FILE" id="track-2" type="presenter/source">
       <oc:mimetype>video/quicktime</oc:mimetype>
       <oc:url>tracks/aonly.mov</oc:url>
       <oc:checksum type="md5">950f9fa49caa8f1c5bbc36892f6fd062</oc:checksum>

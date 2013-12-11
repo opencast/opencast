@@ -4,7 +4,7 @@
 	xmlns:ns2="http://mediapackage.opencastproject.org">
 	<ns2:title>Compose workflow operation handler test</ns2:title>
 	<ns2:media>
-		<ns2:track id="compose-workflow-operation-test-encode-track-id">
+		<ns2:track transport="FILE" id="compose-workflow-operation-test-encode-track-id">
 			<ns2:mimetype>video/x-flv</ns2:mimetype>
 			<ns2:tags />
 			<ns2:url>fooVideo.flv</ns2:url>
@@ -25,7 +25,7 @@
 				<ns2:resolution>624x352</ns2:resolution>
 			</ns2:video>
 		</ns2:track>
-		<ns2:track id="compose-workflow-operation-test-encode-muxing-audiotrack-id">
+		<ns2:track transport="FILE" id="compose-workflow-operation-test-encode-muxing-audiotrack-id">
 			<ns2:mimetype>video/x-flv</ns2:mimetype>
 			<ns2:tags />
 			<ns2:url>fooVideo.flv</ns2:url>
@@ -39,7 +39,7 @@
 				<ns2:bitrate>62500.0</ns2:bitrate>
 			</ns2:audio>
 		</ns2:track>
-		<ns2:track id="compose-workflow-operation-test-encode-muxing-videotrack-id">
+		<ns2:track transport="FILE" id="compose-workflow-operation-test-encode-muxing-videotrack-id">
 			<ns2:mimetype>video/x-flv</ns2:mimetype>
 			<ns2:tags />
 			<ns2:url>fooVideo.flv</ns2:url>
