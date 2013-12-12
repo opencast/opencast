@@ -208,7 +208,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     function initPlugin() {
         // set path to swf player
-        var videojs_swf = plugin.pluginPath + "/lib/videojs/video-js.swf";
+        var videojs_swf = plugin.pluginPath + "lib/videojs/video-js.swf";
 
         Engage.model.on("change:videoDataModel", function() {
             new VideoDataView(this.get("videoDataModel"), plugin.template, videojs_swf);
