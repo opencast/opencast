@@ -306,10 +306,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     //local logic
 
     //Init Event
-    //Engage.log("Controls:init");
-    //Engage.log("Path: " + Engage.getPluginPath(plugin.name));
+    Engage.log("Controls:init");
     var evaluated_plugin_path = Engage.getPluginPath('EngagePluginControls');
-    Engage.log('Path: ' + evaluated_plugin_path);
     //Load other needed JS stuff with Require
     require([evaluated_plugin_path + 'js/bootstrap/js/bootstrap'], function() {
         initCount -= 1;
@@ -334,7 +332,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     //All plugins loaded lets do some stuff
     Engage.on("Core:plugin_load_done", function() {
         Engage.log("Controls: receive plugin load done");
-        Engage.log("Hello: " + plugin_path + "js/bootstrap/js/bootstrap");
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();

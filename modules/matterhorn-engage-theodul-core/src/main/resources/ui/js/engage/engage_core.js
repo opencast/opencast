@@ -118,46 +118,23 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
       }
     },
     getPluginPath : function (pluginName) {
-      // load plugin as requirejs module
-      // this.log("Hello World");
-      // var test = "Hallo";
-      // console.log(test);
-      // if (engageCore.model.get('pluginsInfo').get('pluginlist') && engageCore.model.get('pluginsInfo').get('pluginlist').plugins !== undefined) {
-      //   if ($.isArray(engageCore.model.get('pluginsInfo').get('pluginlist').plugins)) {
-      //     plugin_count = engageCore.model.get('pluginsInfo').get('pluginlist').plugins.length;
-      //     $.each(engageCore.model.get('pluginsInfo').get('pluginlist').plugins, function (index, value) {
-      //       // load plugin
-      //       console.log('Name eq: ' + pluginName + ' === ' + value['name']);
-      //       if (value['static-path'] === pluginName) {
-      //         return PLUGIN_PATH + value['static-path'];
-      //       }
-      //     });
-      //   } else {
-      //     plugin_count = 1;
-      //     // load plugin
-      //     return PLUGIN_PATH + pluginInfos.get('pluginlist').plugins['static-path'];
-      //   }
-      // }
-      // return '';
-    // }
-       var evaluated_plugin_path = "";
+       var evaluated_plugin_path = '';
        var pluginsInfos = engageCore.model.get('pluginsInfo');
        var pluginList = pluginsInfos.get('pluginlist');
        if (pluginList && pluginList.plugins !== undefined) {
-               var plugins = pluginList.plugins;
-               if ($.isArray(plugins)) {
-                 plugin_count = plugins.length;
-                 $.each(plugins, function (index, value) {
-                   console.log('Name eq: ' + pluginName + ' === ' + value['name']);
-                   if (value['name'] === pluginName) {
-                     evaluated_plugin_path = '../../' + value['static-path'] + '/';
-                   }
-                 });
-               } else {
-                 plugin_count = 1;
-                 evaluated_plugin_path = '../../' + value['static-path'] + '/';
-               }
-             } 
+         var plugins = pluginList.plugins;
+         if ($.isArray(plugins)) {
+           plugin_count = plugins.length;
+           $.each(plugins, function (index, value) {
+             if (value['name'] === pluginName) {
+               evaluated_plugin_path = '../../' + value['static-path'] + '/';
+             }
+           });
+         } else {
+           plugin_count = 1;
+           evaluated_plugin_path = '../../' + value['static-path'] + '/';
+         }
+       }
        return evaluated_plugin_path;
      }
   });
