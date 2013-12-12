@@ -55,6 +55,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
           console.log(data);
         }
       }
+    },
+    getPluginPath : function (pluginName) {
+      return '../';
     }
   });
 

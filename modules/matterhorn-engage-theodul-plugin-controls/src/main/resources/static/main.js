@@ -34,6 +34,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         styles: PLUGIN_STYLES,
         template: PLUGIN_TEMPLATE
     };
+    var plugin_path = "";
 
     var initCount = 4; //init resource count
     var isPlaying = false;
@@ -65,6 +66,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             this.model = videoDataModel;
             this.template = template;
             this.pluginPath = plugin_path;
+            console.log("Here:" + plugin_path);
             // bind the render function always to the view
             _.bindAll(this, "render");
             // listen for changes of the model and bind the render function to this
@@ -304,16 +306,18 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     //local logic
 
     //Init Event
-    Engage.log("Controls:init");
-
+    //Engage.log("Controls:init");
+    //Engage.log("Path: " + Engage.getPluginPath(plugin.name));
+    var evaluated_plugin_path = Engage.getPluginPath('EngagePluginControls');
+    Engage.log('Path: ' + evaluated_plugin_path);
     //Load other needed JS stuff with Require
-    require(["./js/bootstrap/js/bootstrap.js"], function() {
+    require([evaluated_plugin_path + 'js/bootstrap/js/bootstrap.js'], function() {
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
         }
     });
-    require(["./js/jqueryui/jquery-ui.min.js"], function() {
+    require([evaluated_plugin_path + 'js/jqueryui/jquery-ui.min.js'], function() {
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
@@ -330,6 +334,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     //All plugins loaded lets do some stuff
     Engage.on("Core:plugin_load_done", function() {
         Engage.log("Controls: receive plugin load done");
+        Engage.log("Hello: " + plugin_path + "js/bootstrap/js/bootstrap");
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
