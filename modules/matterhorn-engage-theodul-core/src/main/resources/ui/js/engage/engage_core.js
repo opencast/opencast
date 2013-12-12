@@ -78,12 +78,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
                 plugin_count = pluginInfos.get('pluginlist').plugins.length;
                 $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
                   // load plugin
-                  loadPlugin(PLUGIN_PATH + value['static-path']);
+                  loadPlugin(PLUGIN_PATH + value['static-path'] + '/');
                 });
               } else {
                 plugin_count = 1;
                 // load plugin
-                loadPlugin(PLUGIN_PATH + pluginInfos.get('pluginlist').plugins['static-path']);
+                loadPlugin(PLUGIN_PATH + pluginInfos.get('pluginlist').plugins['static-path'] + '/');
               }
             }
           }
@@ -190,7 +190,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
   
   function loadPlugin(plugin_path) {
 
-    require([ plugin_path + "/main.js" ], function (plugin) {
+    require([ plugin_path + 'main.js' ], function (plugin) {
       // load styles in link tags via jquery
       if ($.isArray(plugin.styles)) {
         $.each(plugin.styles, function (style_index, style_path) {
@@ -199,7 +199,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
             link.attr({
               type : 'text/css',
               rel : 'stylesheet',
-              href : plugin_path + "/" + style_path
+              href : plugin_path + style_path
             });
             $("head").append(link);
           }
@@ -210,7 +210,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
           link.attr({
             type : 'text/css',
             rel : 'stylesheet',
-            href : plugin_path + "/" + plugin.styles
+            href : plugin_path + plugin.styles
           });
           $("head").append(link);
         }
@@ -218,7 +218,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
 
       if (plugin.template !== "none") {
         // load template async
-        $.get(plugin_path + "/" + plugin.template, function (template) {
+        $.get(plugin_path + plugin.template, function (template) {
           // empty data object
           var template_data = {};
           // add template if not undefined

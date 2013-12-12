@@ -27,7 +27,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 	
 	//Init Event
     Engage.log("Tab:Slidetext: init");
-    
+    var relative_plugin_path = Engage.getPluginPath('EngagePluginTabSlidetext');
+    Engage.log('TabSlidetext: relative plugin path ' + relative_plugin_path);
     //Load other needed JS stuff with Require
     //require(["./js/bootstrap/js/bootstrap.js"]);
     //require(["./js/jqueryui/jquery-ui.min.js"]);	

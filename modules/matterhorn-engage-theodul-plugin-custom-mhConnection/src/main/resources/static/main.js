@@ -88,6 +88,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // plugin logic //
 
     Engage.log("MhConnection: init");
+    var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomMhConnection');
+    Engage.log('MhConnection: relative plugin path ' + relative_plugin_path);
 
     // Get ID
     //mediaPackageID = Engage.urlParams.id;

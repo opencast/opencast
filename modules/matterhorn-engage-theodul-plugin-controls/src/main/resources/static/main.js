@@ -66,7 +66,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             this.model = videoDataModel;
             this.template = template;
             this.pluginPath = plugin_path;
-            console.log("Here:" + plugin_path);
             // bind the render function always to the view
             _.bindAll(this, "render");
             // listen for changes of the model and bind the render function to this
@@ -306,16 +305,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     //local logic
 
     //Init Event
-    Engage.log("Controls:init");
-    var evaluated_plugin_path = Engage.getPluginPath('EngagePluginControls');
+    Engage.log("Controls: init");
+    var relative_plugin_path = Engage.getPluginPath('EngagePluginControls');
+    Engage.log('Controls: relative plugin path ' + relative_plugin_path);
     //Load other needed JS stuff with Require
-    require([evaluated_plugin_path + 'js/bootstrap/js/bootstrap'], function() {
+    require([relative_plugin_path + 'js/bootstrap/js/bootstrap'], function() {
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
         }
     });
-    require([evaluated_plugin_path + 'js/jqueryui/jquery-ui.min'], function() {
+    require([relative_plugin_path + 'js/jqueryui/jquery-ui.min'], function() {
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
