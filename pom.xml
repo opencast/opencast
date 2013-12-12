@@ -868,26 +868,11 @@
         <artifactId>maven-clover2-plugin</artifactId>
         <version>3.1.5</version>
       </plugin>
-<!--      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <version>2.5.3-SNAPSHOT</version>
-        <configuration>
-          <failOnError>true</failOnError>
-          <skip>true</skip>
-          <!- -<timeout>30000</timeout>- ->
-          <!- -<effort>Max</effort>- ->
-          <!- -<threshold>Low</threshold>- ->
-        </configuration>
-        <executions>
-          <execution>
-            <phase>verify</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.0.1</version>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
@@ -1069,6 +1054,20 @@
             <execution>
               <goals>
                 <goal>add-source</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>3.0.1</version>
+          <executions>
+            <execution>
+              <phase>install</phase>
+              <goals>
+                <goal>pmd</goal>
+                <goal>cpd</goal>
               </goals>
             </execution>
           </executions>
@@ -2123,18 +2122,6 @@
           </reportSet>
         </reportSets>
       </plugin>
-<!--      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <version>2.5.3-SNAPSHOT</version>
-        <configuration>
-          <failOnError>true</failOnError>
-          <xmlOutput>true</xmlOutput>
-          <!- -<timeout>30000</timeout>- ->
-          <!- -<effort>Max</effort>- ->
-          <!- -<threshold>Low</threshold>- ->
-        </configuration>
-      </plugin>-->
       <!--<plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
