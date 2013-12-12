@@ -16,16 +16,18 @@
 
 package org.opencastproject.util;
 
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+import static org.opencastproject.util.data.functions.Strings.asStringNull;
+
 import org.opencastproject.util.data.Function2;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
-
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.functions.Strings.asStringNull;
 
 /**
  * <code>UrlSupport</code> is a helper class to deal with urls.
@@ -37,6 +39,46 @@ public final class UrlSupport {
    * This class should not be instanciated, since it only provides static utility methods.
    */
   private UrlSupport() {
+  }
+
+  /** URI constructor function without checked exceptions. */
+  public static URI uri(String uri) {
+    try {
+      return new URI(uri);
+    } catch (Exception e) {
+      return chuck(e);
+    }
+  }
+
+  /** URL constructor function without checked exceptions. */
+  public static URL url(String url) {
+    try {
+      return new URL(url);
+    } catch (Exception e) {
+      return chuck(e);
+    }
+  }
+
+  /** URL constructor function without checked exceptions. */
+  public static URL url(String protocol, String host, int port) {
+    try {
+      return new URL(protocol, host, port, "/");
+    } catch (Exception e) {
+      return chuck(e);
+    }
+  }
+
+  /**
+   * URL constructor function without checked exceptions.
+   * 
+   * @see URL
+   */
+  public static URL url(URL context, String spec) {
+    try {
+      return new URL(context, spec);
+    } catch (Exception e) {
+      return chuck(e);
+    }
   }
 
   /**
@@ -125,7 +167,7 @@ public final class UrlSupport {
 
   /**
    * Concatenates the urls with respect to leading and trailing slashes.
-   *
+   * 
    * @param parts
    *          the parts to concat
    * @return the concatenated url
@@ -136,7 +178,8 @@ public final class UrlSupport {
     if (parts.size() == 0)
       throw new IllegalArgumentException("Array parts is empty");
     return mlist(parts).reducel(new Function2<String, String, String>() {
-      @Override public String apply(String s, String s1) {
+      @Override
+      public String apply(String s, String s1) {
         return concat(s, s1);
       }
     });
@@ -183,13 +226,15 @@ public final class UrlSupport {
   }
 
   /**
-   * Removes any occurence of double separators ("//") and replaces it with "/".
+   * Removes any occurrence of double separators ("//") and replaces it with "/".
+   * Any double separators right after the protocol part are left untouched so that, e.g. http://localhost
+   * stays http://localhost
    * 
    * @param path
    *          the path to check
    * @return the corrected path
    */
-  private static String removeDoubleSeparator(String path) {
+  public static String removeDoubleSeparator(String path) {
     String protocol = "";
     int index = path.indexOf("://");
 

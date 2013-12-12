@@ -21,6 +21,10 @@ import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.EncodingProfileImpl;
 import org.opencastproject.composer.api.EncodingProfileList;
+import org.opencastproject.composer.api.LaidOutElement;
+import org.opencastproject.composer.layout.Dimension;
+import org.opencastproject.composer.layout.Layout;
+import org.opencastproject.composer.layout.Serializer;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
@@ -31,8 +35,10 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -49,6 +55,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -318,6 +325,198 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
       logger.warn("Unable to extract image(s): " + e.getMessage());
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  /**
+   * Compose two videos into one with an optional watermark.
+   * 
+   * @param compositeSizeJson
+   *          The composite track dimension as JSON
+   * @param lowerTrackXml
+   *          The lower track of the composition as XML
+   * @param lowerLayoutJson
+   *          The lower layout as JSON
+   * @param upperTrackXml
+   *          The upper track of the composition as XML
+   * @param upperLayoutJson
+   *          The upper layout as JSON
+   * @param watermarkAttachmentXml
+   *          The watermark image attachment of the composition as XML
+   * @param watermarkLayoutJson
+   *          The watermark layout as JSON
+   * @param profileId
+   *          The encoding profile to use
+   * @param background
+   *          The background color
+   * @return A {@link Response} with the resulting track in the response body
+   * @throws Exception
+   */
+  @POST
+  @Path("composite")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "composite", description = "Starts a video compositing process, based on the specified resolution, encoding profile ID, the source elements and their layouts", restParameters = {
+          @RestParameter(description = "The resolution size of the resulting video as JSON", isRequired = true, name = "compositeSize", type = Type.STRING),
+          @RestParameter(description = "The lower source track containing the lower video", isRequired = true, name = "lowerTrack", type = Type.TEXT),
+          @RestParameter(description = "The lower layout containing the JSON definition of the layout", isRequired = true, name = "lowerLayout", type = Type.TEXT),
+          @RestParameter(description = "The upper source track containing the upper video", isRequired = true, name = "upperTrack", type = Type.TEXT),
+          @RestParameter(description = "The upper layout containing the JSON definition of the layout", isRequired = true, name = "upperLayout", type = Type.TEXT),
+          @RestParameter(description = "The watermark source attachment containing watermark image", isRequired = false, name = "watermarkTrack", type = Type.TEXT),
+          @RestParameter(description = "The watermark layout containing the JSON definition of the layout", isRequired = false, name = "watermarkLayout", type = Type.TEXT),
+          @RestParameter(description = "The background color", isRequired = false, name = "background", type = Type.TEXT, defaultValue = "black"),
+          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING) }, reponses = {
+          @RestResponse(description = "Results in an xml document containing the compound video track", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "If required parameters aren't set or if the source elements aren't from the right type", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  public Response composite(@FormParam("compositeSize") String compositeSizeJson,
+          @FormParam("lowerTrack") String lowerTrackXml, @FormParam("lowerLayout") String lowerLayoutJson,
+          @FormParam("upperTrack") String upperTrackXml, @FormParam("upperLayout") String upperLayoutJson,
+          @FormParam("watermarkAttachment") String watermarkAttachmentXml,
+          @FormParam("watermarkLayout") String watermarkLayoutJson, @FormParam("profileId") String profileId,
+          @FormParam("background") @DefaultValue("black") String background) throws Exception {
+    // Ensure that the POST parameters are present
+    if (StringUtils.isBlank(compositeSizeJson) || StringUtils.isBlank(lowerTrackXml)
+            || StringUtils.isBlank(lowerLayoutJson) || StringUtils.isBlank(upperTrackXml)
+            || StringUtils.isBlank(upperLayoutJson) || StringUtils.isBlank(profileId))
+      return Response.status(Response.Status.BAD_REQUEST).entity("One of the required parameters must not be null")
+              .build();
+
+    // Deserialize the source elements
+    MediaPackageElement lowerTrack = MediaPackageElementParser.getFromXml(lowerTrackXml);
+    Layout lowerLayout = Serializer.layout(JsonObj.jsonObj(lowerLayoutJson));
+    if (!Track.TYPE.equals(lowerTrack.getElementType()))
+      return Response.status(Response.Status.BAD_REQUEST).entity("lowerTrack element must be of type track").build();
+    LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>((Track) lowerTrack, lowerLayout);
+
+    MediaPackageElement upperTrack = MediaPackageElementParser.getFromXml(upperTrackXml);
+    Layout upperLayout = Serializer.layout(JsonObj.jsonObj(upperLayoutJson));
+    if (!Track.TYPE.equals(upperTrack.getElementType()))
+      return Response.status(Response.Status.BAD_REQUEST).entity("upperTrack element must be of type track").build();
+    LaidOutElement<Track> upperLaidOutElement = new LaidOutElement<Track>((Track) upperTrack, upperLayout);
+
+    Option<LaidOutElement<Attachment>> watermarkLaidOutElement = Option.<LaidOutElement<Attachment>> none();
+    if (StringUtils.isNotBlank(watermarkAttachmentXml)) {
+      Layout watermarkLayout = Serializer.layout(JsonObj.jsonObj(watermarkLayoutJson));
+      MediaPackageElement watermarkAttachment = MediaPackageElementParser.getFromXml(watermarkAttachmentXml);
+      if (!Attachment.TYPE.equals(watermarkAttachment.getElementType()))
+        return Response.status(Response.Status.BAD_REQUEST).entity("watermarkTrack element must be of type track")
+                .build();
+      watermarkLaidOutElement = Option.some(new LaidOutElement<Attachment>((Attachment) watermarkAttachment,
+              watermarkLayout));
+    }
+
+    Dimension compositeTrackSize = Serializer.dimension(JsonObj.jsonObj(compositeSizeJson));
+
+    try {
+      // Asynchronously composite the specified source elements
+      Job job = composerService.composite(compositeTrackSize, upperLaidOutElement, lowerLaidOutElement,
+              watermarkLaidOutElement, profileId, background);
+      return Response.ok().entity(new JaxbJob(job)).build();
+    } catch (EncoderException e) {
+      logger.warn("Unable to composite video: " + e.getMessage());
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  /**
+   * Concat multiple tracks having the same codec to a single track.
+   * 
+   * @param sourceTracksXml
+   *          an array of track to concat in order of the array as XML
+   * @param profileId
+   *          The encoding profile to use
+   * @param outputDimension
+   *          The output dimension as JSON
+   * @return A {@link Response} with the resulting track in the response body
+   * @throws Exception
+   */
+  @POST
+  @Path("concat")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "concat", description = "Starts a video concating process from multiple videos, based on the specified encoding profile ID and the source tracks", restParameters = {
+          @RestParameter(description = "The source tracks to concat as XML", isRequired = true, name = "sourceTracks", type = Type.TEXT),
+          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING),
+          @RestParameter(description = "The resolution dimension of the concat video as JSON", isRequired = true, name = "outputDimension", type = Type.STRING) }, reponses = {
+          @RestResponse(description = "Results in an xml document containing the video track", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "If required parameters aren't set or if sourceTracks aren't from the type Track or not at lest two tracks are present", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  public Response concat(@FormParam("sourceTracks") String sourceTracksXml, @FormParam("profileId") String profileId,
+          @FormParam("outputDimension") String outputDimension) throws Exception {
+    // Ensure that the POST parameters are present
+    if (StringUtils.isBlank(sourceTracksXml) || StringUtils.isBlank(profileId) || StringUtils.isBlank(outputDimension))
+      return Response.status(Response.Status.BAD_REQUEST)
+              .entity("sourceTracks, outputDimension and profileId must not be null").build();
+
+    // Deserialize the source track
+    List<? extends MediaPackageElement> tracks = MediaPackageElementParser.getArrayFromXml(sourceTracksXml);
+    if (tracks.size() < 2)
+      return Response.status(Response.Status.BAD_REQUEST).entity("At least two tracks must be set to concat").build();
+
+    for (MediaPackageElement elem : tracks) {
+      if (!Track.TYPE.equals(elem.getElementType()))
+        return Response.status(Response.Status.BAD_REQUEST).entity("sourceTracks must be of type track").build();
+    }
+
+    try {
+      // Asynchronously concat the specified tracks together
+      Job job = composerService.concat(profileId, Serializer.dimension(JsonObj.jsonObj(outputDimension)),
+              tracks.toArray(new Track[tracks.size()]));
+      return Response.ok().entity(new JaxbJob(job)).build();
+    } catch (EncoderException e) {
+      logger.warn("Unable to concat videos: " + e.getMessage());
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  /**
+   * Transforms an image attachment to a video track
+   * 
+   * @param sourceAttachmentXml
+   *          The source image attachment
+   * @param profileId
+   *          The profile to use for encoding
+   * @param timeString
+   *          the length of the resulting video track in seconds
+   * @return A {@link Response} with the resulting track in the response body
+   * @throws Exception
+   */
+  @POST
+  @Path("imagetovideo")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "imagetovideo", description = "Starts an image converting process to a video, based on the specified encoding profile ID and the source image attachment", restParameters = {
+          @RestParameter(description = "The resulting video time in seconds", isRequired = false, name = "time", type = Type.STRING, defaultValue = "1"),
+          @RestParameter(description = "The attachment containing the image to convert", isRequired = true, name = "sourceAttachment", type = Type.TEXT),
+          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING) }, reponses = {
+          @RestResponse(description = "Results in an xml document containing the video track", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "If required parameters aren't set or if sourceAttachment isn't from the type Attachment", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  public Response imageToVideo(@FormParam("sourceAttachment") String sourceAttachmentXml,
+          @FormParam("profileId") String profileId, @FormParam("time") @DefaultValue("1") String timeString)
+          throws Exception {
+    // Ensure that the POST parameters are present
+    if (StringUtils.isBlank(sourceAttachmentXml) || StringUtils.isBlank(profileId))
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceAttachment and profileId must not be null")
+              .build();
+
+    // parse time
+    Long time;
+    try {
+      time = Long.parseLong(timeString);
+    } catch (Exception e) {
+      logger.info("Unable to parse time {} as long value!", timeString);
+      return Response.status(Response.Status.BAD_REQUEST).entity("Could not parse time: invalid format").build();
+    }
+
+    // Deserialize the source track
+    MediaPackageElement sourceAttachment = MediaPackageElementParser.getFromXml(sourceAttachmentXml);
+    if (!Attachment.TYPE.equals(sourceAttachment.getElementType()))
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceAttachment element must be of type attachment")
+              .build();
+
+    try {
+      // Asynchronously convert the specified attachment to a video
+      Job job = composerService.imageToVideo((Attachment) sourceAttachment, profileId, time);
+      return Response.ok().entity(new JaxbJob(job)).build();
+    } catch (EncoderException e) {
+      logger.warn("Unable to convert image to video: " + e.getMessage());
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
