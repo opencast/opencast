@@ -57,7 +57,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
       }
     },
     getPluginPath : function (pluginName) {
-      return '../';
+      return '';
     }
   });
 

@@ -311,13 +311,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var evaluated_plugin_path = Engage.getPluginPath('EngagePluginControls');
     Engage.log('Path: ' + evaluated_plugin_path);
     //Load other needed JS stuff with Require
-    require([evaluated_plugin_path + 'js/bootstrap/js/bootstrap.js'], function() {
+    require([evaluated_plugin_path + 'js/bootstrap/js/bootstrap'], function() {
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
         }
     });
-    require([evaluated_plugin_path + 'js/jqueryui/jquery-ui.min.js'], function() {
+    require([evaluated_plugin_path + 'js/jqueryui/jquery-ui.min'], function() {
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
