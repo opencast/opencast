@@ -100,7 +100,6 @@ public class OcropusTextExtractor implements TextExtractor {
     // Do the extraction
     ProcessExecutor<TextAnalyzerException> analyzer = new ProcessExecutor<TextAnalyzerException>(binary,
             image.getAbsolutePath()) {
-      @Override
       protected boolean onLineRead(String line) {
         logger.trace(line);
         ocrocmdOutput.append(line).append('\n');

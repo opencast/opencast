@@ -16,6 +16,7 @@
 package org.opencastproject.workflow.handler;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.opencastproject.systems.MatterhornConstans.SERVER_URL_PROPERTY;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.functions.Strings.toBool;
 import static org.opencastproject.util.data.functions.Strings.trimToNone;
@@ -43,6 +44,7 @@ import org.opencastproject.search.api.SearchService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -80,7 +82,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final Logger logger = LoggerFactory.getLogger(PublishEngageWorkflowOperationHandler.class);
 
   /** Configuration properties id */
-  private static final String SERVER_URL_PROPERTY = "org.opencastproject.server.url";
   private static final String ENGAGE_URL_PROPERTY = "org.opencastproject.engage.ui.url";
   private static final String STREAMING_URL_PROPERTY = "org.opencastproject.streaming.url";
 
@@ -104,8 +105,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /** The search service */
   private SearchService searchService = null;
 
-  /** The base url to engage */
-  private URL engageBaseUrl;
+  /** The server url */
+  private URL serverUrl;
 
   /** Whether to distribute to streaming server */
   private boolean distributeStreaming = false;
@@ -171,22 +172,10 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     super.activate(cc);
     BundleContext bundleContext = cc.getBundleContext();
 
-    // Get engage UI url
-    try {
-      String engageBaseUrlStr = bundleContext.getProperty(ENGAGE_URL_PROPERTY);
-      if (StringUtils.isNotBlank(engageBaseUrlStr)) {
-        engageBaseUrl = new URL(engageBaseUrlStr);
-      } else {
-        engageBaseUrl = new URL(bundleContext.getProperty(SERVER_URL_PROPERTY));
-      }
-    } catch (MalformedURLException e) {
-      throw new IllegalArgumentException(e);
-    }
+    serverUrl = UrlSupport.url(bundleContext.getProperty(SERVER_URL_PROPERTY));
 
     if (StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY)))
       distributeStreaming = true;
-
-    logger.debug("Default engage server url is {}", engageBaseUrl);
   }
 
   /**
@@ -308,16 +297,14 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       try {
         for (String elementId : downloadElementIds) {
           Job job = downloadDistributionService.distribute(CHANNEL_ID, mediaPackage, elementId, checkAvailability);
-          if (job == null)
-            continue;
-          jobs.add(job);
+          if (job != null)
+            jobs.add(job);
         }
         if (distributeStreaming) {
           for (String elementId : streamingElementIds) {
             Job job = streamingDistributionService.distribute(CHANNEL_ID, mediaPackage, elementId);
-            if (job == null)
-              continue;
-            jobs.add(job);
+            if (job != null)
+              jobs.add(job);
           }
         }
       } catch (DistributionException e) {
@@ -335,6 +322,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
       logger.debug("Distribute of mediapackage {} completed", mediaPackage);
 
+      String engageUrlString = null;
       try {
         MediaPackage mediaPackageForSearch = getMediaPackageForSearchIndex(mediaPackage, jobs, downloadSubflavor,
                 targetDownloadTags, downloadElementIds, streamingSubflavor, streamingElementIds, targetStreamingTags);
@@ -342,6 +330,18 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           throw new WorkflowOperationException("Media package does not meet criteria for publication");
 
         logger.info("Publishing media package {} to search index", mediaPackageForSearch);
+
+        URL engageBaseUrl = null;
+        engageUrlString = StringUtils.trimToNull(workflowInstance.getOrganization().getProperties()
+                .get(ENGAGE_URL_PROPERTY));
+        if (engageUrlString != null) {
+          engageBaseUrl = new URL(engageUrlString);
+        } else {
+          engageBaseUrl = serverUrl;
+          logger.info(
+                  "Using 'server.url' as a fallback for the non-existing organization level key '{}' for the publication url",
+                  ENGAGE_URL_PROPERTY);
+        }
 
         // Create new distribution element
         URI engageUri = URIUtils.resolve(engageBaseUrl.toURI(), "/engage/ui/watch.html?id="
@@ -366,6 +366,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
         logger.debug("Publishing of mediapackage {} completed", mediaPackage);
         return createResult(mediaPackage, Action.CONTINUE);
+      } catch (MalformedURLException e) {
+        logger.error("{} is malformed: {}", ENGAGE_URL_PROPERTY, engageUrlString);
+        throw new WorkflowOperationException(e);
       } catch (Throwable t) {
         if (t instanceof WorkflowOperationException)
           throw (WorkflowOperationException) t;
@@ -411,7 +414,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     // All the jobs have passed, let's update the mediapackage with references to the distributed elements
     List<String> elementsToPublish = new ArrayList<String>();
     Map<String, String> distributedElementIds = new HashMap<String, String>();
-    
+
     for (Job entry : jobs) {
       Job job = serviceRegistry.getJob(entry.getId());
       String sourceElementId = job.getArguments().get(2);
@@ -503,7 +506,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       String distributedElementId = distributedElementIds.get(reference.getIdentifier());
       if (distributedElementId == null)
         continue;
-      
+
       MediaPackageReference translatedReference = new MediaPackageReferenceImpl(mp.getElementById(distributedElementId));
       if (reference.getProperties() != null) {
         translatedReference.getProperties().putAll(reference.getProperties());

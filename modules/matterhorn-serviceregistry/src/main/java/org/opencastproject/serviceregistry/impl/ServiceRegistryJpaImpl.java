@@ -44,10 +44,10 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.opencastproject.serviceregistry.api.SystemLoad;
-import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.serviceregistry.impl.jmx.HostsStatistics;
 import org.opencastproject.serviceregistry.impl.jmx.JobsStatistics;
 import org.opencastproject.serviceregistry.impl.jmx.ServicesStatistics;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.jmx.JmxUtil;
@@ -237,10 +237,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     cleanUndispatchableJobs();
 
     // Find this host's url
-    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty("org.opencastproject.server.url"))) {
+    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY))) {
       hostName = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      hostName = cc.getBundleContext().getProperty("org.opencastproject.server.url");
+      hostName = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
     }
 
     // Register JMX beans with statistics
@@ -1899,7 +1899,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       // Add current organization and user so they can be used during execution at the remote end
       post.addHeader(ORGANIZATION_HEADER, securityService.getOrganization().getId());
-      post.addHeader(USER_HEADER, securityService.getUser().getUserName());
+      post.addHeader(USER_HEADER, securityService.getUser().getUsername());
 
       try {
         String jobXml = JobParser.toXml(jpaJob);

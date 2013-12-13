@@ -24,6 +24,7 @@ import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.capture.admin.api.Recording;
 import org.opencastproject.capture.admin.api.RecordingState;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -317,7 +318,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     User user = securityService.getUser();
     Organization org = securityService.getOrganization();
     String orgAdmin = org.getAdminRole();
-    String[] roles = user.getRoles();
+    Set<Role> roles = user.getRoles();
     try {
       em = emf.createEntityManager();
       Query q = em.createNamedQuery("Agent.byOrganization");
@@ -335,8 +336,8 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
             continue;
           }
           boolean hasSchedulerRole = false;
-          for (String role : roles) {
-            if (schedulerRoles.contains(role)) {
+          for (Role role : roles) {
+            if (schedulerRoles.contains(role.getName())) {
               hasSchedulerRole = true;
               break;
             }

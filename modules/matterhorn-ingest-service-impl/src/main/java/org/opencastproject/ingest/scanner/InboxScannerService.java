@@ -16,8 +16,13 @@
 
 package org.opencastproject.ingest.scanner;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.felix.fileinstall.ArtifactInstaller;
+import static org.opencastproject.security.util.SecurityUtil.getUserAndOrganization;
+import static org.opencastproject.util.data.Collections.dict;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.Tuple.tuple;
+
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -31,6 +36,9 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
@@ -47,25 +55,17 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.opencastproject.security.util.SecurityUtil.getUserAndOrganization;
-import static org.opencastproject.util.data.Collections.dict;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.Tuple.tuple;
-
 /**
  * The inbox scanner monitors a directory for incoming media packages.
  * <p/>
- * There is one InboxScanner instance per inbox. Each instance is configured by
- * a config file in <code>$FELIX_HOME/load</code> named <code>&lt;inbox-scanned-pid&gt;-&lt;name&gt;.cfg</code>
- * where <code>name</code> can be arbitrarily chosen and has no further meaning.
- * <code>inbox-scanned-pid</code> must confirm to the PID given to the InboxScanner in the declarative service (DS)
- * configuration <code>OSGI-INF/inbox-scanner-service.xml</code>.
- *
+ * There is one InboxScanner instance per inbox. Each instance is configured by a config file in
+ * <code>$FELIX_HOME/load</code> named <code>&lt;inbox-scanned-pid&gt;-&lt;name&gt;.cfg</code> where <code>name</code>
+ * can be arbitrarily chosen and has no further meaning. <code>inbox-scanned-pid</code> must confirm to the PID given to
+ * the InboxScanner in the declarative service (DS) configuration <code>OSGI-INF/inbox-scanner-service.xml</code>.
+ * 
  * <h3>Implementation notes</h3>
  * Monitoring leverages Apache FileInstall by implementing {@link ArtifactInstaller}.
- *
+ * 
  * @see Ingestor
  */
 public class InboxScannerService implements ArtifactInstaller, ManagedService {
@@ -129,15 +129,15 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     if (!inbox.canRead()) {
       throw new ConfigurationException(INBOX_PATH, "Cannot read from %s".format(inbox.getAbsolutePath()));
     }
-    final int maxthreads = option(cc.getBundleContext().getProperty("org.opencastproject.inbox.threads")).bind(Strings.toInt).getOrElse(1);
-    final Option<SecurityContext> secCtx =
-            getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
-                    .bind(new Function<Tuple<User, Organization>, Option<SecurityContext>>() {
-                      @Override
-                      public Option<SecurityContext> apply(Tuple<User, Organization> a) {
-                        return some(new SecurityContext(securityService, a.getB(), a.getA()));
-                      }
-                    });
+    final int maxthreads = option(cc.getBundleContext().getProperty("org.opencastproject.inbox.threads")).bind(
+            Strings.toInt).getOrElse(1);
+    final Option<SecurityContext> secCtx = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
+            .bind(new Function<Tuple<User, Organization>, Option<SecurityContext>>() {
+              @Override
+              public Option<SecurityContext> apply(Tuple<User, Organization> a) {
+                return some(new SecurityContext(securityService, a.getB(), a.getA()));
+              }
+            });
     // Only setup new inbox if security context could be aquired
     if (secCtx.isSome()) {
       // remove old file install configuration
@@ -150,7 +150,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
       logger.info("Now watching inbox {}", inbox.getAbsolutePath());
     } else {
       logger.warn("Cannot create security context for user {}, organization {}. "
-                          + "Either the organization or the user does not exist", userId, orgId);
+              + "Either the organization or the user does not exist", userId, orgId);
     }
   }
 
@@ -163,28 +163,24 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   /**
    * Setup an Apache FileInstall configuration for the inbox folder this scanner is responsible for.
-   *
-   * see section 104.4.1 Location Binding, paragraph 4, of the OSGi Spec 4.2
-   * The correct permissions are needed in order to set configuration data for a bundle other than
-   * the calling bundle itself.
+   * 
+   * see section 104.4.1 Location Binding, paragraph 4, of the OSGi Spec 4.2 The correct permissions are needed in order
+   * to set configuration data for a bundle other than the calling bundle itself.
    */
   public static Configuration configureFileInstall(BundleContext bc, File inbox, int interval) {
     final ServiceReference caRef = bc.getServiceReference(ConfigurationAdmin.class.getName());
     if (caRef == null) {
       throw new Error("Cannot obtain a reference to the ConfigurationAdmin service");
     }
-    final Dictionary<String, String> fileInstallConfig = dict(
-            tuple("felix.fileinstall.dir", inbox.getAbsolutePath()),
+    final Dictionary<String, String> fileInstallConfig = dict(tuple("felix.fileinstall.dir", inbox.getAbsolutePath()),
             tuple("felix.fileinstall.poll", Integer.toString(interval)));
 
     // update file install config with the new directory
     try {
-      final String fileInstallBundleLocation =
-              bc.getServiceReferences("org.osgi.service.cm.ManagedServiceFactory", "(service.pid=org.apache.felix.fileinstall)")[0]
-                      .getBundle()
-                      .getLocation();
-      final Configuration conf = ((ConfigurationAdmin) bc.getService(caRef))
-              .createFactoryConfiguration("org.apache.felix.fileinstall", fileInstallBundleLocation);
+      final String fileInstallBundleLocation = bc.getServiceReferences("org.osgi.service.cm.ManagedServiceFactory",
+              "(service.pid=org.apache.felix.fileinstall)")[0].getBundle().getLocation();
+      final Configuration conf = ((ConfigurationAdmin) bc.getService(caRef)).createFactoryConfiguration(
+              "org.apache.felix.fileinstall", fileInstallBundleLocation);
       conf.update(fileInstallConfig);
       return conf;
     } catch (Exception e) {
@@ -219,12 +215,12 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   @Override
   public void update(File artifact) throws Exception {
-    //To change body of implemented methods use File | Settings | File Templates.
+    // To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
   public void uninstall(File artifact) throws Exception {
-    //To change body of implemented methods use File | Settings | File Templates.
+    // To change body of implemented methods use File | Settings | File Templates.
   }
 
   // --
@@ -256,9 +252,9 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   /**
    * Get a mandatory, non-blank value from a dictionary.
-   *
+   * 
    * @throws ConfigurationException
-   *         key does not exist or its value is blank
+   *           key does not exist or its value is blank
    */
   public static String getCfg(Dictionary d, String key) throws ConfigurationException {
     Object p = d.get(key);
@@ -282,9 +278,9 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   /**
    * Get a mandatory integer from a dictionary.
-   *
+   * 
    * @throws ConfigurationException
-   *         key does not exist or is not an integer
+   *           key does not exist or is not an integer
    */
   public static int getCfgAsInt(Dictionary d, String key) throws ConfigurationException {
     try {

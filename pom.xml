@@ -33,6 +33,7 @@
       </activation>
       <modules>
         <module>modules/matterhorn-admin-ui</module>
+        <module>modules/matterhorn-authorization-manager</module>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-caption-api</module>
         <module>modules/matterhorn-caption-remote</module>
@@ -72,7 +73,7 @@
         <module>modules/matterhorn-static</module>
         <module>modules/matterhorn-solr</module>
         <module>modules/matterhorn-textanalyzer-api</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
@@ -168,7 +169,7 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -197,7 +198,7 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-workflow-service-remote</module>   
@@ -233,7 +234,7 @@
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-remote</module>
         <module>modules/matterhorn-static</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -265,7 +266,7 @@
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
         <module>modules/matterhorn-static</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -326,7 +327,7 @@
         <module>modules/matterhorn-search-service-feeds</module>
         <module>modules/matterhorn-search-service-impl</module>
         <module>modules/matterhorn-solr</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-usertracking-api</module>
         <module>modules/matterhorn-usertracking-impl</module>
         <module>modules/matterhorn-webconsole</module>
@@ -360,7 +361,7 @@
         <module>modules/matterhorn-search-service-feeds</module>
         <module>modules/matterhorn-search-service-impl</module>
         <module>modules/matterhorn-solr</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-usertracking-api</module>
         <module>modules/matterhorn-usertracking-impl</module>
         <module>modules/matterhorn-webconsole</module>
@@ -430,7 +431,7 @@
         <!--
         <module>modules/matterhorn-textextractor-ocropus</module>
         -->
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-impl</module>
         <module>modules/matterhorn-webconsole</module>
@@ -471,7 +472,7 @@
         <!--
         <module>modules/matterhorn-textextractor-ocropus</module>
         -->
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-impl</module>
         <module>modules/matterhorn-webconsole</module>
@@ -600,7 +601,7 @@
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-workspace-api</module>
       </modules>
     </profile>
@@ -635,6 +636,16 @@
       </activation>
       <modules>
         <module>modules/matterhorn-security-openid</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>directory-shibboleth</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-security-shibboleth</module>
       </modules>
     </profile>
 

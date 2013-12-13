@@ -19,10 +19,15 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
@@ -41,8 +46,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Tests XACML features of the security service
@@ -59,10 +65,10 @@ public class XacmlSecurityTest {
   protected final String currentUser = "me";
 
   /** The organization to use */
-  protected final Organization organization = new DefaultOrganization();
+  protected final JaxbOrganization organization = new DefaultOrganization();
 
   /** The roles to use with the security service */
-  protected final List<String> currentRoles = new ArrayList<String>();
+  protected final Set<JaxbRole> currentRoles = new HashSet<JaxbRole>();
 
   // Override the behavior of the security service to use the current user and roles defined here
   protected SecurityService securityService = null;
@@ -75,7 +81,7 @@ public class XacmlSecurityTest {
     securityService = new SecurityService() {
       @Override
       public User getUser() {
-        return new User(currentUser, organization.getId(), currentRoles.toArray(new String[currentRoles.size()]));
+        return new JaxbUser(currentUser, organization, currentRoles);
       }
 
       @Override
@@ -100,7 +106,7 @@ public class XacmlSecurityTest {
 
   @After
   public void tearDown() throws Exception {
-    workspace.file.delete();
+    // workspace.file.delete();
   }
 
   @Test
@@ -109,85 +115,88 @@ public class XacmlSecurityTest {
     // Create a mediapackage and some role/action tuples
     MediaPackage mediapackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
 
-    AccessControlList accessControlList = new AccessControlList();
-    List<AccessControlEntry> acl = accessControlList.getEntries();
-    acl.add(new AccessControlEntry("admin", "delete", true));
-    acl.add(new AccessControlEntry("admin", "read", true));
+    AccessControlList aclSeries1 = new AccessControlList();
+    List<AccessControlEntry> entriesSeries1 = aclSeries1.getEntries();
+    entriesSeries1.add(new AccessControlEntry("admin", "delete", true));
+    entriesSeries1.add(new AccessControlEntry("admin", "read", true));
 
-    acl.add(new AccessControlEntry("student", "read", true));
-    acl.add(new AccessControlEntry("student", "comment", true));
+    entriesSeries1.add(new AccessControlEntry("student", "read", true));
+    entriesSeries1.add(new AccessControlEntry("student", "comment", true));
 
-    acl.add(new AccessControlEntry(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, "read", true));
-    acl.add(new AccessControlEntry(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, "comment", false));
+    entriesSeries1.add(new AccessControlEntry(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, "read", true));
+    entriesSeries1.add(new AccessControlEntry(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, "comment", false));
 
-    String xacml = XACMLUtils.getXacml(mediapackage, accessControlList);
-    logger.debug("XACML contents: {}", xacml);
+    AccessControlList aclSeries2 = new AccessControlList();
+    List<AccessControlEntry> entriesSeries2 = aclSeries2.getEntries();
+    entriesSeries2.add(new AccessControlEntry("admin", "delete", true));
+    entriesSeries2.add(new AccessControlEntry("admin", "read", true));
+
+    entriesSeries2.add(new AccessControlEntry("student", "read", false));
+    entriesSeries2.add(new AccessControlEntry("student", "comment", false));
+
+    entriesSeries2.add(new AccessControlEntry(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, "read", true));
+    entriesSeries2.add(new AccessControlEntry(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, "comment", false));
+
+    AccessControlList aclEpisode = new AccessControlList();
 
     // Add the security policy to the mediapackage
-    mediapackage = authzService.setAccessControl(mediapackage, accessControlList);
+    authzService.setAcl(mediapackage, AclScope.Series, aclSeries1);
 
     // Ensure that the permissions specified are respected by the security service
     currentRoles.clear();
-    currentRoles.add("admin");
+    currentRoles.add(new JaxbRole("admin", organization, ""));
     Assert.assertTrue(authzService.hasPermission(mediapackage, "delete"));
     Assert.assertTrue(authzService.hasPermission(mediapackage, "read"));
     Assert.assertFalse(authzService.hasPermission(mediapackage, "comment"));
-
-    AccessControlList computedAcl = authzService.getAccessControlList(mediapackage);
-    Assert.assertTrue("ACLs are the same size?", computedAcl.getEntries().size() == acl.size());
-    Assert.assertTrue("ACLs contain the same ACEs?", computedAcl.getEntries().containsAll(acl));
-
     currentRoles.clear();
-    currentRoles.add("student");
+    currentRoles.add(new JaxbRole("student", organization, ""));
     Assert.assertFalse(authzService.hasPermission(mediapackage, "delete"));
     Assert.assertTrue(authzService.hasPermission(mediapackage, "read"));
     Assert.assertTrue(authzService.hasPermission(mediapackage, "comment"));
+    currentRoles.clear();
+    currentRoles.add(new JaxbRole("admin", organization));
+
+    authzService.setAcl(mediapackage, AclScope.Episode, aclEpisode);
+    Assert.assertFalse(authzService.hasPermission(mediapackage, "delete"));
+    Assert.assertFalse(authzService.hasPermission(mediapackage, "read"));
+    Assert.assertFalse(authzService.hasPermission(mediapackage, "comment"));
+
+    mediapackage = authzService.removeAcl(mediapackage, AclScope.Episode);
+
+    AccessControlList computedAcl = authzService.getActiveAcl(mediapackage).getA();
+    Assert.assertEquals("ACLs are the same size?", entriesSeries1.size(), computedAcl.getEntries().size());
+    Assert.assertTrue("ACLs contain the same ACEs?", computedAcl.getEntries().containsAll(entriesSeries1));
+
+    authzService.setAcl(mediapackage, AclScope.Series, aclSeries2);
 
     currentRoles.clear();
-    currentRoles.add(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS);
+    currentRoles.add(new JaxbRole("student", organization));
+    Assert.assertFalse(authzService.hasPermission(mediapackage, "delete"));
+    Assert.assertFalse(authzService.hasPermission(mediapackage, "read"));
+    Assert.assertFalse(authzService.hasPermission(mediapackage, "comment"));
+
+    currentRoles.clear();
+    currentRoles.add(new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, organization, ""));
     Assert.assertFalse(authzService.hasPermission(mediapackage, "delete"));
     Assert.assertTrue(authzService.hasPermission(mediapackage, "read"));
     Assert.assertFalse(authzService.hasPermission(mediapackage, "comment"));
-
   }
 
   static class WorkspaceStub implements Workspace {
-    protected File file = null;
-
-    public WorkspaceStub() throws IOException {
-      this.file = File.createTempFile("xacml", "xml");
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.opencastproject.workspace.api.Workspace#get(java.net.URI)
-     */
     @Override
     public File get(URI uri) throws NotFoundException, IOException {
-      return file;
+      return new File(uri);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.opencastproject.workspace.api.Workspace#getBaseUri()
-     */
     @Override
     public URI getBaseUri() {
-      // TODO Auto-generated method stub
-      return null;
+      throw new Error();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.opencastproject.workspace.api.Workspace#put(java.lang.String, java.lang.String, java.lang.String,
-     *      java.io.InputStream)
-     */
     @Override
     public URI put(String mediaPackageID, String mediaPackageElementID, String fileName, InputStream in)
             throws IOException {
+      final File file = new File(getURI(mediaPackageID, mediaPackageElementID, fileName));
       FileOutputStream out = new FileOutputStream(file);
       IOUtils.copyLarge(in, out);
       IOUtils.closeQuietly(out);
@@ -195,117 +204,57 @@ public class XacmlSecurityTest {
       return file.toURI();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.opencastproject.workspace.api.Workspace#putInCollection(java.lang.String, java.lang.String,
-     *      java.io.InputStream)
-     */
     @Override
     public URI putInCollection(String collectionId, String fileName, InputStream in) throws IOException {
-      // TODO Auto-generated method stub
       return null;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.opencastproject.workspace.api.Workspace#getCollectionContents(java.lang.String)
-     */
     @Override
     public URI[] getCollectionContents(String collectionId) throws NotFoundException {
-      // TODO Auto-generated method stub
-      return null;
+      throw new Error();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.opencastproject.workspace.api.Workspace#delete(java.net.URI)
-     */
     @Override
     public void delete(URI uri) throws NotFoundException, IOException {
-      // TODO Auto-generated method stub
-
+      new File(uri).delete();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.opencastproject.workspace.api.Workspace#delete(java.lang.String, java.lang.String)
-     */
     @Override
     public void delete(String mediaPackageID, String mediaPackageElementID) throws NotFoundException, IOException {
-      // TODO Auto-generated method stub
-
+      throw new Error();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.opencastproject.workspace.api.Workspace#deleteFromCollection(java.lang.String, java.lang.String)
-     */
     @Override
     public void deleteFromCollection(String collectionId, String fileName) throws NotFoundException, IOException {
-      // TODO Auto-generated method stub
-
+      throw new Error();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.opencastproject.workspace.api.Workspace#getURI(java.lang.String, java.lang.String)
-     */
     @Override
     public URI getURI(String mediaPackageID, String mediaPackageElementID) {
-      return file.toURI();
+      throw new Error();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.opencastproject.workspace.api.Workspace#getCollectionURI(java.lang.String, java.lang.String)
-     */
     @Override
     public URI getCollectionURI(String collectionID, String fileName) {
-      // TODO Auto-generated method stub
-      return null;
+      throw new Error();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.opencastproject.workspace.api.Workspace#moveTo(java.net.URI, java.lang.String, java.lang.String,
-     *      java.lang.String)
-     */
     @Override
     public URI moveTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
             throws NotFoundException, IOException {
-      // TODO Auto-generated method stub
-      return null;
+      throw new Error();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.opencastproject.workspace.api.Workspace#copyTo(java.net.URI, java.lang.String, java.lang.String,
-     *      java.lang.String)
-     */
     @Override
     public URI copyTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
             throws NotFoundException, IOException {
-      // TODO Auto-generated method stub
-      return null;
+      throw new Error();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.opencastproject.workspace.api.Workspace#getURI(java.lang.String, java.lang.String, java.lang.String)
-     */
     @Override
     public URI getURI(String mediaPackageID, String mediaPackageElementID, String filename) {
-      return file.toURI();
+      return new File(IoSupport.getSystemTmpDir(), mediaPackageID + "-" + mediaPackageElementID + "-" + filename)
+              .toURI();
     }
 
     @Override

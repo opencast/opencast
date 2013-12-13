@@ -174,7 +174,7 @@ public final class Param {
   public boolean isPath() {
     return path;
   }
-  
+
   public void setPath(boolean path) {
     this.path = path;
   }

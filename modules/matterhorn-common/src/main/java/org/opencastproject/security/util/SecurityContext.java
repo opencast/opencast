@@ -13,20 +13,18 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.security.util;
+
+import static org.opencastproject.util.EqualsUtil.ne;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.data.Function0;
 
-import static org.opencastproject.util.EqualsUtil.ne;
-
 /**
- * This class handles all the boilerplate of setting up and tearing down a security context.
- * It also makes it possible to pass around contexts so that clients need not deal
- * with services, users, passwords etc.
+ * This class handles all the boilerplate of setting up and tearing down a security context. It also makes it possible
+ * to pass around contexts so that clients need not deal with services, users, passwords etc.
  */
 public class SecurityContext {
   private final SecurityService sec;
@@ -34,7 +32,7 @@ public class SecurityContext {
   private final Organization org;
 
   public SecurityContext(SecurityService sec, Organization org, User user) {
-    if (ne(org.getId(), user.getOrganization())) {
+    if (ne(org, user.getOrganization())) {
       throw new IllegalArgumentException("User is not a member of organization " + org.getId());
     }
     this.sec = sec;
@@ -42,9 +40,7 @@ public class SecurityContext {
     this.org = org;
   }
 
-  /**
-   * Run function <code>f</code> within the context.
-   */
+  /** Run function <code>f</code> within the context. */
   public <A> A runInContext(Function0<A> f) {
     final Organization prevOrg = sec.getOrganization();
     // workaround: if no organization is bound to the current thread sec.getUser() will throw a NPE

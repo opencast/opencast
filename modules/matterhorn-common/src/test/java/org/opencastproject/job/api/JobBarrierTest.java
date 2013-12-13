@@ -15,21 +15,22 @@
  */
 package org.opencastproject.job.api;
 
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.easymock.EasyMock.createNiceMock;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Collections.toArray;
 import static org.opencastproject.util.data.Monadics.mlist;
+
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Function2;
+
+import org.easymock.EasyMock;
+import org.easymock.IAnswer;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Ignore
 public class JobBarrierTest {
@@ -57,7 +58,8 @@ public class JobBarrierTest {
     // create a service registry mock returning those jobs
     final ServiceRegistry sr = createNiceMock(ServiceRegistry.class);
     EasyMock.expect(sr.getJob(EasyMock.anyLong())).andAnswer(new IAnswer<Job>() {
-      @Override public Job answer() throws Throwable {
+      @Override
+      public Job answer() throws Throwable {
         final long jobId = (Long) (EasyMock.getCurrentArguments()[0]);
         return jobs.get(jobId);
       }
@@ -67,26 +69,38 @@ public class JobBarrierTest {
     final JobBarrier.Result res = new JobBarrier(sr, 10, toArray(Job.class, jobs.values())).waitForJobs();
     // check if there are still running jobs
     final boolean noRunningJobs = mlist(jobs.values()).foldl(true, new Function2<Boolean, TestJob, Boolean>() {
-      @Override public Boolean apply(Boolean sum, TestJob job) {
-        return sum && job.getLastReportedStatus().isTerminated();
+      @Override
+      public Boolean apply(Boolean sum, TestJob job) {
+        return sum && hasJobTerminated(job.getLastReportedStatus());
       }
     });
     assertTrue("There are still some jobs running", noRunningJobs);
   }
 
+  private static boolean hasJobTerminated(Job.Status status) {
+    switch (status) {
+      case CANCELED:
+      case DELETED:
+      case FAILED:
+      case FINISHED:
+        return true;
+      default:
+        return false;
+    }
+  }
+
   private static Function<Long, TestJob> alwaysFinish = new Function<Long, TestJob>() {
-    @Override public TestJob apply(Long id) {
-      return new TestJob(id,
-                         System.currentTimeMillis() + 300L + (long) (Math.random() * 700.0D),
-                         Job.Status.FINISHED);
+    @Override
+    public TestJob apply(Long id) {
+      return new TestJob(id, System.currentTimeMillis() + 300L + (long) (Math.random() * 700.0D), Job.Status.FINISHED);
     }
   };
 
   private static Function<Long, TestJob> sometimesFail = new Function<Long, TestJob>() {
-    @Override public TestJob apply(Long id) {
-      return new TestJob(id,
-                         System.currentTimeMillis() + 300L + (long) (Math.random() * 700.0D),
-                         Math.random() < 0.95 ? Job.Status.FINISHED : Job.Status.FAILED);
+    @Override
+    public TestJob apply(Long id) {
+      return new TestJob(id, System.currentTimeMillis() + 300L + (long) (Math.random() * 700.0D),
+              Math.random() < 0.95 ? Job.Status.FINISHED : Job.Status.FAILED);
     }
   };
 
@@ -101,7 +115,8 @@ public class JobBarrierTest {
       this.endStatus = endStatus;
     }
 
-    @Override public Status getStatus() {
+    @Override
+    public Status getStatus() {
       lastReportedStatus = getStatusInternal();
       return lastReportedStatus;
     }

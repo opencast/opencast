@@ -17,9 +17,12 @@ package org.opencastproject.util.data.functions;
 
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 
 import java.util.List;
+
+import static org.opencastproject.util.EqualsUtil.eq;
 
 /** Various functions not directly bound to any type. */
 public final class Misc {
@@ -39,13 +42,49 @@ public final class Misc {
    * http://james-iry.blogspot.de/2010/08/on-removing-java-checked-exceptions-by.html
    */
   public static <A> A chuck(Throwable t) {
-    return Misc.<RuntimeException, A>castGeneric(t);
+    return Misc.<RuntimeException, A> castGeneric(t);
+  }
+
+  /** {@link #chuck(Throwable)} as a function. */
+  public static <A extends Throwable, B> Function<A, B> chuck() {
+    return new Function<A, B>() {
+      @Override
+      public B apply(Throwable throwable) {
+        return chuck(throwable);
+      }
+    };
+  }
+
+  /** Cast from A to B with special treatment of the Number classes. */
+  public static <A, B> B cast(A v, Class<B> to) {
+    if (Number.class.isAssignableFrom(v.getClass())) {
+      if (eq(Integer.class, to)) {
+        return (B) ((Object) (((Number) v).intValue()));
+      } else if (eq(Long.class, to)) {
+        return (B) ((Object) (((Number) v).longValue()));
+      } else if (eq(Double.class, to)) {
+        return (B) ((Object) (((Number) v).doubleValue()));
+      } else if (eq(Float.class, to)) {
+        return (B) ((Object) (((Number) v).floatValue()));
+      } else if (eq(Short.class, to)) {
+        return (B) ((Object) (((Number) v).shortValue()));
+      } else if (eq(Byte.class, to)) {
+        return (B) ((Object) (((Number) v).byteValue()));
+      } else {
+        return (B) v;
+      }
+    } else if (to.isAssignableFrom(v.getClass())) {
+      return (B) v;
+    } else {
+      throw new ClassCastException(v.getClass().getName() + " is not of type " + to.getName());
+    }
   }
 
   /** Cast from A to B. */
   public static <A, B> Function<A, B> cast() {
     return new Function<A, B>() {
-      @Override public B apply(A a) {
+      @Override
+      public B apply(A a) {
         return (B) a;
       }
     };
@@ -57,8 +96,36 @@ public final class Misc {
   }
 
   /** Widening cast. */
+  public static <A> List<A> widen(Class<A> type, List<? extends A> xs) {
+    return (List<A>) xs;
+  }
+
+  /** Widening cast. */
   public static <A> Option<A> widen(Option<? extends A> xs) {
     return (Option<A>) xs;
+  }
+
+  /** Widening cast. */
+  public static <A> Option<A> widen(Class<A> type, Option<? extends A> xs) {
+    return (Option<A>) xs;
+  }
+
+  public static <A extends Exception> Function0<A> error(final Class<A> cls, final String msg, final Throwable cause) {
+    return new Function0.X<A>() {
+      @Override
+      public A xapply() throws Exception {
+        return cls.getConstructor(String.class, Throwable.class).newInstance(msg, cause);
+      }
+    };
+  }
+
+  public static <A extends Exception> Function0<A> error(final Class<A> cls, final String msg) {
+    return new Function0.X<A>() {
+      @Override
+      public A xapply() throws Exception {
+        return cls.getConstructor(String.class).newInstance(msg);
+      }
+    };
   }
 
   /** Print an object. */
@@ -67,6 +134,15 @@ public final class Misc {
       @Override
       protected void run(A a) {
         System.out.println(a);
+      }
+    };
+  }
+
+  public static <A> Function<A, A> ifThen(final A predicate, final A b) {
+    return new Function<A, A>() {
+      @Override
+      public A apply(A a) {
+        return predicate.equals(a) ? b : a;
       }
     };
   }

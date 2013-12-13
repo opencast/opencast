@@ -55,7 +55,10 @@ ocSeries.init = function(){
     }
   });
 
-  ocSeries.roles = ocSecurity.loadRoles();
+  
+  ocSeries.roles = $.map(ocUtils.ensureArray(ocSecurity.loadRoles().roles.role), function(role) {
+      return role.name;
+  });
   
   //Add folding action for hidden sections.
   $('.oc-ui-collapsible-widget .form-box-head').click(
@@ -99,7 +102,7 @@ ocSeries.init = function(){
   var sourceFunction = function(request, response) {
     var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
     var matched = $.grep( ocSeries.roles, function(value) {
-      return matcher.test( value.label || value.value || value );
+      return matcher.test(value);
     });
     if($(matched).size() != 0) {
       response(matched);

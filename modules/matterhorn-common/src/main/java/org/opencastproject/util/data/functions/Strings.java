@@ -17,6 +17,7 @@
 package org.opencastproject.util.data.functions;
 
 import org.apache.commons.lang.StringUtils;
+import org.opencastproject.util.data.Arrays;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
@@ -213,6 +214,11 @@ public final class Strings {
    */
   public static final Function<String, String[]> csvSplit = split(Pattern.compile("\\s*,\\s*"));
 
+  /**
+   * Split function to split comma separated values. Regex = <code>\s*,\s*</code>.
+   */
+  public static final Function<String, List<String>> csvSplitList = Arrays.<String>toList().o(csvSplit);
+
   /** A function to prepend the argument string with a prefix. */
   public static Function<String, String> prepend(final String prefix) {
     return new Function<String, String>() {
@@ -227,6 +233,36 @@ public final class Strings {
     return new Function<String, String>() {
       @Override public String apply(String s) {
         return s + suffix;
+      }
+    };
+  }
+
+  public static final Function<String, String> lowerCase = new Function<String, String>() {
+    @Override public String apply(String s) {
+      return s.toLowerCase();
+    }
+  };
+
+  public static Predicate<String> matches(final String pattern) {
+    return new Predicate<String>() {
+      @Override public Boolean apply(String s) {
+        return s.matches(pattern);
+      }
+    };
+  }
+
+  public static Predicate<String> contains(final String seq) {
+    return new Predicate<String>() {
+      @Override public Boolean apply(String s) {
+        return s.contains(seq);
+      }
+    };
+  }
+
+  public static Function2<String, String, String> concat(final String sep) {
+    return new Function2<String, String, String>() {
+      @Override public String apply(String a, String b) {
+        return a + sep + b;
       }
     };
   }
