@@ -15,30 +15,27 @@
  */
 package org.opencastproject.composer.layout;
 
-import org.opencastproject.util.RequireUtil;
-
-import javax.annotation.concurrent.Immutable;
-
 import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
 
+import org.opencastproject.util.RequireUtil;
+
 /**
- * This layout specification describes how to position a shape
- * and how much of the underlying width of the canvas it shall cover.
+ * This layout specification describes how to position a shape and how much of the underlying width of the canvas it
+ * shall cover.
  */
-@Immutable
 public final class HorizontalCoverageLayoutSpec {
   private final AnchorOffset anchorOffset;
   private final double horizontalCoverage;
 
   /**
    * Create a new specification.
-   *
+   * 
    * @param anchorOffset
-   *         The distance of the anchor points of canvas and shape.
-   *         The canvas is the "reference", the shape the "referring" part of the distance object.
+   *          The distance of the anchor points of canvas and shape. The canvas is the "reference", the shape the
+   *          "referring" part of the distance object.
    * @param horizontalCoverage
-   *         0 <= horizontalCoverage <= 1. How much space of the canvas should be covered.
+   *          0 <= horizontalCoverage <= 1. How much space of the canvas should be covered.
    */
   public HorizontalCoverageLayoutSpec(AnchorOffset anchorOffset, double horizontalCoverage) {
     this.anchorOffset = anchorOffset;
@@ -57,7 +54,8 @@ public final class HorizontalCoverageLayoutSpec {
 
   @Override
   public boolean equals(Object that) {
-    return (this == that) || (that instanceof HorizontalCoverageLayoutSpec && eqFields((HorizontalCoverageLayoutSpec) that));
+    return (this == that)
+            || (that instanceof HorizontalCoverageLayoutSpec && eqFields((HorizontalCoverageLayoutSpec) that));
   }
 
   private boolean eqFields(HorizontalCoverageLayoutSpec that) {

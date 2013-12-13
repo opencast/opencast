@@ -15,8 +15,6 @@
  */
 package org.opencastproject.composer.layout;
 
-import javax.annotation.concurrent.Immutable;
-
 import static org.opencastproject.composer.layout.Offset.offset;
 
 /** Hosts predefined positioning specifications for the {@link TwoShapeLayout}. */
@@ -24,7 +22,6 @@ public final class TwoShapeLayouts {
   private TwoShapeLayouts() {
   }
 
-  @Immutable
   public static final class TwoShapeLayoutSpec {
     private final HorizontalCoverageLayoutSpec upper;
     private final HorizontalCoverageLayoutSpec lower;
@@ -44,11 +41,11 @@ public final class TwoShapeLayouts {
   }
 
   /**
-   * Layout specification placing the upper media in the top left and the lower media in the bottom right
-   * corner of the canvas. The media in the top left corner is scaled to take 20% of the canvas size
-   * while the other media takes 80%.
+   * Layout specification placing the upper media in the top left and the lower media in the bottom right corner of the
+   * canvas. The media in the top left corner is scaled to take 20% of the canvas size while the other media takes 80%.
    */
   public static final TwoShapeLayoutSpec TOP_LEFT_SMALL_BOTTOM_RIGHT_BIG = new TwoShapeLayoutSpec(
           new HorizontalCoverageLayoutSpec(new AnchorOffset(Anchors.TOP_LEFT, Anchors.TOP_LEFT, offset(0, 0)), 0.2),
-          new HorizontalCoverageLayoutSpec(new AnchorOffset(Anchors.BOTTOM_RIGHT, Anchors.BOTTOM_RIGHT, offset(0, 0)), 0.8));
+          new HorizontalCoverageLayoutSpec(new AnchorOffset(Anchors.BOTTOM_RIGHT, Anchors.BOTTOM_RIGHT, offset(0, 0)),
+                  0.8));
 }

@@ -15,14 +15,11 @@
  */
 package org.opencastproject.composer.layout;
 
-import javax.annotation.concurrent.Immutable;
-
 import static java.lang.String.format;
 import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
 
 /** The offset between the anchor points of two rectangular shapes. */
-@Immutable
 public final class AnchorOffset {
   private final Anchor referenceAnchor;
   private final Anchor referringAnchor;
@@ -30,13 +27,13 @@ public final class AnchorOffset {
 
   /**
    * Create a new offset.
-   *
+   * 
    * @param referenceAnchor
-   *         anchor point of the reference shape
+   *          anchor point of the reference shape
    * @param referringAnchor
-   *         anchor point of the referring shape
+   *          anchor point of the referring shape
    * @param offset
-   *         offset between the two anchor points measured from the reference
+   *          offset between the two anchor points measured from the reference
    */
   public AnchorOffset(Anchor referenceAnchor, Anchor referringAnchor, Offset offset) {
     this.referenceAnchor = referenceAnchor;
@@ -73,7 +70,8 @@ public final class AnchorOffset {
   }
 
   private boolean eqFields(AnchorOffset that) {
-    return eq(offset, that.offset) && eq(referenceAnchor, that.referenceAnchor) && eq(referringAnchor, that.referringAnchor);
+    return eq(offset, that.offset) && eq(referenceAnchor, that.referenceAnchor)
+            && eq(referringAnchor, that.referringAnchor);
   }
 
   @Override
@@ -81,8 +79,9 @@ public final class AnchorOffset {
     return hash(offset, referenceAnchor, referringAnchor);
   }
 
-  @Override public String toString() {
-    return format("AnchorOffset(referenceAnchor=%s,referringAnchor=%s,offset=%s)",
-                  referenceAnchor, referringAnchor, offset);
+  @Override
+  public String toString() {
+    return format("AnchorOffset(referenceAnchor=%s,referringAnchor=%s,offset=%s)", referenceAnchor, referringAnchor,
+            offset);
   }
 }

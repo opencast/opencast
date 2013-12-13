@@ -15,13 +15,10 @@
  */
 package org.opencastproject.composer.layout;
 
-import javax.annotation.concurrent.Immutable;
-
 import static java.lang.String.format;
 import static org.opencastproject.util.EqualsUtil.hash;
 
 /** Offset in a left-handed cartesian coordinate system. */
-@Immutable
 public final class Offset {
   private final int y;
   private final int x;
@@ -59,7 +56,8 @@ public final class Offset {
     return hash(x, y);
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return format("Offset(%d,%d)", x, y);
   }
 }

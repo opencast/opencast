@@ -15,24 +15,22 @@
  */
 package org.opencastproject.composer.layout;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /** Layout of multiple shapes on a common canvas. */
-@Immutable
 public final class MultiShapeLayout {
   private final Dimension canvas;
   private final List<Layout> shapes;
 
   /**
    * Create a new layout for multiple shapes on a common canvas.
-   *
+   * 
    * @param canvas
-   *         the dimension of the target canvas
+   *          the dimension of the target canvas
    * @param shapes
-   *         a list of shape positions sorted in z-order with the first shape in the list being the lowermost one
+   *          a list of shape positions sorted in z-order with the first shape in the list being the lowermost one
    */
   public MultiShapeLayout(Dimension canvas, List<Layout> shapes) {
     this.canvas = canvas;

@@ -15,24 +15,21 @@
  */
 package org.opencastproject.composer.layout;
 
-import javax.annotation.concurrent.Immutable;
-
 import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
 
 /** The layout of a rectangular shape on a rectangular canvas. */
-@Immutable
 public final class Layout {
   private final Dimension dim;
   private final Offset offset;
 
   /**
    * Create a new layout.
-   *
+   * 
    * @param dim
-   *         the dimension of the shape
+   *          the dimension of the shape
    * @param offset
-   *         the offset between the top left corner of the shape and the top left corner of the canvas
+   *          the offset between the top left corner of the shape and the top left corner of the canvas
    */
   public Layout(Dimension dim, Offset offset) {
     this.dim = dim;

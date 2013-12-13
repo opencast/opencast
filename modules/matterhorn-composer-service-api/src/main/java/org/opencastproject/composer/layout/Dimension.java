@@ -15,15 +15,12 @@
  */
 package org.opencastproject.composer.layout;
 
-import org.opencastproject.util.RequireUtil;
-
-import javax.annotation.concurrent.Immutable;
-
 import static java.lang.String.format;
 import static org.opencastproject.util.EqualsUtil.hash;
 
+import org.opencastproject.util.RequireUtil;
+
 /** Dimension of a rectangular shape. */
-@Immutable
 public final class Dimension {
   private final int width;
   private final int height;
@@ -59,7 +56,8 @@ public final class Dimension {
     return hash(width, height);
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return format("Dimension(%d,%d)", width, height);
   }
 }

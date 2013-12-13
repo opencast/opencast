@@ -15,13 +15,10 @@
  */
 package org.opencastproject.composer.layout;
 
-import javax.annotation.concurrent.Immutable;
-
 import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
 
 /** Layout of two shapes on a common canvas. */
-@Immutable
 public final class TwoShapeLayout {
   private final Layout upper;
   private final Layout lower;
