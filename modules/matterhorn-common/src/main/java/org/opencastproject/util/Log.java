@@ -15,13 +15,10 @@
  */
 package org.opencastproject.util;
 
-import static java.lang.String.format;
-
 import org.opencastproject.fn.juc.Immutables;
 import org.opencastproject.fn.juc.Iterables;
 import org.opencastproject.fn.juc.Mutables;
 import org.opencastproject.util.data.Prelude;
-
 import org.slf4j.Logger;
 import org.slf4j.spi.LocationAwareLogger;
 
@@ -29,6 +26,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 import java.util.UUID;
+
+import static java.lang.String.format;
 
 /**
  * A logger that maintains a "unit of work" context" to facilitate the grouping of log statements.
@@ -42,16 +41,14 @@ public final class Log {
 
   /** Hold the unit of work stack. */
   private static final ThreadLocal<Stack<String>> uows = new ThreadLocal<Stack<String>>() {
-    @Override
-    protected Stack<String> initialValue() {
+    @Override protected Stack<String> initialValue() {
       return Mutables.stack(JVM_SESSION);
     }
   };
 
   /** Hold the current unit of work hierarchy as a string ready to use for the log methods. */
   private static final ThreadLocal<String> current = new ThreadLocal<String>() {
-    @Override
-    protected String initialValue() {
+    @Override protected String initialValue() {
       return uowString();
     }
   };
@@ -146,7 +143,7 @@ public final class Log {
   private void log(int level, Throwable t, String format, Object... args) {
     final String msg = current.get() + format(format, args);
     if (isLocationAware) {
-      ((LocationAwareLogger) logger).log(null, FQCN, level, msg, t);
+      ((LocationAwareLogger) logger).log(null, FQCN, level, msg, null, t);
     } else {
       switch (level) {
         case LocationAwareLogger.INFO_INT:
