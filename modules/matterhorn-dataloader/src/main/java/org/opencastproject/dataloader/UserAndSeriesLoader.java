@@ -15,6 +15,7 @@
  */
 package org.opencastproject.dataloader;
 
+import org.opencastproject.kernel.security.OrganizationDirectoryServiceImpl;
 import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -113,7 +114,7 @@ public class UserAndSeriesLoader {
   protected SecurityService securityService = null;
 
   /** The organization directory */
-  protected OrganizationDirectoryService organizationDirectoryService = null;
+  protected OrganizationDirectoryServiceImpl organizationDirectoryService = null;
 
   /**
    * Callback on component activation.
@@ -161,6 +162,11 @@ public class UserAndSeriesLoader {
           dc.set(DublinCore.PROPERTY_CONTRIBUTOR, "Contributor #" + i);
 
           for (String orgId : organizationIds) {
+            try {
+              organizationDirectoryService.addOrganization(getOrganization(orgId));
+            } catch (IllegalStateException e) {
+              // Ignoring already existing organizations
+            }
             Organization org = organizationDirectoryService.getOrganization(orgId);
             try {
               JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(org);
@@ -368,7 +374,7 @@ public class UserAndSeriesLoader {
    *          the organizationDirectoryService to set
    */
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
-    this.organizationDirectoryService = organizationDirectoryService;
+    this.organizationDirectoryService = (OrganizationDirectoryServiceImpl) organizationDirectoryService;
   }
 
 }
