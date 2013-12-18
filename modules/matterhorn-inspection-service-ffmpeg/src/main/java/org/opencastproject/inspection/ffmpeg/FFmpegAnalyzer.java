@@ -45,7 +45,7 @@ import java.io.File;
 //import java.util.HashMap;
 //import java.util.Iterator;
 import java.util.Map;
-import java.util.List;
+//import java.util.List;
 //import java.util.ArrayList;
 
 import org.json.simple.JSONArray;
@@ -151,18 +151,40 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
             process.getInputStream()));
 
       JSONObject jsonObject = (JSONObject) parser.parse(reader);
+      Object obj;
+      double duration;
 
       /* Get format specific stuff */
       JSONObject jsonFormat = (JSONObject) jsonObject.get("format");
       metadata.setFileName((String) jsonFormat.get("filename"));
       metadata.setFormat((String) jsonFormat.get("format_long_name"));
-      double duration = new Double((String) jsonFormat.get("duration")) * 1000;
-      metadata.setDuration(new Long(new Double(duration).longValue()));
-      metadata.setSize(new Long((String) jsonFormat.get("size")));
-      metadata.setBitRate(new Float((String) jsonFormat.get("bit_rate")));
       
+      /* Mediainfo does not return a duration if there is no stream but FFprobe
+       * will return 0. For compatibility reasons, check if there are any
+       * streams before reading the duration: */
+      obj = jsonFormat.get("nb_streams");
+      if (obj != null && (Long) obj > 0) {
+        obj = jsonFormat.get("duration");
+        if (obj != null) {
+          duration = new Double((String) obj) * 1000;
+          metadata.setDuration(new Long(new Double(duration).longValue()));
+        }
+      }
+      /* Get file size */
+      obj = jsonFormat.get("size");
+      if (obj != null) {
+        metadata.setSize(new Long((String) obj));
+      }
+      /* Get bitrate */
+      obj = jsonFormat.get("bit_rate");
+      if (obj != null) {
+        metadata.setBitRate(new Float((String) obj));
+      }
+
       /* Loop through streams */
-      JSONArray streams = (JSONArray) jsonObject.get("messages");
+      /* FFprobe will return an empty stream array if there are no streams.
+       * Thus we do not need to check. */
+      JSONArray streams = (JSONArray) jsonObject.get("streams");
       Iterator<JSONObject> iterator = streams.iterator();
       while (iterator.hasNext()) {
         JSONObject stream = iterator.next();
@@ -175,8 +197,8 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
           duration = new Double((String) stream.get("duration")) * 1000;
           aMetadata.setDuration(new Long(new Double(duration).longValue()));
           aMetadata.setBitRate(new Float((String) stream.get("bit_rate")));
-          aMetadata.setChannels((Integer) stream.get("channels"));
-          aMetadata.setSamplingRate((Integer) stream.get("sample_rate"));
+          aMetadata.setChannels(((Long) stream.get("channels")).intValue());
+          aMetadata.setSamplingRate(Integer.parseInt((String) stream.get("sample_rate")));
           /* Add video stream metadata to overall metadata */
           metadata.getAudioStreamMetadata().add(aMetadata);
         } else if ("video".equals(codecType)) {
@@ -186,8 +208,8 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
           duration = new Double((String) stream.get("duration")) * 1000;
           vMetadata.setDuration(new Long(new Double(duration).longValue()));
           vMetadata.setBitRate(new Float((String) stream.get("bit_rate")));
-          vMetadata.setFrameWidth((Integer) stream.get("width"));
-          vMetadata.setFrameHeight((Integer) stream.get("height"));
+          vMetadata.setFrameWidth(((Long) stream.get("width")).intValue());
+          vMetadata.setFrameHeight(((Long) stream.get("height")).intValue());
           vMetadata.setFormatProfile((String) stream.get("profile"));
           vMetadata.setPixelAspectRatio(parseFloat((String) stream.get("sample_aspect_ratio")));
           vMetadata.setFrameRate(parseFloat((String) stream.get("avg_frame_rate")));
