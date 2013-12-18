@@ -157,8 +157,17 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
+    
+    if (workflowInstance == null) {
+      throw new WorkflowOperationException("Invalid workflow instance");
+    }
+    
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     final WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
+    if (currentOperation == null) {
+      throw new WorkflowOperationException("Cannot get current workflow operation");
+    }
+    
     String flavors = currentOperation.getConfiguration(INCLUDE_FLAVORS_PROPERTY);
     final List<MediaPackageElementFlavor> flavorsToZip = new ArrayList<MediaPackageElementFlavor>();
     MediaPackageElementFlavor targetFlavor = DEFAULT_ARCHIVE_FLAVOR;
