@@ -26,9 +26,10 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageImpl;
+import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -61,6 +62,7 @@ import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -124,6 +126,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   private WorkflowService service;
   /** The service registry */
   protected ServiceRegistry serviceRegistry = null;
+  /** The workspace */
+  private Workspace workspace;
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
@@ -143,6 +147,16 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
    */
   public void setService(WorkflowService service) {
     this.service = service;
+  }
+
+  /**
+   * Callback from the OSGi declarative services to set the workspace.
+   * 
+   * @param workspace
+   *          the workspace
+   */
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
   }
 
   /**
@@ -533,10 +547,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Path("start")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "start", description = "Start a new workflow instance.", returnDescription = "An XML representation of the new workflow instance", restParameters = {
-          @RestParameter(name = "definition", isRequired = true, description = "The workflow definition ID or an XML representation of a workflow definition", type = TEXT, 
-                  defaultValue = "${this.sampleWorkflowDefinition}", jaxbClass = WorkflowDefinitionImpl.class),
-          @RestParameter(name = "mediapackage", isRequired = true, description = "The XML representation of a mediapackage", type = TEXT, 
-                  defaultValue = "${this.sampleMediaPackage}", jaxbClass = MediaPackageImpl.class),
+          @RestParameter(name = "definition", isRequired = true, description = "The workflow definition ID or an XML representation of a workflow definition", type = TEXT, defaultValue = "${this.sampleWorkflowDefinition}", jaxbClass = WorkflowDefinitionImpl.class),
+          @RestParameter(name = "mediapackage", isRequired = true, description = "The XML representation of a mediapackage", type = TEXT, defaultValue = "${this.sampleMediaPackage}", jaxbClass = MediaPackageImpl.class),
           @RestParameter(name = "parent", isRequired = false, description = "An optional parent workflow instance identifier", type = STRING),
           @RestParameter(name = "properties", isRequired = false, description = "An optional set of key=value\\n properties", type = TEXT) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the new workflow instance."),
@@ -558,10 +570,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
         throw new WebApplicationException(wpe, Status.BAD_REQUEST);
       }
     }
-    
+
     return startWorkflow(workflowDefinition, mp, parentWorkflowId, localMap);
   }
-
 
   private WorkflowInstanceImpl startWorkflow(WorkflowDefinition workflowDefinition, MediaPackageImpl mp,
           String parentWorkflowId, LocalHashMap localMap) {
@@ -667,8 +678,22 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     try {
       WorkflowInstance workflow = service.getWorkflowById(workflowInstanceId);
       if (mediaPackage != null) {
-        MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(mediaPackage);
-        workflow.setMediaPackage(mp);
+        MediaPackage newMp = MediaPackageParser.getFromXml(mediaPackage);
+        MediaPackage oldMp = workflow.getMediaPackage();
+
+        // Delete removed elements from workspace
+        for (MediaPackageElement elem : oldMp.getElements()) {
+          if (MediaPackageSupport.contains(elem.getIdentifier(), newMp))
+            continue;
+          try {
+            workspace.delete(elem.getURI());
+            logger.info("Deleted removed mediapackge element {}", elem);
+          } catch (NotFoundException e) {
+            logger.info("Removed mediapackage element {} is already deleted", elem);
+          }
+        }
+
+        workflow.setMediaPackage(newMp);
         service.update(workflow);
       }
       service.resume(workflowInstanceId, map);
