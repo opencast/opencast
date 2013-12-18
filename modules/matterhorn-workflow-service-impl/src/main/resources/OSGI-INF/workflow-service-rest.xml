@@ -13,6 +13,8 @@
   </service>
   <reference name="service-impl" interface="org.opencastproject.workflow.api.WorkflowService"
     cardinality="1..1" policy="static" bind="setService" />
-    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+  <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    cardinality="1..1" policy="static" bind="setServiceRegistry" />
+  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+    cardinality="1..1" policy="static" bind="setWorkspace" />
 </scr:component>
