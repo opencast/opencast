@@ -413,6 +413,8 @@ public class SolrRequester {
           int textLength = segmentText.length();
           for (String t : queryTerms) {
             String strippedTerm = StringUtils.strip(t, "*");
+            if (StringUtils.isBlank(strippedTerm))
+              continue;
             int startIndex = 0;
             while (startIndex < textLength - 1) {
               int foundAt = segmentText.indexOf(strippedTerm, startIndex);
@@ -594,8 +596,13 @@ public class SolrRequester {
       if (StringUtils.isNotEmpty(cleanSolrTextRequest)) {
         if (sb.length() > 0)
           sb.append(" AND ");
-        sb.append("*:");
+        sb.append("( *:");
         sb.append(boost(cleanSolrTextRequest));
+        sb.append(" OR (");
+        sb.append(Schema.ID);
+        sb.append(":");
+        sb.append(cleanSolrTextRequest);
+        sb.append(") )");
       }
     }
 

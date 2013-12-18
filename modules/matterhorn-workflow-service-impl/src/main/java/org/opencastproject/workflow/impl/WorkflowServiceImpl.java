@@ -30,6 +30,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
@@ -47,6 +48,7 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
@@ -75,6 +77,7 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -180,6 +183,9 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /** The thread pool to use for firing listeners and handling dispatched jobs */
   protected ThreadPoolExecutor executorService;
+
+  /** The workspace */
+  protected Workspace workspace = null;
 
   /** The service registry */
   protected ServiceRegistry serviceRegistry = null;
@@ -750,7 +756,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
           throws WorkflowException, UnauthorizedException {
     WorkflowOperationInstance processingOperation = workflow.getCurrentOperation();
     if (processingOperation == null)
-      throw new IllegalStateException("No operation to run, workflow is " + workflow.getState());
+      throw new IllegalStateException("Workflow '" + workflow + "' has no operation to run");
 
     // Keep the current state for later reference, it might have been changed from the outside
     WorkflowState initialState = workflow.getState();
@@ -890,7 +896,20 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
           UnauthorizedException {
     WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
     instance.setState(STOPPED);
+
+    // Update the workflow instance
     update(instance);
+
+    // Remove
+    logger.info("Removing temporary files for stopped workflow {}", workflowInstanceId);
+    for (MediaPackageElement elem : instance.getMediaPackage().getElements()) {
+      try {
+        logger.debug("Removing temporary file {} for stopped workflow {}", elem.getURI(), workflowInstanceId);
+        workspace.delete(elem.getURI());
+      } catch (IOException e) {
+        logger.warn("Unable to delete mediapackage element {}", e.getMessage());
+      }
+    }
     return instance;
   }
 
@@ -1288,6 +1307,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
                   ERROR_RESOLUTION_HANDLER_ID, "Error Resolution Operation", "error", true);
           WorkflowOperationInstanceImpl errorResolutionInstance = new WorkflowOperationInstanceImpl(
                   errorResolutionDefinition, currentOperation.getPosition());
+          errorResolutionInstance.setExceptionHandlingWorkflow(currentOperation.getExceptionHandlingWorkflow());
           operations.add(currentOperation.getPosition(), errorResolutionInstance);
           workflow.setOperations(operations);
           break;
@@ -1571,7 +1591,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * @see org.opencastproject.job.api.AbstractJobProducer#isReadyToAccept(org.opencastproject.job.api.Job)
    */
   @Override
-  public boolean isReadyToAccept(Job job) throws ServiceRegistryException {
+  public boolean isReadyToAccept(Job job) throws ServiceRegistryException, UndispatchableJobException {
     String operation = job.getOperation();
 
     // Only restrict execution of new jobs
@@ -1592,7 +1612,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
           }
         }
       } catch (WorkflowParsingException e) {
-        throw new IllegalStateException(job + " is not a proper job to start a workflow");
+        throw new UndispatchableJobException(job + " is not a proper job to start a workflow", e);
       }
     }
 
@@ -1612,13 +1632,13 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       logger.error(
               "Trying to start workflow with id {} but no corresponding instance is available from the workflow service",
               job.getId());
-      return false;
-    } catch (WorkflowDatabaseException e) {
-      logger.error("Error loading workflow instance {}: {}", job.getId(), e.getMessage());
-      return false;
+      throw new UndispatchableJobException(e);
     } catch (UnauthorizedException e) {
       logger.error("Authorization denied while requesting to loading workflow instance {}: {}", job.getId(),
               e.getMessage());
+      throw new UndispatchableJobException(e);
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Error loading workflow instance {}: {}", job.getId(), e.getMessage());
       return false;
     }
 
@@ -1628,7 +1648,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     // Make sure we are not excluding ourselves
     toomany |= workflowInstances.size() == 1 && workflow.getId() != workflowInstances.getItems()[0].getId();
 
-    // Avoid running multiple workflows with same media package id at same time
+    // Avoid running multiple workflows with same media package id at the same time
     if (toomany) {
       if (!delayedWorkflows.contains(workflow.getId())) {
         logger.info("Delaying start of workflow {}, another workflow on media package {} is still running",
@@ -1883,6 +1903,16 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       sb.append("\n");
     }
     return sb.toString();
+  }
+
+  /**
+   * Callback for the OSGi environment to register with the <code>Workspace</code>.
+   * 
+   * @param workspace
+   *          the workspace
+   */
+  protected void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
   }
 
   /**

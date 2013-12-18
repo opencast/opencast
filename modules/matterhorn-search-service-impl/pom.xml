@@ -119,12 +119,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-series-service-impl</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.core</artifactId>
       <scope>test</scope>

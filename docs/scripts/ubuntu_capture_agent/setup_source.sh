@@ -12,35 +12,31 @@ fi
 
 . ${FUNCTIONS}
 
-# Detect if the matterhorn source has been already checked out
-url=$(svn info $FELIX_HOME 2> /dev/null | grep URL: | cut -d ' ' -f 2) 
-if [[ "$url" ]]; then
+while [[ true ]]; do
     echo
-    yesno -d yes "The source $url has been already checked out. Do you wish to keep it?" keep
-else
-    keep=
-fi
+    ask "Enter develop (for trunk), or the name of the tag or branch you would like to install" branch
 
-if [[ -z "$keep" ]]; then
-    # Get the necessary matterhorn source code (the whole trunk, as specified in MH-3211)
-    while [[ true ]]; do
-	echo
-	ask -d "${SRC_DEFAULT}" "Enter the URL of the trunk, branch or tag you would like to download" url
+    pushd . > /dev/null
+    if [[ ! $copied ]]; then
+      cp -rv $PARENT_CHECKOUT_DIR $FELIX_HOME > /dev/null
+      copied=true
+    fi
+    cd $FELIX_HOME
+    git reset --hard
+    git checkout $branch
+    checkoutVal=$?
+    popd > /dev/null
 
-	echo -n "Attempting to download matterhorn source from $url... "
-	svn co --force $url $FELIX_HOME
-
-	if [[ $? -eq 0 ]]; then
-	    break
-	else
-	    ## Error
-	    echo "Error! Couldn't check out the matterhorn code. Check your internet connection and/or the URL inputted."
-	    yesno -d yes "Do you wish to retry?" retry
-	    [[ "$retry" ]] || exit 1
-	fi
-    done
-    echo "Done"
-fi
+    if [[ $checkoutVal -eq 0 ]]; then
+        break
+    else
+        ## Error
+        echo "Error! Couldn't check out the matterhorn code. Please check to ensure you have the correct checkout name."
+        yesno -d yes "Do you wish to retry?" retry
+        [[ "$retry" ]] || exit 1
+    fi
+done
+echo "Done"
 
 # Log the URL downloaded -or already present-
 echo >> $LOG_FILE
