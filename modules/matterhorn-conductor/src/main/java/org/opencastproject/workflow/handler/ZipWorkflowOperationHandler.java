@@ -270,10 +270,16 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
    *           If a file referenced in the mediapackage can not be found
    * @throws MediaPackageException
    *           If the mediapackage can not be serialized to xml
+   * @throws WorkflowOperationException
+   *           If the mediapackage is invalid
    */
   protected File zip(MediaPackage mediaPackage, List<MediaPackageElementFlavor> flavorsToZip, boolean compress)
-          throws IOException, NotFoundException, MediaPackageException {
+          throws IOException, NotFoundException, MediaPackageException, WorkflowOperationException {
 
+    if (mediaPackage == null) {
+      throw new WorkflowOperationException("Invalid mediapackage");
+    }
+    
     // Create the temp directory
     File mediaPackageDir = new File(tempStorageDir, mediaPackage.getIdentifier().compact());
     FileUtils.forceMkdir(mediaPackageDir);
