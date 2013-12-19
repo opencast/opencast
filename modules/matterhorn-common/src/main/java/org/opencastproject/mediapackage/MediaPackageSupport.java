@@ -107,6 +107,21 @@ public final class MediaPackageSupport {
   }
 
   /**
+   * Returns <code>true</code> if the media package contains an element with the specified identifier.
+   * 
+   * @param identifier
+   *          the identifier
+   * @return <code>true</code> if the media package contains an element with this identifier
+   */
+  public static boolean contains(String identifier, MediaPackage mp) {
+    for (MediaPackageElement element : mp.getElements()) {
+      if (element.getIdentifier().equals(identifier))
+        return true;
+    }
+    return false;
+  }
+
+  /**
    * Creates a unique filename inside the root folder, based on the parameter <code>filename</code>.
    *
    * @param root
