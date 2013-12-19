@@ -17,7 +17,7 @@
     <matterhorn.basedir>${basedir}</matterhorn.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <checkstyle.skip>true</checkstyle.skip>
+    <checkstyle.skip>false</checkstyle.skip>
     <jmeter.version>2.4</jmeter.version>
     <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
   </properties>
@@ -770,6 +770,7 @@
         <directory>${project.basedir}/src/test/resources</directory>
       </testResource>
     </testResources>
+    <!-- This defines what plugins run on a global basis.  Plugins defined here run for all child poms without needing to reference them from the child pom.  Note that configuration data goes in the pluginManagement stanza below -->
     <plugins>
       <!-- Require Java 6 or higher for building -->
       <plugin>
@@ -871,9 +872,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
-        <version>3.0.1</version>
       </plugin>
     </plugins>
+    <!-- This defines the global plugin configurations.  Plugins with configuration shared across multiple child poms should be configured here, and then referenced in the child. -->
     <pluginManagement>
       <plugins>
         <!-- Fix eclipse (indigo) maven integration -->
@@ -1062,9 +1063,14 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
           <version>3.0.1</version>
+          <configuration>
+            <!--<includeTests>true</includeTests>-->
+            <typeResolution>true</typeResolution>
+            <targetJdk>1.6</targetJdk>
+          </configuration>
           <executions>
             <execution>
-              <phase>install</phase>
+              <phase>validate</phase>
               <goals>
                 <goal>pmd</goal>
                 <goal>cpd</goal>
@@ -2155,7 +2161,6 @@
           <aggregate>true</aggregate>
           <!--<includeTests>true</includeTests>-->
           <typeResolution>true</typeResolution>
-          <language>java</language>
           <targetJdk>1.6</targetJdk>
         </configuration>
       </plugin>
