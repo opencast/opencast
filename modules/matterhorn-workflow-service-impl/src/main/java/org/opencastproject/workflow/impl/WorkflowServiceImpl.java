@@ -244,7 +244,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       logger.error("Error registarting JMX statistic beans {}", e);
     }
 
-    logger.info("Activate Worklow service");
+    logger.info("Activate Workflow service");
   }
 
   public void deactivate() {
@@ -467,7 +467,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     if (workflowDefinitionScanner.getWorkflowDefinitions().containsKey(id)) {
       throw new IllegalStateException("A workflow definition with ID '" + id + "' is already registered.");
     }
-    workflowDefinitionScanner.putWokflowDefinition(id, workflow);
+    workflowDefinitionScanner.putWorkflowDefinition(id, workflow);
   }
 
   /**
@@ -477,7 +477,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    */
   @Override
   public void unregisterWorkflowDefinition(String workflowDefinitionId) {
-    workflowDefinitionScanner.removeWofklowDefinition(workflowDefinitionId);
+    workflowDefinitionScanner.removeWorkflowDefinition(workflowDefinitionId);
   }
 
   /**
