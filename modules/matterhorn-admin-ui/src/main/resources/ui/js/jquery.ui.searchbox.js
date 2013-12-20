@@ -112,7 +112,7 @@
       // correct layout
       var textboxwidth = this.element.innerWidth() - this.element.find('.searchbox-search-icon').outerWidth(true) - 5;
       if (dropdown !== undefined) {
-        textboxwidth -= dropdown.outerWidth(true) + 9;
+        textboxwidth -= dropdown.outerWidth(true) + 10;
         this.element.find('.searchbox-text-container').height(dropdown.outerHeight());
       }
       this.element.find('.searchbox-text-container').css('width', textboxwidth);
