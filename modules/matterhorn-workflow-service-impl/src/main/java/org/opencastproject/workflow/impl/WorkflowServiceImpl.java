@@ -476,8 +476,10 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * @see org.opencastproject.workflow.api.WorkflowService#unregisterWorkflowDefinition(java.lang.String)
    */
   @Override
-  public void unregisterWorkflowDefinition(String workflowDefinitionId) {
-    workflowDefinitionScanner.removeWorkflowDefinition(workflowDefinitionId);
+  public void unregisterWorkflowDefinition(String workflowDefinitionId) throws NotFoundException, WorkflowDatabaseException {
+    if (workflowDefinitionScanner.removeWorkflowDefinition(workflowDefinitionId) == null) {
+      throw new NotFoundException("Workflow definition not found");
+    }
   }
 
   /**
