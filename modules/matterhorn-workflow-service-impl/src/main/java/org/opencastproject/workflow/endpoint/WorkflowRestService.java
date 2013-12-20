@@ -780,6 +780,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     try {
       service.unregisterWorkflowDefinition(workflowDefinitionId);
       return Response.status(Status.NO_CONTENT).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).build();  
     } catch (WorkflowDatabaseException e) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
