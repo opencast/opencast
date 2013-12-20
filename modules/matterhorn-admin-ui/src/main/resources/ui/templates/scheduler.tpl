@@ -251,7 +251,7 @@
               </select>
             </li>
             <li>
-              <label class="scheduler-label" for="inputList" id="inputLabel"><span class="scheduler-required-text">* </span><span id="i18n_input_label"></span>:</label>
+              <label class="scheduler-label" id="inputLabel"><span class="scheduler-required-text">* </span><span id="i18n_input_label"></span>:</label>
               <div class="scheduler-radio-list">
                 <div id="inputList"></div>
               </div>
@@ -286,7 +286,7 @@
                   </select>
                 </li>
                 <li id="daySelect">
-                  <label class="scheduler-label" for="repeatDays"><span class="scheduler-required-text">* </span><span id="i18n_sched_days">Days</span>:</label>
+                  <label class="scheduler-label" id="recurrenceLabel" for="repeatDays"><span class="scheduler-required-text">* </span><span id="i18n_sched_days">Days</span>:</label>
                   <table id="agentsTable2" class="layout-inline scheduler-day-table">
                     <thead>
                       <tr>
@@ -456,7 +456,7 @@
                 </select>
               </li>
               <li>
-                <label class="scheduler-label" id="inputLabel"><span class="scheduler-required-text">* </span><span id="i18n_input_label">Inputs</span>:</label>
+                <label class="scheduler-label" id="recurInputLabel"><span class="scheduler-required-text">* </span><span id="i18n_input_label">Inputs</span>:</label>
                 <div class="scheduler-radio-list">
                   <div id="recurInputList"></div>
                 </div>

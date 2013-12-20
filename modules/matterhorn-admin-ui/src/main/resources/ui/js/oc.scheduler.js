@@ -965,62 +965,7 @@ var ocScheduler = (function() {
       key: 'description'
     });
     dcComps.copyright = new ocAdmin.Component(['copyright'], {
-        key: 'rights'
-      });
-    agentComps.resources = new ocAdmin.Component([],
-    {
-      key: 'capture.device.names',
-      required: true,
-      errors: {
-        missingRequired: new ocAdmin.Error('missingInputs', 'inputLabel')
-      }
-    },
-    {
-      getValue: function() {
-        var selected = [];
-        for(var el in this.fields){
-          var e = this.fields[el];
-          if(e[0] && e[0].checked){
-            selected.push(e.val());
-          }
-        }
-        this.value = selected.toString();
-        return this.value;
-      },
-      setValue: function(value) {
-        if(typeof value == 'string') {
-          value = {
-            resources: value
-          };
-        }
-        for(var el in this.fields) {
-          var e = this.fields[el];
-          if(e[0] && value.resources.toLowerCase().indexOf(e.val().toLowerCase()) != -1){
-            e[0].checked = true;
-          }else{
-            e[0].checked = false;
-          }
-        }
-        ocScheduler.selectedInputs = value;
-      },
-      validate: function() {
-        if(!this.required) {
-          return []; //empty error array.
-        } else {
-          var oneIsValid = false;
-          var noInputFields = true;
-          for(var e in this.fields) {
-            noInputFields = false;
-            if(this.fields[e][0].checked) {
-              return [];
-            }
-          }
-          if (noInputFields) {
-            return [];
-          }
-        }
-        return this.errors.missingRequired;
-      }
+      key: 'rights'
     });
 
     agentComps.workflowDefinition = new ocAdmin.Component(['workflowSelector'], {
@@ -1228,6 +1173,62 @@ var ocScheduler = (function() {
             this.fields.recurAgent.val(agentId);
             this.fields.recurAgent.change();
           }
+        }
+      });
+
+      agentComps.resources = new ocAdmin.Component([],
+              {
+                key: 'capture.device.names',
+                required: true,
+                errors: {
+                  missingRequired: new ocAdmin.Error('missingInputs', 'recurInputLabel')
+                }
+              },
+      {
+        getValue: function() {
+          var selected = [];
+          for (var el in this.fields) {
+            var e = this.fields[el];
+            if (e[0] && e[0].checked) {
+              selected.push(e.val());
+            }
+          }
+          this.value = selected.toString();
+          return this.value;
+        },
+        setValue: function(value) {
+          if (typeof value == 'string') {
+            value = {
+              resources: value
+            };
+          }
+          for (var el in this.fields) {
+            var e = this.fields[el];
+            if (e[0] && value.resources.toLowerCase().indexOf(e.val().toLowerCase()) != -1) {
+              e[0].checked = true;
+            } else {
+              e[0].checked = false;
+            }
+          }
+          ocScheduler.selectedInputs = value;
+        },
+        validate: function() {
+          if (!this.required) {
+            return []; //empty error array.
+          } else {
+            var oneIsValid = false;
+            var noInputFields = true;
+            for (var e in this.fields) {
+              noInputFields = false;
+              if (this.fields[e][0].checked) {
+                return [];
+              }
+            }
+            if (noInputFields) {
+              return [];
+            }
+          }
+          return this.errors.missingRequired;
         }
       });
 
@@ -1662,6 +1663,61 @@ var ocScheduler = (function() {
             this.fields.agent.val(agentId);
             this.fields.agent.change();
           }
+        }
+      });
+      agentComps.resources = new ocAdmin.Component([],
+              {
+                key: 'capture.device.names',
+                required: true,
+                errors: {
+                  missingRequired: new ocAdmin.Error('missingInputs', 'inputLabel')
+                }
+              },
+      {
+        getValue: function() {
+          var selected = [];
+          for (var el in this.fields) {
+            var e = this.fields[el];
+            if (e[0] && e[0].checked) {
+              selected.push(e.val());
+            }
+          }
+          this.value = selected.toString();
+          return this.value;
+        },
+        setValue: function(value) {
+          if (typeof value == 'string') {
+            value = {
+              resources: value
+            };
+          }
+          for (var el in this.fields) {
+            var e = this.fields[el];
+            if (e[0] && value.resources.toLowerCase().indexOf(e.val().toLowerCase()) != -1) {
+              e[0].checked = true;
+            } else {
+              e[0].checked = false;
+            }
+          }
+          ocScheduler.selectedInputs = value;
+        },
+        validate: function() {
+          if (!this.required) {
+            return []; //empty error array.
+          } else {
+            var oneIsValid = false;
+            var noInputFields = true;
+            for (var e in this.fields) {
+              noInputFields = false;
+              if (this.fields[e][0].checked) {
+                return [];
+              }
+            }
+            if (noInputFields) {
+              return [];
+            }
+          }
+          return this.errors.missingRequired;
         }
       });
     }
