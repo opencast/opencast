@@ -280,7 +280,7 @@
               <ul class="oc-ui-form-list">
                 <li>
                   <label for="scheduleRepeat" class="scheduler-label form-box-label"><span id="i18n_sched_repeats">Repeats</span>:</label>
-                  <select id="scheduleRepeat" disabled="true">
+                  <select id="scheduleRepeat" disabled="disabled">
                     <option value="norepeat" id="i18n_sched_no_repeat">Don't Repeat</option>
                     <option value="weekly" selected="selected" id="i18n_sched_weekly">Weekly</option>
                   </select>
