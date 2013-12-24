@@ -25,3 +25,8 @@ target/
 
 # Ignore all temporary editor files
 .*.swp
+
+# Ignore Maven files and local repository
+/.m2/
+/settings.xml
+
