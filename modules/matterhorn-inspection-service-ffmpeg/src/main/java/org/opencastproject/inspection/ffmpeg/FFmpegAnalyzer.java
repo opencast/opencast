@@ -16,45 +16,25 @@
 
 package org.opencastproject.inspection.ffmpeg;
 
-import org.opencastproject.inspection.ffmpeg.api.MediaAnalyzer;
-import org.opencastproject.inspection.ffmpeg.api.MediaAnalyzerException;
-import org.opencastproject.inspection.ffmpeg.api.MediaContainerMetadata;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
-
-//import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.StringUtils;
-//import org.opencastproject.inspection.api.MediaInspectionException;
-import org.opencastproject.inspection.ffmpeg.api.AudioStreamMetadata;
-import org.opencastproject.inspection.ffmpeg.api.VideoStreamMetadata;
-//import org.opencastproject.mediapackage.track.BitRateMode;
-//import org.opencastproject.mediapackage.track.FrameRateMode;
-//import org.opencastproject.mediapackage.track.ScanType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
-//import java.lang.reflect.InvocationTargetException;
-//import java.lang.reflect.Method;
-//import java.net.MalformedURLException;
-//import java.net.URL;
-//import java.text.ParseException;
-//import java.text.SimpleDateFormat;
-//import java.util.Date;
-//import java.util.HashMap;
-//import java.util.Iterator;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Iterator;
 import java.util.Map;
-//import java.util.List;
-//import java.util.ArrayList;
-
+import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import java.util.Iterator;
+import org.opencastproject.inspection.ffmpeg.api.AudioStreamMetadata;
+import org.opencastproject.inspection.ffmpeg.api.MediaAnalyzer;
+import org.opencastproject.inspection.ffmpeg.api.MediaAnalyzerException;
+import org.opencastproject.inspection.ffmpeg.api.MediaContainerMetadata;
+import org.opencastproject.inspection.ffmpeg.api.VideoStreamMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-//import static org.opencastproject.util.data.Arrays.array;
 
 /**
  * This MediaAnalyzer implementation uses the ffprobe binary of FFmpeg for
@@ -93,13 +73,14 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
   }
 
   @Override
-  public MediaContainerMetadata analyze(File media) throws MediaAnalyzerException {
+  public MediaContainerMetadata analyze(File media) 
+  throws MediaAnalyzerException {
 
     if (binary == null)
       throw new IllegalStateException("Binary is not set");
 
-    String[] command = new String[] {binary, "-show_format", "-show_streams", "-of", "json",
-      media.getAbsolutePath().replaceAll(" ", "\\ ") };
+    String[] command = new String[] {binary, "-show_format", "-show_streams",
+      "-of", "json", media.getAbsolutePath().replaceAll(" ", "\\ ") };
     String commandline = StringUtils.join(command, " ");
 
     /* Execute ffprobe and obtain the result */
@@ -108,39 +89,6 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
     MediaContainerMetadata metadata = new MediaContainerMetadata();
 
     ProcessBuilder pbuilder = new ProcessBuilder(command);
-
-//    try {
-//      Process process = pbuilder.start();
-//      BufferedReader reader = new BufferedReader(new InputStreamReader(
-//            process.getInputStream()));
-//
-//      List<String> section = new ArrayList<String>();
-//      StreamSection type = StreamSection.undefined;
-//      String line;
-//
-//      // Parse JSON string:
-//      // http://www.mkyong.com/java/json-simple-example-read-and-write-json/
-//
-//      while ((line = reader.readLine()) != null) {
-//        if ("[FORMAT]".equals(line)) {
-//          type = StreamSection.general;
-//        } else if ("[STREAM]".equals(line)) {
-//          /* We don't know what type of stream we got yet */
-//          type = StreamSection.stream;
-//        } else if ("[/STREAM]".equals(line) || "[/FORMAT]".equals(line)) {
-//          /* TODO: Analyze stuff here */
-//          type = StreamSection.undefined;
-//          section = new ArrayList<String>();
-//
-//          /* Handle matadata */
-//        } else if (type != StreamSection.undefined) {
-//          section.add(line);
-//        }
-//
-//      }
-//    } catch (IOException e) {
-//      logger.error("Error executing ffprobe: {}", e.getMessage());
-//    }
 
     JSONParser parser = new JSONParser();
 
@@ -152,12 +100,22 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
 
       JSONObject jsonObject = (JSONObject) parser.parse(reader);
       Object obj;
-      double duration;
+      Double duration;
 
       /* Get format specific stuff */
       JSONObject jsonFormat = (JSONObject) jsonObject.get("format");
-      metadata.setFileName((String) jsonFormat.get("filename"));
-      metadata.setFormat((String) jsonFormat.get("format_long_name"));
+
+      /* File Name */
+      obj = jsonFormat.get("filename");
+      if (obj != null) {
+        metadata.setFileName((String) obj);
+      }
+
+      /* Format */
+      obj = jsonFormat.get("format_long_name");
+      if (obj != null) {
+        metadata.setFormat((String) obj);
+      }
       
       /* Mediainfo does not return a duration if there is no stream but FFprobe
        * will return 0. For compatibility reasons, check if there are any
@@ -167,15 +125,17 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
         obj = jsonFormat.get("duration");
         if (obj != null) {
           duration = new Double((String) obj) * 1000;
-          metadata.setDuration(new Long(new Double(duration).longValue()));
+          metadata.setDuration(duration.longValue());
         }
       }
-      /* Get file size */
+
+      /* File Size */
       obj = jsonFormat.get("size");
       if (obj != null) {
         metadata.setSize(new Long((String) obj));
       }
-      /* Get bitrate */
+
+      /* Bitrate */
       obj = jsonFormat.get("bit_rate");
       if (obj != null) {
         metadata.setBitRate(new Float((String) obj));
@@ -190,29 +150,111 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
         JSONObject stream = iterator.next();
         /* Check type of string */
         String codecType = (String) stream.get("codec_type");
+
+        /* Handle audio streams ----------------------------- */
+
         if ("audio".equals(codecType)) {
           /* Extract audio stream metadata */
           AudioStreamMetadata aMetadata = new AudioStreamMetadata();
-          aMetadata.setFormat((String) stream.get("codec_long_name"));
-          duration = new Double((String) stream.get("duration")) * 1000;
-          aMetadata.setDuration(new Long(new Double(duration).longValue()));
-          aMetadata.setBitRate(new Float((String) stream.get("bit_rate")));
-          aMetadata.setChannels(((Long) stream.get("channels")).intValue());
-          aMetadata.setSamplingRate(Integer.parseInt((String) stream.get("sample_rate")));
+
+          /* Codec */
+          obj = stream.get("codec_long_name");
+          if (obj != null) {
+            aMetadata.setFormat((String) obj);
+          }
+
+          /* Duration */
+          obj = stream.get("duration");
+          if (obj != null) {
+            duration = new Double((String) obj) * 1000;
+            aMetadata.setDuration(duration.longValue());
+          } else {
+            /* If no duration for this stream is specified assume the duration
+             * of the file for this as well. */
+            aMetadata.setDuration(metadata.getDuration());
+          }
+
+          /* Bitrate */
+          obj = stream.get("bit_rate");
+          if (obj != null) {
+            aMetadata.setBitRate(new Float((String) obj));
+          }
+
+          /* Channels */
+          obj = stream.get("channels");
+          if (obj != null) {
+            aMetadata.setChannels(((Long) obj).intValue());
+          }
+
+          /* Sample Rate */
+          obj = stream.get("sample_rate");
+          if (obj != null) {
+            aMetadata.setSamplingRate(Integer.parseInt((String) obj));
+          }
+
           /* Add video stream metadata to overall metadata */
           metadata.getAudioStreamMetadata().add(aMetadata);
+
+
+        /* Handle video streams ----------------------------- */
+
         } else if ("video".equals(codecType)) {
           /* Extract video stream metadata */
           VideoStreamMetadata vMetadata = new VideoStreamMetadata();
-          vMetadata.setFormat((String) stream.get("codec_long_name"));
-          duration = new Double((String) stream.get("duration")) * 1000;
-          vMetadata.setDuration(new Long(new Double(duration).longValue()));
-          vMetadata.setBitRate(new Float((String) stream.get("bit_rate")));
-          vMetadata.setFrameWidth(((Long) stream.get("width")).intValue());
-          vMetadata.setFrameHeight(((Long) stream.get("height")).intValue());
-          vMetadata.setFormatProfile((String) stream.get("profile"));
-          vMetadata.setPixelAspectRatio(parseFloat((String) stream.get("sample_aspect_ratio")));
-          vMetadata.setFrameRate(parseFloat((String) stream.get("avg_frame_rate")));
+
+          /* Codec */
+          obj = stream.get("codec_long_name");
+          if (obj != null) {
+            vMetadata.setFormat((String) obj);
+          }
+
+          /* Duration */
+          obj = stream.get("duration");
+          if (obj != null) {
+            duration = new Double((String) obj) * 1000;
+            vMetadata.setDuration(duration.longValue());
+          } else {
+            /* If no duration for this stream is specified assume the duration
+             * of the file for this as well. */
+            vMetadata.setDuration(metadata.getDuration());
+          }
+
+          /* Bitrate */
+          obj = stream.get("bit_rate");
+          if (obj != null) {
+            vMetadata.setBitRate(new Float((String) obj));
+          }
+
+          /* Width */
+          obj = stream.get("width");
+          if (obj != null) {
+            vMetadata.setFrameWidth(((Long) obj).intValue());
+          }
+
+          /* Height */
+          obj = stream.get("height");
+          if (obj != null) {
+            vMetadata.setFrameHeight(((Long) obj).intValue());
+          }
+
+          /* Profile */
+          obj = stream.get("profile");
+          if (obj != null) {
+            vMetadata.setFormatProfile((String) obj);
+          }
+
+          /* Aspect Ratio */
+          obj = stream.get("sample_aspect_ratio");
+          if (obj != null) {
+            vMetadata.setPixelAspectRatio(parseFloat((String) obj));
+          }
+
+          /* Frame Rate */
+          obj = stream.get("avg_frame_rate");
+          if (obj != null) {
+            vMetadata.setFrameRate(parseFloat((String) obj));
+          }
+
           /* Add video stream metadata to overall metadata */
           metadata.getVideoStreamMetadata().add(vMetadata);
         }
@@ -226,6 +268,13 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
 
     return metadata;
   }
+
+
+  private Object getValFromJSON(JSONObject jobj, String key, Object def) {
+    Object obj = jobj.get(key);
+    return (obj == null && def != null) ? def : obj;
+  }
+
 
   /**
    * Allows configuration {@inheritDoc}
@@ -244,7 +293,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
   }
 
 
-  float parseFloat(String val) {
+  private float parseFloat(String val) {
     if (val.contains("/")) {
       String[] v = val.split("/");
       return Float.parseFloat(v[0]) / Float.parseFloat(v[1]);
@@ -254,31 +303,6 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
     } else {
       return Float.parseFloat(val);
     }
-  }
-
-
-  /**
-   * This method will be called once the process returned. This implementation will check for exit codes different from
-   * <code>-1</code>, <code>0</code> and <code>255</code> and throw an exception.
-   * 
-   * @param exitCode
-   *          the processe's exit code
-   * @throws MediaAnalyzerException
-   *           if the exit code is different from -1, 0 or 255.
-   */
-  protected void onFinished(int exitCode) throws MediaAnalyzerException {
-    // Windows binary will return -1 when queried for options
-    /*
-       if (exitCode != -1 && exitCode != 0 && exitCode != 255) {
-       logger.error("Error code " + exitCode + " occured while executing '" + commandline + "'");
-       throw new MediaAnalyzerException("Cmdline tool " + binary + " exited with exit code " + exitCode);
-       }
-       */
-  }
-
-
-  private enum StreamSection {
-    general, stream, undefined
   }
 
 }
