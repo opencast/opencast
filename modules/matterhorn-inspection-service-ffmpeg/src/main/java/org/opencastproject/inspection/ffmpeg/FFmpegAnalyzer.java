@@ -270,12 +270,6 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
   }
 
 
-  private Object getValFromJSON(JSONObject jobj, String key, Object def) {
-    Object obj = jobj.get(key);
-    return (obj == null && def != null) ? def : obj;
-  }
-
-
   /**
    * Allows configuration {@inheritDoc}
    * 
