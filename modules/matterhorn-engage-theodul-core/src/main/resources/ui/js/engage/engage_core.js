@@ -78,12 +78,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
                 plugin_count = pluginInfos.get('pluginlist').plugins.length;
                 $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
                   // load plugin
-                  loadPlugin(PLUGIN_PATH + value['static-path']);
+                  loadPlugin('../../../plugin/' + value['static-path'] + '/');
                 });
               } else {
                 plugin_count = 1;
                 // load plugin
-                loadPlugin(PLUGIN_PATH + pluginInfos.get('pluginlist').plugins['static-path']);
+                loadPlugin('../../../plugin/' + pluginInfos.get('pluginlist').plugins['static-path'] + '/');
               }
             }
           }
@@ -116,7 +116,27 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
           console.log(data);
         }        
       }
-    }
+    },
+    getPluginPath : function (pluginName) {
+       var evaluated_plugin_path = '';
+       var pluginsInfos = engageCore.model.get('pluginsInfo');
+       var pluginList = pluginsInfos.get('pluginlist');
+       if (pluginList && pluginList.plugins !== undefined) {
+         var plugins = pluginList.plugins;
+         if ($.isArray(plugins)) {
+           plugin_count = plugins.length;
+           $.each(plugins, function (index, value) {
+             if (value['name'] === pluginName) {
+               evaluated_plugin_path = '../../../plugin/' + value['static-path'] + '/';
+             }
+           });
+         } else {
+           plugin_count = 1;
+           evaluated_plugin_path = '../../../plugin/' + value['static-path'] + '/';
+         }
+       }
+       return evaluated_plugin_path;
+     }
   });
 
   // Create an engage view once the document has loaded
@@ -170,7 +190,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
   
   function loadPlugin(plugin_path) {
 
-    require([ plugin_path + "/main.js" ], function (plugin) {
+    require([ plugin_path + 'main' ], function (plugin) {
       // load styles in link tags via jquery
       if ($.isArray(plugin.styles)) {
         $.each(plugin.styles, function (style_index, style_path) {
@@ -179,7 +199,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
             link.attr({
               type : 'text/css',
               rel : 'stylesheet',
-              href : plugin_path + "/" + style_path
+              href : 'engage/theodul/' + plugin_path + style_path
             });
             $("head").append(link);
           }
@@ -190,7 +210,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
           link.attr({
             type : 'text/css',
             rel : 'stylesheet',
-            href : plugin_path + "/" + plugin.styles
+            href : 'engage/theodul/' + plugin_path + plugin.styles
           });
           $("head").append(link);
         }
@@ -198,7 +218,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
 
       if (plugin.template !== "none") {
         // load template async
-        $.get(plugin_path + "/" + plugin.template, function (template) {
+        $.get('engage/theodul/' + plugin_path + plugin.template, function (template) {
           // empty data object
           var template_data = {};
           // add template if not undefined
@@ -206,13 +226,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
             template_data = plugin.template_data;
           }          
           // add full plugin path to the tmeplate data
-          template_data.plugin_path = plugin_path;
+          template_data.plugin_path =  'engage/theodul/' + plugin_path;
           // Process the template using underscore
           var processed_template = _.template(template, template_data);
           // Load the compiled HTML into the component
           plugin.container = insertProcessedTemplate(processed_template, plugin.type, plugin.name);
           plugin.template = template;
-          plugin.pluginPath = plugin_path;
+          plugin.pluginPath = 'engage/theodul/' + plugin_path;
           // plugin load done counter
           plugin_count -= 1;
           if (plugin_count === 0) {

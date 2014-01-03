@@ -15,21 +15,52 @@
  */
 /*jslint browser: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone'], function (require, $, _, Backbone) {
+define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], function (require, $, _, Backbone, EngageModel) {
+
+  //Event prototype
+  function EngageEvent(name, description, type){
+
+    this.getName = (function(){
+      return name;
+    });
+
+    this.getDescription = (function(){
+      return description;
+    });
+
+    this.getType = (function(){
+      return type;
+    });
+
+    this.toString = (function(){
+      return name;
+    });
+  }
 
   var EngageCore = Backbone.View.extend({
+    initialize : function () {
+      // The main core is our global event system
+      this.dispatcher = _.clone(Backbone.Events);
+      //link to the engage model
+      this.model = new EngageModel();
+    },
+
     urlParams: {
       id: "123"
     },
-    log: function (msg) {
-      if (window.console) {
-        console.log(msg);
+    Event : EngageEvent,
+    log : function (data) {
+      if(this.model.get("isDebug")){
+        if (window.console) {
+          console.log(data);
+        }
       }
+    },
+    getPluginPath : function (pluginName) {
+      return '';
     }
   });
 
   var engageCore = new EngageCore();
-  //engageCore.trigger("Core:init");
-  //engageCore.trigger("Core:plugin_load_done");
   return engageCore;
 });

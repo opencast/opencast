@@ -65,6 +65,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
   
 	//Init Event
   Engage.log("Tab:Description: init");
+  var relative_plugin_path = Engage.getPluginPath('EngagePluginTabDescription');
+  Engage.log('Tab:Description: relative plugin path ' + relative_plugin_path); 
   
   Engage.model.on("change:mediaPackage", function() { // listen on a change/set of the mediaPackage model
     initCount -= 1;
