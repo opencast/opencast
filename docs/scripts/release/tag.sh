@@ -8,18 +8,18 @@ FUNCTIONS="functions.sh"
 
 #The version the POMs are in the develop branch.
 #E.g. BRANCH_VER=1.3-SNAPSHOT
-BRANCH_VER=1.5-SNAPSHOT
+BRANCH_VER=
 
 #The new version of our release as it will show up in the tags
 #E.g. RELEASE_VER=1.3-rc5
-RELEASE_VER=1.5.0-rc1
+RELEASE_VER=
 
-#The next version that will be going into development.  This is only relevant for final releases!
+#The version that develop should have.  This is only relevant for final releases!
 #E.g. NEXT_VER=1.4-SNAPSHOT
-NEXT_VER=1.6-SNAPSHOT
+NEXT_VER=
 
 #The jira ticket this work is being done under (must be open)
-JIRA_TICKET=000000
+JIRA_TICKET=
 
 #=======You should not need to modify anything below this line=================
 
@@ -35,11 +35,16 @@ git checkout -- tag.sh
 
 choose -t "Are you cutting an RC, or a final release of $curBranch?" "RC" "Final Release" RELEASE_TYPE
 
-#The version we want the poms to be, usually the same as RELEASE_VER
-TAG_VER=$RELEASE_VER
+echo "Replacing POM file version in the POMs."
+sed -i "s/<version>$BRANCH_VER/<version>$RELEASE_VER/" $WORK_DIR/pom.xml
 
-echo "Replacing POM file version in main POM."
-sed -i "s/<version>$BRANCH_VER/<version>$TAG_VER/" $WORK_DIR/pom.xml
+for i in $WORK_DIR/modules/matterhorn-*
+do
+    echo " Module: $i"
+    if [ -f $i/pom.xml ]; then
+        sed -i "s/<version>$BRANCH_VER/<version>$RELEASE_VER/" $i/pom.xml
+    fi
+done
 
 while [[ true ]]; do
   yesno -d no "NOTE: This script has made changes to your POM files.  Please ensure that it only made changes to the Matterhorn version number.  In rare cases some of the dependencies have the same version numbers, and the modification done above does *not* understand that it should not also change those versions.  Manual inspection of the changeset is required before continuing.  Have you finished checking all of the modifications?" has_checked
@@ -69,7 +74,7 @@ case "$RELEASE_TYPE" in
     #Final release
     git commit -a -m "$JIRA_TICKET: Committing $RELEASE_VER directly to $curBranch in preparation for final release."
 
-    git tag -s $TAG_VER -m "Release $TAG_VER"
+    git tag -s $RELEASE_VER -m "Release $RELEASE_VER"
 
     git checkout master
     git merge --no-ff r/$RELEASE_VER
