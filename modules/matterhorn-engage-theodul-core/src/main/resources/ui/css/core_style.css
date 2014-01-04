@@ -32,11 +32,8 @@ h1,h2,h3 {
 
 #engage_controls {
 	width: 100%;
-	height: 90px;
-	position: fixed;
+	height: 97px;
 	background-color: #ffffff;
-	z-index: 10;
-	top: 0;
 }
 
 #engage_top_bar {
@@ -44,11 +41,12 @@ h1,h2,h3 {
   height: 90px;
   position: fixed;
   background-color: #ffffff;
+  z-index: 1;
 }
 
 /* Expanded Header */
 
-.expand_button {
+#engage_timeline_expand_btn {
   width: 23px;
   height: 23px;
   padding: 5px;
@@ -63,11 +61,11 @@ h1,h2,h3 {
   box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
 }
 
-.expand_button:hover {
+#engage_timeline_expand_btn:hover {
   cursor: pointer;
 }
 
-.rotate180 {
+.engage_timeline_expand_btn_rotate180 {
   -moz-transform: rotate(180deg);
   -webkit-transform: rotate(180deg);
   -o-transform: rotate(180deg);
@@ -75,18 +73,12 @@ h1,h2,h3 {
   transform: rotate(180deg);
 }
 
-.expanded_content {
+#engage_timeline_plugin {
   display: none;
   width: 100%;
   background: #f9f9f9;
   border-top: 1px solid #e3e3e3;
   padding: 10px 20px;
-}
-
-.expanded_content img {
-  border-left: 2px solid #333333;
-  border-bottom: 2px solid #333333;
-  border-right: 2px solid #333333;
 }
 
 /* Loading Aninimation*/

@@ -3,7 +3,7 @@
  name="org.opencastproject.engage.theodul.plugin.timeline.statistics" 
  immediate="true"
  activate="activate">
-  <implementation class="org.opencastproject.engage.theodul.plugin.tab.description.EngagePluginTabDescription" />
+  <implementation class="org.opencastproject.engage.theodul.plugin.timeline.statistics.EngagePluginTimelineStatistics" />
   
   <!-- Engage Plugin Properties: at least name and path must be set -->
   <property name="opencast.engage.plugin.name" value="EngagePluginTimelineStatistics" />
