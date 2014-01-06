@@ -215,9 +215,24 @@ $(document)
             videoSlave = $(videoSlave).prepend(
                 '<source src="' + previewTracks[1].url + '" type="' + previewTracks[1].mimetype + '"/>')
             $('#videoPlayer').after(videoSlave);
+            $('#videoPlayer').after('<div id="video_overlay_msg"></div>');
 
-            $.mhPlayerSynch("#videoPlayer", "#videoPlayerSlave");
-            $('#videoPlayerSlave').show()
+            $('#videoPlayerSlave').show();
+
+	    $("#video_overlay_msg").html("Loading videos...").show();
+	    $.synchronizeVideos(0, "videoPlayer", "videoPlayerSlave");
+	    $(document).on("sjs:buffering", function(event) {
+		$("#video_overlay_msg").html("The videos are currently buffering...").show();
+	    });
+	    $(document).on("sjs:allPlayersReady", function(event) {
+		$("#video_overlay_msg").html("").hide();
+	    });
+	    $(document).on("sjs:bufferedAndAutoplaying", function(event) {
+		$("#video_overlay_msg").html("").hide();
+	    });
+	    $(document).on("sjs:bufferedButNotAutoplaying", function(event) {
+		$("#video_overlay_msg").html("").hide();
+	    });
           } else {
             $('#videoPlayer').css("width", "100%");
           }
