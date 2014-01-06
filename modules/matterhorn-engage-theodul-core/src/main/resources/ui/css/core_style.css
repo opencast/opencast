@@ -50,7 +50,6 @@ h1,h2,h3 {
   width: 23px;
   height: 23px;
   padding: 5px;
-  margin-top: 1px;
   background: #dddddd;
   position: fixed;
   right: 20px;
@@ -78,6 +77,7 @@ h1,h2,h3 {
   width: 100%;
   background: #f9f9f9;
   border-top: 1px solid #e3e3e3;
+  border-bottom: 1px solid #e3e3e3;
   padding: 10px 20px;
 }
 
