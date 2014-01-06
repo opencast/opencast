@@ -33,6 +33,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // local privates//
 
     var SEARCH_ENDPOINT = "/search/episode.json";
+    var USERTRACKING_ENDPOINT = "/usertracking/footprint.json"
     var mediaPackageID = "";
     var mediaPackage; // Mediapackage data
     var mediaInfo; // media infos like video tracks and attachments
@@ -84,6 +85,30 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             "attachments": {}
         }
     });
+    
+    var FootprintModel = Backbone.Model.extend({
+      defaults: {
+          "position": 0,
+          "views": 0
+      }    
+    });
+    
+    var FootprintCollection = Backbone.Collection.extend({
+      model: FootprintModel,
+      url: USERTRACKING_ENDPOINT,
+      initialize: function() {
+        //request collection data
+        this.fetch({
+            data: {id: mediaPackageID},
+            success: function(data) {
+              //Engage.log(this);
+            }
+        });
+      },
+      parse: function(response) {
+        return response.footprints.footprint;
+      }
+    });
 
     // plugin logic //
 
@@ -100,6 +125,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     Engage.on("Core:plugin_load_done", function() {
         Engage.log("MhConnection: receive plugin load done");
         Engage.model.set("mediaPackage", new MediaPackageModel());
+        Engage.model.set("footprints", new FootprintCollection());
     });
 
     function extractMediaInfo() {
