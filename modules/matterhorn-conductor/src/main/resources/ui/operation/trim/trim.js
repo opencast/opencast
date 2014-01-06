@@ -444,7 +444,7 @@ function calculateNewLength () {
     inPoint = getTimeInMilliseconds($('#inPoint').val());
     outPoint = getTimeInMilliseconds($('#outPoint').val());
     newLength = (outPoint - inPoint) / 1000;
-    $('#newLength').val(getTimeString(Math.floor(newLength / 3600), Math.floor(newLength / 60), newLength % 60));
+    $('#newLength').val(getTimeString(Math.floor(newLength / 3600), (Math.floor(newLength / 60)) % 60, newLength % 60));    
 }
 
 /**
