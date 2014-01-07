@@ -60,7 +60,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
   /** Tag to define if the the workflows definition have already been loaded */
   private boolean isWFSinitiliazed = false;
 
-  /** The current worklow definition being installed */
+  /** The current workflow definition being installed */
   private WorkflowDefinition currentWFD = null;
 
   /**
@@ -98,7 +98,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
     logger.info("Installing workflow from file {}", artifact.getAbsolutePath());
     artifactsWithError.remove(artifact);
     artifactIds.put(artifact, def.getId());
-    putWokflowDefinition(def.getId(), def);
+    putWorkflowDefinition(def.getId(), def);
 
     // Determine the number of available profiles
     String[] filesInDirectory = artifact.getParentFile().list(new FilenameFilter() {
@@ -129,7 +129,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
     // Since the artifact is gone, we can't open it to read its ID. So we look in the local map.
     String id = artifactIds.remove(artifact);
     if (id != null) {
-      WorkflowDefinition def = removeWofklowDefinition(id);
+      WorkflowDefinition def = removeWorkflowDefinition(id);
       logger.info("Uninstalling workflow definition '{}' from file {}", def.getId(), artifact.getAbsolutePath());
     }
   }
@@ -199,7 +199,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
    * @param wfd
    *          the workflow definition id
    */
-  public void putWokflowDefinition(String id, WorkflowDefinition wfd) {
+  public void putWorkflowDefinition(String id, WorkflowDefinition wfd) {
     installedWorkflows.put(id, wfd);
   }
 
@@ -210,7 +210,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
    *          the workflow definition id
    * @return the removed workflow definition
    */
-  public WorkflowDefinition removeWofklowDefinition(String id) {
+  public WorkflowDefinition removeWorkflowDefinition(String id) {
     return installedWorkflows.remove(id);
   }
 

@@ -607,7 +607,7 @@ public class WorkspaceImpl implements Workspace {
       throw new NotFoundException(e);
     }
     File f = new File(PathSupport.concat(new String[] { wsRoot, WorkingFileRepository.COLLECTION_PATH_PREFIX,
-            collectionId, fileName }));
+            collectionId, PathSupport.toSafeName(fileName) }));
     File collectionDir = f.getParentFile();
     FileUtils.deleteQuietly(f);
     if (collectionDir.isDirectory() && collectionDir.list().length == 0)

@@ -105,8 +105,11 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class EpisodeServiceImpl implements EpisodeService {
+
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(EpisodeServiceImpl.class);
+
+  private static final String COLLECTION_ID = "episode-service";
 
   private final SolrRequester solrRequester;
   private final SolrIndexManager solrIndex;
@@ -531,11 +534,21 @@ public final class EpisodeServiceImpl implements EpisodeService {
     // todo make use of checksums
     logger.info(format("Archiving manifest of mediapackage %s", mpId));
     final String manifestFileName = UUID.randomUUID().toString() + ".xml";
-    final URI manifestTmpUri = workspace.putInCollection("episode-service", manifestFileName,
-            IOUtils.toInputStream(MediaPackageParser.getAsXml(pmp.getMediaPackage()), "UTF-8"));
-    elementStore.put(spath(orgId, mpId, version, manifestAssetId(pmp, "manifest")),
-            source(manifestTmpUri, Option.<Long> none(), Option.some(MimeTypes.XML)));
-    workspace.deleteFromCollection("episode-service", manifestFileName);
+    InputStream inputStream = null;
+    try {
+      inputStream = IOUtils.toInputStream(MediaPackageParser.getAsXml(pmp.getMediaPackage()), "UTF-8");
+      final URI manifestTmpUri = workspace.putInCollection(COLLECTION_ID, manifestFileName, inputStream);
+      elementStore.put(spath(orgId, mpId, version, manifestAssetId(pmp, "manifest")),
+              source(manifestTmpUri, Option.<Long> none(), Option.some(MimeTypes.XML)));
+    } finally {
+      IOUtils.closeQuietly(inputStream);
+      try {
+        workspace.deleteFromCollection(COLLECTION_ID, manifestFileName);
+      } catch (Exception e) {
+        logger.warn("Unable to delete temporary manifest {} from episode-service collection: {}", manifestFileName, e);
+        throw e;
+      }
+    }
   }
 
   /**

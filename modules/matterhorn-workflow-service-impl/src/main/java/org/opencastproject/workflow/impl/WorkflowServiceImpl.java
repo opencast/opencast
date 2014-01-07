@@ -248,7 +248,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       logger.error("Error registarting JMX statistic beans {}", e);
     }
 
-    logger.info("Activate Worklow service");
+    logger.info("Activate Workflow service");
   }
 
   public void deactivate() {
@@ -471,7 +471,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     if (workflowDefinitionScanner.getWorkflowDefinitions().containsKey(id)) {
       throw new IllegalStateException("A workflow definition with ID '" + id + "' is already registered.");
     }
-    workflowDefinitionScanner.putWokflowDefinition(id, workflow);
+    workflowDefinitionScanner.putWorkflowDefinition(id, workflow);
   }
 
   /**
@@ -480,8 +480,10 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    * @see org.opencastproject.workflow.api.WorkflowService#unregisterWorkflowDefinition(java.lang.String)
    */
   @Override
-  public void unregisterWorkflowDefinition(String workflowDefinitionId) {
-    workflowDefinitionScanner.removeWofklowDefinition(workflowDefinitionId);
+  public void unregisterWorkflowDefinition(String workflowDefinitionId) throws NotFoundException, WorkflowDatabaseException {
+    if (workflowDefinitionScanner.removeWorkflowDefinition(workflowDefinitionId) == null) {
+      throw new NotFoundException("Workflow definition not found");
+    }
   }
 
   /**
