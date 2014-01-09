@@ -157,7 +157,7 @@ public abstract class AbstractAclServiceRestEndpoint {
               override);
       return JsonConv.full(t).toJson();
     } catch (AclServiceNoReferenceException e) {
-      logger.info("Managed acl with id '{}' coudl not be found", managedAclId);
+      logger.info("Managed acl with id '{}' could not be found", managedAclId);
       throw new WebApplicationException(Status.BAD_REQUEST);
     } catch (AclServiceException e) {
       logger.warn("Error updating series transition: {}", e);

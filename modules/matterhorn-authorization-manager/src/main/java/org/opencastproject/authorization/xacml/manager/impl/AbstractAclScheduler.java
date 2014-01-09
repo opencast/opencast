@@ -140,7 +140,7 @@ public abstract class AbstractAclScheduler {
 
     @Override
     protected void execute(final AbstractAclScheduler parameters, JobExecutionContext ctx) {
-      logger.info("Running ACL scheduler");
+      logger.debug("Running ACL scheduler");
       // iterate all organizations
       for (final Organization org : parameters.getOrganizationDirectoryService().getOrganizations()) {
         // set the org on the current thread... this approach should be deprecated
