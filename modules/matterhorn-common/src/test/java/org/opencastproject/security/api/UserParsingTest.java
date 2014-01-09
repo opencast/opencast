@@ -16,10 +16,11 @@
 package org.opencastproject.security.api;
 
 import static org.junit.Assert.assertEquals;
-
-import junit.framework.Assert;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.io.IOUtils;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,7 +61,7 @@ public class UserParsingTest {
 
     String expectedOutput = IOUtils.toString(getClass().getResourceAsStream(USER_XML_FILE), "UTF-8");
 
-    assertEquals("User XML not formed as expected", expectedOutput, writer.toString());
+    assertTrue("User XML not formed as expected", XMLUnit.compareXML(expectedOutput, writer.toString()).identical());
   }
 
   @Test
@@ -76,7 +77,7 @@ public class UserParsingTest {
     JaxbUser user = jaxbContext.createUnmarshaller().unmarshal(streamSource, JaxbUser.class).getValue();
 
     assertEquals(expectedUser.getUsername(), user.getUsername());
-    Assert.assertNull(user.getPassword());
+    assertNull(user.getPassword());
     assertEquals(expectedUser.getOrganization(), user.getOrganization());
     assertEquals(expectedUser.getRoles(), user.getRoles());
   }
