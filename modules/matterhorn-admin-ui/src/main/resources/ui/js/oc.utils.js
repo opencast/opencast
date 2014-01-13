@@ -126,7 +126,7 @@ ocUtils.getDateString = function(date, compact) {
   var yearSeparator = " ";
   var d = date;
   var datestring = "";
-  if (compact == undefined || !compact) {
+  if (typeof compact === "undefined" || !compact) {
     datestring += days[d.getDay()];
     datestring += daySeparator;
   }
