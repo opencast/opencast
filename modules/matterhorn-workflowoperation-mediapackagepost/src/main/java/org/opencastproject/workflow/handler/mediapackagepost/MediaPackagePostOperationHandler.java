@@ -20,7 +20,6 @@ package org.opencastproject.workflow.handler.mediapackagepost;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,12 +28,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
@@ -56,7 +49,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
@@ -103,7 +95,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
 
     /* Check if we need to replace the Mediapackage we got with the published
      * Mediapackage from the Search Service */
-    if (config.mpFromSearch) {
+    if (config.mpFromSearch()) {
       SearchQuery searchQuery = new SearchQuery();
       searchQuery.withId(mp.getIdentifier().toString());
       SearchResult result = searchService.getByQuery(searchQuery);
@@ -185,33 +177,6 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
       }
     }
     return createResult(mp, Action.CONTINUE);
-  }
-
-  /** Serialize XML Document to string
-   *
-   * @param doc
-   * @return
-   * @throws Exception
-   */
-  private String xmlToString(Document doc) throws Exception {
-    Source source = new DOMSource(doc);
-    StringWriter stringWriter = new StringWriter();
-    Result result = new StreamResult(stringWriter);
-    TransformerFactory factory = TransformerFactory.newInstance();
-    Transformer transformer = factory.newTransformer();
-    transformer.transform(source, result);
-    return stringWriter.getBuffer().toString();
-  }
-
-  /** Serialize XML Document to JSON string
-   *
-   * @param doc
-   * @return
-   * @throws Exception
-   */
-  private String xmlToJSONString(Document doc) throws Exception {
-    JSONObject json = XML.toJSONObject(xmlToString(doc));
-    return json.toString();
   }
 
   // <editor-fold defaultstate="collapsed" desc="Inner class that wraps around this WorkflowOperations Configuration">
