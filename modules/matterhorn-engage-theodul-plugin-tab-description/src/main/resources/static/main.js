@@ -45,13 +45,29 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         //format values
         var tempVars = {
             description: this.model.get("description"),
-            creator: this.model.get("creator")
+            creator: this.model.get("creator"),
+            title: this.model.get("title"),
+            series: this.model.get("series"),
+            contributor: this.model.get("contributor"),
+            date: this.model.get("date")
         };
-        if(tempVars.creator === ""){
-          tempVars.creator = "No creator available.";
+        if(!tempVars.creator){
+          tempVars.creator = "";
         }
-        if(tempVars.description === ""){
-          tempVars.description = "No description available.";
+        if(!tempVars.description){
+          tempVars.description = "";
+        }
+        if(!tempVars.title){
+          tempVars.title = "";
+        }
+        if(!tempVars.series){
+          tempVars.series = "";
+        }
+        if(!tempVars.contributor){
+          tempVars.contributor = "";
+        }
+        if(!tempVars.date){
+          tempVars.date = "";
         }
         // compile template and load into the html
         this.$el.html(_.template(this.template, tempVars));
@@ -65,6 +81,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
   
 	//Init Event
   Engage.log("Tab:Description: init");
+  var relative_plugin_path = Engage.getPluginPath('EngagePluginTabDescription');
+  Engage.log('Tab:Description: relative plugin path ' + relative_plugin_path); 
   
   Engage.model.on("change:mediaPackage", function() { // listen on a change/set of the mediaPackage model
     initCount -= 1;

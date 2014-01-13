@@ -2,7 +2,6 @@
 requirejs.config({
   baseUrl: 'src/',
   paths: {
-    main: 'main',
     require: 'test/resources/js/lib/require',
     jquery: 'test/resources/js/lib/jquery',
     underscore: 'test/resources/js/lib/underscore',

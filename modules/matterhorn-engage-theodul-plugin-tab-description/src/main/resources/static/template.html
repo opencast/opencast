@@ -1,5 +1,21 @@
 <div id="engage_description_tab_content">		
-  <% if(typeof description !== "undefined" ){ %>
-  <p id="engage_description_tab_creator"> <%= description %> </p>
+  <% if(typeof description !== "undefined" 
+    && typeof title !== "undefined" 
+    && typeof creator !== "undefined" 
+    && typeof series !== "undefined" 
+    && typeof contributor !== "undefined" 
+    && typeof date !== "undefined"){ %>
+    <div id="engage_description_tab_left">
+      <p class="engage_description_tab_entry"> Title: <%= title %> </p>
+      <p class="engage_description_tab_entry"> Presenter: <%= creator %> </p>
+      <p class="engage_description_tab_entry"> Contributor: <%= contributor %> </p>
+    </div>
+    <div id="engage_description_tab_right">
+      <p class="engage_description_tab_entry"> Series: <%= series %> </p>
+      <p class="engage_description_tab_entry"> Recording Date: <%= date %> </p>
+      <p class="engage_description_tab_entry"> Description: <%= description %> </p>
+    </div>
+
+
   <% } %>
 </div>

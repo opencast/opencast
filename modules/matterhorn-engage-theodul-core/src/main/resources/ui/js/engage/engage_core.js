@@ -21,7 +21,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
   //
 
   //Global private core variables
-  var plugin_count = 0;
+  var plugins_loaded = {};
 
   //Theodul Core init
   if (window.console) {
@@ -75,15 +75,20 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
             // load plugin as requirejs module
             if (pluginInfos.get('pluginlist') && pluginInfos.get('pluginlist').plugins !== undefined) {
               if ($.isArray(pluginInfos.get('pluginlist').plugins)) {
-                plugin_count = pluginInfos.get('pluginlist').plugins.length;
+                $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
+                  var plugin_name = value['name'];
+                  plugins_loaded[plugin_name] = false;
+                });
                 $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
                   // load plugin
-                  loadPlugin(PLUGIN_PATH + value['static-path']);
+                  var plugin_name = value['name'];
+                  loadPlugin('../../../plugin/' + value['static-path'] + '/', plugin_name);
                 });
               } else {
-                plugin_count = 1;
                 // load plugin
-                loadPlugin(PLUGIN_PATH + pluginInfos.get('pluginlist').plugins['static-path']);
+                var plugin_name = value['name'];
+                plugins_loaded[plugin_name] = false;
+                loadPlugin('../../../plugin/' + pluginInfos.get('pluginlist').plugins['static-path'] + '/', plugin_name);
               }
             }
           }
@@ -116,7 +121,25 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
           console.log(data);
         }        
       }
-    }
+    },
+    getPluginPath : function (pluginName) {
+       var evaluated_plugin_path = '';
+       var pluginsInfos = engageCore.model.get('pluginsInfo');
+       var pluginList = pluginsInfos.get('pluginlist');
+       if (pluginList && pluginList.plugins !== undefined) {
+         var plugins = pluginList.plugins;
+         if ($.isArray(plugins)) {
+           $.each(plugins, function (index, value) {
+             if (value['name'] === pluginName) {
+               evaluated_plugin_path = '../../../plugin/' + value['static-path'] + '/';
+             }
+           });
+         } else {
+           evaluated_plugin_path = '../../../plugin/' + value['static-path'] + '/';
+         }
+       }
+       return evaluated_plugin_path;
+     }
   });
 
   // Create an engage view once the document has loaded
@@ -167,10 +190,20 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
     }
     return container;
   }
-  
-  function loadPlugin(plugin_path) {
 
-    require([ plugin_path + "/main.js" ], function (plugin) {
+  function checkAllPluginsloaded() {
+    var all_plugins_loaded = true;
+    $.each(plugins_loaded, function (plugin_index, plugin_value) {
+      if(plugin_value === false) {
+         all_plugins_loaded = false;
+      }
+    });
+    return all_plugins_loaded;
+  }
+
+  function loadPlugin(plugin_path, plugin_name) {
+
+    require([ plugin_path + 'main' ], function (plugin) {
       // load styles in link tags via jquery
       if ($.isArray(plugin.styles)) {
         $.each(plugin.styles, function (style_index, style_path) {
@@ -179,7 +212,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
             link.attr({
               type : 'text/css',
               rel : 'stylesheet',
-              href : plugin_path + "/" + style_path
+              href : 'engage/theodul/' + plugin_path + style_path
             });
             $("head").append(link);
           }
@@ -190,7 +223,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
           link.attr({
             type : 'text/css',
             rel : 'stylesheet',
-            href : plugin_path + "/" + plugin.styles
+            href : 'engage/theodul/' + plugin_path + plugin.styles
           });
           $("head").append(link);
         }
@@ -198,7 +231,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
 
       if (plugin.template !== "none") {
         // load template async
-        $.get(plugin_path + "/" + plugin.template, function (template) {
+        $.get('engage/theodul/' + plugin_path + plugin.template, function (template) {
           // empty data object
           var template_data = {};
           // add template if not undefined
@@ -206,24 +239,26 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
             template_data = plugin.template_data;
           }          
           // add full plugin path to the tmeplate data
-          template_data.plugin_path = plugin_path;
+          template_data.plugin_path =  'engage/theodul/' + plugin_path;
           // Process the template using underscore
           var processed_template = _.template(template, template_data);
           // Load the compiled HTML into the component
           plugin.container = insertProcessedTemplate(processed_template, plugin.type, plugin.name);
           plugin.template = template;
-          plugin.pluginPath = plugin_path;
+          plugin.pluginPath = 'engage/theodul/' + plugin_path;
           // plugin load done counter
-          plugin_count -= 1;
-          if (plugin_count === 0) {
+          plugins_loaded[plugin_name] = true;
+          // Check if all plugins are ready
+          if (checkAllPluginsloaded() === true) {
             addPluginLogic();
             // Trigger done event
             engageCore.trigger("Core:plugin_load_done");
           }
         });
       } else {
-        plugin_count -= 1;
-        if (plugin_count === 0) {
+        plugins_loaded[plugin_name] = true;
+        // Check if all plugins are ready
+        if (checkAllPluginsloaded() === true) {
           addPluginLogic();
           // Trigger done event
           engageCore.trigger("Core:plugin_load_done");
