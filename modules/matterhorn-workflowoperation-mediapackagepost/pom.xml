@@ -39,13 +39,11 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.5.8</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.5.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.osgi</groupId>
@@ -58,7 +56,7 @@
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20070829</version>
+			<version>20080701</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -74,8 +72,8 @@
 							org.opencastproject.workflow.handler.mediapackagepost;version=${project.version}
 						</Export-Package>
 						<Private-Package>
-							org.json.*,
-							org.w3c.dom
+							org.json.*;-split-package:=merge-last,
+							org.w3c.dom;-split-package:=merge-last
 						</Private-Package>
 						<Service-Component>
 							OSGI-INF/operations/distribute-mediapackagepost.xml
