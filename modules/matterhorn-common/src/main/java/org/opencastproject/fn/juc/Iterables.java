@@ -34,8 +34,8 @@ public final class Iterables {
   }
 
   /**
-   * Make a string from an iterable separating each element by <code>sep</code>.
-   * The string is surrounded by <code>pre</code> and <code>post</code>.
+   * Make a string from an iterable separating each element by <code>sep</code>. The string is surrounded by
+   * <code>pre</code> and <code>post</code>.
    */
   public static String mkString(Iterable<?> as, String sep, String pre, String post) {
     return pre + mkString(as, sep) + post;
@@ -44,7 +44,8 @@ public final class Iterables {
   /** Return an iterator as an iterable to make it usable in a for comprehension. */
   public static <A> Iterable<A> asIterable(final Iterator<A> i) {
     return new Iterable<A>() {
-      @Override public Iterator<A> iterator() {
+      @Override
+      public Iterator<A> iterator() {
         return i;
       }
     };

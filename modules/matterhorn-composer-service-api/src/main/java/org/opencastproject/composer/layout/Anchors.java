@@ -13,22 +13,16 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.fn;
+package org.opencastproject.composer.layout;
 
-import org.opencastproject.util.data.Function;
-
-/** Functions. */
-public final class Fns {
-  private Fns() {
+/** Some predefined anchor points. */
+public final class Anchors {
+  private Anchors() {
   }
 
-  /** The identity function. */
-  public static <A> Function<A, A> id() {
-    return new Function<A, A>() {
-      @Override
-      public A apply(A a) {
-        return a;
-      }
-    };
-  }
+  public static final Anchor TOP_LEFT = new Anchor(0.0, 0.0);
+  public static final Anchor TOP_RIGHT = new Anchor(1.0, 0.0);
+  public static final Anchor BOTTOM_LEFT = new Anchor(0.0, 1.0);
+  public static final Anchor BOTTOM_RIGHT = new Anchor(1.0, 1.0);
+  public static final Anchor CENTER = new Anchor(0.5, 0.5);
 }

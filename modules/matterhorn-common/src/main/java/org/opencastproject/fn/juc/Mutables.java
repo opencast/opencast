@@ -48,7 +48,7 @@ public final class Mutables {
     return new HashMap<A, B>();
   }
 
-  public static <A>Stack<A> stack() {
+  public static <A> Stack<A> stack() {
     return new Stack<A>();
   }
 

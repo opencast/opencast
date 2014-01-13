@@ -13,26 +13,26 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.fn.juc;
+package org.opencastproject.composer.api;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.opencastproject.composer.layout.Layout;
+import org.opencastproject.mediapackage.MediaPackageElement;
 
-/** Functions for {@link List}s. */
-public final class Lists {
-  private Lists() {
+/** A media package element with layout information. */
+public class LaidOutElement<A extends MediaPackageElement> {
+  private final A element;
+  private final Layout layout;
+
+  public LaidOutElement(A element, Layout layout) {
+    this.element = element;
+    this.layout = layout;
   }
 
-  /**
-   * Create a new immutable list prepending <code>h</code> to list <code>t</code>.
-   * <p/>
-   * Since the implementation is based on the Java Collection classes it cannot make any assumptions about the
-   * immutability of <code>t</code> and therefore has to copy it into a new list. Use with care.
-   */
-  public static <A> List<A> cons(A h, List<? extends A> t) {
-    final List<A> a = new ArrayList<A>(t.size() + 1);
-    a.add(h);
-    a.addAll(t);
-    return Immutables.mk(a);
+  public A getElement() {
+    return element;
+  }
+
+  public Layout getLayout() {
+    return layout;
   }
 }

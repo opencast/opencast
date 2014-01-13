@@ -42,7 +42,7 @@ public final class Immutables {
     return Collections.unmodifiableList(new ArrayList<A>(a));
   }
 
-  public static <A>Set<A> mk(Set<A> a) {
+  public static <A> Set<A> mk(Set<A> a) {
     return Collections.unmodifiableSet(new HashSet<A>(a));
   }
 
