@@ -86,8 +86,13 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   /** The default collection in the working file repository to store archives */
   public static final String DEFAULT_ZIP_COLLECTION = "zip";
 
-  /** The temporary location to use when building an archive */
-  public static final String ARCHIVE_TEMP_DIR = "archive-temp";
+  /** The default location to use when building an zip archive relative to the
+   * storage directory */
+  public static final String DEFAULT_ARCHIVE_TEMP_DIR = "archive-tmp";
+
+  /** Key for configuring the location of the archive-temp folder */
+  public static final String ARCHIVE_TEMP_DIR_CFG_KEY =
+    "org.opencastproject.workflow.handler.ZipWorkflowOperationHandler.tmpdir";
 
   /** The default flavor to use for a mediapackage archive */
   public static final MediaPackageElementFlavor DEFAULT_ARCHIVE_FLAVOR = MediaPackageElementFlavor
@@ -131,14 +136,17 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   }
 
   /**
-   * Activate the component, generating the temporary storage directory for building zip archives if necessary.
+   * Activate the component, generating the temporary storage directory for
+   * building zip archives if necessary.
    * 
    * {@inheritDoc}
    * 
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
    */
   protected void activate(ComponentContext cc) {
-    tempStorageDir = new File(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"), ARCHIVE_TEMP_DIR);
+    tempStorageDir = cc.getBundleContext().getProperty(ARCHIVE_TEMP_DIR_CFG_KEY) != null
+      ? new File(cc.getBundleContext().getProperty(ARCHIVE_TEMP_DIR_CFG_KEY))
+      : new File(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"), DEFAULT_ARCHIVE_TEMP_DIR);
     if (!tempStorageDir.isDirectory()) {
       try {
         FileUtils.forceMkdir(tempStorageDir);
