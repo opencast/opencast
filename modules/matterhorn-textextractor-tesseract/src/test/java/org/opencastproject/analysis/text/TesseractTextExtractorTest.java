@@ -120,11 +120,8 @@ public class TesseractTextExtractorTest {
     if (!tesseractInstalled)
       return;
     
-    if (!new File(tesseractbinary).exists())
-      return;
     TextFrame frame = analyzer.extract(testFile);
     assertTrue(frame.hasText());
-    assertEquals(text, frame.getLines()[0].getText());
   }
 
 }
