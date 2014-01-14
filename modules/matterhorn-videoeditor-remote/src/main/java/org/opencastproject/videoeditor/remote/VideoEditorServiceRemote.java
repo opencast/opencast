@@ -46,7 +46,7 @@ public class VideoEditorServiceRemote extends RemoteBase implements VideoEditorS
 
   @Override
   public List<Job> processSmil(Smil smil) throws ProcessFailedException {
-    HttpPost post = new HttpPost("/videoeditor");
+    HttpPost post = new HttpPost("/process-smil");
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     try {
       params.add(new BasicNameValuePair("smil", smil.toXML()));

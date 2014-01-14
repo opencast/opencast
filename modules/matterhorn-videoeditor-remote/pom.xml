@@ -35,6 +35,10 @@
               org.opencastproject.videoeditor.remote;version=${project.version},
               org.opencastproject.videoeditor.silencedetection.remote;version=${project.version}
             </Export-Package>
+            <Service-Component>
+              OSGI-INF/silencedetection-remote.xml,
+              OSGI-INF/videoeditor-remote.xml
+            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
@@ -51,13 +55,11 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>matterhorn-videoeditor-api</artifactId>
       <version>${project.version}</version>
-      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>matterhorn-common</artifactId>
       <version>${project.version}</version>
-      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
