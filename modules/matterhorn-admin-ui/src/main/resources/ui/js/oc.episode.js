@@ -920,20 +920,16 @@ opencast.episode = (function() {
 
       function mkWorkflow(json) {
         var started = new Date(ocUtils.first(json.operations.operation).started);
+        var lastOp = ocUtils.last(json.operations.operation);
         // Not all operations have a completed field, e.g. those that are SKIPPED so we can't simply
-        // look at the latest operation.
-        // Since Underscore.js is not lazy a real functional (filter map first) sequence is prohibited
-        var lastCompletedOp = _.find(
-                ocUtils.ensureArray(json.operations.operation).reverse(),
-                function(op) { return !_.isUndefined(op.completed); });
+        // use this property.
+        var completed = new Date(!_.isUndefined(lastOp.completed) ? lastOp.completed : lastOp.started);
         return {
           id: json.id,
           title: workflowDisplayName(json),
           state: json.state,
           started: ocUtils.getDateTimeStringCompact(started),
-          completed: (typeof lastCompletedOp !== "undefined")
-                  ? ocUtils.getDateTimeStringCompact(new Date(lastCompletedOp.completed))
-                  : "?"
+          completed: ocUtils.getDateTimeStringCompact(completed)
         }
       }
 
