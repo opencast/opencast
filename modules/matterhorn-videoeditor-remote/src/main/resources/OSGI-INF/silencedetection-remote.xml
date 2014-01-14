@@ -6,7 +6,7 @@
     class="org.opencastproject.videoeditor.silencedetection.remote.SilenceDetectionServiceRemote" />
   <property name="service.description" value="Silence Detection Remote Service Proxy" />
   <service>
-    <provide interface="oorg.opencastproject.videoeditor.silencedetection.api.SilenceDetectionService" />
+    <provide interface="org.opencastproject.videoeditor.silencedetection.api.SilenceDetectionService" />
   </service>
   <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
     cardinality="1..1" policy="static" bind="setTrustedHttpClient" />

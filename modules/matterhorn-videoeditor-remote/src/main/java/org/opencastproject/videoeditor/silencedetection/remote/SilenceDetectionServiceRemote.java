@@ -48,7 +48,7 @@ public class SilenceDetectionServiceRemote extends RemoteBase implements Silence
 
   @Override
   public Job detect(Track track) throws ProcessFailedException {
-    HttpPost post = new HttpPost("/silencedetection");
+    HttpPost post = new HttpPost("/detect");
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     try {
       params.add(new BasicNameValuePair("track", MediaPackageElementParser.getAsXml(track)));
