@@ -107,11 +107,10 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
       mp = result.getItems()[0].getMediaPackage();
     }
 
+    logger.info("Submitting \"" + mp.getTitle() + "\" (" + mp.getIdentifier().toString() + ") as "
+        + config.getFormat().name() + " to " + config.getUrl().toString());
+
     try {
-
-      logger.info("Submitting \"" + mp.getTitle() + "\" (" + mp.getIdentifier().toString() + ") as "
-          + config.getFormat().name() + " to " + config.getUrl().toString());
-
       // serialize MediaPackage to target format
       OutputStream serOut = new ByteArrayOutputStream();
       MediaPackageParser.getAsXml(mp, serOut, false);
@@ -173,6 +172,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
       if (e instanceof WorkflowOperationException) {
         throw (WorkflowOperationException) e;
       } else {
+        logger.error("Submitting mediapackage failed: {}", e.toString());
         throw new WorkflowOperationException(e);
       }
     }
