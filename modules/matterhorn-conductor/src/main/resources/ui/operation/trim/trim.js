@@ -525,7 +525,7 @@ function continueWorkflow () {
     mpe.submit();
 }
 
-function cancel(){
+function leave(){
     window.parent.location.href = "/admin";
 }
 
