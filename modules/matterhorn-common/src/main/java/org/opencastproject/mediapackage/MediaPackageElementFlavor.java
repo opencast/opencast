@@ -16,12 +16,13 @@
 
 package org.opencastproject.mediapackage;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import org.opencastproject.util.data.Function;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ELement flavors describe {@link MediaPackageElement}s in a semantic way. They reveal or give at least a hint about
@@ -89,6 +90,11 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    */
   public MediaPackageElementFlavor(String type, String subtype) {
     this(type, subtype, null);
+  }
+
+  /** Constructor function for {@link #MediaPackageElementFlavor(String, String)}. */
+  public static MediaPackageElementFlavor flavor(String type, String subtype) {
+    return new MediaPackageElementFlavor(type, subtype);
   }
 
   /**
@@ -225,6 +231,13 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
       throw new IllegalArgumentException("Unable to create element flavor from '" + s + "'");
     return new MediaPackageElementFlavor(parts[0], parts[1]);
   }
+
+  public static final Function<String, MediaPackageElementFlavor> parseFlavor =
+          new Function<String, MediaPackageElementFlavor>() {
+            @Override public MediaPackageElementFlavor apply(String s) {
+              return parseFlavor(s);
+            }
+          };
 
   /**
    * Helper class to store type/subtype equivalents for a given element type.

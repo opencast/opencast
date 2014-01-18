@@ -217,9 +217,7 @@
               OSGI-INF/state-service-rest.xml,
               OSGI-INF/configuration-service.xml,
               OSGI-INF/capture-files.xml,
-              OSGI-INF/confidence-monitor-service.xml,
               OSGI-INF/confidence-monitor-service-rest.xml,
-              OSGI-INF/gstreamer-capture-framework.xml
             </Service-Component>
             <Http-Alias>/capture</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>

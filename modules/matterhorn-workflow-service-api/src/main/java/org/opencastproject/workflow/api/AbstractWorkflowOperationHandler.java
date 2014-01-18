@@ -15,16 +15,18 @@
  */
 package org.opencastproject.workflow.api;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Function0;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Constants;
 import org.osgi.service.component.ComponentContext;
 
@@ -33,6 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Abstract base implementation for an operation handler, which implements a simple start operation that returns a
@@ -148,18 +153,25 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     return list;
   }
 
+  /** {@link #asList(String)} as a function. */
+  protected Function<String, List<String>> asList = new Function<String, List<String>>() {
+    @Override public List<String> apply(String s) {
+      return asList(s);
+    }
+  };
+
   /**
    * Generates a filename using the base name of a source element and the extension of a derived element.
    * 
    * @param source
-   *          the source mediapackage element
+   *          the source media package element
    * @param derived
-   *          the derived mediapackage element
+   *          the derived media package element
    * @return the filename
    */
   protected String getFileNameFromElements(MediaPackageElement source, MediaPackageElement derived) {
-    String fileName = FilenameUtils.getBaseName(source.getURI().getPath().toString());
-    String fileExtension = FilenameUtils.getExtension(derived.getURI().getPath().toString());
+    String fileName = FilenameUtils.getBaseName(source.getURI().getPath());
+    String fileExtension = FilenameUtils.getExtension(derived.getURI().getPath());
     return fileName + "." + fileExtension;
   }
 
@@ -321,6 +333,26 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     return barrier.waitForJobs(timeout);
   }
 
+  /** Get a configuration option. */
+  protected Option<String> getCfg(WorkflowInstance wi, String key) {
+    return option(wi.getCurrentOperation().getConfiguration(key));
+  }
+
+  /**
+   * Create an error function.
+   * <p/>
+   * Example usage: <code>getCfg(wi, "key").getOrElse(this.&lt;String&gt;cfgKeyMissing("key"))</code>
+   *
+   * @see #getCfg(WorkflowInstance, String)
+   */
+  protected <A> Function0<A> cfgKeyMissing(final String key) {
+    return new Function0<A>() {
+      @Override public A apply() {
+        return chuck(new WorkflowOperationException(key + " is missing or malformed"));
+      }
+    };
+  }
+
   /**
    * {@inheritDoc}
    * 
@@ -356,5 +388,4 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   public String toString() {
     return getId();
   }
-
 }

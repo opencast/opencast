@@ -102,7 +102,7 @@ public class CaptureAgentImplTest {
     // creates agent, initially idle
     captureAgentImpl = new CaptureAgentImpl();
     captureAgentImpl.setConfigService(config);
-    captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
+    //captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
     Assert.assertNull(captureAgentImpl.getAgentState());
     captureAgentImpl.activate(null);
     Assert.assertEquals(AgentState.IDLE, captureAgentImpl.getAgentState());
@@ -241,7 +241,7 @@ public class CaptureAgentImplTest {
     captureAgentImpl = null;
     // Bring the agent back up and check to make sure it reloads the recording
     captureAgentImpl = new CaptureAgentImpl();
-    captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
+    //captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
     captureAgentImpl.setConfigService(config);
     captureAgentImpl.activate(null);
     Assert.assertEquals(0, captureAgentImpl.getKnownRecordings().size());
@@ -272,7 +272,7 @@ public class CaptureAgentImplTest {
 
     // Create the agent and verify some of the error handling logic
     captureAgentImpl = new CaptureAgentImpl();
-    captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
+    //captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
     Assert.assertEquals(0, captureAgentImpl.getKnownRecordings().size());
     captureAgentImpl.loadRecordingsFromDisk();
     Assert.assertEquals(0, captureAgentImpl.getKnownRecordings().size());
@@ -320,7 +320,7 @@ public class CaptureAgentImplTest {
     captureAgentImpl = null;
 
     captureAgentImpl = new CaptureAgentImpl();
-    captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
+    //captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
     captureAgentImpl.setConfigService(config);
     captureAgentImpl.activate(null);
     captureAgentImpl.updated(loadProperties("config/scheduler.properties"));
@@ -355,7 +355,7 @@ public class CaptureAgentImplTest {
     config = new ConfigurationManager();
     Properties p = setupConfigurationManagerProperties();
     captureAgentImpl = new CaptureAgentImpl();
-    captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
+    //captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
     captureAgentImpl.setConfigService(config);
     waiter = new WaitForState();
     waiter.sleepWait(new CheckState() {
@@ -410,7 +410,7 @@ public class CaptureAgentImplTest {
     config = new ConfigurationManager();
     Properties p = setupConfigurationManagerProperties();
     captureAgentImpl = new CaptureAgentImpl();
-    captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
+    //captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
     captureAgentImpl.setConfigService(config);
     waiter = new WaitForState();
     waiter.sleepWait(new CheckState() {
@@ -479,7 +479,7 @@ public class CaptureAgentImplTest {
     Assert.assertTrue(config.isInitialized());
     
     captureAgentImpl = new CaptureAgentImpl();
-    captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
+    //captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
     captureAgentImpl.setConfigService(config);
     waiter = new WaitForState();
     waiter.sleepWait(new CheckState() {
@@ -519,7 +519,7 @@ public class CaptureAgentImplTest {
     // Create the configuration manager
     config = new ConfigurationManager();
     captureAgentImpl = new CaptureAgentImpl();
-    captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
+    //captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
     captureAgentImpl.updated(loadProperties("config/scheduler.properties"));
     waiter = new WaitForState();
     waiter.sleepWait(new CheckState() {
