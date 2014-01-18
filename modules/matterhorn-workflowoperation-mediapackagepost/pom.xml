@@ -18,11 +18,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.opencastproject</groupId>
-			<artifactId>matterhorn-kernel</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opencastproject</groupId>
 			<artifactId>matterhorn-workflow-service-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -40,23 +35,9 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.compendium</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20080701</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -72,7 +53,6 @@
 							org.opencastproject.workflow.handler.mediapackagepost;version=${project.version}
 						</Export-Package>
 						<Private-Package>
-							org.json.*;-split-package:=merge-last,
 							org.w3c.dom;-split-package:=merge-last
 						</Private-Package>
 						<Service-Component>

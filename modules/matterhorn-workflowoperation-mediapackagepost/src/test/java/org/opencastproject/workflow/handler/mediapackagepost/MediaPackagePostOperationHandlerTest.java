@@ -14,13 +14,11 @@
  *
  */
 
-//package org.opencastproject.workflow.handler;
 package org.opencastproject.workflow.handler.mediapackagepost;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-//import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
@@ -31,24 +29,17 @@ import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 
 import org.junit.Assert;
-//import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-//import java.io.BufferedWriter;
-//import java.io.File;
-//import java.io.FileWriter;
-//import java.io.IOException;
 import java.util.ArrayList;
-//import java.util.HashMap;
 import java.util.List;
-//import java.util.Map;
 
 public class MediaPackagePostOperationHandlerTest {
 
   /** the logging facility provided by log4j */
-  private static final Logger logger = LoggerFactory.getLogger(MediaPackagePostOperationHandlerTest.class.getName());
+  private static final Logger logger
+    = LoggerFactory.getLogger(MediaPackagePostOperationHandlerTest.class.getName());
 
   /** Represents a tuple of handler and instance, useful for return types */
   private static final class InstanceAndHandler {
@@ -56,7 +47,8 @@ public class MediaPackagePostOperationHandlerTest {
     private WorkflowInstanceImpl workflowInstance;
     private WorkflowOperationHandler workflowHandler;
 
-    private InstanceAndHandler(WorkflowInstanceImpl i, WorkflowOperationHandler h) {
+    private InstanceAndHandler(WorkflowInstanceImpl i,
+        WorkflowOperationHandler h) {
       this.workflowInstance = i;
       this.workflowHandler = h;
     }
@@ -64,7 +56,7 @@ public class MediaPackagePostOperationHandlerTest {
   }
 
   /**
-   * Creates a new CLI workflow and readies the engine for processing
+   * Creates a new workflow and readies the engine for processing
    */
   private InstanceAndHandler createWorkflow(String url, String format) {
     WorkflowOperationHandler handler = new MediaPackagePostOperationHandler();
@@ -72,8 +64,10 @@ public class MediaPackagePostOperationHandlerTest {
     WorkflowInstanceImpl workflowInstance = new WorkflowInstanceImpl();
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("op", OperationState.RUNNING);
-    List<WorkflowOperationInstance> operationsList = new ArrayList<WorkflowOperationInstance>();
+    WorkflowOperationInstanceImpl operation
+      = new WorkflowOperationInstanceImpl("op", OperationState.RUNNING);
+    List<WorkflowOperationInstance> operationsList 
+      = new ArrayList<WorkflowOperationInstance>();
     operationsList.add(operation);
     workflowInstance.setOperations(operationsList);
 
@@ -83,14 +77,8 @@ public class MediaPackagePostOperationHandlerTest {
     return new InstanceAndHandler(workflowInstance, handler);
   }
 
-  /**
-   * Tests the xpath replacement in the CLI handler
-   * 
-   * @throws Exception
-   */
-
   @Test
-  public void testVariableSubstitution() throws Exception {
+  public void testHTTPPostXML() throws Exception {
     // create a dummy mediapackage
     MediaPackageBuilderFactory factory = MediaPackageBuilderFactory.newInstance();
     MediaPackageBuilder builder = factory.newMediaPackageBuilder();
@@ -99,8 +87,9 @@ public class MediaPackagePostOperationHandlerTest {
     mp.addContributor("lkiesow");
     mp.addContributor("lkiesow");
 
-    // test the trivial
-    InstanceAndHandler tuple = createWorkflow("http://0.0.0.0:0", "xml");
+    /* Sending stuff to port 9 shound never return anything as the Discard
+     * Protocol uses port 9 */
+    InstanceAndHandler tuple = createWorkflow("http://0.0.0.0:9", "xml");
     MediaPackagePostOperationHandler handler = (MediaPackagePostOperationHandler) tuple.workflowHandler;
     tuple.workflowInstance.setMediaPackage(mp);
 
@@ -109,7 +98,34 @@ public class MediaPackagePostOperationHandlerTest {
     } catch (WorkflowOperationException e) {
       Assert.assertTrue(("org.opencastproject.workflow.api.WorkflowOperationException: "
           + "org.apache.http.conn.HttpHostConnectException: "
-          + "Connection to http://0.0.0.0:0 refused").equals(e.toString()));
+          + "Connection to http://0.0.0.0:9 refused").equals(e.toString()));
+      logger.info(e.toString());
+    }
+
+  }
+
+  @Test
+  public void testHTTPPostJSON() throws Exception {
+    // create a dummy mediapackage
+    MediaPackageBuilderFactory factory = MediaPackageBuilderFactory.newInstance();
+    MediaPackageBuilder builder = factory.newMediaPackageBuilder();
+    MediaPackage mp = builder.createNew(new IdImpl("xyz"));
+    mp.setTitle("test");
+    mp.addContributor("lkiesow");
+    mp.addContributor("lkiesow");
+
+    /* Sending stuff to port 9 shound never return anything as the Discard
+     * Protocol uses port 9 */
+    InstanceAndHandler tuple = createWorkflow("http://0.0.0.0:9", "json");
+    MediaPackagePostOperationHandler handler = (MediaPackagePostOperationHandler) tuple.workflowHandler;
+    tuple.workflowInstance.setMediaPackage(mp);
+
+    try {
+      tuple.workflowHandler.start(tuple.workflowInstance, null);
+    } catch (WorkflowOperationException e) {
+      Assert.assertTrue(("org.opencastproject.workflow.api.WorkflowOperationException: "
+          + "org.apache.http.conn.HttpHostConnectException: "
+          + "Connection to http://0.0.0.0:9 refused").equals(e.toString()));
       logger.info(e.toString());
     }
 

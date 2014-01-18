@@ -15,11 +15,6 @@
  */
 package org.opencastproject.workflow.handler.mediapackagepost;
 
-
-
-
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -36,8 +31,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
-import org.json.XML;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
@@ -112,16 +105,11 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
 
     try {
       // serialize MediaPackage to target format
-      OutputStream serOut = new ByteArrayOutputStream();
-      MediaPackageParser.getAsXml(mp, serOut, false);
-      String mpStr = serOut.toString();
-      serOut.close();
+      String mpStr;
       if (config.getFormat() == Configuration.Format.JSON) {
-         JSONObject json = XML.toJSONObject(mpStr);
-         mpStr = json.toString();
-         if (mpStr.startsWith("{\"ns2:")) {
-            mpStr = (new StringBuilder()).append("{\"").append(mpStr.substring(6)).toString();
-         }
+        mpStr = MediaPackageParser.getAsXml(mp);
+      } else {
+        mpStr = MediaPackageParser.getAsXml(mp);
       }
 
       // Log mediapackge
@@ -145,7 +133,8 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
       if (config.authenticate()) {
         URL targetUrl = config.getUrl().toURL();
         client.getCredentialsProvider().setCredentials(
-            new AuthScope(targetUrl.getHost(), targetUrl.getPort()), config.getCredentials());
+            new AuthScope(targetUrl.getHost(), targetUrl.getPort()),
+            config.getCredentials());
       }
 
       HttpResponse response = client.execute(post);
