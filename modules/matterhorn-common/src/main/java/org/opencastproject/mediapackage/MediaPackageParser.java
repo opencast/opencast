@@ -30,6 +30,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.codehaus.jettison.mapped.Configuration;
+import org.codehaus.jettison.mapped.MappedNamespaceConvention;
+import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.XMLStreamException;
+
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
@@ -59,6 +65,51 @@ public final class MediaPackageParser {
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
       StringWriter writer = new StringWriter();
       marshaller.marshal(mediaPackage, writer);
+      return writer.toString();
+    } catch (JAXBException e) {
+      throw new IllegalStateException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    }
+  }
+
+  /**
+   * Serializes the media package to a JSON string.
+   * 
+   * @param  mediaPackage
+   *         the media package
+   * @return the serialized media package
+   */
+  public static String getAsJSON(MediaPackage mediaPackage) {
+    if (mediaPackage == null) {
+      throw new IllegalArgumentException("Mediapackage must not be null");
+    }
+    try {
+      Marshaller marshaller = MediaPackageImpl.context.createMarshaller();
+
+      Configuration config = new Configuration();
+      config.setSupressAtAttributes(true);
+      MappedNamespaceConvention con = new MappedNamespaceConvention(config);
+      StringWriter writer = new StringWriter();
+      XMLStreamWriter xmlStreamWriter = new MappedXMLStreamWriter(con, writer) {
+        @Override
+        public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
+          super.writeStartElement("", local, "");
+        }
+
+        @Override
+        public void writeStartElement(String uri, String local) throws XMLStreamException {
+          super.writeStartElement("", local, "");
+        }
+
+        @Override
+        public void setPrefix(String pfx, String uri) throws XMLStreamException {
+        }
+
+        @Override
+        public void setDefaultNamespace(String uri) throws XMLStreamException {
+        }
+      };
+
+      marshaller.marshal(mediaPackage, xmlStreamWriter);
       return writer.toString();
     } catch (JAXBException e) {
       throw new IllegalStateException(e.getLinkedException() != null ? e.getLinkedException() : e);
