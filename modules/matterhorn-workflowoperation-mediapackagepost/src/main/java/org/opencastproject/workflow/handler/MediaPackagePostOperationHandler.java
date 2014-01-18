@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler.mediapackagepost;
+package org.opencastproject.workflow.handler;
 
 import java.net.URI;
 import java.net.URL;

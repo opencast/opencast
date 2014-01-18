@@ -14,7 +14,7 @@
  *
  */
 
-package org.opencastproject.workflow.handler.mediapackagepost;
+package org.opencastproject.workflow.handler;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
