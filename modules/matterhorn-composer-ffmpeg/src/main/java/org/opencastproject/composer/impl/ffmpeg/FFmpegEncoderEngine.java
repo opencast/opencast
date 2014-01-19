@@ -20,11 +20,14 @@ import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.impl.AbstractCmdlineEncoderEngine;
 import org.opencastproject.util.data.Option;
+
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +47,7 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
   private static final String CONFIG_FFMPEG_PATH = "org.opencastproject.composer.ffmpegpath";
 
   /** Format for trim times */
-  private static final String TIME_FORMAT = "%02d:%02d:%02d";
+  private static final String TIME_FORMAT = "%02d:%02d:";
 
   /** The trimming start time property name */
   public static final String PROP_TRIMMING_START_TIME = "trim.start";
@@ -80,16 +83,23 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
    *      org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
    */
   @Override
-  public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
-          throws EncoderException {
+  public Option<File> trim(File mediaSource, EncodingProfile format, double start, double duration,
+          Map<String, String> properties) throws EncoderException {
     if (properties == null)
       properties = new HashMap<String, String>();
     start /= 1000;
     duration /= 1000;
-    properties.put(PROP_TRIMMING_START_TIME,
-            String.format(TIME_FORMAT, (long) Math.floor(start / 3600), (start % 3600) / 60, (start % 60)));
-    properties.put(PROP_TRIMMING_DURATION,
-            String.format(TIME_FORMAT, (long) Math.floor(duration / 3600), (duration % 3600) / 60, (duration % 60)));
+    DecimalFormatSymbols ffmpegFormat = new DecimalFormatSymbols();
+    ffmpegFormat.setDecimalSeparator('.');
+    DecimalFormat df = new DecimalFormat("00.000", ffmpegFormat);
+    properties.put(
+            PROP_TRIMMING_START_TIME,
+            String.format(TIME_FORMAT, (long) Math.floor(start / 3600), (long) (start % 3600) / 60)
+                    + df.format(start % 60));
+    properties.put(
+            PROP_TRIMMING_DURATION,
+            String.format(TIME_FORMAT, (long) Math.floor(duration / 3600), (long) (duration % 3600) / 60)
+                    + df.format(duration % 60));
     return super.trim(mediaSource, format, start, duration, properties);
   }
 

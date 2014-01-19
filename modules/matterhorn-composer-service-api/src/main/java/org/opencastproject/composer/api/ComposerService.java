@@ -119,7 +119,7 @@ public interface ComposerService {
    * @throws MediaPackageException
    *           if the mediapackage is invalid
    */
-  Job imageToVideo(Attachment sourceImageAttachment, String profileId, long duration) throws EncoderException,
+  Job imageToVideo(Attachment sourceImageAttachment, String profileId, double duration) throws EncoderException,
           MediaPackageException;
 
   /**
@@ -140,7 +140,7 @@ public interface ComposerService {
    * @throws MediaPackageException
    *           if the mediapackage is invalid
    */
-  Job trim(Track sourceTrack, String profileId, long start, long duration) throws EncoderException,
+  Job trim(Track sourceTrack, String profileId, double start, double duration) throws EncoderException,
           MediaPackageException;
 
   /**
@@ -160,7 +160,7 @@ public interface ComposerService {
    *           if the mediapackage is invalid
    */
   // TODO revise
-  Job image(Track sourceTrack, String profileId, long... time) throws EncoderException, MediaPackageException;
+  Job image(Track sourceTrack, String profileId, double... time) throws EncoderException, MediaPackageException;
 
   /**
    * Converts the given image to a different image format using the specified image profile.

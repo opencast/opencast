@@ -193,7 +193,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
           @RestResponse(description = "If the start time is negative or exceeds the track duration", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "If the duration is negative or, including the new start time, exceeds the track duration", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response trim(@FormParam("sourceTrack") String sourceTrackAsXml, @FormParam("profileId") String profileId,
-          @FormParam("start") long start, @FormParam("duration") long duration) throws Exception {
+          @FormParam("start") double start, @FormParam("duration") double duration) throws Exception {
     // Ensure that the POST parameters are present
     if (StringUtils.isBlank(sourceTrackAsXml) || StringUtils.isBlank(profileId))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack and profileId must not be null").build();
@@ -307,7 +307,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack and profileId must not be null").build();
 
     // parse time codes
-    long[] timeArray;
+    double[] timeArray;
     try {
       timeArray = parseTimeArray(times);
     } catch (Exception e) {
@@ -497,9 +497,9 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
               .build();
 
     // parse time
-    Long time;
+    Double time;
     try {
-      time = Long.parseLong(timeString);
+      time = Double.parseDouble(timeString);
     } catch (Exception e) {
       logger.info("Unable to parse time {} as long value!", timeString);
       return Response.status(Response.Status.BAD_REQUEST).entity("Could not parse time: invalid format").build();
@@ -707,16 +707,16 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
    *          string to be parsed
    * @return array of times in seconds
    */
-  protected long[] parseTimeArray(String times) {
-    String[] timeStringArray = times.split(",");
-    List<Long> parsedTimeArray = new LinkedList<Long>();
+  protected double[] parseTimeArray(String times) {
+    String[] timeStringArray = times.split(";");
+    List<Double> parsedTimeArray = new LinkedList<Double>();
     for (String timeString : timeStringArray) {
       String trimmed = StringUtils.trim(timeString);
       if (StringUtils.isNotBlank(trimmed)) {
-        parsedTimeArray.add(Long.parseLong(timeString));
+        parsedTimeArray.add(Double.parseDouble(timeString));
       }
     }
-    long[] timeArray = new long[parsedTimeArray.size()];
+    double[] timeArray = new double[parsedTimeArray.size()];
     for (int i = 0; i < parsedTimeArray.size(); i++) {
       timeArray[i] = parsedTimeArray.get(i);
     }

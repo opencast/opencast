@@ -244,7 +244,7 @@ public class ComposerServiceTest {
     Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
     List<Job> jobs = new ArrayList<Job>();
     for (int i = 0; i < 10; i++) {
-      jobs.add(composerService.image(sourceTrack, "player-preview.http", 1L));
+      jobs.add(composerService.image(sourceTrack, "player-preview.http", 1D));
     }
     boolean success = new JobBarrier(serviceRegistry, jobs.toArray(new Job[jobs.size()])).waitForJobs().isSuccess();
     assertTrue(success);

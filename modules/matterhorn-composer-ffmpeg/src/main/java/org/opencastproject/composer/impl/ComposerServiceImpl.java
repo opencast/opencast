@@ -71,6 +71,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -280,14 +282,14 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    *      java.lang.String, long, long)
    */
   @Override
-  public Job trim(final Track sourceTrack, final String profileId, final long start, final long duration)
+  public Job trim(final Track sourceTrack, final String profileId, final double start, final double duration)
           throws EncoderException, MediaPackageException {
     try {
       return serviceRegistry.createJob(
               JOB_TYPE,
               Operation.Trim.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId, Long.toString(start),
-                      Long.toString(duration)));
+              Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId, Double.toString(start),
+                      Double.toString(duration)));
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -312,7 +314,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @throws EncoderException
    *           if trimming fails
    */
-  protected Option<Track> trim(Job job, Track sourceTrack, String profileId, long start, long duration)
+  protected Option<Track> trim(Job job, Track sourceTrack, String profileId, double start, double duration)
           throws EncoderException {
     try {
       String targetTrackId = idBuilder.createNew().toString();
@@ -782,17 +784,17 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   }
 
   @Override
-  public Job imageToVideo(Attachment sourceImageAttachment, String profileId, long time) throws EncoderException,
+  public Job imageToVideo(Attachment sourceImageAttachment, String profileId, double time) throws EncoderException,
           MediaPackageException {
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.ImageToVideo.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(sourceImageAttachment), profileId, Long.toString(time)));
+      return serviceRegistry.createJob(JOB_TYPE, Operation.ImageToVideo.toString(), Arrays.asList(
+              MediaPackageElementParser.getAsXml(sourceImageAttachment), profileId, Double.toString(time)));
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create image to video job", e);
     }
   }
 
-  protected Option<Track> imageToVideo(Job job, Attachment sourceImage, String profileId, Long time)
+  protected Option<Track> imageToVideo(Job job, Attachment sourceImage, String profileId, Double time)
           throws EncoderException, MediaPackageException {
     if (job == null)
       throw new EncoderException("The Job parameter must not be null");
@@ -832,8 +834,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
       Map<String, String> properties = new HashMap<String, String>();
       if (time == null || time == -1)
-        time = 0L;
-      properties.put("time", Long.toString(time));
+        time = 0D;
+
+      DecimalFormatSymbols ffmpegFormat = new DecimalFormatSymbols();
+      ffmpegFormat.setDecimalSeparator('.');
+      DecimalFormat df = new DecimalFormat("0.000", ffmpegFormat);
+      properties.put("time", df.format(time));
       // Do the work
       for (File conversionOutput : encoderEngine.encode(imageFile, profile, properties)) {
         // check for validity of output
@@ -943,11 +949,10 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.composer.api.ComposerService#image(org.opencastproject.mediapackage.Track, String,
-   *      long...)
+   * @see org.opencastproject.composer.api.ComposerService#image(Track, String, double...)
    */
   @Override
-  public Job image(Track sourceTrack, String profileId, long... times) throws EncoderException, MediaPackageException {
+  public Job image(Track sourceTrack, String profileId, double... times) throws EncoderException, MediaPackageException {
 
     if (sourceTrack == null)
       throw new IllegalArgumentException("SourceTrack cannot be null");
@@ -959,7 +964,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     parameters[0] = MediaPackageElementParser.getAsXml(sourceTrack);
     parameters[1] = profileId;
     for (int i = 0; i < times.length; i++) {
-      parameters[i + 2] = Long.toString(times[i]);
+      parameters[i + 2] = Double.toString(times[i]);
     }
 
     // TODO: This is unfortunate, since ffmpeg is slow on single images and it would be nice to be able to start a
@@ -986,7 +991,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @throws EncoderException
    *           if extracting the image fails
    */
-  protected List<Attachment> image(Job job, Track sourceTrack, String profileId, long... times)
+  protected List<Attachment> image(Job job, Track sourceTrack, String profileId, double... times)
           throws EncoderException, MediaPackageException {
 
     if (sourceTrack == null)
@@ -1013,11 +1018,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       }
 
       // The time should not be outside of the track's duration
-      for (long time : times) {
+      for (double time : times) {
         if (sourceTrack.getDuration() == null)
           throw new EncoderException("Unable to extract an image from a track with unknown duration");
         if (time < 0 || time > sourceTrack.getDuration()) {
-          throw new EncoderException("Can not extract an image at time " + Long.valueOf(time)
+          throw new EncoderException("Can not extract an image at time " + Double.valueOf(time)
                   + " from a track with duration " + Long.valueOf(sourceTrack.getDuration()));
         }
       }
@@ -1424,9 +1429,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         case Image:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
           encodingProfile = arguments.get(1);
-          long[] times = new long[arguments.size() - 2];
+          double[] times = new double[arguments.size() - 2];
           for (int i = 2; i < arguments.size(); i++) {
-            times[i - 2] = Long.parseLong(arguments.get(i));
+            times[i - 2] = Double.parseDouble(arguments.get(i));
           }
           List<Attachment> resultingElements = image(job, firstTrack, encodingProfile, times);
           serialized = MediaPackageElementParser.getArrayAsXml(resultingElements);
@@ -1447,8 +1452,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         case Trim:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
           encodingProfile = arguments.get(1);
-          long start = Long.parseLong(arguments.get(2));
-          long duration = Long.parseLong(arguments.get(3));
+          double start = Double.parseDouble(arguments.get(2));
+          double duration = Double.parseDouble(arguments.get(3));
           serialized = trim(job, firstTrack, encodingProfile, start, duration).map(
                   MediaPackageElementParser.<Track> getAsXml()).getOrElse("");
           break;
@@ -1498,7 +1503,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         case ImageToVideo:
           Attachment image = (Attachment) MediaPackageElementParser.getFromXml(arguments.get(0));
           encodingProfile = arguments.get(1);
-          long time = Long.parseLong(arguments.get(2));
+          double time = Double.parseDouble(arguments.get(2));
           serialized = imageToVideo(job, image, encodingProfile, time)
                   .map(MediaPackageElementParser.<Track> getAsXml()).getOrElse("");
           break;
