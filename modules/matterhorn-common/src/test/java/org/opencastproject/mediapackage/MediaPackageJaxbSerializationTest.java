@@ -84,6 +84,10 @@ public class MediaPackageJaxbSerializationTest {
     String xml = MediaPackageParser.getAsXml(mp);
     Assert.assertNotNull(xml);
 
+    // Serialize the media package as JSON
+    String json = MediaPackageParser.getAsJSON(mp);
+    Assert.assertNotNull(json);
+
     // Deserialize the media package
     MediaPackage deserialized = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
             .loadFromXml(IOUtils.toInputStream(xml, "UTF-8"));
