@@ -88,6 +88,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-sox-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-videosegmenter-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -191,6 +196,7 @@
             </Private-Package>
             <Service-Component>
               OSGI-INF/events/series-updated.xml,
+              OSGI-INF/operations/analyze-audio.xml,
               OSGI-INF/operations/analyze-text.xml,
               OSGI-INF/operations/analyze-videosegments.xml,
               OSGI-INF/operations/append.xml,
@@ -218,6 +224,7 @@
               OSGI-INF/operations/ingest.xml,
               OSGI-INF/operations/ingest-download.xml,
               OSGI-INF/operations/inspect.xml,
+              OSGI-INF/operations/normalize-audio.xml,
               OSGI-INF/operations/prepare-av.xml,
               OSGI-INF/operations/republish.xml,
               OSGI-INF/operations/retract-engage.xml,
