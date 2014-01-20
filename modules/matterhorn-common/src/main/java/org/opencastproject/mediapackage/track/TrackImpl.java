@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /**
  * This class is the base implementation for a media track, which itself is part of a media package, representing e. g.
@@ -50,6 +51,10 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   /** Serial version UID */
   private static final long serialVersionUID = -1092781733885994038L;
 
+  public static enum StreamingProtocol {
+    HTTP,HLS,DASH,SMOOTH,MMS,RTP,RTSP,RTMP,RTMPE,HDS,PNM,PNA,ICY,BITTORENTLIVE,FILE,UNKNOWN
+  } 
+  
   /** The duration in milliseconds */
   @XmlElement(name = "duration")
   protected Long duration = null;
@@ -59,6 +64,9 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   @XmlElement(name = "video")
   protected List<VideoStream> video = new ArrayList<VideoStream>();
+  
+  @XmlAttribute(name = "transport")
+  protected StreamingProtocol transport = null;
 
   /** Needed by JAXB */
   public TrackImpl() {
@@ -79,6 +87,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
    */
   TrackImpl(MediaPackageElementFlavor flavor, MimeType mimeType, URI uri, long size, Checksum checksum) {
     super(Type.Track, flavor, uri, size, checksum, mimeType);
+    autodetectTransport(uri);
   }
 
   /**
@@ -91,6 +100,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
    */
   TrackImpl(MediaPackageElementFlavor flavor, URI uri) {
     super(Type.Track, flavor, uri);
+      autodetectTransport(uri);
   }
 
   /**
@@ -218,6 +228,14 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
      */
     return buf.toString().toLowerCase();
   }
+  
+  public void setTransport(StreamingProtocol transport) {
+    this.transport = transport;
+  }
+  
+  public StreamingProtocol getTransport() {
+    return transport;
+  }
 
   /**
    * @see java.lang.Object#clone() todo
@@ -245,6 +263,23 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
     public Track unmarshal(TrackImpl mp) throws Exception {
       return mp;
     }
+  }
+  
+  private void autodetectTransport(URI uri) {
+    if (uri == null || uri.getScheme() == null) return;
+    if (uri.getScheme().toLowerCase().startsWith("http")) {
+        if (uri.getFragment() == null) setTransport(StreamingProtocol.HTTP);
+        else if (uri.getFragment().toLowerCase().endsWith(".m3u8")) setTransport(StreamingProtocol.HLS);
+        else if (uri.getFragment().toLowerCase().endsWith(".mpd")) setTransport(StreamingProtocol.DASH);
+        else if (uri.getFragment().toLowerCase().endsWith(".f4m")) setTransport(StreamingProtocol.HDS);
+        else setTransport(StreamingProtocol.HTTP);
+    }
+    else if (uri.getScheme().toLowerCase().startsWith("rtmp")) setTransport(StreamingProtocol.RTMP);
+    else if (uri.getScheme().toLowerCase().startsWith("rtmpe")) setTransport(StreamingProtocol.RTMPE);
+    else if (uri.getScheme().toLowerCase().startsWith("file")) setTransport(StreamingProtocol.FILE);
+    else if (uri.getScheme().toLowerCase().startsWith("rtp")) setTransport(StreamingProtocol.RTP);
+    else if (uri.getScheme().toLowerCase().startsWith("rtsp")) setTransport(StreamingProtocol.RTSP);
+    else setTransport(StreamingProtocol.UNKNOWN);
   }
 
 }
