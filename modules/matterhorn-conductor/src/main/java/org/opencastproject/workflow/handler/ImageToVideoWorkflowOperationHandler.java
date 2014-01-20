@@ -15,7 +15,6 @@
  */
 package org.opencastproject.workflow.handler;
 
-import static java.lang.String.format;
 import static org.opencastproject.util.data.Collections.nil;
 import static org.opencastproject.util.data.Collections.smap;
 import static org.opencastproject.util.data.Monadics.mlist;
@@ -183,7 +182,7 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
     return new Function.X<Attachment, Job>() {
       @Override
       protected Job xapply(Attachment attachment) throws MediaPackageException, EncoderException {
-        logger.info(format("Converting image %s to a video of %d sec", attachment.getURI(), duration));
+        logger.info("Converting image {} to a video of {} sec", attachment.getURI().toString(), duration);
         return composerService.imageToVideo(attachment, profile, duration);
       }
     };
