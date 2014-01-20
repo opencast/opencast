@@ -79,6 +79,8 @@
         <module>modules/matterhorn-workflow-service-impl</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
+        <module>modules/matterhorn-manager-api</module>
+        <module>modules/matterhorn-manager-impl</module>
       </modules>
     </profile>
 
@@ -331,6 +333,8 @@
         <module>modules/matterhorn-usertracking-impl</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workspace-api</module>
+        <module>modules/matterhorn-manager-api</module>
+        <module>modules/matterhorn-manager-impl</module>
       </modules>
     </profile>
 
@@ -435,6 +439,8 @@
         <module>modules/matterhorn-videosegmenter-impl</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workspace-api</module>
+        <module>modules/matterhorn-manager-api</module>
+        <module>modules/matterhorn-manager-impl</module>
       </modules>
     </profile>
 

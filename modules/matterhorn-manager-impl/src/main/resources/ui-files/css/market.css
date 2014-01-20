@@ -1,0 +1,158 @@
+/* Defaults */
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0;}
+table{border-collapse:collapse;border-spacing:0;}
+img{border:0;}
+html{font:13px/1.231 arial,helvetica,clean,sans-serif; }
+ul,li {list-style: none;}
+/* input:focus, button:focus { outline: 1px #999 solid; } */
+table tr td { background: white!important; color: black; }
+table tr.highlight td { background: #d1e8ff!important; color: black; }
+table tr:hover td { background: silver!important; color: black!important; }
+table tr:hover a { color: white!important; font-weight: bold!important; }
+table tr:hover a:hover { text-decoration: underline!important; }
+
+.layout-centered { margin-left: auto; margin-right: auto}
+.layout-inline { display: inline-block; }
+.layout-float-left { float: left; }
+.clear {clear:both; height: 0px; width: 0px;}
+.center { text-align: center;}
+.content-page {margin-left: 30px; margin-right: 30px;}
+.content-table {margin-left: 147px; margin-right: 147px;}
+
+.paging-style A {color: #ffffff;}
+.paging-style A:visited { color: #ffffff }
+.paging-style A:link    { color: #ffffff }
+.paging-style A:hover   { color: #ffffff }
+.paging-style A:aktiv   { color: #ffffff }
+
+/* page layout */
+#pageHeader { background: #A72123; padding: 2px; margin-bottom: 20px; text-align: right;}
+#pageHeader a { color: #FFFFFF; margin-right: 10px; text-decoration: none;}
+#pageHeader #currentVersion { float: left; margin-left: 10px;}
+
+#wrapper { width: 95%; margin: 0 auto; }
+
+#header { margin-bottom: -2em; } /* IE Problem */
+#header #oc-logo { float: right;}
+#header a h1 { margin-left: 160px; font-size: 18px; color: #F6921E; text-decoration: none!important;}
+
+#tabsWrapper { border: none; background: none;}
+#tabsWrapper #tabs { border-left: none; border-right: none; border-top: none; background: none; padding-left: 150px; }
+#tabsWrapper #tabs  li a { padding: 0.3em 1em; }
+
+ul.propnav { list-style: none; padding: 0 20px; margin: 0; float: left;}
+ul.propnav li { float: left; margin-right: 10px; position: relative; }
+ul.propnav li:hover { background:#CCCCCC; float: left; position: relative; }
+ul.propnav li span.subnav { width: 17px; height: 35px; float: left; background: url("../img/icons/arrow-down.png") no-repeat center center; }
+ul.propnav li ul.itemnav { background-color : white; width : 400px; list-style: none; position: absolute; left: 0; top: 30px; margin: 0; padding: 0; display: none; float: left; border: 1px solid #111;  z-index:1; }
+ul.propnav li ul.itemnav li{ height : 2em; width : inherit; margin: 0; padding: 0; border-bottom: 1px solid #444; clear: both; }
+ul.propnav li span.device { float:left; padding: 10px 5px; display:block; }
+ul.itemnav li span.dev-prop { text-decoration : bold; float:left; padding-right: 10px; text-align:right; width:30%; font-weight:bold;}
+ul.itemnav li span.dev-prop-val { text-align:left; width:70%;}
+
+#searchBox { width: 230px; float: right;}
+#search-result { width: 230px; float: right;}
+.searchbox-text-input:focus { outline: none; border: none;}
+.searchbox-search-icon {background-position:-160px -112px;float:left;cursor:pointer;margin-right:55px;margin-top:2px}
+.searchbox-text-container {float:left;}
+.searchbox-text-container .searchbox-clear-icon {background-position:-80px -128px;float:right;margin-right:5px;margin-top:2px;cursor:pointer;}
+.searchbox-text-container .searchbox-text-input {float:left;border:none; height:20px; width:190px;}
+select optgroup option {padding-left:0px;}
+select .nosep {border:none;}
+select .withsep {border-top:1px solid black;}
+select {margin-left: 5px;}
+
+#infoText { width: 500px; height:29px; float: left; }
+#infoText-result { width: 230px; float: right;}
+.infoText-text-container {float:left;}
+
+#perPageContainer { text-align: center; float: left; margin: 20px 10px 0 0; padding: 2px 5px;}
+#prevPage { float: left; color:#ffffff;}
+#pageWidget { float: right; }
+
+#machineSorter { width: 230px; float: left; margin: 20px 10px 0 0; padding: 2px 5px;}
+#machineSorter-result { width: 230px; float: left;}
+.machineSorter-text-container {float:left;}
+
+ul#navigationList {
+    margin: 0px; padding: 1px;
+    text-align: center;
+}
+ul#navigationList li {
+    list-style: none;
+    display: inline;
+    margin: 0px; padding: 1px;
+}
+.list-menu ul {
+    margin: 0px; padding: 1px;
+    text-align: center;
+}
+.list-menu li {
+    list-style: none;
+    display: inline;
+    margin: 0px; padding: 1px;
+}
+
+#controlsTop span.ui-button-text, #searchBox { padding: 0.4em 1em; }
+
+/* missing field container */
+#missingFieldsContainer {
+  width: 800px;
+  margin: 0 auto;
+}
+
+.upload-input-position {padding-top: 30px; display: inline-block; width: 68%; text-align: right; }
+.upload-button-position {display: inline-block; width: 50%; text-align: right; margin-top: 20px;}
+.upload-button-list {padding-top: 10px}
+.upload-checkbox-pos {display: inline-block; width: 55%; text-align: right;}
+
+.form-box-main { margin-top: 10px; width: 60%;}
+.form-box-main .form-box-head { padding: 3px 5px }
+.form-box-main .form-box-content { padding: 20px}
+
+.workflow-buttons {display: inline-block; width: 60%; text-align: right;}
+.workflow-box { margin-top: 10px; width: 927px;}
+.workflow-box .workflow-box-head { padding: 3px 5px }
+.workflow-box .workflow-box-content { padding: 20px;}
+
+.config-box { margin-top: 10px; width: 60%;}
+.config-box .config-box-head { padding: 3px 5px }
+.config-box .config-box-content { padding: 10px;}
+
+
+.form-box-middle { margin-top: 10px; width: 935px;}
+.form-box-middle .form-box-head { padding: 3px 5px;}
+.form-box-middle .form-box-content { padding: 20px; height: 100px;}
+
+.form-box { margin-top: 10px; width: 935px;}
+.form-box .form-box-head { padding: 3px 5px }
+.form-box .form-box-content { padding: 20px;}
+
+.form-box-message { margin-top: 10px; width: 400px;}
+.form-box-message .form-box-message-head { padding: 3px 5px;}
+.form-box-message-main .form-box-message-content { padding: 20px; height: 340px;}
+.form-box-pos { margin-left: 5px; padding-top: 5px; padding-bottom: 5px;}
+.form-box-message-container {padding-top: 20px; padding-bottom: 20px;}
+.form-box-message-margin-left {margin-left: 150px;}
+.form-box-message-margin-left-cert {margin-left: 180px;}
+
+.informationText {font-size: 90%; color:grey; margin: 5px 10px 5px 10px;}
+
+.config-file-tree { 
+  float: left;
+  background: none repeat scroll 0 0 #FFFFFF;
+  border-color: #BBBBBB #FFFFFF #FFFFFF #BBBBBB;
+  border-style: solid;
+  border-width: 1px;
+  height: 400px;
+  overflow: scroll;
+  padding: 5px;
+  width: 15%; 
+  margin: 15px;
+}
+
+.ui-widget-button-position {padding: 3px; float: center; height: 20; width: 60}
+.ui-widget-restart-button-position {padding: 7px; float: right; margin-right: 30px; margin-top: 13px; margin-left: 20px}
+button.ui-button {border: 1px solid #717575; font-weight: normal; color: #000000; }
+button.ui-button:hover { background-color:#CCCCCC; color: #000000;}
+button.ui-button:active { background-color:#ffffff; color: #000000;}
