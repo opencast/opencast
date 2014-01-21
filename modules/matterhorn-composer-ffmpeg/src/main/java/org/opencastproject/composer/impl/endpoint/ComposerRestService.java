@@ -295,7 +295,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Path("image")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "image", description = "Starts an image extraction process, based on the specified encoding profile ID and the source track", restParameters = {
-          @RestParameter(description = "The number of seconds (many numbers can be specified, separated by comma) into the video to extract the image", isRequired = true, name = "time", type = Type.STRING, defaultValue = "1"),
+          @RestParameter(description = "The number of seconds (many numbers can be specified, separated by semicolon) into the video to extract the image", isRequired = true, name = "time", type = Type.STRING, defaultValue = "1"),
           @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "player-preview.http") }, reponses = {
           @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK),
