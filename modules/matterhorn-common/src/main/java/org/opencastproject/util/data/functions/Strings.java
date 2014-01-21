@@ -255,6 +255,9 @@ public final class Strings {
     };
   }
 
+  /**
+   * A function to convert all of the characters in this String to lower case using the rules of the default locale.
+   */
   public static final Function<String, String> lowerCase = new Function<String, String>() {
     @Override
     public String apply(String s) {
@@ -262,6 +265,9 @@ public final class Strings {
     }
   };
 
+  /**
+   * A predicate function to match a regular expression.
+   */
   public static Predicate<String> matches(final String pattern) {
     return new Predicate<String>() {
       @Override
@@ -271,6 +277,9 @@ public final class Strings {
     };
   }
 
+  /**
+   * A predicate function to check if a string contains a specified sequence.
+   */
   public static Predicate<String> contains(final String seq) {
     return new Predicate<String>() {
       @Override
@@ -280,6 +289,9 @@ public final class Strings {
     };
   }
 
+  /**
+   * Return a string concatenation function.
+   */
   public static Function2<String, String, String> concat(final String sep) {
     return new Function2<String, String, String>() {
       @Override

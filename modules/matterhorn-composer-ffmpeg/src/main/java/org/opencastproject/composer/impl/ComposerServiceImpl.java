@@ -986,7 +986,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param profileId
    *          the identifer of the encoding profile to use
    * @param times
-   *          (one or more) times in miliseconds
+   *          (one or more) times in seconds
    * @return the image as an attachment element
    * @throws EncoderException
    *           if extracting the image fails
@@ -1021,7 +1021,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       for (double time : times) {
         if (sourceTrack.getDuration() == null)
           throw new EncoderException("Unable to extract an image from a track with unknown duration");
-        if (time < 0 || time > sourceTrack.getDuration()) {
+        if (time < 0 || time * 1000 > sourceTrack.getDuration()) {
           throw new EncoderException("Can not extract an image at time " + Double.valueOf(time)
                   + " from a track with duration " + Long.valueOf(sourceTrack.getDuration()));
         }
