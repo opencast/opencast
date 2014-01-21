@@ -161,8 +161,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
         } catch (NotFoundException e) {
           return nullToken;
         }
-        return agent == null ? nullToken : Tuple3.tuple3(agent.getState(), agent.getConfiguration(),
-                Long.valueOf(System.currentTimeMillis()));
+        return Tuple3.tuple3(agent.getState(), agent.getConfiguration(), agent.getLastHeardFrom());
       }
     });
   }
