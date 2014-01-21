@@ -140,7 +140,7 @@ public interface ComposerService {
    * @throws MediaPackageException
    *           if the mediapackage is invalid
    */
-  Job trim(Track sourceTrack, String profileId, double start, double duration) throws EncoderException,
+  Job trim(Track sourceTrack, String profileId, long start, long duration) throws EncoderException,
           MediaPackageException;
 
   /**

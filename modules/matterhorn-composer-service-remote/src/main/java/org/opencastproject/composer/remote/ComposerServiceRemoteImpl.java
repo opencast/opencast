@@ -99,17 +99,17 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.composer.api.ComposerService#trim(Track, String, double, double)
+   * @see org.opencastproject.composer.api.ComposerService#trim(Track, String, long, long)
    */
   @Override
-  public Job trim(Track sourceTrack, String profileId, double start, double duration) throws EncoderException {
+  public Job trim(Track sourceTrack, String profileId, long start, long duration) throws EncoderException {
     HttpPost post = new HttpPost("/trim");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
-      params.add(new BasicNameValuePair("start", Double.toString(start)));
-      params.add(new BasicNameValuePair("duration", Double.toString(duration)));
+      params.add(new BasicNameValuePair("start", Long.toString(start)));
+      params.add(new BasicNameValuePair("duration", Long.toString(duration)));
       post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new EncoderException("Unable to assemble a remote composer request for track " + sourceTrack, e);

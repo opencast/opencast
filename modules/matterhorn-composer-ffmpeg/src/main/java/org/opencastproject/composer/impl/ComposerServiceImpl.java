@@ -282,14 +282,14 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    *      java.lang.String, long, long)
    */
   @Override
-  public Job trim(final Track sourceTrack, final String profileId, final double start, final double duration)
+  public Job trim(final Track sourceTrack, final String profileId, final long start, final long duration)
           throws EncoderException, MediaPackageException {
     try {
       return serviceRegistry.createJob(
               JOB_TYPE,
               Operation.Trim.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId, Double.toString(start),
-                      Double.toString(duration)));
+              Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId, Long.toString(start),
+                      Long.toString(duration)));
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -306,15 +306,15 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param profileId
    *          the encoding profile identifier
    * @param start
-   *          the trimming in-point
+   *          the trimming in-point in millis
    * @param duration
-   *          the trimming duration
+   *          the trimming duration in millis
    * @return the trimmed track or none if the operation does not return a track. This may happen for example when doing
    *         two pass encodings where the first pass only creates metadata for the second one
    * @throws EncoderException
    *           if trimming fails
    */
-  protected Option<Track> trim(Job job, Track sourceTrack, String profileId, double start, double duration)
+  protected Option<Track> trim(Job job, Track sourceTrack, String profileId, long start, long duration)
           throws EncoderException {
     try {
       String targetTrackId = idBuilder.createNew().toString();
@@ -1452,8 +1452,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         case Trim:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
           encodingProfile = arguments.get(1);
-          double start = Double.parseDouble(arguments.get(2));
-          double duration = Double.parseDouble(arguments.get(3));
+          long start = Long.parseLong(arguments.get(2));
+          long duration = Long.parseLong(arguments.get(3));
           serialized = trim(job, firstTrack, encodingProfile, start, duration).map(
                   MediaPackageElementParser.<Track> getAsXml()).getOrElse("");
           break;

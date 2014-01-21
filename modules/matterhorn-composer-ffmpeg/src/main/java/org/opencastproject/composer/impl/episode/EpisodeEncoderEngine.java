@@ -286,7 +286,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
    *      org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
    */
   @Override
-  public Option<File> trim(File mediaSource, EncodingProfile format, double start, double duration,
+  public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration,
           Map<String, String> properties) throws EncoderException {
     // TODO: Implement
     throw new UnsupportedOperationException("Not yet implemented");

@@ -193,7 +193,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
           @RestResponse(description = "If the start time is negative or exceeds the track duration", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "If the duration is negative or, including the new start time, exceeds the track duration", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response trim(@FormParam("sourceTrack") String sourceTrackAsXml, @FormParam("profileId") String profileId,
-          @FormParam("start") double start, @FormParam("duration") double duration) throws Exception {
+          @FormParam("start") long start, @FormParam("duration") long duration) throws Exception {
     // Ensure that the POST parameters are present
     if (StringUtils.isBlank(sourceTrackAsXml) || StringUtils.isBlank(profileId))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack and profileId must not be null").build();

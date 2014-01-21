@@ -112,7 +112,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
    * @see org.opencastproject.composer.api.EncoderEngine#trim(File, EncodingProfile, double, double, Map)
    */
   @Override
-  public Option<File> trim(File mediaSource, EncodingProfile format, double start, double duration,
+  public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration,
           Map<String, String> properties) throws EncoderException {
     return process(null, mediaSource, format, properties);
   }

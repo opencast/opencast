@@ -97,8 +97,8 @@ public interface EncoderEngine {
    * @throws EncoderException
    *           if an error occurs during encoding
    */
-  Option<File> trim(File mediaSource, EncodingProfile format, double start, double duration,
-          Map<String, String> properties) throws EncoderException;
+  Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
+          throws EncoderException;
 
   /**
    * Extracts one or more image from video stream.
