@@ -183,7 +183,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     // Read the target flavor
     String targetFlavorOption = currentOperation.getConfiguration(TARGET_FLAVOR_PROPERTY);
     try {
-      targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
+      targetFlavor = targetFlavorOption == null ? DEFAULT_ARCHIVE_FLAVOR : MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
       logger.trace("Using '{}' as the target flavor for the zip archive of recording {}", targetFlavor, mediaPackage);
     } catch (IllegalArgumentException e) {
       throw new WorkflowOperationException("Flavor '" + targetFlavorOption + "' is not valid", e);
