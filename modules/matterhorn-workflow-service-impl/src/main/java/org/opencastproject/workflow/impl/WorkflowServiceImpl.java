@@ -1359,7 +1359,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
         try {
           errorDef = getWorkflowDefinitionById(errorDefId);
           workflow.extend(errorDef);
-          workflow = updateConfiguration(workflow, configuration);
+          workflow.setOperations(updateConfiguration(workflow, configuration).getOperations());
         } catch (NotFoundException notFoundException) {
           throw new IllegalStateException("Unable to find the error workflow definition '" + errorDefId + "'");
         }
