@@ -48,9 +48,12 @@ while [[ true ]]; do
   fi
 done
 
+git commit -a -m "$JIRA_TICKET Updated pom.xml files to reflect new branch version.  Done via docs/scripts/release/branch.sh"
+
 git checkout -b r/$BRANCH_NAME
 
-git commit -a -m "$JIRA_TICKET Updated pom.xml files to reflect correct version.  Done via docs/scripts/release/branch.sh"
+git checkout develop
+git revert --no-edit HEAD
 
 echo "Summary:"
 echo "-Created r/$BRANCH_NAME from develop"

@@ -6,13 +6,17 @@ FUNCTIONS="functions.sh"
 #The comments in this file assume you are creating a tag from a release branch
 #This script does *not* push any changes, so it should be safe to experiment with locally
 
-#The version the POMs are in the develop branch.
+#The version the POMs are in the release branch.
 #E.g. BRANCH_VER=1.3-SNAPSHOT
 BRANCH_VER=
 
 #The new version of our release as it will show up in the tags
 #E.g. RELEASE_VER=1.3-rc5
 RELEASE_VER=
+
+#The version the POMs are in develop.  This is only relevant for final releases!
+#E.g. DEVELOP_VER=1.3-SNAPSHOT
+DEVELOP_VER=
 
 #The version that develop should have.  This is only relevant for final releases!
 #E.g. NEXT_VER=1.4-SNAPSHOT
@@ -56,25 +60,24 @@ done
 case "$RELEASE_TYPE" in
 0)
     # Release candidate
-    git checkout -b r/$RELEASE_VER
-    git commit -a -m "$JIRA_TICKET: Creating $RELEASE_VER branch to contain POM changes and tag"
+    git commit -a -m "$JIRA_TICKET: Committing $RELEASE_VER to branch to contain POM changes and tag"
     git tag -s $RELEASE_VER -m "Release $RELEASE_VER"
+    git revert --no-edit HEAD
 
     echo "Summary:"
-    echo "-Created r/$RELEASE_VER"
     echo "-Modified pom files, and tagged $RELEASE_VER"
     echo "We can push these changes to the public repo if you want."
     yesno -d no "Do you want this script to do that automatically for you?" push
     if [[ "$push" ]]; then
-        git push origin r/$RELEASE_VER
+        git push origin
         git push --tags origin
     fi
     ;;
 1)
     #Final release
     git commit -a -m "$JIRA_TICKET: Committing $RELEASE_VER directly to $curBranch in preparation for final release."
-
     git tag -s $RELEASE_VER -m "Release $RELEASE_VER"
+    git revert --no-edit HEAD
 
     git checkout master
     git merge --no-ff r/$RELEASE_VER
@@ -83,7 +86,7 @@ case "$RELEASE_TYPE" in
     git branch -d r/$RELEASE_VER
 
     echo "Replacing POM file version in main POM."
-    sed -i "s/<version>$RELEASE_VER/<version>$NEXT_VER/" $WORK_DIR/pom.xml
+    sed -i "s/<version>$DEVELOP_VER/<version>$NEXT_VER/" $WORK_DIR/pom.xml
 
     while [[ true ]]; do
       yesno -d no "NOTE: This script has made changes to your POM files.  Please ensure that it only made changes to the Matterhorn version number.  In rare cases some of the dependencies have the same version numbers, and the modification done above does *not* understand that it should not also change those versions.  Manual inspection of the changeset is required before continuing.  Have you finished checking all of the modifications?" has_checked
