@@ -3,6 +3,11 @@ body {
   overflow-x: auto;
 }
 
+#waveformControls {
+    display: none;
+    float: right;
+}
+
 .holdStateUI {
   min-width: 785px;
 }
