@@ -1849,9 +1849,7 @@ function parseInitialSMIL() {
                             enabled: false,
                             description: ""
 			});
-                    } else {
-			clipBegin = 0;
-		    }
+                    }
                     editor.splitData.splits.push({
 			clipBegin: clipBegin,
 			clipEnd: clipEnd,
