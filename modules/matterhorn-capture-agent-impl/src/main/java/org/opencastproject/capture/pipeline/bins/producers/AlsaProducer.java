@@ -82,6 +82,7 @@ public class AlsaProducer extends AudioProducer {
    **/
   @Override
   protected synchronized void setElementProperties() throws UnableToSetElementPropertyBecauseElementWasNullException {
+    super.setElementProperties();
     if (alsasrc != null) {
       if (captureDevice.getLocation() != null) {
         alsasrc.set(GStreamerProperties.DEVICE, captureDevice.getLocation());
@@ -94,7 +95,7 @@ public class AlsaProducer extends AudioProducer {
 
   /** Add all the necessary elements to the bin. **/
   protected void addElementsToBin() {
-    bin.addMany(alsasrc, queue, audioconvert);
+    bin.addMany(alsasrc, queue, volume, audioconvert);
   }
 
   /**
@@ -107,8 +108,10 @@ public class AlsaProducer extends AudioProducer {
   protected void linkElements() throws UnableToLinkGStreamerElementsException {
     if (!alsasrc.link(queue)) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, alsasrc, queue);
-    } else if (!queue.link(audioconvert)) {
-      throw new UnableToLinkGStreamerElementsException(captureDevice, queue, audioconvert);
+    } else if (!queue.link(volume)) {
+      throw new UnableToLinkGStreamerElementsException(captureDevice, queue, volume);
+    } else if (!volume.link(audioconvert)) {
+      throw new UnableToLinkGStreamerElementsException(captureDevice, volume, audioconvert);
     }
   }
 

@@ -34,6 +34,7 @@ public final class ProducerFactory {
    */
   public enum ProducerType {
     ALSASRC, /* Linux sound capture */
+    ALSAMONOSRC, /* Only capture one channel of a linux mono source. */
     AUDIOTESTSRC, /* Built in gstreamer audio test src */
     BLUECHERRY_PROVIDEO, /* Bluecherry ProVideo-143 */
     CUSTOM_VIDEO_SRC, /* Allows the user to specify their producer with gstreamer command line syntax */
@@ -45,11 +46,11 @@ public final class ProducerFactory {
     PULSESRC, /* Linux sound capture */
     V4LSRC, /* Generic v4l source */
     V4L2SRC, /* Generic v4l2 source */
-    VIDEOTESTSRC /* Built in gstreamer video test src */    
+    VIDEOTESTSRC /* Built in gstreamer video test src */
   }
-  
+
   private HashSet<ProducerType> producersWithoutSourceRequirement = new HashSet<ProducerType>();
-  
+
   /** Singleton factory pattern ensuring only one instance of the factory is created even with multiple threads. **/
   public static synchronized ProducerFactory getInstance() {
     if (factory == null) {
@@ -60,7 +61,7 @@ public final class ProducerFactory {
 
   /** Constructor made private so that the number of Factories can be kept to one. **/
   private ProducerFactory() {
-    // Producers that don't require a source. 
+    // Producers that don't require a source.
     producersWithoutSourceRequirement.add(ProducerType.ALSASRC);
     producersWithoutSourceRequirement.add(ProducerType.AUDIOTESTSRC);
     producersWithoutSourceRequirement.add(ProducerType.CUSTOM_AUDIO_SRC);
@@ -107,6 +108,8 @@ public final class ProducerFactory {
       return new BlueCherryBT878Producer(captureDevice, properties);
     else if (captureDevice.getName() == ProducerType.ALSASRC)
       return new AlsaProducer(captureDevice, properties);
+    else if (captureDevice.getName() == ProducerType.ALSAMONOSRC)
+      return new AlsaMonoProducer(captureDevice, properties);
     else if (captureDevice.getName() == ProducerType.PULSESRC)
       return new PulseAudioProducer(captureDevice, properties);
     else if (captureDevice.getName() == ProducerType.AUDIOTESTSRC)
@@ -127,13 +130,14 @@ public final class ProducerFactory {
       throw new NoProducerFoundException("No valid Producer found for device " + captureDevice.getName());
     }
   }
-  
+
   /**
    * Returns true if the ProducerType does require a source to create, returns false if ProducerType is null, doesn't
    * exist or doesn't require the source location.
    * 
-   * @param type The type of Producer that needs to be checked whether it requires a source. 
-   * @return Returns true if it requires a source, false otherwise. 
+   * @param type
+   *          The type of Producer that needs to be checked whether it requires a source.
+   * @return Returns true if it requires a source, false otherwise.
    */
   public boolean requiresSrc(ProducerType type) {
     if (type == null) {
