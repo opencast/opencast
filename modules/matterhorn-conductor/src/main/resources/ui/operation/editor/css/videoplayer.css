@@ -180,10 +180,10 @@
   height: 10px;
   margin-top: 6px;
   border: 1px solid #CCCCCC;
-  background: #F6921E;
-  background-image: -moz-linear-gradient(top, #666666, #F6921E);
+  background: #FFFFFF;
+  background-image: -moz-linear-gradient(top, #666666, #FFFFFF);
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #666666),
-    color-stop(1, #F6921E) );
+    color-stop(1, #FFFFFF) );
 }
 
 .mhVideoPlayer.default .video-seek .ui-slider-handle {
@@ -196,8 +196,8 @@
   -webkit-border-radius: 10px;
   border-radius: 10px;
   background: #FFFFFF;
-  background-image: -moz-linear-gradient(top, #CCCCCC, #FFFFFF);
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #CCCCCC),
+  background-image: -moz-linear-gradient(top, #e7e9e7, #FFFFFF);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #e7e9e7),
     color-stop(1, #FFFFFF) );
 }
 
@@ -210,10 +210,10 @@
   -moz-border-radius: 15px;
   -webkit-border-radius: 15px;
   border-radius: 15px;
-  background: #A72123;
-  background-image: -moz-linear-gradient(top, #666666, #A72123);
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #666666),
-    color-stop(1, #A72123) );
+  background: #898989;
+  background-image: -moz-linear-gradient(top, #535353, #898989);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #535353),
+    color-stop(1, #898989) );
 }
 
 /* timer */
