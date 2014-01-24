@@ -1749,7 +1749,7 @@ function prepareUI() {
                 $('#waveformImage').load(function () {
                     $('#segmentsWaveform').height($('#waveformImage').height());
                     $('#segmentsWaveform').width($('#waveformImage').width());
-		    initialWaveformWidth = $('#waveformImage').width();
+		    initialWaveformWidth = $('#segmentsWaveform').width();
 		    currentWaveformWidth = initialWaveformWidth;
 		    $("#slider-waveform-zoom").slider({
 			range: "min",
@@ -1759,10 +1759,12 @@ function prepareUI() {
 			slide: function(event, ui) {
 			    if(ui.value == 1) {
 				currentWaveformWidth = initialWaveformWidth;
+				$('#segmentsWaveform').width(currentWaveformWidth);
 				$('#waveformImage').width(currentWaveformWidth);
 				positionWaveformAndTimeIndicator();
 			    } else if(ui.value > currWaveformZoom) {
 				currentWaveformWidth = initialWaveformWidth + ui.value * waveformZoomFactor;
+				$('#segmentsWaveform').width(currentWaveformWidth);
 				$('#waveformImage').width(currentWaveformWidth);
 				positionWaveformAndTimeIndicator();
 			    } else if(ui.value < currWaveformZoom) {
@@ -1770,6 +1772,7 @@ function prepareUI() {
 				var newWidth = maxWidth - (maxWaveformZoomSlider - ui.value) * waveformZoomFactor;
 				newWidth = (newWidth >= initialWaveformWidth) ? newWidth : initialWaveformWidth;
 				currentWaveformWidth = newWidth;
+				$('#segmentsWaveform').width(currentWaveformWidth);
 				$('#waveformImage').width(currentWaveformWidth);
 				positionWaveformAndTimeIndicator();
 			    }
@@ -1915,13 +1918,13 @@ function parseInitialSMIL() {
 function positionWaveformAndTimeIndicator() {
     var duration = workflowInstance.mediapackage.duration / 1000;
     var perc = getCurrentTime() / duration * 100;
-    var imgDivWidth = $('#imageDiv').width();
+    var imgDivWidth = $('#videoHolder').width();
     var imgWidth = $('#waveformImage').width();
 
     $('#currentTimeDiv').css("left", perc + "%");
 
     var c = (perc / 100) * (imgWidth - imgDivWidth);
-    $("#imageDiv").css('left', -c);
+    $("#segmentsWaveform").css('left', -c);
 }
 
 /**
