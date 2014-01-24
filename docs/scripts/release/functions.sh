@@ -1,6 +1,85 @@
 #! /bin/bash
 
 ####################################################################################################
+## updatePomVersions
+## Updates the pom files with a new version and is annoying about checking to make sure no accidental changes are made
+## Syntax: 
+##    updatePomVersions -w WORK_DIR -o OLD_POM_VERSION -n NEW_POM_VERSION
+##       WORK_DIR is the root of the clone you want to modify
+##       OLD_POM_VERSION is the version currently in the POM files
+##       NEW_POM_VERSION is the version you wish the POM files to contain
+##
+## Return value:
+##    0 - Success
+##    1 - Wrong value for a flag
+##    2 - Unknown flag
+##    3 - Wrong number of parameters
+##    
+####################################################################################################
+updatePomVersions() {
+  local workDir
+  local oldVersion
+  local newVersion
+
+  # Two parameters: one word for the question and another for the variable to set
+  if [[ $# -ne 6 ]]; then
+    echo "Wrong number of parameters"
+    return 3
+  fi
+
+  # Process command line arguments
+  while [[ true ]]; do
+    case "$1" in
+      -*) # Analyze the flags starting by - that require a value afterwards
+        if [[ -z "$2" || $2 =~ ^-.$ ]]; then
+          echo "Wrong value for argument $1: '$2'"
+          return 1
+        fi
+        # Filters the - to decide what to do
+        case "${1:1}" in 
+          w)
+            workDir="$2"
+          ;;
+          o)
+            oldVersion="$2"
+          ;;
+          n)
+            newVersion="$2"
+          ;;
+          *)  # Unknown
+            echo "Unknown option: $1"
+            return 2
+          ;;
+        esac
+        shift
+      ;;
+      *) 
+        break
+      ;;    
+    esac
+    shift
+  done
+
+  echo "$workDir | $oldVersion | $newVersion"
+  sed -i "s/<version>$oldVersion/<version>$newVersion/" $workDir/pom.xml
+  for i in $workDir/modules/matterhorn-*
+  do
+      echo " Module: $i"
+      if [ -f $i/pom.xml ]; then
+          sed -i "s/<version>$oldVersion/<version>$newVersion/" $i/pom.xml
+      fi
+  done
+
+  while [[ true ]]; do
+    yesno -d no "NOTE: This script has made changes to your POM files.  Please ensure that it only made changes to the Matterhorn version number.  In rare cases some of the dependencies have the same version numbers, and the modification done above does *not* understand that it should not also change those versions.  Manual inspection of the changeset is required before continuing.  Have you finished checking all of the modifications?" has_checked
+    if [[ "$has_checked" ]]; then 
+        break
+    fi
+  done
+  return 0
+}
+
+####################################################################################################
 ## ask
 ## Prompts a question
 ## Syntax: 
@@ -33,49 +112,49 @@ ask() {
     local err_bad_answer="Invalid answer"
 
     # Process command line arguments
-    while [[ true ]]; do
-	case "$1" in
-	    --) # Force stop parsing parameters
-		break
-		;;
-	    -a) # Allow blank
-		blank_allowed=true
-		;;
-	    -*) # Analyze the flags starting by - that require a value afterwards
-		if [[ -z "$2" || $2 =~ ^-.$ ]]; then
-		    echo "Wrong value for argument $1: '$2'"
-		    return 1
-		fi
-		# Filters the - to decide what to do
-		case "${1:1}" in 
-		    d)  # Default value
-			default="$2"
-			;;
-		    f)  # Filter
-			filter="$2"
-			;;
-		    h) # Help prompt
-			help_prompt="$2"
-			;;
-		    \?) # Help
-			help="$2"
-			;;
-		    e)  # Error message
-			err_bad_answer="$2"
-			;;
-		    *)  # Unknown
-			echo "Unknown option: $1"
-			return 2
-			;;
-		esac
-		shift
-		;;
-	    *) 
-		break
-		;;    
-	esac
-	shift
-    done
+  while [[ true ]]; do
+    case "$1" in
+      --) # Force stop parsing parameters
+        break
+      ;;
+      -a) # Allow blank
+        blank_allowed=true
+      ;;
+      -*) # Analyze the flags starting by - that require a value afterwards
+        if [[ -z "$2" || $2 =~ ^-.$ ]]; then
+          echo "Wrong value for argument $1: '$2'"
+          return 1
+        fi
+        # Filters the - to decide what to do
+        case "${1:1}" in 
+          d)  # Default value
+            default="$2"
+          ;;
+          f)  # Filter
+            filter="$2"
+          ;;
+          h) # Help prompt
+            help_prompt="$2"
+          ;;
+          \?) # Help
+            help="$2"
+          ;;
+          e)  # Error message
+            err_bad_answer="$2"
+          ;;
+          *)  # Unknown
+            echo "Unknown option: $1"
+            return 2
+          ;;
+            esac
+            shift
+          ;;
+      *) 
+      break
+      ;;    
+    esac
+    shift
+  done
 
     # Two parameters: one word for the question and another for the variable to set
     if [[ $# -ne 2 ]]; then

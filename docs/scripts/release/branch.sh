@@ -35,22 +35,7 @@ git checkout -- branch.sh
 git checkout develop
 
 echo "Replacing POM file version in the POMs."
-sed -i "s/<version>$OLD_POM_VER/<version>$BRANCH_POM_VER/" $WORK_DIR/pom.xml
-
-for i in $WORK_DIR/modules/matterhorn-*
-do
-    echo " Module: $i"
-    if [ -f $i/pom.xml ]; then
-        sed -i "s/<version>$OLD_POM_VER/<version>$BRANCH_POM_VER/" $i/pom.xml
-    fi
-done
-
-while [[ true ]]; do
-  yesno -d no "NOTE: This script has made changes to your POM files.  Please ensure that it only made changes to the Matterhorn version number.  In rare cases some of the dependencies have the same version numbers, and the modification done above does *not* understand that it should not also change those versions.  Manual inspection of the changeset is required before continuing.  Have you finished checking all of the modifications?" has_checked
-  if [[ "$has_checked" ]]; then 
-      break
-  fi
-done
+updatePomVersions -w $WORK_DIR -o $OLD_POM_VER -n $BRANCH_POM_VER
 
 git commit -a -m "$JIRA_TICKET Updated pom.xml files to reflect new branch version.  Done via docs/scripts/release/branch.sh"
 
@@ -60,16 +45,9 @@ git checkout develop
 git revert --no-edit HEAD
 
 echo "Replacing POM file version in main POM."
-sed -i "s/<version>$OLD_POM_VER/<version>$NEW_DEVELOP_VER/" $WORK_DIR/pom.xml
+updatePomVersions -w $WORK_DIR -o $OLD_POM_VER -n $NEW_DEVELOP_VER
 
-while [[ true ]]; do
-  yesno -d no "NOTE: This script has made changes to your POM files.  Please ensure that it only made changes to the Matterhorn version number.  In rare cases some of the dependencies have the same version numbers, and the modification done above does *not* understand that it should not also change those versions.  Manual inspection of the changeset is required before continuing.  Have you finished checking all of the modifications?" has_checked
-  if [[ "$has_checked" ]]; then 
-      break
-  fi
-done
 git commit -a -m "$JIRA_TICKET: Updating POM versions to $NEW_DEVELOP_VER in develop"
-
 
 echo "Summary:"
 echo "-Created r/$BRANCH_NAME from develop"

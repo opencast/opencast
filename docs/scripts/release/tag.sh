@@ -47,22 +47,7 @@ git checkout -- tag.sh
 choose -t "Are you cutting an RC, or a final release of $curBranch?" "RC" "Final Release" RELEASE_TYPE
 
 echo "Replacing POM file version in the POMs."
-sed -i "s/<version>$BRANCH_VER/<version>$RELEASE_VER/" $WORK_DIR/pom.xml
-
-for i in $WORK_DIR/modules/matterhorn-*
-do
-    echo " Module: $i"
-    if [ -f $i/pom.xml ]; then
-        sed -i "s/<version>$BRANCH_VER/<version>$RELEASE_VER/" $i/pom.xml
-    fi
-done
-
-while [[ true ]]; do
-  yesno -d no "NOTE: This script has made changes to your POM files.  Please ensure that it only made changes to the Matterhorn version number.  In rare cases some of the dependencies have the same version numbers, and the modification done above does *not* understand that it should not also change those versions.  Manual inspection of the changeset is required before continuing.  Have you finished checking all of the modifications?" has_checked
-  if [[ "$has_checked" ]]; then 
-      break
-  fi
-done
+updatePomVersions -w $WORK_DIR -o $BRANCH_VER -n $RELEASE_VER
 
 case "$RELEASE_TYPE" in
 0)
