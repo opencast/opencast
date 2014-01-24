@@ -100,7 +100,7 @@ var initialWaveformWidth = 0;
 var currentWaveformWidth = 0;
 var currWaveformZoom = 1;
 var waveformZoomFactor = 20;
-var maxWaveformZoomSlider = 800;
+var maxWaveformZoomSlider = 400;
 
 /******************************************************************************/
 // editor
