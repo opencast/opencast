@@ -6,6 +6,17 @@ body {
 #waveformControls {
     display: none;
     float: right;
+    width: 500px;
+    margin-top: 5px;
+}
+
+#slider-waveform-zoom {
+    float: left;
+    width: 95%;
+}
+
+#zoomin {
+    float: right;
 }
 
 .holdStateUI {

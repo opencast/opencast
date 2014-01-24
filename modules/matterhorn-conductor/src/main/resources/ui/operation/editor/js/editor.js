@@ -98,7 +98,9 @@ var currSplitItem = null;
 
 var initialWaveformWidth = 0;
 var currentWaveformWidth = 0;
+var currWaveformZoom = 1;
 var waveformZoomFactor = 20;
+var maxWaveformZoomSlider = 800;
 
 /******************************************************************************/
 // editor
@@ -1749,25 +1751,30 @@ function prepareUI() {
                     $('#segmentsWaveform').width($('#waveformImage').width());
 		    initialWaveformWidth = $('#waveformImage').width();
 		    currentWaveformWidth = initialWaveformWidth;
-		    $("#waveform_zoomIn").click(function() {
-			currentWaveformWidth += waveformZoomFactor;
-			$('#waveformImage').width(currentWaveformWidth);
-			positionWaveformAndTimeIndicator();
-		    });
-		    $("#waveform_zoomNormal").click(function() {
-			currentWaveformWidth = initialWaveformWidth;
-			$('#waveformImage').width(currentWaveformWidth);
-			positionWaveformAndTimeIndicator();
-		    });
-		    $("#waveform_zoomOut").click(function() {
-			if((currentWaveformWidth - waveformZoomFactor) >= initialWaveformWidth) {
-			    currentWaveformWidth -= waveformZoomFactor;
-			    $('#waveformImage').width(currentWaveformWidth);
-			} else {
-			    currentWaveformWidth = initialWaveformWidth;
-			    $('#waveformImage').width(currentWaveformWidth);
+		    $("#slider-waveform-zoom").slider({
+			range: "min",
+			value: 1,
+			min: 1,
+			max: maxWaveformZoomSlider,
+			slide: function(event, ui) {
+			    if(ui.value == 1) {
+				currentWaveformWidth = initialWaveformWidth;
+				$('#waveformImage').width(currentWaveformWidth);
+				positionWaveformAndTimeIndicator();
+			    } else if(ui.value > currWaveformZoom) {
+				currentWaveformWidth = initialWaveformWidth + ui.value * waveformZoomFactor;
+				$('#waveformImage').width(currentWaveformWidth);
+				positionWaveformAndTimeIndicator();
+			    } else if(ui.value < currWaveformZoom) {
+				var maxWidth = initialWaveformWidth + maxWaveformZoomSlider * waveformZoomFactor;
+				var newWidth = maxWidth - (maxWaveformZoomSlider - ui.value) * waveformZoomFactor;
+				newWidth = (newWidth >= initialWaveformWidth) ? newWidth : initialWaveformWidth;
+				currentWaveformWidth = newWidth;
+				$('#waveformImage').width(currentWaveformWidth);
+				positionWaveformAndTimeIndicator();
+			    }
+			    currWaveformZoom = ui.value;
 			}
-			positionWaveformAndTimeIndicator();
 		    });
 		    $("#waveformControls").show();
                 });
@@ -1782,6 +1789,7 @@ function prepareUI() {
     } else {
         ocUtils.log("Did not find waveform");
         $('#waveformImage').hide();
+        $('#slider-waveform-zoom').hide();
     }
 
     // adjust size of the holdState UI
