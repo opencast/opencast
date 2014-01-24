@@ -94,7 +94,14 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String STREAMING_SOURCE_FLAVORS = "streaming-source-flavors";
   private static final String STREAMING_TARGET_SUBFLAVOR = "streaming-target-subflavor";
   private static final String CHECK_AVAILABILITY = "check-availability";
-
+  
+  //itbwpdk start
+  /** Distribution delay between elements for engage */
+  private static final String DISTRIBUTION_DELAY__PROPERTY = "org.opencastproject.distribution.delay";
+  
+  /** Distribution delay between elements for engage */
+  private int distributionDelay = 0; 
+  //itbwpdk end
   /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;
 
@@ -170,8 +177,17 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   protected void activate(ComponentContext cc) {
     super.activate(cc);
     BundleContext bundleContext = cc.getBundleContext();
-
-    // Get engage UI url
+    
+    // itbwpdk start
+    // Get element distribution delay
+    if (StringUtils.isNotBlank(bundleContext.getProperty(DISTRIBUTION_DELAY__PROPERTY))) {
+    distributionDelay = Integer.parseInt(bundleContext.getProperty(DISTRIBUTION_DELAY__PROPERTY));
+    } else {
+    distributionDelay = 0;	
+    }
+    // itbwpdk end
+    
+    // Get engage UI url    
     try {
       String engageBaseUrlStr = bundleContext.getProperty(ENGAGE_URL_PROPERTY);
       if (StringUtils.isNotBlank(engageBaseUrlStr)) {
@@ -307,6 +323,11 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       List<Job> jobs = new ArrayList<Job>();
       try {
         for (String elementId : downloadElementIds) {
+        	
+          //itbwpdk start DistributionDelay
+            logger.info("Element distribution delay , sleeping for " +  Integer.toString(distributionDelay));
+            Thread.sleep(distributionDelay);        	
+          //itbwpdk end	
           Job job = downloadDistributionService.distribute(CHANNEL_ID, mediaPackage, elementId, checkAvailability);
           if (job == null)
             continue;

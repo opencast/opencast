@@ -221,7 +221,48 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
               channelId));
       URI uri = distributedElement.getURI();
       long now = 0L;
+      
+      // Start itbwpdk
+      // If the distribution channel is engage player
+      // and the file is available locally
+      // do check on file level for existence
+      if ("engage-player".equals(channelId) && distributionDirectory.exists()) {
+      
+	  File xelement = null;
+	  String buildpath = "";
+	  boolean calc = false;
+	  for (String t : uri.toString().split("/")) {
+			if (calc) {
+			buildpath = buildpath + "/" + t;
+			}
+			if ("static".equals(t)) {
+				calc = true;
+			}
+	  }
+	  xelement = new File(distributionDirectory.getPath().concat(buildpath));	      
       while (checkAvailability) {
+
+      if (xelement.exists()) {
+    	  logger.debug("Distributed file was created in download directory for engage player, " + xelement.getPath());  
+        break;
+      }
+      if (now < TIMEOUT) {
+        try {
+          Thread.sleep(INTERVAL);
+          now += INTERVAL;
+          continue;
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      }
+      logger.warn("Distributed file not created in download directory for engage player, " + xelement.getPath());
+      throw new DistributionException("Distributed file not created, " + xelement.getPath());
+      }
+      
+      } else {
+      
+      
+        while (checkAvailability) {
         HttpResponse response = trustedHttpClient.execute(new HttpHead(uri));
         if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK)
           break;
@@ -238,6 +279,10 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
         logger.warn("Status code of distributed file {}: {}", uri, response.getStatusLine().getStatusCode());
         throw new DistributionException("Unable to load distributed file " + uri.toString());
       }
+      
+      }
+      
+      
       return distributedElement;
     } catch (Exception e) {
       logger.warn("Error distributing " + element, e);
