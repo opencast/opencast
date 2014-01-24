@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.opencastproject</groupId>
 		<artifactId>base</artifactId>
-		<version>1.4.2-rc2</version>
+		<version>1.4.2-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
