@@ -69,7 +69,7 @@ $(document).ready(function () {
     $("#trackForm").append($("#template").jqote(tracks));
 
     $("input[id^='chk']").click(function(event) {
-        if ($("input:checked").length === 0) {
+        if ($("input[id^='chk']:checked").length === 0) {
             $("#trackError").show();
             $(event.currentTarget).prop("checked", true);
         } else {
