@@ -16,18 +16,17 @@
 
 package org.opencastproject.manager.system.workflow.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashMap;
 
+import org.opencastproject.manager.core.MetadataDocumentHandler;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
+
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.opencastproject.manager.api.workflow.WorkflowArtifact;
-import org.opencastproject.manager.api.workflow.WorkflowInstallerService;
-import org.opencastproject.manager.service.WorkflowInstallerServiceImpl;
 
 /**
  * This class handles JSON objects for workflow's.
@@ -42,9 +41,9 @@ public class JSONWorkflowBuilder {
 	private BundleContext bundleContext;
 	
 	/**
-	 * The workflow's artifact hash map.
+	 * The Document Handler
 	 */
-	private HashMap<String, WorkflowArtifact> workflowArtifactList;
+	private MetadataDocumentHandler handleDocument = new MetadataDocumentHandler();
 
 	/**
 	 * Constructor
@@ -61,22 +60,27 @@ public class JSONWorkflowBuilder {
 	 * @return string writer object
 	 * @throws ParserConfigurationException
 	 * @throws IOException
+	 * @throws SAXEception
 	 */
-	public StringWriter createHashMapWorkflowDataFromXML() throws ParserConfigurationException, IOException {
-
-	    ServiceReference sRef = bundleContext.getServiceReference(WorkflowInstallerService.class.getName());
-	    
-	    workflowArtifactList = null;
-	    
-	    if (sRef != null) {
-	    	
-	    	workflowArtifactList = ((WorkflowInstallerServiceImpl) bundleContext.getService(sRef)).getInstalledWorkflowArtifacts();
-	    }
-		
+	public StringWriter createHashMapWorkflowDataFromXML() throws ParserConfigurationException, IOException, SAXException {
+        
         StringWriter w = new StringWriter();
 
-        for (String key : workflowArtifactList.keySet()) {
-   			w.append("{\"id\":\"" + workflowArtifactList.get(key).getID() + "\", \"name\":\"" + workflowArtifactList.get(key).getFileName() + "\"}, ");
+		File folder = new File("etc/workflows/");
+		
+		File[] filesInFolder = folder.listFiles();
+		
+        if (filesInFolder != null) {
+            for (final File fileEntry : filesInFolder) {
+                if (!fileEntry.isDirectory()) {
+                	
+                    Document doc = handleDocument.getDocumentBuilder().parse(fileEntry); 
+                    doc.getDocumentElement().normalize();
+                    String id = doc.getDocumentElement().getElementsByTagName("id").item(0).getTextContent();
+                    
+    	       		w.append("{\"id\":\"" + id + "\", \"name\":\"" + fileEntry.getName() + "\"}, ");
+                }
+            }
         }
         
 		return w;

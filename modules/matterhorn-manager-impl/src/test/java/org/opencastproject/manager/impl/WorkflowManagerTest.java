@@ -149,7 +149,7 @@ public class WorkflowManagerTest {
 
 		this.manager = new WorkflowManager(null);
 		
-		String xmlContent = "<definition><id>unit-test</id></definition>";
+		String xmlContent  = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><definition xmlns=\"http://workflow.opencastproject.org\"><id>unit-test</id><operations><operation></operation></operations></definition>";
 		
 		String fileName = "tmpworkflow";
 		
@@ -217,8 +217,8 @@ public class WorkflowManagerTest {
 		
 		String fileName = "tmpworkflow.xml";
 		
-		String xmlContent = "<definition><id>unit-test</id></definition>";
-		
+		String xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><definition xmlns=\"http://workflow.opencastproject.org\"><id>unit-test</id><operations><operation></operation></operations></definition>";
+
 		// mocks for request and response
 		request = EasyMock.createMock(HttpServletRequest.class);
 		response = EasyMock.createMock(HttpServletResponse.class);
@@ -283,8 +283,8 @@ public class WorkflowManagerTest {
 		this.manager = new WorkflowManager(null);
 		
 		String fileName = "tmpworkflow";
-		String xmlContent = "<definition><id>unit-test</id></definition>";
-		
+		String xmlContent  = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><definition xmlns=\"http://workflow.opencastproject.org\"><id>unit-test</id><operations><operation></operation></operations></definition>";
+
 		// mocks for request and response
 		request = EasyMock.createMock(HttpServletRequest.class);
 		response = EasyMock.createMock(HttpServletResponse.class);

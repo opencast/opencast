@@ -16,29 +16,29 @@
 
 package org.opencastproject.manager.system.workflow;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.io.FileInputStream;
+import java.io.BufferedInputStream;
 import java.util.HashMap;
+import java.io.File;
+import java.io.FileNotFoundException;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-
-import org.apache.commons.io.FileUtils;
 import org.opencastproject.manager.api.PluginManagerConstants;
+import org.opencastproject.manager.core.MetadataDocumentHandler;
 import org.opencastproject.manager.system.workflow.utils.JSONWorkflowBuilder;
 import org.osgi.framework.BundleContext;
 import org.xml.sax.SAXException;
+import org.apache.commons.io.FileUtils;
 
 /**
  * This class represents the worflow's manager.
@@ -52,7 +52,16 @@ public class WorkflowManager {
 	 */
 	private BundleContext bundleContext;
 	
+	/**
+	 * The Document handler
+	 */
+	private MetadataDocumentHandler handleDocument;
 
+	/**
+	 * The workflow's manager constructor.
+	 * 
+	 * @param bundleContext
+	 */
 	public WorkflowManager(BundleContext bundleContext) {
 		
 		this.bundleContext = bundleContext;
@@ -78,13 +87,14 @@ public class WorkflowManager {
 			w = jsonObject.createHashMapWorkflowDataFromXML();
 			vars.put("workflow_data", "[" + w.toString() + "]");
 	    	
-		} catch (ParserConfigurationException e) { }
+		} catch (ParserConfigurationException e) { 
+		} catch (SAXException e) { }
 
 		return vars;
 	}
 	
 	/**
-	 * Handles the workflow operations.
+	 * Handles the workflow's operations.
 	 * 
 	 * @param request
 	 * @param response
@@ -138,38 +148,38 @@ public class WorkflowManager {
 	 */
 	public void handleNewWorkflowFile(HttpServletRequest request, HttpServletResponse response) throws TransformerException, ParserConfigurationException, SAXException, IOException {
 		
-		File xmlWorkflowFile = new File(PluginManagerConstants.WORKFLOWS_PATH + "TMPfile.xml");
-		
-		int counter = 0;
-		
-		try {
-			InputStreamReader inputStream = new InputStreamReader(request.getInputStream());  
-			FileOutputStream outputStream = new FileOutputStream(xmlWorkflowFile);
+        File xmlWorkflowFile = new File(PluginManagerConstants.WORKFLOWS_PATH + "TMPfile.xml");
+        
+        int counter = 0;
+        
+        try {
+                InputStreamReader inputStream = new InputStreamReader(request.getInputStream());
+                FileOutputStream outputStream = new FileOutputStream(xmlWorkflowFile);
 
-			int c = 0;
-
-		    while ((c =  inputStream.read()) != -1) {
-			   outputStream.write(c);
-				counter++;
-		    }
-		    
-		    inputStream.close();
-	        outputStream.close();
-	    } catch (FileNotFoundException e) {
-	        System.err.println("FileStreamsTest: " + e);
-	    } catch (IOException e) {
-	        System.err.println("FileStreamsTest: " + e);
-	    }
+                int c = 0;
 		
-		if (counter == 0) {
-			xmlWorkflowFile.delete();
-			return;
-		}
-	    
-		String newXMLFile = stringValidator(request.getHeader("FileName"));
-		File newXMLWorkflowFile = new File(PluginManagerConstants.WORKFLOWS_PATH + newXMLFile);
-		newXMLWorkflowFile.delete();
-		xmlWorkflowFile.renameTo(new File(PluginManagerConstants.WORKFLOWS_PATH + newXMLFile));
+		         while ((c = inputStream.read()) != -1) {
+		                 outputStream.write(c);
+		                        counter++;
+		         }
+        
+		         inputStream.close();
+		         outputStream.close();
+		 } catch (FileNotFoundException e) {
+			 System.err.println("FileStreamsTest: " + e);
+		 } catch (IOException e) {
+			 System.err.println("FileStreamsTest: " + e);
+		 }
+        
+        if (counter == 0) {
+                xmlWorkflowFile.delete();
+                return;
+        }
+
+        String newXMLFile = stringValidator(request.getHeader("FileName"));
+        File newXMLWorkflowFile = new File(PluginManagerConstants.WORKFLOWS_PATH + newXMLFile);
+        newXMLWorkflowFile.delete();
+        xmlWorkflowFile.renameTo(new File(PluginManagerConstants.WORKFLOWS_PATH + newXMLFile));
 	}
 	
 	/**
@@ -180,10 +190,17 @@ public class WorkflowManager {
 	 * @throws IOException
 	 */
 	public void createNewWorkflowFile(String newWorkflowFile) throws TransformerException, IOException {
-		
+
 		newWorkflowFile = stringValidator(newWorkflowFile);
 		File xmlWorkflowFile = new File(PluginManagerConstants.WORKFLOWS_PATH + newWorkflowFile + ".xml");
-		String inStream = "<definition><id>" + newWorkflowFile + "</id></definition>";
+		String inStream = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+				+ "<definition xmlns=\"http://workflow.opencastproject.org\">\n"
+				+ "<id>" + newWorkflowFile + "</id>\n"
+				+ "<operations>\n"
+				+ "<operation>"
+				+ "</operation>\n"
+				+ "</operations>\n"
+				+ "</definition>\n";
 		FileUtils.writeStringToFile(xmlWorkflowFile, inStream);
 	}
 	
@@ -198,8 +215,8 @@ public class WorkflowManager {
 
 		deleteWorkflowFile = stringValidator(deleteWorkflowFile);
 		File xmlWorkflowFile = new File(PluginManagerConstants.WORKFLOWS_PATH + deleteWorkflowFile);
+		
 		return xmlWorkflowFile.delete();
-	
 	}
 	
 	/**
@@ -267,7 +284,6 @@ public class WorkflowManager {
 		     }
 
 	     } catch (IOException ioe) {
-	    	 
 	        throw new ServletException(ioe.getMessage());
 	     } finally {
 

@@ -22,7 +22,7 @@ var requestHandler = function() {
 					r = new ActiveXObject('Microsoft.XMLHTTP');
 				} catch(e2) {
 					//document.getElementById('activatorHandler').innerHTML = 
-					//alert("Request nicht möglich.");
+					alert("Request nicht möglich.");
 				}
 			}		
 		}
@@ -81,7 +81,7 @@ var requestHandler = function() {
 		
 		var xml = this.stringToXML(txt);
 		var fileName = $('#workflow_selection :selected').text();
-		
+
 		var id = $(xml).find('id').text();
 		
 		if (id == "" || id == "undefined") {
@@ -239,7 +239,15 @@ var requestHandler = function() {
 		$('#workflow_selection').append($('<option></option>').val(wFile+".xml").text(wFile+".xml"));
 		$('#workflow_selection').val(wFile+".xml");
 		editor.markClean();
-		editor.setValue("<definition><id>" + wFile + "</id></definition>");
+		editor.setValue("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+						+ "<definition xmlns=\"http://workflow.opencastproject.org\">\n"
+						+ "<id>" + wFile + "</id>\n"
+						+ "<operations>\n"
+						+ "<operation>"
+						+ "</operation>\n"
+						+ "</operations>\n"
+						+ "</definition>\n");
+		
 		message.closeWorkflowFileView();
 	}
 	

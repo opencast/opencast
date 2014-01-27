@@ -40,8 +40,7 @@
                 org.opencastproject.manager;version=${project.version},
                 org.opencastproject.manager.api;version=${project.version},
                 org.opencastproject.manager.api.bundles;version=${project.version},
-                org.opencastproject.manager.api.plugins;version=${project.version},
-                org.opencastproject.manager.api.workflow;version=${project.version}
+                org.opencastproject.manager.api.plugins;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>
