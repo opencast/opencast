@@ -107,7 +107,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
       // serialize MediaPackage to target format
       String mpStr;
       if (config.getFormat() == Configuration.Format.JSON) {
-        mpStr = MediaPackageParser.getAsXml(mp);
+        mpStr = MediaPackageParser.getAsJSON(mp);
       } else {
         mpStr = MediaPackageParser.getAsXml(mp);
       }
