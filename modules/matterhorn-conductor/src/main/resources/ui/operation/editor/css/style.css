@@ -3,6 +3,22 @@ body {
   overflow-x: auto;
 }
 
+#waveformControls {
+    display: none;
+    float: right;
+    width: 500px;
+    margin-top: 5px;
+}
+
+#slider-waveform-zoom {
+    float: left;
+    width: 95%;
+}
+
+#zoomin {
+    float: right;
+}
+
 .holdStateUI {
   min-width: 785px;
 }
@@ -288,7 +304,7 @@ a.secondaryButton:hover,a.secondaryButton:focus {
   border-right: 1px solid #990000;
   float: left;
   height: 100%;
-  background-color: #00FF00;
+  background-color: #79c966;
   color: #000000;
   /* Firefox */
   -moz-box-sizing: border-box;
@@ -325,26 +341,26 @@ a.secondaryButton:hover,a.secondaryButton:focus {
 
 .splitItemSelected {
   border: 1px solid #0000FF;
-  background-color: #00FF00;
+  background-color: #79c966;
   color: #000000;
 }
 
 .disabled {
-  background-color: #FF0000;
+  background-color: #ce4f4f;
   color: #000000;
   opacity: 0.6;
   filter: alpha(opacity = 60); /* For IE8 and earlier */
 }
 
 .hover {
-  background-color: #0000FF;
+  background-color: #5792d4;
   color: #000000;
   opacity: 0.6;
   filter:alpha(opacity=60); /* For IE8 and earlier */
 }
 
 .splitNumber {
-  background-color: lime;
+  background-color: #d2eecb;
   width: 20px;
   height: 20px;
   text-align: center;
