@@ -104,7 +104,7 @@ a.secondaryButton:hover,a.secondaryButton:focus {
 
 #editor {
   height: 350px;
-  width: 90%;
+  width: 95%;
 }
 
 #shortcuts {
@@ -113,18 +113,55 @@ a.secondaryButton:hover,a.secondaryButton:focus {
 
 #boxes {
   padding-left: 0px;
-  padding-top: 20px;
+  /* padding-top: 20px; */
   width: 100%;
   float: left;
-  min-width: 1131px;
+  min-width: 785px;
+}
+
+#splitElementsHolder {
+  height: 340px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#segment_list_actions {
+    float: right;
 }
 
 #leftBoxDescription {
   font-weight:bold;
   float: left;
-  width: 300px;
+  width: 69%;
 }
 
+#leftBox {
+  float: left;
+  border: 1px solid black;
+  width: 69%;
+  height: 400px;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+#rightBoxDescription {
+  font-weight:bold;
+  float: right;
+  margin-left: 10px;
+  width: 29%;
+}
+
+#rightBox {
+  float: right;
+  border: 1px solid black;
+  width: 26%;
+}
+
+#rightBox table {
+  font-size: 0.9em;
+}
+
+/*
 #midBoxDescription {
   font-weight:bold;
   float: left;
@@ -138,22 +175,6 @@ a.secondaryButton:hover,a.secondaryButton:focus {
   float: left;
   margin-left: 10px;
   width: 400px;
-}
-
-#rightBoxDescription {
-  font-weight:bold;
-  float: left;
-  margin-left: 10px;
-  width: 300px;
-}
-
-#leftBox {
-  float: left;
-  border: 1px solid black;
-  width: 300px;
-  height: 340px;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
 .box_mid {
@@ -179,17 +200,7 @@ a.secondaryButton:hover,a.secondaryButton:focus {
   margin-top: 0px;
   width: 430px;
 }
-
-#rightBox {
-  float: left;
-  border: 1px solid black;
-  margin-left: 10px;
-  width: 350px;
-}
-
-#rightBox table {
-  font-size: 0.9em;
-}
+*/
 
 #buttons {
   float: left;
@@ -199,8 +210,6 @@ a.secondaryButton:hover,a.secondaryButton:focus {
 #newTime {
   margin-left: 10px;
   margin-top: 10px;
-  float: left;
-  width: 350px;
 }
 
 #shortcuts {
@@ -332,13 +341,6 @@ a.secondaryButton:hover,a.secondaryButton:focus {
   z-index: 0;
 }
 
-.splitItemDiv {
-  height: 100%;
-  width: 100%;
-  z-index: 0;
-  position: absolute;
-}
-
 .splitItemSelected {
   border: 1px solid #0000FF;
   background-color: #79c966;
@@ -347,8 +349,8 @@ a.secondaryButton:hover,a.secondaryButton:focus {
 
 .disabled {
   background-color: #ce4f4f;
-  color: #000000;
-  opacity: 0.6;
+  /* color: #000000; */
+  /* opacity: 0.6; */
   filter: alpha(opacity = 60); /* For IE8 and earlier */
 }
 
@@ -366,6 +368,31 @@ a.secondaryButton:hover,a.secondaryButton:focus {
   text-align: center;
   border-bottom: 1px solid black;
   border-right: 1px solid black;
+}
+
+.splitItemDiv {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+  position: absolute;
+}
+
+.splitItemBoxUp {
+    height: 39%;
+}
+
+.splitItemBoxDown {
+    height: 60%;
+}
+
+.segmentButtons {
+    float: left;
+    width: 80%;
+}
+
+.splitRemoverDiv {
+    float: right;
+    width: 10%;
 }
 
 .splitText {

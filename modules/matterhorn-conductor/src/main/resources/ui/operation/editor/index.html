@@ -86,27 +86,32 @@
     <script type="text/x-jqote-template" id="splitElements">
       <![CDATA[
           <% $.each(data[j].splits, function(key, split ) { %>
-            <div class="splitItem" id="splitItem-<%= key %>">
-              <div id="splitItemDiv-<%= key %>" class="splitItemDiv<% if(!split.enabled) { %> disabled<% }%>">
-                <div class="splitNumber floatLeft">
+          <div class="splitItem" id="splitItem-<%= key %>">
+            <div id="splitItemDiv-<%= key %>" class="splitItemDiv<% if(!split.enabled) { %> disabled<% }%>">
+	      <div class="splitItemBoxUp">
+		<div class="splitNumber floatLeft">
                   <span><%= (key + 1) %></span>
-                </div>
-                <div class="splitText">
-                  <span><%= formatTime(split.clipBegin) %></span> - <span><%= formatTime(split.clipEnd) %></span> <br />
-                  <p><%= split.description %></p>
-               </div>
+		</div>
+		<div class="splitText">
+                  <span><%= formatTime(split.clipBegin) %></span> - <span><%= formatTime(split.clipEnd) %></span>
+		</div>
+	      </div>
+	      <div class="splitItemBoxDown">
+		<div class="segmentButtons"><!-- INSERT BUTTONS HERE --></div>
+		<div class="splitRemoverDiv">
+		  <div class="splitRemover">
+                    <% if(split.enabled) { %>
+                    <a title="Remove this item" class="splitRemoverLink" id="splitRemover-<%= key %>"></a>
+                    <% } else { %>
+                    <a title="Readd this item" class="splitAdderLink" id="splitAdder-<%= key %>"></a>
+                    <% } %>
+		  </div>
+		</div>
+	      </div>
             </div>
-            <div class="splitRemoverDiv">
-              <div class="splitRemover">
-                <% if(split.enabled) { %>
-                  <a title="Remove this item" class="splitRemoverLink" id="splitRemover-<%= key %>"></a>
-                <% } else { %>
-                  <a title="Readd this item" class="splitAdderLink" id="splitAdder-<%= key %>"></a>
-                <% } %>
-              </div></div>
-            </div>
+	  </div>
           <% }); %>
-      ]]>
+       ]]>
     </script>
     <div class="ui-helper-hidden" id="deleteDialog">
       <span>Remove this split item?</span>
@@ -122,10 +127,18 @@
     <div id="editor" class="form-box layout-centered ui-widget">
       <div id="boxes">
 	<div id="leftBoxDescription">Segment list</div>
-	<div id="midBoxDescription">Inspector</div>
 	<div id="rightBoxDescription">Shortcuts</div>
 	<div class="clear"></div>
-        <div id="leftBox"></div>
+	<input type="hidden" id="splitUUID" style="display:none;" />
+        <div id="leftBox">
+	  <div id="segment_list_actions">
+	    <span id="newTime"></span>
+	    <input type="button" title="Clear segment split" value="Clear segment list" id="clearList" />
+	  </div>
+	  <div class="clear"></div>
+	  <div id="splitElementsHolder"></div>
+	</div>
+	<!--
 	<div id="bigMidBox">
           <div id="midBox">
             <div class="splitNumber">
@@ -138,13 +151,6 @@
               </div>
               <a id="clipBeginSet" class="frameButton" title="set current time as new inpoint"></a> <span class="clipItem" id="clipBegin"></span> - <span class="clipItem" id="clipEnd"></span> <a id="clipEndSet" class="frameButton" title="set current time as new outpoint"></a> <br />
               <label for="description">Description</label>
-              <br />
-              <textarea id="splitDescription"></textarea>
-              <div class="box_mid">
-		<input type="button" value="Remove" id="deleteButton" />
-		<input type="button" value="Cancel" id="cancelButton" />
-		<input type="button" value="OK" id="okButton" />
-              </div>
             </div>
           </div>
 	  <div id="midBoxDescription2">Information</div>
@@ -156,6 +162,7 @@
 	    </div>
 	  </div>
 	</div>
+	-->
         <div id="rightBox">
 	  <table border="1">
             <tbody>
