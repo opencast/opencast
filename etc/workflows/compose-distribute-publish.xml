@@ -54,8 +54,6 @@
           <span id="dist">
             <input id="distribution" name="distribution" type="checkbox" checked="checked" disabled="disabled" class="configField" value="Matterhorn Media Module" />
             <span id="i18n_dist_mmm">&nbsp;Matterhorn Media Module</span>
-            <input id="youtube" name="youtube" type="checkbox" disabled="disabled" class="configField" value="Youtube" />
-            <span id="i18n_dist_mmm">&nbsp;Youtube</span>
           </span>
         </li>
       </ul>
