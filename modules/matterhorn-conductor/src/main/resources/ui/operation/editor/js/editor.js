@@ -96,6 +96,7 @@ var currEvt = null;
 var jumpBackTime = null;
 var currSplitItem = null;
 
+var waveformImageLoadDone = false;
 var initialWaveformWidth = 0;
 var currentWaveformWidth = 0;
 var currWaveformZoom = 1;
@@ -1732,6 +1733,23 @@ function initPlayButtons() {
     });
 }
 
+function setWaveformWidth(value) {
+    if(value == 1) {
+	currentWaveformWidth = initialWaveformWidth;
+    } else if(value > currWaveformZoom) {
+	currentWaveformWidth = initialWaveformWidth + value * waveformZoomFactor;
+    } else if(value < currWaveformZoom) {
+	var maxWidth = initialWaveformWidth + maxWaveformZoomSlider * waveformZoomFactor;
+	var newWidth = maxWidth - (maxWaveformZoomSlider - value) * waveformZoomFactor;
+	newWidth = (newWidth >= initialWaveformWidth) ? newWidth : initialWaveformWidth;
+	currentWaveformWidth = newWidth;
+    }
+    $('#segmentsWaveform').width(currentWaveformWidth);
+    $('#waveformImage').width(currentWaveformWidth);
+    positionWaveformAndTimeIndicator();
+    currWaveformZoom = value;
+}
+
 /**
  * prepares the UI
  */
@@ -1748,44 +1766,33 @@ function prepareUI() {
                 $('#waveformImage').prop("src", value.url);
                 $('#waveformImage').load(function () {
                     $('#segmentsWaveform').height($('#waveformImage').height());
-                    $('#segmentsWaveform').width($('#waveformImage').width());
+                    $('#segmentsWaveform').width($('#videoHolder').width());
 		    initialWaveformWidth = $('#segmentsWaveform').width();
 		    currentWaveformWidth = initialWaveformWidth;
+		    currWaveformZoom = 1;
+		    waveformImageLoadDone = true;
 		    $("#slider-waveform-zoom").slider({
 			range: "min",
 			value: 1,
 			min: 1,
 			max: maxWaveformZoomSlider,
 			slide: function(event, ui) {
-			    if(ui.value == 1) {
-				currentWaveformWidth = initialWaveformWidth;
-				$('#segmentsWaveform').width(currentWaveformWidth);
-				$('#waveformImage').width(currentWaveformWidth);
-				positionWaveformAndTimeIndicator();
-			    } else if(ui.value > currWaveformZoom) {
-				currentWaveformWidth = initialWaveformWidth + ui.value * waveformZoomFactor;
-				$('#segmentsWaveform').width(currentWaveformWidth);
-				$('#waveformImage').width(currentWaveformWidth);
-				positionWaveformAndTimeIndicator();
-			    } else if(ui.value < currWaveformZoom) {
-				var maxWidth = initialWaveformWidth + maxWaveformZoomSlider * waveformZoomFactor;
-				var newWidth = maxWidth - (maxWaveformZoomSlider - ui.value) * waveformZoomFactor;
-				newWidth = (newWidth >= initialWaveformWidth) ? newWidth : initialWaveformWidth;
-				currentWaveformWidth = newWidth;
-				$('#segmentsWaveform').width(currentWaveformWidth);
-				$('#waveformImage').width(currentWaveformWidth);
-				positionWaveformAndTimeIndicator();
-			    }
-			    currWaveformZoom = ui.value;
+			    setWaveformWidth(ui.value);
 			}
 		    });
 		    $("#waveformControls").show();
                 });
                 $(window).resize(function (evt) {
-                    $('#segmentsWaveform').height($('#waveformImage').height());
-                    $('#segmentsWaveform').width($('#waveformImage').width());
-                    $('.holdStateUI').height($('#segmentsWaveform').height() + $('#videoPlayer').height() + 70);
-		    positionWaveformAndTimeIndicator();
+		    if(waveformImageLoadDone) {
+			$('#segmentsWaveform').height($('#waveformImage').height());
+			$('#segmentsWaveform').width($('#videoHolder').width());
+			initialWaveformWidth = $('#segmentsWaveform').width();
+			currentWaveformWidth = initialWaveformWidth;
+			currWaveformZoom = 1;
+			$("#slider-waveform-zoom").slider("option", "value", 1);
+			$('.holdStateUI').height($('#segmentsWaveform').height() + $('#videoPlayer').height() + 70);
+			setWaveformWidth(currWaveformZoom);
+		    }
                 });
             }
         });
