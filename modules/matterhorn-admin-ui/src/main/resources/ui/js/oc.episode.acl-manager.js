@@ -765,8 +765,6 @@ opencast.episode.aclScheduler.EpisodeSchedule = function(value, episodeScheduler
               self.$el.attr("id",self.id);
               self.isNew = false;
               self.toggleNewStatus(false);
-              self.render();
-
             }
             self.savedParams.aclId          = self.aclId;
             self.savedParams.workflowId     = self.workflowId;
