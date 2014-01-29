@@ -85,32 +85,22 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // MediaPackage from previous workflow operations
     MediaPackage srcPackage = workflowInstance.getMediaPackage();
 
-    String body = operation.getConfiguration(BODY_PROPERTY);
-    String bodyTemplateFile = operation.getConfiguration(BODY_TEMPLATE_FILE_PROPERTY);
-
-    // Templates are cached, use as template name: the template file name or, if in-line, the
-    // workflow name + the operation number + body/to/subject
-    String templateName = bodyTemplateFile;
-    if (templateName == null) {
-      templateName = workflowInstance.getTitle() + "_" + operation.getPosition();
-    }
-
-    // To and subject can also be Freemarker templates
-    String to = DocUtil.generate(new EmailDocData(templateName + "_to", workflowInstance),
-            operation.getConfiguration(TO_PROPERTY));
-    String subject = DocUtil.generate(new EmailDocData(templateName + "_subject", workflowInstance),
-            operation.getConfiguration(SUBJECT_PROPERTY));
+    // To, subject, body can be Freemarker templates
+    String to = applyTemplateIfNecessary(workflowInstance, operation, TO_PROPERTY);
+    String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY);
 
     String bodyText = null;
+    String body = operation.getConfiguration(BODY_PROPERTY);
+    // If specified, templateFile is a file that contains the Freemarker template
+    String bodyTemplateFile = operation.getConfiguration(BODY_TEMPLATE_FILE_PROPERTY);
     // Body informed? If not, use the default.
     if (body == null && bodyTemplateFile == null) {
       // Set the body of the message to be the ID of the media package
       bodyText = srcPackage.getTitle() + "(" + srcPackage.getIdentifier().toString() + ")";
     } else if (body != null) {
-      bodyText = DocUtil.generate(new EmailDocData(templateName + "_body", workflowInstance), body);
+      bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_PROPERTY);
     } else {
-      String template = null; // TO DO: LOAD TEMPLATE HERE!!!!
-      bodyText = DocUtil.generate(new EmailDocData(templateName, workflowInstance), template);
+      bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_TEMPLATE_FILE_PROPERTY);
     }
 
     // Create the mail message
@@ -132,6 +122,26 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
     // Return the source mediapackage and tell processing to continue
     return createResult(srcPackage, Action.CONTINUE);
+  }
+
+  private String applyTemplateIfNecessary(WorkflowInstance workflowInstance, WorkflowOperationInstance operation,
+          String configName) {
+    String value = operation.getConfiguration(configName);
+    // If value doesn't contain a "${", assume it is NOT a Freemarker template and thus return the value as it is
+    if (value.indexOf("${") > -1) {
+      // Templates are cached, use as template name: the template file name or, if in-line, the
+      // workflow name + the operation number + body/to/subject
+      String templateName = null;
+      if (BODY_TEMPLATE_FILE_PROPERTY.equals(configName)) {
+        templateName = value; // Use body template file name
+        value = null; // TO DO: LOAD TEMPLATE HERE!!!!
+      } else {
+        templateName = workflowInstance.getTitle() + "_" + operation.getPosition() + "_" + configName;
+      }
+      // Apply the template
+      value = DocUtil.generate(new EmailDocData(templateName, workflowInstance), value);
+    }
+    return value;
   }
 
   /**

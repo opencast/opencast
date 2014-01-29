@@ -119,7 +119,9 @@ public class EmailWorkflowOperationHandlerTest {
     Assert.assertEquals("somebody@hotmail.com", to[0].getAddress());
     Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", message.getContent()
             .toString());
-
   }
+  
+  
+
 
 }
