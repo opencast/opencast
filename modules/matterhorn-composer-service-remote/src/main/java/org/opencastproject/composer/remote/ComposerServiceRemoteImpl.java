@@ -99,8 +99,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.composer.api.ComposerService#trim(org.opencastproject.mediapackage.Track,
-   *      java.lang.String, long, long, boolean)
+   * @see org.opencastproject.composer.api.ComposerService#trim(Track, String, long, long)
    */
   @Override
   public Job trim(Track sourceTrack, String profileId, long start, long duration) throws EncoderException {
@@ -198,7 +197,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    *      java.lang.String, long)
    */
   @Override
-  public Job image(Track sourceTrack, String profileId, long... times) throws EncoderException {
+  public Job image(Track sourceTrack, String profileId, double... times) throws EncoderException {
     HttpPost post = new HttpPost("/image");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -326,14 +325,14 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    *          time array to be converted to string
    * @return string represented specified time array
    */
-  protected String buildTimeArray(long[] times) {
+  protected String buildTimeArray(double[] times) {
     if (times.length == 0)
       return "";
 
     StringBuilder builder = new StringBuilder();
-    builder.append(Long.toString(times[0]));
+    builder.append(Double.toString(times[0]));
     for (int i = 1; i < times.length; i++) {
-      builder.append("," + Long.toString(times[i]));
+      builder.append(";" + Double.toString(times[i]));
     }
     return builder.toString();
   }
@@ -439,14 +438,14 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   }
 
   @Override
-  public Job imageToVideo(Attachment sourceImageAttachment, String profileId, long time) throws EncoderException,
+  public Job imageToVideo(Attachment sourceImageAttachment, String profileId, double time) throws EncoderException,
           MediaPackageException {
     HttpPost post = new HttpPost("/imagetovideo");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("sourceAttachment", MediaPackageElementParser.getAsXml(sourceImageAttachment)));
       params.add(new BasicNameValuePair("profileId", profileId));
-      params.add(new BasicNameValuePair("time", Long.toString(time)));
+      params.add(new BasicNameValuePair("time", Double.toString(time)));
       post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException(e);

@@ -295,7 +295,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Path("image")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "image", description = "Starts an image extraction process, based on the specified encoding profile ID and the source track", restParameters = {
-          @RestParameter(description = "The number of seconds (many numbers can be specified, separated by comma) into the video to extract the image", isRequired = true, name = "time", type = Type.STRING, defaultValue = "1"),
+          @RestParameter(description = "The number of seconds (many numbers can be specified, separated by semicolon) into the video to extract the image", isRequired = true, name = "time", type = Type.STRING, defaultValue = "1"),
           @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "player-preview.http") }, reponses = {
           @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK),
@@ -307,7 +307,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack and profileId must not be null").build();
 
     // parse time codes
-    long[] timeArray;
+    double[] timeArray;
     try {
       timeArray = parseTimeArray(times);
     } catch (Exception e) {
@@ -497,9 +497,9 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
               .build();
 
     // parse time
-    Long time;
+    Double time;
     try {
-      time = Long.parseLong(timeString);
+      time = Double.parseDouble(timeString);
     } catch (Exception e) {
       logger.info("Unable to parse time {} as long value!", timeString);
       return Response.status(Response.Status.BAD_REQUEST).entity("Could not parse time: invalid format").build();
@@ -707,16 +707,16 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
    *          string to be parsed
    * @return array of times in seconds
    */
-  protected long[] parseTimeArray(String times) {
-    String[] timeStringArray = times.split(",");
-    List<Long> parsedTimeArray = new LinkedList<Long>();
+  protected double[] parseTimeArray(String times) {
+    String[] timeStringArray = times.split(";");
+    List<Double> parsedTimeArray = new LinkedList<Double>();
     for (String timeString : timeStringArray) {
       String trimmed = StringUtils.trim(timeString);
       if (StringUtils.isNotBlank(trimmed)) {
-        parsedTimeArray.add(Long.parseLong(timeString));
+        parsedTimeArray.add(Double.parseDouble(timeString));
       }
     }
-    long[] timeArray = new long[parsedTimeArray.size()];
+    double[] timeArray = new double[parsedTimeArray.size()];
     for (int i = 0; i < parsedTimeArray.size(); i++) {
       timeArray[i] = parsedTimeArray.get(i);
     }
