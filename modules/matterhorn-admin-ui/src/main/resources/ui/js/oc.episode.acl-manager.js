@@ -98,6 +98,7 @@ opencast.episode.aclScheduler = {
 
         $("#twf-cancel").click(function() { 
           self.$workflowWindow.dialog("close"); 
+          self.currentSchedule.setCurrentWorklowParams();
         });
 
         self.getACL();
@@ -158,7 +159,7 @@ opencast.episode.aclScheduler = {
 
             $.each(data.definitions.definition,function(index,value){
                 if(value.id != null && value.description != null)
-                  options += "<option value=\""+value.id+"\">"+value.description+"</option>"
+                  options += "<option value=\""+value.id+"\">"+value.description+"</option>";
             });
 
             self.workflowDefinitionsOptions = options;
@@ -171,11 +172,36 @@ opencast.episode.aclScheduler = {
         return self.workflowDefinitionsOptions;
     },
 
-    getWorkfowParamsUI: function(defId, container, callback) {
-    	$(container).load('/workflow/configurationPanel?definitionId=' + defId, function() {
-    		if(callback)
-    			callback();
-    	});
+    /**
+     * Change the content of the wofklow configuration window
+     * @param  {jQuery Element} data Worfklow configuration panel
+     */
+    prepareWorkflowParamsUI: function(data) {
+      var self = opencast.episode.aclScheduler;
+
+      self.$workflowConfigContainer.detach();
+      self.$workflowWindow.prepend(data);
+      self.$workflowConfigContainer = self.$workflowWindow.find("#twf-config-container");
+    },
+
+    /**
+     * Get the configuration panel for the given worfklow definition
+     * @param  {String} wfId The workflow definition Id
+     * @return {jQuery Element} The configuration panel 
+     */
+    getWorkflowConfigurationEl: function (wfId) {
+      var self = opencast.episode.aclScheduler,
+          $workflowConfiguration;
+          
+      $.ajax({
+        url     : '/workflow/configurationPanel?definitionId=' + wfId,
+        async   : false,
+        success : function (data) {
+          $workflowConfiguration = $(data).wrap('<div id="twf-config-container"></div>');
+        }
+      });
+
+      return $workflowConfiguration.parent();
     },
 
     /**
@@ -570,10 +596,13 @@ opencast.episode.aclScheduler.EpisodeSchedule = function(value, episodeScheduler
 
         self.workflowId = event.target.value;
         self.toggleSaveStatus(false);
+
         if(event.target.value == self.savedParams.workflowId) {
-        	self.workflowParams = self.savedParams.workflowParams;
+          self.workflowParams = self.savedParams.workflowParams;
+          self.$workflowConfiguration = self.savedParams.$workflowConfiguration;
         } else {
-        	self.workflowParams = undefined;
+          self.workflowParams = undefined;
+          self.$workflowConfiguration = opencast.episode.aclScheduler.getWorkflowConfigurationEl(self.workflowId);
         }
         self.checkChanged();
     }
@@ -610,14 +639,14 @@ opencast.episode.aclScheduler.EpisodeSchedule = function(value, episodeScheduler
           
           if(self.workflowParams){
             $.each(self.workflowParams,function(key, value){
-              $el = $("#twf-config-container #"+key);
+              $el = self.$workflowConfiguration.find("#"+key);
 
               if($el.is("input") && $el.attr("type")=="checkbox" && value=="true")
                 $el.attr("checked","checked");
               else
                 $el.val(value);
             });
-          };
+          }
     }
 
     /**
@@ -631,10 +660,9 @@ opencast.episode.aclScheduler.EpisodeSchedule = function(value, episodeScheduler
       var $configContainer = opencast.episode.aclScheduler.$workflowConfigContainer;
 
       opencast.episode.aclScheduler.currentSchedule = self;
-      opencast.episode.aclScheduler.getWorkfowParamsUI(self.workflowId, $configContainer, function(){
-          self.setCurrentWorklowParams();
-          opencast.episode.aclScheduler.openWorkflowWindow();
-      });
+      opencast.episode.aclScheduler.prepareWorkflowParamsUI(self.$workflowConfiguration);
+      opencast.episode.aclScheduler.openWorkflowWindow();
+      self.setCurrentWorklowParams();
     }
 
     /**
@@ -708,6 +736,7 @@ opencast.episode.aclScheduler.EpisodeSchedule = function(value, episodeScheduler
         self.workflowId     = self.savedParams.workflowId;
         self.fromDate       = self.savedParams.fromDate;
         self.workflowParams = self.savedParams.workflowParams
+        self.$workflowConfiguration = self.savedParams.$workflowConfiguration;
       }
 
       self.toggleSaveStatus(true);
@@ -744,8 +773,10 @@ opencast.episode.aclScheduler.EpisodeSchedule = function(value, episodeScheduler
           return;
         }
 
-        if(self.workflowId)
+        if(self.workflowId){
           data["workflowDefinitionId"] = self.workflowId;
+          self.setCurrentWorklowParams();
+        }
           
         if(self.workflowParams)
           data["workflowParams"] = JSON.stringify(self.workflowParams);
@@ -761,15 +792,16 @@ opencast.episode.aclScheduler.EpisodeSchedule = function(value, episodeScheduler
           success: function(data) {
             if(self.isNew){
               var oldId = self.id;
-              self.id   = data.transitionId;
+              self.id   = data.transitionId;             
               self.$el.attr("id",self.id);
               self.isNew = false;
               self.toggleNewStatus(false);
             }
-            self.savedParams.aclId          = self.aclId;
-            self.savedParams.workflowId     = self.workflowId;
-            self.savedParams.fromDate       = self.fromDate;
-            self.savedParams.workflowParams = self.workflowParams
+            self.savedParams.aclId                  = self.aclId;
+            self.savedParams.workflowId             = self.workflowId;
+            self.savedParams.fromDate               = self.fromDate;
+            self.savedParams.workflowParams         = self.workflowParams;
+            self.savedParams.$workflowConfiguration = self.workflowConfiguration;
 
             self.toggleLoadingStatus(false);
 
@@ -851,14 +883,22 @@ opencast.episode.aclScheduler.EpisodeSchedule = function(value, episodeScheduler
         self.isNew = ((value.applicationDate || value.isSeries) ? false : true);
         self.saved = ((value.applicationDate || value.isSeries) ? true  : false);
         
-        if(self.workflowId == undefined)
+        if (_.isUndefined(self.workflowId)) {
         	self.workflowId = "";
+        } else {
+          self.$workflowConfiguration = opencast.episode.aclScheduler.getWorkflowConfigurationEl(self.workflowId);
+          if (_.isUndefined(value.workflowParams)) {
+            self.workflowParams = ocWorkflow.getConfiguration(self.$workflowConfiguration);
+          }
+          self.setCurrentWorklowParams();
+        }
 
         self.savedParams = {
-          aclId           : self.aclId,
-          workflowId      : self.workflowId,
-          fromDate        : self.fromDate,
-          workflowParams  : self.workflowParams
+          aclId                  : self.aclId,
+          workflowId             : self.workflowId,
+          fromDate               : self.fromDate,
+          workflowParams         : self.workflowParams,
+          $workflowConfiguration : self.$workflowConfiguration
         }
 
         self.episodeScheduler = episodeScheduler;
