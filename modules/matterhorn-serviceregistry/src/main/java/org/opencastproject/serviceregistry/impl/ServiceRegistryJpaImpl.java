@@ -2372,8 +2372,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         List<Job> jobsToDispatch = getDispatchableJobs(em);
         List<String> undispatchableJobTypes = new ArrayList<String>();
 
-        jobsStatistics.updateAvg(getAvgOperations(em));
-        jobsStatistics.updateJobCount(getCountPerHostService(em));
+        // FIXME: the stats are not currently used and the queries are very
+        // expense in database time.
+        //jobsStatistics.updateAvg(getAvgOperations(em));
+        //jobsStatistics.updateJobCount(getCountPerHostService(em));
 
         for (Job job : jobsToDispatch) {
 
