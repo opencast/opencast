@@ -616,16 +616,22 @@ opencast.series.aclScheduler.SeriesSchedule = function(value, seriesScheduler){
 
     self.setCurrentWorklowParams = function(){
           var $el;
+
+          self.$workflowConfiguration.find("input[type='checkbox']").removeAttr("checked");
           
           if(self.workflowParams){
             $.each(self.workflowParams,function(key, value){
               $el = self.$workflowConfiguration.find("#"+key);
 
-              if($el.is("input") && $el.attr("type")=="checkbox" && value=="true")
-                $el.attr("checked","checked");
-              else
+              if($el.is("input") && $el.attr("type")=="checkbox") {
+                if (!_.isUndefined(value)) {
+                  $el.attr("checked","checked");
+                } else {
+                  $el.removeAttr("checked");                  
+                }
+              } else {
                 $el.val(value);
-
+              }
             });
           };
 
@@ -759,6 +765,10 @@ opencast.series.aclScheduler.SeriesSchedule = function(value, seriesScheduler){
         if(self.workflowId){
           data["workflowDefinitionId"] = self.workflowId;
           self.setCurrentWorklowParams();
+        }
+
+        if(_.isEmpty(self.workflowParams)) {
+          self.workflowParams = undefined;
         }
           
         if(self.workflowParams)

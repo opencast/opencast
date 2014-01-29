@@ -636,15 +636,22 @@ opencast.episode.aclScheduler.EpisodeSchedule = function(value, episodeScheduler
 
     self.setCurrentWorklowParams = function(){
           var $el;
+
+          self.$workflowConfiguration.find("input[type='checkbox']").removeAttr("checked");
           
           if(self.workflowParams){
             $.each(self.workflowParams,function(key, value){
               $el = self.$workflowConfiguration.find("#"+key);
 
-              if($el.is("input") && $el.attr("type")=="checkbox" && value=="true")
-                $el.attr("checked","checked");
-              else
+              if($el.is("input") && $el.attr("type")=="checkbox") {
+                if (!_.isUndefined(value)) {
+                  $el.attr("checked","checked");
+                } else {
+                  $el.removeAttr("checked");                  
+                }
+              } else {
                 $el.val(value);
+              }
             });
           }
     }
@@ -777,8 +784,12 @@ opencast.episode.aclScheduler.EpisodeSchedule = function(value, episodeScheduler
           data["workflowDefinitionId"] = self.workflowId;
           self.setCurrentWorklowParams();
         }
-          
-        if(self.workflowParams)
+        
+        if(_.isEmpty(self.workflowParams)) {
+          self.workflowParams = undefined;
+        }
+
+        if(self.workflowParams) 
           data["workflowParams"] = JSON.stringify(self.workflowParams);
 
         self.toggleLoadingStatus(true);
@@ -867,7 +878,7 @@ opencast.episode.aclScheduler.EpisodeSchedule = function(value, episodeScheduler
           self.workflowId = value.workflowId;
 
         if(value.workflowParams)
-          self.workflowParams = value.workflowParams;
+          self.workflowParams = JSON.parse(value.workflowParams);
 
         if(value.acl && value.acl.id)
           self.aclId = value.acl.id;
