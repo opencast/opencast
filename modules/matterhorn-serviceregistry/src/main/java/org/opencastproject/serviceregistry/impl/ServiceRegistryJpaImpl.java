@@ -145,6 +145,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the interval to check whether the hosts in the service registry are still alive [sec] **/
   protected static final String OPT_HEARTBEATINTERVAL = "heartbeat.interval";
 
+  /** Configuration key for the collection of job statistics */
+  protected static final String OPT_JOBSTATISTICS = "jobstats.collect";
+
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
 
@@ -153,6 +156,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** Default delay between job dispatching attempts, in milliseconds */
   static final long DEFAULT_DISPATCH_INTERVAL = 5000;
+
+  /** Default setting on job statistics collection */
+  static final boolean DEFAULT_JOB_STATISTICS = false;
 
   /** Default value for {@link #maxAttemptsBeforeErrorState} */
   private static final int MAX_FAILURE_BEFORE_ERROR_STATE = 1;
@@ -195,6 +201,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectoryService = null;
+
+  /** Whether to collect detailed job statistics */
+  protected boolean collectJobstats = false;
 
   protected Map<String, Object> persistenceProperties;
 
@@ -527,6 +536,16 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         heartbeatInterval = DEFAULT_HEART_BEAT;
       } else {
         logger.info("Dispatch interval set to {} minutes", heartbeatInterval);
+      }
+    }
+
+    String jobStatsString = StringUtils.trimToNull((String) properties.get(OPT_JOBSTATISTICS));
+    if (StringUtils.isNotBlank(jobStatsString)) {
+      try {
+        collectJobstats = Boolean.valueOf(jobStatsString);
+      } catch (Exception e) {
+        logger.warn("Job statistics collection flag '{}' is malformed, setting to {}", jobStatsString, DEFAULT_JOB_STATISTICS);
+        collectJobstats = DEFAULT_JOB_STATISTICS;
       }
     }
 
@@ -2374,8 +2393,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
         // FIXME: the stats are not currently used and the queries are very
         // expense in database time.
-        //jobsStatistics.updateAvg(getAvgOperations(em));
-        //jobsStatistics.updateJobCount(getCountPerHostService(em));
+        if (collectJobstats) {
+          jobsStatistics.updateAvg(getAvgOperations(em));
+          jobsStatistics.updateJobCount(getCountPerHostService(em));
+        }
 
         for (Job job : jobsToDispatch) {
 
