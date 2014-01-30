@@ -203,7 +203,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   protected OrganizationDirectoryService organizationDirectoryService = null;
 
   /** Whether to collect detailed job statistics */
-  protected boolean collectJobstats = false;
+  protected boolean collectJobstats = DEFAULT_JOB_STATISTICS;
 
   protected Map<String, Object> persistenceProperties;
 
