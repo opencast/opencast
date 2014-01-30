@@ -12,7 +12,7 @@
 </div>
 <br />
 <% _.each(this.data, function(acl) { %>
-<h2><%= acl.name %></h2><img title="Delete ACL" id="<%= acl.id %>" class="deleteAcl" alt="delete" src="/admin/img/icons/delete.png">
+<h2><%= acl.name %></h2><span title="Delete ACL" id="<%= acl.id %>" class="ui-icon ui-icon-trash deleteAcl" alt="delete" style="display:inline-block"></span>
 <table id="aclTable" class="ui-widget" width="600px" cellspacing="0" border="1">
 	<thead>
 		<tr>
@@ -28,14 +28,14 @@
 			<td><input type="text" class="role_search ui-autocomplete-input" value="<%= role.name %>" id="<%= role.name %>"></td>
 			<td class="privilege_edit"><input type="checkbox" class="privilege_edit" name="priv_read" <% if (role.read) { %> checked="checked" <% } %>></td>
 			<td class="privilege_edit"><input type="checkbox" class="privilege_edit" name="priv_write" <% if (role.write) { %> checked="checked" <% } %>></td>
-			<td class="privilege_edit"><img title="Delete Role" alt="delete" src="/admin/img/icons/delete.png"></td>
+			<td class="privilege_edit"><span class="ui-icon ui-icon-trash" title="Delete Role" alt="delete"></span></td>
 		</tr>		
 		<% }); %>
 		<tr>
 			<td><input type="text" class="role_search ui-autocomplete-input"></td>
 			<td class="privilege_edit"><input type="checkbox" class="privilege_edit" name="priv_read" checked="checked" disabled="disabled"></td>
 			<td class="privilege_edit"><input type="checkbox" class="privilege_edit" name="priv_write" disabled="disabled"></td>
-			<td class="privilege_edit"><img title="Delete Role" alt="delete" src="/admin/img/icons/delete.png" style="display: none;"></td>
+			<td class="privilege_edit"><span class="ui-icon ui-icon-trash" title="Delete Role" alt="delete" style="display: none;"></span></td>
 		</tr>
 	</tbody>
 </table>

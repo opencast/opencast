@@ -37,7 +37,7 @@
             <div class="series-schedule">
               <span><h3>Date</h3></span>
               <span><h3>Override</h3></span>
-              <span><h3>Acl</h3></span>
+              <span><h3>ACL</h3></span>
               <span><h3>Workflow</h3></span>
               <span></span>
             </div>
