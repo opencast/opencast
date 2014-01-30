@@ -97,6 +97,7 @@ var jumpBackTime = null;
 var currSplitItem = null;
 
 var lastId = -1;
+var inputFocused = false;
 
 var waveformImageLoadDone = false;
 var initialWaveformWidth = 0;
@@ -939,30 +940,48 @@ function splitRemoverClick() {
 function setSplitListItemButtonHandler() {
     $('.clipItem').timefield();
 
-    $('#clipBeginSet, #clipEndSet').button({
-        text: false,
-        icons: {
-            primary: "ui-icon-arrowthickstop-1-s"
-        }
-    });
+    /*
+      $('#clipBeginSet, #clipEndSet').button({
+      text: false,
+      icons: {
+      primary: "ui-icon-arrowthickstop-1-s"
+      }
+      });
 
-    $('#clipBeginSet').click(function() {
-	setCurrentTimeAsNewInpoint();
-    });
-    $('#clipEndSet').click(function() {
-	setCurrentTimeAsNewOutpoint();
-    });
+      $('#clipBeginSet').click(function() {
+      setCurrentTimeAsNewInpoint();
+      });
+      $('#clipEndSet').click(function() {
+      setCurrentTimeAsNewOutpoint();
+      });
+    */
 
     // add evtl handler for enter in editing fields
+    $('#clipBegin input').focus(function (e) {
+        inputFocused = true;
+    });
+    $('#clipEnd input').focus(function (e) {
+        inputFocused = true;
+    });
+    $('#clipBegin input').blur(function (e) {
+        inputFocused = false;
+        okButtonClick();
+    });
+    $('#clipEnd input').blur(function (e) {
+        inputFocused = false;
+        okButtonClick();
+    });
     $('#clipBegin input').keyup(function (e) {
         var keyCode = e.keyCode || e.which();
         if (keyCode == KEY_ENTER) {
+            inputFocused = false;
 	    okButtonClick();
         }
     });
     $('#clipEnd input').keyup(function (e) {
         var keyCode = e.keyCode || e.which();
         if (keyCode == KEY_ENTER) {
+            inputFocused = false;
 	    okButtonClick();
         }
     });
@@ -981,56 +1000,58 @@ function splitItemClick() {
 
         // if not disabled and not seeking
         if (/*!$(this).hasClass('disabled') &&*/ ((isSeeking && ($(this).prop('id').indexOf('Div-') == -1)) || !isSeeking)) {
-            // get the id of the split item
-            id = $(this).prop('id');
-            id = id.replace('splitItem-', '');
-            id = id.replace('splitItemDiv-', '');
-            id = id.replace('splitSegmentItem-', '');
+	    // get the id of the split item
+	    id = $(this).prop('id');
+	    id = id.replace('splitItem-', '');
+	    id = id.replace('splitItemDiv-', '');
+	    id = id.replace('splitSegmentItem-', '');
 	    $('#splitUUID').val(id);
 
 	    if(id != lastId) {
-		lastId = id;
+		if(!inputFocused) {
+		    lastId = id;
 
-		// remove all selected classes
-		$('.splitSegmentItem').removeClass('splitSegmentItemSelected');
-		$('.splitItem').removeClass('splitItemSelected');
-		$('.splitItemDiv').removeClass('splitSegmentItemSelected');
+		    // remove all selected classes
+		    $('.splitSegmentItem').removeClass('splitSegmentItemSelected');
+		    $('.splitItem').removeClass('splitItemSelected');
+		    $('.splitItemDiv').removeClass('splitSegmentItemSelected');
 
-		$('#clipBeginSet').remove();
-		$('#clipEndSet').remove();
-		$('#clipItemSpacer').remove();
-		$('#clipBegin').remove();
-		$('#clipEnd').remove();
+		    // $('#clipBeginSet').remove();
+		    // $('#clipEndSet').remove();
+		    $('#clipItemSpacer').remove();
+		    $('#clipBegin').remove();
+		    $('#clipEnd').remove();
 
-		$('.segmentButtons', '#splitItem-' + id).append(/*'<a id="clipBeginSet" class="frameButton" title="set current time as new inpoint"></a> ' + */'<span class="clipItem" id="clipBegin"></span><span id="clipItemSpacer"> - </span><span class="clipItem" id="clipEnd"></span>'/* + ' <a id="clipEndSet" class="frameButton" title="set current time as new outpoint"></a>'*/);
-		setSplitListItemButtonHandler();
+		    $('.segmentButtons', '#splitItem-' + id).append(/*'<a id="clipBeginSet" class="frameButton" title="set current time as new inpoint"></a> ' + */'<span class="clipItem" id="clipBegin"></span><span id="clipItemSpacer"> - </span><span class="clipItem" id="clipEnd"></span>'/* + ' <a id="clipEndSet" class="frameButton" title="set current time as new outpoint"></a>'*/);
+		    setSplitListItemButtonHandler();
 
-		$('#splitSegmentItem-' + id).removeClass('hover');
+		    $('#splitSegmentItem-' + id).removeClass('hover');
 
-		// load data into right box
-		splitItem = editor.splitData.splits[id];
-		editor.selectedSplit = splitItem;
-		editor.selectedSplit.id = parseInt(id);
-		setTimefieldTimeBegin(splitItem.clipBegin);
-		setTimefieldTimeEnd(splitItem.clipEnd);
-		$('#splitIndex').html(parseInt(id) + 1);
+		    // load data into right box
+		    splitItem = editor.splitData.splits[id];
+		    editor.selectedSplit = splitItem;
+		    editor.selectedSplit.id = parseInt(id);
+		    setTimefieldTimeBegin(splitItem.clipBegin);
+		    setTimefieldTimeEnd(splitItem.clipEnd);
+		    $('#splitIndex').html(parseInt(id) + 1);
 
-		// add the selected class to the corresponding items
-		$('#splitSegmentItem-' + id).addClass('splitSegmentItemSelected');
-		$('#splitItem-' + id).addClass('splitItemSelected');
-		$('#splitItemDiv-' + id).addClass('splitSegmentItemSelected');
+		    // add the selected class to the corresponding items
+		    $('#splitSegmentItem-' + id).addClass('splitSegmentItemSelected');
+		    $('#splitItem-' + id).addClass('splitItemSelected');
+		    $('#splitItemDiv-' + id).addClass('splitSegmentItemSelected');
 
-		currSplitItem = splitItem;
+		    currSplitItem = splitItem;
 
-		if (!timeoutUsed) {
-                    if (!currSplitItemClickedViaJQ) {
-			setCurrentTime(splitItem.clipBegin);
-                    }
-                    // update the current time of the player
-                    $('.video-timer').html(formatTime(getCurrentTime()) + "/" + formatTime(getDuration()));
+		    if (!timeoutUsed) {
+			if (!currSplitItemClickedViaJQ) {
+			    setCurrentTime(splitItem.clipBegin);
+			}
+			// update the current time of the player
+			$('.video-timer').html(formatTime(getCurrentTime()) + "/" + formatTime(getDuration()));
+		    }
 		}
 	    }
-        }
+	}
     }
 }
 
