@@ -431,9 +431,6 @@
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
         <module>modules/matterhorn-textextractor-tesseract</module>
-        <!--
-        <module>modules/matterhorn-textextractor-ocropus</module>
-        -->
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-impl</module>
@@ -475,9 +472,6 @@
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
         <module>modules/matterhorn-textextractor-tesseract</module>
-        <!--
-        <module>modules/matterhorn-textextractor-ocropus</module>
-        -->
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-impl</module>

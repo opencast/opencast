@@ -15,7 +15,11 @@
  */
 package org.opencastproject.workflow.handler;
 
-import org.apache.commons.io.FilenameUtils;
+import static org.opencastproject.util.data.Collections.nil;
+import static org.opencastproject.util.data.Collections.smap;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Tuple.tuple;
+
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.job.api.Job;
@@ -42,17 +46,13 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.SortedMap;
-
-import static java.lang.String.format;
-import static org.opencastproject.util.data.Collections.nil;
-import static org.opencastproject.util.data.Collections.smap;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 /**
  * The workflow definition creating a video from a still image.
@@ -82,9 +82,9 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * Callback for the OSGi declarative services configuration.
-   *
+   * 
    * @param composerService
-   *         the local composer service
+   *          the local composer service
    */
   public void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
@@ -93,9 +93,9 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
-   *
+   * 
    * @param workspace
-   *         an instance of the workspace
+   *          an instance of the workspace
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
@@ -103,7 +103,7 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -127,30 +127,29 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
   private WorkflowOperationResult imageToVideo(MediaPackage mp, WorkflowInstance wi) throws Exception {
     // read cfg
     final List<String> sourceTags = getCfg(wi, OPT_SOURCE_TAGS).map(asList).getOrElse(nil(String.class));
-    final Option<MediaPackageElementFlavor> sourceFlavor = getCfg(wi, OPT_SOURCE_FLAVOR).map(MediaPackageElementFlavor.parseFlavor);
+    final Option<MediaPackageElementFlavor> sourceFlavor = getCfg(wi, OPT_SOURCE_FLAVOR).map(
+            MediaPackageElementFlavor.parseFlavor);
     if (sourceFlavor.isNone() && sourceTags.isEmpty()) {
       logger.warn("No source tags or flavor are given to determine the image to use");
       return createResult(mp, Action.SKIP);
     }
     final List<String> targetTags = getCfg(wi, OPT_TARGET_TAGS).map(asList).getOrElse(nil(String.class));
-    final Option<MediaPackageElementFlavor> targetFlavor = getCfg(wi, OPT_TARGET_FLAVOR).map(MediaPackageElementFlavor.parseFlavor);
-    final long duration = getCfg(wi, OPT_DURATION).bind(Strings.toLong).getOrElse(this.<Long>cfgKeyMissing(OPT_DURATION));
-    final String profile = getCfg(wi, OPT_PROFILE).getOrElse(this.<String>cfgKeyMissing(OPT_PROFILE));
+    final Option<MediaPackageElementFlavor> targetFlavor = getCfg(wi, OPT_TARGET_FLAVOR).map(
+            MediaPackageElementFlavor.parseFlavor);
+    final double duration = getCfg(wi, OPT_DURATION).bind(Strings.toDouble).getOrElse(
+            this.<Double> cfgKeyMissing(OPT_DURATION));
+    final String profile = getCfg(wi, OPT_PROFILE).getOrElse(this.<String> cfgKeyMissing(OPT_PROFILE));
     // run image to video jobs
-    final List<Job> jobs =
-            Monadics.<MediaPackageElement>mlist(mp.getAttachments())
-                    .filter(sourceFlavor.map(Filters.matchesFlavor).getOrElse(Booleans.<MediaPackageElement>yes()))
-                    .filter(Filters.hasTagAny(sourceTags))
-                    .map(Misc.<MediaPackageElement, Attachment>cast())
-                    .map(imageToVideo(profile, duration)).value();
+    final List<Job> jobs = Monadics.<MediaPackageElement> mlist(mp.getAttachments())
+            .filter(sourceFlavor.map(Filters.matchesFlavor).getOrElse(Booleans.<MediaPackageElement> yes()))
+            .filter(Filters.hasTagAny(sourceTags)).map(Misc.<MediaPackageElement, Attachment> cast())
+            .map(imageToVideo(profile, duration)).value();
     if (JobUtil.waitForJobs(serviceRegistry, jobs).isSuccess()) {
       for (final Job job : jobs) {
         if (job.getPayload().length() > 0) {
           Track track = (Track) MediaPackageElementParser.getFromXml(job.getPayload());
-          track.setURI(workspace.moveTo(track.getURI(),
-                                        mp.getIdentifier().toString(),
-                                        track.getIdentifier(),
-                                        FilenameUtils.getName(track.getURI().toString())));
+          track.setURI(workspace.moveTo(track.getURI(), mp.getIdentifier().toString(), track.getIdentifier(),
+                  FilenameUtils.getName(track.getURI().toString())));
           // Adjust the target tags
           for (String tag : targetTags) {
             track.addTag(tag);
@@ -168,7 +167,8 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
         }
       }
       return createResult(mp, Action.CONTINUE, mlist(jobs).foldl(0L, new Function2<Long, Job, Long>() {
-        @Override public Long apply(Long max, Job job) {
+        @Override
+        public Long apply(Long max, Job job) {
           return Math.max(max, job.getQueueTime());
         }
       }));
@@ -178,10 +178,11 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
   }
 
   /** Returned function may throw exceptions. */
-  private Function<Attachment, Job> imageToVideo(final String profile, final long duration) {
+  private Function<Attachment, Job> imageToVideo(final String profile, final double duration) {
     return new Function.X<Attachment, Job>() {
-      @Override protected Job xapply(Attachment attachment) throws MediaPackageException, EncoderException {
-        logger.info(format("Converting image %s to a video of %d sec", attachment.getURI(), duration));
+      @Override
+      protected Job xapply(Attachment attachment) throws MediaPackageException, EncoderException {
+        logger.info("Converting image {} to a video of {} sec", attachment.getURI().toString(), duration);
         return composerService.imageToVideo(attachment, profile, duration);
       }
     };

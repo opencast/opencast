@@ -923,7 +923,10 @@ opencast.episode = (function() {
 
       function mkWorkflow(json) {
         var started = new Date(ocUtils.first(json.operations.operation).started);
-        var completed = new Date(ocUtils.last(json.operations.operation).completed);
+        var lastOp = ocUtils.last(json.operations.operation);
+        // Not all operations have a completed field, e.g. those that are SKIPPED so we can't simply
+        // use this property.
+        var completed = new Date(!_.isUndefined(lastOp.completed) ? lastOp.completed : lastOp.started);
         return {
           id: json.id,
           title: workflowDisplayName(json),

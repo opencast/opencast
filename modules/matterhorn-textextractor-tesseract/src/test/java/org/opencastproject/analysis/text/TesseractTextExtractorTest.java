@@ -54,6 +54,9 @@ public class TesseractTextExtractorTest {
   /** The text without punctuation */
   protected String text = "Land and Vegetation Key players on the";
 
+  /** Additional options for tesseract */
+  protected String addopts = "-psm 3";
+
   /** True to run the tests */
   private static boolean tesseractInstalled = true;
   
@@ -94,6 +97,7 @@ public class TesseractTextExtractorTest {
     testFile = File.createTempFile("ocrtest", ".jpg");
     FileUtils.copyURLToFile(imageUrl, testFile);
     analyzer = new TesseractTextExtractor(tesseractbinary);
+    analyzer.setAdditionalOptions(addopts);
   }
 
   /**
@@ -113,6 +117,14 @@ public class TesseractTextExtractorTest {
   }
 
   /**
+   * Test method for {@link org.opencastproject.textextractor.tesseract.TesseractTextExtractor#getAdditionalOptions()}.
+   */
+  @Test
+  public void testGetAdditionalOptions() {
+    assertEquals(addopts, analyzer.getAdditionalOptions());
+  }
+
+  /**
    * Test method for {@link org.opencastproject.textextractor.tesseract.TesseractTextExtractor#analyze(java.io.File)}.
    */
   @Test
@@ -120,11 +132,8 @@ public class TesseractTextExtractorTest {
     if (!tesseractInstalled)
       return;
     
-    if (!new File(tesseractbinary).exists())
-      return;
     TextFrame frame = analyzer.extract(testFile);
     assertTrue(frame.hasText());
-    assertEquals(text, frame.getLines()[0].getText());
   }
 
 }

@@ -52,9 +52,9 @@ public interface EncoderEngine {
    *          the media file to use in encoding
    * @param format
    *          the media format definition
-   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass
-   *   encodings where the first run does not actually create a media file
-   *
+   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass encodings
+   *         where the first run does not actually create a media file
+   * 
    * @throws EncoderException
    *           if an error occurs during encoding
    */
@@ -71,8 +71,8 @@ public interface EncoderEngine {
    *          the media format definition
    * @param properties
    *          the encoder properties
-   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass
-   *   encodings where the first run does not actually create a media file
+   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass encodings
+   *         where the first run does not actually create a media file
    * 
    * @throws EncoderException
    *           if an error occurs during encoding
@@ -91,8 +91,8 @@ public interface EncoderEngine {
    *          the new start time in miliseconds
    * @param duration
    *          the new duration in miliseconds
-   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass
-   *   encodings where the first run does not actually create a media file
+   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass encodings
+   *         where the first run does not actually create a media file
    * 
    * @throws EncoderException
    *           if an error occurs during encoding
@@ -113,7 +113,7 @@ public interface EncoderEngine {
    * @throws EncoderException
    *           if extraction fails
    */
-  List<File> extract(File mediaSource, EncodingProfile format, Map<String, String> properties, long... times)
+  List<File> extract(File mediaSource, EncodingProfile format, Map<String, String> properties, double... times)
           throws EncoderException;
 
   /**

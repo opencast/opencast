@@ -204,6 +204,7 @@
               OSGI-INF/operations/composite.xml,
               OSGI-INF/operations/concat.xml,
               OSGI-INF/operations/coverart.xml,
+              OSGI-INF/operations/delete-archive.xml,
               OSGI-INF/operations/distribute-acl.xml,
               OSGI-INF/operations/distribute-mediapackagepost.xml,
               OSGI-INF/operations/download-dvd.xml,
