@@ -158,7 +158,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   static final long DEFAULT_DISPATCH_INTERVAL = 5000;
 
   /** Default setting on job statistics collection */
-  static final boolean DEFAULT_JOB_STATISTICS = false;
+  static final boolean DEFAULT_JOB_STATISTICS = true;
 
   /** Default value for {@link #maxAttemptsBeforeErrorState} */
   private static final int MAX_FAILURE_BEFORE_ERROR_STATE = 1;
