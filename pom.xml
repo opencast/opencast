@@ -17,7 +17,7 @@
     <matterhorn.basedir>${basedir}</matterhorn.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <checkstyle.skip>true</checkstyle.skip>
+    <checkstyle.skip>false</checkstyle.skip>
     <jmeter.version>2.4</jmeter.version>
     <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
   </properties>
@@ -764,6 +764,7 @@
         <directory>${project.basedir}/src/test/resources</directory>
       </testResource>
     </testResources>
+    <!-- This defines what plugins run on a global basis.  Plugins defined here run for all child poms without needing to reference them from the child pom.  Note that configuration data goes in the pluginManagement stanza below -->
     <plugins>
       <!-- Require Java 6 or higher for building -->
       <plugin>
@@ -862,7 +863,12 @@
         <artifactId>maven-clover2-plugin</artifactId>
         <version>3.1.5</version>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+      </plugin>
     </plugins>
+    <!-- This defines the global plugin configurations.  Plugins with configuration shared across multiple child poms should be configured here, and then referenced in the child. -->
     <pluginManagement>
       <plugins>
         <!-- Fix eclipse (indigo) maven integration -->
@@ -990,7 +996,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>2.0.1</version>
+          <version>3.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -1026,6 +1032,42 @@
               <id>performance-test</id>
               <goals>
                 <goal>jmeter</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>1.7</version>
+          <configuration>
+            <sources>
+              <source>${basedir}/src/main/resources/</source>
+            </sources>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>add-source</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>3.0.1</version>
+          <configuration>
+            <!--<includeTests>true</includeTests>-->
+            <typeResolution>true</typeResolution>
+            <targetJdk>1.6</targetJdk>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>validate</phase>
+              <goals>
+                <goal>pmd</goal>
+                <goal>cpd</goal>
               </goals>
             </execution>
           </executions>
@@ -1997,6 +2039,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
         <version>2.5</version>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -2008,7 +2053,7 @@
           <!-- <detectLinks>true</detectLinks> -->
           <!-- http://jira.codehaus.org/browse/MJAVADOC-273 -->
           <detectJavaApiLink>true</detectJavaApiLink>
-          <javadocVersion>1.6</javadocVersion>
+          <javadocVersion>1.7</javadocVersion>
           <maxmemory>512m</maxmemory>
           <quiet>true</quiet>
         </configuration>
@@ -2017,6 +2062,13 @@
             <id>default</id>
             <reports>
               <report>javadoc</report>
+            </reports>
+          </reportSet>
+          <reportSet>
+            <id>aggregate</id>
+            <inherited>false</inherited>
+            <reports>
+              <report>aggregate</report>
             </reports>
           </reportSet>
         </reportSets>
@@ -2030,6 +2082,15 @@
           <inputEncoding>UTF-8</inputEncoding>
           <outputEncoding>UTF-8</outputEncoding>
         </configuration>
+        <!--<reportSets>
+          <reportSet>
+            <id>aggregate</id>
+            <inherited>false</inherited>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>-->
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -2038,18 +2099,30 @@
         <configuration>
           <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
         </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>cim</report>
+              <report>dependencies</report>
+              <report>dependency-convergence</report>
+<!--3.3              <report>dependency-info</report>-->
+              <report>dependency-management</report>
+<!--3.3              <report>distribution-management</report>-->
+              <report>index</report>
+              <report>issue-tracking</report>
+<!--              <report>license</report>-->
+              <report>mailing-list</report>
+<!--3.3              <report>modules</report>-->
+              <report>plugin-management</report>
+              <report>plugins</report>
+              <report>project-team</report>
+              <report>scm</report>
+              <report>summary</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
-      <!-- findbugs crashes the build too much -AZ -->
-      <!-- <plugin> -->
-      <!-- <groupId>org.codehaus.mojo</groupId> -->
-      <!-- <artifactId>findbugs-maven-plugin</artifactId> -->
-      <!-- <version>2.3</version> -->
-      <!-- <configuration> -->
-      <!-- <failOnError>false</failOnError> -->
-      <!-- <timeout>30000</timeout> -->
-      <!-- </configuration> -->
-      <!-- </plugin> -->
-      <plugin>
+      <!--<plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
         <version>2.4</version>
@@ -2062,17 +2135,29 @@
           </tags>
         </configuration>
       </plugin>
-      <!-- WARNING: this plugin is beta only, we should maybe not use it -AZ -->
+      <!- - WARNING: this plugin is beta only, we should maybe not use it -AZ - ->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jdepend-maven-plugin</artifactId>
         <version>2.0-beta-2</version>
       </plugin>
+      -->
       <!-- <plugin> -->
       <!-- <groupId>org.codehaus.mojo</groupId> -->
       <!-- <artifactId>cobertura-maven-plugin</artifactId> -->
       <!-- <version>2.3</version> -->
       <!-- </plugin> -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.0.1</version>
+        <configuration>
+          <aggregate>true</aggregate>
+          <!--<includeTests>true</includeTests>-->
+          <typeResolution>true</typeResolution>
+          <targetJdk>1.6</targetJdk>
+        </configuration>
+      </plugin>
     </plugins>
   </reporting>
   <!-- defines the various repositories -->
