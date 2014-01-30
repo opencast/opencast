@@ -8,6 +8,7 @@ body {
     float: right;
     width: 500px;
     margin-top: 5px;
+    margin-right: 2%;
 }
 
 #slider-waveform-zoom {
@@ -104,7 +105,7 @@ a.secondaryButton:hover,a.secondaryButton:focus {
 
 #editor {
   height: 350px;
-  width: 90%;
+  width: 95%;
 }
 
 #shortcuts {
@@ -113,78 +114,48 @@ a.secondaryButton:hover,a.secondaryButton:focus {
 
 #boxes {
   padding-left: 0px;
-  padding-top: 20px;
+  /* padding-top: 20px; */
   width: 100%;
   float: left;
-  min-width: 1131px;
+  min-width: 785px;
 }
 
-#leftBoxDescription {
-  font-weight:bold;
-  float: left;
-  width: 300px;
-}
-
-#midBoxDescription {
-  font-weight:bold;
-  float: left;
-  margin-left: 10px;
-  width: 400px;
-}
-
-#midBoxDescription2 {
-  margin-top: 10px;
-  font-weight:bold;
-  float: left;
-  margin-left: 10px;
-  width: 400px;
-}
-
-#rightBoxDescription {
-  font-weight:bold;
-  float: left;
-  margin-left: 10px;
-  width: 300px;
-}
-
-#leftBox {
-  float: left;
-  border: 1px solid black;
-  width: 300px;
+#splitElementsHolder {
   height: 340px;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
-.box_mid {
-  text-align: right;
+#segment_list_actions {
+    float: right;
 }
 
-#bigMidBox {
+#leftBoxDescription {
+  font-weight:bold;
   float: left;
-  width: 440px;
+  width: 69%;
 }
 
-#midBox {
-  float: left;
-  border: 1px solid black;
-  margin-left: 10px;
-  width: 430px;
-}
-
-#midBox2 {
+#leftBox {
   float: left;
   border: 1px solid black;
+  width: 69%;
+  height: 400px;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+#rightBoxDescription {
+  font-weight:bold;
+  float: right;
   margin-left: 10px;
-  margin-top: 0px;
-  width: 430px;
+  width: 26%;
 }
 
 #rightBox {
-  float: left;
+  float: right;
   border: 1px solid black;
-  margin-left: 10px;
-  width: 350px;
+  width: 26%;
 }
 
 #rightBox table {
@@ -199,8 +170,6 @@ a.secondaryButton:hover,a.secondaryButton:focus {
 #newTime {
   margin-left: 10px;
   margin-top: 10px;
-  float: left;
-  width: 350px;
 }
 
 #shortcuts {
@@ -231,12 +200,6 @@ a.secondaryButton:hover,a.secondaryButton:focus {
 #rightBox input {
   width: 95px;
   margin-top: 10px;
-}
-
-#midBox textarea {
-  margin-bottom: 5px;
-  width: 100%;
-  height: 70px;
 }
 
 #descriptionDiv {
@@ -332,13 +295,6 @@ a.secondaryButton:hover,a.secondaryButton:focus {
   z-index: 0;
 }
 
-.splitItemDiv {
-  height: 100%;
-  width: 100%;
-  z-index: 0;
-  position: absolute;
-}
-
 .splitItemSelected {
   border: 1px solid #0000FF;
   background-color: #79c966;
@@ -347,9 +303,9 @@ a.secondaryButton:hover,a.secondaryButton:focus {
 
 .disabled {
   background-color: #ce4f4f;
-  color: #000000;
-  opacity: 0.6;
-  filter: alpha(opacity = 60); /* For IE8 and earlier */
+  /* color: #000000; */
+  /* opacity: 0.6; */
+  /* filter: alpha(opacity = 60); */ /* For IE8 and earlier */
 }
 
 .hover {
@@ -366,6 +322,31 @@ a.secondaryButton:hover,a.secondaryButton:focus {
   text-align: center;
   border-bottom: 1px solid black;
   border-right: 1px solid black;
+}
+
+.splitItemDiv {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+  position: absolute;
+}
+
+.splitItemBoxUp {
+    height: 39%;
+}
+
+.splitItemBoxDown {
+    height: 60%;
+}
+
+.segmentButtons {
+    float: left;
+    width: 80%;
+}
+
+.splitRemoverDiv {
+    float: right;
+    width: 10%;
 }
 
 .splitText {
@@ -415,13 +396,4 @@ a.secondaryButton:hover,a.secondaryButton:focus {
   -webkit-transition: all 0.2s ease-in-out;
   -o-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out; 
-}
-
-.magnifyarea { /* CSS to add shadow to magnified image. Optional */
-  box-shadow: 5px 5px 7px #818181;
-  -webkit-box-shadow: 5px 5px 7px #818181;
-  -moz-box-shadow: 5px 5px 7px #818181;
-  filter: progid:DXImageTransform.Microsoft.dropShadow(color=#818181, offX=5,
-    offY=5, positive=true );
-  background: white;
 }

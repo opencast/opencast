@@ -96,6 +96,9 @@ var currEvt = null;
 var jumpBackTime = null;
 var currSplitItem = null;
 
+var lastId = -1;
+var inputFocused = false;
+
 var waveformImageLoadDone = false;
 var initialWaveformWidth = 0;
 var currentWaveformWidth = 0;
@@ -491,9 +494,9 @@ editor.updateSplitList = function (dontClickCancel) {
 	    }
 	});
 	tmpTime = (tmpTime >= 0) ? tmpTime : 0;
-	$('#newTime').html("Duration after trimming: " + formatTime(tmpTime.toFixed(4)));
+	$('#newTime').html("Final duration: " + formatTime(tmpTime.toFixed(4)));
 
-	$('#leftBox').html($('#splitElements').jqote(editor.splitData));
+	$('#splitElementsHolder').html($('#splitElements').jqote(editor.splitData));
 	$('#splitSegments').html($('#splitSegmentTemplate').jqote(editor.splitData));
 	$('.splitItemDiv').click(splitItemClick);
 	$('.splitSegmentItem').click(splitItemClick);
@@ -714,8 +717,8 @@ function formatTime(seconds) {
         if (indexOfSDot != -1) {
             ms = ms.substr(indexOfSDot + 1, ms.length);
         }
-        ms = ms.substr(0, 4);
-        while (ms.length < 4) {
+        ms = ms.substr(0, 2);
+        while (ms.length < 2) {
             ms += "0";
         }
     }
@@ -778,7 +781,6 @@ function checkPrevAndNext(id) {
         }
         if (getTimefieldTimeBegin() != 0) {
             var newSplitItem = {
-                description: "",
                 clipBegin: 0,
                 clipEnd: splitItem.clipBegin,
                 enabled: true
@@ -792,7 +794,6 @@ function checkPrevAndNext(id) {
         var duration = getDuration();
         if (getTimefieldTimeEnd() != duration) {
             var newLastItem = {
-                description: "",
                 clipBegin: editor.splitData.splits[id].clipEnd,
                 clipEnd: duration,
                 enabled: true
@@ -846,12 +847,10 @@ function okButtonClick() {
 
             var tmpBegin = splitItem.clipBegin;
             var tmpEnd = splitItem.clipEnd;
-            var tmpDescription = splitItem.description;
 
             splitItem = editor.splitData.splits[id];
             splitItem.clipBegin = getTimefieldTimeBegin();
             splitItem.clipEnd = getTimefieldTimeEnd();
-            splitItem.description = $('#splitDescription').val();
             if (checkPrevAndNext(id)) {
                 editor.updateSplitList(true);
                 $('#videoPlayer').focus();
@@ -860,7 +859,6 @@ function okButtonClick() {
                 splitItem = editor.splitData.splits[id];
                 splitItem.clipBegin = tmpBegin;
                 splitItem.clipEnd = tmpEnd;
-                splitItem.description = tmpDescription;
                 selectSegmentListElement(id);
             }
         }
@@ -873,7 +871,6 @@ function okButtonClick() {
  * click handler for canceling editing
  */
 function cancelButtonClick() {
-    $('#splitDescription').html('');
     $('#splitUUID').val('');
     $('#splitDescription').val("");
     setTimefieldTimeBegin(0);
@@ -882,7 +879,6 @@ function cancelButtonClick() {
     $('.splitItem').removeClass('splitItemSelected');
     $('.splitSegmentItem').removeClass('splitSegmentItemSelected');
     editor.selectedSplit = null;
-    enableInspectorBox(false);
 }
 
 /**
@@ -904,24 +900,6 @@ function splitRemoverClick() {
     id = parseInt(id);
     if(editor.splitData.splits[id]) {
 	if (editor.splitData.splits[id].enabled) {
-	    /*
-	      $('#deleteDialog').dialog({
-	      buttons: {
-	      "Yes": function () {
-	      $('#splitItemDiv-' + id).addClass('disabled');
-	      $('#splitRemover-' + id).hide();
-	      $('#splitAdder-' + id).show();
-	      $('.splitItem').removeClass('splitItemSelected');
-	      $(this).dialog('close');
-	      setEnabled(id, false);
-	      },
-	      "No": function () {
-	      $(this).dialog('close')
-	      }
-	      },
-	      title: "Remove Item?"
-	      });
-	    */
 	    $('#splitItemDiv-' + id).addClass('disabled');
 	    $('#splitRemover-' + id).hide();
 	    $('#splitAdder-' + id).show();
@@ -959,6 +937,56 @@ function splitRemoverClick() {
     cancelButtonClick();
 }
 
+function setSplitListItemButtonHandler() {
+    $('.clipItem').timefield();
+
+    /*
+      $('#clipBeginSet, #clipEndSet').button({
+      text: false,
+      icons: {
+      primary: "ui-icon-arrowthickstop-1-s"
+      }
+      });
+
+      $('#clipBeginSet').click(function() {
+      setCurrentTimeAsNewInpoint();
+      });
+      $('#clipEndSet').click(function() {
+      setCurrentTimeAsNewOutpoint();
+      });
+    */
+
+    // add evtl handler for enter in editing fields
+    $('#clipBegin input').focus(function (e) {
+        inputFocused = true;
+    });
+    $('#clipEnd input').focus(function (e) {
+        inputFocused = true;
+    });
+    $('#clipBegin input').blur(function (e) {
+        inputFocused = false;
+        okButtonClick();
+    });
+    $('#clipEnd input').blur(function (e) {
+        inputFocused = false;
+        okButtonClick();
+    });
+    $('#clipBegin input').keyup(function (e) {
+        var keyCode = e.keyCode || e.which();
+        if (keyCode == KEY_ENTER) {
+            inputFocused = false;
+	    okButtonClick();
+        }
+    });
+    $('#clipEnd input').keyup(function (e) {
+        var keyCode = e.keyCode || e.which();
+        if (keyCode == KEY_ENTER) {
+            inputFocused = false;
+	    okButtonClick();
+        }
+    });
+}
+
 /**
  * click handler for selecting a split item in segment bar or list
  */
@@ -971,45 +999,59 @@ function splitItemClick() {
         lastTimeSplitItemClick = now;
 
         // if not disabled and not seeking
-        if (!$(this).hasClass('disabled') && ((isSeeking && ($(this).prop('id').indexOf('Div-') == -1)) || !isSeeking)) {
-            // remove all selected classes
-            $('.splitSegmentItem').removeClass('splitSegmentItemSelected');
-            $('.splitItem').removeClass('splitItemSelected');
+        if (/*!$(this).hasClass('disabled') &&*/ ((isSeeking && ($(this).prop('id').indexOf('Div-') == -1)) || !isSeeking)) {
+	    // get the id of the split item
+	    id = $(this).prop('id');
+	    id = id.replace('splitItem-', '');
+	    id = id.replace('splitItemDiv-', '');
+	    id = id.replace('splitSegmentItem-', '');
+	    $('#splitUUID').val(id);
 
-            // get the id of the split item
-            id = $(this).prop('id');
-            id = id.replace('splitItem-', '');
-            id = id.replace('splitItemDiv-', '');
-            id = id.replace('splitSegmentItem-', '');
+	    if(id != lastId) {
+		if(!inputFocused) {
+		    lastId = id;
 
-            // add the selected class to the corresponding items
-            $('#splitItem-' + id).addClass('splitItemSelected');
-            $('#splitSegmentItem-' + id).addClass('splitSegmentItemSelected');
+		    // remove all selected classes
+		    $('.splitSegmentItem').removeClass('splitSegmentItemSelected');
+		    $('.splitItem').removeClass('splitItemSelected');
+		    $('.splitItemDiv').removeClass('splitSegmentItemSelected');
 
-            $('#splitSegmentItem-' + id).removeClass('hover');
+		    // $('#clipBeginSet').remove();
+		    // $('#clipEndSet').remove();
+		    $('#clipItemSpacer').remove();
+		    $('#clipBegin').remove();
+		    $('#clipEnd').remove();
 
-            // load data into right box
-            splitItem = editor.splitData.splits[id];
-            editor.selectedSplit = splitItem;
-            editor.selectedSplit.id = parseInt(id);
-            $('#splitDescription').val(splitItem.description);
-            $('#splitUUID').val(id);
-            setTimefieldTimeBegin(splitItem.clipBegin);
-            setTimefieldTimeEnd(splitItem.clipEnd);
-            $('#splitIndex').html(parseInt(id) + 1);
+		    $('.segmentButtons', '#splitItem-' + id).append(/*'<a id="clipBeginSet" class="frameButton" title="set current time as new inpoint"></a> ' + */'<span class="clipItem" id="clipBegin"></span><span id="clipItemSpacer"> - </span><span class="clipItem" id="clipEnd"></span>'/* + ' <a id="clipEndSet" class="frameButton" title="set current time as new outpoint"></a>'*/);
+		    setSplitListItemButtonHandler();
 
-            currSplitItem = splitItem;
+		    $('#splitSegmentItem-' + id).removeClass('hover');
 
-            if (!timeoutUsed) {
-                if (!currSplitItemClickedViaJQ) {
-                    setCurrentTime(splitItem.clipBegin);
-                }
-                // update the current time of the player
-                $('.video-timer').html(formatTime(getCurrentTime()) + "/" + formatTime(getDuration()));
-            }
+		    // load data into right box
+		    splitItem = editor.splitData.splits[id];
+		    editor.selectedSplit = splitItem;
+		    editor.selectedSplit.id = parseInt(id);
+		    setTimefieldTimeBegin(splitItem.clipBegin);
+		    setTimefieldTimeEnd(splitItem.clipEnd);
+		    $('#splitIndex').html(parseInt(id) + 1);
 
-            enableInspectorBox(true);
-        }
+		    // add the selected class to the corresponding items
+		    $('#splitSegmentItem-' + id).addClass('splitSegmentItemSelected');
+		    $('#splitItem-' + id).addClass('splitItemSelected');
+		    $('#splitItemDiv-' + id).addClass('splitSegmentItemSelected');
+
+		    currSplitItem = splitItem;
+
+		    if (!timeoutUsed) {
+			if (!currSplitItemClickedViaJQ) {
+			    setCurrentTime(splitItem.clipBegin);
+			}
+			// update the current time of the player
+			$('.video-timer').html(formatTime(getCurrentTime()) + "/" + formatTime(getDuration()));
+		    }
+		}
+	    }
+	}
     }
 }
 
@@ -1030,8 +1072,7 @@ function splitButtonClick() {
             var newItem = {
                 clipBegin: currentTime,
                 clipEnd: newEnd,
-                enabled: true,
-                description: ""
+                enabled: true
             }
             splitItem.clipEnd = currentTime;
             editor.splitData.splits.splice(i + 1, 0, newItem);
@@ -1050,35 +1091,43 @@ function splitButtonClick() {
 /**
  * select the split segment at the current time
  */
-function selectCurrentSplitItem() {
+function selectCurrentSplitItem(excludeDeletedSegments) {
+    excludeDeletedSegments = excludeDeletedSegments || false;
     var splitItem = getCurrentSplitItem();
     if (splitItem != null) {
 	var idFound = false;
 	var id = -1;
-	if(splitItem.enabled) {
-	    id = splitItem.id;
-	    idFound = true;
-	} else {
-	    for(var i = splitItem.id; i < editor.splitData.splits.length; ++i) {
-		if(editor.splitData.splits[i].enabled) {
-		    idFound = true;
-		    id = i;
-		    break;
-		}
-	    }
-	    if(!idFound) {
-		for(var i = splitItem.id; i >= 0; --i) {
+	if(excludeDeletedSegments) {
+	    if(splitItem.enabled) {
+		id = splitItem.id;
+		idFound = true;
+	    } else {
+		for(var i = splitItem.id; i < editor.splitData.splits.length; ++i) {
 		    if(editor.splitData.splits[i].enabled) {
 			idFound = true;
 			id = i;
 			break;
 		    }
 		}
+		if(!idFound) {
+		    for(var i = splitItem.id; i >= 0; --i) {
+			if(editor.splitData.splits[i].enabled) {
+			    idFound = true;
+			    id = i;
+			    break;
+			}
+		    }
+		}
 	    }
+	}
+	else {
+	    id = splitItem.id;
+	    idFound = true;
 	}
 	if(idFound) {
 	    currSplitItemClickedViaJQ = true;
 	    $('#splitSegmentItem-' + id).click();
+	    lastId = -1;
 	    $('#descriptionCurrentTime').html(formatTime(getCurrentTime()));
 	} else {
 	    ocUtils.log("Could not find an enabled ID");
@@ -1129,24 +1178,6 @@ function displayError(errorMsg, errorTitle) {
  */
 function updateCurrentTime() {
     $('#current_time').html(formatTime(getCurrentTime()));
-}
-
-/**
- * enable/disable the right editing box
- * 
- * @param enabled
- *          whether enabled or not
- */
-function enableInspectorBox(enabled) {
-    if (enabled) {
-        $('#midBox :input').removeProp('disabled');
-        $('.frameButton').button("enable");
-        $('#descriptionCurrentTimeDiv').show();
-    } else {
-        $('#midBox :input').prop('disabled', 'disabled');
-        $('.frameButton').button("disable");
-        $('#descriptionCurrentTimeDiv').hide();
-    }
 }
 
 /******************************************************************************/
@@ -1701,16 +1732,6 @@ function addShortcuts() {
  * init the playbuttons in the editing box
  */
 function initPlayButtons() {
-    $('#clipBeginSet, #clipEndSet').button({
-        text: false,
-        icons: {
-            primary: "ui-icon-arrowthickstop-1-s"
-        }
-    });
-
-    $('#clipBeginSet').click(setCurrentTimeAsNewInpoint);
-    $('#clipEndSet').click(setCurrentTimeAsNewOutpoint);
-
     $('#shortcuts').button();
     $('#shortcuts').click(function () {
 	$("#rightBoxDescription").toggle();
@@ -1725,8 +1746,7 @@ function initPlayButtons() {
         editor.splitData.splits.push({
             clipBegin: 0,
             clipEnd: workflowInstance.mediapackage.duration / 1000,
-            enabled: true,
-            description: ""
+            enabled: true
         });
         editor.updateSplitList();
         selectSegmentListElement(0);
@@ -1822,20 +1842,6 @@ function prepareUI() {
         selectCurrentSplitItem();
     });
 
-    // add evtl handler for enter in editing fields
-    $('#clipBegin input').keyup(function (e) {
-        var keyCode = e.keyCode || e.which();
-        if (keyCode == KEY_ENTER) {
-            okButtonClick();
-        }
-    });
-    $('#clipEnd input').keyup(function (e) {
-        var keyCode = e.keyCode || e.which();
-        if (keyCode == KEY_ENTER) {
-            okButtonClick();
-        }
-    });
-
     selectCurrentSplitItem();
 }
 
@@ -1864,15 +1870,13 @@ function parseInitialSMIL() {
 			editor.splitData.splits.push({
                             clipBegin: 0,
                             clipEnd: clipBegin,
-                            enabled: false,
-                            description: ""
+                            enabled: false
 			});
                     }
                     editor.splitData.splits.push({
 			clipBegin: clipBegin,
 			clipEnd: clipEnd,
-			enabled: true,
-			description: value.video[0].description ? value.video[0].description : ""
+			enabled: true
                     });
 
 		    checkPrevAndNext(editor.splitData.splits.length - 1);
@@ -1885,8 +1889,7 @@ function parseInitialSMIL() {
                       editor.splitData.splits.push({
                       clipBegin: clipEnd,
                       clipEnd: editor.parsedSmil.trackDuration,
-                      enabled: false,
-                      description: ""
+                      enabled: false
                       });
                       }
 		    */
@@ -1905,8 +1908,7 @@ function parseInitialSMIL() {
 	editor.splitData.splits.push({
 	    clipBegin: 0,
 	    clipEnd: editor.mediapackageParser.duration / 1000,
-	    enabled: true,
-	    description: ""
+	    enabled: true
 	});
     }
     window.setTimeout(function () {
@@ -1941,6 +1943,8 @@ function playerReady() {
     if (!editor.ready) {
         editor.ready = true;
 
+	$("#cancelButton").css("color", "#FFFFFF");
+
         // create additional data output
         $('#videoHolder').append('<div id="segmentsWaveform"></div>');
         $('#segmentsWaveform').append('<div id="splitSegments"></div>');
@@ -1955,8 +1959,7 @@ function playerReady() {
         editor.splitData.splits.push({
             clipBegin: 0,
             clipEnd: workflowInstance.mediapackage.duration / 1000,
-            enabled: true,
-            description: ""
+            enabled: true
         });
 
         editor.smil = null;
@@ -1994,7 +1997,6 @@ $(document).ready(function () {
     editor.player.on("canplay", playerReady);
     editor.player.on("seeking", isSeeking);
     editor.player.on("seeked", hasSeeked);
-    $('.clipItem').timefield();
     $('.video-split-button').click(splitButtonClick);
     $('#okButton').click(okButtonClick);
     $('#cancelButton').click(cancelButtonClick);
@@ -2004,12 +2006,8 @@ $(document).ready(function () {
     $('#cancelButton').button();
     $('#okButton').button();
     
-    enableInspectorBox(false);
     initPlayButtons();
     addShortcuts();
-
-    checkClipBegin();
-    checkClipEnd();
 
     $(document).keydown(function (e) {
         var keyCode = e.keyCode || e.which();
