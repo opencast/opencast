@@ -88,7 +88,7 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
 
   /** Property key for the feed entry link template */
   public static final String PROP_ENTRY = "feed.entry";
-  
+
   /** Property key for the feed entry rel=self link template */
   public static final String PROP_SELF = "feed.self";
 
@@ -128,7 +128,7 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
 
   /**
    * Creates a new abstract feed generator.
-   * 
+   *
    * @param uri
    *          the feed identifier
    * @param feedHome
@@ -147,7 +147,7 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.api.FeedGenerator#accept(java.lang.String[])
    */
   public boolean accept(String[] query) {
@@ -161,35 +161,35 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
       logger.debug("{} denies to handle unknown request", this);
       return false;
     }
-    
+
     //truncate uri, as it had to be and real uri not an id
-    
+
     String id = extractId(uri);
-    
+
     // Check the uri
     if (!query[0].equalsIgnoreCase(id)) {
       logger.debug("{} denies to handle request for {}", this, query);
       return false;
     }
-    
-    // Check the selector 
+
+    // Check the selector
     if (selector != null && (query.length < 2 || !query[1].equalsIgnoreCase(selector))) {
       return false;
     }
-    
+
     logger.debug("{} accepts to handle request for {}", this, query);
     return true;
   }
 
   protected String extractId(String uri) {
-	String id = uri.substring(uri.lastIndexOf("/") + 1);
-	if (id == null) return uri;
-	return id;
+  String id = uri.substring(uri.lastIndexOf("/") + 1);
+  if (id == null) return uri;
+  return id;
 }
 
 /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#loadFeedData(org.opencastproject.feed.api.Feed.Type,
    *      java.lang.String[], int, int)
    */
@@ -197,16 +197,16 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.api.FeedGenerator#initialize(java.util.Properties)
    */
   @Override
   public void initialize(Properties properties) {
     serverUrl = (String) properties.get("org.opencastproject.engage.ui.url");
-    if (serverUrl == null) serverUrl = (String) properties.get("org.opencastproject.server.url"); 
-    
-    uri = generateFeedUri((String) properties.get(PROP_URI)); 
-    
+    if (serverUrl == null) serverUrl = (String) properties.get("org.opencastproject.server.url");
+
+    uri = generateFeedUri((String) properties.get(PROP_URI));
+
 
     String sizeAsString = (String) properties.get(PROP_SIZE);
     try {
@@ -230,7 +230,7 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
       cover = ensureUrl((String) properties.get(PROP_COVER), serverUrl);
     }
     linkTemplate = ensureUrl((String) properties.get(PROP_ENTRY), serverUrl);
-    if (properties.get(PROP_SELF) != null) 
+    if (properties.get(PROP_SELF) != null)
        linkSelf = ensureUrl((String) properties.get(PROP_SELF), serverUrl);
     String rssFlavors = (String) properties.get(PROP_RSSFLAVORS);
     if (rssFlavors != null) {
@@ -268,7 +268,7 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
       }
     }
   }
-  
+
   protected String generateFeedUri(String feedId) {
     return ensureUrl(feedId, serverUrl);
   }
@@ -281,7 +281,7 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
   public int hashCode() {
     return super.hashCode();
   }
-  
+
   /**
    * {@inheritDoc}
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#equals(java.lang.Object)
@@ -292,10 +292,10 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
       return super.equals(o);
     return super.equals(o) && selector.equals(((AbstractFeedService)o).selector);
   }
-  
+
   /**
    * Ensures that this string is an absolute URL. If not, prepend the local serverUrl to the string.
-   * 
+   *
    * @param string
    *          The absolute or relative URL
    * @param baseUrl
@@ -314,7 +314,7 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
 
   /**
    * Sets the search service.
-   * 
+   *
    * @param searchService
    *          the search service
    */
@@ -324,16 +324,16 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
 
   /**
    * Returns the search service.
-   * 
+   *
    * @return the search services
    */
   protected SearchService getSearchService() {
     return searchService;
   }
-  
+
   /**
    * Sets the series service.
-   * 
+   *
    * @param seriesService
    *          the series service
    */
@@ -343,7 +343,7 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
 
   /**
    * Returns the series service.
-   * 
+   *
    * @return the series services
    */
   protected SeriesService getSeriesService() {

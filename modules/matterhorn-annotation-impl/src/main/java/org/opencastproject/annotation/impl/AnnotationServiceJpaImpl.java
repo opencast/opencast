@@ -77,7 +77,7 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
 
   /**
    * Sets the matterhorn security service
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -87,7 +87,7 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
 
   /**
    * OSGI declarative services callback for component activation
-   * 
+   *
    * @param componentContext
    *          the OSGI declarative services component context
    */
@@ -164,7 +164,7 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
     try {
       em = emf.createEntityManager();
       tx = em.getTransaction();
-      tx.begin(); 
+      tx.begin();
       Query q = em.createNamedQuery("updateAnnotation");
       q.setParameter("value", a.getValue());
       q.setParameter("annotationId", id);
@@ -271,7 +271,7 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
       q.setMaxResults(limit);
       @SuppressWarnings("unchecked")
       Collection<Annotation> annotations = q.getResultList();
-	
+
       for (Annotation a : annotations) {
         result.add(a);
       }
