@@ -77,7 +77,7 @@
           %>
             <div class="splitSegmentItem<%= !split.enabled ? ' splitSegmentDisabled disabled' : '' %>" 
                  id="splitSegmentItem-<%= index %>" 
-                 style="width:<%= perc%>%" title="<%= split.description%>">
+                 style="width:<%= perc%>%">
             </div>
           <% }); %>
       ]]>
@@ -138,31 +138,6 @@
 	  <div class="clear"></div>
 	  <div id="splitElementsHolder"></div>
 	</div>
-	<!--
-	<div id="bigMidBox">
-          <div id="midBox">
-            <div class="splitNumber">
-              <span id="splitIndex">#</span>
-            </div>
-            <div id="descriptionDiv">
-              <input type="hidden" id="splitUUID" />
-              <div id="descriptionCurrentTimeDiv" class="ui-helper-hidden">
-		<span>Current time:</span> <span id="descriptionCurrentTime" title="current time"></span><br />
-              </div>
-              <a id="clipBeginSet" class="frameButton" title="set current time as new inpoint"></a> <span class="clipItem" id="clipBegin"></span> - <span class="clipItem" id="clipEnd"></span> <a id="clipEndSet" class="frameButton" title="set current time as new outpoint"></a> <br />
-              <label for="description">Description</label>
-            </div>
-          </div>
-	  <div id="midBoxDescription2">Information</div>
-          <div id="midBox2">
-	    <div id="newTime"></div>
-	    <div id="buttons">
-              <input type="button" title="show all shortcuts" id="shortcuts" value="Shortcuts" />
-              <input type="button" title="Clear segment split" value="Clear segment list" id="clearList" />
-	    </div>
-	  </div>
-	</div>
-	-->
         <div id="rightBox">
 	  <table border="1">
             <tbody>

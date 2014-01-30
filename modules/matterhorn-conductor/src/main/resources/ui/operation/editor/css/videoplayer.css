@@ -262,10 +262,10 @@
   visiblity: hidden;
   opacity: 0;
   border: 1px solid #444;
-  background: #A72123;
-  background-image: -moz-linear-gradient(top, #A72123, #F6921E);
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #A72123),
-    color-stop(1, #F6921E) );
+  background: #898989;
+  background-image: -moz-linear-gradient(top, #898989, #FFFFFF);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #898989),
+    color-stop(1, #FFFFFF) );
   -moz-transition: all 0.1s ease-in-out;
   -webkit-transition: all 0.1s ease-in-out;
   -o-transition: all 0.1s ease-in-out;
@@ -297,10 +297,10 @@
   -moz-border-radius: 15px;
   -webkit-border-radius: 15px;
   border-radius: 15px;
-  background: #A72123;
-  background-image: -moz-linear-gradient(top, #A72123, #F6921E);
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #A72123),
-    color-stop(1, #F6921E) );
+  background: #898989;
+  background-image: -moz-linear-gradient(top, #898989, #FFFFFF);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #898989),
+    color-stop(1, #FFFFFF) );
 }
 
 /* volume button */
