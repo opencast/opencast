@@ -388,9 +388,9 @@
 	    var onSeekUpdate = function() {
 		updateTime();
 		currenttime = mhVideo.prop('currentTime');
-		// if (!seeksliding) {
-		video_seek.slider('value', currenttime);
-		// }
+		if (!seeksliding) {
+		    video_seek.slider('value', currenttime);
+		}
 	    };
 
 	    /**
@@ -503,6 +503,7 @@
 			stop : function(e, ui) {
 			    seeksliding = false;
 			    mhVideo.prop("currentTime", ui.value);
+			    onSeekUpdate();
 			}
 		    });
 		    if (controls) {

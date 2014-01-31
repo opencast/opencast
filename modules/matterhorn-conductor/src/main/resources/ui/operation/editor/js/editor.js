@@ -1092,45 +1092,47 @@ function splitButtonClick() {
  * select the split segment at the current time
  */
 function selectCurrentSplitItem(excludeDeletedSegments) {
-    excludeDeletedSegments = excludeDeletedSegments || false;
-    var splitItem = getCurrentSplitItem();
-    if (splitItem != null) {
-	var idFound = false;
-	var id = -1;
-	if(excludeDeletedSegments) {
-	    if(splitItem.enabled) {
-		id = splitItem.id;
-		idFound = true;
-	    } else {
-		for(var i = splitItem.id; i < editor.splitData.splits.length; ++i) {
-		    if(editor.splitData.splits[i].enabled) {
-			idFound = true;
-			id = i;
-			break;
-		    }
-		}
-		if(!idFound) {
-		    for(var i = splitItem.id; i >= 0; --i) {
+    if(!isSeeking) {
+	excludeDeletedSegments = excludeDeletedSegments || false;
+	var splitItem = getCurrentSplitItem();
+	if (splitItem != null) {
+	    var idFound = false;
+	    var id = -1;
+	    if(excludeDeletedSegments) {
+		if(splitItem.enabled) {
+		    id = splitItem.id;
+		    idFound = true;
+		} else {
+		    for(var i = splitItem.id; i < editor.splitData.splits.length; ++i) {
 			if(editor.splitData.splits[i].enabled) {
 			    idFound = true;
 			    id = i;
 			    break;
 			}
 		    }
+		    if(!idFound) {
+			for(var i = splitItem.id; i >= 0; --i) {
+			    if(editor.splitData.splits[i].enabled) {
+				idFound = true;
+				id = i;
+				break;
+			    }
+			}
+		    }
 		}
 	    }
-	}
-	else {
-	    id = splitItem.id;
-	    idFound = true;
-	}
-	if(idFound) {
-	    currSplitItemClickedViaJQ = true;
-	    $('#splitSegmentItem-' + id).click();
-	    lastId = -1;
-	    $('#descriptionCurrentTime').html(formatTime(getCurrentTime()));
-	} else {
-	    ocUtils.log("Could not find an enabled ID");
+	    else {
+		id = splitItem.id;
+		idFound = true;
+	    }
+	    if(idFound) {
+		currSplitItemClickedViaJQ = true;
+		$('#splitSegmentItem-' + id).click();
+		lastId = -1;
+		$('#descriptionCurrentTime').html(formatTime(getCurrentTime()));
+	    } else {
+		ocUtils.log("Could not find an enabled ID");
+	    }
 	}
     }
 }
@@ -1217,17 +1219,6 @@ function splitHoverOut(evt) {
 /******************************************************************************/
 // events
 /******************************************************************************/
-
-/**
- * event handler for isSeeking
- */
-function isSeeking() {}
-
-/**
- * event handler for hasSeeked
- */
-
-function hasSeeked() {}
 
 /**
  * clearing events
@@ -1995,8 +1986,7 @@ $(document).ready(function () {
 
     editor.player = $('#videoPlayer');
     editor.player.on("canplay", playerReady);
-    editor.player.on("seeking", isSeeking);
-    editor.player.on("seeked", hasSeeked);
+
     $('.video-split-button').click(splitButtonClick);
     $('#okButton').click(okButtonClick);
     $('#cancelButton').click(cancelButtonClick);
