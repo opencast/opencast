@@ -238,8 +238,8 @@
 				name_td.appendTo(tr);
 
 				// value
-				var value_td = $('<td />');
-				var input = $('<input type="text" value="' + line["value"] + '" id="' + id + '-value"/>');
+				var value_td = $('<td class="valueinput" />');
+				var input = $('<input class="valueinput" type="text" value="' + line["value"] + '" id="' + id + '-value"/>');
 				input.appendTo(value_td);
 				value_td.appendTo(tr);
 				
@@ -398,8 +398,8 @@
 		name_td.appendTo(tr);
 
 		// value
-		var value_td = $('<td />');
-		var input = $('<input type="text" value="' + value + '" id="' + id + '-value"/>');
+		var value_td = $('<td class="valueinput"/>');
+		var input = $('<input class="valueinput" type="text" value="' + value + '" id="' + id + '-value"/>');
 		input.appendTo(value_td);
 		value_td.appendTo(tr);
 

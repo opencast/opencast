@@ -25,6 +25,9 @@ table tr:hover a:hover { text-decoration: underline!important; }
 .paging-style A:hover   { color: #ffffff }
 .paging-style A:aktiv   { color: #ffffff }
 
+.valueinput { width: 95%;
+	      padding: 3px; }
+
 /* page layout */
 #pageHeader { background: #A72123; padding: 2px; margin-bottom: 20px; text-align: right;}
 #pageHeader a { color: #FFFFFF; margin-right: 10px; text-decoration: none;}
