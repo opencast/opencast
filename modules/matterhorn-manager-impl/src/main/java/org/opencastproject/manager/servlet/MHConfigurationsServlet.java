@@ -222,9 +222,13 @@ public class MHConfigurationsServlet extends HttpServlet {
 			try {
 				// handle workflow operations
 				workflowManager.handleWorkflowOperations(request, response);
-			} catch (TransformerException e) { 
-			} catch (ParserConfigurationException e) { 
-			} catch (SAXException e) { }
+			} catch (TransformerException e) {
+				 logger.error("Workflow editor could not write workflow XML file."); 
+			} catch (ParserConfigurationException e) {
+				 logger.error("Workflow editor could not write workflow XML file."); 
+			} catch (SAXException e) {
+				 logger.error("Workflow editor could not write workflow XML file."); 
+			}
 			
 	    	// handle restart
 			String pluginState = request.getParameter(PluginManagerConstants.PLUGIN_STATE);
@@ -273,15 +277,11 @@ public class MHConfigurationsServlet extends HttpServlet {
 	  		logger.info("the config file " + config.getRelPath() + " was changed");
 	  
 	  	} catch (IOException e) {
-			
-			e.printStackTrace();
+			logger.error("Config editor could not write properties file."); 
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		
 		} catch (JSONException e) {
-			
-			e.printStackTrace();
+			logger.error("Config editor could not parse new properties file."); 
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		
 		}
 	  	
 	}

@@ -25,6 +25,9 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.BundleContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.opencastproject.manager.api.PluginManagerConstants;
 
 /**
@@ -38,6 +41,8 @@ public class Restart {
 	 * The bundle context
 	 */
 	private BundleContext bundleContext;
+
+	private static final Logger logger = LoggerFactory.getLogger(Restart.class);
 
 	/**
 	 * Constructor
@@ -74,7 +79,9 @@ public class Restart {
                     } else {
                         systemBundle.stop();
                     }
-                } catch (BundleException be) { }
+                } catch (BundleException be) {
+			logger.error("Restarting Matterhorn failed.");	
+		}
             }
         };
         

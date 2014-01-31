@@ -39,6 +39,9 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.io.FileUtils;
 
 import org.w3c.dom.Document;
@@ -55,6 +58,8 @@ import java.net.URL;
  * @author Leonid Oldenburger
  */
 public class MetadataDocumentHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(MetadataDocumentHandler.class);
 
     /**
      * Returns the document builder factory object.
@@ -110,14 +115,14 @@ public class MetadataDocumentHandler {
 		    fop.flush();
 		    fop.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Workflow editor could not add notes to XML file.");
 		} finally {
 		      try {
 		          if (fop != null) {
 		              fop.close();
 		          }
 		      } catch (IOException e) {
-		          e.printStackTrace();
+			  logger.error("Workflow editor could not add notes to XML file.");
 		      }
 		}
 	}
@@ -146,10 +151,12 @@ public class MetadataDocumentHandler {
 	public void moveDocumentDirectory(File srcFile, File destDir) {
 		
 		try {
-            FileUtils.forceMkdir(destDir);
-            FileUtils.copyDirectoryToDirectory(srcFile, destDir);
-            FileUtils.deleteDirectory(srcFile);
-        } catch (Exception e) { }
+	            FileUtils.forceMkdir(destDir);
+        	    FileUtils.copyDirectoryToDirectory(srcFile, destDir);
+         	    FileUtils.deleteDirectory(srcFile);
+        	} catch (Exception e) {
+			logger.error("Workflow editor could not move document directory.");
+		}
 	}
 	
 	/**
@@ -200,8 +207,10 @@ public class MetadataDocumentHandler {
 		try {
 			FileUtils.copyURLToFile(new URL(fileUrl), new File(fileName));
 		} catch (FileNotFoundException ex) {
+			logger.warn("Workflow editor could find file {}.", fileName);
 			return false;
 		} catch (MalformedURLException ex) {
+			 logger.warn("Workflow editor could not parse URL {}.", fileUrl);
 			return false;
 		}
 		return true;
