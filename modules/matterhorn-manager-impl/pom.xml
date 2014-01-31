@@ -90,25 +90,14 @@
   </dependencies>
   <build>
   <plugins>
-    <plugin>
-      <groupId>org.apache.rat</groupId>
-      <artifactId>apache-rat-plugin</artifactId>
-      <configuration>
-      <includes>
-        <include>src/**</include>
-      </includes>
-      <excludes>
-      </excludes>
-      </configuration>
-      </plugin>
-      <!--  >plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.12.3</version>
         <configuration>
           <workingDirectory>${project.build.directory}/output/</workingDirectory>
         </configuration>
-      </plugin-->
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
