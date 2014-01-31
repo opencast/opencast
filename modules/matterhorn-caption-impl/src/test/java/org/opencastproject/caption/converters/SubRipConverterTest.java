@@ -36,7 +36,7 @@ import java.util.List;
  *
  */
 public class SubRipConverterTest {
-  
+
   // SubRip converter
   private SubRipCaptionConverter format;
   // srt sample
@@ -45,22 +45,22 @@ public class SubRipConverterTest {
   private ByteArrayOutputStream outputStream;
   // expected output
   private String expectedOutput = "1\r\n"
-  		+ "00:00:49,520 --> 00:00:52,961\r\n"
-  		+ "This is caption testing.\r\n"
-  		+ "1. line.";
-  
+      + "00:00:49,520 --> 00:00:52,961\r\n"
+      + "This is caption testing.\r\n"
+      + "1. line.";
+
   @Before
   public void setUp() throws IOException {
     format = new SubRipCaptionConverter();
     inputStream = SubRipConverterTest.class.getResourceAsStream("/sample.srt");
     outputStream = new ByteArrayOutputStream();
   }
-  
+
   @Test
   public void testImportAndExport() {
     try {
       // verify parsing and exporting without exceptions
-    	List<Caption> collection = format.importCaption(inputStream, null);
+      List<Caption> collection = format.importCaption(inputStream, null);
       format.exportCaption(outputStream, collection, null);
       Assert.assertTrue(outputStream.toString("UTF-8").startsWith(expectedOutput));
     } catch (Exception e) {
@@ -68,7 +68,7 @@ public class SubRipConverterTest {
       Assert.fail(e.getMessage());
     }
   }
-  
+
   @After
   public void tear() throws IOException {
     IOUtils.closeQuietly(inputStream);

@@ -61,7 +61,7 @@ import org.osgi.service.cm.ManagedService;
 
 /**
  * A service for big file uploads via HTTP.
- * 
+ *
  */
 public class FileUploadServiceImpl implements FileUploadService, ManagedService {
 
@@ -90,7 +90,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   protected synchronized void activate(ComponentContext cc) throws Exception {
     /* Ensure a working directory is set */
     if (workRoot == null) {
-	 /* Use the default location: STORAGE_DIR / DEFAULT_UPLOAD_WORKDIR */
+   /* Use the default location: STORAGE_DIR / DEFAULT_UPLOAD_WORKDIR */
       String dir = cc.getBundleContext().getProperty(PROPKEY_STORAGE_DIR);
       if (dir == null) {
         throw new RuntimeException("Storage directory not defined. "
@@ -106,10 +106,10 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     JAXBContext jctx = JAXBContext.newInstance("org.opencastproject.fileupload.api.job", cl);
     jobMarshaller = jctx.createMarshaller();
     jobUnmarshaller = jctx.createUnmarshaller();
-    
+
     cleaner = new FileUploadServiceCleaner(this);
     cleaner.schedule();
-    
+
     log.info("File Upload Service activated.");
   }
 
@@ -117,7 +117,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     log.info("File Upload Service deactivated");
     cleaner.shutdown();
   }
-  
+
   @Override
   public synchronized void updated(Dictionary properties) throws ConfigurationException {
     // try to get time-to-live threshold for jobs, use default if not configured
@@ -147,7 +147,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.fileupload.api.FileUploadService#createJob(String filename, long filesize, int chunksize)
    */
   @Override
@@ -155,20 +155,20 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
           MediaPackageElementFlavor flavor) throws FileUploadException {
     FileUploadJob job = new FileUploadJob(filename, filesize, chunksize, mp, flavor);
     log.info("Creating new upload job: {}", job);
-    
+
     try {
       File jobDir = getJobDir(job.getId());      // create working dir
       FileUtils.forceMkdir(jobDir);
       ensureExists(getPayloadFile(job.getId())); // create empty payload file
       storeJob(job);                             // create job file
-    
+
     } catch (FileUploadException e) {
       deleteJob(job.getId());
       String message = new StringBuilder("Could not create job file in ").append(workRoot.getAbsolutePath())
               .append(": ").append(e.getMessage()).toString();
       log.error(message, e);
       throw new FileUploadException(message, e);
-    
+
     } catch (IOException e) {
       deleteJob(job.getId());
       String message = new StringBuilder("Could not create upload job directory in ")
@@ -181,7 +181,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.fileupload.api.FileUploadService#hasJob(String id)
    */
   @Override
@@ -201,13 +201,13 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.fileupload.api.FileUploadService#getJob(String id)
    */
   @Override
   public FileUploadJob getJob(String id) throws FileUploadException {
     if (jobCache.containsKey(id)) {          // job already cached?
-      return jobCache.get(id);               
+      return jobCache.get(id);
     } else {                                 // job not in cache?
       try {                                  // try to load job from filesystem
         synchronized (this) {
@@ -215,7 +215,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
           FileUploadJob job = (FileUploadJob) jobUnmarshaller.unmarshal(jobFile);
           job.setLastModified(jobFile.lastModified());  // get last modified time from job file
           return job;
-        }                                    // if loading from fs also fails 
+        }                                    // if loading from fs also fails
       } catch (Exception e) {                // we could not find the job and throw an Exception
         log.warn("Failed to load job " + id + " from file.");
         throw new FileUploadException("Error retrieving job " + id, e);
@@ -225,7 +225,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.fileupload.api.FileUploadService#cleanOutdatedJobs()
    */
   @Override
@@ -238,11 +238,11 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
             FileUploadJob job = getJob(id);
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.HOUR, -jobMaxTTL);
-            if (job.lastModified() < cal.getTimeInMillis()) {  
+            if (job.lastModified() < cal.getTimeInMillis()) {
               FileUtils.forceDelete(dir);
               jobCache.remove(id);
               log.info("Deleted outdated job {}", id);
-            } 
+            }
           }
         } catch (Exception e) {        // something went wrong, so we assume the dir is corrupted
           FileUtils.forceDelete(dir);  // ..and delete it right away
@@ -254,7 +254,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.fileupload.api.FileUploadService#storeJob(org.opencastproject.fileupload.api.job.FileUploadJob
    *      job)
    */
@@ -272,7 +272,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.fileupload.api.FileUploadService#deleteJob(String id)
    */
   @Override
@@ -292,7 +292,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.fileupload.api.FileUploadService#acceptChunk(org.opencastproject.fileupload.api.job.FileUploadJob
    *      job, long chunk, InputStream content)
    */
@@ -405,7 +405,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.fileupload.api.FileUploadService#getPayload(org.opencastproject.fileupload.api.job.FileUploadJob
    *      job)
    */
@@ -427,7 +427,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * Locks an upload job and puts it in job cache.
-   * 
+   *
    * @param job
    *          job to lock
    */
@@ -438,7 +438,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * Returns true if the job with the given ID is currently locked.
-   * 
+   *
    * @param id
    *          ID of the job in question
    * @return true if job is locked, false otherwise
@@ -455,7 +455,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * Removes upload job from job cache.
-   * 
+   *
    * @param job
    *          job to remove from cache
    * @throws FileUploadException
@@ -466,7 +466,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * Unlocks an finalizes an upload job.
-   * 
+   *
    * @param job
    *          job to finalize
    * @throws FileUploadException
@@ -486,7 +486,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * Function that writes the given file to the uploaded collection.
-   * 
+   *
    */
   private Function2<InputStream, File, Option<URI>> putInCollection = new Function2<InputStream, File, Option<URI>>() {
 
@@ -507,7 +507,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * Puts the payload of an upload job into the upload collection in the WFR and returns the URL to the file in the WFR.
-   * 
+   *
    * @param job
    * @return URL of the file in the WFR
    * @throws FileUploadException
@@ -530,7 +530,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   /**
    * Puts the payload of an upload job into a MediaPackage in the WFR, adds the files as a track to the MediaPackage and
    * returns the files URL in the WFR.
-   * 
+   *
    * @param job
    * @return URL of the file in the WFR
    * @throws FileUploadException
@@ -561,7 +561,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * Deletes the chunk file from working directory.
-   * 
+   *
    * @param id
    *          ID of the job of which the chunk file should be deleted
    */
@@ -579,7 +579,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * Deletes the payload file from working directory.
-   * 
+   *
    * @param id
    *          ID of the job of which the chunk file should be deleted
    */
@@ -597,7 +597,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * Ensures the existence of a given file.
-   * 
+   *
    * @param file
    * @return File existing file
    * @throws IllegalStateException
@@ -615,7 +615,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * Returns the directory for a given job ID.
-   * 
+   *
    * @param id
    *          ID for which a directory name should be generated
    * @return File job directory
@@ -627,7 +627,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * Returns the job information file for a given job ID.
-   * 
+   *
    * @param id
    *          ID for which a job file name should be generated
    * @return File job file
@@ -640,7 +640,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * Returns the chunk file for a given job ID.
-   * 
+   *
    * @param id
    *          ID for which a chunk file name should be generated
    * @return File chunk file
@@ -653,7 +653,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   /**
    * Returns the payload file for a given job ID.
-   * 
+   *
    * @param id
    *          ID for which a payload file name should be generated
    * @return File job file
