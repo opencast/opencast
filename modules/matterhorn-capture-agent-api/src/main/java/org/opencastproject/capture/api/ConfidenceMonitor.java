@@ -37,8 +37,21 @@ public interface ConfidenceMonitor {
    * @param friendlyName The friendly name of the device
    * @param timestamp Unix time in milliseconds marking start of RMS data
    * @return A List of RMS values that occur *after* timestamp
+   * 
+   * @deprecated timestamp format changed to long see: {@see getRMSValues(String, long)}
    */
+  @Deprecated
   List<Double> getRMSValues(String friendlyName, double timestamp);
+  
+  /**
+   * Return all RMS values from device 'name' that occur after Unix time
+   * 'timestamp'
+   * 
+   * @param friendlyName The friendly name of the device
+   * @param timestamp Unix time in milliseconds marking start of RMS data
+   * @return A List of RMS values that occur *after* timestamp
+   */
+  List<Double> getRMSValues(String friendlyName, long timestamp);
   
   /**
    * Provide access to the devices on the capture box

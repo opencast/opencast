@@ -1,6 +1,3 @@
-create schema matterhorn DEFAULT CHARACTER SET = 'utf8';
-use matterhorn;
-
 CREATE TABLE SEQUENCE (
   SEQ_NAME VARCHAR(50) NOT NULL,
   SEQ_COUNT DECIMAL(38),

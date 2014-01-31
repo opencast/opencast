@@ -1,42 +1,60 @@
 #!/bin/bash
 
+FUNCTIONS="functions.sh"
+. ${FUNCTIONS}
+
 #THIS SCRIPT SHOULD NOT BE USED IF YOU ARE CREATING A FEATURE BRANCH
-#This script modifies the POM files for develop
 
 #The name of the new branch, without the release branch prefix
-#E.g. BRANCH_NAME=1.3.x
+#E.g. BRANCH_NAME=1.4.2
 BRANCH_NAME=
 
 #The version the POMs are in develop right now.
-#E.g. OLD_POM_VER=1.3-SNAPSHOT
+#E.g. OLD_POM_VER=1.4-SNAPSHOT
 OLD_POM_VER=
 
 #The new version for our POMs
-#E.g. NEW_POM_VER=1.4-SNAPSHOT
-NEW_POM_VER=
+#E.g. BRANCH_POM_VER=1.4.2-SNAPSHOT
+BRANCH_POM_VER=
+
+#The version that develop should have.  This is only relevant for final releases!
+#E.g. NEW_DEVELOP_POM_VER=1.5-SNAPSHOT
+NEW_DEVELOP_POM_VER=
 
 #The jira ticket this work is being done under (must be open)
 JIRA_TICKET=
 
 #=======You should not need to modify anything below this line=================
 
-WORK_DIR=$(echo `pwd` | sed 's/\(.*\/.*\)\/docs\/scripts\/release/\1/g')
+WORK_DIR=../../../
 
+#Reset this script so that the modifications do not get committed
 git checkout -- branch.sh
-git flow release start $BRANCH_NAME
+
+#Make sure we are on develop, then create a branch
 git checkout develop
 
+echo "Replacing POM file version in the POMs."
+updatePomVersions -w $WORK_DIR -o $OLD_POM_VER -n $BRANCH_POM_VER
+
+git commit -a -m "$JIRA_TICKET Updated pom.xml files to reflect new branch version.  Done via docs/scripts/release/branch.sh"
+
+git checkout -b r/$BRANCH_NAME
+
+git checkout develop
+git revert --no-edit HEAD
+
 echo "Replacing POM file version in main POM."
-sed -i "s/<version>$OLD_POM_VER/<version>$NEW_POM_VER/" $WORK_DIR/pom.xml
+updatePomVersions -w $WORK_DIR -o $OLD_POM_VER -n $NEW_DEVELOP_VER
 
-for i in $WORK_DIR/modules/matterhorn-*
-do
-    echo " Module: $i"
-    if [ -f $i/pom.xml ]; then
-        sed -i "s/<version>$BRANCH_POM_VER/<version>$TAG_POM_VER/" $i/pom.xml
-    fi
-done
-git commit -a -m "$JIRA_TICKET Updated pom.xml files to reflect correct version.  Done via docs/scripts/release/branch.sh"
+git commit -a -m "$JIRA_TICKET: Updating POM versions to $NEW_DEVELOP_VER in develop"
 
-echo ""
-echo "Please verify that things look correct, and then push the new branch upstream!s"
+echo "Summary:"
+echo "-Created r/$BRANCH_NAME from develop"
+echo "-Updated local develop POMs to $NEW_DEVELOP_POM_VER"
+echo "We can push these changes to the public repo."
+yesno -d no "Do you want this script to do that automatically for you?" push
+if [[ "$push" ]]; then
+    git push origin r/$BRANCH_NAME
+    git push origin develop
+fi

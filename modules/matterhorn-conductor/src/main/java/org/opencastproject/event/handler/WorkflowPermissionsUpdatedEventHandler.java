@@ -196,45 +196,53 @@ public class WorkflowPermissionsUpdatedEventHandler implements EventHandler {
           securityService.setOrganization(defaultOrg);
           securityService.setUser(new User(systemAccount, defaultOrg.getId(), new String[] { GLOBAL_ADMIN_ROLE }));
 
+          // Note: getWorkflowInstances will only return a given number of results (default 20)
           WorkflowQuery q = new WorkflowQuery().withSeriesId(seriesId);
           WorkflowSet result = workflowService.getWorkflowInstancesForAdministrativeRead(q);
+          Integer offset = 0;
+          
+          while (result.size() > 0) {
+            for (WorkflowInstance instance : result.getItems()) {
+              if (!isActive(instance)) {
+                continue;
+              }
 
-          for (WorkflowInstance instance : result.getItems()) {
-            if (!isActive(instance))
-              continue;
+              Organization org = instance.getOrganization();
+              securityService.setOrganization(org);
 
-            Organization org = instance.getOrganization();
-            securityService.setOrganization(org);
+              MediaPackage mp = instance.getMediaPackage();
 
-            MediaPackage mp = instance.getMediaPackage();
+              // Update the series XACML file
+              if (SERIES_ACL_TOPIC.equals(event.getTopic())) {
+                // Build a new XACML file for this mediapackage
+                AccessControlList acl = AccessControlParser.parseAcl((String) event.getProperty(PAYLOAD));
+                authorizationService.setAccessControl(mp, acl);
+              }
 
-            // Update the series XACML file
-            if (SERIES_ACL_TOPIC.equals(event.getTopic())) {
-              // Build a new XACML file for this mediapackage
-              AccessControlList acl = AccessControlParser.parseAcl((String) event.getProperty(PAYLOAD));
-              authorizationService.setAccessControl(mp, acl);
+              // Update the series dublin core
+              DublinCoreCatalog seriesDublinCore = seriesService.getSeries(seriesId);
+              mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
+
+              // Update the series dublin core
+              Catalog[] seriesCatalogs = mp.getCatalogs(MediaPackageElements.SERIES);
+              if (seriesCatalogs.length == 1) {
+                Catalog c = seriesCatalogs[0];
+                String filename = FilenameUtils.getName(c.getURI().toString());
+                URI uri = workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
+                        dublinCoreService.serialize(seriesDublinCore));
+                c.setURI(uri);
+                // setting the URI to a new source so the checksum will most like be invalid
+                c.setChecksum(null);
+              }
+
+              // Update the search index with the modified mediapackage
+              workflowService.update(instance);
             }
 
-            // Update the series dublin core
-            DublinCoreCatalog seriesDublinCore = seriesService.getSeries(seriesId);
-            mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
-
-            // Update the series dublin core
-            Catalog[] seriesCatalogs = mp.getCatalogs(MediaPackageElements.SERIES);
-            if (seriesCatalogs.length == 1) {
-              Catalog c = seriesCatalogs[0];
-              String filename = FilenameUtils.getName(c.getURI().toString());
-              URI uri = workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
-                      dublinCoreService.serialize(seriesDublinCore));
-              c.setURI(uri);
-              // setting the URI to a new source so the checksum will most like be invalid
-              c.setChecksum(null);
-            }
-
-            // Update the search index with the modified mediapackage
-            workflowService.update(instance);
+            offset++;
+            q = q.withStartPage(offset);
+            result = workflowService.getWorkflowInstancesForAdministrativeRead(q);
           }
-
         } catch (WorkflowException e) {
           logger.warn(e.getMessage());
         } catch (UnauthorizedException e) {

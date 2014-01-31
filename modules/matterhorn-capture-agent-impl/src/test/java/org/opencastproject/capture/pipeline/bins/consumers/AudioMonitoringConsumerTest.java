@@ -19,11 +19,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Properties;
+import org.gstreamer.Bus;
 import org.gstreamer.Element;
 import org.gstreamer.ElementFactory;
 import org.gstreamer.Gst;
+import org.gstreamer.Message;
 import org.gstreamer.Pipeline;
 import org.gstreamer.State;
+import org.gstreamer.Structure;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -45,6 +48,8 @@ public class AudioMonitoringConsumerTest {
   private CaptureDevice captureDevice = null;
   /** Pipeline created for unit testing **/
   private Pipeline pipeline = null;
+  /** Got RMS message flag. **/
+  private boolean gotRmsMessage = false;
 
   /** True to run the tests */
   private static boolean gstreamerInstalled = true;
@@ -108,6 +113,27 @@ public class AudioMonitoringConsumerTest {
     pipeline.add(consumerBin.getBin());
     return Element.linkPads(queue, "src", consumerBin.getBin(), consumerBin.GHOST_PAD_NAME);
   }
+  
+  private void hookUpBus() {
+    pipeline.getBus().connect("element", new Bus.MESSAGE() {
+
+      @Override
+      public void busMessage(Bus bus, Message msg) {
+        Structure msgStructure = msg.getStructure();
+        if (!gotRmsMessage
+                && msgStructure != null                       // level messages should have a structure
+                && "level".equals(msgStructure.getName())     // structure name should be 'level'
+                && msgStructure.hasField("rms")) {            // and should contain a rms value-list
+
+          Double rms = msgStructure.getValueList("rms").getDouble(0);
+          if (rms != null && Math.abs(rms) > 0) {
+            logger.debug("Got audio rms value: {}", rms);
+            gotRmsMessage = true;
+          }
+        }
+      }
+    });
+  }
 
   @Test
   public void testAudioMonitoringConsumer() {
@@ -119,6 +145,7 @@ public class AudioMonitoringConsumerTest {
         gstreamerInstalled = false;
         Assert.fail("can not link audio monitoring bin");
       }
+      hookUpBus();
       
       // start pipeline
       pipeline.play();
@@ -130,17 +157,15 @@ public class AudioMonitoringConsumerTest {
       
       // wait 3 sec
       Thread.sleep(3000);
-      
-      // test rms-valu-list is not empty
-      if (AudioMonitoringConsumer.getRMSValues(captureDevice.getFriendlyName(), 1).isEmpty()) {
-        pipeline.setState(State.NULL);
-        pipeline = null;
-        Assert.fail("rms-value-list is empty");
-      }
-      
       // stop pipeline
       pipeline.setState(State.NULL);
+      pipeline = null;
       
+      // test rms-valu-list is not empty
+      if (!gotRmsMessage) {
+        Assert.fail("Does not got any RMS vlaue messages on pipeline");
+      }
+            
     } catch (Exception ex) {
       Assert.fail(ex.getMessage());
     }
