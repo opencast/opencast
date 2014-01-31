@@ -33,6 +33,8 @@ while [[ true ]]; do
     if [[ ! "`gpg --list-secret-keys | grep $new_key_id`" ]]; then
       "No key with that ID found..."
     else
+      #Fake autocomplete, but it works
+      new_key_id=`gpg --list-secret-keys | grep $new_key_id | sed 's/.*\/\('$new_key_id'.*\) .*/\1/g'`
       keyOpts="-u $new_key_id"
       break
     fi
