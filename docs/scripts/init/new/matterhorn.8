@@ -104,8 +104,10 @@ The most important things are configured in
 /etc/matterhorn/config.properties
 .TP
 .B org.opencastproject.server.url
-This is set to http://localhost:8080 by default.
-That will only allow access from the local machine.
+This is set to http://localhost:8080 by default, which means that
+Matterhorn will only be usable from the local machine as localhost will be
+used for all internal links, etc. This is not a protection against access
+from the outside.
 You should change this if your server should be accessible within a
 network.
 Set it to your domain name or IP address.
@@ -128,7 +130,7 @@ from the internet.
 .RS
 .RE
 .TP
-.B org.opencastproject.security.digest.user and
+.B org.opencastproject.security.digest.user
 The user for the communication between Matterhorn nodes.
 This is set to matterhorn_system_account by default.
 .RS

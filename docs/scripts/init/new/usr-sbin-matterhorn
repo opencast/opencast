@@ -48,10 +48,10 @@ then
 	echo "Usage: $0 [ --daemon | --interactive | --quit | --help ]"
 	echo ''
 	echo 'OPTIONS:'
-	echo '  --daemon       Run matterhorn as _unmanaged_ daemon.'
+	echo '  --daemon       Run Matterhorn as _unmanaged_ daemon.'
 	echo '                 Consider using the SysV init script.'
-	echo '  --interactive  Run matterhorn in interactive mode.'
-	echo '  --quit         Stop a previously started matterhorn.'
+	echo '  --interactive  Run Matterhorn in interactive mode.'
+	echo '  --quit         Stop a previously started Matterhorn.'
 	echo '  --help         Show this message.'
 	exit 0
 fi
@@ -67,9 +67,9 @@ fi
 [ -f $pidfile ] && ps p "`cat $pidfile`" &> /dev/null && \
 	echo "Matterhorn already running" && exit 0
 
-# Create the pidfile as quickly as possible after we are shure the user wants
-# to start matterhorn and after the existence of a pidfile and the associated
-# process was checked. As matterhorn itself is not running at the moment and
+# Create the pidfile as quickly as possible after we are sure the user wants to
+# start Matterhorn and after the existence of a pidfile and the associated
+# process was checked. As Matterhorn itself is not running at the moment and
 # the file should contain a pid to check for we use for now the pid of this
 # script:
 echo $$ > $pidfile
