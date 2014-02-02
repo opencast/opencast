@@ -39,25 +39,25 @@ public class UserAndRoleDirectoryServiceImplTest {
 
   /** The user and role directory */
   private UserAndRoleDirectoryServiceImpl directory = null;
-  
+
   /** A username */
   private String userName = null;
-  
+
   /** An organization */
   private Organization org = null;
-  
+
   @Before
   public void setUp() throws Exception {
     org = new DefaultOrganization();
     userName = "sampleUser";
-    
+
     User user1 = new User(userName, null, org.getId(), new String[] {"role1", "role2"});
     User user2 = new User(userName, "secret", org.getId(), new String[] {"role2", "role3"});
-    
+
     UserProvider provider1 = EasyMock.createNiceMock(UserProvider.class);
     EasyMock.expect(provider1.getOrganization()).andReturn(org.getId()).anyTimes();
     EasyMock.expect(provider1.loadUser((String)EasyMock.anyObject())).andReturn(user1).anyTimes();
-    
+
     UserProvider provider2 = EasyMock.createNiceMock(UserProvider.class);
     EasyMock.expect(provider2.getOrganization()).andReturn(org.getId()).anyTimes();
     EasyMock.expect(provider2.loadUser((String)EasyMock.anyObject())).andReturn(user2).anyTimes();
@@ -66,13 +66,13 @@ public class UserAndRoleDirectoryServiceImplTest {
     EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
 
     EasyMock.replay(provider1, provider2, securityService);
-    
+
     directory = new UserAndRoleDirectoryServiceImpl();
     directory.setSecurityService(securityService);
     directory.addUserProvider(provider1);
     directory.addUserProvider(provider2);
   }
-  
+
   @Test
   public void testUserMerge() throws Exception {
     User mergedUser = directory.loadUser(userName);

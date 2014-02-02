@@ -55,19 +55,19 @@ public class PingBackService {
 
   /** The trusted http client used to connect to the runtime info ui */
   private TrustedHttpClient httpClient = null;
-  
+
   /** Name of the "id" form parameters */
-  private static final String PARAM_NAME_ID = "form_id"; 
+  private static final String PARAM_NAME_ID = "form_id";
 
   /** Name of the "submitted" form parameters */
-  private static final String PARAM_NAME_SUBMITTED = "submitted[data]"; 
+  private static final String PARAM_NAME_SUBMITTED = "submitted[data]";
 
   /** Value of the "id" form parameters */
-  private static final String PARAM_VALUE_ID = "webform_client_form_1445"; 
+  private static final String PARAM_VALUE_ID = "webform_client_form_1445";
 
   /**
    * Osgi callback that is executed on component activation.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -121,7 +121,7 @@ public class PingBackService {
 
   /**
    * Returns the runtime information as a JSON string.
-   * 
+   *
    * @return the runtime information
    * @throws IOException
    *           if reading the response body fails
@@ -141,7 +141,7 @@ public class PingBackService {
 
   /**
    * Osgi callback that adds a reference to the trusted http client implementation.
-   * 
+   *
    * @param client
    *          the trusted http client
    */

@@ -207,7 +207,7 @@ public class AnnotationImpl implements Annotation {
   }
 
   public void setPrivate(Boolean isPrivate) {
-    this.privateAnnotation = isPrivate;    
+    this.privateAnnotation = isPrivate;
   }
 
 }

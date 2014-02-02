@@ -112,7 +112,7 @@ public class VideoFilesinkConsumerTest {
               map.get(key), sinkBin.encoder.get(key).toString());
     }
   }
-  
+
   private void checkMuxerProperties(ConsumerBin sinkBin, String muxer) {
     Assert.assertTrue("The muxer name " + sinkBin.muxer.getName() + " should match the muxer type " + muxer,
             sinkBin.muxer.getName().contains(muxer));
@@ -140,7 +140,7 @@ public class VideoFilesinkConsumerTest {
     VideoFilesinkConsumer videoFileSinkBin = createVideoFileSinkBinDontWantException(captureDeviceProperties);
     checkEncoderProperties(videoFileSinkBin, VideoFilesinkConsumer.DEFAULT_ENCODER, "1024");
   }
-  
+
   @Test
   public void x264EncoderPropertiesCanBeSet() throws UnableToLinkGStreamerElementsException,
           UnableToCreateGhostPadsForBinException, UnableToSetElementPropertyBecauseElementWasNullException,
@@ -180,7 +180,7 @@ public class VideoFilesinkConsumerTest {
     VideoFilesinkConsumer videoFileSinkBin = new VideoFilesinkConsumer(captureDevice, captureDeviceProperties);
     checkX264EncoderProperties(videoFileSinkBin, encoderProperties);
   }
-  
+
   @Test
   public void settingCodecButNotContainerResultsInCorrectCodecAndDefaultMuxer() {
     if (!gstreamerInstalled && PipelineTestHelpers.testGstreamerElement(GStreamerElements.X264ENC)

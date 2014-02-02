@@ -112,7 +112,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param streamingDistributionService
    *          the streaming distribution service
    */
@@ -122,7 +122,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param downloadDistributionService
    *          the download distribution service
    */
@@ -133,7 +133,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * Callback for declarative services configuration that will introduce us to the search service. Implementation
    * assumes that the reference is configured as being static.
-   * 
+   *
    * @param searchService
    *          an instance of the search service
    */
@@ -191,7 +191,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -201,7 +201,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -383,7 +383,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * Returns a mediapackage that only contains elements that are marked for distribution.
-   * 
+   *
    * @param current
    *          the current mediapackage
    * @param jobs
@@ -411,7 +411,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     // All the jobs have passed, let's update the mediapackage with references to the distributed elements
     List<String> elementsToPublish = new ArrayList<String>();
     Map<String, String> distributedElementIds = new HashMap<String, String>();
-    
+
     for (Job entry : jobs) {
       Job job = serviceRegistry.getJob(entry.getId());
       String sourceElementId = job.getArguments().get(2);
@@ -503,7 +503,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       String distributedElementId = distributedElementIds.get(reference.getIdentifier());
       if (distributedElementId == null)
         continue;
-      
+
       MediaPackageReference translatedReference = new MediaPackageReferenceImpl(mp.getElementById(distributedElementId));
       if (reference.getProperties() != null) {
         translatedReference.getProperties().putAll(reference.getProperties());

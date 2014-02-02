@@ -127,7 +127,7 @@ public class MonadicsTest {
     List<Integer> mapped = mlist(list(list(1, 2), list(3, 4))).flatMap(Functions.<List<Integer>>identity()).value();
     assertEquals(4, mapped.size());
   }
-  
+
   @Test
   public void testTakeArray() {
     assertTrue(mlist(array(1, 2, 3, 4, 5)).take(0).value().isEmpty());
@@ -192,7 +192,7 @@ public class MonadicsTest {
     }).eval();
     assertArrayEquals(new Integer[]{1, 3, 5, 7, 9}, eval.toArray(new Integer[]{}));
   }
-  
+
   @Test
   public void testLazyFlatMap() {
     List<Integer> eval = Monadics.mlazy(asList(1, 2, 3))
@@ -358,7 +358,7 @@ public class MonadicsTest {
             .eval();
     assertEquals(40, sum[0]);
   }
-  
+
   @Test
   public void testLazyTake() {
     assertTrue(Monadics.mlazy(asList(1, 2, 3, 4, 5)).take(0).eval().isEmpty());

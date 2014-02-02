@@ -28,7 +28,7 @@ public class EnclosureImpl implements Enclosure {
 
   /** Enclosure type */
   private String type = null;
-  
+
   /** Enclosure flavour */
   private String flavor = null;
 
@@ -37,13 +37,13 @@ public class EnclosureImpl implements Enclosure {
 
   /**
    * Creates a new enclosure.
-   * 
+   *
    * @param url
    *          the enclosure's url
    * @param type
    *          the type
    * @param flavour
-   *          the mediapackage element flavour         
+   *          the mediapackage element flavour
    * @param length
    *          the lenght
    */

@@ -286,31 +286,31 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
 
         if (offset != null)
           search.offset(offset);
-        
+
         if (tags != null)
           search.elementTags(mlist(tags).bind(Strings.trimToNil).value());
-        
+
         if (StringUtils.isNotBlank(id))
           search.id(id.trim());
-        
+
         if (StringUtils.isNotBlank(text))
           search.text(text.trim());
-        
+
         if (StringUtils.isNotBlank(creator))
           search.creator(creator.trim());
-        
+
         if (StringUtils.isNotBlank(contributor))
           search.contributor(contributor.trim());
-        
+
         if (StringUtils.isNotBlank(language))
           search.language(language.trim());
-        
+
         if (StringUtils.isNotBlank(series))
           search.seriesId(series.trim());
-        
+
         if (StringUtils.isNotBlank(license))
           search.license(license.trim());
-        
+
         if (StringUtils.isNotBlank(title))
           search.title(title.trim());
 

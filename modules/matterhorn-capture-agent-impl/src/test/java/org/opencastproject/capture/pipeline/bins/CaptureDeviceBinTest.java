@@ -250,7 +250,7 @@ public class CaptureDeviceBinTest {
     runDeviceTest(PipelineTestHelpers.HAUPPAGE_LOCATION, ProducerType.HAUPPAUGE_WINTV, "Hauppage Source", tempDirectory
             + "/fileSrc.mpg");
   }
-  
+
   @Ignore@Test
   public void captureDeviceBinUsesCustomConsumers() throws UnableToLinkGStreamerElementsException,
           UnableToCreateGhostPadsForBinException, UnableToSetElementPropertyBecauseElementWasNullException,
@@ -275,7 +275,7 @@ public class CaptureDeviceBinTest {
         foundSink = true;
       }
     }
-    Assert.assertTrue("The sink we tried to create wasn't actually created, " 
+    Assert.assertTrue("The sink we tried to create wasn't actually created, "
             + "at least it wasn't in the list of elements.", foundSink);
   }
 }

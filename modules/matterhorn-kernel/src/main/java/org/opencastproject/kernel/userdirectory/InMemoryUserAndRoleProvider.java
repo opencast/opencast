@@ -59,7 +59,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -69,7 +69,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * Sets a reference to the security service.
-   * 
+   *
    * @param securityService
    *          the security service
    */
@@ -79,7 +79,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * Callback to activate the component.
-   * 
+   *
    * @param cc
    *          the declarative services component context
    */
@@ -107,7 +107,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
     for (String roleName : MH_SYSTEM_ROLES) {
       roleList.add(roleName);
     }
-    
+
     // Add the roles as defined in the system configuration
     if (StringUtils.isNotBlank(adminUserRoles)) {
       for (String roleName : StringUtils.split(adminUserRoles, ',')) {
@@ -133,7 +133,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleProvider#getRoles()
    */
   @Override
@@ -147,7 +147,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#loadUser(java.lang.String)
    */
   @Override
@@ -161,7 +161,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override
@@ -171,7 +171,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#getOrganization()
    */
   @Override
@@ -181,7 +181,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
    */
   @Override

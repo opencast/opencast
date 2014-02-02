@@ -85,7 +85,7 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -102,7 +102,7 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -116,7 +116,7 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#skip(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -144,7 +144,7 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#resume(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext, java.util.Map)
    */
@@ -185,8 +185,8 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
     for (Track t : workflowInstance.getMediaPackage().getTracks()) {
       // By default we should trim at the indicated point
       long trimDuration = initialTrimDuration;
-      
-      if (strThreshold != null) { 
+
+      if (strThreshold != null) {
         // Check track duration and adjust trim point accordingly
         if (t.getDuration() < trimEnd) {
           // The track duration is shorter than the trim point
@@ -196,7 +196,7 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
                   t.getIdentifier(),
                   t.getDuration());
           if (t.getDuration() >= trimEnd - durationThreshold) {
-            // The track duration is, however, within the specified threshold interval 
+            // The track duration is, however, within the specified threshold interval
             trimDuration = t.getDuration() - trimStart;
             logger.warn(String.format(
                     "%1$s, but is within the %2$d ms. threshold. "
@@ -260,7 +260,7 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
 
   /**
    * Sets the composer service.
-   * 
+   *
    * @param composerService
    *          the composer service
    */
@@ -270,7 +270,7 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
 
   /**
    * Sets the workspace
-   * 
+   *
    * @param workspace
    *          the workspace
    */

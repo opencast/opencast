@@ -36,7 +36,7 @@ public abstract class Either<A, B> {
   public abstract <X> X fold(Match<A, B, X> visitor);
 
   public abstract <X> X fold(Function<A, X> left, Function<B, X> right);
-   
+
   public abstract boolean isLeft();
 
   public abstract boolean isRight();
@@ -57,13 +57,13 @@ public abstract class Either<A, B> {
     public abstract Either<A, B> either();
 
     public abstract <X> Either<X, B> map(Function<A, X> f);
-    
+
     public abstract <X> Either<X, B> bind(Function<A, Either<X, B>> f);
 
     public <X> Either<X, B> flatMap(Function<A, Either<X, B>> f) {
       return bind(f);
     }
-    
+
     public abstract A value();
 
     public abstract A getOrElse(A right);
@@ -80,7 +80,7 @@ public abstract class Either<A, B> {
     }
 
     public abstract Either<A, B> either();
-    
+
     public abstract <X> Either<A, X> map(Function<B, X> f);
 
     public abstract <X> Either<A, X> bind(Function<B, Either<A, X>> f);
@@ -127,7 +127,7 @@ public abstract class Either<A, B> {
 
           @Override
           public Either<A, B> either() {
-            return self; 
+            return self;
           }
 
           @Override
@@ -238,7 +238,7 @@ public abstract class Either<A, B> {
           public <X> Either<X, B> bind(Function<A, Either<X, B>> f) {
             return right(right) ;
           }
-        };                
+        };
       }
 
       @Override

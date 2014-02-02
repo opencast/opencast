@@ -33,17 +33,17 @@ import org.slf4j.LoggerFactory;
  * Static Gstreamer helpers.
  */
 public final class GStreamerPipelineTools {
-  
+
   private static final Logger logger = LoggerFactory.getLogger(GStreamerPipelineTools.class);
-  
+
   /** Private default constructor is needed for utility classes. **/
   private GStreamerPipelineTools() { }
-  
+
   /**
-   * Double checks that the source location for capture is set, otherwise throws an exception. 
-   * @param name Friendly name of the capture device. 
-   * @param srcLoc The source location that should be set to something. 
-   * @throws CannotFindSourceFileOrDeviceException Thrown if the source location is null or the empty string. 
+   * Double checks that the source location for capture is set, otherwise throws an exception.
+   * @param name Friendly name of the capture device.
+   * @param srcLoc The source location that should be set to something.
+   * @throws CannotFindSourceFileOrDeviceException Thrown if the source location is null or the empty string.
    */
   public static void checkSrcLocationExists(String name, String srcLoc) throws CannotFindSourceFileOrDeviceException {
     if (srcLoc == null || ("").equals(srcLoc)) {
@@ -80,13 +80,13 @@ public final class GStreamerPipelineTools {
       }
     }
   }
-  
-  /** Creates a CaptureDevice used mostly for testing purposes from its important components. 
+
+  /** Creates a CaptureDevice used mostly for testing purposes from its important components.
    * @param srcLoc Where the capture device will capture from e.g. /dev/video0.
    * @param devName The ProducerType of the capture device such as V4L2SRC.
    * @param name The unique name of the capture device.
-   * @param outputLoc The output name of the capture media. 
-   * @param properties Capture device properties 
+   * @param outputLoc The output name of the capture media.
+   * @param properties Capture device properties
    **/
   public static CaptureDevice createCaptureDevice(String srcLoc, ProducerFactory.ProducerType devName, String name, String outputLoc, Properties properties) {
     CaptureDevice capdev = new CaptureDevice(srcLoc, devName, name, outputLoc);
@@ -129,13 +129,13 @@ public final class GStreamerPipelineTools {
 
     return capdev;
   }
-  
-  private static String createDevice(String outputDirectory, 
-          boolean confidenceOnly, ArrayList<CaptureDevice> devices, String name, Properties properties) 
-          
+
+  private static String createDevice(String outputDirectory,
+          boolean confidenceOnly, ArrayList<CaptureDevice> devices, String name, Properties properties)
+
           throws InvalidDeviceNameException, UnableToCreateSampleOutputFileException,
           UnrecognizedDeviceException, CannotFindSourceFileOrDeviceException {
-    
+
     name = name.trim();
     ProducerFactory.ProducerType devName;
 
@@ -161,7 +161,7 @@ public final class GStreamerPipelineTools {
     logger.debug("Device {} has source at {}.", name, srcLoc);
     if (outputFile != null)
       logger.debug("Device {} has output at {}.", name, outputFile);
-    else 
+    else
       logger.debug("Device {} has no output, because running monitoring only.", name);
 
     String type = properties.getProperty(typeProperty);
@@ -172,7 +172,7 @@ public final class GStreamerPipelineTools {
     if (!confidenceOnly && outputFile != null) {
       try {
         if (!outputFile.createNewFile()) {
-          throw new UnableToCreateSampleOutputFileException("Could not create ouput file for " 
+          throw new UnableToCreateSampleOutputFileException("Could not create ouput file for "
                   + outputFile.getAbsolutePath()
                   + " because we cannot create a new file possibly because it already exists.");
         }
@@ -182,12 +182,12 @@ public final class GStreamerPipelineTools {
                 + ". " + e.getMessage());
       }
     }
-    
+
     if (type != null) {
       devName = ProducerFactory.ProducerType.valueOf(type);
       logger.debug("Device {} has been confirmed to be type {}", name, devName.toString());
       /** For certain devices we need to check to make sure that the src is specified, others are exempt. **/
-      if (ProducerFactory.getInstance().requiresSrc(devName)) {  
+      if (ProducerFactory.getInstance().requiresSrc(devName)) {
         checkSrcLocationExists(name, srcLoc);
       }
     } else {
@@ -209,10 +209,10 @@ public final class GStreamerPipelineTools {
     }
     return name;
   }
-  
+
   /**
    * Splits the device names from the pipeline's properties.
-   * 
+   *
    * @return The device names to capture from.
    * @throws InvalidCaptureDevicesSpecifiedException
    *           - If there are no capture devices specified in the configuration file we throw an exception.
@@ -238,11 +238,11 @@ public final class GStreamerPipelineTools {
 
     return friendlyNames;
   }
-  
+
   /**
    * Returns an {@code ArrayList} of {@code CaptureDevice}s which contain everything the rest of this class needs to
    * start the pipeline
-   * 
+   *
    * @param friendlyNames
    *          The list of friendly names we will be capturing from.
    * @param outputDirectory
@@ -268,7 +268,7 @@ public final class GStreamerPipelineTools {
         logger.error("Device " + name + " is an unrecognized device ", e);
       }
     }
-    
+
     return devices;
   }
 }

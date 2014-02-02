@@ -306,7 +306,7 @@ public class RestDocsAnnotationTest {
       fail();
     }
   }
-  
+
   @Test
   public void testPathPatternMatching() throws Exception {
     assertTrue("/{seriesID:.+}".matches(RestDocData.PATH_VALIDATION_REGEX));

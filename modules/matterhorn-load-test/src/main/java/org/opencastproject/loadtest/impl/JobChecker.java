@@ -38,10 +38,10 @@ public class JobChecker implements Runnable {
   private LoadTest loadTest = null;
   // The client to use to connect to the core for the ingest.
   private TrustedHttpClient client = null;
-  
+
   /**
    * Checks each of the ingest jobs to find out if they are finished yet or not.
-   * 
+   *
    * @param ingestJobs
    *          The ingest jobs that we are meant to check.
    * @param newLoadTesting
@@ -54,10 +54,10 @@ public class JobChecker implements Runnable {
   }
 
   /**
-   * Use the TrustedHttpClient from matterhorn to check the status of jobs. 
-   * 
+   * Use the TrustedHttpClient from matterhorn to check the status of jobs.
+   *
    * @param id
-   *          The media package id to check. 
+   *          The media package id to check.
    * @param mediaPackageLocation
    *          The location of the mediapackage we want to ingest.
    */
@@ -68,7 +68,7 @@ public class JobChecker implements Runnable {
       URL url = new URL(loadTest.getCoreAddress() + "/workflow/instance/" + id);
       logger.debug("Check Job URL is " + url.toString());
       HttpGet getMethod = new HttpGet(url.toString());
-      
+
       // Send the request
       HttpResponse response = null;
       int retValue = -1;
@@ -105,7 +105,7 @@ public class JobChecker implements Runnable {
   /**
    * Check the ingest jobs to see if they have started on the core yet at a set interval in the configuration file until
    * they have all started.
-   * 
+   *
    * @see java.lang.Runnable#run()
    **/
   @Override

@@ -71,7 +71,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
   /**
    * Constructs an ldap user provider with the needed settings.
-   * 
+   *
    * @param pid
    *          the pid of this service
    * @param organization
@@ -105,12 +105,12 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       contextSource.setPassword(password);
       contextSource.setUserDn(userDn);
       // Required so that authentication will actually be used
-      contextSource.setAnonymousReadOnly(false);      
+      contextSource.setAnonymousReadOnly(false);
     } else {
-      // No password set so try to connect anonymously. 
-      contextSource.setAnonymousReadOnly(true);  
+      // No password set so try to connect anonymously.
+      contextSource.setAnonymousReadOnly(true);
     }
-    
+
     try {
       contextSource.afterPropertiesSet();
     } catch (Exception e) {
@@ -163,7 +163,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#getOrganization()
    */
   @Override
@@ -173,7 +173,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#loadUser(java.lang.String)
    */
   @Override
@@ -195,7 +195,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
   /**
    * Loads a user from LDAP.
-   * 
+   *
    * @param userName
    *          the username
    * @return the user
@@ -238,7 +238,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.CachingUserProviderMXBean#getCacheHitRatio()
    */
   public float getCacheHitRatio() {

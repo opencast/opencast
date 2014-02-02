@@ -101,7 +101,7 @@ public class WorkflowPermissionsUpdatedEventHandler implements EventHandler {
 
   /**
    * OSGI callback for component activation.
-   * 
+   *
    * @param bundleContext
    *          the OSGI bundle context
    */
@@ -176,7 +176,7 @@ public class WorkflowPermissionsUpdatedEventHandler implements EventHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.event.EventHandler#handleEvent(org.osgi.service.event.Event)
    */
   @Override
@@ -200,7 +200,7 @@ public class WorkflowPermissionsUpdatedEventHandler implements EventHandler {
           WorkflowQuery q = new WorkflowQuery().withSeriesId(seriesId);
           WorkflowSet result = workflowService.getWorkflowInstancesForAdministrativeRead(q);
           Integer offset = 0;
-          
+
           while (result.size() > 0) {
             for (WorkflowInstance instance : result.getItems()) {
               if (!isActive(instance)) {

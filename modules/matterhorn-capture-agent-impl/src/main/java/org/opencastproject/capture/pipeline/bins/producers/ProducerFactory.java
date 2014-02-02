@@ -45,11 +45,11 @@ public final class ProducerFactory {
     PULSESRC, /* Linux sound capture */
     V4LSRC, /* Generic v4l source */
     V4L2SRC, /* Generic v4l2 source */
-    VIDEOTESTSRC /* Built in gstreamer video test src */    
+    VIDEOTESTSRC /* Built in gstreamer video test src */
   }
-  
+
   private HashSet<ProducerType> producersWithoutSourceRequirement = new HashSet<ProducerType>();
-  
+
   /** Singleton factory pattern ensuring only one instance of the factory is created even with multiple threads. **/
   public static synchronized ProducerFactory getInstance() {
     if (factory == null) {
@@ -60,7 +60,7 @@ public final class ProducerFactory {
 
   /** Constructor made private so that the number of Factories can be kept to one. **/
   private ProducerFactory() {
-    // Producers that don't require a source. 
+    // Producers that don't require a source.
     producersWithoutSourceRequirement.add(ProducerType.ALSASRC);
     producersWithoutSourceRequirement.add(ProducerType.AUDIOTESTSRC);
     producersWithoutSourceRequirement.add(ProducerType.CUSTOM_AUDIO_SRC);
@@ -71,7 +71,7 @@ public final class ProducerFactory {
 
   /**
    * Returns the Producer corresponding to the ProducerType
-   * 
+   *
    * @param captureDevice
    *          The properties of the capture device such as container, codec, bitrate, enabled confidence monitoring etc.
    *          used to initialize the Producer.
@@ -127,13 +127,13 @@ public final class ProducerFactory {
       throw new NoProducerFoundException("No valid Producer found for device " + captureDevice.getName());
     }
   }
-  
+
   /**
    * Returns true if the ProducerType does require a source to create, returns false if ProducerType is null, doesn't
    * exist or doesn't require the source location.
-   * 
-   * @param type The type of Producer that needs to be checked whether it requires a source. 
-   * @return Returns true if it requires a source, false otherwise. 
+   *
+   * @param type The type of Producer that needs to be checked whether it requires a source.
+   * @return Returns true if it requires a source, false otherwise.
    */
   public boolean requiresSrc(ProducerType type) {
     if (type == null) {

@@ -83,7 +83,7 @@ public class UserTrackingRestService {
 
   /**
    * Method to set the service this REST endpoint uses
-   * 
+   *
    * @param service
    */
   public void setService(UserTrackingService service) {
@@ -92,7 +92,7 @@ public class UserTrackingRestService {
 
   /**
    * Sets the security service
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -102,7 +102,7 @@ public class UserTrackingRestService {
 
   /**
    * The method that is called, when the service is activated
-   * 
+   *
    * @param cc
    *          The ComponentContext of this service
    */
@@ -288,16 +288,16 @@ public class UserTrackingRestService {
     a.setOutpoint(out);
     a.setType(type);
     a.setIsPlaying(Boolean.valueOf(isPlaying));
-    
+
     //MH-8616 the connection might be via a proxy
     String clientIP = request.getHeader("X-FORWARDED-FOR");
-    
+
     if (clientIP == null) {
       clientIP = request.getRemoteAddr();
     }
     logger.debug("Got client ip: {}", clientIP);
     a.setUserIp(clientIP);
-    
+
     try {
       if ("FOOTPRINT".equals(type)) {
         a = (UserActionImpl) usertrackingService.addUserFootprint(a);

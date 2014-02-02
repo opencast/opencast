@@ -37,7 +37,7 @@ public class XVImagesinkConsumer extends ConsumerBin {
   /**
    * Available in Linux only. Streams Producer video data in real time to the screen so that it can be watched by using
    * the GStreamer Element xvimagesink.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the platform is not Linux or the gst-plugins-base is not installed this Exception is thrown.
    * @throws UnableToLinkGStreamerElementsException
@@ -58,7 +58,7 @@ public class XVImagesinkConsumer extends ConsumerBin {
 
   /**
    * Create the XVImageSink.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the OS is not Linux or the gst-plugins-bas is not installed.
    */

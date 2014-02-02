@@ -43,7 +43,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /** This service factory's PID */
   public static final String PID = "org.opencastproject.userdirectory.ldap";
-  
+
   /** The key to look up the ldap search filter in the service configuration properties */
   private static final String SEARCH_FILTER_KEY = "org.opencastproject.userdirectory.ldap.searchfilter";
 
@@ -79,7 +79,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /**
    * Builds the factory with the current bundle context, which is used to register new ldap providers.
-   * 
+   *
    * @param bundleContext
    *          the OSGI bundle context
    */
@@ -91,7 +91,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedServiceFactory#getName()
    */
   @Override
@@ -101,7 +101,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedServiceFactory#updated(java.lang.String, java.util.Dictionary)
    */
   @Override
@@ -150,7 +150,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedServiceFactory#deleted(java.lang.String)
    */
   @Override
@@ -168,12 +168,12 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /**
    * Builds a JMX object name for a given PID
-   * 
+   *
    * @param pid
    *          the PID
    * @return the object name
-   * @throws NullPointerException 
-   * @throws MalformedObjectNameException 
+   * @throws NullPointerException
+   * @throws MalformedObjectNameException
    */
   public static final ObjectName getObjectName(String pid) throws MalformedObjectNameException, NullPointerException {
     return new ObjectName(pid + ":type=LDAPRequests");

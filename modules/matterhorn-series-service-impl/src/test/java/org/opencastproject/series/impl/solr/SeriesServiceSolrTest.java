@@ -43,7 +43,7 @@ import java.util.List;
 
 /**
  * Tests indexing: indexing, removing, retrieving, merging and searching.
- * 
+ *
  */
 public class SeriesServiceSolrTest {
 
@@ -162,24 +162,24 @@ public class SeriesServiceSolrTest {
     DublinCoreCatalogList result = index.search(q);
     Assert.assertTrue("Two series satisfy time range", result.size() == 2);
   }
-  
+
   @Test
   public void testAccessControlManagment() throws Exception {
     // sample access control list
     AccessControlList accessControlList = new AccessControlList();
     List<AccessControlEntry> acl = accessControlList.getEntries();
     acl.add(new AccessControlEntry("admin", "delete", true));
-    
+
     index.updateIndex(testCatalog);
     String seriesID = testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER);
     index.updateSecurityPolicy(seriesID, accessControlList);
-    
+
     AccessControlList retrievedACL = index.getAccessControl(seriesID);
     Assert.assertNotNull(retrievedACL);
     acl = retrievedACL.getEntries();
     Assert.assertEquals(acl.size(), 1);
     Assert.assertEquals(acl.get(0).getRole(), "admin");
-    
+
     try {
       index.updateSecurityPolicy("failid", accessControlList);
       Assert.fail("Should fail when indexing ACL to nonexistent series");

@@ -137,25 +137,25 @@ public class AnnotationServiceJpaImplTest {
     a1.setValue("This is some user generated content");
     annotationService.addAnnotation(a1);
     Long a1Id = a1.getAnnotationId();
- 
+
     AnnotationImpl a2 = new AnnotationImpl();
     a2.setAnnotationId(a1Id);
     a2.setValue("This is some other user generated content");
     Annotation a3 = annotationService.changeAnnotation(a2);
     Assert.assertNotNull(a3);
-    
+
     Long a2Id = a2.getAnnotationId();
     Assert.assertEquals(a1Id, a2Id);
-    
+
     Annotation a1FromDb = annotationService.getAnnotation(a1Id);
     Assert.assertEquals(a1.getAnnotationId(), a1FromDb.getAnnotationId());
     Assert.assertEquals(a2.getValue(), a1FromDb.getValue());
     Assert.assertEquals(a1.getSessionId(), a1FromDb.getSessionId());
     Assert.assertEquals(a1.getUserId(), a1FromDb.getUserId());
     Assert.assertEquals(a1.getUserId(), annotationService.securityService.getUser().getUserName());
-   
+
     //remove annotation
-    Assert.assertTrue(annotationService.removeAnnotation(a1));  
+    Assert.assertTrue(annotationService.removeAnnotation(a1));
 
   }
 

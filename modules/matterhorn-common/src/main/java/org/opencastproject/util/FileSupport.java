@@ -57,7 +57,7 @@ public final class FileSupport {
   /**
    * Moves the specified file or directory from <code>sourceLocation</code> to <code>targetDirectory</code>. If
    * <code>targetDirectory</code> does not exist, it will be created.
-   * 
+   *
    * @param sourceLocation
    *          the source file or directory
    * @param targetDirectory
@@ -92,7 +92,7 @@ public final class FileSupport {
    * <p/>
    * Also note that if <code>targetLocation</code> is a directory than the directory itself, not only its content is
    * copied.
-   * 
+   *
    * @param sourceLocation
    *          the source file or directory
    * @param targetLocation
@@ -116,7 +116,7 @@ public final class FileSupport {
    * file already exists.
    * <p/>
    * Note that if <code>targetLocation</code> is a directory than the directory itself, not only its content is copied.
-   * 
+   *
    * @param sourceFile
    *          the source file or directory
    * @param targetFile
@@ -131,9 +131,9 @@ public final class FileSupport {
 
     // This variable is used when the channel copy files, and stores the maximum size of the file parts copied from source to target
     final int chunk = 1024 * 1024 * 512; // 512 MB
-    
+
     // This variable is used when the cannel copy fails completely, as the size of the memory buffer used to copy the data from one stream to the other.
-    final int bufferSize = 1024 * 1024; // 1 MB 
+    final int bufferSize = 1024 * 1024; // 1 MB
 
     File dest = determineDestination(targetFile, sourceFile, overwrite);
 
@@ -216,7 +216,7 @@ public final class FileSupport {
    * <p/>
    * If <code>overwrite</code> is set to <code>false</code>, this method throws an {@link IOException} if the target
    * file already exists.
-   * 
+   *
    * @param sourceDirectory
    *          the source directory
    * @param targetDirectory
@@ -246,7 +246,7 @@ public final class FileSupport {
    * <code>targetDirectory</code>.
    * <p/>
    * Note that existing files and directories will be overwritten.
-   * 
+   *
    * @param sourceDirectory
    *          the source directory
    * @param targetDirectory
@@ -264,7 +264,7 @@ public final class FileSupport {
    * <p/>
    * If <code>overwrite</code> is set to <code>false</code>, this method throws an {@link IOException} if the target
    * file already exists.
-   * 
+   *
    * @param sourceDirectory
    *          the source directory
    * @param targetDirectory
@@ -329,7 +329,7 @@ public final class FileSupport {
    * <code>targetDirectory</code>.
    * <p/>
    * Note that existing files and directories will be overwritten.
-   * 
+   *
    * @param sourceDirectory
    *          the source directory
    * @param targetDirectory
@@ -348,7 +348,7 @@ public final class FileSupport {
    * <p>
    * If this fails (because linking is not supported on the current filesystem, then a copy is made.
    * </p>
-   * 
+   *
    * @param sourceLocation
    *          the source file or directory
    * @param targetLocation
@@ -369,7 +369,7 @@ public final class FileSupport {
    * </p>
    * If <code>overwrite</code> is set to <code>false</code>, this method throws an {@link IOException} if the target
    * file already exists.
-   * 
+   *
    * @param sourceLocation
    *          the source file or directory
    * @param targetLocation
@@ -385,7 +385,7 @@ public final class FileSupport {
       throw new IllegalArgumentException("Source location must not by null");
     if (targetLocation == null)
       throw new IllegalArgumentException("Target location must not by null");
-    
+
     File dest = determineDestination(targetLocation, sourceLocation, overwrite);
 
     // Special treatment for directories as sources
@@ -467,7 +467,7 @@ public final class FileSupport {
    * Returns <code>true</code> if the operating system as well as the disk layout support creating a hard link from
    * <code>src</code> to <code>dest</code>. Note that this implementation requires two files rather than directories and
    * will overwrite any existing file that might already be present at the destination.
-   * 
+   *
    * @param sourceLocation
    *          the source file
    * @param targetLocation
@@ -519,10 +519,10 @@ public final class FileSupport {
   }
 
   /**
-   * @param sourceLocation The location of the file you want to link. 
-   * @param targetLocation The location and name to place the link. 
-   * @param overwrite Whether to overwrite a link if it exists. 
-   * @return Returns a process that should link the two 
+   * @param sourceLocation The location of the file you want to link.
+   * @param targetLocation The location and name to place the link.
+   * @param overwrite Whether to overwrite a link if it exists.
+   * @return Returns a process that should link the two
    * @throws IOException
    */
   private static Process createLinkFileProcess(File sourceLocation, File targetLocation, boolean overwrite) throws IOException {
@@ -534,7 +534,7 @@ public final class FileSupport {
         p = new ProcessBuilder("ln", sourceLocation.getAbsolutePath(), targetLocation.getAbsolutePath()).start();
       }
     } else {
-      /** 
+      /**
        * Handle the windows special case by using mklink instead of ln. mklink is also a command in the cmd.exe command
        * shell, not a separate application so we need to run a command shell with the /C switch to be able to use the
        * utility. There also is no force in windows. **/
@@ -555,7 +555,7 @@ public final class FileSupport {
                 "-exec", "ln", "{}", targetDirectory.getAbsolutePath() + File.separator, ";").start();
       }
     } else {
-      /** 
+      /**
        * Handle the windows special case by using mklink instead of ln. mklink is also a command in the cmd.exe command
        * shell, not a separate application so we need to run a command shell with the /C switch to be able to use the
        * utility. There also is no force in windows. **/
@@ -576,14 +576,14 @@ public final class FileSupport {
         if (targetLocation.isDirectory())
           // Create a destination file within it, with the same name of the source target
           dest = new File(targetLocation, sourceLocation.getName());
-        else 
+        else
           // targetLocation is either a normal file or doesn't exist
           dest = targetLocation;
-        
+
         // Source and target locations can not be the same
         if (sourceLocation.equals(dest))
           throw new IOException("Source and target locations must be different");
-        
+
         // Search the first existing parent of the target file, to check if it can be written
         // getParentFile can return null even though there *is* a parent file, if the file is not absolute
         // That's the reason why getAbsoluteFile is used here
@@ -591,19 +591,19 @@ public final class FileSupport {
           if (iter.exists()) {
             if (iter.canWrite())
               break;
-            else  
+            else
               throw new IOException("Destination " + dest + "cannot be written/modified");
           }
-        
+
         // Check the target file can be overwritten
         if (dest.exists() && !dest.isDirectory() && !overwrite)
           throw new IOException("Destination " + dest + " already exists");
-        
+
       } else
         throw new IOException(sourceLocation + " cannot be read");
     } else
       throw new IOException("Source " + sourceLocation + " does not exist");
-    
+
     return dest;
   }
 
@@ -612,7 +612,7 @@ public final class FileSupport {
    * <p>
    * If <code>f</code> is a directory, it will only be deleted if it doesn't contain any other files or directories. To
    * do a recursive delete, you may use {@link #delete(File, boolean)}.
-   * 
+   *
    * @param f
    *          the file or directory
    * @see #delete(File, boolean)
@@ -627,7 +627,7 @@ public final class FileSupport {
    * In the case that <code>f</code> references a directory, it will only be deleted if it doesn't contain other files
    * or directories, unless <code>recurse</code> is set to <code>true</code>.
    * </p>
-   * 
+   *
    * @param f
    *          the file or directory
    * @param recurse
@@ -650,7 +650,7 @@ public final class FileSupport {
   /**
    * Deletes the content of directory <code>dir</code> and, if specified, the directory itself. If <code>dir</code> is a
    * normal file it will always be deleted.
-   * 
+   *
    * @return true everthing was deleted, false otherwise
    */
   public static boolean delete(File dir, int mode) {
@@ -686,7 +686,7 @@ public final class FileSupport {
 
   /**
    * Sets the webapp's temporary directory. Make sure that directory exists and has write permissions turned on.
-   * 
+   *
    * @param tmpDir
    *          the new temporary directory
    * @throws IllegalArgumentException
@@ -704,7 +704,7 @@ public final class FileSupport {
 
   /**
    * Returns the webapp's temporary work directory.
-   * 
+   *
    * @return the temp directory
    */
   public static File getTempDirectory() {
@@ -716,7 +716,7 @@ public final class FileSupport {
 
   /**
    * Returns a directory <code>subdir</code> inside the webapp's temporary work directory.
-   * 
+   *
    * @param subdir
    *          name of the subdirectory
    * @return the ready to use temp directory
@@ -736,7 +736,7 @@ public final class FileSupport {
 
   /**
    * Returns true if both canonical file paths are equal.
-   * 
+   *
    * @param a
    *          the first file or null
    * @param b
@@ -758,7 +758,7 @@ public final class FileSupport {
 
     /**
      * Creates a new stream helper that will swallow some well known error messages while linking.
-     * 
+     *
      * @param stream
      *          the content stream
      * @param output

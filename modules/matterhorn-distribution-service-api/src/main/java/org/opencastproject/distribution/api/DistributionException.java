@@ -19,7 +19,7 @@ package org.opencastproject.distribution.api;
  * A DistributionException indicates that an error occurred while interacting with a distribution channel.
  */
 public class DistributionException extends Exception {
-  
+
   private static final long serialVersionUID = -2340507612898278368L;
 
   public DistributionException(String message) {

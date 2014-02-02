@@ -41,7 +41,7 @@ public interface CaptureAgent {
 
   /**
    * Starting a simple capture.  Uses the machine's default metadata and assigns a generated recording ID to the capture if one is not specified in the properties object.  The relevant keys can be found in CaptureParameters.
-   * Properties not in the configuration parameter use the machine defaults.  If, for example, you only wish to specify the recording's ID then only set that value in the properties and the machine will use its defeaults for the others. 
+   * Properties not in the configuration parameter use the machine defaults.  If, for example, you only wish to specify the recording's ID then only set that value in the properties and the machine will use its defeaults for the others.
    * Note that this will not start a second capture if there is already one in progress.  You must first stop the running capture before starting another.
    * @param configuration {@code Properties} object containing the properties for the recording.
    * @return The recording ID associated with the recording, or null in the case of an error.
@@ -59,7 +59,7 @@ public interface CaptureAgent {
    * @see org.opencastproject.capture.CaptureParameters
    */
   String startCapture(MediaPackage mediaPackage, Properties configuration);
-  
+
   /**
    * Stops the currently running capture.  Returns true on success.
    * Error conditions occur if gstreamer has an unexpected error, or there is no recording currently in progress.  In this case it will return false.
@@ -88,7 +88,7 @@ public interface CaptureAgent {
   /**
    * Gets the machine's current state.
    * This is returning a string so that inter-version compatibility it maintained (eg, a version 2 agent talking to a version 1 core).
-   * 
+   *
    * @return A state (should be defined in AgentState).
    * @see org.opencastproject.capture.admin.api.AgentState
    */
@@ -99,14 +99,14 @@ public interface CaptureAgent {
    * @return The agent's capabilities, or null in the case of an error.
    */
   Properties getAgentCapabilities();
-  
+
   /**
    * Returns a pretty-printed version of the agent's default properties.
    * @return The agent's default properties
    */
   @Deprecated
   String getDefaultAgentPropertiesAsString();
-  
+
   /**
    * Returns the agent's default properties.
    * @return The agent's default properties, or null in the case of an error.

@@ -50,10 +50,10 @@ public interface SolrFields {
   String STARTS_KEY = "event_start";
   String ENDS_KEY = "event_end";
   String LAST_MODIFIED = "event_last_modified";
-  
+
   /** Capture agent fields */
   String CA_PROPERTIES = "ca_properties";
-  
+
   /** Fulltext search field */
   String FULLTEXT_KEY = "fulltext";
 }
