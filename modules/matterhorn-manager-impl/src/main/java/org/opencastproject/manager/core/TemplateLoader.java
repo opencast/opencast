@@ -28,38 +28,38 @@ import org.apache.commons.io.IOUtils;
  */
 public final class TemplateLoader {
 
-	/**
-	 * constructor
-	 */
-	public TemplateLoader() { }
-	
+  /**
+   * constructor
+   */
+  public TemplateLoader() { }
+  
     /**
      * Returns the template (HTML) as string.
      * 
      * @return template as string 
      */
-	public String readTemplateFile(final String templateFile) {
-		
-		InputStream templateStream = this.getClass().getResourceAsStream(templateFile);
-	      
-		if (templateStream != null) {
-			try {
-				String str = IOUtils.toString(templateStream, "UTF-8");
-				switch (str.charAt(0)) { 
-					case 0xFEFF: // UTF-16/UTF-32, big-endian
-					case 0xFFFE: // UTF-16, little-endian
-					case 0xEFBB: // UTF-8
-					return str.substring(1);
-					default:
-					break;
-	          }
-	          return str;
-			} catch (IOException e) { 
-			} finally {
-	    	  IOUtils.closeQuietly(templateStream);
-	      	}
-		}
-	  // no template file
-	  return "";
-	}
+  public String readTemplateFile(final String templateFile) {
+    
+    InputStream templateStream = this.getClass().getResourceAsStream(templateFile);
+        
+    if (templateStream != null) {
+      try {
+        String str = IOUtils.toString(templateStream, "UTF-8");
+        switch (str.charAt(0)) { 
+          case 0xFEFF: // UTF-16/UTF-32, big-endian
+          case 0xFFFE: // UTF-16, little-endian
+          case 0xEFBB: // UTF-8
+          return str.substring(1);
+          default:
+          break;
+            }
+            return str;
+      } catch (IOException e) { 
+      } finally {
+          IOUtils.closeQuietly(templateStream);
+          }
+    }
+    // no template file
+    return "";
+  }
 }

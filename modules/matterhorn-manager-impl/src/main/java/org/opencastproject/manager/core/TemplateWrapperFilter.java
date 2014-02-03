@@ -38,10 +38,10 @@ import javax.servlet.http.HttpServletResponseWrapper;
  */
 public class TemplateWrapperFilter extends HttpServletResponseWrapper {
 
-	/**
-	 * the servlet's request providing the variable resolver at the time
-	 * the getWriter() method is called
-	 */
+  /**
+   * the servlet's request providing the variable resolver at the time
+   * the getWriter() method is called
+   */
     private final ServletRequest request;
 
     /**
@@ -59,7 +59,7 @@ public class TemplateWrapperFilter extends HttpServletResponseWrapper {
      */
     public TemplateWrapperFilter(final HttpServletResponse response, final ServletRequest request) {
         
-    	super(response);
+      super(response);
         this.request = request;
     }
 
@@ -71,7 +71,7 @@ public class TemplateWrapperFilter extends HttpServletResponseWrapper {
      */
     public PrintWriter getWriter() throws IOException {
         
-    	if (writer == null) {
+      if (writer == null) {
             final PrintWriter base = super.getWriter();
             
             if (doWrap()) {

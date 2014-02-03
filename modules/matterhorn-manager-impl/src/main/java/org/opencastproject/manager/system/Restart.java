@@ -37,36 +37,36 @@ import org.opencastproject.manager.api.PluginManagerConstants;
  */
 public class Restart {
 
-	/**
-	 * The bundle context
-	 */
-	private BundleContext bundleContext;
+  /**
+   * The bundle context
+   */
+  private BundleContext bundleContext;
 
-	private static final Logger logger = LoggerFactory.getLogger(Restart.class);
+  private static final Logger logger = LoggerFactory.getLogger(Restart.class);
 
-	/**
-	 * Constructor
-	 * 
-	 * @param bundleContext
-	 */
-	public Restart(BundleContext bundleContext) {
-		
-		this.bundleContext = bundleContext;
-	}
-	
-	/**
-	 * Restarts the framework.
-	 * 
-	 * @throws IOException
-	 */
-	public void restart() throws IOException {
-	            
-		FileUtils.cleanDirectory(new File(PluginManagerConstants.FELIX_CACHE_PATH)); 
-		
-		final Bundle systemBundle = bundleContext.getBundle(0);
+  /**
+   * Constructor
+   * 
+   * @param bundleContext
+   */
+  public Restart(BundleContext bundleContext) {
+    
+    this.bundleContext = bundleContext;
+  }
+  
+  /**
+   * Restarts the framework.
+   * 
+   * @throws IOException
+   */
+  public void restart() throws IOException {
+              
+    FileUtils.cleanDirectory(new File(PluginManagerConstants.FELIX_CACHE_PATH)); 
+    
+    final Bundle systemBundle = bundleContext.getBundle(0);
 
         Thread t = new Thread("Stopper") {
-        	
+          
             public void run() {
                 try {
                     Thread.sleep(2000L);
@@ -80,11 +80,11 @@ public class Restart {
                         systemBundle.stop();
                     }
                 } catch (BundleException be) {
-			logger.error("Restarting Matterhorn failed.");	
-		}
+      logger.error("Restarting Matterhorn failed.");  
+    }
             }
         };
         
         t.start();
-	}
+  }
 }

@@ -22,120 +22,120 @@ import org.json.JSONObject;
 
 
 public class ConfigLine {
-	
-	private String line;
-	
-	private String key;
-	private String value;
-	
-	private boolean isProperty;
-	private boolean isCommentedProperty;
-	
-	public ConfigLine(String line) {
-		
-		this.line = line.trim();
-		parseLine();
-		
-	}
-	
-	
-	public ConfigLine(String key, String value, boolean enabled) {
-		
-		this.key = key;
-		this.value = value;
-		this.isProperty = true;
-		this.isCommentedProperty = !enabled;
-		this.line = key + "=" + value;
-		
-		if (!enabled) {
-			this.line += "#";			
-		}
-		
-	}
-	
-	
-	private void parseLine() {
-		
-		String uncommented = this.line.replaceFirst("#*", "");
-		String[] lines = uncommented.split("=", 2);
-		
-		// property (key-value paar separated with "=")
-		if (lines.length == 2) {
-			
-			this.key = lines[0].trim();
-			this.value = lines[1].trim();
-			
-			this.isProperty = true;
-			this.isCommentedProperty = this.line.startsWith("#") ? true : false;
-			
-		}
-		// comment or uncommented text or empty line
-		else {
-			
-			this.isCommentedProperty = false; 
-			this.isProperty = false;
-			
-			// comment uncommented text
-			if (!this.line.equals("") && !this.line.startsWith("#")) {
-			
-				this.line = "#".concat(this.line);
-			
-			}
-		}
-	}
-	
-	
-	public String toString() {
-		
-		if (!this.isProperty) {
-			return this.line;
-		}
-		
-		String retStr = this.key + "=" + this.value;
-		
-		if (this.isCommentedProperty) {
-			retStr = "#".concat(retStr);
-		}
-		
-		return retStr.replace("\\", "\\\n ");
-		
-	}
-	
-	public Object toJSON() throws JSONException {
-		
-		if (!this.isProperty) {
-			return this.line;
-		}
-		
-		
-		JSONObject json = new JSONObject();
-		json.put("key", this.key);
-		json.put("value", this.value);
-		json.put("enabled", !this.isCommentedProperty);
-		
-		return json;
-		
-	}
+  
+  private String line;
+  
+  private String key;
+  private String value;
+  
+  private boolean isProperty;
+  private boolean isCommentedProperty;
+  
+  public ConfigLine(String line) {
+    
+    this.line = line.trim();
+    parseLine();
+    
+  }
+  
+  
+  public ConfigLine(String key, String value, boolean enabled) {
+    
+    this.key = key;
+    this.value = value;
+    this.isProperty = true;
+    this.isCommentedProperty = !enabled;
+    this.line = key + "=" + value;
+    
+    if (!enabled) {
+      this.line += "#";      
+    }
+    
+  }
+  
+  
+  private void parseLine() {
+    
+    String uncommented = this.line.replaceFirst("#*", "");
+    String[] lines = uncommented.split("=", 2);
+    
+    // property (key-value paar separated with "=")
+    if (lines.length == 2) {
+      
+      this.key = lines[0].trim();
+      this.value = lines[1].trim();
+      
+      this.isProperty = true;
+      this.isCommentedProperty = this.line.startsWith("#") ? true : false;
+      
+    }
+    // comment or uncommented text or empty line
+    else {
+      
+      this.isCommentedProperty = false; 
+      this.isProperty = false;
+      
+      // comment uncommented text
+      if (!this.line.equals("") && !this.line.startsWith("#")) {
+      
+        this.line = "#".concat(this.line);
+      
+      }
+    }
+  }
+  
+  
+  public String toString() {
+    
+    if (!this.isProperty) {
+      return this.line;
+    }
+    
+    String retStr = this.key + "=" + this.value;
+    
+    if (this.isCommentedProperty) {
+      retStr = "#".concat(retStr);
+    }
+    
+    return retStr.replace("\\", "\\\n ");
+    
+  }
+  
+  public Object toJSON() throws JSONException {
+    
+    if (!this.isProperty) {
+      return this.line;
+    }
+    
+    
+    JSONObject json = new JSONObject();
+    json.put("key", this.key);
+    json.put("value", this.value);
+    json.put("enabled", !this.isCommentedProperty);
+    
+    return json;
+    
+  }
 
 
-	public String getValue() {
-		return this.value == null ? "" : this.value;
-	}
-	
-	public String getKey() {
-		return this.key == null ? "" : this.key;
-	}
-	
-	public void setEnabled(boolean enabled) {
-		if (this.isProperty) {
-			this.isCommentedProperty = !enabled;
-		}
-	}
-	
-	public void update(String value) {
-		if (this.isProperty) {
-			this.value = value.trim();
-		}
-	}
+  public String getValue() {
+    return this.value == null ? "" : this.value;
+  }
+  
+  public String getKey() {
+    return this.key == null ? "" : this.key;
+  }
+  
+  public void setEnabled(boolean enabled) {
+    if (this.isProperty) {
+      this.isCommentedProperty = !enabled;
+    }
+  }
+  
+  public void update(String value) {
+    if (this.isProperty) {
+      this.value = value.trim();
+    }
+  }
 
 }

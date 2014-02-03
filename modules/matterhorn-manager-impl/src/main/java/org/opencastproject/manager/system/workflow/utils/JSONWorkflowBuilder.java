@@ -33,56 +33,56 @@ import javax.xml.parsers.ParserConfigurationException;
  * 
  * @author Leonid Oldenburger
  */
-public class JSONWorkflowBuilder {	
-	
-	/**
-	 * The bundle context
-	 */
-	private BundleContext bundleContext;
-	
-	/**
-	 * The Document Handler
-	 */
-	private MetadataDocumentHandler handleDocument = new MetadataDocumentHandler();
+public class JSONWorkflowBuilder {  
+  
+  /**
+   * The bundle context
+   */
+  private BundleContext bundleContext;
+  
+  /**
+   * The Document Handler
+   */
+  private MetadataDocumentHandler handleDocument = new MetadataDocumentHandler();
 
-	/**
-	 * Constructor
-	 * 
-	 * @param bundleContext
-	 */
-	public JSONWorkflowBuilder(BundleContext bundleContext) {
-		this.bundleContext = bundleContext;
-	}
-	
-	/**
-	 * Creates HashMap with workflow's data.
-	 * 
-	 * @return string writer object
-	 * @throws ParserConfigurationException
-	 * @throws IOException
-	 * @throws SAXEception
-	 */
-	public StringWriter createHashMapWorkflowDataFromXML() throws ParserConfigurationException, IOException, SAXException {
+  /**
+   * Constructor
+   * 
+   * @param bundleContext
+   */
+  public JSONWorkflowBuilder(BundleContext bundleContext) {
+    this.bundleContext = bundleContext;
+  }
+  
+  /**
+   * Creates HashMap with workflow's data.
+   * 
+   * @return string writer object
+   * @throws ParserConfigurationException
+   * @throws IOException
+   * @throws SAXEception
+   */
+  public StringWriter createHashMapWorkflowDataFromXML() throws ParserConfigurationException, IOException, SAXException {
         
         StringWriter w = new StringWriter();
 
-		File folder = new File("etc/workflows/");
-		
-		File[] filesInFolder = folder.listFiles();
-		
+    File folder = new File("etc/workflows/");
+    
+    File[] filesInFolder = folder.listFiles();
+    
         if (filesInFolder != null) {
             for (final File fileEntry : filesInFolder) {
                 if (!fileEntry.isDirectory()) {
-                	
+                  
                     Document doc = handleDocument.getDocumentBuilder().parse(fileEntry); 
                     doc.getDocumentElement().normalize();
                     String id = doc.getDocumentElement().getElementsByTagName("id").item(0).getTextContent();
                     
-    	       		w.append("{\"id\":\"" + id + "\", \"name\":\"" + fileEntry.getName() + "\"}, ");
+                 w.append("{\"id\":\"" + id + "\", \"name\":\"" + fileEntry.getName() + "\"}, ");
                 }
             }
         }
         
-		return w;
-	}
+    return w;
+  }
 }

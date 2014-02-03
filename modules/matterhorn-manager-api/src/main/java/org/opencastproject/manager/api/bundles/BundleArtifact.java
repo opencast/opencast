@@ -35,66 +35,66 @@ public class BundleArtifact {
     /**
      * The file's name.
      */
-	@XmlElement
-	private String fileName;
-	
+  @XmlElement
+  private String fileName;
+  
     /**
      * The bundles name.
      */
-	@XmlElement
-	private String bundleName;
-	
+  @XmlElement
+  private String bundleName;
+  
     /**
      * The bundles version.
      */
-	@XmlElement
-	private String bundleVersion;
-	
+  @XmlElement
+  private String bundleVersion;
+  
     /**
      * Sets the bundles file name.
      */
-	public void setFileName(String fileName) {
-		 this.fileName = fileName;
-	}
-	
+  public void setFileName(String fileName) {
+     this.fileName = fileName;
+  }
+  
     /**
      * Returns the file's name.
      * 
      * @return the file name
      */
-	public String getFileName() {
-		return fileName;
-	}
-	
+  public String getFileName() {
+    return fileName;
+  }
+  
     /**
      * Sets the bundles name.
      */
-	public void setBundleName(String bundleName) {
-		this.bundleName = bundleName;
-	}
-	
+  public void setBundleName(String bundleName) {
+    this.bundleName = bundleName;
+  }
+  
     /**
      * Returns the bundles name.
      * 
      * @return the bundle name
      */
-	public String getBundleName() {
-		return bundleName;
-	}
+  public String getBundleName() {
+    return bundleName;
+  }
 
     /**
      * Sets the bundles version.
      */
-	public void setVersion(String bundleVersion) {
-		this.bundleVersion = bundleVersion;
-	}
-	
+  public void setVersion(String bundleVersion) {
+    this.bundleVersion = bundleVersion;
+  }
+  
     /**
      * Returns the bundles version.
      * 
      * @return the bundles version
      */
-	public String getVersion() {
-		return bundleVersion;
-	}
+  public String getVersion() {
+    return bundleVersion;
+  }
 }

@@ -26,5 +26,5 @@ import java.util.HashMap;
  */
 public interface BundleInstallerService {
 
-	HashMap<String, BundleArtifact> getInstalledBundleArtifacts();
+  HashMap<String, BundleArtifact> getInstalledBundleArtifacts();
 }

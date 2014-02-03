@@ -25,6 +25,6 @@ import java.util.HashMap;
  */
 public interface PluginInstallerService {
 
-	HashMap<String, PluginArtifact> getInstalledPluginsArtifacts();
-	HashMap<String, PluginArtifact> getInstalledBackupArtifacts();
+  HashMap<String, PluginArtifact> getInstalledPluginsArtifacts();
+  HashMap<String, PluginArtifact> getInstalledBackupArtifacts();
 }
