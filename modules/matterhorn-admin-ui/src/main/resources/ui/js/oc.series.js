@@ -185,11 +185,11 @@ ocSeries.init = function(){
         }
         $.each(roles.acl.ace, function () {
           if(ocSeries.seriesRolesList[this.role] !== undefined) {
-            ocSeries.seriesRolesList[this.role][this.action] = true;
+            ocSeries.seriesRolesList[this.role][this.action] = this.allow;
           }
           else {
             ocSeries.seriesRolesList[this.role] = new Object();
-            ocSeries.seriesRolesList[this.role][this.action] = true;
+            ocSeries.seriesRolesList[this.role][this.action] = this.allow;
           }
         });
       },
@@ -378,38 +378,35 @@ ocSeries.createACLDocument = function() {
   var out = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="http://org.opencastproject.security">';
   $('.role_search').each(function () {
     var $field = $(this);
+
     //check whether there is a value and entered value is a valid role
     if ($field.attr('value') != "") {
-      if($field.parent().parent().children().find('[name|="priv_view"]').attr('checked')) {
         out += '<ace>';
         out += '<role>' + $field.attr('value') + '</role>';
         out += '<action>read</action>';
-        out += '<allow>true</allow>';
+        out += '<allow>' + $field.parent().parent().children().find('[name|="priv_view"]').is(':checked') + '</allow>';
         out += '</ace>';
-      }
-      if($field.parent().parent().children().find('[name|="priv_edit"]').attr('checked')) {
+
         out += '<ace>';
         out += '<role>' + $field.attr('value') + '</role>';
         out += '<action>write</action>';
-        out += '<allow>true</allow>';
+        out += '<allow>' + $field.parent().parent().children().find('[name|="priv_edit"]').is(':checked') + '</allow>';
         out += '</ace>';
-      }
-      if($field.parent().parent().children().find('[name|="priv_analyze"]').attr('checked')) {
-          out += '<ace>';
-          out += '<role>' + $field.attr('value') + '</role>';
-          out += '<action>analyze</action>';
-          out += '<allow>true</allow>';
-          out += '</ace>';
-        }
+
+        out += '<ace>';
+        out += '<role>' + $field.attr('value') + '</role>';
+        out += '<action>analyze</action>';
+        out += '<allow>' + $field.parent().parent().children().find('[name|="priv_analyze"]').is(':checked') + '</allow>';
+        out += '</ace>';
     }
   });
-  if($('#anonymous_view').attr('checked')) {
-    out += '<ace>';
-    out += '<role>' + ocSeries.anonymous_role + '</role>';
-    out += '<action>read</action>';
-    out += '<allow>true</allow>';
-    out += '</ace>';
-  }
+
+  out += '<ace>';
+  out += '<role>' + ocSeries.anonymous_role + '</role>';
+  out += '<action>read</action>';
+  out += '<allow>' + $('#anonymous_view').is(':checked') + '</allow>';
+  out += '</ace>';
+
   out += '</acl>';
   return out;
 }

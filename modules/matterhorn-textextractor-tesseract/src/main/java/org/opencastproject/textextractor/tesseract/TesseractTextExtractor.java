@@ -49,11 +49,21 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
   /** Default name of the tesseract binary */
   public static final String TESSERACT_BINARY_DEFAULT = "tesseract";
 
-  /** The configuration admin property that defines the path to the tesseract binary */
-  public static final String TESSERACT_BINARY_CONFIG_KEY = "org.opencastproject.textanalyzer.tesseract.path";
+  /** Configuration property that defines the path to the tesseract binary */
+  public static final String TESSERACT_BINARY_CONFIG_KEY =
+    "org.opencastproject.textanalyzer.tesseract.path";
+
+  /** Configuration property that defines additional tesseract options like the
+   * language or the pagesegmode to use. This is just appended to the command
+   * line when tesseract is called. */
+  public static final String TESSERACT_OPTS_CONFIG_KEY =
+    "org.opencastproject.textanalyzer.tesseract.options";
 
   /** Binary of the tesseract command */
   protected String binary = null;
+
+  /** Additional options for the tesseract command */
+  protected String addOptions = "";
 
   /**
    * Creates a new tesseract command wrapper that will be using the default binary.
@@ -82,6 +92,24 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
   }
 
   /**
+   * Sets additional options for tesseract calls.
+   *
+   * @param binary
+   */
+  public void setAdditionalOptions(String addOptions) {
+    this.addOptions = addOptions;
+  }
+
+  /**
+   * Returns the additional options for tesseract..
+   *
+   * @return additional options
+   */
+  public String getAdditionalOptions() {
+    return addOptions;
+  }
+
+  /**
    * Sets the path to the <code>tesseract</code> binary.
    * 
    * @param binary
@@ -92,7 +120,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.textextractor.api.TextExtractor#extract(java.io.File)
    */
   public TextFrame extract(File image) throws TextExtractorException {
@@ -103,9 +131,10 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     File outputFile = null;
     File outputFileBase = new File(image.getParentFile(), FilenameUtils.getBaseName(image.getName()));
     // Run tesseract
+    String opts = getAnalysisOptions(image, outputFileBase);
+    logger.info("Running Tesseract: {} {}", binary, opts);
     try {
-      ProcessExecutor<TextAnalyzerException> analyzer = new ProcessExecutor<TextAnalyzerException>(binary,
-              getAnalysisOptions(image, outputFileBase)) {
+      ProcessExecutor<TextAnalyzerException> analyzer = new ProcessExecutor<TextAnalyzerException>(binary, opts) {
         @Override
         protected void onProcessFinished(int exitCode) throws TextAnalyzerException {
           // Windows binary will return -1 when queried for options
@@ -147,7 +176,11 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
    */
   protected String getAnalysisOptions(File image, File outputFile) {
     StringBuilder options = new StringBuilder();
-    options.append(image.getAbsolutePath()).append(" ").append(outputFile.getAbsolutePath());
+    options.append(image.getAbsolutePath());
+    options.append(" ");
+    options.append(outputFile.getAbsolutePath());
+    options.append(" ");
+    options.append(this.addOptions);
     return options.toString();
   }
 
@@ -157,6 +190,12 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     if (path != null) {
       logger.info("Setting Tesseract path to {}", path);
       this.binary = path;
+    }
+    /* Set additional options for tesseract (i.e. language to use) */
+    String addopts = (String) properties.get(TESSERACT_OPTS_CONFIG_KEY);
+    if (addopts != null) {
+      logger.info("Setting additional options for Tesseract path to '{}'", addopts);
+      this.addOptions = addopts;
     }
   }
 
@@ -168,6 +207,15 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     } else {
       setBinary(path);
       logger.info("Setting Tesseract path to binary from config: {}", path);
+    }
+    /* Set additional options for tesseract (i.e. language to use) */
+    String addopts = (String) cc.getBundleContext().getProperty(TESSERACT_OPTS_CONFIG_KEY);
+    if (addopts != null) {
+      logger.info("Setting additional options for Tesseract path to '{}'", addopts);
+      this.addOptions = addopts;
+    } else {
+      logger.info("No additional options for Tesseract");
+      this.addOptions = "";
     }
   }
 }

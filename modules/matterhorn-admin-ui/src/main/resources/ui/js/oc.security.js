@@ -177,7 +177,7 @@ ocSecurity = new (function() {
       privilegeRow += '<td><input type="text" class="role_search ui-autocomplete-input"></td>';
       privilegeRow += '<td class="privilege_edit"><input type="checkbox" class="privilege_edit" name="priv_read" checked="checked" disabled="disabled"></td>';
       privilegeRow += '<td class="privilege_edit"><input type="checkbox" class="privilege_edit" name="priv_write" disabled="disabled"></td>';
-      privilegeRow += '<td class="privilege_edit"><img title="Delete Role" alt="delete" src="/admin/img/icons/delete.png" style="display: none;"></td>';
+      privilegeRow += '<td class="privilege_edit"><span class="ui-icon ui-icon-trash" title="Delete Role" alt="delete"></span></td>';
       privilegeRow += '</tr>';
       
 	  var roleList = $.map(A(roleData.roles.role), function(role) {
@@ -186,7 +186,7 @@ ocSecurity = new (function() {
 	  
 	  var createACLDocument = function(aclId) {
 		  var out = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="http://org.opencastproject.security">';
-		  var table = $('div#aclContainer img#' + aclId).next();
+		  var table = $('div#aclContainer span#' + aclId).next();
 		  table.find('input.role_search').each(function () {
 		    var $field = $(this);
 		    var value = $.trim($field.attr('id'));
@@ -251,7 +251,7 @@ ocSecurity = new (function() {
 	    }
 	    if($(this).attr('id') == ('' || undefined)) {
 	      var row = $(privilegeRow);
-	      row.find('img').click(removeRole);
+	      row.find('span').click(removeRole);
 	      row.find('input.privilege_edit[type|="checkbox"]').click(updateCheckbox);
 	      row.find('input').autocomplete({
 	          source: sourceFunction,
@@ -264,7 +264,7 @@ ocSecurity = new (function() {
 	      });
 	      $(this).parents("#aclTable").append(row);
 	      $(this).parents('tr').find('input:disabled').removeAttr('disabled');
-	      $(this).parents('tr').find('img').show();
+	      $(this).parents('tr').find('span').show();
 	    }
 	    $(this).attr('id', ui.item.value);
 	    $(this).parent().find('p').remove();
@@ -283,9 +283,9 @@ ocSecurity = new (function() {
           }
       });
       
-      $('table#aclTable img').click(removeRole);
+      $('table#aclTable span').click(removeRole);
       $('table#aclTable input.privilege_edit[type|="checkbox"]').click(updateCheckbox);
-      $('#aclContainer img.deleteAcl').click(function() {
+      $('#aclContainer span.deleteAcl').click(function() {
     	  self.removeAcl($(this).attr('id'));
       });
   }

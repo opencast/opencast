@@ -69,7 +69,7 @@ $(document).ready(function () {
     $("#trackForm").append($("#template").jqote(tracks));
 
     $("input[id^='chk']").click(function(event) {
-        if ($("input:checked").length === 0) {
+        if ($("input[id^='chk']:checked").length === 0) {
             $("#trackError").show();
             $(event.currentTarget).prop("checked", true);
         } else {
@@ -444,7 +444,7 @@ function calculateNewLength () {
     inPoint = getTimeInMilliseconds($('#inPoint').val());
     outPoint = getTimeInMilliseconds($('#outPoint').val());
     newLength = (outPoint - inPoint) / 1000;
-    $('#newLength').val(getTimeString(Math.floor(newLength / 3600), Math.floor(newLength / 60), newLength % 60));
+    $('#newLength').val(getTimeString(Math.floor(newLength / 3600), (Math.floor(newLength / 60)) % 60, newLength % 60));    
 }
 
 /**
@@ -525,7 +525,7 @@ function continueWorkflow () {
     mpe.submit();
 }
 
-function cancel(){
+function leave(){
     window.parent.location.href = "/admin";
 }
 

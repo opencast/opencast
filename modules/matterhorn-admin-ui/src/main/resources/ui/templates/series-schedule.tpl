@@ -17,7 +17,7 @@
         </select>
     </span>
     <span>
-        <div class="ui-icon ui-icon-gear params"></div>
+        <div class="ui-icon ui-icon-pencil params"></div>
         <div class="ui-icon ui-icon-trash delete"></div>
         <button class="save"><div class="ui-icon ui-icon-check" title="Save this schedule"></div> Save</button>
         <button class="cancel"><div class="ui-icon ui-icon-close" title="Cancel"></div> Cancel</button>

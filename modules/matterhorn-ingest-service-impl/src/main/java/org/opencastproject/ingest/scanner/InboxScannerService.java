@@ -49,6 +49,8 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.io.FileUtils;
+import java.io.IOException;
 import java.io.File;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -124,7 +126,12 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     final int interval = getCfgAsInt(properties, INBOX_POLL);
     final File inbox = new File(getCfg(properties, INBOX_PATH));
     if (!inbox.isDirectory()) {
-      throw new ConfigurationException(INBOX_PATH, "%s does not exists".format(inbox.getAbsolutePath()));
+      try {
+        FileUtils.forceMkdir(inbox);
+      } catch (IOException e) {
+        throw new ConfigurationException(INBOX_PATH,
+            "%s does not exists and could not be created".format(inbox.getAbsolutePath()));
+      }
     }
     if (!inbox.canRead()) {
       throw new ConfigurationException(INBOX_PATH, "Cannot read from %s".format(inbox.getAbsolutePath()));

@@ -1,0 +1,170 @@
+#!/bin/sh
+
+
+prog="matterhorn"
+config="/etc/${prog}/service.conf"
+config_opt="/opt/${prog}/etc/service.conf"
+pidfile="/var/run/${prog}.pid"
+
+# Times to try sending a SIGTERM before sending a SIGKILL
+kill_attempts=20
+# Time in seconds to sleep between each try
+kill_attempts_sleep=1
+# The time to wait before the SIGKILL is hence (attempts * attempts_sleep)
+# seconds. Do not set this value to low. A “normal” fresh Matterhorn needs
+# about seven seconds before its complete shutdown.
+
+# Remove all files from the felix cache (bundle configuration, …)
+# This will prevent trouble after package updates.
+clean_felix_cache() {
+	if [ -d "$FELIX_CACHE_DIR" ]
+	then
+		rm -rf $FELIX_CACHE_DIR/*
+	fi
+}
+
+stop_matterhorn() {
+	[ ! -f $pidfile ] && return
+	pid=`cat $pidfile`
+	attempts=1
+	kill $pid
+	ps p $pid &> /dev/null
+	# Wait for termination
+	while [ $? -eq 0 ]
+	do
+		sleep $kill_attempts_sleep
+		attempts=$[$attempts+1]
+		[ $attempts -gt $kill_attempts ] && kill -s KILL $pid
+		ps p $pid &> /dev/null
+	done
+	rm -f $pidfile
+	return 0
+}
+
+
+if [ $# -ne 1 ] || ( [ "$1" != '--daemon' ] && \
+	[ "$1" != '--interactive' ] && [ "$1" != '--quit' ] )
+then
+	echo "Usage: $0 [ --daemon | --interactive | --quit | --help ]"
+	echo ''
+	echo 'OPTIONS:'
+	echo '  --daemon       Run Matterhorn as _unmanaged_ daemon.'
+	echo '                 Consider using the SysV init script.'
+	echo '  --interactive  Run Matterhorn in interactive mode.'
+	echo '  --quit         Stop a previously started Matterhorn.'
+	echo '  --help         Show this message.'
+	exit 0
+fi
+
+# Only root is allowed to start Matterhorn
+[ `id -u` -ne 0 ] && echo "User '`id -un`' has insufficient privilege" && exit 4
+
+
+# Stop Matterhorn if --quit is given
+[ "$1" == "--quit" ] && stop_matterhorn && exit 0
+
+# Check if Matterhorn is already running
+[ -f $pidfile ] && ps p "`cat $pidfile`" &> /dev/null && \
+	echo "Matterhorn already running" && exit 0
+
+# Create the pidfile as quickly as possible after we are sure the user wants to
+# start Matterhorn and after the existence of a pidfile and the associated
+# process was checked. As Matterhorn itself is not running at the moment and
+# the file should contain a pid to check for we use for now the pid of this
+# script:
+echo $$ > $pidfile
+
+
+###
+# The following is for the actual Matterhorn start
+##
+
+# Load default configuration
+MATTERHORN=/usr/share/matterhorn
+CA=$MATTERHORN/capture-agent
+MATTERHORN_USER=matterhorn
+LOGDIR=/var/log/matterhorn
+LOGLEVEL="WARN"
+ECLIPSE_LOGLEVEL="SEVERE"
+[ -z $DEBUG ] && DEBUG=false
+DEBUG_PORT="8000"
+DEBUG_SUSPEND="n"
+FELIX_CONFIG_DIR=/etc/matterhorn
+FELIX_WORK_DIR=/srv/matterhorn
+FELIX_CACHE_DIR="/tmp/matterhorn/felix-cache"
+JMX_REMOTE_PORT="1099"
+JMX_REMOTE_AUTHENTICATE="false"
+JMX_REMOTE_SSL="false"
+ADD_OPTS=""
+if [ -f $MATTERHORN/lib/matterhorn/matterhorn-capture-agent-impl*.jar ]
+then
+	IS_CA=true
+else
+	IS_CA=false
+fi
+
+# Load configuration files
+[ -e $config_opt ] && . $config_opt
+[ -e $config ] && . $config
+
+FELIX="-Dfelix.home=$MATTERHORN"
+FELIX="${FELIX} -Dfelix.work=$FELIX_WORK_DIR"
+FELIX="${FELIX} -Dfelix.config.properties=file:${FELIX_CONFIG_DIR}/config.properties"
+FELIX="${FELIX} -Dfelix.system.properties=file:${FELIX_CONFIG_DIR}/system.properties"
+FELIX="${FELIX} -Dfelix.fileinstall.dir=$FELIX_CONFIG_DIR/load"
+
+# Configure Java Management Extensions (JMX) 
+JMX="-Dcom.sun.management.jmxremote"
+JMX="${JMX} -Dcom.sun.management.jmxremote.port=${JMX_REMOTE_PORT}"
+JMX="${JMX} -Dcom.sun.management.jmxremote.authenticate=${JMX_REMOTE_AUTHENTICATE}"
+JMX="${JMX} -Dcom.sun.management.jmxremote.ssl=${JMX_REMOTE_SSL}"
+
+LOGGING="-Dopencast.logdir=$LOGDIR"
+LOGGING="${LOGGING} -Dbundles.configuration.location=$FELIX_CONFIG_DIR"
+LOGGING="${LOGGING} -Djava.util.logging.config.file=$FELIX_CONFIG_DIR/services/java.util.logging.properties"
+LOGGING="${LOGGING} -Dorg.ops4j.pax.logging.DefaultServiceLog.level=${LOGLEVEL}"
+LOGGING="${LOGGING} -Declipselink.logging.level=${ECLIPSE_LOGLEVEL}"
+
+GRAPHICS="-Djava.awt.headless=true"
+GRAPHICS="${GRAPHICS} -Dawt.toolkit=sun.awt.HeadlessToolkit"
+
+JETTY="-Dorg.mortbay.jetty.Request.maxFormContentSize=1000000"
+
+DISABLE_PHONEHOME="-Dnet.sf.ehcache.skipUpdateCheck=true"
+DISABLE_PHONEHOME="${DISABLE_PHONEHOME} -Dorg.terracotta.quartz.skipUpdateCheck=true"
+
+JAVA="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
+[ "$1" == '--daemon' ] && GOSH="-Dgosh.args='--noshutdown -c noop=true'"
+
+if $DEBUG
+then
+	DEBUG="-Xdebug"
+	DEBUG="${DEBUG} -Xnoagent"
+	DEBUG="${DEBUG} -Xrunjdwp:transport=dt_socket"
+	DEBUG="${DEBUG},address=$DEBUG_PORT"
+	DEBUG="${DEBUG},server=y"
+	DEBUG="${DEBUG},suspend=$DEBUG_SUSPEND"
+else
+	DEBUG=""
+fi
+
+MATTERHORN_OPTS="$GOSH $DEBUG $FELIX $GRAPHICS $JETTY $JAVA $LOGGING $JMX $DISABLE_PHONEHOME $ADD_OPTS"
+
+# Execute Capture-Agent device configuration
+$IS_CA && $CA/device_config.sh
+
+# Make sure matterhorn bundles are reloaded
+clean_felix_cache
+
+if [ "$1" == "--daemon" ]
+then
+	su -c "java $MATTERHORN_OPTS -jar $MATTERHORN/bin/felix.jar \
+		$FELIX_CACHE_DIR &> /dev/null & echo \$! 1>&3" \
+		$MATTERHORN_USER 3> $pidfile || ( rm -f $pidfile && exit 1 )
+else
+	su -c "/bin/sh -c \"set -o monitor; \
+		java $MATTERHORN_OPTS -jar $MATTERHORN/bin/felix.jar \
+		$FELIX_CACHE_DIR 3>&- & echo \\\$! 1>&3 && fg %% \"" \
+		$MATTERHORN_USER 3> $pidfile
+	stop_matterhorn
+fi

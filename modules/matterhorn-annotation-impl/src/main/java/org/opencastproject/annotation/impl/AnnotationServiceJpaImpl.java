@@ -77,7 +77,7 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
 
   /**
    * Sets the matterhorn security service
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -87,7 +87,7 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
 
   /**
    * OSGI declarative services callback for component activation
-   * 
+   *
    * @param componentContext
    *          the OSGI declarative services component context
    */

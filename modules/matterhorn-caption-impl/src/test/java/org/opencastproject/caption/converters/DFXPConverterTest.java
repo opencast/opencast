@@ -31,9 +31,9 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * 
+ *
  * Test class for DFXP converter.
- * 
+ *
  */
 public class DFXPConverterTest {
 
@@ -58,7 +58,7 @@ public class DFXPConverterTest {
   public void testDFXPConversion() {
     try {
       // verify conversion parsing and exporting without exception
-    	List<Caption> collection = dfxpConverter.importCaption(inputStream, "en");
+      List<Caption> collection = dfxpConverter.importCaption(inputStream, "en");
       dfxpConverter.exportCaption(outputStream, collection, "en");
       Assert.assertTrue(outputStream.toString("UTF-8").startsWith(expectedOutput));
     } catch (Exception e) {
