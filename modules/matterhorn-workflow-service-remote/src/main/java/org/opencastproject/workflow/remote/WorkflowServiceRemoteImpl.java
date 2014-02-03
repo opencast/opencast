@@ -41,6 +41,7 @@ import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -674,4 +675,35 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
             "Removing workflow listeners from a remote workflow service is not supported");
   }
 
+  @Override
+  public void cleanupWorkflowInstances(int lifetime, WorkflowState state) throws WorkflowDatabaseException,
+          UnauthorizedException {
+    HttpPost post = new HttpPost("/cleanup");
+
+    List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+    params.add(new BasicNameValuePair("lifetime", String.valueOf(lifetime)));
+    params.add(new BasicNameValuePair("state", state.toString()));
+    try {
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (UnsupportedEncodingException e) {
+      throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
+    }
+
+    HttpResponse response = getResponse(post);
+    try {
+      if (response != null) {
+        if (HttpStatus.SC_BAD_REQUEST == response.getStatusLine().getStatusCode()) {
+          throw new WorkflowDatabaseException("State '" + state.toString() + "' is not a valid workflow state");
+        } else if (HttpStatus.SC_FORBIDDEN == response.getStatusLine().getStatusCode()) {
+          throw new WorkflowDatabaseException("Deleting workflows with state '" + state.toString() + "' is not allowed");
+        } else {
+          logger.info("Successful request to workflow cleanup endpoint");
+          return;
+        }
+      }
+    } finally {
+      closeConnection(response);
+    }
+    throw new WorkflowDatabaseException("Unable to successfully request the workflow cleanup endpoint");
+  }
 }

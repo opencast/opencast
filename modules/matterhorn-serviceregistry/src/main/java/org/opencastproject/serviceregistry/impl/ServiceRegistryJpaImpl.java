@@ -139,7 +139,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the maximum load */
   protected static final String OPT_MAXLOAD = "org.opencastproject.server.maxload";
 
-  /** Configuration key for the dispatch interval in miliseconds */
+  /** Configuration key for the dispatch interval in milliseconds */
   protected static final String OPT_DISPATCHINTERVAL = "dispatchinterval";
 
   /** Configuration key for the interval to check whether the hosts in the service registry are still alive [sec] **/
@@ -476,6 +476,78 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         tx.rollback();
       }
       throw e;
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public void removeJob(long jobId) throws NotFoundException, ServiceRegistryException {
+    if (jobId < 1)
+      throw new NotFoundException("Job ID must be greater than zero (0)");
+
+    logger.debug("Start deleting job with ID '{}'", jobId);
+
+    EntityManager em = null;
+    EntityTransaction tx = null;
+
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+
+      Job job = em.find(JobJpaImpl.class, jobId);
+      if (job == null)
+        throw new NotFoundException("Job with ID '" + jobId + "' not found");
+
+      deleteChildJobs(jobId);
+
+      tx.begin();
+      em.remove(job);
+      tx.commit();
+      logger.debug("Job with ID '{}' deleted", jobId);
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Unable to remove job {}: {}", jobId, e);
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      throw new ServiceRegistryException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  private void deleteChildJobs(long jobId) throws ServiceRegistryException {
+    List<Job> childJobs = getChildJobs(jobId);
+    if (childJobs.isEmpty()) {
+      logger.debug("No child jobs of job '{}' found to delete.", jobId);
+      return;
+    }
+
+    logger.debug("Start deleting child jobs of job '{}'", jobId);
+
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      for (Job job : childJobs) {
+        Job jobToDelete = em.merge(job);
+        em.remove(jobToDelete);
+        logger.debug("Job '{}' deleted", jobToDelete.getId());
+      }
+      tx.commit();
+      logger.debug("Deleted all child jobs of job '{}'", jobId);
+    } catch (Exception e) {
+      logger.error("Unable to remove child jobs from {}: {}", jobId, e);
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      throw new ServiceRegistryException(e);
     } finally {
       if (em != null)
         em.close();

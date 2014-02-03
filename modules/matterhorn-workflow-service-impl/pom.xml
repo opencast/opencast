@@ -46,6 +46,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-serviceregistry</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
       <exclusions>
@@ -97,6 +102,12 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
+    </dependency>
+    
+    <!-- Scope test -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -153,6 +164,7 @@
               org.opencastproject.workflow.endpoint;version=${project.version}
             </Export-Package>
             <Service-Component>
+              OSGI-INF/workflow-cleanup-scheduler-service.xml,
               OSGI-INF/workflow-definition-scanner.xml,
               OSGI-INF/workflow-service.xml,
               OSGI-INF/workflow-service-index.xml,

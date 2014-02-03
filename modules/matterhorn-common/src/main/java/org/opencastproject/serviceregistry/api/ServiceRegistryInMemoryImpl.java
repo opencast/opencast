@@ -74,6 +74,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   /** The job identifier */
   protected AtomicLong idCounter = new AtomicLong();
 
+  /** Holds the current running job */
+  protected Job currentJob = null;
+
   /**
    * An (optional) security service. If set to a non-null value, this will be used to obtain the current user when
    * creating new jobs.
@@ -337,6 +340,16 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     return job;
   }
 
+  @Override
+  public void removeJob(long id) throws NotFoundException, ServiceRegistryException {
+    synchronized (jobs) {
+      if (!jobs.containsKey(id))
+        throw new NotFoundException("No job with ID '" + id + "' found");
+
+      jobs.remove(id);
+    }
+  }
+
   /**
    * Dispatches the job to the least loaded service or throws a <code>ServiceUnavailableException</code> if there is no
    * such service.
@@ -432,7 +445,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
           result.add(job);
 
         Long parentJobId = job.getParentJobId();
-        while (parentJobId != null) {
+        while (parentJobId != null && parentJobId > 0) {
           try {
             Job parentJob = getJob(job.getParentJobId());
             if (parentJob.getParentJobId().equals(id)) {
@@ -747,13 +760,12 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   @Override
   public Job getCurrentJob() {
-    // TODO Auto-generated method stub
-    return null;
+    return this.currentJob;
   }
 
   @Override
   public void setCurrentJob(Job job) {
-    // TODO Auto-generated method stub
+    this.currentJob = job;
   }
 
   @Override

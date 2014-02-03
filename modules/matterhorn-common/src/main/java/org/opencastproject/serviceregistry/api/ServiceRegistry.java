@@ -279,6 +279,14 @@ public interface ServiceRegistry {
   Job getJob(long id) throws NotFoundException, ServiceRegistryException;
 
   /**
+   * Deletes a job from the service registry
+   * 
+   * @param id
+   *          the job id
+   */
+  void removeJob(long id) throws NotFoundException, ServiceRegistryException;
+
+  /**
    * Gets the current running job
    * 
    * @return the current job

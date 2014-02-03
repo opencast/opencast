@@ -15,6 +15,7 @@
  */
 package org.opencastproject.workflow.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.opencastproject.workflow.api.WorkflowOperationResult.Action.CONTINUE;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
@@ -686,6 +687,55 @@ public class WorkflowServiceImplTest {
 
     Assert.assertEquals(count, service.countWorkflowInstances());
     Assert.assertEquals(count, stateListener.countStateChanges(WorkflowState.SUCCEEDED));
+  }
+
+  /**
+   * Test for {@link WorkflowServiceImpl#remove(long)}
+   * 
+   * @throws Exception
+   *           if anything fails
+   */
+  @Test
+  public void testRemove() throws Exception {
+    WorkflowInstance wi1 = startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
+    WorkflowInstance wi2 = startAndWait(workingDefinition, mediapackage2, WorkflowState.SUCCEEDED);
+
+    // reload instances, because operations have no id before
+    wi1 = service.getWorkflowById(wi1.getId());
+    wi2 = service.getWorkflowById(wi2.getId());
+
+    service.remove(wi1.getId());
+    assertEquals(1, service.getWorkflowInstances(new WorkflowQuery()).size());
+    for (WorkflowOperationInstance op : wi1.getOperations()) {
+      assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
+    }
+
+    service.remove(wi2.getId());
+    assertEquals(0, service.getWorkflowInstances(new WorkflowQuery()).size());
+  }
+
+  /**
+   * Test for {@link WorkflowServiceImpl#cleanupWorkflowInstances(int, WorkflowState)}
+   * 
+   * @throws Exception
+   *           if anything fails
+   */
+  @Test
+  public void testCleanupWorkflowInstances() throws Exception {
+    WorkflowInstance wi1 = startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
+    startAndWait(workingDefinition, mediapackage2, WorkflowState.SUCCEEDED);
+
+    // reload instances, because operations have no id before
+    wi1 = service.getWorkflowById(wi1.getId());
+
+    service.cleanupWorkflowInstances(0, WorkflowState.FAILED);
+    assertEquals(2, service.getWorkflowInstances(new WorkflowQuery()).size());
+
+    service.cleanupWorkflowInstances(0, WorkflowState.SUCCEEDED);
+    assertEquals(0, service.getWorkflowInstances(new WorkflowQuery()).size());
+    for (WorkflowOperationInstance op : wi1.getOperations()) {
+      assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
+    }
   }
 
   class SucceedingWorkflowOperationHandler extends AbstractWorkflowOperationHandler {

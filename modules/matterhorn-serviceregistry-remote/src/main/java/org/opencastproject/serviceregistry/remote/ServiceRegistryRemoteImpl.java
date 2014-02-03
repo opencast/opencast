@@ -22,6 +22,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.HostRegistrationParser;
 import org.opencastproject.serviceregistry.api.JaxbHostRegistrationList;
@@ -42,6 +43,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -64,7 +66,7 @@ import java.util.List;
  * <code>HTTP</code> rather than by directly connecting to the database that is backing the service.
  * <p>
  * This means that it is suited to run inside protected environments as long as there is an implementation of the
- * service running somwhere that provides the matching communication endpoint, which is the case with the default
+ * service running somewhere that provides the matching communication endpoint, which is the case with the default
  * implementation at {@link org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl}.
  * <p>
  * Other than with the other <code>-remote</code> implementations, this one needs to be configured to find it's
@@ -948,6 +950,28 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
   @Override
   public void setCurrentJob(Job job) {
     currentJob.set(job);
+  }
+
+  @Override
+  public void removeJob(long id) throws NotFoundException, ServiceRegistryException {
+    HttpDelete delete = new HttpDelete(UrlSupport.concat(serverUrl, "job", String.valueOf(id)));
+
+    HttpResponse response = null;
+    int responseStatusCode;
+    try {
+      response = client.execute(delete);
+      responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
+        return;
+      } else if (responseStatusCode == HttpStatus.SC_NOT_FOUND) {
+        throw new NotFoundException();
+      }
+    } catch (TrustedHttpClientException e) {
+      throw new ServiceRegistryException(e);
+    } finally {
+      client.close(response);
+    }
+    throw new ServiceRegistryException("Unable to remove job with ID " + id + " (" + responseStatusCode + ")");
   }
 
 }
