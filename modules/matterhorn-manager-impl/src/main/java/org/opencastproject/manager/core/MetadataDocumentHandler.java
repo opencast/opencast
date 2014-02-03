@@ -54,7 +54,7 @@ import java.net.URL;
 
 /**
  * This class represents meta data document handler.
- * 
+ *
  * @author Leonid Oldenburger
  */
 public class MetadataDocumentHandler {
@@ -63,36 +63,36 @@ public class MetadataDocumentHandler {
 
     /**
      * Returns the document builder factory object.
-     * 
+     *
      * @return the document builder factory object
      * @throws ParserConfigurationException
      */
   public DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
-    
+
     DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
     return dbFactory.newDocumentBuilder();
   }
-  
+
     /**
      * Returns the document object.
-     * 
+     *
      * @return the document object
      * @throws ParserConfigurationException
      */
   public Document getNewDocument() throws ParserConfigurationException {
-    
+
     DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
     return dbFactory.newDocumentBuilder().newDocument();
   }
-  
+
   /**
    * Sets data in a XML-file.
-   * 
-   * @throws TransformerFactoryConfigurationError 
-   * @throws TransformerException 
+   *
+   * @throws TransformerFactoryConfigurationError
+   * @throws TransformerException
    */
   public synchronized void writeNewPluginNodesInFile(File file, Document doc) throws TransformerFactoryConfigurationError, TransformerException {
-    
+
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
@@ -102,15 +102,15 @@ public class MetadataDocumentHandler {
     transformer.transform(source, result);
 
     String xmlString = result.getWriter().toString();
-  
+
     //writing to file
     FileOutputStream fop = null;
-      
+
     try {
         fop = new FileOutputStream(file);
-        
+
         byte[] contentInBytes = xmlString.getBytes();
-    
+
         fop.write(contentInBytes);
         fop.flush();
         fop.close();
@@ -126,30 +126,30 @@ public class MetadataDocumentHandler {
           }
     }
   }
-  
+
   /**
-   * Returns node value. 
-   * 
+   * Returns node value.
+   *
    * @param tag
    * @param element
    * @param k index
    * @return node value
    */
   public String getValue(String tag, Element element, int k) {
-    
+
     NodeList nodes = element.getElementsByTagName(tag).item(k).getChildNodes();
     Node node = (Node) nodes.item(0);
     return node.getNodeValue();
   }
-  
+
   /**
-   * Copy files. 
-   * 
+   * Copy files.
+   *
    * @param srcFile
    * @param srcDir
    */
   public void moveDocumentDirectory(File srcFile, File destDir) {
-    
+
     try {
               FileUtils.forceMkdir(destDir);
               FileUtils.copyDirectoryToDirectory(srcFile, destDir);
@@ -158,52 +158,52 @@ public class MetadataDocumentHandler {
       logger.error("Workflow editor could not move document directory.");
     }
   }
-  
+
   /**
-   * Returns files byte array. 
-   * 
+   * Returns files byte array.
+   *
    * @param file
    * @return byte array
    * @throws IOException
    */
   public byte[] loadFile(File file) throws IOException {
-  
+
     InputStream is = new FileInputStream(file);
-     
+
     long length = file.length();
-    
+
     if (length > Integer.MAX_VALUE) {
     // File is too large
     }
-    
+
     byte[] bytes = new byte[(int)length];
     int offset = 0;
     int numRead = 0;
-    
+
     while (offset < bytes.length && numRead >= 0) {
       offset += numRead;
       numRead = is.read(bytes, offset, bytes.length - offset);
     }
-     
+
     if (offset < bytes.length) {
       throw new IOException("Could not completely read file " + file.getName());
     }
-     
+
     is.close();
-    
+
     return bytes;
   }
-  
+
   /**
-   * Returns boolean if copying file is done. 
-   * 
+   * Returns boolean if copying file is done.
+   *
    * @param file name
    * @param file URL
    * @return boolean
    * @throws IOException
    */
   public Boolean copyFileFromURL(String fileName, String fileUrl) throws IOException {
-    
+
     try {
       FileUtils.copyURLToFile(new URL(fileUrl), new File(fileName));
     } catch (FileNotFoundException ex) {
@@ -215,21 +215,21 @@ public class MetadataDocumentHandler {
     }
     return true;
   }
-  
+
   /**
-   * Returns date. 
-   * 
+   * Returns date.
+   *
    * @param file
    * @return date
    * @throws IOException
    * @throws FileNotFoundException
    */
   public Date getDateFromFile(File dateFile) throws IOException, FileNotFoundException {
-    
+
     FileReader namereader = new FileReader(dateFile);
     BufferedReader in = new BufferedReader(namereader);
     String unixTime = in.readLine();
-    
+
     return new Date((Long.parseLong(unixTime) * 1000));
   }
 }

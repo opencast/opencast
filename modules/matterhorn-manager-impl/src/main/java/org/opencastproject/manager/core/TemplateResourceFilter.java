@@ -62,7 +62,7 @@ public class TemplateResourceFilter extends FilterWriter
      * proceeds to {@link #STATE_NULL}
      */
     private static final int STATE_ESCAPE = 3;
-    
+
     /**
      * HashMap
      */
@@ -79,13 +79,13 @@ public class TemplateResourceFilter extends FilterWriter
     private int state = STATE_NULL;
 
     /**
-     * Constructor 
-     * 
+     * Constructor
+     *
      * @param out
      * @param variables
      */
     TemplateResourceFilter(final Writer out, final HashMap variables) {
-      
+
         super(out);
         this.variables = (variables != null) ? variables : new HashMap();
     }
@@ -108,7 +108,7 @@ public class TemplateResourceFilter extends FilterWriter
      * @exception IOException If an I/O error occurs
      */
     public void write(int c) throws IOException {
-      
+
         switch (state) {
             case STATE_NULL:
                 if (c == '$') {
@@ -160,9 +160,9 @@ public class TemplateResourceFilter extends FilterWriter
      * @exception IOException If an I/O error occurs
      */
     public void write(char [] cbuf, int off, int len) throws IOException {
-        
+
       final int limit = off + len;
-      
+
         for (int i = off; i < limit; i++) {
             write(cbuf[i]);
         }
@@ -177,9 +177,9 @@ public class TemplateResourceFilter extends FilterWriter
      * @exception IOException If an I/O error occurs
      */
     public void write(String str, int off, int len) throws IOException {
-        
+
       final int limit = off + len;
-        
+
       for (int i = off; i < limit; i++) {
             write(str.charAt(i));
         }
@@ -192,11 +192,11 @@ public class TemplateResourceFilter extends FilterWriter
      * is returned unmodified.
      */
     private String translate() {
-      
+
         final String key = lineBuffer.toString();
         lineBuffer.delete(0, lineBuffer.length());
         String value = variables.get((Object) key).toString();
-     
+
         return value;
     }
 }

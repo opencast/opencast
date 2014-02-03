@@ -53,12 +53,12 @@ public class TemplateWrapperFilter extends HttpServletResponseWrapper {
      * Creates a wrapper instance using the given resource bundle for
      * translations.
      *
-     * @param response the response to wrap 
+     * @param response the response to wrap
      * @param locale a resource bundle, that will be used for translation of the strings
      * @param request the original request - used to obtain the variable resolver
      */
     public TemplateWrapperFilter(final HttpServletResponse response, final ServletRequest request) {
-        
+
       super(response);
         this.request = request;
     }
@@ -70,13 +70,13 @@ public class TemplateWrapperFilter extends HttpServletResponseWrapper {
      * configured for this response.
      */
     public PrintWriter getWriter() throws IOException {
-        
+
       if (writer == null) {
             final PrintWriter base = super.getWriter();
-            
+
             if (doWrap()) {
                 final TemplateResourceFilter filter = new TemplateResourceFilter(base, (HashMap) request.getAttribute("template_var"));
-                
+
                 writer = new PrintWriter(filter);
             } else {
                 writer = base;
@@ -87,12 +87,12 @@ public class TemplateWrapperFilter extends HttpServletResponseWrapper {
 
     /**
      * Method proofs is there is a correct file to wrap.
-     * 
+     *
      * @return wrap state
      */
     private boolean doWrap() {
         boolean doWrap = getContentType() != null && getContentType().indexOf("text/html") >= 0;
-        
+
         return doWrap;
     }
 }

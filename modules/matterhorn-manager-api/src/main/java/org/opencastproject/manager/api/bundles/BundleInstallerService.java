@@ -19,9 +19,9 @@ package org.opencastproject.manager.api.bundles;
 import java.util.HashMap;
 
 /**
- * Imports bundles catalogs to a hash map of bundles artifacts 
+ * Imports bundles catalogs to a hash map of bundles artifacts
  * and exports these artifacts to catalog presentations.
- * 
+ *
  * @author Leonid Oldenburger
  */
 public interface BundleInstallerService {

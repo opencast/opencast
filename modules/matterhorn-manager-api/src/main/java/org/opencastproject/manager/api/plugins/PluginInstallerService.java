@@ -18,9 +18,9 @@ package org.opencastproject.manager.api.plugins;
 import java.util.HashMap;
 
 /**
- * Imports plug-ins catalogs to a hash map of plug-ins artifacts 
+ * Imports plug-ins catalogs to a hash map of plug-ins artifacts
  * and exports these artifacts to catalog presentations.
- * 
+ *
  * @author Leonid Oldenburger
  */
 public interface PluginInstallerService {

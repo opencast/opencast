@@ -46,12 +46,12 @@ import org.apache.commons.io.FileUtils;
  * @author Leonid Oldenburger
  */
 public class WorkflowManager {
-  
+
   /**
    * The bundle context
    */
   private BundleContext bundleContext;
-  
+
   /**
    * The Document handler
    */
@@ -59,43 +59,43 @@ public class WorkflowManager {
 
   /**
    * The workflow's manager constructor.
-   * 
+   *
    * @param bundleContext
    */
   public WorkflowManager(BundleContext bundleContext) {
-    
+
     this.bundleContext = bundleContext;
   }
-  
+
   /**
    * Returns the workflow's variable in hash map.
-   * 
+   *
    * @param hash map
    * @return hash map
    * @throws ServletException
    * @throws IOException
    */
   public HashMap<String, String> createWorkflowVars(HashMap<String, String> map) throws ServletException, IOException {
-       
+
     StringWriter w = null;
-        
+
     HashMap<String, String> vars = map;
-      
+
     try {
       JSONWorkflowBuilder jsonObject = new JSONWorkflowBuilder(bundleContext);
-    
+
       w = jsonObject.createHashMapWorkflowDataFromXML();
       vars.put("workflow_data", "[" + w.toString() + "]");
-        
-    } catch (ParserConfigurationException e) { 
+
+    } catch (ParserConfigurationException e) {
     } catch (SAXException e) { }
 
     return vars;
   }
-  
+
   /**
    * Handles the workflow's operations.
-   * 
+   *
    * @param request
    * @param response
    * @throws TransformerException
@@ -105,40 +105,40 @@ public class WorkflowManager {
    * @throws IOException
    */
   public void handleWorkflowOperations(HttpServletRequest request, HttpServletResponse response) throws TransformerException, ServletException, ParserConfigurationException, SAXException, IOException {
-    
+
     String contentTyp = "text/xml; charset=UTF-8";
     String newWorkflowFile = request.getParameter("new_workflow_file");
     String deleteWorkflowFile = request.getParameter("delete_workflow_file");
-    
+
     if (newWorkflowFile != null) {
       try {
         createNewWorkflowFile(newWorkflowFile);
       } catch (TransformerException e) { }
     }
-    
+
     if (deleteWorkflowFile != null) {
       try {
         deleteWorkflowFile(deleteWorkflowFile);
       } catch (TransformerException e) { }
     }
-    
+
     if (contentTyp.contains(request.getContentType())) {
-      
+
       try {
         handleNewWorkflowFile(request, response);
-      } catch (TransformerException e) { 
-      } catch (ParserConfigurationException e) { 
+      } catch (TransformerException e) {
+      } catch (ParserConfigurationException e) {
       } catch (SAXException e) { }
     }
-    
+
     if (request.getParameter("workflow_file") != null) {
       handleWorkflowFiles(request, response);
     }
   }
-  
+
   /**
    * Handles the new worklfow file.
-   * 
+   *
    * @param request
    * @param response
    * @throws TransformerException
@@ -147,22 +147,22 @@ public class WorkflowManager {
    * @throws IOException
    */
   public void handleNewWorkflowFile(HttpServletRequest request, HttpServletResponse response) throws TransformerException, ParserConfigurationException, SAXException, IOException {
-    
+
         File xmlWorkflowFile = new File(PluginManagerConstants.WORKFLOWS_PATH + "TMPfile.xml");
-        
+
         int counter = 0;
-        
+
         try {
                 InputStreamReader inputStream = new InputStreamReader(request.getInputStream());
                 FileOutputStream outputStream = new FileOutputStream(xmlWorkflowFile);
 
                 int c = 0;
-    
+
              while ((c = inputStream.read()) != -1) {
                      outputStream.write(c);
                             counter++;
              }
-        
+
              inputStream.close();
              outputStream.close();
      } catch (FileNotFoundException e) {
@@ -170,7 +170,7 @@ public class WorkflowManager {
      } catch (IOException e) {
        System.err.println("FileStreamsTest: " + e);
      }
-        
+
         if (counter == 0) {
                 xmlWorkflowFile.delete();
                 return;
@@ -181,10 +181,10 @@ public class WorkflowManager {
         newXMLWorkflowFile.delete();
         xmlWorkflowFile.renameTo(new File(PluginManagerConstants.WORKFLOWS_PATH + newXMLFile));
   }
-  
+
   /**
    * Create a new workflow's file.
-   * 
+   *
    * @param new workflow's file
    * @throws TransformerException
    * @throws IOException
@@ -203,10 +203,10 @@ public class WorkflowManager {
         + "</definition>\n";
     FileUtils.writeStringToFile(xmlWorkflowFile, inStream);
   }
-  
+
   /**
    * Delete the workflow's file.
-   * 
+   *
    * @param delete workflow's file
    * @throws TransformerException
    * @throws IOException
@@ -215,32 +215,32 @@ public class WorkflowManager {
 
     deleteWorkflowFile = stringValidator(deleteWorkflowFile);
     File xmlWorkflowFile = new File(PluginManagerConstants.WORKFLOWS_PATH + deleteWorkflowFile);
-    
+
     return xmlWorkflowFile.delete();
   }
-  
+
   /**
    * RegEx handler
-   * 
+   *
    * @param string
    * @return string
    */
   public String stringValidator(String string) {
-    
+
        String fileName = string;
        fileName = fileName.replaceAll("[^a-z0-9-_. ]", "");
-       
+
        int length = fileName.length();
-       
+
        if (length > 50) {
          length = 50;
        }
        return fileName.substring(0, length);
   }
-  
+
   /**
    * Handle workflow's files.
-   * 
+   *
    * @param request
    * @param response
    * @throws ServletException
@@ -249,12 +249,12 @@ public class WorkflowManager {
   public void handleWorkflowFiles(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
        String fileName = stringValidator((String) request.getParameter("workflow_file"));
-       String empty = ""; 
-       
+       String empty = "";
+
        if (empty.equals(fileName) || fileName == null)
              throw new ServletException(
               "Invalid or non-existent file parameter in SendXml servlet.");
-            
+
        String xmlDir = PluginManagerConstants.WORKFLOWS_PATH;
 
        if (empty.equals(xmlDir) || xmlDir == null)
@@ -263,21 +263,21 @@ public class WorkflowManager {
 
        ServletOutputStream stream = null;
        BufferedInputStream buf = null;
-       
+
        try {
          stream = response.getOutputStream();
          File xml = new File(xmlDir + fileName);
-         
+
          response.setContentType("text/xml");
          response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
          response.setContentLength((int) xml.length());
-         
+
          FileInputStream input = new FileInputStream(xml);
-         
+
          buf = new BufferedInputStream(input);
-         
+
          int readBytes = 0;
-  
+
          //read from the file; write to the ServletOutputStream
          while ((readBytes = buf.read()) != -1) {
             stream.write(readBytes);
@@ -289,7 +289,7 @@ public class WorkflowManager {
 
            if (stream != null)
                stream.close();
-           
+
             if (buf != null)
                 buf.close();
        }

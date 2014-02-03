@@ -27,40 +27,40 @@ import org.opencastproject.manager.system.configeditor.Config;
 
 
 public class ConfigTest {
-  
-  
+
+
   private Config config;
-  
+
   @Test
   public void testConfigConstructor() {
-    
+
     URL url = this.getClass().getResource("/configs");
-    String absFile = url.getFile();  
-    
+    String absFile = url.getFile();
+
     try {
       Config config = new Config(absFile, "/system.properties");
-      
+
       Assert.assertEquals(config.getRootPath(), absFile);
       Assert.assertEquals(config.getRelPath(), "/system.properties");
-      
+
       String json = "{\"path\":\"/system.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":false,\"value\":\"commented.property.value\",\"key\":\"commented.property.name\"}]}";
 
       Assert.assertEquals(config.toJSON(), json);
-      
+
       this.config = config;
-      
+
     } catch (IOException e) {
       e.printStackTrace();
     } catch (JSONException e) {
       e.printStackTrace();
     }
   }
-  
+
   @Test
   public void testUpdateProperty() {
-    
+
     URL url = this.getClass().getResource("/configs");
-    String absFile = url.getFile();  
+    String absFile = url.getFile();
 
     try {
       this.config = new Config(absFile, "/system.properties");
@@ -68,10 +68,10 @@ public class ConfigTest {
       // TODO Auto-generated catch block
       e1.printStackTrace();
     }
-    
+
     // uncomment property
     this.config.updateProperty("commented.property.name", "commented.property.value", true);
-  
+
     String json = "{\"path\":\"/system.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":true,\"value\":\"commented.property.value\",\"key\":\"commented.property.name\"}]}";
 
     try {
@@ -79,10 +79,10 @@ public class ConfigTest {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    
+
     // change prop value
     this.config.updateProperty("commented.property.name", "commented.property.new_value", true);
-    
+
     json = "{\"path\":\"/system.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":true,\"value\":\"commented.property.new_value\",\"key\":\"commented.property.name\"}]}";
 
     try {
@@ -90,70 +90,70 @@ public class ConfigTest {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    
+
   }
-  
+
   @Test
   public void testAddProperty() {
-    
+
     URL url = this.getClass().getResource("/configs");
-    String absFile = url.getFile();  
+    String absFile = url.getFile();
 
     try {
       this.config = new Config(absFile, "/system.properties");
     } catch (IOException e1) {
       e1.printStackTrace();
     }
-    
+
     // add property
     this.config.addProperty("new.property.name", "new.property.value", true, "org.osgi.service.http.port");
-  
+
     String json = "{\"path\":\"/system.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},{\"enabled\":true,\"value\":\"new.property.value\",\"key\":\"new.property.name\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":false,\"value\":\"commented.property.value\",\"key\":\"commented.property.name\"}]}";
 
     try {
 
       Assert.assertEquals(config.toJSON(), json);
-    
+
     } catch (JSONException e) {
       e.printStackTrace();
-    }    
+    }
   }
-  
+
   @Test
   public void testSaveConfig() {
-    
-    String absFile = this.getClass().getResource("/temp").getFile();  
+
+    String absFile = this.getClass().getResource("/temp").getFile();
 
     try {
       this.config = new Config(absFile, "/system.properties");
     } catch (IOException e1) {
       e1.printStackTrace();
     }
-    
+
     // add property
     this.config.addProperty("new.property.name", "new.property.value", true, "org.osgi.service.http.port");
-  
-    
+
+
     try {
-    
+
       // save config
       String newPath = "/system_new.properties";
       config.setRelPath(newPath);
       config.save();
-      
+
       // read saved config
       config = new Config(absFile, newPath);
-      
+
       // compare
       String json = "{\"path\":\"/system_new.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},{\"enabled\":true,\"value\":\"new.property.value\",\"key\":\"new.property.name\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":false,\"value\":\"commented.property.value\",\"key\":\"commented.property.name\"}]}";
 
       Assert.assertEquals(config.toJSON(), json);
-    
+
     } catch (JSONException e) {
       e.printStackTrace();
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
-    }    
+    }
   }
 }
