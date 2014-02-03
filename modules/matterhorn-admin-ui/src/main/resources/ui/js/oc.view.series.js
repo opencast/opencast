@@ -64,36 +64,33 @@ var ocViewSeries = (function(){
       $.get(SERIES_URL2 + "/" + seriesId + "/acl.json", function (data)
       {
         var roles = {};
-        if(!$.isArray(data.acl.ace) && data.acl.ace.role == anonymous_role && data.acl.ace.action == "read" && data.acl.ace.allow == true) {
+
+        if (!$.isArray(data.acl.ace) && data.acl.ace.role == anonymous_role && data.acl.ace.action == "read" && data.acl.ace.allow == true) {
             roles["Public"] = ["View"];
         } else { 
           data.acl.ace = ocUtils.ensureArray(data.acl.ace);
 
-          $.each(data.acl.ace, function(key, value)
-          {
-            if(!$.isArray(roles[value.role]) && value.role != anonymous_role)
-            {
-              roles[value.role] = [];
-            }
-            if(value.action != "contribute" && value.role != anonymous_role)
-            {
+          $.each(data.acl.ace, function (key, value) {
+            
+            if (value.action != "contribute" && value.role != anonymous_role && value.allow) {
+              if (!$.isArray(roles[value.role])) {
+                roles[value.role] = [];
+              }
               roles[value.role].push(trans[value.action]);
             }
           
-            if(value.role == anonymous_role)
-            {
+            if (value.role == anonymous_role && value.allow) {
               roles["Public"] = ["View"];
             }
+
           });
         }
         
-        if(roles["Public"] == undefined)
-        {
+        if (roles["Public"] == undefined) {
           roles["Public"] = ["No access"];
         }
         
-        $.each(roles, function(key, value)
-        {
+        $.each(roles, function (key, value) {
           roles[key] = value.join(', ');
         });
         
