@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.kernel.mail.EmailTemplateScanner" immediate="true" activate="activate">
+  <implementation class=""org.opencastproject.kernel.mail.EmailTemplateScanner" />
+  <property name="service.description" value="Email Template Scanner" />
+  <service>
+    <provide interface="org.apache.felix.fileinstall.ArtifactInstaller" />
+    <provide interface="org.opencastproject.kernel.mail.EmailTemplateScanner" />
+  </service>
+</scr:component>
