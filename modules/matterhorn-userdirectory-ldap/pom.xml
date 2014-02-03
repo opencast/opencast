@@ -113,7 +113,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Bundle-Activator>org.opencastproject.userdirectory.ldap.Activator</Bundle-Activator>
             <Embed-Dependency>
               org.springframework.ldap;inline=true,
               org.springframework.beans;inline=true,

@@ -17,6 +17,7 @@ package org.opencastproject.series.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -41,6 +42,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.UrlSupport;
@@ -134,7 +136,7 @@ public class SeriesRestService {
     if (cc == null) {
       this.serverUrl = "http://localhost:8080";
     } else {
-      String ccServerUrl = cc.getBundleContext().getProperty("org.opencastproject.server.url");
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
       logger.debug("Configured server url is {}", ccServerUrl);
       if (ccServerUrl == null)
         this.serverUrl = "http://localhost:8080";
@@ -159,6 +161,7 @@ public class SeriesRestService {
   @RestQuery(name = "getAsXml", description = "Returns the series with the given identifier", returnDescription = "Returns the series dublin core XML document", pathParameters = { @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "The series dublin core."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "You do not have permission to view this series."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to view this series. Maybe you need to authenticate.") })
   public Response getSeriesXml(@PathParam("seriesID") String seriesID) {
     logger.debug("Series Lookup: {}", seriesID);

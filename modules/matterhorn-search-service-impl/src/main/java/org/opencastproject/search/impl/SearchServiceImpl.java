@@ -343,7 +343,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
       throw new IllegalArgumentException("Unable to add a null mediapackage");
     }
     logger.debug("Attempting to add mediapackage {} to search index", mediaPackage.getIdentifier());
-    AccessControlList acl = authorizationService.getAccessControlList(mediaPackage);
+    AccessControlList acl = authorizationService.getActiveAcl(mediaPackage).getA();
 
     Date now = new Date();
 
@@ -455,13 +455,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   @Override
   public SearchResult getForAdministrativeRead(SearchQuery q) throws SearchException, UnauthorizedException {
     User user = securityService.getUser();
-    Organization organization;
-    try {
-      organization = organizationDirectory.getOrganization(user.getOrganization());
-    } catch (NotFoundException e) {
-      throw new SearchException(e);
-    }
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(organization.getAdminRole()))
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole()))
       throw new UnauthorizedException(user, getClass().getName() + ".getForAdministrativeRead");
 
     try {

@@ -16,12 +16,13 @@
 
 package org.opencastproject.mediapackage;
 
-import org.junit.After;
-import org.junit.Before;
 import org.opencastproject.mediapackage.identifier.Handle;
 import org.opencastproject.mediapackage.identifier.HandleBuilder;
 import org.opencastproject.mediapackage.identifier.HandleBuilderFactory;
 import org.opencastproject.util.FileSupport;
+
+import org.junit.After;
+import org.junit.Before;
 
 import java.io.File;
 import java.io.FileInputStream;

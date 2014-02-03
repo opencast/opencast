@@ -79,17 +79,19 @@ public abstract class CmdlineMediaAnalyzerSupport implements MediaAnalyzer {
 
     logger.debug("Running {}", commandline);
     // Analyze
-    final ProcessExecutor<MediaAnalyzerException> mediaAnalyzer = new ProcessExecutor<MediaAnalyzerException>(binary, cmdOptions) {
+    final ProcessExecutor<MediaAnalyzerException> mediaAnalyzer = new ProcessExecutor<MediaAnalyzerException>(binary,
+            cmdOptions) {
+
       @Override
-      protected boolean onStdout(String line) {
+      protected void onStdout(String line) {
         onAnalysis(line);
-        return true;
+        return;
       }
 
       @Override
-      protected boolean onStderr(String line) {
+      protected void onStderr(String line) {
         onAnalysis(line);
-        return true;
+        return;
       }
 
       @Override
