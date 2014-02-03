@@ -15,6 +15,10 @@
  */
 package org.opencastproject.authorization.xacml;
 
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
+
 import org.jboss.security.xacml.core.model.policy.ActionMatchType;
 import org.jboss.security.xacml.core.model.policy.ActionType;
 import org.jboss.security.xacml.core.model.policy.ActionsType;
@@ -31,13 +35,11 @@ import org.jboss.security.xacml.core.model.policy.ResourcesType;
 import org.jboss.security.xacml.core.model.policy.RuleType;
 import org.jboss.security.xacml.core.model.policy.SubjectAttributeDesignatorType;
 import org.jboss.security.xacml.core.model.policy.TargetType;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.security.api.AccessControlEntry;
-import org.opencastproject.security.api.AccessControlList;
+
+import java.io.StringWriter;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import java.io.StringWriter;
 
 /**
  * Utility implementation for dealing with XACML data.

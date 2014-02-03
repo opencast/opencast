@@ -11,6 +11,4 @@
   name="DistributionService" policy="static" target="(distribution.channel=acl)" bind="setDistributionService"/>
   <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
     policy="static" bind="setServiceRegistry" />
-  <reference name="AuthorizationSErvice" cardinality="1..1" interface="org.opencastproject.security.api.AuthorizationService"
-    policy="static" bind="setAuthorizationService" />
 </scr:component>

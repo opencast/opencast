@@ -15,26 +15,19 @@
  */
 package org.opencastproject.episode.endpoint;
 
-import static org.opencastproject.systems.MatterhornConstans.SERVER_URL_PROPERTY;
-import static org.opencastproject.util.OsgiUtil.getComponentContextProperty;
-import static org.opencastproject.util.OsgiUtil.getContextProperty;
-import static org.opencastproject.util.data.Option.option;
-
 import org.opencastproject.episode.api.EpisodeService;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.workflow.api.WorkflowService;
-
 import org.osgi.service.component.ComponentContext;
 
 import javax.ws.rs.Path;
 
+import static org.opencastproject.util.OsgiUtil.getComponentContextProperty;
+import static org.opencastproject.util.OsgiUtil.getContextProperty;
+
 /** OSGi bound implementation. */
 @Path("/")
 public final class OsgiEpisodeServiceRestEndpoint extends AbstractEpisodeServiceRestEndpoint {
-  // todo this key is also defined in RuntimeInfo. Access to these properties should be unified somewhere else
-  private static final String ADMIN_URL_PROPERTY = "org.opencastproject.admin.ui.url";
-
   private EpisodeService episodeService;
   private WorkflowService workflowService;
   private SecurityService securityService;
@@ -53,24 +46,20 @@ public final class OsgiEpisodeServiceRestEndpoint extends AbstractEpisodeService
 
   @Override
   public String getServerUrl() {
-    Organization org = securityService.getOrganization();
-    // return the organization specific admin url or the global server url as a fallback
-    return option(org.getProperties().get(ADMIN_URL_PROPERTY)).getOrElse(serverUrl);
+    return serverUrl;
   }
 
-  @Override
-  public String getMountPoint() {
+  @Override public String getMountPoint() {
     return mountPoint;
   }
 
-  @Override
-  public SecurityService getSecurityService() {
+  @Override public SecurityService getSecurityService() {
     return securityService;
   }
 
   /** OSGi callback. */
   public void activate(ComponentContext cc) {
-    serverUrl = getContextProperty(cc, SERVER_URL_PROPERTY);
+    serverUrl = getContextProperty(cc, "org.opencastproject.server.url");
     mountPoint = getComponentContextProperty(cc, "opencast.service.path");
   }
 

@@ -18,10 +18,9 @@ package org.opencastproject.oaipmh.server;
 
 import org.w3c.dom.Document;
 
-import java.util.Iterator;
-
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
+import java.util.Iterator;
 
 /**
  * Copied from the test harness module.

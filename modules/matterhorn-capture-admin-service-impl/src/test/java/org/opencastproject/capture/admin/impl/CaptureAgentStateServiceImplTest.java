@@ -26,8 +26,6 @@ import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.Recording;
 import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
@@ -96,11 +94,8 @@ public class CaptureAgentStateServiceImplTest {
     EasyMock.replay(workflowService);
     service.setWorkflowService(workflowService);
 
-    DefaultOrganization organization = new DefaultOrganization();
-
-    HashSet<JaxbRole> roles = new HashSet<JaxbRole>();
-    roles.add(new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, organization, ""));
-    User user = new JaxbUser("testuser", organization, roles);
+    User user = new User("testuser", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+            new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN });
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
@@ -488,10 +483,7 @@ public class CaptureAgentStateServiceImplTest {
     Assert.assertEquals(1, service.getKnownAgents().size());
 
     // Use a security service that identifies us as a non-administrative user
-    DefaultOrganization organization = new DefaultOrganization();
-    HashSet<JaxbRole> roleSet = new HashSet<JaxbRole>();
-    roleSet.add(new JaxbRole("ROLE_NOT_ADMIN", organization, ""));
-    User user = new JaxbUser("testuser", organization, roleSet);
+    User user = new User("testuser", DefaultOrganization.DEFAULT_ORGANIZATION_ID, new String[] { "ROLE_NOT_ADMIN" });
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();

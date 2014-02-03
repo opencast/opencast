@@ -25,7 +25,7 @@ import java.util.Vector;
 
 @Deprecated
 public class RestEndpoint {
-
+  
   public static enum Type {
     WRITE, READ
   };
@@ -248,22 +248,21 @@ public class RestEndpoint {
     this.form = form;
   }
 
+  
   /**
-   * @param pathFormat
-   *          the pathFormat to set
+   * @param pathFormat the pathFormat to set
    */
   public void setPathFormat(String pathFormat) {
     this.pathFormat = pathFormat;
   }
-
+  
   /**
-   * @param pathFormatHtml
-   *          the pathFormatHtml to set
+   * @param pathFormatHtml the pathFormatHtml to set
    */
   public void setPathFormatHtml(String pathFormatHtml) {
     this.pathFormatHtml = pathFormatHtml;
   }
-
+  
   /**
    * Setting this to true will cause the path to be filled in with format extensions which will work with the {FORMAT}
    * convention (which is automatically filled in with the selected or default format key - e.g. json) <br/>

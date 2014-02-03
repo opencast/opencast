@@ -252,7 +252,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
       in = new FileInputStream(f);
       return dcService.load(in);
     } catch (NotFoundException e) {
-      throw new IOException("Unable to open catalog " + catalog, e);
+      throw new IOException("Unable to open catalog " + catalog + ": " + e.getMessage());
     } finally {
       IOUtils.closeQuietly(in);
     }

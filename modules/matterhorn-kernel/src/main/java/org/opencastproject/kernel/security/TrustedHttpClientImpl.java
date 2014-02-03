@@ -27,10 +27,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.security.api.User;
-import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
@@ -243,10 +240,22 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     logger.debug("deactivate");
   }
 
+  /**
+   * Set {@link org.opencastproject.loadtest.impl.LoadTestFactory} service.
+   * 
+   * @param service
+   *          Service implemented {@link org.opencastproject.loadtest.impl.LoadTestFactory}
+   */
   public void setHttpClientFactory(HttpClientFactory httpClientFactory) {
     this.httpClientFactory = httpClientFactory;
   }
 
+  /**
+   * Unset {@link org.opencastproject.loadtest.impl.LoadTestFactory} service.
+   * 
+   * @param service
+   *          Service implemented {@link org.opencastproject.loadtest.impl.LoadTestFactory}
+   */
   public void unsetHttpClientFactory(HttpClientFactory defaultHttpClientFactory) {
     defaultHttpClientFactory = null;
   }
@@ -266,11 +275,6 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
               "There is no DefaultHttpClientFactory service available so we cannot make a request"));
     }
     return httpClientFactory.makeHttpClient();
-  }
-
-  @Override
-  public <A> Function<Function<HttpResponse, A>, Either<Exception, A>> run(final HttpUriRequest httpUriRequest) {
-    return StandAloneTrustedHttpClientImpl.run(this, httpUriRequest);
   }
 
   /**
@@ -302,7 +306,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
       httpUriRequest.setHeader(SecurityConstants.ORGANIZATION_HEADER, organization.getId());
       User currentUser = securityService.getUser();
       if (currentUser != null)
-        httpUriRequest.setHeader(SecurityConstants.USER_HEADER, currentUser.getUsername());
+        httpUriRequest.setHeader(SecurityConstants.USER_HEADER, currentUser.getUserName());
     }
 
     if ("GET".equalsIgnoreCase(httpUriRequest.getMethod()) || "HEAD".equalsIgnoreCase(httpUriRequest.getMethod())) {
@@ -523,6 +527,11 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     return new String[] { realm, nonce };
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.security.HttpConnectionMXBean#getOpenConnections()
+   */
   @Override
   public int getOpenConnections() {
     return responseMap.size();

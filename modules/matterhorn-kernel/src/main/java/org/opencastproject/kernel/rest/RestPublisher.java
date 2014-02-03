@@ -18,7 +18,6 @@ package org.opencastproject.kernel.rest;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.rest.StaticResource;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.cxf.Bus;
@@ -115,7 +114,7 @@ public class RestPublisher implements RestConstants {
   @SuppressWarnings("unchecked")
   protected void activate(ComponentContext componentContext) {
     logger.debug("activate()");
-    this.baseServerUri = componentContext.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+    this.baseServerUri = componentContext.getBundleContext().getProperty("org.opencastproject.server.url");
     this.componentContext = componentContext;
     this.fourOhFour = "The resource you requested does not exist."; // TODO: Replace this with something a little nicer
     this.servletRegistrationMap = new ConcurrentHashMap<String, ServiceRegistration>();
@@ -194,19 +193,13 @@ public class RestPublisher implements RestConstants {
       logger.debug("Waiting for the servlet at '{}' to be initialized", servicePath);
       try {
         Thread.sleep(100);
-        count++;
+        count ++;
       } catch (InterruptedException e) {
         logger.warn("Interrupt while waiting for RestServlet initialization");
         break;
       }
     }
-
-    // Was initialization successful
-    if (!cxf.isInitialized()) {
-      logger.error("Whiteboard implemenation failed to pick up REST endpoint declaration {}", serviceType);
-      return;
-    }
-
+    
     // Was initialization successful
     if (!cxf.isInitialized()) {
       logger.error("Whiteboard implemenation failed to pick up REST endpoint declaration {}", serviceType);
@@ -236,9 +229,6 @@ public class RestPublisher implements RestConstants {
       Thread.currentThread().setContextClassLoader(bundleClassLoader);
     }
     logger.info("Registered REST endpoint at " + servicePath);
-    if (service instanceof RestEndpoint) {
-      ((RestEndpoint) service).endpointPublished();
-    }
   }
 
   /**

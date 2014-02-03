@@ -15,9 +15,6 @@
  */
 package org.opencastproject.episode.impl.persistence;
 
-import static org.opencastproject.util.data.Tuple.tuple;
-import static org.opencastproject.util.persistence.Queries.named;
-
 import org.opencastproject.episode.api.Version;
 import org.opencastproject.util.data.Option;
 
@@ -28,6 +25,10 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+
+import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResultQuery;
+import static org.opencastproject.util.persistence.PersistenceUtil.runUpdate;
 
 /** Supports the determination of the next free version identifier. */
 @Entity(name = "VersionClaim")
@@ -63,12 +64,13 @@ public final class VersionClaimDto {
 
   /** Find the last claimed version for a media package. */
   public static Option<VersionClaimDto> findLast(EntityManager em, String mediaPackageId) {
-    return named.findSingle(em, "VersionClaim.last", tuple("mediaPackageId", mediaPackageId));
+    return runSingleResultQuery(em, "VersionClaim.last", tuple("mediaPackageId", mediaPackageId));
   }
 
   /** Update the last claimed version of a media package. */
   public static boolean update(EntityManager em, String mediaPackageId, Version lastClaimed) {
-    return named.update(em, "VersionClaim.update", tuple("mediaPackageId", mediaPackageId),
-            tuple("lastClaimed", lastClaimed.value()));
+    return runUpdate(em, "VersionClaim.update",
+                     tuple("mediaPackageId", mediaPackageId),
+                     tuple("lastClaimed", lastClaimed.value()));
   }
 }

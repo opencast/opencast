@@ -27,8 +27,6 @@ import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -54,9 +52,8 @@ public class YouTubePublicationServiceTest {
     mp = MediaPackageSupport.loadFromClassPath("/mediapackage.xml");
     service = new YouTubePublicationServiceImpl();
 
-    DefaultOrganization defaultOrganization = new DefaultOrganization();
-    User anonymous = new JaxbUser("anonymous", defaultOrganization, new JaxbRole(
-            DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, defaultOrganization));
+    User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+            new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);

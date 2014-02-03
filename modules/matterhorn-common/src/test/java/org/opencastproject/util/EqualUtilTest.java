@@ -16,16 +16,10 @@
 
 package org.opencastproject.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.EqualsUtil.eqMap;
-import static org.opencastproject.util.EqualsUtil.hash;
-import static org.opencastproject.util.data.Arrays.array;
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Tuple.tuple;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.opencastproject.util.EqualsUtil.hash;
 
 public class EqualUtilTest {
   @Test
@@ -34,15 +28,5 @@ public class EqualUtilTest {
     assertEquals(hash("a", null, "c"), 41 * (41 * (41 + "a".hashCode()) + 0L) + "c".hashCode());
     assertEquals(0L, hash());
     assertEquals(0L, hash(null));
-  }
-
-  @Test
-  public void testEqualMap() {
-    assertTrue(eqMap(map(tuple("a", "b")), map(tuple("a", "b"))));
-    assertTrue(eqMap(map(tuple("a", map(tuple(1, "bla")))), map(tuple("a", map(tuple(1, "bla"))))));
-    // this yields false since Java does not define equality on arrays.
-    assertFalse(eqMap(map(tuple(4, array(1, 2, 4))), map(tuple(4, array(1, 2, 4)))));
-    assertFalse(eqMap(map(tuple(1, new Object())), map(tuple(1, new Object()))));
-    assertFalse(eqMap(map(tuple("a", "b"), tuple("x", "y")), map(tuple("a", "b"), tuple("x", "z"))));
   }
 }

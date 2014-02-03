@@ -156,7 +156,6 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
       throw new IllegalStateException("Can not add an organization with id '" + organization.getId()
               + "' since an organization with that identifier has already been registered");
     persistence.storeOrganization(organization);
-    cache.invalidate();
   }
 
   @Override

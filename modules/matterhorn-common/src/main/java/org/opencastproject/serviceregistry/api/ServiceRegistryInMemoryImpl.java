@@ -312,7 +312,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     synchronized (this) {
       job = new JaxbJob(idCounter.addAndGet(1));
       if (securityService != null) {
-        job.setCreator(securityService.getUser().getUsername());
+        job.setCreator(securityService.getUser().getUserName());
         job.setOrganization(securityService.getOrganization().getId());
       }
       job.setJobType(type);

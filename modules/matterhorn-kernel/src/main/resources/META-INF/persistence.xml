@@ -7,8 +7,6 @@
     http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
   <persistence-unit name="org.opencastproject.kernel" transaction-type="RESOURCE_LOCAL">
     <class>org.opencastproject.kernel.security.persistence.JpaOrganization</class>
-    <class>org.opencastproject.kernel.bundleinfo.BundleInfoJpa</class>
-    <class>org.opencastproject.kernel.bundleinfo.DbSchemaVersionJpa</class>
     <properties>
       <property name="eclipselink.create-ddl-jdbc-file-name" value="create-matterhorn-kernel-jpa.jdbc"/>
       <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-matterhorn-kernel-jpa.jdbc"/>

@@ -8,10 +8,8 @@
   </service>
   <reference name="series" interface="org.opencastproject.series.api.SeriesService"
     cardinality="1..1" policy="static" bind="setSeriesService" />
-  <reference name="users" interface="org.opencastproject.userdirectory.JpaUserAndRoleProvider"
+  <reference name="users" interface="org.opencastproject.userdirectory.jpa.JpaUserAndRoleProvider"
     cardinality="1..1" policy="static" bind="setJpaUserProvider" />
-  <reference name="groups" interface="org.opencastproject.userdirectory.JpaGroupRoleProvider"
-    cardinality="1..1" policy="static" bind="setJpaGroupRoleProvider" />
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
     cardinality="1..1" policy="static" bind="setSecurityService" />
   <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"

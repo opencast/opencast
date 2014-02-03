@@ -16,23 +16,6 @@
 package org.opencastproject.security.api;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.util.EqualsUtil.bothNotNull;
-import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
-import static org.opencastproject.util.data.Either.left;
-import static org.opencastproject.util.data.Either.right;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-
-import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Tuple;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Provides common functions helpful in dealing with {@link AccessControlList}s.
@@ -73,83 +56,19 @@ public final class AccessControlUtil {
     if (user.hasRole(GLOBAL_ADMIN_ROLE) || user.hasRole(org.getAdminRole()))
       return true;
 
-    Set<Role> userRoles = user.getRoles();
+    String[] userRoles = user.getRoles();
     for (AccessControlEntry entry : acl.getEntries()) {
       if (!action.equals(entry.getAction()))
         continue;
 
       String aceRole = entry.getRole();
-      for (Role role : userRoles) {
-        if (!role.getName().equals(aceRole))
+      for (String role : userRoles) {
+        if (!role.equals(aceRole))
           continue;
 
         return entry.isAllow();
       }
     }
     return false;
-  }
-
-  public static final Function<String, Option<AclScope>> toAclScope = new Function<String, Option<AclScope>>() {
-    @Override
-    public Option<AclScope> apply(String s) {
-      try {
-        return some(AclScope.valueOf(s));
-      } catch (IllegalArgumentException e) {
-        return none();
-      }
-    }
-  };
-
-  /**
-   * Constructor function for ACLs.
-   * 
-   * @see #entry(String, String, boolean)
-   * @see #entries(String, org.opencastproject.util.data.Tuple[])
-   */
-  public static AccessControlList acl(Either<AccessControlEntry, List<AccessControlEntry>>... entries) {
-    // sequence entries
-    final List<AccessControlEntry> seq = mlist(entries)
-            .foldl(new ArrayList<AccessControlEntry>(),
-                    new Function2<List<AccessControlEntry>, Either<AccessControlEntry, List<AccessControlEntry>>, List<AccessControlEntry>>() {
-                      @Override
-                      public List<AccessControlEntry> apply(List<AccessControlEntry> sum,
-                              Either<AccessControlEntry, List<AccessControlEntry>> current) {
-                        if (current.isLeft())
-                          sum.add(current.left().value());
-                        else
-                          sum.addAll(current.right().value());
-                        return sum;
-                      }
-                    });
-    return new AccessControlList(seq);
-  }
-
-  /** Create a single access control entry. */
-  public static Either<AccessControlEntry, List<AccessControlEntry>> entry(String role, String action, boolean allow) {
-    return left(new AccessControlEntry(role, action, allow));
-  }
-
-  /** Create a list of access control entries for a given role. */
-  public static Either<AccessControlEntry, List<AccessControlEntry>> entries(final String role,
-          Tuple<String, Boolean>... actions) {
-    final List<AccessControlEntry> entries = mlist(actions).map(
-            new Function<Tuple<String, Boolean>, AccessControlEntry>() {
-              @Override
-              public AccessControlEntry apply(Tuple<String, Boolean> action) {
-                return new AccessControlEntry(role, action.getA(), action.getB());
-              }
-            }).value();
-    return right(entries);
-  }
-
-  /**
-   * Define equality on AccessControlLists. Two AccessControlLists are considered equal if they contain the exact same
-   * entries no matter in which order.
-   * <p/>
-   * This has not been implemented in terms of #equals and #hashCode because the list of entries is not immutable and
-   * therefore not suitable to be put in a set.
-   */
-  public static boolean equals(AccessControlList a, AccessControlList b) {
-    return bothNotNull(a, b) && eqListUnsorted(a.getEntries(), b.getEntries());
   }
 }

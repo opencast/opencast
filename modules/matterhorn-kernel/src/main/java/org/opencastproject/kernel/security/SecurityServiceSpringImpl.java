@@ -15,9 +15,6 @@
  */
 package org.opencastproject.kernel.security;
 
-import org.opencastproject.security.api.JaxbOrganization;
-import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -29,8 +26,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * A Spring Security implementation of {@link SecurityService}.
@@ -56,7 +51,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.security.api.SecurityService#setOrganization(Organization)
+   * @see org.opencastproject.security.api.SecurityService#setOrganization(org.opencastproject.security.api.Organization)
    */
   @Override
   public void setOrganization(Organization organization) {
@@ -79,27 +74,28 @@ public class SecurityServiceSpringImpl implements SecurityService {
       return delegatedUser;
     }
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(org);
     if (auth == null) {
-      return SecurityUtil.createAnonymousUser(jaxbOrganization);
+      return SecurityUtil.createAnonymousUser(org);
     } else {
       Object principal = auth.getPrincipal();
       if (principal == null) {
-        return SecurityUtil.createAnonymousUser(jaxbOrganization);
+        return SecurityUtil.createAnonymousUser(org);
       }
       if (principal instanceof UserDetails) {
         UserDetails userDetails = (UserDetails) principal;
 
-        Set<JaxbRole> roles = new HashSet<JaxbRole>();
+        String[] roles = null;
         Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
         if (authorities != null && authorities.size() > 0) {
+          roles = new String[authorities.size()];
+          int i = 0;
           for (GrantedAuthority ga : authorities) {
-            roles.add(new JaxbRole(ga.getAuthority(), jaxbOrganization));
+            roles[i++] = ga.getAuthority();
           }
         }
-        return new JaxbUser(userDetails.getUsername(), jaxbOrganization, roles);
+        return new User(userDetails.getUsername(), org.getId(), roles);
       } else {
-        return SecurityUtil.createAnonymousUser(jaxbOrganization);
+        return SecurityUtil.createAnonymousUser(org);
       }
     }
   }
@@ -107,7 +103,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.security.api.SecurityService#setUser(User)
+   * @see org.opencastproject.security.api.SecurityService#setUser(org.opencastproject.security.api.User)
    */
   @Override
   public void setUser(User user) {

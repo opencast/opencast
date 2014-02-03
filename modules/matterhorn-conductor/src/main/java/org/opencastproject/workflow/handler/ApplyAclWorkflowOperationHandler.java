@@ -17,10 +17,12 @@ package org.opencastproject.workflow.handler;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -95,10 +97,14 @@ public class ApplyAclWorkflowOperationHandler extends AbstractWorkflowOperationH
     try {
       AccessControlList acl = seriesService.getSeriesAccessControl(seriesId);
       if (acl != null) {
-        authorizationService.setAcl(mediaPackage, AclScope.Series, acl);
+        authorizationService.setAccessControl(mediaPackage, acl);
       }
       return createResult(mediaPackage, Action.CONTINUE);
-    } catch (Exception e) {
+    } catch (SeriesException e) {
+      throw new WorkflowOperationException(e);
+    } catch (MediaPackageException e) {
+      throw new WorkflowOperationException(e);
+    } catch (NotFoundException e) {
       throw new WorkflowOperationException(e);
     }
   }

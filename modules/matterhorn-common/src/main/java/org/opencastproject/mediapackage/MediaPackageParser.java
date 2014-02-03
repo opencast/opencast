@@ -15,29 +15,28 @@
  */
 package org.opencastproject.mediapackage;
 
-import static org.opencastproject.util.data.functions.Misc.chuck;
-
 import org.opencastproject.util.DateTimeSupport;
-
-import org.codehaus.jettison.mapped.Configuration;
-import org.codehaus.jettison.mapped.MappedNamespaceConvention;
-import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.codehaus.jettison.mapped.Configuration;
+import org.codehaus.jettison.mapped.MappedNamespaceConvention;
+import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.XMLStreamException;
+
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Convenience implementation that supports serializing and deserializing media packages.
@@ -75,8 +74,8 @@ public final class MediaPackageParser {
   /**
    * Serializes the media package to a JSON string.
    * 
-   * @param mediaPackage
-   *          the media package
+   * @param  mediaPackage
+   *         the media package
    * @return the serialized media package
    */
   public static String getAsJSON(MediaPackage mediaPackage) {
@@ -143,9 +142,9 @@ public final class MediaPackageParser {
   /**
    * Serializes the media package to a {@link org.w3c.dom.Document}.
    * <p/>
-   * todo Implementation is currently defective since it misses various properties. See
-   * http://opencast.jira.com/browse/MH-9489 Use {@link #getAsXmlDocument(MediaPackage)} instead if you do not need a
-   * serializer.
+   * todo Implementation is currently defective since it misses various properties.
+   *   See http://opencast.jira.com/browse/MH-9489
+   *   Use {@link #getAsXmlDocument(MediaPackage)} instead if you do not need a serializer.
    * 
    * @param mediaPackage
    *          the mediapackage

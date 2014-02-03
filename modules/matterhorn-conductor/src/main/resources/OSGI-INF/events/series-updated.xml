@@ -1,104 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
-  <scr:component name="org.opencastproject.event.handler.ConductingSeriesUpdatedEventHandler"
-          immediate="true">
-    <implementation class="org.opencastproject.event.handler.ConductingSeriesUpdatedEventHandler"/>
-    <property name="service.description" value="Conducting event handler for series events"/>
-    <property name="event.topics" value="org/opencastproject/series/*"/>
-    <service>
-      <provide interface="org.osgi.service.event.EventHandler"/>
-    </service>
-    <reference name="seriesUpdatedEventHandler"
-            interface="org.opencastproject.event.handler.SeriesUpdatedEventHandler"
-            cardinality="1..1" policy="static" bind="setSeriesUpdatedEventHandler"/>
-    <reference name="workflowPermissionsUpdatedEventHandler"
-            interface="org.opencastproject.event.handler.WorkflowPermissionsUpdatedEventHandler"
-            cardinality="1..1" policy="static" bind="setWorkflowPermissionsUpdatedEventHandler"/>
-    <reference name="episodesPermissionsUpdatedEventHandler"
-            interface="org.opencastproject.event.handler.EpisodesPermissionsUpdatedEventHandler"
-            cardinality="1..1" policy="static" bind="setEpisodesPermissionsUpdatedEventHandler"/>
-  </scr:component>
-
-  <scr:component
-          name="org.opencastproject.event.handler.SeriesUpdatedEventHandler"
-          immediate="true"
-          activate="activate">
-    <implementation class="org.opencastproject.event.handler.SeriesUpdatedEventHandler"/>
-    <property name="service.description" value="Series Updated Event Handler"/>
-    <service>
-      <provide interface="org.opencastproject.event.handler.SeriesUpdatedEventHandler"/>
-    </service>
-    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-            cardinality="1..1" policy="static" bind="setServiceRegistry"/>
-    <reference name="seriesService" interface="org.opencastproject.series.api.SeriesService"
-            cardinality="1..1" policy="static" bind="setSeriesService"/>
-    <reference name="searchService" interface="org.opencastproject.search.api.SearchService"
-            cardinality="1..1" policy="static" bind="setSearchService"/>
-    <reference name="distributionService" interface="org.opencastproject.distribution.api.DistributionService"
-            cardinality="1..1" policy="static" target="(distribution.channel=download)" bind="setDistributionService"/>
-    <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
-            cardinality="1..1" policy="static" bind="setSecurityService"/>
-    <reference name="authorizationService" interface="org.opencastproject.security.api.AuthorizationService"
-            cardinality="1..1" policy="static" bind="setAuthorizationService"/>
-    <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-            cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
-    <reference name="catalogService" interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
-            cardinality="1..1" policy="static" bind="setDublinCoreCatalogService"/>
-    <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
-            cardinality="1..1" policy="static" bind="setWorkspace"/>
-  </scr:component>
-  <scr:component
-          name="org.opencastproject.event.handler.WorkflowPermissionsUpdatedEventHandler"
-          immediate="true"
-          activate="activate">
-    <implementation class="org.opencastproject.event.handler.WorkflowPermissionsUpdatedEventHandler"/>
-    <property name="service.description" value="Workflow Permissions Updated Event Handler"/>
-    <service>
-      <provide interface="org.opencastproject.event.handler.WorkflowPermissionsUpdatedEventHandler"/>
-    </service>
-    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-            cardinality="1..1" policy="static" bind="setServiceRegistry"/>
-    <reference name="seriesService" interface="org.opencastproject.series.api.SeriesService"
-            cardinality="1..1" policy="static" bind="setSeriesService"/>
-    <reference name="workflowService" interface="org.opencastproject.workflow.api.WorkflowService"
-            cardinality="1..1" policy="static" bind="setWorkflowService"/>
-    <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
-            cardinality="1..1" policy="static" bind="setSecurityService"/>
-    <reference name="authorizationService" interface="org.opencastproject.security.api.AuthorizationService"
-            cardinality="1..1" policy="static" bind="setAuthorizationService"/>
-    <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-            cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
-    <reference name="catalogService" interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
-            cardinality="1..1" policy="static" bind="setDublinCoreCatalogService"/>
-    <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
-            cardinality="1..1" policy="static" bind="setWorkspace"/>
-  </scr:component>
-  <scr:component
-          name="org.opencastproject.event.handler.EpisodesPermissionsUpdatedEventHandler"
-          immediate="true"
-          activate="activate">
-    <implementation class="org.opencastproject.event.handler.EpisodesPermissionsUpdatedEventHandler"/>
-    <property name="service.description" value="Episodes Permissions Updated Event Handler"/>
-    <service>
-      <provide interface="org.opencastproject.event.handler.EpisodesPermissionsUpdatedEventHandler"/>
-    </service>
-    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-            cardinality="1..1" policy="static" bind="setServiceRegistry"/>
-    <reference name="seriesService" interface="org.opencastproject.series.api.SeriesService"
-            cardinality="1..1" policy="static" bind="setSeriesService"/>
-    <reference name="epidsodeService" interface="org.opencastproject.episode.api.EpisodeService"
-            cardinality="1..1" policy="static" bind="setEpisodeService"/>
-	<reference name="httpMediaPackageElementProvider" interface="org.opencastproject.episode.api.HttpMediaPackageElementProvider"
-		    cardinality="1..1" policy="static" bind="setHttpMediaPackageElementProvider" />
-    <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
-            cardinality="1..1" policy="static" bind="setSecurityService"/>
-    <reference name="authorizationService" interface="org.opencastproject.security.api.AuthorizationService"
-            cardinality="1..1" policy="static" bind="setAuthorizationService"/>
-    <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-            cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
-    <reference name="catalogService" interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
-            cardinality="1..1" policy="static" bind="setDublinCoreCatalogService"/>
-    <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
-            cardinality="1..1" policy="static" bind="setWorkspace"/>
-  </scr:component>
+	<scr:component
+	  name="org.opencastproject.event.handler.SeriesUpdatedEventHandler"
+	  immediate="true"
+	  activate="activate"
+	  >
+	    <implementation class="org.opencastproject.event.handler.SeriesUpdatedEventHandler" />
+	    <property name="service.description" value="Series Updated Event Handler" />
+	    <property name="event.topics" value="org/opencastproject/series/*" />
+	    <service>
+	      <provide interface="org.osgi.service.event.EventHandler" />
+	    </service>
+	  <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+	    cardinality="1..1" policy="static" bind="setServiceRegistry" />
+	  <reference name="seriesService" interface="org.opencastproject.series.api.SeriesService"
+	    cardinality="1..1" policy="static" bind="setSeriesService" />
+	  <reference name="searchService" interface="org.opencastproject.search.api.SearchService"
+	    cardinality="1..1" policy="static" bind="setSearchService" />
+	  <reference name="distributionService" interface="org.opencastproject.distribution.api.DistributionService"
+	    cardinality="1..1" policy="static" target="(distribution.channel=download)" bind="setDistributionService" />
+	  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
+	    cardinality="1..1" policy="static" bind="setSecurityService" />
+	  <reference name="authorizationService" interface="org.opencastproject.security.api.AuthorizationService"
+	    cardinality="1..1" policy="static" bind="setAuthorizationService" />
+	  <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+	    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+	  <reference name="catalogService" interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
+	    cardinality="1..1" policy="static" bind="setDublinCoreCatalogService" />    
+	  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+	    cardinality="1..1" policy="static" bind="setWorkspace" />    
+	</scr:component>
+	<scr:component
+	  name="org.opencastproject.event.handler.WorkflowPermissionsUpdatedEventHandler"
+	  immediate="true"
+	  activate="activate"
+	  >
+	    <implementation class="org.opencastproject.event.handler.WorkflowPermissionsUpdatedEventHandler" />
+	    <property name="service.description" value="Workflow Permissions Updated Event Handler" />
+	    <property name="event.topics" value="org/opencastproject/series/*" />
+	    <service>
+	      <provide interface="org.osgi.service.event.EventHandler" />
+	    </service>
+	  <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+	    cardinality="1..1" policy="static" bind="setServiceRegistry" />
+	  <reference name="seriesService" interface="org.opencastproject.series.api.SeriesService"
+	    cardinality="1..1" policy="static" bind="setSeriesService" />
+	  <reference name="workflowService" interface="org.opencastproject.workflow.api.WorkflowService"
+	    cardinality="1..1" policy="static" bind="setWorkflowService" />
+	  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
+	    cardinality="1..1" policy="static" bind="setSecurityService" />
+	  <reference name="authorizationService" interface="org.opencastproject.security.api.AuthorizationService"
+	    cardinality="1..1" policy="static" bind="setAuthorizationService" />
+	  <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+	    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+	  <reference name="catalogService" interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
+	    cardinality="1..1" policy="static" bind="setDublinCoreCatalogService" />    
+	  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+	    cardinality="1..1" policy="static" bind="setWorkspace" />    
+	</scr:component>
+	<scr:component
+	  name="org.opencastproject.event.handler.EpisodesPermissionsUpdatedEventHandler"
+	  immediate="true"
+	  activate="activate"
+	  >
+	    <implementation class="org.opencastproject.event.handler.EpisodesPermissionsUpdatedEventHandler" />
+	    <property name="service.description" value="Episodes Permissions Updated Event Handler" />
+	    <property name="event.topics" value="org/opencastproject/series/*" />
+	    <service>
+	      <provide interface="org.osgi.service.event.EventHandler" />
+	    </service>
+	  <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+	    cardinality="1..1" policy="static" bind="setServiceRegistry" />
+	  <reference name="seriesService" interface="org.opencastproject.series.api.SeriesService"
+	    cardinality="1..1" policy="static" bind="setSeriesService" />
+	  <reference name="epidsodeService" interface="org.opencastproject.episode.api.EpisodeService"
+	    cardinality="1..1" policy="static" bind="setEpisodeService" />
+	  <reference name="httpMediaPackageElementProvider" interface="org.opencastproject.episode.api.HttpMediaPackageElementProvider"
+	    cardinality="1..1" policy="static" bind="setHttpMediaPackageElementProvider" />
+	  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
+	    cardinality="1..1" policy="static" bind="setSecurityService" />
+	  <reference name="authorizationService" interface="org.opencastproject.security.api.AuthorizationService"
+	    cardinality="1..1" policy="static" bind="setAuthorizationService" />
+	  <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+	    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+	  <reference name="catalogService" interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
+	    cardinality="1..1" policy="static" bind="setDublinCoreCatalogService" />    
+	  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+	    cardinality="1..1" policy="static" bind="setWorkspace" />    
+	</scr:component>
 </scr:components>

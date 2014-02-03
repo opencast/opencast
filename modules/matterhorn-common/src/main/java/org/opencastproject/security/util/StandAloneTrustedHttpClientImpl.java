@@ -15,15 +15,6 @@
  */
 package org.opencastproject.security.util;
 
-import static org.opencastproject.util.data.Either.left;
-import static org.opencastproject.util.data.Either.right;
-
-import org.opencastproject.security.api.TrustedHttpClient;
-import org.opencastproject.security.api.TrustedHttpClientException;
-import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
-
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpResponse;
@@ -37,6 +28,9 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.auth.DigestScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
+import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.security.api.TrustedHttpClientException;
+import org.opencastproject.util.data.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +40,8 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * An http client that executes secure (though not necessarily encrypted) http requests. Unlike the original
- * TrustedHttpClientImpl this version is not bound to an OSGi environment.
+ * An http client that executes secure (though not necessarily encrypted) http requests.
+ * Unlike the original TrustedHttpClientImpl this version is not bound to an OSGi environment.
  */
 public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient {
   /** The logger */
@@ -98,8 +92,10 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
   /** The maximum amount of time in seconds to wait in addition to the RETRY_BASE_DELAY. */
   private final int retryMaximumVariableTime;
 
-  public StandAloneTrustedHttpClientImpl(String user, String pass, Option<Integer> nonceTimeoutRetries,
-          Option<Integer> retryBaseDelay, Option<Integer> retryMaximumVariableTime) {
+  public StandAloneTrustedHttpClientImpl(String user, String pass,
+                                         Option<Integer> nonceTimeoutRetries,
+                                         Option<Integer> retryBaseDelay,
+                                         Option<Integer> retryMaximumVariableTime) {
     this.user = user;
     this.pass = pass;
     this.nonceTimeoutRetries = nonceTimeoutRetries.getOrElse(DEFAULT_NONCE_TIMEOUT_RETRIES);
@@ -107,29 +103,11 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
     this.retryMaximumVariableTime = retryMaximumVariableTime.getOrElse(DEFAULT_RETRY_MAXIMUM_VARIABLE_TIME);
   }
 
-  @Override
-  public <A> Function<Function<HttpResponse, A>, Either<Exception, A>> run(final HttpUriRequest httpUriRequest) {
-    return run(this, httpUriRequest);
-  }
-
-  public static <A> Function<Function<HttpResponse, A>, Either<Exception, A>> run(final TrustedHttpClient client,
-          final HttpUriRequest httpUriRequest) {
-    return new Function<Function<HttpResponse, A>, Either<Exception, A>>() {
-      @Override
-      public Either<Exception, A> apply(Function<HttpResponse, A> responseHandler) {
-        HttpResponse response = null;
-        try {
-          response = client.execute(httpUriRequest);
-          return right(responseHandler.apply(response));
-        } catch (Exception e) {
-          return left(e);
-        } finally {
-          client.close(response);
-        }
-      }
-    };
-  }
-
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.security.api.TrustedHttpClient#execute(org.apache.http.client.methods.HttpUriRequest)
+   */
   @Override
   public HttpResponse execute(HttpUriRequest httpUriRequest) throws TrustedHttpClientException {
     return execute(httpUriRequest, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT);
@@ -143,8 +121,8 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
     // Add the request header to elicit a digest auth response
     httpUriRequest.setHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
 
-    // if (serviceRegistry != null && serviceRegistry.getCurrentJob() != null)
-    // httpUriRequest.setHeader(CURRENT_JOB_HEADER, Long.toString(serviceRegistry.getCurrentJob().getId()));
+//    if (serviceRegistry != null && serviceRegistry.getCurrentJob() != null)
+//      httpUriRequest.setHeader(CURRENT_JOB_HEADER, Long.toString(serviceRegistry.getCurrentJob().getId()));
 
     if ("GET".equalsIgnoreCase(httpUriRequest.getMethod()) || "HEAD".equalsIgnoreCase(httpUriRequest.getMethod())) {
       // Set the user/pass
@@ -190,7 +168,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
 
   /**
    * Retries a request if the nonce timed out during the request.
-   * 
+   *
    * @param httpUriRequest
    *          The request to be made that isn't a GET, those are handled automatically.
    * @param response
@@ -237,7 +215,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
 
   /**
    * Determines if the nonce has timed out before a request could be performed.
-   * 
+   *
    * @param response
    *          The response to test to see if it has timed out.
    * @return true if it has time out, false if it hasn't
@@ -249,7 +227,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
 
   /**
    * Handles the necessary handshake for digest authenticaion in the case where it isn't a GET operation.
-   * 
+   *
    * @param httpUriRequest
    *          The request location to get the digest authentication for.
    * @param httpClient

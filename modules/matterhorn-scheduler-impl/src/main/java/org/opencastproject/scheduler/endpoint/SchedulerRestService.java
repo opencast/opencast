@@ -26,7 +26,6 @@ import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerQuery;
 import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.SolrUtils;
@@ -131,7 +130,7 @@ public class SchedulerRestService {
     if (cc == null) {
       serverUrl = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty("org.opencastproject.server.url");
       logger.debug("configured server url is {}", ccServerUrl);
       if (ccServerUrl == null) {
         serverUrl = UrlSupport.DEFAULT_BASE_URL;

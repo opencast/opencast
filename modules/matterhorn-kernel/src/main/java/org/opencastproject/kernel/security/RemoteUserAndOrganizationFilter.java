@@ -122,7 +122,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
         // User switching is only allowed if the request is coming in with
         // the global admin role enabled
         if (!originalUser.hasRole(GLOBAL_ADMIN_ROLE)) {
-          logger.warn("An unauthorized request is trying to switch from user '{}' to '{}'", originalUser.getUsername(),
+          logger.warn("An unauthorized request is trying to switch from user '{}' to '{}'", originalUser.getUserName(),
                   userHeader);
           ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
           return;
@@ -130,7 +130,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
         if (SecurityConstants.GLOBAL_ANONYMOUS_USERNAME.equals(userHeader)) {
           requestUser = SecurityUtil.createAnonymousUser(requestOrganization);
-          logger.trace("Request user is switched to '{}'", requestUser.getUsername());
+          logger.trace("Request user is switched to '{}'", requestUser.getUserName());
         } else {
           requestUser = userDirectory.loadUser(userHeader);
           if (requestUser != null) {
@@ -145,7 +145,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
       }
 
       // Execute the rest of the filter chain
-      logger.trace("Executing the filter chain with user '{}@{}'", requestUser.getUsername(),
+      logger.trace("Executing the filter chain with user '{}@{}'", requestUser.getUserName(),
               requestOrganization.getId());
       chain.doFilter(httpRequest, response);
 

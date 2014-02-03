@@ -15,16 +15,9 @@
  */
 package org.opencastproject.episode.impl.persistence;
 
-import static org.opencastproject.episode.api.Version.version;
-import static org.opencastproject.episode.impl.StoragePath.spath;
-import static org.opencastproject.util.data.Tuple.tuple;
-import static org.opencastproject.util.persistence.Queries.named;
-
 import org.opencastproject.episode.impl.StoragePath;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
-
-import java.net.URI;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,6 +27,14 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import java.net.URI;
+
+import static org.opencastproject.episode.api.Version.version;
+import static org.opencastproject.episode.impl.StoragePath.spath;
+import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.persistence.PersistenceUtil.runFirstResultQuery;
+import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResultQuery;
+import static org.opencastproject.util.persistence.PersistenceUtil.runUpdate;
 
 /** JPA link to {@link org.opencastproject.episode.impl.persistence.Asset}. */
 @Entity(name = "Asset")
@@ -80,34 +81,40 @@ public final class AssetDto {
 
   /** Convert into business object. */
   public Asset toAsset() {
-    return new Asset(URI.create(uri), spath(organizationId, mediaPackageId, version(version), mediaPackageElementId),
-            checksum);
+    return new Asset(URI.create(uri), spath(organizationId, mediaPackageId, version(version), mediaPackageElementId), checksum);
   }
 
   /** Find an asset by its URI. */
   public static Function<EntityManager, Option<AssetDto>> findByUri(final URI uri) {
-    return named.findSingle("Asset.findByUri", tuple("id", uri.toString()));
+    return new Function<EntityManager, Option<AssetDto>>() {
+      @Override public Option<AssetDto> apply(EntityManager em) {
+        return runSingleResultQuery(em, "Asset.findByUri", tuple("id", uri.toString()));
+      }
+    };
   }
 
   /** Find an arbitrary asset having the same checksum. */
   public static Function<EntityManager, Option<AssetDto>> findOneByChecksum(final String checksum) {
-    return named.findFirst("Asset.findByChecksum", tuple("checksum", checksum));
+    return new Function<EntityManager, Option<AssetDto>>() {
+      @Override public Option<AssetDto> apply(EntityManager em) {
+        return runFirstResultQuery(em, "Asset.findByChecksum", tuple("checksum", checksum));
+      }
+    };
   }
 
   /**
    * Delete assets by media package ID.
-   * 
    * @return true if at least on asset has been deleted
    */
   public static boolean deleteByMediaPackageId(EntityManager em, String mpId) {
-    return named.update(em, "Asset.deleteByMediaPackageId", tuple("mpId", mpId));
+    return runUpdate(em, "Asset.deleteByMediaPackageId", tuple("mpId", mpId));
   }
 
   /** Convert a DTO into the corresponding business object. */
   public static final Function<AssetDto, Asset> toAsset = new Function<AssetDto, Asset>() {
-    @Override
-    public Asset apply(AssetDto dto) {
+    @Override public Asset apply(AssetDto dto) {
       return dto.toAsset();
     }
   };
 }
+

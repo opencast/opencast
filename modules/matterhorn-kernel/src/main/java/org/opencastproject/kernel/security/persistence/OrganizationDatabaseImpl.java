@@ -153,9 +153,6 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
         organizationEntity.setName(org.getName());
         organizationEntity.setAdminRole(org.getAdminRole());
         organizationEntity.setAnonymousRole(org.getAnonymousRole());
-        for (Map.Entry<String, Integer> servers : org.getServers().entrySet()) {
-          organizationEntity.addServer(servers.getKey(), servers.getValue());
-        }
         organizationEntity.setServers(org.getServers());
         organizationEntity.setProperties(org.getProperties());
         em.merge(organizationEntity);

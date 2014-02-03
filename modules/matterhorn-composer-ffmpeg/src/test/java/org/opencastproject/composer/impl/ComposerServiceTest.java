@@ -37,9 +37,7 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.JaxbOrganization;
-import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -72,7 +70,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -171,10 +168,8 @@ public class ComposerServiceTest {
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
     EasyMock.expect(cc.getBundleContext()).andReturn(bc).anyTimes();
 
-    JaxbOrganization org = new DefaultOrganization();
-    HashSet<JaxbRole> roles = new HashSet<JaxbRole>();
-    roles.add(new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, org, ""));
-    User user = new JaxbUser("admin", org, roles);
+    Organization org = new DefaultOrganization();
+    User user = new User("admin", org.getId(), new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN });
     OrganizationDirectoryService orgDirectory = EasyMock.createNiceMock(OrganizationDirectoryService.class);
     EasyMock.expect(orgDirectory.getOrganization((String) EasyMock.anyObject())).andReturn(org).anyTimes();
 

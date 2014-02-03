@@ -20,7 +20,6 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
 import org.opencastproject.security.api.TrustedHttpClient;
-import org.opencastproject.systems.MatterhornConstans;
 
 import junit.framework.Assert;
 
@@ -39,7 +38,7 @@ public class LoadTestTest {
   private ComponentContext contextMock;
   private BundleContext bundleContextMock;
   private LoadTest loadTest;
-
+   
   /**
    * @throws java.lang.Exception
    */
@@ -85,7 +84,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_KEY, "");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 1 }", loadTest.getPrettyPackageDistribution());
@@ -102,7 +101,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_KEY, "Some String");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 1 }", loadTest.getPrettyPackageDistribution());
@@ -119,7 +118,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_KEY, "0");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 0 }", loadTest.getPrettyPackageDistribution());
@@ -136,7 +135,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_KEY, "1");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 1 }", loadTest.getPrettyPackageDistribution());
@@ -153,7 +152,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_KEY, "10");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 10 }", loadTest.getPrettyPackageDistribution());
@@ -170,7 +169,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_KEY, "21111111111111111111");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 1 }", loadTest.getPrettyPackageDistribution());
@@ -187,7 +186,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_KEY, "-3");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 3 }", loadTest.getPrettyPackageDistribution());
@@ -204,7 +203,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_KEY, "1,0");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 1 0 }", loadTest.getPrettyPackageDistribution());
@@ -221,11 +220,11 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_KEY, "1,2,3,4,5,6,7,8,9,10,0,11,12,13,14,15,16,17,18,19,20,211111111");
     loadTest = new LoadTest(properties, clientMock, contextMock);
-    Assert.assertEquals("{ 1 2 3 4 5 6 7 8 9 10 0 11 12 13 14 15 16 17 18 19 20 211111111 }",
-            loadTest.getPrettyPackageDistribution());
+    Assert.assertEquals("{ 1 2 3 4 5 6 7 8 9 10 0 11 12 13 14 15 16 17 18 19 20 211111111 }", loadTest
+            .getPrettyPackageDistribution());
   }
 
   /**
@@ -239,7 +238,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_TIMINGS_KEY, "");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 0 }", loadTest.getPrettyPackageDistributionTimings());
@@ -256,7 +255,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_TIMINGS_KEY, "Some String");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 0 }", loadTest.getPrettyPackageDistributionTimings());
@@ -273,7 +272,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_TIMINGS_KEY, "0");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 0 }", loadTest.getPrettyPackageDistributionTimings());
@@ -290,7 +289,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_TIMINGS_KEY, "1");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 1 }", loadTest.getPrettyPackageDistributionTimings());
@@ -307,7 +306,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_TIMINGS_KEY, "-5");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 5 }", loadTest.getPrettyPackageDistributionTimings());
@@ -324,7 +323,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_TIMINGS_KEY, "21111111111111111111");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 0 }", loadTest.getPrettyPackageDistributionTimings());
@@ -341,7 +340,7 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_TIMINGS_KEY, "1,0");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("{ 1 0 }", loadTest.getPrettyPackageDistributionTimings());
@@ -358,14 +357,14 @@ public class LoadTestTest {
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_TIMINGS_KEY,
             "1,2,3,4,5,6,7,8,9,10,0,11,12,13,14,15,16,17,18,19,20,211111111");
     loadTest = new LoadTest(properties, clientMock, contextMock);
-    Assert.assertEquals("{ 1 2 3 4 5 6 7 8 9 10 0 11 12 13 14 15 16 17 18 19 20 211111111 }",
-            loadTest.getPrettyPackageDistributionTimings());
+    Assert.assertEquals("{ 1 2 3 4 5 6 7 8 9 10 0 11 12 13 14 15 16 17 18 19 20 211111111 }", loadTest
+            .getPrettyPackageDistributionTimings());
   }
-
+  
   /**
    * Test method for {@link org.opencastproject.load.test.LoadTesting#updateCoreAddress()}.
    * 
@@ -373,16 +372,17 @@ public class LoadTestTest {
    */
   @Test
   public void validIPCoreAddressResultsInGoodURL() throws Exception {
-    //
+    // 
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
-    properties.put(LoadTest.CORE_ADDRESS_KEY, "http://1.2.3.4:8080");
+    
+    properties.put(LoadTest.CORE_ADDRESS_KEY,
+            "http://1.2.3.4:8080");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("http://1.2.3.4:8080", loadTest.getCoreAddress());
   }
-
+  
   /**
    * Test method for {@link org.opencastproject.load.test.LoadTesting#updateCoreAddress()}.
    * 
@@ -395,12 +395,13 @@ public class LoadTestTest {
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
     replay(contextMock);
-    properties.put(LoadTest.CORE_ADDRESS_KEY, "http://test.url.com:8080");
+    properties.put(LoadTest.CORE_ADDRESS_KEY,
+            "http://test.url.com:8080");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("http://test.url.com:8080", loadTest.getCoreAddress());
     verify(contextMock);
   }
-
+  
   /**
    * Test method for {@link org.opencastproject.load.test.LoadTesting#updateCoreAddress()}.
    * 
@@ -412,7 +413,7 @@ public class LoadTestTest {
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
     expect(contextMock.getBundleContext()).andReturn(bundleContextMock).times(2);
-    expect(bundleContextMock.getProperty(MatterhornConstans.SERVER_URL_PROPERTY)).andReturn("http://test.url.com:8080");
+    expect(bundleContextMock.getProperty(LoadTest.BUNDLE_CONTEXT_SERVER_URL)).andReturn("http://test.url.com:8080");
     replay(contextMock);
     replay(bundleContextMock);
     loadTest = new LoadTest(properties, clientMock, contextMock);
@@ -420,7 +421,7 @@ public class LoadTestTest {
     verify(bundleContextMock);
     Assert.assertEquals("http://test.url.com:8080", loadTest.getCoreAddress());
   }
-
+  
   /**
    * Test method for {@link org.opencastproject.load.test.LoadTesting#updateCoreAddress()}.
    * 
@@ -428,15 +429,15 @@ public class LoadTestTest {
    */
   @Test
   public void validWorkspaceLocationIsSetCorrectly() throws Exception {
-    //
+    // 
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.WORKSPACE_KEY, "/example/location");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("/example/location", loadTest.getWorkspaceLocation());
   }
-
+  
   /**
    * Test method for {@link org.opencastproject.load.test.LoadTesting#updateCoreAddress()}.
    * 
@@ -456,7 +457,7 @@ public class LoadTestTest {
     verify(bundleContextMock);
     Assert.assertEquals("/example/location/loadtest/workspace/", loadTest.getWorkspaceLocation());
   }
-
+  
   /**
    * Test method for {@link org.opencastproject.load.test.LoadTesting#updateCoreAddress()}.
    * 
@@ -464,14 +465,14 @@ public class LoadTestTest {
    */
   @Test
   public void validSourceLocationIsSetCorrectly() throws Exception {
-    //
+    // 
     properties.put(LoadTest.WORKSPACE_KEY, "/example/location");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("/example/location", loadTest.getWorkspaceLocation());
   }
-
+  
   /**
    * Test method for {@link org.opencastproject.load.test.LoadTesting#updateCoreAddress()}.
    * 
@@ -491,7 +492,7 @@ public class LoadTestTest {
     verify(bundleContextMock);
     Assert.assertEquals("/example/location/loadtest/source/media.zip", loadTest.getSourceMediaPackageLocation());
   }
-
+  
   /**
    * Test method for {@link org.opencastproject.load.test.LoadTesting#updateCoreAddress()}.
    * 
@@ -499,16 +500,16 @@ public class LoadTestTest {
    */
   @Test
   public void jobCheckIntervalSetCorrectly() throws Exception {
-    //
+    // 
     properties.put(LoadTest.WORKSPACE_KEY, "/example/location");
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.JOB_CHECK_INTERVAL_KEY, "55");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals(55, loadTest.getJobCheckInterval());
   }
-
+  
   /**
    * Test method for {@link org.opencastproject.load.test.LoadTesting#updateCoreAddress()}.
    * 
@@ -516,15 +517,15 @@ public class LoadTestTest {
    */
   @Test
   public void jobCheckIntervalNotSetDefaultIsUsed() throws Exception {
-    //
+    // 
     properties.put(LoadTest.WORKSPACE_KEY, "/example/location");
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals(5, loadTest.getJobCheckInterval());
   }
-
+  
   /**
    * Test method for {@link org.opencastproject.load.test.LoadTesting#updateCoreAddress()}.
    * 
@@ -532,16 +533,16 @@ public class LoadTestTest {
    */
   @Test
   public void jobCheckIntervalNegativeIsSetPositive() throws Exception {
-    //
+    // 
     properties.put(LoadTest.WORKSPACE_KEY, "/example/location");
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.JOB_CHECK_INTERVAL_KEY, "-20");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals(20, loadTest.getJobCheckInterval());
   }
-
+  
   /**
    * Test method for {@link org.opencastproject.load.test.LoadTesting#updateCoreAddress()}.
    * 
@@ -549,16 +550,16 @@ public class LoadTestTest {
    */
   @Test
   public void jobCheckSetToStringInsteadOfNumberGetsDefaultValue() throws Exception {
-    //
+    // 
     properties.put(LoadTest.WORKSPACE_KEY, "/example/location");
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
-
+    
     properties.put(LoadTest.JOB_CHECK_INTERVAL_KEY, "Job Interval");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals(LoadTest.DEFAULT_JOB_CHECK_INTERVAL, loadTest.getJobCheckInterval());
   }
-
+  
   /**
    * Test method for {@link org.opencastproject.load.test.LoadTesting#updateCoreAddress()}.
    * 
@@ -573,11 +574,11 @@ public class LoadTestTest {
     replay(bundleContextMock);
     properties.put(LoadTest.WORKSPACE_KEY, "/example/location");
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
-
+    
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals(LoadTest.DEFAULT_WORKFLOW_ID, loadTest.getWorkflowID());
   }
-
+  
   /**
    * Test method for {@link org.opencastproject.load.test.LoadTesting#updateCoreAddress()}.
    * 
@@ -585,7 +586,7 @@ public class LoadTestTest {
    */
   @Test
   public void validCustomWorkflowIDIsUsed() throws Exception {
-    //
+    // 
     properties.put(LoadTest.WORKSPACE_KEY, "/example/location");
     properties.put(LoadTest.SOURCE_MEDIA_PACKAGE_KEY, "/example/location");
     properties.put(LoadTest.WORKFLOW_KEY, "Custom Workflow ID #1");

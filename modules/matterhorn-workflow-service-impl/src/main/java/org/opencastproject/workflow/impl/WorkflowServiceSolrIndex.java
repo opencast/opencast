@@ -23,12 +23,12 @@ import static org.opencastproject.workflow.api.WorkflowService.WRITE_PERMISSION;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
@@ -40,7 +40,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
-import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -86,7 +85,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -502,17 +500,15 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     }
 
     User workflowCreator = instance.getCreator();
-    doc.addField(WORKFLOW_CREATOR_KEY, workflowCreator.getUsername());
+    doc.addField(WORKFLOW_CREATOR_KEY, workflowCreator.getUserName());
     doc.addField(ORG_KEY, instance.getOrganization().getId());
 
-    AccessControlList acl;
     try {
-      acl = authorizationService.getActiveAcl(mp).getA();
-    } catch (Error e) {
-      logger.error("No security xacml found on media package {}", mp);
-      throw new WorkflowException(e);
+      AccessControlList acl = authorizationService.getAccessControlList(mp);
+      addAuthorization(doc, acl);
+    } catch (MediaPackageException e) {
+      throw new WorkflowDatabaseException(e);
     }
-    addAuthorization(doc, acl);
 
     return doc;
   }
@@ -888,15 +884,21 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   protected void appendSolrAuthFragment(StringBuilder sb, String action) throws WorkflowDatabaseException {
     User user = securityService.getUser();
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole())) {
+    Organization organization;
+    try {
+      organization = orgDirectory.getOrganization(user.getOrganization());
+    } catch (NotFoundException e) {
+      throw new WorkflowDatabaseException(e);
+    }
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(organization.getAdminRole())) {
       sb.append(" AND ").append(ORG_KEY).append(":")
               .append(escapeQueryChars(securityService.getOrganization().getId()));
-      Set<Role> roles = user.getRoles();
-      if (roles.size() > 0) {
-        sb.append(" AND (").append(WORKFLOW_CREATOR_KEY).append(":").append(escapeQueryChars(user.getUsername()));
-        for (Role role : roles) {
+      String[] roles = user.getRoles();
+      if (roles.length > 0) {
+        sb.append(" AND (").append(WORKFLOW_CREATOR_KEY).append(":").append(escapeQueryChars(user.getUserName()));
+        for (String role : roles) {
           sb.append(" OR ");
-          sb.append(ACL_KEY_PREFIX).append(action).append(":").append(escapeQueryChars(role.getName()));
+          sb.append(ACL_KEY_PREFIX).append(action).append(":").append(escapeQueryChars(role));
         }
         sb.append(")");
       }

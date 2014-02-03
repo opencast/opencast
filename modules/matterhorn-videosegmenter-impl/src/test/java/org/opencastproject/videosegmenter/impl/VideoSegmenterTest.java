@@ -35,8 +35,6 @@ import org.opencastproject.metadata.mpeg7.MultimediaContentType;
 import org.opencastproject.metadata.mpeg7.Segment;
 import org.opencastproject.metadata.mpeg7.TemporalDecomposition;
 import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -134,8 +132,8 @@ public class VideoSegmenterTest {
     });
     EasyMock.replay(workspace);
 
-    User anonymous = new JaxbUser("anonymous", new DefaultOrganization(), new JaxbRole(
-            DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, new DefaultOrganization()));
+    User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+            new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);

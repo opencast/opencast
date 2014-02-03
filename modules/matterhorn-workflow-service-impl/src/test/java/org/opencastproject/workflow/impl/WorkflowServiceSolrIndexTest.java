@@ -20,10 +20,11 @@ import static org.opencastproject.workflow.api.WorkflowService.READ_PERMISSION;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -51,6 +52,8 @@ import java.util.List;
 public class WorkflowServiceSolrIndexTest {
 
   private WorkflowServiceSolrIndex dao = null;
+
+  private AccessControlList acl = new AccessControlList();
 
   @Before
   public void setUp() throws Exception {
@@ -85,10 +88,15 @@ public class WorkflowServiceSolrIndexTest {
     EasyMock.expect(serviceRegistry.getJob(123)).andReturn(job);
     EasyMock.replay(serviceRegistry);
 
+    AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
+    EasyMock.expect(authzService.getAccessControlList((MediaPackage) EasyMock.anyObject())).andReturn(acl).anyTimes();
+    EasyMock.replay(authzService);
+
     // Now create the dao
     dao = new WorkflowServiceSolrIndex();
     dao.solrRoot = PathSupport.concat("target", Long.toString(System.currentTimeMillis()));
     dao.setServiceRegistry(serviceRegistry);
+    dao.setAuthorizationService(authzService);
     dao.setSecurityService(securityService);
     dao.setOrgDirectory(orgDirectroy);
     dao.activate("System Admin");
@@ -153,8 +161,7 @@ public class WorkflowServiceSolrIndexTest {
   @Test
   public void testNonAdminQuery() throws Exception {
     String userRole = "ROLE_USER";
-    User nonAdminUser = new JaxbUser("noAdmin", new DefaultOrganization(), new JaxbRole(userRole,
-            new DefaultOrganization()));
+    User nonAdminUser = new User("noAdmin", DefaultOrganization.DEFAULT_ORGANIZATION_ID, new String[] { userRole });
 
     // security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -166,7 +173,7 @@ public class WorkflowServiceSolrIndexTest {
     WorkflowQuery q = new WorkflowQuery().withMediaPackage("123").withSeriesId("series1");
     String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
     String expected = "oc_org:mh_default_org AND mediapackageid:123 AND seriesid:series1 AND oc_org:"
-            + DefaultOrganization.DEFAULT_ORGANIZATION_ID + " AND (oc_creator:" + nonAdminUser.getUsername()
+            + DefaultOrganization.DEFAULT_ORGANIZATION_ID + " AND (oc_creator:" + nonAdminUser.getUserName()
             + " OR oc_acl_read:" + userRole + ")";
 
     assertEquals(expected, solrQuery);

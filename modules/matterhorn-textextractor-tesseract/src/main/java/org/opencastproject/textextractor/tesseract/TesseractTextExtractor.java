@@ -144,10 +144,10 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
         }
 
         @Override
-        protected void onStderr(String line) {
+        protected boolean onStderr(String line) {
           if ("Page 0".equals(line.trim()))
-            return;
-          super.onStderr(line);
+            return false;
+          return super.onStderr(line);
         }
 
       };
@@ -185,6 +185,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public void updated(Dictionary properties) throws ConfigurationException {
     String path = (String) properties.get(TESSERACT_BINARY_CONFIG_KEY);
     if (path != null) {

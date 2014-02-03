@@ -18,9 +18,6 @@ package org.opencastproject.serviceregistry.impl;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.JaxbOrganization;
-import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -89,9 +86,7 @@ public class ServiceRegistrationTest {
     EasyMock.replay(organizationDirectoryService);
     serviceRegistry.setOrganizationDirectoryService(organizationDirectoryService);
 
-    JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
-    User anonymous = new JaxbUser("anonymous", jaxbOrganization, new JaxbRole(jaxbOrganization.getAnonymousRole(),
-            jaxbOrganization));
+    User anonymous = new User("anonymous", organization.getId(), new String[] { organization.getAnonymousRole() });
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(anonymous).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();

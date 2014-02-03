@@ -34,12 +34,11 @@ public class AccessControlUtilTest {
     acl.getEntries().add(new AccessControlEntry("role2", "action2", false));
     acl.getEntries().add(new AccessControlEntry("role2", "action3", true));
 
-    JaxbOrganization org = new DefaultOrganization();
-    User user1 = new JaxbUser("user1", org, new JaxbRole("role1", org), new JaxbRole("someRole", org));
-    User user2 = new JaxbUser("user2", org, new JaxbRole("role2", org), new JaxbRole("someRole", org));
-    User localAdmin = new JaxbUser("localAdmin", org, new JaxbRole(org.getAdminRole(), org), new JaxbRole("someRole",
-            org));
-    User globalAdmin = new JaxbUser("globalAdmin", org, new JaxbRole(GLOBAL_ADMIN_ROLE, org));
+    Organization org = new DefaultOrganization();
+    User user1 = new User("user1", org.getId(), new String[] { "role1", "someRole" });
+    User user2 = new User("user2", org.getId(), new String[] { "role2", "someRole" });
+    User localAdmin = new User("localAdmin", org.getId(), new String[] { org.getAdminRole(), "someRole" });
+    User globalAdmin = new User("globalAdmin", org.getId(), new String[] { GLOBAL_ADMIN_ROLE });
 
     assertTrue(AccessControlUtil.isAuthorized(acl, user1, org, "action1"));
     assertTrue(AccessControlUtil.isAuthorized(acl, user1, org, "action2"));

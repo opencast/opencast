@@ -16,17 +16,37 @@
 
 package org.opencastproject.mediapackage;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.presentations;
+import static org.opencastproject.util.data.Monadics.mlist;
+
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdBuilder;
 import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.IoSupport;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -44,24 +64,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
-
-import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.presentations;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 /**
  * Default implementation for a media media package.
@@ -426,7 +428,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
     List<MediaPackageElement> elements = new ArrayList<MediaPackageElement>();
     for (MediaPackageElement element : getElements()) {
-      if (flavor.matches(element.getFlavor()))
+      if (flavor.equals(element.getFlavor()))
         elements.add(element);
     }
     return elements.toArray(new MediaPackageElement[elements.size()]);

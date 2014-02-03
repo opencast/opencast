@@ -64,11 +64,11 @@ var ocViewSeries = (function(){
       $.get(SERIES_URL2 + "/" + seriesId + "/acl.json", function (data)
       {
         var roles = {};
-        if(!$.isArray(data.acl.ace) && data.acl.ace.role == anonymous_role && data.acl.ace.action == "read" && data.acl.ace.allow == true) {
+        if(!$.isArray(data.acl.ace)) {
+          if(data.acl.ace.role == anonymous_role && data.acl.ace.action == "read" && data.acl.ace.allow == true) {
             roles["Public"] = ["View"];
-        } else { 
-          data.acl.ace = ocUtils.ensureArray(data.acl.ace);
-
+          }
+        } else {
           $.each(data.acl.ace, function(key, value)
           {
             if(!$.isArray(roles[value.role]) && value.role != anonymous_role)

@@ -23,7 +23,6 @@ import static org.opencastproject.workflow.api.WorkflowOperationInstance.Operati
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.JaxbOrganization;
-import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
@@ -46,7 +45,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlType(name = "workflow", namespace = "http://workflow.opencastproject.org")
 @XmlRootElement(name = "workflow", namespace = "http://workflow.opencastproject.org")
@@ -71,11 +69,9 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   @XmlElement(name = "parent", nillable = true)
   private Long parentId;
 
-  @XmlJavaTypeAdapter(UserAdapter.class)
   @XmlElement(name = "creator", namespace = "http://org.opencastproject.security")
   private User creator;
 
-  @XmlJavaTypeAdapter(OrganizationAdapter.class)
   @XmlElement(name = "organization", namespace = "http://org.opencastproject.security")
   private JaxbOrganization organization;
 
@@ -274,12 +270,12 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
    * 
    * @see org.opencastproject.workflow.api.WorkflowInstance#getCurrentOperation()
    */
-  public WorkflowOperationInstance getCurrentOperation() throws IllegalStateException {
+  public WorkflowOperationInstance getCurrentOperation() {
     if (!initialized)
       init();
 
     if (operations == null || operations.isEmpty())
-      throw new IllegalStateException("Workflow " + id + " has no operations");
+      return null;
 
     WorkflowOperationInstance currentOperation = null;
 
@@ -560,40 +556,6 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
     public WorkflowInstance unmarshal(WorkflowInstanceImpl instance) throws Exception {
       instance.init();
       return instance;
-    }
-  }
-
-  /**
-   * Allows JAXB handling of {@link Organization} interfaces.
-   */
-  static class OrganizationAdapter extends XmlAdapter<JaxbOrganization, Organization> {
-    public JaxbOrganization marshal(Organization org) throws Exception {
-      if (org == null)
-        return null;
-      if (org instanceof JaxbOrganization)
-        return (JaxbOrganization) org;
-      return JaxbOrganization.fromOrganization(org);
-    }
-
-    public Organization unmarshal(JaxbOrganization org) throws Exception {
-      return org;
-    }
-  }
-
-  /**
-   * Allows JAXB handling of {@link Organization} interfaces.
-   */
-  static class UserAdapter extends XmlAdapter<JaxbUser, User> {
-    public JaxbUser marshal(User user) throws Exception {
-      if (user == null)
-        return null;
-      if (user instanceof JaxbUser)
-        return (JaxbUser) user;
-      return JaxbUser.fromUser(user);
-    }
-
-    public User unmarshal(JaxbUser user) throws Exception {
-      return user;
     }
   }
 

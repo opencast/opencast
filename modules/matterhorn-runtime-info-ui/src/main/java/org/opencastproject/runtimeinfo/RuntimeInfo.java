@@ -19,10 +19,8 @@ import static org.opencastproject.rest.RestConstants.SERVICES_FILTER;
 
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
-import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -72,16 +70,17 @@ public class RuntimeInfo {
   /** Configuration properties id */
   private static final String ADMIN_URL_PROPERTY = "org.opencastproject.admin.ui.url";
   private static final String ENGAGE_URL_PROPERTY = "org.opencastproject.engage.ui.url";
+  private static final String SERVER_URL_PROPERTY = "org.opencastproject.server.url";
 
-  /**
-   * The rest publisher looks for any non-servlet with the 'opencast.service.path' property
-   */
+  /** The rest publisher looks for any non-servlet with the 'opencast.service.path' property */
   public static final String SERVICE_FILTER = "(&(!(objectClass=javax.servlet.Servlet))("
           + RestConstants.SERVICE_PATH_PROPERTY + "=*))";
 
   private SecurityService securityService;
   private BundleContext bundleContext;
   private URL serverUrl;
+  private URL engageBaseUrl;
+  private URL adminBaseUrl;
 
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
@@ -97,8 +96,26 @@ public class RuntimeInfo {
 
   public void activate(ComponentContext cc) throws MalformedURLException {
     logger.debug("start()");
+
     this.bundleContext = cc.getBundleContext();
-    serverUrl = new URL(bundleContext.getProperty(MatterhornConstans.SERVER_URL_PROPERTY));
+
+    serverUrl = new URL(bundleContext.getProperty(SERVER_URL_PROPERTY));
+
+    // Get admin UI url
+    String adminBaseUrlStr = bundleContext.getProperty(ADMIN_URL_PROPERTY);
+    if (StringUtils.isBlank(adminBaseUrlStr))
+      adminBaseUrl = serverUrl;
+    else
+      adminBaseUrl = new URL(adminBaseUrlStr);
+    logger.debug("Default admin server url is {}", adminBaseUrlStr);
+
+    // Get engage UI url
+    String engageBaseUrlStr = bundleContext.getProperty(ENGAGE_URL_PROPERTY);
+    if (StringUtils.isBlank(engageBaseUrlStr))
+      engageBaseUrl = serverUrl;
+    else
+      engageBaseUrl = new URL(engageBaseUrlStr);
+    logger.debug("Default engage server url is {}", engageBaseUrl);
   }
 
   public void deactivate() {
@@ -118,38 +135,33 @@ public class RuntimeInfo {
 
     // Create the engage target URL
     URL targetEngageBaseUrl = null;
-    String orgEngageBaseUrl = organization.getProperties().get(ENGAGE_URL_PROPERTY);
-    if (StringUtils.isNotBlank(orgEngageBaseUrl)) {
+    String organizationEngageURL = organization.getProperties().get(ENGAGE_URL_PROPERTY);
+    if (StringUtils.isNotBlank(organizationEngageURL)) {
       try {
-        targetEngageBaseUrl = new URL(orgEngageBaseUrl);
+        targetEngageBaseUrl = new URL(organizationEngageURL);
       } catch (MalformedURLException e) {
-        logger.warn("Engage url '{}' of organization '{}' is malformed", orgEngageBaseUrl, organization.getId());
+        logger.warn("Engage url '{}' of organization '{}' is malformed", organizationEngageURL, organization.getId());
+        targetEngageBaseUrl = new URL(targetScheme, engageBaseUrl.getHost(), engageBaseUrl.getPort(),
+                engageBaseUrl.getFile());
       }
-    }
-
-    if (targetEngageBaseUrl == null) {
-      logger.info(
-              "Using 'org.opencastproject.server.url' as a fallback for the non-existing organization level key '{}' for the components.json response",
-              ENGAGE_URL_PROPERTY);
-      targetEngageBaseUrl = new URL(targetScheme, serverUrl.getHost(), serverUrl.getPort(), serverUrl.getFile());
+    } else {
+      targetEngageBaseUrl = new URL(targetScheme, engageBaseUrl.getHost(), engageBaseUrl.getPort(),
+              engageBaseUrl.getFile());
     }
 
     // Create the admin target URL
     URL targetAdminBaseUrl = null;
-    String orgAdminBaseUrl = organization.getProperties().get(ADMIN_URL_PROPERTY);
-    if (StringUtils.isNotBlank(orgAdminBaseUrl)) {
+    String organizationAdminURL = organization.getProperties().get(ADMIN_URL_PROPERTY);
+    if (StringUtils.isNotBlank(organizationAdminURL)) {
       try {
-        targetAdminBaseUrl = new URL(orgAdminBaseUrl);
+        targetAdminBaseUrl = new URL(organizationAdminURL);
       } catch (MalformedURLException e) {
-        logger.warn("Admin url '{}' of organization '{}' is malformed", orgAdminBaseUrl, organization.getId());
+        logger.warn("Admin url '{}' of organization '{}' is malformed", organizationAdminURL, organization.getId());
+        targetAdminBaseUrl = new URL(targetScheme, adminBaseUrl.getHost(), adminBaseUrl.getPort(),
+                adminBaseUrl.getFile());
       }
-    }
-
-    if (targetAdminBaseUrl == null) {
-      logger.info(
-              "Using 'org.opencastproject.server.url' as a fallback for the non-existing organization level key '{}' for the components.json response",
-              ADMIN_URL_PROPERTY);
-      targetAdminBaseUrl = new URL(targetScheme, serverUrl.getHost(), serverUrl.getPort(), serverUrl.getFile());
+    } else {
+      targetAdminBaseUrl = new URL(targetScheme, adminBaseUrl.getHost(), adminBaseUrl.getPort(), adminBaseUrl.getFile());
     }
 
     JSONObject json = new JSONObject();
@@ -170,12 +182,12 @@ public class RuntimeInfo {
     JSONObject json = new JSONObject();
 
     User user = securityService.getUser();
-    json.put("username", user.getUsername());
+    json.put("username", user.getUserName());
 
     // Add the current user's roles
     JSONArray roles = new JSONArray();
-    for (Role role : user.getRoles()) {
-      roles.add(role.getName());
+    for (String role : user.getRoles()) {
+      roles.add(role);
     }
     json.put("roles", roles);
 

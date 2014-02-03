@@ -15,12 +15,13 @@
  */
 package org.opencastproject.security.api;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.List;
 
 /**
  * A JAXB-annotated list of organizations.
@@ -42,7 +43,7 @@ public class OrganizationList {
 
   /**
    * Constructs a new OrganizationList wrapper from a list of organizations.
-   *
+   * 
    * @param organizations
    *          the list or organizations
    */

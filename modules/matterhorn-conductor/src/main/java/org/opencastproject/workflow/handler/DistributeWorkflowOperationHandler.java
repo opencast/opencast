@@ -15,9 +15,7 @@
  */
 package org.opencastproject.workflow.handler;
 
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.workflow.handler.EngagePublicationChannel.CHANNEL_ID;
-
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
@@ -27,24 +25,20 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.mediapackage.selector.SimpleFlavorPrioritySelector;
-import org.opencastproject.security.api.AclScope;
-import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,6 +47,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import static org.opencastproject.workflow.handler.EngagePublicationChannel.CHANNEL_ID;
 
 /**
  * The workflow definition for handling "distribute" operations
@@ -65,9 +61,6 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
   /** The distribution service */
   private DistributionService distributionService = null;
 
-  /** The authorization service */
-  private AuthorizationService authorizationService = null;
-
   /**
    * Callback for the OSGi declarative services configuration.
    * 
@@ -76,16 +69,6 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
    */
   protected void setDistributionService(DistributionService distributionService) {
     this.distributionService = distributionService;
-  }
-
-  /**
-   * Callback for the OSGi declarative services configuration.
-   * 
-   * @param authorizationService
-   *          the authorization service
-   */
-  protected void setAuthorizationService(AuthorizationService authorizationService) {
-    this.authorizationService = authorizationService;
   }
 
   /** The configuration options for this handler */
@@ -181,11 +164,11 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
       // -----
       // This was removed in the meantime by a fix for MH-8515, but could now be used again.
       // -----
-      List<Attachment> securityAttachments = new ArrayList<Attachment>();
-      securityAttachments.addAll(authorizationService.getAclAttachments(mediaPackage, some(AclScope.Episode)));
-      securityAttachments.addAll(authorizationService.getAclAttachments(mediaPackage, some(AclScope.Series)));
-      for (Attachment a : securityAttachments) {
-        elementIds.add(a.getIdentifier());
+      Attachment[] securityAttachments = mediaPackage.getAttachments(MediaPackageElements.XACML_POLICY);
+      if (securityAttachments != null && securityAttachments.length > 0) {
+        for (Attachment a : securityAttachments) {
+          elementIds.add(a.getIdentifier());
+        }
       }
 
       // Finally, push the elements to the distribution channel

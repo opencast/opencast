@@ -18,18 +18,9 @@ package org.opencastproject.mediapackage;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeType;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.Collection;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -41,6 +32,13 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlTransient;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.Collection;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * This class provides base functionality for media package elements.

@@ -27,35 +27,6 @@ import static org.opencastproject.util.data.functions.Functions.identity;
 import static org.opencastproject.util.data.functions.Functions.toPredicate;
 
 public class FunctionsTest {
-  public static final Function<String, Integer> length = new Function<String, Integer>() {
-    @Override public Integer apply(String a) {
-      return a.length();
-    }
-  };
-
-  public static final Function0<String> hello = new Function0<String>() {
-    @Override public String apply() {
-      return "hello";
-    }
-  };
-
-  public static final Function<Integer, String> toString = new Function<Integer, String>() {
-    @Override public String apply(Integer a) {
-      return a.toString();
-    }
-  };
-
-  public static final Function0<Integer> yield1 = new Function0<Integer>() {
-    @Override public Integer apply() {
-      return 1;
-    }
-  };
-
-  public static final Function2<Integer, Integer, Integer> subtract = new Function2<Integer, Integer, Integer>() {
-    @Override public Integer apply(Integer a, Integer b) {
-      return a - b;
-    }
-  };
 
   @Test
   public void testIdentity() {
@@ -81,41 +52,6 @@ public class FunctionsTest {
     assertEquals(f.apply(1d), f2.apply(1d));
   }
 
-  @Test
-  public void testThen() {
-    assertEquals("5", Functions.then(length, toString).apply("hello"));
-    assertEquals(integer(1), Functions.then(toString, length).apply(5));
-    assertEquals("5", length.then(toString).apply("hello"));
-    assertEquals(integer(1), toString.then(length).apply(5));
-    assertEquals(integer(1), yield1.then(yield1).apply());
-    assertEquals("1", yield1.then(toString).apply());
-  }
-
-  @Test
-  public void testComposition() {
-    assertEquals("5", toString.o(length).apply("hello"));
-    assertEquals("1", toString.o(yield1).apply());
-  }
-
-  @Test
-  public void testCurrying() {
-    assertEquals("10", toString.curry().apply(10).apply());
-    assertEquals("10", toString.curry(10).apply());
-    assertEquals(integer(-20), subtract.curry().apply(10).apply(30));
-    assertEquals(integer(20), subtract.curry().apply(30).apply(10));
-    assertEquals(integer(20), subtract.curry(30).apply(10));
-  }
-
-  @Test
-  public void testUncurrying() {
-    assertEquals(integer(5), Functions.uncurry(subtract.curry()).apply(10, 5));
-  }
-
-  @Test
-  public void testFlip() {
-    assertEquals(integer(-20), subtract.flip().apply(30, 10));
-  }
-
   class A {
   }
 
@@ -139,10 +75,6 @@ public class FunctionsTest {
         return true;
       }
     });
-  }
 
-  /** {@link org.junit.Assert#assertEquals} complains when using unboxed integers. */
-  private static Integer integer(int i) {
-    return i;
   }
 }

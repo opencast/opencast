@@ -18,8 +18,8 @@ package org.opencastproject.episode.impl;
 import static org.opencastproject.util.data.Collections.cons;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.util.data.functions.Booleans.ne;
-import static org.opencastproject.util.osgi.SimpleServicePublisher.ServiceReg.reg;
 
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.api.HttpMediaPackageElementProvider;
@@ -41,6 +41,7 @@ import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function0;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.VCell;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.util.osgi.SimpleServicePublisher;
@@ -53,6 +54,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -107,8 +109,7 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
   private MediaInspectionService mediaInspectionSvc;
   private EpisodeServiceImpl episodeService;
 
-  public synchronized void setHttpMediaPackageElementProvider(
-          HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
+  public synchronized void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
     // Populate the search index if it is empty
     // bad approach but episode service and its rest endpoint are in a cyclic dependency
     episodeService.populateIndex(httpMediaPackageElementProvider.getUriRewriter(), true);
@@ -170,7 +171,8 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
   }
 
   @Override
-  public ServiceReg registerService(Dictionary properties, final ComponentContext cc) throws ConfigurationException {
+  public Tuple<List<ServiceRegistration>, Effect0> registerService(Dictionary properties, final ComponentContext cc)
+          throws ConfigurationException {
     final String solrServerUrlConfig = StringUtils.trimToNull(cc.getBundleContext().getProperty(CONFIG_SOLR_URL));
     final SolrServer solrServer = new Function0<SolrServer>() {
       @Override
@@ -207,30 +209,36 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
       }
     }.apply();
     final SolrRequester solrRequester = new SolrRequester(solrServer);
-    final SolrIndexManager solrIndex = new SolrIndexManager(solrServer, workspace, metadataSvcs, seriesService,
-            mpeg7CatalogService, securityService);
+    final SolrIndexManager solrIndex = new SolrIndexManager(solrServer,
+                                                            workspace,
+                                                            metadataSvcs,
+                                                            seriesService,
+                                                            mpeg7CatalogService,
+                                                            securityService);
     String systemUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
-    episodeService = new EpisodeServiceImpl(solrRequester, solrIndex, securityService, authorizationService,
-            orgDirectory, serviceRegistry, workflowService, workspace, mediaInspectionSvc, persistence, elementStore,
-            systemUserName);
-    final Effect0 shutdownSolr = new Effect0() {
-      @Override
-      protected void run() {
-        SolrServerFactory.shutdown(solrServer);
-      }
-    };
-
-    final Effect0 shutdownJmx = new Effect0() {
-      @Override
-      protected void run() {
-        JmxUtil.unregisterMXBean(registeredMXBean);
-      }
-    };
+    episodeService = new EpisodeServiceImpl(solrRequester,
+                                            solrIndex,
+                                            securityService,
+                                            authorizationService,
+                                            orgDirectory,
+                                            serviceRegistry,
+                                            workflowService,
+                                            workspace,
+                                            mediaInspectionSvc,
+                                            persistence,
+                                            elementStore,
+                                            systemUserName);
     // the JMX file system element store bean
     final ElementStoreBean elementStoreBean = new ElementStoreBean(elementStore);
     registeredMXBean = JmxUtil.registerMXBean(elementStoreBean, JMX_ELEMENT_STORE_TYPE);
-    return reg(list(registerService(cc, episodeService, EpisodeService.class, "Episode service")),
-            list(shutdownSolr, shutdownJmx));
+    return tuple(list(registerService(cc, episodeService, EpisodeService.class, "Episode service")),
+            (Effect0) new Effect0() {
+              @Override
+              protected void run() {
+                SolrServerFactory.shutdown(solrServer);
+                JmxUtil.unregisterMXBean(registeredMXBean);
+              }
+            });
   }
 
   @Override

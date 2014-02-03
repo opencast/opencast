@@ -47,18 +47,6 @@ public final class Cells {
     }
   }
 
-  /** Create a memo cell that calculates <code>f</code> once and then returns the value. */
-  public static <A> Cell<A> memo(final Function0<A> f) {
-    return new FCell<A>() {
-      @Override protected A calc() {
-        if (a == null) {
-          a = f.apply();
-        }
-        return a;
-      }
-    };
-  }
-
   public static <B, A> Cell<A> fcell(final Cell<B> master, final Function<B, A> f) {
     return new FCell<A>() {
       @Override protected A calc() {

@@ -88,7 +88,6 @@ public class DictionaryScanner implements ArtifactInstaller {
     // Make sure we are not importing something that already exists
     if (Arrays.asList(dictionaryService.getLanguages()).contains(language)) {
       logger.debug("Skipping existing dictionary '{}'", language);
-      sumInstalledFiles++;
     } else {
       logger.info("Loading language pack from {}", artifact);
       // read csv file and fill dictionary index
@@ -114,15 +113,13 @@ public class DictionaryScanner implements ArtifactInstaller {
                     new String[] { word, language, e.getMessage() });
           }
         }
-        sumInstalledFiles++;
-      } catch (Exception e) {
-        logger.error("Error installing dictionary from {}", artifact.getAbsolutePath());
-        return;
       } finally {
         IOUtils.closeQuietly(br);
       }
       logger.info("Finished loading language pack from {}", artifact);
     }
+
+    sumInstalledFiles++;
 
     // Determine the number of available profiles
     String[] filesInDirectory = artifact.getParentFile().list(new FilenameFilter() {

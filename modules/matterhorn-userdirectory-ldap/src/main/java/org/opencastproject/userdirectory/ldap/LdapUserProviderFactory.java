@@ -15,17 +15,13 @@
  */
 package org.opencastproject.userdirectory.ldap;
 
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.UserProvider;
-import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +43,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /** This service factory's PID */
   public static final String PID = "org.opencastproject.userdirectory.ldap";
-
+  
   /** The key to look up the ldap search filter in the service configuration properties */
   private static final String SEARCH_FILTER_KEY = "org.opencastproject.userdirectory.ldap.searchfilter";
 
@@ -76,28 +72,21 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   private static final String CACHE_EXPIRATION = "org.opencastproject.userdirectory.ldap.cache.expiration";
 
   /** A map of pid to ldap user provider instance */
-  private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
+  private Map<String, ServiceRegistration> providerRegistrations = null;
 
   /** The OSGI bundle context */
   protected BundleContext bundleContext = null;
 
-  /** The organization directory service */
-  private OrganizationDirectoryService orgDirectory;
-
-  /** OSGi callback for setting the organization directory service. */
-  public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
-    this.orgDirectory = orgDirectory;
-  }
-
   /**
-   * Callback for activation of this component.
+   * Builds the factory with the current bundle context, which is used to register new ldap providers.
    * 
-   * @param cc
-   *          the component context
+   * @param bundleContext
+   *          the OSGI bundle context
    */
-  public void activate(ComponentContext cc) {
-    logger.debug("Activate LdapUserProviderFactory");
-    this.bundleContext = cc.getBundleContext();
+  public LdapUserProviderFactory(BundleContext bundleContext) {
+    logger.debug("Creating LdapUserProviderFactory");
+    providerRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
+    this.bundleContext = bundleContext;
   }
 
   /**
@@ -136,27 +125,15 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
     int cacheSize = 1000;
     logger.debug("Using cache size " + properties.get(CACHE_SIZE) + " for " + LdapUserProviderFactory.class.getName());
-    try {
-      if (properties.get(CACHE_SIZE) != null) {
-        Integer configuredCacheSize = Integer.parseInt(properties.get(CACHE_SIZE).toString());
-        if (configuredCacheSize != null) {
-          cacheSize = configuredCacheSize.intValue();
-        }
-      }
-    } catch (Exception e) {
-      logger.warn("{} could not be loaded, default value is used: {}", CACHE_SIZE, cacheSize);
+    Integer configuredCacheSize = Integer.parseInt((String) properties.get(CACHE_SIZE));
+    if (configuredCacheSize != null) {
+      cacheSize = configuredCacheSize.intValue();
     }
 
     int cacheExpiration = 1;
-    try {
-      if (properties.get(CACHE_EXPIRATION) != null) {
-        Integer configuredCacheExpiration = Integer.parseInt(properties.get(CACHE_EXPIRATION).toString());
-        if (configuredCacheExpiration != null) {
-          cacheExpiration = configuredCacheExpiration.intValue();
-        }
-      }
-    } catch (Exception e) {
-      logger.warn("{} could not be loaded, default value is used: {}", CACHE_EXPIRATION, cacheExpiration);
+    Integer configuredCacheExpiration = Integer.parseInt((String) properties.get(CACHE_EXPIRATION));
+    if (configuredCacheExpiration != null) {
+      cacheExpiration = configuredCacheExpiration.intValue();
     }
 
     // Now that we have everything we need, go ahead and activate a new provider, removing an old one if necessary
@@ -164,17 +141,10 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     if (existingRegistration != null) {
       existingRegistration.unregister();
     }
-
-    Organization org;
-    try {
-      org = orgDirectory.getOrganization(organization);
-    } catch (NotFoundException e) {
-      logger.warn("Organization {} not found!", organization);
-      throw new ConfigurationException(ORGANIZATION_KEY, "not found");
-    }
-    LdapUserProviderInstance provider = new LdapUserProviderInstance(pid, org, searchBase, searchFilter, url, userDn,
-            password, roleAttributesGlob, cacheSize, cacheExpiration);
-    providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
+    LdapUserProviderInstance provider = new LdapUserProviderInstance(pid, organization, searchBase, searchFilter, url,
+            userDn, password, roleAttributesGlob, cacheSize, cacheExpiration);
+    providerRegistrations.put(pid,
+            bundleContext.registerService(UserProvider.class.getName(), provider, null));
 
   }
 
@@ -202,8 +172,8 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
    * @param pid
    *          the PID
    * @return the object name
-   * @throws NullPointerException
-   * @throws MalformedObjectNameException
+   * @throws NullPointerException 
+   * @throws MalformedObjectNameException 
    */
   public static final ObjectName getObjectName(String pid) throws MalformedObjectNameException, NullPointerException {
     return new ObjectName(pid + ":type=LDAPRequests");

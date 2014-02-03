@@ -105,19 +105,7 @@ public interface MediaPackageElements {
 
   // Security flavors
 
-  /** Episode bound XACML policy flavor */
-  MediaPackageElementFlavor XACML_POLICY_EPISODE = new MediaPackageElementFlavor("security", "xacml+episode",
-          "Security policy for the mediapackage");
-
-  /** Series bound XACML policy flavor */
-  MediaPackageElementFlavor XACML_POLICY_SERIES = new MediaPackageElementFlavor("security", "xacml+series",
-          "Security policy for the series");
-
-  /**
-   * XACML policy flavor.
-   * 
-   * @deprecated use {@link #XACML_POLICY_SERIES} instead.
-   */
+  /** XACML Policy flavor */
   MediaPackageElementFlavor XACML_POLICY = new MediaPackageElementFlavor("security", "xacml",
           "Security policy for the mediapackage");
 
@@ -134,11 +122,5 @@ public interface MediaPackageElements {
   /** A flavor for DFXP caption files */
   MediaPackageElementFlavor CAPTION_DFXP_FLAVOR = new MediaPackageElementFlavor("caption", "dfxp",
           "DFXP Captions catalog");
-
-  /** OAI-PMH subtype flavor */
-  MediaPackageElementFlavor OAIPMH = new MediaPackageElementFlavor("*", "oaipmh");
-
-  /** Notes metadata flavor */
-  MediaPackageElementFlavor NOTES = new MediaPackageElementFlavor("metadata", "notes");
 
 }

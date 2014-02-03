@@ -20,7 +20,6 @@ import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobProducer;
-import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -28,11 +27,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
-import org.opencastproject.security.api.AclScope;
-import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -42,7 +37,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
@@ -79,9 +73,8 @@ public class DistributeWorkflowOperationHandlerTest {
     mp = builder.loadFromXml(uriMP.toURL().openStream());
     service = new TestDistributionService();
 
-    DefaultOrganization defaultOrganization = new DefaultOrganization();
-    User anonymous = new JaxbUser("anonymous", defaultOrganization, new JaxbRole(
-            DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, defaultOrganization));
+    User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+            new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
@@ -100,17 +93,11 @@ public class DistributeWorkflowOperationHandlerTest {
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
             organizationDirectoryService);
 
-    AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
-    EasyMock.expect(
-            authorizationService.getAclAttachments((MediaPackage) EasyMock.anyObject(),
-                    (Option<AclScope>) EasyMock.anyObject())).andReturn(new ArrayList<Attachment>()).anyTimes();
-    EasyMock.replay(authorizationService);
-
     // set up the handler
     operationHandler = new DistributeWorkflowOperationHandler();
     operationHandler.setDistributionService(service);
     operationHandler.setServiceRegistry(serviceRegistry);
-    operationHandler.setAuthorizationService(authorizationService);
+
   }
 
   @Test

@@ -20,6 +20,8 @@ import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
 import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
 import static org.opencastproject.job.api.Job.Status.FINISHED;
 import static org.opencastproject.mediapackage.MediaPackageElementParser.getFromXml;
+import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.workflow.handler.EngagePublicationChannel.CHANNEL_ID;
 
 import org.opencastproject.distribution.api.DistributionException;
@@ -43,14 +45,13 @@ import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlParsingException;
-import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -61,14 +62,19 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-/** Responds to series events by re-distributing metadata and security policy files for published mediapackages. */
-public class SeriesUpdatedEventHandler {
+/**
+ * Responds to series events by re-distributing metadata and security policy files for published mediapackages.
+ */
+public class SeriesUpdatedEventHandler implements EventHandler {
 
   /** The logger */
   protected static final Logger logger = LoggerFactory.getLogger(SeriesUpdatedEventHandler.class);
@@ -103,6 +109,9 @@ public class SeriesUpdatedEventHandler {
   /** The system account to use for running asynchronous events */
   protected String systemAccount = null;
 
+  /** The executor */
+  protected ExecutorService executor = null;
+
   /**
    * OSGI callback for component activation.
    * 
@@ -111,6 +120,7 @@ public class SeriesUpdatedEventHandler {
    */
   protected void activate(BundleContext bundleContext) {
     this.systemAccount = bundleContext.getProperty("org.opencastproject.security.digest.user");
+    this.executor = Executors.newCachedThreadPool();
   }
 
   /**
@@ -185,100 +195,115 @@ public class SeriesUpdatedEventHandler {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.osgi.service.event.EventHandler#handleEvent(org.osgi.service.event.Event)
+   */
+  @Override
   public void handleEvent(final Event event) {
+    logger.debug("Queuing {}", event);
+
     // A series or its ACL has been updated. Find any mediapackages with that series, and update them.
-    logger.debug("Handling {}", event);
-    String seriesId = (String) event.getProperty(ID);
+    executor.execute(new Runnable() {
+      @Override
+      public void run() {
+        logger.debug("Handling {}", event);
+        String seriesId = (String) event.getProperty(ID);
 
-    // We must be an administrative user to make this query
-    try {
-      DefaultOrganization defaultOrg = new DefaultOrganization();
-      securityService.setOrganization(defaultOrg);
-      securityService.setUser(SecurityUtil.createSystemUser(systemAccount, defaultOrg));
+        // We must be an administrative user to make this query
+        try {
+          DefaultOrganization defaultOrg = new DefaultOrganization();
+          securityService.setOrganization(defaultOrg);
+          securityService.setUser(new User(systemAccount, defaultOrg.getId(), new String[] { GLOBAL_ADMIN_ROLE }));
 
-      SearchQuery q = new SearchQuery().withSeriesId(seriesId);
-      SearchResult result = searchService.getForAdministrativeRead(q);
+          SearchQuery q = new SearchQuery().withSeriesId(seriesId);
+          SearchResult result = searchService.getForAdministrativeRead(q);
 
-      for (SearchResultItem item : result.getItems()) {
-        MediaPackage mp = item.getMediaPackage();
-        Organization org = organizationDirectoryService.getOrganization(item.getOrganization());
-        securityService.setOrganization(org);
+          for (SearchResultItem item : result.getItems()) {
+            MediaPackage mp = item.getMediaPackage();
+            Organization org = organizationDirectoryService.getOrganization(item.getOrganization());
+            securityService.setOrganization(org);
 
-        // If the security policy has been updated, make sure to distribute that change
-        // to the distribution channels as well
-        if (SERIES_ACL_TOPIC.equals(event.getTopic())) {
-          // Build a new XACML file for this mediapackage
-          AccessControlList acl = AccessControlParser.parseAcl((String) event.getProperty(PAYLOAD));
-          Attachment fileRepoCopy = authorizationService.setAcl(mp, AclScope.Series, acl).getB();
+            // If the security policy has been updated, make sure to distribute that change
+            // to the distribution channels as well
+            if (SERIES_ACL_TOPIC.equals(event.getTopic())) {
+              // Build a new XACML file for this mediapackage
+              AccessControlList acl = AccessControlParser.parseAcl((String) event.getProperty(PAYLOAD));
+              authorizationService.setAccessControl(mp, acl);
+              Attachment fileRepoCopy = mp.getAttachments(XACML_POLICY)[0];
 
-          // Distribute the updated XACML file
-          Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, fileRepoCopy.getIdentifier());
-          JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
-          Result jobResult = barrier.waitForJobs();
-          if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
-            mp.remove(fileRepoCopy);
-            mp.add(getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload()));
-          } else {
-            logger.error("Unable to distribute XACML {}", fileRepoCopy.getIdentifier());
-            continue;
+              // Distribute the updated XACML file
+              Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, fileRepoCopy.getIdentifier());
+              JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
+              Result jobResult = barrier.waitForJobs();
+              if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
+                mp.remove(fileRepoCopy);
+                mp.add(getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload()));
+              } else {
+                logger.error("Unable to distribute XACML {}", fileRepoCopy.getIdentifier());
+                continue;
+              }
+            }
+
+            // Update the series dublin core
+            DublinCoreCatalog seriesDublinCore = seriesService.getSeries(seriesId);
+            mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
+
+            // Update the series dublin core
+            Catalog[] seriesCatalogs = mp.getCatalogs(MediaPackageElements.SERIES);
+            if (seriesCatalogs.length == 1) {
+              Catalog c = seriesCatalogs[0];
+              String filename = FilenameUtils.getName(c.getURI().toString());
+              URI uri = workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
+                      dublinCoreService.serialize(seriesDublinCore));
+              c.setURI(uri);
+              // setting the URI to a new source so the checksum will most like be invalid
+              c.setChecksum(null);
+
+              // Distribute the updated series dc
+              Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, c.getIdentifier());
+              JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
+              Result jobResult = barrier.waitForJobs();
+              if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
+                mp.remove(c);
+                mp.add(getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload()));
+              } else {
+                logger.error("Unable to distribute series catalog {}", c.getIdentifier());
+                continue;
+              }
+            }
+
+            // Update the search index with the modified mediapackage
+            searchService.add(mp);
+            Job searchJob = searchService.add(mp);
+            JobBarrier barrier = new JobBarrier(serviceRegistry, searchJob);
+            barrier.waitForJobs();
           }
+
+        } catch (SearchException e) {
+          logger.warn("Unable to find mediapackages in search: ", e.getMessage());
+        } catch (UnauthorizedException e) {
+          logger.warn(e.getMessage());
+        } catch (MediaPackageException e) {
+          logger.warn(e.getMessage());
+        } catch (ServiceRegistryException e) {
+          logger.warn(e.getMessage());
+        } catch (NotFoundException e) {
+          logger.warn(e.getMessage());
+        } catch (IOException e) {
+          logger.warn(e.getMessage());
+        } catch (AccessControlParsingException e) {
+          logger.warn(e.getMessage());
+        } catch (DistributionException e) {
+          logger.warn(e.getMessage());
+        } catch (SeriesException e) {
+          logger.warn(e.getMessage());
+        } finally {
+          securityService.setOrganization(null);
+          securityService.setUser(null);
         }
-
-        // Update the series dublin core
-        DublinCoreCatalog seriesDublinCore = seriesService.getSeries(seriesId);
-        mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
-
-        // Update the series dublin core
-        Catalog[] seriesCatalogs = mp.getCatalogs(MediaPackageElements.SERIES);
-        if (seriesCatalogs.length == 1) {
-          Catalog c = seriesCatalogs[0];
-          String filename = FilenameUtils.getName(c.getURI().toString());
-          URI uri = workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
-                  dublinCoreService.serialize(seriesDublinCore));
-          c.setURI(uri);
-          // setting the URI to a new source so the checksum will most like be invalid
-          c.setChecksum(null);
-
-          // Distribute the updated series dc
-          Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, c.getIdentifier());
-          JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
-          Result jobResult = barrier.waitForJobs();
-          if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
-            mp.remove(c);
-            mp.add(getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload()));
-          } else {
-            logger.error("Unable to distribute series catalog {}", c.getIdentifier());
-            continue;
-          }
-        }
-
-        // Update the search index with the modified mediapackage
-        Job searchJob = searchService.add(mp);
-        JobBarrier barrier = new JobBarrier(serviceRegistry, searchJob);
-        barrier.waitForJobs();
       }
-
-    } catch (SearchException e) {
-      logger.warn("Unable to find mediapackages in search: ", e.getMessage());
-    } catch (UnauthorizedException e) {
-      logger.warn(e.getMessage());
-    } catch (MediaPackageException e) {
-      logger.warn(e.getMessage());
-    } catch (ServiceRegistryException e) {
-      logger.warn(e.getMessage());
-    } catch (NotFoundException e) {
-      logger.warn(e.getMessage());
-    } catch (IOException e) {
-      logger.warn(e.getMessage());
-    } catch (AccessControlParsingException e) {
-      logger.warn(e.getMessage());
-    } catch (DistributionException e) {
-      logger.warn(e.getMessage());
-    } catch (SeriesException e) {
-      logger.warn(e.getMessage());
-    } finally {
-      securityService.setOrganization(null);
-      securityService.setUser(null);
-    }
+    });
   }
 }

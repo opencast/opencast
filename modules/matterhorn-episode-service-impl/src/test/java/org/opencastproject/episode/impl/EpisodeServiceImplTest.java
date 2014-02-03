@@ -39,13 +39,10 @@ import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
-import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
-import org.opencastproject.util.data.functions.Functions;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -68,11 +65,12 @@ import static org.opencastproject.mediapackage.MediaPackageSupport.loadFromClass
 import static org.opencastproject.util.UrlSupport.DEFAULT_BASE_URL;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.functions.Booleans.and;
+import static org.opencastproject.util.data.functions.Functions.uncurry;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Tests the functionality of the search env.getService().
- * 
+ *
  * todo setup scenario where gathering metadata from both the media package and the dublin core is required
  * (StaticMetadataServiceMediaPackageImpl, StaticMetadataServiceDublinCoreImpl)
  */
@@ -80,6 +78,7 @@ public class EpisodeServiceImplTest {
 
   private EpisodeServiceTestEnv env;
 
+  @SuppressWarnings("unchecked")
   @Before
   public void setUp() throws Exception {
     env = new EpisodeServiceTestEnv();
@@ -108,25 +107,24 @@ public class EpisodeServiceImplTest {
     SearchResult result = env.getService().find(systemQuery().id("10.0000/1"), env.getRewriter());
     assertEquals("Number of results", 1, result.size());
     assertTrue("Number of media package elements", result.getItems().get(0).getMediaPackage().getElements().length > 0);
-    assertEquals("Rewritten URL", "http://episodes/10.0000/1/catalog-1/0/catalog.xml", result.getItems().get(0)
-            .getMediaPackage().getElements()[0].getURI().toString());
+    assertEquals("Rewritten URL",
+                 "http://episodes/10.0000/1/catalog-1/0/catalog.xml",
+                 result.getItems().get(0).getMediaPackage().getElements()[0].getURI().toString());
     // delete mediapackage
     env.getService().delete(mediaPackage.getIdentifier().toString());
-    assertEquals("Mediapackage has been deleted", 0,
-            env.getService().find(systemQuery().id("10.0000/1"), env.getRewriter()).size());
+    assertEquals("Mediapackage has been deleted", 0, env.getService().find(systemQuery().id("10.0000/1"), env.getRewriter()).size());
     // add again
     env.getService().add(mediaPackage);
-    assertEquals("Number of mediapackages in archive", 1, env.getService().find(systemQuery(), env.getRewriter())
-            .size());
+    assertEquals("Number of mediapackages in archive", 1, env.getService().find(systemQuery(), env.getRewriter()).size());
     // only ROLE_UNKNOWN is allowed to read
     env.getAcl().getEntries().clear();
     env.getAcl().getEntries().add(new AccessControlEntry("ROLE_UNKNOWN", EpisodeService.READ_PERMISSION, true));
-    env.getAcl().getEntries()
-            .add(new AccessControlEntry(env.getStudentRole().getName(), EpisodeService.WRITE_PERMISSION, true));
+    env.getAcl().getEntries().add(
+            new AccessControlEntry(env.getUserWithPermissions().getRoles()[0], EpisodeService.WRITE_PERMISSION, true));
     // now add the mediapackage with this restrictive ACL to the search index
     env.getService().add(mediaPackage);
-    assertEquals("Current user is not allowed to read the latest version but only the first", 1,
-            env.getService().find(systemQuery(), env.getRewriter()).size());
+    assertEquals("Current user is not allowed to read the latest version but only the first",
+                 1, env.getService().find(systemQuery(), env.getRewriter()).size());
   }
 
   @Test
@@ -146,14 +144,16 @@ public class EpisodeServiceImplTest {
       final SearchResult r = env.getService().find(systemQuery().id("10.0000/1"), env.getRewriter());
       assertEquals(4, r.size());
       // check that each added media package has a unique version
-      assertEquals(r.size(), mlist(env.getService().find(systemQuery().id("10.0000/1"), env.getRewriter()).getItems())
-              .foldl(Collections.<Version> set(), new Function2<Set<Version>, SearchResultItem, Set<Version>>() {
-                @Override
-                public Set<Version> apply(Set<Version> sum, SearchResultItem item) {
-                  sum.add(item.getOcVersion());
-                  return sum;
-                }
-              }).size());
+      assertEquals(
+              r.size(),
+              mlist(env.getService().find(systemQuery().id("10.0000/1"), env.getRewriter()).getItems()).foldl(Collections.<Version> set(),
+                      new Function2<Set<Version>, SearchResultItem, Set<Version>>() {
+                        @Override
+                        public Set<Version> apply(Set<Version> sum, SearchResultItem item) {
+                          sum.add(item.getOcVersion());
+                          return sum;
+                        }
+                      }).size());
     }
     {
       final SearchResult r = env.getService().find(systemQuery().id("10.0000/1").onlyLastVersion(), env.getRewriter());
@@ -171,8 +171,7 @@ public class EpisodeServiceImplTest {
     env.getService().add(mediaPackage);
 
     SearchResult episodeMetadataResult = env.getService().find(systemQuery().text("Vegetation"), env.getRewriter());
-    SearchResult seriesMetadataResult = env.getService().find(systemQuery().text("Atmospheric Science"),
-            env.getRewriter());
+    SearchResult seriesMetadataResult = env.getService().find(systemQuery().text("Atmospheric Science"), env.getRewriter());
 
     assertEquals(1, episodeMetadataResult.getItems().size());
     assertEquals(1, seriesMetadataResult.getItems().size());
@@ -253,12 +252,9 @@ public class EpisodeServiceImplTest {
     env.getService().add(mp1);
     env.getService().add(mp2);
     assertTrue(env.getService().delete(mpId));
-    assertEquals(1L, env.getService().find(systemQuery().id(mpId).includeDeleted(true), env.getRewriter())
-            .getTotalSize());
+    assertEquals(1L, env.getService().find(systemQuery().id(mpId).includeDeleted(true), env.getRewriter()).getTotalSize());
     assertEquals(2L, env.getService().find(systemQuery().includeDeleted(true), env.getRewriter()).getTotalSize());
-    assertEquals(1L,
-            env.getService().find(systemQuery().includeDeleted(false).deletedSince(new Date(0L)), env.getRewriter())
-                    .getTotalSize());
+    assertEquals(1L, env.getService().find(systemQuery().includeDeleted(false).deletedSince(new Date(0L)), env.getRewriter()).getTotalSize());
     assertEquals(1L, env.getService().find(systemQuery(), env.getRewriter()).getTotalSize());
   }
 
@@ -278,11 +274,9 @@ public class EpisodeServiceImplTest {
 
     Map<String, Integer> servers = new HashMap<String, Integer>();
     servers.put(DEFAULT_BASE_URL, 8080);
-    env.getOrganizationResponder().setResponse(
-            new JaxbOrganization(DefaultOrganization.DEFAULT_ORGANIZATION_ID,
-                    DefaultOrganization.DEFAULT_ORGANIZATION_NAME, servers,
-                    DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS,
-                    null));
+    env.getOrganizationResponder().setResponse(new JaxbOrganization(DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+                                                                    DefaultOrganization.DEFAULT_ORGANIZATION_NAME, servers, DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN,
+                                                                    DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, null));
 
     // Try to delete it
     try {
@@ -293,8 +287,7 @@ public class EpisodeServiceImplTest {
     }
 
     // Second try with a "fixed" roleset
-    User adminUser = new JaxbUser("admin", new DefaultOrganization(), new JaxbRole(
-            DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, new DefaultOrganization()));
+    User adminUser = new User("admin", "opencastproject.org", new String[] { new DefaultOrganization().getAdminRole() });
     env.getUserResponder().setResponse(adminUser);
     Date deletedDate = new Date();
     assertTrue(env.getService().delete(mediaPackage.getIdentifier().toString()));
@@ -310,7 +303,7 @@ public class EpisodeServiceImplTest {
 
   /**
    * Ads a media package with one dublin core for the episode and one for the series.
-   * 
+   *
    * todo media package needs to return a series id for this test to work
    */
   @Test
@@ -347,6 +340,7 @@ public class EpisodeServiceImplTest {
     assertEquals("foobar-serie", result.getItems().get(0).getId());
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testPopulateIndex() throws Exception {
     // This service registry must return a list of jobs
@@ -392,9 +386,7 @@ public class EpisodeServiceImplTest {
     final Date dayAhead = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000);
     assertEquals(1, env.getService().find(systemQuery().addedBefore(dayAhead), env.getRewriter()).size());
     assertEquals(0, env.getService().find(systemQuery().addedAfter(dayAhead), env.getRewriter()).size());
-    assertEquals(1,
-            env.getService().find(systemQuery().addedAfter(new Date(0)).addedBefore(dayAhead), env.getRewriter())
-                    .size());
+    assertEquals(1, env.getService().find(systemQuery().addedAfter(new Date(0)).addedBefore(dayAhead), env.getRewriter()).size());
   }
 
   @Test
@@ -410,8 +402,7 @@ public class EpisodeServiceImplTest {
     e.add(mpc);
     assertEquals("Number of episodes", 3, e.find(systemQuery(), r).size());
     assertTrue("Each episode has a series title",
-            mlist(e.find(systemQuery(), r).getItems())
-                    .foldl(true, Functions.<SearchResultItem, Boolean, Boolean>uncurry(and.curry().o(hasSeriesTitle)).flip()));
+               mlist(e.find(systemQuery(), r).getItems()).foldl(true, uncurry(and.curry().o(hasSeriesTitle)).flip()));
     assertEquals("mp-a", 1, e.find(systemQuery().id("mp-a"), r).size());
     assertEquals("Title of mp-a", "Aurelien", e.find(systemQuery().id("mp-a"), r).getItems().get(0).getDcTitle());
     assertEquals("Title of mp-b", "Brighton Rock", e.find(systemQuery().id("mp-b"), r).getItems().get(0).getDcTitle());
@@ -435,23 +426,22 @@ public class EpisodeServiceImplTest {
     assertEquals("Find american greene (text)", 2, e.find(systemQuery().text("american greene"), r).size());
     //
     // sorting
-    assertEquals("Sort by title ascending", "Aurelien", e.find(systemQuery().sort(EpisodeQuery.Sort.TITLE, true), r)
-            .getItems().get(0).getDcTitle());
+    assertEquals("Sort by title ascending", "Aurelien",
+                 e.find(systemQuery().sort(EpisodeQuery.Sort.TITLE, true), r).getItems().get(0).getDcTitle());
     assertEquals("Sort by title descending", "World of Tiers",
-            e.find(systemQuery().sort(EpisodeQuery.Sort.TITLE, false), r).getItems().get(0).getDcTitle());
+                 e.find(systemQuery().sort(EpisodeQuery.Sort.TITLE, false), r).getItems().get(0).getDcTitle());
     assertEquals("Sort by creator ascending", "Graham Greene",
-            e.find(systemQuery().sort(EpisodeQuery.Sort.CREATOR, true), r).getItems().get(0).getDcCreator());
+                 e.find(systemQuery().sort(EpisodeQuery.Sort.CREATOR, true), r).getItems().get(0).getDcCreator());
     assertEquals("Sort by creator descending", "Philip Jose Farmer",
-            e.find(systemQuery().sort(EpisodeQuery.Sort.CREATOR, false), r).getItems().get(0).getDcCreator());
+                 e.find(systemQuery().sort(EpisodeQuery.Sort.CREATOR, false), r).getItems().get(0).getDcCreator());
     assertEquals("Sort by series title ascending", "American literature",
-            e.find(systemQuery().sort(EpisodeQuery.Sort.SERIES_TITLE, true), r).getItems().get(0).getDcSeriesTitle());
+                 e.find(systemQuery().sort(EpisodeQuery.Sort.SERIES_TITLE, true), r).getItems().get(0).getDcSeriesTitle());
     assertEquals("Sort by series title descending", "French literature",
-            e.find(systemQuery().sort(EpisodeQuery.Sort.SERIES_TITLE, false), r).getItems().get(0).getDcSeriesTitle());
+                 e.find(systemQuery().sort(EpisodeQuery.Sort.SERIES_TITLE, false), r).getItems().get(0).getDcSeriesTitle());
   }
 
   private static final Function<SearchResultItem, Boolean> hasSeriesTitle = new Function<SearchResultItem, Boolean>() {
-    @Override
-    public Boolean apply(SearchResultItem item) {
+    @Override public Boolean apply(SearchResultItem item) {
       return item.getDcSeriesTitle() != null;
     }
   };

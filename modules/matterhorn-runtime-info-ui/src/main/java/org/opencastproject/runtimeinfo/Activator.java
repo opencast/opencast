@@ -15,19 +15,12 @@
  */
 package org.opencastproject.runtimeinfo;
 
-import static org.opencastproject.rest.RestConstants.SERVICES_FILTER;
-import static org.opencastproject.rest.RestConstants.SERVICE_PATH_PROPERTY;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.runtimeinfo.rest.RestDocData;
-import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestService;
-
-import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -35,14 +28,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -52,6 +37,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+
+import static org.opencastproject.rest.RestConstants.SERVICES_FILTER;
+import static org.opencastproject.rest.RestConstants.SERVICE_PATH_PROPERTY;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
 
 /** A bundle activator that registers the REST documentation servlet. */
 public class Activator extends HttpServlet implements BundleActivator {
@@ -87,7 +84,9 @@ public class Activator extends HttpServlet implements BundleActivator {
   private void prepareMacros() {
     globalMacro = new HashMap<String, String>();
     globalMacro.put("PING_BACK_URL", bundleContext.getProperty("org.opencastproject.anonymous.feedback.url"));
-    globalMacro.put("HOST_URL", bundleContext.getProperty(MatterhornConstans.SERVER_URL_PROPERTY));
+    globalMacro.put("HOST_URL", bundleContext.getProperty("org.opencastproject.server.url"));
+    globalMacro.put("ADMIN_BASE_URL", bundleContext.getProperty("org.opencastproject.admin.ui.url"));
+    globalMacro.put("ENGAGE_BASE_URL", bundleContext.getProperty("org.opencastproject.engage.ui.url"));
     globalMacro.put("LOCAL_STORAGE_DIRECTORY", bundleContext.getProperty("org.opencastproject.storage.dir"));
   }
 
@@ -125,11 +124,9 @@ public class Activator extends HttpServlet implements BundleActivator {
     } else {
       final Object restService = bundleContext.getService(reference);
       findRestAnnotation(restService.getClass()).fold(new Option.Match<RestService, Void>() {
-        @Override
-        public Void some(RestService annotation) {
+        @Override public Void some(RestService annotation) {
           globalMacro.put("SERVICE_CLASS_SIMPLE_NAME", restService.getClass().getSimpleName());
-          RestDocData data = new RestDocData(annotation.name(), annotation.title(), docPath, annotation.notes(),
-                  restService, globalMacro);
+          RestDocData data = new RestDocData(annotation.name(), annotation.title(), docPath, annotation.notes(), restService, globalMacro);
           data.setAbstract(annotation.abstractText());
 
           for (Method m : restService.getClass().getMethods()) {
@@ -153,8 +150,7 @@ public class Activator extends HttpServlet implements BundleActivator {
           return null;
         }
 
-        @Override
-        public Void none() {
+        @Override public Void none() {
           docs.append("No documentation has been found for ").append(restService.getClass().getSimpleName());
           return null;
         }

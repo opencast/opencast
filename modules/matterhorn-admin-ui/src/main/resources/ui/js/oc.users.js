@@ -25,14 +25,10 @@ ocUsers.init = function () {
         
 }
 
-ocUsers.buildUsersView = function(data) {
-  ocUsers.users = data.users.user;
+ocUsers.buildUsersView = function(users) {
+  ocUsers.users = users;
   $.each(ocUsers.users, function (key, user) {
-	var roles = [];
-	$.each(user.roles.role, function (key, role) {
-	  roles.push(role.name);
-	});
-    user.roles = roles.sort().join(', ');
+    user.roles = user.roles.join(', ');
   });
   $('#addHeader').jqotesubtpl('templates/users.tpl', {users: ocUsers.users});
   // Attach actions to the update buttons

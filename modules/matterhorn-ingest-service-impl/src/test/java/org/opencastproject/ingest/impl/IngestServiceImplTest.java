@@ -20,12 +20,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AclScope;
-import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -33,7 +28,6 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -190,8 +184,8 @@ public class IngestServiceImplTest {
 
     EasyMock.replay(wfr, workflowInstance, workflowService, schedulerService);
 
-    User anonymous = new JaxbUser("anonymous", new DefaultOrganization(), new JaxbRole(
-            DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, new DefaultOrganization()));
+    User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+            new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
@@ -227,17 +221,10 @@ public class IngestServiceImplTest {
     EasyMock.expect(httpClient.execute((HttpGet) EasyMock.anyObject())).andReturn(httpResponse).anyTimes();
     EasyMock.replay(httpClient);
 
-    AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
-    EasyMock.expect(authorizationService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
-            .andReturn(Tuple.tuple(new AccessControlList(), AclScope.Series)).anyTimes();
-    EasyMock.replay(authorizationService);
-
     service = new IngestServiceImpl();
     service.setHttpClient(httpClient);
-    service.setAuthorizationService(authorizationService);
     service.setWorkingFileRepository(wfr);
     service.setWorkflowService(workflowService);
-    service.setSecurityService(securityService);
     service.setSchedulerService(schedulerService);
     ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,
             userDirectoryService, organizationDirectoryService);

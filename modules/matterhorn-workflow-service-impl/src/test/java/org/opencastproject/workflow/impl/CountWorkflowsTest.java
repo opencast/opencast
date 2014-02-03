@@ -26,7 +26,6 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -34,7 +33,6 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -59,7 +57,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -129,7 +127,7 @@ public class CountWorkflowsTest {
     service.setSecurityService(securityService);
 
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
-    EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject())).andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
+    EasyMock.expect(authzService.getAccessControlList((MediaPackage) EasyMock.anyObject())).andReturn(acl).anyTimes();
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
@@ -140,8 +138,7 @@ public class CountWorkflowsTest {
     service.setUserDirectoryService(userDirectoryService);
 
     Organization organization = new DefaultOrganization();
-    List<Organization> organizationList = new ArrayList<Organization>();
-    organizationList.add(organization);
+    List<Organization> organizationList = Arrays.asList(new Organization[] { organization });
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
             .andReturn(organization).anyTimes();

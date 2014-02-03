@@ -2,7 +2,3 @@ AccessControlEntry
 AccessControlList
 JaxbOrganization
 JaxbOrganizationList
-JaxbUser
-JaxbUserList
-JaxbRole
-JaxbRoleList

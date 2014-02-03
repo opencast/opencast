@@ -26,12 +26,9 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
-import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityConstants;
@@ -40,7 +37,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationDefinitionImpl;
@@ -55,7 +51,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -109,30 +105,22 @@ public class WorkflowServiceImplAuthzTest {
   @Before
   public void setUp() throws Exception {
     Map<String, Integer> servers = new HashMap<String, Integer>();
-    servers.put("http://somewhere", 80);
+    servers.put("http://somewhere", 8080);
     defaultOrganization = new DefaultOrganization();
     otherOrganization = new JaxbOrganization("other_org", "Another organization", servers,
             defaultOrganization.getAdminRole(), defaultOrganization.getAnonymousRole(), null);
 
-    JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(defaultOrganization);
-
-    instructor1 = new JaxbUser("instructor1", jaxbOrganization, new JaxbRole("ROLE_INSTRUCTOR", jaxbOrganization));
-    instructor2 = new JaxbUser("instructor2", jaxbOrganization, new JaxbRole("ROLE_INSTRUCTOR", jaxbOrganization));
-
-    JaxbOrganization differentOrg = new JaxbOrganization("differentorg");
-    instructorFromDifferentOrg = new JaxbUser("instructor3", differentOrg,
-            new JaxbRole("ROLE_INSTRUCTOR", differentOrg));
-
-    JaxbOrganization doesntMatterOrg = new JaxbOrganization("org doesn't matter");
-    globalAdmin = new JaxbUser("global_admin", doesntMatterOrg, new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE,
-            doesntMatterOrg));
+    instructor1 = new User("instructor1", defaultOrganization.getId(), new String[] { "ROLE_INSTRUCTOR" });
+    instructor2 = new User("instructor2", defaultOrganization.getId(), new String[] { "ROLE_INSTRUCTOR" });
+    instructorFromDifferentOrg = new User("instructor3", "differentorg", new String[] { "ROLE_INSTRUCTOR" });
+    globalAdmin = new User("global_admin", "org doesn't matter", new String[] { SecurityConstants.GLOBAL_ADMIN_ROLE });
 
     users = new HashMap<String, User>();
-    users.put(instructor1.getUsername(), instructor1);
-    users.put(instructor2.getUsername(), instructor2);
-    users.put(instructorFromDifferentOrg.getUsername(), instructorFromDifferentOrg);
-    users.put(DEFAULT_ORG_ADMIN.getUsername(), DEFAULT_ORG_ADMIN);
-    users.put(globalAdmin.getUsername(), globalAdmin);
+    users.put(instructor1.getUserName(), instructor1);
+    users.put(instructor2.getUserName(), instructor2);
+    users.put(instructorFromDifferentOrg.getUserName(), instructorFromDifferentOrg);
+    users.put(DEFAULT_ORG_ADMIN.getUserName(), DEFAULT_ORG_ADMIN);
+    users.put(globalAdmin.getUserName(), globalAdmin);
 
     service = new WorkflowServiceImpl() {
       public Set<HandlerRegistration> getRegisteredHandlers() {
@@ -144,8 +132,7 @@ public class WorkflowServiceImplAuthzTest {
     service.addWorkflowDefinitionScanner(scanner);
 
     // Organization Service
-    List<Organization> organizationList = new ArrayList<Organization>();
-    organizationList.add(defaultOrganization);
+    List<Organization> organizationList = Arrays.asList(new Organization[] { defaultOrganization });
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
             .andAnswer(new IAnswer<Organization>() {
@@ -153,7 +140,7 @@ public class WorkflowServiceImplAuthzTest {
               public Organization answer() throws Throwable {
                 String orgId = (String) EasyMock.getCurrentArguments()[0];
                 Map<String, Integer> servers = new HashMap<String, Integer>();
-                servers.put("http://" + orgId, 80);
+                servers.put("http://" + orgId, 8080);
                 defaultOrganization = new DefaultOrganization();
                 return new JaxbOrganization(orgId, orgId, servers, "ROLE_ADMIN", "ROLE_ANONYMOUS", null);
               }
@@ -237,8 +224,7 @@ public class WorkflowServiceImplAuthzTest {
 
     // Mock up an authorization service that always returns "true" for hasPermission()
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
-    EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
-            .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
+    EasyMock.expect(authzService.getAccessControlList((MediaPackage) EasyMock.anyObject())).andReturn(acl).anyTimes();
     EasyMock.expect(authzService.hasPermission((MediaPackage) EasyMock.anyObject(), (String) EasyMock.anyObject()))
             .andReturn(true).anyTimes();
     EasyMock.replay(authzService);
@@ -309,8 +295,8 @@ public class WorkflowServiceImplAuthzTest {
   public void testWorkflowWithoutSecurityPolicy() throws Exception {
     // Mock up an authorization service that always returns "false" for hasPermission()
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
-    EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
-            .andReturn(Tuple.tuple(new AccessControlList(), AclScope.Series)).anyTimes();
+    EasyMock.expect(authzService.getAccessControlList((MediaPackage) EasyMock.anyObject()))
+            .andReturn(new AccessControlList()).anyTimes();
     EasyMock.expect(authzService.hasPermission((MediaPackage) EasyMock.anyObject(), (String) EasyMock.anyObject()))
             .andReturn(false).anyTimes();
     EasyMock.replay(authzService);

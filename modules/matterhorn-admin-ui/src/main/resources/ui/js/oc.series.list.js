@@ -198,8 +198,6 @@ ocSeriesList.buildSeriesView = function(data) {
       ocSeriesList.askForSeries();
     }
   });
-
-  opencast.series.aclScheduler.init();
 }
 
 ocSeriesList.deleteSeries = function(seriesId, title) {

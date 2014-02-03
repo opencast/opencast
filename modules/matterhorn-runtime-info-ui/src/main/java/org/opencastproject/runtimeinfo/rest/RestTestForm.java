@@ -64,7 +64,7 @@ public class RestTestForm {
    * output
    */
   private boolean usesPathFormat = false;
-
+  
   /**
    * The form parameters.
    */

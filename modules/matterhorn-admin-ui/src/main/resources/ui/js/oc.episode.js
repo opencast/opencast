@@ -243,7 +243,6 @@ opencast.episode = (function() {
     return {
       id: json.id,
       title: json.dcTitle,
-      series: json.mediapackage.series,
       seriesTitle: json.mediapackage.seriestitle,
       creators: _.pluck(A(json.mediapackage.creators), "creator").join(", "),
       date: json.mediapackage.start ? ocUtils.fromUTCDateStringToFormattedTime(json.mediapackage.start) : "?",
@@ -708,8 +707,6 @@ opencast.episode = (function() {
                   .find(".selectEpisode").each(function() {this.disabled = true})
                   .end()
                   .addClass("highlight");
-
-          opencast.episode.aclScheduler.refresh();
         }
 
         /** If an episode is currently being processed by a workflow, add the workflow information

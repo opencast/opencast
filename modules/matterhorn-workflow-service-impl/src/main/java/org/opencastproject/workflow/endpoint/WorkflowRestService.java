@@ -34,7 +34,6 @@ import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.LocalHashMap;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
@@ -171,7 +170,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     if (cc == null) {
       serverUrl = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty("org.opencastproject.server.url");
       logger.info("configured server url is {}", ccServerUrl);
       if (ccServerUrl == null) {
         serverUrl = UrlSupport.DEFAULT_BASE_URL;

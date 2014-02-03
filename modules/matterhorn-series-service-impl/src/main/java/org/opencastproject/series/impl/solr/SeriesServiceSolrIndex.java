@@ -30,7 +30,6 @@ import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesException;
@@ -66,7 +65,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -717,18 +715,14 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     User currentUser = securityService.getUser();
     Organization currentOrg = securityService.getOrganization();
     if (!currentUser.hasRole(currentOrg.getAdminRole()) && !currentUser.hasRole(GLOBAL_ADMIN_ROLE)) {
-      List<String> roleList = new ArrayList<String>();
-      for (Role role : currentUser.getRoles()) {
-        roleList.add(role.getName());
-      }
-      String[] roles = roleList.toArray(new String[roleList.size()]);
+      final String[] roles = currentUser.getRoles();
       if (forEdit) {
         appendAnd(sb, SolrFields.ACCESS_CONTROL_EDIT, roles);
       } else if (roles.length > 0) {
         sb.append(" AND (");
-        append(sb, "", SolrFields.ACCESS_CONTROL_CONTRIBUTE, roles);
+        append(sb, "", SolrFields.ACCESS_CONTROL_CONTRIBUTE, currentUser.getRoles());
         sb.append(" OR ");
-        append(sb, "", SolrFields.ACCESS_CONTROL_READ, roles);
+        append(sb, "", SolrFields.ACCESS_CONTROL_READ, currentUser.getRoles());
         sb.append(")");
       }
     }
