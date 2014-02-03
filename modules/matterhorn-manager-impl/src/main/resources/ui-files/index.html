@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <title>Opencast Matterhorn</title>
+    
+    <link rel="shortcut icon" href="ui-files/css/images/favicon.ico" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    
+    <!-- STYLESHEETS -->
+   <!-- <link rel="stylesheet" type="text/css" href="ui-files/css/jquery-ui-1.8.6.custom.css" /> -->
+    <link rel="stylesheet" type="text/css" href="ui-files/css/market-ui.css" />
+    <link rel="stylesheet" type="text/css" href="ui-files/css/market.css" />
+    <link rel="stylesheet" type="text/css" href="ui-files/css/popup.css" />
+    
+    <link rel="stylesheet" type="text/css" href="ui-files/css/jqueryFileTree.css" />
+    
+    <!-- SCRIPTS -->
+    
+    <script type="text/javascript" src="ui-files/lib/jquery-1.10.2.min.js"></script>
+	
+    <script type="text/javascript">
+      // make jquery 1.6.x available under $6
+      $6 = jQuery.noConflict(true);
+    </script>
+    
+    <script type="text/javascript" src="ui-files/lib/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="ui-files/lib/jquery-ui-1.8.6.custom.min.js"></script>
+    <script type="text/javascript" src="ui-files/lib/jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="ui-files/lib/jquery.i18n.properties-min.js"></script>
+    <script type="text/javascript" src="ui-files/lib/jquery.jqote2.js"></script>
+    <script type="text/javascript" src="ui-files/lib/underscore-1.1.7.min.js"></script>
+    <script type="text/javascript" src="ui-files/lib/oc.utils.js"></script>
+    <script type="text/javascript" src="ui-files/lib/jquery.address-1.4.min.js"></script>
+    <script type="text/javascript" src="ui-files/lib/jquery.cookie.js"></script>
+    
+    
+    <script type="text/javascript" src="ui-files/js/config-editor/jqueryFileTree.js"></script>
+    
+
+ 	<script type="text/javascript">
+ 		// environment variable
+	    var workflow_data = ${workflow_data};
+    </script>
+ 	
+    <!-- define all possible tabs here -->
+    <script type="text/x-jqote-template" id="tabs-template">
+      <ul id="tabs">
+        <li>
+          <a href="#config" title="Config Editor" id="i18n_tab_manage_config">Config Editor</a>
+        </li>
+        <li>
+          <a href="#editor" title="Workflow Editor" id="i18n_tab_workflow_editor">Workflow Editor</a>
+        </li>
+      </ul>
+    </script>
+
+    <script type="text/javascript" src="ui-files/js/utils/uiTabsRenderer.js"></script>
+    
+  </head>
+  <body>
+    <!-- VERSION AND LOGOUT BAR -->
+    <div class="layout-page-header oc-ui-version-bar ui-helper-clearfix">
+      <div id="pageHeader">
+        <span id="currentVersion"></span>
+        <a href="/j_spring_security_logout">Log out</a>
+        <div class="clear"></div>
+      </div>
+
+      <!-- notification that javaScript is disabled -->
+      <noscript>
+        <div style="border:1px solid red;width:530px;margin:20px;margin-left:auto;margin-right:auto;">
+          <div style="text-align: left;background:red; color:white;padding-top:2px;padding-bottom:2px;">
+            <div class="icon icon-error" style="margin-left:5px;margin-right:5px;">&nbsp;</div>
+            JavaScript is disabled
+          </div>
+          <div style="padding:10px;">
+            JavaScript is turned off in your web browser, so this site won't work properly! <br />
+            <strong>
+              Please turn JavaScript on to use this site, then refresh the page.
+            </strong>
+          </div>
+        </div>
+      </noscript>
+
+      <div id="wrapper">
+        <div id="header">
+          <a href="/config" style="text-decoration: none;">
+            <img src="ui-files/css/images/MatterhornLogo.png" onclick="document.location='../welcome.html'; return false;" alt="Matterhorn Home Page" title="Matterhorn Home Page" width="104" height="72" align="left"/>
+            <h1>Matterhorn Manager</h1>
+          </a>
+          <a href="http://www.opencastproject.org" id="oc-logo">
+            <img src="ui-files/css/images/OpencastLogo.png" width="143" height="38" alt="Opencast Community Project" title="Opencast Community Project" />
+          </a>
+
+          <div class="clear"></div>
+        </div>
+      </div>
+      <!-- PAGE TABS -->
+      <div class="content-page" id="page-header">
+        <div id="tabsWrapper" class="ui-tabs ui-widget ui-widget-content"></div>
+        <div id="addHeader"></div>
+        <div id="holdActionStage" style="display:none">
+          <input type="hidden" id="holdWorkflowId" value="" />
+          <iframe id="holdActionUI" border="0" frameborder="0" style="height:640px;"></iframe>
+        </div>
+      </div>
+    </div>
+    <div id="buttons-container" class="ui-widget-restart-button-position">
+	  <div id="config-controls" style="visibility:hidden">
+	    <button id="mh-restart-btn" class="ui-button ui-corner-all" onclick="restartSystem();">
+	      <p>
+         	<img width="80" height="80" alt="Restart MH" src="ui-files/css/images/restart.png">
+	      </p>
+	      Restart MH
+	    </button>
+	    <p><br>
+	      <input type="checkbox" id="hide_comments_checkbox"/><label> hide comments</label>
+	    </p>
+	    <p><br>
+	      <input type="checkbox" id="mode_checkbox"/><label> expert mode</label>
+	    </p>
+	    <p><br>
+	      <button class="config-save-btn ui-widget-button-position" onclick="saveConfig();">Save‌ config</button>
+	    </p>
+	  </div>
+	  
+	  <div id="workflow-controls" style="visibility:hidden">
+	    <p>
+	      <button type="button" onclick="handleSaveWorkflowVerification();" class="ui-widget-button-position">Save workflow</button>
+	    </p>  
+	    <p>
+	      <button type="button" onclick="clearTextField();" class="ui-widget-button-position">Clear workflow</button>
+        </p>
+	    <p>
+	      <button type="button" onclick="handleNewWorkflowCreation();" class="ui-widget-button-position">Create workflow</button>
+        </p>
+	    <p>
+	      <button type="button" onclick="deleteWorkflowFile();" class="ui-widget-button-position">Delete workflow</button>
+        </p>
+	  </div>
+	</div>
+    <div class="content-page ui-widget-content-margin-top ui-widget-margin-bottom" id="content"/>
+  </body>
+</html>
