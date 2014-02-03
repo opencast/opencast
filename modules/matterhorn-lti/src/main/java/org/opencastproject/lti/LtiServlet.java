@@ -40,10 +40,10 @@ import javax.servlet.http.HttpSession;
  */
 public class LtiServlet extends HttpServlet {
 
-	private static final String LTI_CUSTOM_PREFIX = "custom_";
+  private static final String LTI_CUSTOM_PREFIX = "custom_";
 
   /** The logger */
-	private static final Logger logger = LoggerFactory.getLogger(LtiServlet.class);
+  private static final Logger logger = LoggerFactory.getLogger(LtiServlet.class);
 
   /** The serialization uid */
   private static final long serialVersionUID = 6138043870346176520L;
@@ -163,7 +163,7 @@ public class LtiServlet extends HttpServlet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse)
    */
@@ -181,31 +181,31 @@ public class LtiServlet extends HttpServlet {
     if (toolReq != null) {
       toolUrl = toolReq;
       if (!(toolUrl.indexOf("/") == 0)) {
-        //if not supplied we assume this is a root path to the tool 
+        //if not supplied we assume this is a root path to the tool
         toolUrl = "/" + toolUrl;
       }
     }
 
     String customParams = getCustomParams(req);
     if (customParams != null) {
-      toolUrl = toolUrl + "?" + customParams; 
+      toolUrl = toolUrl + "?" + customParams;
     }
-    
+
     // Always set the session cookie
     resp.setHeader("Set-Cookie", "JSESSIONID=" + session.getId() + ";Path=/");
-    
+
     // The client can specify debug option by passing a value to test
     String testString = req.getParameter("custom_test");
     boolean test = false;
     if (testString != null) {
       logger.debug("test: {}", req.getParameter("custom_test"));
       test = Boolean.valueOf(testString).booleanValue();
-    } 
-    
+    }
+
     //we need to add the custom params to the outgoing request
-    
-    
-    // if in test mode display details where we go 
+
+
+    // if in test mode display details where we go
     if (test) {
       resp.getWriter().write("<html><body>Welcome to matterhorn lti, you are going to " + toolUrl + "<br>");
       resp.getWriter().write("<a href=\"" + toolUrl + "\">continue...</a></body></html>");
@@ -215,11 +215,11 @@ public class LtiServlet extends HttpServlet {
       resp.sendRedirect(toolUrl);
     }
   }
-  
+
   /**
-   * Get a list of custom params to pass to the tool 
+   * Get a list of custom params to pass to the tool
    * @param req
-   * @return 
+   * @return
    */
   @SuppressWarnings("unchecked")
   protected String getCustomParams(HttpServletRequest req) {
@@ -238,15 +238,15 @@ public class LtiServlet extends HttpServlet {
         builder.append(paramName + "=" + paramValue + "&");
       }
     }
-    
-    
+
+
     return builder.toString();
-    
+
   }
 
   /**
    * Builds a map of LTI parameters
-   * 
+   *
    * @param req
    *          the LTI Launch HttpServletRequest
    * @return the map of LTI parameters to the values for this launch
@@ -264,7 +264,7 @@ public class LtiServlet extends HttpServlet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse)
    */

@@ -22,17 +22,17 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 
 public class AnalyticsServiceImplTest {
-	private AnalyticsServiceImpl visualizationImpl = new AnalyticsServiceImpl();
-	private TrustedHttpClient client;
-	
-	@Before
-	public void setUp() {
-		visualizationImpl.setTrustedClient(client);
-	}
-	
-	@Test
-	public void getWatches() throws TrustedHttpClientException {
+  private AnalyticsServiceImpl visualizationImpl = new AnalyticsServiceImpl();
+  private TrustedHttpClient client;
 
-	}
-	
+  @Before
+  public void setUp() {
+    visualizationImpl.setTrustedClient(client);
+  }
+
+  @Test
+  public void getWatches() throws TrustedHttpClientException {
+
+  }
+
 }

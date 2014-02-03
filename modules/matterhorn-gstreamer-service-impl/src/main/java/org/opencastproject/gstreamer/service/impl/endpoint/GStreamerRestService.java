@@ -76,14 +76,14 @@ public class GStreamerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
-  
+
   @Override
   public ServiceRegistry getServiceRegistry() {
     return serviceRegistry;
@@ -91,7 +91,7 @@ public class GStreamerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Sets the gstreamer service
-   * 
+   *
    * @param gstreamerService
    *          the gstreamer service
    */
@@ -101,7 +101,7 @@ public class GStreamerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
@@ -115,13 +115,13 @@ public class GStreamerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Launches a gstreamer pipeline
-   * 
+   *
    * @param mediapackage
-   *          The mediapackage to draw track locations from. 
+   *          The mediapackage to draw track locations from.
    * @param launch
    *          The launch command to run after substitutions have been made.
    * @param outputFiles
-   *          The outputFiles to substitute into the launch command.  
+   *          The outputFiles to substitute into the launch command.
    * @return A response containing the job for this encoding job in the response body.
    * @throws Exception
    */
@@ -134,8 +134,8 @@ public class GStreamerRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "The list of files to add to the media package. Currently only supports one.", isRequired = true, name = "outputFiles", type = Type.STRING) }, reponses = { @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response launch(@FormParam("mediapackage") String mediaPackageXml, @FormParam("launch") String launch, @FormParam("outputFiles") String outputFiles)
           throws Exception {
-	  logger.debug("Remote call for mediapackage " + mediaPackageXml + " with launch string " + launch + " and output files " + outputFiles);
-	  Job job = null;
+    logger.debug("Remote call for mediapackage " + mediaPackageXml + " with launch string " + launch + " and output files " + outputFiles);
+    Job job = null;
     try {
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       job = gstreamerService.launch(mediapackage, launch, outputFiles);
@@ -149,7 +149,7 @@ public class GStreamerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override

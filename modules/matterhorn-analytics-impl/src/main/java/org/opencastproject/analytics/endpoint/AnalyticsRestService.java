@@ -60,17 +60,17 @@ public class AnalyticsRestService {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
   public void activate(ComponentContext cc) {
-	  logger.debug("Activating " + AnalyticsRestService.class.getName());
+    logger.debug("Activating " + AnalyticsRestService.class.getName());
   }
 
   /**
    * Set {@link org.opencastproject.analytics.impl.AnalyticsImpl} service.
-   * 
+   *
    * @param service
    *          Service implemented {@link org.opencastproject.analytics.impl.AnalyticsImpl}
    */
@@ -80,14 +80,14 @@ public class AnalyticsRestService {
 
   /**
    * Unset {@link org.opencastproject.analytics.impl.AnalyticsImpl} service.
-   * 
+   *
    * @param service
    *          Service implemented {@link org.opencastproject.analytics.impl.AnalyticsImpl}
    */
   public void unsetService(AnalyticsServiceImpl analyticsServiceImpl) {
     this.analyticsServiceImpl = null;
   }
-  
+
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("series.xml")
@@ -148,7 +148,7 @@ public class AnalyticsRestService {
               .entity("Exception while trying to obtain metadata: " + e.getMessage() + ".").build();
     }
   }
-  
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("episodes.json")
@@ -168,7 +168,7 @@ public class AnalyticsRestService {
               .entity("Exception while trying to obtain metadata: " + e.getMessage() + ".").build();
     }
   }
-  
+
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("episode.xml")
@@ -188,7 +188,7 @@ public class AnalyticsRestService {
               .entity("Exception while trying to obtain metadata: " + e.getMessage() + ".").build();
     }
   }
-  
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("episode.json")
@@ -207,8 +207,8 @@ public class AnalyticsRestService {
       return Response.serverError().status(Response.Status.INTERNAL_SERVER_ERROR)
               .entity("Exception while trying to obtain metadata: " + e.getMessage() + ".").build();
     }
-  } 
-  
+  }
+
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("firstview.xml")
@@ -228,7 +228,7 @@ public class AnalyticsRestService {
               .entity("Exception while trying to obtain metadata: " + e.getMessage() + ".").build();
     }
   }
-  
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("firstview.json")
@@ -248,7 +248,7 @@ public class AnalyticsRestService {
               .entity("Exception while trying to obtain metadata: " + e.getMessage() + ".").build();
     }
   }
-  
+
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("lastview.xml")
@@ -268,7 +268,7 @@ public class AnalyticsRestService {
               .entity("Exception while trying to obtain metadata: " + e.getMessage() + ".").build();
     }
   }
-  
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("lastview.json")
@@ -288,15 +288,15 @@ public class AnalyticsRestService {
               .entity("Exception while trying to obtain metadata: " + e.getMessage() + ".").build();
     }
   }
-  
+
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("views.xml")
-	@RestQuery(name = "views", description = "Returns the statistics for all of the intervals between two dates for a given episode.", pathParameters = { }, restParameters = {
-			@RestParameter(description = "The id of the media package.", isRequired = false, name = "episodeID", type = Type.STRING),
-			@RestParameter(description = "The start time of the range that the user is interested in in format YYYYMMDDHHMM e.g. 201202250830 which would be February 25, 2012 at 8:30 am.", isRequired = false, name = "start", type = Type.STRING), 
-			@RestParameter(description = "The end time of the range that the user is interested in in format YYYYMMDDHHMM e.g. 201210252330 which would be October 25, 2012 at 11:30 pm.", isRequired = false, name = "end", type = Type.STRING), 
-			@RestParameter(description = "The interval time in seconds e.g. 631 is 10 minutes, 31 seconds per interval.", isRequired = false, name = "interval", type = Type.STRING) }, reponses = {
+  @RestQuery(name = "views", description = "Returns the statistics for all of the intervals between two dates for a given episode.", pathParameters = { }, restParameters = {
+      @RestParameter(description = "The id of the media package.", isRequired = false, name = "episodeID", type = Type.STRING),
+      @RestParameter(description = "The start time of the range that the user is interested in in format YYYYMMDDHHMM e.g. 201202250830 which would be February 25, 2012 at 8:30 am.", isRequired = false, name = "start", type = Type.STRING),
+      @RestParameter(description = "The end time of the range that the user is interested in in format YYYYMMDDHHMM e.g. 201210252330 which would be October 25, 2012 at 11:30 pm.", isRequired = false, name = "end", type = Type.STRING),
+      @RestParameter(description = "The interval time in seconds e.g. 631 is 10 minutes, 31 seconds per interval.", isRequired = false, name = "interval", type = Type.STRING) }, reponses = {
           @RestResponse(description = "the user based data is returned", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "the user based data could not be retrieved", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
           @RestResponse(description = "Analytics information is not available", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
@@ -310,30 +310,30 @@ public class AnalyticsRestService {
       throw new WebApplicationException(e);
     }
   }
-  
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("views.json")
-	@RestQuery(name = "views", description = "Returns the statistics for all of the intervals between two dates for a given episode.", pathParameters = { }, restParameters = {
-			@RestParameter(description = "The id of the media package.", isRequired = false, name = "episodeID", type = Type.STRING),
-			@RestParameter(description = "The start time of the range that the user is interested in in format YYYYMMDDHHMM e.g. 201202250830 which would be February 25, 2012 at 8:30 am.", isRequired = false, name = "start", type = Type.STRING), 
-			@RestParameter(description = "The end time of the range that the user is interested in in format YYYYMMDDHHMM e.g. 201210252330 which would be October 25, 2012 at 11:30 pm.", isRequired = false, name = "end", type = Type.STRING), 
-			@RestParameter(description = "The interval time in seconds e.g. 631 is 10 minutes, 31 seconds per interval.", isRequired = false, name = "interval", type = Type.STRING) }, reponses = {
+  @RestQuery(name = "views", description = "Returns the statistics for all of the intervals between two dates for a given episode.", pathParameters = { }, restParameters = {
+      @RestParameter(description = "The id of the media package.", isRequired = false, name = "episodeID", type = Type.STRING),
+      @RestParameter(description = "The start time of the range that the user is interested in in format YYYYMMDDHHMM e.g. 201202250830 which would be February 25, 2012 at 8:30 am.", isRequired = false, name = "start", type = Type.STRING),
+      @RestParameter(description = "The end time of the range that the user is interested in in format YYYYMMDDHHMM e.g. 201210252330 which would be October 25, 2012 at 11:30 pm.", isRequired = false, name = "end", type = Type.STRING),
+      @RestParameter(description = "The interval time in seconds e.g. 631 is 10 minutes, 31 seconds per interval.", isRequired = false, name = "interval", type = Type.STRING) }, reponses = {
           @RestResponse(description = "the user based data is returned", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "the user based data could not be retrieved", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
           @RestResponse(description = "Analytics information is not available", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
-	public ViewCollection getViewsAsJson(@FormParam("episodeID") String episodeID, @FormParam("start") String start, @FormParam("end") String end, @FormParam("interval") String interval) {
-		return getViewsAsXml(episodeID, start, end, interval);
-	}
-  
+  public ViewCollection getViewsAsJson(@FormParam("episodeID") String episodeID, @FormParam("start") String start, @FormParam("end") String end, @FormParam("interval") String interval) {
+    return getViewsAsXml(episodeID, start, end, interval);
+  }
+
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("users.xml")
   @RestQuery(name = "users", description = "Returns the statistics for all of the users for a given date.", pathParameters = { }, restParameters = {
       @RestParameter(description = "The type of the user action you are interested in e.g. HEARTBEAT, FOOTPRINT etc.", isRequired = false, name = "type", type = Type.STRING),
-      @RestParameter(description = "The day to collect data from YYYYMMDD e.g. 20120225 which would be February 25, 2012.", isRequired = false, name = "day", type = Type.STRING), 
-      @RestParameter(description = "The maximum number of results to return.", isRequired = false, name = "limit", type = Type.STRING), 
-      @RestParameter(description = "The number of collections past the limit to return (offset of 0 is the first set of results up to the limit, 1 is the next set up to the limit etc.)", isRequired = false, name = "offset", type = Type.STRING) }, 
+      @RestParameter(description = "The day to collect data from YYYYMMDD e.g. 20120225 which would be February 25, 2012.", isRequired = false, name = "day", type = Type.STRING),
+      @RestParameter(description = "The maximum number of results to return.", isRequired = false, name = "limit", type = Type.STRING),
+      @RestParameter(description = "The number of collections past the limit to return (offset of 0 is the first set of results up to the limit, 1 is the next set up to the limit etc.)", isRequired = false, name = "offset", type = Type.STRING) },
       reponses = {
           @RestResponse(description = "the user based data is returned", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "the user based data could not be retrieved", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
@@ -348,15 +348,15 @@ public class AnalyticsRestService {
       throw new WebApplicationException(e);
     }
   }
-  
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("users.json")
   @RestQuery(name = "users", description = "Returns the statistics for all of the users for a given date.", pathParameters = { }, restParameters = {
           @RestParameter(description = "The type of the user action you are interested in e.g. HEARTBEAT, FOOTPRINT etc.", isRequired = false, name = "type", type = Type.STRING),
-          @RestParameter(description = "The day to collect data from YYYYMMDD e.g. 20120225 which would be February 25, 2012.", isRequired = false, name = "day", type = Type.STRING), 
-          @RestParameter(description = "The maximum number of results to return.", isRequired = false, name = "limit", type = Type.STRING), 
-          @RestParameter(description = "The number of collections past the limit to return (offset of 0 is the first set of results up to the limit, 1 is the next set up to the limit etc.)", isRequired = false, name = "offset", type = Type.STRING) }, 
+          @RestParameter(description = "The day to collect data from YYYYMMDD e.g. 20120225 which would be February 25, 2012.", isRequired = false, name = "day", type = Type.STRING),
+          @RestParameter(description = "The maximum number of results to return.", isRequired = false, name = "limit", type = Type.STRING),
+          @RestParameter(description = "The number of collections past the limit to return (offset of 0 is the first set of results up to the limit, 1 is the next set up to the limit etc.)", isRequired = false, name = "offset", type = Type.STRING) },
       reponses = {
           @RestResponse(description = "the user based data is returned", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "the user based data could not be retrieved", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
@@ -364,13 +364,13 @@ public class AnalyticsRestService {
   public Response getUsersAsJson(@FormParam("type")String type, @FormParam("day")String day, @FormParam("limit")String limit, @FormParam("offset")String offset) {
     return analyticsServiceImpl.getUserActionsAsJson(type, day, limit, offset);
   }
-  
+
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("userSummary.xml")
   @RestQuery(name = "users", description = "Return a summary of the activity of users from a particular series in a particular type of activity.", pathParameters = { }, restParameters = {
       @RestParameter(description = "The type of the user action you are interested in e.g. HEARTBEAT, FOOTPRINT etc.", isRequired = false, name = "type", type = Type.STRING),
-      @RestParameter(description = "The series id to get the summary from.", isRequired = false, name = "seriesID", type = Type.STRING) }, 
+      @RestParameter(description = "The series id to get the summary from.", isRequired = false, name = "seriesID", type = Type.STRING) },
       reponses = {
           @RestResponse(description = "the user based data is returned", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "the user based data could not be retrieved", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
@@ -386,7 +386,7 @@ public class AnalyticsRestService {
       throw new WebApplicationException(e);
     }
   }
-  
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("userSummary.json")
