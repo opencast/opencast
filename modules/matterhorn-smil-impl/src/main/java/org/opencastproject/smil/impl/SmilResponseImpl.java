@@ -154,7 +154,7 @@ public class SmilResponseImpl implements SmilResponse {
     StringWriter writer = new StringWriter();
     JAXBContext ctx = JAXBContext.newInstance(SmilResponseImpl.class);
     Marshaller marshaller = ctx.createMarshaller();
-//		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+    // marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
     marshaller.marshal(this, writer);
     return writer.toString();
   }

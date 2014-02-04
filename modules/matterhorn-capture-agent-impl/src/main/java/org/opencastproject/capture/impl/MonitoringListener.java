@@ -15,21 +15,18 @@
  */
 package org.opencastproject.capture.impl;
 
-/** Interface used to define a framework to use when capturing from devices / files. **/
-public interface CaptureFramework {
-  /**
-   * Start capturing from devices / files.
-   * 
-   * @param newRec
-   *          The details of the recording to start including its unique ID and which devices to use while capturing.
-   * @param captureFailureHandler
-   *          The class to call if something goes wrong.
-   **/
-  void start(RecordingImpl newRec, CaptureFailureHandler captureFailureHandler);
-
-  /** Stop capturing from devices / files. **/
-  void stop(long timeout);
-
-  /** Checks to see if this is a mock capture. **/
-  boolean isMockCapture();
+/**
+ * Capture Agent class should implement this interface to get monitoring updates.
+ */
+public interface MonitoringListener {
+  
+  enum DeviceType {
+    AUDIO,
+    VIDEO,
+    AV
+  }
+  
+  void registerDevice(String deviceFriendlyName, DeviceType type);
+  void setMonitoringVideoLocation(String deviceFriendlyName, String monitoringVideoLocation);
+  void addRmsValue(String deviceFriendlyName, long timestamp, double rmsValue);
 }

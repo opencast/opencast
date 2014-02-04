@@ -23,12 +23,12 @@ import org.opencastproject.smil.entity.api.SmilObject;
  */
 public interface SmilMediaParamGroup extends SmilObject {
 
-	/**
-	 * Returns {@link List} of {@link SmilMediaParam} elements inside.
-	 * The {@link List} is immutable, use {@link SmilService} to modify it.
-	 * 
-	 * @return the params list
-	 */
-	List<SmilMediaParam> getParams();
-	
+  /**
+   * Returns {@link List} of {@link SmilMediaParam} elements inside. The
+   * {@link List} is immutable, use {@link SmilService} to modify it.
+   *
+   * @return the params list
+   */
+  List<SmilMediaParam> getParams();
+
 }

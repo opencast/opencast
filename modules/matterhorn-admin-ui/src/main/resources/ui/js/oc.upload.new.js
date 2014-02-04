@@ -708,13 +708,14 @@ ocUpload.Ingest = (function() {
       cache: false,
       contentType: false,
       success: function (e, status, jqHBX) {
-        if(jqHBX.status == 404) {
-          ocUpload.UI.showFailure("Could not upload chunk #" + chunk + " to UploadJob because job wasn't found");
-        } else if(jqHBX.status == 400) {
-          ocUpload.UI.showFailure("Could not upload chunk #" + chunk + " to UploadJob because a malformed uploadrequest");
-        } else {
+        if(jqHBX.status >= 200 && jqHBX.status < 300)  {
           nextPart(file, ++chunk, jobId, start + ocUpload.CHUNKSIZE, end + ocUpload.CHUNKSIZE);
         }
+      },
+      error: function receiveError(jqXHR, textStatus, errorThrown) {
+        ocUpload.UI.hideProgressDialog();
+        alert("Upload failed:\n" + errorThrown);
+        window.location = '/admin/index.html#/recordings?' + window.location.hash.split('?')[1];;
       }
     });
   }
@@ -851,9 +852,17 @@ ocUpload.Listener = (function() {
         url : ocUpload.INGEST_PROGRESS_URL + '/' + Update.jobId + ".json",
         type : 'get',
         dataType : 'json',
-        success : receiveUpdate
+        success : receiveUpdate,
+        error: receiveError
       });
     }
+  }
+
+  function receiveError(jqXHR, textStatus, errorThrown) {
+    var httpStatus = textStatus + ', ' + errorThrown;
+    var logEntry = Update.jobId + ' [' + httpStatus + ']';
+    ocUpload.UI.showFailure("Upload failed with: " + httpStatus);
+    uploadFailed(logEntry);
   }
 
   function receiveUpdate(data) {

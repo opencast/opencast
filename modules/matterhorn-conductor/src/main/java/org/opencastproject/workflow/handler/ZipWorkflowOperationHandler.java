@@ -86,8 +86,13 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   /** The default collection in the working file repository to store archives */
   public static final String DEFAULT_ZIP_COLLECTION = "zip";
 
-  /** The temporary location to use when building an archive */
-  public static final String ARCHIVE_TEMP_DIR = "archive-temp";
+  /** The default location to use when building an zip archive relative to the
+   * storage directory */
+  public static final String DEFAULT_ARCHIVE_TEMP_DIR = "archive-tmp";
+
+  /** Key for configuring the location of the archive-temp folder */
+  public static final String ARCHIVE_TEMP_DIR_CFG_KEY =
+    "org.opencastproject.workflow.handler.ZipWorkflowOperationHandler.tmpdir";
 
   /** The default flavor to use for a mediapackage archive */
   public static final MediaPackageElementFlavor DEFAULT_ARCHIVE_FLAVOR = MediaPackageElementFlavor
@@ -131,14 +136,17 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   }
 
   /**
-   * Activate the component, generating the temporary storage directory for building zip archives if necessary.
+   * Activate the component, generating the temporary storage directory for
+   * building zip archives if necessary.
    * 
    * {@inheritDoc}
    * 
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
    */
   protected void activate(ComponentContext cc) {
-    tempStorageDir = new File(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"), ARCHIVE_TEMP_DIR);
+    tempStorageDir = cc.getBundleContext().getProperty(ARCHIVE_TEMP_DIR_CFG_KEY) != null
+      ? new File(cc.getBundleContext().getProperty(ARCHIVE_TEMP_DIR_CFG_KEY))
+      : new File(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"), DEFAULT_ARCHIVE_TEMP_DIR);
     if (!tempStorageDir.isDirectory()) {
       try {
         FileUtils.forceMkdir(tempStorageDir);
@@ -157,8 +165,17 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
+    
+    if (workflowInstance == null) {
+      throw new WorkflowOperationException("Invalid workflow instance");
+    }
+    
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     final WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
+    if (currentOperation == null) {
+      throw new WorkflowOperationException("Cannot get current workflow operation");
+    }
+    
     String flavors = currentOperation.getConfiguration(INCLUDE_FLAVORS_PROPERTY);
     final List<MediaPackageElementFlavor> flavorsToZip = new ArrayList<MediaPackageElementFlavor>();
     MediaPackageElementFlavor targetFlavor = DEFAULT_ARCHIVE_FLAVOR;
@@ -166,7 +183,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     // Read the target flavor
     String targetFlavorOption = currentOperation.getConfiguration(TARGET_FLAVOR_PROPERTY);
     try {
-      targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
+      targetFlavor = targetFlavorOption == null ? DEFAULT_ARCHIVE_FLAVOR : MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
       logger.trace("Using '{}' as the target flavor for the zip archive of recording {}", targetFlavor, mediaPackage);
     } catch (IllegalArgumentException e) {
       throw new WorkflowOperationException("Flavor '" + targetFlavorOption + "' is not valid", e);
@@ -262,10 +279,16 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
    *           If a file referenced in the mediapackage can not be found
    * @throws MediaPackageException
    *           If the mediapackage can not be serialized to xml
+   * @throws WorkflowOperationException
+   *           If the mediapackage is invalid
    */
   protected File zip(MediaPackage mediaPackage, List<MediaPackageElementFlavor> flavorsToZip, boolean compress)
-          throws IOException, NotFoundException, MediaPackageException {
+          throws IOException, NotFoundException, MediaPackageException, WorkflowOperationException {
 
+    if (mediaPackage == null) {
+      throw new WorkflowOperationException("Invalid mediapackage");
+    }
+    
     // Create the temp directory
     File mediaPackageDir = new File(tempStorageDir, mediaPackage.getIdentifier().compact());
     FileUtils.forceMkdir(mediaPackageDir);

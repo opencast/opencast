@@ -29,8 +29,7 @@ import org.opencastproject.capture.impl.jobs.AgentConfigurationJob;
 import org.opencastproject.capture.impl.jobs.AgentStateJob;
 import org.opencastproject.capture.impl.jobs.JobParameters;
 import org.opencastproject.capture.impl.jobs.LoadRecordingsJob;
-import org.opencastproject.capture.impl.monitoring.ConfidenceMonitorImpl;
-import org.opencastproject.capture.pipeline.GStreamerPipeline;
+import org.opencastproject.capture.pipeline.GStreamerCapturePipeline;
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -94,21 +93,26 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.activation.MimetypesFileTypeMap;
+import org.opencastproject.capture.api.ConfidenceMonitor;
+import org.opencastproject.capture.pipeline.GStreamerMonitoringPipeline;
+import org.opencastproject.capture.pipeline.GStreamerPipeline;
 
 /**
  * Implementation of the Capture Agent: using gstreamer, generates several Pipelines to store several tracks from a
  * certain recording.
  */
 public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedService, ConfigurationManagerListener,
-        CaptureFailureHandler {
+        CaptureFailureHandler, ConfidenceMonitor, MonitoringListener {
   // The amount of time to wait until shutting down the pipeline manually.
   // private static final long DEFAULT_PIPELINE_SHUTDOWN_TIMEOUT = 60000L;
 
@@ -147,8 +151,8 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
   /** The http client used to communicate with the core */
   private TrustedHttpClient client = null;
 
-  /** The capture framework to use to capture from the various devices. **/
-  private CaptureFramework captureFramework = null;
+  /** GStreamer Pipeline builder **/
+  private GStreamerPipeline pipeline = null;
 
   /** Indicates the ID of the recording currently being recorded. **/
   private String currentRecID = null;
@@ -170,6 +174,15 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /** The last properties the CaptureAgentImpl was updated by felix with. **/
   private Dictionary<String, String> cachedProperties = new Hashtable<String, String>();
+  
+  /** Collection with running monitoring devices and their type (audio, video or av). **/
+  protected Map<String, String> monitoringDeviceFriendlyNames = new Hashtable<String, String>();
+  
+  protected Map<String, String> monitoringDevicesVideoLocation = new Hashtable<String, String>();
+  /** Synchronized collection for audio RMS values at specific time (unix timestamp). **/
+  protected Map<String, SortedMap<Long, Double>> monitoringDevicesRmsValues = new Hashtable<String, SortedMap<Long, Double>>();
+    
+  private int maxRmsValuesPerDevice = 60;
 
   /**
    * Sets the configuration service form which this capture agent should draw its configuration data.
@@ -183,19 +196,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
     agentName = configService.getItem(CaptureParameters.AGENT_NAME);
     configService.registerListener(this);
   }
-
-  /**
-   * Sets the capture framework which this capture agent should capture from.
-   * 
-   * @param cfg
-   *          The configuration service.
-   * @throws ConfigurationException
-   */
-  public void setCaptureFramework(CaptureFramework captureFramework) throws ConfigurationException {
-    this.captureFramework = captureFramework;
-    logger.debug("Setting Capture Framework to " + captureFramework.toString());
-  }
-
+  
   /**
    * Returns the configuration service form which this capture agent should draw its configuration data.
    * 
@@ -299,11 +300,8 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
   @Override
   public String startCapture(MediaPackage mediaPackage, Properties properties) {
     logger.debug("startCapture(mediaPackage, properties): {} {}", mediaPackage, properties);
-    // Stop the confidence monitoring if its pipeline is playing.
-    if (confidence) {
-      logger.info("Confidence monitoring disabled for capturing.");
-      ConfidenceMonitorImpl.getInstance().stopMonitoring();
-    }
+    // Stop the confidence monitoring if its pipeline is running.
+    // stopMonitoring();
     
     // Check to make sure we're not already capturing something
     if (currentRecID != null || !agentState.equals(AgentState.IDLE)) {
@@ -337,9 +335,14 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
     String recordingID = newRec.getID();
 
     try {
-      captureFramework.start(newRec, this);
+      pipeline = new GStreamerCapturePipeline(this);
+      if (confidence) {
+        pipeline.setMonitoringListener(this);
+      }
+      ((GStreamerCapturePipeline)pipeline).start(newRec);
     } catch (UnableToStartCaptureException exception) {
       logger.error(exception.getMessage());
+      pipeline = null;
       resetOnFailure(newRec.getID());
       return null;
     }
@@ -364,7 +367,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   private long getStopCaptureTimeout() {
     // Get the timeout value to wait for a capture to start.
-    long timeout = GStreamerPipeline.DEFAULT_PIPELINE_SHUTDOWN_TIMEOUT;
+    long timeout = GStreamerCapturePipeline.DEFAULT_PIPELINE_SHUTDOWN_TIMEOUT;
     if (configService.getItem(CaptureParameters.RECORDING_SHUTDOWN_TIMEOUT) == null) {
       logger.warn("Unable to find shutdown timeout value.  Assuming 1 minute.  Missing key is {}.",
               CaptureParameters.RECORDING_SHUTDOWN_TIMEOUT);
@@ -466,12 +469,14 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
     logger.debug("stopCapture() called.");
     setAgentState(AgentState.SHUTTING_DOWN);
     // If pipe is null and no mock capture is on
-    if (captureFramework.isMockCapture()) {
+    if (pipeline == null || pipeline.isPipelineNull()) {
       logger.warn("Pipeline is null, this is normal if running a mock capture.");
       setAgentState(AgentState.IDLE);
     } else {
       long timeout = getStopCaptureTimeout();
-      captureFramework.stop(timeout);
+      pipeline.stop(timeout);
+      pipeline = null;
+      cleanupMonitoring();
       // Checks there is a currentRecID defined --should always be
       if (currentRecID == null) {
         logger.warn("There is no currentRecID assigned, but the Pipeline was not null!");
@@ -499,7 +504,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
     logger.info("Recording \"{}\" succesfully stopped", theRec.getID());
 
-    startConfidenceMonitoring();
+    // startMonitoring(); // do not run monitoring while not capturing
 
     if (immediateIngest) {
       if (scheduler.scheduleSerializationAndIngest(theRec.getID())) {
@@ -1134,6 +1139,33 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
         logger.error(e.getMessage());
       }
     }
+    
+    // update confidence monitoring properties
+    confidence = Boolean.valueOf(configService.getItem(CaptureParameters.CAPTURE_CONFIDENCE_ENABLE));
+    if (confidence) {
+      String monitoringMaxRmsValuesPerDeviceStr = configService.getItem(
+              CaptureParameters.CAPTURE_CONFIDENCE_AUDIO_LENGTH);
+
+      if (!StringUtils.isBlank(monitoringMaxRmsValuesPerDeviceStr)) {
+        try {
+          int maxRmsValuesPerDevice = Integer.parseInt(monitoringMaxRmsValuesPerDeviceStr);
+          if (maxRmsValuesPerDevice > 0) {
+            this.maxRmsValuesPerDevice = maxRmsValuesPerDevice;
+          } else {
+            logger.warn("Config property value for {} should be positive integer", 
+                    CaptureParameters.CAPTURE_CONFIDENCE_AUDIO_LENGTH);
+          }
+        } catch (NumberFormatException ex) {
+          logger.warn("Can't parse configuration value for '{}'", 
+                  CaptureParameters.CAPTURE_CONFIDENCE_AUDIO_LENGTH);
+        }
+      }
+      // (re)start monitoring pipeline if isn't capturing
+//      if (pipeline != null && pipeline.isMonitoringOnly()) {
+//        stopMonitoring();
+//        startMonitoring(); // do not run monitoring while not capturing
+//      }
+    }
   }
 
   /** If ConfigurationManager had updated and passed on those properties to the Capture Agent this returns true. **/
@@ -1198,7 +1230,6 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
    */
   public void activate(ComponentContext ctx) {
     logger.info("Starting CaptureAgentImpl.");
-    confidence = Boolean.valueOf(configService.getItem(CaptureParameters.CAPTURE_CONFIDENCE_ENABLE));
 
     if (ctx != null) {
       // Setup the shell commands
@@ -1223,21 +1254,6 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
       logger.warn("Config service was null, unable to set local server url!");
     } else if (ctx == null) {
       logger.warn("Context was null, unable to set local server url!");
-    }
-  }
-
-  private void startConfidenceMonitoring() {
-    if (confidence) {
-      logger.info("Confidence monitoring enabled.");
-      
-      boolean confidenceStarted = ConfidenceMonitorImpl.getInstance().startMonitoring(); 
-      if (confidenceStarted) {
-        logger.info("Confidence Monitoring is starting");
-      } else {
-        logger.warn("Confidence Monitoring failed to start. ");
-      }
-    } else {
-      logger.info("Confidence monitoring disabled.");
     }
   }
 
@@ -1509,6 +1525,193 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
   public void updateSchedule() {
     if (scheduler != null) {
       scheduler.updateCalendar();
+    }
+  }
+
+  /**
+   * 
+   * @param friendlyName
+   * @return 
+   */
+  @Override
+  public byte[] grabFrame(String friendlyName) {
+    if (pipeline != null && pipeline.isMonitoringEnabled() 
+            && monitoringDevicesVideoLocation.get(friendlyName) != null
+            && new File(monitoringDevicesVideoLocation.get(friendlyName)).exists()) {
+      try {
+        return FileUtils.readFileToByteArray(new File(monitoringDevicesVideoLocation.get(friendlyName)));
+      } catch (IOException ex) {
+        logger.error("Can't read confidence monitoring image for {} device.", friendlyName);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * 
+   * @param friendlyName
+   * @param timestamp
+   * @return
+   * @deprecated
+   */
+  @Override
+  @Deprecated
+  public List<Double> getRMSValues(String friendlyName, double timestamp) {
+    return getRMSValues(friendlyName, Math.round(timestamp));
+  }
+  
+  /**
+   * 
+   * @param friendlyName
+   * @param timestamp
+   * @return 
+   */
+  @Override
+  public List<Double> getRMSValues(String friendlyName, long timestamp) {
+    SortedMap<Long, Double> deviceValues = monitoringDevicesRmsValues.get(friendlyName);
+    if (deviceValues == null)
+      return new LinkedList<Double>();
+    
+    synchronized (deviceValues) {
+      return new LinkedList<Double>(deviceValues.tailMap(timestamp).values());
+    }
+  }
+
+  /**
+   * 
+   * @return 
+   */
+  @Override
+  public List<String> getFriendlyNames() {
+    LinkedList<String> deviceList = new LinkedList<String>();
+    for (String name : monitoringDeviceFriendlyNames.keySet()) {
+      deviceList.add(name + "," + monitoringDeviceFriendlyNames.get(name));
+    }
+    
+    return deviceList;
+  }
+
+  /**
+   * 
+   * @return 
+   */
+  @Override
+  public String getCoreUrl() {
+    if (configService != null)
+      return configService.getAllProperties().getProperty(CaptureParameters.CAPTURE_CORE_URL);
+    
+    return null;
+  }
+  
+  /**
+   * Remove video monitoring image files and clear audio values.
+   */
+  protected void cleanupMonitoring() {
+    monitoringDeviceFriendlyNames.clear();
+    monitoringDevicesRmsValues.clear();
+    for (String videoMonitoringFilePath : monitoringDevicesVideoLocation.values()) {
+      File videoMonitoringFile = new File(videoMonitoringFilePath);
+      if (videoMonitoringFile.exists()) {
+        videoMonitoringFile.delete();
+      }
+    }
+    monitoringDevicesVideoLocation.clear();
+  }
+
+  /**
+   * 
+   * @return 
+   */
+  @Override
+  public boolean startMonitoring() {
+    if (confidence) {
+      logger.info("Confidence monitoring enabled.");
+      
+      if (pipeline != null) {
+        logger.warn("Abort start monitoring pipeline, because there is another pipeline running.");
+        return false;
+      }
+      
+      cleanupMonitoring();
+     
+      pipeline = new GStreamerMonitoringPipeline();
+      pipeline.setMonitoringListener(this);
+      
+      try {
+        ((GStreamerMonitoringPipeline)pipeline).start(configService.getAllProperties());
+        logger.info("Confidence Monitoring is starting");
+        return true;
+      } catch (UnableToStartMonitoringException ex) {
+        logger.warn("Confidence Monitoring failed to start. ", ex);
+      }
+    }
+    return false;
+  }
+
+  /**
+   * 
+   */
+  @Override
+  public void stopMonitoring() {
+    if (pipeline != null && pipeline.isMonitoringOnly()) {
+     pipeline.stop();
+     pipeline = null;
+     
+     cleanupMonitoring();
+    }
+  }
+
+  /**
+   * 
+   * @param deviceFriendlyName
+   * @param type 
+   */
+  @Override
+  public void registerDevice(String deviceFriendlyName, DeviceType type) {
+    if (monitoringDeviceFriendlyNames.get(deviceFriendlyName) == null) {
+      monitoringDeviceFriendlyNames.put(deviceFriendlyName, type.toString().toLowerCase());
+    }
+    
+    if (type == DeviceType.AUDIO || type == DeviceType.AV
+            && monitoringDevicesRmsValues.get(deviceFriendlyName) == null) {
+      monitoringDevicesRmsValues.put(deviceFriendlyName, new TreeMap<Long, Double>());
+    }
+  }
+
+  /**
+   * 
+   * @param deviceFriendlyName
+   * @param monitoringVideoLocation 
+   */
+  @Override
+  public void setMonitoringVideoLocation(String deviceFriendlyName, String monitoringVideoLocation) {
+    monitoringDevicesVideoLocation.put(deviceFriendlyName, monitoringVideoLocation);
+  }
+
+  /**
+   * 
+   * @param deviceFriendlyName
+   * @param timestamp
+   * @param rmsValue 
+   */
+  @Override
+  public void addRmsValue(String deviceFriendlyName, long timestamp, double rmsValue) {
+    for (String name : monitoringDeviceFriendlyNames.keySet()) {
+      if (deviceFriendlyName.contains(name)) {
+        // get rms values map
+        SortedMap<Long, Double> rmsValues = monitoringDevicesRmsValues.get(name);
+        if (rmsValues != null) {
+          synchronized (rmsValues) {
+            // if maximum entries reached, remove latest
+            if (rmsValues.keySet().size() >= maxRmsValuesPerDevice) {
+              rmsValues.remove(rmsValues.firstKey());
+            }
+            // store new value
+            rmsValues.put(timestamp, rmsValue);
+            break;
+          }
+        }
+      }
     }
   }
 }

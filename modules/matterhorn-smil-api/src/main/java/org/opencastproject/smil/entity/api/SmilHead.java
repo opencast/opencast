@@ -23,20 +23,20 @@ import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
  */
 public interface SmilHead extends SmilObject {
 
-	/**
-	 * Returns {@link List} of meta elements inside.
-	 * The {@link List} is immutable, use {@link SmilService} to modify it.
-	 *
-	 * @return the meta data elements.
-	 */
-	List<SmilMeta> getMetas();
+  /**
+   * Returns {@link List} of meta elements inside. The {@link List} is
+   * immutable, use {@link SmilService} to modify it.
+   *
+   * @return the meta data elements.
+   */
+  List<SmilMeta> getMetas();
 
-	/**
-	 * Returns {@link List} of paramGroup elements.
-	 * The {@link List} is immutable, use {@link SmilService} to modify it.
-	 * 
-	 * @return the param groups
-	 */
-	List<SmilMediaParamGroup> getParamGroups();
-	
+  /**
+   * Returns {@link List} of paramGroup elements. The {@link List} is immutable,
+   * use {@link SmilService} to modify it.
+   *
+   * @return the param groups
+   */
+  List<SmilMediaParamGroup> getParamGroups();
+
 }

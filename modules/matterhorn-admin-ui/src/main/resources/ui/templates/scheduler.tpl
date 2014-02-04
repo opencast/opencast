@@ -28,14 +28,22 @@
         <li id="missingSeries" class="ui-state-error-text multiple-error">
           <span class="ui-icon ui-icon-carat-1-e"></span>Please enter a <a href="javascript:$('#isPartOf')[0].focus();">Series name</a> for this group of recordings.
         </li>
-        <li id="missingDistribution" class="ui-state-error-text single-error multiple-error">
-          <span class="ui-icon ui-icon-carat-1-e"></span>Please choose at least one <a href="javascript:document.getElementById('distITunesU').focus();">distribution channel</a>.
+        <li id="errorRecurrence" class="ui-state-error-text multiple-error">
+          <span class="ui-icon ui-icon-carat-1-e"></span>You must select at least one day of the week.
         </li>
         <li id="missingStartdate" class="ui-state-error-text single-error multiple-error">
           <span class="ui-icon ui-icon-carat-1-e"></span>Please choose a starting <a href="javascript:document.getElementById('startDate').focus()">date</a> and <a href="javascript:document.getElementById('startTimeHour').focus()">time</a> in the future for your recording.
         </li>
+        <li id="errorRecurStartEnd" class="ui-state-error-text multiple-error">
+          <span class="ui-icon ui-icon-carat-1-e"></span>Please choose an <a href="javascript:$('#recurEnd')[0].focus()">end date</a> that occurs after the start date.
+        </li>
         <li id="missingDuration" class="ui-state-error-text single-error multiple-error">
           <span class="ui-icon ui-icon-carat-1-e"></span>You must have a <a href="javascript:document.getElementById('durationHour').focus();">duration</a> greater than 0 hours and 0 minutes.
+        </li>
+        <li id="errorConflict" class="ui-state-error-text">
+          <span class="ui-icon ui-icon-carat-1-e" title=""></span>The following events conflict with your scheduled time on your selected capture agent:
+          <ul id="conflictingEvents" style="margin-top: 0px;">
+          </ul>
         </li>
         <li id="missingAgent" class="ui-state-error-text single-error multiple-error">
           <span class="ui-icon ui-icon-carat-1-e"></span>Please choose a <a href="javascript:document.getElementById('agent').focus();">capture agent</a> to record the event.
@@ -43,17 +51,10 @@
         <li id="missingInputs" class="ui-state-error-text single-error multiple-error">
           <span class="ui-icon ui-icon-carat-1-e"></span>You must choose at least one <a href="javascript:document.getElementById('inputList').focus();">input</a>.
         </li>
-        <li id="errorRecurStartEnd" class="ui-state-error-text multiple-error">
-          <span class="ui-icon ui-icon-carat-1-e"></span>Please choose an <a href="javascript:$('#recurEnd')[0].focus()">end date</a> that occurs after the start date.
+        <li id="missingDistribution" class="ui-state-error-text single-error multiple-error">
+          <span class="ui-icon ui-icon-carat-1-e"></span>Please choose at least one <a href="javascript:document.getElementById('distITunesU').focus();">distribution channel</a>.
         </li>
-        <li id="errorRecurrence" class="ui-state-error-text multiple-error">
-          <span class="ui-icon ui-icon-carat-1-e"></span>You must select at least one day of the week.
-        </li>
-        <li id="errorConflict" class="ui-state-error-text">
-          <span class="ui-icon ui-icon-carat-1-e" title=""></span>The following events conflict with your scheduled time on your selected capture agent:
-          <ul id="conflictingEvents" style="margin-top: 0px;">
-          </ul>
-        </li>
+
       </ul>
     </div>
   </div>
@@ -250,7 +251,7 @@
               </select>
             </li>
             <li>
-              <label class="scheduler-label" for="inputList" id="inputLabel"><span class="scheduler-required-text">* </span><span id="i18n_input_label"></span>:</label>
+              <label class="scheduler-label" id="inputLabel"><span class="scheduler-required-text">* </span><span id="i18n_input_label"></span>:</label>
               <div class="scheduler-radio-list">
                 <div id="inputList"></div>
               </div>
@@ -279,13 +280,13 @@
               <ul class="oc-ui-form-list">
                 <li>
                   <label for="scheduleRepeat" class="scheduler-label form-box-label"><span id="i18n_sched_repeats">Repeats</span>:</label>
-                  <select id="scheduleRepeat" disabled="true">
+                  <select id="scheduleRepeat" disabled="disabled">
                     <option value="norepeat" id="i18n_sched_no_repeat">Don't Repeat</option>
                     <option value="weekly" selected="selected" id="i18n_sched_weekly">Weekly</option>
                   </select>
                 </li>
                 <li id="daySelect">
-                  <label class="scheduler-label" for="repeatDays"><span class="scheduler-required-text">* </span><span id="i18n_sched_days">Days</span>:</label>
+                  <label class="scheduler-label" id="recurrenceLabel" for="repeatDays"><span class="scheduler-required-text">* </span><span id="i18n_sched_days">Days</span>:</label>
                   <table id="agentsTable2" class="layout-inline scheduler-day-table">
                     <thead>
                       <tr>
@@ -455,7 +456,7 @@
                 </select>
               </li>
               <li>
-                <label class="scheduler-label" id="inputLabel"><span class="scheduler-required-text">* </span><span id="i18n_input_label">Inputs</span>:</label>
+                <label class="scheduler-label" id="recurInputLabel"><span class="scheduler-required-text">* </span><span id="i18n_input_label">Inputs</span>:</label>
                 <div class="scheduler-radio-list">
                   <div id="recurInputList"></div>
                 </div>

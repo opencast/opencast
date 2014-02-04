@@ -141,7 +141,7 @@ public class SmilServiceImplTest {
     assertNotNull(parent.getElements().get(0));
     assertTrue(parent.getElements().get(0) instanceof SmilMediaSequenceImpl);
     assertEquals(parent.getElements().get(0).getId(), smilResponse.getEntity().getId());
-//		logger.info(((SmilImpl)smilResponse.getSmil()).toXML());
+    // logger.info(((SmilImpl)smilResponse.getSmil()).toXML());
   }
 
   /**
@@ -161,7 +161,7 @@ public class SmilServiceImplTest {
     SmilMediaContainer par = (SmilMediaContainer) smilResponse.getEntity();
     // add video track into parallel element
     smilResponse = smilService.addClip(smilResponse.getSmil(), par.getId(), videoTrack, 1000L, 1000000L);
-//		logger.info(smilResponse.getSmil().toXML());
+    // logger.info(smilResponse.getSmil().toXML());
     SmilMediaObject media = null;
     for (SmilObject entity : smilResponse.getEntities()) {
       if (entity instanceof SmilMediaObject) {
@@ -180,7 +180,6 @@ public class SmilServiceImplTest {
     // start + duration = 1s + 1000s = 1001s
     assertEquals(1001000L, ((SmilMediaElement) media).getClipEndMS());
 
-
     TrackImpl audioTrack = new TrackImpl();
     audioTrack.setIdentifier("track-2");
     audioTrack.setFlavor(new MediaPackageElementFlavor("source", "presenter"));
@@ -190,7 +189,7 @@ public class SmilServiceImplTest {
 
     // add audio track into parallel element
     smilResponse = smilService.addClip(smilResponse.getSmil(), par.getId(), audioTrack, 1000L, 1000000L);
-//		logger.info(smilResponse.getSmil().toXML());
+    // logger.info(smilResponse.getSmil().toXML());
     media = null;
     for (SmilObject entity : smilResponse.getEntities()) {
       if (entity instanceof SmilMediaObject) {
@@ -214,7 +213,7 @@ public class SmilServiceImplTest {
     // add tracks (as array) to par
     smilResponse = smilService.addClips(smilResponse.getSmil(), par.getId(),
             new Track[]{audioTrack, videoTrack}, 15000L, 1000L);
-//		logger.info(smilResponse.getSmil().toXML());
+    // logger.info(smilResponse.getSmil().toXML());
     assertSame(2, smilResponse.getEntitiesCount());
     assertTrue(smilResponse.getEntities()[0] instanceof SmilMediaElement);
     // get audio element

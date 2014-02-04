@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.Properties;
+import org.opencastproject.capture.impl.MonitoringListener;
+import org.opencastproject.capture.pipeline.bins.consumers.VideoMonitoringConsumer;
 
 public class CaptureDeviceBin {
   private static final Logger logger = LoggerFactory.getLogger(CaptureDeviceBin.class);
@@ -69,7 +71,35 @@ public class CaptureDeviceBin {
    *           Thrown if a GStreamer Element can't be created because the platform it is running on doesn't support it
    *           or the necessary GStreamer module is not installed.
    */
-  public CaptureDeviceBin(CaptureDevice captureDevice, Properties properties, boolean confidenceOnly)
+  public CaptureDeviceBin(CaptureDevice captureDevice, Properties properties, boolean confidenceOnly) 
+          throws UnableToLinkGStreamerElementsException, UnableToCreateGhostPadsForBinException,
+          UnableToSetElementPropertyBecauseElementWasNullException, NoConsumerFoundException,
+          CaptureDeviceNullPointerException, UnableToCreateElementException, NoProducerFoundException {
+    this(captureDevice, properties, false, null);
+  }
+          
+  /***
+   * Creates a bin that contains a complete pipeline from Producer to all Consumers for a capture device.
+   * 
+   * @throws UnableToLinkGStreamerElementsException
+   *           Thrown if any of the GStreamer Elements for the Producers or Consumers fails to Link together.
+   * @throws UnableToCreateGhostPadsForBinException
+   *           Thrown if one of the Producer or Consumers can't create ghost pads used to connect them together.
+   * @throws UnableToSetElementPropertyBecauseElementWasNullException
+   *           Thrown if setting one of the GStreamer Elements is null when setting one of its Properties.
+   * @throws NoConsumerFoundException
+   *           Thrown if no consumer can be found for the type specified.
+   * @throws NoProducerFoundException
+   *           Thrown if no producer can be found for the type specified.
+   * @throws CaptureDeviceNullPointerException
+   *           Thrown if the captureDevice parameter is null since it is necessary for creating both Producers and
+   *           Consumers.
+   * @throws UnableToCreateElementException
+   *           Thrown if a GStreamer Element can't be created because the platform it is running on doesn't support it
+   *           or the necessary GStreamer module is not installed.
+   */
+  public CaptureDeviceBin(CaptureDevice captureDevice, Properties properties, 
+          boolean confidenceOnly, MonitoringListener monitorinListener)
           throws UnableToLinkGStreamerElementsException, UnableToCreateGhostPadsForBinException,
           UnableToSetElementPropertyBecauseElementWasNullException, NoConsumerFoundException,
           CaptureDeviceNullPointerException, UnableToCreateElementException, NoProducerFoundException {
@@ -89,7 +119,7 @@ public class CaptureDeviceBin {
       createRTPSinkConsumer(captureDevice, properties);
     }
     
-    createMontoringConsumer(this.captureDevice, properties);
+    createMontoringConsumer(this.captureDevice, properties, monitorinListener);
     linkProducerToConsumers();
   }
   
@@ -332,19 +362,36 @@ public class CaptureDeviceBin {
    * @throws NoProducerFoundException
    *           Thrown if the captureDevice.getName returns a ConsumerType that unrecognized.
    */
-  private void createMontoringConsumer(CaptureDevice captureDevice, Properties properties) 
+  private void createMontoringConsumer(CaptureDevice captureDevice, Properties properties, 
+          MonitoringListener monitoringListener) 
           throws UnableToLinkGStreamerElementsException, UnableToCreateGhostPadsForBinException, 
           UnableToSetElementPropertyBecauseElementWasNullException, CaptureDeviceNullPointerException, 
           UnableToCreateElementException, NoConsumerFoundException {
 
     
-    if (!producerBin.captureDeviceProperties.isConfidence()) return;
+    if (!producerBin.captureDeviceProperties.isConfidence() || monitoringListener == null) return;
     
     if (producerBin.isAudioDevice()) {
       consumerBins.add(ConsumerFactory.getInstance().getSink(ConsumerType.AUDIO_MONITORING_SINK, captureDevice, properties));
     } 
     if (producerBin.isVideoDevice()) {
-      consumerBins.add(ConsumerFactory.getInstance().getSink(ConsumerType.VIDEO_MONITORING_SINK, captureDevice, properties));
+      ConsumerBin videoMonitoringBin = ConsumerFactory.getInstance().getSink(ConsumerType.VIDEO_MONITORING_SINK, captureDevice, properties);
+      consumerBins.add(videoMonitoringBin);
+      
+      if (videoMonitoringBin instanceof VideoMonitoringConsumer) {
+        ((VideoMonitoringConsumer)videoMonitoringBin).registerVideoLocation(monitoringListener);
+      }
+    }
+    
+    if (producerBin.isAudioDevice() && producerBin.isVideoDevice()) {
+      monitoringListener.registerDevice(captureDevice.getFriendlyName(), MonitoringListener.DeviceType.AV);
+    } else {
+      if (producerBin.isAudioDevice()) {
+        monitoringListener.registerDevice(captureDevice.getFriendlyName(), MonitoringListener.DeviceType.AUDIO);
+      }
+      if (producerBin.isVideoDevice()) {
+        monitoringListener.registerDevice(captureDevice.getFriendlyName(), MonitoringListener.DeviceType.VIDEO);
+      }
     }
   }
   
