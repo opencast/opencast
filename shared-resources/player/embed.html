@@ -14,6 +14,21 @@
         <link rel="stylesheet" type="text/css" href="css/player/jquery.wysiwyg.css" />
         <link rel="stylesheet" type="text/css" href="css/oc.segments.css" />
         <link rel="stylesheet" type="text/css" href="css/player/embed.css" />
+
+        <!-- Set Coocke if we get a session via URL parameter -->
+        <script type="text/javascript">
+
+          if ( window.location.pathname.match(/.*;jsessionid=.*/)) {
+            sid = window.location.pathname.split('=')[1];
+            url = window.location.href.replace(/;jsessionid=[^?]*[?$]/, '?');
+            /* Set the session id as cookie */
+            document.cookie = 'JSESSIONID=' + sid + ';Path=/';
+            /* Redirect to page without URL session id */
+            window.location.href = url;
+          }
+
+        </script>
+
         <!-- Javascript includes -->
         <script type="text/javascript" src="js/jquery/jquery.js"></script>
         <script type="text/javascript" src="js/jquery/plugins/jARIA.js"></script>

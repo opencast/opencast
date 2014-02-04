@@ -40,55 +40,55 @@ import org.opencastproject.videoeditor.silencedetection.api.SilenceDetectionServ
  */
 @Path("/")
 @RestService(name = "SilenceDetectionServiceEndpoint", title = "Silence Detection Service REST Endpoint",
-		abstractText = "Detect silent sequences in audio file.",
-		notes = {"All paths above are relative to the REST endpoint base (something like http://your.server/silencedetection)"})
+        abstractText = "Detect silent sequences in audio file.",
+        notes = {"All paths above are relative to the REST endpoint base (something like http://your.server/silencedetection)"})
 public class SilenceDetectionServiceEndpoint extends AbstractJobProducerEndpoint {
 
-	private SilenceDetectionService silenceDetectionService;
-	private ServiceRegistry serviceRegistry;
+  private SilenceDetectionService silenceDetectionService;
+  private ServiceRegistry serviceRegistry;
 
-	@POST
-	@Path("/detect")
-	@Produces({MediaType.APPLICATION_XML})
-	@RestQuery(name = "detect", description = "Create silence detection job.",
-			returnDescription = "Silence detection job.",
-			restParameters = {
-		@RestParameter(name = "track", type = RestParameter.Type.TEXT,
-				description = "Track where to run silence detection.", isRequired = true)
-	},
-			reponses = {
-		@RestResponse(description = "Silence detection job created successfully.", responseCode = HttpServletResponse.SC_OK),
-		@RestResponse(description = "Create silence detection job failed.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-	})
-	public Response detect(@FormParam("track") String trackXml) {
-		try {
-			Track track = (Track) MediaPackageElementParser.getFromXml(trackXml);
-			Job job = silenceDetectionService.detect(track);
-			return Response.ok(new JaxbJob(job)).build();
-		} catch (Exception ex) {
-			return Response.serverError().entity(ex.getMessage()).build();
-		}
-	}
+  @POST
+  @Path("/detect")
+  @Produces({MediaType.APPLICATION_XML})
+  @RestQuery(name = "detect", description = "Create silence detection job.",
+          returnDescription = "Silence detection job.",
+          restParameters = {
+            @RestParameter(name = "track", type = RestParameter.Type.TEXT,
+                    description = "Track where to run silence detection.", isRequired = true)
+          },
+          reponses = {
+            @RestResponse(description = "Silence detection job created successfully.", responseCode = HttpServletResponse.SC_OK),
+            @RestResponse(description = "Create silence detection job failed.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+          })
+  public Response detect(@FormParam("track") String trackXml) {
+    try {
+      Track track = (Track) MediaPackageElementParser.getFromXml(trackXml);
+      Job job = silenceDetectionService.detect(track);
+      return Response.ok(new JaxbJob(job)).build();
+    } catch (Exception ex) {
+      return Response.serverError().entity(ex.getMessage()).build();
+    }
+  }
 
-	@Override
-	public JobProducer getService() {
-		if (silenceDetectionService instanceof JobProducer) {
-			return (JobProducer) silenceDetectionService;
-		} else {
-			return null;
-		}
-	}
+  @Override
+  public JobProducer getService() {
+    if (silenceDetectionService instanceof JobProducer) {
+      return (JobProducer) silenceDetectionService;
+    } else {
+      return null;
+    }
+  }
 
-	@Override
-	public ServiceRegistry getServiceRegistry() {
-		return serviceRegistry;
-	}
+  @Override
+  public ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
+  }
 
-	public void setSilenceDetectionService(SilenceDetectionService silenceDetectionService) {
-		this.silenceDetectionService = silenceDetectionService;
-	}
+  public void setSilenceDetectionService(SilenceDetectionService silenceDetectionService) {
+    this.silenceDetectionService = silenceDetectionService;
+  }
 
-	public void setServiceRegistry(ServiceRegistry serviceRegistry) {
-		this.serviceRegistry = serviceRegistry;
-	}
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
 }

@@ -24,31 +24,35 @@ import org.opencastproject.smil.entity.api.Smil;
  * {@link SmilService} provides {@link Smil} manipulation.
  */
 public interface SmilService {
-    
+
   /**
    * Create a new {@link Smil}.
-   * 
+   *
    * @return a new {@link Smil}
    */
   SmilResponse createNewSmil();
 
   /**
-   * Create a new {@link Smil} and store the {@link MediaPackage} Id as meta data.
+   * Create a new {@link Smil} and store the {@link MediaPackage} Id as meta
+   * data.
+   *
    * @param mediaPackage
    * @return a new {@link Smil}
    */
   SmilResponse createNewSmil(MediaPackage mediaPackage);
-  
+
   /**
    * Add new par element to {@link Smil}.
+   *
    * @param smil {@link Smil} to edit
    * @return edited {@link Smil} and the new {@link SmilMediaContainer}
-   * @throws SmilException 
+   * @throws SmilException
    */
   SmilResponse addParallel(Smil smil) throws SmilException;
 
   /**
    * Add new par element to {@link Smil} inside an element with given Id.
+   *
    * @param smil {@link Smil} to edit
    * @param parentId element id, where to add new par element
    * @return edited {@link Smil} and the new {@link SmilMediaContainer}
@@ -58,6 +62,7 @@ public interface SmilService {
 
   /**
    * Add new seq element to {@link Smil}.
+   *
    * @param smil {@link Smil} to edit
    * @return edited {@link Smil} and the new {@link SmilMediaContainer}
    * @throws SmilException
@@ -66,6 +71,7 @@ public interface SmilService {
 
   /**
    * Add new seq element to {@link Smil} inside an element with given Id.
+   *
    * @param smil {@link Smil} to edit
    * @param parentId element id, where to add new seq element
    * @return edited {@link Smil} and the new {@link SmilMediaContainer}
@@ -74,27 +80,31 @@ public interface SmilService {
   SmilResponse addSequence(Smil smil, String parentId) throws SmilException;
 
   /**
-   * Add a {@link SmilMediaElement} based on given track and start/duration information.
-   * 
+   * Add a {@link SmilMediaElement} based on given track and start/duration
+   * information.
+   *
    * @param smil {@link Smil} to edit
    * @param parentId element id, where to add new {@link SmilMediaElement}
    * @param track {@link Track} to add as {@link SmilMediaElement}
    * @param start start position in {@link Track} in milliseconds
    * @param duration duration in milliseconds
-   * @return edited {@link Smil}, the new {@link SmilMediaElement} and generated meta data
+   * @return edited {@link Smil}, the new {@link SmilMediaElement} and generated
+   * meta data
    * @throws SmilException if there is no element with the given parentId
    */
   SmilResponse addClip(Smil smil, String parentId, Track track, long start, long duration) throws SmilException;
 
   /**
-   * Add a list of {@link SmilMediaElement}s based on given tracks and start/duration information.
-   * 
+   * Add a list of {@link SmilMediaElement}s based on given tracks and
+   * start/duration information.
+   *
    * @param smil {@link Smil} to edit
    * @param parentId element id, where to add new {@link SmilMediaElement}s
    * @param tracks {@link Track}s to add as {@link SmilMediaElement}s
    * @param start start position in {@link Track}s in milliseconds
    * @param duration duration in milliseconds
-   * @return edited {@link Smil}, the new {@link SmilMediaElement}s and tracks meta data
+   * @return edited {@link Smil}, the new {@link SmilMediaElement}s and tracks
+   * meta data
    * @throws SmilException if there is no element with the given parentId
    */
   SmilResponse addClips(Smil smil, String parentId, Track[] tracks, long start, long duration) throws SmilException;
@@ -111,15 +121,17 @@ public interface SmilService {
 
   /**
    * Remove element (identified by elementId) from {@link Smil} if exists.
+   *
    * @param smil {@link Smil} to edit
    * @param elementId element Id to remove
-   * @return edited {@link Smil} and removed {@link SmilMediaElement}
-   *	if {@link Smil} contains an element with given Id
+   * @return edited {@link Smil} and removed {@link SmilMediaElement} if
+   * {@link Smil} contains an element with given Id
    */
   SmilResponse removeSmilElement(Smil smil, String elementId);
 
   /**
    * Returns {@link Smil} from Xml {@code String}.
+   *
    * @param smilXml Smil document Xml as {@code String}
    * @return parsed {@link Smil}
    * @throws SmilException if an error occures while parsing {@link Smil}
@@ -128,6 +140,7 @@ public interface SmilService {
 
   /**
    * Returns {@link Smil} from Xml {@code File}.
+   *
    * @param smilXmlFile Smil document Xml as {@code File}
    * @return parsed {@link Smil}
    * @throws SmilException if an error occures while parsing {@link Smil}

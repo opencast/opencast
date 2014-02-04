@@ -20,41 +20,48 @@ import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.api.SmilObject;
 
 /**
- * {@link SmilService} response container for {@link Smil} and {@link SmilObject}s as entities.
+ * {@link SmilService} response container for {@link Smil} and
+ * {@link SmilObject}s as entities.
  */
 public interface SmilResponse {
 
-	/**
-	 * Returns {@link Smil} object from response.
-	 * @return {@link Smil} object
-	 */
-	Smil getSmil();
+  /**
+   * Returns {@link Smil} object from response.
+   *
+   * @return {@link Smil} object
+   */
+  Smil getSmil();
 
-	/**
-	 * Returns number of entities defined with this response.
-	 * @return number of entities
-	 */
-	int getEntitiesCount();
+  /**
+   * Returns number of entities defined with this response.
+   *
+   * @return number of entities
+   */
+  int getEntitiesCount();
 
-	/**
-	 * Returns {@link SmilObject} if only one entity stored.
-	 * Throws {@link SmilException} otherwise.
-	 * @return {@link SmilObject}
-	 * @throws SmilException if entities count not one
-	 */
-	SmilObject getEntity() throws SmilException;
+  /**
+   * Returns {@link SmilObject} if only one entity stored. Throws
+   * {@link SmilException} otherwise.
+   *
+   * @return {@link SmilObject}
+   * @throws SmilException if entities count not one
+   */
+  SmilObject getEntity() throws SmilException;
 
-	/**
-	 * Returns {@link SmilObject}s if there are any or throws {@link SmilException}.
-	 * @return {@link SmilObject}s as array
-	 * @throws SmilException if there are no entities defined by response.
-	 */
-	SmilObject[] getEntities() throws SmilException;
+  /**
+   * Returns {@link SmilObject}s if there are any or throws
+   * {@link SmilException}.
+   *
+   * @return {@link SmilObject}s as array
+   * @throws SmilException if there are no entities defined by response.
+   */
+  SmilObject[] getEntities() throws SmilException;
 
-	/**
-	 * Return XML serialized instance of this {@link SmilResponse}.
-	 * @return {@link SmilResponse} as XML
-	 * @throws JAXBException if serialization failed
-	 */
-	String toXml() throws JAXBException;
+  /**
+   * Return XML serialized instance of this {@link SmilResponse}.
+   *
+   * @return {@link SmilResponse} as XML
+   * @throws JAXBException if serialization failed
+   */
+  String toXml() throws JAXBException;
 }

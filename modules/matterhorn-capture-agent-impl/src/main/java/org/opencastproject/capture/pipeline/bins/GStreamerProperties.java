@@ -70,4 +70,6 @@ public interface GStreamerProperties {
   String EMIT_SIGNALS = "emit-signals";
   String DROP = "drop";
   String MAX_BUFFERS = "max-buffers";
+  String MESSAGE = "message";
+  String INTERVAL = "interval";
 }

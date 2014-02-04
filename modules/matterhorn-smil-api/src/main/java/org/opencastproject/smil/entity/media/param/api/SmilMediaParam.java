@@ -22,21 +22,23 @@ import org.opencastproject.smil.entity.api.SmilObject;
  */
 public interface SmilMediaParam extends SmilObject {
 
-	String PARAM_NAME_TRACK_ID = "track-id";
-	String PARAM_NAME_TRACK_FLAVOR = "track-flavor";
-	String PARAM_NAME_TRACK_SRC = "track-src";
-	String PARAM_NAME_TRACK = "tarck";
+  String PARAM_NAME_TRACK_ID = "track-id";
+  String PARAM_NAME_TRACK_FLAVOR = "track-flavor";
+  String PARAM_NAME_TRACK_SRC = "track-src";
+  String PARAM_NAME_TRACK = "tarck";
 
-	/**
-	 * Returns param name.
-	 * @return the name
-	 */
-	String getName();
+  /**
+   * Returns param name.
+   *
+   * @return the name
+   */
+  String getName();
 
-	/**
-	 * Returns param value.
-	 * @return the value
-	 */
-	String getValue();
-	
+  /**
+   * Returns param value.
+   *
+   * @return the value
+   */
+  String getValue();
+
 }

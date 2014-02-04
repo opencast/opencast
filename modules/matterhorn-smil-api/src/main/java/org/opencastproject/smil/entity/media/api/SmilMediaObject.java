@@ -18,16 +18,18 @@ package org.opencastproject.smil.entity.media.api;
 import org.opencastproject.smil.entity.api.SmilObject;
 
 /**
- * Represent {@link Smil} media elements and containers.
- * Media elements like {@code audio}, {@code video}, ...
- * and media containers like {@code par}, {@code seq} should implement this interface.
+ * Represent {@link Smil} media elements and containers. Media elements like
+ * {@code audio}, {@code video}, ... and media containers like {@code par},
+ * {@code seq} should implement this interface.
  */
 public interface SmilMediaObject extends SmilObject {
 
-	/**
-	 * Returns {@code true} if this element is an container for other media elements.
-	 * @return true if container for other media elements
-	 */
-	boolean isContainer();
-	
+  /**
+   * Returns {@code true} if this element is an container for other media
+   * elements.
+   *
+   * @return true if container for other media elements
+   */
+  boolean isContainer();
+
 }

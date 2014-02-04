@@ -41,153 +41,153 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class PublicationBuilderPlugin extends AbstractElementBuilderPlugin {
-	
-	  /**
-	   * the logging facility provided by log4j
-	   */
-	  private static final Logger logger = LoggerFactory.getLogger(PublicationBuilderPlugin.class);
 
-	@Override
-	public boolean accept(Type type, MediaPackageElementFlavor flavor) {
-		return type.equals(MediaPackageElement.Type.Publication);
-	}
+    /**
+     * the logging facility provided by log4j
+     */
+    private static final Logger logger = LoggerFactory.getLogger(PublicationBuilderPlugin.class);
 
-	@Override
-	public boolean accept(URI uri, Type type, MediaPackageElementFlavor flavor) {
-		return MediaPackageElement.Type.Publication.equals(type);
-	}
+  @Override
+  public boolean accept(Type type, MediaPackageElementFlavor flavor) {
+    return type.equals(MediaPackageElement.Type.Publication);
+  }
 
-	@Override
-	public boolean accept(Node elementNode) {
-	    String name = elementNode.getNodeName();
-	    if (name.contains(":")) {
-	      name = name.substring(name.indexOf(":") + 1);
-	    }
-	    return name.equalsIgnoreCase(MediaPackageElement.Type.Publication.toString());
-	}
+  @Override
+  public boolean accept(URI uri, Type type, MediaPackageElementFlavor flavor) {
+    return MediaPackageElement.Type.Publication.equals(type);
+  }
 
-	@Override
-	public MediaPackageElement elementFromURI(URI uri)
-			throws UnsupportedElementException {
-		// TODO Auto-generated method stub
-		logger.trace("Creating publication element from " + uri);
-	    Publication publication = new PublicationImpl();
-	    publication.setURI(uri);
-		return publication;
-	}
+  @Override
+  public boolean accept(Node elementNode) {
+      String name = elementNode.getNodeName();
+      if (name.contains(":")) {
+        name = name.substring(name.indexOf(":") + 1);
+      }
+      return name.equalsIgnoreCase(MediaPackageElement.Type.Publication.toString());
+  }
 
-	@Override
-	public MediaPackageElement elementFromManifest(Node elementNode,
-			MediaPackageSerializer serializer)
-			throws UnsupportedElementException {
-		
-	 	String id = null;
-	    MimeType mimeType = null;
-	    MediaPackageElementFlavor flavor = null;
-	    String reference = null;
-	    String channel = null;
-	    URI url = null;
-	    long size = -1;
-	    Checksum checksum = null;
+  @Override
+  public MediaPackageElement elementFromURI(URI uri)
+      throws UnsupportedElementException {
+    // TODO Auto-generated method stub
+    logger.trace("Creating publication element from " + uri);
+      Publication publication = new PublicationImpl();
+      publication.setURI(uri);
+    return publication;
+  }
 
-	    try {
-	      // id
-	      id = (String) xpath.evaluate("@id", elementNode, XPathConstants.STRING);
-	      if (StringUtils.isEmpty(id)) {
-	    	  throw new UnsupportedElementException("Unvalid or missing id argument!");
-	      }
-	      
-	      // url
-	      url = serializer.resolvePath(xpath.evaluate("url/text()", elementNode).trim());
+  @Override
+  public MediaPackageElement elementFromManifest(Node elementNode,
+      MediaPackageSerializer serializer)
+      throws UnsupportedElementException {
 
-	      // channel
-	      channel = (String) xpath.evaluate("@channel", elementNode).trim();
-	      if (StringUtils.isEmpty(channel)) {
-	    	  throw new UnsupportedElementException("Unvalid or missing channel argument!");
-	      }
-	      
-	      // reference
-	      reference = (String) xpath.evaluate("@ref", elementNode, XPathConstants.STRING);
-	      
-	      // size
-	      String trackSize = xpath.evaluate("size/text()", elementNode).trim();
-	      if (!"".equals(trackSize))
-	        size = Long.parseLong(trackSize);
+     String id = null;
+      MimeType mimeType = null;
+      MediaPackageElementFlavor flavor = null;
+      String reference = null;
+      String channel = null;
+      URI url = null;
+      long size = -1;
+      Checksum checksum = null;
 
-	      // flavor
-	      String flavorValue = (String) xpath.evaluate("@type", elementNode, XPathConstants.STRING);
-	      if (StringUtils.isNotEmpty(flavorValue))
-	        flavor = MediaPackageElementFlavor.parseFlavor(flavorValue);
+      try {
+        // id
+        id = (String) xpath.evaluate("@id", elementNode, XPathConstants.STRING);
+        if (StringUtils.isEmpty(id)) {
+          throw new UnsupportedElementException("Unvalid or missing id argument!");
+        }
 
-	      // checksum
-	      String checksumValue = (String) xpath.evaluate("checksum/text()", elementNode, XPathConstants.STRING);
-	      String checksumType = (String) xpath.evaluate("checksum/@type", elementNode, XPathConstants.STRING);
-	      if (StringUtils.isNotEmpty(checksumValue) && checksumType != null)
-	        checksum = Checksum.create(checksumType.trim(), checksumValue.trim());
+        // url
+        url = serializer.resolvePath(xpath.evaluate("url/text()", elementNode).trim());
 
-	      // mimetype
-	      String mimeTypeValue = (String) xpath.evaluate("mimetype/text()", elementNode, XPathConstants.STRING);
-	      if (StringUtils.isNotEmpty(mimeTypeValue)) {
-	        mimeType = MimeTypes.parseMimeType(mimeTypeValue);
-	      } else {
-	    	  throw new UnsupportedElementException("Unvalid or missing mimetype argument!");
-	      }
+        // channel
+        channel = (String) xpath.evaluate("@channel", elementNode).trim();
+        if (StringUtils.isEmpty(channel)) {
+          throw new UnsupportedElementException("Unvalid or missing channel argument!");
+        }
 
-	      // Build the publication element
-	      PublicationImpl publication = new PublicationImpl(id, channel, url, mimeType);
+        // reference
+        reference = (String) xpath.evaluate("@ref", elementNode, XPathConstants.STRING);
 
-	      if (StringUtils.isNotBlank(id))
-	        publication.setIdentifier(id);
+        // size
+        String trackSize = xpath.evaluate("size/text()", elementNode).trim();
+        if (!"".equals(trackSize))
+          size = Long.parseLong(trackSize);
 
-	      // Add url
-	      publication.setURI(url);
+        // flavor
+        String flavorValue = (String) xpath.evaluate("@type", elementNode, XPathConstants.STRING);
+        if (StringUtils.isNotEmpty(flavorValue))
+          flavor = MediaPackageElementFlavor.parseFlavor(flavorValue);
 
-	      // Add reference
-	      if (StringUtils.isNotEmpty(reference))
-	        publication.referTo(MediaPackageReferenceImpl.fromString(reference));
+        // checksum
+        String checksumValue = (String) xpath.evaluate("checksum/text()", elementNode, XPathConstants.STRING);
+        String checksumType = (String) xpath.evaluate("checksum/@type", elementNode, XPathConstants.STRING);
+        if (StringUtils.isNotEmpty(checksumValue) && checksumType != null)
+          checksum = Checksum.create(checksumType.trim(), checksumValue.trim());
 
-	      // Set size
-	      if (size > 0)
-	        publication.setSize(size);
+        // mimetype
+        String mimeTypeValue = (String) xpath.evaluate("mimetype/text()", elementNode, XPathConstants.STRING);
+        if (StringUtils.isNotEmpty(mimeTypeValue)) {
+          mimeType = MimeTypes.parseMimeType(mimeTypeValue);
+        } else {
+          throw new UnsupportedElementException("Unvalid or missing mimetype argument!");
+        }
 
-	      // Set checksum
-	      if (checksum != null)
-	        publication.setChecksum(checksum);
+        // Build the publication element
+        PublicationImpl publication = new PublicationImpl(id, channel, url, mimeType);
 
-	      // Set mimetpye
-	      if (mimeType != null)
-	        publication.setMimeType(mimeType);
+        if (StringUtils.isNotBlank(id))
+          publication.setIdentifier(id);
 
-	      if (flavor != null)
-	        publication.setFlavor(flavor);
+        // Add url
+        publication.setURI(url);
 
-	      // description
-	      String description = (String) xpath.evaluate("description/text()", elementNode, XPathConstants.STRING);
-	      if (StringUtils.isNotBlank(description))
-	        publication.setElementDescription(description.trim());
+        // Add reference
+        if (StringUtils.isNotEmpty(reference))
+          publication.referTo(MediaPackageReferenceImpl.fromString(reference));
 
-	      // tags
-	      NodeList tagNodes = (NodeList) xpath.evaluate("tags/tag", elementNode, XPathConstants.NODESET);
-	      for (int i = 0; i < tagNodes.getLength(); i++) {
-	        publication.addTag(tagNodes.item(i).getTextContent());
-	      }
+        // Set size
+        if (size > 0)
+          publication.setSize(size);
 
-	      return publication;
-	    } catch (XPathExpressionException e) {
-	      throw new UnsupportedElementException("Error while reading track information from manifest: " + e.getMessage());
-	    } catch (NoSuchAlgorithmException e) {
-	      throw new UnsupportedElementException("Unsupported digest algorithm: " + e.getMessage());
-	    } catch (URISyntaxException e) {
-	      throw new UnsupportedElementException("Error while reading presenter track " + url + ": " + e.getMessage());
-	    }
-	}
+        // Set checksum
+        if (checksum != null)
+          publication.setChecksum(checksum);
 
-	@Override
-	public MediaPackageElement newElement(Type type,
-			MediaPackageElementFlavor flavor) {
-		Publication element = new PublicationImpl();
-		element.setFlavor(flavor);
-		return element;
-	}
+        // Set mimetpye
+        if (mimeType != null)
+          publication.setMimeType(mimeType);
+
+        if (flavor != null)
+          publication.setFlavor(flavor);
+
+        // description
+        String description = (String) xpath.evaluate("description/text()", elementNode, XPathConstants.STRING);
+        if (StringUtils.isNotBlank(description))
+          publication.setElementDescription(description.trim());
+
+        // tags
+        NodeList tagNodes = (NodeList) xpath.evaluate("tags/tag", elementNode, XPathConstants.NODESET);
+        for (int i = 0; i < tagNodes.getLength(); i++) {
+          publication.addTag(tagNodes.item(i).getTextContent());
+        }
+
+        return publication;
+      } catch (XPathExpressionException e) {
+        throw new UnsupportedElementException("Error while reading track information from manifest: " + e.getMessage());
+      } catch (NoSuchAlgorithmException e) {
+        throw new UnsupportedElementException("Unsupported digest algorithm: " + e.getMessage());
+      } catch (URISyntaxException e) {
+        throw new UnsupportedElementException("Error while reading presenter track " + url + ": " + e.getMessage());
+      }
+  }
+
+  @Override
+  public MediaPackageElement newElement(Type type,
+      MediaPackageElementFlavor flavor) {
+    Publication element = new PublicationImpl();
+    element.setFlavor(flavor);
+    return element;
+  }
 
 }

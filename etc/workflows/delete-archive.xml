@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>delete-archive</id>
+  <title>Delete media package from the archive</title>
+  <tags>
+	<tag>archive</tag>
+  </tags>
+  <description>Delete a media packge from the archive on optianlly retract it from the engage distribution channel. WARNING! When retracting from the different publication channels is disabled, they can't be retracted anymore by the archive UI. Instead the REST endpoints have to be used!</description>
+  <configuration_panel>
+  <![CDATA[
+    <fieldset>
+      <legend>Retraction</legend>
+      <span style="color: #ff0000">WARNING! When retracting from the different publication channels is disabled, they can't be retracted anymore by the archive UI. Instead the REST endpoints have to be used!</span>
+      <ul class="oc-ui-form-list">
+        <li class="ui-helper-clearfix">
+          <label>Publication Channels:</label>
+          <span>
+            <input id="engage" name="engage" type="checkbox" checked="checked" class="configField" value="Matterhorn Engage Player" />
+            <span>&nbsp;Matterhorn Engage Player</span>
+            <input id="youtube" name="youtube" type="checkbox" checked="checked" class="configField" value="Youtube" />
+            <span>&nbsp;Youtube</span>
+          </span>
+        </li>
+      </ul>
+    </fieldset>
+
+    <script type="text/javascript">           
+      ocWorkflowPanel.registerComponents = function(components){
+        /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
+         * into the workflow. The component's nodeKey must match the components array key.
+         *
+         * Example:'org.opencastproject.workflow.config.myProperty' will be availible at ${my.property}
+         */
+        components['org.opencastproject.workflow.config.engage'] = new ocAdmin.Component(
+          ['engage'],
+	      {key: 'org.opencastproject.workflow.config.engage'},
+          {getValue: function(){ return this.fields.engage.is(":checked"); }
+          }
+        );
+        components['org.opencastproject.workflow.config.youtube'] = new ocAdmin.Component(
+          ['youtube'],
+	      {key: 'org.opencastproject.workflow.config.youtube'},
+          {getValue: function(){ return this.fields.youtube.is(":checked"); }
+          }
+        );
+        //etc...
+      }
+      ocWorkflowPanel.setComponentValues = function(values, components){
+        components['org.opencastproject.workflow.config.engage'].setValue(values['org.opencastproject.workflow.config.engage']);
+        components['org.opencastproject.workflow.config.youtube'].setValue(values['org.opencastproject.workflow.config.youtube']);
+      }
+    </script>
+  ]]>
+  </configuration_panel>
+  <operations>
+  
+    <!-- Retract from engage player -->
+
+    <operation
+      id="retract-engage"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      if="${engage}"
+      description="Retract media package from the engage player">
+    </operation>
+
+    <!-- Retract from youtube -->
+
+    <operation
+      id="retract-youtube"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      if="${youtube}"
+      description="Retract media package from youtube">
+    </operation>
+
+    <!-- Archive the current state of the mediapackage -->
+
+    <operation
+        id="delete-archive"
+        fail-on-error="true"
+        exception-handler-workflow="error"
+        description="Delete media package form the archive">
+    </operation>
+
+    <!-- Cleanup the working file repository -->
+ 
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+      <configurations>
+        <configuration key="preserve-flavors"></configuration>
+      </configurations>
+    </operation>
+  
+  </operations>
+  
+</definition>

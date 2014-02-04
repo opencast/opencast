@@ -37,7 +37,7 @@ public class VideoFilesinkConsumer extends ConsumerBin {
   public static final String DEFAULT_ENCODER = GStreamerElements.X264ENC;
   public static final String DEFAULT_BITRATE = "2048";
   public static final String DEFAULT_ENCODER_SPEED_PRESET = "1";
-  
+
   /**
    * Pass 0 is CBR (default), Pass 4 is constant quantizer, Pass 5 is constant quality.
    **/
@@ -47,7 +47,7 @@ public class VideoFilesinkConsumer extends ConsumerBin {
    * VideoFilesinkConsumer dumps the video source into a file. It is used when a Producer has the isVideoFlag set to
    * true. The main difference between this class and the AudioFilesinkConsumer is the defaults for the encoder
    * (default=ffenc_mpeg2video) and muxer(default=mpegpsmux).
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           If the Elements for this Consumer cannot be linked together this Exception will be thrown.
    * @throws UnableToCreateGhostPadsForBinException
@@ -73,7 +73,7 @@ public class VideoFilesinkConsumer extends ConsumerBin {
   /**
    * This creates the Encoder and Muxer that when linked with the queue at the start and the filesink at the end creates
    * a full Consumer solution for outputting video data to a file.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the current install of GStreamer on this machine doesn't support the container or codec that is set
    *           for the encoder or muxer this exception is thrown.
@@ -88,7 +88,7 @@ public class VideoFilesinkConsumer extends ConsumerBin {
   /**
    * Creates the encoder to change the raw video data outputted from GStreamer into the default codec if none is
    * specified, or the specified codec in the capture properties file.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the current GStreamer install doesn't support the default codec if no codec is specified or if the
    *           specified codec is not supported by one of the GStreamer modules installed then this Exception is thrown,
@@ -109,7 +109,7 @@ public class VideoFilesinkConsumer extends ConsumerBin {
 
   /**
    * Creates the muxer to insert the encoder information into the default container or a user specified container.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the default container or the user specified container is not supported by the GStreamer modules
    *           installed this Exception is thrown.
@@ -135,7 +135,7 @@ public class VideoFilesinkConsumer extends ConsumerBin {
 
   /**
    * Sets the user defined properties for the filesink and encoder.
-   * 
+   *
    * @throws IllegalArgumentException
    *           Thrown if necessary arguments such as file location are not set.
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
@@ -152,7 +152,7 @@ public class VideoFilesinkConsumer extends ConsumerBin {
 
   /**
    * Defines the location of the filesink that will be the file that is created by the capture.
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If the filesink is null at this point this Exception is thrown.
    * @throws IllegalArgumentException
@@ -172,7 +172,7 @@ public class VideoFilesinkConsumer extends ConsumerBin {
 
   /**
    * Sets the bitrate for the encoder if the user specified it. If not it is set to DEFAULT_BITRATE.
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If encoder is null at this point this Exception is thrown.
    **/
@@ -187,7 +187,7 @@ public class VideoFilesinkConsumer extends ConsumerBin {
     } else {
       encoder.set(GStreamerProperties.BITRATE, DEFAULT_BITRATE);
     }
-   
+
     if (captureDeviceProperties.getCodec() != null
             && captureDeviceProperties.getCodec().equalsIgnoreCase(GStreamerElements.X264ENC) || StringUtils.trimToNull(captureDeviceProperties.getCodec()) == null) {
       setX264EncoderProperties();
@@ -209,17 +209,17 @@ public class VideoFilesinkConsumer extends ConsumerBin {
 
   /**
    * Sets a property on the encoder using the capture agent device properties.
-   * 
+   *
    * @param key
    *          The name of the property to set.
    **/
   private void setEncoderProperty(String key) {
-	  setEncoderProperty(key, null);
+    setEncoderProperty(key, null);
   }
-  
+
   /**
-   * Sets a property on the encoder using the capture agent device properties with a possible default value. 
-   * 
+   * Sets a property on the encoder using the capture agent device properties with a possible default value.
+   *
    * @param key
    *          The name of the property to set.
    **/
@@ -228,13 +228,13 @@ public class VideoFilesinkConsumer extends ConsumerBin {
     if (properties.containsKey(fullPropertiesKey)) {
       encoder.set(key, properties.get(fullPropertiesKey));
     } else if (StringUtils.trimToNull(defaultValue) != null) {
-    	encoder.set(key, defaultValue);
+      encoder.set(key, defaultValue);
     }
   }
-  
+
   /**
    * Links the queue to the encoder to the muxer to the filesink.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           If any of these links fail this Exception is thrown.
    */

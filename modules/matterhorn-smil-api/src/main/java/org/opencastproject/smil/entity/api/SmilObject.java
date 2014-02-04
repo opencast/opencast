@@ -20,10 +20,11 @@ package org.opencastproject.smil.entity.api;
  */
 public interface SmilObject {
 
-	/**
-	 * Returns the Id of the {@link Smil} element.
-	 * @return element Id
-	 */
-	String getId();
-	
+  /**
+   * Returns the Id of the {@link Smil} element.
+   *
+   * @return element Id
+   */
+  String getId();
+
 }

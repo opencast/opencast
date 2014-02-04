@@ -128,7 +128,7 @@ public class SmilResponseImplTest {
 
     try {
       String xml = response.toXml();
-//			logger.info(xml);
+      // logger.info(xml);
       assertNotNull(xml);
       // test xml contains smil element
       assertTrue(xml.contains("<smil"));

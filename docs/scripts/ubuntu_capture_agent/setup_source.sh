@@ -23,6 +23,7 @@ while [[ true ]]; do
     fi
     cd $FELIX_HOME
     git reset --hard
+    git fetch
     git checkout $branch
     checkoutVal=$?
     popd > /dev/null

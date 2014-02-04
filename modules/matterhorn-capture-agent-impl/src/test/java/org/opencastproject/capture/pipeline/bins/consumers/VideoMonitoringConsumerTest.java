@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 public class VideoMonitoringConsumerTest {
   
+  private static final String CAPTURE_DEVICE_FRIENDLY_NAME = "videotestsrc";
   /** Videotestsrc Capture Device created for unit testing **/
   private CaptureDevice captureDevice = null;
   /** Confidence monitoring properties **/
@@ -78,11 +79,13 @@ public class VideoMonitoringConsumerTest {
       return;
     
     new File(testPath).mkdir();
-    Properties captureDeviceProperties = PipelineTestHelpers.createCaptureDeviceProperties(captureDevice, 
-            null, null, null, null, null, null);
-    captureDevice = PipelineTestHelpers.createCaptureDevice(null, ProducerType.VIDEOTESTSRC, "videotestsrc", testPath, captureDeviceProperties);
+    Properties captureDeviceProperties = PipelineTestHelpers.createCaptureDeviceProperties(
+            captureDevice, null, null, null, null, null, null);
+    captureDevice = PipelineTestHelpers.createCaptureDevice(null, ProducerType.VIDEOTESTSRC, 
+            CAPTURE_DEVICE_FRIENDLY_NAME, testPath, captureDeviceProperties);
     confidenceProperties = new Properties();
-    confidenceProperties.setProperty(CaptureParameters.CAPTURE_CONFIDENCE_VIDEO_LOCATION, new File(testPath).getAbsolutePath());
+    confidenceProperties.setProperty(CaptureParameters.CAPTURE_CONFIDENCE_VIDEO_LOCATION, 
+            new File(testPath).getAbsolutePath());
     
     
     pipeline = new Pipeline();
@@ -143,17 +146,14 @@ public class VideoMonitoringConsumerTest {
       
       // wait 3 sec
       Thread.sleep(3000);
+      pipeline.setState(State.NULL);
+      pipeline = null;
       
       // test monitoring frame exists
-      File frame = new File(testPath, testPath.split("/")[testPath.split("/").length - 1] + ".jpg");
+      File frame = new File(testPath, CAPTURE_DEVICE_FRIENDLY_NAME + ".jpg");
       if (!frame.exists() || frame.length() == 0) {
-        pipeline.setState(State.NULL);
-        pipeline = null;
         Assert.fail("monitoring frame does not exist or file size is zero");
       }
-      
-      // stop pipeline
-      pipeline.setState(State.NULL);
       
     } catch (Exception ex) {
       Assert.fail(ex.getMessage());

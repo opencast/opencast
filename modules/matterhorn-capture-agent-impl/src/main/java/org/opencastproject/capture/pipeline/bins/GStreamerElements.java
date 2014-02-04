@@ -19,6 +19,7 @@ package org.opencastproject.capture.pipeline.bins;
 public interface GStreamerElements {
   /** Source Module: gstreamer **/
   String CAPSFILTER = "capsfilter";
+  String FAKESINK = "fakesink";
   String FAKESRC = "fakesrc";
   String FILESINK = "filesink";
   String FILESRC = "filesrc";
@@ -27,15 +28,16 @@ public interface GStreamerElements {
   String TEE = "tee";
 
   /** Source Module: gst-plugins-base **/
+  String APPSRC = "appsrc";
+  String APPSINK = "appsink";
   String AUDIOCONVERT = "audioconvert";
   String AUDIOTESTSRC = "audiotestsrc";
   String DECODEBIN = "decodebin";
   String FFMPEGCOLORSPACE = "ffmpegcolorspace";
+  String TIMEOVERLAY = "timeoverlay";
   String V4LSRC = "v4lsrc";
   String VIDEORATE = "videorate";
   String VIDEOTESTSRC = "videotestsrc";
-  String APPSRC = "appsrc";
-  String APPSINK = "appsink";
   // Available only in Linux
   String ALSASRC = "alsasrc";
   String XVIMAGESINK = "xvimagesink";
@@ -45,6 +47,9 @@ public interface GStreamerElements {
   String DV1394SRC = "dv1394src";
   String DVDEC = "dvdec";
   String DVDEMUX = "dvdemux";
+  String JPEGENC = "jpegenc";
+  String LEVEL = "level";
+  String MULTIFILESINK = "multifilesink";
   String MULTIFILESRC = "multifilesrc";
   String PNGDEC = "pngdec";
   String PULSESRC = "pulsesrc";

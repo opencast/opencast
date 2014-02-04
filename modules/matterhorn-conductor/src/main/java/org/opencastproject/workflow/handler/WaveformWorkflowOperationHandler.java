@@ -67,6 +67,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
    * The configuration options for this handler
    */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
+
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put(SOURCE_FLAVOR_PROPERTY, "The source wave file flavor.");
@@ -141,7 +142,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
       String elementId = UUID.randomUUID().toString();
       URI waveformUri = workspace.put(mediaPackage.getIdentifier().compact(), elementId, "waveform.png", is);
       Attachment attachment = (Attachment) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-            .elementFromURI(waveformUri, MediaPackageElement.Type.Attachment, targetFlavor);
+              .elementFromURI(waveformUri, MediaPackageElement.Type.Attachment, targetFlavor);
       mediaPackage.add(attachment);
 
       logger.info("Generation waveform png from {} finished.", tracks[0].getURI().toString());
@@ -302,7 +303,8 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
        *
        * @param filename Wave file
        * @throws IOException if reading from input stream failed
-       * @throws WaveException if wave file has invalid or unsupported header format
+       * @throws WaveException if wave file has invalid or unsupported header
+       * format
        */
       public Wave(String filename) throws IOException, WaveException {
         this(new File(filename));
@@ -313,21 +315,22 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
        *
        * @param f the wav file
        * @throws IOException if reading from input stream failed
-       * @throws WaveException if wave file has invalid or unsupported header format
+       * @throws WaveException if wave file has invalid or unsupported header
+       * format
        */
       public Wave(File f) throws IOException, WaveException {
         this(new FileInputStream(f));
       }
 
       /**
-       * Constructor.
-       * On any thrown exception the input stream will be closed.
+       * Constructor. On any thrown exception the input stream will be closed.
        *
        * @param inputStream Wave file input stream
        * @throws IOException if reading from input stream failed
-       * @throws WaveException if wave file has invalid or unsupported header format
+       * @throws WaveException if wave file has invalid or unsupported header
+       * format
        */
-      protected Wave(InputStream inputStream) throws IOException, WaveException  {
+      protected Wave(InputStream inputStream) throws IOException, WaveException {
         this.inputStream = inputStream;
         waveHeader = new WaveUtils.WaveHeader(inputStream);
 
@@ -441,9 +444,9 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
       private long subChunk2Size = 0L; // unsigned 4 bytes, little endian
 
       /**
-       * Read the wave file header.
-       * Check isValid flag, if the wave file supported.
-       * 
+       * Read the wave file header. Check isValid flag, if the wave file
+       * supported.
+       *
        * @param inputStream wave file input stream
        * @throws IOException if an I/O error occurs.
        */
@@ -528,7 +531,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
             do {
               // list info header wrap some metadata like encoder software, author, etc.
               // we are not interesting on it but should read them till raw wav data chunk
-              byte[] listHeader = new byte[(int)subChunk2Size];
+              byte[] listHeader = new byte[(int) subChunk2Size];
               inputStream.read(listHeader);
               // drop list data chunk
 
