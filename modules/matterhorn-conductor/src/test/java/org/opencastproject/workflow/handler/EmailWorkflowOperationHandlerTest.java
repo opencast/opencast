@@ -15,6 +15,7 @@
  */
 package org.opencastproject.workflow.handler;
 
+import org.opencastproject.kernel.mail.EmailTemplateScanner;
 import org.opencastproject.kernel.mail.SmtpService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
@@ -29,7 +30,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import junit.framework.Assert;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -71,6 +72,12 @@ public class EmailWorkflowOperationHandlerTest {
     EasyMock.replay(smtpService);
     operationHandler.setSmtpService(smtpService);
 
+    EmailTemplateScanner templateScanner = EasyMock.createMock(EmailTemplateScanner.class);
+    EasyMock.expect(templateScanner.getTemplate("template1")).andReturn(
+            "This is the media package: ${mediaPackage.identifier}");
+    EasyMock.replay(templateScanner);
+    operationHandler.setEmailTemplateScanner(templateScanner);
+
     workflowInstance = new WorkflowInstanceImpl();
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
@@ -83,7 +90,6 @@ public class EmailWorkflowOperationHandlerTest {
 
   @Test
   public void testDefaultBody() throws Exception {
-    System.out.println("testDefaultBody");
     workflowInstance.setTitle("testDefaultBody");
     operation.setConfiguration(EmailWorkflowOperationHandler.TO_PROPERTY, "somebody@hotmail.com");
     operation.setConfiguration(EmailWorkflowOperationHandler.SUBJECT_PROPERTY, "this is the subject");
@@ -102,7 +108,6 @@ public class EmailWorkflowOperationHandlerTest {
 
   @Test
   public void testTemplateInBody() throws Exception {
-    System.out.println("testTemplateInBody");
     workflowInstance.setTitle("testTemplateInBody");
     operation.setConfiguration(EmailWorkflowOperationHandler.TO_PROPERTY, "somebody@hotmail.com");
     operation.setConfiguration(EmailWorkflowOperationHandler.SUBJECT_PROPERTY, "this is the subject");
@@ -120,8 +125,24 @@ public class EmailWorkflowOperationHandlerTest {
     Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", message.getContent()
             .toString());
   }
-  
-  
 
+  @Test
+  public void testTemplateInFile() throws Exception {
+    workflowInstance.setTitle("testTemplateInFile");
+    operation.setConfiguration(EmailWorkflowOperationHandler.TO_PROPERTY, "somebody@hotmail.com");
+    operation.setConfiguration(EmailWorkflowOperationHandler.SUBJECT_PROPERTY, "this is the subject");
+    operation.setConfiguration(EmailWorkflowOperationHandler.BODY_TEMPLATE_FILE_PROPERTY, "template1");
+
+    WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
+
+    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assert.assertEquals("this is the subject", message.getSubject());
+
+    InternetAddress[] to = (InternetAddress[]) message.getRecipients(Message.RecipientType.TO);
+    Assert.assertEquals(1, to.length);
+    Assert.assertEquals("somebody@hotmail.com", to[0].getAddress());
+    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", message.getContent()
+            .toString());
+  }
 
 }

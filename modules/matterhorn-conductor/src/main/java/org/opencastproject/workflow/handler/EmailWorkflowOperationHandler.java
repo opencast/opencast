@@ -17,6 +17,7 @@ package org.opencastproject.workflow.handler;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.kernel.mail.EmailDocData;
+import org.opencastproject.kernel.mail.EmailTemplateScanner;
 import org.opencastproject.kernel.mail.SmtpService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.util.doc.DocUtil;
@@ -46,6 +47,9 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /** The smtp service */
   private SmtpService smptService = null;
 
+  /** Email template manager */
+  private EmailTemplateScanner templateScanner = null;
+
   // Configuration properties used in the workflow definition
   public static final String TO_PROPERTY = "to";
   public static final String SUBJECT_PROPERTY = "subject";
@@ -64,7 +68,6 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   protected void activate(ComponentContext cc) {
     super.activate(cc);
     addConfigurationOption(TO_PROPERTY, "The mail address to send to");
-
     addConfigurationOption(SUBJECT_PROPERTY, "The subject line");
     addConfigurationOption(BODY_PROPERTY, "The email body text (or Freemarker template)");
     addConfigurationOption(BODY_TEMPLATE_FILE_PROPERTY, "The file name of the Freemarker template for the email body");
@@ -126,22 +129,30 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   private String applyTemplateIfNecessary(WorkflowInstance workflowInstance, WorkflowOperationInstance operation,
           String configName) {
-    String value = operation.getConfiguration(configName);
-    // If value doesn't contain a "${", assume it is NOT a Freemarker template and thus return the value as it is
-    if (value.indexOf("${") > -1) {
-      // Templates are cached, use as template name: the template file name or, if in-line, the
-      // workflow name + the operation number + body/to/subject
-      String templateName = null;
-      if (BODY_TEMPLATE_FILE_PROPERTY.equals(configName)) {
-        templateName = value; // Use body template file name
-        value = null; // TO DO: LOAD TEMPLATE HERE!!!!
-      } else {
-        templateName = workflowInstance.getTitle() + "_" + operation.getPosition() + "_" + configName;
+    String configValue = operation.getConfiguration(configName);
+
+    // Templates are cached, use as template name: the template name or, if in-line, the
+    // workflow name + the operation number + body/to/subject
+    String templateName = null;
+    String template = null;
+
+    if (BODY_TEMPLATE_FILE_PROPERTY.equals(configName)) {
+      templateName = configValue; // Use body template file name
+      template = templateScanner.getTemplate(templateName);
+      if (template == null) {
+        logger.warn("E-mail template not found: {}", templateName);
+        return configValue; // Assume no template, but it's probably missing
       }
-      // Apply the template
-      value = DocUtil.generate(new EmailDocData(templateName, workflowInstance), value);
+    } else if (configValue.indexOf("${") > -1) {
+      // If value contains a "${", it may be a template so apply it
+      templateName = workflowInstance.getTitle() + "_" + operation.getPosition() + "_" + configName;
+      template = configValue;
+    } else {
+      // If value doesn't contain a "${", assume it is NOT a Freemarker template and thus return the value as it is
+      return configValue;
     }
-    return value;
+    // Apply the template
+    return DocUtil.generate(new EmailDocData(templateName, workflowInstance), template);
   }
 
   /**
@@ -152,6 +163,16 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
    */
   void setSmtpService(SmtpService smtpService) {
     this.smptService = smtpService;
+  }
+
+  /**
+   * Callback for OSGi to set the {@link EmailTemplateScanner}.
+   * 
+   * @param smtpService
+   *          the smtp service
+   */
+  void setEmailTemplateScanner(EmailTemplateScanner templateScanner) {
+    this.templateScanner = templateScanner;
   }
 
 }

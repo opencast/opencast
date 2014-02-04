@@ -98,10 +98,11 @@ public class EmailTemplateScanner implements ArtifactInstaller {
   public void install(File artifact) throws Exception {
     logger.info("Registering email template from {}", artifact.getName());
     FileReader in = null;
+    BufferedReader reader = null;
     StringBuilder stringBuilder = new StringBuilder();
     try {
       in = new FileReader(artifact);
-      BufferedReader reader = new BufferedReader(in);
+      reader = new BufferedReader(in);
       String line = null;
       String ls = System.getProperty("line.separator");
 
@@ -114,6 +115,7 @@ public class EmailTemplateScanner implements ArtifactInstaller {
     } catch (Exception e) {
       logger.error("Email tempalte could not be read from {}: {}", artifact, e.getMessage());
     } finally {
+      IOUtils.closeQuietly(reader);
       IOUtils.closeQuietly(in);
     }
 
@@ -124,11 +126,11 @@ public class EmailTemplateScanner implements ArtifactInstaller {
       }
     });
 
-    // Once all temapltes have been loaded, announce readiness
+    // Once all templates have been loaded, announce readiness
     if (filesInDirectory.length == sumInstalledFiles) {
       Dictionary<String, String> properties = new Hashtable<String, String>();
       properties.put(ARTIFACT, "emailtemplates");
-      logger.debug("Indicating readiness of email temapltes");
+      logger.debug("Indicating readiness of email templates");
       bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
       logger.info("All {} email templates installed", filesInDirectory.length);
     } else {
@@ -146,7 +148,7 @@ public class EmailTemplateScanner implements ArtifactInstaller {
     for (Iterator<String> iter = templates.values().iterator(); iter.hasNext();) {
       String temp = iter.next();
       if (artifact.getName().equals(temp)) {
-        logger.info("Uninstalling profile {}", temp);
+        logger.info("Uninstalling template {}", temp);
         iter.remove();
       }
     }
