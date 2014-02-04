@@ -80,6 +80,9 @@ editor.mediapackageParser = null;
 editor.smilParser = null;
 editor.smilResponseParser = null;
 
+var prePostRoll = 2; // in etc/load/org.opencastproject.organization-mh_default_org.cfg
+var minSegmentLength = 0.5;
+
 var windowResizeMS = 500;
 var initMS = 150;
 var lastTimeSplitItemClick = 0;
@@ -777,7 +780,8 @@ function checkPrevAndNext(id) {
                 var next = editor.splitData.splits[1];
                 next.clipBegin = editor.splitData.splits[0].clipEnd;
             }
-            if (getTimefieldTimeBegin() != 0) {
+            if ((getTimefieldTimeBegin() != 0)
+		&& (editor.splitData.splits[0].clipBegin > 0)) {
                 var newSplitItem = {
                     clipBegin: 0,
                     clipEnd: editor.splitData.splits[0].clipBegin,
@@ -790,7 +794,8 @@ function checkPrevAndNext(id) {
             // new last item
         } else if (id == editor.splitData.splits.length - 1) {
             var duration = getDuration();
-            if (getTimefieldTimeEnd() != duration) {
+            if ((getTimefieldTimeEnd() != duration)
+		&& (editor.splitData.splits[id].clipEnd < duration)) {
                 var newLastItem = {
                     clipBegin: editor.splitData.splits[id].clipEnd,
                     clipEnd: duration,
@@ -1844,6 +1849,7 @@ function parseInitialSMIL() {
         if (editor.parsedSmil.par) {
             editor.splitData.splits = [];
             editor.parsedSmil.par = ocUtils.ensureArray(editor.parsedSmil.par);
+	    var i = 0;
             $.each(editor.parsedSmil.par, function (key, value) {
                 value.video = ocUtils.ensureArray(value.video);
                 var clipBegin = parseFloat(value.video[0].clipBegin) / 1000;
@@ -1851,15 +1857,23 @@ function parseInitialSMIL() {
                 ocUtils.log("Found a split element (" + clipBegin + " - " + clipEnd + ")");
                 if (editor.splitData && editor.splitData.splits) {
                     // check whether split element is big enough
-                    if ((clipEnd - clipBegin) > 0.02) {
-                        if ((editor.splitData.splits.length == 0) && (clipBegin > 0.02)) {
-                            newStart = true;
-                            editor.splitData.splits.push({
-                                clipBegin: 0,
-                                clipEnd: clipBegin,
-                                enabled: false
-                            });
-                        }
+                    if ((clipEnd - clipBegin) > minSegmentLength) {
+			if(editor.splitData.splits.length == 0) {
+                            if (clipBegin > minSegmentLength) {
+				newStart = true;
+				editor.splitData.splits.push({
+                                    clipBegin: 0,
+                                    clipEnd: clipBegin,
+                                    enabled: false
+				});
+                            } else {
+				clipBegin = 0;
+			    }
+			}
+			if((i == (editor.parsedSmil.par.length - 1))
+			  && ((getDuration() - clipEnd) < minSegmentLength)) {
+			    clipEnd = getDuration();
+			}
                         editor.splitData.splits.push({
                             clipBegin: clipBegin,
                             clipEnd: clipEnd,
@@ -1876,8 +1890,10 @@ function parseInitialSMIL() {
                         ocUtils.log("Split element not inserted due to a too short duration");
                     }
                 }
+		++i;
             });
         }
+	
         ocUtils.log("Done");
     } else {
         ocUtils.log("No smil found.");
@@ -1892,6 +1908,10 @@ function parseInitialSMIL() {
             });
         }
         window.setTimeout(function () {
+            // if (!isBrowser("ie")) {
+            // playVideo();
+            // pauseVideo();
+            // }
             if (!newStart) {
                 $('#splitSegmentItem-0').click();
                 if (editor.splitData.splits.length == 1) {
@@ -1900,7 +1920,7 @@ function parseInitialSMIL() {
             } else {
                 $('#splitSegmentItem-1').click();
             }
-        }, 200);
+        }, initMS);
     }
     prepareUI();
 }
@@ -2006,6 +2026,16 @@ $(document).ready(function () {
         return false;
     }
 
+    $.ajax({
+        url: '/info/me.json',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            var val = parseInt(data.org.properties["adminui.prePostRoll"]);
+	    prePostRoll = !isNaN(val) ? val : prePostRoll;
+	}
+    });
+
     editor.player = $('#videoPlayer');
     editor.player.on("canplay", playerReady);
 
@@ -2060,14 +2090,4 @@ $(document).ready(function () {
         editor.updateSplitList();
         selectCurrentSplitItem();
     });
-
-    window.setTimeout(function () {
-        selectCurrentSplitItem();
-
-        // if (!isBrowser("ie")) {
-        playVideo();
-        pauseVideo();
-        setCurrentTime(0);
-        // }
-    }, initMS);
 });
