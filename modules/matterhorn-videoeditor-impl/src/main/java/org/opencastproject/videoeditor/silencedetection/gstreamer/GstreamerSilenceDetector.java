@@ -130,7 +130,12 @@ public class GstreamerSilenceDetector {
           case EOS:
             logger.debug("EOS from " + message.getSource().getName());
             if (lastSilenceStart > lastSilenceStop) {
+              // segment started but not stopped
               addMediaSegment(TimeUnit.NANOSECONDS.toMillis(lastSilenceStart), 
+                      fakesink.getLastBuffer().getTimestamp().toMillis());
+            } else if (fakesink.getLastBuffer().getTimestamp().toMillis() - lastSilenceStop < minSilenceLength) {
+              // correct last segment end (postprocessing will merge last two segments to a single)
+              addMediaSegment(TimeUnit.NANOSECONDS.toMillis(lastSilenceStop), 
                       fakesink.getLastBuffer().getTimestamp().toMillis());
             }
             mainLoop.quit();
@@ -216,20 +221,17 @@ public class GstreamerSilenceDetector {
     
     // go thrue found segments and filter them with minimum silence length
     List<MediaSegment> segmentsTmp = new LinkedList<MediaSegment>();
-    MediaSegment lastSegment = null;
+    MediaSegment lastSegment = new MediaSegment(0,0);
     for (int i = 0; i < segments.size(); i++) {
       MediaSegment segment = (MediaSegment) segments.get(i);
-      if (lastSegment == null) {
-        lastSegment = segment;
+
+      if (segment.getSegmentStart() - lastSegment.getSegmentStop() < minSilenceLength) {
+        segmentsTmp.remove(lastSegment);
+        lastSegment = new MediaSegment(lastSegment.getSegmentStart(), segment.getSegmentStop());
       } else {
-      
-        if (segment.getSegmentStart() - lastSegment.getSegmentStop() < minSilenceLength) {
-          segmentsTmp.remove(lastSegment);
-          lastSegment = (MediaSegment) new MediaSegment(lastSegment.getSegmentStart(), segment.getSegmentStop());
-        } else {
-          lastSegment = segment;
-        }
+        lastSegment = segment;
       }
+      
       segmentsTmp.add(lastSegment);
     }
     // drop all segments with length < minimum length
