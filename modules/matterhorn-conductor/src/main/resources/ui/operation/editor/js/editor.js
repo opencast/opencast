@@ -80,7 +80,9 @@ editor.mediapackageParser = null;
 editor.smilParser = null;
 editor.smilResponseParser = null;
 
+var prePostRoll = 2; // in etc/load/org.opencastproject.organization-mh_default_org.cfg
 var minSegmentLength = 0.5;
+
 var windowResizeMS = 500;
 var initMS = 150;
 var lastTimeSplitItemClick = 0;
@@ -2023,6 +2025,16 @@ $(document).ready(function () {
         $("#cancelButton").attr('title', 'Back').html('Back');
         return false;
     }
+
+    $.ajax({
+        url: '/info/me.json',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            var val = parseInt(data.org.properties["adminui.prePostRoll"]);
+	    prePostRoll = !isNaN(val) ? val : prePostRoll;
+	}
+    });
 
     editor.player = $('#videoPlayer');
     editor.player.on("canplay", playerReady);
