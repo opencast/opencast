@@ -787,6 +787,9 @@ function checkPrevAndNext(id, checkTimefields) {
                 var next = editor.splitData.splits[1];
                 next.clipBegin = current.clipEnd;
             }
+	    if(checkTimefields) {
+		console.log(getTimefieldTimeBegin());
+	    }
             if ((!checkTimefields || (checkTimefields && (getTimefieldTimeBegin() != 0)))
 		&& (current.clipBegin > minSegmentLength)) {
                 ocUtils.log("Inserting a first split element (auto): (" + 0 + " - " + current.clipBegin + ")");
@@ -850,9 +853,7 @@ function checkPrevAndNext(id, checkTimefields) {
             }
 
             prev.clipEnd = current.clipBegin;
-	    var currEnd = current.clipEnd;
-            current.clipEnd = next.clipBegin;
-            next.clipBegin = currEnd;
+            next.clipBegin = current.clipEnd;
         }
     }
     return {
@@ -872,6 +873,10 @@ function okButtonClick() {
     if (checkClipBegin() && checkClipEnd()) {
         id = $('#splitUUID').val();
         if (id != "") {
+	    var current = editor.splitData.splits[id];
+	    var tmpBegin = current.clipBegin;
+	    var tmpEnd = current.clipEnd;
+	    var duration = getDuration();
             id = parseInt(id);
             if (getTimefieldTimeBegin() > getTimefieldTimeEnd()) {
                 displayError("The inpoint is bigger than the outpoint. Please check and correct it.",
@@ -880,21 +885,37 @@ function okButtonClick() {
                 return;
             }
 
-            if (editor.splitData && editor.splitData.splits) {
-                var splitItem = editor.splitData.splits[id];
-                var tmpBegin = splitItem.clipBegin;
-                var tmpEnd = splitItem.clipEnd;
-                splitItem.clipBegin = getTimefieldTimeBegin();
-                splitItem.clipEnd = getTimefieldTimeEnd();
-                if (checkPrevAndNext(id, true).ok) {
-                    editor.updateSplitList(true);
-                    $('#videoPlayer').focus();
-                    selectSegmentListElement(id);
-                } else {
-                    splitItem.clipBegin = tmpBegin;
-                    splitItem.clipEnd = tmpEnd;
-                    selectSegmentListElement(id);
-                }
+            if (checkPrevAndNext(id, true).ok) {
+		if (editor.splitData && editor.splitData.splits) {
+		    current.clipBegin = getTimefieldTimeBegin();
+		    current.clipEnd = getTimefieldTimeEnd();
+		    
+		    var last = editor.splitData.splits[editor.splitData.splits.length - 1];
+		    if (last.clipEnd < duration) {
+			ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
+			var newLastItem = {
+			    clipBegin: last.clipEnd,
+			    clipEnd: duration,
+			    enabled: true
+			};
+			
+			// add the new item to the end
+			editor.splitData.splits.push(newLastItem);
+		    }
+		    for(var i = 0; i < editor.splitData.splits.length; ++i) {
+			if(checkPrevAndNext(i, false).inserted) {
+			    i = 0;
+			}
+		    }
+		}
+		    
+		editor.updateSplitList(true);
+		$('#videoPlayer').focus();
+		selectSegmentListElement(id);
+            } else {
+                current.clipBegin = tmpBegin;
+                current.clipEnd = tmpEnd;
+                selectSegmentListElement(id);
             }
         }
     } else {
