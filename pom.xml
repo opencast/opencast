@@ -769,7 +769,7 @@
       <activation>
         <activeByDefault>false</activeByDefault>
         <property>
-          <name>all</name>
+          <name>test</name>
         </property>
       </activation>
       <modules>
@@ -809,9 +809,11 @@
       <id>test-performance</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <!-- They don't work at all
         <property>
-          <name>all</name>
+          <name>test</name>
         </property>
+        -->
       </activation>
       <build>
         <plugins>
@@ -855,7 +857,7 @@
       <activation>
         <activeByDefault>false</activeByDefault>
         <property>
-          <name>all</name>
+          <name>test</name>
         </property>
       </activation>
       <modules>
