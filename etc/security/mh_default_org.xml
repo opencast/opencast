@@ -60,7 +60,7 @@
     <sec:intercept-url pattern="/services/*" access="ROLE_ADMIN" />
     <sec:intercept-url pattern="/system/**" access="ROLE_ADMIN" />
     <sec:intercept-url pattern="/config/**" access="ROLE_ADMIN" />
-    
+
     <!-- Secure the user management URLs for admins only -->
     <sec:intercept-url pattern="/users/**" access="ROLE_ADMIN" />
     <sec:intercept-url pattern="/admin/users.html" access="ROLE_ADMIN" />
@@ -90,8 +90,8 @@
     <!-- Digest auth is used by capture agents and is used to enable transparent clustering of services -->
     <sec:custom-filter position="BASIC_AUTH_FILTER" ref="digestFilter" />
 
-	  <!-- Matterhorn is shipping its own implementation of the anonymous filter -->
-	  <sec:custom-filter ref="anonymousFilter" position="ANONYMOUS_FILTER" />
+    <!-- Matterhorn is shipping its own implementation of the anonymous filter -->
+    <sec:custom-filter ref="anonymousFilter" position="ANONYMOUS_FILTER" />
 
     <!--
       2-legged oauth is used by trusted 3rd party applications, including LTI producers.
@@ -116,12 +116,12 @@
   <!-- ######################################## -->
   <!-- # Custom Anonymous Filter Definition   # -->
   <!-- ######################################## -->
- 
+
   <bean id="anonymousFilter" class="org.opencastproject.kernel.security.TrustedAnonymousAuthenticationFilter">
     <property name="userAttribute" ref="anonymousUserAttributes" />
     <property name="key" value="anonymousKey" />
   </bean>
-  
+
   <bean id="anonymousUserAttributes" class="org.springframework.security.core.userdetails.memory.UserAttribute">
     <property name="authoritiesAsString" value="ROLE_ANONYMOUS"/>
     <property name="password" value="empty"/>
@@ -216,9 +216,14 @@
 
   <!-- Obtain services from the OSGI service registry -->
   <osgi:reference id="userDetailsService" cardinality="1..1"
-    interface="org.springframework.security.core.userdetails.UserDetailsService" />
+                  interface="org.springframework.security.core.userdetails.UserDetailsService" />
 
-  <osgi:reference id="securityService" cardinality="1..1" interface="org.opencastproject.security.api.SecurityService" />
+  <osgi:reference id="securityService" cardinality="1..1"
+                  interface="org.opencastproject.security.api.SecurityService" />
+
+  <!-- Uncomment to enable external users e.g. used together shibboleth -->
+  <!-- <osgi:reference id="userReferenceProvider" cardinality="1..1"
+                  interface="org.opencastproject.userdirectory.JpaUserReferenceProvider"  /> -->
 
 
   <!-- ############################# -->
@@ -226,7 +231,7 @@
   <!-- ############################# -->
 
   <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
-  <sec:authentication-manager>
+  <sec:authentication-manager alias="authenticationManager">
     <sec:authentication-provider user-service-ref="userDetailsService">
       <sec:password-encoder hash="md5"><sec:salt-source user-property="username" /></sec:password-encoder>
     </sec:authentication-provider>

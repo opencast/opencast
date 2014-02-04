@@ -16,6 +16,7 @@
 package org.opencastproject.kernel.pingback;
 
 import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.lang.StringUtils;
@@ -55,15 +56,15 @@ public class PingBackService {
 
   /** The trusted http client used to connect to the runtime info ui */
   private TrustedHttpClient httpClient = null;
-  
+
   /** Name of the "id" form parameters */
-  private static final String PARAM_NAME_ID = "form_id"; 
+  private static final String PARAM_NAME_ID = "form_id";
 
   /** Name of the "submitted" form parameters */
-  private static final String PARAM_NAME_SUBMITTED = "submitted[data]"; 
+  private static final String PARAM_NAME_SUBMITTED = "submitted[data]";
 
   /** Value of the "id" form parameters */
-  private static final String PARAM_VALUE_ID = "webform_client_form_1445"; 
+  private static final String PARAM_VALUE_ID = "webform_client_form_1445";
 
   /**
    * Osgi callback that is executed on component activation.
@@ -76,7 +77,7 @@ public class PingBackService {
     logger.debug("start()");
     // Pingback server, if enabled
     final String pingbackUrl = bundleContext.getProperty("org.opencastproject.anonymous.feedback.url");
-    final String hostUrl = bundleContext.getProperty("org.opencastproject.server.url");
+    final String hostUrl = bundleContext.getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
     if (StringUtils.isNotBlank(pingbackUrl) && StringUtils.isNotBlank(hostUrl)) {
       try {
         final URI uri = new URI(pingbackUrl);

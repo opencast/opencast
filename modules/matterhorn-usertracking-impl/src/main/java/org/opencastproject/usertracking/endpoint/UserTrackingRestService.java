@@ -20,6 +20,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.usertracking.api.UserTrackingException;
 import org.opencastproject.usertracking.api.UserTrackingService;
 import org.opencastproject.usertracking.impl.UserActionImpl;
@@ -59,16 +60,14 @@ import javax.ws.rs.core.Response.Status;
  * REST Endpoint for User Tracking Service
  */
 @Path("")
-@RestService(name = "usertracking", title = "User Tracking Service",
-  abstractText = "This service is used for tracking user interaction creates, edits and retrieves user actions and "
-               + "viewing statistics.",
-  notes = {
+@RestService(name = "usertracking", title = "User Tracking Service", abstractText = "This service is used for tracking user interaction creates, edits and retrieves user actions and "
+        + "viewing statistics.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
-        + "not working and is either restarting or has failed",
+                + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class UserTrackingRestService {
 
   private static final Logger logger = LoggerFactory.getLogger(UserTrackingRestService.class);
@@ -111,7 +110,7 @@ public class UserTrackingRestService {
     if (cc == null) {
       serverUrl = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      String ccServerUrl = cc.getBundleContext().getProperty("org.opencastproject.server.url");
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
       logger.info("configured server url is {}", ccServerUrl);
       if (ccServerUrl == null) {
         serverUrl = UrlSupport.DEFAULT_BASE_URL;
@@ -255,7 +254,7 @@ public class UserTrackingRestService {
           @Context HttpServletRequest request) {
 
     String sessionId = request.getSession().getId();
-    String userId = securityService.getUser().getUserName();
+    String userId = securityService.getUser().getUsername();
 
     // Parse the in and out strings, which might be empty (hence, we can't let jax-rs handle them properly)
     if (StringUtils.isEmpty(inString)) {
@@ -288,16 +287,16 @@ public class UserTrackingRestService {
     a.setOutpoint(out);
     a.setType(type);
     a.setIsPlaying(Boolean.valueOf(isPlaying));
-    
-    //MH-8616 the connection might be via a proxy
+
+    // MH-8616 the connection might be via a proxy
     String clientIP = request.getHeader("X-FORWARDED-FOR");
-    
+
     if (clientIP == null) {
       clientIP = request.getRemoteAddr();
     }
     logger.debug("Got client ip: {}", clientIP);
     a.setUserIp(clientIP);
-    
+
     try {
       if ("FOOTPRINT".equals(type)) {
         a = (UserActionImpl) usertrackingService.addUserFootprint(a);
@@ -350,7 +349,7 @@ public class UserTrackingRestService {
   @Path("/footprint.xml")
   @RestQuery(name = "footprintasxml", description = "Gets the 'footprint' action for an episode", returnDescription = "An XML representation of the footprints", restParameters = { @RestParameter(name = "id", description = "The episode identifier", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the footprints") })
   public FootprintsListImpl getFootprintAsXml(@QueryParam("id") String mediapackageId) {
-    String userId = securityService.getUser().getUserName();
+    String userId = securityService.getUser().getUsername();
 
     // Is the mediapackageId passed
     if (mediapackageId == null)

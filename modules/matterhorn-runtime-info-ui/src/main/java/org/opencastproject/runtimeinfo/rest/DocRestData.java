@@ -35,7 +35,7 @@ public class DocRestData extends DocData {
   public static final String FORMAT_KEY = "{FORMAT}";
 
   public static final String SLASH = "/";
-  
+
   protected List<RestEndpointHolder> holders;
 
   /**

@@ -16,6 +16,7 @@
 package org.opencastproject.loadtest.impl;
 
 import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.systems.MatterhornConstans;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -39,8 +40,6 @@ import java.util.Properties;
 public class LoadTest implements Runnable {
   // The key for the storage location for use as a default location to find and process the source media package.
   public static final String BUNDLE_CONTEXT_STORAGE_DIR = "org.opencastproject.storage.dir";
-  // The key for the current machine's hostname so that we can load test against it by default if another one is not specified.
-  public static final String BUNDLE_CONTEXT_SERVER_URL = "org.opencastproject.server.url";
   // The key to look for the default workflow to apply to the load testing.
   public static final String BUNDLE_CONTEXT_DEFAULT_WORKFLOW = "org.opencastproject.workflow.default.definition";
   /** Constants **/
@@ -83,7 +82,6 @@ public class LoadTest implements Runnable {
   public static final String USER_NAME = "matterhorn_system_account";
   // REST Endpoint Password
   public static final String PASSWORD = "CHANGE_ME";
-  
 
   // The distribution of the number of packages to ingest
   private int[] packageDistribution = { 1 };
@@ -147,7 +145,7 @@ public class LoadTest implements Runnable {
     } catch (IOException e) {
       logger.error("Had trouble creating workspace at " + workspaceLocation + " because " + e.getMessage());
     }
-    
+
     if (this.packageDistribution.length != this.packageDistributionTiming.length) {
       logger.warn("The length of the distribution must be 1 greater than the number of package distribution timings. ");
       return;
@@ -215,7 +213,7 @@ public class LoadTest implements Runnable {
       coreAddress = newCoreAddress;
     } else if (componentContext != null && componentContext.getBundleContext() != null) {
       // Use the core address as a default.
-      coreAddress = componentContext.getBundleContext().getProperty(BUNDLE_CONTEXT_SERVER_URL);
+      coreAddress = componentContext.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
       if (coreAddress == null) {
         throw new InvalidConfigurationException(
                 "The core address must be set in the configuration file so that loadtesting will occur. It isn't set in {FELIX_HOME}/conf/config.properties or {FELIX_HOME}/conf/services/org.opencastproject.loadtest.impl.LoadTestFactory.properties");
@@ -241,13 +239,12 @@ public class LoadTest implements Runnable {
       workflowID = componentContext.getBundleContext().getProperty(BUNDLE_CONTEXT_DEFAULT_WORKFLOW);
       if (workflowID == null) {
         workflowID = DEFAULT_WORKFLOW_ID;
-        logger
-                .warn("No workflow id set in {FELIX_HOME}/conf/config.properties or {FELIX_HOME}/conf/services/org.opencastproject.loadtest.impl.LoadTestFactory.properties so default of "
-                        + DEFAULT_WORKFLOW_ID + " will be used.");
+        logger.warn("No workflow id set in {FELIX_HOME}/conf/config.properties or {FELIX_HOME}/conf/services/org.opencastproject.loadtest.impl.LoadTestFactory.properties so default of "
+                + DEFAULT_WORKFLOW_ID + " will be used.");
       }
     }
   }
-  
+
   /**
    * Sets a new workspace location.
    * 
@@ -269,10 +266,11 @@ public class LoadTest implements Runnable {
           foundWorkspaceLocation = true;
         }
       }
-    } 
+    }
     if (!foundWorkspaceLocation && componentContext != null && componentContext.getBundleContext() != null) {
       // Try to get the storage location/loadtest/ as a default.
-      workspaceLocation = StringUtils.trimToNull(componentContext.getBundleContext().getProperty(BUNDLE_CONTEXT_STORAGE_DIR));
+      workspaceLocation = StringUtils.trimToNull(componentContext.getBundleContext().getProperty(
+              BUNDLE_CONTEXT_STORAGE_DIR));
       if (workspaceLocation != null) {
         workspaceLocation = workspaceLocation + "/loadtest/workspace/";
         foundWorkspaceLocation = true;
@@ -296,15 +294,15 @@ public class LoadTest implements Runnable {
   private void updateSourceMediaPackageLocation(Dictionary properties) throws InvalidConfigurationException,
           URISyntaxException {
     Boolean foundSourceMediaPackageLocation = false;
-    String sourceMediaPackageLocation = StringUtils.trimToNull((String) properties.get(SOURCE_MEDIA_PACKAGE_KEY)); 
+    String sourceMediaPackageLocation = StringUtils.trimToNull((String) properties.get(SOURCE_MEDIA_PACKAGE_KEY));
     if (sourceMediaPackageLocation != null) {
       URI newSourceMediaPackage = new URI(sourceMediaPackageLocation);
       if (newSourceMediaPackage != null) {
         this.sourceMediaPackageLocation = newSourceMediaPackage.toString();
         foundSourceMediaPackageLocation = true;
-      } 
-    } 
-    
+      }
+    }
+
     if (!foundSourceMediaPackageLocation) {
       // Try to get the storage location as a default.
       this.sourceMediaPackageLocation = StringUtils.trimToNull(componentContext.getBundleContext().getProperty(
@@ -314,7 +312,7 @@ public class LoadTest implements Runnable {
         foundSourceMediaPackageLocation = true;
       }
     }
-    
+
     if (!foundSourceMediaPackageLocation) {
       throw new InvalidConfigurationException(
               "The source media package must be set in the configuration file so that loadtesting will occur. It isn't set in {FELIX_HOME}/conf/config.properties or {FELIX_HOME}/conf/services/org.opencastproject.loadtest.impl.LoadTestFactory.properties");

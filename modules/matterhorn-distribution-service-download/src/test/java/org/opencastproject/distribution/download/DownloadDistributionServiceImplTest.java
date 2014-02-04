@@ -15,7 +15,34 @@
  */
 package org.opencastproject.distribution.download;
 
+import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.JobBarrier;
+import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageBuilder;
+import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
+import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.Either;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.workspace.api.Workspace;
+
 import junit.framework.Assert;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -26,31 +53,12 @@ import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.opencastproject.job.api.Job;
-import org.opencastproject.job.api.JobBarrier;
-import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilder;
-import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageElementParser;
-import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.TrustedHttpClient;
-import org.opencastproject.security.api.User;
-import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
-import org.opencastproject.util.PathSupport;
-import org.opencastproject.util.UrlSupport;
-import org.opencastproject.workspace.api.Workspace;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+
+import javax.servlet.http.HttpServletResponse;
 
 public class DownloadDistributionServiceImplTest {
 
@@ -83,12 +91,21 @@ public class DownloadDistributionServiceImplTest {
     EasyMock.expect(response.getStatusLine()).andReturn(statusLine).anyTimes();
     EasyMock.replay(response);
 
-    TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
+    final TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
     EasyMock.expect(httpClient.execute((HttpUriRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
+    EasyMock.expect(httpClient.run((HttpUriRequest) EasyMock.anyObject()))
+            .andAnswer(new IAnswer<Function<Function<HttpResponse, Object>, Either<Exception, Object>>>() {
+              @Override
+              public Function<Function<HttpResponse, Object>, Either<Exception, Object>> answer() throws Throwable {
+                HttpUriRequest req = (HttpUriRequest) EasyMock.getCurrentArguments()[0];
+                return StandAloneTrustedHttpClientImpl.run(httpClient, req);
+              }
+            }).anyTimes();
     EasyMock.replay(httpClient);
 
-    User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
-            new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
+    DefaultOrganization defaultOrganization = new DefaultOrganization();
+    User anonymous = new JaxbUser("anonymous", defaultOrganization, new JaxbRole(
+            DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, defaultOrganization));
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
@@ -118,7 +135,8 @@ public class DownloadDistributionServiceImplTest {
     service.setWorkspace(workspace);
 
     EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
-      @Override public File answer() throws Throwable {
+      @Override
+      public File answer() throws Throwable {
         final URI uri = (URI) EasyMock.getCurrentArguments()[0];
         final String[] pathElems = uri.getPath().split("/");
         final String file = pathElems[pathElems.length - 1];

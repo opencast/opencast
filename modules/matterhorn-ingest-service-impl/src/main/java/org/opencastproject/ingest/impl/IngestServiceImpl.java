@@ -37,6 +37,10 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AclScope;
+import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
@@ -146,6 +150,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The opencast service registry */
   private ServiceRegistry serviceRegistry;
 
+  /** The authorization service */
+  private AuthorizationService authorizationService = null;
+
   /** The security service */
   protected SecurityService securityService = null;
 
@@ -209,6 +216,16 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
+  }
+
+  /**
+   * Sets the authorization service
+   * 
+   * @param authorizationService
+   *          the authorization service to set
+   */
+  public void setAuthorizationService(AuthorizationService authorizationService) {
+    this.authorizationService = authorizationService;
   }
 
   /**
@@ -299,7 +316,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       // Folder name to compare with next one to figure out if there's a root folder
       String folderName = null;
       // Indicates if zip has a root folder or not, initialized as true
-      boolean hasRootFolder = true;      
+      boolean hasRootFolder = true;
       // While there are entries write them to a collection
       while ((entry = zis.getNextZipEntry()) != null) {
         try {
@@ -330,7 +347,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               // No, we can conclude there's no root folder
               hasRootFolder = false;
             } else if (hasRootFolder && folderName != null && !folderName.equals(entry.getName().substring(0, pos))) {
-              // Folder name different from previous so there's no root folder 
+              // Folder name different from previous so there's no root folder
               hasRootFolder = false;
             } else if (folderName == null) {
               // Just initialize folder name
@@ -849,6 +866,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
       // If the indicated workflow does not exist, start a new workflow with the given workflow definition
       if (workflow == null) {
+        setPublicAclIfEmpty(mp);
         ingestStatistics.successful();
         if (workflowDef != null) {
           logger.info("Starting new workflow with ingested mediapackage '{}' using the specified template '{}'", mp
@@ -949,6 +967,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           existingMediaPackage.add(element);
         }
 
+        setPublicAclIfEmpty(mp);
+
         // Extend the workflow operations
         workflow.extend(workflowDef);
 
@@ -989,6 +1009,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (WorkflowException e) {
       ingestStatistics.failed();
       throw new IngestException(e);
+    }
+  }
+
+  private void setPublicAclIfEmpty(MediaPackage mp) {
+    AccessControlList activeAcl = authorizationService.getActiveAcl(mp).getA();
+    if (activeAcl.getEntries().size() == 0) {
+      String anonymousRole = securityService.getOrganization().getAnonymousRole();
+      activeAcl = new AccessControlList(new AccessControlEntry(anonymousRole, "read", true));
+      authorizationService.setAcl(mp, AclScope.Series, activeAcl);
     }
   }
 

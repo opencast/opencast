@@ -169,7 +169,7 @@ public final class RestParamData {
   public String getEscapedXmlSchema() {
     return StringEscapeUtils.escapeXml(xmlSchema);
   }
-  
+
   /**
    * Get the type of this parameter.
    * 

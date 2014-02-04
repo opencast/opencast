@@ -148,7 +148,7 @@ public class StatusData {
     // list from http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
     String result = "UNKNOWN";
     switch (code) {
-      // 1xx Informational
+    // 1xx Informational
       case HttpServletResponse.SC_CONTINUE: // 100
         result = "Continue";
         break;
