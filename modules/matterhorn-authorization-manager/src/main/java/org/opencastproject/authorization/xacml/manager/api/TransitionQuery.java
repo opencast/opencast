@@ -72,7 +72,7 @@ public final class TransitionQuery {
     this.transitionId = some(transitionId);
     return this;
   }
-  
+
   public TransitionQuery withAclId(Long aclId) {
     this.aclId = some(aclId);
     return this;
@@ -80,7 +80,7 @@ public final class TransitionQuery {
 
   /**
    * Find transitions that are done or not.
-   * 
+   *
    * @param done
    *          true to find done transitions
    */
@@ -96,7 +96,7 @@ public final class TransitionQuery {
   public Option<String> getId() {
     return id;
   }
-  
+
   public Option<Long> getAclId() {
     return aclId;
   }
