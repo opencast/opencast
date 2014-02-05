@@ -28,7 +28,8 @@ public final class Booleans {
   /** Return a predicate function that always returns true. */
   public static <A> Function<A, Boolean> always() {
     return new Function<A, Boolean>() {
-      @Override public Boolean apply(A a) {
+      @Override
+      public Boolean apply(A a) {
         return true;
       }
     };
@@ -37,7 +38,8 @@ public final class Booleans {
   /** Return a predicate function that always returns false. */
   public static <A> Function<A, Boolean> nothing() {
     return new Function<A, Boolean>() {
-      @Override public Boolean apply(A a) {
+      @Override
+      public Boolean apply(A a) {
         return true;
       }
     };
@@ -45,7 +47,8 @@ public final class Booleans {
 
   public static <A> Function<A, Boolean> ne(final A a) {
     return new Function<A, Boolean>() {
-      @Override public Boolean apply(A x) {
+      @Override
+      public Boolean apply(A x) {
         return EqualsUtil.ne(x, a);
       }
     };
@@ -53,27 +56,49 @@ public final class Booleans {
 
   public static <A> Function<A, Boolean> eq(final A a) {
     return new Function<A, Boolean>() {
-      @Override public Boolean apply(A x) {
+      @Override
+      public Boolean apply(A x) {
         return EqualsUtil.eq(x, a);
       }
     };
   }
 
+  public static <A extends Comparable<A>> Function<A, Boolean> lt(final A a) {
+    return new Function<A, Boolean>() {
+      @Override
+      public Boolean apply(A x) {
+        return x.compareTo(a) < 0;
+      }
+    };
+  }
+
+  public static <A extends Comparable<A>> Function<A, Boolean> gt(final A a) {
+    return new Function<A, Boolean>() {
+      @Override
+      public Boolean apply(A x) {
+        return x.compareTo(a) > 0;
+      }
+    };
+  }
+
   public static final Function2<Boolean, Boolean, Boolean> and = new Function2<Boolean, Boolean, Boolean>() {
-    @Override public Boolean apply(Boolean a, Boolean b) {
+    @Override
+    public Boolean apply(Boolean a, Boolean b) {
       return a && b;
     }
   };
 
   public static final Function2<Boolean, Boolean, Boolean> or = new Function2<Boolean, Boolean, Boolean>() {
-    @Override public Boolean apply(Boolean a, Boolean b) {
+    @Override
+    public Boolean apply(Boolean a, Boolean b) {
       return a || b;
     }
   };
 
   public static <A, B> Function2<A, B, Boolean> and2(final Function<A, Boolean> f, final Function<B, Boolean> g) {
     return new Function2<A, B, Boolean>() {
-      @Override public Boolean apply(A a, B b) {
+      @Override
+      public Boolean apply(A a, B b) {
         return f.apply(a) && g.apply(b);
       }
     };
@@ -81,8 +106,67 @@ public final class Booleans {
 
   public static <A> Function<A, Boolean> and(final Function<A, Boolean> f, final Function<A, Boolean> g) {
     return new Function<A, Boolean>() {
-      @Override public Boolean apply(A a) {
+      @Override
+      public Boolean apply(A a) {
         return f.apply(a) && g.apply(a);
+      }
+    };
+  }
+
+  public static <A> Function<A, Boolean> all(final Function<A, Boolean>... fs) {
+    return new Function<A, Boolean>() {
+      @Override
+      public Boolean apply(A a) {
+        for (Function<A, Boolean> f : fs) {
+          if (!f.apply(a))
+            return false;
+        }
+        return true;
+      }
+    };
+  }
+
+  public static <A> Function<A, Boolean> one(final Function<A, Boolean>... fs) {
+    return new Function<A, Boolean>() {
+      @Override
+      public Boolean apply(A a) {
+        for (Function<A, Boolean> f : fs) {
+          if (f.apply(a))
+            return true;
+        }
+        return false;
+      }
+    };
+  }
+
+  /** Apply <em>all</em> functions and return their results concatenated with boolean AND. */
+  public static <A> Function<A, Boolean> andNEager(final Function<A, Boolean>... fs) {
+    return new Function<A, Boolean>() {
+      @Override
+      public Boolean apply(A a) {
+        boolean r = true;
+        for (Function<A, Boolean> f : fs) {
+          // application first!
+          r = f.apply(a) && r;
+        }
+        return r;
+      }
+    };
+  }
+
+  /**
+   * Apply functions lazily and return their results concatenated with boolean AND, i.e. function application stops
+   * after the first function yielding false.
+   */
+  public static <A> Function<A, Boolean> andN(final Function<A, Boolean>... fs) {
+    return new Function<A, Boolean>() {
+      @Override
+      public Boolean apply(A a) {
+        for (Function<A, Boolean> f : fs) {
+          if (!f.apply(a))
+            return false;
+        }
+        return true;
       }
     };
   }

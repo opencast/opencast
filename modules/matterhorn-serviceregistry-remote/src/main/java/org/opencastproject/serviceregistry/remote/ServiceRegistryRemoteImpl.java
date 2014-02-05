@@ -33,6 +33,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.opencastproject.serviceregistry.api.SystemLoad;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.QueryStringBuilder;
 import org.opencastproject.util.UrlSupport;
@@ -97,23 +98,25 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
    *          the component context
    */
   protected void activate(ComponentContext cc) {
-    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty("org.opencastproject.server.url"))) {
+    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY))) {
       serverUrl = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      serverUrl = cc.getBundleContext().getProperty("org.opencastproject.server.url");
+      serverUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
     }
 
     if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL))) {
       try {
         serviceURL = new URL(serverUrl + "/services").toExternalForm();
       } catch (MalformedURLException e) {
-        throw new ServiceException(OPT_SERVICE_REGISTRY_URL + " is missing, and fallback localhost url is malformed: " + serverUrl + "/services");
+        throw new ServiceException(OPT_SERVICE_REGISTRY_URL + " is missing, and fallback localhost url is malformed: "
+                + serverUrl + "/services");
       }
     } else {
       try {
         serviceURL = new URL(cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL)).toExternalForm();
       } catch (MalformedURLException e) {
-        throw new ServiceException(OPT_SERVICE_REGISTRY_URL + " is malformed: " + StringUtils.trimToNull(cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL)));
+        throw new ServiceException(OPT_SERVICE_REGISTRY_URL + " is malformed: "
+                + StringUtils.trimToNull(cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL)));
       }
     }
   }
@@ -581,11 +584,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
       responseStatusCode = response.getStatusLine().getStatusCode();
       if (responseStatusCode == HttpStatus.SC_OK) {
         JaxbJobList jaxbJobList = JobParser.parseJobList(response.getEntity().getContent());
-        List<Job> jobs = new ArrayList<Job>(jaxbJobList.getJobs().size());
-        for (Job job : jaxbJobList.getJobs()) {
-          jobs.add(job);
-        }
-        return jobs;
+        return new ArrayList<Job>(jaxbJobList.getJobs());
       }
     } catch (IOException e) {
       throw new ServiceRegistryException("Unable to get jobs", e);

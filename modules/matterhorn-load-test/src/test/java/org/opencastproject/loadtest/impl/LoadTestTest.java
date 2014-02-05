@@ -20,6 +20,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
 import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.systems.MatterhornConstans;
 
 import junit.framework.Assert;
 
@@ -223,8 +224,8 @@ public class LoadTestTest {
 
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_KEY, "1,2,3,4,5,6,7,8,9,10,0,11,12,13,14,15,16,17,18,19,20,211111111");
     loadTest = new LoadTest(properties, clientMock, contextMock);
-    Assert.assertEquals("{ 1 2 3 4 5 6 7 8 9 10 0 11 12 13 14 15 16 17 18 19 20 211111111 }", loadTest
-            .getPrettyPackageDistribution());
+    Assert.assertEquals("{ 1 2 3 4 5 6 7 8 9 10 0 11 12 13 14 15 16 17 18 19 20 211111111 }",
+            loadTest.getPrettyPackageDistribution());
   }
 
   /**
@@ -361,8 +362,8 @@ public class LoadTestTest {
     properties.put(LoadTest.PACKAGE_DISTRIBUTION_TIMINGS_KEY,
             "1,2,3,4,5,6,7,8,9,10,0,11,12,13,14,15,16,17,18,19,20,211111111");
     loadTest = new LoadTest(properties, clientMock, contextMock);
-    Assert.assertEquals("{ 1 2 3 4 5 6 7 8 9 10 0 11 12 13 14 15 16 17 18 19 20 211111111 }", loadTest
-            .getPrettyPackageDistributionTimings());
+    Assert.assertEquals("{ 1 2 3 4 5 6 7 8 9 10 0 11 12 13 14 15 16 17 18 19 20 211111111 }",
+            loadTest.getPrettyPackageDistributionTimings());
   }
 
   /**
@@ -377,8 +378,7 @@ public class LoadTestTest {
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
 
-    properties.put(LoadTest.CORE_ADDRESS_KEY,
-            "http://1.2.3.4:8080");
+    properties.put(LoadTest.CORE_ADDRESS_KEY, "http://1.2.3.4:8080");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("http://1.2.3.4:8080", loadTest.getCoreAddress());
   }
@@ -395,8 +395,7 @@ public class LoadTestTest {
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
     replay(contextMock);
-    properties.put(LoadTest.CORE_ADDRESS_KEY,
-            "http://test.url.com:8080");
+    properties.put(LoadTest.CORE_ADDRESS_KEY, "http://test.url.com:8080");
     loadTest = new LoadTest(properties, clientMock, contextMock);
     Assert.assertEquals("http://test.url.com:8080", loadTest.getCoreAddress());
     verify(contextMock);
@@ -413,7 +412,7 @@ public class LoadTestTest {
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
     expect(contextMock.getBundleContext()).andReturn(bundleContextMock).times(2);
-    expect(bundleContextMock.getProperty(LoadTest.BUNDLE_CONTEXT_SERVER_URL)).andReturn("http://test.url.com:8080");
+    expect(bundleContextMock.getProperty(MatterhornConstans.SERVER_URL_PROPERTY)).andReturn("http://test.url.com:8080");
     replay(contextMock);
     replay(bundleContextMock);
     loadTest = new LoadTest(properties, clientMock, contextMock);

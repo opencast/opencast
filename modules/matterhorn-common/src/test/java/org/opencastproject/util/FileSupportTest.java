@@ -16,7 +16,14 @@
 
 package org.opencastproject.util;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.util.FileSupport.deleteHierarchyIfEmpty;
+import static org.opencastproject.util.FileSupport.isParent;
+import static org.opencastproject.util.PathSupport.path;
+
 import junit.framework.Assert;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -24,9 +31,9 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 public class FileSupportTest {
-
   private File fileToLink;
   private File linkLocation;
   private File fileSupportTestsDirectory;
@@ -47,8 +54,7 @@ public class FileSupportTest {
             fileSupportTestsDirectory.canWrite());
     // Create file that we could link.
     FileUtils.touch(fileToLink);
-    Assert.assertTrue("Can't read from file directory " + fileToLink.getAbsolutePath(),
-            fileToLink.canRead());
+    Assert.assertTrue("Can't read from file directory " + fileToLink.getAbsolutePath(), fileToLink.canRead());
   }
 
   @After
@@ -115,5 +121,65 @@ public class FileSupportTest {
     } catch (IOException e) {
       // Test should have IOException.
     }
+  }
+
+  @Test
+  public void testIsParent() throws Exception {
+    final File a = new File(path("one", "two", "three"));
+    final File b = new File(path("one", "two"));
+    final File c = new File(path("one", "..", "one", ".", "two", "."));
+    final File d = new File(path("two", "three"));
+    assertTrue(isParent(b, a));
+    assertTrue(isParent(c, a));
+    assertFalse(isParent(d, a));
+    assertFalse(isParent(d, c));
+    assertFalse(isParent(a, b));
+    assertFalse(isParent(a, a));
+  }
+
+  @Test
+  public void testDeleteHierarchyIfEmpty() throws Exception {
+    final File a = File.createTempFile("test", ".tmp");
+    a.deleteOnExit();
+    final File tmpDir = a.getParentFile();
+    assertFalse(deleteHierarchyIfEmpty(tmpDir, a));
+    assertFalse(deleteHierarchyIfEmpty(a, a));
+    // three nested sub dirs
+    final File subDir1 = createDirWithRandomNameIn(tmpDir);
+    final File subDir2 = createDirWithRandomNameIn(subDir1);
+    final File subDir3 = createDirWithRandomNameIn(subDir2);
+    final File subDir1File = createFileWithRandomNameIn(subDir1);
+    final File subDir3File = createFileWithRandomNameIn(subDir3);
+    //
+    assertFalse("file in sub dir 3 prevents deletion", deleteHierarchyIfEmpty(subDir1, subDir3));
+    assertTrue(subDir3.exists());
+    assertTrue(subDir3File.exists());
+    assertTrue(subDir3File.delete());
+    assertTrue("sub dir 3 and sub dir 2 are empty", deleteHierarchyIfEmpty(subDir1, subDir3));
+    assertFalse(subDir3.exists());
+    assertFalse(subDir2.exists());
+    assertTrue("sub dir 1 has not been deleted", subDir1.exists());
+    assertTrue(subDir2.mkdirs());
+    assertTrue(subDir3.mkdirs());
+    assertTrue(subDir1File.delete());
+    assertTrue("all sub dirs are empty", deleteHierarchyIfEmpty(tmpDir, subDir3));
+    assertFalse(subDir3.exists());
+    assertFalse(subDir2.exists());
+    assertFalse(subDir1.exists());
+    assertTrue(tmpDir.exists());
+  }
+
+  private File createDirWithRandomNameIn(File parent) {
+    final File dir = new File(parent, UUID.randomUUID().toString());
+    dir.deleteOnExit();
+    assertTrue(dir.mkdirs());
+    return dir;
+  }
+
+  private File createFileWithRandomNameIn(File parent) throws IOException {
+    final File file = new File(parent, UUID.randomUUID().toString());
+    file.deleteOnExit();
+    assertTrue(file.createNewFile());
+    return file;
   }
 }

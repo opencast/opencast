@@ -59,7 +59,6 @@ import javax.xml.bind.annotation.XmlType;
         @NamedQuery(name = "findDistinctEpisodeIdTotalByIntervall", query = "SELECT COUNT(distinct a.mediapackageId) FROM Annotation a WHERE :begin <= a.created AND a.created <= :end AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
         @NamedQuery(name = "findTotalByTypeAndIntervall", query = "SELECT COUNT(a) FROM Annotation a WHERE :begin <= a.created AND a.created <= :end AND a.type = :type AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
         @NamedQuery(name = "updateAnnotation", query = "UPDATE Annotation a SET a.value = :value WHERE a.annotationId = :annotationId") })
-
 @XmlType(name = "annotation", namespace = "http://annotation.opencastproject.org")
 @XmlRootElement(name = "annotation", namespace = "http://annotation.opencastproject.org")
 @XmlAccessorType(XmlAccessType.FIELD)

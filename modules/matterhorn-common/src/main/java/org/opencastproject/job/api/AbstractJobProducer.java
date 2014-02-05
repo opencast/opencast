@@ -206,9 +206,9 @@ public abstract class AbstractJobProducer implements JobProducer {
         logger.info(e.getMessage());
       } catch (Throwable e) {
         job.setStatus(Status.FAILED);
+        logger.error("Error handling operation '{}': {}", job.getOperation(), e);
         if (e instanceof ServiceRegistryException)
           throw (ServiceRegistryException) e;
-        logger.warn("Error handling operation '{}': {}", job.getOperation(), e.getMessage());
       } finally {
         try {
           getServiceRegistry().updateJob(job);

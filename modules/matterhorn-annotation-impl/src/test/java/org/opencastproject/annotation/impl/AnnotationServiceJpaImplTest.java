@@ -18,6 +18,8 @@ package org.opencastproject.annotation.impl;
 import org.opencastproject.annotation.api.Annotation;
 import org.opencastproject.annotation.api.AnnotationList;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
@@ -32,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -57,7 +60,12 @@ public class AnnotationServiceJpaImplTest {
     props.put("eclipselink.ddl-generation.output-mode", "database");
 
     // Set up a mock security service that always returns "me" as the current user
-    User me = new User("me", "opencast.org", new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
+
+    DefaultOrganization organization = new DefaultOrganization();
+    JaxbRole role = new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, organization, "");
+    HashSet<JaxbRole> roles = new HashSet<JaxbRole>();
+    roles.add(role);
+    User me = new JaxbUser("me", organization, roles);
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(me).anyTimes();
     EasyMock.replay(securityService);
@@ -97,7 +105,7 @@ public class AnnotationServiceJpaImplTest {
     Assert.assertEquals(a.getMediapackageId(), a1FromDb.getMediapackageId());
     Assert.assertEquals(a.getSessionId(), a1FromDb.getSessionId());
     Assert.assertEquals(a.getUserId(), a1FromDb.getUserId());
-    Assert.assertEquals(a.getUserId(), annotationService.securityService.getUser().getUserName());
+    Assert.assertEquals(a.getUserId(), annotationService.securityService.getUser().getUsername());
   }
 
   @Test
@@ -152,9 +160,9 @@ public class AnnotationServiceJpaImplTest {
     Assert.assertEquals(a2.getValue(), a1FromDb.getValue());
     Assert.assertEquals(a1.getSessionId(), a1FromDb.getSessionId());
     Assert.assertEquals(a1.getUserId(), a1FromDb.getUserId());
-    Assert.assertEquals(a1.getUserId(), annotationService.securityService.getUser().getUserName());
+    Assert.assertEquals(a1.getUserId(), annotationService.securityService.getUser().getUsername());
 
-    //remove annotation
+    // remove annotation
     Assert.assertTrue(annotationService.removeAnnotation(a1));
 
   }

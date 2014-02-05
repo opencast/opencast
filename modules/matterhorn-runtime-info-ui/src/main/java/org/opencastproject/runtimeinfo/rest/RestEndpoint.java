@@ -248,16 +248,17 @@ public class RestEndpoint {
     this.form = form;
   }
 
-
   /**
-   * @param pathFormat the pathFormat to set
+   * @param pathFormat
+   *          the pathFormat to set
    */
   public void setPathFormat(String pathFormat) {
     this.pathFormat = pathFormat;
   }
 
   /**
-   * @param pathFormatHtml the pathFormatHtml to set
+   * @param pathFormatHtml
+   *          the pathFormatHtml to set
    */
   public void setPathFormatHtml(String pathFormatHtml) {
     this.pathFormatHtml = pathFormatHtml;

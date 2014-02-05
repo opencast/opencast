@@ -26,6 +26,7 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -34,6 +35,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -70,7 +72,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -156,11 +157,12 @@ public class WorkflowServiceImplTest {
     service.setUserDirectoryService(userDirectoryService);
 
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
-    EasyMock.expect(authzService.getAccessControlList((MediaPackage) EasyMock.anyObject())).andReturn(acl).anyTimes();
+    EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject())).andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
-    List<Organization> organizationList = Arrays.asList(new Organization[] { organization });
+    List<Organization> organizationList = new ArrayList<Organization>();
+    organizationList.add(organization);
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
             .andReturn(securityService.getOrganization()).anyTimes();

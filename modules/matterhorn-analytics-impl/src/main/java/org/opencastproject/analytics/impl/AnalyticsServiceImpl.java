@@ -15,25 +15,6 @@
  */
 package org.opencastproject.analytics.impl;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.search.api.SearchQuery;
@@ -43,6 +24,7 @@ import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
@@ -59,7 +41,10 @@ import org.opencastproject.usertracking.impl.UserActionListImpl;
 import org.opencastproject.usertracking.impl.UserSummaryListImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-import org.osgi.framework.ServiceException;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,17 +53,34 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 /**
- * This is a class that handles rest calls to the visualization endpoints mostly
- * by collecting data from other endpoints and stitching it together in a more
- * useful manner for the visualizations.
+ * This is a class that handles rest calls to the visualization endpoints mostly by collecting data from other endpoints
+ * and stitching it together in a more useful manner for the visualizations.
  */
 public class AnalyticsServiceImpl {
   // The maximum episodes to return.
   private static final int MAXIMUM_EPISODES = 100000;
   // The key to retrieve the url of the engage node so that we can use rest calls on it.
   private static final String ENGAGE_URL_KEY = "org.opencastproject.engage.ui.url";
-  //The key to retrieve the url of the current server node so that we can use rest calls on it.
+  // The key to retrieve the url of the current server node so that we can use rest calls on it.
   private static final String SERVER_URL_KEY = "org.opencastproject.server.url";
   // The XML tag for the amount of time a video has been played.
   private static final String PLAYED_XML_TAG = "played";
@@ -96,8 +98,6 @@ public class AnalyticsServiceImpl {
   private TrustedHttpClient client;
   // The logger
   private Logger logger = LoggerFactory.getLogger(AnalyticsServiceImpl.class);
-  // The URL representing the engage node retrieved from the context.
-  private String engageURL = null;
   // Series Service
   private SeriesService seriesService = null;
 
@@ -107,9 +107,12 @@ public class AnalyticsServiceImpl {
 
   private UserTrackingService userTrackingService = null;
 
+  /** The server url */
+  private URL serverUrl;
+
   /**
    * Sets the http client which this service uses to communicate with the engage server.
-   *
+   * 
    * @param c
    *          The client object.
    */
@@ -118,27 +121,12 @@ public class AnalyticsServiceImpl {
   }
 
   /**
-   * Activate this module and get the admin and engage urls from the bundle
-   * context.
+   * Activate this module and get the admin and engage urls from the bundle context.
    **/
   public void activate(ComponentContext ctx) {
     logger.debug("Activating " + AnalyticsServiceImpl.class.getName());
-    // Get the engage node's location
-    String engageURLProperty = StringUtils.trimToNull((String) ctx.getBundleContext().getProperty(ENGAGE_URL_KEY));
-    // Get the server node's location in case the engage setting is not enabled.
-    String serverURLProperty = StringUtils.trimToNull((String) ctx.getBundleContext().getProperty(SERVER_URL_KEY));
-    if (engageURLProperty == null && serverURLProperty != null) {
-      engageURLProperty = serverURLProperty;
-      logger.info("Using " + serverURLProperty
-              + " as the engage location. If you have a seperate engage node please set the " + ENGAGE_URL_KEY
-              + " in config.properties.");
-    }
-    try {
-      engageURL = new URL(engageURLProperty).toExternalForm();
-    } catch (MalformedURLException e) {
-      throw new ServiceException(ENGAGE_URL_KEY + " is malformed: " + engageURLProperty);
-    }
 
+    serverUrl = UrlSupport.url(ctx.getBundleContext().getProperty(SERVER_URL_KEY));
   }
 
   public void setService(SeriesService seriesService) {
@@ -175,29 +163,35 @@ public class AnalyticsServiceImpl {
 
   /**
    * Check to see if the necessary services are up.
-   *
+   * 
    * @return A Response of null if everything is up and running. SERVICE_UNAVAILABLE if there mandatory services
    *         missing.
    **/
   public Response servicesAreUp() {
     if (securityService == null) {
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
-              .entity("Visualization service is unavailable due to security service being unavailable, please wait...").build();
+              .entity("Visualization service is unavailable due to security service being unavailable, please wait...")
+              .build();
     }
 
     if (seriesService == null) {
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
-              .entity("Visualization service is unavailable due to series service being unavailable, please wait...").build();
+              .entity("Visualization service is unavailable due to series service being unavailable, please wait...")
+              .build();
     }
 
     if (searchService == null) {
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
-              .entity("Visualization service is unavailable due to search service being unavailable, please wait...").build();
+              .entity("Visualization service is unavailable due to search service being unavailable, please wait...")
+              .build();
     }
 
     if (userTrackingService == null) {
-      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
-              .entity("Visualization service is unavailable due to user tracking service being unavailable, please wait...").build();
+      return Response
+              .serverError()
+              .status(Response.Status.SERVICE_UNAVAILABLE)
+              .entity("Visualization service is unavailable due to user tracking service being unavailable, please wait...")
+              .build();
     }
 
     return null;
@@ -205,18 +199,14 @@ public class AnalyticsServiceImpl {
 
   /**
    * Gets the details for a particular episode in XML format.
-   *
+   * 
    * @param episodeID
-   *            The unique id for the episode, also known as the mediapackage
-   *            id.
-   * @return Returns a string representation of the XML that represents an
-   *         episode.
+   *          The unique id for the episode, also known as the mediapackage id.
+   * @return Returns a string representation of the XML that represents an episode.
    * @throws TrustedHttpClientException
-   *             Thrown if the trusted http client cannot get the data from
-   *             the endpoint.
+   *           Thrown if the trusted http client cannot get the data from the endpoint.
    */
-  public Response getEpisodeAsXml(String episodeID)
-      throws TrustedHttpClientException {
+  public Response getEpisodeAsXml(String episodeID) throws TrustedHttpClientException {
     if (servicesAreUp() != null) {
       return servicesAreUp();
     }
@@ -225,18 +215,14 @@ public class AnalyticsServiceImpl {
 
   /**
    * Gets the details for a particular episode in JSON format.
-   *
+   * 
    * @param episodeID
-   *            The unique id for the episode, also known as the mediapackage
-   *            id.
-   * @return Returns a string representation of the JSON that represents an
-   *         episode.
+   *          The unique id for the episode, also known as the mediapackage id.
+   * @return Returns a string representation of the JSON that represents an episode.
    * @throws TrustedHttpClientException
-   *             Thrown if the trusted http client cannot get the data from
-   *             the endpoint.
+   *           Thrown if the trusted http client cannot get the data from the endpoint.
    */
-  public Response getEpisodeAsJson(String episodeID)
-      throws TrustedHttpClientException {
+  public Response getEpisodeAsJson(String episodeID) throws TrustedHttpClientException {
     if (servicesAreUp() != null) {
       return servicesAreUp();
     }
@@ -245,7 +231,7 @@ public class AnalyticsServiceImpl {
 
   /**
    * Returns a SearchResult with the details of the episode that matches the unique id provided.
-   *
+   * 
    * @param episodeID
    *          the unique id of the episode (also known as the mediapackage id)
    * @return The details of the episode if the user is allowed to see it and it exists.
@@ -274,7 +260,7 @@ public class AnalyticsServiceImpl {
 
   /**
    * Check to see if a user can see the analytics for a particular episode.
-   *
+   * 
    * @param episodeID
    *          The unique id of the episode to check if the user has access to analyze it.
    * @return Returns true if the user can analyze the episode, false if s/he can't.
@@ -299,7 +285,7 @@ public class AnalyticsServiceImpl {
 
   /**
    * Get the episodes of a particular series if the user can see the analytics for that series.
-   *
+   * 
    * @param seriesID
    *          The series to get all of the episodes for.
    * @return All of the episodes that the user is able to see the analytics for.
@@ -319,7 +305,7 @@ public class AnalyticsServiceImpl {
 
   /**
    * Check to see if a user can view the analytics of a series.
-   *
+   * 
    * @param seriesID
    *          The series to check whether the user can view the analytics.
    * @return true if the user has the correct permissions to analyze the series.
@@ -337,15 +323,14 @@ public class AnalyticsServiceImpl {
 
   /**
    * Get all of the episodes for a particular series id in XML format.
-   *
+   * 
    * @param seriesID
-   *            The id of the series you are interested in.
+   *          The id of the series you are interested in.
    * @return An xml representation of all of the episodes for a series.
    * @throws TrustedHttpClientException
-   *             Thrown if it cannot query a rest endpoint.
+   *           Thrown if it cannot query a rest endpoint.
    */
-  public Response getEpisodesBySeriesAsXml(String seriesID)
-      throws TrustedHttpClientException {
+  public Response getEpisodesBySeriesAsXml(String seriesID) throws TrustedHttpClientException {
     if (servicesAreUp() != null) {
       return servicesAreUp();
     }
@@ -354,15 +339,14 @@ public class AnalyticsServiceImpl {
 
   /**
    * Get all of the episodes for a particular series id in JSON format.
-   *
+   * 
    * @param seriesID
-   *            The id of the series you are interested in.
+   *          The id of the series you are interested in.
    * @return An JSON representation of all of the episodes for a series.
    * @throws TrustedHttpClientException
-   *             Thrown if it cannot query a rest endpoint.
+   *           Thrown if it cannot query a rest endpoint.
    */
-  public Response getEpisodesBySeriesAsJson(String seriesID)
-      throws TrustedHttpClientException {
+  public Response getEpisodesBySeriesAsJson(String seriesID) throws TrustedHttpClientException {
     if (servicesAreUp() != null) {
       return servicesAreUp();
     }
@@ -371,11 +355,10 @@ public class AnalyticsServiceImpl {
 
   /**
    * Get an xml representation of all of the available series in the system that the user can view their analytics.
-   *
-   * @return An xml representation of all of the available series in the
-   *         system.
+   * 
+   * @return An xml representation of all of the available series in the system.
    * @throws TrustedHttpClientException
-   *             Thrown if it cannot query a rest endpoint.
+   *           Thrown if it cannot query a rest endpoint.
    */
   public Response getSeriesAsXml() throws TrustedHttpClientException {
     if (servicesAreUp() != null) {
@@ -391,11 +374,10 @@ public class AnalyticsServiceImpl {
 
   /**
    * Get an json representation of all of the available series in the system that the user can view their analytics.
-   *
-   * @return An json representation of all of the available series in the
-   *         system.
+   * 
+   * @return An json representation of all of the available series in the system.
    * @throws TrustedHttpClientException
-   *             Thrown if it cannot query a rest endpoint.
+   *           Thrown if it cannot query a rest endpoint.
    */
   public Response getSeriesAsJson() throws TrustedHttpClientException {
     if (servicesAreUp() != null) {
@@ -406,6 +388,7 @@ public class AnalyticsServiceImpl {
 
   /**
    * A helper function to find all of the possible series in a list of episodes.
+   * 
    * @param allEpisodes
    *          All of the episodes to search for series to return.
    * @return Returns a HashMap with the key as the series id and the value of false for each entry.
@@ -422,7 +405,7 @@ public class AnalyticsServiceImpl {
 
   /**
    * A helper function that returns the dublin core catalogs of a list of series.
-   *
+   * 
    * @param series
    *          A list of series ids as Strings to return the dublin core catalogs of.
    * @return Returns a list of dublin core catalogs of the series in the parameter
@@ -448,7 +431,7 @@ public class AnalyticsServiceImpl {
 
   /**
    * Get all of the series that a user is able to view the analytics for.
-   *
+   * 
    * @return Returns the list of series ids that a user is able to view the analytics for.
    */
   private List<String> getAnalyzeSeriesIDs() {
@@ -459,7 +442,7 @@ public class AnalyticsServiceImpl {
     HashMap<String, Boolean> allSeries = getAvailableSeries(allEpisodes);
     // Filter the series to the ones we have analyze ability on
     User user = securityService.getUser();
-    String[] roles = user.getRoles();
+    Set<Role> roles = user.getRoles();
 
     for (String seriesID : allSeries.keySet()) {
       AccessControlList accessControlList;
@@ -467,8 +450,8 @@ public class AnalyticsServiceImpl {
         accessControlList = seriesService.getSeriesAccessControl(seriesID);
         for (AccessControlEntry accessControlEntry : accessControlList.getEntries()) {
           if (accessControlEntry.getAction().equalsIgnoreCase("analyze")) {
-            for (String role : roles) {
-              if (accessControlEntry.getRole().equalsIgnoreCase(role)) {
+            for (Role role : roles) {
+              if (accessControlEntry.getRole().equalsIgnoreCase(role.getName())) {
                 if (!allSeries.get(seriesID)) {
                   analyzeSeries.add(seriesID);
                   allSeries.put(seriesID, true);
@@ -488,6 +471,7 @@ public class AnalyticsServiceImpl {
 
   /**
    * Search for all of the episodes a user can watch.
+   * 
    * @return Returns a list of all of the episodes available to this user.
    */
   private SearchResult searchForAllEpisodes() {
@@ -497,28 +481,24 @@ public class AnalyticsServiceImpl {
   }
 
   /**
-   * Gets the number of times an episode was watched and for how long in
-   * intervals over a time range.
-   *
+   * Gets the number of times an episode was watched and for how long in intervals over a time range.
+   * 
    * @param id
-   *            The unique id of the episode to get the statistics for.
+   *          The unique id of the episode to get the statistics for.
    * @param start
-   *            The start of the period to investigate in the form
-   *            YYYYMMDDHHMM e.g. 201212312359.
+   *          The start of the period to investigate in the form YYYYMMDDHHMM e.g. 201212312359.
    * @param end
-   *            The end of the period to investigate in the form YYYYMMDDHHMM
-   *            e.g. 201212312359.
+   *          The end of the period to investigate in the form YYYYMMDDHHMM e.g. 201212312359.
    * @param intervalString
-   *            The number of seconds to break up the views and durations into
-   *            from start time to end time.
-   * @return An xml representation of all of these intervals between start and
-   *         end.
+   *          The number of seconds to break up the views and durations into from start time to end time.
+   * @return An xml representation of all of these intervals between start and end.
    * @throws TrustedHttpClientException
-   *             Thrown if rest calls cannot be made. Thrown if it cannot
-   *             query a rest endpoint.
+   *           Thrown if rest calls cannot be made. Thrown if it cannot query a rest endpoint.
+   * @throws MalformedURLException
+   *           if the engage url couldn't be parsed
    */
   public ViewCollection getViews(String id, String start, String end, String intervalString)
-          throws TrustedHttpClientException {
+          throws TrustedHttpClientException, MalformedURLException {
     if (canAnalyzeEpisode(id)) {
 
       long limit = DEFAULT_LIMIT;
@@ -547,8 +527,22 @@ public class AnalyticsServiceImpl {
       HttpResponse response;
       Boolean foundViews = false;
 
+      String engageURL = null;
+      // Get the engage node's location
+      String engageURLProperty = StringUtils.trimToNull(securityService.getOrganization().getProperties()
+              .get(ENGAGE_URL_KEY));
+      if (engageURLProperty == null) {
+        engageURL = serverUrl.toExternalForm();
+        logger.info(
+                "Using 'server.url' as a fallback for the non-existing organization level key '{}' for the usertracking base url",
+                ENGAGE_URL_KEY);
+      } else {
+        engageURL = new URL(engageURLProperty).toExternalForm();
+      }
+
       do {
         foundViews = false;
+
         // Get the start and end of the interval
         intervalStart = new Date(startDate.getTime() + interval * secondsToMilliseconds * intervalCount);
         intervalEnd = new Date(startDate.getTime() + interval * secondsToMilliseconds * (intervalCount + 1));
@@ -629,7 +623,7 @@ public class AnalyticsServiceImpl {
 
   /**
    * Get all of the user actions for a particular day of a particular type.
-   *
+   * 
    * @param type
    *          The type of user actions to be queried e.g. HEARTBEAT
    * @param day
@@ -652,7 +646,8 @@ public class AnalyticsServiceImpl {
       try {
         offset = Integer.parseInt(offsetInput);
       } catch (NumberFormatException e) {
-        return Response.serverError()
+        return Response
+                .serverError()
                 .status(Response.Status.BAD_REQUEST)
                 .entity("Your offset "
                         + offsetInput
@@ -666,7 +661,8 @@ public class AnalyticsServiceImpl {
       try {
         limit = Integer.parseInt(limitInput);
       } catch (NumberFormatException e) {
-        return Response.serverError()
+        return Response
+                .serverError()
                 .status(Response.Status.BAD_REQUEST)
                 .entity("Your limit "
                         + limitInput
@@ -711,7 +707,7 @@ public class AnalyticsServiceImpl {
 
   /**
    * Get the oldest record of a user action for a series.
-   *
+   * 
    * @param seriesID
    *          The series to find the first user action from.
    * @param mediaType
@@ -764,10 +760,9 @@ public class AnalyticsServiceImpl {
     return getLastUserActionForSeries(seriesID, MediaType.APPLICATION_JSON);
   }
 
-
   /**
    * Get the most recent user action on a series.
-   *
+   * 
    * @param seriesID
    *          The series to get the most recent event form.
    * @param mediaType
@@ -814,7 +809,7 @@ public class AnalyticsServiceImpl {
 
   /**
    * Reduce a list of UserActions to only the ones that a user is able to see the analytics for.
-   *
+   * 
    * @param userActionList
    *          The userActionList of entries to filter out invalid ones.
    * @return Returns a UserActionList without the entries for episodes that a user is not allowed to view the analytics
@@ -854,7 +849,7 @@ public class AnalyticsServiceImpl {
 
   /**
    * Get the user summaries of activity for a particular series based on a particular type of user activity.
-   *
+   * 
    * @param type
    *          The type of UserActions to look for e.g. HEARTBEATS to create the summary.
    * @param seriesID
@@ -875,7 +870,7 @@ public class AnalyticsServiceImpl {
 
   /**
    * Get the value of an xml tag.
-   *
+   * 
    * @param sTag
    *          The xml tag to look for and get the first result.
    * @param eElement

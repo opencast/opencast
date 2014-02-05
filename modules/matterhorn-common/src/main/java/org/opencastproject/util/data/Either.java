@@ -13,17 +13,21 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.util.data;
 
+import java.util.Iterator;
+import java.util.List;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.opencastproject.util.data.Option.some;
 
 /**
  * An algebraic data type representing a disjoint union. By convention left is considered to represent an error while
  * right represents a value.
  * <p/>
- * This implementation of <code>Either</code> is much simpler than implementations you may know from other
- * languages or libraries.
+ * This implementation of <code>Either</code> is much simpler than implementations you may know from other languages or
+ * libraries.
  */
 public abstract class Either<A, B> {
   private Either() {
@@ -35,7 +39,7 @@ public abstract class Either<A, B> {
 
   public abstract <X> X fold(Match<A, B, X> visitor);
 
-  public abstract <X> X fold(Function<A, X> left, Function<B, X> right);
+  public abstract <X> X fold(Function<? super A, ? extends X> left, Function<? super B, ? extends X> right);
 
   public abstract boolean isLeft();
 
@@ -50,7 +54,7 @@ public abstract class Either<A, B> {
   /**
    * Left projection of either.
    */
-  public abstract class LeftProjection<A, B> {
+  public abstract class LeftProjection<A, B> implements Iterable<A> {
     private LeftProjection() {
     }
 
@@ -69,12 +73,14 @@ public abstract class Either<A, B> {
     public abstract A getOrElse(A right);
 
     public abstract Option<A> toOption();
+
+    public abstract List<A> toList();
   }
 
   /**
    * Right projection of either.
    */
-  public abstract class RightProjection<A, B> {
+  public abstract class RightProjection<A, B> implements Iterable<B> {
 
     private RightProjection() {
     }
@@ -94,6 +100,8 @@ public abstract class Either<A, B> {
     public abstract B getOrElse(B left);
 
     public abstract Option<B> toOption();
+
+    public abstract List<B> toList();
   }
 
   /**
@@ -118,6 +126,16 @@ public abstract class Either<A, B> {
           @Override
           public Option<A> toOption() {
             return some(left);
+          }
+
+          @Override
+          public List<A> toList() {
+            return singletonList(left);
+          }
+
+          @Override
+          public Iterator<A> iterator() {
+            return toList().iterator();
           }
 
           @Override
@@ -175,11 +193,21 @@ public abstract class Either<A, B> {
           public Option<B> toOption() {
             return Option.none();
           }
+
+          @Override
+          public List<B> toList() {
+            return emptyList();
+          }
+
+          @Override
+          public Iterator<B> iterator() {
+            return toList().iterator();
+          }
         };
       }
 
       @Override
-      public <C> C fold(Function<A, C> leftf, Function<B, C> rightf) {
+      public <C> C fold(Function<? super A, ? extends C> leftf, Function<? super B, ? extends C> rightf) {
         return leftf.apply(left);
       }
 
@@ -220,6 +248,16 @@ public abstract class Either<A, B> {
           }
 
           @Override
+          public List<A> toList() {
+            return emptyList();
+          }
+
+          @Override
+          public Iterator<A> iterator() {
+            return toList().iterator();
+          }
+
+          @Override
           public A getOrElse(A right) {
             return right;
           }
@@ -236,7 +274,7 @@ public abstract class Either<A, B> {
 
           @Override
           public <X> Either<X, B> bind(Function<A, Either<X, B>> f) {
-            return right(right) ;
+            return right(right);
           }
         };
       }
@@ -274,11 +312,21 @@ public abstract class Either<A, B> {
           public Option<B> toOption() {
             return some(right);
           }
+
+          @Override
+          public List<B> toList() {
+            return singletonList(right);
+          }
+
+          @Override
+          public Iterator<B> iterator() {
+            return toList().iterator();
+          }
         };
       }
 
       @Override
-      public <X> X fold(Function<A, X> leftf, Function<B, X> rightf) {
+      public <X> X fold(Function<? super A, ? extends X> leftf, Function<? super B, ? extends X> rightf) {
         return rightf.apply(right);
       }
 

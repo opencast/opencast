@@ -16,6 +16,7 @@
 package org.opencastproject.kernel.pingback;
 
 import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.lang.StringUtils;
@@ -76,7 +77,7 @@ public class PingBackService {
     logger.debug("start()");
     // Pingback server, if enabled
     final String pingbackUrl = bundleContext.getProperty("org.opencastproject.anonymous.feedback.url");
-    final String hostUrl = bundleContext.getProperty("org.opencastproject.server.url");
+    final String hostUrl = bundleContext.getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
     if (StringUtils.isNotBlank(pingbackUrl) && StringUtils.isNotBlank(hostUrl)) {
       try {
         final URI uri = new URI(pingbackUrl);

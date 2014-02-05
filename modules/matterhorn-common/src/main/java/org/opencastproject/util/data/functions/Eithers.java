@@ -32,4 +32,13 @@ public final class Eithers {
       }
     };
   }
+
+  /** Flatten nested Eithers. */
+  public static <A, B> Either<A, B> flatten(Either<A, Either<A, B>> e) {
+    return e.right().bind(new Function<Either<A, B>, Either<A, B>>() {
+      @Override public Either<A, B> apply(Either<A, B> e) {
+        return e.right().either();
+      }
+    });
+  }
 }

@@ -16,25 +16,6 @@
 
 package org.opencastproject.mediapackage;
 
-import org.junit.Test;
-import org.opencastproject.mediapackage.MediaPackageElement.Type;
-import org.opencastproject.util.ConfigurationException;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.util.HashSet;
-import java.util.Set;
-
 import static com.jayway.restassured.path.xml.XmlPath.from;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -44,6 +25,27 @@ import static org.opencastproject.mediapackage.MediaPackageElements.PRESENTER_SO
 import static org.opencastproject.mediapackage.MediaPackageSupport.loadFromClassPath;
 import static org.opencastproject.mediapackage.PublicationImpl.publication;
 import static org.opencastproject.util.MimeType.mimeType;
+
+import org.opencastproject.mediapackage.MediaPackageElement.Type;
+import org.opencastproject.util.ConfigurationException;
+
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * Test cases for the media package.
@@ -103,7 +105,8 @@ public class MediaPackageTest extends AbstractMediaPackageTest {
 
       // Add the "derived" catalog
       MediaPackageElementFlavor derivedFlavor = new MediaPackageElementFlavor("dublincore", "specialedition");
-      MediaPackageElement derivedElement = mediaPackageElementBuilder.elementFromURI(dcFile.toURI(), Type.Catalog, derivedFlavor);
+      MediaPackageElement derivedElement = mediaPackageElementBuilder.elementFromURI(dcFile.toURI(), Type.Catalog,
+              derivedFlavor);
       mediaPackage.addDerived(derivedElement, dcCatalog);
 
       // Test the whole thing
@@ -137,11 +140,11 @@ public class MediaPackageTest extends AbstractMediaPackageTest {
   public void testPublicationElementFromFile() throws Exception {
     final MediaPackage mp = loadFromClassPath("/manifest.xml");
     assertEquals("Number of publication elements", 1, mp.getPublications().length);
-    assertEquals("Publication channel name in deserialized mediapackage",
-                 "engage", mp.getPublications()[0].getChannel());
+    assertEquals("Publication channel name in deserialized mediapackage", "engage",
+            mp.getPublications()[0].getChannel());
     final String xml = MediaPackageParser.getAsXml(mp);
-    assertEquals("Publication channel name in serialized mediapackage",
-                 "engage", from(xml).get("mediapackage.publications.publication.@channel"));
+    assertEquals("Publication channel name in serialized mediapackage", "engage",
+            from(xml).get("mediapackage.publications.publication.@channel"));
   }
 
   @Test
@@ -178,7 +181,7 @@ public class MediaPackageTest extends AbstractMediaPackageTest {
     assertEquals(2, elements.size());
     // crash! does not hold true anymore since adding mutates fields that are used for hash code calculation
     // comment in if issue has been resolved
-//    assertTrue("Expect presenter to be in set", elements.contains(presenter));
-//    assertTrue("Expect presentation to be in set", elements.contains(presentation));
+    // assertTrue("Expect presenter to be in set", elements.contains(presenter));
+    // assertTrue("Expect presentation to be in set", elements.contains(presentation));
   }
 }

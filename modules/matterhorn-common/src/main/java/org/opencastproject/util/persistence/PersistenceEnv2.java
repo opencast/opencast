@@ -22,6 +22,7 @@ import javax.persistence.EntityManager;
 
 /**
  * Persistence environment that handles errors with an either instead of throwing exceptions.
+ * 
  * @see PersistenceEnv
  */
 public interface PersistenceEnv2<F> {
