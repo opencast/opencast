@@ -15,30 +15,72 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
+
 define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function (require, $, _, Backbone, Engage) {
   //
   "use strict"; // strict mode in all our application
   //
+
   var PLUGIN_NAME = "Slide Text";
   var PLUGIN_TYPE = "engage_tab";
   var PLUGIN_VERSION = "0.1";
   var PLUGIN_TEMPLATE = "template.html";
   var PLUGIN_STYLES = ["style.css"];
 
+  var TEMPLATE_TAB_CONTENT_ID = "#engage_slidetext_tab_content";
+  var segments=[];
+
+  function Segment(time,image_url) {
+    this.time = time;
+    this.image_url = image_url;
+  }
+
   //Init Event
   Engage.log("Tab:Slidetext: init");
   var relative_plugin_path = Engage.getPluginPath('EngagePluginTabSlidetext');
-  Engage.log('TabSlidetext: relative plugin path ' + relative_plugin_path);
+  Engage.log('Tab:Slidetext: relative plugin path ' + relative_plugin_path);
   //Load other needed JS stuff with Require
   //require(["./js/bootstrap/js/bootstrap.js"]);
   //require(["./js/jqueryui/jquery-ui.min.js"]);
 
   //All plugins loaded lets do some stuff
   Engage.on("Core:plugin_load_done", function() {
-
     Engage.log("Tab:Slidetext: receive plugin load done");
-
   });
+
+  Engage.model.on("change:mediaPackage", function() { // listen on a change/set of the mediaPackage model
+    Engage.log("Tab:SlideText: change:mediaPackage event");
+    initPlugin();
+  });
+
+  function initPlugin() {
+    Engage.log("TabSlideText: initalizing plugin");
+    Engage.model.get("mediaPackage").on("change", function() {
+      var attachments = this.get("attachments");
+      if(attachments) {
+        $(attachments).each(function(index, attachment) {
+          if (attachment.mimetype && attachment.type && attachment.type.match(/presentation\/segment\+preview/g) && attachment.mimetype.match(/image/g)) {
+            var time = attachment.ref.match(/([0-9]{2}:[0-9]{2}:[0-9]{2})/g);
+            segments.push(new Segment(time, attachment.url));
+          }
+        });
+        segments.sort(function(a, b){
+          return new Date("1970/1/1 " + a.time) - new Date("1970/1/1 " + b.time);
+        });
+        if (segments.length > 0) {
+          $(TEMPLATE_TAB_CONTENT_ID).empty();
+          $(segments).each(function(index, segment) {
+            var html_snippet = "";
+            html_snippet += "<div id=\"#tab_slidetext_segment_" + index + "\">";
+            html_snippet += segment.time;
+            html_snippet += "  <img src=\"" + segment.image_url + "\"/>";
+            html_snippet += "</div>";
+            $(TEMPLATE_TAB_CONTENT_ID).append(html_snippet);
+          });
+        }
+      }
+    });
+  }
 
   return {
     name: PLUGIN_NAME,
