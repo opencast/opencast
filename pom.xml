@@ -68,6 +68,7 @@
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
+        <module>modules/matterhorn-silencedetection-api</module>
         <module>modules/matterhorn-smil-api</module>
         <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
@@ -426,6 +427,8 @@
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
+        <module>modules/matterhorn-silencedetection-api</module>
+        <module>modules/matterhorn-silencedetection-impl</module>
         <module>modules/matterhorn-smil-api</module>
         <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
@@ -468,6 +471,8 @@
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-remote</module>
+        <module>modules/matterhorn-silencedetection-api</module>
+        <module>modules/matterhorn-silencedetection-impl</module>
         <module>modules/matterhorn-smil-api</module>
         <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
@@ -504,6 +509,8 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-series-service-api</module>
+        <module>modules/matterhorn-silencedetection-api</module>
+        <module>modules/matterhorn-silencedetection-remote</module>
         <module>modules/matterhorn-smil-api</module>
         <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>

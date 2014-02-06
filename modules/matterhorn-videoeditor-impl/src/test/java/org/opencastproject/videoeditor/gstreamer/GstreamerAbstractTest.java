@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public abstract class GstreamerAbstractTest {
   
   /** The logging instance */
-  private static final org.slf4j.Logger logger = LoggerFactory.getLogger(VideoEditorPipelineTest.class);
+  private static final org.slf4j.Logger logger = LoggerFactory.getLogger(GstreamerAbstractTest.class);
   
   public static final int WAIT_SEC = 3;
   

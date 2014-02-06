@@ -38,9 +38,6 @@
               org.opencastproject.videoeditor.impl.*;version=${project.version},
               org.opencastproject.videoeditor.endpoint.*;version=${project.version},
               org.opencastproject.videoeditor.gstreamer.*;version=${project.version},
-              org.opencastproject.videoeditor.silencedetection.impl.*;version=${project.version},
-              org.opencastproject.videoeditor.silencedetection.endpoint.*;version=${project.version},
-              org.opencastproject.videoeditor.silencedetection.gstreamer.*;version=${project.version},
             </Export-Package>
             <Embed-Dependency>
               gstreamer-java;inline=true,
@@ -48,27 +45,10 @@
             </Embed-Dependency>
             <Service-Component>
               OSGI-INF/videoeditor-service.xml,
-              OSGI-INF/silence-detection-service.xml,
             </Service-Component>
           </instructions>
         </configuration>
       </plugin>
-      <!--      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-        <execution>
-          <id>copy-dependencies</id>
-          <phase>test-compile</phase>
-          <goals>
-          <goal>copy-dependencies</goal>
-          </goals>
-          <configuration>
-          <includeArtifactIds>audio,camera,screen</includeArtifactIds>
-          </configuration>
-        </execution>
-        </executions>
-      </plugin>-->
     </plugins>
   </build>
 

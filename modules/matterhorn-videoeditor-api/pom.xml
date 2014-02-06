@@ -32,8 +32,7 @@
               *;resolution:=optional
             </Import-Package>
             <Export-Package> 
-              org.opencastproject.videoeditor.api;version=${project.version},
-              org.opencastproject.videoeditor.silencedetection.api;version=${project.version}
+              org.opencastproject.videoeditor.api;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>
@@ -45,7 +44,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>matterhorn-smil-api</artifactId>
       <version>${project.version}</version>
-      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

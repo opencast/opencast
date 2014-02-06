@@ -32,11 +32,9 @@
               *;resolution:=optional
             </Import-Package>
             <Export-Package> 
-              org.opencastproject.videoeditor.remote;version=${project.version},
-              org.opencastproject.videoeditor.silencedetection.remote;version=${project.version}
+              org.opencastproject.videoeditor.remote;version=${project.version}
             </Export-Package>
             <Service-Component>
-              OSGI-INF/silencedetection-remote.xml,
               OSGI-INF/videoeditor-remote.xml
             </Service-Component>
           </instructions>
@@ -60,12 +58,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>matterhorn-common</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.10</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
