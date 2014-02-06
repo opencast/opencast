@@ -27,7 +27,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
   var PLUGIN_TEMPLATE = "template.html";
   var PLUGIN_STYLES = ["style.css"];
 
-  var TEMPLATE_TAB_CONTENT_ID = "#engage_slidetext_tab_content";
+  var TEMPLATE_TAB_CONTENT_ID = "engage_slidetext_tab_content";
   var segments=[];
 
   function Segment(time,image_url) {
@@ -68,14 +68,33 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
           return new Date("1970/1/1 " + a.time) - new Date("1970/1/1 " + b.time);
         });
         if (segments.length > 0) {
-          $(TEMPLATE_TAB_CONTENT_ID).empty();
+          $("#" + TEMPLATE_TAB_CONTENT_ID).empty();
+          //var $list = $("<ul class=\"media-list\">");
+          //$("#" + TEMPLATE_TAB_CONTENT_ID).append($list);
           $(segments).each(function(index, segment) {
             var html_snippet = "";
-            html_snippet += "<div id=\"#tab_slidetext_segment_" + index + "\">";
-            html_snippet += segment.time;
-            html_snippet += "  <img src=\"" + segment.image_url + "\"/>";
+            var html_snippet_id = "tab_slidetext_segment_" + index;
+            var segment_name = "Segment " + index;
+            html_snippet += "<div class=\"media\" id=\"" + html_snippet_id + "\">";
+            html_snippet += "  <img class=\"media-object pull-left\" src=\"" + segment.image_url + "\" alt=\"" + segment_name + "\">";
+            html_snippet += "  <div class=\"media-body\">";
+            html_snippet += "    <h4 class=\"media-heading\">" + segment_name + "</h4>";
+            html_snippet += "    " + segment.time;
+            html_snippet += "  </div>";
             html_snippet += "</div>";
-            $(TEMPLATE_TAB_CONTENT_ID).append(html_snippet);
+            // html_snippet += "  <li class=\"media\" id=\"" + html_snippet_id + "\">";
+            // html_snippet += "      <img class=\"media-object pull-lef\" src=\"" + segment.image_url + "\" alt=\"" + segment_name + "\">";
+            // html_snippet += "    <div class=\"media-body\">";
+            // html_snippet += "      <h4 class=\"media-heading\">"+ segment_name + "</h4>";
+            // html_snippet += "     " + segment.time;
+            // html_snippet += "    </div>";
+            // html_snippet += "  </li>";
+
+
+            $("#" + TEMPLATE_TAB_CONTENT_ID).append(html_snippet);
+            $("#" + html_snippet_id).click(function() {
+              console.log("clicked:" + html_snippet_id + " at " + segment.time);
+            });
           });
         }
       }
