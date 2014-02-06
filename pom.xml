@@ -670,6 +670,17 @@
     </profile>
 
     <profile>
+      <id>server-management</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-manager-api</module>
+        <module>modules/matterhorn-manager-impl</module>
+      </modules>
+    </profile>
+
+    <profile>
       <id>test</id>
       <activation>
         <activeByDefault>false</activeByDefault>
