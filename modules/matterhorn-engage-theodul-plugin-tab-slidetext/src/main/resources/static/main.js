@@ -35,42 +35,27 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     this.image_url = image_url;
   }
 
-  //Init Event
-  Engage.log("Tab:Slidetext: init");
-  var relative_plugin_path = Engage.getPluginPath('EngagePluginTabSlidetext');
-  Engage.log('Tab:Slidetext: relative plugin path ' + relative_plugin_path);
-  //Load other needed JS stuff with Require
-  //require(["./js/bootstrap/js/bootstrap.js"]);
-  //require(["./js/jqueryui/jquery-ui.min.js"]);
-
-  //All plugins loaded lets do some stuff
-  Engage.on("Core:plugin_load_done", function() {
-    Engage.log("Tab:Slidetext: receive plugin load done");
-  });
-
-  Engage.model.on("change:mediaPackage", function() { // listen on a change/set of the mediaPackage model
-    Engage.log("Tab:SlideText: change:mediaPackage event");
-    initPlugin();
-  });
-
   function initPlugin() {
     Engage.log("TabSlideText: initalizing plugin");
     Engage.model.get("mediaPackage").on("change", function() {
       var attachments = this.get("attachments");
       if(attachments) {
+        // Extract segments which type is "segement+preview" out of the model
         $(attachments).each(function(index, attachment) {
           if (attachment.mimetype && attachment.type && attachment.type.match(/presentation\/segment\+preview/g) && attachment.mimetype.match(/image/g)) {
+            // Pull time string out of the ref property
+            // (e.g. "ref": "track:4ea9108d-c1df-4d8e-b729-e7c75c87519e;time=T00:00:00:0F1000")
             var time = attachment.ref.match(/([0-9]{2}:[0-9]{2}:[0-9]{2})/g);
             segments.push(new Segment(time, attachment.url));
           }
         });
+        // Sort segments ascending by time
         segments.sort(function(a, b){
           return new Date("1970/1/1 " + a.time) - new Date("1970/1/1 " + b.time);
         });
+        // Building html snippet for a segment and inject each in the template
         if (segments.length > 0) {
           $("#" + TEMPLATE_TAB_CONTENT_ID).empty();
-          //var $list = $("<ul class=\"media-list\">");
-          //$("#" + TEMPLATE_TAB_CONTENT_ID).append($list);
           $(segments).each(function(index, segment) {
             var html_snippet = "";
             var html_snippet_id = "tab_slidetext_segment_" + index;
@@ -82,16 +67,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             html_snippet += "    " + segment.time;
             html_snippet += "  </div>";
             html_snippet += "</div>";
-            // html_snippet += "  <li class=\"media\" id=\"" + html_snippet_id + "\">";
-            // html_snippet += "      <img class=\"media-object pull-lef\" src=\"" + segment.image_url + "\" alt=\"" + segment_name + "\">";
-            // html_snippet += "    <div class=\"media-body\">";
-            // html_snippet += "      <h4 class=\"media-heading\">"+ segment_name + "</h4>";
-            // html_snippet += "     " + segment.time;
-            // html_snippet += "    </div>";
-            // html_snippet += "  </li>";
-
-
             $("#" + TEMPLATE_TAB_CONTENT_ID).append(html_snippet);
+
+            // Add click handler to each segemnt (slide)
             $("#" + html_snippet_id).click(function() {
               console.log("clicked:" + html_snippet_id + " at " + segment.time);
             });
@@ -100,6 +78,21 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
       }
     });
   }
+
+  //Init Event
+  Engage.log("Tab:Slidetext: init");
+  var relative_plugin_path = Engage.getPluginPath('EngagePluginTabSlidetext');
+  Engage.log('Tab:Slidetext: relative plugin path ' + relative_plugin_path);
+
+  //All plugins loaded lets do some stuff
+  Engage.on("Core:plugin_load_done", function() {
+    Engage.log("Tab:Slidetext: receive plugin load done");
+  });
+
+  Engage.model.on("change:mediaPackage", function() { // listen on a change/set of the mediaPackage model
+    Engage.log("Tab:SlideText: change:mediaPackage event");
+    initPlugin();
+  });
 
   return {
     name: PLUGIN_NAME,
