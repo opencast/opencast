@@ -4,11 +4,13 @@
   name="org.opencastproject.dictionary.impl.DictionaryServiceJpaImpl"
   immediate="true"
   activate="activate">
-  <implementation 
+
+  <implementation
     class="org.opencastproject.dictionary.impl.DictionaryServiceJpaImpl" />
   <property name="service.description" value="Dictionary Service" />
   <service>
     <provide interface="org.opencastproject.dictionary.api.DictionaryService" />
+    <provide interface="org.opencastproject.dictionary.impl.DictionaryServiceJpaImpl" />
   </service>
   <reference name="persistence" interface="javax.persistence.spi.PersistenceProvider"
     cardinality="1..1" policy="static" bind="setPersistenceProvider" />
