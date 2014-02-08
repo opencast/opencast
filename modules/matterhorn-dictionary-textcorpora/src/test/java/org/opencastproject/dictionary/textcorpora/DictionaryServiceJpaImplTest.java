@@ -13,9 +13,9 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.dictionary.impl;
+package org.opencastproject.dictionary.textcorpora;
 
-import org.opencastproject.dictionary.impl.DictionaryServiceJpaImpl.DICT_TOKEN;
+import org.opencastproject.dictionary.textcorpora.DictionaryServiceJpaImpl.DICT_TOKEN;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 

@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.dictionary.impl;
+package org.opencastproject.dictionary.textcorpora;
 
 import org.opencastproject.dictionary.api.DictionaryService;
 
@@ -41,8 +41,9 @@ import org.opencastproject.metadata.mpeg7.Textual;
 import org.opencastproject.metadata.mpeg7.TextualImpl;
 
 /**
- * A JPA-based implementation of the DictionaryService. This implementation stores all words in a single table, and
- * keeps track of the available languages in a separate language table.
+ * A JPA-based implementation of the DictionaryService. This implementation
+ * stores all words in a single table, and keeps track of the available
+ * languages in a separate language table.
  */
 public class DictionaryServiceJpaImpl implements DictionaryService {
 

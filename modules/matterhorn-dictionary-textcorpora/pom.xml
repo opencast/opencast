@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
-  <artifactId>matterhorn-dictionary-impl</artifactId>
+  <artifactId>matterhorn-dictionary-textcorpora</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-dictionary-impl</name>
+  <name>matterhorn-dictionary-textcorpora</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>

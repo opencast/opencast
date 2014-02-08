@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.dictionary.impl;
+package org.opencastproject.dictionary.textcorpora;
 
 import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
 
