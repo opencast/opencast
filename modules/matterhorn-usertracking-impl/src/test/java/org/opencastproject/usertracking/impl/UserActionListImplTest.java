@@ -41,7 +41,7 @@ public class UserActionListImplTest {
     ua1.setType("test");
     ua1.setUserId("testing user");
     ua1.setUserIp("127.0.0.1");
-    
+
     UserAction ua2 = new UserActionImpl();
     ua2.setId(6L);
     ua2.setInpoint(5);
@@ -69,7 +69,7 @@ public class UserActionListImplTest {
     Assert.assertEquals("testing user", ual1.getUserActions().get(0).getUserId());
     Assert.assertEquals("127.0.0.1", ual1.getUserActions().get(0).getUserIp());
     Assert.assertEquals(10, ual1.getUserActions().get(0).getLength());
-    
+
     UserActionList ual2 = new UserActionListImpl();
     ual2.add(ua2);
     ual2.setTotal(1);
@@ -103,7 +103,7 @@ public class UserActionListImplTest {
     ua1.setType("test");
     ua1.setUserId("testing user");
     ua1.setUserIp("127.0.0.1");
-    
+
     UserAction ua2 = new UserActionImpl();
     ua2.setId(6L);
     ua2.setInpoint(5);

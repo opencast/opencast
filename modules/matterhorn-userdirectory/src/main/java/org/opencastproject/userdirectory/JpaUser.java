@@ -83,7 +83,7 @@ public class JpaUser implements User {
 
   /**
    * Constructs a user with the specified username and password.
-   * 
+   *
    * @param username
    *          the username
    * @param password
@@ -101,7 +101,7 @@ public class JpaUser implements User {
 
   /**
    * Constructs a user with the specified username, password, and roles.
-   * 
+   *
    * @param username
    *          the username
    * @param password
@@ -122,13 +122,13 @@ public class JpaUser implements User {
 
   /**
    * Gets this user's clear text password.
-   * 
+   *
    * @return the user account's password
    */
   public String getPassword() {
     return password;
   }
-  
+
   /**
    * @see org.opencastproject.security.api.User#canLogin()
    */
@@ -175,7 +175,7 @@ public class JpaUser implements User {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -188,7 +188,7 @@ public class JpaUser implements User {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -198,7 +198,7 @@ public class JpaUser implements User {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

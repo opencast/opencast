@@ -38,9 +38,9 @@ public final class PipelineTestHelpers {
   private static String operatingSystemName = null;
 
   private PipelineTestHelpers() {
-    
+
   }
-  
+
   /** Returns a string of the operating system. **/
   public static String getOsName() {
     if (operatingSystemName == null) {
@@ -61,7 +61,7 @@ public final class PipelineTestHelpers {
 
   /**
    * Creates a new Properties file with all of the properties required to adequately test Bins.
-   * 
+   *
    * @param captureDevice
    *          The capture device specific properties such as location of the source to capture from, the friendly name
    *          of the capture device etc.
@@ -117,7 +117,7 @@ public final class PipelineTestHelpers {
 
   /**
    * Creates a CaptureDevice object along with its properties.
-   * 
+   *
    * @param sourceLocation
    * @param sourceDeviceName
    * @param friendlyName
@@ -147,7 +147,7 @@ public final class PipelineTestHelpers {
       return true;
     } catch (UnableToCreateElementException e) {
       return false;
-    } 
+    }
   }
-  
+
 }

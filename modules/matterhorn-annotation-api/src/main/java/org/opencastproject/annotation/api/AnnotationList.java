@@ -31,6 +31,6 @@ public interface AnnotationList {
 
   int getOffset();
   void setOffset(int offset);
-  
+
   List<Annotation> getAnnotations();
 }

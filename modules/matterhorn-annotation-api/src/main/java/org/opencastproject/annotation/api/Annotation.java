@@ -20,7 +20,7 @@ import java.util.Date;
 
 /**
  * A class that represents an annotation
- * 
+ *
  */
 public interface Annotation {
 
@@ -47,7 +47,7 @@ public interface Annotation {
   int getOutpoint();
 
   void setOutpoint(int outpoint);
-  
+
   int getLength();
 
   String getType();

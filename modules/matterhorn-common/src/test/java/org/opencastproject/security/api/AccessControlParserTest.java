@@ -48,12 +48,12 @@ public class AccessControlParserTest {
   public void tearDown() throws Exception {
     acl = null;
   }
-  
+
   @Test
   public void testXmlParsing() throws Exception {
     // Get the acl as an xml string
     String xml = AccessControlParser.toXml(acl);
-    
+
     // Now convert back to an acl and confirm that the roles, etc are as expected
     AccessControlList aclAfterMarshaling = AccessControlParser.parseAcl(xml);
     for (AccessControlEntry entry : aclAfterMarshaling.getEntries()) {
@@ -63,12 +63,12 @@ public class AccessControlParserTest {
       Assert.assertEquals(allowed, role + action % 2 == 0);
     }
   }
-  
+
   @Test
   public void testJsonParsing() throws Exception {
     // Get the acl as a JSON string
     String json = AccessControlParser.toJson(acl);
-    
+
     // Now convert back to an acl and confirm that the roles, etc are as expected
     // Now convert back to an acl and confirm that the roles, etc are as expected
     AccessControlList aclAfterMarshaling = AccessControlParser.parseAcl(json);

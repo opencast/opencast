@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * Query object used for storing search parameters.
- * 
+ *
  */
 public class SchedulerQuery {
 
@@ -80,7 +80,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by license
-   * 
+   *
    * @param license
    * @return
    */
@@ -93,7 +93,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by abstract
-   * 
+   *
    * @param eventAbstract
    * @return
    */
@@ -106,7 +106,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by created from
-   * 
+   *
    * @param createdFrom
    * @return
    */
@@ -117,7 +117,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by created to
-   * 
+   *
    * @param createdTo
    * @return
    */
@@ -128,7 +128,7 @@ public class SchedulerQuery {
 
   /**
    * Set search over all text fields
-   * 
+   *
    * @param text
    * @return
    */
@@ -141,7 +141,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by series id
-   * 
+   *
    * @param seriesId
    * @return
    */
@@ -154,7 +154,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by creator
-   * 
+   *
    * @param creator
    * @return
    */
@@ -167,7 +167,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by contributor
-   * 
+   *
    * @param contributor
    * @return
    */
@@ -180,7 +180,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by language
-   * 
+   *
    * @param language
    * @return
    */
@@ -193,7 +193,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by subject
-   * 
+   *
    * @param subject
    * @return
    */
@@ -206,7 +206,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by publisher
-   * 
+   *
    * @param publisher
    * @return
    */
@@ -219,7 +219,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by description
-   * 
+   *
    * @param description
    * @return
    */
@@ -232,7 +232,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by spatial
-   * 
+   *
    * @param spatial
    * @return
    */
@@ -245,7 +245,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by start date of event
-   * 
+   *
    * @param startsFrom
    * @return
    */
@@ -256,7 +256,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by start date of event
-   * 
+   *
    * @param startsTo
    * @return
    */
@@ -267,7 +267,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by end date of event.
-   * 
+   *
    * @param endsFrom
    * @return
    */
@@ -278,7 +278,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by end date of event.
-   * 
+   *
    * @param endsTo
    * @return
    */
@@ -289,7 +289,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by rights holder
-   * 
+   *
    * @param rightsHolder
    * @return
    */
@@ -302,7 +302,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by title.
-   * 
+   *
    * @param title
    * @return
    */
@@ -315,7 +315,7 @@ public class SchedulerQuery {
 
   /**
    * Set search by identifier.
-   * 
+   *
    * @param identifier
    * @return
    */
@@ -328,7 +328,7 @@ public class SchedulerQuery {
 
   /**
    * Set a list of identifiers
-   * 
+   *
    * @param ids
    * @return
    */
@@ -340,7 +340,7 @@ public class SchedulerQuery {
   }
   /**
    * Set sort field with ascending order
-   * 
+   *
    * @param sort
    * @return
    */
@@ -350,7 +350,7 @@ public class SchedulerQuery {
 
   /**
    * Set sort field with sort order
-   * 
+   *
    * @param sort
    * @param ascending
    * @return
@@ -363,7 +363,7 @@ public class SchedulerQuery {
 
   /**
    * Get sort field
-   * 
+   *
    * @return
    */
   public Sort getSort() {
@@ -372,7 +372,7 @@ public class SchedulerQuery {
 
   /**
    * Whether sort order is ascending
-   * 
+   *
    * @return
    */
   public boolean isSortAscending() {
@@ -381,7 +381,7 @@ public class SchedulerQuery {
 
   /**
    * Get text
-   * 
+   *
    * @return
    */
   public String getText() {
@@ -390,7 +390,7 @@ public class SchedulerQuery {
 
   /**
    * Get series id
-   * 
+   *
    * @return
    */
   public String getSeriesId() {
@@ -399,7 +399,7 @@ public class SchedulerQuery {
 
   /**
    * Get creator
-   * 
+   *
    * @return
    */
   public String getCreator() {
@@ -408,7 +408,7 @@ public class SchedulerQuery {
 
   /**
    * Get contributor
-   * 
+   *
    * @return
    */
   public String getContributor() {
@@ -417,7 +417,7 @@ public class SchedulerQuery {
 
   /**
    * Get language
-   * 
+   *
    * @return
    */
   public String getLanguage() {
@@ -426,7 +426,7 @@ public class SchedulerQuery {
 
   /**
    * Get license
-   * 
+   *
    * @return
    */
   public String getLicense() {
@@ -435,7 +435,7 @@ public class SchedulerQuery {
 
   /**
    * Get subject
-   * 
+   *
    * @return
    */
   public String getSubject() {
@@ -444,7 +444,7 @@ public class SchedulerQuery {
 
   /**
    * Get publisher
-   * 
+   *
    * @return
    */
   public String getPublisher() {
@@ -453,7 +453,7 @@ public class SchedulerQuery {
 
   /**
    * Get abstract
-   * 
+   *
    * @return
    */
   public String getAbstract() {
@@ -462,7 +462,7 @@ public class SchedulerQuery {
 
   /**
    * Get description
-   * 
+   *
    * @return
    */
   public String getDescription() {
@@ -471,7 +471,7 @@ public class SchedulerQuery {
 
   /**
    * Get spatial
-   * 
+   *
    * @return
    */
   public String getSpatial() {
@@ -480,7 +480,7 @@ public class SchedulerQuery {
 
   /**
    * Get created from
-   * 
+   *
    * @return
    */
   public Date getCreatedFrom() {
@@ -489,7 +489,7 @@ public class SchedulerQuery {
 
   /**
    * Get created to
-   * 
+   *
    * @return
    */
   public Date getCreatedTo() {
@@ -498,7 +498,7 @@ public class SchedulerQuery {
 
   /**
    * Get starts from
-   * 
+   *
    * @return
    */
   public Date getStartsFrom() {
@@ -507,7 +507,7 @@ public class SchedulerQuery {
 
   /**
    * Get starts to
-   * 
+   *
    * @return
    */
   public Date getStartsTo() {
@@ -516,7 +516,7 @@ public class SchedulerQuery {
 
   /**
    * Get ends from
-   * 
+   *
    * @return
    */
   public Date getEndsFrom() {
@@ -529,7 +529,7 @@ public class SchedulerQuery {
 
   /**
    * Get rights holder
-   * 
+   *
    * @return
    */
   public String getRightsHolder() {
@@ -539,7 +539,7 @@ public class SchedulerQuery {
   public String getIdentifier() {
     return identifier;
   }
-  
+
   public List<Long> getIdsList() {
     return idList;
   }

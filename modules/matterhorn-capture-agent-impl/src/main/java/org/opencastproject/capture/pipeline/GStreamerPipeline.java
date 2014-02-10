@@ -21,36 +21,36 @@ import org.opencastproject.capture.impl.MonitoringListener;
  * GStreamer pipeline wrapper class schould implement this interface.
  */
 public interface GStreamerPipeline {
-  
+
   /**
    * Returns true if Gstreamer Pipeline is null.
    * @return true if Gstreamer Pipeline is null
    */
   boolean isPipelineNull();
-  
+
   /**
    * Returns true if confidence monitoring enabled.
    * @return true if confidence monitoring enabled
    */
   boolean isMonitoringEnabled();
-  
+
   /**
    * Returns true if only monitoring Pipeline is running (without capture).
    * @return true if only monitoring Pipeline is running (without capture)
    */
   boolean isMonitoringOnly();
-  
+
   /**
    * Stop Pipeline.
    */
   void stop();
-  
+
   /**
    * This method waits until the pipeline has had an opportunity to shutdown and if it surpasses the maximum timeout
    * value it will be manually stopped.
    */
   void stop(long timeout);
-  
+
   /**
    * Seta for monitoring listener.
    * @param rmsValueGrabber monitoring listener

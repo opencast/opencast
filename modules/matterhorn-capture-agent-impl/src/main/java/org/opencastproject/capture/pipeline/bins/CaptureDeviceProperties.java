@@ -36,7 +36,7 @@ public class CaptureDeviceProperties {
    * salient properties. These properties are all settings for the GStreamer properties and are intended to be passed
    * through as is. Certain codecs for example have different ranges for bitrate and so it is important to check the
    * GStreamer docs for possible values.
-   * 
+   *
    * @param captureDevice
    *          Details about the captureDevice such as location, codec, container, etc.
    * @param properties
@@ -64,7 +64,7 @@ public class CaptureDeviceProperties {
   public String getCustomProducer() {
     return customProducer;
   }
-  
+
   public void setCustomSource(String customSource) {
     this.customProducer = customSource;
   }
@@ -72,11 +72,11 @@ public class CaptureDeviceProperties {
   public String getCustomConsumer() {
     return customConsumer;
   }
-  
+
   public void setCustomConsumer(String customConsumer) {
     this.customConsumer = customConsumer;
   }
-  
+
   public String getCodec() {
     return codec;
   }

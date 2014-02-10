@@ -68,7 +68,7 @@ public class PingBackService {
 
   /**
    * Osgi callback that is executed on component activation.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -122,7 +122,7 @@ public class PingBackService {
 
   /**
    * Returns the runtime information as a JSON string.
-   * 
+   *
    * @return the runtime information
    * @throws IOException
    *           if reading the response body fails
@@ -142,7 +142,7 @@ public class PingBackService {
 
   /**
    * Osgi callback that adds a reference to the trusted http client implementation.
-   * 
+   *
    * @param client
    *          the trusted http client
    */

@@ -40,7 +40,7 @@ public class ResumableTestWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /** True if the resume() method has been called */
   private boolean resumed = false;
-  
+
   /** The properties used to resume the workflow, or null */
   private Map<String, String> properties;
 
@@ -72,7 +72,7 @@ public class ResumableTestWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * Sets the action that is returned on {@link #start(WorkflowInstance, JobContext)}.
-   * 
+   *
    * @param startAction
    *          the start action
    */
@@ -82,7 +82,7 @@ public class ResumableTestWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * Sets the action that is returned on {@link #resume(WorkflowInstance, JobContext, Map)}.
-   * 
+   *
    * @param resumeAction
    *          the resume action
    */
@@ -92,7 +92,7 @@ public class ResumableTestWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * Returns <code>true</code> if the resume() method has been called.
-   * 
+   *
    * @return <code>true</code> if the handler was resumed
    */
   public boolean isResumed() {
@@ -101,7 +101,7 @@ public class ResumableTestWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * Returns <code>true</code> if the start() method has been called.
-   * 
+   *
    * @return <code>true</code> if the handler was started
    */
   public boolean isStarted() {
@@ -119,7 +119,7 @@ public class ResumableTestWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -132,7 +132,7 @@ public class ResumableTestWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#resume(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext, java.util.Map)
    */
@@ -146,7 +146,7 @@ public class ResumableTestWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#getHoldStateUserInterfaceURL(org.opencastproject.workflow.api.WorkflowInstance)
    */
   @Override
@@ -156,14 +156,14 @@ public class ResumableTestWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#getHoldActionTitle()
    */
   @Override
   public String getHoldActionTitle() {
     return "Test action";
   }
-  
+
   /**
    * @return the properties
    */

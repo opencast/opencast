@@ -41,7 +41,7 @@ public class JaxbServiceStatistics implements ServiceStatistics {
   /** The mean queue time for jobs **/
   @XmlAttribute(name = "meanqueuetime")
   protected long meanQueueTime;
-  
+
   /** The number of finished jobs **/
   @XmlAttribute(name = "finished")
   protected int finishedJobs;
@@ -62,7 +62,7 @@ public class JaxbServiceStatistics implements ServiceStatistics {
 
   /**
    * Constructs a new service statistics instance without statistics.
-   * 
+   *
    * @param serviceRegistration
    *          the service registration
    */
@@ -73,7 +73,7 @@ public class JaxbServiceStatistics implements ServiceStatistics {
 
   /**
    * Constructs a new service statistics instance with statistics.
-   * 
+   *
    * @param serviceRegistration
    *          the service registration
    * @param meanRunTime
@@ -93,7 +93,7 @@ public class JaxbServiceStatistics implements ServiceStatistics {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceStatistics#getMeanQueueTime()
    */
   @Override
@@ -103,7 +103,7 @@ public class JaxbServiceStatistics implements ServiceStatistics {
 
   /**
    * Sets the mean queue time.
-   * 
+   *
    * @param meanQueueTime
    *          the mean queue time
    */
@@ -113,7 +113,7 @@ public class JaxbServiceStatistics implements ServiceStatistics {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceStatistics#getMeanRunTime()
    */
   @Override
@@ -123,7 +123,7 @@ public class JaxbServiceStatistics implements ServiceStatistics {
 
   /**
    * Sets the mean run time.
-   * 
+   *
    * @param meanRunTime
    *          the mean run time.
    */
@@ -133,7 +133,7 @@ public class JaxbServiceStatistics implements ServiceStatistics {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceStatistics#getFinishedJobs()
    */
   @Override
@@ -143,7 +143,7 @@ public class JaxbServiceStatistics implements ServiceStatistics {
 
   /**
    * Sets the number of finished jobs
-   * 
+   *
    * @param finishedJobs
    *          the number of finished jobs
    */
@@ -153,7 +153,7 @@ public class JaxbServiceStatistics implements ServiceStatistics {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceStatistics#getQueuedJobs()
    */
   @Override
@@ -163,7 +163,7 @@ public class JaxbServiceStatistics implements ServiceStatistics {
 
   /**
    * Sets the number of queued jobs
-   * 
+   *
    * @param queuedJobs
    *          the number of queued jobs
    */
@@ -173,7 +173,7 @@ public class JaxbServiceStatistics implements ServiceStatistics {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceStatistics#getRunningJobs()
    */
   @Override
@@ -183,7 +183,7 @@ public class JaxbServiceStatistics implements ServiceStatistics {
 
   /**
    * Sets the number of running jobs
-   * 
+   *
    * @param runningJobs
    *          the number of running jobs
    */
@@ -193,7 +193,7 @@ public class JaxbServiceStatistics implements ServiceStatistics {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceStatistics#getServiceRegistration()
    */
   @Override

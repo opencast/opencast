@@ -64,7 +64,7 @@ public class LoadTestingRestService {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
@@ -73,7 +73,7 @@ public class LoadTestingRestService {
 
   /**
    * Set {@link org.opencastproject.loadtest.impl.LoadTestFactory} service.
-   * 
+   *
    * @param service
    *          Service implemented {@link org.opencastproject.loadtest.impl.LoadTestFactory}
    */
@@ -83,7 +83,7 @@ public class LoadTestingRestService {
 
   /**
    * Unset {@link org.opencastproject.loadtest.impl.LoadTestFactory} service.
-   * 
+   *
    * @param service
    *          Service implemented {@link org.opencastproject.loadtest.impl.LoadTestFactory}
    */
@@ -117,7 +117,7 @@ public class LoadTestingRestService {
               "Exception while trying to obtain metadata: " + e.getMessage() + ".").build();
     }
   }
-  
+
   @POST
   @Produces(MediaType.TEXT_PLAIN)
   @Path("startLoadTesting")
