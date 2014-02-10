@@ -95,11 +95,11 @@ public class IngestJobTest {
     expect(captureAgentMock.ingest(recordingID)).andReturn(HttpURLConnection.HTTP_OK).times(1);
     replay(captureAgentMock);
     setProperties(intervaltime, retrytimes, pausetime);
-    scheduler.addTriggerListener(new VerifyCaptureAgentMockTriggerListener(1));
+    scheduler.addGlobalTriggerListener(new VerifyCaptureAgentMockTriggerListener(1));
     JobDetailTriggerPair jobDetailTriggerPair = JobCreator.createInjestJob(Long.parseLong(intervaltime), recordingID,
             postfix, captureAgentMock, scheduler, configurationManager);
     verifyJobDetails(intervaltime, jobDetailTriggerPair);
-    jobDetailTriggerPair.getTrigger().addTriggerListener(VerifyCaptureAgentMockTriggerListener.NAME);
+    //jobDetailTriggerPair.getTrigger().addTriggerListener(VerifyCaptureAgentMockTriggerListener.NAME);
     scheduler.start();
     scheduler.scheduleJob(jobDetailTriggerPair.getJob(), jobDetailTriggerPair.getTrigger());
     waiter.sleepWait();
