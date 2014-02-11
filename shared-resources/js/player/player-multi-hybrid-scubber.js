@@ -178,8 +178,11 @@ Opencast.Scrubber = (function ()
             var newPosition = 0;
             var x = e.pageX - $("#scubber-channel").offset().left;
             x = Math.max(4, x - 8);
-            var sc_x = $("#scrubber").position().left;
-
+            // Get current scrubber position as a number
+            var scrubPosition = $("#scrubber").css("left").replace(/[^0-9:]/g, '');
+            var sc_x = parseInt(scrubPosition, 10); 
+ 
+            // Change timeline if request is not too close to current position
             if (x < (sc_x - 8) || (sc_x + 8) < x)
             {
                 if ($('.load-progress').width() >= x && Opencast.Player.getHtmlBool() === true)

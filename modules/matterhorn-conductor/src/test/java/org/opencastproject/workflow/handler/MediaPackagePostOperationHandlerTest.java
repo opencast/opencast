@@ -66,7 +66,7 @@ public class MediaPackagePostOperationHandlerTest {
     workflowInstance.setState(WorkflowState.RUNNING);
     WorkflowOperationInstanceImpl operation
       = new WorkflowOperationInstanceImpl("op", OperationState.RUNNING);
-    List<WorkflowOperationInstance> operationsList 
+    List<WorkflowOperationInstance> operationsList
       = new ArrayList<WorkflowOperationInstance>();
     operationsList.add(operation);
     workflowInstance.setOperations(operationsList);

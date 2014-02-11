@@ -42,6 +42,21 @@
     </service>
     <reference name="roleDirectoryService" interface="org.opencastproject.security.api.RoleDirectoryService"
       cardinality="1..1" policy="static" bind="setRoleDirectoryService" />
+	<reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+	  cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+  </scr:component>
+  
+  <scr:component name="org.opencastproject.kernel.userdirectory.UserEndpoint" immediate="true">
+    <implementation class="org.opencastproject.kernel.userdirectory.UserEndpoint" />
+    <property name="service.description" value="User listing REST endpoint" />
+    <property name="opencast.service.type" value="org.opencastproject.userdirectory.users" />
+    <property name="opencast.service.path" value="/users" />
+    <property name="opencast.service.jobproducer" value="false" />
+    <service>
+      <provide interface="org.opencastproject.kernel.userdirectory.UserEndpoint" />
+    </service>
+    <reference name="userDirectoryService" interface="org.opencastproject.security.api.UserDirectoryService"
+      cardinality="1..1" policy="static" bind="setUserDirectoryService" />
   </scr:component>
 
 </scr:components>

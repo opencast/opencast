@@ -132,7 +132,8 @@
               *;resolution:=optional
             </Import-Package>
             <Export-Package>
-              org.opencastproject.load.test.*;version=${project.version},
+              org.opencastproject.loadtest.endpoint;version=${project.version},
+              org.opencastproject.loadtest.impl;version=${project.version}
             </Export-Package>
             <Service-Component>
               OSGI-INF/load-test.xml,

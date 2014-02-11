@@ -204,7 +204,9 @@
               OSGI-INF/operations/composite.xml,
               OSGI-INF/operations/concat.xml,
               OSGI-INF/operations/coverart.xml,
+              OSGI-INF/operations/delete-archive.xml,
               OSGI-INF/operations/distribute-acl.xml,
+              OSGI-INF/operations/distribute-mediapackagepost.xml,
               OSGI-INF/operations/download-dvd.xml,
               OSGI-INF/operations/email.xml,
               OSGI-INF/operations/embed.xml,
@@ -230,8 +232,7 @@
               OSGI-INF/operations/tag.xml,
               OSGI-INF/operations/trim.xml,
               OSGI-INF/operations/zip.xml,
-              OSGI-INF/operations/watermark.xml,
-							OSGI-INF/operations/distribute-mediapackagepost.xml
+              OSGI-INF/operations/watermark.xml
             </Service-Component>
           </instructions>
         </configuration>

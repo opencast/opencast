@@ -42,20 +42,20 @@ public class EnclosureImplTest {
      */
     @Test
     public void testSetterAndGetter() {
-        
+
         String result = "item";
-        Assert.assertNull(instance.getFlavor()); 
+        Assert.assertNull(instance.getFlavor());
         instance.setFlavor(result);
         Assert.assertEquals(instance.getFlavor(), result);
 
-        Assert.assertNull(instance.getType()); 
+        Assert.assertNull(instance.getType());
         instance.setType(result);
         Assert.assertEquals(instance.getType(), result);
-        
-        Assert.assertNull(instance.getUrl()); 
+
+        Assert.assertNull(instance.getUrl());
         instance.setUrl(result);
         Assert.assertEquals(instance.getUrl(), result);
-        
+
         Assert.assertEquals(instance.getLength(), 2L);
         instance.setLength(4L);
         Assert.assertEquals(instance.getLength(), 4L);

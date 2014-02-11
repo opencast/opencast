@@ -44,3 +44,11 @@
   </div>
   <!-- END Table pagination Options -->
 </div>
+
+<div id="twf-window" title="Configure Wokflow for transition">
+  <div id="twf-config-container"></div>
+  <div>
+    <button id="twf-submit">Save</button>
+    <button id="twf-cancel">Cancel</button>
+  </div>
+</div> 

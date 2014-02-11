@@ -143,9 +143,11 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
-  public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     logger.debug("Running segments preview workflow operation on {}", workflowInstance);
 
     // Check if there is an mpeg-7 catalog containing video segments
@@ -266,7 +268,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
           }
 
           // convert to time array
-          long[] timeArray = new long[timePointList.size()];
+          double[] timeArray = new double[timePointList.size()];
           for (int i = 0; i < timePointList.size(); i++)
             timeArray[i] = timePointList.get(i).getTimeInMilliseconds() / 1000;
 

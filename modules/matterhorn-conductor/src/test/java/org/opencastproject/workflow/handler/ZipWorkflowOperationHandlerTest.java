@@ -24,12 +24,17 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workspace.api.Workspace;
 
 import junit.framework.Assert;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +45,7 @@ public class ZipWorkflowOperationHandlerTest {
 
   private ZipWorkflowOperationHandler operationHandler;
   private MediaPackage mp;
+  private Workspace workspace = null;
 
   @Before
   public void setUp() throws Exception {
@@ -48,6 +54,21 @@ public class ZipWorkflowOperationHandlerTest {
 
     // set up the handler
     operationHandler = new ZipWorkflowOperationHandler();
+
+    // set up mock workspace
+    workspace = EasyMock.createNiceMock(Workspace.class);
+    URI newURI = new URI("http://www.url.org");
+    EasyMock.expect(
+            workspace.put((String) EasyMock.anyObject(),
+            (String) EasyMock.anyObject(),
+            (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(newURI).anyTimes();
+    EasyMock.expect(workspace.getURI((String) EasyMock.anyObject(),
+            (String) EasyMock.anyObject())).andReturn(newURI).anyTimes();
+    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(
+            new File(getClass().getResource("/dublincore.xml").toURI())).anyTimes();
+    EasyMock.replay(workspace);
+    operationHandler.setWorkspace(workspace);
   }
 
   /*
@@ -74,7 +95,7 @@ public class ZipWorkflowOperationHandlerTest {
     }
 
   }
-  
+
   /*
    * MH-9759
    */
@@ -98,5 +119,32 @@ public class ZipWorkflowOperationHandlerTest {
     } catch (WorkflowOperationException e) {
       // expecting exception
     }
+  }
+
+  /*
+   * MH-10043
+   */
+  @Test
+  public void testConfigKeyTargetFlavorDefaultValue() {
+    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
+    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    ops.add(operation);
+    instance.setOperations(ops);
+    instance.setMediaPackage(mp);
+
+    operation.setConfiguration(ZipWorkflowOperationHandler.ZIP_COLLECTION_PROPERTY, "failed-zips");
+    operation.setConfiguration(ZipWorkflowOperationHandler.INCLUDE_FLAVORS_PROPERTY, "*/source,dublincore/*");
+    // targe-flavor is not mandatory
+    // operation.setConfiguration(ZipWorkflowOperationHandler.TARGET_FLAVOR_PROPERTY, "archive/zip");
+    operation.setConfiguration(ZipWorkflowOperationHandler.COMPRESS_PROPERTY, "false");
+
+    try {
+        WorkflowOperationResult result = operationHandler.start(instance, null);
+        Assert.assertEquals("workflow result action not CONTINUE: " + result.getAction(), WorkflowOperationResult.Action.CONTINUE, result.getAction());
+    } catch (WorkflowOperationException e) {
+        Assert.fail("missing target-flavor and no default value kicked in: " + e);
+    }
+
   }
 }

@@ -73,7 +73,7 @@ public class ExportWorkflowOperationHandler extends ResumableWorkflowOperationHa
 
   /** The gstreamer service */
   private GStreamerService gstreamerService = null;
-  
+
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
   }
@@ -87,7 +87,7 @@ public class ExportWorkflowOperationHandler extends ResumableWorkflowOperationHa
   public String getDescription() {
     return DESCRIPTION;
   }
-  
+
   @Override
   public SortedMap<String, String> getConfigurationOptions() {
     return CONFIG_OPTIONS;
@@ -95,24 +95,24 @@ public class ExportWorkflowOperationHandler extends ResumableWorkflowOperationHa
 
   /**
    * Set the workspace.
-   * 
+   *
    * @param workspace
    *          The new workspace.
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
-  
+
   /**
    * Set the gstreamer service.
-   * 
+   *
    * @param workspace
    *          The new workspace.
    */
   public void setGStreamerService(GStreamerService gstreamerService) {
     this.gstreamerService = gstreamerService;
   }
-  
+
   public void activate(ComponentContext cc) {
     if (cc != null) {
       super.activate(cc);
@@ -141,20 +141,20 @@ public class ExportWorkflowOperationHandler extends ResumableWorkflowOperationHa
     // MediaPackage from previous workflow operations
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     Properties totalProperties = getTotalProperties(mediaPackage, properties);
-    
+
     String gstreamerCommand = totalProperties.getProperty(GSTREAMER_COMMAND_KEY);
-    
+
     // Fail if we don't have a gstreamer command to execute.
     if (StringUtils.trimToNull(gstreamerCommand) == null) {
       throw new WorkflowOperationException("There was no gstreamer command to execute. ");
     } else if (mediaPackage.getTracks() == null || mediaPackage.getTracks().length <= 0) {
       throw new WorkflowOperationException("There are no tracks to run an export on. ");
     }
-    
+
     String outputFiles = totalProperties.getProperty(OUTPUT_FILES_KEY);
-    
+
     String acl = totalProperties.getProperty(EXPORT_ACL_KEY, "");
-    
+
     long jobTime = 0;
     Job job = null;
     try {
@@ -169,7 +169,7 @@ public class ExportWorkflowOperationHandler extends ResumableWorkflowOperationHa
     } catch (MediaPackageException e) {
       throw new WorkflowOperationException("Encoding failed ", e);
     }
-    
+
     logger.debug("Gstreamer launch operation completed");
     addTrackToMediaPackage(mediaPackage, job.getPayload());
     addAclStringToMediaPackageAsXml(mediaPackage, acl);
@@ -189,7 +189,7 @@ public class ExportWorkflowOperationHandler extends ResumableWorkflowOperationHa
 
   /**
    * Consolidates all of the properties into a single properties file.
-   * 
+   *
    * @param mediaPackage
    *          The mediapackage to get all of the possible properties files from.
    * @param properties
@@ -227,7 +227,7 @@ public class ExportWorkflowOperationHandler extends ResumableWorkflowOperationHa
 
   /**
    * Creates an XML document with the access control list that will allow users to view exported videos.
-   * 
+   *
    * @param mediaPackage
    *          The media package to add the acl xml to.
    * @param acl
@@ -241,7 +241,7 @@ public class ExportWorkflowOperationHandler extends ResumableWorkflowOperationHa
     if (StringUtils.trimToNull(acl) == null) {
       logger.warn("There was no acl to add to the media package so it will be skipped.");
     }
-    
+
     if (mediaPackage != null && StringUtils.trimToNull(acl) != null) {
       String identifier = mediaPackage.getIdentifier().toString();
       String extension = ".acl";

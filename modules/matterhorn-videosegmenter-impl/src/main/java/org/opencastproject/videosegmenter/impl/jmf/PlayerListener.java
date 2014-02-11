@@ -91,13 +91,13 @@ public class PlayerListener implements ControllerListener {
 
   /** Flag to indicate whether the last state transition was successful */
   protected boolean stateTransitionOK = true;
-  
+
   /** The player that as being listened to */
   protected Player player = null;
 
   /**
    * Creates a new player listener for the realized player <code>p</code>.
-   * 
+   *
    * @param p
    *          the player
    */
@@ -107,7 +107,7 @@ public class PlayerListener implements ControllerListener {
 
   /**
    * Returns as soon as there is a successful state transition in the player that matches the requested state.
-   * 
+   *
    * @param state
    *          the controller state
    * @return <code>true</code> if the transition was successful
@@ -128,7 +128,7 @@ public class PlayerListener implements ControllerListener {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.media.ControllerListener#controllerUpdate(javax.media.ControllerEvent)
    */
   public void controllerUpdate(ControllerEvent evt) {

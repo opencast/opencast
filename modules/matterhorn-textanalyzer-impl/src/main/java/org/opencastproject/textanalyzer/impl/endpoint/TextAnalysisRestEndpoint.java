@@ -47,7 +47,7 @@ import javax.ws.rs.core.Response.Status;
  * The REST endpoint for {@link MediaAnalysisService}s
  */
 @Path("")
-@RestService(name = "textanalysis", title = "Text Analysis Service", 
+@RestService(name = "textanalysis", title = "Text Analysis Service",
   abstractText = "This service enables conversion from one caption format to another.",
   notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
@@ -69,7 +69,7 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
@@ -101,7 +101,7 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -111,7 +111,7 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Sets the text analyzer
-   * 
+   *
    * @param textAnalyzer
    *          the text analyzer
    */
@@ -121,7 +121,7 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -134,7 +134,7 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override

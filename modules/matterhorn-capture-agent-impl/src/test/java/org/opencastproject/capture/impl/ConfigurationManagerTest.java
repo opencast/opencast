@@ -49,7 +49,7 @@ public class ConfigurationManagerTest {
   private ConfigurationManager configManager;
 
   private static final Logger logger = LoggerFactory.getLogger(ConfigurationManagerTest.class);
-  
+
   @Before
   public void setUp() throws ConfigurationException, IOException, URISyntaxException {
     configManager = new ConfigurationManager();
@@ -290,7 +290,7 @@ public class ConfigurationManagerTest {
     Thread.sleep(100);
     verify(registersAfter);
   }
-  
+
   @Test
   public void testPropertiesAreStripped() {
     configManager = new ConfigurationManager();
@@ -306,12 +306,12 @@ public class ConfigurationManagerTest {
       logger.error(e.getMessage());
       Assert.fail("ConfigurationException cccured before the test could complete. ");
     }
-    
+
     Properties returnedProperties = configManager.getAllProperties();
     Assert.assertTrue("Configuration Manager doesn't trim blank entries properly. ",
             returnedProperties.getProperty(blanks).equalsIgnoreCase(""));
     Assert.assertTrue("Configuration Manager doesn't trim ntries with spaces properly. ", returnedProperties
             .getProperty(withoutLeadingAndTrailing).equalsIgnoreCase(withoutLeadingAndTrailing));
   }
-  
+
 }

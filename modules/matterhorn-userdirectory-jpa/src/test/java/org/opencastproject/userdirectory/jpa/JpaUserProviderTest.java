@@ -39,7 +39,7 @@ public class JpaUserProviderTest {
   private JpaUserAndRoleProvider provider = null;
   private Organization org1 = null;
   private Organization org2 = null;
-  
+
   @Before
   public void setUp() throws Exception {
     Map<String, Integer> server1 = new HashMap<String, Integer>();
@@ -78,13 +78,13 @@ public class JpaUserProviderTest {
     Set<String> authorities = new HashSet<String>();
     authorities.add("ROLE_ASTRO_101_SPRING_2011_STUDENT");
     JpaUser user = new JpaUser("user1", "pass1", org1.getId(), authorities);
-    
+
     // Set the security sevice
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getOrganization()).andReturn(org1).anyTimes();
     EasyMock.replay(securityService);
     provider.setSecurityService(securityService);
-    
+
     provider.addUser(user);
     Assert.assertNotNull(provider.loadUser("user1"));
     Assert.assertNull("Loading 'does not exist' should return null", provider.loadUser("does not exist"));

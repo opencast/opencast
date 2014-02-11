@@ -15,32 +15,6 @@
  */
 package org.opencastproject.episode.persistence;
 
-import org.apache.commons.io.FileUtils;
-import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.opencastproject.episode.impl.persistence.AbstractEpisodeServiceDatabase;
-import org.opencastproject.episode.impl.persistence.Episode;
-import org.opencastproject.episode.impl.persistence.EpisodeServiceDatabase;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.security.api.AccessControlEntry;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.SecurityConstants;
-import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.User;
-import org.opencastproject.util.Checksum;
-import org.opencastproject.util.PathSupport;
-import org.opencastproject.util.persistence.PersistenceEnv;
-import org.opencastproject.util.persistence.PersistenceUtil;
-
-import java.io.File;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -50,6 +24,35 @@ import static org.opencastproject.episode.impl.EpisodeServiceImpl.rewriteAssetsF
 import static org.opencastproject.mediapackage.MediaPackageSupport.copy;
 import static org.opencastproject.mediapackage.MediaPackageSupport.loadFromClassPath;
 import static org.opencastproject.util.data.Option.some;
+
+import org.opencastproject.episode.impl.persistence.AbstractEpisodeServiceDatabase;
+import org.opencastproject.episode.impl.persistence.Episode;
+import org.opencastproject.episode.impl.persistence.EpisodeServiceDatabase;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.SecurityConstants;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
+import org.opencastproject.util.Checksum;
+import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.persistence.PersistenceEnv;
+import org.opencastproject.util.persistence.PersistenceUtil;
+
+import org.apache.commons.io.FileUtils;
+import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.File;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Tests persistence: storing, merging, retrieving and removing.
@@ -69,19 +72,22 @@ public class EpisodeServicePersistenceTest {
     storage = PathSupport.concat("target", "db" + currentTime + ".h2.db");
 
     securityService = EasyMock.createNiceMock(SecurityService.class);
-    User user = new User("admin", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
-            new String[] { SecurityConstants.GLOBAL_ADMIN_ROLE });
+    DefaultOrganization defaultOrganization = new DefaultOrganization();
+    User user = new JaxbUser("admin", defaultOrganization, new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE,
+            defaultOrganization));
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
 
     penv = PersistenceUtil.newTestPersistenceEnv("org.opencastproject.episode.impl.persistence");
     episodeDatabase = new AbstractEpisodeServiceDatabase() {
-      @Override protected PersistenceEnv getPenv() {
+      @Override
+      protected PersistenceEnv getPenv() {
         return penv;
       }
 
-      @Override protected SecurityService getSecurityService() {
+      @Override
+      protected SecurityService getSecurityService() {
         return securityService;
       }
     };
@@ -133,12 +139,12 @@ public class EpisodeServicePersistenceTest {
     assertNotNull("Media package elements are supposed to have checksums", checksum);
     episodeDatabase.storeEpisode(mkPartial(mediaPackage), accessControlList, new Date(), version(1L));
     assertTrue("There should be one asset with checksum " + checksum,
-               episodeDatabase.findAssetByChecksum(checksum.toString()).isSome());
+            episodeDatabase.findAssetByChecksum(checksum.toString()).isSome());
     Date deletionDate = new Date();
     episodeDatabase.deleteEpisode(mediaPackage.getIdentifier().toString(), deletionDate);
     assertEquals(deletionDate, episodeDatabase.getDeletionDate(mediaPackage.getIdentifier().toString()).get());
     assertTrue("Asset with checksum " + checksum + " should have been deleted",
-               episodeDatabase.findAssetByChecksum(checksum.toString()).isNone());
+            episodeDatabase.findAssetByChecksum(checksum.toString()).isNone());
   }
 
   @Test
@@ -168,7 +174,8 @@ public class EpisodeServicePersistenceTest {
     episodeDatabase.storeEpisode(mkPartial(mediaPackage), accessControlList, new Date(), version(1L));
     final MediaPackageElement mpe = mediaPackage.getElements()[0];
     assertTrue(episodeDatabase.findAssetByChecksum(mpe.getChecksum().toString()).isSome());
-    assertEquals(mpe.getChecksum().toString(), episodeDatabase.findAssetByChecksum(mpe.getChecksum().toString()).get().getChecksum());
+    assertEquals(mpe.getChecksum().toString(), episodeDatabase.findAssetByChecksum(mpe.getChecksum().toString()).get()
+            .getChecksum());
     episodeDatabase.storeEpisode(mkPartial(mediaPackage), accessControlList, new Date(), version(2L));
     assertTrue(episodeDatabase.findAssetByChecksum(mpe.getChecksum().toString()).isSome());
     episodeDatabase.storeEpisode(mkPartial(mediaPackage), accessControlList, new Date(), version(3L));

@@ -23,7 +23,8 @@
       </ul>
     </fieldset>
 
-    <script type="text/javascript">           
+    <script type="text/javascript">   
+      var ocWorkflowPanel = ocWorkflowPanel || {};        
       ocWorkflowPanel.registerComponents = function(components){
         /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
          * into the workflow. The component's nodeKey must match the components array key.

@@ -62,8 +62,7 @@ public class RestDocsAnnotationTest {
 
     // notes
     assertEquals(2, restServiceAnnotation.notes().length);
-    assertEquals(
-            "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+    assertEquals("All paths above are relative to the REST endpoint base (something like http://your.server/files)",
             restServiceAnnotation.notes()[0]);
     assertEquals(
             "If the service is down or not working it will return a status 503, this means the the underlying service is not working and is either restarting or has failed",
@@ -148,8 +147,7 @@ public class RestDocsAnnotationTest {
         assertEquals(HttpServletResponse.SC_BAD_REQUEST, restQueryAnnotation.reponses()[1].responseCode());
         assertEquals("", restQueryAnnotation.reponses()[1].description());
 
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                restQueryAnnotation.reponses()[2].responseCode());
+        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, restQueryAnnotation.reponses()[2].responseCode());
         assertEquals("", restQueryAnnotation.reponses()[2].description());
 
       }
@@ -197,8 +195,7 @@ public class RestDocsAnnotationTest {
 
         // name, description and return description
         assertEquals("addTrackInputStream", endpoint.getName());
-        assertEquals("Add a media track to a given media package using an input stream",
-                endpoint.getDescription());
+        assertEquals("Add a media track to a given media package using an input stream", endpoint.getDescription());
         assertEquals(1, endpoint.getNotes().size());
         assertEquals("Return value description: augmented media package", endpoint.getNotes().get(0));
 
@@ -306,7 +303,7 @@ public class RestDocsAnnotationTest {
       fail();
     }
   }
-  
+
   @Test
   public void testPathPatternMatching() throws Exception {
     assertTrue("/{seriesID:.+}".matches(RestDocData.PATH_VALIDATION_REGEX));

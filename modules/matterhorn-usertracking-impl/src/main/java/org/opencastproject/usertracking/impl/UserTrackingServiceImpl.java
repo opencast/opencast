@@ -53,7 +53,7 @@ import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Implementation of org.opencastproject.usertracking.api.UserTrackingService
- * 
+ *
  * @see org.opencastproject.usertracking.api.UserTrackingService
  */
 public class UserTrackingServiceImpl implements UserTrackingService, ManagedService {
@@ -308,7 +308,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-  
+
   @SuppressWarnings("unchecked")
   public UserActionList getUserActionsByTypeAndDay(String type, String day, int offset, int limit) {
     UserActionList result = new UserActionListImpl();
@@ -377,7 +377,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-  
+
   public UserActionList getUserActionsByTypeAndMediapackageIdByDescendingDate(String type, String mediapackageId,
           int offset, int limit) {
     UserActionList result = new UserActionListImpl();
@@ -406,7 +406,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-  
+
   @SuppressWarnings("unchecked")
   public UserSummaryListImpl getUserSummaryByTypeAndMediaPackage(String type, String mediapackageId) {
     UserSummaryListImpl result = new UserSummaryListImpl();
@@ -423,7 +423,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
         result.add(userSummary);
       }
       return result;
-    } catch (Exception e) { 
+    } catch (Exception e) {
       logger.warn("Unable to return any results from mediapackage " + mediapackageId + " of type " + type + " because of ", e);
       return result;
     }
@@ -433,7 +433,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-  
+
   private int getTotal(String type, Calendar calBegin, Calendar calEnd) {
     EntityManager em = null;
     try {
@@ -464,7 +464,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-  
+
   @SuppressWarnings("unchecked")
   public UserActionList getUserActionsByDay(String day, int offset, int limit) {
     UserActionList result = new UserActionListImpl();
@@ -600,7 +600,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-  
+
   public FootprintList getFootprints(String mediapackageId, String userId) {
     EntityManager em = null;
     try {
@@ -653,7 +653,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.usertracking.api.UserTrackingService#getUserAction(java.lang.Long)
    */
   @Override
@@ -679,7 +679,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.usertracking.api.UserTrackingService#getUserTrackingEnabled()
    */
   @Override
