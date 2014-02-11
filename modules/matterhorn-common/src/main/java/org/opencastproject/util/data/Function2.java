@@ -34,9 +34,13 @@ public abstract class Function2<A, B, C> {
     return Functions.curry(this, a);
   }
 
-  /** Currying. */
+  /** Currying. (a, b) -> c => a -> b -> c */
   public Function<A, Function<B, C>> curry() {
     return Functions.curry(this);
+  }
+
+  public Function<Tuple<A, B>, C> tupled() {
+    return Functions.tupled(this);
   }
 
   /** Argument flipping. */

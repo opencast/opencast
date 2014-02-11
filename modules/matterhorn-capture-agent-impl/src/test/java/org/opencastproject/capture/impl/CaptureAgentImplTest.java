@@ -171,7 +171,7 @@ public class CaptureAgentImplTest {
             captureAgentImpl.loadRecording(new File(captureAgentImpl.getKnownRecordings().get(id).getBaseDir(), id + ".recording"))
                     .getState());
 
-    // Test to make sure the manifest file gets created correctly. 
+    // Test to make sure the manifest file gets created correctly.
     manifestFile = new File(outputdir.getAbsolutePath(), CaptureParameters.MANIFEST_NAME);
     // Wait and see if the manifest file is actually there.
     waiter = new WaitForState();
@@ -186,8 +186,8 @@ public class CaptureAgentImplTest {
       }
     });
     Assert.assertTrue("Manifest file does not exist!", manifestFile.exists());
-    
-    // Test to make sure that the zipped media is created. 
+
+    // Test to make sure that the zipped media is created.
     zippedMedia = new File(outputdir.getAbsolutePath(), CaptureParameters.ZIP_NAME);
     // Wait and see if the zipped media file is actually there.
     waiter = new WaitForState();
@@ -282,7 +282,7 @@ public class CaptureAgentImplTest {
     Assert.assertEquals(0, captureAgentImpl.getKnownRecordings().size());
     captureAgentImpl.loadRecordingsFromDisk();
     Assert.assertEquals(0, captureAgentImpl.getKnownRecordings().size());
-    
+
     captureAgentImpl.activate(null);
 
     // More error handling tests
@@ -367,7 +367,7 @@ public class CaptureAgentImplTest {
           return false;
         }
       }
-    });    
+    });
     Assert.assertFalse("The configuration manager is just created it shouldn't be updated yet.", captureAgentImpl.isRefreshed());
     Assert.assertFalse("The agent is just created it shouldn't be updated either", captureAgentImpl.isUpdated());
     captureAgentImpl.updated(loadProperties("config/scheduler.properties"));
@@ -381,7 +381,7 @@ public class CaptureAgentImplTest {
           return false;
         }
       }
-    });    
+    });
     Assert.assertFalse("The config manager hasn't been updated so should not be refreshed.", captureAgentImpl.isRefreshed());
     Assert.assertTrue("The agent has been updated, so updated should be true.", captureAgentImpl.isUpdated());
     config.updated(p);
@@ -422,7 +422,7 @@ public class CaptureAgentImplTest {
           return false;
         }
       }
-    });    
+    });
     Assert.assertFalse("The configuration manager is just created it shouldn't be updated yet.", captureAgentImpl.isRefreshed());
     Assert.assertFalse("The agent is just created it shouldn't be updated either", captureAgentImpl.isUpdated());
     config.updated(p);
@@ -455,7 +455,7 @@ public class CaptureAgentImplTest {
     Assert.assertTrue("The agent should still be updated.", captureAgentImpl.isUpdated());
     Assert.assertNotNull("If the properties are set, a SchedulerImpl should be created.", captureAgentImpl.getSchedulerImpl());
   }
-  
+
   @Test
   public void configurationManagerComingUpCompletelyBeforeCaptureAgentImplOkay() throws IOException,
           ConfigurationException, InterruptedException {
@@ -477,7 +477,7 @@ public class CaptureAgentImplTest {
       }
     });
     Assert.assertTrue(config.isInitialized());
-    
+
     captureAgentImpl = new CaptureAgentImpl();
     //captureAgentImpl.setCaptureFramework(new GStreamerCaptureFramework());
     captureAgentImpl.setConfigService(config);
@@ -510,7 +510,7 @@ public class CaptureAgentImplTest {
     Assert.assertTrue("The agent should be updated.", captureAgentImpl.isUpdated());
     Assert.assertNotNull("If the properties are set, a SchedulerImpl should be created.", captureAgentImpl.getSchedulerImpl());
   }
-  
+
   @Test
   public void captureAgentImplComingUpFullyBeforeConfigurationManagerOkay() throws IOException,
           ConfigurationException, InterruptedException {
@@ -564,7 +564,7 @@ public class CaptureAgentImplTest {
     Assert.assertTrue("The agent should be updated.", captureAgentImpl.isUpdated());
     Assert.assertNotNull("If the properties are set, a SchedulerImpl should be created.", captureAgentImpl.getSchedulerImpl());
   }
-  
+
   private Properties setupConfigurationManagerProperties() throws IOException {
     Properties p = loadProperties("config/capture.properties");
     p.put("org.opencastproject.storage.dir",

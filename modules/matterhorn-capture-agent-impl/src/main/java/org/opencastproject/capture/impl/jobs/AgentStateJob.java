@@ -53,9 +53,9 @@ public class AgentStateJob implements Job {
   private StateService state = null;
   private TrustedHttpClient client = null;
   private String localAddress = "";
-  private int statePushCount = -1; 
-  
-  /** 
+  private int statePushCount = -1;
+
+  /**
    * Creates a unique identifier that will allow us to track which updates are having errors to when they started.
    * @return An ever increasing int that will wrap around once it hits Interger.MAX_VALUE
    */
@@ -68,10 +68,10 @@ public class AgentStateJob implements Job {
     }
     return globalStatePushCount++;
   }
-  
+
   /**
    * Pushes the agent's state to the remote state service. {@inheritDoc}
-   * 
+   *
    * @see org.quartz.Job#execute(JobExecutionContext)
    * @throws JobExecutionException
    */
@@ -153,9 +153,9 @@ public class AgentStateJob implements Job {
 
     // For each recording being tracked by the system send an update
     Map<String, AgentRecording> recordings = state.getKnownRecordings();
-    
+
     for (Entry<String, AgentRecording> e : recordings.entrySet()) {
-      if (!RecordingState.WORKFLOW_IGNORE_STATES.contains(e.getValue().getState())) { 
+      if (!RecordingState.WORKFLOW_IGNORE_STATES.contains(e.getValue().getState())) {
         List<NameValuePair> formParams = new ArrayList<NameValuePair>();
         formParams.add(new BasicNameValuePair("state", e.getValue().getState()));
         logger.debug("#" + statePushCount + " - Sending recording {}'s state: {}.", e.getKey(), e.getValue().getState());
@@ -171,7 +171,7 @@ public class AgentStateJob implements Job {
   /**
    * Utility method to POST data to a URL. This method encodes the data in UTF-8 as post data, rather than multipart
    * MIME.
-   * 
+   *
    * @param formParams
    *          The data to send.
    * @param url

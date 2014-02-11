@@ -131,6 +131,11 @@
       <artifactId>javax.activation-mail</artifactId>
       <version>1.1.1.1.4.2-1.4.2</version>
 	</dependency>
+	
+	<dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>javax.persistence</artifactId>
+    </dependency>
 
     <!-- Logging -->
 
@@ -142,24 +147,37 @@
     
     <!-- Testing -->
 
+    <!-- REST test environment -->
+    <dependency>
+      <groupId>com.jayway.restassured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <version>1.8.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-library</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
     </dependency>
-    
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <scope>test</scope>
     </dependency>
-    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-    
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
@@ -305,7 +323,7 @@
               org.springframework.security.web.authentication,
               org.springframework.security.web.authentication.www,
               org.springframework.security.web.authentication.logout,
-              org.springframework.util,              
+              org.springframework.util,
               org.opencastproject.job.api;version=${project.version},
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.serviceregistry.api;version=${project.version},
@@ -340,8 +358,9 @@
               OSGI-INF/https-filter.xml, 
               OSGI-INF/jsonp.xml,
               OSGI-INF/organization-directory-service.xml,
-              OSGI-INF/organization-filter.xml,
               OSGI-INF/organization-persistence.xml,
+              OSGI-INF/organization-filter.xml,
+              OSGI-INF/organization-role-provider.xml,
               OSGI-INF/current-job-filter.xml,
               OSGI-INF/pingback.xml,
               OSGI-INF/rest.xml,

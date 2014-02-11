@@ -16,8 +16,11 @@
 package org.opencastproject.usertracking.impl;
 
 import org.opencastproject.rest.RestConstants;
+import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.User;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserTrackingException;
 import org.opencastproject.usertracking.api.UserTrackingService;
@@ -49,10 +52,14 @@ public class UserTrackingRestServiceTest {
   @Before
   public void setUp() throws UserTrackingException {
     SecurityService security = EasyMock.createMock(SecurityService.class);
-    EasyMock.expect(security.getUser()).andReturn(new User(MOCK_USER, "mh_default", new String[] {"ROLE_USER"})).anyTimes();
+    EasyMock.expect(security.getUser())
+            .andReturn(
+                    new JaxbUser(MOCK_USER, new DefaultOrganization(), new JaxbRole("ROLE_USER",
+                            new DefaultOrganization()))).anyTimes();
 
     BundleContext bc = EasyMock.createMock(BundleContext.class);
-    EasyMock.expect(bc.getProperty("org.opencastproject.server.url")).andReturn("http://www.example.org:8080").anyTimes();
+    EasyMock.expect(bc.getProperty(MatterhornConstans.SERVER_URL_PROPERTY)).andReturn("http://www.example.org:8080")
+            .anyTimes();
 
     @SuppressWarnings("rawtypes")
     Dictionary dict = EasyMock.createMock(Dictionary.class);
@@ -94,10 +101,11 @@ public class UserTrackingRestServiceTest {
     return request;
   }
 
-  @Test @Ignore
+  @Test
+  @Ignore
   public void testNullContext() {
     service.activate(null);
-    //This is broken, the Response object generated in the REST service can't find the appropriate class :(
+    // This is broken, the Response object generated in the REST service can't find the appropriate class :(
     HttpServletRequest request = getMockHttpSession();
     Response r = service.addFootprint("test", "0", "10", "FOOTPRINT", "true", request);
     UserAction a = (UserAction) r.getEntity();

@@ -66,7 +66,7 @@ public class CaptureRestService {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
@@ -75,7 +75,7 @@ public class CaptureRestService {
 
   /**
    * Set {@link org.opencastproject.capture.api.CaptureAgent} service.
-   * 
+   *
    * @param service
    *          Service implemented {@link org.opencastproject.capture.api.CaptureAgent}
    */
@@ -85,7 +85,7 @@ public class CaptureRestService {
 
   /**
    * Unset {@link org.opencastproject.capture.api.CaptureAgent} service.
-   * 
+   *
    * @param service
    *          Service implemented {@link org.opencastproject.capture.api.CaptureAgent}
    */
@@ -119,7 +119,7 @@ public class CaptureRestService {
               .entity("Exception while trying to start capture: " + e.getMessage() + ".").build();
     }
   }
-  
+
   @POST
   @Produces(MediaType.TEXT_PLAIN)
   @Path("startCapture")
@@ -159,7 +159,7 @@ public class CaptureRestService {
               .entity("Exception while trying to start capture: " + e.getMessage() + ".").build();
     }
   }
-  
+
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("stopCapture")
@@ -185,7 +185,7 @@ public class CaptureRestService {
               .entity("Exception while trying to stop capture: " + e.getMessage() + ".").build();
     }
   }
-  
+
   @POST
   @Produces(MediaType.TEXT_PLAIN)
   @Path("stopCapture")
@@ -214,12 +214,12 @@ public class CaptureRestService {
               .entity("Exception while trying to stop capture: " + e.getMessage() + ".").build();
     }
   }
-  
+
   @GET
   @Produces({ MediaType.TEXT_XML, MediaType.TEXT_PLAIN })
   @Path("configuration.{type:xml|txt}")
   @RestQuery(name = "config", description = "Returns a list with the default agent configuration properties.  This is in the same format as the startCapture endpoint.", pathParameters = {
-		      @RestParameter(name = "type", description = "The Document Type", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = { }, reponses = {
+          @RestParameter(name = "type", description = "The Document Type", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = { }, reponses = {
           @RestResponse(description = "the configuration values are returned", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "the configuration properties could not be retrieved", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
           @RestResponse(description = "Capture Agent is unavailable", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
@@ -244,7 +244,7 @@ public class CaptureRestService {
               .entity("Exception while trying to obtain metadata: " + e.getMessage() + ".").build();
     }
   }
-  
+
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("schedule")

@@ -15,16 +15,15 @@
  */
 package org.opencastproject.kernel.userdirectory;
 
+import org.opencastproject.security.api.JaxbRoleList;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleDirectoryService;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.json.simple.JSONArray;
-
-import java.util.Arrays;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.Iterator;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -42,17 +41,35 @@ public class RoleEndpoint {
   /** The role directory service */
   protected RoleDirectoryService roleDirectoryService = null;
 
+  /** The organization directory service */
+  protected OrganizationDirectoryService organizationDirectoryService = null;
+
+  /**
+   * @param organizationDirectory
+   *          the organization directory
+   */
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
+    this.organizationDirectoryService = organizationDirectory;
+  }
+
   @GET
-  @Path("list.json")
+  @Path("roles.xml")
+  @Produces(MediaType.APPLICATION_XML)
+  @RestQuery(name = "rolesasxml", description = "Lists the roles as XML", returnDescription = "The list of roles as XML", reponses = { @RestResponse(responseCode = 200, description = "OK, roles returned") })
+  public JaxbRoleList getRolesAsXml() {
+    JaxbRoleList roleList = new JaxbRoleList();
+    for (Iterator<Role> i = roleDirectoryService.getRoles(); i.hasNext();) {
+      roleList.add(i.next());
+    }
+    return roleList;
+  }
+
+  @GET
+  @Path("roles.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "roles", description = "Lists the roles as a json array", returnDescription = "The list of roles as a json array", reponses = { @RestResponse(responseCode = 200, description = "OK, roles returned") })
-  @SuppressWarnings("unchecked")
-  public String getRoles() {
-    SortedSet<String> knownRoles = new TreeSet<String>();
-    knownRoles.addAll(Arrays.asList(roleDirectoryService.getRoles()));
-    JSONArray json = new JSONArray();
-    json.addAll(knownRoles);
-    return json.toJSONString();
+  @RestQuery(name = "rolesasjson", description = "Lists the roles as JSON", returnDescription = "The list of roles as JSON", reponses = { @RestResponse(responseCode = 200, description = "OK, roles returned") })
+  public JaxbRoleList getRolesAsJson() {
+    return getRolesAsXml();
   }
 
   /**

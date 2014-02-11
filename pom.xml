@@ -17,7 +17,7 @@
     <matterhorn.basedir>${basedir}</matterhorn.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <checkstyle.skip>true</checkstyle.skip>
+    <checkstyle.skip>false</checkstyle.skip>
     <jmeter.version>2.4</jmeter.version>
     <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
   </properties>
@@ -30,9 +30,13 @@
       <id>admin</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-admin-ui</module>
+        <module>modules/matterhorn-authorization-manager</module>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-caption-api</module>
         <module>modules/matterhorn-caption-remote</module>
@@ -72,7 +76,7 @@
         <module>modules/matterhorn-static</module>
         <module>modules/matterhorn-solr</module>
         <module>modules/matterhorn-textanalyzer-api</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
@@ -86,6 +90,9 @@
       <id>analytics</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-analytics-impl</module>
@@ -107,6 +114,9 @@
       <id>export-admin</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -123,6 +133,9 @@
       <id>export-worker</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-gstreamer-service-api</module>
@@ -134,6 +147,9 @@
       <id>export-all-in-one</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -150,6 +166,9 @@
       <id>ingest</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -168,7 +187,7 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -179,6 +198,9 @@
       <id>ingest-standalone</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -197,10 +219,10 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
-        <module>modules/matterhorn-workflow-service-remote</module>   
+        <module>modules/matterhorn-workflow-service-remote</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-working-file-repository-service-impl</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -212,6 +234,9 @@
       <id>dist-standalone</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -233,7 +258,7 @@
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-remote</module>
         <module>modules/matterhorn-static</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -244,6 +269,9 @@
       <id>dist</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -265,7 +293,7 @@
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
         <module>modules/matterhorn-static</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -276,6 +304,9 @@
       <id>dist-stub</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -304,6 +335,9 @@
       <id>engage</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-annotation-api</module>
@@ -326,7 +360,7 @@
         <module>modules/matterhorn-search-service-feeds</module>
         <module>modules/matterhorn-search-service-impl</module>
         <module>modules/matterhorn-solr</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-usertracking-api</module>
         <module>modules/matterhorn-usertracking-impl</module>
         <module>modules/matterhorn-webconsole</module>
@@ -338,6 +372,9 @@
       <id>engage-standalone</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-annotation-api</module>
@@ -360,7 +397,7 @@
         <module>modules/matterhorn-search-service-feeds</module>
         <module>modules/matterhorn-search-service-impl</module>
         <module>modules/matterhorn-solr</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-usertracking-api</module>
         <module>modules/matterhorn-usertracking-impl</module>
         <module>modules/matterhorn-webconsole</module>
@@ -372,6 +409,9 @@
       <id>engage-stub</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -401,6 +441,9 @@
       <id>worker</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -415,6 +458,9 @@
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-inspection-service-impl</module>
+        <!--
+        <module>modules/matterhorn-inspection-service-ffmpeg</module>
+        -->
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -427,10 +473,7 @@
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
         <module>modules/matterhorn-textextractor-tesseract</module>
-        <!--
-        <module>modules/matterhorn-textextractor-ocropus</module>
-        -->
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-impl</module>
         <module>modules/matterhorn-webconsole</module>
@@ -442,6 +485,9 @@
       <id>worker-standalone</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -456,6 +502,9 @@
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-inspection-service-impl</module>
+        <!--
+        <module>modules/matterhorn-inspection-service-ffmpeg</module>
+        -->
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -468,10 +517,7 @@
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
         <module>modules/matterhorn-textextractor-tesseract</module>
-        <!--
-        <module>modules/matterhorn-textextractor-ocropus</module>
-        -->
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-impl</module>
         <module>modules/matterhorn-webconsole</module>
@@ -483,6 +529,9 @@
       <id>worker-stub</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -513,6 +562,9 @@
       <id>workspace</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -528,6 +580,9 @@
       <id>workspace-stub</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -543,6 +598,9 @@
       <id>serviceregistry</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -557,6 +615,9 @@
       <id>serviceregistry-stub</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -570,6 +631,9 @@
       <id>oaipmh</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -591,6 +655,9 @@
       <id>directory-db</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -600,7 +667,7 @@
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-userdirectory-jpa</module>
+        <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-workspace-api</module>
       </modules>
     </profile>
@@ -609,6 +676,9 @@
       <id>directory-ldap</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -622,6 +692,9 @@
       <id>directory-cas</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-security-cas</module>
@@ -632,6 +705,9 @@
       <id>directory-openid</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-security-openid</module>
@@ -639,9 +715,25 @@
     </profile>
 
     <profile>
+      <id>directory-shibboleth</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-security-shibboleth</module>
+      </modules>
+    </profile>
+
+    <profile>
       <id>capture</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -659,9 +751,26 @@
     </profile>
 
     <profile>
+      <id>server-management</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-manager-api</module>
+        <module>modules/matterhorn-manager-impl</module>
+      </modules>
+    </profile>
+
+    <profile>
       <id>test</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>test</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-test-harness</module>
@@ -700,6 +809,11 @@
       <id>test-performance</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <!-- They don't work at all
+        <property>
+          <name>test</name>
+        </property>
+        -->
       </activation>
       <build>
         <plugins>
@@ -742,6 +856,9 @@
       <id>test-load</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>test</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -770,6 +887,7 @@
         <directory>${project.basedir}/src/test/resources</directory>
       </testResource>
     </testResources>
+    <!-- This defines what plugins run on a global basis.  Plugins defined here run for all child poms without needing to reference them from the child pom.  Note that configuration data goes in the pluginManagement stanza below -->
     <plugins>
       <!-- Require Java 6 or higher for building -->
       <plugin>
@@ -868,7 +986,12 @@
         <artifactId>maven-clover2-plugin</artifactId>
         <version>3.1.5</version>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+      </plugin>
     </plugins>
+    <!-- This defines the global plugin configurations.  Plugins with configuration shared across multiple child poms should be configured here, and then referenced in the child. -->
     <pluginManagement>
       <plugins>
         <!-- Fix eclipse (indigo) maven integration -->
@@ -996,7 +1119,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>2.0.1</version>
+          <version>3.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -1032,6 +1155,42 @@
               <id>performance-test</id>
               <goals>
                 <goal>jmeter</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>1.7</version>
+          <configuration>
+            <sources>
+              <source>${basedir}/src/main/resources/</source>
+            </sources>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>add-source</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>3.0.1</version>
+          <configuration>
+            <!--<includeTests>true</includeTests>-->
+            <typeResolution>true</typeResolution>
+            <targetJdk>1.6</targetJdk>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>validate</phase>
+              <goals>
+                <goal>pmd</goal>
+                <goal>cpd</goal>
               </goals>
             </execution>
           </executions>
@@ -1404,13 +1563,13 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.5.8</version>
+        <version>1.6.4</version>
       </dependency>
 
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
-        <version>1.5.8</version>
+        <version>1.6.4</version>
       </dependency>
 
       <dependency>
@@ -1473,7 +1632,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>1.6</version>
+        <version>2.3</version>
       </dependency>
 
       <dependency>
@@ -1487,7 +1646,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.5</version>
+        <version>4.11</version>
         <scope>test</scope>
       </dependency>
 
@@ -2009,6 +2168,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
         <version>2.5</version>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -2020,7 +2182,7 @@
           <!-- <detectLinks>true</detectLinks> -->
           <!-- http://jira.codehaus.org/browse/MJAVADOC-273 -->
           <detectJavaApiLink>true</detectJavaApiLink>
-          <javadocVersion>1.6</javadocVersion>
+          <javadocVersion>1.7</javadocVersion>
           <maxmemory>512m</maxmemory>
           <quiet>true</quiet>
         </configuration>
@@ -2029,6 +2191,13 @@
             <id>default</id>
             <reports>
               <report>javadoc</report>
+            </reports>
+          </reportSet>
+          <reportSet>
+            <id>aggregate</id>
+            <inherited>false</inherited>
+            <reports>
+              <report>aggregate</report>
             </reports>
           </reportSet>
         </reportSets>
@@ -2042,6 +2211,15 @@
           <inputEncoding>UTF-8</inputEncoding>
           <outputEncoding>UTF-8</outputEncoding>
         </configuration>
+        <!--<reportSets>
+          <reportSet>
+            <id>aggregate</id>
+            <inherited>false</inherited>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>-->
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -2050,18 +2228,30 @@
         <configuration>
           <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
         </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>cim</report>
+              <report>dependencies</report>
+              <report>dependency-convergence</report>
+<!--3.3              <report>dependency-info</report>-->
+              <report>dependency-management</report>
+<!--3.3              <report>distribution-management</report>-->
+              <report>index</report>
+              <report>issue-tracking</report>
+<!--              <report>license</report>-->
+              <report>mailing-list</report>
+<!--3.3              <report>modules</report>-->
+              <report>plugin-management</report>
+              <report>plugins</report>
+              <report>project-team</report>
+              <report>scm</report>
+              <report>summary</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
-      <!-- findbugs crashes the build too much -AZ -->
-      <!-- <plugin> -->
-      <!-- <groupId>org.codehaus.mojo</groupId> -->
-      <!-- <artifactId>findbugs-maven-plugin</artifactId> -->
-      <!-- <version>2.3</version> -->
-      <!-- <configuration> -->
-      <!-- <failOnError>false</failOnError> -->
-      <!-- <timeout>30000</timeout> -->
-      <!-- </configuration> -->
-      <!-- </plugin> -->
-      <plugin>
+      <!--<plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
         <version>2.4</version>
@@ -2074,17 +2264,29 @@
           </tags>
         </configuration>
       </plugin>
-      <!-- WARNING: this plugin is beta only, we should maybe not use it -AZ -->
+      <!- - WARNING: this plugin is beta only, we should maybe not use it -AZ - ->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jdepend-maven-plugin</artifactId>
         <version>2.0-beta-2</version>
       </plugin>
+      -->
       <!-- <plugin> -->
       <!-- <groupId>org.codehaus.mojo</groupId> -->
       <!-- <artifactId>cobertura-maven-plugin</artifactId> -->
       <!-- <version>2.3</version> -->
       <!-- </plugin> -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.0.1</version>
+        <configuration>
+          <aggregate>true</aggregate>
+          <!--<includeTests>true</includeTests>-->
+          <typeResolution>true</typeResolution>
+          <targetJdk>1.6</targetJdk>
+        </configuration>
+      </plugin>
     </plugins>
   </reporting>
   <!-- defines the various repositories -->
@@ -2141,7 +2343,7 @@
       <releases>
         <enabled>false</enabled>
       </releases>
-    </repository>    
+    </repository>
     <repository>
       <id>sakai</id>
       <name>Sakai Repo</name>

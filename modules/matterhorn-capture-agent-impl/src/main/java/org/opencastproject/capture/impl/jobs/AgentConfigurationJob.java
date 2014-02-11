@@ -47,7 +47,7 @@ public class AgentConfigurationJob implements Job {
   private static final Logger logger = LoggerFactory.getLogger(AgentStateJob.class);
   private static int globalCapabilityPushCount = 0;
   private int uniqueID = -1;
-  /** 
+  /**
    * Creates a unique identifier that will allow us to track which updates are having errors to when they started.
    * @return An ever increasing int that will wrap around once it hits Interger.MAX_VALUE
    */
@@ -60,10 +60,10 @@ public class AgentConfigurationJob implements Job {
     }
     return globalCapabilityPushCount++;
   }
-  
+
   /**
    * Pushes the agent's capabilities to the remote state service. {@inheritDoc}
-   * 
+   *
    * @see org.quartz.Job#execute(JobExecutionContext)
    * @throws JobExecutionException
    */
@@ -78,7 +78,7 @@ public class AgentConfigurationJob implements Job {
               .error("TrustedHttpClient was null so we won't be able to update the agent capabilities until it is updated.");
       return;
     }
-    
+
     // Figure out where we're sending the data
     String url = config.getItem(CaptureParameters.AGENT_STATE_REMOTE_ENDPOINT_URL);
     if (url == null) {

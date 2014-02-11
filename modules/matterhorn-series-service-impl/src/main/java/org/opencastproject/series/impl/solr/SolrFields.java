@@ -25,7 +25,7 @@ public interface SolrFields {
 
   /** The key in solr documents representing series DC as xml */
   String XML_KEY = "xml";
-  
+
   /** The key representing Access Control List */
   String ACCESS_CONTROL_KEY = "access_control";
 

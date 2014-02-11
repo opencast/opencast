@@ -15,13 +15,6 @@
  */
 package org.opencastproject.series.impl.solr;
 
-import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
@@ -29,12 +22,23 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
+
+import junit.framework.Assert;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.InputStream;
@@ -43,7 +47,7 @@ import java.util.List;
 
 /**
  * Tests indexing: indexing, removing, retrieving, merging and searching.
- * 
+ *
  */
 public class SeriesServiceSolrTest {
 
@@ -58,8 +62,8 @@ public class SeriesServiceSolrTest {
   public void setUp() throws Exception {
     // Mock up a security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    User user = new User("admin", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
-            new String[] { SecurityConstants.GLOBAL_ADMIN_ROLE });
+    User user = new JaxbUser("admin", new DefaultOrganization(), new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE,
+            new DefaultOrganization()));
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
@@ -104,7 +108,8 @@ public class SeriesServiceSolrTest {
     Assert.assertTrue("Index should contain one instance", index.count() == 1);
 
     DublinCoreCatalog returnedCatalog = index.getDublinCore(testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER));
-    Assert.assertTrue("Unexpected Dublin Core", "Test Title".equals(returnedCatalog.getFirst(DublinCore.PROPERTY_TITLE)));
+    Assert.assertTrue("Unexpected Dublin Core",
+            "Test Title".equals(returnedCatalog.getFirst(DublinCore.PROPERTY_TITLE)));
   }
 
   @Test
@@ -162,24 +167,24 @@ public class SeriesServiceSolrTest {
     DublinCoreCatalogList result = index.search(q);
     Assert.assertTrue("Two series satisfy time range", result.size() == 2);
   }
-  
+
   @Test
   public void testAccessControlManagment() throws Exception {
     // sample access control list
     AccessControlList accessControlList = new AccessControlList();
     List<AccessControlEntry> acl = accessControlList.getEntries();
     acl.add(new AccessControlEntry("admin", "delete", true));
-    
+
     index.updateIndex(testCatalog);
     String seriesID = testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER);
     index.updateSecurityPolicy(seriesID, accessControlList);
-    
+
     AccessControlList retrievedACL = index.getAccessControl(seriesID);
     Assert.assertNotNull(retrievedACL);
     acl = retrievedACL.getEntries();
     Assert.assertEquals(acl.size(), 1);
     Assert.assertEquals(acl.get(0).getRole(), "admin");
-    
+
     try {
       index.updateSecurityPolicy("failid", accessControlList);
       Assert.fail("Should fail when indexing ACL to nonexistent series");

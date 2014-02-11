@@ -18,11 +18,21 @@ package org.opencastproject.security.api;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.opencastproject.util.data.Either;
+import org.opencastproject.util.data.Function;
 
 /**
  * Provides secured http client components to access to protected resources.
  */
 public interface TrustedHttpClient {
+  /**
+   * Create a function that takes a function to handle the response of the given request returning
+   * either a result or any occurred exception.
+   * @param httpUriRequest
+   *          The http request
+   * @return <code>HttpUriRequest -> (HttpResponse -> A) -> Either Exception A</code>
+   */
+  <A> Function<Function<HttpResponse, A>, Either<Exception, A>> run(HttpUriRequest httpUriRequest);
 
   /**
    * Executes an HttpRequest using a secure, but not necessarily encrypted, http connection.

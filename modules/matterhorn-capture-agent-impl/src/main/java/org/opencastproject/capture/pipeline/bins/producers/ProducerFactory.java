@@ -72,7 +72,7 @@ public final class ProducerFactory {
 
   /**
    * Returns the Producer corresponding to the ProducerType
-   * 
+   *
    * @param captureDevice
    *          The properties of the capture device such as container, codec, bitrate, enabled confidence monitoring etc.
    *          used to initialize the Producer.
@@ -134,7 +134,7 @@ public final class ProducerFactory {
   /**
    * Returns true if the ProducerType does require a source to create, returns false if ProducerType is null, doesn't
    * exist or doesn't require the source location.
-   * 
+   *
    * @param type
    *          The type of Producer that needs to be checked whether it requires a source.
    * @return Returns true if it requires a source, false otherwise.

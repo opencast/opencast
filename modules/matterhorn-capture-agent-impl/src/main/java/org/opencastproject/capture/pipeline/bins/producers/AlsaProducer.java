@@ -34,7 +34,7 @@ public class AlsaProducer extends AudioProducer {
 
   /**
    * Creates a ProducerBin specifically designed to capture from an ALSA source.
-   * 
+   *
    * @param captureDevice
    *          The ALSA source {@code CaptureDevice} to create Producer around
    * @param properties
@@ -62,7 +62,7 @@ public class AlsaProducer extends AudioProducer {
 
   /**
    * Create all the elements required for an ALSA source
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the platform is not Linux, or the correct module is not installed to support an alsasrc this Exception
    *           is thrown.
@@ -76,7 +76,7 @@ public class AlsaProducer extends AudioProducer {
 
   /**
    * Set the correct location for the ALSA source
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If the alsasrc Element is null this Exception is thrown
    **/
@@ -87,7 +87,7 @@ public class AlsaProducer extends AudioProducer {
       if (captureDevice.getLocation() != null) {
         alsasrc.set(GStreamerProperties.DEVICE, captureDevice.getLocation());
       }
-    } 
+    }
     else {
       throw new UnableToSetElementPropertyBecauseElementWasNullException(alsasrc, GStreamerProperties.DEVICE);
     }
@@ -100,7 +100,7 @@ public class AlsaProducer extends AudioProducer {
 
   /**
    * Link all the necessary elements together.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           If any of the elements will not link together it throws an exception.
    */

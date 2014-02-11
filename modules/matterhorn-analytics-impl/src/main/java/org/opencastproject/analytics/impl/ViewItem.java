@@ -26,60 +26,60 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ViewItem {
 
-	@XmlElement(name = "episode-id")
-	private String id = "";
-	@XmlElement(name = "views")
-	private String views = "";
-	@XmlElement(name = "played")
-	private String played = "";
-	@XmlElement(name = "start")
-	private String start = "";
-	@XmlElement(name = "end")
-	private String end = "";
+  @XmlElement(name = "episode-id")
+  private String id = "";
+  @XmlElement(name = "views")
+  private String views = "";
+  @XmlElement(name = "played")
+  private String played = "";
+  @XmlElement(name = "start")
+  private String start = "";
+  @XmlElement(name = "end")
+  private String end = "";
 
-	/**
-	 * A no-arg constructor needed by JAXB
-	 */
-	public ViewItem() {
-	}
+  /**
+   * A no-arg constructor needed by JAXB
+   */
+  public ViewItem() {
+  }
 
-	public String getId() {
-		return id;
-	}
+  public String getId() {
+    return id;
+  }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+  public void setId(String id) {
+    this.id = id;
+  }
 
-	public String getViews() {
-		return views;
-	}
+  public String getViews() {
+    return views;
+  }
 
-	public void setViews(String views) {
-		this.views = views;
-	}
+  public void setViews(String views) {
+    this.views = views;
+  }
 
-	public String getPlayed() {
-		return played;
-	}
+  public String getPlayed() {
+    return played;
+  }
 
-	public void setPlayed(String played) {
-		this.played = played;
-	}
+  public void setPlayed(String played) {
+    this.played = played;
+  }
 
-	public String getStart() {
-		return start;
-	}
+  public String getStart() {
+    return start;
+  }
 
-	public void setStart(String start) {
-		this.start = start;
-	}
+  public void setStart(String start) {
+    this.start = start;
+  }
 
-	public String getEnd() {
-		return end;
-	}
+  public String getEnd() {
+    return end;
+  }
 
-	public void setEnd(String end) {
-		this.end = end;
-	}
+  public void setEnd(String end) {
+    this.end = end;
+  }
 }
