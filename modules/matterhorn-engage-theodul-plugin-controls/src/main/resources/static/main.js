@@ -34,6 +34,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         styles: PLUGIN_STYLES,
         template: PLUGIN_TEMPLATE
     };
+    var plugin_path = "";
 
     var initCount = 4; //init resource count
     var isPlaying = false;
@@ -296,16 +297,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     //local logic
 
     //Init Event
-    Engage.log("Controls:init");
-
+    Engage.log("Controls: init");
+    var relative_plugin_path = Engage.getPluginPath('EngagePluginControls');
+    Engage.log('Controls: relative plugin path ' + relative_plugin_path);
     //Load other needed JS stuff with Require
-    require(["./js/bootstrap/js/bootstrap.js"], function() {
+    require([relative_plugin_path + 'js/bootstrap/js/bootstrap'], function() {
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
         }
     });
-    require(["./js/jqueryui/jquery-ui.min.js"], function() {
+    require([relative_plugin_path + 'js/jqueryui/jquery-ui.min'], function() {
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();

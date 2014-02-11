@@ -208,7 +208,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     function initPlugin() {
         // set path to swf player
-        var videojs_swf = plugin.pluginPath + "/lib/videojs/video-js.swf";
+        var videojs_swf = plugin.pluginPath + "lib/videojs/video-js.swf";
 
         Engage.model.on("change:videoDataModel", function() {
             new VideoDataView(this.get("videoDataModel"), plugin.template, videojs_swf);
@@ -284,7 +284,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     // init Event
-    Engage.log("Video:init");
+    Engage.log("Video: init");
+    var relative_plugin_path = Engage.getPluginPath('EngagePluginVideoVideoJS');
+    Engage.log('Video: relative plugin path ' + relative_plugin_path);
 
     Engage.model.on("change:mediaPackage", function() { // listen on a change/set of the mediaPackage model
         initCount -= 1;
@@ -292,9 +294,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             initPlugin();
         }
     });
-
     // load video.js lib
-    require(["./lib/videojs/video.js"], function(videojs) {
+    require([relative_plugin_path + "lib/videojs/video"], function(videojs) {
         Engage.log("Video: Load video.js done");
         initCount -= 1;
         if (initCount === 0) {
@@ -303,7 +304,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     });
 
     // load synchronize lib
-    require(["./lib/synchronize.js"], function(videojs) {
+    require([relative_plugin_path + "lib/synchronize"], function(videojs) {
         Engage.log("Video: Load synchronize.js done");
         initCount -= 1;
         if (initCount === 0) {

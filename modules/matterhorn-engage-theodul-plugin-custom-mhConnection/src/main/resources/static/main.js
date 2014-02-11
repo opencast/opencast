@@ -67,6 +67,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                                 model.attributes.description = mediaPackage.dcDescription;
                             if (mediaPackage.dcSubject)
                                 model.attributes.subject = mediaPackage.dcSubject;
+                            if (mediaPackage.dcContributor)
+                                model.attributes.contributor = mediaPackage.dcContributor;
+                            if (mediaPackage.mediapackage.seriestitle)
+                                model.attributes.series = mediaPackage.mediapackage.seriestitle;
                         }
                         model.trigger("change"); //one change event
                     } else {
@@ -113,6 +117,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // plugin logic //
 
     Engage.log("MhConnection: init");
+    var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomMhConnection');
+    Engage.log('MhConnection: relative plugin path ' + relative_plugin_path);
 
     // Get ID
     //mediaPackageID = Engage.urlParams.id;
