@@ -69,7 +69,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             html_snippet += "</div>";
             $("#" + TEMPLATE_TAB_CONTENT_ID).append(html_snippet);
 
-            // Add click handler to each segemnt (slide)
+            // Add click handler to each segment (slide)
             $("#" + html_snippet_id).click(function() {
               console.log("clicked:" + html_snippet_id + " at " + segment.time);
             });
