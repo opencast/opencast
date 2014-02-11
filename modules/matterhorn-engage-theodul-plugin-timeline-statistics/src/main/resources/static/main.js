@@ -20,7 +20,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 	var PLUGIN_TYPE = "engage_timeline";
 	var PLUGIN_VERSION = "0.1";
 	var PLUGIN_TEMPLATE = "template.html";
-	var PLUGIN_STYLES = ["style.css"];
+	var PLUGIN_STYLES = ["style.css", "lib/jquery.jqplot.css"];
   var plugin = {
       name: PLUGIN_NAME,
       type: PLUGIN_TYPE,
@@ -54,7 +54,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         this.$el.html(_.template(this.template, tempVars));
         
         var duration = this.videoData.get("duration");
-        //canvas insert done, init highchart js
         
         //fill array 
         var data = new Array();
@@ -64,66 +63,35 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             if(this.footprints.at(index).get("position") == i)
               cView = this.footprints.at(index).get("views");
           }, this);
-          data.push(cView);
+          data.push([i,cView]);
         }
-
-        //init highchart with options to the div container
-        $('#engage_timeline_statistics_chart').highcharts({
-          title : {
-            text : ""
-          },
-          credits : {
-            enabled : false
-          },
-          exporting : {
-            enabled : false
-          },
-          chart : {
-            type : 'areaspline',
-            spacing : [ 10, 10, 10, 0 ],
-            zoomType: 'x'
-          },
-          tooltip : {
-            formatter : function () {
-              var duration = moment.duration(this.x, "seconds");
-              var tooltip = '<b>' + this.y + ' Views at</b><br/>' + duration.hours() + ':' + duration.minutes() + ':' + duration.seconds();
-              return tooltip;
-            }
-          },
-          yAxis : {
-            title : {
-              enabled : false
+        var data2 = [];
+        for(var i=0; i<10000; i++){
+          data2[i] = [i,123];
+        }
+        //init jqcharts with options to the div container
+        $.jqplot('engage_timeline_statistics_chart', [ data2 ], {
+          axes : {
+            yaxis : {
+              showLabel : false,
+              showTicks : false,
+              padMax : 0,
+              padMin : 0
             },
-            labels : {
-              enabled : false
+            xaxis : {
+              showLabel : false,
+              showTicks : false
             }
-          },
-          xAxis : {
-            title : {
-              align : "low",
-              text : "Minutes"
-            },
-            labels : {
-              formatter : function () {
-                return Math.round(this.value / 60)
-              }
-            }
-          },
-          plotOptions : {
-            areaspline : {
-              marker : {
-                enabled : false
-              }
-            }
-          },
-          legend : {
-            enabled : false
           },
           series : [ {
-            name : "Views",
-            data : data
-          } ]
-        });    
+            color : '#5FAB78',
+            lineWidth : 1,
+            showMarker : false
+          } ],
+          grid : {
+            drawGridlines : false
+          }
+        });
     }
   });
 
@@ -160,23 +128,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
   });
   
   // load highchart lib
-  require(["./lib/highchart/highcharts.js"], function(videojs) {
-      Engage.log("Statistics Timeline: Load highcharts.js done");
+  require(["./lib/jquery.jqplot.min.js"], function(videojs) {
+      Engage.log("Statistics Timeline: Load jqplot.js done");
       initCount -= 1;
       if (initCount === 0) {
           initPlugin();
       }
   });
-  /*
-  // load highchart exporting module lib
-  require(["./lib/highchart/modules/exporting.js"], function(videojs) {
-      Engage.log("Statistics Timeline: Load highchart exporting module done");
-      initCount -= 1;
-      if (initCount === 0) {
-          initPlugin();
-      }
-  });
-  */
+
   // Load moment.js lib
   require(["./lib/moment.min.js"], function(momentjs) {
       Engage.log("Description: load moment.min.js done");
