@@ -778,6 +778,12 @@
 
     <profile>
       <id>sign</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>sign</name>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>
