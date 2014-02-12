@@ -102,7 +102,7 @@ public class LoadTest implements Runnable {
 
   /**
    * Creates a load test with a particular configuration.
-   * 
+   *
    * @param properties
    *          The incoming properties to use for load testing.
    * @param client
@@ -179,7 +179,7 @@ public class LoadTest implements Runnable {
 
   /**
    * Update the important properties for load testing.
-   * 
+   *
    * @param properties
    *          The new properties
    * @throws InvalidConfigurationException
@@ -200,7 +200,7 @@ public class LoadTest implements Runnable {
 
   /**
    * Sets a new URI to hit the core with.
-   * 
+   *
    * @param properties
    *          The new properties to extract the property from.
    * @throws InvalidConfigurationException
@@ -223,7 +223,7 @@ public class LoadTest implements Runnable {
 
   /**
    * Sets a new workflow id to process the media package with.
-   * 
+   *
    * @param properties
    *          The new properties to extract the property from.
    * @throws InvalidConfigurationException
@@ -247,7 +247,7 @@ public class LoadTest implements Runnable {
 
   /**
    * Sets a new workspace location.
-   * 
+   *
    * @param properties
    *          The new properties to extract the property from.
    * @throws InvalidConfigurationException
@@ -284,7 +284,7 @@ public class LoadTest implements Runnable {
 
   /**
    * Sets a new source media package location.
-   * 
+   *
    * @param properties
    *          The new properties to extract the property from.
    * @throws InvalidConfigurationException
@@ -321,7 +321,7 @@ public class LoadTest implements Runnable {
 
   /**
    * Updates to a new interval in seconds to check the ingest jobs.
-   * 
+   *
    * @param properties
    *          The new properties to extract the property from.
    * @throws InvalidConfigurationException
@@ -350,7 +350,7 @@ public class LoadTest implements Runnable {
 
   /**
    * Gets the distribution of media packages to ingest.
-   * 
+   *
    * @param properties
    *          The new properties to extract the property from.
    * @throws InvalidConfigurationException
@@ -391,7 +391,7 @@ public class LoadTest implements Runnable {
 
   /**
    * Gets the time between ingesting each group of ingests.
-   * 
+   *
    * @param properties
    *          The new properties to extract the property from.
    * @throws InvalidConfigurationException
@@ -433,7 +433,7 @@ public class LoadTest implements Runnable {
 
   /**
    * Start the thread to check if ingest jobs have finished.
-   * 
+   *
    * @param ingestJobs
    *          The list of ingests to check.
    */
@@ -479,7 +479,7 @@ public class LoadTest implements Runnable {
 
   /**
    * Creates a string that is a nice representation of an array of ints.
-   * 
+   *
    * @param array
    *          The array to create the string from.
    * @return The String representing the array.

@@ -36,10 +36,10 @@ import org.slf4j.LoggerFactory;
  * Abstract Gstreamer Pipeline wrapper.
  */
 public abstract class GStreamerAbstractPipeline implements GStreamerPipeline {
-  
+
   private static final Logger logger = LoggerFactory.getLogger(GStreamerAbstractPipeline.class);
-  
-  /** The amount of time to wait until shutting down the pipeline forcefully.**/ 
+
+  /** The amount of time to wait until shutting down the pipeline forcefully.**/
   public static final long DEFAULT_PIPELINE_SHUTDOWN_TIMEOUT = 60000L;
   /** Wait intervall time to check pipeline state is null. **/
   protected static final int WAIT_FOR_NULL_SLEEP_TIME = 1000;
@@ -50,34 +50,34 @@ public abstract class GStreamerAbstractPipeline implements GStreamerPipeline {
    * initialisation routines
    */
   public static final long GST_SECOND = 1000000000L;
-  // Capture properties. 
+  // Capture properties.
   protected Properties properties;
-  // List of captureDeviceBins inside the pipeline so that we can send each an EOS. 
+  // List of captureDeviceBins inside the pipeline so that we can send each an EOS.
   protected ArrayList<CaptureDeviceBin> captureDeviceBins;
-  // Pipeline used to capture. 
+  // Pipeline used to capture.
   protected Pipeline pipeline;
   // Monitoring listener class.
   protected MonitoringListener monitoringListener = null;
 
   public GStreamerAbstractPipeline() {
   }
-  
+
   @Override
   public boolean isPipelineNull() {
     return pipeline == null;
   }
-  
+
   @Override
   public boolean isMonitoringEnabled() {
     return properties != null && Boolean.valueOf(
             properties.getProperty(CaptureParameters.CAPTURE_CONFIDENCE_ENABLE, "false"));
   }
-  
+
   @Override
   public void setMonitoringListener(MonitoringListener monitoringListener) {
     this.monitoringListener = monitoringListener;
   }
-  
+
   protected void hookUpBus() {
     logger.debug("Starting to hookup GStreamer Pipeline bus. ");
     // Hook up the shutdown handlers
@@ -85,7 +85,7 @@ public abstract class GStreamerAbstractPipeline implements GStreamerPipeline {
     bus.connect(new Bus.EOS() {
       /**
        * {@inheritDoc}
-       * 
+       *
        * @see org.gstreamer.Bus.EOS#endOfStream(org.gstreamer.GstObject)
        */
       public void endOfStream(GstObject arg0) {
@@ -97,7 +97,7 @@ public abstract class GStreamerAbstractPipeline implements GStreamerPipeline {
     bus.connect(new Bus.ERROR() {
       /**
        * {@inheritDoc}
-       * 
+       *
        * @see org.gstreamer.Bus.ERROR#errorMessage(org.gstreamer.GstObject, int, java.lang.String)
        */
       public void errorMessage(GstObject obj, int retCode, String msg) {
@@ -107,7 +107,7 @@ public abstract class GStreamerAbstractPipeline implements GStreamerPipeline {
     bus.connect(new Bus.WARNING() {
       /**
        * {@inheritDoc}
-       * 
+       *
        * @see org.gstreamer.Bus.WARNING#warningMessage(org.gstreamer.GstObject, int, java.lang.String)
        */
       public void warningMessage(GstObject obj, int retCode, String msg) {
@@ -123,23 +123,23 @@ public abstract class GStreamerAbstractPipeline implements GStreamerPipeline {
                 && msgStructure != null
                 && msgStructure.hasName("level")
                 && msgStructure.hasField("rms")) {
-          
+
           // message data should be like that:
-          // 
-          // level, endtime=(guint64)60103401360, timestamp=(guint64)55094784580, 
-          // stream-time=(guint64)55094784580, 
-          // running-time=(guint64)55094784580, duration=(guint64)5008616780, 
-          // rms=(double){ -40.952087684510758, -40.984825946785662 }, 
-          // peak=(double){ -36.329598612473987, -36.346987786726558 }, 
+          //
+          // level, endtime=(guint64)60103401360, timestamp=(guint64)55094784580,
+          // stream-time=(guint64)55094784580,
+          // running-time=(guint64)55094784580, duration=(guint64)5008616780,
+          // rms=(double){ -40.952087684510758, -40.984825946785662 },
+          // peak=(double){ -36.329598612473987, -36.346987786726558 },
           // decay=(double){ -36.576273313948491, -36.558419474901676 };
-          
+
           // get element name to determine witch audio device bin sent these values
-          String deviceFriendlyName = 
+          String deviceFriendlyName =
                   msg.getSource().getName().replaceFirst(AudioMonitoringConsumer.LEVEL_NAME_PREFIX, "");
-          
+
           if (deviceFriendlyName != null) {
             ValueList rmsChanelList = msgStructure.getValueList("rms");
-            
+
             monitoringListener.addRmsValue(deviceFriendlyName, System.currentTimeMillis(), rmsChanelList.getDouble(0));
           }
         }
@@ -147,12 +147,12 @@ public abstract class GStreamerAbstractPipeline implements GStreamerPipeline {
     });
     logger.debug("Successfully hooked up GStreamer Pipeline bus to Log4J.");
   }
-  
+
   @Override
   public void stop() {
     stop(DEFAULT_PIPELINE_SHUTDOWN_TIMEOUT);
   }
-  
+
   /**
    * This method waits until the pipeline has had an opportunity to shutdown and if it surpasses the maximum timeout
    * value it will be manually stopped.
@@ -163,10 +163,10 @@ public abstract class GStreamerAbstractPipeline implements GStreamerPipeline {
     for (CaptureDeviceBin captureDeviceBin : captureDeviceBins) {
       captureDeviceBin.shutdown();
     }
-    
+
     long startWait = System.currentTimeMillis();
-   
-   
+
+
     while (pipeline != null && (pipeline.getState() != State.PAUSED || pipeline.getState() != State.NULL)) {
       try {
         Thread.sleep(WAIT_FOR_NULL_SLEEP_TIME);
@@ -181,16 +181,16 @@ public abstract class GStreamerAbstractPipeline implements GStreamerPipeline {
         pipeline = null;
       }
     }
-    
+
     if (pipeline != null) {
       pipeline.setState(State.NULL);
     }
     pipeline = null;
   }
-  
+
   /**
    * addPipeline will add a pipeline for the specified capture device to the bin.
-   * 
+   *
    * @param captureDevice
    *          {@code CaptureDevice} to create pipeline around
    * @param pipeline
@@ -208,7 +208,7 @@ public abstract class GStreamerAbstractPipeline implements GStreamerPipeline {
     pipeline.add(captureDeviceBin.getBin());
     // Add them to a list so that we can send EOS's to their source Elements.
     captureDeviceBins.add(captureDeviceBin);
-    
+
     return true;
   }
 }

@@ -119,7 +119,7 @@ public final class RestServiceTestEnv {
   public static RestServiceTestEnv testEnvForClasses(URL baseUrl, Class... restServices) {
     return new RestServiceTestEnv(baseUrl, some(new ClassNamesResourceConfig(restServices)));
   }
-  
+
   public static RestServiceTestEnv testEnvForCustomConfig(String baseUrl, ResourceConfig cfg) {
     return new RestServiceTestEnv(UrlSupport.url(baseUrl), some(cfg));
   }

@@ -30,14 +30,14 @@ public interface FeedGenerator {
 
   /**
    * Returns the feed identifier.
-   * 
+   *
    * @return the feed identifier
    */
   String getIdentifier();
 
   /**
    * Return the feed name.
-   * 
+   *
    * @return the feed name
    */
   String getName();
@@ -49,7 +49,7 @@ public interface FeedGenerator {
 
   /**
    * Return the feed link.
-   * 
+   *
    * @return the feed link
    */
   String getFeedLink();
@@ -57,7 +57,7 @@ public interface FeedGenerator {
   /**
    * Returns <code>true</code> if the generator is able to satisfy the request for a feed described by the query. The
    * query consists of all the elements that are found in the request, separated by a slash.
-   * 
+   *
    * @return <code>true</code> if the generator can handle the query
    */
   boolean accept(String[] query);
@@ -65,7 +65,7 @@ public interface FeedGenerator {
   /**
    * Returns <code>null</code> if the generator cannot deal with the request. Otherwise it must returns a valid xml
    * feed.
-   * 
+   *
    * @param type
    *          the feed type
    * @param query
@@ -78,14 +78,14 @@ public interface FeedGenerator {
 
   /**
    * Returns the copyright for the feed.
-   * 
+   *
    * @return the feed
    */
   String getCopyright();
 
   /**
    * Returns the url to the cover art.
-   * 
+   *
    * @return the cover
    */
   String getCover();
@@ -109,7 +109,7 @@ public interface FeedGenerator {
    * <li><code>feed.atomtags</code> - comma separated list of tags identifying atom feed media package elements</li>
    * <li><code>org.opencastproject.server.url</code> - this server's base URL</li>
    * </ul>
-   * 
+   *
    * @param properties
    *          used to initialize the feed
    */
@@ -118,7 +118,7 @@ public interface FeedGenerator {
   /**
    * Sets the search service for this feed generator. FIXME: This shouldn't be exposed in the API, but must be present
    * for the FeedRegistrationScanner to function.
-   * 
+   *
    * @param searchService
    *          The search service to use in finding data to expose in the feed
    */
@@ -127,10 +127,10 @@ public interface FeedGenerator {
   /**
    * Sets the series service for this feed generator. FIXME: This shouldn't be exposed in the API, but must be present
    * for the FeedRegistrationScanner to function.
-   * 
+   *
    * @param seriesService
    *          The series service to use in finding data to expose in the feed
    */
   void setSeriesService(SeriesService seriesService);
-  
+
 }

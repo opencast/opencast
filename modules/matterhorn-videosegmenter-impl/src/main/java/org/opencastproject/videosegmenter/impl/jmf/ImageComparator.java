@@ -59,7 +59,7 @@ public class ImageComparator {
    * images are different.
    * <p>
    * <b>Note:</b> turning on statistics will make the algorithm slightly less efficient.
-   * 
+   *
    * @param changesThreshold
    *          the number of changes in percent that will make two images different
    */
@@ -72,7 +72,7 @@ public class ImageComparator {
   /**
    * Turns collecting statistical values on or off. Turning on statistics will make the algorithm slightly less
    * efficient.
-   * 
+   *
    * @param statistics
    *          <code>true</code> to collect statistics.
    */
@@ -82,7 +82,7 @@ public class ImageComparator {
 
   /**
    * Returns <code>true</code> if collecting statistics was turned on.
-   * 
+   *
    * @return <code>true</code> if statistics have been collected
    */
   public boolean hasStatistics() {
@@ -92,7 +92,7 @@ public class ImageComparator {
   /**
    * Creates a directory where the temporary files will be put. If no directory is passed, images will not be written to
    * disk, thus making the comparator essentially a black box.
-   * 
+   *
    * @param directory
    *          directory for the temporary images
    */
@@ -104,7 +104,7 @@ public class ImageComparator {
 
   /**
    * Returns the directory containing the intermediary images.
-   * 
+   *
    * @return the images
    */
   public File getSavedImagesDirectory() {
@@ -114,7 +114,7 @@ public class ImageComparator {
   /**
    * Returns the average change in %. Note that this method will throw an <code>IllegalStateException</code> if
    * statistics have not been turned on in advance.
-   * 
+   *
    * @return the average change
    */
   public float getAvgChange() {
@@ -125,7 +125,7 @@ public class ImageComparator {
 
   /**
    * Returns the number of comparisons made by this comparator.
-   * 
+   *
    * @return the number of comparisons
    */
   public long getComparisons() {
@@ -138,20 +138,20 @@ public class ImageComparator {
    * <p>
    * Note that <code>image</code> might contain an altered version of the image, which will facilitate in the comparison
    * next time when <code>image</code> is <code>currentImage</code>.
-   * 
+   *
    * @param previousImage
    *          the previous image
    * @param image
    *          the new image
    * @param timestamp
    *          the image timestamp
-   * 
+   *
    * @return <code>true</code> if the two images are different
    */
   public boolean isDifferent(BufferedImage previousImage, BufferedImage image, long timestamp) {
     boolean differsFromCurrentScene = false;
     BufferedImage edgeImage = getEdgedImage(image);
-    
+
     if (previousImage == null) {
       differsFromCurrentScene = true;
       logger.debug("First segment started");
@@ -208,7 +208,7 @@ public class ImageComparator {
 
   /**
    * Returns an image that is reduced to it's edges.
-   * 
+   *
    * @param image
    *          the image
    * @return the edged image

@@ -62,7 +62,7 @@ public interface GStreamerElements {
   String UDPSINK = "udpsink";
   String UDPSRC = "udpsrc";
   String V4L2SRC = "v4l2src";
-  
+
   /** Source Module: gst-plugins-bad **/
   String FAAC = "faac";
   String INPUT_SELECTOR = "input-selector";

@@ -29,7 +29,7 @@ public interface UserTrackingService {
   /**
    * Adds a new annotation to the database and returns the event with an updated annotationId, to make sure the
    * annotationId stays unique
-   * 
+   *
    * @param a
    *          The UserAction that will be added to the database
    * @return the updated annotation, with a new ID. NULL if there are errors while adding the annotation.
@@ -41,7 +41,7 @@ public interface UserTrackingService {
   /**
    * Adds a new tracking event to the database and returns the event with an updated annotationId, to make sure the
    * annotationId stays unique
-   * 
+   *
    * @param a
    *          The UserAction that will be added to the database
    * @return the updated annotation, with a new ID. NULL if there are errors while adding the annotation.
@@ -52,7 +52,7 @@ public interface UserTrackingService {
 
   /**
    * Returns annotations
-   * 
+   *
    * @param offset
    *          the offset
    * @param limit
@@ -65,7 +65,7 @@ public interface UserTrackingService {
 
   /**
    * Returns annotations of a given key
-   * 
+   *
    * @param key
    *          The annotation key
    * @param offset
@@ -80,7 +80,7 @@ public interface UserTrackingService {
 
   /**
    * Returns annotations of a given day (YYYYMMDD)
-   * 
+   *
    * @param day
    *          The day in the format of YYYYMMDD
    * @param offset
@@ -95,7 +95,7 @@ public interface UserTrackingService {
 
   /**
    * Returns annotations of a given key and day
-   * 
+   *
    * @param key
    *          the annotation key
    * @param day
@@ -112,7 +112,7 @@ public interface UserTrackingService {
 
   /**
    * Returns annotations of a given key and mediapackage id
-   * 
+   *
    * @param key
    *          the annotation key
    * @param mediapackageId
@@ -129,8 +129,8 @@ public interface UserTrackingService {
           throws UserTrackingException;
 
   /**
-   * Returns annotations of a given key and mediapackage id ordered by date. 
-   * 
+   * Returns annotations of a given key and mediapackage id ordered by date.
+   *
    * @param key
    *          the annotation key
    * @param mediapackageId
@@ -146,10 +146,10 @@ public interface UserTrackingService {
   UserActionList getUserActionsByTypeAndMediapackageIdByDate(String key, String mediapackageId, int offset, int limit)
           throws UserTrackingException;
 
-  
+
   /**
-   * Returns annotations of a given key and mediapackage id ordered descending by date. 
-   * 
+   * Returns annotations of a given key and mediapackage id ordered descending by date.
+   *
    * @param key
    *          the annotation key
    * @param mediapackageId
@@ -164,10 +164,10 @@ public interface UserTrackingService {
    */
   UserActionList getUserActionsByTypeAndMediapackageIdByDescendingDate(String key, String mediapackageId, int offset, int limit)
           throws UserTrackingException;
-  
+
   /**
    * Returns the views of a mediapackage
-   * 
+   *
    * @param mediapackageId
    *          the mediapackeId
    * @return the views
@@ -178,7 +178,7 @@ public interface UserTrackingService {
 
   /**
    * Returns a report
-   * 
+   *
    * @param from
    *          The from day key
    * @param to
@@ -195,7 +195,7 @@ public interface UserTrackingService {
 
   /**
    * Returns a report
-   * 
+   *
    * @param offset
    *          the offset
    * @param limit
@@ -208,7 +208,7 @@ public interface UserTrackingService {
 
   /**
    * Gets the summary of user activity for a given media package and type of activity.
-   * 
+   *
    * @param key
    *          The annotation key to look for.
    * @param mediapackageId
@@ -220,10 +220,10 @@ public interface UserTrackingService {
    * @return A summary of all user activity that the user is able to see.
    */
   UserSummaryList getUserSummaryByTypeAndMediaPackage(String key, String mediapackageId);
-  
+
   /**
    * Returns a list of footprints, if a userId is passed only the footprints of that user are returned.
-   * 
+   *
    * @param mediapackageId
    *          The mediapackageId
    * @param userId
@@ -236,7 +236,7 @@ public interface UserTrackingService {
 
   /**
    * Get a single user action by its identifier.
-   * 
+   *
    * @param id
    *          the user action identifier
    * @return the user action
@@ -246,11 +246,11 @@ public interface UserTrackingService {
    *           if the no user action with this identifier exists
    */
   UserAction getUserAction(Long id) throws UserTrackingException, NotFoundException;
-  
+
   /**
    * Returns the flag turning user tracking on or off.
    * Turning user tracking off disables the detailed information gathering, but does *not* disable footprint gathering.
-   * 
+   *
    * @return True if detailed user tracking should be gathered, false otherwise
    */
   boolean getUserTrackingEnabled();

@@ -55,7 +55,7 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
 
   /** The search service to use in each feed generator */
   protected SearchService searchService;
-  
+
   /** The series service to be used by the series feeds */
   protected SeriesService seriesService;
 
@@ -74,10 +74,10 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
-  
+
   /**
    * Activates the component
-   * 
+   *
    * @param cc
    *          the component's context
    */
@@ -94,7 +94,7 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactListener#canHandle(java.io.File)
    */
   @Override
@@ -104,7 +104,7 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#install(java.io.File)
    */
   @Override
@@ -150,7 +150,7 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#uninstall(java.io.File)
    */
   @Override
@@ -164,7 +164,7 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#update(java.io.File)
    */
   @Override

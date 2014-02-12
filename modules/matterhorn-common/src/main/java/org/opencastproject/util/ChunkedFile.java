@@ -26,7 +26,7 @@ public class ChunkedFile {
   private long offset;
 
   /**
-   * 
+   *
    * @param file the file containing the data
    * @throws IOException if an error occured
    */
@@ -36,7 +36,7 @@ public class ChunkedFile {
 
   /**
    * Creates a new instance that fetches data from the specified file.
-   * 
+   *
    * @param offset the offset of the file where the transfer begins
    * @param contentLength the number of bytes to transfer
    */
@@ -64,14 +64,14 @@ public class ChunkedFile {
   public long getOffset() {
     return offset;
   }
-  
+
   /**
    * @return the file
    */
   public File getFile() {
     return file;
   }
-  
+
   /**
    * @return the size of the content
    */

@@ -50,7 +50,7 @@ public class TesseractTextExtractorTest {
 
   /** The tesseract text analyzer */
   protected TesseractTextExtractor analyzer = null;
-  
+
   /** The text without punctuation */
   protected String text = "Land and Vegetation Key players on the";
 
@@ -59,7 +59,7 @@ public class TesseractTextExtractorTest {
 
   /** True to run the tests */
   private static boolean tesseractInstalled = true;
-  
+
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(TesseractTextExtractorTest.class);
 
@@ -131,7 +131,7 @@ public class TesseractTextExtractorTest {
   public void testAnalyze() throws Exception {
     if (!tesseractInstalled)
       return;
-    
+
     TextFrame frame = analyzer.extract(testFile);
     assertTrue(frame.hasText());
   }

@@ -42,21 +42,21 @@ public abstract class ConsumerBin extends PartialBin {
 
   /**
    * ConsumerBin is the ancestor for all Consumers and is meant to be inherited. To inherit from ConsumerBin:
-   * 
+   *
    * 1. In the same pattern for the rest of the descendants of PartialBin make sure you create any additional Elements
    * you need in an overridden createElements, set any of the properties for the Elements in overridden setProperties,
    * add all Elements into the Bin with overridden addElementsToBin and finally link your Elements together with
    * linkElements.
-   * 
+   *
    * 2. Make sure you return the first Element (the Element with an available sink pad) in your Bin in the getSrc
    * method. This will be used to create the ghost pads for the bin so that it can be linked to the Producer.
-   * 
+   *
    * @param captureDevice
    *          This is the properties such as codec, container, bitrate etc. of the capture device output.
-   * 
+   *
    * @param properties
    *          This is the confidence monitoring properties
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           If there is a problem linking any of the Elements together that make up the SinkBin this Exception will
    *           be thrown
@@ -84,7 +84,7 @@ public abstract class ConsumerBin extends PartialBin {
   /**
    * Creates a queue so that the tee won't pause this Bin automatically and a filesink to dump the data created by the
    * producer.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           This function will not actually throw this Exception personally because both queue and filesink are part
    *           of the GStreamer core module. A basic GStreamer exception will be thrown before this when the GST.init is
@@ -98,7 +98,7 @@ public abstract class ConsumerBin extends PartialBin {
   /**
    * Creates the queue that prevents us dropping frames and unpauses the tee used to connect all consumers. Otherwise
    * the tee will not unpause this Bin and only other Consumers will be able to use the data the Producers create.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the current system does not have the correct GStreamer module for queue installed this Exception will
    *           be thrown.
@@ -110,7 +110,7 @@ public abstract class ConsumerBin extends PartialBin {
 
   /**
    * Creates the filesink that will be the output of the capture device
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the current system does not have the correct GStreamer module for filesink installed this Exception
    *           will be thrown.
@@ -122,7 +122,7 @@ public abstract class ConsumerBin extends PartialBin {
 
   /**
    * Sets the queue size for the sink so that we don't lose any information.
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If the queue is null because this function is called before createElements this exception is thrown.
    * @throws IllegalArgumentException
@@ -134,7 +134,7 @@ public abstract class ConsumerBin extends PartialBin {
 
   /**
    * Sets the size of the queue that acts as a buffer so that we don't lose frames or audio bits.
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If the queue is null because this function is called before createElements this exception is thrown.
    **/
@@ -163,7 +163,7 @@ public abstract class ConsumerBin extends PartialBin {
 
   /**
    * Creates the ghost pad that will connect this Consumer to the Producer.
-   * 
+   *
    * @throws UnableToCreateGhostPadsForBinException
    *           If the getSrc function returns a null Element or there is a problem adding the pad as a ghost pad (maybe
    *           no sink pads are available) an Exception is thrown.

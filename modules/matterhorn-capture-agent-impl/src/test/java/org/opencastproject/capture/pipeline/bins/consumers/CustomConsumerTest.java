@@ -41,7 +41,7 @@ public class CustomConsumerTest {
   private static final Logger logger = LoggerFactory.getLogger(CustomConsumer.class);
   /** Boolean to set to false if gstreamer is not around. **/
   private static boolean gstreamerInstalled = true;
-  
+
   @BeforeClass
   public static void testGst() {
     try {
@@ -59,26 +59,26 @@ public class CustomConsumerTest {
     if (!gstreamerInstalled)
       return;
     String customConsumerString = "queue ! fakesink";
-    
+
     CaptureDevice captureDevice = new CaptureDevice("/dev/video1", ProducerType.V4LSRC, "vga", "/tmp/testout.mpg");
     Properties properties = new Properties();
     properties.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + captureDevice.getFriendlyName()
             + CaptureParameters.CAPTURE_DEVICE_CUSTOM_CONSUMER, customConsumerString);
-    
+
     captureDevice.setProperties(properties);
     CustomConsumer customConsumer = new CustomConsumer(captureDevice, properties);
     Assert.assertEquals(2, customConsumer.getBin().getElements().size());
     Element fakesrc = GStreamerElementFactory.getInstance().createElement("CustomConsumerTest", "fakesrc", "testFakesrc");
     fakesrc.link(customConsumer.getSrc());
   }
-  
+
   @Test
   public void testCaptureDevicePropertiesSubstitution() throws UnableToLinkGStreamerElementsException,
           UnableToCreateGhostPadsForBinException, UnableToSetElementPropertyBecauseElementWasNullException,
           CaptureDeviceNullPointerException, UnableToCreateElementException {
     if (!gstreamerInstalled)
       return;
-    // Setup strings to test replacement against. 
+    // Setup strings to test replacement against.
     String location = "/location/";
     String friendlyName = "friendlyName";
     ProducerType type = ProducerType.FILE;
@@ -93,19 +93,19 @@ public class CustomConsumerTest {
             + CaptureParameters.CAPTURE_DEVICE_CUSTOM_CONSUMER, customConsumerString);
     captureDevice.setProperties(properties);
     CustomConsumer customConsumer = new CustomConsumer(captureDevice, properties);
-    // Check to make sure the replacement string matches the substitution. 
+    // Check to make sure the replacement string matches the substitution.
     String replacementString = customConsumer.getAllCustomStringSubstitutions().replacePropertiesInCustomString(customConsumerString);
     Assert.assertTrue("CustomConsumer is not replacing CaptureDevice properties's correctly. \""
             + replacementString + "\" should be \"" + expected + "\"", replacementString.equalsIgnoreCase(expected));
   }
-  
+
   @Test
   public void testConfigurationManagerPropertiesSubstitution() throws UnableToLinkGStreamerElementsException,
           UnableToCreateGhostPadsForBinException, UnableToSetElementPropertyBecauseElementWasNullException,
           CaptureDeviceNullPointerException, UnableToCreateElementException {
     if (!gstreamerInstalled)
       return;
-    // Setup strings to test replacement against. 
+    // Setup strings to test replacement against.
     String location = "/location/";
     String friendlyName = "friendlyName";
     ProducerType type = ProducerType.FILE;
@@ -117,7 +117,7 @@ public class CustomConsumerTest {
             + "}/myCaptureDevice.mpg";
     // The expected string after substitution.
     String expected = "queue ! filesink location=" + path + "/" + id + "/myCaptureDevice.mpg";
-    
+
     CaptureDevice captureDevice = new CaptureDevice(location, type, friendlyName, outputLocation);
     Properties properties = new Properties();
     properties.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + captureDevice.getFriendlyName()
@@ -131,58 +131,58 @@ public class CustomConsumerTest {
     Assert.assertTrue("CustomConsumer is not replacing ConfigurationManagerProperties correctly. \""
             + replacementString + "\" should be \"" + expected + "\"", replacementString.equalsIgnoreCase(expected));
   }
-  
+
   @Test
   public void customConsumerStringHandlesBadProperties() throws UnableToLinkGStreamerElementsException, UnableToCreateGhostPadsForBinException, UnableToSetElementPropertyBecauseElementWasNullException, CaptureDeviceNullPointerException, UnableToCreateElementException {
     if (!gstreamerInstalled)
       return;
     // Looking to make sure that it handles bad properties such as empty ${} missing braces ${property and $property} or
-    // missing dollar sign {property}  
+    // missing dollar sign {property}
     String badCustomConsumerString = "queue ! filesink location=${}";
     String result = testBadString(badCustomConsumerString);
     Assert.assertTrue(badCustomConsumerString.equalsIgnoreCase(result));
-    
+
     badCustomConsumerString = "queue ! filesink location=${location";
     result = testBadString(badCustomConsumerString);
     Assert.assertTrue(badCustomConsumerString.equalsIgnoreCase(result));
-    
+
     badCustomConsumerString = "queue ! filesink location=$location}";
     result = testBadString(badCustomConsumerString);
     Assert.assertTrue(badCustomConsumerString.equalsIgnoreCase(result));
-    
+
     badCustomConsumerString = "queue ! filesink location={location}";
     result = testBadString(badCustomConsumerString);
     Assert.assertTrue(badCustomConsumerString.equalsIgnoreCase(result));
-    
+
     badCustomConsumerString = "queue ! filesink location={}";
     result = testBadString(badCustomConsumerString);
     Assert.assertTrue(badCustomConsumerString.equalsIgnoreCase(result));
-    
+
     badCustomConsumerString = "queue ! filesink location=$";
     result = testBadString(badCustomConsumerString);
     Assert.assertTrue(badCustomConsumerString.equalsIgnoreCase(result));
-    
+
     badCustomConsumerString = "queue ! filesink location={";
     result = testBadString(badCustomConsumerString);
     Assert.assertTrue(badCustomConsumerString.equalsIgnoreCase(result));
-    
+
     badCustomConsumerString = "queue ! filesink location=}";
     result = testBadString(badCustomConsumerString);
     Assert.assertTrue(badCustomConsumerString.equalsIgnoreCase(result));
-    
+
     badCustomConsumerString = "queue ! filesink location=${fakeProperty}";
     result = testBadString(badCustomConsumerString);
     Assert.assertTrue(badCustomConsumerString.equalsIgnoreCase(result));
-    
+
     badCustomConsumerString = "queue ! filesink location=${${" + CustomConsumer.LOCATION + "}}";
     result = testBadString(badCustomConsumerString);
     Assert.assertTrue(badCustomConsumerString.equalsIgnoreCase(result));
-    
+
     badCustomConsumerString = "";
     try {
       result = testBadString(badCustomConsumerString);
       Assert.fail();
-    } catch (UnableToCreateElementException exception) {      
+    } catch (UnableToCreateElementException exception) {
     }
   }
 

@@ -23,7 +23,7 @@ import org.apache.http.params.HttpParams;
 
 import java.io.IOException;
 
-/** This interface dictates the required methods for an HttpClient that executes requests. */ 
+/** This interface dictates the required methods for an HttpClient that executes requests. */
 public interface HttpClient {
 
   /** Get the parameters of the http request. */

@@ -24,7 +24,7 @@ import java.util.Date;
  */
 public interface UserSummary {
   void combine(UserSummary other);
-  
+
   String getUserId();
 
   void setUserId(String userId);
