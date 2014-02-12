@@ -36,24 +36,24 @@ import org.opencastproject.capture.impl.UnableToStartMonitoringException;
 public final class GStreamerMonitoringPipeline extends GStreamerAbstractPipeline {
 
   private static final Logger logger = LoggerFactory.getLogger(GStreamerMonitoringPipeline.class);
-   
+
   public GStreamerMonitoringPipeline() {
    captureDeviceBins = new ArrayList<CaptureDeviceBin>();
   }
-  
+
   @Override
-  public boolean isMonitoringOnly() { 
+  public boolean isMonitoringOnly() {
     return true;
   }
-  
+
   /**
    * Creates the GStreamer monitoring pipeline and blocks until it starts successfully.
-   * 
+   *
    * @param properties Device and monitoring properties
    */
   public void start(Properties properties) throws UnableToStartMonitoringException {
     this.properties = properties;
-    
+
     // Create the pipeline
     try {
       pipeline = create(properties);
@@ -82,17 +82,17 @@ public final class GStreamerMonitoringPipeline extends GStreamerAbstractPipeline
     // Try and start the pipeline
     pipeline.play();
     if (pipeline.getState(wait * GStreamerMonitoringPipeline.GST_SECOND) != State.PLAYING) {
-      // In case of an error call stop to clean up the pipeline.  
+      // In case of an error call stop to clean up the pipeline.
       logger.debug("Pipeline was unable to start after " + wait + " seconds.");
       stop(GStreamerMonitoringPipeline.DEFAULT_PIPELINE_SHUTDOWN_TIMEOUT);
       throw new UnableToStartMonitoringException("Unable to start pipeline after " + wait + " seconds.  Aborting!");
     }
     logger.debug("{} started.", pipeline.getName());
   }
-  
+
   /**
    * Create a bin that contains multiple pipelines using each source in the properties object as the gstreamer source
-   * 
+   *
    * @param props
    *          {@code Properties} object defining sources
    * @return The {@code Pipeline} to control the pipelines
@@ -121,7 +121,7 @@ public final class GStreamerMonitoringPipeline extends GStreamerAbstractPipeline
 
   /**
    * Initializes the pipeline itself, but does not start capturing
-   * 
+   *
    * @param devices
    *          The list of devices to capture from.
    * @return The created {@code Pipeline}, or null in the case of an error.

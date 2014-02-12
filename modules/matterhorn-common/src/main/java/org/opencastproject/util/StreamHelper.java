@@ -54,7 +54,7 @@ public class StreamHelper extends Thread {
 
   /**
    * Creates a new stream helper and immediately starts capturing output from the given stream.
-   * 
+   *
    * @param inputStream
    *          the input stream
    */
@@ -65,7 +65,7 @@ public class StreamHelper extends Thread {
   /**
    * Creates a new stream helper and immediately starts capturing output from the given stream. Output will be captured
    * to the given buffer.
-   * 
+   *
    * @param inputStream
    *          the input stream to read from
    * @param contentBuffer
@@ -78,7 +78,7 @@ public class StreamHelper extends Thread {
   /**
    * Creates a new stream helper and immediately starts capturing output from the given stream. Output will be captured
    * to the given buffer.
-   * 
+   *
    * @param inputStream
    *          the input stream to read from
    * @param processLogger
@@ -93,7 +93,7 @@ public class StreamHelper extends Thread {
   /**
    * Creates a new stream helper and immediately starts capturing output from the given stream. Output will be captured
    * to the given buffer and also redirected to the provided output stream.
-   * 
+   *
    * @param inputStream
    *          the input stream to read from
    * @param redirect
@@ -108,7 +108,7 @@ public class StreamHelper extends Thread {
   /**
    * Creates a new stream helper and immediately starts capturing output from the given stream. Output will be captured
    * to the given buffer and also redirected to the provided output stream.
-   * 
+   *
    * @param inputStream
    *          the input stream to read from
    * @param redirect
@@ -128,7 +128,7 @@ public class StreamHelper extends Thread {
 
   /**
    * Tells the stream helper to stop reading and exit from the main loop, it then waits for the thread to die.
-   * 
+   *
    * @see Thread#join()
    * @throws InterruptedException
    *           if the thread is interrupted while waiting for the main loop to come to an end
@@ -152,7 +152,7 @@ public class StreamHelper extends Thread {
       }
       streamReader = new InputStreamReader(inputStream);
       bufferedReader = new BufferedReader(streamReader);
-      
+
       // Whether any content has been read
       boolean foundContent = false;
 
@@ -190,7 +190,7 @@ public class StreamHelper extends Thread {
 
   /**
    * This method will write any output from the stream to the the content buffer and the logger.
-   * 
+   *
    * @param output
    *          the stream output
    */
@@ -211,7 +211,7 @@ public class StreamHelper extends Thread {
 
   /**
    * If a logger has been specified, the output is written to the logger using the defined log level.
-   * 
+   *
    * @param output
    *          the stream output
    */

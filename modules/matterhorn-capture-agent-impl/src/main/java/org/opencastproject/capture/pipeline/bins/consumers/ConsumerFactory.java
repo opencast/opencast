@@ -42,7 +42,7 @@ public final class ConsumerFactory {
 
   /**
    * Returns the Consumer corresponding to the ConsumerType
-   * 
+   *
    * @param consumerType
    *          The enum value of the Consumer to create.
    * @param captureDevice

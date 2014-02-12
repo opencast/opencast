@@ -131,7 +131,7 @@ public final class FileSupport {
     final int chunk = 1024 * 1024 * 512; // 512 MB
 
     // This variable is used when the cannel copy fails completely, as the size of the memory buffer used to copy the data from one stream to the other.
-    final int bufferSize = 1024 * 1024; // 1 MB 
+    final int bufferSize = 1024 * 1024; // 1 MB
 
     File dest = determineDestination(targetFile, sourceFile, overwrite);
 

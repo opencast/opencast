@@ -159,7 +159,7 @@ public class RestPublisher implements RestConstants {
 
   /**
    * Creates a REST endpoint for the JAX-RS annotated service.
-   * 
+   *
    * @param ref
    *          the osgi service reference
    * @param service
@@ -243,7 +243,7 @@ public class RestPublisher implements RestConstants {
 
   /**
    * Removes an endpoint
-   * 
+   *
    * @param alias
    *          The URL space to reclaim
    */
@@ -262,7 +262,7 @@ public class RestPublisher implements RestConstants {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.apache.cxf.jaxrs.provider.JSONProvider#createWriter(java.lang.Object, java.lang.Class,
      *      java.lang.reflect.Type, java.lang.String, java.io.OutputStream, boolean)
      */
@@ -357,7 +357,7 @@ public class RestPublisher implements RestConstants {
 
     /**
      * Creates a new StaticResourceBundleTracker.
-     * 
+     *
      * @param context
      *          the bundle context
      */
@@ -367,7 +367,7 @@ public class RestPublisher implements RestConstants {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.osgi.util.tracker.BundleTracker#addingBundle(org.osgi.framework.Bundle, org.osgi.framework.BundleEvent)
      */
     @Override
@@ -406,7 +406,7 @@ public class RestPublisher implements RestConstants {
 
     /**
      * Whether the http service has initialized this servlet.
-     * 
+     *
      * @return the initialization state
      */
     public boolean isInitialized() {
@@ -423,7 +423,7 @@ public class RestPublisher implements RestConstants {
   public class RestDocRedirector implements RequestHandler {
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.apache.cxf.jaxrs.ext.RequestHandler#handleRequest(org.apache.cxf.message.Message,
      *      org.apache.cxf.jaxrs.model.ClassResourceInfo)
      */

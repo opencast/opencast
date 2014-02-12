@@ -127,7 +127,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
   /**
    * Sets the workspace to use.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -138,9 +138,9 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   /**
    * Activate the component, generating the temporary storage directory for
    * building zip archives if necessary.
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
    */
   protected void activate(ComponentContext cc) {
@@ -158,24 +158,24 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
-    
+
     if (workflowInstance == null) {
       throw new WorkflowOperationException("Invalid workflow instance");
     }
-    
+
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     final WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
     if (currentOperation == null) {
       throw new WorkflowOperationException("Cannot get current workflow operation");
     }
-    
+
     String flavors = currentOperation.getConfiguration(INCLUDE_FLAVORS_PROPERTY);
     final List<MediaPackageElementFlavor> flavorsToZip = new ArrayList<MediaPackageElementFlavor>();
     MediaPackageElementFlavor targetFlavor = DEFAULT_ARCHIVE_FLAVOR;
@@ -266,12 +266,12 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
   /**
    * Creates a zip archive of all elements in a mediapackage.
-   * 
+   *
    * @param mediaPackage
    *          the mediapackage to zip
-   * 
+   *
    * @return the zip file
-   * 
+   *
    * @throws IOException
    *           If an IO exception occurs
    * @throws NotFoundException
@@ -287,7 +287,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     if (mediaPackage == null) {
       throw new WorkflowOperationException("Invalid mediapackage");
     }
-    
+
     // Create the temp directory
     File mediaPackageDir = new File(tempStorageDir, mediaPackage.getIdentifier().compact());
     FileUtils.forceMkdir(mediaPackageDir);
@@ -341,7 +341,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override

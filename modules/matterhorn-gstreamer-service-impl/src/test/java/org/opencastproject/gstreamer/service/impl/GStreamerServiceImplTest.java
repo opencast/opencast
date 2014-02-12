@@ -58,24 +58,24 @@ import java.util.Properties;
 public class GStreamerServiceImplTest {
   /** the logging facility provided by log4j */
   private static final Logger logger = LoggerFactory.getLogger(GStreamerServiceImplTest.class.getName());
-  
+
   /** True if the environment provides the tools needed for the test suite */
   private static boolean gstreamerInstalled = true;
-  
+
   private GStreamerServiceImpl gstreamerServiceImpl;
-  
+
   private static Workspace workspace;
-  
+
   private ServiceRegistry serviceRegistry;
-  
+
   private MediaPackage mediaPackage;
-  
+
   private URI badGStreamerURI;
   private URI movieFileURI;
   private URI withoutGStreamerURI;
   private URI withGStreamerURI;
   private URI randomXMLURI;
-  
+
   /** Make sure that gstreamer is installed and available. **/
   @BeforeClass
   public static void testGst() {
@@ -86,7 +86,7 @@ public class GStreamerServiceImplTest {
       gstreamerInstalled = false;
     }
   }
-  
+
   @Before
   public void setUp() throws NotFoundException, IOException, URISyntaxException, GStreamerLaunchException,
           MediaPackageException, ServiceRegistryException {
@@ -129,12 +129,12 @@ public class GStreamerServiceImplTest {
     EasyMock.expect(job.getStatus()).andReturn(Status.FINISHED).anyTimes();
     EasyMock.expect(job.getQueueTime()).andReturn(10L).anyTimes();
     EasyMock.replay(job);
-    
+
     serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job).anyTimes();
     EasyMock.replay(serviceRegistry);
   }
-  
+
   @Test
   public void gstreamerBinaryLocationSetBeforeActivation() {
     if (!gstreamerInstalled) {
@@ -143,7 +143,7 @@ public class GStreamerServiceImplTest {
     gstreamerServiceImpl = new GStreamerServiceImpl();
     Assert.assertEquals(GStreamerServiceImpl.DEFAULT_GSTREAMER_LOCATION, gstreamerServiceImpl.getGStreamerLocation());
   }
-  
+
   @Test
   public void defaultGstreamerBinaryLocationSetAfterActivation() {
     if (!gstreamerInstalled) {
@@ -153,7 +153,7 @@ public class GStreamerServiceImplTest {
     gstreamerServiceImpl.activate(null);
     Assert.assertEquals(GStreamerServiceImpl.DEFAULT_GSTREAMER_LOCATION, gstreamerServiceImpl.getGStreamerLocation());
   }
-  
+
   @SuppressWarnings("rawtypes")
   @Test
   public void nullGstreamerBinaryLocationDoesntBreak() {
@@ -162,22 +162,22 @@ public class GStreamerServiceImplTest {
     }
     ServiceRegistration mockServiceRegistration = EasyMock.createMock(ServiceRegistration.class);
     Properties properties = new Properties();
-    
+
     BundleContext mockBundleContext = EasyMock.createMock(BundleContext.class);
     EasyMock.expect(mockBundleContext.registerService((String) EasyMock.anyObject(), EasyMock.anyObject(), (Dictionary) EasyMock.anyObject())).andReturn(mockServiceRegistration);
     EasyMock.expect(mockBundleContext.getProperty(GStreamerServiceImpl.CONFIG_GSTREAMER_LOCATION_KEY)).andReturn(null);
     EasyMock.replay(mockBundleContext);
-    
+
     ComponentContext mockComponentContext = EasyMock.createMock(ComponentContext.class);
     EasyMock.expect(mockComponentContext.getProperties()).andReturn(properties).anyTimes();
     EasyMock.expect(mockComponentContext.getBundleContext()).andReturn(mockBundleContext).anyTimes();
     EasyMock.replay(mockComponentContext);
-    
+
     gstreamerServiceImpl = new GStreamerServiceImpl();
     gstreamerServiceImpl.activate(mockComponentContext);
     Assert.assertEquals(GStreamerServiceImpl.DEFAULT_GSTREAMER_LOCATION, gstreamerServiceImpl.getGStreamerLocation());
   }
-  
+
   @SuppressWarnings("rawtypes")
   @Test
   public void emptyStringGstreamerBinaryLocationDoesntBreak() {
@@ -186,22 +186,22 @@ public class GStreamerServiceImplTest {
     }
     ServiceRegistration mockServiceRegistration = EasyMock.createMock(ServiceRegistration.class);
     Properties properties = new Properties();
-    
+
     BundleContext mockBundleContext = EasyMock.createMock(BundleContext.class);
     EasyMock.expect(mockBundleContext.registerService((String) EasyMock.anyObject(), EasyMock.anyObject(), (Dictionary) EasyMock.anyObject())).andReturn(mockServiceRegistration);
     EasyMock.expect(mockBundleContext.getProperty(GStreamerServiceImpl.CONFIG_GSTREAMER_LOCATION_KEY)).andReturn("");
     EasyMock.replay(mockBundleContext);
-    
+
     ComponentContext mockComponentContext = EasyMock.createMock(ComponentContext.class);
     EasyMock.expect(mockComponentContext.getProperties()).andReturn(properties).anyTimes();
     EasyMock.expect(mockComponentContext.getBundleContext()).andReturn(mockBundleContext).anyTimes();
     EasyMock.replay(mockComponentContext);
-    
+
     gstreamerServiceImpl = new GStreamerServiceImpl();
     gstreamerServiceImpl.activate(mockComponentContext);
     Assert.assertEquals(GStreamerServiceImpl.DEFAULT_GSTREAMER_LOCATION, gstreamerServiceImpl.getGStreamerLocation());
   }
-  
+
   @SuppressWarnings("rawtypes")
   @Test
   public void gstreamerBinaryLocationCanBeSetInConfigProperties() {
@@ -211,22 +211,22 @@ public class GStreamerServiceImplTest {
     String location = "/to/nowhere/gstreamer";
     ServiceRegistration mockServiceRegistration = EasyMock.createMock(ServiceRegistration.class);
     Properties properties = new Properties();
-    
+
     BundleContext mockBundleContext = EasyMock.createMock(BundleContext.class);
     EasyMock.expect(mockBundleContext.registerService((String) EasyMock.anyObject(), EasyMock.anyObject(), (Dictionary) EasyMock.anyObject())).andReturn(mockServiceRegistration);
     EasyMock.expect(mockBundleContext.getProperty(GStreamerServiceImpl.CONFIG_GSTREAMER_LOCATION_KEY)).andReturn(location);
     EasyMock.replay(mockBundleContext);
-    
+
     ComponentContext mockComponentContext = EasyMock.createMock(ComponentContext.class);
     EasyMock.expect(mockComponentContext.getProperties()).andReturn(properties).anyTimes();
     EasyMock.expect(mockComponentContext.getBundleContext()).andReturn(mockBundleContext).anyTimes();
     EasyMock.replay(mockComponentContext);
-    
+
     gstreamerServiceImpl = new GStreamerServiceImpl();
     gstreamerServiceImpl.activate(mockComponentContext);
     Assert.assertEquals(location, gstreamerServiceImpl.getGStreamerLocation());
   }
-  
+
   @Test
   public void substitutionOfTrackGStreamerLineInProperties() throws NotFoundException, IOException {
     if (!gstreamerInstalled) {

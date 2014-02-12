@@ -28,12 +28,12 @@ public final class Execute {
   private static final Logger logger = LoggerFactory.getLogger(Execute.class);
 
   private Execute() {
-    
+
   }
 
   /**
    * Launches a command line execution e.g. cp source destination
-   * 
+   *
    * @param command
    *          The command line utility to execute.
    * **/
@@ -43,7 +43,7 @@ public final class Execute {
     BufferedReader bufferedReader = null;
     try {
       String line;
-      
+
       // launch EXE and grab stdin/stdout and stderr
       Process process = Runtime.getRuntime().exec(command);
 

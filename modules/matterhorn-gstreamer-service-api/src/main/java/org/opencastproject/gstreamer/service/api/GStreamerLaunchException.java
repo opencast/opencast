@@ -23,13 +23,13 @@ public class GStreamerLaunchException extends Exception {
 
   /** serial version uid */
   private static final long serialVersionUID = 7371209976253680445L;
-  
+
   /** Exit code of external processes */
   private int exitCode = -1;
 
   /**
    * Creates a new gstreamer launch exception with the given error message.
-   * 
+   *
    * @param message
    *          the error message
    */
@@ -39,7 +39,7 @@ public class GStreamerLaunchException extends Exception {
 
   /**
    * Creates a new gstreamer launch exception with the given error message, caused by the given exception.
-   * 
+   *
    * @param message
    *          the error message
    * @param cause
@@ -51,7 +51,7 @@ public class GStreamerLaunchException extends Exception {
 
   /**
    * Creates a new gstreamer launch exception, caused by the given exception.
-   * 
+   *
    * @param cause
    *          the error cause
    */
@@ -62,7 +62,7 @@ public class GStreamerLaunchException extends Exception {
   /**
    * Returns the exit code of the process if it was not 0. If the exception wasn't caused by an exit code unequal to 0,
    * -1 is returned.
-   * 
+   *
    * @return the exit code
    */
   public int getExitCode() {

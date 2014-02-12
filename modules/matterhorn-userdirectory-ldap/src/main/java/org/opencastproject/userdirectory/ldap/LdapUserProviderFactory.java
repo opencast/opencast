@@ -91,7 +91,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /**
    * Callback for activation of this component.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -102,7 +102,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedServiceFactory#getName()
    */
   @Override
@@ -112,7 +112,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedServiceFactory#updated(java.lang.String, java.util.Dictionary)
    */
   @Override
@@ -180,7 +180,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedServiceFactory#deleted(java.lang.String)
    */
   @Override
@@ -198,7 +198,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /**
    * Builds a JMX object name for a given PID
-   * 
+   *
    * @param pid
    *          the PID
    * @return the object name
