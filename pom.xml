@@ -3,7 +3,7 @@
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
   <packaging>pom</packaging>
-  <version>1.6-SNAPSHOT</version>
+  <version>1.5.0-SNAPSHOT</version>
   <name>matterhorn</name>
   <description>The Opencast Project's Matterhorn software is a media capture, processing, and distribution system</description>
   <url>http://opencastproject.org</url>
@@ -2152,7 +2152,7 @@
     <connection>scm:git:https://bitbucket.org/opencast-community/matterhorn.git</connection>
     <developerConnection>scm:git:git@bitbucket.org:opencast-community/matterhorn.git</developerConnection>
     <url>https://bitbucket.org/opencast-community</url>
-    <tag>HEAD</tag>
+    <tag>r/1.5.0</tag>
   </scm>
 
   <issueManagement>
