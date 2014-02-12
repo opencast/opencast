@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>matterhorn-runtime-dependencies</artifactId>
@@ -7,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.5.0-SNAPSHOT</version>
+    <version>1.5-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -535,7 +536,8 @@
             <configuration>
               <target if="deployTo">
                 <copy todir="${deployTo}/lib/ext" failonerror="false">
-                  <fileset dir="${project.build.directory}/dependency" includes="**/*" />
+                  <fileset dir="${project.build.directory}/dependency"
+                    includes="**/*" />
                 </copy>
               </target>
             </configuration>
@@ -549,7 +551,8 @@
             <configuration>
               <target if="unpackTo">
                 <copy todir="${unpackTo}/lib/ext" failonerror="false">
-                  <fileset dir="${project.build.directory}/dependency" includes="**/*" />
+                  <fileset dir="${project.build.directory}/dependency"
+                    includes="**/*" />
                 </copy>
               </target>
             </configuration>
