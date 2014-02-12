@@ -769,7 +769,7 @@
       <activation>
         <activeByDefault>false</activeByDefault>
         <property>
-          <name>test</name>
+          <name>tests</name>
         </property>
       </activation>
       <modules>
@@ -811,7 +811,7 @@
         <activeByDefault>false</activeByDefault>
         <!-- They don't work at all
         <property>
-          <name>test</name>
+          <name>tests</name>
         </property>
         -->
       </activation>
@@ -857,7 +857,7 @@
       <activation>
         <activeByDefault>false</activeByDefault>
         <property>
-          <name>test</name>
+          <name>tests</name>
         </property>
       </activation>
       <modules>
