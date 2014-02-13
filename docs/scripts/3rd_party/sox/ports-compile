@@ -7,16 +7,8 @@ source "${HOME3P}/utilx"
 [ $? -ne 0 ] && exit 1
 #
 [ -f .done-ports ] && exit 0
-export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`
 #
-if [ -d /Users/Shared/dports/multimedia/ffmpeg ]; then
-  rm -fr /Users/Shared/dports/multimedia/ffmpeg
-  [ $? -ne 0 ] && exit 1
-  portindex -f /Users/Shared/dports
-  [ $? -ne 0 ] && exit 1
-fi
-#
-sudox port -f install ffmpeg +nonfree || exit 1
+sudox port -f install sox || exit 1
 #
 touch .done-ports
 [ $? -ne 0 ] && exit 1

@@ -634,13 +634,17 @@ install_macports() {
   [ $? -ne 0 ] && return 1
   #
   case `os_ver` in
-    10.6* )
-      URLS=`getmcfg MacPorts_Snow_url:`
-      dmgs=`getmcfg MacPorts_Snow_pkgs:`
-      ;;
     10.7* )
       URLS=`getmcfg MacPorts_Lion_url:`
       dmgs=`getmcfg MacPorts_Lion_pkgs:`
+      ;;
+    10.8* )
+      URLS=`getmcfg MacPorts_Moun_url:`
+      dmgs=`getmcfg MacPorts_Moun_pkgs:`
+      ;;
+    10.9* )
+      URLS=`getmcfg MacPorts_Maver_url:`
+      dmgs=`getmcfg MacPorts_Maver_pkgs:`
       ;;
   esac
   MPVER="${dmgs##MacPorts-}"
@@ -732,10 +736,11 @@ install_git() {
   if [ "$dmg" != "${dmg%.dmg}" ]; then
     sudox hdiutil attach "$dmg"
     [ $? -ne 0 ] && return 1
-    # mounted to /Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard
-    sudox installer -pkg "/Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard/git-1.6.5.1-UNIVERSALbinary-leopard.pkg" -target /
+    path=`getmcfg git_mac_path:`
+    # mounted to /Volumes/<path>
+    sudox installer -pkg "/Volumes/$path/${dmg%.dmg}.pkg" -target /
     [ $? -ne 0 ] && return 1
-    sudox hdiutil detach "/Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard"
+    sudox hdiutil detach "/Volumes/$path"
     [ $? -ne 0 ] && return 1
   elif [ "$dmg" != "${dmg%.pkg}" ]; then
     sudox installer -pkg "$dmg" -target /
@@ -882,8 +887,8 @@ check_prereq() {
       ;;
     MacOS )
       chkprog port  || install_macports   || return 1
-      if [ `macports_version` -lt 10902 ]; then
-        echo "Mac ports version is too old - should be at least 1.9.2 or greater" 1>&2
+      if [ `macports_version` -lt 20200 ]; then
+        echo "Mac ports version is too old - should be at least 2.2.0 or greater" 1>&2
         return 1
       fi
       #
