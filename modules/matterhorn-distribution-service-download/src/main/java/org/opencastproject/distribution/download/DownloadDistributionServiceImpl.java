@@ -223,8 +223,10 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
       long now = 0L;
       while (checkAvailability) {
         HttpResponse response = trustedHttpClient.execute(new HttpHead(uri));
-        if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK)
+        if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
+          trustedHttpClient.close(response);
           break;
+        }
 
         if (now < TIMEOUT) {
           try {
