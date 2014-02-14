@@ -4,6 +4,8 @@ CENTOS_MIRROR: http://mirror.ox.ac.uk/sites/mirror.centos.org
 EPEL_MIRROR: http://mirror.switch.ch/ftp/mirror
 ATOMIC_MIRROR: http://www6.atomicorp.com/channels/atomic
 RPMFORGE_MIRROR: http://apt.sw.be
+RPMFUSION_MIRROR: http://download1.rpmfusion.org
+ATRPMS_MIRROR: http://dl.atrpms.net
 GNU_MIRROR: http://ftpmirror.gnu.org
 USASK_MIRROR: http://aifile.usask.ca/matterhorn/mirror/thirdparty
 MACPORTS_SVN: http://svn.macports.org/repository/macports/trunk/dports
@@ -33,17 +35,29 @@ rpmforge5_x64_pkgs: rpmforge-release-0.5.3-1.el5.rf.x86_64.rpm
 rpmforge6_x64_url: ${RPMFORGE_MIRROR}/redhat/el6/en/x86_64/rpmforge/RPMS ${USASK_MIRROR}
 rpmforge6_x64_pkgs: rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
 
-rpmfusion-free5_url: http://download1.rpmfusion.org/free/el/updates/5/i386 ${USASK_MIRROR}
+rpmfusion-free5_url: ${RPMFUSION_MIRROR}/free/el/updates/5/i386 ${USASK_MIRROR}
 rpmfusion-free5_pkgs: rpmfusion-free-release-5-1.noarch.rpm
 
-rpmfusion-free6_url: http://download1.rpmfusion.org/free/el/updates/6/i386 ${USASK_MIRROR}
+rpmfusion-free6_url: ${RPMFUSION_MIRROR}/free/el/updates/6/i386 ${USASK_MIRROR}
 rpmfusion-free6_pkgs: rpmfusion-free-release-6-1.noarch.rpm
 
-rpmfusion-nonfree5_url: http://download1.rpmfusion.org/nonfree/el/updates/5/i386 ${USASK_MIRROR}
+rpmfusion-nonfree5_url: ${RPMFUSION_MIRROR}/nonfree/el/updates/5/i386 ${USASK_MIRROR}
 rpmfusion-nonfree5_pkgs: rpmfusion-nonfree-release-5-1.noarch.rpm
 
-rpmfusion-nonfree6_url: http://download1.rpmfusion.org/nonfree/el/updates/6/i386 ${USASK_MIRROR}
+rpmfusion-nonfree6_url: ${RPMFUSION_MIRROR}/nonfree/el/updates/6/i386 ${USASK_MIRROR}
 rpmfusion-nonfree6_pkgs: rpmfusion-nonfree-release-6-1.noarch.rpm
+
+atrpms5_x86_url: ${ATRPMS_MIRROR}/all ${USASK_MIRROR}
+atrpms5_x86_pkgs: atrpms-repo-5-7.el5.i386.rpm
+
+atrpms6_x86_url: ${ATRPMS_MIRROR}/all ${USASK_MIRROR}
+atrpms6_x86_pkgs: atrpms-repo-6-7.el6.i686.rpm
+
+atrpms5_x64_url: ${ATRPMS_MIRROR}/all ${USASK_MIRROR}
+atrpms5_x64_pkgs: atrpms-repo-5-7.el5.x86_64.rpm
+
+atrpms6_x64_url: ${ATRPMS_MIRROR}/all ${USASK_MIRROR}
+atrpms6_x64_pkgs: atrpms-repo-6-7.el6.x86_64.rpm
 
 # ----- standard packages
 wget5_x86_url: ${CENTOS_MIRROR}/5/os/i386/CentOS ${USASK_MIRROR}

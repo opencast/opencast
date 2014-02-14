@@ -232,6 +232,52 @@ enable_rpmfusion() {
   return 0
 }
 #
+enable_atrpms() {
+  cd "$HOME3P"
+  [ $? -ne 0 ] && return 1
+  mkdir -p packages
+  [ $? -ne 0 ] && return 1
+  cd packages
+  [ $? -ne 0 ] && return 1
+  #
+  case `os_ver` in
+    5.* ) V=5 ;;
+    6.* ) V=6 ;;
+    * ) V="" ;;
+  esac
+  rpms=""
+  case `arch` in
+    i386 )
+      URLS=`getmcfg atrpms${V}_x86_url:`
+      rpms=`getmcfg atrpms${V}_x86_pkgs:`
+      ;;
+    x86_64 )
+      URLS=`getmcfg atrpms${V}_x64_url:`
+      rpms=`getmcfg atrpms${V}_x64_pkgs:`
+      ;;
+  esac
+  for rpm in $rpms; do
+    if [ ! -s "$rpm" ]; then
+      copypkg "$rpm"
+      if [ $? -ne 0 ]; then
+        ok=1
+        for URL in $URLS; do
+          wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+          ok=$?
+          [ $ok -eq 0 ] && break
+        done
+        if [ $ok -ne 0 ]; then
+          rm -f "$rpm"
+          return 1
+        fi
+      fi
+    fi
+  done
+  install_rpms $rpms
+  [ $? -ne 0 ] && return 1
+  return 0
+}
+#
 install_prog() {
   cd "$HOME3P"
   [ $? -ne 0 ] && return 1
@@ -795,6 +841,7 @@ check_prereq() {
       chkrepo atomic    || enable_atomic       || return 1
       chkrepo rpmforge  || enable_rpmforge     || return 1
       chkrepo rpmfusion || enable_rpmfusion    || return 1
+      #chkrepo atrpms    || enable_atrpms       || return 1
       #
       chkprog wget    || install_prog wget     || return 1
       chkprog zip     || install_prog zip      || return 1
