@@ -9,7 +9,7 @@ install_rpms() {
   name_ver=`echo "$1" | awk '{
     sub("\\\.(i386|i686|x86_64|noarch)\\\.rpm$", "", $1); print $1; exit 0}'`
   case `os` in
-    CentOS | RHEL )
+    CentOS | RHEL | SciL )
       installed=`rpm -q --last "$name" | awk '{
         sub("\\\.(i386|i686|x86_64|noarch)$", "", $1); print $1; exit 0}'`
       if [ ! "$installed" = "$name_ver" ]; then
@@ -287,7 +287,7 @@ install_prog() {
   [ $? -ne 0 ] && return 1
   #
   case `os` in
-    CentOS | RHEL )
+    CentOS | RHEL | SciL )
       case `os_ver` in
         5.* ) V=5 ;;
         6.* ) V=6 ;;
@@ -822,7 +822,7 @@ preinstall_scons() {
   [ $? -ne 0 ] && return 1
   #
   case `os` in
-    CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | Amazon )
+    CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | SciL | Amazon )
       download .
       [ $? -ne 0 ] && return 1
       ./linux-compile
@@ -836,7 +836,7 @@ preinstall_scons() {
 #
 check_prereq() {
   case `os` in
-    CentOS | RHEL )
+    CentOS | RHEL | SciL )
       chkrepo epel      || enable_epel         || return 1
       chkrepo atomic    || enable_atomic       || return 1
       chkrepo rpmforge  || enable_rpmforge     || return 1
@@ -976,7 +976,7 @@ install_mingw32() {
   [ $? -ne 0 ] && return 1
   #
   case `os` in
-    CentOS | RHEL )
+    CentOS | RHEL | SciL )
       case `os_ver` in
         5.* ) V=5 ;;
         6.* ) V=6 ;;
@@ -1244,7 +1244,7 @@ fix_libs() {
   [ $? -ne 0 ] && return 1
   #
   case `os` in
-    CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | Amazon )
+    CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | SciL | Amazon )
       #
       # Install patchelf 0.5
       #
@@ -1285,7 +1285,7 @@ fix_libs() {
   esac
   #
   case `os` in
-    CentOS | RHEL )
+    CentOS | RHEL | SciL )
       # Check & set /usr/local/lib in LD_LIBRARY_PATH
       grep '/usr/local/lib' /etc/ld.so.conf.d/* >/dev/null
       if [ $? -ne 0 ]; then
@@ -1428,7 +1428,7 @@ EOF
 }
 #
 case `os` in
-  CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | Amazon | MacOS )
+  CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | SciL | Amazon | MacOS )
     ;;
   * )
     echo "Unsupported operating system: `os`" 1>&2

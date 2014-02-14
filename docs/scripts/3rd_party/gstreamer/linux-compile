@@ -9,7 +9,7 @@ source "${HOME3P}/utilx"
 [ -f .done-linux ] && exit 0
 #
 case `os` in
-  CentOS )
+  CentOS | SciL )
     sudox yum -y install gstreamer        # gst-launch-0.10
     [ $? -ne 0 ] && exit 1
     sudox yum -y install gstreamer-tools  # gst-launch
