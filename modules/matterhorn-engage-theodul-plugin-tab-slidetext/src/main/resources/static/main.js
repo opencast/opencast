@@ -29,6 +29,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
   var TEMPLATE_TAB_CONTENT_ID = "engage_slidetext_tab_content";
   var segments=[];
+  function timeStrToSeconds(timeStr) {
+    var elements = timeStr.match(/([0-9]{2})/g);
+    //var timeSeconds = 0;
+    //$(elements).each(function(index, element) {
+    //   timeSeconds += (parseInt(element,10) * Math.pow(60, elements.length-index-1));
+    //});
+    //return timeSeconds;
+    return parseInt(elements[0],10) * 3600 + parseInt(elements[1],10) * 60 + parseInt(elements[2],10);
+  }
 
   function Segment(time,image_url) {
     this.time = time;
@@ -46,7 +55,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             // Pull time string out of the ref property
             // (e.g. "ref": "track:4ea9108d-c1df-4d8e-b729-e7c75c87519e;time=T00:00:00:0F1000")
             var time = attachment.ref.match(/([0-9]{2}:[0-9]{2}:[0-9]{2})/g);
-            segments.push(new Segment(time, attachment.url));
+            if (time.length > 0) {
+              segments.push(new Segment(time[0], attachment.url));
+            } else {
+              Engage.log("Failure on time evaluation for segement with url: " + attachment.url);
+            }
           }
         });
         // Sort segments ascending by time
@@ -71,7 +84,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
             // Add click handler to each segment (slide)
             $("#" + html_snippet_id).click(function() {
-              console.log("clicked:" + html_snippet_id + " at " + segment.time);
+              console.log("clicked:" + html_snippet_id + " at " + timeStrToSeconds(segment.time));
+              Engage.trigger("Video:seek", timeStrToSeconds(segment.time));
             });
           });
         }

@@ -42,7 +42,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
           volumechange : new Engage.Event("Video:volumechange", "notices a volume change", "trigger"),
           fullscreenChange : new Engage.Event("Video:fullscreenChange", "notices a fullscreen change", "trigger"),
           ended : new Engage.Event("Video:ended", "end of the video", "trigger"),
-          sliderStop : new Engage.Event("Slider:stop", "notices a stop of the slider", "handler")
+          sliderStop : new Engage.Event("Slider:stop", "notices a stop of the slider", "handler"),
+          seek : new Engage.Event("Video:seek", "seek video to time position given in seconds", "handler")
         }
     };
     var initCount = 4;
@@ -185,12 +186,18 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         Engage.on(plugin.events.getVolume, function(callback) {
             callback(theodulVideodisplay.volume());
         });
+        Engage.on(plugin.events.seek, function(time) {
+            Engage.log("Before setting: " + theodulVideodisplay.currentTime());
+            theodulVideodisplay.currentTime(time);
+            Engage.log("After setting: " + theodulVideodisplay.currentTime());
+        });
         Engage.on(plugin.events.sliderStop, function(time) {
             var duration = Engage.model.get("videoDataModel").get("duration");
             var normTime = (time / 1000) * (duration / 1000);
             theodulVideodisplay.currentTime(normTime);
         });
         theodulVideodisplay.on("timeupdate", function() {
+            Engage.log("CurrentTime while timeupdate: " + theodulVideodisplay.currentTime());
             Engage.trigger("Video:timeupdate", theodulVideodisplay.currentTime());
         });
         theodulVideodisplay.on("volumechange", function() {
