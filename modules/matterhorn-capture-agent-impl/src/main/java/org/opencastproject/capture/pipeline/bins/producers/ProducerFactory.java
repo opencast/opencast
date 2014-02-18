@@ -109,7 +109,7 @@ public final class ProducerFactory {
     else if (captureDevice.getName() == ProducerType.ALSASRC)
       return new AlsaProducer(captureDevice, properties);
     else if (captureDevice.getName() == ProducerType.ALSAMONOSRC)
-      return new AlsaMonoProducer(captureDevice, properties);
+      return new AlsaProducer(captureDevice, properties);
     else if (captureDevice.getName() == ProducerType.PULSESRC)
       return new PulseAudioProducer(captureDevice, properties);
     else if (captureDevice.getName() == ProducerType.AUDIOTESTSRC)
