@@ -20,7 +20,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 	var PLUGIN_TYPE = "engage_timeline";
 	var PLUGIN_VERSION = "0.1";
 	var PLUGIN_TEMPLATE = "template.html";
-	var PLUGIN_STYLES = ["style.css", "lib/jquery.jqplot.css"];
+	var PLUGIN_STYLES = ["style.css"];
   var plugin = {
       name: PLUGIN_NAME,
       type: PLUGIN_TYPE,
@@ -47,8 +47,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     render: function() {
         //format values
         var tempVars = {
-            width: "1329",
-            height: "70"
+            width: $(window).width(),
+            height: "60"
         };
         // compile template and load into the html
         this.$el.html(_.template(this.template, tempVars));
@@ -65,36 +65,123 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
           }, this);
           data.push([i,cView]);
         }
-        var data2 = [];
-        for(var i=0; i<10000; i++){
-          data2[i] = [i,123];
-        }
-        //init jqcharts with options to the div container
-        $.jqplot('engage_timeline_statistics_chart', [ data2 ], {
-          axes : {
-            yaxis : {
-              showLabel : false,
-              showTicks : false,
-              padMax : 0,
-              padMin : 0
-            },
-            xaxis : {
-              showLabel : false,
-              showTicks : false
-            }
-          },
-          series : [ {
-            color : '#5FAB78',
-            lineWidth : 1,
-            showMarker : false
-          } ],
-          grid : {
-            drawGridlines : false
+        /*
+        var labels = new Array();
+        var data = new Array();
+        for(i=0;i<100;i++){
+          labels.push("");
+          if(i>50 && i<80){
+            data.push(5);
+          }else if(i>0 && i<10){
+            data.push(10);
+          }else{
+            data.push(0);
           }
-        });
+        }*/
+        var labels = new Array(); //chart label array
+        var data = new Array(); //chart data array
+        var int = (duration/1000)/500; //interval length
+        var cTime = 0; //current time in process
+        var tmpViews = 0; //views per interval
+        var tmpViewsCount = 0; //view entry count per interval
+        for(i=1;i<=500;i++){
+          tmpViews = 0;
+          tmpViewsCount = 0;
+          for(j=1;j<=int;j++){ //real time loop
+            cTime++;
+            //Count Views for interval length
+            _.each(this.footprints, function(element, index, list){
+              if(this.footprints.at(index).get("position") == cTime)
+                tmpViews += this.footprints.at(index).get("views");
+                tmpViewsCount++;
+            }, this);
+          }
+          //push chart data each point
+          labels.push("");
+          if(tmpViews != 0 && tmpViewsCount != 0){
+            data.push(tmpViews/tmpViewsCount);
+          }else{
+            data.push(0);
+          }       
+        }
+
+        var options = { 
+            //Boolean - If we show the scale above the chart data     
+            scaleOverlay : true,
+            //Boolean - If we want to override with a hard coded scale
+            scaleOverride : false,
+            //** Required if scaleOverride is true **
+            //Number - The number of steps in a hard coded scale
+            scaleSteps : 1,
+            //Number - The value jump in the hard coded scale
+            scaleStepWidth : null,
+            //Number - The scale starting value
+            scaleStartValue : 0,
+            //String - Colour of the scale line 
+            scaleLineColor : "rgba(0,0,0,.1)",
+            //Number - Pixel width of the scale line  
+            scaleLineWidth : 1,
+            //Boolean - Whether to show labels on the scale 
+            scaleShowLabels : false,
+            //Interpolated JS string - can access value
+            scaleLabel : "<%=value%>",
+            //String - Scale label font declaration for the scale label
+            scaleFontFamily : "'Arial'",
+            //Number - Scale label font size in pixels  
+            scaleFontSize : 12,
+            //String - Scale label font weight style  
+            scaleFontStyle : "normal",
+            //String - Scale label font colour  
+            scaleFontColor : "#666",  
+            ///Boolean - Whether grid lines are shown across the chart
+            scaleShowGridLines : false,
+            //String - Colour of the grid lines
+            scaleGridLineColor : "rgba(0,0,0,.05)",
+            //Number - Width of the grid lines
+            scaleGridLineWidth : 1, 
+            //Boolean - Whether the line is curved between points
+            bezierCurve : true,
+            //Boolean - Whether to show a dot for each point
+            pointDot : false,
+            //Number - Radius of each point dot in pixels
+            pointDotRadius : 3,
+            //Number - Pixel width of point dot stroke
+            pointDotStrokeWidth : 1,
+            //Boolean - Whether to show a stroke for datasets
+            datasetStroke : false,
+            //Number - Pixel width of dataset stroke
+            datasetStrokeWidth : 1,
+            //Boolean - Whether to fill the dataset with a colour
+            datasetFill : true,
+            //Boolean - Whether to animate the chart
+            animation : false,
+            //Number - Number of animation steps
+            animationSteps : 60,
+            //String - Animation easing effect
+            animationEasing : "easeOutQuart",
+            //Function - Fires when the animation is complete
+            onAnimationComplete : null
+          }
+
+          var lineChartData = {
+            labels : labels,
+            datasets : [
+              {
+                fillColor : "rgba(151,187,205,0.5)",
+                strokeColor : "rgba(151,187,205,1)",
+                pointColor : "rgba(151,187,205,1)",
+                pointStrokeColor : "#fff",
+                data : data
+              }
+            ] 
+          }
+
+          this.chart = new Chart(document.getElementById("engage_timeline_statistics_chart").getContext("2d")).Line(lineChartData, options);
     }
   });
 
+
+  
   function initPlugin() {
     Engage.log("Timeline: Statistics: init view");
     //create a new view with the media package model and the template
@@ -102,6 +189,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     //new StatisticsTimelineView(Engage.model.get("videoDataModel"), plugin.template);
     new StatisticsTimelineView("");
   }
+  
+  var relative_plugin_path = Engage.getPluginPath('EngagePluginTimelineStatistics');
+  Engage.log('Statistics: relative plugin path ' + relative_plugin_path);
   
 	//Init Event
   Engage.log("Timeline: Statistics: init");
@@ -128,8 +218,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
   });
   
   // load highchart lib
-  require(["./lib/jquery.jqplot.min.js"], function(videojs) {
-      Engage.log("Statistics Timeline: Load jqplot.js done");
+  require([relative_plugin_path + "lib/Chart.min"], function(videojs) {
+      Engage.log("Statistics Timeline: Load Chart JS done");
       initCount -= 1;
       if (initCount === 0) {
           initPlugin();
@@ -137,7 +227,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
   });
 
   // Load moment.js lib
-  require(["./lib/moment.min.js"], function(momentjs) {
+  require([relative_plugin_path + "lib/moment.min"], function(momentjs) {
       Engage.log("Description: load moment.min.js done");
       initCount -= 1;
       if (initCount === 0) {
