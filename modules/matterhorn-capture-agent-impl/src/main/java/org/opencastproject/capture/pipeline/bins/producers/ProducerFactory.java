@@ -34,7 +34,6 @@ public final class ProducerFactory {
    */
   public enum ProducerType {
     ALSASRC, /* Linux sound capture */
-    ALSAMONOSRC, /* Only capture one channel of a linux mono source. */
     AUDIOTESTSRC, /* Built in gstreamer audio test src */
     BLUECHERRY_PROVIDEO, /* Bluecherry ProVideo-143 */
     CUSTOM_VIDEO_SRC, /* Allows the user to specify their producer with gstreamer command line syntax */
@@ -107,8 +106,6 @@ public final class ProducerFactory {
     else if (captureDevice.getName() == ProducerType.BLUECHERRY_PROVIDEO)
       return new BlueCherryBT878Producer(captureDevice, properties);
     else if (captureDevice.getName() == ProducerType.ALSASRC)
-      return new AlsaProducer(captureDevice, properties);
-    else if (captureDevice.getName() == ProducerType.ALSAMONOSRC)
       return new AlsaProducer(captureDevice, properties);
     else if (captureDevice.getName() == ProducerType.PULSESRC)
       return new PulseAudioProducer(captureDevice, properties);
