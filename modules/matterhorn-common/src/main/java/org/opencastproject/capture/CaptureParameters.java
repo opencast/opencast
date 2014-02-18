@@ -209,9 +209,6 @@ public interface CaptureParameters {
   /** Property appended to CAPTURE_DEVICE_BUFFER specifying the maximum length of time to store buffers in the queue */
   String CAPTURE_DEVICE_BUFFER_MAX_TIME = ".time";
 
-  /** Property appended to CAPTURE_DEVICE_BUFFER specifying the maximum length of time to store buffers in the queue */
-  String CAPTURE_DEVICE_VOLUME = ".volume";
-  
   /** Time interval between confidence updates (in seconds) */
   String CAPTURE_DEVICE_CONFIDENCE_INTERVAL = ".confidence.interval";
 

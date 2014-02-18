@@ -34,7 +34,6 @@ public final class ProducerFactory {
    */
   public enum ProducerType {
     ALSASRC, /* Linux sound capture */
-    ALSAMONOSRC, /* Only capture one channel of a linux mono source. */
     AUDIOTESTSRC, /* Built in gstreamer audio test src */
     BLUECHERRY_PROVIDEO, /* Bluecherry ProVideo-143 */
     CUSTOM_VIDEO_SRC, /* Allows the user to specify their producer with gstreamer command line syntax */
@@ -108,8 +107,6 @@ public final class ProducerFactory {
       return new BlueCherryBT878Producer(captureDevice, properties);
     else if (captureDevice.getName() == ProducerType.ALSASRC)
       return new AlsaProducer(captureDevice, properties);
-    else if (captureDevice.getName() == ProducerType.ALSAMONOSRC)
-      return new AlsaMonoProducer(captureDevice, properties);
     else if (captureDevice.getName() == ProducerType.PULSESRC)
       return new PulseAudioProducer(captureDevice, properties);
     else if (captureDevice.getName() == ProducerType.AUDIOTESTSRC)
@@ -135,8 +132,7 @@ public final class ProducerFactory {
    * Returns true if the ProducerType does require a source to create, returns false if ProducerType is null, doesn't
    * exist or doesn't require the source location.
    *
-   * @param type
-   *          The type of Producer that needs to be checked whether it requires a source.
+   * @param type The type of Producer that needs to be checked whether it requires a source.
    * @return Returns true if it requires a source, false otherwise.
    */
   public boolean requiresSrc(ProducerType type) {
