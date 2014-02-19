@@ -72,12 +72,11 @@
               var duration = previewTracks[0].duration / 1000.0;
               var begin = split.clipBegin;
               var end = split.clipEnd;
-              var perc = (((end - begin) / duration) * 99.9).toFixed(5);
+              var perc = (((end - begin) / duration) * 100);
 	      perc = (perc > 100) ? (perc / 1000) : perc;
+	      perc = (perc < 0) ? (perc * -1) : perc;
           %>
-            <div class="splitSegmentItem<%= !split.enabled ? ' splitSegmentDisabled disabled' : '' %>" 
-                 id="splitSegmentItem-<%= index %>" 
-                 style="width:<%= perc%>%">
+            <div class="splitSegmentItem<%= !split.enabled ? ' splitSegmentDisabled disabled' : '' %>" id="splitSegmentItem-<%= index %>" style="width:<%= perc %>%">
             </div>
           <% }); %>
       ]]>

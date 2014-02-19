@@ -348,8 +348,9 @@ editor.addPar = function (currParIndex) {
                 var strs = getAllStringsOf(wfXML, "<ns3:track", "</ns3:track>");
                 var error = false;
                 for (var i = 0; i < strs.length && !error; ++i) {
-                    var start = parseInt(editor.splitData.splits[currParIndex].clipBegin * 1000);
-                    var duration = parseInt((editor.splitData.splits[currParIndex].clipEnd - editor.splitData.splits[currParIndex].clipBegin) * 1000);
+		    // TODO parseInt vs parseFloat
+                    var start = parseFloat(editor.splitData.splits[currParIndex].clipBegin * 1000);
+                    var duration = parseFloat((editor.splitData.splits[currParIndex].clipEnd - editor.splitData.splits[currParIndex].clipBegin) * 1000);
 
                     ocUtils.log("Adding track no " + (i + 1) + " / " + strs.length);
                     $.ajax({
@@ -539,7 +540,7 @@ editor.updateSplitList = function (dontClickCancel) {
  */
 function getCurrentTime() {
     var currentTime = editor.player.prop("currentTime");
-    currentTime = isNaN(currentTime) ? 0 : currentTime.toFixed(4);
+    currentTime = isNaN(currentTime) ? 0 : parseFloat(currentTime).toFixed(4);
     return currentTime;
 }
 
@@ -550,7 +551,7 @@ function getCurrentTime() {
  */
 function getDuration() {
     var duration = editor.player.prop("duration");
-    duration = isNaN(duration) ? 0 : duration.toFixed(4);
+    duration = isNaN(duration) ? 0 : parseFloat(duration).toFixed(4);
     return duration;
 }
 
@@ -589,7 +590,7 @@ function getCurrentSplitItem() {
  * @return the time in the timefield begin
  */
 function getTimefieldTimeBegin() {
-    return $('#clipBegin').timefield('option', 'value');
+    return parseFloat($('#clipBegin').timefield('option', 'value'));
 }
 
 /**
@@ -598,7 +599,7 @@ function getTimefieldTimeBegin() {
  * @return the time in the timefield end
  */
 function getTimefieldTimeEnd() {
-    return $('#clipEnd').timefield('option', 'value');
+    return parseFloat($('#clipEnd').timefield('option', 'value'));
 }
 
 /******************************************************************************/
@@ -785,7 +786,7 @@ function checkPrevAndNext(id, checkTimefields) {
         if (id == 0) {
             if (editor.splitData.splits.length > 1) {
                 var next = editor.splitData.splits[1];
-                next.clipBegin = current.clipEnd;
+                next.clipBegin = parseFloat(current.clipEnd);
             }
             if (checkTimefields) {
                 console.log(getTimefieldTimeBegin());
@@ -794,7 +795,7 @@ function checkPrevAndNext(id, checkTimefields) {
                 ocUtils.log("Inserting a first split element (auto): (" + 0 + " - " + current.clipBegin + ")");
                 var newSplitItem = {
                     clipBegin: 0,
-                    clipEnd: current.clipBegin,
+                    clipEnd: parseFloat(current.clipBegin),
                     enabled: true
                 };
                 inserted = true;
@@ -812,8 +813,8 @@ function checkPrevAndNext(id, checkTimefields) {
             if ((!checkTimefields || (checkTimefields && (getTimefieldTimeEnd() != duration))) && (current.clipEnd < (duration - minSegmentLength))) {
                 ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
                 var newLastItem = {
-                    clipBegin: current.clipEnd,
-                    clipEnd: duration,
+                    clipBegin: parseFloat(current.clipEnd),
+                    clipEnd: parseFloat(duration),
                     enabled: true
                 };
                 inserted = true;
@@ -821,11 +822,11 @@ function checkPrevAndNext(id, checkTimefields) {
                 // add the new item to the end
                 editor.splitData.splits.push(newLastItem);
                 var prev = editor.splitData.splits[id - 1];
-                prev.clipEnd = current.clipBegin;
+                prev.clipEnd = parseFloat(current.clipBegin);
                 insertedLastItem = true;
             } else {
                 ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
-                current.clipEnd = duration;
+                current.clipEnd = parseFloat(duration);
             }
         }
         // in the middle
@@ -850,8 +851,8 @@ function checkPrevAndNext(id, checkTimefields) {
                 };
             }
 
-            prev.clipEnd = current.clipBegin;
-            next.clipBegin = current.clipEnd;
+            prev.clipEnd = parseFloat(current.clipBegin);
+            next.clipBegin = parseFloat(current.clipEnd);
         }
     }
     return {
@@ -872,8 +873,8 @@ function okButtonClick() {
         id = $('#splitUUID').val();
         if (id != "") {
             var current = editor.splitData.splits[id];
-            var tmpBegin = current.clipBegin;
-            var tmpEnd = current.clipEnd;
+            var tmpBegin = parseFloat(current.clipBegin);
+            var tmpEnd = parseFloat(current.clipEnd);
             var duration = getDuration();
             id = parseInt(id);
             if (getTimefieldTimeBegin() > getTimefieldTimeEnd()) {
@@ -892,8 +893,8 @@ function okButtonClick() {
                     if (last.clipEnd < duration) {
                         ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
                         var newLastItem = {
-                            clipBegin: last.clipEnd,
-                            clipEnd: duration,
+                            clipBegin: parseFloat(last.clipEnd),
+                            clipEnd: parseFloat(duration),
                             enabled: true
                         };
 
@@ -1097,10 +1098,13 @@ function splitItemClick() {
  * click/shortcut handler for adding a split item at current time
  */
 function splitButtonClick() {
-    var currentTime = getCurrentTime();
     if (editor.splitData && editor.splitData.splits) {
+	var currentTime = getCurrentTime();
         for (var i = 0; i < editor.splitData.splits.length; ++i) {
             var splitItem = editor.splitData.splits[i];
+
+	    splitItem.clipBegin = parseFloat(splitItem.clipBegin);
+	    splitItem.clipEnd = parseFloat(splitItem.clipEnd);
             if ((splitItem.clipBegin < currentTime) && (currentTime < splitItem.clipEnd)) {
                 newEnd = 0;
                 if (editor.splitData.splits.length == (i + 1)) {
@@ -1109,12 +1113,15 @@ function splitButtonClick() {
                     newEnd = editor.splitData.splits[i + 1].clipBegin;
                 }
                 var newItem = {
-                    clipBegin: currentTime,
-                    clipEnd: newEnd,
+                    clipBegin: parseFloat(currentTime),
+                    clipEnd: parseFloat(newEnd),
                     enabled: true
                 }
+		
                 splitItem.clipEnd = currentTime;
+		console.log(editor.splitData.splits.length);
                 editor.splitData.splits.splice(i + 1, 0, newItem);
+		console.log(editor.splitData.splits.length);
                 editor.updateSplitList();
                 selectSegmentListElement(i + 1);
                 return;
@@ -1786,7 +1793,7 @@ function initPlayButtons() {
             // create standard split point
             editor.splitData.splits.push({
                 clipBegin: 0,
-                clipEnd: workflowInstance.mediapackage.duration / 1000,
+                clipEnd: parseFloat(workflowInstance.mediapackage.duration) / 1000,
                 enabled: true
             });
             editor.updateSplitList();
@@ -1906,15 +1913,15 @@ function parseInitialSMIL() {
                 if ((key > 0) && (lastEnd != clipBegin)) {
                     ocUtils.log("Inserting a split element: (" + lastEnd + " - " + clipBegin + ")");
                     editor.splitData.splits.push({
-                        clipBegin: lastEnd,
-                        clipEnd: clipBegin,
+                        clipBegin: parseFloat(lastEnd),
+                        clipEnd: parseFloat(clipBegin),
                         enabled: false
                     });
                 }
                 ocUtils.log("Inserting a split element: (" + clipBegin + " - " + clipEnd + ")");
                 editor.splitData.splits.push({
-                    clipBegin: clipBegin,
-                    clipEnd: clipEnd,
+                    clipBegin: parseFloat(clipBegin),
+                    clipEnd: parseFloat(clipEnd),
                     enabled: true
                 });
                 lastEnd = clipEnd;
@@ -1931,19 +1938,19 @@ function parseInitialSMIL() {
                 if (current.clipEnd < (duration - minSegmentLength)) {
                     ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
                     var newLastItem = {
-                        clipBegin: current.clipEnd,
-                        clipEnd: duration,
+                        clipBegin: parseFloat(current.clipEnd),
+                        clipEnd: parseFloat(duration),
                         enabled: true
                     };
 
                     // add the new item to the end
                     editor.splitData.splits.push(newLastItem);
                     var prev = editor.splitData.splits[id - 2];
-                    prev.clipEnd = current.clipBegin;
+                    prev.clipEnd = parseFloat(current.clipBegin);
                     insertedLastItem = true;
                 } else {
                     ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
-                    current.clipEnd = duration;
+                    current.clipEnd = parseFloat(duration);
                 }
             }
         }
@@ -1957,7 +1964,7 @@ function parseInitialSMIL() {
             if (!insertedSplitItem) {
                 editor.splitData.splits.push({
                     clipBegin: 0,
-                    clipEnd: duration,
+                    clipEnd: parseFloat(duration),
                     enabled: true
                 });
             }
@@ -2029,7 +2036,7 @@ function playerReady() {
             // create standard split point
             editor.splitData.splits.push({
                 clipBegin: 0,
-                clipEnd: workflowInstance.mediapackage.duration / 1000,
+                clipEnd: parseFloat(workflowInstance.mediapackage.duration) / 1000,
                 enabled: true
             });
         }
