@@ -539,7 +539,7 @@ editor.updateSplitList = function (dontClickCancel) {
  */
 function getCurrentTime() {
     var currentTime = editor.player.prop("currentTime");
-    currentTime = isNaN(currentTime) ? 0 : currentTime;
+    currentTime = isNaN(currentTime) ? 0 : currentTime.toFixed(4);
     return currentTime;
 }
 
@@ -550,7 +550,7 @@ function getCurrentTime() {
  */
 function getDuration() {
     var duration = editor.player.prop("duration");
-    duration = isNaN(duration) ? 0 : duration;
+    duration = isNaN(duration) ? 0 : duration.toFixed(4);
     return duration;
 }
 
@@ -787,69 +787,67 @@ function checkPrevAndNext(id, checkTimefields) {
                 var next = editor.splitData.splits[1];
                 next.clipBegin = current.clipEnd;
             }
-	    if(checkTimefields) {
-		console.log(getTimefieldTimeBegin());
-	    }
-            if ((!checkTimefields || (checkTimefields && (getTimefieldTimeBegin() != 0)))
-		&& (current.clipBegin > minSegmentLength)) {
+            if (checkTimefields) {
+                console.log(getTimefieldTimeBegin());
+            }
+            if ((!checkTimefields || (checkTimefields && (getTimefieldTimeBegin() != 0))) && (current.clipBegin > minSegmentLength)) {
                 ocUtils.log("Inserting a first split element (auto): (" + 0 + " - " + current.clipBegin + ")");
                 var newSplitItem = {
                     clipBegin: 0,
                     clipEnd: current.clipBegin,
                     enabled: true
                 };
-		inserted = true;
+                inserted = true;
 
                 // add new item to front
                 editor.splitData.splits.splice(0, 0, newSplitItem);
-		insertedFirstItem = true;
+                insertedFirstItem = true;
             } else {
-		ocUtils.log("Extending the first split element from (auto): (" + 0 + " - " + current.clipBegin + ")");
-		current.clipBegin = 0;
-	    }
+                ocUtils.log("Extending the first split element from (auto): (" + 0 + " - " + current.clipBegin + ")");
+                current.clipBegin = 0;
+            }
         }
-	// new last item
-	else if ((editor.splitData.splits.length > 0) && (id == editor.splitData.splits.length - 1)) {
-            if ((!checkTimefields || (checkTimefields && (getTimefieldTimeEnd() != duration)))
-		&& (current.clipEnd < (duration - minSegmentLength))) {
+        // new last item
+        else if ((editor.splitData.splits.length > 0) && (id == editor.splitData.splits.length - 1)) {
+            if ((!checkTimefields || (checkTimefields && (getTimefieldTimeEnd() != duration))) && (current.clipEnd < (duration - minSegmentLength))) {
                 ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
                 var newLastItem = {
                     clipBegin: current.clipEnd,
                     clipEnd: duration,
                     enabled: true
                 };
-		inserted = true;
+                inserted = true;
 
                 // add the new item to the end
                 editor.splitData.splits.push(newLastItem);
-		var prev = editor.splitData.splits[id - 1];
-		prev.clipEnd = current.clipBegin;
-		insertedLastItem = true;
+                var prev = editor.splitData.splits[id - 1];
+                prev.clipEnd = current.clipBegin;
+                insertedLastItem = true;
             } else {
-		ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
-		current.clipEnd = duration;
-	    }
+                ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
+                current.clipEnd = duration;
+            }
         }
-	// in the middle
-	else if((id > 0) && (id < (editor.splitData.splits.length - 1))) {
+        // in the middle
+        else if ((id > 0) && (id < (editor.splitData.splits.length - 1))) {
             var prev = editor.splitData.splits[id - 1];
             var next = editor.splitData.splits[id + 1];
 
             if (checkTimefields && (getTimefieldTimeBegin() <= prev.clipBegin)) {
                 displayError("The inpoint is lower than the begin of the last segment. Please check.",
                     "Check inpoint");
-		return {
-		    ok: false,
-		    inserted: false
-		};
+                return {
+                    ok: false,
+                    inserted: false
+                };
             }
             if (checkTimefields && (getTimefieldTimeEnd() >= next.clipEnd)) {
                 displayError("The outpoint is bigger than the end of the next segment. Please check.",
                     "Check outpoint");
-		return {
-		    ok: false,
-		    inserted: false
-		};
+                return {
+                    ok: false,
+                    inserted: false
+                };
             }
 
             prev.clipEnd = current.clipBegin;
@@ -857,8 +855,8 @@ function checkPrevAndNext(id, checkTimefields) {
         }
     }
     return {
-	ok: true,
-	inserted: inserted
+        ok: true,
+        inserted: inserted
     };
 }
 
@@ -873,10 +871,10 @@ function okButtonClick() {
     if (checkClipBegin() && checkClipEnd()) {
         id = $('#splitUUID').val();
         if (id != "") {
-	    var current = editor.splitData.splits[id];
-	    var tmpBegin = current.clipBegin;
-	    var tmpEnd = current.clipEnd;
-	    var duration = getDuration();
+            var current = editor.splitData.splits[id];
+            var tmpBegin = current.clipBegin;
+            var tmpEnd = current.clipEnd;
+            var duration = getDuration();
             id = parseInt(id);
             if (getTimefieldTimeBegin() > getTimefieldTimeEnd()) {
                 displayError("The inpoint is bigger than the outpoint. Please check and correct it.",
@@ -886,32 +884,32 @@ function okButtonClick() {
             }
 
             if (checkPrevAndNext(id, true).ok) {
-		if (editor.splitData && editor.splitData.splits) {
-		    current.clipBegin = getTimefieldTimeBegin();
-		    current.clipEnd = getTimefieldTimeEnd();
-		    
-		    var last = editor.splitData.splits[editor.splitData.splits.length - 1];
-		    if (last.clipEnd < duration) {
-			ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
-			var newLastItem = {
-			    clipBegin: last.clipEnd,
-			    clipEnd: duration,
-			    enabled: true
-			};
-			
-			// add the new item to the end
-			editor.splitData.splits.push(newLastItem);
-		    }
-		    for(var i = 0; i < editor.splitData.splits.length; ++i) {
-			if(checkPrevAndNext(i, false).inserted) {
-			    i = 0;
-			}
-		    }
-		}
-		    
-		editor.updateSplitList(true);
-		$('#videoPlayer').focus();
-		selectSegmentListElement(id);
+                if (editor.splitData && editor.splitData.splits) {
+                    current.clipBegin = getTimefieldTimeBegin();
+                    current.clipEnd = getTimefieldTimeEnd();
+
+                    var last = editor.splitData.splits[editor.splitData.splits.length - 1];
+                    if (last.clipEnd < duration) {
+                        ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
+                        var newLastItem = {
+                            clipBegin: last.clipEnd,
+                            clipEnd: duration,
+                            enabled: true
+                        };
+
+                        // add the new item to the end
+                        editor.splitData.splits.push(newLastItem);
+                    }
+                    for (var i = 0; i < editor.splitData.splits.length; ++i) {
+                        if (checkPrevAndNext(i, false).inserted) {
+                            i = 0;
+                        }
+                    }
+                }
+
+                editor.updateSplitList(true);
+                $('#videoPlayer').focus();
+                selectSegmentListElement(id);
             } else {
                 current.clipBegin = tmpBegin;
                 current.clipEnd = tmpEnd;
@@ -1900,70 +1898,70 @@ function parseInitialSMIL() {
         if (editor.parsedSmil.par) {
             editor.splitData.splits = [];
             editor.parsedSmil.par = ocUtils.ensureArray(editor.parsedSmil.par);
-	    var lastEnd = 0;
+            var lastEnd = 0;
             $.each(editor.parsedSmil.par, function (key, value) {
                 value.video = ocUtils.ensureArray(value.video);
                 var clipBegin = parseFloat(value.video[0].clipBegin) / 1000;
                 var clipEnd = parseFloat(value.video[0].clipEnd) / 1000;
-		if((key > 0) && (lastEnd !=  clipBegin)) {
+                if ((key > 0) && (lastEnd != clipBegin)) {
                     ocUtils.log("Inserting a split element: (" + lastEnd + " - " + clipBegin + ")");
-		    editor.splitData.splits.push({
-			clipBegin: lastEnd,
-			clipEnd: clipBegin,
-			enabled: false
-		    });
-		}
+                    editor.splitData.splits.push({
+                        clipBegin: lastEnd,
+                        clipEnd: clipBegin,
+                        enabled: false
+                    });
+                }
                 ocUtils.log("Inserting a split element: (" + clipBegin + " - " + clipEnd + ")");
-		editor.splitData.splits.push({
+                editor.splitData.splits.push({
                     clipBegin: clipBegin,
                     clipEnd: clipEnd,
                     enabled: true
-		});
-		lastEnd = clipEnd;
-	    });
-	    for(var i = 0; i < editor.splitData.splits.length; ++i) {
-                if(checkPrevAndNext(i, false).inserted) {
-		    i = 0;
-		}
-	    }
-	    // check last segment
-	    var current = editor.splitData.splits[editor.splitData.splits.length - 1];
-	    var duration = getDuration();
-	    if(current.clipEnd != duration) {
-		if (current.clipEnd < (duration - minSegmentLength)) {
+                });
+                lastEnd = clipEnd;
+            });
+            for (var i = 0; i < editor.splitData.splits.length; ++i) {
+                if (checkPrevAndNext(i, false).inserted) {
+                    i = 0;
+                }
+            }
+            // check last segment
+            var current = editor.splitData.splits[editor.splitData.splits.length - 1];
+            var duration = getDuration();
+            if (current.clipEnd != duration) {
+                if (current.clipEnd < (duration - minSegmentLength)) {
                     ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
                     var newLastItem = {
-			clipBegin: current.clipEnd,
-			clipEnd: duration,
-			enabled: true
+                        clipBegin: current.clipEnd,
+                        clipEnd: duration,
+                        enabled: true
                     };
 
                     // add the new item to the end
                     editor.splitData.splits.push(newLastItem);
-		    var prev = editor.splitData.splits[id - 2];
-		    prev.clipEnd = current.clipBegin;
-		    insertedLastItem = true;
-		} else {
-		    ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
-		    current.clipEnd = duration;
-		}
-	    }
+                    var prev = editor.splitData.splits[id - 2];
+                    prev.clipEnd = current.clipBegin;
+                    insertedLastItem = true;
+                } else {
+                    ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
+                    current.clipEnd = duration;
+                }
+            }
         }
-	
+
         ocUtils.log("Done parsing smil.");
     } else {
         ocUtils.log("No smil found.");
-	if (editor.splitData && editor.splitData.splits) {
-	    var duration = editor.mediapackageParser.duration / 1000;
+        if (editor.splitData && editor.splitData.splits) {
+            var duration = editor.mediapackageParser.duration / 1000;
             ocUtils.log("Inserting a split element: (" + 0 + " - " + duration + ")");
             if (!insertedSplitItem) {
-		editor.splitData.splits.push({
+                editor.splitData.splits.push({
                     clipBegin: 0,
                     clipEnd: duration,
                     enabled: true
-		});
+                });
             }
-	}
+        }
     }
 
     editor.splitData.splits[0].enabled = !insertedFirstItem;
@@ -2091,12 +2089,14 @@ $(document).ready(function () {
         url: '/info/me.json',
         type: 'GET',
         dataType: 'json',
-        success: function(data) {
-            var val1 = parseInt(data.org.properties["adminui.prePostRoll"]);
-	    prePostRoll = !isNaN(val1) ? val1 : prePostRoll;
-            var val2 = parseInt(data.org.properties["adminui.minSegmentLength"]);
-	    minSegmentLength = !isNaN(val2) ? val2 : minSegmentLength;
-	}
+        success: function (data) {
+            if (data && data.org) {
+                var val1 = parseInt(data.org.properties["adminui.prePostRoll"]);
+                prePostRoll = (val1 && !isNaN(val1)) ? val1 : prePostRoll;
+                var val2 = parseInt(data.org.properties["adminui.minSegmentLength"]);
+                minSegmentLength = (val2 && !isNaN(val2)) ? val2 : minSegmentLength;
+            }
+        }
     });
 
     editor.player = $('#videoPlayer');
@@ -2119,16 +2119,22 @@ $(document).ready(function () {
         if (keyCode == KEY_SPACE) {
             clearEvents2();
         }
-        if (!$('#clipBegin').is(":focus") && !$('#clipEnd').is(":focus") && ((keyCode == KEY_LEFT) || (keyCode == KEY_UP) || (keyCode == KEY_RIGHT) || (keyCode == KEY_DOWN))) {
+        if (!($('input:checked').length > 0) && ((keyCode == KEY_LEFT) || (keyCode == KEY_UP) || (keyCode == KEY_RIGHT) || (keyCode == KEY_DOWN))) {
             isSeeking = true;
             return false;
+        } else {
+            isSeeking = false;
+            return true;
         }
     }).keyup(function (e) {
         var keyCode = e.keyCode || e.which();
-        if ((keyCode == KEY_LEFT) || (keyCode == KEY_UP) || (keyCode == KEY_RIGHT) || (keyCode == KEY_DOWN)) {
+        if (!($('input:checked').length > 0) && ((keyCode == KEY_LEFT) || (keyCode == KEY_UP) || (keyCode == KEY_RIGHT) || (keyCode == KEY_DOWN))) {
             isSeeking = false;
             lastTimeSplitItemClick = new Date();
             return false;
+        } else {
+            isSeeking = false;
+            return true;
         }
     });
 
