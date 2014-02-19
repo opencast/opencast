@@ -774,4 +774,22 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     return null;
   }
 
+  @Override
+  public void removeParentlessJobs(int lifetime) throws ServiceRegistryException {
+    synchronized (jobs) {
+      for (String serializedJob : jobs.values()) {
+        Job job = null;
+        try {
+          job = JobParser.parseJob(serializedJob);
+        } catch (IOException e) {
+          throw new IllegalStateException("Error unmarshaling job", e);
+        }
+
+        Long parentJobId = job.getParentJobId();
+        if (parentJobId == null | parentJobId < 1)
+          jobs.remove(job.getId());
+      }
+    }
+  }
+
 }

@@ -22,6 +22,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.lang.BooleanUtils;
@@ -42,6 +43,9 @@ public class OsgiWorkflowCleanupScheduler extends AbstractWorkflowCleanupSchedul
   /** Reference to the Workflow service */
   private WorkflowService workflowService;
 
+  /** Reference to the service registry */
+  private ServiceRegistry serviceRegistry;
+
   /** Reference to the security service */
   private SecurityService securityService;
 
@@ -56,6 +60,7 @@ public class OsgiWorkflowCleanupScheduler extends AbstractWorkflowCleanupSchedul
   private static final String PARAM_KEY_LIFETIME_SUCCEEDED = "lifetime.succeeded";
   private static final String PARAM_KEY_LIFETIME_FAILED = "lifetime.failed";
   private static final String PARAM_KEY_LIFETIME_STOPPED = "lifetime.stopped";
+  private static final String PARAM_KEY_LIFETIME_PARENTLESS = "lifetime.parentless";
 
   private String systemUserName;
 
@@ -74,14 +79,33 @@ public class OsgiWorkflowCleanupScheduler extends AbstractWorkflowCleanupSchedul
         throw new ConfigurationException(PARAM_KEY_CRON_EXPR, "Cron expression must be valid");
       logger.debug("cronExpression = {}", cronExpression);
 
-      lifetimeSuccessfulJobs = Integer.valueOf((String) properties.get(PARAM_KEY_LIFETIME_SUCCEEDED));
+      try {
+        lifetimeSuccessfulJobs = Integer.valueOf((String) properties.get(PARAM_KEY_LIFETIME_SUCCEEDED));
+      } catch (NumberFormatException e) {
+        throw new ConfigurationException(PARAM_KEY_LIFETIME_SUCCEEDED, "Lifetime must be a valid integer", e);
+      }
       logger.debug("lifetimeFinishedJobs = {}", lifetimeSuccessfulJobs);
 
-      lifetimeFailedJobs = Integer.valueOf((String) properties.get(PARAM_KEY_LIFETIME_FAILED));
+      try {
+        lifetimeFailedJobs = Integer.valueOf((String) properties.get(PARAM_KEY_LIFETIME_FAILED));
+      } catch (NumberFormatException e) {
+        throw new ConfigurationException(PARAM_KEY_LIFETIME_FAILED, "Lifetime must be a valid integer", e);
+      }
       logger.debug("lifetimeFailedJobs = {}", lifetimeFailedJobs);
 
-      lifetimeStoppedJobs = Integer.valueOf((String) properties.get(PARAM_KEY_LIFETIME_STOPPED));
+      try {
+        lifetimeStoppedJobs = Integer.valueOf((String) properties.get(PARAM_KEY_LIFETIME_STOPPED));
+      } catch (NumberFormatException e) {
+        throw new ConfigurationException(PARAM_KEY_LIFETIME_STOPPED, "Lifetime must be a valid integer", e);
+      }
       logger.debug("lifetimeStoppedJobs = {}", lifetimeStoppedJobs);
+
+      try {
+        lifetimeParentlessJobs = Integer.valueOf((String) properties.get(PARAM_KEY_LIFETIME_PARENTLESS));
+      } catch (NumberFormatException e) {
+        throw new ConfigurationException(PARAM_KEY_LIFETIME_PARENTLESS, "Lifetime must be a valid integer", e);
+      }
+      logger.debug("lifetimeParentlessJobs = {}", lifetimeParentlessJobs);
     }
 
     schedule();
@@ -107,6 +131,11 @@ public class OsgiWorkflowCleanupScheduler extends AbstractWorkflowCleanupSchedul
     return this.workflowService;
   }
 
+  @Override
+  public ServiceRegistry getServiceRegistry() {
+    return this.serviceRegistry;
+  }
+
   /** OSGi component activate callback */
   protected void activate(ComponentContext cc) {
     systemUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
@@ -130,6 +159,10 @@ public class OsgiWorkflowCleanupScheduler extends AbstractWorkflowCleanupSchedul
   /** OSGi callback to set security service */
   protected void bindSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  protected void bindServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
   }
 
 }

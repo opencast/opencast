@@ -158,7 +158,8 @@ public class WorkflowServiceImplTest {
     service.setUserDirectoryService(userDirectoryService);
 
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
-    EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject())).andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
+    EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
+            .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
@@ -183,6 +184,7 @@ public class WorkflowServiceImplTest {
             organizationDirectoryService);
 
     serviceRegistry.registerService(REMOTE_SERVICE, REMOTE_HOST, "/path", true);
+    service.setWorkspace(workspace);
 
     dao = new WorkflowServiceSolrIndex();
     dao.setServiceRegistry(serviceRegistry);

@@ -54,6 +54,7 @@ import org.opencastproject.util.jmx.JmxUtil;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -94,6 +95,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
+import javax.persistence.TypedQuery;
 import javax.persistence.spi.PersistenceProvider;
 
 /**
@@ -534,13 +536,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     try {
       em = emf.createEntityManager();
       tx = em.getTransaction();
-      tx.begin();
-      for (Job job : childJobs) {
-        Job jobToDelete = em.merge(job);
+      for (int i = childJobs.size() - 1; i >= 0; i--) {
+        Job job = childJobs.get(i);
+        Job jobToDelete = em.find(JobJpaImpl.class, job.getId());
+        tx.begin();
         em.remove(jobToDelete);
+        tx.commit();
         logger.debug("Job '{}' deleted", jobToDelete.getId());
       }
-      tx.commit();
       logger.debug("Deleted all child jobs of job '{}'", jobId);
     } catch (Exception e) {
       logger.error("Unable to remove child jobs from {}: {}", jobId, e);
@@ -552,6 +555,49 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (em != null)
         em.close();
     }
+  }
+
+  @Override
+  public void removeParentlessJobs(int lifetime) throws ServiceRegistryException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+
+    Date d = DateUtils.addDays(new Date(), -lifetime);
+    int count = 0;
+
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      TypedQuery<JobJpaImpl> query = em.createNamedQuery("Job.withoutParent", JobJpaImpl.class);
+      List<JobJpaImpl> jobs = query.getResultList();
+
+      tx.begin();
+      for (JobJpaImpl job : jobs) {
+        if (job.getDateCreated().after(d))
+          continue;
+
+        // DO NOT DELETE workflow instances and operations!
+        if (START_OPERATION.equals(job.getOperation()) || START_WORKFLOW.equals(job.getOperation()))
+          continue;
+
+        if (job.getStatus().isTerminated()) {
+          JobJpaImpl jobToRemove = em.merge(job);
+          em.remove(jobToRemove);
+          logger.debug("Parentless job '{}' removed");
+          count++;
+        }
+
+      }
+      tx.commit();
+      if (count > 0)
+        logger.info("Successfully removed {} parentless jobs", count);
+      else
+        logger.info("No parentless jobs found to remove", count);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+    return;
   }
 
   /**

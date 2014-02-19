@@ -21,6 +21,8 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.util.SecurityContext;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NeedleEye;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function0;
@@ -65,6 +67,9 @@ public abstract class AbstractWorkflowCleanupScheduler {
   /** Get a workflow service */
   public abstract WorkflowService getWorkflowService();
 
+  /** Get a service registry */
+  public abstract ServiceRegistry getServiceRegistry();
+
   /** Is the scheduler enabled? */
   protected boolean enabled = false;
 
@@ -79,6 +84,9 @@ public abstract class AbstractWorkflowCleanupScheduler {
 
   /** Lifetime of failed jobs in days */
   protected static int lifetimeStoppedJobs = -1;
+
+  /** Lifetime of parentless jobs in days */
+  protected static int lifetimeParentlessJobs = -1;
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(AbstractWorkflowCleanupScheduler.class);
@@ -190,11 +198,17 @@ public abstract class AbstractWorkflowCleanupScheduler {
               if (lifetimeStoppedJobs > 0)
                 parameters.getWorkflowService().cleanupWorkflowInstances(lifetimeStoppedJobs,
                         WorkflowInstance.WorkflowState.STOPPED);
+
+              if (lifetimeParentlessJobs > 0)
+                parameters.getServiceRegistry().removeParentlessJobs(lifetimeParentlessJobs);
+
             } catch (WorkflowDatabaseException e) {
               logger.error("Unable to cleanup jobs: {}", e);
             } catch (UnauthorizedException e) {
               logger.error("Workflow cleanup job doesn't have right to delete jobs!");
               throw new IllegalStateException(e);
+            } catch (ServiceRegistryException e) {
+              logger.error("There was an error while removing parentless jobs: {}", e.getMessage());
             }
           }
         });

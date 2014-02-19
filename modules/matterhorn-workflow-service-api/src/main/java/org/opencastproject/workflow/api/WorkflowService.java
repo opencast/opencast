@@ -237,7 +237,8 @@ public interface WorkflowService {
   WorkflowInstance stop(long workflowInstanceId) throws WorkflowException, NotFoundException, UnauthorizedException;
 
   /**
-   * Permanently removes a workflow instance.
+   * Permanently removes a workflow instance. Only workflow instances with state {@link WorkflowState#SUCCEEDED},
+   * {@link WorkflowState#STOPPED} or {@link WorkflowState#FAILED} may be removed.
    * 
    * @param workflowInstanceId
    *          the workflow instance identifier
@@ -247,9 +248,11 @@ public interface WorkflowService {
    *           if no workflow instance with the given identifier could be found
    * @throws UnauthorizedException
    *           if the current user does not have {@link #WRITE_PERMISSION} on the workflow instance
+   * @throws WorkflowStateException
+   *           if the workflow instance is in a disallowed state
    */
   void remove(long workflowInstanceId) throws WorkflowDatabaseException, WorkflowParsingException, NotFoundException,
-          UnauthorizedException;
+          UnauthorizedException, WorkflowStateException;
 
   /**
    * Temporarily suspends a started workflow instance.

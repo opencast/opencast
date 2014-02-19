@@ -12,6 +12,7 @@
   </service>
   
   <reference cardinality="1..1" interface="org.opencastproject.workflow.api.WorkflowService" name="WorkflowService" policy="static" bind="bindWorkflowService"/>
+  <reference cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry" name="ServiceRegistry" policy="static" bind="bindServiceRegistry"/>
   <reference cardinality="1..1" interface="org.opencastproject.security.api.OrganizationDirectoryService" name="OrganizationDirectoryService" policy="static" bind="bindOrganizationDirectoryService"/>
   <reference cardinality="1..1" interface="org.opencastproject.security.api.SecurityService" name="SecurityService" policy="static" bind="bindSecurityService"/>
  

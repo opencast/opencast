@@ -974,4 +974,32 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
     throw new ServiceRegistryException("Unable to remove job with ID " + id + " (" + responseStatusCode + ")");
   }
 
+  @Override
+  public void removeParentlessJobs(int lifetime) throws ServiceRegistryException {
+    String postUrl = UrlSupport.concat(serverUrl, "removeparentlessjobs");
+    HttpPost post = new HttpPost(postUrl);
+
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("lifetime", String.valueOf(lifetime)));
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (UnsupportedEncodingException e) {
+      throw new IllegalStateException(e);
+    }
+
+    HttpResponse response = null;
+    try {
+      response = client.execute(post);
+      int responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
+        logger.info("Parentless jobs successfully removed");
+        return;
+      }
+    } catch (TrustedHttpClientException e) {
+      throw new ServiceRegistryException(e);
+    } finally {
+      client.close(response);
+    }
+    throw new ServiceRegistryException("Unable to remove parentless jobs");
+  }
 }

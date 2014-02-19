@@ -287,6 +287,17 @@ public interface ServiceRegistry {
   void removeJob(long id) throws NotFoundException, ServiceRegistryException;
 
   /**
+   * Removes all jobs which do not have a parent job (except workflow instance jobs) and which have passed their
+   * lifetime.
+   * 
+   * @param lifetime
+   *          lifetime in days
+   * @throws ServiceRegistryException
+   *           if removing the jobs fails
+   */
+  void removeParentlessJobs(int lifetime) throws ServiceRegistryException;
+
+  /**
    * Gets the current running job
    * 
    * @return the current job
