@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-userdirectory</artifactId>
   <name>matterhorn-userdirectory</name>
@@ -41,7 +40,6 @@
       <groupId>com.googlecode.guava-osgi</groupId>
       <artifactId>guava-osgi</artifactId>
     </dependency>
-    
     <!-- Testing -->
     <dependency>
       <groupId>junit</groupId>
@@ -109,8 +107,8 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-<Build-Number>${build.number}</Build-Number>
-<Mh-Db-Version>${mh.db.version}</Mh-Db-Version>
+            <Build-Number>${build.number}</Build-Number>
+            <Mh-Db-Version>${mh.db.version}</Mh-Db-Version>
             <Export-Package>
               org.opencastproject.userdirectory;version=${project.version},
             </Export-Package>

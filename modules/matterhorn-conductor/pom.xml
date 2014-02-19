@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>matterhorn-conductor</artifactId>
@@ -149,20 +148,20 @@
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
     <dependency>
-    	<groupId>org.gstreamer</groupId>
-    	<artifactId>gstreamer-java</artifactId>
-    	<version>1.4-no-tests-and-bin-launch</version>
+      <groupId>org.gstreamer</groupId>
+      <artifactId>gstreamer-java</artifactId>
+      <version>1.4-no-tests-and-bin-launch</version>
     </dependency>
     <dependency>
-    	<groupId>net.java.dev.jna</groupId>
-    	<artifactId>jna</artifactId>
-    	<version>3.2.4</version>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>3.2.4</version>
     </dependency>
     <dependency>
-	    <groupId>org.sakaiproject.nakamura</groupId>
-	    <artifactId>javax.activation-mail</artifactId>
-	    <version>1.1.1.1.4.2-1.4.2</version>
-	</dependency>
+      <groupId>org.sakaiproject.nakamura</groupId>
+      <artifactId>javax.activation-mail</artifactId>
+      <version>1.1.1.1.4.2-1.4.2</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -174,7 +173,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-	    <Include-Resource>
+            <Include-Resource>
 	      {maven-resources},
 	      ui/operation/trim/common-data.tpl=../../shared-resources/templates/common-data.tpl,
 	      ui/operation/trim/additional-description.tpl=../../shared-resources/templates/additional-description.tpl

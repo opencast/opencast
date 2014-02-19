@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-security-openid</artifactId>
   <name>matterhorn-security-openid</name>
@@ -10,26 +9,20 @@
     <version>1.5.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
-
   <properties>
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
     <checkstyle.skip>true</checkstyle.skip>
   </properties>
-
   <dependencies>
-
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>org.springframework.security.openid</artifactId>
     </dependency>
- 
     <dependency>
       <groupId>org.openid4java</groupId>
       <artifactId>com.springsource.org.openid4java</artifactId>
     </dependency>
-
   </dependencies>
-  
   <build>
     <plugins>
       <plugin>

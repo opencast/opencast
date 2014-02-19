@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-userdirectory-ldap</artifactId>
   <name>matterhorn-userdirectory-ldap</name>
@@ -57,7 +56,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-
     <!-- Legacy spring LDAP dependencies -->
     <dependency>
       <groupId>org.springframework.ldap</groupId>
@@ -79,7 +77,6 @@
       <artifactId>org.springframework.transaction</artifactId>
       <version>2.5.6.SEC02</version>
     </dependency>
-
     <!-- Testing -->
     <dependency>
       <groupId>junit</groupId>

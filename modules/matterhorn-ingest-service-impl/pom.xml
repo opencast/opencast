@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-ingest-service-impl</artifactId>
   <name>matterhorn-ingest-service-impl</name>
@@ -237,10 +236,8 @@
       </plugin>
     </plugins>
   </build>
-
   <reporting>
     <plugins>
-
       <!--
         DISABLED to get the mvn site:site running -AZ <plugin>
         <groupId>gr.abiss.mvn.plugins</groupId>
@@ -256,5 +253,4 @@
       -->
     </plugins>
   </reporting>
-
 </project>

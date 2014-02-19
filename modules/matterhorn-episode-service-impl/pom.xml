@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-episode-service-impl</artifactId>
   <name>matterhorn-episode-service-impl</name>
@@ -87,14 +86,14 @@
       <artifactId>jsr311-api</artifactId>
     </dependency>
     <!--<dependency>-->
-      <!--<groupId>org.apache.tika</groupId>-->
-      <!--<artifactId>tika-bundle</artifactId>-->
+    <!--<groupId>org.apache.tika</groupId>-->
+    <!--<artifactId>tika-bundle</artifactId>-->
     <!--</dependency>-->
     <!--<dependency>-->
-      <!--<groupId>org.apache.tika</groupId>-->
-      <!--<artifactId>tika-core</artifactId>-->
-      <!--<version>0.7</version>-->
-      <!--<scope>compile</scope>-->
+    <!--<groupId>org.apache.tika</groupId>-->
+    <!--<artifactId>tika-core</artifactId>-->
+    <!--<version>0.7</version>-->
+    <!--<scope>compile</scope>-->
     <!--</dependency>-->
     <dependency>
       <groupId>org.osgi</groupId>
@@ -132,7 +131,7 @@
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.antlr</artifactId>
       <scope>test</scope>
-    </dependency> 
+    </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
@@ -142,7 +141,7 @@
       <groupId>c3p0</groupId>
       <artifactId>c3p0</artifactId>
       <scope>test</scope>
-    </dependency> 
+    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
@@ -196,7 +195,7 @@
               OSGI-INF/episode-service-rest.xml,
               OSGI-INF/episode-service-persistence.xml
             </Service-Component>
-            <JPA-PersistenceUnits>org.opencastproject.episode.impl.persistence</JPA-PersistenceUnits>   
+            <JPA-PersistenceUnits>org.opencastproject.episode.impl.persistence</JPA-PersistenceUnits>
           </instructions>
         </configuration>
       </plugin>
