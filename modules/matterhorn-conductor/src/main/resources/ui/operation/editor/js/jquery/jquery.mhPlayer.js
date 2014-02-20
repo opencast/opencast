@@ -77,9 +77,9 @@
             var strPrevMarker = "Previous Marker";
             var strNextMarker = "Next Marker";
 
-            var strPlayPrePost = "Play at current playhead with 2s pre roll and 2s post roll excluding removed items";
+            var strPlayPrePost = "Play at current playhead with pre roll and post roll excluding removed items";
 
-            var strSplit = "split at current time";
+            var strSplit = "Split at current time";
 
             /*************************************************************************
              * class names
