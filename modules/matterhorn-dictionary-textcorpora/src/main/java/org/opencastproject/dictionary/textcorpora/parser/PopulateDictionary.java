@@ -13,9 +13,9 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.dictionary.impl.parser;
+package org.opencastproject.dictionary.textcorpora.parser;
 
-import org.opencastproject.dictionary.impl.Word;
+import org.opencastproject.dictionary.textcorpora.Word;
 
 import org.apache.commons.lang.StringUtils;
 import org.xml.sax.Attributes;

@@ -13,11 +13,10 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.dictionary.impl;
+package org.opencastproject.dictionary.textcorpora;
 
 import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
 
-import org.opencastproject.dictionary.api.DictionaryService;
 import org.opencastproject.util.ReadinessIndicator;
 
 import org.apache.commons.io.IOUtils;
@@ -42,7 +41,7 @@ public class DictionaryScanner implements ArtifactInstaller {
   private static final Logger logger = LoggerFactory.getLogger(DictionaryScanner.class);
 
   /** The dictionary in which we can install languages */
-  protected DictionaryService dictionaryService = null;
+  protected DictionaryServiceJpaImpl dictionaryService = null;
 
   /** OSGi bundle context */
   private BundleContext bundleCtx = null;
@@ -61,7 +60,7 @@ public class DictionaryScanner implements ArtifactInstaller {
   }
 
   /** Sets the dictionary service */
-  public void setDictionaryService(DictionaryService dictionaryService) {
+  public void setDictionaryService(DictionaryServiceJpaImpl dictionaryService) {
     this.dictionaryService = dictionaryService;
   }
 

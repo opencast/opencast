@@ -454,7 +454,7 @@
         <module>modules/matterhorn-composer-ffmpeg</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dictionary-api</module>
-        <module>modules/matterhorn-dictionary-impl</module>
+        <module>modules/matterhorn-dictionary-textcorpora</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-inspection-service-impl</module>
@@ -498,7 +498,7 @@
         <module>modules/matterhorn-composer-ffmpeg</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dictionary-api</module>
-        <module>modules/matterhorn-dictionary-impl</module>
+        <module>modules/matterhorn-dictionary-textcorpora</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-inspection-service-impl</module>

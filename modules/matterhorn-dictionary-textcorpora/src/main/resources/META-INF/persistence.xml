@@ -6,10 +6,10 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
     http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
   <persistence-unit name="org.opencastproject.dictionary" transaction-type="RESOURCE_LOCAL">
-    <class>org.opencastproject.dictionary.impl.Word</class>
+    <class>org.opencastproject.dictionary.textcorpora.Word</class>
     <properties>
-      <property name="eclipselink.create-ddl-jdbc-file-name" value="create-matterhorn-dictionary-impl.jdbc"/>
-      <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-matterhorn-dictionary-impl.jdbc"/>
+      <property name="eclipselink.create-ddl-jdbc-file-name" value="create-matterhorn-dictionary-textcorpora.jdbc"/>
+      <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-matterhorn-dictionary-textcorpora.jdbc"/>
     </properties>
   </persistence-unit>
 </persistence>

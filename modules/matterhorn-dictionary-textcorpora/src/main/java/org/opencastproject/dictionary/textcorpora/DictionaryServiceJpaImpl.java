@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.dictionary.impl;
+package org.opencastproject.dictionary.textcorpora;
 
 import org.opencastproject.dictionary.api.DictionaryService;
 
@@ -35,10 +35,15 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
 import javax.persistence.spi.PersistenceProvider;
+import org.apache.commons.lang.StringUtils;
+
+import org.opencastproject.metadata.mpeg7.Textual;
+import org.opencastproject.metadata.mpeg7.TextualImpl;
 
 /**
- * A JPA-based implementation of the DictionaryService. This implementation stores all words in a single table, and
- * keeps track of the available languages in a separate language table.
+ * A JPA-based implementation of the DictionaryService. This implementation
+ * stores all words in a single table, and keeps track of the available
+ * languages in a separate language table.
  */
 public class DictionaryServiceJpaImpl implements DictionaryService {
 
@@ -53,6 +58,10 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
+
+  enum DICT_TOKEN {
+    NONE, WORD, STOPWORD
+  }
 
   /**
    * Sets the JPA persistence provider
@@ -118,7 +127,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * 
    * @see org.opencastproject.dictionary.api.DictionaryService#addWord(java.lang.String, java.lang.String)
    */
-  @Override
   public void addWord(String text, String language) {
     text = Word.fixCase(text);
     Word word = getWord(text, language);
@@ -149,7 +157,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * @see org.opencastproject.dictionary.api.DictionaryService#addWord(java.lang.String, java.lang.String,
    *      java.lang.Integer)
    */
-  @Override
   public void addWord(String text, String language, Integer count) {
     text = Word.fixCase(text);
     Word word = getWord(text, language);
@@ -184,7 +191,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * @see org.opencastproject.dictionary.api.DictionaryService#addWord(java.lang.String, java.lang.String,
    *      java.lang.Integer, java.lang.Double)
    */
-  @Override
   public void addWord(String text, String language, Integer count, Double weight) {
     text = Word.fixCase(text);
     Word word = getWord(text, language);
@@ -220,7 +226,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * 
    * @see org.opencastproject.dictionary.api.DictionaryService#cleanText(java.lang.String[], java.lang.String)
    */
-  @Override
   public DICT_TOKEN[] cleanText(String[] text, String language) {
     DICT_TOKEN[] tokens = new DICT_TOKEN[text.length];
     for (int i = 0; i < text.length; i++) {
@@ -241,7 +246,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * 
    * @see org.opencastproject.dictionary.api.DictionaryService#clear(java.lang.String)
    */
-  @Override
   public void clear(String language) {
     EntityManager em = null;
     EntityTransaction tx = null;
@@ -290,7 +294,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * 
    * @see org.opencastproject.dictionary.api.DictionaryService#detectLanguage(java.lang.String[])
    */
-  @Override
   public String[] detectLanguage(String[] text) {
     // FIXME This is not an efficient use of the database
     Map<String, Integer> languageScores = new HashMap<String, Integer>();
@@ -348,7 +351,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * @see org.opencastproject.dictionary.api.DictionaryService#getLanguages()
    */
   @SuppressWarnings("unchecked")
-  @Override
   public String[] getLanguages() {
     EntityManager em = null;
     try {
@@ -367,7 +369,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * @see org.opencastproject.dictionary.api.DictionaryService#getLanguages(java.lang.String)
    */
   @SuppressWarnings("unchecked")
-  @Override
   public String[] getLanguages(String text) {
     text = Word.fixCase(text);
     EntityManager em = null;
@@ -387,7 +388,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * 
    * @see org.opencastproject.dictionary.api.DictionaryService#getWordCount(java.lang.String, java.lang.String)
    */
-  @Override
   public Long getWordCount(String text, String language) {
     Word word = getWord(text, language);
     if (word == null) {
@@ -402,7 +402,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * 
    * @see org.opencastproject.dictionary.api.DictionaryService#getWordWeight(java.lang.String, java.lang.String)
    */
-  @Override
   public double getWordWeight(String text, String language) {
     Word word = getWord(text, language);
     if (word == null) {
@@ -417,7 +416,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * 
    * @see org.opencastproject.dictionary.api.DictionaryService#isStopWord(java.lang.String)
    */
-  @Override
   public Boolean isStopWord(String text) {
     Word[] words = getWords(text);
     for (Word w : words) {
@@ -432,7 +430,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * 
    * @see org.opencastproject.dictionary.api.DictionaryService#isStopWord(java.lang.String, java.lang.String)
    */
-  @Override
   public Boolean isStopWord(String text, String language) {
     Word word = getWord(text, language);
     if (word == null) {
@@ -447,7 +444,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * 
    * @see org.opencastproject.dictionary.api.DictionaryService#isWord(java.lang.String)
    */
-  @Override
   public Boolean isWord(String text) {
     return getWords(text).length > 0;
   }
@@ -457,7 +453,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * 
    * @see org.opencastproject.dictionary.api.DictionaryService#isWord(java.lang.String, java.lang.String)
    */
-  @Override
   public Boolean isWord(String text, String language) {
     return getWord(text, language) != null;
   }
@@ -467,7 +462,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * 
    * @see org.opencastproject.dictionary.api.DictionaryService#markStopWord(java.lang.String, java.lang.String)
    */
-  @Override
   public void markStopWord(String text, String language) {
     Word word = getWord(text, language);
     text = Word.fixCase(text);
@@ -498,7 +492,6 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
    * 
    * @see org.opencastproject.dictionary.api.DictionaryService#parseStopWords(java.lang.Double, java.lang.String)
    */
-  @Override
   public void parseStopWords(Double threshold, String language) {
     EntityManager em = null;
     EntityTransaction tx = null;
@@ -521,4 +514,43 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
         em.close();
     }
   }
+
+  /**
+   * Filter the text according to the rules defined by the dictionary
+   * implementation used.
+   *
+   * @return filtered text
+   **/
+  @Override
+  public Textual cleanUpText(String text) {
+
+    if (this.getLanguages().length == 0) {
+      logger.warn("There are no language packs installed. "
+          + "All text extracted from video will be considered valid.");
+      return new TextualImpl(text);
+    }
+
+
+    String[] potentialWords = text.split("\\W");
+    String[] languages = this.detectLanguage(potentialWords);
+
+    if (languages.length == 0) {
+      /* There are languages installed, but these words are not part of on of
+       * those languages */
+      logger.debug("No languages found for '{}'.", text);
+      return new TextualImpl();
+    }
+
+    String language = languages[0];
+    DICT_TOKEN[] tokens = this.cleanText(potentialWords, language);
+    List<String> cleanLine = new ArrayList<String>();
+    for (int j = 0; j < potentialWords.length; j++) {
+      if (tokens[j] == DICT_TOKEN.WORD) {
+        cleanLine.add(potentialWords[j]);
+      }
+    }
+    return new TextualImpl(StringUtils.join(cleanLine.toArray(), " "), language);
+
+  }
+
 }
