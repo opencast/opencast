@@ -70,11 +70,18 @@ case "$RELEASE_TYPE" in
 1)
     #Final release
     git commit -a -m "$JIRA_TICKET: Committing $RELEASE_VER directly to $curBranch in preparation for final release."
-    git revert --no-edit HEAD
 
+    #Final version of the branch into master, and tag!
     git checkout master
     git merge --no-ff r/$RELEASE_VER
     git tag $keyOpts -s $RELEASE_VER -m "Release $RELEASE_VER"
+
+    #Pop this off the release branch since we do not want the POM version changes in develop
+    #(remember that we changed them with the branch script)
+    git checkout r/$RELEASE_VER
+    git revert --no-edit HEAD
+
+    #Merge everything into develop
     git checkout develop
     git merge --no-ff r/$RELEASE_VER
     git branch -d r/$RELEASE_VER

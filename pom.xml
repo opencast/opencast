@@ -4,7 +4,7 @@
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
   <packaging>pom</packaging>
-  <version>1.5-SNAPSHOT</version>
+  <version>1.6-SNAPSHOT</version>
   <name>matterhorn</name>
   <description>The Opencast Project's Matterhorn software is a media capture, processing, and distribution system</description>
   <url>http://opencastproject.org</url>
@@ -769,7 +769,7 @@
       <activation>
         <activeByDefault>false</activeByDefault>
         <property>
-          <name>test</name>
+          <name>tests</name>
         </property>
       </activation>
       <modules>
@@ -811,7 +811,7 @@
         <activeByDefault>false</activeByDefault>
         <!-- They don't work at all
         <property>
-          <name>test</name>
+          <name>tests</name>
         </property>
         -->
       </activation>
@@ -857,7 +857,7 @@
       <activation>
         <activeByDefault>false</activeByDefault>
         <property>
-          <name>test</name>
+          <name>tests</name>
         </property>
       </activation>
       <modules>
@@ -869,6 +869,37 @@
         <module>modules/matterhorn-static</module>
         <module>modules/matterhorn-webconsole</module>
       </modules>
+    </profile>
+
+    <profile>
+      <id>sign</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>sign</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <configuration>
+                  <useAgent>true</useAgent>
+                </configuration>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 
@@ -1130,11 +1161,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
           <version>2.4.2</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-gpg-plugin</artifactId>
-          <version>1.0-alpha-4</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
