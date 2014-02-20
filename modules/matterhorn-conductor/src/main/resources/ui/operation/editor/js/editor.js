@@ -94,6 +94,7 @@ var now = 100;
 var isSeeking = false;
 var timeoutUsed = false;
 var currSplitItemClickedViaJQ = false;
+var timeoutRenewSessionID = null;
 var timeout1 = null;
 var timeout2 = null;
 var timeout3 = null;
@@ -251,6 +252,7 @@ editor.getSmil = function (func) {
             url: WORKFLOW_INSTANCE_PATH + editor.workflowID + WORKFLOW_INSTANCE_SUFFIX_JSON
         }).done(function (data) {
             ocUtils.log("Done");
+            renewSessionID();
             editor.parseWorkflow(data);
             if (!editor.error) {
                 editor.parseMediapackage(editor.workflowParser.mediapackage);
@@ -427,38 +429,54 @@ editor.saveSplitListHelper = function (startAtIndex) {
                     // Form params:
                     //   file: the file
 
-                    // generate a random mediapackage element ID
-                    if (editor.mediapackageParser && editor.mediapackageParser.smil_id && editor.mediapackageParser.id) {
-                        var mpElementID = editor.mediapackageParser.smil_id; // Math.floor((Math.random()*1000)+1);
+                    $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        url: WORKFLOW_INSTANCE_PATH + editor.workflowID + WORKFLOW_INSTANCE_SUFFIX_JSON
+                    }).done(function (data) {
+                        if (data && data.workflow && data.workflow.state) {
+                            if (data.workflow.state.toLowerCase() == "paused") {
+                                // generate a random mediapackage element ID
+                                if (editor.mediapackageParser && editor.mediapackageParser.smil_id && editor.mediapackageParser.id) {
+                                    var mpElementID = editor.mediapackageParser.smil_id; // Math.floor((Math.random()*1000)+1);
 
-                        // define a boundary -- stole this from Chrome
-                        var boundary = "----WebKitFormBoundaryvasZVBiO9iHRlTvY";
-                        // define the request payload
-                        var body = '--' + boundary + '\r\n' + 'Content-Disposition: form-data; name="mediaPackageID"\r\n' + '\r\n' + editor.mediapackageParser.id + '\r\n' + boundary + '\r\n';
-                        body +=
-                            'Content-Disposition: form-data; name="mediaPackageElementID"\r\n' + '\r\n' + mpElementID + '\r\n' + '--' + boundary + '\r\n';
-                        body +=
-                        // parameter name "file", local filename "smil.smil"
-                        'Content-Disposition: form-data; name="file"; filename="smil.smil"\r\n' + 'Content-Type: application/smil\r\n' + '\r\n' + editor.smil + '\r\n' + '--' + boundary + '--' + '\r\n';
+                                    // define a boundary -- stole this from Chrome
+                                    var boundary = "----WebKitFormBoundaryvasZVBiO9iHRlTvY";
+                                    // define the request payload
+                                    var body = '--' + boundary + '\r\n' + 'Content-Disposition: form-data; name="mediaPackageID"\r\n' + '\r\n' + editor.mediapackageParser.id + '\r\n' + boundary + '\r\n';
+                                    body +=
+                                        'Content-Disposition: form-data; name="mediaPackageElementID"\r\n' + '\r\n' + mpElementID + '\r\n' + '--' + boundary + '\r\n';
+                                    body +=
+                                    // parameter name "file", local filename "smil.smil"
+                                    'Content-Disposition: form-data; name="file"; filename="smil.smil"\r\n' + 'Content-Type: application/smil\r\n' + '\r\n' + editor.smil + '\r\n' + '--' + boundary + '--' + '\r\n';
 
-                        $.ajax({
-                            type: "POST",
-                            contentType: "multipart/form-data; boundary=" + boundary,
-                            data: body,
-                            url: FILE_PATH +
-                                FILE_MEDIAPACKAGE_PATH +
-                                "/" + editor.mediapackageParser.id +
-                                "/" + mpElementID
-                        }).done(function (data) {
-                            ocUtils.log("Done");
-                            ocUtils.log("Continuing workflow...");
-                            editor.continueWorkflowFunction();
-                        }).fail(function (e) {
-                            ocUtils.log("Error: Error submitting smil file: ");
-                            ocUtils.log(e);
-                            displayError("Error submitting smil file.", "Error");
-                        });
-                    }
+                                    $.ajax({
+                                        type: "POST",
+                                        contentType: "multipart/form-data; boundary=" + boundary,
+                                        data: body,
+                                        url: FILE_PATH +
+                                            FILE_MEDIAPACKAGE_PATH +
+                                            "/" + editor.mediapackageParser.id +
+                                            "/" + mpElementID
+                                    }).done(function (data) {
+                                        ocUtils.log("Done");
+                                        ocUtils.log("Continuing workflow...");
+                                        editor.continueWorkflowFunction();
+                                    }).fail(function (e) {
+                                        ocUtils.log("Error: Error submitting smil file: ");
+                                        ocUtils.log(e);
+                                        displayError("Error submitting smil file.", "Error");
+                                    });
+                                }
+                            } else {
+                                displayError("The video has already been edited and is being processed. Please cancel editing.",
+                                    "Cancel editing");
+                            }
+                        }
+                    }).fail(function (error) {
+                        displayError("Could not get the workflow state. Please cancel editing.",
+                            "Cancel editing");
+                    });
                 }
             }
         }
@@ -2131,6 +2149,36 @@ function isBrowser(browser) {
     }
 }
 
+function renewSessionID() {
+    window.clearTimeout(timeoutRenewSessionID);
+    timeoutRenewSessionID = null;
+    timeoutRenewSessionID = window.setTimeout(function () {
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: WORKFLOW_INSTANCE_PATH + editor.workflowID + WORKFLOW_INSTANCE_SUFFIX_JSON
+        }).done(function (data) {
+            ocUtils.log("Renewed session ID.");
+
+            if (data && data.workflow && data.workflow.state) {
+                if (data.workflow.state.toLowerCase() == "paused") {
+                    renewSessionID();
+                } else {
+                    displayError("The video has already been edited and is being processed. Please cancel editing.",
+                        "Cancel editing");
+                }
+            }
+        }).fail(function (error) {
+            ocUtils.log("Failed renewing session ID.");
+
+            displayError("Could not renew the session ID. Please cancel editing.",
+                "Cancel editing");
+
+            renewSessionID();
+        });
+    }, 30000);
+}
+
 /**
  * document fully loaded
  */
@@ -2223,4 +2271,3 @@ $(document).ready(function () {
         selectCurrentSplitItem();
     });
 });
-
