@@ -284,25 +284,6 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     if (element == null)
       throw new IllegalStateException("No element " + elementId + " found in mediapackage");
 
-    // Find the element that has been created as part of the distribution process
-/*    final URI distributedURI;
-    MediaPackageElement distributedElement = null;
-    try {
-      distributedURI = getDistributionUri(channelId, mediapackage, element);
-      for (MediaPackageElement e : mediapackage.getElements()) {
-        if (distributedURI.equals(e.getURI())) {
-          distributedElement = e;
-          break;
-        }
-      }
-    } catch (URISyntaxException e) {
-      throw new DistributionException("Retracted element produces an invalid URI", e);
-    }
-
-    // Has this element been distributed?
-    if (distributedElement == null)
-      return null;*/
-
     try {
       final File elementFile = getDistributionFile(channelId, mediapackage, element);
       final File mediapackageDir = getMediaPackageDirectory(channelId, mediapackage);
