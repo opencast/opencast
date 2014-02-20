@@ -285,7 +285,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       throw new IllegalStateException("No element " + elementId + " found in mediapackage");
 
     // Find the element that has been created as part of the distribution process
-    final URI distributedURI;
+/*    final URI distributedURI;
     MediaPackageElement distributedElement = null;
     try {
       distributedURI = getDistributionUri(channelId, mediapackage, element);
@@ -301,7 +301,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
     // Has this element been distributed?
     if (distributedElement == null)
-      return null;
+      return null;*/
 
     try {
       final File elementFile = getDistributionFile(channelId, mediapackage, element);
@@ -310,7 +310,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       // Does the file exist? If not, the current element has not been distributed to this channel
       // or has been removed otherwise
       if (!elementFile.exists())
-        return distributedElement;
+        return element;
 
       // Try to remove the file and - if possible - the parent folder
       FileUtils.forceDelete(elementFile);
@@ -320,7 +320,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
       logger.info("Finished rectracting element {} of media package {}", elementId, mediapackage);
 
-      return distributedElement;
+      return element;
     } catch (Exception e) {
       logger.warn("Error retracting element " + elementId + " of mediapackage " + mediapackage, e);
       if (e instanceof DistributionException) {
@@ -338,9 +338,13 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    * @return The file to copy the content to
    */
   protected File getDistributionFile(String channelId, MediaPackage mp, MediaPackageElement element) {
-    final String uriString = element.getURI().toString();
+    String uriString = element.getURI().toString();
     final String directoryName = distributionDirectory.getAbsolutePath();
     if (uriString.startsWith(streamingUrl)) {
+      if (uriString.lastIndexOf(".") < (uriString.length() - 4)) {
+        if (uriString.contains("mp4:")) uriString += ".mp4";
+        else uriString += ".flv";
+      }
       String[] splitUrl = uriString.substring(streamingUrl.length() + 1).split("/");
       if (splitUrl.length < 4) {
         logger.warn(format(
