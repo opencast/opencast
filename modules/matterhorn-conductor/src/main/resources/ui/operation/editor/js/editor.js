@@ -52,15 +52,15 @@ var KEY_RIGHT = 39;
 var KEY_DOWN = 40;
 
 var default_config = {};
-default_config[PREVIOUS_FRAME] = "left";
-default_config[NEXT_FRAME] = "right";
+default_config[PREVIOUS_FRAME] = "Left";
+default_config[NEXT_FRAME] = "Right";
 default_config[SPLIT_AT_CURRENT_TIME] = "v";
 default_config[PLAY_CURRENT_SEGMENT] = "c";
 default_config[PLAY_CURRENT_PRE_POST] = "Shift+c";
 default_config[PLAY_CURRENT_PRE_POST_FULL] = "Shift+v";
 default_config[SET_CURRENT_TIME_AS_INPOINT] = "i";
 default_config[SET_CURRENT_TIME_AS_OUTPOINT] = "o";
-default_config[PLAY_PAUSE] = "space";
+default_config[PLAY_PAUSE] = "Space";
 default_config[SELECT_ITEM_AT_CURRENT_TIME] = "y";
 default_config[DELETE_SELECTED_ITEM] = "Delete";
 default_config[PREVIOUS_MARKER] = "Up";
@@ -352,8 +352,8 @@ editor.addPar = function (currParIndex) {
                 var strs = getAllStringsOf(wfXML, "<ns3:track", "</ns3:track>");
                 var error = false;
                 for (var i = 0; i < strs.length && !error; ++i) {
-                    var start = parseFloat(editor.splitData.splits[currParIndex].clipBegin * 1000);
-                    var duration = parseFloat((editor.splitData.splits[currParIndex].clipEnd - editor.splitData.splits[currParIndex].clipBegin) * 1000);
+                    var start = parseFloat(editor.splitData.splits[currParIndex].clipBegin) * 1000;
+                    var duration = (parseFloat(editor.splitData.splits[currParIndex].clipEnd) * 1000) - start;
 
                     ocUtils.log("Adding track no " + (i + 1) + " / " + strs.length);
                     $.ajax({
@@ -373,6 +373,7 @@ editor.addPar = function (currParIndex) {
                         if (editor.smilResponseParser.smil) {
                             editor.parseSmil(editor.smilResponseParser.smil);
                         }
+
                     }).fail(function (e) {
                         ocUtils.log("Error: Could not add clip");
                         ocUtils.log(e);
