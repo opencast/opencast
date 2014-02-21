@@ -560,8 +560,8 @@ editor.updateSplitList = function (dontClickCancel) {
  */
 function getCurrentTime() {
     var currentTime = editor.player.prop("currentTime");
-    currentTime = isNaN(currentTime) ? 0 : parseFloat(currentTime).toFixed(4);
-    return currentTime;
+    currentTime = isNaN(currentTime) ? 0 : currentTime.toFixed(4);
+    return parseFloat(currentTime);
 }
 
 /**
@@ -1156,7 +1156,9 @@ function splitButtonClick() {
 function selectCurrentSplitItem(excludeDeletedSegments) {
     if (!isSeeking) {
         excludeDeletedSegments = excludeDeletedSegments || false;
+
         var splitItem = getCurrentSplitItem();
+
         if (splitItem != null) {
             var idFound = false;
             var id = -1;
