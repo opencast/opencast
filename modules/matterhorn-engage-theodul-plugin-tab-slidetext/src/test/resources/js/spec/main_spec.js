@@ -128,8 +128,30 @@ define(['main'], function (Main) {
           expect(Main.version).toEqual(jasmine.any(String));
         });
       });
-
     });
 
+    describe("should should calculate seconds of given time string", function () {
+      it("00:00:00 should be 0", function () {
+        expect(Main.timeStrToSeconds("00:00:00")).toEqual(0);
+      });
+      it("00:00:59 should be 59", function () {
+        expect(Main.timeStrToSeconds("00:00:59")).toEqual(59);
+      });
+      it("00:01:01 should be 61", function () {
+        expect(Main.timeStrToSeconds("00:01:01")).toEqual(61);
+      });
+      it("00:10:01 should be 601", function () {
+        expect(Main.timeStrToSeconds("00:10:01")).toEqual(601);
+      });
+      it("00:59:59 should be 3599", function () {
+        expect(Main.timeStrToSeconds("00:59:59")).toEqual(3599);
+      });
+      it("01:01:01 should be 3661", function () {
+        expect(Main.timeStrToSeconds("01:01:01")).toEqual(3661);
+      });
+      it("23:59:59 should be 86399", function () {
+        expect(Main.timeStrToSeconds("23:59:59")).toEqual(86399);
+      });
+    });
   });
 });

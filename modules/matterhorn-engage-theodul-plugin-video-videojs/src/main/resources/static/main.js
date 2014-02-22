@@ -187,9 +187,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             callback(theodulVideodisplay.volume());
         });
         Engage.on(plugin.events.seek, function(time) {
-            Engage.log("Before setting: " + theodulVideodisplay.currentTime());
             theodulVideodisplay.currentTime(time);
-            Engage.log("After setting: " + theodulVideodisplay.currentTime());
         });
         Engage.on(plugin.events.sliderStop, function(time) {
             var duration = Engage.model.get("videoDataModel").get("duration");
