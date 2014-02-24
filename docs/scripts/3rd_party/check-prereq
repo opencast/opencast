@@ -119,6 +119,16 @@ enable_atomic() {
   done
   install_rpms $rpms
   [ $? -ne 0 ] && return 1
+  case `os` in
+    SciL )
+      TMPFILE=`mktemp /tmp/${0##*/}-atomic.repo.XXXXX`
+      sudox sed 's/$releasever/'${V}'/g' /etc/yum.repos.d/atomic.repo > $TMPFILE
+      [ $? -ne 0 ] && return 1
+      sudox cp $TMPFILE /etc/yum.repos.d/atomic.repo
+      [ $? -ne 0 ] && return 1
+      sudox rm -f $TMPFILE
+      ;;
+  esac
   return 0
 }
 #
