@@ -67,11 +67,12 @@ public class TesseractTextExtractorTest {
   public static void testTesseract() {
     StreamHelper stdout = null;
     StreamHelper stderr = null;
+    StringBuffer errorBuffer = new StringBuffer();
     Process p = null;
     try {
       p = new ProcessBuilder(tesseractbinary).start();
       stdout = new StreamHelper(p.getInputStream());
-      stderr = new StreamHelper(p.getErrorStream());
+      stderr = new StreamHelper(p.getErrorStream(), errorBuffer);
       int status = p.waitFor();
       stdout.stopReading();
       stderr.stopReading();
@@ -80,6 +81,7 @@ public class TesseractTextExtractorTest {
     } catch (Throwable t) {
       logger.warn("Skipping text analysis tests due to unsatisifed tesseract installation");
       logger.warn(t.getMessage(), t);
+      logger.warn(errorBuffer.toString());
       tesseractInstalled = false;
     } finally {
       IoSupport.closeQuietly(stdout);
