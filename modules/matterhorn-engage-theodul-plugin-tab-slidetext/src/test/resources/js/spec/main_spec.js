@@ -130,7 +130,7 @@ define(['main'], function (Main) {
       });
     });
 
-    describe("should should calculate seconds of given time string", function () {
+    describe("should calculate seconds of given time string", function () {
       it("00:00:00 should be 0", function () {
         expect(Main.timeStrToSeconds("00:00:00")).toEqual(0);
       });
