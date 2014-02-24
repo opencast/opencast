@@ -60,6 +60,11 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
   @SuppressWarnings("unchecked")
   public Collection<T> select(MediaPackage mediaPackage, boolean withTagsAndFlavors) {
     Set<T> result = new HashSet<T>();
+
+    // If no flavors and tags are set, return empty list
+    if (flavors.isEmpty() && tags.isEmpty())
+      return result;
+
     Class type = getParametrizedType(result);
     elementLoop: for (MediaPackageElement e : mediaPackage.getElements()) {
 
@@ -69,12 +74,6 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
         for (String tag : e.getTags()) {
           if (excludeTags.contains(tag))
             continue elementLoop;
-        }
-
-        // If no flavors and tags are set, add all elements
-        if (flavors.isEmpty() && tags.isEmpty()) {
-          result.add((T) e);
-          continue;
         }
 
         // Any of the flavors?

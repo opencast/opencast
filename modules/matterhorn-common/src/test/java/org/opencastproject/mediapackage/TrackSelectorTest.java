@@ -98,12 +98,12 @@ public class TrackSelectorTest extends SimpleElementSelectorTest {
 
   @Test
   public void testNoTagsOrFlavorSelect() {
-    assertEquals(3, new TrackSelector().select(mediaPackage, false).size());
+    assertEquals(0, new TrackSelector().select(mediaPackage, false).size());
   }
 
   @Test
   public void testNoTagsAndFlavorSelect() {
-    assertEquals(3, new TrackSelector().select(mediaPackage, true).size());
+    assertEquals(0, new TrackSelector().select(mediaPackage, true).size());
   }
 
 }
