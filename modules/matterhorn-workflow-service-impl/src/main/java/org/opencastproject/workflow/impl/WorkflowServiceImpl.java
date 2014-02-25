@@ -924,14 +924,14 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   private void removeTempFiles(long workflowInstanceId) throws WorkflowDatabaseException, UnauthorizedException,
           NotFoundException {
-    logger.info("Removing temporary files for workflow %s", workflowInstanceId);
+    logger.info("Removing temporary files for workflow {}", workflowInstanceId);
     WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
     for (MediaPackageElement elem : instance.getMediaPackage().getElements()) {
       try {
-        logger.debug("Removing temporary file %s for workflow %d", elem.getURI(), workflowInstanceId);
+        logger.debug("Removing temporary file {} for workflow {}", elem.getURI(), workflowInstanceId);
         workspace.delete(elem.getURI());
       } catch (IOException e) {
-        logger.warn("Unable to delete mediapackage element %s", e.getMessage());
+        logger.warn("Unable to delete mediapackage element {}", e.getMessage());
       } catch (NotFoundException e) {
         // File was probably already deleted before...
       }
