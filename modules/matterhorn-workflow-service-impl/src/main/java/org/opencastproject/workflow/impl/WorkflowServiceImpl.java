@@ -974,15 +974,17 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       // Second, remove jobs related to a operation which belongs to the workflow instance
       List<WorkflowOperationInstance> operations = instance.getOperations();
       for (WorkflowOperationInstance op : operations) {
-        long workflowOpId = op.getId();
-        if (workflowOpId != workflowInstanceId) {
-          try {
-            serviceRegistry.removeJob(workflowOpId);
-          } catch (ServiceRegistryException e) {
-            logger.warn("Problems while removing jobs related to workflow operation '{}': {}", workflowOpId,
-                    e.getMessage());
-          } catch (NotFoundException e) {
-            logger.debug("No jobs related to the workflow operation '{}' found in the service registry", workflowOpId);
+        if (op.getId() != null) {
+          long workflowOpId = op.getId();
+          if (workflowOpId != workflowInstanceId) {
+            try {
+              serviceRegistry.removeJob(workflowOpId);
+            } catch (ServiceRegistryException e) {
+              logger.warn("Problems while removing jobs related to workflow operation '{}': {}", workflowOpId,
+                      e.getMessage());
+            } catch (NotFoundException e) {
+              logger.debug("No jobs related to the workflow operation '{}' found in the service registry", workflowOpId);
+            }
           }
         }
       }
