@@ -581,10 +581,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           continue;
 
         if (job.getStatus().isTerminated()) {
-          JobJpaImpl jobToRemove = em.merge(job);
-          em.remove(jobToRemove);
-          logger.debug("Parentless job '{}' removed");
-          count++;
+          try {
+            removeJob(job.getId());
+            logger.debug("Parentless job '{}' removed", job.getId());
+            count++;
+          } catch (NotFoundException e) {
+            logger.debug("Parentless job '{} ' not found in database: {}", job.getId(), e);
+          }
         }
 
       }
