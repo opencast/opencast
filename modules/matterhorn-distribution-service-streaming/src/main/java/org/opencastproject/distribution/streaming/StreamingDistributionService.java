@@ -323,8 +323,10 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     final String directoryName = distributionDirectory.getAbsolutePath();
     if (uriString.startsWith(streamingUrl)) {
       if (uriString.lastIndexOf(".") < (uriString.length() - 4)) {
-        if (uriString.contains("mp4:")) uriString += ".mp4";
-        else uriString += ".flv";
+        if (uriString.contains("mp4:")) {
+          uriString += ".mp4";
+          uriString = uriString.replace("mp4:", "");
+        } else uriString += ".flv";
       }
       String[] splitUrl = uriString.substring(streamingUrl.length() + 1).split("/");
       if (splitUrl.length < 4) {
