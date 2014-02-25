@@ -295,10 +295,13 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
       // Try to remove the file and - if possible - the parent folder
       FileUtils.forceDelete(elementFile);
-      if (mediapackageDir.isDirectory() && mediapackageDir.list().length == 0) {
-        FileSupport.delete(mediapackageDir.getParentFile());
+      File elementDir = elementFile.getParentFile();
+      if (elementDir.isDirectory() && elementDir.list().length == 0) {
+        FileSupport.delete(elementDir);
       }
-
+      if (mediapackageDir.isDirectory() && mediapackageDir.list().length == 0) {
+        FileSupport.delete(mediapackageDir);
+      }
       logger.info("Finished rectracting element {} of media package {}", elementId, mediapackage);
 
       return element;
