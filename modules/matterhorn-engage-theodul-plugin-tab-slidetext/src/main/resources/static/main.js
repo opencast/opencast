@@ -35,7 +35,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var Segment = function (time,image_url) {
       this.time = time;
       this.image_url = image_url;
-    }
+    };
 
     plugin.timeStrToSeconds = function (timeStr) {
       var elements = timeStr.match(/([0-9]{2})/g);
@@ -45,7 +45,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
       //});
       //return timeSeconds;
       return parseInt(elements[0],10) * 3600 + parseInt(elements[1],10) * 60 + parseInt(elements[2],10);
-    }
+    };
 
     plugin.initPlugin = function () {
       Engage.log("TabSlideText: initalizing plugin");
@@ -94,7 +94,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
           }
         }
       });
-    }
+    };
 
     //Init Event
     Engage.log("Tab:Slidetext: init");
