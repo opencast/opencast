@@ -14,19 +14,14 @@ dir=`getcfg DIR:`
 #
 rm -fr "$dir" "${dir}-mac"
 [ $? -ne 0 ] && exit 1
-bzip2 -dc "$pkg" | tar -xv
+xz -dc "$pkg" | tar -xv
 [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
 mv "$dir" "${dir}-mac"
 [ $? -ne 0 ] && exit 1
 cd "${dir}-mac"
 [ $? -ne 0 ] && exit 1
 #
-patch -p0 < ../mp4v2-1.9.1.patch
-[ $? -ne 0 ] && exit 1
-patch -p0 < ../mp4v2-1.9.1-llvm.patch
-[ $? -ne 0 ] && exit 1
-./configure \
---prefix=${LOCAL_PREFIX}
+./configure
 [ $? -ne 0 ] && exit 1
 make
 [ $? -ne 0 ] && exit 1
