@@ -1026,6 +1026,7 @@
     <pluginManagement>
       <plugins>
         <!-- Fix eclipse (indigo) maven integration -->
+        <!-- See http://wiki.eclipse.org/M2E_plugin_execution_not_covered for more information -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
@@ -1048,11 +1049,12 @@
                 </pluginExecution>
                 <pluginExecution>
                   <pluginExecutionFilter>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <versionRange>[1.0.0,)</versionRange>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <versionRange>[3.0.0,)</versionRange>
                     <goals>
-                      <goal>exec</goal>
+                      <goal>pmd</goal>
+                      <goal>cpd</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>
