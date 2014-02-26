@@ -145,7 +145,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
         if (config.debug()) {
           logger.info("Successfully submitted \"" + mp.getTitle()
               + "\" (" + mp.getIdentifier().toString() + ") to " + config.getUrl().toString()
-              + ": 200 OK");
+              + ": " + status);
         }
       } else if (status == 418) {
         logger.warn("Submitted \"" + mp.getTitle() + "\" ("
