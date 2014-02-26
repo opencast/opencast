@@ -1904,14 +1904,6 @@ function zoomedIn() {
     return !($("#slider-waveform-zoom").slider("option", "value") == 1);
 }
 
-function showZoomControls() {
-    if (zoomedIn()) {
-        editor.updateSplitList(false, false);
-    } else {
-        editor.updateSplitList(false, true);
-    }
-}
-
 function updateWaveformClickEvent() {
     $('#segmentsWaveform').click(function (evt) {
         if (zoomedIn()) {
@@ -1959,7 +1951,11 @@ function prepareUI() {
                             setWaveformWidth(ui.value);
                         },
                         stop: function (event, ui) {
-                            showZoomControls();
+                            if (zoomedIn()) {
+                                editor.updateSplitList(false, false);
+                            } else {
+                                editor.updateSplitList(false, true);
+                            }
                         }
                     });
                     $("#waveformControls").show();
