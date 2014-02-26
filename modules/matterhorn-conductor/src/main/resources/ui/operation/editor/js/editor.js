@@ -502,7 +502,7 @@ editor.saveSplitList = function (func) {
 /**
  * update UI split list
  */
-editor.updateSplitList = function (dontClickCancel) {
+editor.updateSplitList = function (dontClickCancel, segmentsClickable) {
     if (!editor.error) {
         if (!dontClickCancel) {
             cancelButtonClick();
@@ -517,11 +517,16 @@ editor.updateSplitList = function (dontClickCancel) {
         tmpTime = (tmpTime >= 0) ? tmpTime : 0;
         $('#newTime').html("Final duration: " + formatTime(tmpTime.toFixed(4)));
 
-        $('#splitElementsHolder').html($('#splitElements').jqote(editor.splitData));
-        $('#splitSegments').html($('#splitSegmentTemplate').jqote(editor.splitData));
-        $('.splitItemDiv').click(splitItemClick);
-        $('.splitSegmentItem').click(splitItemClick);
-        // $('.splitRemover').click(splitRemoverClick);
+        // TODO: Display splitSegments when zoomed in
+        if (segmentsClickable) {
+            $('#splitElementsHolder').html($('#splitElements').jqote(editor.splitData));
+            $('#splitSegments').html($('#splitSegmentTemplate').jqote(editor.splitData));
+            $('.splitItemDiv').click(splitItemClick);
+            $('.splitSegmentItem').click(splitItemClick);
+            // $('.splitRemover').click(splitRemoverClick);
+        } else {
+            $('#splitSegments').html("");
+        }
 
         $('.splitRemoverLink').button({
             text: false,
@@ -637,7 +642,7 @@ function getTimefieldTimeEnd() {
 function setEnabled(uuid, enabled) {
     if (editor.splitData && editor.splitData.splits) {
         editor.splitData.splits[uuid].enabled = enabled;
-        editor.updateSplitList();
+        editor.updateSplitList(false, true);
     }
 }
 
@@ -925,7 +930,7 @@ function okButtonClick() {
                     }
                 }
 
-                editor.updateSplitList(true);
+                editor.updateSplitList(true, true);
                 $('#videoPlayer').focus();
                 selectSegmentListElement(id);
             } else {
@@ -1137,7 +1142,7 @@ function splitButtonClick() {
 
                 splitItem.clipEnd = currentTime;
                 editor.splitData.splits.splice(i + 1, 0, newItem);
-                editor.updateSplitList();
+                editor.updateSplitList(false, true);
                 selectSegmentListElement(i + 1);
                 return;
             }
@@ -1872,7 +1877,7 @@ function initPlayButtons() {
                 clipEnd: parseFloat(workflowInstance.mediapackage.duration) / 1000,
                 enabled: true
             });
-            editor.updateSplitList();
+            editor.updateSplitList(false, true);
             selectSegmentListElement(0);
         }
     });
@@ -1895,12 +1900,32 @@ function setWaveformWidth(value) {
     currWaveformZoom = value;
 }
 
+function zoomedIn() {
+    return !($("#slider-waveform-zoom").slider("option", "value") == 1);
+}
+
+function updateWaveformClickEvent() {
+    $('#segmentsWaveform').click(function (evt) {
+        if (zoomedIn()) {
+            if (evt && evt.offsetX) {
+                var currentTime = getCurrentTime();
+                var duration = getDuration();
+                var imgWidth = $('#waveformImage').width();
+
+                var segLength = duration / imgWidth;
+                var nrSeg = segLength * evt.offsetX;
+                setCurrentTime(nrSeg);
+            }
+        }
+    });
+}
+
 /**
  * prepares the UI
  */
 function prepareUI() {
     // update split list and enable the editor
-    editor.updateSplitList();
+    editor.updateSplitList(false, true);
     $('#editor').removeClass('disabled');
 
     // try to load waveform image
@@ -1914,6 +1939,7 @@ function prepareUI() {
                     $('#segmentsWaveform').width($('#videoHolder').width());
                     initialWaveformWidth = $('#segmentsWaveform').width();
                     currentWaveformWidth = initialWaveformWidth;
+                    updateWaveformClickEvent();
                     currWaveformZoom = 1;
                     waveformImageLoadDone = true;
                     $("#slider-waveform-zoom").slider({
@@ -1923,6 +1949,13 @@ function prepareUI() {
                         max: maxWaveformZoomSlider,
                         slide: function (event, ui) {
                             setWaveformWidth(ui.value);
+                        },
+                        stop: function (event, ui) {
+                            if (zoomedIn()) {
+                                editor.updateSplitList(false, false);
+                            } else {
+                                editor.updateSplitList(false, true);
+                            }
                         }
                     });
                     $("#waveformControls").show();
@@ -1933,6 +1966,7 @@ function prepareUI() {
                         $('#segmentsWaveform').width($('#videoHolder').width());
                         initialWaveformWidth = $('#segmentsWaveform').width();
                         currentWaveformWidth = initialWaveformWidth;
+                        updateWaveformClickEvent();
                         currWaveformZoom = 1;
                         $("#slider-waveform-zoom").slider("option", "value", 1);
                         $('.holdStateUI').height($('#segmentsWaveform').height() + $('#videoPlayer').height() + 70);
@@ -2270,7 +2304,7 @@ $(document).ready(function () {
 
     $(window).bind('resizeEnd', function () {
         // window has not been resized in windowResizeMS ms
-        editor.updateSplitList();
+        editor.updateSplitList(false, true);
         selectCurrentSplitItem();
     });
 });
