@@ -103,11 +103,14 @@ import javax.persistence.spi.PersistenceProvider;
  */
 public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
-  /** Id of the workflow operation start operation, need to match the corresponding enum value in WorkflowServiceImpl */
+  /** Id of the workflow's start operation operation, need to match the corresponding enum value in WorkflowServiceImpl */
   public static final String START_OPERATION = "START_OPERATION";
 
-  /** Id of the workflow start operation, need to match the corresponding enum value in WorkflowServiceImpl */
+  /** Id of the workflow's start workflow operation, need to match the corresponding enum value in WorkflowServiceImpl */
   public static final String START_WORKFLOW = "START_WORKFLOW";
+
+  /** Id of the workflow's resume operation, need to match the corresponding enum value in WorkflowServiceImpl */
+  public static final String RESUME = "RESUME";
 
   /** Identifier for the workflow service */
   public static final String TYPE_WORKFLOW = "org.opencastproject.workflow";
@@ -577,7 +580,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           continue;
 
         // DO NOT DELETE workflow instances and operations!
-        if (START_OPERATION.equals(job.getOperation()) || START_WORKFLOW.equals(job.getOperation()))
+        if (START_OPERATION.equals(job.getOperation()) || START_WORKFLOW.equals(job.getOperation())
+                || RESUME.equals(job.getOperation()))
           continue;
 
         if (job.getStatus().isTerminated()) {
@@ -665,7 +669,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       try {
         collectJobstats = Boolean.valueOf(jobStatsString);
       } catch (Exception e) {
-        logger.warn("Job statistics collection flag '{}' is malformed, setting to {}", jobStatsString, DEFAULT_JOB_STATISTICS);
+        logger.warn("Job statistics collection flag '{}' is malformed, setting to {}", jobStatsString,
+                DEFAULT_JOB_STATISTICS);
         collectJobstats = DEFAULT_JOB_STATISTICS;
       }
     }
