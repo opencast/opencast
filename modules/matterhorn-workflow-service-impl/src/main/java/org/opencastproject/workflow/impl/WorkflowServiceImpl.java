@@ -1949,7 +1949,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     try {
       for (Organization org : organizationDirectoryService.getOrganizations()) {
         securityService.setOrganization(org);
-        WorkflowQuery workflowQuery = new WorkflowQuery().withState(WorkflowInstance.WorkflowState.PAUSED);
+        WorkflowQuery workflowQuery = new WorkflowQuery().withState(WorkflowInstance.WorkflowState.PAUSED).withCount(
+                Integer.MAX_VALUE);
         WorkflowSet workflowSet = getWorkflowInstances(workflowQuery);
         workflows.addAll(Arrays.asList(workflowSet.getItems()));
       }
@@ -2232,7 +2233,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     int instancesCleaned = 0;
     int cleaningFailed = 0;
 
-    WorkflowQuery query = new WorkflowQuery().withState(state).withDateBefore(DateUtils.addDays(new Date(), -lifetime));
+    WorkflowQuery query = new WorkflowQuery().withState(state).withDateBefore(DateUtils.addDays(new Date(), -lifetime))
+            .withCount(Integer.MAX_VALUE);
     for (WorkflowInstance workflowInstance : getWorkflowInstances(query).getItems()) {
       try {
         remove(workflowInstance.getId());
