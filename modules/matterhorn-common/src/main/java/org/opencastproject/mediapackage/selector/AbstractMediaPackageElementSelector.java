@@ -60,6 +60,11 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
   @SuppressWarnings("unchecked")
   public Collection<T> select(MediaPackage mediaPackage, boolean withTagsAndFlavors) {
     Set<T> result = new HashSet<T>();
+
+    // If no flavors and tags are set, return empty list
+    if (flavors.isEmpty() && tags.isEmpty())
+      return result;
+
     Class type = getParametrizedType(result);
     elementLoop: for (MediaPackageElement e : mediaPackage.getElements()) {
 
@@ -80,24 +85,14 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
           }
         }
 
-        // boolean add = false;
-        // for (String elementTag : element.getTags()) {
-        // if (lose.contains(elementTag)) {
-        // add = false;
-        // break;
-        // } else if (keep.contains(elementTag)) {
-        // add = true;
-        // }
-        // }
-        // if (add) {
-        // result.add(element);
-        // }
+        if (flavors.isEmpty())
+          matchesFlavor = true;
 
         // If the elements selection is done by tags AND flavors
         if (withTagsAndFlavors && matchesFlavor && e.containsTag(tags))
           result.add((T) e);
         // Otherwise if only one of these parameters is necessary to select an element
-        if (!withTagsAndFlavors && (matchesFlavor || (!tags.isEmpty() && e.containsTag(tags))))
+        if (!withTagsAndFlavors && ((!flavors.isEmpty() && matchesFlavor) || (!tags.isEmpty() && e.containsTag(tags))))
           result.add((T) e);
       }
     }
@@ -113,11 +108,6 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
    */
   @SuppressWarnings("unchecked")
   private Class getParametrizedType(Object object) {
-    // Class<T> c = (Class<T>) this.getClass();
-    // ParameterizedType type = ((ParameterizedType) c.getGenericSuperclass());
-    // Class<T> actualType = (Class<T>) type.getActualTypeArguments()[0];
-    // return actualType;
-
     Class current = getClass();
     Type superclass;
     Class<? extends T> entityClass = null;
