@@ -1142,7 +1142,8 @@ function splitButtonClick() {
 
                 splitItem.clipEnd = currentTime;
                 editor.splitData.splits.splice(i + 1, 0, newItem);
-                editor.updateSplitList(false, true);
+		// TODO Make splitSegments clickable when zoomed in
+                editor.updateSplitList(false, !zoomedIn());
                 selectSegmentListElement(i + 1);
                 return;
             }
