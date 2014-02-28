@@ -4,6 +4,16 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   
   <requiredProperties>
+    
+    <requiredProperty key="version">
+      <defaultValue>1.5-SNAPSHOT</defaultValue>
+    </requiredProperty>
+    
+    <requiredProperty key="plugin_type">
+    </requiredProperty>
+    
+    <requiredProperty key="plugin_version">
+    </requiredProperty>
 
     <!-- registry name of the plugin -->
     <requiredProperty key="plugin_name">
@@ -11,12 +21,13 @@
 
     <!-- specifies if the plugin should provide a REST endpoint -->
     <requiredProperty key="plugin_rest">
+      <!-- defaultValue>false</defaultValue -->
     </requiredProperty>
 
     <!-- short description of the plugin -->
     <requiredProperty key="plugin_description">
     </requiredProperty>
-
+    
   </requiredProperties>
 
   
