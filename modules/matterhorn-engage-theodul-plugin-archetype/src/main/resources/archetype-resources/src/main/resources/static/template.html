@@ -1,16 +1,5 @@
-<div id="engage_basic_description">
-    <% if(typeof title !== "undefined" ){ %>
-    <h1 id="engage_basic_description_title"> <%= title %> </h1>
-    <% } %>
-    <h2 id="engage_basic_description_info">
-        <% if(typeof creator !== "undefined" ){ %>
-        <div id="engage_basic_description_creator" class="engage_basic_description_wrap"><%= creator %></div>
-        <% } %>
-        <% if((typeof creator !== "undefined" ) && (typeof date !== "undefined" ) && (creator !== "")) { %>
-        <div class="engage_basic_description_wrap">, &nbsp;</div>
-        <% } %>
-        <% if(typeof date !== "undefined" ){ %>
-        <div id="engage_basic_description_date"><%= date %></div>
-        <% } %>
-    </h2>
+<div id="${plugin_name}_container">
+  
+  <!-- add plugin markup here -->
+  
 </div>
