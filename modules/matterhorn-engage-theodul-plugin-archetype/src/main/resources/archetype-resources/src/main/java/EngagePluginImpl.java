@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 #if( $plugin_rest == "true" )
 @Path("/")
 #end
-public class EngagePluginDescription extends AbstractEngagePlugin {
+public class EngagePluginImpl extends AbstractEngagePlugin {
 
   private static final Logger log = LoggerFactory.getLogger(EngagePluginDescription.class);
   
