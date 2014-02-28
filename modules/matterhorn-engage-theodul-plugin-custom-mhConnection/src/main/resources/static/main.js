@@ -33,6 +33,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // local privates//
 
     var SEARCH_ENDPOINT = "/search/episode.json";
+    var USERTRACKING_ENDPOINT = "/usertracking/footprint.json"
     var mediaPackageID = "";
     var mediaPackage; // Mediapackage data
     var mediaInfo; // media infos like video tracks and attachments
@@ -42,41 +43,44 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var MediaPackageModel = Backbone.Model.extend({
         urlRoot: SEARCH_ENDPOINT,
         initialize: function() {
-            Engage.log("MhConnection: init MediaPackageModel");
-            //request model data
-            this.fetch({
-                data: {id: mediaPackageID},
-                success: function(model) {
-                    var mediaPackage; // Mediapackage data
-                    if (model.attributes && model.attributes['search-results'] && model.attributes['search-results'].result) {
-                        mediaPackage = model.attributes['search-results'].result;
-                        if (mediaPackage) {
-                            //format silent the model data, see dublincore for reference names
-                            if (mediaPackage.mediapackage.media.track)
-                                model.attributes.tracks = mediaPackage.mediapackage.media.track;
-                            if (mediaPackage.mediapackage.attachments.attachment)
-                                model.attributes.attachments = mediaPackage.mediapackage.attachments.attachment;
-                            if (mediaPackage.dcTitle)
-                                model.attributes.title = mediaPackage.dcTitle;
-                            if (mediaPackage.dcCreator)
-                                model.attributes.creator = mediaPackage.dcCreator;
-                            if (mediaPackage.dcCreated)
-                                model.attributes.date = mediaPackage.dcCreated;
-                            if (mediaPackage.dcDescription)
-                                model.attributes.description = mediaPackage.dcDescription;
-                            if (mediaPackage.dcSubject)
-                                model.attributes.subject = mediaPackage.dcSubject;
-                            if (mediaPackage.dcContributor)
-                                model.attributes.contributor = mediaPackage.dcContributor;
-                            if (mediaPackage.mediapackage.seriestitle)
-                                model.attributes.series = mediaPackage.mediapackage.seriestitle;
-                        }
-                        model.trigger("change"); //one change event
-                    } else {
-                        // TODO: error
-                    }
-                }
-            });
+          Engage.log("MhConnection: init MediaPackageModel");
+          this.update();
+        },
+        update: function(){
+          //request model data
+          this.fetch({
+              data: {id: mediaPackageID},
+              success: function(model) {
+                  var mediaPackage; // Mediapackage data
+                  if (model.attributes && model.attributes['search-results'] && model.attributes['search-results'].result) {
+                      mediaPackage = model.attributes['search-results'].result;
+                      if (mediaPackage) {
+                          //format silent the model data, see dublincore for reference names
+                          if (mediaPackage.mediapackage.media.track)
+                              model.attributes.tracks = mediaPackage.mediapackage.media.track;
+                          if (mediaPackage.mediapackage.attachments.attachment)
+                              model.attributes.attachments = mediaPackage.mediapackage.attachments.attachment;
+                          if (mediaPackage.dcTitle)
+                              model.attributes.title = mediaPackage.dcTitle;
+                          if (mediaPackage.dcCreator)
+                              model.attributes.creator = mediaPackage.dcCreator;
+                          if (mediaPackage.dcCreated)
+                              model.attributes.date = mediaPackage.dcCreated;
+                          if (mediaPackage.dcDescription)
+                              model.attributes.description = mediaPackage.dcDescription;
+                          if (mediaPackage.dcSubject)
+                              model.attributes.subject = mediaPackage.dcSubject;
+                          if (mediaPackage.dcContributor)
+                              model.attributes.contributor = mediaPackage.dcContributor;
+                          if (mediaPackage.mediapackage.seriestitle)
+                              model.attributes.series = mediaPackage.mediapackage.seriestitle;
+                      }
+                      model.trigger("change"); //one change event
+                  } else {
+                      // TODO: error
+                  }
+              }
+          });          
         },
         defaults: {
             "title": "",
@@ -87,6 +91,34 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             "tracks": {},
             "attachments": {}
         }
+    });
+    
+    var FootprintModel = Backbone.Model.extend({
+      defaults: {
+          "position": 0,
+          "views": 0
+      }    
+    });
+    
+    var FootprintCollection = Backbone.Collection.extend({
+      model: FootprintModel,
+      url: USERTRACKING_ENDPOINT,
+      initialize: function() {
+        this.update();
+      },
+      update: function(){
+        //request collection data
+        this.fetch({
+            data: {id: mediaPackageID},
+            success: function(collection) {
+              //Engage.log(this);
+              collection.trigger("change"); //change event
+            }
+        });        
+      },
+      parse: function(response) {
+        return response.footprints.footprint;
+      }
     });
 
     // plugin logic //
@@ -106,6 +138,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     Engage.on("Core:plugin_load_done", function() {
         Engage.log("MhConnection: receive plugin load done");
         Engage.model.set("mediaPackage", new MediaPackageModel());
+        Engage.model.set("footprints", new FootprintCollection());
     });
 
     function extractMediaInfo() {

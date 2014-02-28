@@ -94,6 +94,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
           }
         });
       });
+      //describe timeline extensions
+      $("#engage_timeline_expand_btn").click(function() {
+        $("#engage_timeline_plugin").slideToggle("fast");
+        $("#engage_timeline_expand_btn_img").toggleClass("engage_timeline_expand_btn_rotate180");
+      });
       // load plugins done, hide loading and show content
       this.dispatcher.on("Core:plugin_load_done", function () {
         $(".loading").hide();
@@ -185,7 +190,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
     case "engage_description":
       $("#engage_description").html(processed_template);
       container = "#engage_description";
-      break;      
+      break;    
+    case "engage_timeline":
+      $("#engage_timeline_plugin").html(processed_template);
+      container = "#engage_timeline_plugin";
+      break; 
     default:
     }
     return container;
