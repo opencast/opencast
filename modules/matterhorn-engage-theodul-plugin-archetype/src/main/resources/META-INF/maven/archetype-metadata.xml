@@ -49,8 +49,8 @@
       </includes>
     </fileSet>
 
-    <!-- static resources -->
-    <fileSet encoding="UTF-8">
+    <!-- static resources must be filtered to be adjusted to plugin type-->
+    <fileSet filtered="true" encoding="UTF-8">
       <directory>src/main/resources</directory>
       <includes>
         <include>**/*.html</include>
