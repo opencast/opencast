@@ -765,6 +765,19 @@
     </profile>
 
     <profile>
+      <id>alternatives</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-inspection-service-ffmpeg</module>
+      </modules>
+    </profile>
+
+    <profile>
       <id>test</id>
       <activation>
         <activeByDefault>false</activeByDefault>
