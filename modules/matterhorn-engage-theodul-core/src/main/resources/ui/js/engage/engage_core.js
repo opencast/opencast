@@ -180,12 +180,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
     case "engage_tab":        
       var tab_ref = plugin_name.replace(/ /g, "_");
       // insert tab navigation line
-      var tabNavTag = '<li><a href="#engage_' + tab_ref + '_tab">' + plugin_name + '</a></li>';
+      var tabNavTag = '<li><a id="engage_' + tab_ref + '_tab" href="#engage_' + tab_ref + '_tab_content">' + plugin_name + '</a></li>';
       $("#engage_tab_nav").prepend(tabNavTag);
       // insert tab content
-      var tabTag = '<div class="tab-pane" id="engage_' + tab_ref + '_tab">' + processed_template + '</div>';
+      var tabTag = '<div class="tab-pane" id="engage_' + tab_ref + '_tab_content">' + processed_template + '</div>';
       $("#engage_tab_content").prepend(tabTag);
-      container = "#engage_" + tab_ref + "_tab";
+      container = "#engage_" + tab_ref + "_tab_content";
       break;
     case "engage_description":
       $("#engage_description").html(processed_template);
