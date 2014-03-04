@@ -156,11 +156,56 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
    * BEGIN Private core functions
    */ 
   function addPluginLogic() {
+    var ID_TAB_UL = 'engage_tab_nav';
+
+    // Sorts bootstrap tabs
+    // * The ul tag must have an id.
+    // * Each ahref of a tab must have an id.
+    // * id's of the li tags are overridden
+    function sorting_bootstrap_tabs (selector) {
+      var prefix_tab_ids = "tabs";
+
+      function add_ids_to_tabs (selector) {
+        // Give each li an id
+        $('#' + selector + ' li').each(function(index) {
+          $(this).attr('id', prefix_tab_ids + index);
+        });
+      }
+
+      function get_tabs_and_sort (selector) {
+        // Get tabs
+        var tabs = [];
+        $.each($('#' + selector +' a'), function (index, value) {
+          tabs[index] = $(this).detach();
+        });
+
+        // Sort tabs by tab text
+        tabs.sort( function (a, b) {
+          if (a[0].id > b[0].id)
+            return 1;
+          if (a[0].id < b[0].id)
+            return -1;
+          // a must be equal to b
+          return 0;
+        });
+
+        // Sort tabs
+        $.each(tabs, function (index, value) {
+          $('#' + prefix_tab_ids + index).append(tabs[index]);
+        });
+      }
+
+      add_ids_to_tabs(selector);
+      get_tabs_and_sort(selector);
+    }
+    sorting_bootstrap_tabs(ID_TAB_UL);
+
     // first tab is on startup active
-    $('#engage_tab_nav li:first').addClass("active");
-    $('#engage_tab_content div:first').addClass("active");
+    var activated = $('#' + ID_TAB_UL + ' li:first').addClass("active");
+    $('#' + activated[0].firstElementChild.id + "_content").addClass("active");
+
     // click listener to change tab
-    $('#engage_tab_nav a').click(function (e) {
+    $('#' + ID_TAB_UL + ' a').click(function (e) {
       e.preventDefault();
       $(this).tab('show');
     });
@@ -172,7 +217,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
     case "engage_controls":       
       $("#engage_controls").html(processed_template);
       container = "#engage_controls";
-      break;  
+      break;
     case "engage_video":        
       $("#engage_video").html(processed_template);
       container = "#engage_video";
