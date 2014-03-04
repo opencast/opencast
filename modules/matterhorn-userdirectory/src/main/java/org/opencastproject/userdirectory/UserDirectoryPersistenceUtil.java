@@ -112,6 +112,41 @@ public final class UserDirectoryPersistenceUtil {
   }
 
   /**
+   * Persist an user
+   * 
+   * @param user
+   *          the user to persist
+   * @param emf
+   *          the entity manager factory
+   * @return the persisted organization
+   */
+  public static JpaUser saveUser(JpaUser user, EntityManagerFactory emf) {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      JpaUser u = findUser(user.getUsername(), user.getOrganization().getId(), emf);
+      if (u == null) {
+        em.persist(user);
+      } else {
+        u.password = user.getPassword();
+        u.roles = user.roles;
+        user = em.merge(u);
+      }
+      tx.commit();
+      return user;
+    } finally {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
    * Returns all groups from the persistence unit as a list
    * 
    * @param organization
@@ -396,6 +431,44 @@ public final class UserDirectoryPersistenceUtil {
         throw new NotFoundException("Group with ID " + groupId + " does not exist");
       }
       em.remove(em.merge(group));
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      throw e;
+    } finally {
+      em.close();
+    }
+  }
+
+  /**
+   * Delete the user with given name in the given organization
+   * 
+   * @param username
+   *          the name of the user to delete
+   * @param orgId
+   *          the organization id
+   * @param emf
+   *          the entity manager factory
+   * @throws NotFoundException
+   * @throws Exception
+   */
+  public static void deleteUser(String username, String orgId, EntityManagerFactory emf) throws NotFoundException,
+          Exception {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      JpaUser user = findUser(username, orgId, emf);
+      if (user == null) {
+        throw new NotFoundException("User with name " + username + " does not exist");
+      }
+      em.remove(em.merge(user));
       tx.commit();
     } catch (NotFoundException e) {
       throw e;
