@@ -22,6 +22,12 @@
       <artifactId>matterhorn-common</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-dublincore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   
 	<dependency>
        <groupId>org.opencastproject</groupId>

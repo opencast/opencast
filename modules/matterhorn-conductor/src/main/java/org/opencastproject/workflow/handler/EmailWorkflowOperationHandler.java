@@ -27,6 +27,7 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -46,6 +47,8 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /** The smtp service */
   private SmtpService smptService = null;
+  /** The workspace (needed to read the catalogs) **/
+  private Workspace workspace;
 
   /** Email template manager */
   private EmailTemplateScanner templateScanner = null;
@@ -88,28 +91,28 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // MediaPackage from previous workflow operations
     MediaPackage srcPackage = workflowInstance.getMediaPackage();
 
-    // To, subject, body can be Freemarker templates
-    String to = applyTemplateIfNecessary(workflowInstance, operation, TO_PROPERTY);
-    String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY);
-
-    String bodyText = null;
-    String body = operation.getConfiguration(BODY_PROPERTY);
-    // If specified, templateFile is a file that contains the Freemarker template
-    String bodyTemplateFile = operation.getConfiguration(BODY_TEMPLATE_FILE_PROPERTY);
-    // Body informed? If not, use the default.
-    if (body == null && bodyTemplateFile == null) {
-      // Set the body of the message to be the ID of the media package
-      bodyText = srcPackage.getTitle() + "(" + srcPackage.getIdentifier().toString() + ")";
-    } else if (body != null) {
-      bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_PROPERTY);
-    } else {
-      bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_TEMPLATE_FILE_PROPERTY);
-    }
-
-    // Create the mail message
-    MimeMessage message = smptService.createMessage();
-
     try {
+      // To, subject, body can be Freemarker templates
+      String to = applyTemplateIfNecessary(workflowInstance, operation, TO_PROPERTY);
+      String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY);
+
+      String bodyText = null;
+      String body = operation.getConfiguration(BODY_PROPERTY);
+      // If specified, templateFile is a file that contains the Freemarker template
+      String bodyTemplateFile = operation.getConfiguration(BODY_TEMPLATE_FILE_PROPERTY);
+      // Body informed? If not, use the default.
+      if (body == null && bodyTemplateFile == null) {
+        // Set the body of the message to be the ID of the media package
+        bodyText = srcPackage.getTitle() + "(" + srcPackage.getIdentifier().toString() + ")";
+      } else if (body != null) {
+        bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_PROPERTY);
+      } else {
+        bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_TEMPLATE_FILE_PROPERTY);
+      }
+
+      // Create the mail message
+      MimeMessage message = smptService.createMessage();
+
       message.addRecipient(RecipientType.TO, new InternetAddress(to));
       message.setSubject(subject);
       message.setText(bodyText);
@@ -120,6 +123,9 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
       logger.info("E-mail notification sent to {}", to);
 
     } catch (MessagingException e) {
+      throw new WorkflowOperationException(e);
+    } catch (Exception e) {
+      // Freemarker exceptions (invalid template, etc)
       throw new WorkflowOperationException(e);
     }
 
@@ -152,7 +158,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
       return configValue;
     }
     // Apply the template
-    return DocUtil.generate(new EmailDocData(templateName, workflowInstance), template);
+    return DocUtil.generate(new EmailDocData(templateName, workflowInstance, workspace), template);
   }
 
   /**
@@ -173,6 +179,16 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
    */
   void setEmailTemplateScanner(EmailTemplateScanner templateScanner) {
     this.templateScanner = templateScanner;
+  }
+
+  /**
+   * Callback for OSGi to set the {@link Workspace}.
+   * 
+   * @param ws
+   *          the workspace
+   */
+  void setWorkspace(Workspace ws) {
+    this.workspace = ws;
   }
 
 }
