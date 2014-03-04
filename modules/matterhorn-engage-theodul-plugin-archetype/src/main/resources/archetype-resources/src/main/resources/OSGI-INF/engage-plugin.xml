@@ -9,9 +9,9 @@
   <implementation class="${package}.EngagePluginImpl" />
   
   <!-- Engage Plugin Properties: at least name and path must be set -->
-  <property name="opencast.engage.name" value="${plugin_name}" />
-  <property name="opencast.engage.description" value="${plugin_description}" />
-  <property name="opencast.engage.rest" value="${plugin_rest}" />
+  <property name="opencast.engage.plugin.name" value="${plugin_name}" />
+  <property name="opencast.engage.plugin.description" value="${plugin_description}" />
+  <property name="opencast.engage.plugin.rest" value="${plugin_rest}" />
   
   <service>
     <provide interface="org.opencastproject.engage.theodul.api.EngagePlugin" />
