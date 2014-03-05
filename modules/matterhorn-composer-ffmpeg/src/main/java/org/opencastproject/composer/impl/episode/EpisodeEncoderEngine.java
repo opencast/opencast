@@ -358,4 +358,9 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
    * @see org.opencastproject.composer.api.EncoderEngine#extract(java.io.File,
    * org.opencastproject.composer.api.EncodingProfile, java.util.Map, long[])
    */
+
+  @Override
+  public List<File> parallelEncode(File mediaSource, EncodingProfile format, Map<String, String> properties) throws EncoderException {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
 }

@@ -205,6 +205,7 @@
               OSGI-INF/operations/delete-archive.xml,
               OSGI-INF/operations/distribute-acl.xml,
               OSGI-INF/operations/download-dvd.xml,
+              OSGI-INF/operations/encode.xml,  
               OSGI-INF/operations/email.xml,
               OSGI-INF/operations/embed.xml,
               OSGI-INF/operations/publish-engage.xml,

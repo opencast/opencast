@@ -90,6 +90,40 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
     }
     throw new EncoderException("Unable to encode track " + sourceTrack + " using a remote composer service");
   }
+  
+    /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.composer.api.ComposerService#paralellEncode(org.opencastproject.mediapackage.Track,
+   *      java.lang.String)
+   */
+  @Override
+  public Job parallelEncode(Track sourceTrack, String profileId) throws EncoderException {
+    HttpPost post = new HttpPost("/parallelencode");
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
+      params.add(new BasicNameValuePair("profileId", profileId));
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (Exception e) {
+      throw new EncoderException("Unable to assemble a remote composer request for track " + sourceTrack, e);
+    }
+    HttpResponse response = null;
+    try {
+      response = getResponse(post);
+      if (response != null) {
+        String content = EntityUtils.toString(response.getEntity());
+        Job r = JobParser.parseJob(content);
+        logger.info("Encoding job {} started on a remote composer", r.getId());
+        return r;
+      }
+    } catch (Exception e) {
+      throw new EncoderException("Unable to encode track " + sourceTrack + " using a remote composer service", e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new EncoderException("Unable to encode track " + sourceTrack + " using a remote composer service");
+  }
 
   /**
    * {@inheritDoc}

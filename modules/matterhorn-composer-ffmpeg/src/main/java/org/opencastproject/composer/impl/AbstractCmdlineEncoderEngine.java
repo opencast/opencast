@@ -461,5 +461,120 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       }
     }
   }
+  
+  /**
+   * Executes the command line encoder with the given set of files and properties and using the provided encoding
+   * profile.
+   * 
+   * @param videoSource
+   *          the video file
+   * @param profile
+   *          the profile identifier
+   * @param properties
+   *          the encoding properties to be interpreted by the actual encoder implementation
+   * @return a list of the precessed Tracks
+   * @throws EncoderException
+   *           if processing fails
+   */
+  public List<File> parallelEncode(File mediaSource, EncodingProfile profile, Map<String, String> properties)
+          throws EncoderException {
+    // Fist, update the parameters
+    if (properties != null)
+      params.putAll(properties);
+    // build command
+    BufferedReader in = null;
+    Process encoderProcess = null;
+    if (mediaSource == null) {
+      throw new IllegalArgumentException("At least one track must be specified.");
+    }
+    try {
+      // Set encoding parameters
+      if (mediaSource != null) {
+        String mediaInput = FilenameUtils.normalize(mediaSource.getAbsolutePath());
+        params.put("in.video.path", mediaInput);
+        params.put("in.video.name", FilenameUtils.getBaseName(mediaInput));
+        params.put("in.video.suffix", FilenameUtils.getExtension(mediaInput));
+        params.put("in.video.filename", FilenameUtils.getName(mediaInput));
+      }
+      String outDir = mediaSource.getAbsoluteFile().getParent();
+      String outFileName = FilenameUtils.getBaseName(mediaSource.getName());
+      
+
+      if (params.containsKey("time")) {
+        outFileName += "_" + properties.get("time");
+      }
+
+      // generate random name if multiple jobs are producing file with identical name (MH-7673)
+      outFileName += "_" + UUID.randomUUID().toString();
+
+      params.put("out.dir", outDir);
+      params.put("out.name", outFileName); 
+      
+      ArrayList<String> suffixes = new ArrayList<String>();
+      
+      for (String tag : profile.getTags()) {
+logger.info("tag {} with suffix {}", tag, profile.getSuffix(tag));        
+        String outSuffix = processParameters(profile.getSuffix(tag));
+        params.put("out.suffix" + "." + tag, outSuffix);
+        suffixes.add(outSuffix);
+      }
+      
+      // create encoder process.
+      // no special working dir is set which means the working dir of the
+      // current java process is used.
+      List<String> command = buildCommand(profile);
+      StringBuilder sb = new StringBuilder();
+      for (String cmd : command) {
+        sb.append(cmd);
+        sb.append(" ");
+      }
+      logger.info("Executing encoding command: {}", sb);
+      ProcessBuilder pbuilder = new ProcessBuilder(command);
+      pbuilder.redirectErrorStream(REDIRECT_ERROR_STREAM);
+      encoderProcess = pbuilder.start();
+
+      // tell encoder listeners about output
+      in = new BufferedReader(new InputStreamReader(encoderProcess.getInputStream()));
+      String line;
+      while ((line = in.readLine()) != null) {
+        handleEncoderOutput(profile, line, mediaSource);
+      }
+
+      // wait until the task is finished
+      encoderProcess.waitFor();
+      int exitCode = encoderProcess.exitValue();
+      if (exitCode != 0) {
+        throw new EncoderException(this, "Encoder exited abnormally with status " + exitCode);
+      }
+
+      logger.info("Media track {} successfully encoded using profile '{}'", new String[] { mediaSource.getName(),
+             profile.getIdentifier() });
+      fireEncoded(this, profile, mediaSource);
+      ArrayList<File> tracks = new ArrayList<File>();
+      for (String outSuffix : suffixes) {
+          tracks.add(new File(mediaSource.getParent(), outFileName + outSuffix));
+      }
+      return tracks; 
+    } catch (EncoderException e) {
+      logger.warn("Error while encoding video track {} using '{}': {}", new String[] {
+             (mediaSource == null ? "N/A" : mediaSource.getName()), profile.getIdentifier(), e.getMessage() });
+      fireEncodingFailed(this, profile, e, mediaSource);
+      throw e;
+    } catch (Exception e) {
+      logger.warn("Error while encoding media {} to {}:{}, {}",
+              new Object[] { (mediaSource == null ? "N/A" : mediaSource.getName()), profile.getName(), e.getMessage() });
+      fireEncodingFailed(this, profile, e, mediaSource);
+      throw new EncoderException(this, e.getMessage(), e);
+    } finally {
+      IoSupport.closeQuietly(in);
+      IoSupport.closeQuietly(encoderProcess);
+    }
+  }  
+  
+  protected List<String> getTags(EncodingProfile profile) {
+    ArrayList<String> tags = new ArrayList<String>();
+    
+    return tags;
+  }
 
 }

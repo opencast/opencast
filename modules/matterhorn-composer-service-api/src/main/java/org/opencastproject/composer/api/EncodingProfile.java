@@ -16,6 +16,7 @@
 
 package org.opencastproject.composer.api;
 
+import java.util.List;
 import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 
@@ -91,11 +92,25 @@ public interface EncodingProfile {
   MediaType getOutputType();
 
   /**
-   * Returns a suffix of the files.
+   * Returns a suffix of the files. First tag found used if tags are used but not provided in the request
    * 
    * @return the suffix
    */
   String getSuffix();
+  
+  /**
+   * Returns a suffix of the files for a certain tag.
+   * 
+   * @param tag a tag that describes the aoutput file
+   * @return the suffix
+   */
+  String getSuffix(String tag);  
+  
+  /**
+   * Returns a list of the tags for output files used in this request
+   * @return a list of the used tags
+   */
+  List<String> getTags();
 
   /**
    * Returns the media type's mime type.

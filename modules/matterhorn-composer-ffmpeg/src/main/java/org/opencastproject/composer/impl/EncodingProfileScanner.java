@@ -38,6 +38,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.Set;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -183,7 +184,6 @@ public class EncodingProfileScanner implements ArtifactInstaller {
               + "). (Check web.xml profiles.)");
 
     EncodingProfileImpl df = new EncodingProfileImpl(identifier, name, artifact);
-
     // Output Type
     String type = getDefaultProperty(profile, PROP_OUTPUT, properties, defaultProperties);
     if (StringUtils.isBlank(type))
@@ -195,11 +195,21 @@ public class EncodingProfileScanner implements ArtifactInstaller {
               + "' is unknwon");
     }
 
-    // Suffix
-    String suffixObj = getDefaultProperty(profile, PROP_SUFFIX, properties, defaultProperties);
-    if (StringUtils.isBlank(suffixObj))
-      throw new ConfigurationException("Suffix (" + PROP_SUFFIX + ") of profile '" + profile + "' is missing");
-    df.setSuffix(StringUtils.trim(suffixObj));
+    //Suffixes with tags?
+    List<String> tags = getTags(profile, properties, defaultProperties);
+    if (tags.size() > 0) {     
+      for (String tag : tags) {
+        String prop = PROP_SUFFIX + "." + tag;
+        String suffixObj = getDefaultProperty(profile, prop, properties, defaultProperties);
+        df.setSuffix(tag, StringUtils.trim(suffixObj));
+      }
+    } else {   
+      // Suffix old stile, without tags
+      String suffixObj = getDefaultProperty(profile, PROP_SUFFIX, properties, defaultProperties);
+      if (StringUtils.isBlank(suffixObj))
+        throw new ConfigurationException("Suffix (" + PROP_SUFFIX + ") of profile '" + profile + "' is missing");
+      df.setSuffix(StringUtils.trim(suffixObj)); 
+    }
 
     // Mimetype
     String mimeTypeObj = getDefaultProperty(profile, PROP_MIMETYPE, properties, defaultProperties);
@@ -255,6 +265,37 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     list.add(key);
     final String prop = properties.getProperty(key);
     return prop != null ? prop.trim() : prop;
+  }
+
+  /**
+   * Get any tags that might follow the PROP_SUFFIX
+   * @param profile
+   *          the profile identifier
+   * @param properties
+   *          the properties
+   * @param list
+   *          the list of default property keys
+   * @return A list of tags for output files
+   */
+  
+  private static List<String> getTags(String profile, Properties properties, List<String> list) {
+    Set<Object> keys = properties.keySet();
+    StringBuffer buf = new StringBuffer(PROP_PREFIX);
+    buf.append(profile);
+    buf.append(PROP_SUFFIX);
+    String key = buf.toString();
+
+    ArrayList<String> tags = new ArrayList<String>();
+    for (Object o : keys) {       
+      String k = o.toString(); 
+      if (k.startsWith(key)) {
+        if (k.substring(key.length()).length() > 0) {
+          list.add(k);
+          tags.add(k.substring(key.length() + 1));
+        }
+      }
+    }  
+    return tags;
   }
 
   /**

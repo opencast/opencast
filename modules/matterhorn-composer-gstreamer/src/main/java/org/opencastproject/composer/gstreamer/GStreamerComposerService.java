@@ -687,6 +687,11 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
     // TODO: implement me
     throw new UnsupportedOperationException("Not supported yet.");
   }
+  
+  @Override
+  public Job parallelEncode(Track sourceTrack, String profileId) throws EncoderException {
+    throw new UnsupportedOperationException("Not supported yet."); 
+  }  
 
   /**
    * Deletes any valid file in the list.
