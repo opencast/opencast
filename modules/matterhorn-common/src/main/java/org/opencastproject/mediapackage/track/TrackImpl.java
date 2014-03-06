@@ -87,7 +87,6 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
    */
   TrackImpl(MediaPackageElementFlavor flavor, MimeType mimeType, URI uri, long size, Checksum checksum) {
     super(Type.Track, flavor, uri, size, checksum, mimeType);
-    autodetectTransport(uri);
   }
 
   /**
@@ -100,7 +99,6 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
    */
   TrackImpl(MediaPackageElementFlavor flavor, URI uri) {
     super(Type.Track, flavor, uri);
-      autodetectTransport(uri);
   }
 
   /**
@@ -234,6 +232,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   }
   
   public StreamingProtocol getTransport() {
+    if (transport == null) return autodetectTransport(getURI());
     return transport;
   }
 
@@ -265,21 +264,21 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
     }
   }
   
-  private void autodetectTransport(URI uri) {
-    if (uri == null || uri.getScheme() == null) return;
+  private StreamingProtocol autodetectTransport(URI uri) {
+    if (uri == null || uri.getScheme() == null) return null;
     if (uri.getScheme().toLowerCase().startsWith("http")) {
-        if (uri.getFragment() == null) setTransport(StreamingProtocol.HTTP);
-        else if (uri.getFragment().toLowerCase().endsWith(".m3u8")) setTransport(StreamingProtocol.HLS);
-        else if (uri.getFragment().toLowerCase().endsWith(".mpd")) setTransport(StreamingProtocol.DASH);
-        else if (uri.getFragment().toLowerCase().endsWith(".f4m")) setTransport(StreamingProtocol.HDS);
+        if (uri.getFragment() == null) return StreamingProtocol.HTTP;
+        else if (uri.getFragment().toLowerCase().endsWith(".m3u8")) return StreamingProtocol.HLS;
+        else if (uri.getFragment().toLowerCase().endsWith(".mpd")) return StreamingProtocol.DASH;
+        else if (uri.getFragment().toLowerCase().endsWith(".f4m")) return StreamingProtocol.HDS;
         else setTransport(StreamingProtocol.HTTP);
     }
-    else if (uri.getScheme().toLowerCase().startsWith("rtmp")) setTransport(StreamingProtocol.RTMP);
-    else if (uri.getScheme().toLowerCase().startsWith("rtmpe")) setTransport(StreamingProtocol.RTMPE);
-    else if (uri.getScheme().toLowerCase().startsWith("file")) setTransport(StreamingProtocol.FILE);
-    else if (uri.getScheme().toLowerCase().startsWith("rtp")) setTransport(StreamingProtocol.RTP);
-    else if (uri.getScheme().toLowerCase().startsWith("rtsp")) setTransport(StreamingProtocol.RTSP);
-    else setTransport(StreamingProtocol.UNKNOWN);
+    else if (uri.getScheme().toLowerCase().startsWith("rtmp")) return StreamingProtocol.RTMP;
+    else if (uri.getScheme().toLowerCase().startsWith("rtmpe")) return StreamingProtocol.RTMPE;
+    else if (uri.getScheme().toLowerCase().startsWith("file")) return StreamingProtocol.FILE;
+    else if (uri.getScheme().toLowerCase().startsWith("rtp")) return StreamingProtocol.RTP;
+    else if (uri.getScheme().toLowerCase().startsWith("rtsp")) return StreamingProtocol.RTSP;
+    return StreamingProtocol.UNKNOWN;
   }
 
 }
