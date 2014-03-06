@@ -782,7 +782,8 @@ ocRecordings = new (function() {
     var data = {
       id : ocRecordings.Hold.workflow.id
     };
-
+    var def = $.Deferred();
+    
     // add properties for workflow resum if provided by hold operation
     if (postData !== undefined) {
       data.properties = "";
@@ -810,11 +811,15 @@ ocRecordings = new (function() {
         } else {
           alert('Could not resume Workflow: ' + status);
         }
+        def.resolve();
       },
       success    : function(data) {
         ocRecordings.reload();
+        def.resolve();
       }
     });
+    
+    return def.promise();
   }
 
   this.hideHoldActionUI = function() {

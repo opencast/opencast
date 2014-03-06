@@ -482,6 +482,7 @@ function continueWorkflow () {
         trimFromData = $('#inPoint').val(),
         trimToData;
 
+    var def = $.Deferred();
 
     trimFromData = ((trimFromData == '') || (trimFromData == null)) ? '00:00:00' : trimFromData;
     // Format 'Trim To'
@@ -516,13 +517,16 @@ function continueWorkflow () {
                 });
                 parent.ocRecordings.Hold.changedMediaPackage = mp;
             }
-            parent.ocRecordings.continueWorkflow(postData);
+            $.when(parent.ocRecordings.continueWorkflow(postData)).then(function(){ def.resolve(); });
         } else {
-        $("div#errorMessage").html("The In-Point must not be bigger than the Out-Point");
+          $("div#errorMessage").html("The In-Point must not be bigger than the Out-Point");
+          def.resolve();
         }
     });
 
     mpe.submit();
+    
+    return def.promise();
 }
 
 function leave(){
