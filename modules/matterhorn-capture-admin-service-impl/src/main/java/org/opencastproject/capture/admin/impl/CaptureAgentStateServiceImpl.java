@@ -179,7 +179,9 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    */
   @Override
   public Agent getAgent(String name) throws NotFoundException {
-    return getAgent(name, securityService.getOrganization().getId());
+    String org = securityService.getOrganization().getId();
+    Agent agent = getAgent(name, org);
+    return updateCachedLastHeardFrom(agent, org);
   }
 
   /**
@@ -235,6 +237,24 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     } catch (NoResultException e) {
       return null;
     }
+  }
+
+  /**
+   * Mix in the last-seen timestamp from the agent cache
+   * 
+   * @param agent
+   *          The Agent you wish to update
+   * @param org
+   *          the organization
+   * @return the agent
+   */
+  protected Agent updateCachedLastHeardFrom(Agent agent, String org) {
+    String agentKey = agent.getName().concat(DELIMITER).concat(org);
+    Tuple3<String, Properties, Long> cachedAgent = (Tuple3) agentCache.get(agentKey);
+    if (cachedAgent != null) {
+      agent.setLastHeardFrom(cachedAgent.getC());
+    }
+    return agent;
   }
 
   /**
@@ -354,15 +374,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       // Build the map that the API defines as agent name->agent
       Map<String, Agent> map = new TreeMap<String, Agent>();
       for (AgentImpl agent : agents) {
-
-        // Mix in the last-seen timestamp from the agent cache
-        String agentKey = agent.getName().concat(DELIMITER).concat(org.getId());
-        Tuple3<String, Properties, Long> cachedAgent = (Tuple3) agentCache.get(agentKey);
-        if (cachedAgent != null) {
-          agent.setLastHeardFrom(cachedAgent.getC());
-        }
-
-        map.put(agent.getName(), agent);
+        map.put(agent.getName(), updateCachedLastHeardFrom(agent, org.getId()));
       }
       return map;
     } finally {
