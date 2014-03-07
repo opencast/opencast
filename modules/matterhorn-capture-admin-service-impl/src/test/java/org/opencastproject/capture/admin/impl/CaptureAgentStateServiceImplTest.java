@@ -518,4 +518,30 @@ public class CaptureAgentStateServiceImplTest {
     }
   }
 
+  @Test
+  public void testUpdatedTimeSinceLastUpdate() throws Exception {
+    //See MH-10031
+    String name = "agent1";
+    Long lastHeardFrom = 0L;
+    Agent agent = null;
+    service.setAgentState(name, IDLE);
+
+    agent = service.getAgent(name);
+    lastHeardFrom = agent.getLastHeardFrom();
+    service.setAgentState(name, CAPTURING);
+    agent = service.getAgent(name);
+    Assert.assertTrue(lastHeardFrom < agent.getLastHeardFrom());
+
+    lastHeardFrom = agent.getLastHeardFrom();
+    service.setAgentState(name, IDLE);
+    agent = service.getAgent(name);
+    Assert.assertTrue(lastHeardFrom < agent.getLastHeardFrom());
+
+    lastHeardFrom = agent.getLastHeardFrom();
+    service.setAgentState(name, IDLE);
+    agent = service.getAgent(name);
+    Assert.assertTrue(lastHeardFrom < agent.getLastHeardFrom());
+  }
+
+
 }
