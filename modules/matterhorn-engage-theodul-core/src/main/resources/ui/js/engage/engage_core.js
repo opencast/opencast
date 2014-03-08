@@ -15,7 +15,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], function (require, $, _, Backbone, EngageModel) {
+define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'engage/engage_tab_logic'], function (require, $, _, Backbone, EngageModel, EngageTabLogic) {
   //
   "use strict"; // strict mode in all our application
   //
@@ -156,59 +156,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
    * BEGIN Private core functions
    */ 
   function addPluginLogic() {
-    var ID_TAB_UL = 'engage_tab_nav';
-
-    // Sorts bootstrap tabs
-    // * The ul tag must have an id.
-    // * Each ahref of a tab must have an id.
-    // * id's of the li tags are overridden
-    function sorting_bootstrap_tabs (selector) {
-      var prefix_tab_ids = "tabs";
-
-      function add_ids_to_tabs (selector) {
-        // Give each li an id
-        $('#' + selector + ' li').each(function(index) {
-          $(this).attr('id', prefix_tab_ids + index);
-        });
-      }
-
-      function get_tabs_and_sort (selector) {
-        // Get tabs
-        var tabs = [];
-        $.each($('#' + selector +' a'), function (index, value) {
-          tabs[index] = $(this).detach();
-        });
-
-        // Sort tabs by tab text
-        tabs.sort( function (a, b) {
-          if (a[0].id > b[0].id)
-            return 1;
-          if (a[0].id < b[0].id)
-            return -1;
-          // a must be equal to b
-          return 0;
-        });
-
-        // Sort tabs
-        $.each(tabs, function (index, value) {
-          $('#' + prefix_tab_ids + index).append(tabs[index]);
-        });
-      }
-
-      add_ids_to_tabs(selector);
-      get_tabs_and_sort(selector);
-    }
-    sorting_bootstrap_tabs(ID_TAB_UL);
-
-    // first tab is on startup active
-    var activated = $('#' + ID_TAB_UL + ' li:first').addClass("active");
-    $('#' + activated[0].firstElementChild.id + "_content").addClass("active");
-
-    // click listener to change tab
-    $('#' + ID_TAB_UL + ' a').click(function (e) {
-      e.preventDefault();
-      $(this).tab('show');
-    });
+    EngageTabLogic('tabs', 'engage_tab_nav');
   }
 
   function insertProcessedTemplate(processed_template, plugin_type, plugin_name) {
@@ -225,12 +173,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
     case "engage_tab":        
       var tab_ref = plugin_name.replace(/ /g, "_");
       // insert tab navigation line
-      var tabNavTag = '<li><a id="engage_' + tab_ref + '_tab" href="#engage_' + tab_ref + '_tab_content">' + plugin_name + '</a></li>';
+      var tabNavTag = '<li><a href="#engage_' + tab_ref + '_tab">' + plugin_name + '</a></li>';
       $("#engage_tab_nav").prepend(tabNavTag);
       // insert tab content
-      var tabTag = '<div class="tab-pane" id="engage_' + tab_ref + '_tab_content">' + processed_template + '</div>';
+      var tabTag = '<div class="tab-pane" id="engage_' + tab_ref + '_tab">' + processed_template + '</div>';
       $("#engage_tab_content").prepend(tabTag);
-      container = "#engage_" + tab_ref + "_tab_content";
+      container = "#engage_" + tab_ref + "_tab";
       break;
     case "engage_description":
       $("#engage_description").html(processed_template);
