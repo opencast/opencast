@@ -12,7 +12,7 @@
     policy="static" bind="setSmilService" />
   <reference cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace" name="Workspace"
     policy="static" bind="setWorkspace" />
-  <reference name="detectionService" interface="org.opencastproject.videoeditor.silencedetection.api.SilenceDetectionService"
+  <reference name="detectionService" interface="org.opencastproject.silencedetection.api.SilenceDetectionService"
     cardinality="1..1" policy="static" bind="setDetectionService" />
   <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
     policy="static" bind="setServiceRegistry" />

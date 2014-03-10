@@ -51,7 +51,7 @@ ocStatistics = new (function() {
     "org_opencastproject_publication_youtube"    : "Media publication (YouTube)",
     "org_opencastproject_smil"                   : "SMIL service",
     "org_opencastproject_videoeditor"            : "Video editor",
-    "org_opencastproject_videoeditor_silencedetection": "Silence detection",
+    "org_opencastproject_silencedetection"       : "Silence detection",
     "org_opencastproject_gstreamer"              : "GStreamer Launch Service",
     "org_opencastproject_inspection"             : "Media inspection",
     "org_opencastproject_workflow"               : "Workflow",
