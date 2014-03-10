@@ -10,7 +10,7 @@
         <th id="sortTitle" width="30%" class="ui-widget-header sortable"><div>Title<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
     	<th id="sortPresenter" width="5%" class="ui-widget-header sortable"><div>Presenter<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
     	<th id="sortSeries" width="15%" class="ui-widget-header sortable"><div>Course/Series<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
-    	<th id="sortAgent" width="10%" class="ui-widget-header sortable"><div>Capture Agent<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
+        <th id="sortAgent" width="10%" class="ui-widget-header sortable"><div>Capture Agent</div></th>
     	<th id="sortDate" width="10%" class="ui-widget-header sortable"><div>Recording Date &amp; Time<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
     	<% if (ocRecordings.Configuration.state == 'failed') { %>
 			<th id="sortFailDate" width="10%" class="ui-widget-header"><div>Failure Date &amp; Time</div></th>

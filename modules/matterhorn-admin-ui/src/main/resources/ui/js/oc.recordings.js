@@ -11,14 +11,13 @@ ocRecordings = new (function() {
   var STATISTICS_DELAY = 9000;     // time interval for statistics update
 
   var UPCOMMING_EVENTS_GRACE_PERIOD = 30 * 1000;
-  
+  var END_OF_CAPTURE_GRACE_PERIOD = 3600 * 1000;  
   
 
   var SORT_FIELDS = {
     'Title' : 'TITLE',
     'Presenter' : 'CREATOR',
     'Series' : 'SERIES_TITLE',
-    'Agent' : 'SPATIAL',
     'Date' : 'DATE_CREATED'
   }
 
@@ -28,7 +27,6 @@ ocRecordings = new (function() {
     title : 'Title',
     creator : 'Presenter',
     seriestitle : 'Course/Series',
-    spatial : 'Capture Agent'
   },
   {
     contributor : 'Contributor',
@@ -215,7 +213,6 @@ ocRecordings = new (function() {
 	    params.push('op=-schedule');
 	    params.push('op=-capture');
 	    params.push('op=-ingest');
-	    params.push('op=-publish-delayed');
 	  }
 	  else if (state == 'ignored') {
 	    params.pop();
@@ -224,9 +221,6 @@ ocRecordings = new (function() {
 	    params.push('op=-schedule');
 	    params.push('op=-capture');
 	    params.push('op=-ingest');
-	  }
-	  else if (state == 'delayed') {
-		params.push('op=publish-delayed');
 	  }
 	  else if (state == 'failed') {
 	    params.push('state=failed');
@@ -339,7 +333,6 @@ ocRecordings = new (function() {
    *  - capturing: definition=capturing, state=running
    *  - processing: definition:all other than scheduling,capture, state=running
    *  - finished: definition:all other than scheduling,capture, state=succeeded
-   *  - delayed: definition=publish-delayed
    *  - on hold: definition:all other than scheduling,capture, state=paused, publish-delayed
    *  - failed: from summary -> failed  (assuming that scheduling goes into
    *      FAILED when recording was not started, capture goes into FAILED when
@@ -357,7 +350,6 @@ ocRecordings = new (function() {
       finished:0,
       hold:0,
       ignored:0,
-      delayed:0,
       failed:0
     };
 
@@ -370,7 +362,7 @@ ocRecordings = new (function() {
         addStatistics(data.statistics.definitions.definition, stats);
       }
     }
-    stats.all = stats.instantiated + stats.upcoming + stats.capturing + stats.processing + stats.finished + stats.failed + stats.hold + stats.ignored + stats.delayed;
+    stats.all = stats.instantiated + stats.upcoming + stats.capturing + stats.processing + stats.finished + stats.failed + stats.hold + stats.ignored;
     if (ocRecordings.statistics != null
       && ocRecordings.statistics[ocRecordings.Configuration.state] != stats[ocRecordings.Configuration.state]) {
       refresh();
@@ -394,17 +386,9 @@ ocRecordings = new (function() {
         }
       });
     } else {
-    	// publish-delayed is a subset of PAUSED
-    	$.each(definition.operations.operation, function(index, op) {
-            if (op.id == 'publish-delayed') {
-              stats.delayed += parseInt(op.paused);
-              stats.hold -= parseInt(op.paused);
-            }
-          });
       stats.instantiated += parseInt(definition.instantiated);
       stats.processing += parseInt(definition.running);
       stats.finished += parseInt(definition.finished);
-      stats.hold += parseInt(definition.paused);
       stats.ignored += parseInt(definition.stopped);
       stats.failed += parseInt(definition.failed) + parseInt(definition.failing);
     }
@@ -445,7 +429,6 @@ ocRecordings = new (function() {
     this.holdAction=false;
     this.error = false;
     this.captureAgent = '';
-    this.publishDelay = '';
 
     var self = this;    // ie for $.each
 
@@ -457,9 +440,6 @@ ocRecordings = new (function() {
         if (elm.key == 'schedule.location') {
           self.captureAgent = elm['$'];
         }
-        if (elm.key == 'schedule.publishDelay') {
-            self.publishDelay = elm['$'];
-          }
       });
     }
 
@@ -498,17 +478,17 @@ ocRecordings = new (function() {
     	this.state = 'Failed';
     	var wf = ocRecordings.getWorkflow(wf.id);
     	var failedOp = ocRecordings.findFirstOperation(wf, 'FAILED');
-		this.state = 'Failed' + failedOp.description;
-		this.end = ocUtils.fromTimestampToFormattedTime(failedOp.completed);
-		if (wf.errors === '') {
-			if (op) {
-				this.error = 'Failed in operation ' + op.description;
-			} else {
-				this.error = 'No error message available';
-			}
+	this.state = 'Failed' + failedOp.description;
+	this.end = ocUtils.fromTimestampToFormattedTime(failedOp.completed);
+	if (wf.errors === '') {
+		if (op) {
+			this.error = 'Failed in operation ' + op.description;
 		} else {
-			this.error = ocUtils.ensureArray(wf.errors.error).join(', ');
+			this.error = 'No error message available';
 		}
+	} else {
+		this.error = ocUtils.ensureArray(wf.errors.error).join(', ');
+	}
     } else if (wf.state == 'PAUSED') {
     	var pausedOp = ocRecordings.findFirstOperation(wf, 'PAUSED');
       if (pausedOp) {
@@ -519,17 +499,13 @@ ocRecordings = new (function() {
         } else if (pausedOp.id == 'ingest') {
           this.state = 'Captured';
           this.operation = 'Sending recording to processing';
-        } else if (pausedOp.id == 'publish-delayed') {
-            this.state = 'Delayed';
-            this.end = ocUtils.fromTimestampToFormattedTime(pausedOp.started);
-            this.operation = pausedOp.description + " of " + ocUtils.fromTimestampToFormattedTime(this.publishDelay);
-        } else if (pausedOp.holdurl && pausedOp.id != 'publish-delayed') {
-          this.state = 'On Hold';
-      	  this.end = ocUtils.fromTimestampToFormattedTime(pausedOp.started);
-          this.operation = pausedOp.description;
-          this.holdAction = {
-            url : pausedOp.holdurl,
-            title : pausedOp['hold-action-title']
+        } else if (pausedOp.holdurl) {
+            this.state = 'On Hold';
+      	    this.end = ocUtils.fromTimestampToFormattedTime(pausedOp.started);
+            this.operation = pausedOp.description;
+            this.holdAction = {
+              url : pausedOp.holdurl,
+              title : pausedOp['hold-action-title']
           };
       } else {
         this.state = 'Paused';
@@ -571,6 +547,18 @@ ocRecordings = new (function() {
           }
         }
       });
+    } else if (this.state == 'Capturing') {
+      $.each(wf.configurations.configuration, function(index, elm) {
+        if (elm.key == 'schedule.stop') {
+          var stop = elm['$'];
+          var now = new Date().getTime() - END_OF_CAPTURE_GRACE_PERIOD;
+          if (parseInt(stop) < now) {
+            self.error = 'It seems the core system did not receive proper status updates from the Capture Agent that should have conducted this recording.';
+            self.state = 'WARNING : Recording failed to ingest!';
+            recordingActions.push('ignore');
+          }
+        }
+      });
     }
     
     this.actions = recordingActions;
@@ -585,11 +573,7 @@ ocRecordings = new (function() {
         this.actions.push('stop');
     } else if (this.state == 'On Hold') {
       this.actions.push('ignore');
-    } else if (this.state == 'Delayed') {
-    	this.actions.push('ignore');
-    	this.actions.push('publish');
     }
-
     return this;
   }
 
@@ -1174,27 +1158,6 @@ ocRecordings = new (function() {
     }
   }
   
-  this.publishNow = function(id) {
-	    var wf = ocRecordings.getWorkflow(id);
-	    if (wf) {
-	      if(confirm('Are you sure you wish to cancel the publish delay on this recording?')){
-	        $.ajax({
-	          url: WORKFLOW_URL + '/resume',
-	          type: 'POST',
-	          data: {
-	            id: id
-	          },
-	          error: function(XHR,status,e){
-	            alert('Could not Publish Now.');
-	          },
-	          success: function(){
-	            ocRecordings.reload();
-	          }
-	        });
-	      }
-	    }
-	  }
-
   this.publishRecording = function(wfId) {
     var workflow = ocRecordings.getWorkflow(id);
     if (workflow) {
@@ -1613,9 +1576,6 @@ ocRecordings = new (function() {
 
       } else if (action == 'stop') {
         links.push('<a href="javascript:ocRecordings.stopWorkflow(\'' + id + '\')">Ignore</a>');
-        
-      } else if (action == 'publish') {
-        links.push('<a href="javascript:ocRecordings.publishNow(\'' + id + '\')">Cancel Publish Delay</a>');
       }
     });
     return links.join(' | \n');
