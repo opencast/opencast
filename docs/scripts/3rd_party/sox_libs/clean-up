@@ -6,7 +6,9 @@ set -x
 source "${HOME3P}/utilx"
 [ $? -ne 0 ] && exit 1
 #
-cleanup .    "$1" || exit 1
-cleanup flac "$1" || exit 1
+cleanup .      "$1" || exit 1
+cleanup flac   "$1" || exit 1
+cleanup mad    "$1" || exit 1
+cleanup id3tag "$1" || exit 1
 #
 exit 0
