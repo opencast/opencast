@@ -63,7 +63,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -73,7 +73,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -141,14 +141,14 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
 
       // throw Exception if target host did not return 200
       int status = response.getStatusLine().getStatusCode();
-      if (status == 200) {
+      if ((status >= 200) && (status < 300)) {
         if (config.debug()) {
           logger.info("Successfully submitted \"" + mp.getTitle()
               + "\" (" + mp.getIdentifier().toString() + ") to " + config.getUrl().toString()
-              + ": 200 OK");
+              + ": " + status);
         }
       } else if (status == 418) {
-        logger.warn("Submitted \"" + mp.getTitle() + "\" (" 
+        logger.warn("Submitted \"" + mp.getTitle() + "\" ("
             + mp.getIdentifier().toString() + ") to " + config.getUrl().toString()
             + ": The target claims to be a teapot. "
             + "The Reason for this is probably an insane programmer.");
@@ -188,21 +188,21 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
 
     static {
       OPTIONS = new TreeMap<String, String>();
-      OPTIONS.put(Configuration.PROPERTY_URL, 
+      OPTIONS.put(Configuration.PROPERTY_URL,
           "The URL to which the MediaPackage will be submitted");
-      OPTIONS.put(Configuration.PROPERTY_FORMAT, 
+      OPTIONS.put(Configuration.PROPERTY_FORMAT,
           "The output format for the MediaPackage (default: XML)");
-      OPTIONS.put(Configuration.PROPERTY_ENCODING, 
+      OPTIONS.put(Configuration.PROPERTY_ENCODING,
           "Message Encoding (default: UTF-8)");
-      OPTIONS.put(Configuration.PROPERTY_AUTH, 
+      OPTIONS.put(Configuration.PROPERTY_AUTH,
           "The authentication method to use (no/http-digest)");
-      OPTIONS.put(Configuration.PROPERTY_AUTHUSER, 
+      OPTIONS.put(Configuration.PROPERTY_AUTHUSER,
           "The username to use for authentication");
-      OPTIONS.put(Configuration.PROPERTY_AUTHPASSWD, 
+      OPTIONS.put(Configuration.PROPERTY_AUTHPASSWD,
           "The password to use for authentication");
-      OPTIONS.put(Configuration.PROPERTY_DEBUG, 
+      OPTIONS.put(Configuration.PROPERTY_DEBUG,
           "If this options is set the message body returned by target host is dumped to log (default: no)");
-      OPTIONS.put(Configuration.PROPERTY_MEDIAPACKAGE_TYPE, 
+      OPTIONS.put(Configuration.PROPERTY_MEDIAPACKAGE_TYPE,
           "Type of Mediapackage to send (workflow, search; default: search)");
     }
 

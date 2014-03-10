@@ -53,7 +53,7 @@ public class CaptureDeviceBin {
 
   /***
    * Creates a bin that contains a complete pipeline from Producer to all Consumers for a capture device.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           Thrown if any of the GStreamer Elements for the Producers or Consumers fails to Link together.
    * @throws UnableToCreateGhostPadsForBinException
@@ -71,16 +71,16 @@ public class CaptureDeviceBin {
    *           Thrown if a GStreamer Element can't be created because the platform it is running on doesn't support it
    *           or the necessary GStreamer module is not installed.
    */
-  public CaptureDeviceBin(CaptureDevice captureDevice, Properties properties, boolean confidenceOnly) 
+  public CaptureDeviceBin(CaptureDevice captureDevice, Properties properties, boolean confidenceOnly)
           throws UnableToLinkGStreamerElementsException, UnableToCreateGhostPadsForBinException,
           UnableToSetElementPropertyBecauseElementWasNullException, NoConsumerFoundException,
           CaptureDeviceNullPointerException, UnableToCreateElementException, NoProducerFoundException {
     this(captureDevice, properties, false, null);
   }
-          
+
   /***
    * Creates a bin that contains a complete pipeline from Producer to all Consumers for a capture device.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           Thrown if any of the GStreamer Elements for the Producers or Consumers fails to Link together.
    * @throws UnableToCreateGhostPadsForBinException
@@ -98,34 +98,34 @@ public class CaptureDeviceBin {
    *           Thrown if a GStreamer Element can't be created because the platform it is running on doesn't support it
    *           or the necessary GStreamer module is not installed.
    */
-  public CaptureDeviceBin(CaptureDevice captureDevice, Properties properties, 
+  public CaptureDeviceBin(CaptureDevice captureDevice, Properties properties,
           boolean confidenceOnly, MonitoringListener monitorinListener)
           throws UnableToLinkGStreamerElementsException, UnableToCreateGhostPadsForBinException,
           UnableToSetElementPropertyBecauseElementWasNullException, NoConsumerFoundException,
           CaptureDeviceNullPointerException, UnableToCreateElementException, NoProducerFoundException {
-            
+
     this.captureDevice = captureDevice;
     if (isFile()) {
       // if captureDevice is a file (or capture card with hardware encoding element) set ProducerType to FILE
-      this.captureDevice = new CaptureDevice(captureDevice.getLocation(), 
+      this.captureDevice = new CaptureDevice(captureDevice.getLocation(),
               ProducerType.FILE, captureDevice.getFriendlyName(), captureDevice.getOutputPath());
       this.captureDevice.setProperties(captureDevice.getProperties());
     }
     createProducer(this.captureDevice, properties);
-    
+
     if (!confidenceOnly) {
       // pass if captureagent should capture
       createConsumers(this.captureDevice, properties);
       createRTPSinkConsumer(captureDevice, properties);
     }
-    
+
     createMontoringConsumer(this.captureDevice, properties, monitorinListener);
     linkProducerToConsumers();
   }
-  
+
   /***
    * Creates a bin that contains a complete pipeline from Producer to all Consumers for a capture device.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           Thrown if any of the GStreamer Elements for the Producers or Consumers fails to Link together.
    * @throws UnableToCreateGhostPadsForBinException
@@ -146,19 +146,19 @@ public class CaptureDeviceBin {
           throws UnableToLinkGStreamerElementsException, UnableToCreateGhostPadsForBinException,
           UnableToSetElementPropertyBecauseElementWasNullException, NoConsumerFoundException,
           CaptureDeviceNullPointerException, UnableToCreateElementException, NoProducerFoundException {
-          
+
     this(captureDevice, properties, false);
   }
-  
+
   /**
-   * Returns true if {@link captureDevice} is a file or 
+   * Returns true if {@link captureDevice} is a file or
    * a Hauppauge card and no codec and container properties are set
    * (so that we take advantage of the onboard mpeg encoding  and don't do it in software).
-   * 
+   *
    * @return true if {@link captureDevice} is a file.
    */
   private boolean isFile() {
-    return captureDevice.getName() == ProducerType.FILE 
+    return captureDevice.getName() == ProducerType.FILE
             || (captureDevice.getName() == ProducerType.HAUPPAUGE_WINTV
             && captureDevice.getProperties().getProperty("codec") == null
             && captureDevice.getProperties().getProperty("container") == null);
@@ -166,7 +166,7 @@ public class CaptureDeviceBin {
 
   /**
    * Creates the Producer that will be used for this Capture Device
-   * 
+   *
    * @param captureDevice
    *          The details of the capture device.
    * @param properties
@@ -188,13 +188,13 @@ public class CaptureDeviceBin {
           throws UnableToLinkGStreamerElementsException, UnableToCreateGhostPadsForBinException,
           UnableToSetElementPropertyBecauseElementWasNullException, CaptureDeviceNullPointerException,
           UnableToCreateElementException, NoProducerFoundException {
-          
+
     producerBin = ProducerFactory.getInstance().getProducer(captureDevice, properties);
   }
 
   /**
    * Creates the Consumers that will be used for this Capture Device
-   * 
+   *
    * @param captureDevice
    *          The details of the capture device.
    * @param properties
@@ -226,10 +226,10 @@ public class CaptureDeviceBin {
     }
   }
 
-  
+
   /**
    * Creates a filesink Consumer for this Producer that will save the media to a file.
-   * 
+   *
    * @param captureDevice
    *          The details of the capture device.
    * @param properties
@@ -263,10 +263,10 @@ public class CaptureDeviceBin {
     }
     consumerBins.add(consumerBin);
   }
-  
+
   /**
    * Creates an RTP Consumer that will stream audio and/or video-data over the network as RTP and RTCP Stream.
-   * 
+   *
    * @param captureDevice
    *          The details of the capture device.
    * @param properties
@@ -288,15 +288,15 @@ public class CaptureDeviceBin {
           throws NoConsumerFoundException, UnableToLinkGStreamerElementsException,
           UnableToCreateGhostPadsForBinException, UnableToSetElementPropertyBecauseElementWasNullException,
           CaptureDeviceNullPointerException, UnableToCreateElementException {
-    
+
     ConsumerBin consumerBin = null;
     String prefix = CaptureParameters.CAPTURE_DEVICE_PREFIX + captureDevice.getFriendlyName();
-    
+
     if (properties.containsKey(prefix + CaptureParameters.CAPTURE_RTP_AUDIO_CONSUMER_RTP_PORT)
             || properties.containsKey(prefix + CaptureParameters.CAPTURE_RTP_VIDEO_CONSUMER_RTP_PORT)) {
-      
+
       logger.info("Create a {} RTP consumer!", captureDevice.getFriendlyName());
-              
+
       consumerBin = ConsumerFactory.getInstance().getSink(ConsumerType.RTP_SINK, captureDevice, properties);
       consumerBins.add(consumerBin);
     }
@@ -309,10 +309,10 @@ public class CaptureDeviceBin {
     logger.debug("Using Custom Consumer");
     consumerBins.add(ConsumerFactory.getInstance().getSink(ConsumerType.CUSTOM_CONSUMER, captureDevice, properties));
   }
-  
+
   /**
    * Creates an XVImagesink Consumer for this Producer that will show the video input in real time.
-   * 
+   *
    * @param captureDevice
    *          The details of the capture device.
    * @param properties
@@ -342,7 +342,7 @@ public class CaptureDeviceBin {
       }
     }
   }
-  
+
   /**
    * Creates an monitoring Consumer for capture device described in {@code captureDevice}.
    * @param captureDevice
@@ -362,27 +362,27 @@ public class CaptureDeviceBin {
    * @throws NoProducerFoundException
    *           Thrown if the captureDevice.getName returns a ConsumerType that unrecognized.
    */
-  private void createMontoringConsumer(CaptureDevice captureDevice, Properties properties, 
-          MonitoringListener monitoringListener) 
-          throws UnableToLinkGStreamerElementsException, UnableToCreateGhostPadsForBinException, 
-          UnableToSetElementPropertyBecauseElementWasNullException, CaptureDeviceNullPointerException, 
+  private void createMontoringConsumer(CaptureDevice captureDevice, Properties properties,
+          MonitoringListener monitoringListener)
+          throws UnableToLinkGStreamerElementsException, UnableToCreateGhostPadsForBinException,
+          UnableToSetElementPropertyBecauseElementWasNullException, CaptureDeviceNullPointerException,
           UnableToCreateElementException, NoConsumerFoundException {
 
-    
+
     if (!producerBin.captureDeviceProperties.isConfidence() || monitoringListener == null) return;
-    
+
     if (producerBin.isAudioDevice()) {
       consumerBins.add(ConsumerFactory.getInstance().getSink(ConsumerType.AUDIO_MONITORING_SINK, captureDevice, properties));
-    } 
+    }
     if (producerBin.isVideoDevice()) {
       ConsumerBin videoMonitoringBin = ConsumerFactory.getInstance().getSink(ConsumerType.VIDEO_MONITORING_SINK, captureDevice, properties);
       consumerBins.add(videoMonitoringBin);
-      
+
       if (videoMonitoringBin instanceof VideoMonitoringConsumer) {
         ((VideoMonitoringConsumer)videoMonitoringBin).registerVideoLocation(monitoringListener);
       }
     }
-    
+
     if (producerBin.isAudioDevice() && producerBin.isVideoDevice()) {
       monitoringListener.registerDevice(captureDevice.getFriendlyName(), MonitoringListener.DeviceType.AV);
     } else {
@@ -394,10 +394,10 @@ public class CaptureDeviceBin {
       }
     }
   }
-  
+
   /**
    * Link the Producer to a tee and create new pads for the tee to connect it to each Consumer.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           If linking between the Producer, Tee or Consumer fails then this Exception is thrown.
    * @throws UnableToCreateElementException
@@ -413,7 +413,7 @@ public class CaptureDeviceBin {
 
   /**
    * Link the Producer to the Tee
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           Thrown if the Producer fails to link to the Tee.
    * **/
@@ -425,7 +425,7 @@ public class CaptureDeviceBin {
 
   /**
    * Link the Tee to each of the Consumers
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           Thrown if the Tee fails to link to one of the Consumers
    * @throws UnableToCreateElementException
@@ -445,7 +445,7 @@ public class CaptureDeviceBin {
 
   /**
    * Link the tee to the Consumer
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           Thrown if the Consumer fails to link to the tee.
    * **/

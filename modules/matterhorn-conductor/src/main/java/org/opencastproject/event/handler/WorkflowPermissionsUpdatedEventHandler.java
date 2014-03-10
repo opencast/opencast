@@ -92,7 +92,7 @@ public class WorkflowPermissionsUpdatedEventHandler {
 
   /**
    * OSGI callback for component activation.
-   * 
+   *
    * @param bundleContext
    *          the OSGI bundle context
    */

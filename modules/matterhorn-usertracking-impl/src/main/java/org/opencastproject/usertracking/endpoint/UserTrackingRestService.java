@@ -82,7 +82,7 @@ public class UserTrackingRestService {
 
   /**
    * Method to set the service this REST endpoint uses
-   * 
+   *
    * @param service
    */
   public void setService(UserTrackingService service) {
@@ -91,7 +91,7 @@ public class UserTrackingRestService {
 
   /**
    * Sets the security service
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -101,7 +101,7 @@ public class UserTrackingRestService {
 
   /**
    * The method that is called, when the service is activated
-   * 
+   *
    * @param cc
    *          The ComponentContext of this service
    */

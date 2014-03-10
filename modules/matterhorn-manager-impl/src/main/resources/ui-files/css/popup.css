@@ -1,0 +1,76 @@
+#background {
+	display:none;
+	z-index:1;
+	position: fixed;
+	height:100%;
+	width:100%;
+	top:0px;
+	left:0px;
+	background:#000000;
+}
+
+#popup {
+	display: none;
+    z-index: 3;
+	position: fixed;
+    width:650px;
+    top: 5%;
+    left: 50%;
+    margin-left: -350px;
+}
+
+#message {
+	display: none;
+    z-index: 5;
+	position: fixed;
+    width:450px;
+    top: 20%;
+    left: 50%;
+    margin-left: -250px;
+}
+
+#messageRestart {
+	display: none;
+    z-index: 5;
+	position: fixed;
+    width:450px;
+    top: 20%;
+    left: 50%;
+    margin-left: -250px;
+}
+
+#messageCert {
+	display: none;
+    z-index: 5;
+	position: fixed;
+    width:450px;
+    top: 20%;
+    left: 50%;
+    margin-left: -250px;
+}
+
+#newWorkflowFile {
+	display: none;
+    z-index: 5;
+	position: fixed;
+    width:450px;
+    top: 20%;
+    left: 50%;
+    margin-left: -250px;
+}
+
+
+div.close {
+    position: relative;
+    top: 5px;
+    height: 30px;
+    width: 30px;
+    left: 27px;
+    background: url("images/close.png") no-repeat scroll 0 0 transparent;
+	float: right;
+	cursor: pointer;
+}
+
+#popup_inhalt {
+    margin: 8px 14px;
+}

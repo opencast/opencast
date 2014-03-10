@@ -56,7 +56,7 @@ public class JaxbSearchResult implements SearchResult {
 
   /**
    * Reads the search result from the input stream.
-   * 
+   *
    * @param xml
    *          the input stream
    * @return the deserialized search result
@@ -72,7 +72,7 @@ public class JaxbSearchResult implements SearchResult {
       IOUtils.closeQuietly(xml);
     }
   }
-  
+
   /** A list of search items. */
   @XmlElement(name = "result")
   private List<JaxbSearchResultItem> resultSet = null;
@@ -106,7 +106,7 @@ public class JaxbSearchResult implements SearchResult {
 
   /**
    * Creates a new and empty search result.
-   * 
+   *
    * @param query
    *          the query
    */
@@ -124,7 +124,7 @@ public class JaxbSearchResult implements SearchResult {
 
   /**
    * Adds an item to the result set.
-   * 
+   *
    * @param item
    *          the item to add
    */
@@ -159,7 +159,7 @@ public class JaxbSearchResult implements SearchResult {
 
   /**
    * Set the offset.
-   * 
+   *
    * @param offset
    *          The offset.
    */
@@ -174,7 +174,7 @@ public class JaxbSearchResult implements SearchResult {
 
   /**
    * Set the limit.
-   * 
+   *
    * @param limit
    *          The limit.
    */
@@ -189,7 +189,7 @@ public class JaxbSearchResult implements SearchResult {
 
   /**
    * Set the search time.
-   * 
+   *
    * @param searchTime
    *          The time in ms.
    */
@@ -199,7 +199,7 @@ public class JaxbSearchResult implements SearchResult {
 
   /**
    * Sets the total hit count.
-   * 
+   *
    * @param total
    *          the total hit count
    */

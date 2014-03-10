@@ -19,13 +19,13 @@ package org.opencastproject.capture.impl;
  * Capture Agent class should implement this interface to get monitoring updates.
  */
 public interface MonitoringListener {
-  
+
   enum DeviceType {
     AUDIO,
     VIDEO,
     AV
   }
-  
+
   void registerDevice(String deviceFriendlyName, DeviceType type);
   void setMonitoringVideoLocation(String deviceFriendlyName, String monitoringVideoLocation);
   void addRmsValue(String deviceFriendlyName, long timestamp, double rmsValue);

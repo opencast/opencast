@@ -34,27 +34,27 @@ import org.gstreamer.event.EOSEvent;
 import java.util.Properties;
 
 /**
- * Producer Bin is the ancestor for every device or file supported but gstreamer capture. 
+ * Producer Bin is the ancestor for every device or file supported but gstreamer capture.
  */
 public abstract class ProducerBin extends PartialBin {
-  
+
   public static final String GHOST_PAD_NAME = GStreamerProperties.SRC;
   protected Element queue;
 
   /**
    * ProducerBin is the super class for all sources for matterhorn including both audio and video sources.
-   * 
+   *
    * To inherit to create a new ProducerBin:
-   * 
+   *
    * 1. Override createElements to create any additional GStreamer Elements, override setElementProperties to set any
    * properties you need to on the aforementioned GStreamer Elements, Add all the Elements you need in the Bin by
    * overriding addElementsToBin, finally override linkElements and link together all of the Elements you need to
    * capture from the source.
-   * 
+   *
    * 2. Override getSrcPad with the last GStreamer Element in your pipeline to get data from this source and change it
    * into something the gstreamer pipeline can use raw. This will be used to create the ghostpads for the ProducerBin
    * which will be used to connect this Producer to its Consumers such as filesinks, confidence monitoring etc.
-   * 
+   *
    * @param captureDevice
    *          The details of the capture device in the configuration file we are dealing with.
    * @param confidenceMonitoringProperties
@@ -79,7 +79,7 @@ public abstract class ProducerBin extends PartialBin {
 
   /**
    * Create all elements necessary by all capture devices, in this case a queue.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           Thrown if the queue cannot be created.
    **/
@@ -91,7 +91,7 @@ public abstract class ProducerBin extends PartialBin {
 
   /**
    * Create the Ghost Pads necessary to link the source to the tee in the @code{CaptureDeviceBin}.
-   * 
+   *
    * @throws UnableToCreateGhostPadsForBinException
    *           Thrown if Ghost Pads cannot be created.
    **/
@@ -106,12 +106,12 @@ public abstract class ProducerBin extends PartialBin {
   /**
    * Abstract method so that we can get Element we will use to create the ghost pads for this Producer. If you are
    * creating a Producer just return the last Element in your pipeline with an available src pad.
-   * 
+   *
    * @throws UnableToCreateGhostPadsForBinException
    *           Thrown if the ghost pads cannot be created
    */
   protected abstract Pad getSrcPad() throws UnableToCreateGhostPadsForBinException;
-  
+
   /** Sends an EOS event to all of the sources within the Bin. **/
   public void shutdown() {
     /**

@@ -33,27 +33,27 @@ import org.opencastproject.capture.pipeline.bins.UnableToSetElementPropertyBecau
  * Audio monitoring consumer bin.
  */
 public class AudioMonitoringConsumer extends ConsumerBin {
-  
+
   public static final String LEVEL_NAME_PREFIX = "level-";
-  
+
   /** 1 sec = 1000000000 nanosec */
   public static final long GST_NANOSECONDS = 1000000000L;
-    
+
   private Element decodebin;
   private Element level;
   private Element fakesink;
 
   /**
-   * Create an audio monitoring consumer bin. 
-   * Gstreamer level element generate messages about raw audio data. We catch them 
-   * from bus to get the rms value from. 
-   * 
+   * Create an audio monitoring consumer bin.
+   * Gstreamer level element generate messages about raw audio data. We catch them
+   * from bus to get the rms value from.
+   *
    * @param captureDevice
    *          This is the properties such as codec, container, bitrate etc. of the capture device output.
-   * 
+   *
    * @param properties
    *          This is the confidence monitoring properties
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           If there is a problem linking any of the Elements together that make up the SinkBin this Exception will
    *           be thrown
@@ -71,20 +71,20 @@ public class AudioMonitoringConsumer extends ConsumerBin {
    *           If the current setup is not able to create an Element because either that Element is specific to another
    *           OS or because the module for that Element is not installed this Exception is thrown.
    */
-  public AudioMonitoringConsumer(CaptureDevice captureDevice, Properties properties) 
-          throws UnableToLinkGStreamerElementsException, 
-          UnableToCreateGhostPadsForBinException, 
-          UnableToSetElementPropertyBecauseElementWasNullException, 
-          CaptureDeviceNullPointerException, 
+  public AudioMonitoringConsumer(CaptureDevice captureDevice, Properties properties)
+          throws UnableToLinkGStreamerElementsException,
+          UnableToCreateGhostPadsForBinException,
+          UnableToSetElementPropertyBecauseElementWasNullException,
+          CaptureDeviceNullPointerException,
           UnableToCreateElementException {
-            
+
     super(captureDevice, properties);
   }
-  
+
   /**
    * {@inheritDoc}
-   * 
-   * @see org.opencastproject.capture.pipeline.bins.consumers.ConsumerBin#getSrc() 
+   *
+   * @see org.opencastproject.capture.pipeline.bins.consumers.ConsumerBin#getSrc()
    */
   @Override
   public Element getSrc() {
@@ -92,10 +92,10 @@ public class AudioMonitoringConsumer extends ConsumerBin {
   }
 
   /**
-   * Create queue, decodebin, level and fakesink gstreamer elements. 
-   * 
-   * @throws UnableToCreateElementException 
-   *        Thrown if the Element cannot be created because the Element 
+   * Create queue, decodebin, level and fakesink gstreamer elements.
+   *
+   * @throws UnableToCreateElementException
+   *        Thrown if the Element cannot be created because the Element
    *        doesn't exist on this machine.
    */
   @Override
@@ -107,12 +107,12 @@ public class AudioMonitoringConsumer extends ConsumerBin {
     fakesink = GStreamerElementFactory.getInstance().createElement(captureDevice.getFriendlyName(),
             GStreamerElements.FAKESINK, null);
   }
-  
+
   /**
-   * Set level element interval property. 
-   * 
+   * Set level element interval property.
+   *
    * @throws IllegalArgumentException
-   * @throws UnableToSetElementPropertyBecauseElementWasNullException 
+   * @throws UnableToSetElementPropertyBecauseElementWasNullException
    */
   @Override
   protected void setElementProperties() throws IllegalArgumentException,
@@ -123,7 +123,7 @@ public class AudioMonitoringConsumer extends ConsumerBin {
     // interval property in nano sec. (see gstreamer docs)
     level.set(GStreamerProperties.INTERVAL, "" + (interval * GST_NANOSECONDS));
   }
-  
+
   /**
    * Add gstreamer elements to the bin.
    */
@@ -131,11 +131,11 @@ public class AudioMonitoringConsumer extends ConsumerBin {
   protected void addElementsToBin() {
     bin.addMany(decodebin, level, fakesink);
   }
-  
+
   /**
    * Link gstreamer elements.
-   * 
-   * @throws UnableToLinkGStreamerElementsException 
+   *
+   * @throws UnableToLinkGStreamerElementsException
    *        Will be thrown, if the elements can not be linked together.
    */
   @Override
@@ -149,7 +149,7 @@ public class AudioMonitoringConsumer extends ConsumerBin {
         }
       }
     });
-    
+
     if (!level.link(fakesink)) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, level, fakesink);
     }

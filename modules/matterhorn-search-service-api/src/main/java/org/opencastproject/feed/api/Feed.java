@@ -37,24 +37,24 @@ public interface Feed {
         return Atom;
     }
   };
-  
+
   /**
    * Returns the feed type.
-   * 
+   *
    * @return the feed type
    */
   Type getType();
 
   /**
    * Returns the charset encoding of a the feed.
-   * 
+   *
    * @return the charset encoding of the feed
    */
   String getEncoding();
 
   /**
    * Sets the charset encoding of a the feed.
-   * 
+   *
    * @param encoding
    *          the charset encoding of the feed
    */
@@ -74,7 +74,7 @@ public interface Feed {
    * might be on different hosting platforms but be the same item). Also, though rare, there could be multiple items
    * with the same link but a different URI and associated metadata which need to be treated as distinct entities. In
    * the RSS 1.0 case the URI must be a valid RDF URI reference.
-   * 
+   *
    * @return the feed URI, <b>null</b> if none.
    */
   String getUri();
@@ -91,7 +91,7 @@ public interface Feed {
    * might be on different hosting platforms but be the same item). Also, though rare, there could be multiple items
    * with the same link but a different URI and associated metadata which need to be treated as distinct entities. In
    * the RSS 1.0 case the URI must be a valid RDF URI reference.
-   * 
+   *
    * @param uri
    *          the feed URI to set, <b>null</b> if none
    */
@@ -99,21 +99,21 @@ public interface Feed {
 
   /**
    * Get the feed link.
-   * 
+   *
    * @return the feed link
    */
   String getLink();
 
   /**
    * Set the feed link.
-   * 
+   *
    * @param link the link to the feed
    */
   void setLink(String link);
 
   /**
    * Sets the feed title.
-   * 
+   *
    * @param title
    *          the feed title to set, <b>null</b> if none
    */
@@ -121,14 +121,14 @@ public interface Feed {
 
   /**
    * Returns the feed title.
-   * 
+   *
    * @return the feed title, <b>null</b> if none
    */
   Content getTitle();
 
   /**
    * Sets the feed title.
-   * 
+   *
    * @param title
    *          the feed title to set, <b>null</b> if none
    */
@@ -136,14 +136,14 @@ public interface Feed {
 
   /**
    * Returns the entry links.
-   * 
+   *
    * @return the entry links, <b>null</b> if none
    */
   List<Link> getLinks();
 
   /**
    * Sets the entry links.
-   * 
+   *
    * @param links
    *          the entry links to set, <b>null</b> if none
    */
@@ -159,7 +159,7 @@ public interface Feed {
    * might be on different hosting platforms but be the same item). Also, though rare, there could be multiple items
    * with the same link but a different URI and associated metadata which need to be treated as distinct entities. In
    * the RSS 1.0 case the URI must be a valid RDF URI reference.
-   * 
+   *
    * @param link
    *          the link to add
    */
@@ -167,7 +167,7 @@ public interface Feed {
 
   /**
    * Sets the feed description.
-   * 
+   *
    * @param description
    *          the feed description to set, <b>null</b> if none
    */
@@ -175,14 +175,14 @@ public interface Feed {
 
   /**
    * Returns the feed description as a text construct.
-   * 
+   *
    * @return the feed description, <b>null</b> if none
    */
   Content getDescription();
 
   /**
    * Sets the feed description as a text construct.
-   * 
+   *
    * @param description
    *          the feed description to set, <b>null</b> if none
    */
@@ -192,7 +192,7 @@ public interface Feed {
    * Returns the feed published date.
    * <p>
    * This method is a convenience method, it maps to the Dublin Core module date.
-   * 
+   *
    * @return the feed published date, <b>null</b> if none
    */
   Date getPublishedDate();
@@ -201,7 +201,7 @@ public interface Feed {
    * Sets the feed published date.
    * <p>
    * This method is a convenience method, it maps to the Dublin Core module date.
-   * 
+   *
    * @param publishedDate
    *          the feed published date to set, <b>null</b> if none
    */
@@ -212,7 +212,7 @@ public interface Feed {
    * <p>
    * For Atom feeds, this returns the authors as a list of SyndPerson objects, for RSS feeds this method is a
    * convenience method, it maps to the Dublin Core module creator.
-   * 
+   *
    * @return the feed authors, <b>null</b> if none
    */
   List<Person> getAuthors();
@@ -222,7 +222,7 @@ public interface Feed {
    * <p>
    * For Atom feeds, this sets the authors as a list of SyndPerson objects, for RSS feeds this method is a convenience
    * method, it maps to the Dublin Core module creator.
-   * 
+   *
    * @param authors
    *          the feed authors to set, <b>null</b> if none
    */
@@ -233,7 +233,7 @@ public interface Feed {
    * <p>
    * For Atom feeds, this adds the author to a list of Person objects, for RSS feeds this method is a convenience
    * method, it maps to the Dublin Core module creator.
-   * 
+   *
    * @param author
    *          the feed author to add
    */
@@ -243,14 +243,14 @@ public interface Feed {
    * Returns the feed contributors.
    * <p>
    * For Atom feeds, this returns the contributors as a list of Person objects.
-   * 
+   *
    * @return the feed contributors, <b>null</b> if none
    */
   List<Person> getContributors();
 
   /**
    * Sets the feed contributors.
-   * 
+   *
    * @param contributors
    *          the feed contributors to set, <b>null</b> if none
    */
@@ -258,7 +258,7 @@ public interface Feed {
 
   /**
    * Adds a feed contributor.
-   * 
+   *
    * @param contributor
    *          the contributor to add
    */
@@ -268,7 +268,7 @@ public interface Feed {
    * Returns the feed copyright.
    * <p>
    * This method is a convenience method, it maps to the Dublin Core module rights.
-   * 
+   *
    * @return the feed copyright, <b>null</b> if none
    */
   String getCopyright();
@@ -277,7 +277,7 @@ public interface Feed {
    * Sets the feed copyright.
    * <p>
    * This method is a convenience method, it maps to the Dublin Core module rights.
-   * 
+   *
    * @param copyright
    *          the feed copyright to set, <b>null</b> if none
    */
@@ -285,14 +285,14 @@ public interface Feed {
 
   /**
    * Returns the feed image.
-   * 
+   *
    * @return the feed image, <b>null</b> if none
    */
   Image getImage();
 
   /**
    * Sets the feed image.
-   * 
+   *
    * @param image
    *          the feed image to set, <b>null</b> if none
    */
@@ -302,7 +302,7 @@ public interface Feed {
    * Returns the feed categories.
    * <p>
    * This method is a convenience method, it maps to the Dublin Core module subjects.
-   * 
+   *
    * @return a list of SyndCategoryImpl elements with the feed categories, an empty list if none
    */
   List<Category> getCategories();
@@ -311,7 +311,7 @@ public interface Feed {
    * Sets the feed categories.
    * <p>
    * This method is a convenience method, it maps to the Dublin Core module subjects.
-   * 
+   *
    * @param categories
    *          the list of SyndCategoryImpl elements with the feed categories to set, an empty list or <b>null</b> if
    *          none
@@ -320,14 +320,14 @@ public interface Feed {
 
   /**
    * Returns the feed entries.
-   * 
+   *
    * @return a list of FeedEntry elements with the feed entries, an empty list if none.
    */
   List<FeedEntry> getEntries();
 
   /**
    * Sets the feed entries.
-   * 
+   *
    * @param entries
    *          the list of FeedEntry elements with the feed entries to set, an empty list or <b>null</b> if none
    */
@@ -335,7 +335,7 @@ public interface Feed {
 
   /**
    * Adds a feed entry.
-   * 
+   *
    * @param entry
    *          the feed entry to add
    */
@@ -345,7 +345,7 @@ public interface Feed {
    * Returns the feed language.
    * <p>
    * This method is a convenience method, it maps to the Dublin Core module language.
-   * 
+   *
    * @return the feed language, <b>null</b> if none
    */
   String getLanguage();
@@ -354,7 +354,7 @@ public interface Feed {
    * Sets the feed language.
    * <p>
    * This method is a convenience method, it maps to the Dublin Core module language.
-   * 
+   *
    * @param language
    *          the feed language to set, <b>null</b> if none
    */
@@ -362,7 +362,7 @@ public interface Feed {
 
   /**
    * Returns the module identified by a given URI.
-   * 
+   *
    * @param uri
    *          the URI of the module
    * @return The module with the given URI, <b>null</b> if none
@@ -371,14 +371,14 @@ public interface Feed {
 
   /**
    * Returns the feed modules.
-   * 
+   *
    * @return a list of module elements with the feed modules, an empty list if none
    */
   List<FeedExtension> getModules();
 
   /**
    * Sets the feed modules.
-   * 
+   *
    * @param modules
    *          the list of module elements with the feed modules to set, an empty list or <b>null</b> if none
    */
@@ -386,26 +386,26 @@ public interface Feed {
 
   /**
    * Adds the feed module.
-   * 
+   *
    * @param module
    *          the module to add
    */
   void addModule(FeedExtension module);
-  
+
   /**
    * Returns the feed updated date.
    * <p>
    * This method is a convenience method, it maps to the Dublin Core module date.
-   * 
+   *
    * @return the feed updated date, <b>null</b> if none
    */
   Date getUpdatedDate();
 
   /**
-   * Sets the feed updated date, which is needed for a valid Atom feed. 
+   * Sets the feed updated date, which is needed for a valid Atom feed.
    * <p>
    * This method is a convenience method, it maps to the Dublin Core module date.
-   * 
+   *
    * @param updatedDate
    *          the feed updated date to set, <b>null</b> if none
    */

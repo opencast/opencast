@@ -61,7 +61,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
 
   /**
    * Returns the binary used to provide media inspection functionality.
-   * 
+   *
    * @return the binary
    */
   protected String getBinary() {
@@ -73,7 +73,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
   }
 
   @Override
-  public MediaContainerMetadata analyze(File media) 
+  public MediaContainerMetadata analyze(File media)
   throws MediaAnalyzerException {
 
     if (binary == null)
@@ -116,7 +116,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
       if (obj != null) {
         metadata.setFormat((String) obj);
       }
-      
+
       /* Mediainfo does not return a duration if there is no stream but FFprobe
        * will return 0. For compatibility reasons, check if there are any
        * streams before reading the duration: */
@@ -272,7 +272,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
 
   /**
    * Allows configuration {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.inspection.ffmpeg.api.MediaAnalyzer#setConfig(java.util.Map)
    */
   @Override

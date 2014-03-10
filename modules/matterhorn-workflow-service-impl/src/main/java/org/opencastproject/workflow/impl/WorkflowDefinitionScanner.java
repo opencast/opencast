@@ -65,9 +65,9 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
 
   /**
    * OSGi callback on component activation. private boolean initialized = true;
-   * 
+   *
    * /** OSGi callback on component activation.
-   * 
+   *
    * @param ctx
    *          the bundle context
    */
@@ -77,23 +77,23 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#install(java.io.File)
    */
   public void install(File artifact) throws Exception {
     WorkflowDefinition def = currentWFD;
-    
+
     // If the current workflow definition is null, it means this is a first install and not an update...
     if (def == null) {
       // ... so we have to load the definition first
       def = parseWorkflowDefinitionFile(artifact);
-      
+
       if (def == null) {
         logger.warn("Unable to install workflow from {}", artifact.getAbsolutePath());
         artifactsWithError.add(artifact);
         return;
       }
-    } 
+    }
 
     logger.info("Installing workflow from file {}", artifact.getAbsolutePath());
     artifactsWithError.remove(artifact);
@@ -106,9 +106,9 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
         return name.endsWith(".xml");
       }
     });
-    
+
     logger.info("Worfkflow definition '{}' from file {} installed", def.getId(), artifact.getAbsolutePath());
-    
+
     // Once all profiles have been loaded, announce readiness
     if ((filesInDirectory.length - artifactsWithError.size()) == artifactIds.size() && !isWFSinitiliazed) {
       logger.info("{} Workflow definitions loaded, activating Workflow service", filesInDirectory.length - artifactsWithError.size());
@@ -122,7 +122,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#uninstall(java.io.File)
    */
   public void uninstall(File artifact) throws Exception {
@@ -136,7 +136,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#update(java.io.File)
    */
   public void update(File artifact) throws Exception {
@@ -151,7 +151,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
 
   /**
    * Parse the given workflow definition file and return the related workflow definition
-   * 
+   *
    * @param artifact
    *          The workflow definition file to parse
    * @return the workflow definition if the given contained a valid one, or null if the file can not be parsed.
@@ -174,7 +174,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
 
   /**
    * Gets the workflow definitions with the given id.
-   * 
+   *
    * @param id
    * @return the workflow definition if exist or null
    */
@@ -184,7 +184,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
 
   /**
    * Get the list of installed workflow definitions.
-   * 
+   *
    * @return the collection of installed workflow definitions id
    */
   public Map<String, WorkflowDefinition> getWorkflowDefinitions() {
@@ -193,7 +193,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
 
   /**
    * Add the given workflow definition to the installed workflow definition id.
-   * 
+   *
    * @param id
    *          the id of the workflow definition to add
    * @param wfd
@@ -205,7 +205,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
 
   /**
    * Remove the workflow definition with the given id from the installed definition list.
-   * 
+   *
    * @param id
    *          the workflow definition id
    * @return the removed workflow definition
@@ -216,7 +216,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactListener#canHandle(java.io.File)
    */
   public boolean canHandle(File artifact) {

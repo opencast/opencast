@@ -4,7 +4,7 @@
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
   <packaging>pom</packaging>
-  <version>1.5-SNAPSHOT</version>
+  <version>1.6-SNAPSHOT</version>
   <name>matterhorn</name>
   <description>The Opencast Project's Matterhorn software is a media capture, processing, and distribution system</description>
   <url>http://opencastproject.org</url>
@@ -30,6 +30,9 @@
       <id>admin</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-admin-ui</module>
@@ -87,6 +90,9 @@
       <id>analytics</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-analytics-impl</module>
@@ -108,6 +114,9 @@
       <id>export-admin</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -124,6 +133,9 @@
       <id>export-worker</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-gstreamer-service-api</module>
@@ -135,6 +147,9 @@
       <id>export-all-in-one</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -151,6 +166,9 @@
       <id>ingest</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -180,6 +198,9 @@
       <id>ingest-standalone</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -201,7 +222,7 @@
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
-        <module>modules/matterhorn-workflow-service-remote</module>   
+        <module>modules/matterhorn-workflow-service-remote</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-working-file-repository-service-impl</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -213,6 +234,9 @@
       <id>dist-standalone</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -245,6 +269,9 @@
       <id>dist</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -277,6 +304,9 @@
       <id>dist-stub</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -305,6 +335,9 @@
       <id>engage</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-annotation-api</module>
@@ -339,6 +372,9 @@
       <id>engage-standalone</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-annotation-api</module>
@@ -373,6 +409,9 @@
       <id>engage-stub</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -402,6 +441,9 @@
       <id>worker</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -412,7 +454,7 @@
         <module>modules/matterhorn-composer-ffmpeg</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dictionary-api</module>
-        <module>modules/matterhorn-dictionary-impl</module>
+        <module>modules/matterhorn-dictionary-textcorpora</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-inspection-service-impl</module>
@@ -445,6 +487,9 @@
       <id>worker-standalone</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -455,7 +500,7 @@
         <module>modules/matterhorn-composer-ffmpeg</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dictionary-api</module>
-        <module>modules/matterhorn-dictionary-impl</module>
+        <module>modules/matterhorn-dictionary-textcorpora</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-inspection-service-impl</module>
@@ -488,6 +533,9 @@
       <id>worker-stub</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
@@ -520,6 +568,9 @@
       <id>workspace</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -535,6 +586,9 @@
       <id>workspace-stub</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -550,6 +604,9 @@
       <id>serviceregistry</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -564,6 +621,9 @@
       <id>serviceregistry-stub</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -577,6 +637,9 @@
       <id>oaipmh</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -598,6 +661,9 @@
       <id>directory-db</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -616,6 +682,9 @@
       <id>directory-ldap</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -629,6 +698,9 @@
       <id>directory-cas</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-security-cas</module>
@@ -639,6 +711,9 @@
       <id>directory-openid</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-security-openid</module>
@@ -649,6 +724,9 @@
       <id>directory-shibboleth</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-security-shibboleth</module>
@@ -659,6 +737,9 @@
       <id>capture</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -676,9 +757,26 @@
     </profile>
 
     <profile>
+      <id>server-management</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-manager-api</module>
+        <module>modules/matterhorn-manager-impl</module>
+      </modules>
+    </profile>
+
+    <profile>
       <id>test</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>tests</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-test-harness</module>
@@ -717,6 +815,11 @@
       <id>test-performance</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <!-- They don't work at all
+        <property>
+          <name>tests</name>
+        </property>
+        -->
       </activation>
       <build>
         <plugins>
@@ -759,6 +862,9 @@
       <id>test-load</id>
       <activation>
         <activeByDefault>false</activeByDefault>
+        <property>
+          <name>tests</name>
+        </property>
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
@@ -769,6 +875,37 @@
         <module>modules/matterhorn-static</module>
         <module>modules/matterhorn-webconsole</module>
       </modules>
+    </profile>
+
+    <profile>
+      <id>sign</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>sign</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <configuration>
+                  <useAgent>true</useAgent>
+                </configuration>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 
@@ -1030,11 +1167,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
           <version>2.4.2</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-gpg-plugin</artifactId>
-          <version>1.0-alpha-4</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -2243,7 +2375,7 @@
       <releases>
         <enabled>false</enabled>
       </releases>
-    </repository>    
+    </repository>
     <repository>
       <id>sakai</id>
       <name>Sakai Repo</name>

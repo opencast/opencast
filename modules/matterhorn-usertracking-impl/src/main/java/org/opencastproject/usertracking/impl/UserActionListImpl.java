@@ -59,7 +59,7 @@ public class UserActionListImpl implements UserActionList {
       add((UserActionImpl)userAction);
     }
   }
-  
+
   /**
    * A no-arg constructor needed by JAXB
    */
@@ -82,15 +82,15 @@ public class UserActionListImpl implements UserActionList {
   public int getTotal() {
     return total;
   }
-  
+
   public int getLimit() {
     return limit;
   }
-  
+
   public int getOffset() {
     return offset;
   }
-  
+
   public List<UserAction> getUserActions() {
     List<UserAction> userActions = new LinkedList<UserAction>();
     for (UserActionImpl userActionImpl : actions) {

@@ -10,12 +10,11 @@ source "${HOME3P}/utilx"
 compile base_libs    linux || exit 1
 compile ffmpeg_libs  linux || exit 1
 compile ffmpeg       linux || exit 1
+compile sox_libs     linux || exit 1
+compile sox          linux || exit 1
 compile gstreamer    linux || exit 1
 compile mediainfo    linux || exit 1
-compile ocropus_libs linux || exit 1
-# tesseract depends on leptonica and gif
 compile tesseract    linux || exit 1
-compile ocropus      linux || exit 1
 compile qtembedder   linux || exit 1
 #
 exit 0

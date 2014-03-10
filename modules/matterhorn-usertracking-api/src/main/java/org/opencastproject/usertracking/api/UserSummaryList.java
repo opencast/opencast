@@ -20,15 +20,15 @@ import java.util.List;
 
 /**
  * A List of {@link UserSummary}s
- * 
+ *
  */
 public interface UserSummaryList {
-  
+
   void add(UserSummary userSummary);
-  
+
   void add(Collection<UserSummary> userSummaries);
-  
+
   int getTotal();
-  
+
   List<UserSummary> getUserSummaries();
 }

@@ -56,7 +56,7 @@ public class SchedulerImplTest {
   private String directory = "scheduler-restart-test";
   private static final Logger logger = LoggerFactory.getLogger(SchedulerImplTest.class);
   private WaitForState waiter;
-  
+
   @Before
   public void setUp() {
     Properties properties = setupCaptureProperties();
@@ -147,7 +147,7 @@ public class SchedulerImplTest {
   /**
    * Sets up a set of valid calendar times. Assumes edge case calendar is being used, but values will still be usable by
    * 'normal' calendars
-   * 
+   *
    * @throws IOException
    * @throws ConfigurationException
    */
@@ -282,7 +282,7 @@ public class SchedulerImplTest {
     configurationManager.setItem(CaptureParameters.CAPTURE_SCHEDULE_CACHE_URL, null);
     schedulerImpl = new SchedulerImpl(schedulerProperties, configurationManager, captureAgentImpl);
     schedulerImpl.updateCalendar();
-    
+
     String[] schedule = null;
     schedule = schedulerImpl.getCaptureSchedule();
     Assert.assertEquals(1, schedule.length);
@@ -509,7 +509,7 @@ public class SchedulerImplTest {
     String[] schedule = schedulerImpl.getCaptureSchedule();
     Assert.assertEquals(0, schedule.length);
   }
-  
+
   @Test
   public void testValidRemoteDuplicateCalendar() throws IOException, ConfigurationException {
     String[] times = setupValidTimes(new Date(System.currentTimeMillis() + 2 * CaptureParameters.HOURS
@@ -761,31 +761,31 @@ public class SchedulerImplTest {
     schedulerImpl = new SchedulerImpl(schedulerProperties, configurationManager, captureAgentImpl);
     Assert.assertEquals(2, schedulerImpl.getCaptureSchedule().length);
   }
-  
+
   @Test
   public void testRestartingCaptureDoesStartWithNoMediaFiles() throws IOException, ConfigurationException,
           InterruptedException {
     // Unused test that should test the ability of the capture agent to skip starting a capture late if there has
-    // already been captured media. 
+    // already been captured media.
     setupFakeMediaPackageWithoutMediaFiles();
     setupThreeCaptureCalendar(-10, -1, 10);
     captureAgentImpl.activate(null);
     schedulerImpl = new SchedulerImpl(schedulerProperties, configurationManager, captureAgentImpl);
     Assert.assertEquals(2, schedulerImpl.getCaptureSchedule().length);
   }
-  
+
   @Test
   public void testRestartingCaptureDoesntOverwriteExistingCapture() throws IOException, ConfigurationException,
           InterruptedException {
     // Unused test that should test the ability of the capture agent to skip starting a capture late if there has
-    // already been captured media. 
+    // already been captured media.
     setupFakeMediaPackageWithMediaFiles();
     setupThreeCaptureCalendar(-10, -1, 10);
     captureAgentImpl.activate(null);
     schedulerImpl = new SchedulerImpl(schedulerProperties, configurationManager, captureAgentImpl);
     Assert.assertEquals(1, schedulerImpl.getCaptureSchedule().length);
   }
-  
+
   private XProperties loadProperties(String location) throws IOException {
     XProperties props = new XProperties();
     InputStream s = getClass().getClassLoader().getResourceAsStream(location);
@@ -795,7 +795,7 @@ public class SchedulerImplTest {
     props.load(s);
     return props;
   }
-  
+
   public void setupFakeMediaPackageWithoutMediaFiles() {
     // Create the configuration manager
     configurationManager = new ConfigurationManager();
@@ -818,7 +818,7 @@ public class SchedulerImplTest {
       e.printStackTrace();
       Assert.fail();
     }
-    
+
     File uidFile = new File(recordingDir, "2nd-Capture");
     try {
       FileUtils.forceMkdir(uidFile);
@@ -831,7 +831,7 @@ public class SchedulerImplTest {
       e.printStackTrace();
     }
   }
-  
+
   public void setupFakeMediaPackageWithMediaFiles() {
     String directory = "scheduler-restart-test";
     setupFakeMediaPackageWithoutMediaFiles();
@@ -845,7 +845,7 @@ public class SchedulerImplTest {
       e.printStackTrace();
     }
   }
-  
+
   @Test
   public void callingRefreshBeforeUpdateDoesntCauseNullPointerException() throws IOException, ConfigurationException,
           InterruptedException {
