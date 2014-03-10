@@ -16,7 +16,7 @@ if [ -d /Users/Shared/dports/multimedia/ffmpeg ]; then
   [ $? -ne 0 ] && exit 1
 fi
 #
-sudox port -f install ffmpeg || exit 1
+sudox port -f install ffmpeg +nonfree || exit 1
 #
 touch .done-ports
 [ $? -ne 0 ] && exit 1

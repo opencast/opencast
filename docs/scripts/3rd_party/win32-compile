@@ -10,12 +10,11 @@ source "${HOME3P}/utilx"
 compile base_libs    win32 || exit 1
 compile ffmpeg_libs  win32 || exit 1
 compile ffmpeg       win32 || exit 1
+compile sox_libs     win32 || exit 1
+compile sox          win32 || exit 1
 compile gstreamer    win32 || exit 1
 compile mediainfo    win32 || exit 1
-compile ocropus_libs win32 || exit 1
-# tesseract depends on leptonica and gif
 compile tesseract    win32 || exit 1
-compile ocropus      win32 || exit 1
 compile qtembedder   win32 || exit 1
 #
 exit 0

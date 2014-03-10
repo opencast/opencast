@@ -211,7 +211,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     /* Set additional options for tesseract (i.e. language to use) */
     String addopts = (String) cc.getBundleContext().getProperty(TESSERACT_OPTS_CONFIG_KEY);
     if (addopts != null) {
-      logger.info("Setting additional options for Tesseract path to '{}'", addopts);
+      logger.info("Setting additional options for Tesseract to '{}'", addopts);
       this.addOptions = addopts;
     } else {
       logger.info("No additional options for Tesseract");
