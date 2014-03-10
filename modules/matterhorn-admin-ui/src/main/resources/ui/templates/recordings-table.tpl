@@ -13,17 +13,17 @@
         <th id="sortAgent" width="10%" class="ui-widget-header sortable"><div>Capture Agent</div></th>
     	<th id="sortDate" width="10%" class="ui-widget-header sortable"><div>Recording Date &amp; Time<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
     	<% if (ocRecordings.Configuration.state == 'failed') { %>
-			<th id="sortFailDate" width="10%" class="ui-widget-header"><div>Failure Date &amp; Time</div></th>
-		<% } %>
-		<% if (ocRecordings.Configuration.state == 'finished') { %>
-			<th id="sortFailDate" width="10%" class="ui-widget-header"><div>Finished Date &amp; Time</div></th>
-		<% } %>
-		<% if (ocRecordings.Configuration.state == 'hold') { %>
-			<th id="sortFailDate" width="10%" class="ui-widget-header"><div>Hold Date &amp; Time</div></th>
-		<% } %>
-		<% if (ocRecordings.Configuration.state == 'processing') { %>
-			<th id="sortFailDate" width="10%" class="ui-widget-header"><div>Processing Date &amp; Time</div></th>
-		<% } %>
+	<th id="sortFailDate" width="10%" class="ui-widget-header"><div>Failure Date &amp; Time</div></th>
+	<% } %>
+	<% if (ocRecordings.Configuration.state == 'finished') { %>
+	<th id="sortFailDate" width="10%" class="ui-widget-header"><div>Finished Date &amp; Time</div></th>
+	<% } %>
+	<% if (ocRecordings.Configuration.state == 'hold') { %>
+	<th id="sortFailDate" width="10%" class="ui-widget-header"><div>Hold Date &amp; Time</div></th>
+	<% } %>
+	<% if (ocRecordings.Configuration.state == 'processing') { %>
+	<th id="sortFailDate" width="10%" class="ui-widget-header"><div>Processing Date &amp; Time</div></th>
+	<% } %>
     	<th width="10%" class="ui-widget-header">Status</th>
     	<th width="10%" class="ui-widget-header">Action</th>
       </tr>
