@@ -359,10 +359,13 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
   }
 
   /**
-   * 
+   * Finds a suitable audio track from the mediapackage
    * 
    * @param videoTrack
-   * @return
+   *          the video track
+   * @param mediaPackage
+   *          the mediapackage
+   * @return the found audio track
    */
   private Track findAudioTrack(Track videoTrack, MediaPackage mediaPackage) {
     MediaPackageElementFlavor flavor = new MediaPackageElementFlavor("*", videoTrack.getFlavor().getSubtype());

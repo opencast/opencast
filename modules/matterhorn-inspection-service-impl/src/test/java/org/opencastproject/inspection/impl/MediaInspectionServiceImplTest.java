@@ -55,6 +55,7 @@ public class MediaInspectionServiceImplTest {
   public static void setupClass() {
     StreamHelper stdout = null;
     StreamHelper stderr = null;
+    StringBuffer errorBuffer = new StringBuffer();
     Process p = null;
     try {
       // Mediainfo requires a track in order to return a status code of 0, indicating that it is working as expected
@@ -62,7 +63,7 @@ public class MediaInspectionServiceImplTest {
       File f = new File(uriTrack);
       p = new ProcessBuilder(MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT, f.getAbsolutePath()).start();
       stdout = new StreamHelper(p.getInputStream());
-      stderr = new StreamHelper(p.getErrorStream());
+      stderr = new StreamHelper(p.getErrorStream(), errorBuffer);
       int exitCode = p.waitFor();
       stdout.stopReading();
       stderr.stopReading();
@@ -71,6 +72,7 @@ public class MediaInspectionServiceImplTest {
       mediainfoPath = some(MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT);
     } catch (Throwable t) {
       logger.warn("Skipping media inspection tests due to unsatisfied mediainfo installation: " + t.getMessage());
+      logger.warn(errorBuffer.toString());
       mediainfoPath = none();
     } finally {
       IoSupport.closeQuietly(stdout);

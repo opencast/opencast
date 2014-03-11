@@ -41,43 +41,29 @@ stop_matterhorn() {
 	return 0
 }
 
+show_version() {
+	echo -n 'Matterhorn version: '
+	ls $MATTERHORN/lib/matterhorn/matterhorn-common-* | sed 's/^.*matterhorn-common-\(.*\)\.jar/\1/'
+}
+
 
 if [ $# -ne 1 ] || ( [ "$1" != '--daemon' ] && \
-	[ "$1" != '--interactive' ] && [ "$1" != '--quit' ] )
+	[ "$1" != '--interactive' ] && \
+	[ "$1" != '--quit' ] && \
+	[ "$1" != '--version' ] )
 then
 	echo "Usage: $0 [ --daemon | --interactive | --quit | --help ]"
 	echo ''
 	echo 'OPTIONS:'
-	echo '  --daemon       Run Matterhorn as _unmanaged_ daemon.'
+	echo '  --version      Show Matterhorn version and exit.'
+	echo '  --daemon       Run matterhorn as _unmanaged_ daemon.'
 	echo '                 Consider using the SysV init script.'
-	echo '  --interactive  Run Matterhorn in interactive mode.'
-	echo '  --quit         Stop a previously started Matterhorn.'
+	echo '  --interactive  Run matterhorn in interactive mode.'
+	echo '  --quit         Stop a previously started matterhorn.'
 	echo '  --help         Show this message.'
 	exit 0
 fi
 
-# Only root is allowed to start Matterhorn
-[ `id -u` -ne 0 ] && echo "User '`id -un`' has insufficient privilege" && exit 4
-
-
-# Stop Matterhorn if --quit is given
-[ "$1" == "--quit" ] && stop_matterhorn && exit 0
-
-# Check if Matterhorn is already running
-[ -f $pidfile ] && ps p "`cat $pidfile`" &> /dev/null && \
-	echo "Matterhorn already running" && exit 0
-
-# Create the pidfile as quickly as possible after we are sure the user wants to
-# start Matterhorn and after the existence of a pidfile and the associated
-# process was checked. As Matterhorn itself is not running at the moment and
-# the file should contain a pid to check for we use for now the pid of this
-# script:
-echo $$ > $pidfile
-
-
-###
-# The following is for the actual Matterhorn start
-##
 
 # Load default configuration
 MATTERHORN=/usr/share/matterhorn
@@ -106,6 +92,32 @@ fi
 # Load configuration files
 [ -e $config_opt ] && . $config_opt
 [ -e $config ] && . $config
+
+# Show version and exit if --version is given
+[ "$1" == "--version" ] && show_version && exit 0
+
+# Only root is allowed to start Matterhorn
+[ `id -u` -ne 0 ] && echo "User '`id -un`' has insufficient privilege" && exit 4
+
+
+# Stop Matterhorn if --quit is given
+[ "$1" == "--quit" ] && stop_matterhorn && exit 0
+
+# Check if Matterhorn is already running
+[ -f $pidfile ] && ps p "`cat $pidfile`" &> /dev/null && \
+	echo "Matterhorn already running" && exit 0
+
+# Create the pidfile as quickly as possible after we are shure the user wants
+# to start matterhorn and after the existence of a pidfile and the associated
+# process was checked. As matterhorn itself is not running at the moment and
+# the file should contain a pid to check for we use for now the pid of this
+# script:
+echo $$ > $pidfile
+
+
+###
+# The following is for the actual Matterhorn start
+##
 
 FELIX="-Dfelix.home=$MATTERHORN"
 FELIX="${FELIX} -Dfelix.work=$FELIX_WORK_DIR"

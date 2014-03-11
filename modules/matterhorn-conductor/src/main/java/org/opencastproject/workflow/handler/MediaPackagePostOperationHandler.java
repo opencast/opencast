@@ -141,11 +141,11 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
 
       // throw Exception if target host did not return 200
       int status = response.getStatusLine().getStatusCode();
-      if (status == 200) {
+      if ((status >= 200) && (status < 300)) {
         if (config.debug()) {
           logger.info("Successfully submitted \"" + mp.getTitle()
               + "\" (" + mp.getIdentifier().toString() + ") to " + config.getUrl().toString()
-              + ": 200 OK");
+              + ": " + status);
         }
       } else if (status == 418) {
         logger.warn("Submitted \"" + mp.getTitle() + "\" ("
