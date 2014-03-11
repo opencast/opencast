@@ -1,5 +1,0 @@
-URL: http://www.openfst.org/twiki/pub/FST/FstDownload ${USASK_MIRROR}
-PKG: openfst-1.2.8.tar.gz
-SHA: 0cfad53bd45a72f04a58a8b1133dd46cd276b4a2
-DIR: openfst-1.2.8
-PCP: pc-fst.zip

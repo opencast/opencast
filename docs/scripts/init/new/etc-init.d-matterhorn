@@ -14,6 +14,7 @@
 # Provides: matterhorn
 # Required-Start: $local_fs $remote_fs $syslog $network
 # Required-Stop:
+# Default-Start:
 # Default-Stop:
 # Short-Description: run matterhorn
 # Description: Matterhorn is a free, open-source platform to support the
