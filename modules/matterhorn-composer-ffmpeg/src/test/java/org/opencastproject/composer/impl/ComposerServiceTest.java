@@ -94,6 +94,9 @@ public class ComposerServiceTest {
   /** FFmpeg binary location */
   private static final String FFMPEG_BINARY = "ffmpeg";
 
+  /** File pointer to the testing dir to not pollute tmp */
+  private static File testDir = new File("target");
+
   /** True to run the tests */
   private static boolean ffmpegInstalled = true;
 
@@ -142,25 +145,25 @@ public class ComposerServiceTest {
 
     // Copy an existing media file to a temp file
     File f = new File("src/test/resources/slidechanges.mov");
-    source = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mov");
+    source = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mov", testDir);
     FileUtils.copyFile(f, source);
     f = null;
 
     // Create another video only file
     f = new File("src/test/resources/video.mp4");
-    sourceVideoOnly = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mp4");
+    sourceVideoOnly = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mp4", testDir);
     FileUtils.copyFile(f, sourceVideoOnly);
     f = null;
 
     // Create another audio only file
     f = new File("src/test/resources/audio.mp3");
-    sourceAudioOnly = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mp3");
+    sourceAudioOnly = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mp3", testDir);
     FileUtils.copyFile(f, sourceAudioOnly);
     f = null;
 
     // Create an image file
     f = new File("src/test/resources/image.jpg");
-    sourceImage = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".jpg");
+    sourceImage = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".jpg", testDir);
     FileUtils.copyFile(f, sourceImage);
     f = null;
 

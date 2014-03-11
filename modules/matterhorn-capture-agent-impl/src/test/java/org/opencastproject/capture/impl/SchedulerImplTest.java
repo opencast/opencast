@@ -59,7 +59,7 @@ public class SchedulerImplTest {
   private WaitForState waiter;
 
   @Before
-  public void setUp() {
+  public void setUp() throws ConfigurationException {
     removeTestDirectory();
     testDir.mkdirs();
     Properties properties = setupCaptureProperties();
@@ -105,8 +105,9 @@ public class SchedulerImplTest {
     configurationManager.setItem("M2_REPO", getClass().getClassLoader().getResource("m2_repo").getFile());
   }
 
-  private void setupCaptureAgentImpl() {
+  private void setupCaptureAgentImpl() throws ConfigurationException {
     captureAgentImpl = new CaptureAgentImpl();
+    captureAgentImpl.setConfigService(configurationManager);
   }
 
   private void setupSchedulerProperties() {
@@ -139,6 +140,7 @@ public class SchedulerImplTest {
     schedulerImpl = null;
     configurationManager = null;
     schedulerProperties = null;
+    captureAgentImpl.deactivate();
   }
 
   private String formatDate(Date d, long offset) {
@@ -778,7 +780,7 @@ public class SchedulerImplTest {
     setupFakeMediaPackageWithoutMediaFiles();
     File testfile = setupThreeCaptureCalendar(-10, -1, 10);
     captureAgentImpl.activate(null);
-    schedulerImpl = new SchedulerImpl(schedulerProperties, configurationManager, captureAgentImpl);
+    //schedulerImpl = new SchedulerImpl(schedulerProperties, configurationManager, captureAgentImpl);
     Assert.assertEquals(2, schedulerImpl.getCaptureSchedule().length);
     FileUtils.deleteQuietly(testfile);
   }
@@ -791,7 +793,7 @@ public class SchedulerImplTest {
     setupFakeMediaPackageWithMediaFiles();
     File testfile = setupThreeCaptureCalendar(-10, -1, 10);
     captureAgentImpl.activate(null);
-    schedulerImpl = new SchedulerImpl(schedulerProperties, configurationManager, captureAgentImpl);
+    //schedulerImpl = new SchedulerImpl(schedulerProperties, configurationManager, captureAgentImpl);
     Assert.assertEquals(1, schedulerImpl.getCaptureSchedule().length);
     FileUtils.deleteQuietly(testfile);
   }
