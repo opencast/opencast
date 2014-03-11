@@ -6,6 +6,12 @@ requirejs.config({
     plugins: '/engage/plugin/*/static'
   },
   shim: {
+    'bootstrap' : {
+      //script dependencies
+      deps: ['jquery'],
+      //global variable
+      exports: 'Bootstrap'
+    },
     'backbone': {
       //script dependencies
       deps: ['underscore', 'jquery'],

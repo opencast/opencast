@@ -40,11 +40,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
   }
 
   function initPlugin () {
-    Engage.log("TabSlideText: initalizing plugin");
+    Engage.log("TabSlideText: initializing plugin");
     Engage.model.get("mediaPackage").on("change", function() {
       var attachments = this.get("attachments");
       if(attachments) {
-        // Extract segments which type is "segement+preview" out of the model
+        // Extract segments which type is "segment+preview" out of the model
         $(attachments).each(function(index, attachment) {
           if (attachment.mimetype && attachment.type && attachment.type.match(/presentation\/segment\+preview/g) && attachment.mimetype.match(/image/g)) {
             // Pull time string out of the ref property
@@ -53,7 +53,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             if (time.length > 0) {
               segments.push(new Segment(time[0], attachment.url));
             } else {
-              Engage.log("Failure on time evaluation for segement with url: " + attachment.url);
+              Engage.log("Failure on time evaluation for segment with url: " + attachment.url);
             }
           }
         });

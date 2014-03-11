@@ -15,7 +15,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], function (require, $, _, Backbone, EngageModel) {
+define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'engage/engage_tab_logic'], function (require, $, _, Backbone, EngageModel, EngageTabLogic) {
   //
   "use strict"; // strict mode in all our application
   //
@@ -156,14 +156,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
    * BEGIN Private core functions
    */ 
   function addPluginLogic() {
-    // first tab is on startup active
-    $('#engage_tab_nav li:first').addClass("active");
-    $('#engage_tab_content div:first').addClass("active");
-    // click listener to change tab
-    $('#engage_tab_nav a').click(function (e) {
-      e.preventDefault();
-      $(this).tab('show');
-    });
+    EngageTabLogic('tabs', 'engage_tab_nav');
   }
 
   function insertProcessedTemplate(processed_template, plugin_type, plugin_name) {
@@ -172,7 +165,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model'], f
     case "engage_controls":       
       $("#engage_controls").html(processed_template);
       container = "#engage_controls";
-      break;  
+      break;
     case "engage_video":        
       $("#engage_video").html(processed_template);
       container = "#engage_video";
