@@ -979,7 +979,9 @@ public class SchedulerRestService {
    *           if parsing fails
    */
   private DublinCoreCatalog parseDublinCore(String dcXML) throws IOException {
-    return dcService.load(new ByteArrayInputStream(dcXML.getBytes("UTF-8")));
+    // Trim XML string because parsing will fail if there are any chars before XML processing instruction
+    String trimmedDcXml = StringUtils.trim(dcXML);
+    return dcService.load(new ByteArrayInputStream(trimmedDcXml.getBytes("UTF-8")));
   }
 
   /**
