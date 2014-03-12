@@ -79,7 +79,6 @@ public class EncodingProfileImpl implements EncodingProfile {
   @XmlElementWrapper(name = "extensions")
   protected List<Extension> extensions = new ArrayList<Extension>();
 
-  @XmlElement(name = "suffix")
   @XmlElementWrapper(name = "suffixes")
   protected HashMap<String,String> suffixes = new HashMap<String, String>();
   
