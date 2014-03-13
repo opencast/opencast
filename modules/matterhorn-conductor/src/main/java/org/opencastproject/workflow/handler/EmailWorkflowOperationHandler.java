@@ -16,18 +16,14 @@
 package org.opencastproject.workflow.handler;
 
 import org.opencastproject.job.api.JobContext;
-import org.opencastproject.kernel.mail.EmailDocData;
-import org.opencastproject.kernel.mail.EmailTemplateScanner;
 import org.opencastproject.kernel.mail.SmtpService;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -47,11 +43,6 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /** The smtp service */
   private SmtpService smptService = null;
-  /** The workspace (needed to read the catalogs) **/
-  private Workspace workspace;
-
-  /** Email template manager */
-  private EmailTemplateScanner templateScanner = null;
 
   // Configuration properties used in the workflow definition
   public static final String TO_PROPERTY = "to";
@@ -140,25 +131,20 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // Templates are cached, use as template name: the template name or, if in-line, the
     // workflow name + the operation number + body/to/subject
     String templateName = null;
-    String template = null;
+    String templateContent = null;
 
     if (BODY_TEMPLATE_FILE_PROPERTY.equals(configName)) {
       templateName = configValue; // Use body template file name
-      template = templateScanner.getTemplate(templateName);
-      if (template == null) {
-        logger.warn("E-mail template not found: {}", templateName);
-        return configValue; // Assume no template, but it's probably missing
-      }
     } else if (configValue.indexOf("${") > -1) {
       // If value contains a "${", it may be a template so apply it
       templateName = workflowInstance.getTitle() + "_" + operation.getPosition() + "_" + configName;
-      template = configValue;
+      templateContent = configValue;
     } else {
       // If value doesn't contain a "${", assume it is NOT a Freemarker template and thus return the value as it is
       return configValue;
     }
     // Apply the template
-    return DocUtil.generate(new EmailDocData(templateName, workflowInstance, workspace), template);
+    return smptService.applyTemplate(templateName, templateContent, workflowInstance);
   }
 
   /**
@@ -169,26 +155,6 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
    */
   void setSmtpService(SmtpService smtpService) {
     this.smptService = smtpService;
-  }
-
-  /**
-   * Callback for OSGi to set the {@link EmailTemplateScanner}.
-   * 
-   * @param smtpService
-   *          the smtp service
-   */
-  void setEmailTemplateScanner(EmailTemplateScanner templateScanner) {
-    this.templateScanner = templateScanner;
-  }
-
-  /**
-   * Callback for OSGi to set the {@link Workspace}.
-   * 
-   * @param ws
-   *          the workspace
-   */
-  void setWorkspace(Workspace ws) {
-    this.workspace = ws;
   }
 
 }

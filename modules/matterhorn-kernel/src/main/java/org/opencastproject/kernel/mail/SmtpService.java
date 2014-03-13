@@ -15,6 +15,10 @@
  */
 package org.opencastproject.kernel.mail;
 
+import org.opencastproject.util.doc.DocUtil;
+import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workspace.api.Workspace;
+
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -95,6 +99,12 @@ public class SmtpService implements ManagedService {
 
   /** The current mail transport protocol */
   private String mailTransport = null;
+
+  /** The workspace (needed to read the catalogs when processing templates) **/
+  private Workspace workspace;
+
+  /** Email template manager */
+  private EmailTemplateScanner templateScanner = null;
 
   /**
    * Callback from the OSGi <code>ConfigurationAdmin</code> on configuration changes.
@@ -275,6 +285,40 @@ public class SmtpService implements ManagedService {
     message.setText("Hello world");
     message.saveChanges();
     send(message);
+  }
+
+  public String applyTemplate(String templateName, String templateContent, WorkflowInstance workflowInstance) {
+    if (templateContent == null) {
+      templateContent = templateScanner.getTemplate(templateName);
+    }
+
+    if (templateContent == null) {
+      logger.warn("E-mail template not found: {}", templateName);
+      return "TEMPLATE NOT FOUND: " + templateName; // it's probably missing
+    }
+
+    // Apply the template
+    return DocUtil.generate(new EmailDocData(templateName, workflowInstance, workspace), templateContent);
+  }
+
+  /**
+   * Callback for OSGi to set the {@link EmailTemplateScanner}.
+   * 
+   * @param smtpService
+   *          the smtp service
+   */
+  void setEmailTemplateScanner(EmailTemplateScanner templateScanner) {
+    this.templateScanner = templateScanner;
+  }
+
+  /**
+   * Callback for OSGi to set the {@link Workspace}.
+   * 
+   * @param ws
+   *          the workspace
+   */
+  void setWorkspace(Workspace ws) {
+    this.workspace = ws;
   }
 
 }

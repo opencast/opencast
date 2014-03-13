@@ -7,10 +7,7 @@
   <service>
     <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
   </service>
-  <reference name="smtpservice" interface="org.opencastproject.kernel.mail.SmtpService" policy="static" cardinality="1..1" bind="setSmtpService" />
-  <reference name="emailTemplateScanner" interface="org.opencastproject.kernel.mail.EmailTemplateScanner" policy="static" cardinality="1..1" bind="setEmailTemplateScanner" />
+  <reference name="SmtpService" interface="org.opencastproject.kernel.mail.SmtpService" policy="static" cardinality="1..1" bind="setSmtpService" />    
   <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
     policy="static" bind="setServiceRegistry" />
-  <reference name="Workspace" cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace"
-    policy="static" bind="setWorkspace" />
 </scr:component>

@@ -377,6 +377,7 @@
               OSGI-INF/pingback.xml,
               OSGI-INF/rest.xml,
               OSGI-INF/security-service.xml,
+              OSGI-INF/email-template-scanner.xml,
               OSGI-INF/smtp-service.xml,
               OSGI-INF/remote-user-and-role-filter.xml,
               OSGI-INF/security-config-scanner.xml,
