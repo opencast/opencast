@@ -131,7 +131,8 @@ public class GstreamerSilenceDetector {
               // segment started but not stopped
               addMediaSegment(TimeUnit.NANOSECONDS.toMillis(lastSilenceStart), 
                       fakesink.getLastBuffer().getTimestamp().toMillis());
-            } else if (fakesink.getLastBuffer().getTimestamp().toMillis() - lastSilenceStop < minSilenceLength) {
+            } else if (fakesink.getLastBuffer().getTimestamp().toMillis() 
+                    - TimeUnit.NANOSECONDS.toMillis(lastSilenceStop) < minSilenceLength) {
               // correct last segment end (postprocessing will merge last two segments to a single)
               addMediaSegment(TimeUnit.NANOSECONDS.toMillis(lastSilenceStop), 
                       fakesink.getLastBuffer().getTimestamp().toMillis());
@@ -174,7 +175,7 @@ public class GstreamerSilenceDetector {
       long timestamp = (Long) message.getStructure().getValue("timestamp");
       boolean above = message.getStructure().getBoolean("above");
       
-      logger.debug("{}: {}", new String[] {
+      logger.debug("{} ns: {}", new String[] {
         Long.toString(timestamp), (above ? "silence stop" : "silence start")
       });
       
@@ -196,6 +197,8 @@ public class GstreamerSilenceDetector {
    * @param stopMillis segment stop position (in milliseconds)
    */
   private void addMediaSegment(long startMillis, long stopMillis) {
+    logger.debug("Add segment [{} ms - {} ms].", startMillis, stopMillis);
+    
     if (startMillis < stopMillis)
       segments.add((MediaSegment) new MediaSegment(startMillis, stopMillis));
   }
@@ -224,6 +227,13 @@ public class GstreamerSilenceDetector {
       MediaSegment segment = (MediaSegment) segments.get(i);
 
       if (segment.getSegmentStart() - lastSegment.getSegmentStop() < minSilenceLength) {
+        logger.debug("Merge two segments to one ([{} ms - {} ms], [{} ms - {} ms] => [{} ms - {} ms]).",
+                new Long[] {
+                  lastSegment.getSegmentStart(), lastSegment.getSegmentStop(),
+                  segment.getSegmentStart(), segment.getSegmentStop(),
+                  lastSegment.getSegmentStart(), segment.getSegmentStop()
+                });
+        
         segmentsTmp.remove(lastSegment);
         lastSegment = new MediaSegment(lastSegment.getSegmentStart(), segment.getSegmentStop());
       } else {
@@ -237,6 +247,9 @@ public class GstreamerSilenceDetector {
     for (MediaSegment segment : segmentsTmp) {
         if (segment.getSegmentStop() - segment.getSegmentStart() >= minVoiceLength) {
             segments.add(segment);
+        } else {
+          logger.debug("Drop segment [{} ms - {} ms] because segment length is shorter than min voice length.",
+                    segment.getSegmentStart(), segment.getSegmentStop());
         }
     }
     
