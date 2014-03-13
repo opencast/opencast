@@ -15,13 +15,25 @@
  */
 package org.opencastproject.kernel.mail;
 
+import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
+
+import org.opencastproject.util.ReadinessIndicator;
+import org.opencastproject.util.doc.DocUtil;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 
 public class EmailTemplateScanner implements ArtifactInstaller {
@@ -30,7 +42,7 @@ public class EmailTemplateScanner implements ArtifactInstaller {
   private BundleContext bundleCtx = null;
 
   /** Sum of template files currently installed */
-  // private int sumInstalledFiles = 0;
+  private int sumInstalledFiles = 0;
 
   /** The templates map */
   private Map<String, String> templates = new HashMap<String, String>();
@@ -86,27 +98,49 @@ public class EmailTemplateScanner implements ArtifactInstaller {
    */
   @Override
   public void install(File artifact) throws Exception {
-    logger.info("EmailTemplateScanner install called");
-    /*
-     * logger.info("Registering email template from {}", artifact.getName()); FileReader in = null; BufferedReader
-     * reader = null; StringBuilder stringBuilder = new StringBuilder(); try { in = new FileReader(artifact); reader =
-     * new BufferedReader(in); String line = null; String ls = System.getProperty("line.separator");
-     * 
-     * while ((line = reader.readLine()) != null) { stringBuilder.append(line); stringBuilder.append(ls); }
-     * templates.put(artifact.getName(), stringBuilder.toString()); sumInstalledFiles++; } catch (Exception e) {
-     * logger.error("Email template could not be read from {}: {}", artifact, e.getMessage()); } finally {
-     * IOUtils.closeQuietly(reader); IOUtils.closeQuietly(in); }
-     * 
-     * // Determine the number of available templates String[] filesInDirectory = artifact.getParentFile().list(new
-     * FilenameFilter() { public boolean accept(File arg0, String name) { return true; } });
-     * 
-     * // Once all templates have been loaded, announce readiness if (filesInDirectory.length == sumInstalledFiles) {
-     * Dictionary<String, String> properties = new Hashtable<String, String>(); properties.put(ARTIFACT,
-     * "emailtemplates"); logger.debug("Indicating readiness of email templates");
-     * bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
-     * logger.info("All {} email templates installed", filesInDirectory.length); } else {
-     * logger.debug("{} of {} email templates installed", sumInstalledFiles, filesInDirectory.length); }
-     */
+    logger.info("Registering email template from {}", artifact.getName());
+
+    String template = DocUtil.loadTemplate(artifact.getAbsolutePath());
+    FileReader in = null;
+    BufferedReader reader = null;
+    StringBuilder stringBuilder = new StringBuilder();
+    try {
+      in = new FileReader(artifact);
+      reader = new BufferedReader(in);
+      String line = null;
+      String ls = System.getProperty("line.separator");
+
+      while ((line = reader.readLine()) != null) {
+        stringBuilder.append(line);
+        stringBuilder.append(ls);
+      }
+      templates.put(artifact.getName(), stringBuilder.toString());
+      sumInstalledFiles++;
+    } catch (Exception e) {
+      logger.error("Email template could not be read from {}: {}", artifact, e.getMessage());
+    } finally {
+      IOUtils.closeQuietly(reader);
+      IOUtils.closeQuietly(in);
+    }
+
+    // Determine the number of available templates
+    String[] filesInDirectory = artifact.getParentFile().list(new FilenameFilter() {
+      public boolean accept(File arg0, String name) {
+        return true;
+      }
+    });
+
+    // Once all templates have been loaded, announce readiness
+    if (filesInDirectory.length == sumInstalledFiles) {
+      Dictionary<String, String> properties = new Hashtable<String, String>();
+      properties.put(ARTIFACT, "emailtemplates");
+      logger.debug("Indicating readiness of email templates");
+      bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
+      logger.info("All {} email templates installed", filesInDirectory.length);
+    } else {
+      logger.debug("{} of {} email templates installed", sumInstalledFiles, filesInDirectory.length);
+    }
+
   }
 
   /**
@@ -116,11 +150,13 @@ public class EmailTemplateScanner implements ArtifactInstaller {
    */
   @Override
   public void uninstall(File artifact) throws Exception {
-    logger.info("EmailTemplateScanner install called");
-    /*
-     * for (Iterator<String> iter = templates.values().iterator(); iter.hasNext();) { String temp = iter.next(); if
-     * (artifact.getName().equals(temp)) { logger.info("Uninstalling template {}", temp); iter.remove(); } }
-     */
+    for (Iterator<String> iter = templates.values().iterator(); iter.hasNext();) {
+      String temp = iter.next();
+      if (artifact.getName().equals(temp)) {
+        logger.info("Uninstalling template {}", temp);
+        iter.remove();
+      }
+    }
   }
 
   /**
