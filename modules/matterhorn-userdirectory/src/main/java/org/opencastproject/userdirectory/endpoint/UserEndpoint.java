@@ -31,7 +31,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
-import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.userdirectory.JpaRole;
 import org.opencastproject.userdirectory.JpaUser;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
@@ -76,9 +75,6 @@ public class UserEndpoint {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(UserEndpoint.class);
 
-  /** The role directory service */
-  protected UserDirectoryService userDirectoryService = null;
-
   private JpaUserAndRoleProvider jpaUserAndRoleProvider;
 
   private SecurityService securityService;
@@ -90,16 +86,6 @@ public class UserEndpoint {
     logger.info("Start users endpoint");
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc);
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
-  }
-
-  /**
-   * Sets the user directory service
-   * 
-   * @param userDirectoryService
-   *          the userDirectoryService to set
-   */
-  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
-    this.userDirectoryService = userDirectoryService;
   }
 
   /**
@@ -130,7 +116,7 @@ public class UserEndpoint {
       limit = 100;
 
     JaxbUserList userList = new JaxbUserList();
-    for (Iterator<User> i = userDirectoryService.findUsers("%", offset, limit); i.hasNext();) {
+    for (Iterator<User> i = jpaUserAndRoleProvider.findUsers("%", offset, limit); i.hasNext();) {
       userList.add(i.next());
     }
     return userList;
@@ -166,7 +152,6 @@ public class UserEndpoint {
     }
 
     JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
-    JpaUser user = new JpaUser(username, password, organization);
 
     JSONArray rolesArray = (JSONArray) JSONValue.parse(roles);
     Set<JpaRole> rolesSet = new HashSet<JpaRole>();
@@ -181,9 +166,10 @@ public class UserEndpoint {
       rolesSet.add(new JpaRole(organization.getAnonymousRole(), organization));
     }
 
-    jpaUserAndRoleProvider.addUser(new JpaUser(username, password, (JpaOrganization) organization, rolesSet));
+    JpaUser user = new JpaUser(username, password, organization, rolesSet);
+    jpaUserAndRoleProvider.addUser(user);
 
-    return Response.status(SC_CREATED).contentLocation(uri(endpointBaseUrl, user.getUsername() + ".json")).build();
+    return Response.created(uri(endpointBaseUrl, user.getUsername() + ".json")).build();
   }
 
   @PUT
