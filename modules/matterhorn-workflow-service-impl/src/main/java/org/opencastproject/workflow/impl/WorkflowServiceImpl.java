@@ -632,6 +632,11 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   protected WorkflowInstance updateConfiguration(WorkflowInstance instance, Map<String, String> properties) {
     try {
+      if (properties != null) {
+        for (Entry<String, String> entry : properties.entrySet()) {
+          instance.setConfiguration(entry.getKey(), entry.getValue());
+        }
+      }
       String xml = replaceVariables(WorkflowParser.toXml(instance), properties);
       WorkflowInstanceImpl workflow = WorkflowParser.parseWorkflowInstance(xml);
       return workflow;

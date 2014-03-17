@@ -1,0 +1,157 @@
+--- src/atom_standard.cpp	2009-07-14 01:07:12.000000000 +0200
++++ src/atom_standard.cpp	2014-02-13 01:08:39.448417886 +0100
+@@ -178,7 +178,7 @@
+         ExpectChildAtom("soco", Optional, OnlyOne); /* sort composer */
+         ExpectChildAtom("sosn", Optional, OnlyOne); /* sort show */
+         ExpectChildAtom("hdvd", Optional, OnlyOne); /* HD video */
+-        ExpectChildAtom("©enc", Optional, OnlyOne); /* Encoded by */
++        ExpectChildAtom("\251enc", Optional, OnlyOne); /* Encoded by */
+         ExpectChildAtom("pcst", Optional, OnlyOne); /* Podcast flag */
+         ExpectChildAtom("keyw", Optional, OnlyOne); /* Keywords (for podcasts?) */
+         ExpectChildAtom("catg", Optional, OnlyOne); /* Category (for podcasts?) */
+
+--- src/cmeta.cpp	2009-07-14 01:07:12.000000000 +0200
++++ src/cmeta.cpp	2014-02-13 00:50:13.193551229 +0100
+@@ -1383,7 +1383,7 @@
+ MP4ItmfAddItem( MP4FileHandle hFile, const MP4ItmfItem* item )
+ {
+     if( !MP4_IS_VALID_FILE_HANDLE( hFile ))
+-        return NULL;
++        return false;
+ 
+     try {
+         return itmf::genericAddItem( *(MP4File*)hFile, item );
+@@ -1402,7 +1402,7 @@
+ MP4ItmfSetItem( MP4FileHandle hFile, const MP4ItmfItem* item )
+ {
+     if( !MP4_IS_VALID_FILE_HANDLE( hFile ))
+-        return NULL;
++        return false;
+ 
+     try {
+         return itmf::genericSetItem( *(MP4File*)hFile, item );
+@@ -1421,7 +1421,7 @@
+ MP4ItmfRemoveItem( MP4FileHandle hFile, const MP4ItmfItem* item )
+ {
+     if( !MP4_IS_VALID_FILE_HANDLE( hFile ))
+-        return NULL;
++        return false;
+ 
+     try {
+         return itmf::genericRemoveItem( *(MP4File*)hFile, item );
+
+--- src/bmff/typebmff.cpp	2009-07-14 01:07:10.000000000 +0200
++++ src/bmff/typebmff.cpp	2014-02-13 01:22:38.258587242 +0100
+@@ -23,19 +23,12 @@
+ 
+ #include "impl.h"
+ 
+-// VStudio idiocy prevents defining template instanced static data
+-// in a namespace. Workaround it by defining in global scope.
+-// Other platforms will continue to put things in the proper namespace.
+-#if defined( _MSC_VER )
+-using namespace mp4v2::impl::bmff;
+-#else
+-namespace mp4v2 { namespace impl { namespace bmff {
+-#endif
++namespace mp4v2 { namespace impl {
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+ 
+ template <>
+-const EnumLanguageCode::Entry EnumLanguageCode::data[] = {
++const bmff::EnumLanguageCode::Entry bmff::EnumLanguageCode::data[] = {
+     { mp4v2::impl::bmff::ILC_AAR,  "aar",  "Afar" },
+     { mp4v2::impl::bmff::ILC_ABK,  "abk",  "Abkhazian" },
+     { mp4v2::impl::bmff::ILC_ACE,  "ace",  "Achinese" },
+@@ -526,9 +519,7 @@
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+ 
+-#if defined( _MSC_VER )
+-namespace mp4v2 { namespace impl { namespace bmff {
+-#endif
++namespace bmff {
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+ 
+--- src/itmf/type.cpp	2009-07-14 01:07:08.000000000 +0200
++++ src/itmf/type.cpp	2014-02-13 01:21:21.730162713 +0100
+@@ -24,19 +24,12 @@
+ 
+ #include "impl.h"
+ 
+-// VStudio idiocy prevents defining template instanced static data
+-// in a namespace. Workaround it by defining in global scope.
+-// Other platforms will continue to put things in the proper namespace.
+-#if defined( _MSC_VER )
+-using namespace mp4v2::impl::itmf;
+-#else
+-namespace mp4v2 { namespace impl { namespace itmf {
+-#endif
++namespace mp4v2 { namespace impl {
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+ 
+ template <>
+-const EnumBasicType::Entry EnumBasicType::data[] = {
++const itmf::EnumBasicType::Entry itmf::EnumBasicType::data[] = {
+     { mp4v2::impl::itmf::BT_IMPLICIT,  "implicit",  "implicit" },
+     { mp4v2::impl::itmf::BT_UTF8,      "utf8",      "UTF-8" },
+     { mp4v2::impl::itmf::BT_UTF16,     "utf16",     "UTF-16" },
+@@ -64,7 +57,7 @@
+ ///////////////////////////////////////////////////////////////////////////////
+ 
+ template <>
+-const EnumGenreType::Entry EnumGenreType::data[] = {
++const itmf::EnumGenreType::Entry itmf::EnumGenreType::data[] = {
+     { mp4v2::impl::itmf::GENRE_BLUES,             "blues",             "Blues" },
+     { mp4v2::impl::itmf::GENRE_CLASSIC_ROCK,      "classicrock",       "Classic Rock" },
+     { mp4v2::impl::itmf::GENRE_COUNTRY,           "country",           "Country" },
+@@ -200,7 +193,7 @@
+ ///////////////////////////////////////////////////////////////////////////////
+ 
+ template <>
+-const EnumStikType::Entry EnumStikType::data[] = {
++const itmf::EnumStikType::Entry itmf::EnumStikType::data[] = {
+     { mp4v2::impl::itmf::STIK_OLD_MOVIE,    "oldmovie",    "Movie" },
+     { mp4v2::impl::itmf::STIK_NORMAL,       "normal",      "Normal" },
+     { mp4v2::impl::itmf::STIK_AUDIOBOOK,    "audiobook",   "Audio Book" },
+@@ -216,7 +209,7 @@
+ ///////////////////////////////////////////////////////////////////////////////
+ 
+ template <>
+-const EnumAccountType::Entry EnumAccountType::data[] = {
++const itmf::EnumAccountType::Entry itmf::EnumAccountType::data[] = {
+     { mp4v2::impl::itmf::AT_ITUNES,  "itunes",   "iTunes" },
+     { mp4v2::impl::itmf::AT_AOL,     "aol",      "AOL" },
+ 
+@@ -226,7 +219,7 @@
+ ///////////////////////////////////////////////////////////////////////////////
+ 
+ template <>
+-const EnumCountryCode::Entry EnumCountryCode::data[] = {
++const itmf::EnumCountryCode::Entry itmf::EnumCountryCode::data[] = {
+     { mp4v2::impl::itmf::CC_USA,  "usa",   "United States" },
+     { mp4v2::impl::itmf::CC_USA,  "fra",   "France" },
+     { mp4v2::impl::itmf::CC_DEU,  "ger",   "Germany" },
+@@ -256,7 +249,7 @@
+ ///////////////////////////////////////////////////////////////////////////////
+ 
+ template <>
+-const EnumContentRating::Entry EnumContentRating::data[] = {
++const itmf::EnumContentRating::Entry itmf::EnumContentRating::data[] = {
+     { mp4v2::impl::itmf::CR_NONE,      "none",       "None" },
+     { mp4v2::impl::itmf::CR_CLEAN,     "clean",      "Clean" },
+     { mp4v2::impl::itmf::CR_EXPLICIT,  "explicit",   "Explicit" },
+@@ -266,9 +259,7 @@
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+ 
+-#if defined( _MSC_VER )
+-namespace mp4v2 { namespace impl { namespace itmf {
+-#endif
++namespace itmf {
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+ 

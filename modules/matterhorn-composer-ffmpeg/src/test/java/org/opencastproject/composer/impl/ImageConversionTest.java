@@ -59,11 +59,12 @@ public class ImageConversionTest {
   public static void testOcropus() {
     StreamHelper stdout = null;
     StreamHelper stderr = null;
+    StringBuffer errorBuffer = new StringBuffer();
     Process p = null;
     try {
       p = new ProcessBuilder(FFmpegEncoderEngine.FFMPEG_BINARY_DEFAULT, "-version").start();
       stdout = new StreamHelper(p.getInputStream());
-      stderr = new StreamHelper(p.getErrorStream());
+      stderr = new StreamHelper(p.getErrorStream(), errorBuffer);
       int status = p.waitFor();
       stdout.stopReading();
       stderr.stopReading();
@@ -71,6 +72,7 @@ public class ImageConversionTest {
         throw new IllegalStateException();
     } catch (Throwable t) {
       logger.warn("Skipping image conversion tests due to unsatisifed ffmpeg installation");
+      logger.warn(errorBuffer.toString());
       ffmpegInstalled = false;
     } finally {
       IoSupport.closeQuietly(stdout);

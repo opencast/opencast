@@ -18,13 +18,14 @@ package org.opencastproject.textextractor.tesseract;
 import org.opencastproject.textextractor.api.TextFrame;
 import org.opencastproject.textextractor.api.TextLine;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 /**
  * This class represents a tesseract output frame that holds a number of lines found on an image. Note that Tesseract
@@ -45,10 +46,11 @@ public class TesseractTextFrame implements TextFrame {
    *           if reading the ocropus output fails
    */
   public static TextFrame parse(InputStream is) throws IOException {
-    String ocropusFrame = new String(IOUtils.toByteArray(is));
-    String[] lines = StringUtils.split(ocropusFrame, '\n');
+    BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+    String line;
     TesseractTextFrame textFrame = new TesseractTextFrame();
-    for (String line : lines) {
+
+    while ((line = in.readLine()) != null) {
       List<String> words = new ArrayList<String>();
       for (String word : StringUtils.split(line)) {
         String result = word.replaceAll("^[\\W]*|[\\W]*$", "");
@@ -59,8 +61,8 @@ public class TesseractTextFrame implements TextFrame {
       if (words.size() == 0) {
         continue;
       }
-      TesseractLine ocrLine = new TesseractLine(StringUtils.join(words.toArray(new String[words.size()]), ' '));
-      textFrame.lines.add(ocrLine);
+      textFrame.lines.add(new TesseractLine(StringUtils.join(
+              words.toArray(new String[words.size()]), ' ')));
     }
 
     return textFrame;

@@ -129,7 +129,8 @@ public class HoldStateTest {
     service.setSecurityService(securityService);
 
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
-    EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject())).andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
+    EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
+            .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
@@ -196,9 +197,8 @@ public class HoldStateTest {
     service.removeWorkflowListener(pauseListener);
 
     // The variable "testproperty" should have been replaced by "foo", but not "anotherproperty"
-    String xml = WorkflowParser.toXml(workflow);
-    Assert.assertTrue(xml.contains("foo"));
-    Assert.assertTrue(xml.contains("anotherproperty"));
+    Assert.assertEquals("foo", workflow.getOperations().get(0).getConfiguration("testkey"));
+    Assert.assertEquals("${anotherproperty}", workflow.getOperations().get(1).getConfiguration("testkey"));
 
     // Simulate a user resuming and submitting new properties (this time, with a value for "anotherproperty") to the
     // workflow
@@ -216,11 +216,9 @@ public class HoldStateTest {
     Assert.assertEquals("Workflow expected to succeed", 1, succeedListener.countStateChanges(WorkflowState.SUCCEEDED));
 
     WorkflowInstance fromDb = service.getWorkflowById(workflow.getId());
-    String xmlFromDb = WorkflowParser.toXml(fromDb);
     logger.info("checking for the existence of 'anotherproperty', which should have been replaced");
-    Assert.assertTrue("the 'anotherproperty' key should have been replaced", !xmlFromDb.contains("anotherproperty"));
-    Assert.assertTrue("the 'testproperty' key should have been set to 'foo'", xmlFromDb.contains("foo"));
-    Assert.assertTrue("'bar' should have been set as a property value", xmlFromDb.contains("bar"));
+    Assert.assertEquals("foo", fromDb.getOperations().get(0).getConfiguration("testkey"));
+    Assert.assertEquals("bar", fromDb.getOperations().get(1).getConfiguration("testkey"));
   }
 
   @Test
