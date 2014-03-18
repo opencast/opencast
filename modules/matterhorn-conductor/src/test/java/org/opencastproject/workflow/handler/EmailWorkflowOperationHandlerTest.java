@@ -67,9 +67,8 @@ public class EmailWorkflowOperationHandlerTest {
     // Note: actual template substitution tests can be found in SmtpServiceTest (kernel bundle)
     SmtpService smtpService = EasyMock.createMock(SmtpService.class);
     EasyMock.expect(
-            smtpService.applyTemplate("testTemplateInBody_2_body",
-                    "This is the media package: ${mediaPackage.identifier}", workflowInstance)).andReturn(
-            "This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557");
+            smtpService.applyTemplate("DCE_workflow_2_body", "This is the media package: ${mediaPackage.identifier}",
+                    workflowInstance)).andReturn("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557");
     EasyMock.expect(smtpService.applyTemplate("template1", null, workflowInstance)).andReturn(
             "This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557");
     EasyMock.expect(smtpService.applyTemplate("templateSyntaxError", null, workflowInstance)).andThrow(
@@ -82,6 +81,7 @@ public class EmailWorkflowOperationHandlerTest {
 
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
+    workflowInstance.setTemplate("DCE-workflow");
     workflowInstance.setMediaPackage(mp);
     WorkflowOperationInstanceImpl failedOperation1 = new WorkflowOperationInstanceImpl("operation1",
             OperationState.FAILED);

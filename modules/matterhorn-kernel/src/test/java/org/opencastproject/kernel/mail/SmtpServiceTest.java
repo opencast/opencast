@@ -75,7 +75,7 @@ public class SmtpServiceTest {
                     + "Workflow errors: <#list workflow.errorMessages as er>${er} </#list>");
     EasyMock.expect(templateScanner.getTemplate("templateSyntaxError")).andReturn("${mediaPackage");
     EasyMock.replay(templateScanner);
-    smtpService.setEmailTemplateScanner(templateScanner);
+    smtpService.bindEmailTemplateScanner(templateScanner);
 
     workflowInstance = new WorkflowInstanceImpl();
     workflowInstance.setId(1);

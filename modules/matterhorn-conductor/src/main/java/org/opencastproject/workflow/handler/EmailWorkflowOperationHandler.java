@@ -135,9 +135,11 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
     if (BODY_TEMPLATE_FILE_PROPERTY.equals(configName)) {
       templateName = configValue; // Use body template file name
-    } else if (configValue.indexOf("${") > -1) {
+    } else if (configValue != null && configValue.indexOf("${") > -1) {
       // If value contains a "${", it may be a template so apply it
-      templateName = workflowInstance.getTitle() + "_" + operation.getPosition() + "_" + configName;
+      // Give a name to the inline template
+      templateName = workflowInstance.getTemplate() + "_" + operation.getPosition() + "_" + configName;
+      templateName = templateName.replaceAll("[^A-Za-z0-9 ]", "_"); // Only alphanumeric and _
       templateContent = configValue;
     } else {
       // If value doesn't contain a "${", assume it is NOT a Freemarker template and thus return the value as it is

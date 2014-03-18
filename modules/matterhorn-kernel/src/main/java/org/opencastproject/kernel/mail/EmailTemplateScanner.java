@@ -15,11 +15,6 @@
  */
 package org.opencastproject.kernel.mail;
 
-import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
-
-import org.opencastproject.util.ReadinessIndicator;
-import org.opencastproject.util.doc.DocUtil;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
@@ -29,10 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FilenameFilter;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -100,7 +92,6 @@ public class EmailTemplateScanner implements ArtifactInstaller {
   public void install(File artifact) throws Exception {
     logger.info("Registering email template from {}", artifact.getName());
 
-    String template = DocUtil.loadTemplate(artifact.getAbsolutePath());
     FileReader in = null;
     BufferedReader reader = null;
     StringBuilder stringBuilder = new StringBuilder();
@@ -122,25 +113,6 @@ public class EmailTemplateScanner implements ArtifactInstaller {
       IOUtils.closeQuietly(reader);
       IOUtils.closeQuietly(in);
     }
-
-    // Determine the number of available templates
-    String[] filesInDirectory = artifact.getParentFile().list(new FilenameFilter() {
-      public boolean accept(File arg0, String name) {
-        return true;
-      }
-    });
-
-    // Once all templates have been loaded, announce readiness
-    if (filesInDirectory.length == sumInstalledFiles) {
-      Dictionary<String, String> properties = new Hashtable<String, String>();
-      properties.put(ARTIFACT, "emailtemplates");
-      logger.debug("Indicating readiness of email templates");
-      bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
-      logger.info("All {} email templates installed", filesInDirectory.length);
-    } else {
-      logger.debug("{} of {} email templates installed", sumInstalledFiles, filesInDirectory.length);
-    }
-
   }
 
   /**

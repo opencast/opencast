@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
@@ -103,8 +104,8 @@ public class SmtpService implements ManagedService {
   /** The workspace (needed to read the catalogs when processing templates) **/
   private Workspace workspace;
 
-  /** Email template manager */
-  private EmailTemplateScanner templateScanner = null;
+  /** Email template scanner is optional and has dynamic policy */
+  private AtomicReference<EmailTemplateScanner> templateScannerRef = new AtomicReference<EmailTemplateScanner>();
 
   /**
    * Callback from the OSGi <code>ConfigurationAdmin</code> on configuration changes.
@@ -288,8 +289,8 @@ public class SmtpService implements ManagedService {
   }
 
   public String applyTemplate(String templateName, String templateContent, WorkflowInstance workflowInstance) {
-    if (templateContent == null) {
-      templateContent = templateScanner.getTemplate(templateName);
+    if (templateContent == null && templateScannerRef.get() != null) {
+      templateContent = templateScannerRef.get().getTemplate(templateName);
     }
 
     if (templateContent == null) {
@@ -302,16 +303,6 @@ public class SmtpService implements ManagedService {
   }
 
   /**
-   * Callback for OSGi to set the {@link EmailTemplateScanner}.
-   * 
-   * @param smtpService
-   *          the smtp service
-   */
-  void setEmailTemplateScanner(EmailTemplateScanner templateScanner) {
-    this.templateScanner = templateScanner;
-  }
-
-  /**
    * Callback for OSGi to set the {@link Workspace}.
    * 
    * @param ws
@@ -319,6 +310,26 @@ public class SmtpService implements ManagedService {
    */
   void setWorkspace(Workspace ws) {
     this.workspace = ws;
+  }
+
+  /**
+   * Callback for OSGi to set the {@link EmailTemplateScanner}.
+   * 
+   * @param templateScanner
+   *          the template scanner service
+   */
+  void bindEmailTemplateScanner(EmailTemplateScanner templateScanner) {
+    this.templateScannerRef.compareAndSet(null, templateScanner);
+  }
+
+  /**
+   * Callback for OSGi to unset the {@link EmailTemplateScanner}.
+   * 
+   * @param templateScanner
+   *          the template scanner service
+   */
+  void unbindEmailTemplateScanner(EmailTemplateScanner templateScanner) {
+    this.templateScannerRef.compareAndSet(templateScanner, null);
   }
 
 }

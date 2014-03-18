@@ -7,7 +7,8 @@
       <provide interface="org.osgi.service.cm.ManagedService" />
       <provide interface="org.opencastproject.kernel.mail.SmtpService" />
     </service>
-    <reference name="EmailTemplateScanner" interface="org.opencastproject.kernel.mail.EmailTemplateScanner" policy="static" cardinality="1..1" bind="setEmailTemplateScanner" />    
+    <reference name="EmailTemplateScanner" interface="org.opencastproject.kernel.mail.EmailTemplateScanner" 
+    	policy="dynamic" cardinality="0..1" bind="bindEmailTemplateScanner" unbind="unbindEmailTemplateScanner" />    
     <reference name="Workspace" cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace"
       policy="static" bind="setWorkspace" />
   </scr:component>
