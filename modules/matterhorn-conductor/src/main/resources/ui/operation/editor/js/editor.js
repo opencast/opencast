@@ -517,11 +517,11 @@ editor.updateSplitList = function (dontClickCancel, segmentsClickable) {
         tmpTime = (tmpTime >= 0) ? tmpTime : 0;
         $('#newTime').html("Final duration: " + formatTime(tmpTime.toFixed(4)));
 
+        $('#splitElementsHolder').html($('#splitElements').jqote(editor.splitData));
+        $('.splitItemDiv').click(splitItemClick);
         // TODO: Display splitSegments when zoomed in
         if (segmentsClickable) {
-            $('#splitElementsHolder').html($('#splitElements').jqote(editor.splitData));
             $('#splitSegments').html($('#splitSegmentTemplate').jqote(editor.splitData));
-            $('.splitItemDiv').click(splitItemClick);
             $('.splitSegmentItem').click(splitItemClick);
             // $('.splitRemover').click(splitRemoverClick);
         } else {
