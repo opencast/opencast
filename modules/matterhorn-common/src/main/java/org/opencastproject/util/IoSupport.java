@@ -13,13 +13,13 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.util;
 
 import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
@@ -32,8 +32,8 @@ import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 
+import com.google.common.io.Resources;
 import de.schlichtherle.io.FileWriter;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -53,6 +53,7 @@ import java.io.RandomAccessFile;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.FileLock;
+import java.nio.charset.Charset;
 import java.util.Properties;
 
 /**
@@ -290,16 +291,29 @@ public final class IoSupport {
 
   public static Properties loadPropertiesFromFile(final String path) {
     try {
-      return withResource(new FileInputStream(path), new Function.X<FileInputStream, Properties>() {
-        @Override public Properties xapply(FileInputStream in) throws Exception {
-          final Properties p = new Properties();
-          p.load(in);
-          return p;
-        }
-      });
+      return loadPropertiesFromStream(new FileInputStream(path));
     } catch (FileNotFoundException e) {
       return chuck(e);
     }
+  }
+
+  public static Properties loadPropertiesFromUrl(final URL url) {
+    try {
+      return loadPropertiesFromStream(url.openStream());
+    } catch (IOException e) {
+      return chuck(e);
+    }
+  }
+
+  /** Load properties from a stream. Close the stream after reading. */
+  public static Properties loadPropertiesFromStream(final InputStream stream) {
+    return withResource(stream, new Function.X<InputStream, Properties>() {
+      @Override public Properties xapply(InputStream in) throws Exception {
+        final Properties p = new Properties();
+        p.load(in);
+        return p;
+      }
+    });
   }
 
   /** Load a properties file from the classpath using the class loader of {@link IoSupport}. */
@@ -309,18 +323,21 @@ public final class IoSupport {
 
   /** Load a properties file from the classpath using the class loader of the given class. */
   public static Properties loadPropertiesFromClassPath(final String resource, final Class<?> clazz) {
-    return withResource(clazz.getResourceAsStream(resource), new Function<InputStream, Properties>() {
-      @Override
-      public Properties apply(InputStream is) {
-        final Properties p = new Properties();
-        try {
-          p.load(is);
-        } catch (Exception e) {
-          throw new Error("Cannot load resource " + resource + "@" + clazz);
+    for (InputStream in : openClassPathResource(resource, clazz)) {
+      return withResource(in, new Function<InputStream, Properties>() {
+        @Override
+        public Properties apply(InputStream is) {
+          final Properties p = new Properties();
+          try {
+            p.load(is);
+          } catch (Exception e) {
+            throw new Error("Cannot load resource " + resource + "@" + clazz);
+          }
+          return p;
         }
-        return p;
-      }
-    });
+      });
+    }
+    return chuck(new FileNotFoundException(resource + " does not exist"));
   }
 
   /**
@@ -345,6 +362,47 @@ public final class IoSupport {
     } finally {
       IoSupport.closeQuietly(b);
     }
+  }
+
+  /**
+   * Open a classpath resource using the class loader of the given class.
+   *
+   * @return an input stream to the resource wrapped in a Some or none if the resource cannot be found
+   */
+  public static Option<InputStream> openClassPathResource(String resource, Class<?> clazz) {
+    return option(clazz.getResourceAsStream(resource));
+  }
+
+  /**
+   * Open a classpath resource using the class loader of {@link IoSupport}.
+   *
+   * @see #openClassPathResource(String, Class)
+   */
+  public static Option<InputStream> openClassPathResource(String resource) {
+    return openClassPathResource(resource, IoSupport.class);
+  }
+
+  /**
+   * Load a classpath resource into a string using UTF-8 encoding and the class loader of the given class.
+   *
+   * @return the content of the resource wrapped in a Some or none in case of any error
+   */
+  public static Option<String> loadFileFromClassPathAsString(String resource, Class<?> clazz) {
+    try {
+      final URL url = clazz.getResource(resource);
+      return url != null ? some(Resources.toString(clazz.getResource(resource), Charset.forName("UTF-8"))) : none(String.class);
+    } catch (IOException e) {
+      return none();
+    }
+  }
+
+  /**
+   * Load a classpath resource into a string using the class loader of {@link IoSupport}.
+   *
+   * @see #loadFileFromClassPathAsString(String, Class)
+   */
+  public static Option<String> loadFileFromClassPathAsString(String resource) {
+    return loadFileFromClassPathAsString(resource, IoSupport.class);
   }
 
   /**
@@ -451,6 +509,24 @@ public final class IoSupport {
     } catch (IOException e) {
       return chuck(e);
     }
+  }
+
+  /** Function that reads an input stream into a string using utf-8 encoding. Stream does not get closed. */
+  public static final Function<InputStream, String> readToString = new Function.X<InputStream, String>() {
+    @Override public String xapply(InputStream in) throws IOException {
+      return IOUtils.toString(in, "utf-8");
+    }
+  };
+
+  /** Wrap function <code>f</code> to close the input stream after usage. */
+  public static <A> Function<InputStream, A> closeAfterwards(final Function<InputStream, ? extends A> f) {
+    return new Function<InputStream, A>() {
+      @Override public A apply(InputStream in) {
+        final A a = f.apply(in);
+        IOUtils.closeQuietly(in);
+        return a;
+      }
+    };
   }
 
   /** Create a function that creates a {@link java.io.FileInputStream}. */

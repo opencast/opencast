@@ -22,6 +22,8 @@ import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.util.data.functions.Strings.split;
 import static org.opencastproject.util.data.functions.Strings.trimToNil;
 
+import org.opencastproject.job.api.JaxbJob;
+import org.opencastproject.job.api.Job;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
@@ -129,9 +131,18 @@ public final class RestUtil {
     return b;
   }
 
-  /** Return JSON if <code>format</code> == json, XML else. */
+  /**
+   * Return JSON if <code>format</code> == json, XML else.
+   *
+   * @deprecated use {@link #getResponseType(String)}
+   */
   public static MediaType getResponseFormat(String format) {
     return "json".equalsIgnoreCase(format) ? MediaType.APPLICATION_JSON_TYPE : MediaType.APPLICATION_XML_TYPE;
+  }
+
+  /** Return JSON if <code>type</code> == json, XML else. */
+  public static MediaType getResponseType(String type) {
+    return "json".equalsIgnoreCase(type) ? MediaType.APPLICATION_JSON_TYPE : MediaType.APPLICATION_XML_TYPE;
   }
 
   private static final Function<String, String[]> CSV_SPLIT = split(Pattern.compile(","));
@@ -147,6 +158,7 @@ public final class RestUtil {
     return mlist();
   }
 
+  /** Response builder functions. */
   public static final class R {
     private R() {
     }
@@ -159,8 +171,16 @@ public final class RestUtil {
       return Response.ok().entity(entity).build();
     }
 
+    public static Response ok(boolean entity) {
+      return Response.ok().entity(Boolean.toString(entity)).build();
+    }
+
     public static Response ok(Jsons.Obj json) {
-      return Response.ok().entity(json.toJson()).build();
+      return Response.ok().entity(json.toJson()).type(MediaType.APPLICATION_JSON_TYPE).build();
+    }
+
+    public static Response ok(Job job) {
+      return Response.ok().entity(new JaxbJob(job)).build();
     }
 
     public static Response ok(MediaType type, Object entity) {
@@ -173,6 +193,10 @@ public final class RestUtil {
 
     public static Response notFound(Object entity) {
       return Response.status(Response.Status.NOT_FOUND).entity(entity).build();
+    }
+
+    public static Response notFound(Object entity, MediaType type) {
+      return Response.status(Response.Status.NOT_FOUND).entity(entity).type(type).build();
     }
 
     public static Response serverError() {
@@ -189,6 +213,10 @@ public final class RestUtil {
 
     public static Response badRequest() {
       return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    public static Response badRequest(String msg) {
+      return Response.status(Response.Status.BAD_REQUEST).entity(msg).build();
     }
   }
 }

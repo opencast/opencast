@@ -52,8 +52,12 @@
             <% if (data[j].recordings[i].error) { %>
             <div class="foldable">
               <div class="fold-header" style="color:red;font-weight:bold;"><%= data[j].recordings[i].state %></div>
+              <% if (!data[j].recordings[i].incident) { %>
               <div class="fold-body">
                 <%= data[j].recordings[i].error %>
+              <% } else { %>
+              <div id="workflowId-<%= data[j].recordings[i].id %>" class="fold-body empty">
+              <% } %>
               </div>
             </div>
             <% } else { %>

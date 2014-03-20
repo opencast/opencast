@@ -29,7 +29,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -89,10 +89,6 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   @XmlElement(name = "configuration")
   @XmlElementWrapper(name = "configurations")
   protected Set<WorkflowConfiguration> configurations;
-
-  @XmlElement(name = "error")
-  @XmlElementWrapper(name = "errors")
-  protected String[] errorMessages = new String[0];
 
   @XmlTransient
   protected boolean initialized = false;
@@ -456,14 +452,19 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
    */
   @Override
   public void setConfiguration(String key, String value) {
-    if (key == null || configurations == null)
+    if (key == null)
       return;
+    if (configurations == null)
+      configurations = new HashSet<WorkflowConfiguration>();
+
+    // Adjust already existing values
     for (WorkflowConfiguration config : configurations) {
       if (config.getKey().equals(key)) {
         ((WorkflowConfigurationImpl) config).setValue(value);
         return;
       }
     }
+
     // No configurations were found, so add a new one
     configurations.add(new WorkflowConfigurationImpl(key, value));
   }
@@ -610,33 +611,6 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
    */
   public void setTemplate(String template) {
     this.template = template;
-  }
-
-  /**
-   * @return the errorMessages
-   */
-  public String[] getErrorMessages() {
-    return errorMessages;
-  }
-
-  /**
-   * @param errorMessages
-   *          the errorMessages to set
-   */
-  public void setErrorMessages(String[] errorMessages) {
-    this.errorMessages = errorMessages;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.workflow.api.WorkflowInstance#addErrorMessage(java.lang.String)
-   */
-  @Override
-  public void addErrorMessage(String localizedMessage) {
-    String[] errors = Arrays.copyOf(this.errorMessages, this.errorMessages.length + 1);
-    errors[errors.length - 1] = localizedMessage;
-    this.errorMessages = errors;
   }
 
   /**

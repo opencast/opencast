@@ -45,9 +45,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * Simple and in-memory implementation of a the service registry intended for testing scenarios.
- */
+/** Simple and in-memory implementation of a the service registry intended for testing scenarios. */
 public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /** Logging facility */
@@ -86,21 +84,22 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectoryService = null;
 
+  protected Incidents incidents;
+
   public ServiceRegistryInMemoryImpl(JobProducer service, SecurityService securityService,
-          UserDirectoryService userDirectoryService, OrganizationDirectoryService organizationDirectoryService)
-          throws ServiceRegistryException {
+          UserDirectoryService userDirectoryService, OrganizationDirectoryService organizationDirectoryService,
+          IncidentService incidentService) throws ServiceRegistryException {
     if (service != null)
       registerService(service);
     this.securityService = securityService;
     this.userDirectoryService = userDirectoryService;
     this.organizationDirectoryService = organizationDirectoryService;
+    this.incidents = new Incidents(this, incidentService);
     this.dispatcher.scheduleWithFixedDelay(new JobDispatcher(), DEFAULT_DISPATCHER_TIMEOUT, DEFAULT_DISPATCHER_TIMEOUT,
             TimeUnit.MILLISECONDS);
   }
 
-  /**
-   * This method shuts down the service registry.
-   */
+  /** This method shuts down the service registry. */
   public void dispose() {
     dispatcher.shutdownNow();
   }
@@ -479,6 +478,11 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     return result;
   }
 
+  @Override
+  public Incidents incident() {
+    return incidents;
+  }
+
   /**
    * {@inheritDoc}
    * 
@@ -692,9 +696,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     }
   }
 
-  /**
-   * Shuts down this service registry, logging all jobs and their statuses.
-   */
+  /** Shuts down this service registry, logging all jobs and their statuses. */
   public void deactivate() {
     dispatcher.shutdownNow();
     Map<Status, AtomicInteger> counts = new HashMap<Job.Status, AtomicInteger>();

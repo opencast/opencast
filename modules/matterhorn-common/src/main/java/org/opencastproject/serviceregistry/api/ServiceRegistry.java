@@ -21,9 +21,7 @@ import org.opencastproject.util.NotFoundException;
 
 import java.util.List;
 
-/**
- * Manages clustered services and the {@link Job}s they may create to enable asynchronous job handling.
- */
+/** Manages clustered services and the {@link Job}s they may create to enable asynchronous job handling. */
 public interface ServiceRegistry {
 
   /**
@@ -53,7 +51,6 @@ public interface ServiceRegistry {
    * 
    * @param host
    *          The base URL for this server
-   * 
    * @throws NotFoundException
    *           if the host does not exist
    * @throws ServiceRegistryException
@@ -91,9 +88,9 @@ public interface ServiceRegistry {
    *          The base URL where the service that can handle this service type can be found
    * @param path
    *          The path to the service endpoint
+   * @return the service registration
    * @throws ServiceRegistryException
    *           if communication with the service registry fails
-   * @return the service registration
    */
   ServiceRegistration registerService(String serviceType, String host, String path) throws ServiceRegistryException;
 
@@ -108,9 +105,9 @@ public interface ServiceRegistry {
    *          The path to the service endpoint
    * @param jobProducer
    *          Whether this service registration produces {@link Job}s to track long running operations
+   * @return the service registration
    * @throws ServiceRegistryException
    *           if communication with the service registry fails
-   * @return the service registration
    */
   ServiceRegistration registerService(String serviceType, String host, String path, boolean jobProducer)
           throws ServiceRegistryException;
@@ -315,7 +312,14 @@ public interface ServiceRegistry {
    * @throws ServiceRegistryException
    *           if there is a problem accessing the service registry
    */
-  List<Job> getChildJobs(long id) throws NotFoundException, ServiceRegistryException;
+  List<Job> getChildJobs(long id) throws ServiceRegistryException;
+
+  /**
+   * Return a facility to record job incidents.
+   * 
+   * @see org.opencastproject.job.api.Incident
+   */
+  Incidents incident();
 
   /**
    * Finds the service registrations for this kind of job, ordered by load (lightest to heaviest).
@@ -454,7 +458,6 @@ public interface ServiceRegistry {
    * Get the load factors for each registered node.
    * 
    * @return the load values
-   * 
    * @throws ServiceRegistryException
    *           if there is a problem accessing the service registry
    */

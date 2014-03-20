@@ -16,6 +16,12 @@
 
 package org.opencastproject.util;
 
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -60,5 +66,18 @@ public final class EnumSupport {
     } catch (InvocationTargetException ignore) {
     }
     return null;
+  }
+
+  /** Create a function to parse a string into an Enum value. */
+  public static <A extends Enum> Function<String, Option<A>> parseEnum(final A e) {
+    return new Function<String, Option<A>>() {
+      @Override public Option<A> apply(String s) {
+        try {
+          return some((A) Enum.valueOf(e.getClass(), s));
+        } catch (Exception ex) {
+          return none();
+        }
+      }
+    };
   }
 }

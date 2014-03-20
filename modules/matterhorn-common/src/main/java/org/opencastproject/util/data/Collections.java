@@ -15,6 +15,8 @@
  */
 package org.opencastproject.util.data;
 
+import static org.opencastproject.util.data.Option.some;
+
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 
@@ -34,8 +36,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import static org.opencastproject.util.data.Option.some;
 
 /**
  * This class provides functions to ease and secure the handling of collections by supporting a type safe -- at least to
@@ -347,8 +347,16 @@ public final class Collections {
     return a != null ? list(a) : Collections.<A> nil();
   }
 
-  /** Return the list as is or nil, if <code>as</code> is null. */
+  /**
+   * Return the list as is or nil, if <code>as</code> is null.
+   * @deprecated use {@link #nullToNil(java.util.List)}
+   */
   public static <A> List<A> mkList(List<A> as) {
+    return as != null ? as : Collections.<A> nil();
+  }
+
+  /** Return the list as is or nil, if <code>as</code> is null. */
+  public static <A> List<A> nullToNil(List<A> as) {
     return as != null ? as : Collections.<A> nil();
   }
 

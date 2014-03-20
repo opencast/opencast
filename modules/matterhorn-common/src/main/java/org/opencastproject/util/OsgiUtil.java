@@ -107,6 +107,17 @@ public final class OsgiUtil {
     }
   }
 
+  /**
+   * Check the existence of the given dictionary. Throw an exception if null.
+   */
+  public static void checkDictionary(Dictionary properties,
+                                     ComponentContext componentContext) throws ConfigurationException {
+    if (properties == null) {
+      String dicName = componentContext.getProperties().get("service.pid").toString();
+      throw new ConfigurationException("*", "Dictionary for " + dicName + " does not exist");
+    }
+  }
+
   /** Create a config info string suitable for logging purposes. */
   public static String showConfig(Tuple<String, ?>... cfg) {
     return "Config\n" + Collections.mkString(

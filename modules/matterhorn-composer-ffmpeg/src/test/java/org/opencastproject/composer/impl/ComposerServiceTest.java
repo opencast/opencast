@@ -44,6 +44,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.IoSupport;
@@ -208,7 +209,7 @@ public class ComposerServiceTest {
     // Create and populate the composer service
     composerService = new ComposerServiceImpl() {
       @Override
-      protected Job inspect(URI workspaceURI) throws MediaInspectionException, EncoderException {
+      protected Job inspect(Job job, URI workspaceURI) throws EncoderException {
         Job inspectionJob = EasyMock.createNiceMock(Job.class);
         try {
           EasyMock.expect(inspectionJob.getPayload()).andReturn(MediaPackageElementParser.getAsXml(inspectedTrack));
@@ -219,7 +220,8 @@ public class ComposerServiceTest {
         return inspectionJob;
       }
     };
-    serviceRegistry = new ServiceRegistryInMemoryImpl(composerService, securityService, userDirectory, orgDirectory);
+    serviceRegistry = new ServiceRegistryInMemoryImpl(composerService, securityService, userDirectory, orgDirectory,
+            EasyMock.createNiceMock(IncidentService.class));
     composerService.setEncoderEngineFactory(encoderEngineFactory);
     composerService.setOrganizationDirectoryService(orgDirectory);
     composerService.setSecurityService(securityService);
@@ -323,7 +325,7 @@ public class ComposerServiceTest {
 
     try {
       composerService.encode(null, sourceTrackVideo, sourceTrackAudio, "av.work", null);
-    } catch (EncoderException e) {
+    } catch (IllegalArgumentException e) {
       assertTrue("The Job parameter must not be null".equals(e.getMessage()));
     }
   }

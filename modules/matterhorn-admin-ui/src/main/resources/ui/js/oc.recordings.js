@@ -4,6 +4,7 @@ ocRecordings = new (function() {
   var WORKFLOW_LIST_URL = '../workflow/instances.json';          // URL of workflow instances list endpoint
   var WORKFLOW_INSTANCE_URL = '';                                // URL of workflow instance endpoint
   var WORKFLOW_STATISTICS_URL = '../workflow/statistics.json';   // URL of workflow instances statistics endpoint
+  var JOB_INCIDENTS_URL = '../incidents/job/';                   // URL of job incidents endpoint
   var SERIES_URL = '/series';
   var SEARCH_URL = '../search';
   var ENGAGE_URL = '';
@@ -420,6 +421,7 @@ ocRecordings = new (function() {
     this.actions=[];
     this.holdAction=false;
     this.error = false;
+    this.incident = true;
     this.captureAgent = '';
 
     var self = this;    // ie for $.each
@@ -463,15 +465,7 @@ ocRecordings = new (function() {
       this.state = 'Finished';
     } else if (wf.state == 'FAILING' || wf.state == 'FAILED') {
       this.state = 'Failed';
-      if (wf.errors === '') {
-        if (op) {
-          this.error = 'Failed in operation ' + op.description;
-        } else {
-          this.error = 'No error message available';
-        }
-      } else {
-        this.error = ocUtils.ensureArray(wf.errors.error).join(', ');
-      }
+      this.error = true;
     } else if (wf.state == 'PAUSED') {
       if (op) {
         if (op.id == 'schedule') {
@@ -515,6 +509,7 @@ ocRecordings = new (function() {
           var start = elm['$'];
           var now = new Date().getTime() - UPCOMMING_EVENTS_GRACE_PERIOD;
           if (parseInt(start) < now) {
+        	self.incident = false;
             self.error = 'It seems the core system did not receive proper status updates from the Capture Agent that should have conducted this recording.';
             self.state = 'WARNING : Recording may have failed to start or ingest!';
             recordingActions.push('ignore');
@@ -527,6 +522,7 @@ ocRecordings = new (function() {
           var stop = elm['$'];
           var now = new Date().getTime() - END_OF_CAPTURE_GRACE_PERIOD;
           if (parseInt(stop) < now) {
+        	self.incident = false;
             self.error = 'It seems the core system did not receive proper status updates from the Capture Agent that should have conducted this recording.';
             self.state = 'WARNING : Recording failed to ingest!';
             recordingActions.push('ignore');
@@ -681,6 +677,7 @@ ocRecordings = new (function() {
     }
     // care for items in the table that can be unfolded
     //$('#recordingsTable .foldable').
+    var self = this;
     $('#recordingsTable .foldable').each( function() {
       $('<span></span>').addClass('fold-icon ui-icon ui-icon-triangle-1-e').css('float','left').prependTo($(this).find('.fold-header'));
       $(this).click( function() {
@@ -691,11 +688,59 @@ ocRecordings = new (function() {
           if($(this).css('display') === 'none') {
             ocRecordings.updateRefreshInterval(true, ocRecordings.Configuration.refresh);
           } else {
+        	var foldBody = $(this);
+        	if(foldBody.hasClass('empty')) {
+              $.ajax({
+            	url: JOB_INCIDENTS_URL + foldBody.attr('id').replace('workflowId-','') + '.json?cascade=true&format=digest',
+            	type: 'GET',
+            	error: function(XHR,status,e){
+            	  alert('Could not get error failure reason.');
+            	},
+            	success: function(data){
+                  foldBody.removeClass('empty');
+            	  var causeIncident = self.getLastIncident(data.incidentFullTree);
+            	  if(!causeIncident) {
+            		foldBody.html("No error failure reason available!");
+            	  } else {
+                    foldBody.html("<b>ErrorCode:</b> " + causeIncident.code + "<br />" +
+                    		  "<b>Title:</b> " + causeIncident.title + "<br />" +
+                    		  "<b>Description:</b> " + causeIncident.description + "<br />" +
+                    		  "<b>Severity:</b> " + causeIncident.severity + "<br />");
+            	  }
+            	}
+              });
+        	}
             ocRecordings.disableRefresh();
           }
         });
       });
     });
+  }
+  
+  this.getLastIncident = function(incidents) {
+	var self = this;
+	var rootIncident;
+	
+    $.each(ocUtils.ensureArray(incidents.incident), function(index, incident) {
+      if (!$.isEmptyObject(incident) && incident.severity == "FAILURE") {
+    	  rootIncident = incident;
+      }
+    });
+    var childIncident;
+    if($.isArray(incidents.incidents)) {
+        $.each(incidents.incidents, function(index, incident) {
+        	childIncident = self.getLastIncident(incident);
+        });
+    }
+    else if (!$.isEmptyObject(incidents.incidents)) {
+    	childIncident = self.getLastIncident(incidents.incidents);
+    }
+    
+	if(childIncident) {
+	  return childIncident;
+	} else {
+	  return rootIncident;
+	}
   }
 
   this.buildURLparams = function() {

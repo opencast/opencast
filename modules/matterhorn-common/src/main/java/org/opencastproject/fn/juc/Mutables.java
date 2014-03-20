@@ -15,10 +15,13 @@
  */
 package org.opencastproject.fn.juc;
 
+import org.opencastproject.util.data.Tuple;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -29,7 +32,18 @@ public final class Mutables {
   }
 
   public static <A> List<A> list() {
-    return new ArrayList<A>();
+    return new LinkedList<A>();
+  }
+
+  public static <A> List<A> list(List<A> as) {
+    return new LinkedList<A>(as);
+  }
+
+  public static <A> List<A> list(A a, A... as) {
+    final LinkedList<A> buf = new LinkedList<A>();
+    buf.add(a);
+    Collections.addAll(buf, as);
+    return buf;
   }
 
   public static <A> List<A> arrayList() {
@@ -42,6 +56,15 @@ public final class Mutables {
 
   public static <A, B> Map<A, B> map() {
     return new HashMap<A, B>();
+  }
+
+  public static <A, B> Map<A, B> map(Map<A, ? extends B> m, Tuple<A, ? extends B>... as) {
+    final Map<A, B> r = new HashMap<A, B>();
+    r.putAll(m);
+    for (Tuple<A, ? extends B> a : as) {
+      r.put(a.getA(), a.getB());
+    }
+    return r;
   }
 
   public static <A, B> Map<A, B> hashMap() {
