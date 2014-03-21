@@ -1,4 +1,4 @@
-URL: http://downloads.xiph.org/releases/vorbis ${USASK_MIRROR}
+URL: http://downloads.xiph.org/releases/vorbis ${USASK_MIRROR} ${ETH_MIRROR}
 PKG: libvorbis-1.3.4.tar.gz
 SHA: 1602716c187593ffe4302124535240cec2079df3
 DIR: libvorbis-1.3.4

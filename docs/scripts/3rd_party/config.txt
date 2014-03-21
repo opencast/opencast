@@ -8,6 +8,7 @@ RPMFUSION_MIRROR: http://download1.rpmfusion.org
 ATRPMS_MIRROR: http://dl.atrpms.net
 GNU_MIRROR: http://ftpmirror.gnu.org
 USASK_MIRROR: http://aifile.usask.ca/matterhorn/mirror/thirdparty
+ETH_MIRROR: http://downloads.opencastproject.org/3rd_party/
 MACPORTS_SVN: http://svn.macports.org/repository/macports/trunk/dports
 
 # ----- repositories
