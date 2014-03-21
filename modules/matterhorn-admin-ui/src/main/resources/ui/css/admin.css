@@ -68,6 +68,7 @@ li#titleNote {padding:0 0 4px 0;}
 /* page: recordings */
 #recordingsTable th div { position: relative; padding: 2px;}
 #recordingsTable th div.sort-icon {position: absolute; right: 5px; top: 0.1em; padding: 0px;}
+#recordingsTable th div.column-title {padding-right: 30px;}
 #recordingsTable tr {height:30px;}
 #recordingsTable tr td, #seriesTable tr td, #captureTable tr td, #statsTable tr td {color: black;}
 #bulkHeader {height:13px !important;}

@@ -468,7 +468,7 @@ ocRecordings = new (function() {
     if (wf.operations !== undefined && wf.operations.operation !== undefined) {
       op = wf.operations.operation;
     } else {
-    	ocUtils.log('Warning: no operations found for workflow id = ' + wf );
+    	ocUtils.log('Warning: no operations found for workflow id = ' + wf.id );
     }
     if (wf.state == 'SUCCEEDED') {
       this.state = 'Finished';

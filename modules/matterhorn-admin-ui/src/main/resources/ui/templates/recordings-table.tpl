@@ -7,22 +7,22 @@
       </tr>
       <tr>
         <th class="ui-state-default ui-helper-hidden bulkSelect"><input type="checkbox" id="selectAllRecordings" onclick="ocRecordings.selectAll(this.checked);" /></th>
-        <th id="sortTitle" width="30%" class="ui-widget-header sortable"><div>Title<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
-    	<th id="sortPresenter" width="5%" class="ui-widget-header sortable"><div>Presenter<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
-    	<th id="sortSeries" width="15%" class="ui-widget-header sortable"><div>Course/Series<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
-        <th id="sortAgent" width="10%" class="ui-widget-header sortable"><div>Capture Agent</div></th>
-    	<th id="sortDate" width="10%" class="ui-widget-header sortable"><div>Recording Date &amp; Time<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
+        <th id="sortTitle" width="30%" class="ui-widget-header sortable"><div class="column-title">Title<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
+    	<th id="sortPresenter" width="5%" class="ui-widget-header sortable"><div class="column-title">Presenter<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
+    	<th id="sortSeries" width="15%" class="ui-widget-header sortable"><div class="column-title">Course/Series<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
+        <th id="sortAgent" width="10%" class="ui-widget-header sortable"><div class="column-title">Capture Agent</div></th>
+    	<th id="sortDate" width="10%" class="ui-widget-header sortable"><div class="column-title">Recording Date &amp; Time<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
     	<% if (ocRecordings.Configuration.state == 'failed') { %>
-	<th id="sortFailDate" width="10%" class="ui-widget-header"><div>Failure Date &amp; Time</div></th>
+	<th id="sortFailDate" width="10%" class="ui-widget-header"><div class="column-title">Failure Date &amp; Time</div></th>
 	<% } %>
 	<% if (ocRecordings.Configuration.state == 'finished') { %>
-	<th id="sortFailDate" width="10%" class="ui-widget-header"><div>Finished Date &amp; Time</div></th>
+	<th id="sortFailDate" width="10%" class="ui-widget-header"><div class="column-title">Finished Date &amp; Time</div></th>
 	<% } %>
 	<% if (ocRecordings.Configuration.state == 'hold') { %>
-	<th id="sortFailDate" width="10%" class="ui-widget-header"><div>Hold Date &amp; Time</div></th>
+	<th id="sortFailDate" width="10%" class="ui-widget-header"><div class="column-title">Hold Date &amp; Time</div></th>
 	<% } %>
 	<% if (ocRecordings.Configuration.state == 'processing') { %>
-	<th id="sortFailDate" width="10%" class="ui-widget-header"><div>Processing Date &amp; Time</div></th>
+	<th id="sortFailDate" width="10%" class="ui-widget-header"><div class="column-title">Processing Date &amp; Time</div></th>
 	<% } %>
     	<th width="10%" class="ui-widget-header">Status</th>
     	<th width="10%" class="ui-widget-header">Action</th>
