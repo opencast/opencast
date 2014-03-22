@@ -21,6 +21,7 @@
 
     <div id="notRunningStatesContainer">
       <input type="radio" name="stateSelect" value="hold" id="state-hold" /><label for="state-hold">On Hold<span id="stats-hold"></span></label>
+      <input type="radio" name="stateSelect" value="ignored" id="state-ignored" /><label for="state-ignored">Ignored<span id="stats-ignored"></span></label>
       <input type="radio" name="stateSelect" value="failed" id="state-failed" /><label for="state-failed">Failed<span id="stats-failed"></span></label>
     </div>
 
@@ -151,8 +152,8 @@
       <span class="refresh-text">Update table every&#160;</span>
       <select id="refreshInterval">
         <option value="5">5</option>
-        <option value="7">7</option>
         <option value="10">10</option>
+        <option value="30">30</option>
       </select>
       <span class="refresh-text">&#160;seconds.</span>
     </div>
