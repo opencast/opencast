@@ -760,12 +760,12 @@ ocRecordings = new (function() {
   this.findFirstOperation = function(workflow, state) {
     var out = false;
     if (workflow.operations == undefined || workflow.operations.operation == undefined) {
-     ocUtils.log('Warning: no operations found for workflow id = ' + workflow.id );
+      ocUtils.log('Warning: no operations found for workflow id = ' + workflow.id );
     } else {
       $.each(ocUtils.ensureArray(workflow.operations.operation), function(index, operation) {
         if (operation.state == state) {
           out = operation;
-          return false; //only want first 
+          return false; //only want first
         }
       });
     }
@@ -775,7 +775,7 @@ ocRecordings = new (function() {
   this.findLastOperation = function(workflow, state) {
     var out = false;
     if (workflow.operations == undefined || workflow.operations.operation == undefined) {
-     ocUtils.log('Warning: no operations found for workflow id = ' + workflow.id );
+      ocUtils.log('Warning: no operations found for workflow id = ' + workflow.id );
     } else {
       $.each(ocUtils.ensureArray(workflow.operations.operation), function(index, operation) {
         if (operation.state == state) {
