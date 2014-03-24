@@ -1122,6 +1122,12 @@
         <version>1.0-rc2-patched</version>
       </dependency>
 
+	    <dependency>
+	      <groupId>org.apache.servicemix.bundles</groupId>
+	      <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
+	      <version>1.8.5_1</version>
+	    </dependency>
+
       <!-- OSGi -->
       <dependency>
         <groupId>org.osgi</groupId>

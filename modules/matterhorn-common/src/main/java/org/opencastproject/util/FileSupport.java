@@ -129,11 +129,13 @@ public final class FileSupport {
    */
   public static File copy(File sourceFile, File targetFile, boolean overwrite) throws IOException {
 
-    // This variable is used when the channel copy files, and stores the maximum size of the file parts copied from source to target
+    // This variable is used when the channel copy files, and stores the maximum size of the file parts copied from
+    // source to target
     final int chunk = 1024 * 1024 * 512; // 512 MB
-    
-    // This variable is used when the cannel copy fails completely, as the size of the memory buffer used to copy the data from one stream to the other.
-    final int bufferSize = 1024 * 1024; // 1 MB 
+
+    // This variable is used when the cannel copy fails completely, as the size of the memory buffer used to copy the
+    // data from one stream to the other.
+    final int bufferSize = 1024 * 1024; // 1 MB
 
     File dest = determineDestination(targetFile, sourceFile, overwrite);
 
@@ -171,7 +173,8 @@ public final class FileSupport {
         } catch (IOException ioe) {
           logger.warn("Got IOException using Channels for copying.");
         } finally {
-          // This has to be in "finally", because in 64-bit machines the channel copy may fail to copy the whole file without causing a exception
+          // This has to be in "finally", because in 64-bit machines the channel copy may fail to copy the whole file
+          // without causing a exception
           if ((sourceChannel != null) && (targetChannel != null) && (size < sourceFile.length()))
             // Failing back to using FileChannels *but* with chunks and not altogether
             logger.info("Trying to copy the file in chunks using Channels");
@@ -385,7 +388,7 @@ public final class FileSupport {
       throw new IllegalArgumentException("Source location must not by null");
     if (targetLocation == null)
       throw new IllegalArgumentException("Target location must not by null");
-    
+
     File dest = determineDestination(targetLocation, sourceLocation, overwrite);
 
     // Special treatment for directories as sources
@@ -519,13 +522,17 @@ public final class FileSupport {
   }
 
   /**
-   * @param sourceLocation The location of the file you want to link. 
-   * @param targetLocation The location and name to place the link. 
-   * @param overwrite Whether to overwrite a link if it exists. 
-   * @return Returns a process that should link the two 
+   * @param sourceLocation
+   *          The location of the file you want to link.
+   * @param targetLocation
+   *          The location and name to place the link.
+   * @param overwrite
+   *          Whether to overwrite a link if it exists.
+   * @return Returns a process that should link the two
    * @throws IOException
    */
-  private static Process createLinkFileProcess(File sourceLocation, File targetLocation, boolean overwrite) throws IOException {
+  private static Process createLinkFileProcess(File sourceLocation, File targetLocation, boolean overwrite)
+          throws IOException {
     Process p;
     if (!System.getProperty("os.name").startsWith("Windows")) {
       if (overwrite) {
@@ -534,17 +541,19 @@ public final class FileSupport {
         p = new ProcessBuilder("ln", sourceLocation.getAbsolutePath(), targetLocation.getAbsolutePath()).start();
       }
     } else {
-      /** 
+      /**
        * Handle the windows special case by using mklink instead of ln. mklink is also a command in the cmd.exe command
        * shell, not a separate application so we need to run a command shell with the /C switch to be able to use the
-       * utility. There also is no force in windows. **/
-      p = new ProcessBuilder("cmd", "/C", "mklink", "/H", targetLocation.getAbsolutePath(), sourceLocation.getAbsolutePath()).start();
+       * utility. There also is no force in windows.
+       **/
+      p = new ProcessBuilder("cmd", "/C", "mklink", "/H", targetLocation.getAbsolutePath(),
+              sourceLocation.getAbsolutePath()).start();
     }
     return p;
   }
 
   private static Process createLinkDirectoryProcess(File sourceDirectory, File targetDirectory, boolean overwrite)
-  throws IOException {
+          throws IOException {
     Process p;
     if (!System.getProperty("os.name").startsWith("Windows")) {
       if (overwrite) {
@@ -555,17 +564,19 @@ public final class FileSupport {
                 "-exec", "ln", "{}", targetDirectory.getAbsolutePath() + File.separator, ";").start();
       }
     } else {
-      /** 
+      /**
        * Handle the windows special case by using mklink instead of ln. mklink is also a command in the cmd.exe command
        * shell, not a separate application so we need to run a command shell with the /C switch to be able to use the
-       * utility. There also is no force in windows. **/
-      p = new ProcessBuilder("cmd", "/C", "mklink", "/J", sourceDirectory.getAbsolutePath(), targetDirectory.getAbsolutePath()).start();
+       * utility. There also is no force in windows.
+       **/
+      p = new ProcessBuilder("cmd", "/C", "mklink", "/J", sourceDirectory.getAbsolutePath(),
+              targetDirectory.getAbsolutePath()).start();
     }
     return p;
   }
 
   private static File determineDestination(File targetLocation, File sourceLocation, boolean overwrite)
-  throws IOException {
+          throws IOException {
     File dest = null;
 
     // Source location exists
@@ -576,14 +587,14 @@ public final class FileSupport {
         if (targetLocation.isDirectory())
           // Create a destination file within it, with the same name of the source target
           dest = new File(targetLocation, sourceLocation.getName());
-        else 
+        else
           // targetLocation is either a normal file or doesn't exist
           dest = targetLocation;
-        
+
         // Source and target locations can not be the same
         if (sourceLocation.equals(dest))
           throw new IOException("Source and target locations must be different");
-        
+
         // Search the first existing parent of the target file, to check if it can be written
         // getParentFile can return null even though there *is* a parent file, if the file is not absolute
         // That's the reason why getAbsoluteFile is used here
@@ -591,20 +602,56 @@ public final class FileSupport {
           if (iter.exists()) {
             if (iter.canWrite())
               break;
-            else  
+            else
               throw new IOException("Destination " + dest + "cannot be written/modified");
           }
-        
+
         // Check the target file can be overwritten
         if (dest.exists() && !dest.isDirectory() && !overwrite)
           throw new IOException("Destination " + dest + " already exists");
-        
+
       } else
         throw new IOException(sourceLocation + " cannot be read");
     } else
       throw new IOException("Source " + sourceLocation + " does not exist");
-    
+
     return dest;
+  }
+
+  /**
+   * Delete all directories from <code>start</code> up to directory <code>limit</code> if they are empty. Directory
+   * <code>limit</code> is <em>exclusive</em> and will not be deleted.
+   * 
+   * @return true if the <em>complete</em> hierarchy has been deleted. false in any other case.
+   */
+  public static boolean deleteHierarchyIfEmpty(File limit, File start) {
+    return limit.isDirectory()
+            && start.isDirectory()
+            && (isEqual(limit, start) || (isParent(limit, start) && start.list().length == 0 && start.delete() && deleteHierarchyIfEmpty(
+                    limit, start.getParentFile())));
+  }
+
+  /** Compare two files by their canonical paths. */
+  public static boolean isEqual(File a, File b) {
+    try {
+      return a.getCanonicalPath().equals(b.getCanonicalPath());
+    } catch (IOException e) {
+      return false;
+    }
+  }
+
+  /**
+   * Check if <code>a</code> is a parent of <code>b</code>. This can only be the case if <code>a</code> is a directory
+   * and a sub path of <code>b</code>. <code>isParent(a, a) == true</code>.
+   */
+  public static boolean isParent(File a, File b) {
+    try {
+      final String aCanonical = a.getCanonicalPath();
+      final String bCanonical = b.getCanonicalPath();
+      return (!aCanonical.equals(bCanonical) && bCanonical.startsWith(aCanonical));
+    } catch (IOException e) {
+      return false;
+    }
   }
 
   /**
