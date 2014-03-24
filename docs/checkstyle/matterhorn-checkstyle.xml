@@ -16,9 +16,7 @@
 
   <!-- Checks whether spaces are used as opposed to tabs                    -->
   <!-- See http://checkstyle.sf.net/config_whitespace.html#FileTabCharacter -->
-  <!--
   <module name="FileTabCharacter"/>
-  -->
 
   <!-- Checks whether files end with a new line.                        -->
   <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
@@ -31,7 +29,7 @@
   <!-- Checks that property files contain the same keys.         -->
   <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
   <module name="Translation" />
-  
+
   <!-- Checks that property files contain the same keys.         -->
   <!-- See http://checkstyle.sf.net/config_duplicates.html -->
   <!--
@@ -40,7 +38,7 @@
     <property name="severity" value="error" />
   </module>
   -->
-  
+
   <!-- Checks for Size Violations.                    -->
   <!-- See http://checkstyle.sf.net/config_sizes.html -->
   <!--
@@ -275,7 +273,7 @@
       <property name="protectedAllowed" value="true"/>
       <property name="severity" value="error" />
     </module>
-    
+
     <!-- Checks for metrics                               -->
     <!-- See http://checkstyle.sf.net/config_metrics.html -->
     <!--
@@ -314,7 +312,7 @@
       <property name="severity" value="error" />
     </module>
     <module name="Regexp">
-      <property name="format" value="\s+\\n" />
+      <property name="format" value="[ \t]+$" />
       <property name="message" value="Line has trailing spaces." />
       <property name="illegalPattern" value="true" />
       <property name="ignoreComments" value="true" />

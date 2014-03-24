@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Interface to OSGi service for fetching capture schedules and starting captures (MH-1052).
  */
- 
+
 public interface Scheduler {
 
   /**
@@ -84,7 +84,7 @@ public interface Scheduler {
    * @return The current schedule in a {@code List} of {@code ScheduledEvent}s or null in the case of an error.
    */
   List<ScheduledEvent> getSchedule();
-  
+
   /**
    * Schedules an immediate {@code IngestJob} for the recording.  This method does not create a manifest or zip the recording.
    * @param recordingID The ID of the recording to it ingest.

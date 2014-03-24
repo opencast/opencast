@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" 
+ name="org.opencastproject.authorization.xacml.manager.endpoint.ACLManagerRestService">
+  <implementation class="org.opencastproject.authorization.xacml.manager.endpoint.OsgiAclServiceRestEndpoint" />
+  <property name="service.description" value="ACL Manager REST endpoint" />
+  
+  <property name="opencast.service.type" value="org.opencastproject.authorization.xacml.manager" />
+  <property name="opencast.service.path" value="/acl-manager" />
+  
+  <service>
+    <provide interface="org.opencastproject.authorization.xacml.manager.endpoint.OsgiAclServiceRestEndpoint" />
+  </service>
+  <reference name="acl-service-factory" interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"
+    cardinality="1..1" policy="static" bind="setAclServiceFactory" />
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="authorization-service" interface="org.opencastproject.security.api.AuthorizationService"
+    cardinality="1..1" policy="static" bind="setAuthorizationService" />
+  <reference name="episode-service" interface="org.opencastproject.episode.api.EpisodeService"
+    cardinality="1..1" policy="static" bind="setEpisodeService" />
+  <reference name="series-service" interface="org.opencastproject.series.api.SeriesService"
+    cardinality="1..1" policy="static" bind="setSeriesService" />
+  <reference name="httpMediaPackageElementProvider" interface="org.opencastproject.episode.api.HttpMediaPackageElementProvider"
+    cardinality="1..1" policy="static" bind="setHttpMediaPackageElementProvider" />
+</scr:component>

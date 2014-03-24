@@ -49,7 +49,7 @@ import java.util.TimerTask;
 /**
  * Class for retrieving, storing and accessing both local and centralised configuration files for the CaptureAgent. Uses
  * java.util.Properties to store configuration file which can read/write INI style config files.
- * 
+ *
  * FIXME: Is this class thread safe (answer: currently, no)? Does it need to be? (jt)
  */
 public class ConfigurationManager implements ManagedService {
@@ -76,7 +76,7 @@ public class ConfigurationManager implements ManagedService {
    * ConfigurationManager.
    **/
   private List<ConfigurationManagerListener> listeners  = Collections.synchronizedList(new LinkedList<ConfigurationManagerListener>());
-  
+
   /** If this ConfigurationManager has had its properties updated this will be initialised. **/
   public boolean isInitialized() {
     return initialized;
@@ -120,7 +120,7 @@ public class ConfigurationManager implements ManagedService {
       Object key = keys.nextElement();
       Object value = props.get(key);
       if (String.class.isInstance(key) && String.class.isInstance(value)) {
-        // Trim the value before we allow it to end up in the properties. 
+        // Trim the value before we allow it to end up in the properties.
         properties.put(key, ((String)value).trim());
       }
     }
@@ -189,7 +189,7 @@ public class ConfigurationManager implements ManagedService {
 
   /**
    * A thread to run the refresh for each ConfigurationManagerListener. This will ensure that the listeners don't get
-   * blocked waiting for another one to finish executing hence causing deadlock. 
+   * blocked waiting for another one to finish executing hence causing deadlock.
    **/
   class RefreshRunner implements Runnable {
     /** The listener to call refresh on. **/
@@ -218,7 +218,7 @@ public class ConfigurationManager implements ManagedService {
 
   /**
    * Creates a file or directory.
-   * 
+   *
    * @param key
    *          The key to set in this configuration manager. Key is set equal to name.
    * @param fallback
@@ -250,7 +250,7 @@ public class ConfigurationManager implements ManagedService {
 
   /**
    * Retrieve property for configuration.
-   * 
+   *
    * @param key
    *          the key to retrieve from the property list.
    * @return the value corresponding to the key.
@@ -271,7 +271,7 @@ public class ConfigurationManager implements ManagedService {
 
   /**
    * Returns the value of an expanded variable
-   * 
+   *
    * @param variable
    *          The name of the variable (ie, java.io.tmpdir, or M2_REPO)
    * @return The value of that variable, or null if the variable is not found
@@ -282,7 +282,7 @@ public class ConfigurationManager implements ManagedService {
 
   /**
    * Retrieve property for configuration. The return value for this function do *not* have its variable(s) expanded.
-   * 
+   *
    * @param key
    *          the key to retrieve from the property list.
    * @return the value corresponding to the key.
@@ -303,7 +303,7 @@ public class ConfigurationManager implements ManagedService {
 
   /**
    * Add a key, value pair to the property list.
-   * 
+   *
    * @param key
    *          the key to be placed in the properties list.
    * @param value
@@ -325,7 +325,7 @@ public class ConfigurationManager implements ManagedService {
   /**
    * Read a remote properties file and load it into memory. The URL it attempts to read from is defined by
    * CaptureParameters.CAPTURE_CONFIG_ENDPOINT_URL
-   * 
+   *
    * @return The properties (if any) fetched from the server
    * @see org.opencastproject.capture.CaptureParameters#CAPTURE_CONFIG_REMOTE_ENDPOINT_URL
    */
@@ -353,7 +353,7 @@ public class ConfigurationManager implements ManagedService {
 
   /**
    * Stores a local copy of the properties on disk.
-   * 
+   *
    * @see org.opencastproject.capture.CaptureParameters#CAPTURE_CONFIG_CACHE_URL
    */
   void writeConfigFileToDisk() {
@@ -381,7 +381,7 @@ public class ConfigurationManager implements ManagedService {
 
   /**
    * Returns a Dictionary of all the properties associated with this configuration manager.
-   * 
+   *
    * @return the key/value pair mapping.
    */
   public XProperties getAllProperties() {
@@ -392,7 +392,7 @@ public class ConfigurationManager implements ManagedService {
 
   /**
    * Filters the capabilities (mappings between friendly names and recording devices) from this agent's properties
-   * 
+   *
    * @return A Properties object containing the capabilities --friendly names as keys and device locations as values
    */
   public Properties getCapabilities() {
@@ -445,7 +445,7 @@ public class ConfigurationManager implements ManagedService {
   /**
    * Merges the given Properties with the ConfigurationManager's properties. Will not overwrite the ConfigurationManager
    * if specified.
-   * 
+   *
    * @param p
    *          Properties object to be merged with ConfigurationManager.
    * @param overwrite
@@ -484,7 +484,7 @@ public class ConfigurationManager implements ManagedService {
   /**
    * Registers a ConfigurationManagerListener with this ConfigurationManager so that when the properties are updated,
    * each listener will be updated automatically.
-   * 
+   *
    * @param ConfigurationManagerListener
    *          A new listener to update when the configuration properties are updated.
    **/

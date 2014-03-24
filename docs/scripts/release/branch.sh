@@ -17,7 +17,7 @@ OLD_POM_VER=
 #E.g. BRANCH_POM_VER=1.4.2-SNAPSHOT
 BRANCH_POM_VER=
 
-#The version that develop should have.  This is only relevant for final releases!
+#The version that develop should have.
 #E.g. NEW_DEVELOP_POM_VER=1.5-SNAPSHOT
 NEW_DEVELOP_POM_VER=
 
@@ -45,7 +45,7 @@ git checkout develop
 git revert --no-edit HEAD
 
 echo "Replacing POM file version in main POM."
-updatePomVersions -w $WORK_DIR -o $OLD_POM_VER -n $NEW_DEVELOP_VER
+updatePomVersions -w $WORK_DIR -o $OLD_POM_VER -n $NEW_DEVELOP_POM_VER
 
 git commit -a -m "$JIRA_TICKET: Updating POM versions to $NEW_DEVELOP_VER in develop"
 

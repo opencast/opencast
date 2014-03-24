@@ -19,6 +19,8 @@ package org.opencastproject.metadata.dublincore;
 import org.joda.time.Duration;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.ISOPeriodFormat;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,6 +29,8 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.opencastproject.util.data.Option.option;
 
 /**
  * Utility class to facilitate the work with DCMI encoding schemes.
@@ -208,6 +212,13 @@ public final class EncodingSchemeUtils {
     return null;
   }
 
+  /** {@link #decodeDate(org.opencastproject.metadata.dublincore.DublinCoreValue)} as a function. */
+  public static final Function<DublinCoreValue, Option<Date>> dcValueToDate = new Function<DublinCoreValue, Option<Date>>() {
+    @Override public Option<Date> apply(DublinCoreValue dublinCoreValue) {
+      return option(decodeDate(dublinCoreValue));
+    }
+  };
+
   /**
    * Tries to decode the given value as a W3C-DTF encoded date. If decoding fails, null is returned.
    * 
@@ -220,6 +231,13 @@ public final class EncodingSchemeUtils {
     }
     return null;
   }
+
+  /** {@link #decodeDate(String)} as a function. */
+  public static final Function<String, Option<Date>> stringToDate = new Function<String, Option<Date>>() {
+    @Override public Option<Date> apply(String s) {
+      return option(decodeDate(s));
+    }
+  };
 
   /**
    * Like {@link #decodeDate(String)}, but throws an {@link IllegalArgumentException} if the value cannot be decoded.

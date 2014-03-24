@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.5.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -206,6 +206,7 @@
               OSGI-INF/operations/coverart.xml,
               OSGI-INF/operations/delete-archive.xml,
               OSGI-INF/operations/distribute-acl.xml,
+              OSGI-INF/operations/distribute-mediapackagepost.xml,
               OSGI-INF/operations/download-dvd.xml,
               OSGI-INF/operations/email.xml,
               OSGI-INF/operations/embed.xml,
@@ -231,8 +232,7 @@
               OSGI-INF/operations/tag.xml,
               OSGI-INF/operations/trim.xml,
               OSGI-INF/operations/zip.xml,
-              OSGI-INF/operations/watermark.xml,
-							OSGI-INF/operations/distribute-mediapackagepost.xml
+              OSGI-INF/operations/watermark.xml
             </Service-Component>
           </instructions>
         </configuration>

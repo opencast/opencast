@@ -447,7 +447,7 @@ public class MediapackageRestService {
       MediaPackage mp = getMediaPackage(mediapackage);
 
       mp.removeSubject(subject);
-      
+
       return Response.ok(mp).build();
     } catch (MediaPackageException ex) {
       logger.error(ex.getMessage(), ex);

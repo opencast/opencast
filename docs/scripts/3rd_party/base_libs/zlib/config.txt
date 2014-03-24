@@ -1,4 +1,4 @@
-URL: http://zlib.net http://downloads.sourceforge.net/project/libpng/zlib/1.2.6 ${USASK_MIRROR}
+URL: http://heanet.dl.sourceforge.net/project/libpng/zlib/1.2.6 ${USASK_MIRROR}
 PKG: zlib-1.2.6.tar.gz
 SHA: 38690375d8d42398ce33b2df726e25cacf096496
 DIR: zlib-1.2.6

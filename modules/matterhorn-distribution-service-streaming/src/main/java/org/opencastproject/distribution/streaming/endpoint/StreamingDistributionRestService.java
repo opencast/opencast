@@ -48,15 +48,13 @@ import javax.ws.rs.core.Response.Status;
  * Rest endpoint for distributing media to the local streaming distribution channel.
  */
 @Path("/")
-@RestService(name = "localdistributionservice", title = "Local Distribution Service",
-  abstractText = "This service distributes media packages to the Matterhorn feed and engage services.",
-  notes = {
+@RestService(name = "localdistributionservice", title = "Local Distribution Service", abstractText = "This service distributes media packages to the Matterhorn feed and engage services.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
-        + "not working and is either restarting or has failed",
+                + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class StreamingDistributionRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -103,9 +101,7 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
           @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
           @RestParameter(name = "elementId", isRequired = true, description = "The element to distribute", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job") })
   public Response distribute(@FormParam("mediapackage") String mediaPackageXml,
-                             @FormParam("channelId") String channelId,
-                             @FormParam("elementId") String elementId)
-          throws Exception {
+          @FormParam("channelId") String channelId, @FormParam("elementId") String elementId) throws Exception {
     Job job = null;
     try {
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
@@ -127,10 +123,8 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
           @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
           @RestParameter(name = "elementId", isRequired = true, description = "The element to retract", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job") })
-  public Response retract(@FormParam("mediapackage") String mediaPackageXml,
-                          @FormParam("channelId") String channelId,
-                          @FormParam("elementId") String elementId)
-          throws Exception {
+  public Response retract(@FormParam("mediapackage") String mediaPackageXml, @FormParam("channelId") String channelId,
+          @FormParam("elementId") String elementId) throws Exception {
     Job job = null;
     try {
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);

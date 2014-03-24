@@ -38,23 +38,23 @@ import java.util.Properties;
 public final class GStreamerCapturePipeline extends GStreamerAbstractPipeline {
 
   private static final Logger logger = LoggerFactory.getLogger(GStreamerCapturePipeline.class);
- 
-  // Used to stop the capture above if something goes wrong at this level. 
+
+  // Used to stop the capture above if something goes wrong at this level.
   private CaptureFailureHandler captureFailureHandler;
-  
+
   public GStreamerCapturePipeline(CaptureFailureHandler captureFailureHandler) {
-   captureDeviceBins = new ArrayList<CaptureDeviceBin>(); 
+   captureDeviceBins = new ArrayList<CaptureDeviceBin>();
    this.captureFailureHandler = captureFailureHandler;
   }
-  
+
   @Override
-  public boolean isMonitoringOnly() { 
+  public boolean isMonitoringOnly() {
     return false;
   }
-  
+
   /**
    * Creates the gStreamer pipeline and blocks until it starts successfully
-   * 
+   *
    * @param newRec
    *          The RecordingImpl of the capture we wish to perform.
    * @return The recording ID (equal to newRec.getID()) or null in the case of an error
@@ -91,17 +91,17 @@ public final class GStreamerCapturePipeline extends GStreamerAbstractPipeline {
     // Try and start the pipeline
     pipeline.play();
     if (pipeline.getState(wait * GStreamerCapturePipeline.GST_SECOND) != State.PLAYING) {
-      // In case of an error call stop to clean up the pipeline.  
+      // In case of an error call stop to clean up the pipeline.
       logger.debug("Pipeline was unable to start after " + wait + " seconds.");
       stop(GStreamerCapturePipeline.DEFAULT_PIPELINE_SHUTDOWN_TIMEOUT);
       throw new UnableToStartCaptureException("Unable to start pipeline after " + wait + " seconds.  Aborting!");
     }
     logger.info("{} started.", pipeline.getName());
   }
-  
+
   /**
    * Create a bin that contains multiple pipelines using each source in the properties object as the gstreamer source
-   * 
+   *
    * @param props
    *          {@code Properties} object defining sources
    * @return The {@code Pipeline} to control the pipelines
@@ -133,7 +133,7 @@ public final class GStreamerCapturePipeline extends GStreamerAbstractPipeline {
 
   /**
    * Initializes the pipeline itself, but does not start capturing
-   * 
+   *
    * @param devices
    *          The list of devices to capture from.
    * @return The created {@code Pipeline}, or null in the case of an error.

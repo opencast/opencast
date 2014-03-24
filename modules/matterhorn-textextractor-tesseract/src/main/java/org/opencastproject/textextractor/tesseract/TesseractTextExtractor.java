@@ -144,10 +144,10 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
         }
 
         @Override
-        protected boolean onStderr(String line) {
+        protected void onStderr(String line) {
           if ("Page 0".equals(line.trim()))
-            return false;
-          return super.onStderr(line);
+            return;
+          super.onStderr(line);
         }
 
       };
@@ -185,7 +185,6 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void updated(Dictionary properties) throws ConfigurationException {
     String path = (String) properties.get(TESSERACT_BINARY_CONFIG_KEY);
     if (path != null) {
@@ -212,7 +211,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     /* Set additional options for tesseract (i.e. language to use) */
     String addopts = (String) cc.getBundleContext().getProperty(TESSERACT_OPTS_CONFIG_KEY);
     if (addopts != null) {
-      logger.info("Setting additional options for Tesseract path to '{}'", addopts);
+      logger.info("Setting additional options for Tesseract to '{}'", addopts);
       this.addOptions = addopts;
     } else {
       logger.info("No additional options for Tesseract");

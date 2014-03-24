@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.5.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -131,7 +131,8 @@
               *;resolution:=optional
             </Import-Package>
             <Export-Package>
-              org.opencastproject.load.test.*;version=${project.version},
+              org.opencastproject.loadtest.endpoint;version=${project.version},
+              org.opencastproject.loadtest.impl;version=${project.version}
             </Export-Package>
             <Service-Component>
               OSGI-INF/load-test.xml,

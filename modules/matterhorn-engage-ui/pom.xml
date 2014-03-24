@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.5.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -233,33 +233,33 @@
   </build>
   <reporting>
 		<plugins>
-			<plugin>
+			<!--<plugin>
 				<groupId>gr.abiss.mvn.plugins</groupId>
 				<artifactId>maven-jstools-plugin</artifactId>
 				<version>0.7</version>
 				<inherited>false</inherited>
 				<configuration>
-					<!-- the default is src/main/js -->
-					<!-- main player javascript -->
+					<!- - the default is src/main/js - ->
+					<!- - main player javascript - ->
 					<jsDir>../../shared-resources</jsDir>
-					<!-- this is actually the default -->
+					<!- - this is actually the default - ->
 					<includes>**/*.js</includes>
-					<!-- maybe you need to exclude compressed JS files -->
+					<!- - maybe you need to exclude compressed JS files - ->
 					<excludes>**/*-compressed.js</excludes>
-					<!-- this is actually the default -->
+					<!- - this is actually the default - ->
 					<caseSensitive>true</caseSensitive>
-					<!-- for more configuration properties, see the goals documentation -->
+					<!- - for more configuration properties, see the goals documentation - ->
 				</configuration>
 				<reportSets>
 					<reportSet>
 						<reports>
-							<!-- include the desired reports -->
+							<!- - include the desired reports - ->
 							<report>jslint</report>
 							<report>jsdoc</report>
 						</reports>
 					</reportSet>
 				</reportSets>
-			</plugin>
+			</plugin>-->
 		</plugins>
 	</reporting>
 </project>

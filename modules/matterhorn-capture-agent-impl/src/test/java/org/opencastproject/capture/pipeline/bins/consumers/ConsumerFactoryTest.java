@@ -125,7 +125,7 @@ public class ConsumerFactoryTest {
       logger.error("Unable to create an Audio File Sink in SinkFactoryTest", e);
     }
   }
-  
+
   @Test
   public void testAudioMonitoringSink() {
     if (!gstreamerInstalled)
@@ -138,7 +138,7 @@ public class ConsumerFactoryTest {
       logger.error("Unable to create an Audio Monitoring Sink in SinkFactoryTest", e);
     }
   }
-  
+
   @Test
   public void testVideoMonitoringSink() {
     if (!gstreamerInstalled)

@@ -663,7 +663,7 @@ public final class Schema {
   private static String mkString(Object v) {
     return v != null ? v.toString() : null;
   }
-  
+
   private static boolean mkBoolean(Object v) {
     return v != null ? (Boolean) v : null;
   }

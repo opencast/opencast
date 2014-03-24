@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.5.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -332,7 +332,7 @@
 						<reports>
 							<!-- include the desired reports -->
 							<report>jslint</report>
-							<report>jsdoc</report>
+							<!--<report>jsdoc</report>-->
 						</reports>
 					</reportSet>
 				</reportSets>

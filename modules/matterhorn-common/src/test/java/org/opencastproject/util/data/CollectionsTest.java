@@ -149,7 +149,7 @@ public class CollectionsTest {
     List<Integer> l = list(1, 2, 3);
     assertEquals("1-2-3", Collections.mkString(l, "-"));
   }
-  
+
   @Test
   public void testToList() {
     List<Integer> i1 = toList(java.util.Collections.<Integer>emptyList().iterator());
@@ -173,7 +173,7 @@ public class CollectionsTest {
     assertTrue(toList(repeat(1, 0)).isEmpty());
     assertEquals(3, toList(repeat(1, 3)).size());
   }
-  
+
   @Test
   public void testJoin() {
     assertArrayEquals(array(1, 2, 3, 4, 5, 6), toArray(Integer.class, toList(join(list(1, 2, 3).iterator(), list(4, 5, 6).iterator()))));
@@ -181,7 +181,7 @@ public class CollectionsTest {
     assertArrayEquals(array(1, 2, 3), toArray(Integer.class, toList(join(java.util.Collections.<Integer>emptyList().iterator(), list(1, 2, 3).iterator()))));
     assertEquals(0, toArray(Object.class, toList(join(java.util.Collections.emptyList().iterator(), java.util.Collections.emptyList().iterator()))).length);
   }
-  
+
   @Test(expected = NoSuchElementException.class)
   public void testIterator1() {
     Iterator<Integer> i = iterator(new Integer[0]);

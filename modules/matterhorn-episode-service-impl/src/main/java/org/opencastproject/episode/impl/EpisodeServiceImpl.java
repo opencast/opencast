@@ -38,7 +38,7 @@ import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.functions.Functions.constant;
+import static org.opencastproject.util.data.functions.Functions.constant0;
 import static org.opencastproject.util.data.functions.Functions.toPredicate;
 
 import org.opencastproject.episode.api.ArchivedMediaPackageElement;
@@ -150,9 +150,9 @@ public final class EpisodeServiceImpl implements EpisodeService {
   public synchronized void add(final MediaPackage mp) throws EpisodeServiceException {
     handleException(new Effect0.X() {
       @Override
-      public void xrun() throws Exception {
+      protected void xrun() throws Exception {
         logger.debug("Attempting to add mediapackage {} to archive", mp.getIdentifier());
-        final AccessControlList acl = authSvc.getAccessControlList(mp);
+        final AccessControlList acl = authSvc.getActiveAcl(mp).getA();
         protect(acl, list(WRITE_PERMISSION), new Effect0.X() {
           @Override
           public void xrun() throws Exception {
@@ -298,10 +298,9 @@ public final class EpisodeServiceImpl implements EpisodeService {
       @Override
       public SearchResult xapply() throws Exception {
         User user = secSvc.getUser();
-        Organization organization = orgDir.getOrganization(user.getOrganization());
-        if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(organization.getAdminRole())) {
+        if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole()))
           throw new UnauthorizedException(user, getClass().getName() + ".getForAdministrativeRead");
-        }
+
         final SearchResult r = solrRequester.find(q);
         for (SearchResultItem item : r.getItems()) {
           // rewrite URIs in place
@@ -439,6 +438,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
           latestVersion = latestEpisode.get().getVersion();
           maps.put(episodeId, latestVersion);
         }
+
         boolean isLatestVersion = episode.getVersion().equals(latestVersion);
 
         final Organization organization = orgDir.getOrganization(episode.getOrganization());
@@ -684,7 +684,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
     for (MediaPackageElement mpe : pmp.getPartial()) {
       mpe.setURI(uriCreator.apply(mpe));
     }
-  }
+  };
 
   /** Rewrite URIs of assets of mediapackage elements. */
   public static void rewriteAssetsForArchival(PartialMediaPackage pmp, Version version) {
@@ -726,7 +726,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
     return new Function.X<SearchResultItem, Protected<SearchResultItem>>() {
       @Override
       public Protected<SearchResultItem> xapply(SearchResultItem item) throws Exception {
-        return protect(AccessControlParser.parseAcl(item.getOcAcl()), list(action), constant(item));
+        return protect(AccessControlParser.parseAcl(item.getOcAcl()), list(action), constant0(item));
       }
     };
   }
@@ -736,7 +736,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
     return new Function<Episode, Protected<Episode>>() {
       @Override
       public Protected<Episode> apply(Episode e) {
-        return protect(e.getAcl(), list(action), constant(e));
+        return protect(e.getAcl(), list(action), constant0(e));
       }
     };
   }

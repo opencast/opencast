@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * 
+ *
  */
 public interface CatalogService<T extends MetadataCatalog> {
   /**
@@ -29,28 +29,28 @@ public interface CatalogService<T extends MetadataCatalog> {
    * @return a new catalog
    */
   T newInstance();
-  
+
   /**
    * Loads the catalog contents from an input stream
-   * 
+   *
    * @param in the catalog data
    * @return the deserialized catalog contents
    * @throws IOException if the content of the catalog can not be loaded
    */
   T load(InputStream in) throws IOException;
-  
+
   /**
    * Whether the mediapackage catalog is readable by this catalog service.  A true value does not indicate that the
    * catalog will be parsed correctly, only that the catalog's metadata seems to match this service.
-   * 
+   *
    * @param catalog the mediapackage catalog
    * @return whether the catalog is readable
    */
   boolean accepts(Catalog catalog);
-  
+
   /**
    * Serializes a catalog
-   * 
+   *
    * @param catalog The catalog to serialize
    * @return the (usually xml) stream
    * @throws IOException if the catalog can not be serialized properly

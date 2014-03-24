@@ -16,23 +16,22 @@
 
 package org.opencastproject.util.persistence;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.Tuple.tuple;
+
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.util.data.functions.Functions;
+
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+
 import org.osgi.service.component.ComponentContext;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
-import javax.persistence.Query;
-import javax.persistence.TemporalType;
-import javax.persistence.spi.PersistenceProvider;
-import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -42,13 +41,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.opencastproject.util.data.Either.left;
-import static org.opencastproject.util.data.Either.right;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.functions.Misc.chuck;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
+import javax.persistence.Query;
+import javax.persistence.TemporalType;
+import javax.persistence.spi.PersistenceProvider;
+import javax.sql.DataSource;
+/** Functions supporting persistence. */
 
 /**
  * Functions supporting persistence.
@@ -57,15 +58,19 @@ public final class PersistenceUtil {
   private PersistenceUtil() {
   }
 
+  public static final Map<String, Object> NO_PERSISTENCE_PROPS = Collections
+          .unmodifiableMap(new HashMap<String, Object>());
+
   /**
-   * Create a new entity manager factory with the persistence unit name <code>emName</code>.
-   * A {@link javax.persistence.spi.PersistenceProvider} named <code>persistence</code> has to be registered as an OSGi service.
-   * If you want to configure the factory please also register a map containing all properties under
-   * the name <code>persistenceProps</code>. See {@link javax.persistence.spi.PersistenceProvider#createEntityManagerFactory(String, java.util.Map)}
-   * for more information about config maps.
-   *
+   * Create a new entity manager factory with the persistence unit name <code>emName</code>. A
+   * {@link javax.persistence.spi.PersistenceProvider} named <code>persistence</code> has to be registered as an OSGi
+   * service. If you want to configure the factory please also register a map containing all properties under the name
+   * <code>persistenceProps</code>. See
+   * {@link javax.persistence.spi.PersistenceProvider#createEntityManagerFactory(String, java.util.Map)} for more
+   * information about config maps.
+   * 
    * @param emName
-   *         name of the persistence unit
+   *          name of the persistence unit
    */
   public static EntityManagerFactory newEntityManagerFactory(ComponentContext cc, String emName) {
     PersistenceProvider persistenceProvider = (PersistenceProvider) cc.locateService("persistence");
@@ -76,42 +81,30 @@ public final class PersistenceUtil {
   }
 
   /**
-   * Create a new entity manager factory with the persistence unit name <code>emName</code>.
-   * A {@link javax.persistence.spi.PersistenceProvider} named <code>persistence</code> has to be registered as an OSGi service.
-   * See {@link javax.persistence.spi.PersistenceProvider#createEntityManagerFactory(String, java.util.Map)}
+   * Create a new entity manager factory with the persistence unit name <code>emName</code>. A
+   * {@link javax.persistence.spi.PersistenceProvider} named <code>persistence</code> has to be registered as an OSGi
+   * service. See {@link javax.persistence.spi.PersistenceProvider#createEntityManagerFactory(String, java.util.Map)}
    * for more information about config maps.
-   *
+   * 
    * @param emName
-   *         name of the persistence unit
+   *          name of the persistence unit
    * @param persistenceProps
-   *         config map for the creation of an EntityManagerFactory
+   *          config map for the creation of an EntityManagerFactory
    */
   public static EntityManagerFactory newEntityManagerFactory(ComponentContext cc, String emName, Map persistenceProps) {
     PersistenceProvider persistenceProvider = (PersistenceProvider) cc.locateService("persistence");
     return persistenceProvider.createEntityManagerFactory(emName, persistenceProps);
   }
 
-  /**
-   * Create a new, concurrently usable persistence environment which uses JPA local transactions.
-   * <p/>
-   * Runtime exceptions that occured are simply rethrown.
-   * <p/>
-   * Please note that calling {@link PersistenceEnv#tx(org.opencastproject.util.data.Function)} always creates a <em>new</em> transaction.
-   * Transaction propagation is <em>not</em> supported.
-   */
-  public static PersistenceEnv newPersistenceEnvironment(final EntityManagerFactory emf) {
-    return newPersistenceEnvironment(emf, Functions.<Exception>identity());
-  }
-
   /** Create a new persistence environment. This method is the preferred way of creating a persitence environment. */
   public static PersistenceEnv newPersistenceEnvironment(PersistenceProvider persistenceProvider, String emName,
-                                                         Map persistenceProps) {
+          Map persistenceProps) {
     return newPersistenceEnvironment(persistenceProvider.createEntityManagerFactory(emName, persistenceProps));
   }
 
   /**
    * Shortcut for <code>newPersistenceEnvironment(newEntityManagerFactory(cc, emName, persistenceProps))</code>.
-   *
+   * 
    * @see #newEntityManagerFactory(org.osgi.service.component.ComponentContext, String, java.util.Map)
    */
   public static PersistenceEnv newPersistenceEnvironment(ComponentContext cc, String emName, Map persistenceProps) {
@@ -120,111 +113,55 @@ public final class PersistenceUtil {
 
   /**
    * Shortcut for <code>newPersistenceEnvironment(newEntityManagerFactory(cc, emName))</code>.
-   *
+   * 
    * @see #newEntityManagerFactory(org.osgi.service.component.ComponentContext, String)
    */
   public static PersistenceEnv newPersistenceEnvironment(ComponentContext cc, String emName) {
     return newPersistenceEnvironment(newEntityManagerFactory(cc, emName));
   }
 
-  /**
-   * Equip a persistence environment with an exception handler.
-   *
-   * @see #newPersistenceEnvironment(javax.persistence.EntityManagerFactory, org.opencastproject.util.data.Function)
-   */
-  public static <T extends Exception> PersistenceEnv equip(final PersistenceEnv penv,
-                                                           final Function<Exception, T> exHandler) {
-    return new PersistenceEnv() {
-      @Override public <A> A tx(Function<EntityManager, A> transactional) {
-        try {
-          return penv.tx(transactional);
-        } catch (Exception e) {
-          return chuck(exHandler.apply(e));
-        }
-      }
-
-      @Override public void close() {
-        penv.close();
-      }
-    };
+  /** Create a new entity manager or return none, if the factory has already been closed. */
+  public static Option<EntityManager> createEntityManager(EntityManagerFactory emf) {
+    try {
+      return some(emf.createEntityManager());
+    } catch (IllegalStateException ex) {
+      // factory is already closed
+      return none();
+    }
   }
 
   /**
    * Equip a persistence environment with an exception handler.
-   *
+   * 
    * @see #newPersistenceEnvironment(javax.persistence.EntityManagerFactory, org.opencastproject.util.data.Function)
    */
   public static <F> PersistenceEnv2<F> equip2(final PersistenceEnv penv, final Function<Exception, F> exHandler) {
     return new PersistenceEnv2<F>() {
-      @Override public <A> Either<F, A> tx(Function<EntityManager, A> transactional) {
+      @Override
+      public <A> Either<F, A> tx(Function<EntityManager, A> transactional) {
         try {
-          return right(penv.tx(transactional));
+          return Either.right(penv.tx(transactional));
         } catch (Exception e) {
-          return left(exHandler.apply(e));
+          return Either.left(exHandler.apply(e));
         }
       }
 
-      @Override public void close() {
+      @Override
+      public void close() {
         penv.close();
       }
     };
   }
 
-  private interface Transactional {
-    <A> A tx(Function<EntityManager, A> transactional);
-  }
-
-  private static final ThreadLocal<Option<Transactional>> emStore = new ThreadLocal<Option<Transactional>>() {
-    @Override protected Option<Transactional> initialValue() {
-      return none();
-    }
-  };
-
   /**
    * Create a new, concurrently usable persistence environment which uses JPA local transactions.
    * <p/>
-   * Runtime excpetions that occured are transformed by function <code>exHandler</code> and then thrown.
-   * <p/>
-   * Transaction propagation is supported per thread.
+   * Transaction propagation is supported on a per thread basis.
+   * 
+   * @deprecated use {@link PersistenceEnvs#persistenceEnvironment(EntityManagerFactory)}
    */
-  public static <T extends Exception> PersistenceEnv newPersistenceEnvironment(final EntityManagerFactory emf,
-                                                                               final Function<Exception, T> exHandler) {
-    final Transactional startTx = new Transactional() {
-      @Override
-      public <A> A tx(Function<EntityManager, A> transactional) {
-        final EntityManager em = emf.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
-        try {
-          tx.begin();
-          emStore.set(Option.<Transactional>some(new Transactional() {
-            @Override public <A> A tx(Function<EntityManager, A> transactional) {
-              return transactional.apply(em);
-            }
-          }));
-          A ret = transactional.apply(em);
-          tx.commit();
-          return ret;
-        } catch (RuntimeException e) {
-          if (tx.isActive()) {
-            tx.rollback();
-          }
-          // propagate exception
-          return chuck(exHandler.apply(e));
-        } finally {
-          em.close();
-          emStore.remove();
-        }
-      }
-    };
-    return new PersistenceEnv() {
-      @Override public <A> A tx(Function<EntityManager, A> transactional) {
-        return emStore.get().getOrElse(startTx).tx(transactional);
-      }
-
-      @Override public void close() {
-        emf.close();
-      }
-    };
+  public static PersistenceEnv newPersistenceEnvironment(final EntityManagerFactory emf) {
+    return PersistenceEnvs.persistenceEnvironment(emf);
   }
 
   public static void closeQuietly(Connection c) {
@@ -238,7 +175,7 @@ public final class PersistenceUtil {
 
   /**
    * Test if a connection to the given data source can be established.
-   *
+   * 
    * @return none, if the connection could be established
    */
   public static Option<SQLException> testConnection(DataSource ds) {
@@ -254,8 +191,10 @@ public final class PersistenceUtil {
   }
 
   /**
-   * Create a named query with a list of parameters. Values of type {@link Date} are recognized
-   * and set as a timestamp ({@link TemporalType#TIMESTAMP}.
+   * Create a named query with a list of parameters. Values of type {@link Date} are recognized and set as a timestamp (
+   * {@link TemporalType#TIMESTAMP}.
+   * 
+   * @deprecated use {@link Queries#named#query(EntityManager, String, Class, Object[])}
    */
   public static Query createNamedQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
     final Query q = em.createNamedQuery(queryName);
@@ -270,12 +209,20 @@ public final class PersistenceUtil {
     return q;
   }
 
-  /** Run an update query and ensure that at least one row got affected. */
+  /**
+   * Run an update (UPDATE or DELETE) query and ensure that at least one row got affected.
+   * 
+   * @deprecated use {@link Queries#named#update(EntityManager, String, Object[])}
+   */
   public static boolean runUpdate(EntityManager em, String queryName, Tuple<String, ?>... params) {
     return createNamedQuery(em, queryName, params).executeUpdate() > 0;
   }
 
-  /** Run a query that should return a single result. */
+  /**
+   * Run a query (SELECT) that should return a single result.
+   * 
+   * @deprecated use {@link Queries#named#findSingle(EntityManager, String, Object[])}
+   */
   public static <A> Option<A> runSingleResultQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
     try {
       return some((A) createNamedQuery(em, queryName, params).getSingleResult());
@@ -286,7 +233,11 @@ public final class PersistenceUtil {
     }
   }
 
-  /** Run a query that should return the first result of it. */
+  /**
+   * Run a query that should return the first result of it.
+   * 
+   * @deprecated use {@link Queries#named#findFirst(EntityManager, String, Object[])}
+   */
   public static <A> Option<A> runFirstResultQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
     try {
       return some((A) createNamedQuery(em, queryName, params).setMaxResults(1).getSingleResult());
@@ -297,14 +248,20 @@ public final class PersistenceUtil {
     }
   }
 
-  /** Execute a <code>count(x)</code> query. */
+  /**
+   * Execute a <code>COUNT(x)</code> query.
+   * 
+   * @deprecated use {@link Queries#named#count(EntityManager, String, Object[])}
+   */
   public static long runCountQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
     return ((Number) createNamedQuery(em, queryName, params).getSingleResult()).longValue();
   }
 
+  /** @deprecated use {@link Queries#find(Class, Object)} */
   public static <A> Function<EntityManager, Option<A>> findById(final Class<A> clazz, final Object primaryKey) {
     return new Function<EntityManager, Option<A>>() {
-      @Override public Option<A> apply(EntityManager em) {
+      @Override
+      public Option<A> apply(EntityManager em) {
         return option(em.find(clazz, primaryKey));
       }
     };
@@ -312,120 +269,156 @@ public final class PersistenceUtil {
 
   /**
    * Find a single object.
-   *
+   * 
    * @param params
-   *         the query parameters
+   *          the query parameters
    * @param toA
-   *         map to the desired result object
+   *          map to the desired result object
    * @deprecated
    */
   public static <A, B> Option<A> find(EntityManager em, final Function<B, A> toA, final String queryName,
-                                      final Tuple<String, ?>... params) {
-    return PersistenceUtil.<B>runSingleResultQuery(em, queryName, params).map(toA);
+          final Tuple<String, ?>... params) {
+    return PersistenceUtil.<B> runSingleResultQuery(em, queryName, params).map(toA);
   }
 
-  /** Find multiple objects. */
+  /**
+   * Find multiple objects.
+   * 
+   * @deprecated use {@link Queries#named#findAll(EntityManager, String, Object[])}
+   */
   public static <A> List<A> findAll(EntityManager em, final String queryName, final Tuple<String, ?>... params) {
     return (List<A>) createNamedQuery(em, queryName, params).getResultList();
   }
 
-  /** Find multiple objects with optional pagination. */
-  public static <A> List<A> findAll(EntityManager em, final String queryName,
-                                    Option<Integer> offset, Option<Integer> limit,
-                                    final Tuple<String, ?>... params) {
+  /**
+   * Find multiple objects with optional pagination.
+   * 
+   * @deprecated use {@link Queries#named#findAll(EntityManager, String, Option, Option, Object[])}
+   */
+  public static <A> List<A> findAll(EntityManager em, final String queryName, Option<Integer> offset,
+          Option<Integer> limit, final Tuple<String, ?>... params) {
     final Query q = createNamedQuery(em, queryName, params);
-    for (Integer x : offset) q.setFirstResult(x);
-    for (Integer x : limit) q.setMaxResults(x);
+    for (Integer x : offset)
+      q.setFirstResult(x);
+    for (Integer x : limit)
+      q.setMaxResults(x);
     return (List<A>) q.getResultList();
   }
 
   /**
    * Find multiple objects.
-   *
+   * 
    * @param params
-   *         the query parameters
+   *          the query parameters
    * @param toA
-   *         map to the desired result object
-   * @deprecated use {@link #findAll(javax.persistence.EntityManager, String, org.opencastproject.util.data.Tuple[])} instead
+   *          map to the desired result object
+   * @deprecated use {@link Queries#named#findAll(EntityManager, String, Object[])} instead
    */
   public static <A, B> List<A> findAll(EntityManager em, final Function<B, A> toA, final String queryName,
-                                       final Tuple<String, ?>... params) {
+          final Tuple<String, ?>... params) {
     return mlist((List<B>) createNamedQuery(em, queryName, params).getResultList()).map(toA).value();
   }
 
   /**
    * Find multiple objects with optional pagination.
-   *
+   * 
    * @param params
-   *         the query parameters
+   *          the query parameters
    * @param toA
-   *         map to the desired result object
-   * @deprecated use {@link #findAll(javax.persistence.EntityManager, String, org.opencastproject.util.data.Option, org.opencastproject.util.data.Option, org.opencastproject.util.data.Tuple[])} instead
+   *          map to the desired result object
+   * @deprecated use {@link Queries#named#findAll(EntityManager, String, Option, Option, Object[])} instead
    */
-  public static <A, B> List<A> findAll(EntityManager em, final Function<B, A> toA,
-                                       Option<Integer> offset, Option<Integer> limit,
-                                       final String queryName, final Tuple<String, ?>... params) {
+  public static <A, B> List<A> findAll(EntityManager em, final Function<B, A> toA, Option<Integer> offset,
+          Option<Integer> limit, final String queryName, final Tuple<String, ?>... params) {
     final Query q = createNamedQuery(em, queryName, params);
-    for (Integer x : offset) q.setFirstResult(x);
-    for (Integer x : limit) q.setMaxResults(x);
+    for (Integer x : offset)
+      q.setFirstResult(x);
+    for (Integer x : limit)
+      q.setMaxResults(x);
     return mlist((List<B>) q.getResultList()).map(toA).value();
   }
 
-  /** Create function to persist object <code>a</code> using {@link EntityManager#persist(Object)}. */
+  /**
+   * Create function to persist object <code>a</code> using {@link EntityManager#persist(Object)}.
+   * 
+   * @deprecated use {@link Queries#persist(A)}
+   */
   public static <A> Function<EntityManager, A> persist(final A a) {
     return new Function<EntityManager, A>() {
-      @Override public A apply(EntityManager em) {
+      @Override
+      public A apply(EntityManager em) {
         em.persist(a);
         return a;
       }
     };
   }
 
-  /** Create function to merge an object <code>a</code> with the persisten context of the given entity manage. */
+  /**
+   * Create function to merge an object <code>a</code> with the persisten context of the given entity manage.
+   * 
+   * @deprecated use {@link Queries#merge(A)}
+   */
   public static <A> Function<EntityManager, A> merge(final A a) {
     return new Function<EntityManager, A>() {
-      @Override public A apply(EntityManager em) {
+      @Override
+      public A apply(EntityManager em) {
         em.merge(a);
         return a;
       }
     };
   }
 
-  /**
-   * Create a new entity manager factory backed by an in-memory H2 database for testing purposes.
-   *
-   * @param emName
-   *         name of the persistence unit (see META-INF/persistence.xml)
-   */
-  public static EntityManagerFactory newTestEntityManagerFactory(String emName) {
+  public static EntityManagerFactory newEntityManagerFactory(String emName, String vendor, String driver, String url,
+          String user, String pwd, Map<String, ?> persistenceProps, PersistenceProvider pp) {
     // Set up the database
-    ComboPooledDataSource pooledDataSource = new ComboPooledDataSource();
+    final ComboPooledDataSource pooledDataSource = new ComboPooledDataSource();
     try {
-      pooledDataSource.setDriverClass("org.h2.Driver");
+      pooledDataSource.setDriverClass(driver);
     } catch (PropertyVetoException e) {
       throw new RuntimeException(e);
     }
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + System.currentTimeMillis());
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
+    pooledDataSource.setJdbcUrl(url);
+    pooledDataSource.setUser(user);
+    pooledDataSource.setPassword(pwd);
 
     // Set up the persistence properties
-    Map<String, Object> persistenceProps = new HashMap<String, Object>();
-    persistenceProps.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    persistenceProps.put("eclipselink.ddl-generation", "create-tables");
-    persistenceProps.put("eclipselink.ddl-generation.output-mode", "database");
+    final Map<String, Object> props = new HashMap<String, Object>(persistenceProps);
+    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
+    props.put("eclipselink.target-database", vendor);
 
-    PersistenceProvider pp = new org.eclipse.persistence.jpa.PersistenceProvider();
-    return option(pp.createEntityManagerFactory(emName, persistenceProps))
-            .getOrElse(Option.<EntityManagerFactory>error("Cannot create entity manager factory. Maybe you mispelled the name of the persistence unit?"));
+    final EntityManagerFactory emf = pp.createEntityManagerFactory(emName, props);
+    if (emf == null) {
+      throw new Error("Cannot create entity manager factory for persistence unit " + emName
+              + ". Maybe you misspelled the name of the persistence unit?");
+    }
+    return emf;
+  }
+
+  /**
+   * Create a new entity manager factory backed by an in-memory H2 database for testing purposes.
+   * 
+   * @param emName
+   *          name of the persistence unit (see META-INF/persistence.xml)
+   */
+  public static EntityManagerFactory newTestEntityManagerFactory(String emName) {
+    return newEntityManagerFactory(
+            emName,
+            "Auto",
+            "org.h2.Driver",
+            "jdbc:h2:./target/db" + System.currentTimeMillis(),
+            "sa",
+            "sa",
+            map(tuple("eclipselink.ddl-generation", "create-tables"),
+                    tuple("eclipselink.ddl-generation.output-mode", "database")),
+            new org.eclipse.persistence.jpa.PersistenceProvider());
   }
 
   /**
    * Create a new persistence environment based on an entity manager factory backed by an in-memory H2 database for
    * testing purposes.
-   *
+   * 
    * @param emName
-   *         name of the persistence unit (see META-INF/persistence.xml)
+   *          name of the persistence unit (see META-INF/persistence.xml)
    */
   public static PersistenceEnv newTestPersistenceEnv(String emName) {
     return newPersistenceEnvironment(newTestEntityManagerFactory(emName));

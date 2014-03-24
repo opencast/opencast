@@ -43,7 +43,7 @@ import java.net.URL;
 import javax.servlet.http.HttpServletResponse;
 
 public class WorkspaceImplTest {
-  
+
   private WorkspaceImpl workspace;
 
   private static final String workspaceRoot = "." + File.separator + "target" + File.separator
