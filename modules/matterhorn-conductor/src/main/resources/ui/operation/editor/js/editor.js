@@ -1957,9 +1957,11 @@ function prepareUI() {
                             } else {
                                 editor.updateSplitList(false, true);
                             }
+			    selectCurrentSplitItem();
                         }
                     });
                     $("#waveformControls").show();
+		    $("#slider-waveform-zoom .ui-slider-handle").unbind('keydown');
                 });
                 $(window).resize(function (evt) {
                     if (waveformImageLoadDone) {
