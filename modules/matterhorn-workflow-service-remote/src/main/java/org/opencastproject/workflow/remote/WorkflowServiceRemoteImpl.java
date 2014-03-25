@@ -696,6 +696,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
           throw new WorkflowDatabaseException("State '" + state.toString() + "' is not a valid workflow state");
         } else if (HttpStatus.SC_FORBIDDEN == response.getStatusLine().getStatusCode()) {
           throw new WorkflowDatabaseException("Deleting workflows with state '" + state.toString() + "' is not allowed");
+        } else if (HttpStatus.SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+          throw new UnauthorizedException("You do not have permission to cleanup");
         } else {
           logger.info("Successful request to workflow cleanup endpoint");
           return;

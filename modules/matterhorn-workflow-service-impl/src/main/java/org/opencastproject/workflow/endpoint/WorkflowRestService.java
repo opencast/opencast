@@ -22,6 +22,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_PRECONDITION_FAILED;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
@@ -796,6 +797,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "cleanup", description = "Cleans up workflow instances", returnDescription = "No return value", reponses = {
           @RestResponse(responseCode = SC_OK, description = "Cleanup OK"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Couldn't parse given state"),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to cleanup. Maybe you need to authenticate."),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "It's not allowed to delete other workflow instance statues than STOPPED, SUCCEEDED and FAILED") }, restParameters = {
           @RestParameter(name = "lifetime", type = Type.INTEGER, defaultValue = "30", isRequired = true, description = "Lifetime in days a workflow instance should live"),
           @RestParameter(name = "state", type = Type.STRING, isRequired = true, description = "Workflow instance state, only STOPPED, SUCCEEDED and FAILED are allowed values here") })
