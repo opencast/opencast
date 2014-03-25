@@ -15,10 +15,6 @@
  */
 package org.opencastproject.serviceregistry.impl;
 
-import static org.junit.Assert.assertEquals;
-
-import org.opencastproject.job.api.Job.FailureReason;
-import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
@@ -27,7 +23,6 @@ import org.opencastproject.util.jmx.JmxUtil;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -42,7 +37,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 import javax.persistence.spi.PersistenceProvider;
 
 public class ServiceRegistryJpaImplTest {
@@ -151,26 +145,6 @@ public class ServiceRegistryJpaImplTest {
   @Test(expected = NotFoundException.class)
   public void testDeleteJobInvalidJobId() throws Exception {
     serviceRegistryJpaImpl.removeJob(-1L);
-  }
-
-  @Test
-  @Ignore
-  public void testRemoveJobsWithoutParent() throws Exception {
-    JobJpaImpl jobRunning = (JobJpaImpl) serviceRegistryJpaImpl.createJob("TEST", "TEST", null, null, false, null);
-    jobRunning.setStatus(Status.RUNNING);
-    em.persist(jobRunning);
-
-    JobJpaImpl jobFinished = (JobJpaImpl) serviceRegistryJpaImpl.createJob("TEST", "TEST", null, null, false, null);
-    jobFinished.setStatus(Status.FINISHED);
-    em.persist(jobFinished);
-
-    JobJpaImpl jobFailed = (JobJpaImpl) serviceRegistryJpaImpl.createJob("TEST", "TEST", null, null, false, null);
-    jobFailed.setStatus(Status.FAILED, FailureReason.NONE);
-    em.persist(jobFailed);
-
-    TypedQuery<JobJpaImpl> query = em.createNamedQuery("Job.withoutParent", JobJpaImpl.class);
-    assertEquals(3, query.getResultList().size());
-
   }
 
 }
