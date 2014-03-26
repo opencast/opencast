@@ -1,0 +1,5 @@
+URL: http://heanet.dl.sourceforge.net/project/mad/libid3tag/0.15.1b ${USASK_MIRROR}
+PKG: libid3tag-0.15.1b.tar.gz
+SHA: 4d867e8a8436e73cd7762fe0e85958e35f1e4306
+DIR: libid3tag-0.15.1b
+PCP: pc-id3tag.zip
