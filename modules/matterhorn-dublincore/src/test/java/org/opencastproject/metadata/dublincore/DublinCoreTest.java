@@ -48,8 +48,6 @@ import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.workspace.api.Workspace;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -57,6 +55,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -70,6 +69,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -91,6 +91,7 @@ public class DublinCoreTest {
    * The catalog name
    */
   private static final String catalogName = "/dublincore.xml";
+  private static final String catalogName2 = "/dublincore2.xml";
 
   /** The XML catalog list name */
   private static final String xmlCatalogListName = "/dublincore-list.xml";
@@ -102,6 +103,7 @@ public class DublinCoreTest {
    * The test catalog
    */
   private File catalogFile = null;
+  private File catalogFile2 = null;
 
   /** Temp files for test catalogs */
   private File dcTempFile1 = null;
@@ -115,8 +117,11 @@ public class DublinCoreTest {
   @Before
   public void setUp() throws Exception {
     catalogFile = new File(this.getClass().getResource(catalogName).toURI());
+    catalogFile2 = new File(this.getClass().getResource(catalogName2).toURI());
     if (!catalogFile.exists() || !catalogFile.canRead())
       throw new Exception("Unable to access test catalog");
+    if (!catalogFile2.exists() || !catalogFile2.canRead())
+      throw new Exception("Unable to access test catalog 2");
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(catalogFile).anyTimes();
     EasyMock.replay(workspace);
@@ -490,6 +495,29 @@ public class DublinCoreTest {
     assertEquals(1, dc.get(PROPERTY_LICENSE).size());
     assertEquals(val, dc.get(PROPERTY_LICENSE).get(0));
     assertEquals(ENC_SCHEME_URI, dc.get(PROPERTY_LICENSE).get(0).getEncodingScheme());
+  }
+
+  @Test
+  public void testSerializeDublinCore() throws Exception {
+    DublinCoreCatalog dc = null;
+    FileInputStream in = new FileInputStream(catalogFile2);
+    dc = new DublinCoreCatalogImpl(in);
+    IOUtils.closeQuietly(in);
+
+    String inputXml = IOUtils.toString(new FileInputStream(catalogFile2), "UTF-8");
+    Assert.assertTrue(inputXml.contains("xmlns:dcterms=\"http://purl.org/dc/terms/\""));
+
+    Assert.assertTrue(dc.toXmlString().contains("xmlns:dcterms=\"http://purl.org/dc/terms/\""));
+
+    DublinCoreValue extent = EncodingSchemeUtils.encodeDuration(3000);
+    dc.set(DublinCore.PROPERTY_EXTENT, extent);
+
+    Assert.assertTrue(dc.toXmlString().contains("xmlns:dcterms=\"http://purl.org/dc/terms/\""));
+
+    DublinCoreValue date = EncodingSchemeUtils.encodeDate(new Date(), Precision.Minute);
+    dc.set(DublinCore.PROPERTY_CREATED, date);
+
+    Assert.assertTrue(dc.toXmlString().contains("xmlns:dcterms=\"http://purl.org/dc/terms/\""));
   }
 
   // test that exceptions are thrown correctly
