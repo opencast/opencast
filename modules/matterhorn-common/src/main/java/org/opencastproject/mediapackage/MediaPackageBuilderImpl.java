@@ -161,7 +161,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
     for (int i = 0; i < nodes.getLength(); i++) {
       Node uri = nodes.item(i).getFirstChild();
       if (uri != null)
-        uri.setNodeValue(serializer.resolvePath(uri.getNodeValue()).toString());
+        uri.setNodeValue(serializer.resolvePath(uri.getNodeValue().trim()).toString());
     }
   }
 
