@@ -6,8 +6,10 @@ set -x
 source "${HOME3P}/utilx"
 [ $? -ne 0 ] && exit 1
 #
-compile flac   win32 || exit 1
-compile mad    win32 || exit 1
-compile id3tag win32 || exit 1
+[ -f .done-ports ] && exit 0
 #
+sudox port -f install libmad || exit 1
+#
+touch .done-ports
+[ $? -ne 0 ] && exit 1
 exit 0
