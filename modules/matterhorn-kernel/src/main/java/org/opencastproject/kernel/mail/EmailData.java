@@ -38,7 +38,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Holds data to be displayed in an email message.
+ * Holds data to be displayed in an email message. The following data will be available: mediaPackage, workflow,
+ * workflowConfig: workflow configuration as key-value pairs, catalogs: hash of catalogs whose key is the catalog flavor
+ * sub-type e.g. "series", "episode", failedOperation: the last operation marked as "failOnError" that failed.
  * 
  * @author Rute Santos
  * 
@@ -86,6 +88,7 @@ public class EmailData extends DocData {
     m.put("notes", notes);
     m.put("mediaPackage", mediaPackage);
     m.put("workflow", workflow);
+    m.put("workflowConfig", initWorkflowConfiguration());
     m.put("catalogs", catalogs);
     m.put("failedOperation", findFailedOperation()); // Null if no errors
     return m;
@@ -122,6 +125,14 @@ public class EmailData extends DocData {
         catalogs.put(catalogFlavor, catalogHash);
       }
     }
+  }
+
+  private Map<String, String> initWorkflowConfiguration() {
+    Map<String, String> wfConfiguration = new HashMap<String, String>();
+    for (String key : workflow.getConfigurationKeys()) {
+      wfConfiguration.put(key, workflow.getConfiguration(key));
+    }
+    return wfConfiguration;
   }
 
   private WorkflowOperationInstance findFailedOperation() {

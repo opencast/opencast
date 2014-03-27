@@ -18,6 +18,7 @@ package org.opencastproject.kernel.mail;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -34,7 +35,9 @@ import org.junit.Test;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SmtpServiceTest {
   private SmtpService smtpService;
@@ -77,7 +80,11 @@ public class SmtpServiceTest {
     EasyMock.replay(templateScanner);
     smtpService.bindEmailTemplateScanner(templateScanner);
 
-    workflowInstance = new WorkflowInstanceImpl();
+    WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
+    def.setId("wfdef");
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("emailAddress", "user@domain.com");
+    workflowInstance = new WorkflowInstanceImpl(def, null, null, null, null, props);
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
@@ -126,6 +133,15 @@ public class SmtpServiceTest {
             + "title: Test Media Package, created: 2013-11-19T15:20:00Z, "
             + "SERIES creator: Harvard Extension School, description: http://extension.harvard.edu, "
             + "subject: TEST E-19997", result);
+  }
+
+  @Test
+  public void testWorkflowConfiguration() throws Exception {
+    String templateName = "templateConfig";
+    String templateContent = "This is an email address: ${workflowConfig['emailAddress']}";
+
+    String result = smtpService.applyTemplate(templateName, templateContent, workflowInstance);
+    Assert.assertEquals("This is an email address: user@domain.com", result);
   }
 
   @Test
