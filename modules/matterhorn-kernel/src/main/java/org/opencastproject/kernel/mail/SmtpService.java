@@ -299,7 +299,7 @@ public class SmtpService implements ManagedService {
     }
 
     // Apply the template
-    return DocUtil.generate(new EmailDocData(templateName, workflowInstance, workspace), templateContent);
+    return DocUtil.generate(new EmailData(templateName, workflowInstance, workspace), templateContent);
   }
 
   /**

@@ -43,7 +43,7 @@ import java.util.Map;
  * @author Rute Santos
  * 
  */
-public class EmailDocData extends DocData {
+public class EmailData extends DocData {
 
   private WorkflowInstance workflow;
 
@@ -60,7 +60,7 @@ public class EmailDocData extends DocData {
    * 
    * @param name
    */
-  public EmailDocData(String name, WorkflowInstance wf, Workspace ws) {
+  public EmailData(String name, WorkflowInstance wf, Workspace ws) {
     super(name, null, null);
 
     workflow = wf;
