@@ -1,0 +1,5 @@
+URL: http://heanet.dl.sourceforge.net/project/mad/libmad/0.15.1b ${USASK_MIRROR}
+PKG: libmad-0.15.1b.tar.gz
+SHA: cac19cd00e1a907f3150cc040ccc077783496d76
+DIR: libmad-0.15.1b
+PCP: pc-mad.zip
