@@ -75,6 +75,7 @@
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static</module>
         <module>modules/matterhorn-solr</module>
+        <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videosegmenter-api</module>
