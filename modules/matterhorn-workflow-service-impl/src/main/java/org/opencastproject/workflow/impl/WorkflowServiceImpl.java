@@ -917,18 +917,17 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     // Update the workflow instance
     update(instance);
 
-    removeTempFiles(workflowInstanceId);
+    removeTempFiles(instance);
 
     return instance;
   }
 
-  private void removeTempFiles(long workflowInstanceId) throws WorkflowDatabaseException, UnauthorizedException,
-          NotFoundException {
-    logger.info("Removing temporary files for workflow {}", workflowInstanceId);
-    WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
-    for (MediaPackageElement elem : instance.getMediaPackage().getElements()) {
+  private void removeTempFiles(WorkflowInstance workflowInstance) throws WorkflowDatabaseException,
+          UnauthorizedException, NotFoundException {
+    logger.info("Removing temporary files for workflow {}", workflowInstance);
+    for (MediaPackageElement elem : workflowInstance.getMediaPackage().getElements()) {
       try {
-        logger.debug("Removing temporary file {} for workflow {}", elem.getURI(), workflowInstanceId);
+        logger.debug("Removing temporary file {} for workflow {}", elem.getURI(), workflowInstance);
         workspace.delete(elem.getURI());
       } catch (IOException e) {
         logger.warn("Unable to delete mediapackage element {}", e.getMessage());
@@ -965,7 +964,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
       // First, remove temporary files DO THIS BEFORE REMOVING FROM INDEX
       try {
-        removeTempFiles(workflowInstanceId);
+        removeTempFiles(instance);
       } catch (NotFoundException e) {
         // If the files aren't their anymore, we don't have to cleanup up them :-)
         logger.debug("Temporary files of workflow instance {} seem to be gone already...", workflowInstanceId);
