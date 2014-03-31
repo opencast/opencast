@@ -52,25 +52,25 @@ define(['jquery', 'bootstrap'], function ($, Bootstrap) {
 
     var sortBootstrapTabsAlphabetically = function(selector) {
       // Get tabs
-      var $tabs = [];
+      var tabs = [];
       console.log('Sorting tabs alphabetically');
       $.each($('#' + selector +' a'), function(index, value) {
-        $tabs[index] = $(this).detach();
+        tabs[index] = $(this).detach();
       });
 
       // Sort tabs by tab text
-      $tabs.sort( function(a, b) {
-        if (a[0].id > b[0].id)
+      tabs.sort( function(a, b) {
+        if (a[0].href > b[0].href)
           return 1;
-        if (a[0].id < b[0].id)
+        if (a[0].href < b[0].href)
           return -1;
         // a must be equal to b
         return 0;
       });
 
       // Sort tabs
-      $.each($tabs, function(index, value) {
-        $('#' + TAB_IDS_PREFIX + index).append($tabs[index]);
+      $.each(tabs, function(index, value) {
+        $('#' + TAB_IDS_PREFIX + index).append(tabs[index]);
       });
     };
 
