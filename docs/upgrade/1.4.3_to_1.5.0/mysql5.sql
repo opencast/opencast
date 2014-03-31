@@ -140,4 +140,4 @@ CREATE TABLE mh_user_ref_role (
 ) ENGINE=InnoDB;
 
 -- Change type of field 'payload' in table 'mh_job' from TEXT to MEDIUMTEXT, see MH-10139
-ALTER TABLE mh_job CHANGE payload payload MEDIUMTEXT;
+ALTER TABLE mh_job MODIFY COLUMN payload MEDIUMTEXT;
