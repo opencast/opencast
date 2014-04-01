@@ -495,19 +495,6 @@ install_prog() {
               ;;
           esac
           ;;
-        yasm )
-          prog="$1"
-          case `arch` in
-            i386 )
-              URLS=`getmcfg yasm${V}_x86_url:`
-              rpms=`getmcfg yasm${V}_x86_pkgs:`
-              ;;
-            x86_64 )
-              URLS=`getmcfg yasm${V}_x64_url:`
-              rpms=`getmcfg yasm${V}_x64_pkgs:`
-              ;;
-          esac
-          ;;
         ImageMagick )
           prog="$1"
           case `arch` in
@@ -827,6 +814,23 @@ install_git() {
   return 0
 }
 #
+preinstall_yasm() {
+  cd "$HOME3P/base_libs/yasm"
+  [ $? -ne 0 ] && return 1
+  #
+  case `os` in
+    CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | SciL | Amazon )
+      download .
+      [ $? -ne 0 ] && return 1
+      ./linux-compile
+      [ $? -ne 0 ] && return 1
+      ;;
+    MacOS )
+      ;;
+  esac
+  return 0
+}
+#
 preinstall_scons() {
   cd "$HOME3P/base_libs/scons"
   [ $? -ne 0 ] && return 1
@@ -867,7 +871,7 @@ check_prereq() {
       chkprog git     || install_prog git      || return 1
       # These are needed for Windows compile
       chkprog jam     || install_prog jam      || return 1
-      chkprog yasm    || install_prog yasm     || return 1
+      chkprog yasm    || preinstall_yasm       || return 1
       chkprog scons   || preinstall_scons      || return 1
       #fix_scons || return 1
       #
@@ -908,7 +912,7 @@ check_prereq() {
       chkprog git     || install_prog git      || return 1
       # These are needed for Windows compile
       chkprog jam     || install_prog jam      || return 1
-      chkprog yasm    || install_prog yasm     || return 1
+      chkprog yasm    || preinstall_yasm       || return 1
       chkprog scons   || preinstall_scons      || return 1
       #fix_scons || return 1
       #
@@ -1284,7 +1288,7 @@ fix_libs() {
         [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
         cd patchelf-0.5
         [ $? -ne 0 ] && return 1
-        ./configure
+        ./configure --prefix=$LOCAL_PREFIX
         [ $? -ne 0 ] && return 1
         sudox make install
         [ $? -ne 0 ] && return 1
@@ -1296,11 +1300,11 @@ fix_libs() {
   #
   case `os` in
     CentOS | RHEL | SciL )
-      # Check & set /usr/local/lib in LD_LIBRARY_PATH
-      grep '/usr/local/lib' /etc/ld.so.conf.d/* >/dev/null
+      # Check & set $LOCAL_PREFIX/lib in LD_LIBRARY_PATH
+      grep "$LOCAL_PREFIX/lib" /etc/ld.so.conf.d/* >/dev/null
       if [ $? -ne 0 ]; then
         cat > local.conf << EOF
-/usr/local/lib
+$LOCAL_PREFIX/lib
 EOF
         [ $? -ne 0 ] && return 1
         if [ -s /etc/ld.so.conf.d/local.conf ]; then
@@ -1320,11 +1324,11 @@ EOF
       #
       # Temporarily removed
       #
-      # Check & set /usr/local/lib in LD_LIBRARY_PATH
-      grep '/usr/local/lib' /etc/ld.so.conf.d/* >/dev/null
+      # Check & set $LOCAL_PREFIX/lib in LD_LIBRARY_PATH
+      grep "$LOCAL_PREFIX/lib" /etc/ld.so.conf.d/* >/dev/null
       if [ $? -ne 0 ]; then
         cat > local.conf << EOF
-/usr/local/lib
+$LOCAL_PREFIX/lib
 EOF
         [ $? -ne 0 ] && return 1
         if [ -s /etc/ld.so.conf.d/local.conf ]; then
@@ -1403,11 +1407,11 @@ EOF
         fi
       fi
       #
-      # Check & set /usr/local/lib in LD_LIBRARY_PATH
-      grep '/usr/local/lib' /etc/ld.so.conf.d/* >/dev/null
+      # Check & set $LOCAL_PREFIX/lib in LD_LIBRARY_PATH
+      grep "$LOCAL_PREFIX/lib" /etc/ld.so.conf.d/* >/dev/null
       if [ $? -ne 0 ]; then
         cat > local.conf << EOF
-/usr/local/lib
+$LOCAL_PREFIX/lib
 EOF
         [ $? -ne 0 ] && return 1
         if [ -s /etc/ld.so.conf.d/local.conf ]; then

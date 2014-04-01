@@ -21,7 +21,7 @@ mv "$dir" "${dir}-linux"
 cd "${dir}-linux"
 [ $? -ne 0 ] && exit 1
 #
-./configure \
+./configure --prefix=$LOCAL_PREFIX \
 LDFLAGS='-L${LOCAL_PREFIX}/lib -Wl,-rpath,${LOCAL_PREFIX}/lib'
 [ $? -ne 0 ] && exit 1
 make

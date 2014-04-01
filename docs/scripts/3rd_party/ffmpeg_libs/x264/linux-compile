@@ -21,7 +21,7 @@ mv "$dir" "${dir}-linux"
 cd "${dir}-linux"
 [ $? -ne 0 ] && exit 1
 #
-./configure --enable-shared
+./configure --prefix=$LOCAL_PREFIX --enable-shared
 [ $? -ne 0 ] && exit 1
 make
 [ $? -ne 0 ] && exit 1
