@@ -59,10 +59,18 @@ import javax.persistence.spi.PersistenceProvider;
 public class UserTrackingServiceImpl implements UserTrackingService, ManagedService {
 
   public static final String FOOTPRINT_KEY = "FOOTPRINT";
+  
+  public static final String DETAILED_TRACKING = "org.opencastproject.usertracking.detailedtrack";
+  public static final String IP_LOGGING = "org.opencastproject.usertracking.log.ip";
+  public static final String USER_LOGGING = "org.opencastproject.usertracking.log.user";
+  public static final String SESSION_LOGGING = "org.opencastproject.usertracking.log.session";
 
   private static final Logger logger = LoggerFactory.getLogger(UserTrackingServiceImpl.class);
 
   private boolean detailedTracking = false;
+  private boolean logIp = true;
+  private boolean logUser = true;
+  private boolean logSession = true;
 
   /**
    * @param persistenceProvider
@@ -114,10 +122,23 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       return;
     }
 
-    Object val = props.get("org.opencastproject.usertracking.detailedtrack");
+    Object val = props.get(DETAILED_TRACKING);
     if (val != null && String.class.isInstance(val)) {
       detailedTracking = Boolean.valueOf((String) val);
     }
+    val = props.get(IP_LOGGING);
+    if (val != null && String.class.isInstance(val)) {
+      logIp = Boolean.valueOf((String) val);
+    }
+    val = props.get(USER_LOGGING);
+    if (val != null && String.class.isInstance(val)) {
+      logUser = Boolean.valueOf((String) val);
+    }
+    val = props.get(SESSION_LOGGING);
+    if (val != null && String.class.isInstance(val)) {
+      logSession = Boolean.valueOf((String) val);
+    }
+    
   }
 
   public int getViews(String mediapackageId) {
@@ -136,9 +157,12 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
 
   @SuppressWarnings("unchecked")
   public UserAction addUserFootprint(UserAction a) throws UserTrackingException {
-    a.setType("FOOTPRINT");
+    a.setType(FOOTPRINT_KEY);
     EntityManager em = null;
     EntityTransaction tx = null;
+    if (!logIp) a.setUserIp("-omitted-");
+    if (!logUser) a.setUserId("-omitted-");
+    if (!logSession) a.setSessionId("-omitted-");
     try {
       em = emf.createEntityManager();
       tx = em.getTransaction();
@@ -178,6 +202,9 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
   public UserAction addUserTrackingEvent(UserAction a) throws UserTrackingException {
     EntityManager em = null;
     EntityTransaction tx = null;
+    if (!logIp) a.setUserIp("-omitted-");
+    if (!logUser) a.setUserId("-omitted-");
+    if (!logSession) a.setSessionId("-omitted-");    
     try {
       em = emf.createEntityManager();
       tx = em.getTransaction();
@@ -603,6 +630,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
   
   public FootprintList getFootprints(String mediapackageId, String userId) {
     EntityManager em = null;
+    if (! logUser) userId = null;
     try {
       em = emf.createEntityManager();
       Query q = null;
