@@ -782,7 +782,8 @@ ocRecordings = new (function() {
     var data = {
       id : ocRecordings.Hold.workflow.id
     };
-
+    var def = $.Deferred();
+    
     // add properties for workflow resum if provided by hold operation
     if (postData !== undefined) {
       data.properties = "";
@@ -810,11 +811,15 @@ ocRecordings = new (function() {
         } else {
           alert('Could not resume Workflow: ' + status);
         }
+        def.resolve();
       },
       success    : function(data) {
         ocRecordings.reload();
+        def.resolve();
       }
     });
+    
+    return def.promise();
   }
 
   this.hideHoldActionUI = function() {
@@ -1467,7 +1472,7 @@ ocRecordings = new (function() {
         var series, seriesComponent, seriesId;
         var creationSucceeded = false;
         if(this.fields.seriesSelect !== ''){
-          series = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn"><dcterms:title xmlns="">' + this.fields.seriesSelect.val() + '</dcterms:title></dublincore>'
+          series = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn/"><dcterms:title xmlns="">' + this.fields.seriesSelect.val() + '</dcterms:title></dublincore>'
           seriesComponent = this;
           $.ajax({
             async: false,
