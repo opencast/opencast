@@ -83,19 +83,22 @@ public class CaptureAgentImplTest {
       return;
     // Create the configuration manager
     config = new ConfigurationManager();
-    File testDir = new File("./target", "capture-agent-test" + File.separator + "cache" + File.separator + "captures"
+    File testDir = new File("./target", "capture-agent-test");
+    File captureTest = new File(testDir, "cache" + File.separator + "captures"
             + File.separator + recordingID);
-    if (testDir.exists()) {
-      FileUtils.deleteQuietly(testDir);
-      logger.info("Removing  " + testDir.getAbsolutePath());
+    if (captureTest.exists()) {
+      FileUtils.deleteQuietly(captureTest);
+      logger.info("Removing  " + captureTest.getAbsolutePath());
     } else {
-      logger.info("Didn't Delete " + testDir.getAbsolutePath());
+      logger.info("Didn't Delete " + captureTest.getAbsolutePath());
     }
 
     Properties p = loadProperties("config/capture.properties");
     p.put("org.opencastproject.storage.dir",
             new File("./target", "capture-agent-test").getAbsolutePath());
     p.put("org.opencastproject.server.url", "http://localhost:8080");
+    p.put(CaptureParameters.CAPTURE_FILESYSTEM_CACHE_URL, new File(testDir, "cache").getAbsolutePath());
+    p.put(CaptureParameters.CAPTURE_FILESYSTEM_VOLATILE_URL, new File(testDir, "volatile").getAbsolutePath());
     p.put(CaptureParameters.CAPTURE_SCHEDULE_REMOTE_POLLING_INTERVAL, -1);
     p.put("M2_REPO", getClass().getClassLoader().getResource("m2_repo").getFile());
     config.updated(p);
@@ -127,6 +130,7 @@ public class CaptureAgentImplTest {
     config.deactivate();
     config = null;
     properties = null;
+    FileUtils.deleteQuietly(new File("./target", "capture-agent-test"));
   }
 
   private XProperties loadProperties(String location) throws IOException {

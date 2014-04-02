@@ -54,13 +54,15 @@ public class SchedulerImplTest {
   private CaptureAgentImpl captureAgentImpl = null;
   private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
   private String directory = "scheduler-restart-test";
+  private File testDir = new File("./target", directory);
   private static final Logger logger = LoggerFactory.getLogger(SchedulerImplTest.class);
   private WaitForState waiter;
 
   @Before
-  public void setUp() {
-    Properties properties = setupCaptureProperties();
+  public void setUp() throws ConfigurationException {
     removeTestDirectory();
+    testDir.mkdirs();
+    Properties properties = setupCaptureProperties();
     setupConfigurationManager(properties);
     setupCaptureAgentImpl();
     setupSchedulerProperties();
@@ -68,7 +70,6 @@ public class SchedulerImplTest {
   }
 
   private void removeTestDirectory() {
-    File testDir = new File("./target", directory);
     if (testDir.exists()) {
       FileUtils.deleteQuietly(testDir);
       logger.info("Removing  " + testDir.getAbsolutePath());
@@ -99,13 +100,14 @@ public class SchedulerImplTest {
     // If we don't have it then the locations get turned into /tmp/valid-whatever/demo_capture_agent
     configurationManager.setItem(CaptureParameters.AGENT_NAME, "");
     configurationManager.setItem(CaptureParameters.CAPTURE_SCHEDULE_REMOTE_POLLING_INTERVAL, "60");
-    configurationManager.setItem("org.opencastproject.storage.dir", new File("./target", "capture-sched-test").getAbsolutePath());
+    configurationManager.setItem("org.opencastproject.storage.dir", testDir.getAbsolutePath());
     configurationManager.setItem("org.opencastproject.server.url", "http://localhost:8080");
     configurationManager.setItem("M2_REPO", getClass().getClassLoader().getResource("m2_repo").getFile());
   }
 
-  private void setupCaptureAgentImpl() {
+  private void setupCaptureAgentImpl() throws ConfigurationException {
     captureAgentImpl = new CaptureAgentImpl();
+    captureAgentImpl.setConfigService(configurationManager);
   }
 
   private void setupSchedulerProperties() {
@@ -138,6 +140,7 @@ public class SchedulerImplTest {
     schedulerImpl = null;
     configurationManager = null;
     schedulerProperties = null;
+    captureAgentImpl.deactivate();
   }
 
   private String formatDate(Date d, long offset) {
@@ -240,7 +243,7 @@ public class SchedulerImplTest {
     source = source.replace("@ERROR_START@", times[5]);
     source = source.replace("@PAST_START@", times[6]);
 
-    File output = File.createTempFile("scheduler-test-", ".ics");
+    File output = File.createTempFile("scheduler-test-", ".ics", testDir);
     FileWriter out = null;
     out = new FileWriter(output);
     out.write(source);
@@ -261,7 +264,7 @@ public class SchedulerImplTest {
     source = source.replace("@START3@", times[6]);
     source = source.replace("@END5@", times[7]);
 
-    File output = File.createTempFile("scheduler-test-", ".ics");
+    File output = File.createTempFile("scheduler-test-", ".ics", testDir);
     FileWriter out = null;
     out = new FileWriter(output);
     out.write(source);
@@ -638,13 +641,12 @@ public class SchedulerImplTest {
   }
 
   @Test
-  @Ignore
   public void scheduleRendersCaptureTimesCorrectly() throws IOException, ConfigurationException, InterruptedException {
     Calendar start = Calendar.getInstance();
     int firstMinuteOffset = 20;
     int secondMinuteOffset = -5;
     int thirdMinuteOffset = 30;
-    setupThreeCaptureCalendar(firstMinuteOffset, secondMinuteOffset, thirdMinuteOffset);
+    File testfile = setupThreeCaptureCalendar(firstMinuteOffset, secondMinuteOffset, thirdMinuteOffset);
     Thread.sleep(100);
     List<ScheduledEvent> events = schedulerImpl.getSchedule();
     Assert.assertTrue("There should be some events in the schedule.", events.size() > 0);
@@ -657,6 +659,7 @@ public class SchedulerImplTest {
         checkTime(start, thirdMinuteOffset, scheduleEvent);
       }
     }
+    FileUtils.deleteQuietly(testfile);
   }
 
   private void checkTime(Calendar start, int offset, ScheduledEvent scheduleEvent) {
@@ -675,7 +678,7 @@ public class SchedulerImplTest {
             + " minutes before right now and 1 second before " + after.toString(), after.after(time));
   }
 
-  private void setupThreeCaptureCalendar(int firstMinuteOffset, int secondMinuteOffset, int thirdMinuteOffset)
+  private File setupThreeCaptureCalendar(int firstMinuteOffset, int secondMinuteOffset, int thirdMinuteOffset)
           throws IOException, ConfigurationException {
     String[] times = createThreeCaptures(firstMinuteOffset, secondMinuteOffset, thirdMinuteOffset);
     File testfile = setupCaptureAgentTestCalendar("calendars/ThreeCaptures.ics", times);
@@ -683,6 +686,9 @@ public class SchedulerImplTest {
     configurationManager.setItem(CaptureParameters.CAPTURE_SCHEDULE_CACHE_URL, testfile.getAbsolutePath());
     captureAgentImpl.setConfigService(configurationManager);
     schedulerImpl.setConfigService(configurationManager);
+    schedulerImpl.updated(schedulerProperties);
+    schedulerImpl.updateCalendar();
+    return testfile;
   }
 
   private String[] createThreeCaptures(int firstMinuteOffset, int secondMinuteOffset, int thirdMinuteOffset) {
@@ -714,7 +720,7 @@ public class SchedulerImplTest {
     source = source.replace("@START2@", times[1]);
     source = source.replace("@START3@", times[2]);
 
-    File output = File.createTempFile("capture-scheduler-test-", ".ics");
+    File output = File.createTempFile("capture-scheduler-test-", ".ics", testDir);
     FileWriter out = null;
     out = new FileWriter(output);
     out.write(source);
@@ -726,40 +732,44 @@ public class SchedulerImplTest {
   @Test
   public void testCaptureAgentStatusPollingDoesNotFireIfCaptureIsInFuture() throws IOException, ConfigurationException,
           InterruptedException {
-    setupThreeCaptureCalendar(10, 20, 30);
+    File testfile = setupThreeCaptureCalendar(10, 20, 30);
     captureAgentImpl.activate(null);
     Assert.assertEquals(AgentState.IDLE, captureAgentImpl.getAgentState());
     Thread.sleep(100);
     Assert.assertEquals(AgentState.IDLE, captureAgentImpl.getAgentState());
+    FileUtils.deleteQuietly(testfile);
   }
 
   @Test
   public void testCaptureAgentStatusPollingDoesNotFireIfCaptureWasInPast() throws IOException, ConfigurationException,
           InterruptedException {
-    setupThreeCaptureCalendar(-1000, -100, -10);
+    File testfile = setupThreeCaptureCalendar(-1000, -100, -10);
     captureAgentImpl.activate(null);
     Assert.assertEquals(AgentState.IDLE, captureAgentImpl.getAgentState());
     Thread.sleep(100);
     Assert.assertEquals(AgentState.IDLE, captureAgentImpl.getAgentState());
+    FileUtils.deleteQuietly(testfile);
   }
 
   @Test
   public void testCaptureAgentStatusPollingDoesNotFireIfCapturesAreInPastAndFuture() throws IOException,
           ConfigurationException, InterruptedException {
-    setupThreeCaptureCalendar(-20, 10, 20);
+    File testfile = setupThreeCaptureCalendar(-20, 10, 20);
     captureAgentImpl.activate(null);
     Assert.assertEquals(AgentState.IDLE, captureAgentImpl.getAgentState());
     Thread.sleep(100);
     Assert.assertEquals(AgentState.IDLE, captureAgentImpl.getAgentState());
+    FileUtils.deleteQuietly(testfile);
   }
 
   @Test
   public void testLateCaptures() throws IOException, ConfigurationException,
           InterruptedException {
-    setupThreeCaptureCalendar(-10, -1, 10);
+    File testfile = setupThreeCaptureCalendar(-10, -1, 10);
     captureAgentImpl.activate(null);
     schedulerImpl = new SchedulerImpl(schedulerProperties, configurationManager, captureAgentImpl);
     Assert.assertEquals(2, schedulerImpl.getCaptureSchedule().length);
+    FileUtils.deleteQuietly(testfile);
   }
 
   @Test
@@ -768,10 +778,11 @@ public class SchedulerImplTest {
     // Unused test that should test the ability of the capture agent to skip starting a capture late if there has
     // already been captured media.
     setupFakeMediaPackageWithoutMediaFiles();
-    setupThreeCaptureCalendar(-10, -1, 10);
+    File testfile = setupThreeCaptureCalendar(-10, -1, 10);
     captureAgentImpl.activate(null);
-    schedulerImpl = new SchedulerImpl(schedulerProperties, configurationManager, captureAgentImpl);
+    //schedulerImpl = new SchedulerImpl(schedulerProperties, configurationManager, captureAgentImpl);
     Assert.assertEquals(2, schedulerImpl.getCaptureSchedule().length);
+    FileUtils.deleteQuietly(testfile);
   }
 
   @Test
@@ -780,10 +791,11 @@ public class SchedulerImplTest {
     // Unused test that should test the ability of the capture agent to skip starting a capture late if there has
     // already been captured media.
     setupFakeMediaPackageWithMediaFiles();
-    setupThreeCaptureCalendar(-10, -1, 10);
+    File testfile = setupThreeCaptureCalendar(-10, -1, 10);
     captureAgentImpl.activate(null);
-    schedulerImpl = new SchedulerImpl(schedulerProperties, configurationManager, captureAgentImpl);
+    //schedulerImpl = new SchedulerImpl(schedulerProperties, configurationManager, captureAgentImpl);
     Assert.assertEquals(1, schedulerImpl.getCaptureSchedule().length);
+    FileUtils.deleteQuietly(testfile);
   }
 
   private XProperties loadProperties(String location) throws IOException {
@@ -804,6 +816,8 @@ public class SchedulerImplTest {
     Properties p;
     try {
       p = loadProperties("config/capture.properties");
+      p.put(CaptureParameters.CAPTURE_FILESYSTEM_CACHE_URL, new File(testDir, "cache").getAbsolutePath());
+      p.put(CaptureParameters.CAPTURE_FILESYSTEM_VOLATILE_URL, new File(testDir, "volatile").getAbsolutePath());
       p.put(CaptureParameters.RECORDING_ROOT_URL, recordingDir.getAbsolutePath());
       p.put(CaptureParameters.RECORDING_ID, "2nd-Capture");
       p.put("org.opencastproject.server.url", "http://localhost:8080");
@@ -860,5 +874,6 @@ public class SchedulerImplTest {
     schedulerImpl = new SchedulerImpl(schedulerProperties, configurationManager, captureAgentImpl);
     captureAgentImpl.setConfigService(configurationManager);
     schedulerImpl.setConfigService(configurationManager);
+    FileUtils.deleteQuietly(testfile);
   }
 }

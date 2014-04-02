@@ -27,7 +27,6 @@ import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
-import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
@@ -183,6 +182,10 @@ public class XacmlSecurityTest {
   }
 
   static class WorkspaceStub implements Workspace {
+
+    /** The default workspace base, this is set to the target directory within the module. */
+    private static File workspaceBase = new File("target");
+
     @Override
     public File get(URI uri) throws NotFoundException, IOException {
       return new File(uri);
@@ -253,7 +256,7 @@ public class XacmlSecurityTest {
 
     @Override
     public URI getURI(String mediaPackageID, String mediaPackageElementID, String filename) {
-      return new File(IoSupport.getSystemTmpDir(), mediaPackageID + "-" + mediaPackageElementID + "-" + filename)
+      return new File(workspaceBase, mediaPackageID + "-" + mediaPackageElementID + "-" + filename)
               .toURI();
     }
 
