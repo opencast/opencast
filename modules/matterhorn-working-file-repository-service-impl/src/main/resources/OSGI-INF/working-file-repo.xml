@@ -17,6 +17,5 @@
   </service>
 
   <reference name="remoteServiceManager" interface="org.opencastproject.serviceregistry.api.ServiceRegistry" cardinality="1..1" policy="static" bind="setRemoteServiceManager" />
-  <reference name="tikaOSGIParser" interface="org.apache.tika.parser.Parser" cardinality="1..1" policy="static" bind="setTikaParser" />
 
 </scr:component>

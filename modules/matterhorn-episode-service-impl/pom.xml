@@ -86,16 +86,6 @@
       <groupId>javax.ws.rs</groupId>
       <artifactId>jsr311-api</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.apache.tika</groupId>-->
-      <!--<artifactId>tika-bundle</artifactId>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-      <!--<groupId>org.apache.tika</groupId>-->
-      <!--<artifactId>tika-core</artifactId>-->
-      <!--<version>0.7</version>-->
-      <!--<scope>compile</scope>-->
-    <!--</dependency>-->
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
