@@ -1,4 +1,4 @@
-URL: file://repository ${USASK_MIRROR}
+URL: file://repository ${USASK_MIRROR} ${ETH_MIRROR}
 PKG: rand48-1.0.zip
 SHA: 41750fce2c6c07b2706bb155eff749502a8a7dc5
 DIR: rand48-1.0

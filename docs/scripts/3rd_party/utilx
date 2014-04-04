@@ -614,6 +614,7 @@ export RPMFUSION_MIRROR=`getmcfg RPMFUSION_MIRROR:`
 export ATRPMS_MIRROR=`getmcfg ATRPMS_MIRROR:`
 export GNU_MIRROR=`getmcfg GNU_MIRROR:`
 export USASK_MIRROR=`getmcfg USASK_MIRROR:`
+export ETH_MIRROR=`getmcfg ETH_MIRROR:`
 export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`
 #
 [ "$XTRACE" = "on" ] && set -x
