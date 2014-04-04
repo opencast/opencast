@@ -275,5 +275,10 @@ public class XacmlSecurityTest {
       return Option.<Long> none();
     }
 
+    @Override
+    public void cleanup(Option<Integer> maxAge) {
+      // TODO Auto-generated method stub
+    }
+
   }
 }
