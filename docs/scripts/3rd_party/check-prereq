@@ -654,7 +654,7 @@ install_prog() {
         git ) prog=git-core ;;
         ImageMagick ) prog=imagemagick ;;
         gsl-devel ) prog=libgsl0-dev ;;
-        gmp ) prog=libgmp3c2 ;;
+        gmp ) if [ `os_ver` < "13.04" ] ; then prog=libgmp3c2; else prog=libgmp10; fi ;;
         zlib-devel ) prog=zlib1g-dev ;;
         Xext-devel ) prog="libx11-dev libxpm-dev x11proto-xext-dev libxext-dev" ;;
         * ) prog="$1" ;;
