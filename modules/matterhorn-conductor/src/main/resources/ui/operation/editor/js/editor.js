@@ -1908,15 +1908,23 @@ function zoomedIn() {
 function updateWaveformClickEvent() {
     $('#segmentsWaveform').click(function (evt) {
         if (zoomedIn()) {
-            if (evt && evt.offsetX) {
+            if (evt) {
+		var offsetX = 0;
+		if(evt.offsetX != undefined) {
+		    offsetX = evt.offsetX;
+		}
+		// in firefox offsetX == undefined...
+		else {
+		    offsetX = evt.pageX - $('#segmentsWaveform').offset().left;
+		}
                 var currentTime = getCurrentTime();
                 var duration = getDuration();
                 var imgWidth = $('#waveformImage').width();
-
+		
                 var segLength = duration / imgWidth;
-                var nrSeg = segLength * evt.offsetX;
+                var nrSeg = segLength * offsetX;
                 setCurrentTime(nrSeg);
-            }
+	    }
         }
     });
 }
