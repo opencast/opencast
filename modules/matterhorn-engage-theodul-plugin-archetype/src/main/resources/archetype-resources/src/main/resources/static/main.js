@@ -15,11 +15,11 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
+define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $ , _, Backbone, Engage) {
     "use strict"; // strict mode in all our application
-    var PLUGIN_NAME = "Basic Engage Description";
-    var PLUGIN_TYPE = "engage_description";
-    var PLUGIN_VERSION = "0.1";
+    var PLUGIN_NAME = "${plugin_name}";
+    var PLUGIN_TYPE = "engage_${plugin_type}";
+    var PLUGIN_VERSION = "${plugin_version}";
     var PLUGIN_TEMPLATE = "template.html";
     var PLUGIN_STYLES = ["style.css"];
     var plugin = {
@@ -27,72 +27,24 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         type: PLUGIN_TYPE,
         version: PLUGIN_VERSION,
         styles: PLUGIN_STYLES,
-        template: PLUGIN_TEMPLATE
+        template: PLUGIN_TEMPLATE,
+        pluginPath: "", //filled after core procession, see core reference
+        container: "", //filled after core procession, see core reference
+        events : {
+          //put here your events
+        }
     };
-    //privates //
-
-    var initCount = 3; //wait for three inits, moment lib, plugin load done and mediapackage
-    var id_engage_description = "engage_description";
-
-    // view //
-
-    var DescriptionView = Backbone.View.extend({
-        el: $("#" + id_engage_description), // Every view has a element associated with it
-        initialize: function(mediaPackageModel, template) {
-            this.model = mediaPackageModel;
-            this.template = template;
-            //bound the render function always to the view
-            _.bindAll(this, "render");
-            //listen for changes of the model and bind the render function to this
-            this.model.bind("change", this.render);
-        },
-        render: function() {
-            //format values
-            var tempVars = {
-                title: this.model.get("title"),
-                creator: this.model.get("creator"),
-                date: this.model.get("date")
-            };
-            //try to format the date
-            if (moment(tempVars.date) !== null) {
-                tempVars.date = moment(this.model.get("date")).format("MMMM Do YYYY");
-            }
-            // compile template and load into the html
-            this.$el.html(_.template(this.template, tempVars));
-        }
-    });
-
-    function initPlugin() {
-        //create a new view with the media package model and the template
-        new DescriptionView(Engage.model.get("mediaPackage"), plugin.template);
-    }
-
-    //inits
-    Engage.log("Description: init");
-    var relative_plugin_path = Engage.getPluginPath('EngagePluginDescription');
-    Engage.log('Description: relative plugin path ' + relative_plugin_path);
-
-    Engage.model.on("change:mediaPackage", function() { // listen on a change/set of the mediaPackage model
-        initCount -= 1;
-        if (initCount === 0) {
-            initPlugin();
-        }
-    });
-    // Load moment.js lib
-    require([relative_plugin_path + 'lib/moment.min'], function(momentjs) {
-        Engage.log("Description: load moment.min.js done");
-        initCount -= 1;
-        if (initCount === 0) {
-            initPlugin();
-        }
-    });
-    //All plugins loaded
-    Engage.on("Core:plugin_load_done", function() {
-        initCount -= 1;
-        if (initCount === 0) {
-            initPlugin();
-        }
-    });
-
-    return plugin;
-});
+    
+#if( $plugin_type == "custom" )
+#include("templates/customPlugin.vtl")
+#elseif( $plugin_type == "controls" )
+#include("templates/controlsPlugin.vtl")
+#elseif( $plugin_type == "timeline" )
+#include("templates/timelinePlugin.vtl")
+#elseif( $plugin_type == "video" )
+#include("templates/videoPlugin.vtl")
+#elseif( $plugin_type == "description" )
+#include("templates/labelPlugin.vtl")
+#elseif( $plugin_type == "tab" )
+#include("templates/tabPlugin.vtl")
+#end

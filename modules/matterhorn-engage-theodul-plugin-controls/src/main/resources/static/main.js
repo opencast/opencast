@@ -41,9 +41,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var isSliding = false;
     var isMuted = false;
 
-    var class_expand_button = "expand_button";
-    var class_expanded_content = "expanded_content";
-    var class_pulldown_image = "pulldown_image";
     var id_engage_controls = "engage_controls";
     var id_slider = "slider";
     var id_volume = "volume";
@@ -208,11 +205,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             } else {
                 Engage.trigger("Video:play");
             }
-        });
-
-        $("." + class_expand_button).click(function() {
-            $("." + class_expanded_content).slideToggle("fast");
-            $("." + class_pulldown_image).toggleClass("rotate180");
         });
 
         $("#" + id_fullscreen_button).click(function() {

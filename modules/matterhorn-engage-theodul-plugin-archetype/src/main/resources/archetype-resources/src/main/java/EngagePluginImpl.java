@@ -32,9 +32,9 @@ import org.slf4j.LoggerFactory;
 #if( $plugin_rest == "true" )
 @Path("/")
 #end
-public class EngagePluginDescription extends AbstractEngagePlugin {
+public class EngagePluginImpl extends AbstractEngagePlugin {
 
-  private static final Logger log = LoggerFactory.getLogger(EngagePluginDescription.class);
+  private static final Logger log = LoggerFactory.getLogger(EngagePluginImpl.class);
   
   protected void activate(ComponentContext cc) {
     log.info("Activated Theodul plugin: ${plugin_name}");
