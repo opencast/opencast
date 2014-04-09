@@ -35,14 +35,14 @@ esac
 #
 # List of rpms and their dependencies
 #
-url_i386[0]="http://mirror.centos.org/centos/6/os/i386/Packages ${USASK_MIRROR}"
+url_i386[0]="http://mirror.centos.org/centos/6/os/i386/Packages ${USASK_MIRROR} ${ETH_MIRROR}"
 pkg_i386[0]=libdc1394-2.1.2-3.4.el6.i686.rpm
-url_x86_64[0]="http://mirror.centos.org/centos/6/os/x86_64/Packages ${USASK_MIRROR}"
+url_x86_64[0]="http://mirror.centos.org/centos/6/os/x86_64/Packages ${USASK_MIRROR} ${ETH_MIRROR}"
 pkg_x86_64[0]=libdc1394-2.1.2-3.4.el6.x86_64.rpm
 #
-url_i386[1]="http://mirror.centos.org/centos/6/os/i386/Packages ${USASK_MIRROR}"
+url_i386[1]="http://mirror.centos.org/centos/6/os/i386/Packages ${USASK_MIRROR ${ETH_MIRROR}"
 pkg_i386[1]=libmusicbrainz-2.1.5-11.1.el6.i686.rpm
-url_x86_64[1]="http://mirror.centos.org/centos/6/os/x86_64/Packages ${USASK_MIRROR}"
+url_x86_64[1]="http://mirror.centos.org/centos/6/os/x86_64/Packages ${USASK_MIRROR} ${ETH_MIRROR}"
 pkg_x86_64[1]=libmusicbrainz-2.1.5-11.1.el6.x86_64.rpm
 #
 # Download rpms

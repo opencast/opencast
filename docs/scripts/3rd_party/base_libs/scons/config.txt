@@ -1,4 +1,4 @@
-URL: http://heanet.dl.sourceforge.net/project/scons/scons/2.0.1 ${USASK_MIRROR}
+URL: http://heanet.dl.sourceforge.net/project/scons/scons/2.0.1 ${USASK_MIRROR} ${ETH_MIRROR}
 PKG: scons-2.0.1.tar.gz
 SHA: f9183f1b29cb94b48bb3175608831276e60b8fc5
 DIR: scons-2.0.1
