@@ -758,7 +758,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
    *          The ID for the recording to be ingested.
    * @return The status code for the http post, or one of a number of error values. The error values are as follows: -1:
    *         Unable to ingest because the recording id does not exist -2: Invalid ingest url -3: Invalid ingest url -4:
-   *         Invalid ingest url -5: Unable to open media package
+   *         Invalid ingest url -5: Unable to open media package -6: Service registry not found
    */
   public int ingest(String recID) {
     logger.info("Ingesting recording: {}", recID);
@@ -773,6 +773,10 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
     List<ServiceRegistration> ingestServices = null;
     URL url = null;
     try {
+      if (serviceRegistry == null) {
+        logger.warn("Service registry was null, this is probably a test.  If you see this during operations please file a bug!");
+        return -6;
+      }
       ingestServices = serviceRegistry.getServiceRegistrationsByLoad("org.opencastproject.ingest");
       if (ingestServices.size() == 0) {
         logger.warn("Unable to ingest media because no ingest service is available");
@@ -788,6 +792,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
     } catch (MalformedURLException e) {
       logger.warn("Malformed URL for ingest target.");
       return -3;
+
     }
 
     File fileDesc = new File(recording.getBaseDir(), CaptureParameters.ZIP_NAME);
@@ -1268,7 +1273,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
             agentScheduler.deleteJob(jobname, groupname);
           }
         }
-        agentScheduler.shutdown(true);
+        agentScheduler.shutdown();
       }
     } catch (SchedulerException e) {
       logger.warn("Finalize for scheduler did not execute cleanly: {}.", e);
@@ -1359,7 +1364,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
    * @param jobtype
    */
   private void createScheduler(Properties schedulerProps, String jobname, String jobtype) {
-    // Either create the scheduler or empty out the existing one
+    // Create a scheduler, and if necessary shut down the old one.
     try {
       if (agentScheduler != null) {
         // Clear the existing jobs and reschedule everything
@@ -1368,18 +1373,18 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
             agentScheduler.deleteJob(name, JobParameters.RECURRING_TYPE);
           }
         }
-      } else {
-        StdSchedulerFactory scheduleFactory = null;
-        if (schedulerProps.size() > 0) {
-          scheduleFactory = new StdSchedulerFactory(schedulerProps);
-        } else {
-          scheduleFactory = new StdSchedulerFactory();
-        }
-
-        // Create and start the scheduler
-        agentScheduler = scheduleFactory.getScheduler();
-        agentScheduler.start();
+        agentScheduler.shutdown();
       }
+      StdSchedulerFactory scheduleFactory = null;
+      if (schedulerProps.size() > 0) {
+        scheduleFactory = new StdSchedulerFactory(schedulerProps);
+      } else {
+        scheduleFactory = new StdSchedulerFactory();
+      }
+
+      // Create and start the scheduler
+      agentScheduler = scheduleFactory.getScheduler();
+      agentScheduler.start();
     } catch (SchedulerException e) {
       logger.error("Scheduler exception in State Service: {}.", e);
       return;

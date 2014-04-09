@@ -35,14 +35,14 @@ esac
 #
 # List of rpms and their dependencies
 #
-url_i386[0]="http://mirror.centos.org/centos/6/os/i386/Packages ${USASK_MIRROR}"
+url_i386[0]="http://mirror.centos.org/centos/6/os/i386/Packages ${USASK_MIRROR} ${ETH_MIRROR}"
 pkg_i386[0]=libdvdread-4.1.4-0.3.svn1183.el6.i686.rpm
-url_x86_64[0]="http://mirror.centos.org/centos/6/os/x86_64/Packages ${USASK_MIRROR}"
+url_x86_64[0]="http://mirror.centos.org/centos/6/os/x86_64/Packages ${USASK_MIRROR} ${ETH_MIRROR}"
 pkg_x86_64[0]=libdvdread-4.1.4-0.3.svn1183.el6.x86_64.rpm
 #
-url_i386[1]="http://mirror.centos.org/centos/6/os/i386/Packages ${USASK_MIRROR}"
+url_i386[1]="http://mirror.centos.org/centos/6/os/i386/Packages ${USASK_MIRROR} ${ETH_MIRROR}"
 pkg_i386[1]=libid3tag-0.15.1b-11.el6.i686.rpm
-url_x86_64[1]="http://mirror.centos.org/centos/6/os/x86_64/Packages ${USASK_MIRROR}"
+url_x86_64[1]="http://mirror.centos.org/centos/6/os/x86_64/Packages ${USASK_MIRROR} ${ETH_MIRROR}"
 pkg_x86_64[1]=libid3tag-0.15.1b-11.el6.x86_64.rpm
 #
 # Download rpms
