@@ -168,7 +168,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
    *           cannot be copied or another unexpected exception occurs.
    */
-  public MediaPackageElement distributeElement(String channelId, final MediaPackage mediapackage, String elementId)
+  public MediaPackageElement[] distributeElement(String channelId, final MediaPackage mediapackage, String elementId)
           throws DistributionException {
     if (mediapackage == null)
       throw new IllegalArgumentException("Mediapackage must be specified");
@@ -225,7 +225,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       distributedElement.setIdentifier(null);
 
       logger.info("Finished distribution of {}", element);
-      return distributedElement;
+      return new MediaPackageElement[] {distributedElement};
 
     } catch (Exception e) {
       logger.warn("Error distributing " + element, e);
@@ -271,7 +271,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    *          the element identifier
    * @return the retracted element or <code>null</code> if the element was not retracted
    */
-  protected MediaPackageElement retractElement(String channelId, MediaPackage mediapackage, String elementId)
+  protected MediaPackageElement[] retractElement(String channelId, MediaPackage mediapackage, String elementId)
           throws DistributionException {
 
     if (mediapackage == null)
@@ -291,7 +291,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       // Does the file exist? If not, the current element has not been distributed to this channel
       // or has been removed otherwise
       if (!elementFile.exists())
-        return element;
+        return new MediaPackageElement[] {element};
 
       // Try to remove the file and - if possible - the parent folder
       FileUtils.forceDelete(elementFile);
@@ -304,7 +304,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       }
       logger.info("Finished rectracting element {} of media package {}", elementId, mediapackage);
 
-      return element;
+      return new MediaPackageElement[] {element};
     } catch (Exception e) {
       logger.warn("Error retracting element " + elementId + " of mediapackage " + mediapackage, e);
       if (e instanceof DistributionException) {
@@ -391,14 +391,14 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       String elementId = arguments.get(2);
       switch (op) {
         case Distribute:
-          MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, elementId);
-          return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
+          MediaPackageElement[] distributedElement = distributeElement(channelId, mediapackage, elementId);
+          return (distributedElement != null) ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(distributedElement)) : null;
         case Retract:
-          MediaPackageElement retractedElement = null;
+          MediaPackageElement[] retractedElement = null;
           if (distributionDirectory != null && StringUtils.isNotBlank(streamingUrl)) {
             retractedElement = retractElement(channelId, mediapackage, elementId);
           }
-          return (retractedElement != null) ? MediaPackageElementParser.getAsXml(retractedElement) : null;
+          return (retractedElement != null) ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(retractedElement)) : null;
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
       }
