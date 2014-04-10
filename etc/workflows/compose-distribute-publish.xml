@@ -262,8 +262,9 @@
       fail-on-error="false"
       description="Executing SilenceDetection">
       <configurations>
-        <configuration key="source-flavor">audio/waveform</configuration>
-        <configuration key="target-flavor">smil/smil</configuration>
+        <configuration key="source-flavors">audio/waveform</configuration>
+        <configuration key="smil-flavor-subtype">smil</configuration>
+        <configuration key="reference-tracks-flavor">*/preview</configuration>
       </configurations>
     </operation>
 
