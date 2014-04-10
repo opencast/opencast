@@ -15,6 +15,7 @@
  */
 package org.opencastproject.silencedetection.endpoint;
 
+import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -29,11 +30,11 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.silencedetection.api.SilenceDetectionService;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-import org.opencastproject.silencedetection.api.SilenceDetectionService;
 
 /**
  * SilenceDetectionService REST Endpoint.
@@ -54,16 +55,25 @@ public class SilenceDetectionServiceEndpoint extends AbstractJobProducerEndpoint
           returnDescription = "Silence detection job.",
           restParameters = {
             @RestParameter(name = "track", type = RestParameter.Type.TEXT,
-                    description = "Track where to run silence detection.", isRequired = true)
+                    description = "Track where to run silence detection.", isRequired = true),
+            @RestParameter(name = "referenceTracks", type = RestParameter.Type.TEXT,
+                    description = "Tracks referenced by resulting smil (as sources).", isRequired = false)
           },
           reponses = {
             @RestResponse(description = "Silence detection job created successfully.", responseCode = HttpServletResponse.SC_OK),
             @RestResponse(description = "Create silence detection job failed.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
           })
-  public Response detect(@FormParam("track") String trackXml) {
+  public Response detect(@FormParam("track") String trackXml, @FormParam("referenceTracks") String referenceTracksXml) {
     try {
       Track track = (Track) MediaPackageElementParser.getFromXml(trackXml);
-      Job job = silenceDetectionService.detect(track);
+      Job job = null;
+      if (referenceTracksXml != null) {
+        List<Track> referenceTracks = null;
+        referenceTracks = (List<Track>) MediaPackageElementParser.getArrayFromXml(referenceTracksXml);
+        job = silenceDetectionService.detect(track, referenceTracks.toArray(new Track[referenceTracks.size()]));
+      } else {
+        job = silenceDetectionService.detect(track);
+      }
       return Response.ok(new JaxbJob(job)).build();
     } catch (Exception ex) {
       return Response.serverError().entity(ex.getMessage()).build();
