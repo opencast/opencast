@@ -36,7 +36,7 @@ public class QTSbtlEmbedderEngine extends AbstractCmdlineEmbedderEngine {
   public static final String QTEMBEDDER_BINARY_DEFAULT = "qtsbtlembedder";
 
   /** Parameter name for retrieving qt embedder path */
-  private static final String CONFIG_QTEMBEDDER_PATH = "org.opencastproject.composer.qtembedderpath";
+  private static final String CONFIG_QTEMBEDDER_PATH = "org.opencastproject.composer.qtembedder.path";
 
   /** Command line template for executing job */
   // WARNING use 0.3 with multiple subtitle embedding capability
