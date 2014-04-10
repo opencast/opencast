@@ -60,7 +60,7 @@ public class SilenceDetectionServiceRemote extends RemoteBase implements Silence
       params.add(new BasicNameValuePair("track", MediaPackageElementParser.getAsXml(sourceTrack)));
       if (referencedTracks != null && referencedTracks.length > 0) {
         String referencedTracksXml = MediaPackageElementParser.getArrayAsXml(Arrays.asList(referencedTracks));
-        params.add(new BasicNameValuePair("referencedTracks", referencedTracksXml));
+        params.add(new BasicNameValuePair("referenceTracks", referencedTracksXml));
       }
       post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
