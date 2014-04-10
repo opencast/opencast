@@ -236,7 +236,7 @@
       fail-on-error="false"
       description="Extracting audio for waveform generation">
       <configurations>
-        <configuration key="source-flavor">presenter/work</configuration>
+        <configuration key="source-flavor">*/work</configuration>
         <configuration key="target-flavor">audio/waveform</configuration>
         <configuration key="target-tags">waveform</configuration>
         <configuration key="encoding-profile">audio-waveform.http</configuration>
