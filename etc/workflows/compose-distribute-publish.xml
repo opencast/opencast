@@ -260,7 +260,7 @@
       id="silence"
       if="${trimHold}"
       fail-on-error="false"
-      description="Executing SilenceDetection">
+      description="Executing silence detection">
       <configurations>
         <configuration key="source-flavors">audio/waveform</configuration>
         <configuration key="smil-flavor-subtype">smil</configuration>

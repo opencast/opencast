@@ -18,6 +18,7 @@ package org.opencastproject.silencedetection.impl;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
@@ -113,12 +114,19 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
       if (sourceTrack == null) {
         throw new SilenceDetectionFailedException("Source track is null!");
       }
-
-      String trackXML = MediaPackageElementParser.getAsXml(sourceTrack);
+      List<String> arguments = new LinkedList<String>();
+      // put source track as job argument
+      arguments.add(0, MediaPackageElementParser.getAsXml(sourceTrack));
+      
+      // put reference tracks as second argument
+      if (referenceTracks != null) {
+        arguments.add(1, MediaPackageElementParser.getArrayAsXml(Arrays.asList(referenceTracks)));
+      }
+      
       return serviceRegistry.createJob(
               getJobType(),
               Operation.SILENCE_DETECTION.toString(),
-              Arrays.asList(trackXML));
+              arguments);
 
     } catch (ServiceRegistryException ex) {
       throw new SilenceDetectionFailedException("Unable to create job! " + ex.getMessage());
@@ -199,14 +207,14 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
    */
   protected Smil generateSmil(MediaSegments segments, List<Track> referenceTracks) throws SmilException {
     SmilResponse smilResponse = smilService.createNewSmil();
+    Track[] referenceTracksArr = referenceTracks.toArray(new Track[referenceTracks.size()]);
+    
     for (MediaSegment segment : segments.getMediaSegments()) {
       smilResponse = smilService.addParallel(smilResponse.getSmil());
       String parId = smilResponse.getEntity().getId();
       
-      for (Track referenceTrack : referenceTracks) {
-        smilResponse = smilService.addClip(smilResponse.getSmil(), parId, referenceTrack,
+      smilResponse = smilService.addClips(smilResponse.getSmil(), parId, referenceTracksArr,
               segment.getSegmentStart(), segment.getSegmentStop() - segment.getSegmentStart());
-      }
     }
     return smilResponse.getSmil();
   }
