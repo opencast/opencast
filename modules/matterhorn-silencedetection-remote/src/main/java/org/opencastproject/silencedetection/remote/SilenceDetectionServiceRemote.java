@@ -16,6 +16,7 @@
 package org.opencastproject.silencedetection.remote;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -40,22 +41,31 @@ import org.slf4j.LoggerFactory;
 public class SilenceDetectionServiceRemote extends RemoteBase implements SilenceDetectionService {
 
   private static final Logger logger = LoggerFactory.getLogger(SilenceDetectionServiceRemote.class);
-  private SmilService smilService;
+  private SmilService smilService = null;
 
   public SilenceDetectionServiceRemote() {
     super(JOB_TYPE);
   }
 
   @Override
-  public Job detect(Track track) throws SilenceDetectionFailedException {
+  public Job detect(Track sourceTrack) throws SilenceDetectionFailedException {
+    return detect(sourceTrack, null);
+  }
+  
+  @Override
+  public Job detect(Track sourceTrack, Track[] referencedTracks) throws SilenceDetectionFailedException {
     HttpPost post = new HttpPost("/detect");
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     try {
-      params.add(new BasicNameValuePair("track", MediaPackageElementParser.getAsXml(track)));
+      params.add(new BasicNameValuePair("track", MediaPackageElementParser.getAsXml(sourceTrack)));
+      if (referencedTracks != null && referencedTracks.length > 0) {
+        String referencedTracksXml = MediaPackageElementParser.getArrayAsXml(Arrays.asList(referencedTracks));
+        params.add(new BasicNameValuePair("referencedTracks", referencedTracksXml));
+      }
       post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new SilenceDetectionFailedException(
-              "Unable to assemble a remote silence detection request for track " + track.getIdentifier());
+              "Unable to assemble a remote silence detection request for track " + sourceTrack.getIdentifier());
     }
 
     HttpResponse response = null;
@@ -67,18 +77,18 @@ public class SilenceDetectionServiceRemote extends RemoteBase implements Silence
           Job resultJob = JobParser.parseJob(entity);
           logger.info(
                   "Start silence detection for track '{}' on remote silence detection service",
-                  track.getIdentifier());
+                  sourceTrack.getIdentifier());
           return resultJob;
         }
       }
     } catch (Exception e) {
       throw new SilenceDetectionFailedException("Unable to run silence detection for track "
-              + track.getIdentifier() + " on remote silence detection service", e);
+              + sourceTrack.getIdentifier() + " on remote silence detection service", e);
     } finally {
       closeConnection(response);
     }
     throw new SilenceDetectionFailedException("Unable to run silence detection for track "
-            + track.getIdentifier() + " on remote silence detection service");
+            + sourceTrack.getIdentifier() + " on remote silence detection service");
   }
 
   public void setSmilService(SmilService smilService) {
