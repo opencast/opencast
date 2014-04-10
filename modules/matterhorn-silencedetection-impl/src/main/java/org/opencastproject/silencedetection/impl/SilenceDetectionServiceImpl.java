@@ -18,7 +18,10 @@ package org.opencastproject.silencedetection.impl;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
+import org.apache.commons.lang.StringUtils;
 import org.gstreamer.Gst;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
@@ -30,16 +33,16 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.smil.api.SmilException;
-import org.opencastproject.smil.api.SmilResponse;
-import org.opencastproject.smil.api.SmilService;
-import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.silencedetection.api.MediaSegment;
 import org.opencastproject.silencedetection.api.MediaSegments;
 import org.opencastproject.silencedetection.api.SilenceDetectionFailedException;
 import org.opencastproject.silencedetection.api.SilenceDetectionService;
 import org.opencastproject.silencedetection.gstreamer.GstreamerSilenceDetector;
 import org.opencastproject.silencedetection.gstreamer.PipelineBuildException;
+import org.opencastproject.smil.api.SmilException;
+import org.opencastproject.smil.api.SmilResponse;
+import org.opencastproject.smil.api.SmilService;
+import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.workspace.api.Workspace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -89,53 +92,41 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
   }
 
   /**
-   * Run silence detection on the source track and returns {
+   * {@inheritDoc}
    *
-   * @see org.opencastproject.silencedetection.api.MediaSegments}
-   * XML as string. Source track should have an audio stream. All detected {
-   * @see org.opencastproject.silencedetection.api.MediaSegment}s
-   * (one or more) are non silent sequences.
-   *
-   * @param job processing job
-   * @param track track where to run silence detection
-   * @return {
-   * @see MediaSegments} Xml as String
-   * @throws ProcessFailedException if an error occures
+   * @see org.opencastproject.silencedetection.api.SilenceDetectionService#detect(
+   * org.opencastproject.mediapackage.Track)
    */
-  protected String detect(Job job, Track track) throws SilenceDetectionFailedException {
-    try {
-      String filePath = workspace.get(track.getURI()).getAbsolutePath();
-      GstreamerSilenceDetector silenceDetector = new GstreamerSilenceDetector(properties, track.getIdentifier(), filePath);
-      silenceDetector.runDetection();
-      return generateSmil(track, silenceDetector.getMediaSegments()).toXML();
-
-    } catch (SmilException ex) {
-      throw new SilenceDetectionFailedException("Generating Smil failed!");
-    } catch (PipelineBuildException ex) {
-      throw new SilenceDetectionFailedException("Unable to build detection Pipeline!");
-    } catch (Exception ex) {
-      throw new SilenceDetectionFailedException(ex.getMessage());
-    }
+  @Override
+  public Job detect(Track sourceTrack) throws SilenceDetectionFailedException {
+    return detect(sourceTrack, null);
   }
-
+  
   /**
    * {@inheritDoc}
    *
-   * @see
-   * org.opencastproject.silencedetection.api.SilenceDetectionService#detect(org.opencastproject.mediapackage.Track)
+   * @see org.opencastproject.silencedetection.api.SilenceDetectionService#detect(
+   * org.opencastproject.mediapackage.Track, org.opencastproject.mediapackage.Track[])
    */
   @Override
-  public Job detect(Track track) throws SilenceDetectionFailedException {
+  public Job detect(Track sourceTrack, Track[] referenceTracks) throws SilenceDetectionFailedException {
     try {
-      if (track == null) {
-        throw new SilenceDetectionFailedException("Track is null!");
+      if (sourceTrack == null) {
+        throw new SilenceDetectionFailedException("Source track is null!");
       }
-
-      String trackXML = MediaPackageElementParser.getAsXml(track);
+      List<String> arguments = new LinkedList<String>();
+      // put source track as job argument
+      arguments.add(0, MediaPackageElementParser.getAsXml(sourceTrack));
+      
+      // put reference tracks as second argument
+      if (referenceTracks != null) {
+        arguments.add(1, MediaPackageElementParser.getArrayAsXml(Arrays.asList(referenceTracks)));
+      }
+      
       return serviceRegistry.createJob(
               getJobType(),
               Operation.SILENCE_DETECTION.toString(),
-              Arrays.asList(trackXML));
+              arguments);
 
     } catch (ServiceRegistryException ex) {
       throw new SilenceDetectionFailedException("Unable to create job! " + ex.getMessage());
@@ -145,26 +136,84 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
   }
 
   @Override
-  protected String process(Job job) throws Exception {
+  protected String process(Job job) throws SilenceDetectionFailedException, SmilException, MediaPackageException {
     if (Operation.SILENCE_DETECTION.toString().equals(job.getOperation())) {
-      String trackXml = job.getArguments().get(0);
-      if (trackXml == null) {
+      // get source track
+      String sourceTrackXml = StringUtils.trimToNull(job.getArguments().get(0));
+      if (sourceTrackXml == null) {
         throw new SilenceDetectionFailedException("Track not set!");
       }
-
-      Track track = (Track) MediaPackageElementParser.getFromXml(trackXml);
-      return detect(job, track);
+      Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
+      
+      // run detection on source track
+      MediaSegments segments = runDetection(sourceTrack);
+      
+      // get reference tracks if any
+      List<Track> referenceTracks = null;
+      if (job.getArguments().size() > 1) {
+        String referenceTracksXml = StringUtils.trimToNull(job.getArguments().get(1));
+        if (referenceTracksXml != null) {
+          referenceTracks = (List<Track>) MediaPackageElementParser.getArrayFromXml(referenceTracksXml);
+        }
+      }
+      
+      if (referenceTracks == null) {
+        referenceTracks = Arrays.asList(sourceTrack);
+      }
+      
+      // create smil XML as result
+      try {
+        return generateSmil(segments, referenceTracks).toXML();
+      } catch (Exception ex) {
+        throw new SmilException("Failed to create smil document.", ex);
+      }
     }
 
     throw new SilenceDetectionFailedException("Can't handle this operation: " + job.getOperation());
   }
+  
+  /**
+   * Run silence detection on the source track and returns 
+   * {@see org.opencastproject.silencedetection.api.MediaSegments}   
+   * XML as string. Source track should have an audio stream. All detected 
+   * {@see org.opencastproject.silencedetection.api.MediaSegment}s
+   * (one or more) are non silent sequences.
+   *
+   * @param track track where to run silence detection
+   * @return {@see MediaSegments} Xml as String
+   * @throws SilenceDetectionFailedException if an error occures
+   */
+  protected MediaSegments runDetection(Track track) throws SilenceDetectionFailedException {
+    try {
+      String filePath = workspace.get(track.getURI()).getAbsolutePath();
+      GstreamerSilenceDetector silenceDetector = new GstreamerSilenceDetector(properties, track.getIdentifier(), filePath);
+      silenceDetector.runDetection();
+      return silenceDetector.getMediaSegments();
 
-  protected Smil generateSmil(Track track, MediaSegments segments) throws SmilException {
+    } catch (PipelineBuildException ex) {
+      throw new SilenceDetectionFailedException("Unable to build detection Pipeline!");
+    } catch (Exception ex) {
+      throw new SilenceDetectionFailedException(ex.getMessage());
+    }
+  }
+
+  /**
+   * Create a smil from given parameters.
+   * 
+   * @param segments media segment list with timestamps
+   * @param referenceTracks tracks to put as media segment source files
+   * @return generated smil
+   * @throws SmilException if smil creation failed
+   */
+  protected Smil generateSmil(MediaSegments segments, List<Track> referenceTracks) throws SmilException {
     SmilResponse smilResponse = smilService.createNewSmil();
+    Track[] referenceTracksArr = referenceTracks.toArray(new Track[referenceTracks.size()]);
+    
     for (MediaSegment segment : segments.getMediaSegments()) {
       smilResponse = smilService.addParallel(smilResponse.getSmil());
       String parId = smilResponse.getEntity().getId();
-      smilResponse = smilService.addClip(smilResponse.getSmil(), parId, track,
+      
+      smilResponse = smilService.addClips(smilResponse.getSmil(), parId, referenceTracksArr,
               segment.getSegmentStart(), segment.getSegmentStop() - segment.getSegmentStart());
     }
     return smilResponse.getSmil();
