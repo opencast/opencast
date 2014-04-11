@@ -224,7 +224,6 @@
       <configurations>
         <configuration key="source-flavor">*/work</configuration>
         <configuration key="target-flavor">*/preview</configuration>
-        <configuration key="target-tags">webm</configuration>
         <configuration key="encoding-profile">webm-preview.http</configuration>
       </configurations>
     </operation>
@@ -237,9 +236,8 @@
       description="Extracting audio for waveform generation">
       <configurations>
         <configuration key="source-flavor">*/work</configuration>
-        <configuration key="target-flavor">audio/waveform</configuration>
-        <configuration key="target-tags">waveform</configuration>
-        <configuration key="encoding-profile">audio-waveform.http</configuration>
+        <configuration key="target-flavor">*/audio</configuration>
+        <configuration key="encoding-profile">audio.wav</configuration>
       </configurations>
     </operation>
     
@@ -250,8 +248,8 @@
       fail-on-error="false"
       description="Generating waveform">
       <configurations>
-        <configuration key="source-flavor">audio/waveform</configuration>
-        <configuration key="target-flavor">image/waveform</configuration>
+        <configuration key="source-flavor">*/audio</configuration>
+        <configuration key="target-flavor">*/waveform</configuration>
       </configurations>
     </operation>
     
@@ -262,7 +260,7 @@
       fail-on-error="false"
       description="Executing silence detection">
       <configurations>
-        <configuration key="source-flavors">audio/waveform</configuration>
+        <configuration key="source-flavors">*/audio</configuration>
         <configuration key="smil-flavor-subtype">smil</configuration>
         <configuration key="reference-tracks-flavor">*/preview</configuration>
       </configurations>
@@ -280,7 +278,7 @@
       <configurations>
         <configuration key="source-flavors">*/work</configuration>
         <configuration key="preview-flavors">*/preview</configuration>
-        <configuration key="smil-flavor">smil/smil</configuration>
+        <configuration key="smil-flavor">presenter/smil</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>
       </configurations>
     </operation>

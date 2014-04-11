@@ -27,18 +27,22 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collection;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
 import javax.imageio.ImageIO;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -63,6 +67,10 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
    * Target flavor configuration property name.
    */
   private static final String TARGET_FLAVOR_PROPERTY = "target-flavor";
+  /**
+   * File name for generated waveform png files.
+   */
+  private static final String WAVEFORM_FILE_NAME = "waveform.png";
   /**
    * The configuration options for this handler
    */
@@ -109,57 +117,86 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
           throws WorkflowOperationException {
 
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
-
-    String sourceFlavorProperty = workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVOR_PROPERTY);
-    MediaPackageElementFlavor sourceFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavorProperty);
-
-    String targetFlavorProperty = workflowInstance.getCurrentOperation().getConfiguration(TARGET_FLAVOR_PROPERTY);
-    MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorProperty);
-
-    Track[] tracks = mediaPackage.getTracks(sourceFlavor);
-    if (tracks.length == 0) {
-      logger.info("Skipping Waveform generation because no wave file is present in the mediapackage {}",
-              mediaPackage.getIdentifier().compact());
-      return createResult(Action.SKIP);
+    logger.debug("Start waveform workflow operation for mediapackage {}", mediaPackage.getIdentifier().compact());
+    
+    String sourceFlavorProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVOR_PROPERTY));
+    if (sourceFlavorProperty == null) {
+      throw new WorkflowOperationException(String.format("Required property %s not set.", SOURCE_FLAVOR_PROPERTY));
     }
-    logger.info("Generating waveform png from {}", tracks[0].getURI().toString());
-
-    WaveUtils waveUtils = null;
-    BufferedImage bufferedImage = null;
-    ByteArrayOutputStream os = null;
-    InputStream is = null;
-    try {
-      File waveFile = workspace.get(tracks[0].getURI());
-      waveUtils = new WaveUtils(waveFile);
-      bufferedImage = waveUtils.generateWaveformImage(true);
-
-      // finally save the image to file
-      logger.debug("putting bufferedImage in ByteArrayOutputstream");
-      os = new ByteArrayOutputStream();
-      ImageIO.write(bufferedImage, "png", os);
-      is = new ByteArrayInputStream(os.toByteArray());
-      logger.debug("adding waveform png to mediapackage");
-      String elementId = UUID.randomUUID().toString();
-      URI waveformUri = workspace.put(mediaPackage.getIdentifier().compact(), elementId, "waveform.png", is);
-      Attachment attachment = (Attachment) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-              .elementFromURI(waveformUri, MediaPackageElement.Type.Attachment, targetFlavor);
-      mediaPackage.add(attachment);
-
-      logger.info("Generation waveform png from {} finished.", tracks[0].getURI().toString());
-      return createResult(mediaPackage, Action.CONTINUE);
-
-    } catch (WaveException ex) {
-      logger.error("creating waveform image failed", ex);
-    } catch (NotFoundException ex) {
-      logger.error("wave file not found", ex);
-    } catch (IOException ex) {
-      logger.error("io exception occures while creating waveform image", ex);
-    } finally {
-      IOUtils.closeQuietly(is);
-      IOUtils.closeQuietly(os);
+    
+    String targetFlavorProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(TARGET_FLAVOR_PROPERTY));
+    if (targetFlavorProperty == null) {
+      throw new WorkflowOperationException(String.format("Required property %s not set.", TARGET_FLAVOR_PROPERTY));
     }
+    
+    TrackSelector trackSelector = new TrackSelector();
+    for (String flavor : asList(sourceFlavorProperty)) {
+      trackSelector.addFlavor(flavor);
+    }
+    Collection<Track> sourceTracks = trackSelector.select(mediaPackage, false);
+    if (sourceTracks.isEmpty()) {
+      logger.warn("No tracks found in mediapackage {} with specified {} {}", new String[] { 
+              mediaPackage.getIdentifier().compact(),
+              SOURCE_FLAVOR_PROPERTY,
+              sourceFlavorProperty});
+      createResult(mediaPackage, Action.SKIP);
+    }
+    
+    MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+    for (Track sourceTrack : sourceTracks) {
+      // generate waveform
+      logger.info("Generating waveform png for track {}", sourceTrack.getIdentifier());
+    
+      WaveUtils waveUtils = null;
+      BufferedImage bufferedImage = null;
+      ByteArrayOutputStream os = null;
+      InputStream is = null;
+      try {
+        File waveFile = workspace.get(sourceTrack.getURI());
+        waveUtils = new WaveUtils(waveFile);
+        bufferedImage = waveUtils.generateWaveformImage(true);
 
-    return createResult(Action.SKIP);
+        // finally save the image to file
+        os = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage, "png", os);
+        is = new ByteArrayInputStream(os.toByteArray());
+        logger.debug("Adding waveform png for track {} to mediapackage {}.", new String[] {
+          sourceTrack.getIdentifier(), mediaPackage.getIdentifier().compact()
+        });
+        String elementId = UUID.randomUUID().toString();
+        URI waveformUri = workspace.put(mediaPackage.getIdentifier().compact(), elementId, WAVEFORM_FILE_NAME, is);
+        
+        MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorProperty);
+        if ("*".equals(targetFlavor.getType())) {
+          targetFlavor = new MediaPackageElementFlavor(sourceTrack.getFlavor().getType(), targetFlavor.getSubtype());
+        }
+        if ("*".equals(targetFlavor.getSubtype())) {
+          targetFlavor = new MediaPackageElementFlavor(targetFlavor.getType(), sourceTrack.getFlavor().getSubtype());
+        }
+        Attachment attachment = (Attachment) mpeBuilder.elementFromURI(
+                waveformUri, MediaPackageElement.Type.Attachment, targetFlavor);
+        attachment.setIdentifier(elementId);
+        mediaPackage.add(attachment);
+
+        logger.info("Generation waveform png for track {} finished.", sourceTrack.getIdentifier());
+
+      } catch (WaveException ex) {
+        throw new WorkflowOperationException(String.format(
+                "Generation waveform image for track %s failed.", sourceTrack.getIdentifier()), ex);
+      } catch (NotFoundException ex) {
+        throw new WorkflowOperationException(String.format(
+                "Can't get source file %s from workspace.", sourceTrack.getURI()), ex);
+      } catch (IOException ex) {
+        throw new WorkflowOperationException(String.format(
+                "IO exception occures while generation waveform image for track %s.", 
+                sourceTrack.getIdentifier()), ex);
+      } finally {
+        IOUtils.closeQuietly(is);
+        IOUtils.closeQuietly(os);
+      }
+    }
+    logger.info("Finished waveform workflow operation for mediapackage {}", mediaPackage.getIdentifier().compact());
+    return createResult(mediaPackage, Action.CONTINUE);
   }
 
   /**
