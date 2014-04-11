@@ -111,7 +111,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
           throws WorkflowOperationException {
 
     MediaPackage mp = workflowInstance.getMediaPackage();
-    logger.debug("Start silence detection workflow operation for mediapackage {}.", mp.getIdentifier().compact());
+    logger.debug("Start silence detection workflow operation for mediapackage {}", mp.getIdentifier().compact());
     
     String sourceFlavors = StringUtils.trimToNull(
             workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVORS_PROPERTY));
@@ -119,7 +119,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
             workflowInstance.getCurrentOperation().getConfiguration(SMIL_FLAVOR_SUBTYPE_PROPERTY));
     if (sourceFlavors == null) {
       throw new WorkflowOperationException(String.format(
-              "No %s or %s have been specified.", SOURCE_FLAVORS_PROPERTY, SMIL_FLAVOR_SUBTYPE_PROPERTY));
+              "No %s or %s have been specified", SOURCE_FLAVORS_PROPERTY, SMIL_FLAVOR_SUBTYPE_PROPERTY));
     }
     String referenceTracksFlavor = StringUtils.trimToNull(
             workflowInstance.getCurrentOperation().getConfiguration(REFERENCE_TRACKS_FLAVOR_PROPERTY));
@@ -132,7 +132,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
     }
     Collection<Track> sourceTracks = trackSelector.select(mp, false);
     if (sourceTracks.isEmpty()) {
-      logger.info("No tracks found. Skip silence detection.");
+      logger.info("No source tracks found, skip silence detection");
       return createResult(mp, Action.SKIP);
     }
     
@@ -144,7 +144,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
     if (referenceTracks.isEmpty()) {
       // REFERENCE_TRACKS_FLAVOR_PROPERTY was set to wrong value
       throw new WorkflowOperationException(
-              String.format("No tracks found filtered by flavor(s) '%s'.", referenceTracksFlavor));
+              String.format("No tracks found filtered by flavor(s) '%s'", referenceTracksFlavor));
     }
     MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
     
@@ -153,7 +153,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
       try {
         Job detectionJob = detetionService.detect(sourceTrack, referenceTracks.toArray(new Track[referenceTracks.size()]));
         if (!waitForStatus(detectionJob).isSuccess()) {
-          throw new WorkflowOperationException("Silence Detection failed!");
+          throw new WorkflowOperationException("Silence Detection failed");
         }
         Smil smil = smilService.fromXml(detectionJob.getPayload()).getSmil();
         InputStream is = null;
@@ -166,7 +166,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
           mp.add(catalog);
         } catch (Exception ex) {
           throw new WorkflowOperationException(String.format(
-                  "Failed to put smil into workspace. Silence detection for track %s failed.", 
+                  "Failed to put smil into workspace. Silence detection for track %s failed", 
                   sourceTrack.getIdentifier()), ex);
         } finally {
           IOUtils.closeQuietly(is);
@@ -175,13 +175,13 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
         logger.info("Finished silence detection on track {}", sourceTrack.getIdentifier());
       } catch (SilenceDetectionFailedException ex) {
         throw new WorkflowOperationException(String.format(
-                "Failed to create silence detection job for track %s.", sourceTrack.getIdentifier()));
+                "Failed to create silence detection job for track %s", sourceTrack.getIdentifier()));
       } catch (SmilException ex) {
         throw new WorkflowOperationException(String.format(
-                "Failed to get smil from silence detection job for track %s.", sourceTrack.getIdentifier()));
+                "Failed to get smil from silence detection job for track %s", sourceTrack.getIdentifier()));
       }
     }
-    logger.debug("Finished silence detection workflow operation for mediapackage {}.", mp.getIdentifier().compact());
+    logger.debug("Finished silence detection workflow operation for mediapackage {}", mp.getIdentifier().compact());
     return createResult(mp, Action.CONTINUE);
   }
 

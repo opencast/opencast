@@ -117,16 +117,16 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
           throws WorkflowOperationException {
 
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
-    logger.debug("Start waveform workflow operation for mediapackage {}", mediaPackage.getIdentifier().compact());
+    logger.info("Start waveform workflow operation for mediapackage {}", mediaPackage.getIdentifier().compact());
     
     String sourceFlavorProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVOR_PROPERTY));
     if (sourceFlavorProperty == null) {
-      throw new WorkflowOperationException(String.format("Required property %s not set.", SOURCE_FLAVOR_PROPERTY));
+      throw new WorkflowOperationException(String.format("Required property %s not set", SOURCE_FLAVOR_PROPERTY));
     }
     
     String targetFlavorProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(TARGET_FLAVOR_PROPERTY));
     if (targetFlavorProperty == null) {
-      throw new WorkflowOperationException(String.format("Required property %s not set.", TARGET_FLAVOR_PROPERTY));
+      throw new WorkflowOperationException(String.format("Required property %s not set", TARGET_FLAVOR_PROPERTY));
     }
     
     TrackSelector trackSelector = new TrackSelector();
@@ -160,9 +160,8 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
         os = new ByteArrayOutputStream();
         ImageIO.write(bufferedImage, "png", os);
         is = new ByteArrayInputStream(os.toByteArray());
-        logger.debug("Adding waveform png for track {} to mediapackage {}.", new String[] {
-          sourceTrack.getIdentifier(), mediaPackage.getIdentifier().compact()
-        });
+        logger.debug("Adding waveform png for track {} to mediapackage {}", new String[] {
+          sourceTrack.getIdentifier(), mediaPackage.getIdentifier().compact()});
         String elementId = UUID.randomUUID().toString();
         URI waveformUri = workspace.put(mediaPackage.getIdentifier().compact(), elementId, WAVEFORM_FILE_NAME, is);
         
@@ -178,17 +177,15 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
         attachment.setIdentifier(elementId);
         mediaPackage.add(attachment);
 
-        logger.info("Generation waveform png for track {} finished.", sourceTrack.getIdentifier());
-
       } catch (WaveException ex) {
         throw new WorkflowOperationException(String.format(
-                "Generation waveform image for track %s failed.", sourceTrack.getIdentifier()), ex);
+                "Generation waveform image for track %s failed", sourceTrack.getIdentifier()), ex);
       } catch (NotFoundException ex) {
         throw new WorkflowOperationException(String.format(
-                "Can't get source file %s from workspace.", sourceTrack.getURI()), ex);
+                "Can't get source file %s from workspace", sourceTrack.getURI()), ex);
       } catch (IOException ex) {
         throw new WorkflowOperationException(String.format(
-                "IO exception occures while generation waveform image for track %s.", 
+                "IO exception occures while generation waveform image for track %s", 
                 sourceTrack.getIdentifier()), ex);
       } finally {
         IOUtils.closeQuietly(is);

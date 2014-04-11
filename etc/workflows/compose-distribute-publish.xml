@@ -278,7 +278,8 @@
       <configurations>
         <configuration key="source-flavors">*/work</configuration>
         <configuration key="preview-flavors">*/preview</configuration>
-        <configuration key="smil-flavor">presenter/smil</configuration>
+        <configuration key="smil-flavors">*/smil</configuration>
+        <configuration key="target-smil-flavor">episode/smil</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>
       </configurations>
     </operation>
