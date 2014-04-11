@@ -466,12 +466,12 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           if (flavor != null) {
             MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
                     downloadSubflavor.getSubtype());
-            for (int i = 0; i < distributedElements.size(); i++) 
+            for (int i = 0; i < distributedElements.size(); i++)
               ((MediaPackageElement)distributedElements.get(i)).setFlavor(newFlavor);
           }
         }
         for (String tag : downloadTargetTags) {
-          for (int i = 0; i < distributedElements.size(); i++) 
+          for (int i = 0; i < distributedElements.size(); i++)
             ((MediaPackageElement)distributedElements.get(i)).addTag(tag);
         }
       }
@@ -483,12 +483,12 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           if (flavor != null) {
             MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
                     streamingSubflavor.getSubtype());
-            for (int i = 0; i < distributedElements.size(); i++) 
+            for (int i = 0; i < distributedElements.size(); i++)
               ((MediaPackageElement)distributedElements.get(i)).setFlavor(newFlavor);
           }
         }
         for (String tag : streamingTargetTags) {
-          for (int i = 0; i < distributedElements.size(); i++) 
+          for (int i = 0; i < distributedElements.size(); i++)
             ((MediaPackageElement)distributedElements.get(i)).addTag(tag);
         }
       }
@@ -497,7 +497,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       MediaPackageReference ref = sourceElement.getReference();
       if (ref != null && mp.getElementByReference(ref) != null) {
         MediaPackageReference newReference = (MediaPackageReference) ref.clone();
-        for (int i = 0; i < distributedElements.size(); i++) 
+        for (int i = 0; i < distributedElements.size(); i++)
             ((MediaPackageElement)distributedElements.get(i)).setReference(newReference);
       }
 
