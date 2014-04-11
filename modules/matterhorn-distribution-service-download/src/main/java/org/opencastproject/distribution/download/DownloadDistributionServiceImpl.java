@@ -169,7 +169,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
    *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
    *           cannot be copied or another unexpected exception occurs.
    */
-  public MediaPackageElement distributeElement(String channelId, MediaPackage mediapackage, String elementId,
+  public MediaPackageElement[] distributeElement(String channelId, MediaPackage mediapackage, String elementId,
           boolean checkAvailability) throws DistributionException {
     notNull(mediapackage, "mediapackage");
     notNull(elementId, "elementId");
@@ -281,11 +281,15 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
         logger.warn("Status code of distributed file {}: {}", uri, response.getStatusLine().getStatusCode());
         throw new DistributionException("Unable to load distributed file " + uri.toString());
       }
+<<<<<<< Updated upstream
 
       }
 
 
       return distributedElement;
+=======
+      return new MediaPackageElement[] {distributedElement};
+>>>>>>> Stashed changes
     } catch (Exception e) {
       logger.warn("Error distributing " + element, e);
       if (e instanceof DistributionException) {
@@ -324,7 +328,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
    * @throws org.opencastproject.distribution.api.DistributionException
    *           in case of an error
    */
-  protected MediaPackageElement retractElement(String channelId, MediaPackage mediapackage, String elementId)
+  protected MediaPackageElement[] retractElement(String channelId, MediaPackage mediapackage, String elementId)
           throws DistributionException {
     notNull(mediapackage, "mediapackage");
     notNull(elementId, "elementId");
@@ -345,7 +349,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
         logger.info(format(
                 "Element %s@%s has already been removed or has never been distributed for publication channel %s",
                 elementId, mediapackageId, channelId));
-        return element;
+        return new MediaPackageElement[] {element};
       }
 
       logger.info("Retracting element {} from {}", element, elementFile);
@@ -357,7 +361,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
       logger.info(format("Finished retracting element %s@%s for publication channel %s", elementId, mediapackageId,
               channelId));
-      return element;
+      return new MediaPackageElement[] {element};
     } catch (Exception e) {
       logger.warn(
               format("Error retracting element %s@%s for publication channel %s", elementId, mediapackageId, channelId),
@@ -388,12 +392,12 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
       switch (op) {
         case Distribute:
           Boolean checkAvailability = Boolean.parseBoolean(arguments.get(3));
-          MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, elementId,
+          MediaPackageElement[] distributedElement = distributeElement(channelId, mediapackage, elementId,
                   checkAvailability);
-          return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
+          return (distributedElement != null) ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(distributedElement)) : null;
         case Retract:
-          MediaPackageElement retractedElement = retractElement(channelId, mediapackage, elementId);
-          return (retractedElement != null) ? MediaPackageElementParser.getAsXml(retractedElement) : null;
+          MediaPackageElement[] retractedElement = retractElement(channelId, mediapackage, elementId);
+          return (retractedElement != null) ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(retractedElement)) : null;
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
       }
