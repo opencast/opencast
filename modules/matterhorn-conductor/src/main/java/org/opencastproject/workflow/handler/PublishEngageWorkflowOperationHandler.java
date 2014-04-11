@@ -440,20 +440,24 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       if (job.getPayload() == null)
         continue;
 
-      MediaPackageElement distributedElement = null;
+      List distributedElements = null;
       try {
-        distributedElement = MediaPackageElementParser.getFromXml(job.getPayload());
+        distributedElements = MediaPackageElementParser.getArrayFromXml(job.getPayload());
       } catch (MediaPackageException e) {
         throw new WorkflowOperationException(e);
       }
 
       // If the job finished successfully, but returned no new element, the channel simply doesn't support this
       // kind of element. So we just keep on looping.
-      if (distributedElement == null)
+      if (distributedElements == null || distributedElements.size() < 1)
         continue;
 
       // Make sure the mediapackage is prompted to create a new identifier for this element
-      distributedElement.setIdentifier(null);
+      for (int i = 0; i < distributedElements.size(); i++) {
+        if (distributedElements.get(i) instanceof MediaPackageElement)
+          ((MediaPackageElement) distributedElements.get(i)).setIdentifier(null);
+        else distributedElements.remove(i); // make sure no other Elements are in the list for future operations
+      }
 
       // Adjust the flavor and tags for downloadable elements
       if (downloadElementIds.contains(sourceElementId)) {
@@ -462,11 +466,13 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           if (flavor != null) {
             MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
                     downloadSubflavor.getSubtype());
-            distributedElement.setFlavor(newFlavor);
+            for (int i = 0; i < distributedElements.size(); i++) 
+              ((MediaPackageElement)distributedElements.get(i)).setFlavor(newFlavor);
           }
         }
         for (String tag : downloadTargetTags) {
-          distributedElement.addTag(tag);
+          for (int i = 0; i < distributedElements.size(); i++) 
+            ((MediaPackageElement)distributedElements.get(i)).addTag(tag);
         }
       }
 
@@ -477,11 +483,13 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           if (flavor != null) {
             MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
                     streamingSubflavor.getSubtype());
-            distributedElement.setFlavor(newFlavor);
+            for (int i = 0; i < distributedElements.size(); i++) 
+              ((MediaPackageElement)distributedElements.get(i)).setFlavor(newFlavor);
           }
         }
         for (String tag : streamingTargetTags) {
-          distributedElement.addTag(tag);
+          for (int i = 0; i < distributedElements.size(); i++) 
+            ((MediaPackageElement)distributedElements.get(i)).addTag(tag);
         }
       }
 
@@ -489,13 +497,16 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       MediaPackageReference ref = sourceElement.getReference();
       if (ref != null && mp.getElementByReference(ref) != null) {
         MediaPackageReference newReference = (MediaPackageReference) ref.clone();
-        distributedElement.setReference(newReference);
+        for (int i = 0; i < distributedElements.size(); i++) 
+            ((MediaPackageElement)distributedElements.get(i)).setReference(newReference);
       }
 
       // Add the new element to the mediapackage
-      mp.add(distributedElement);
-      elementsToPublish.add(distributedElement.getIdentifier());
-      distributedElementIds.put(sourceElementId, distributedElement.getIdentifier());
+      for (int i = 0; i < distributedElements.size(); i++) {
+        mp.add((MediaPackageElement)distributedElements.get(i));
+        elementsToPublish.add(((MediaPackageElement)distributedElements.get(i)).getIdentifier());
+        distributedElementIds.put(sourceElementId, ((MediaPackageElement)distributedElements.get(i)).getIdentifier());
+      }
 
     }
 
