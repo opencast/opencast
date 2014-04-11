@@ -1,69 +1,60 @@
 #!/bin/bash
 
+FUNCTIONS="functions.sh"
+. ${FUNCTIONS}
+
 #THIS SCRIPT SHOULD NOT BE USED IF YOU ARE CREATING A FEATURE BRANCH
-#Instead, just svn copy from your source branch to your dev branch
-#This script modifies the POM files for trunk.
 
-#The comments in this file assume you are creating a branch from trunk
-#Eg:  The defaults in the comments here will take the current version of 
-#https://opencast.jira.com/svn/MH/trunk and tag it as 
-#https://opencast.jira.com/svn/MH/tags/1.3.x
-
-#The name of the new branch
-#E.g. BRANCH_NAME=1.3.x
+#The name of the new branch, without the release branch prefix
+#E.g. BRANCH_NAME=1.4.2
 BRANCH_NAME=
 
-#The version the POMs are in trunk right now.
-#E.g. OLD_POM_VER=1.3-SNAPSHOT
+#The version the POMs are in develop right now.
+#E.g. OLD_POM_VER=1.4-SNAPSHOT
 OLD_POM_VER=
 
-#The new version of our release as it will show up in the branch directory
-#E.g. NEW_POM_VER=1.4-SNAPSHOT
-NEW_POM_VER=
+#The new version for our POMs
+#E.g. BRANCH_POM_VER=1.4.2-SNAPSHOT
+BRANCH_POM_VER=
+
+#The version that develop should have.
+#E.g. NEW_DEVELOP_POM_VER=1.5-SNAPSHOT
+NEW_DEVELOP_POM_VER=
 
 #The jira ticket this work is being done under (must be open)
 JIRA_TICKET=
 
-#The scratch directory where the work is performed.  Make sure you have enough
-#space.  Should not already include a subdirectory of $WORK_DIR/$JIRA_TICKET
-WORK_DIR=/tmp/
-
 #=======You should not need to modify anything below this line=================
 
-#The actual working dir
-WORK_DIR=$WORK_DIR/$JIRA_TICKET
+WORK_DIR=../../../
 
-#Matterhorn base URL
-SVN_URL=https://opencast.jira.com/svn/MH
+#Reset this script so that the modifications do not get committed
+git checkout -- branch.sh
 
-TRUNK_URL=$SVN_URL/trunk
-BRANCH_URL=$SVN_URL/branches/$BRANCH_NAME
+#Make sure we are on develop, then create a branch
+git checkout develop
 
-#TODO: We should use an svn switch instead because while we are working on this
-#tag to get it ready people might think it has been released.
-echo "Creating new branch by copying $TRUNK_URL to $BRANCH_URL."
-svn copy $TRUNK_URL $BRANCH_URL -m "$JIRA_TICKET Creating $BRANCH_NAME Branch"
+echo "Replacing POM file version in the POMs."
+updatePomVersions -w $WORK_DIR -o $OLD_POM_VER -n $BRANCH_POM_VER
 
-echo "Creating scratch dir and checking out release sources"
-pushd .
-rm -rf $WORK_DIR
-mkdir $WORK_DIR
-cd $WORK_DIR
-svn co $TRUNK_URL .
+git commit -a -m "$JIRA_TICKET Updated pom.xml files to reflect new branch version.  Done via docs/scripts/release/branch.sh"
+
+git checkout -b r/$BRANCH_NAME
+
+git checkout develop
+git revert --no-edit HEAD
 
 echo "Replacing POM file version in main POM."
-sed -i "s/<version>$OLD_POM_VER/<version>$NEW_POM_VER/" $WORK_DIR/pom.xml
+updatePomVersions -w $WORK_DIR -o $OLD_POM_VER -n $NEW_DEVELOP_POM_VER
 
-for i in modules/matterhorn-*
-do
-    echo " Module: $i"
-    if [ -f $WORK_DIR/$i/pom.xml ]; then
-        sed -i "s/<version>$OLD_POM_VER/<version>$NEW_POM_VER/" $WORK_DIR/$i/pom.xml
-        sleep 1
-    fi
-done
-svn commit -m "$JIRA_TICKET Updated pom.xml files to reflect correct version.  Done via docs/scripts/release/branch.sh"
+git commit -a -m "$JIRA_TICKET: Updating POM versions to $NEW_DEVELOP_VER in develop"
 
-#Return to previous environment and cleanup
-popd
-rm -rf $WORK_DIR
+echo "Summary:"
+echo "-Created r/$BRANCH_NAME from develop"
+echo "-Updated local develop POMs to $NEW_DEVELOP_POM_VER"
+echo "We can push these changes to the public repo."
+yesno -d no "Do you want this script to do that automatically for you?" push
+if [[ "$push" ]]; then
+    git push origin r/$BRANCH_NAME
+    git push origin develop
+fi

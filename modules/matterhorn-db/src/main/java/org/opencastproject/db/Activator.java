@@ -68,7 +68,7 @@ public class Activator implements BundleActivator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   @Override
@@ -116,7 +116,7 @@ public class Activator implements BundleActivator {
     if ("true".equalsIgnoreCase(bundleContext.getProperty("org.opencastproject.db.ddl.generation"))) {
       props.put("eclipselink.ddl-generation", "create-tables");
       if ("true".equalsIgnoreCase(bundleContext.getProperty("org.opencastproject.db.ddl.script.generation"))) {
-        props.put("eclipselink.ddl-generation.output-mode", "both");        
+        props.put("eclipselink.ddl-generation.output-mode", "both");
       } else {
         props.put("eclipselink.ddl-generation.output-mode", "database");
       }
@@ -126,13 +126,13 @@ public class Activator implements BundleActivator {
     // Listen for bundles with persistence units restarting
     jpaClientBundleListener = new JpaClientBundleListener();
     bundleContext.addBundleListener(jpaClientBundleListener);
-    
+
     logger.info("Database connection pool established at {}", jdbcUrl);
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
    */
   @Override
@@ -155,7 +155,7 @@ public class Activator implements BundleActivator {
   class JpaClientBundleListener implements BundleListener {
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.osgi.framework.BundleListener#bundleChanged(org.osgi.framework.BundleEvent)
      */
     @Override

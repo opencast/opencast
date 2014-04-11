@@ -44,7 +44,6 @@ import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
@@ -73,6 +72,7 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowService;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -100,7 +100,9 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -118,7 +120,7 @@ public class SchedulerServiceImplTest {
 
   private WorkflowService workflowService;
   private SeriesService seriesService;
-  private IngestService ingestService;
+  private Workspace workspace;
 
   private String persistenceStorage;
   private SchedulerServiceImpl schedSvc;
@@ -196,9 +198,12 @@ public class SchedulerServiceImplTest {
     seriesService = EasyMock.createMock(SeriesService.class);
     EasyMock.expect(seriesService.getSeries(EasyMock.eq(seriesIdentifier))).andReturn(seriesCatalog).anyTimes();
 
-    ingestService = EasyMock.createNiceMock(IngestService.class);
+    workspace = EasyMock.createNiceMock(Workspace.class);
+    EasyMock.expect(
+            workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    (InputStream) EasyMock.anyObject())).andReturn(new URI("http://localhost:8080/test")).anyTimes();
 
-    EasyMock.replay(workflowService, seriesService, ingestService);
+    EasyMock.replay(workflowService, seriesService, workspace);
 
     schedSvc = new SchedulerServiceImpl();
 
@@ -207,7 +212,7 @@ public class SchedulerServiceImplTest {
     schedSvc.setSeriesService(seriesService);
     schedSvc.setIndex(index);
     schedSvc.setPersistence(schedulerDatabase);
-    schedSvc.setIngestService(ingestService);
+    schedSvc.setWorkspace(workspace);
 
     schedSvc.activate(null);
   }
@@ -579,7 +584,7 @@ public class SchedulerServiceImplTest {
     schedSvc2.setSeriesService(seriesService);
     schedSvc2.setIndex(index);
     schedSvc2.setPersistence(schedulerDatabase);
-    schedSvc2.setIngestService(ingestService);
+    schedSvc2.setWorkspace(workspace);
 
     schedSvc2.activate(null);
 

@@ -26,13 +26,15 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageImpl;
+import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.LocalHashMap;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
@@ -61,6 +63,7 @@ import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -124,10 +127,12 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   private WorkflowService service;
   /** The service registry */
   protected ServiceRegistry serviceRegistry = null;
+  /** The workspace */
+  private Workspace workspace;
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -137,7 +142,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Sets the workflow service
-   * 
+   *
    * @param service
    *          the workflow service instance
    */
@@ -146,8 +151,18 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   }
 
   /**
+   * Callback from the OSGi declarative services to set the workspace.
+   *
+   * @param workspace
+   *          the workspace
+   */
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
+  }
+
+  /**
    * OSGI callback for component activation
-   * 
+   *
    * @param cc
    *          the OSGI declarative services component context
    */
@@ -156,7 +171,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     if (cc == null) {
       serverUrl = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      String ccServerUrl = cc.getBundleContext().getProperty("org.opencastproject.server.url");
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
       logger.info("configured server url is {}", ccServerUrl);
       if (ccServerUrl == null) {
         serverUrl = UrlSupport.DEFAULT_BASE_URL;
@@ -300,7 +315,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Returns the workflow configuration panel HTML snippet for the workflow definition specified by
-   * 
+   *
    * @param definitionId
    * @return config panel HTML snippet
    */
@@ -492,7 +507,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
                   + "the workflow instance, with mediapackage elements, workflow and workflow operation configurations and "
                   + "non-current operations removed.", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow set.") })
   public Response getWorkflowsAsJson(@QueryParam("state") List<String> states, @QueryParam("q") String text,
-          @QueryParam("seriesid") String seriesId, @QueryParam("seriestitle") String seriesTitle,
+          @QueryParam("seriesId") String seriesId, @QueryParam("seriesTitle") String seriesTitle,
           @QueryParam("creator") String creator, @QueryParam("contributor") String contributor,
           @QueryParam("fromdate") String fromDate, @QueryParam("todate") String toDate,
           @QueryParam("language") String language, @QueryParam("license") String license,
@@ -533,10 +548,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Path("start")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "start", description = "Start a new workflow instance.", returnDescription = "An XML representation of the new workflow instance", restParameters = {
-          @RestParameter(name = "definition", isRequired = true, description = "The workflow definition ID or an XML representation of a workflow definition", type = TEXT, 
-                  defaultValue = "${this.sampleWorkflowDefinition}", jaxbClass = WorkflowDefinitionImpl.class),
-          @RestParameter(name = "mediapackage", isRequired = true, description = "The XML representation of a mediapackage", type = TEXT, 
-                  defaultValue = "${this.sampleMediaPackage}", jaxbClass = MediaPackageImpl.class),
+          @RestParameter(name = "definition", isRequired = true, description = "The workflow definition ID or an XML representation of a workflow definition", type = TEXT, defaultValue = "${this.sampleWorkflowDefinition}", jaxbClass = WorkflowDefinitionImpl.class),
+          @RestParameter(name = "mediapackage", isRequired = true, description = "The XML representation of a mediapackage", type = TEXT, defaultValue = "${this.sampleMediaPackage}", jaxbClass = MediaPackageImpl.class),
           @RestParameter(name = "parent", isRequired = false, description = "An optional parent workflow instance identifier", type = STRING),
           @RestParameter(name = "properties", isRequired = false, description = "An optional set of key=value\\n properties", type = TEXT) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the new workflow instance."),
@@ -558,10 +571,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
         throw new WebApplicationException(wpe, Status.BAD_REQUEST);
       }
     }
-    
+
     return startWorkflow(workflowDefinition, mp, parentWorkflowId, localMap);
   }
-
 
   private WorkflowInstanceImpl startWorkflow(WorkflowDefinition workflowDefinition, MediaPackageImpl mp,
           String parentWorkflowId, LocalHashMap localMap) {
@@ -667,8 +679,22 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     try {
       WorkflowInstance workflow = service.getWorkflowById(workflowInstanceId);
       if (mediaPackage != null) {
-        MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(mediaPackage);
-        workflow.setMediaPackage(mp);
+        MediaPackage newMp = MediaPackageParser.getFromXml(mediaPackage);
+        MediaPackage oldMp = workflow.getMediaPackage();
+
+        // Delete removed elements from workspace
+        for (MediaPackageElement elem : oldMp.getElements()) {
+          if (MediaPackageSupport.contains(elem.getIdentifier(), newMp))
+            continue;
+          try {
+            workspace.delete(elem.getURI());
+            logger.info("Deleted removed mediapackge element {}", elem);
+          } catch (NotFoundException e) {
+            logger.info("Removed mediapackage element {} is already deleted", elem);
+          }
+        }
+
+        workflow.setMediaPackage(newMp);
         service.update(workflow);
       }
       service.resume(workflowInstanceId, map);
@@ -755,6 +781,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     try {
       service.unregisterWorkflowDefinition(workflowDefinitionId);
       return Response.status(Status.NO_CONTENT).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).build();
     } catch (WorkflowDatabaseException e) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
@@ -790,7 +818,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -804,7 +832,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override

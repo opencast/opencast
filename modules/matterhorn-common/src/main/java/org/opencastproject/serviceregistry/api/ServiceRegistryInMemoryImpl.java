@@ -312,7 +312,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     synchronized (this) {
       job = new JaxbJob(idCounter.addAndGet(1));
       if (securityService != null) {
-        job.setCreator(securityService.getUser().getUserName());
+        job.setCreator(securityService.getUser().getUsername());
         job.setOrganization(securityService.getOrganization().getId());
       }
       job.setJobType(type);
@@ -349,7 +349,8 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    * @throws ServiceRegistryException
    *           if the service registrations are unavailable or dispatching of the job fails
    */
-  protected boolean dispatchJob(Job job) throws ServiceUnavailableException, ServiceRegistryException {
+  protected boolean dispatchJob(Job job) throws ServiceUnavailableException, ServiceRegistryException,
+          UndispatchableJobException {
     List<ServiceRegistration> registrations = getServiceRegistrationsByLoad(job.getJobType());
     if (registrations.size() == 0)
       throw new ServiceUnavailableException("No service is available to handle jobs of type '" + job.getJobType() + "'");

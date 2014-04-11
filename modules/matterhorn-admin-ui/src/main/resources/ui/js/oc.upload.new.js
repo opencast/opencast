@@ -708,13 +708,14 @@ ocUpload.Ingest = (function() {
       cache: false,
       contentType: false,
       success: function (e, status, jqHBX) {
-        if(jqHBX.status == 404) {
-          ocUpload.UI.showFailure("Could not upload chunk #" + chunk + " to UploadJob because job wasn't found");
-        } else if(jqHBX.status == 400) {
-          ocUpload.UI.showFailure("Could not upload chunk #" + chunk + " to UploadJob because a malformed uploadrequest");
-        } else {
+        if(jqHBX.status >= 200 && jqHBX.status < 300)  {
           nextPart(file, ++chunk, jobId, start + ocUpload.CHUNKSIZE, end + ocUpload.CHUNKSIZE);
         }
+      },
+      error: function receiveError(jqXHR, textStatus, errorThrown) {
+        ocUpload.UI.hideProgressDialog();
+        alert("Upload failed:\n" + errorThrown);
+        window.location = '/admin/index.html#/recordings?' + window.location.hash.split('?')[1];;
       }
     });
   }
@@ -734,7 +735,7 @@ ocUpload.Ingest = (function() {
 
   function createSeries(name) {
     var id = false;
-    var seriesXml = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn"><dcterms:title xmlns="">' + name + '</dcterms:title></dublincore>';
+    var seriesXml = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn/"><dcterms:title xmlns="">' + name + '</dcterms:title></dublincore>';
     var anonymous_role = 'anonymous';
 
     ocUpload.UI.setProgress("Creating Series " + name);
@@ -850,9 +851,17 @@ ocUpload.Listener = (function() {
         url : ocUpload.INGEST_PROGRESS_URL + '/' + Update.jobId + ".json",
         type : 'get',
         dataType : 'json',
-        success : receiveUpdate
+        success : receiveUpdate,
+        error: receiveError
       });
     }
+  }
+
+  function receiveError(jqXHR, textStatus, errorThrown) {
+    var httpStatus = textStatus + ', ' + errorThrown;
+    var logEntry = Update.jobId + ' [' + httpStatus + ']';
+    ocUpload.UI.showFailure("Upload failed with: " + httpStatus);
+    uploadFailed(logEntry);
   }
 
   function receiveUpdate(data) {

@@ -26,9 +26,9 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.kernel.http.api.HttpClient;
 import org.opencastproject.kernel.http.impl.HttpClientFactory;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClientException;
-import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import junit.framework.Assert;
@@ -85,7 +85,7 @@ public class TrustedHttpClientImplTest {
 
     securityService = createNiceMock(SecurityService.class);
     expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
-    expect(securityService.getUser()).andReturn(new User()).anyTimes();
+    expect(securityService.getUser()).andReturn(new JaxbUser()).anyTimes();
     replay(securityService);
 
     serviceRegistry = createNiceMock(ServiceRegistry.class);

@@ -22,12 +22,12 @@ import static org.opencastproject.scheduler.impl.Util.setEventIdentifierImmutabl
 import static org.opencastproject.scheduler.impl.Util.setEventIdentifierMutable;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
@@ -72,6 +72,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -83,6 +84,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.UUID;
 
 /**
  * Implementation of {@link SchedulerService}.
@@ -117,9 +119,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   /** The series service */
   protected SeriesService seriesService;
 
-  /** The ingest service */
-  protected IngestService ingestService;
-
   /** The workflow service */
   protected WorkflowService workflowService;
 
@@ -153,11 +152,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   /** OSGi callback */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  /** OSGi callback */
-  public void setIngestService(IngestService ingestService) {
-    this.ingestService = ingestService;
   }
 
   /**
@@ -358,6 +352,9 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     operation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_STOP, Long.toString(endDate.getTime()));
     operation.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_LOCATION, event.getFirst(DublinCore.PROPERTY_SPATIAL));
     // Set the location in the workflow as well, so that it shows up in the UI properly.
+    // Update the same workflow global parameters created in the schedule create method
+    workflow.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_START, Long.toString(startDate.getTime()));
+    workflow.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_STOP, Long.toString(endDate.getTime()));
     workflow.setConfiguration(WORKFLOW_OPERATION_KEY_SCHEDULE_LOCATION, event.getFirst(DublinCore.PROPERTY_SPATIAL));
 
     for (Entry<String, String> property : wfProperties.entrySet()) {
@@ -378,7 +375,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    *          {@link DublinCoreCatalog} for event
    */
   private void populateMediapackageWithStandardDCFields(MediaPackage mp, DublinCoreCatalog dc) throws Exception {
-    final String seriesId = dc.getFirst(DublinCore.PROPERTY_IS_PART_OF);
+    String seriesId = dc.getFirst(DublinCore.PROPERTY_IS_PART_OF);
     mp.setTitle(dc.getFirst(DublinCore.PROPERTY_TITLE));
     mp.setLanguage(dc.getFirst(DublinCore.PROPERTY_LANGUAGE));
     mp.setLicense(dc.getFirst(DublinCore.PROPERTY_LICENSE));
@@ -387,7 +384,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       // add series dc to mp
       // add the episode catalog
       DublinCoreCatalog seriesCatalog = seriesService.getSeries(seriesId);
-      ingestService.addCatalog(IOUtils.toInputStream(seriesCatalog.toXmlString(), "UTF-8"), "dublincore.xml",
+      addCatalog(IOUtils.toInputStream(seriesCatalog.toXmlString(), "UTF-8"), "dublincore.xml",
               MediaPackageElements.SERIES, mp);
     } else if (isNotBlank(mp.getSeries()) && !mp.getSeries().equals(seriesId)) {
       // switch to new series dc and remove old
@@ -395,9 +392,11 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
         logger.debug("Deleting existing series dublin core {} from media package {}", c.getIdentifier(), mp
                 .getIdentifier().toString());
         mp.remove(c);
+        workspace.delete(c.getURI());
       }
+      seriesId = mp.getSeries();
       DublinCoreCatalog seriesCatalog = seriesService.getSeries(seriesId);
-      ingestService.addCatalog(IOUtils.toInputStream(seriesCatalog.toXmlString(), "UTF-8"), "dublincore.xml",
+      addCatalog(IOUtils.toInputStream(seriesCatalog.toXmlString(), "UTF-8"), "dublincore.xml",
               MediaPackageElements.SERIES, mp);
     } else if (isNotBlank(mp.getSeries()) && isBlank(seriesId)) {
       // remove series dc
@@ -405,8 +404,12 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
         logger.debug("Deleting existing series dublin core {} from media package {}", c.getIdentifier(), mp
                 .getIdentifier().toString());
         mp.remove(c);
+        workspace.delete(c.getURI());
       }
     }
+
+    // set series id
+    mp.setSeries(seriesId);
 
     // set series title
     if (isNotBlank(seriesId)) {
@@ -420,9 +423,6 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     } else {
       mp.setSeriesTitle(null);
     }
-
-    // set series id
-    mp.setSeries(seriesId);
 
     for (DublinCoreValue value : dc.get(DublinCore.PROPERTY_CREATOR)) {
       mp.addCreator(value.getValue());
@@ -441,8 +441,36 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       workspace.delete(c.getURI());
     }
     // add the episode catalog
-    ingestService.addCatalog(IOUtils.toInputStream(dc.toXmlString(), "UTF-8"), "dublincore.xml",
-            MediaPackageElements.EPISODE, mp);
+    addCatalog(IOUtils.toInputStream(dc.toXmlString(), "UTF-8"), "dublincore.xml", MediaPackageElements.EPISODE, mp);
+  }
+
+  /**
+   * Adds a catalog to the working file repository.
+   * 
+   * @param in
+   *          the catalog's input stream
+   * @param fileName
+   *          the catalog file name
+   * @param flavor
+   *          the catalog's flavor
+   * @param mediaPackage
+   *          the parent mediapackage
+   * @return the modified mediapackage
+   * @throws IOException
+   *           if the catalog cannot be stored in the working file repository
+   */
+  private MediaPackage addCatalog(InputStream in, String fileName, MediaPackageElementFlavor flavor,
+          MediaPackage mediaPackage) throws IOException {
+    try {
+      String elementId = UUID.randomUUID().toString();
+      URI catalogUrl = workspace.put(mediaPackage.getIdentifier().compact(), elementId, fileName, in);
+      logger.info("Adding catalog with flavor {} to mediapackage {}", flavor, mediaPackage);
+      MediaPackageElement mpe = mediaPackage.add(catalogUrl, MediaPackageElement.Type.Catalog, flavor);
+      mpe.setIdentifier(elementId);
+      return mediaPackage;
+    } catch (IOException e) {
+      throw e;
+    }
   }
 
   /**

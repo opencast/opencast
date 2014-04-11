@@ -1,5 +1,5 @@
-URL: http://downloads.xvid.org/downloads ${USASK_MIRROR}
-PKG: xvidcore-1.2.2.tar.gz
-SHA: d6e73c725b2fe74695f9fd129966c98f81b27fea
+URL: http://downloads.xvid.org/downloads ${USASK_MIRROR} ${ETH_MIRROR}
+PKG: xvidcore-1.3.2.tar.gz
+SHA: 56e065d331545ade04c63c91153b9624b51d6e1b
 DIR: xvidcore
 PCP: pc-xvid.zip

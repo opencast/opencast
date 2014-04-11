@@ -32,14 +32,14 @@ public class LinkImpl implements Link {
   private String hreflang = null;
 
   private String title = null;
- 
+
   private String flavour = null;
 
   private long length = -1;
 
   /**
    * Creates a link with the given <code>href</code> attribute.
-   * 
+   *
    * @param href
    *          the link
    */
@@ -130,7 +130,7 @@ public class LinkImpl implements Link {
   public void setType(String type) {
     this.type = type;
   }
-  
+
   /**
    * @see org.opencastproject.feed.api.Link#getFlavour()
    */
@@ -144,6 +144,6 @@ public class LinkImpl implements Link {
   public void setFlavour(String flavor) {
     this.flavour = flavor;
   }
-  
+
 
 }

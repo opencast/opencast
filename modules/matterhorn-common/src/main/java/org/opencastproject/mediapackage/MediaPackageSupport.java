@@ -13,9 +13,9 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.mediapackage;
 
+import org.opencastproject.fn.juc.Immutables;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
@@ -30,13 +30,13 @@ import java.util.List;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.opencastproject.util.IoSupport.withResource;
 import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.functions.Booleans.not;
 import static org.opencastproject.util.data.functions.Options.sequenceOpt;
 import static org.opencastproject.util.data.functions.Options.toOption;
 
 /** Utility class used for media package handling. */
 public final class MediaPackageSupport {
-
   /** Disable construction of this utility class */
   private MediaPackageSupport() {
   }
@@ -107,6 +107,21 @@ public final class MediaPackageSupport {
   }
 
   /**
+   * Returns <code>true</code> if the media package contains an element with the specified identifier.
+   * 
+   * @param identifier
+   *          the identifier
+   * @return <code>true</code> if the media package contains an element with this identifier
+   */
+  public static boolean contains(String identifier, MediaPackage mp) {
+    for (MediaPackageElement element : mp.getElements()) {
+      if (element.getIdentifier().equals(identifier))
+        return true;
+    }
+    return false;
+  }
+
+  /**
    * Creates a unique filename inside the root folder, based on the parameter <code>filename</code>.
    *
    * @param root
@@ -166,10 +181,26 @@ public final class MediaPackageSupport {
     };
   }
 
+  public static void removeElements(List<MediaPackageElement> es, MediaPackage mp) {
+    for (MediaPackageElement e : es) {
+      mp.remove(e);
+    }
+  }
+
+  public static Effect<MediaPackage> removeElements(final List<MediaPackageElement> es) {
+    return new Effect<MediaPackage>() {
+      @Override protected void run(MediaPackage mp) {
+        removeElements(es, mp);
+      }
+    };
+  }
+
   /** Replaces all elements of <code>mp</code> with <code>es</code>. Mutates <code>mp</code>. */
   public static void replaceElements(MediaPackage mp, List<MediaPackageElement> es) {
-    for (MediaPackageElement e : mp.getElements()) mp.remove(e);
-    for (MediaPackageElement e : es) mp.add(e);
+    for (MediaPackageElement e : mp.getElements())
+      mp.remove(e);
+    for (MediaPackageElement e : es)
+      mp.add(e);
   }
 
   public static final Function<MediaPackageElement, String> getMediaPackageElementId = new Function<MediaPackageElement, String>() {
@@ -178,7 +209,26 @@ public final class MediaPackageSupport {
     }
   };
 
-  /** Contains filters and predicates to work with media package element collections. */
+  public static final Function<MediaPackageElement, Option<String>> getMediaPackageElementReferenceId = new Function<MediaPackageElement, Option<String>>() {
+    @Override public Option<String> apply(MediaPackageElement mediaPackageElement) {
+      return option(mediaPackageElement.getReference()).map(getReferenceId);
+    }
+  };
+
+  public static final Function<MediaPackageReference, String> getReferenceId = new Function<MediaPackageReference, String>() {
+    @Override public String apply(MediaPackageReference mediaPackageReference) {
+      return mediaPackageReference.getIdentifier();
+    }
+  };
+
+  /** Get the checksum from a media package element. */
+  public static final Function<MediaPackageElement, Option<String>> getChecksum = new Function<MediaPackageElement, Option<String>>() {
+    @Override public Option<String> apply(MediaPackageElement mpe) {
+      return option(mpe.getChecksum().getValue());
+    }
+  };
+
+  /** Filters and predicates to work with media package element collections. */
   public static final class Filters {
     private Filters() {
     }
@@ -187,16 +237,41 @@ public final class MediaPackageSupport {
 
     public static <A extends MediaPackageElement> Function<MediaPackageElement, List<A>> byType(final Class<A> type) {
       return new Function<MediaPackageElement, List<A>>() {
-        @Override public List<A> apply(MediaPackageElement mpe) {
+        @SuppressWarnings("unchecked")
+        @Override
+        public List<A> apply(MediaPackageElement mpe) {
           return type.isAssignableFrom(mpe.getClass()) ? list((A) mpe) : (List<A>) NIL;
         }
       };
     }
 
-    public static <A extends MediaPackageElement> Function<MediaPackageElement, List<A>> byTags(final List<String> tags) {
-      return new Function<MediaPackageElement, List<A>>() {
-        @Override public List<A> apply(MediaPackageElement mpe) {
-          return mpe.containsTag(tags) ? list((A) mpe) : (List<A>) NIL;
+    public static Function<MediaPackageElement, List<MediaPackageElement>> byFlavor(
+            final MediaPackageElementFlavor flavor) {
+      return new Function<MediaPackageElement, List<MediaPackageElement>>() {
+        @SuppressWarnings("unchecked")
+        @Override
+        public List<MediaPackageElement> apply(MediaPackageElement mpe) {
+          // match is commutative
+          return flavor.matches(mpe.getFlavor()) ? list(mpe) : Immutables.<MediaPackageElement>nil();
+        }
+      };
+    }
+
+    public static Function<MediaPackageElement, List<MediaPackageElement>> byTags(final List<String> tags) {
+      return new Function<MediaPackageElement, List<MediaPackageElement>>() {
+        @SuppressWarnings("unchecked")
+        @Override
+        public List<MediaPackageElement> apply(MediaPackageElement mpe) {
+          return mpe.containsTag(tags) ? list(mpe) : Immutables.<MediaPackageElement>nil();
+        }
+      };
+    }
+
+    /** {@link MediaPackageElement#containsTag(java.util.Collection)} as a function. */
+    public static Function<MediaPackageElement, Boolean> ofTags(final List<String> tags) {
+      return new Function<MediaPackageElement, Boolean>() {
+        @Override public Boolean apply(MediaPackageElement mpe) {
+          return mpe.containsTag(tags);
         }
       };
     }
@@ -229,6 +304,15 @@ public final class MediaPackageSupport {
 
     public static final Function<MediaPackageElement, Boolean> hasNoChecksum = not(hasChecksum);
 
+    /** Filters publications to channel <code>channelId</code>. */
+    public static Function<Publication, Boolean> ofChannel(final String channelId) {
+      return new Function<Publication, Boolean>() {
+        @Override public Boolean apply(Publication p) {
+          return p.getChannel().equals(channelId);
+        }
+      };
+    }
+
     /** Check if mediapackage element has any of the given tags. */
     public static Function<MediaPackageElement, Boolean> hasTagAny(final List<String> tags) {
       return new Function<MediaPackageElement, Boolean>() {
@@ -245,6 +329,69 @@ public final class MediaPackageSupport {
         }
       };
     }
+
+    /**
+     * Return true if the element has a flavor that matches <code>flavor</code>.
+     *
+     * @see MediaPackageElementFlavor#matches(MediaPackageElementFlavor)
+     */
+    public static Function<MediaPackageElement, Boolean> matchesFlavor(final MediaPackageElementFlavor flavor) {
+      return new Function<MediaPackageElement, Boolean>() {
+        @Override public Boolean apply(MediaPackageElement mpe) {
+          // match is commutative
+          return flavor.matches(mpe.getFlavor());
+        }
+      };
+    }
+
+    /**
+     * Return true if the element has a flavor that matches any of the <code>flavors</code>.
+     *
+     * @see MediaPackageElementFlavor#matches(MediaPackageElementFlavor)
+     */
+    public static Function<MediaPackageElement, Boolean> matchesFlavorAny(
+            final List<MediaPackageElementFlavor> flavors) {
+      return new Function<MediaPackageElement, Boolean>() {
+        @Override public Boolean apply(MediaPackageElement mpe) {
+          for (MediaPackageElementFlavor f : flavors) {
+            if (f.matches(mpe.getFlavor())) {
+              return true;
+            }
+          }
+          return false;
+        }
+      };
+    }
+
+    public static final Function<MediaPackageElementFlavor, Function<MediaPackageElement, Boolean>> matchesFlavor =
+            new Function<MediaPackageElementFlavor, Function<MediaPackageElement, Boolean>>() {
+              @Override public Function<MediaPackageElement, Boolean> apply(final MediaPackageElementFlavor flavor) {
+                return matchesFlavor(flavor);
+              }
+            };
+
+    /** {@link MediaPackageElementFlavor#matches(MediaPackageElementFlavor)} as a function. */
+    public static Function<MediaPackageElementFlavor, Boolean> matches(final MediaPackageElementFlavor flavor) {
+      return new Function<MediaPackageElementFlavor, Boolean>() {
+        @Override public Boolean apply(MediaPackageElementFlavor f) {
+          return f.matches(flavor);
+        }
+      };
+    }
+
+    public static final Function<MediaPackageElement, Boolean> isEpisodeDublinCore = new Function<MediaPackageElement, Boolean>() {
+      @Override public Boolean apply(MediaPackageElement mpe) {
+        // match is commutative
+        return MediaPackageElements.EPISODE.matches(mpe.getFlavor());
+      }
+    };
+
+    public static final Function<MediaPackageElement, Boolean> isSeriesDublinCore = new Function<MediaPackageElement, Boolean>() {
+      @Override public Boolean apply(MediaPackageElement mpe) {
+        // match is commutative
+        return MediaPackageElements.SERIES.matches(mpe.getFlavor());
+      }
+    };
   }
 
   /**
@@ -272,5 +419,48 @@ public final class MediaPackageSupport {
                             return MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(is);
                           }
                         });
+  }
+
+  /**
+   * Function to extract the ID of a media package.
+   *
+   * @deprecated use {@link Fn#getId}
+   */
+  public static final Function<MediaPackage, String> getId = new Function<MediaPackage, String>() {
+    @Override
+    public String apply(MediaPackage mp) {
+      return mp.getIdentifier().toString();
+    }
+  };
+
+  /** Functions on media packages. */
+  public static final class Fn {
+    private Fn() {
+    }
+
+    /** Function to extract the ID of a media package. */
+    public static final Function<MediaPackage, String> getId = new Function<MediaPackage, String>() {
+      @Override public String apply(MediaPackage mp) {
+        return mp.getIdentifier().toString();
+      }
+    };
+
+    public static final Function<MediaPackage, List<MediaPackageElement>> getElements = new Function<MediaPackage, List<MediaPackageElement>>() {
+      @Override public List<MediaPackageElement> apply(MediaPackage a) {
+        return Immutables.list(a.getElements());
+      }
+    };
+
+    public static final Function<MediaPackage, List<Track>> getTracks = new Function<MediaPackage, List<Track>>() {
+      @Override public List<Track> apply(MediaPackage a) {
+        return Immutables.list(a.getTracks());
+      }
+    };
+
+    public static final Function<MediaPackage, List<Publication>> getPublications = new Function<MediaPackage, List<Publication>>() {
+      @Override public List<Publication> apply(MediaPackage a) {
+        return Immutables.list(a.getPublications());
+      }
+    };
   }
 }

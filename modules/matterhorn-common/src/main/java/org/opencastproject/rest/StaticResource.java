@@ -40,17 +40,17 @@ public class StaticResource extends HttpServlet {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(StaticResource.class);
-  
+
   /** The mimetypes to use for delivering files */
   private static final MimetypesFileTypeMap mimeMap = new MimetypesFileTypeMap(StaticResource.class.getClassLoader()
           .getResourceAsStream("mimetypes"));
-  
+
   /** The classpath to search for the static resources */
   protected String classpath = null;
-  
+
   /** The base URL for these static resources */
   protected String alias = null;
-  
+
   /** The welcome file to redirect to, if only the alias is specified in the request */
   protected String welcomeFile = null;
 
@@ -59,7 +59,7 @@ public class StaticResource extends HttpServlet {
 
   /**
    * Constructs a static resources.
-   * 
+   *
    * @param bundleContext
    *          the bundle context of this servlet
    * @param classpath
@@ -78,7 +78,7 @@ public class StaticResource extends HttpServlet {
 
   /**
    * Activates the static resource when it is instantiated using Declarative Services.
-   * 
+   *
    * @param componentContext
    *          the DS component context
    */

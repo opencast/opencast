@@ -59,11 +59,12 @@ public class EmbedderEngineTest {
   public static void testGst() {
     StreamHelper stdout = null;
     StreamHelper stderr = null;
+    StringBuffer errorBuffer = new StringBuffer();
     Process p = null;
     try {
       p = new ProcessBuilder(defaultBinaryPath, "--help").start();
       stdout = new StreamHelper(p.getInputStream());
-      stderr = new StreamHelper(p.getErrorStream());
+      stderr = new StreamHelper(p.getErrorStream(), errorBuffer);
       int status = p.waitFor();
       stdout.stopReading();
       stderr.stopReading();
@@ -71,6 +72,7 @@ public class EmbedderEngineTest {
         throw new IllegalStateException();
     } catch (Throwable t) {
       logger.warn("Skipping qt embedder tests due to unsatisifed qtsbtlembedder installation");
+      logger.warn(errorBuffer.toString());
       qtembedderInstalled = false;
     } finally {
       IoSupport.closeQuietly(stdout);

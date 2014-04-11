@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.6-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -128,7 +128,6 @@
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
-      <version>1.6.6_1</version>
     </dependency>
     <dependency>
       <groupId>net.fortuna.ical4j</groupId>
@@ -217,9 +216,7 @@
               OSGI-INF/state-service-rest.xml,
               OSGI-INF/configuration-service.xml,
               OSGI-INF/capture-files.xml,
-              OSGI-INF/confidence-monitor-service.xml,
               OSGI-INF/confidence-monitor-service-rest.xml,
-              OSGI-INF/gstreamer-capture-framework.xml
             </Service-Component>
             <Http-Alias>/capture</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>

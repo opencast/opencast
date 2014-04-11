@@ -23,8 +23,8 @@ import org.opencastproject.util.data.Function2;
  * Functions operating on integers.
  */
 public final class Integers {
-  
-  private Integers() {    
+
+  private Integers() {
   }
 
   /**

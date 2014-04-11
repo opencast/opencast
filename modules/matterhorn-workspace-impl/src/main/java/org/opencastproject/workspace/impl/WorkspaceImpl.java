@@ -24,6 +24,7 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workingfilerepository.api.PathMappable;
@@ -50,6 +51,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 
 import javax.management.ObjectInstance;
@@ -82,8 +86,8 @@ public class WorkspaceImpl implements Workspace {
   private ObjectInstance registeredMXBean;
 
   protected String wsRoot = null;
-  protected long maxAgeInSeconds = -1;
-  protected long garbageCollectionPeriodInSeconds = -1;
+  protected int maxAgeInSeconds = -1;
+  protected int garbageCollectionPeriodInSeconds = -1;
   protected Timer garbageFileCollector;
   protected boolean linkingEnabled = false;
 
@@ -92,6 +96,8 @@ public class WorkspaceImpl implements Workspace {
   protected WorkingFileRepository wfr = null;
   protected String wfrRoot = null;
   protected String wfrUrl = null;
+
+  private WorkspaceCleaner workspaceCleaner;
 
   public WorkspaceImpl() {
   }
@@ -143,14 +149,14 @@ public class WorkspaceImpl implements Workspace {
     }
 
     // Set up the garbage file collection timer
-    if (cc != null && cc.getBundleContext().getProperty("org.opencastproject.workspace.gc.period") != null) {
-      String period = cc.getBundleContext().getProperty("org.opencastproject.workspace.gc.period");
+    if (cc != null && cc.getBundleContext().getProperty("org.opencastproject.workspace.cleanup.period") != null) {
+      String period = cc.getBundleContext().getProperty("org.opencastproject.workspace.cleanup.period");
       if (period != null) {
         try {
-          garbageCollectionPeriodInSeconds = Long.parseLong(period);
+          garbageCollectionPeriodInSeconds = Integer.parseInt(period);
         } catch (NumberFormatException e) {
           logger.warn("Workspace garbage collection period can not be set to {}. Please choose a valid number "
-                  + "for the 'org.opencastproject.workspace.gc.period' setting", period);
+                  + "for the 'org.opencastproject.workspace.cleanup.period' setting", period);
         }
       }
     }
@@ -174,19 +180,22 @@ public class WorkspaceImpl implements Workspace {
     }
 
     // Activate garbage collection
-    if (cc != null && cc.getBundleContext().getProperty("org.opencastproject.workspace.gc.max.age") != null) {
-      String age = cc.getBundleContext().getProperty("org.opencastproject.workspace.gc.max.age");
+    if (cc != null && cc.getBundleContext().getProperty("org.opencastproject.workspace.cleanup.max.age") != null) {
+      String age = cc.getBundleContext().getProperty("org.opencastproject.workspace.cleanup.max.age");
       if (age != null) {
         try {
-          maxAgeInSeconds = Long.parseLong(age);
+          maxAgeInSeconds = Integer.parseInt(age);
         } catch (NumberFormatException e) {
           logger.warn("Workspace garbage collection max age can not be set to {}. Please choose a valid number "
-                  + "for the 'org.opencastproject.workspace.gc.max.age' setting", age);
+                  + "for the 'org.opencastproject.workspace.cleanup.max.age' setting", age);
         }
       }
     }
 
     registeredMXBean = JmxUtil.registerMXBean(workspaceBean, JMX_WORKSPACE_TYPE);
+
+    workspaceCleaner = new WorkspaceCleaner(this, garbageCollectionPeriodInSeconds, maxAgeInSeconds);
+    workspaceCleaner.schedule();
   }
 
   /**
@@ -194,6 +203,7 @@ public class WorkspaceImpl implements Workspace {
    */
   public void deactivate() {
     JmxUtil.unregisterMXBean(registeredMXBean);
+    workspaceCleaner.shutdown();
   }
 
   /**
@@ -203,7 +213,7 @@ public class WorkspaceImpl implements Workspace {
    */
   public File get(final URI uri) throws NotFoundException, IOException {
     final String urlString = uri.toString();
-    final File f = getWorkspaceFile(uri, false);
+    final File f = getWorkspaceFile(uri, true);
 
     // Does the file exist and is it up to date?
     Long workspaceFileLastModified = new Long(0); // make sure this is not null, otherwise the requested file can not be
@@ -607,7 +617,7 @@ public class WorkspaceImpl implements Workspace {
       throw new NotFoundException(e);
     }
     File f = new File(PathSupport.concat(new String[] { wsRoot, WorkingFileRepository.COLLECTION_PATH_PREFIX,
-            collectionId, fileName }));
+            collectionId, PathSupport.toSafeName(fileName) }));
     File collectionDir = f.getParentFile();
     FileUtils.deleteQuietly(f);
     if (collectionDir.isDirectory() && collectionDir.list().length == 0)
@@ -636,7 +646,8 @@ public class WorkspaceImpl implements Workspace {
     }
     String wsDirectoryPath = PathSupport.concat(wsRoot, serverPath);
     File wsDirectory = new File(wsDirectoryPath);
-    wsDirectory.mkdirs();
+    if (createDirectories)
+      wsDirectory.mkdirs();
 
     String safeFileName = PathSupport.toSafeName(FilenameUtils.getName(uriString));
     return new File(wsDirectory, safeFileName);
@@ -707,4 +718,38 @@ public class WorkspaceImpl implements Workspace {
     return wfr.getBaseUri();
   }
 
+  @Override
+  public void cleanup(final Option<Integer> maxAge) {
+    final File rootDirecotry = new File(wsRoot);
+
+    logger.info("Starting cleanup of workspace at {}", rootDirecotry);
+    Collection<File> files = FileUtils.listFiles(rootDirecotry, null, true);
+    List<File> filesToDelete = Monadics.mlist(files).filter(new Function<File, Boolean>() {
+      @Override
+      public Boolean apply(File file) {
+        if (file.isDirectory())
+          return false;
+
+        File mediapackageDirectory = new File(rootDirecotry, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX);
+        File collectionDirectory = new File(rootDirecotry, WorkingFileRepository.COLLECTION_PATH_PREFIX);
+
+        if (file.getAbsolutePath().startsWith(mediapackageDirectory.getAbsolutePath())
+                || file.getAbsolutePath().startsWith(collectionDirectory.getAbsolutePath()))
+          return false;
+
+        boolean maxAgeReached = true;
+        if (maxAge.isSome())
+          maxAgeReached = FileUtils.isFileOlder(file, new Date().getTime() + maxAge.get());
+
+        return maxAgeReached;
+      }
+    }).value();
+
+    for (File file : filesToDelete) {
+      logger.info("Workspace cleanup: Deleting {}", file);
+      FileSupport.delete(file);
+      FileSupport.deleteHierarchyIfEmpty(rootDirecotry, file.getParentFile());
+    }
+    logger.info("Finished cleanup of workspace!");
+  }
 }

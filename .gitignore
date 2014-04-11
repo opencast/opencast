@@ -14,7 +14,7 @@ target/
 # ignore Eclipse project data
 .project
 .classpath
-.metadata
+.metadata/
 .settings/
 
 # ignore NetBeans project data
@@ -35,3 +35,9 @@ Icon
 # OS X: Files that might appear on external disk
 .Spotlight-V100
 .Trashes
+# Ignore all temporary editor files
+.*.swp
+
+# Ignore Maven files and local repository
+/.m2/
+/settings.xml

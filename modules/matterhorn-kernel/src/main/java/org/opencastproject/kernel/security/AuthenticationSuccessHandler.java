@@ -17,6 +17,7 @@ package org.opencastproject.kernel.security;
 
 import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint.INITIAL_REQUEST_PATH;
 
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 
@@ -70,15 +71,15 @@ public class AuthenticationSuccessHandler implements
 
     // If there are no configured welcome pages, send the user to /
     if (welcomePages == null || welcomePages.isEmpty()) {
-      response.sendRedirect(welcomePages.get(ROOT));
+      response.sendRedirect(ROOT);
       return;
     }
 
     // Look for a welcome page for one of this user's roles
     User currentUser = securityService.getUser();
-    for (String role : currentUser.getRoles()) {
-      if (welcomePages.containsKey(role)) {
-        response.sendRedirect(welcomePages.get(role));
+    for (Role role : currentUser.getRoles()) {
+      if (welcomePages.containsKey(role.getName())) {
+        response.sendRedirect(welcomePages.get(role.getName()));
         return;
       }
     }
@@ -87,7 +88,7 @@ public class AuthenticationSuccessHandler implements
     if (welcomePages.containsKey(WILDCARD)) {
       response.sendRedirect(welcomePages.get(WILDCARD));
     } else {
-      response.sendRedirect(welcomePages.get(ROOT));
+      response.sendRedirect(ROOT);
     }
   }
 

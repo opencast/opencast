@@ -42,6 +42,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,17 +74,29 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   /** The element flavors to include in the zip file */
   public static final String INCLUDE_FLAVORS_PROPERTY = "include-flavors";
 
+  /** The zip archive's target element flavor */
+  public static final String TARGET_FLAVOR_PROPERTY = "target-flavor";
+
+  /** The zip archive's target tags */
+  public static final String TARGET_TAGS_PROPERTY = "target-tags";
+
   /** The property indicating whether to apply compression to the archive */
   public static final String COMPRESS_PROPERTY = "compression";
 
   /** The default collection in the working file repository to store archives */
   public static final String DEFAULT_ZIP_COLLECTION = "zip";
 
-  /** The temporary location to use when building an archive */
-  public static final String ARCHIVE_TEMP_DIR = "archive-temp";
+  /** The default location to use when building an zip archive relative to the
+   * storage directory */
+  public static final String DEFAULT_ARCHIVE_TEMP_DIR = "archive-tmp";
 
-  /** The flavor to use for a mediapackage archive */
-  public static final MediaPackageElementFlavor ARCHIVE_FLAVOR = MediaPackageElementFlavor.parseFlavor("archive/zip");
+  /** Key for configuring the location of the archive-temp folder */
+  public static final String ARCHIVE_TEMP_DIR_CFG_KEY =
+    "org.opencastproject.workflow.handler.ZipWorkflowOperationHandler.tmpdir";
+
+  /** The default flavor to use for a mediapackage archive */
+  public static final MediaPackageElementFlavor DEFAULT_ARCHIVE_FLAVOR = MediaPackageElementFlavor
+          .parseFlavor("archive/zip");
 
   /** The temporary storage location */
   protected File tempStorageDir = null;
@@ -105,11 +118,16 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
             "The configuration key that specifies whether to compress the zip archive.  Defaults to false.");
     configurationOptions.put(INCLUDE_FLAVORS_PROPERTY,
             "The configuration key that specifies the element flavors to include in the zipped mediapackage archive");
+    configurationOptions.put(TARGET_FLAVOR_PROPERTY, "The target flavor for the zip archive element, defaulting to '"
+            + DEFAULT_ARCHIVE_FLAVOR + "'");
+    configurationOptions.put(TARGET_FLAVOR_PROPERTY, "The target flavor for the zip archive element, defaulting to '"
+            + DEFAULT_ARCHIVE_FLAVOR + "'");
+    configurationOptions.put(TARGET_TAGS_PROPERTY, "The target tags for the zip archive element");
   }
 
   /**
    * Sets the workspace to use.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -118,14 +136,17 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   }
 
   /**
-   * Activate the component, generating the temporary storage directory for building zip archives if necessary.
-   * 
+   * Activate the component, generating the temporary storage directory for
+   * building zip archives if necessary.
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
    */
   protected void activate(ComponentContext cc) {
-    tempStorageDir = new File(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"), ARCHIVE_TEMP_DIR);
+    tempStorageDir = cc.getBundleContext().getProperty(ARCHIVE_TEMP_DIR_CFG_KEY) != null
+      ? new File(cc.getBundleContext().getProperty(ARCHIVE_TEMP_DIR_CFG_KEY))
+      : new File(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"), DEFAULT_ARCHIVE_TEMP_DIR);
     if (!tempStorageDir.isDirectory()) {
       try {
         FileUtils.forceMkdir(tempStorageDir);
@@ -137,17 +158,40 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
+
+    if (workflowInstance == null) {
+      throw new WorkflowOperationException("Invalid workflow instance");
+    }
+
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     final WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
+    if (currentOperation == null) {
+      throw new WorkflowOperationException("Cannot get current workflow operation");
+    }
+
     String flavors = currentOperation.getConfiguration(INCLUDE_FLAVORS_PROPERTY);
     final List<MediaPackageElementFlavor> flavorsToZip = new ArrayList<MediaPackageElementFlavor>();
+    MediaPackageElementFlavor targetFlavor = DEFAULT_ARCHIVE_FLAVOR;
+
+    // Read the target flavor
+    String targetFlavorOption = currentOperation.getConfiguration(TARGET_FLAVOR_PROPERTY);
+    try {
+      targetFlavor = targetFlavorOption == null ? DEFAULT_ARCHIVE_FLAVOR : MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
+      logger.trace("Using '{}' as the target flavor for the zip archive of recording {}", targetFlavor, mediaPackage);
+    } catch (IllegalArgumentException e) {
+      throw new WorkflowOperationException("Flavor '" + targetFlavorOption + "' is not valid", e);
+    }
+
+    // Read the target tags
+    String targetTagsOption = StringUtils.trimToEmpty(currentOperation.getConfiguration(TARGET_TAGS_PROPERTY));
+    String[] targetTags = StringUtils.split(targetTagsOption, ",");
 
     // If the configuration does not specify flavors, just zip them all
     if (flavors == null) {
@@ -166,6 +210,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     // Zip the contents of the mediapackage
     File zip = null;
     try {
+      logger.info("Creating zipped archive of recording {}", mediaPackage);
       zip = zip(mediaPackage, flavorsToZip, compress);
     } catch (Exception e) {
       throw new WorkflowOperationException("Unable to create a zip archive from mediapackage " + mediaPackage, e);
@@ -176,13 +221,15 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     String collectionId = configuredCollectionId == null ? DEFAULT_ZIP_COLLECTION : configuredCollectionId;
 
     // Add the zip as an attachment to the mediapackage
-    logger.info("Adding zipped mediapackage {} to the {} archive", mediaPackage, collectionId);
+    logger.info("Moving zipped archive of recording {} to the working file repository collection '{}'", mediaPackage,
+            collectionId);
 
     InputStream in = null;
     URI uri = null;
     try {
       in = new FileInputStream(zip);
       uri = workspace.putInCollection(collectionId, mediaPackage.getIdentifier().compact() + ".zip", in);
+      logger.info("Zipped archive of recording {} is available from {}", mediaPackage, uri);
     } catch (FileNotFoundException e) {
       throw new WorkflowOperationException("zip file " + zip + " not found", e);
     } catch (IOException e) {
@@ -190,16 +237,21 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     } finally {
       IOUtils.closeQuietly(in);
     }
-    logger.info("Zipped mediapackage {} moved to the {} archive", mediaPackage, collectionId);
 
     Attachment attachment = (Attachment) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-            .elementFromURI(uri, Type.Attachment, ARCHIVE_FLAVOR);
+            .elementFromURI(uri, Type.Attachment, targetFlavor);
     try {
       attachment.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, zip));
     } catch (IOException e) {
       throw new WorkflowOperationException(e);
     }
     attachment.setMimeType(MimeTypes.ZIP);
+
+    // Apply the target tags
+    for (String tag : targetTags) {
+      attachment.addTag(tag);
+      logger.trace("Tagging the archive of recording '{}' with '{}'", mediaPackage, tag);
+    }
 
     // The zip file is safely in the archive, so it's now safe to attempt to remove the original zip
     try {
@@ -214,21 +266,27 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
   /**
    * Creates a zip archive of all elements in a mediapackage.
-   * 
+   *
    * @param mediaPackage
    *          the mediapackage to zip
-   * 
+   *
    * @return the zip file
-   * 
+   *
    * @throws IOException
    *           If an IO exception occurs
    * @throws NotFoundException
    *           If a file referenced in the mediapackage can not be found
    * @throws MediaPackageException
    *           If the mediapackage can not be serialized to xml
+   * @throws WorkflowOperationException
+   *           If the mediapackage is invalid
    */
   protected File zip(MediaPackage mediaPackage, List<MediaPackageElementFlavor> flavorsToZip, boolean compress)
-          throws IOException, NotFoundException, MediaPackageException {
+          throws IOException, NotFoundException, MediaPackageException, WorkflowOperationException {
+
+    if (mediaPackage == null) {
+      throw new WorkflowOperationException("Invalid mediapackage");
+    }
 
     // Create the temp directory
     File mediaPackageDir = new File(tempStorageDir, mediaPackage.getIdentifier().compact());
@@ -283,7 +341,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override

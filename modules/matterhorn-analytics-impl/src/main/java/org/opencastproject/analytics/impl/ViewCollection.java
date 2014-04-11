@@ -35,94 +35,94 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ViewCollection {
 
-	@XmlAttribute(name = "from")
-	protected Date from;
+  @XmlAttribute(name = "from")
+  protected Date from;
 
-	@XmlAttribute(name = "to")
-	protected Date to;
+  @XmlAttribute(name = "to")
+  protected Date to;
 
-	@XmlAttribute(name = "interval")
-	protected long interval;
+  @XmlAttribute(name = "interval")
+  protected long interval;
 
-	@XmlAttribute(name = "views")
-	protected int views;
+  @XmlAttribute(name = "views")
+  protected int views;
 
-	@XmlAttribute(name = "played")
-	protected long played;
+  @XmlAttribute(name = "played")
+  protected long played;
 
-	@XmlAttribute(name = "total")
-	protected int total;
+  @XmlAttribute(name = "total")
+  protected int total;
 
-	@XmlAttribute(name = "limit")
-	protected long limit;
+  @XmlAttribute(name = "limit")
+  protected long limit;
 
-	@XmlElement(name = "view-item", namespace = "http://analytics.opencastproject.org")
-	protected List<ViewItem> viewDurationItems;
+  @XmlElement(name = "view-item", namespace = "http://analytics.opencastproject.org")
+  protected List<ViewItem> viewDurationItems;
 
-	public void add(ViewItem reportItem) {
-		viewDurationItems.add((ViewItem) reportItem);
-	}
+  public void add(ViewItem reportItem) {
+    viewDurationItems.add((ViewItem) reportItem);
+  }
 
-	/**
-	 * A no-arg constructor needed by JAXB
-	 */
-	public ViewCollection() {
-		this.viewDurationItems = new ArrayList<ViewItem>();
-	}
+  /**
+   * A no-arg constructor needed by JAXB
+   */
+  public ViewCollection() {
+    this.viewDurationItems = new ArrayList<ViewItem>();
+  }
 
-	public void setTotal(int total) {
-		this.total = total;
-	}
+  public void setTotal(int total) {
+    this.total = total;
+  }
 
-	public void setLimit(long limit) {
-		this.limit = limit;
-	}
+  public void setLimit(long limit) {
+    this.limit = limit;
+  }
 
-	public Date getFrom() {
-		return from;
-	}
+  public Date getFrom() {
+    return from;
+  }
 
-	public void setFrom(Date from) {
-		this.from = from;
-	}
+  public void setFrom(Date from) {
+    this.from = from;
+  }
 
-	public Date getTo() {
-		return to;
-	}
+  public Date getTo() {
+    return to;
+  }
 
-	public void setTo(Date to) {
-		this.to = to;
-	}
+  public void setTo(Date to) {
+    this.to = to;
+  }
 
-	public int getViews() {
-		return views;
-	}
+  public int getViews() {
+    return views;
+  }
 
-	public void setViews(int views) {
-		this.views = views;
-	}
+  public void setViews(int views) {
+    this.views = views;
+  }
 
-	public long getPlayed() {
-		return played;
-	}
+  public long getPlayed() {
+    return played;
+  }
 
-	public void setPlayed(long played) {
-		this.played = played;
-	}
+  public void setPlayed(long played) {
+    this.played = played;
+  }
 
-	public int getTotal() {
-		return total;
-	}
+  public int getTotal() {
+    return total;
+  }
 
-	public long getLimit() {
-		return limit;
-	}
-	
-	public long getInterval() {
-		return interval;
-	}
+  public long getLimit() {
+    return limit;
+  }
 
-	public void setInterval(long interval) {
-		this.interval = interval;
-	}
+  public long getInterval() {
+    return interval;
+  }
+
+  public void setInterval(long interval) {
+    this.interval = interval;
+  }
 }

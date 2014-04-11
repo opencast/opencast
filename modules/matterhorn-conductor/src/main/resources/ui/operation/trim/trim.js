@@ -69,7 +69,7 @@ $(document).ready(function () {
     $("#trackForm").append($("#template").jqote(tracks));
 
     $("input[id^='chk']").click(function(event) {
-        if ($("input:checked").length === 0) {
+        if ($("input[id^='chk']:checked").length === 0) {
             $("#trackError").show();
             $(event.currentTarget).prop("checked", true);
         } else {
@@ -444,7 +444,7 @@ function calculateNewLength () {
     inPoint = getTimeInMilliseconds($('#inPoint').val());
     outPoint = getTimeInMilliseconds($('#outPoint').val());
     newLength = (outPoint - inPoint) / 1000;
-    $('#newLength').val(getTimeString(Math.floor(newLength / 3600), Math.floor(newLength / 60), newLength % 60));
+    $('#newLength').val(getTimeString(Math.floor(newLength / 3600), (Math.floor(newLength / 60)) % 60, newLength % 60));    
 }
 
 /**
@@ -482,6 +482,7 @@ function continueWorkflow () {
         trimFromData = $('#inPoint').val(),
         trimToData;
 
+    var def = $.Deferred();
 
     trimFromData = ((trimFromData == '') || (trimFromData == null)) ? '00:00:00' : trimFromData;
     // Format 'Trim To'
@@ -516,16 +517,19 @@ function continueWorkflow () {
                 });
                 parent.ocRecordings.Hold.changedMediaPackage = mp;
             }
-            parent.ocRecordings.continueWorkflow(postData);
+            $.when(parent.ocRecordings.continueWorkflow(postData)).then(function(){ def.resolve(); });
         } else {
-        $("div#errorMessage").html("The In-Point must not be bigger than the Out-Point");
+          $("div#errorMessage").html("The In-Point must not be bigger than the Out-Point");
+          def.resolve();
         }
     });
 
     mpe.submit();
+    
+    return def.promise();
 }
 
-function cancel(){
+function leave(){
     window.parent.location.href = "/admin";
 }
 

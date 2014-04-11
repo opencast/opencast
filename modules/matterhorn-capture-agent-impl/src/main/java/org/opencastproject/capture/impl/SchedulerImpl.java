@@ -72,7 +72,7 @@ import org.opencastproject.capture.impl.jobs.PollCalendarJob;
 import org.opencastproject.capture.impl.jobs.SerializeJob;
 import org.opencastproject.capture.impl.jobs.StartCaptureJob;
 import org.opencastproject.capture.impl.jobs.StopCaptureJob;
-import org.opencastproject.capture.pipeline.GStreamerPipeline;
+import org.opencastproject.capture.pipeline.GStreamerPipelineTools;
 import org.opencastproject.capture.pipeline.InvalidCaptureDevicesSpecifiedException;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -101,7 +101,7 @@ import org.slf4j.LoggerFactory;
  * Scheduler implementation class. This class is responsible for retrieving iCal and then scheduling captures from the
  * resulting calendaring data. It expects the calendaring data in RFC 2445 form, and makes use of the following fields:
  * VEVENT UID DTSTART DTEND DURATION SUMMARY ATTACHMENT
- * 
+ *
  * @see {@link http://www.ietf.org/rfc/rfc2445.txt}
  */
 public class SchedulerImpl {
@@ -146,7 +146,7 @@ public class SchedulerImpl {
   /** The trusted HttpClient used to talk to the core */
   private TrustedHttpClient trustedClient = null;
 
-  /** 
+  /**
    * A variable that is set when the calendar polling process is running, and unset when it is not.
    * The purpose of this flag is to keep the calendar polling thread from crushing the server if the
    * endpoint which returns the calendar takes a long time to return (say, with a huge number of events).
@@ -160,10 +160,10 @@ public class SchedulerImpl {
     this.captureAgent = captureAgentImpl;
     this.updated(dictionary);
   }
-  
+
   /**
    * Set the current ConfigurationManager and register this class as a listener for property updates.
-   * 
+   *
    * @param ConfigurationManager
    *          The ConfigurationManager service that is activated
    **/
@@ -185,7 +185,7 @@ public class SchedulerImpl {
 
   /**
    * Gets a {@code Scheduler} object which can be used to schedule events
-   * 
+   *
    * @param schedProps
    *          The {@code Properties} object containing the scheduler's properties
    * @return A {@Scheduler} object
@@ -196,7 +196,7 @@ public class SchedulerImpl {
 
   /**
    * Gets a {@code Scheduler} object which can be used to schedule events
-   * 
+   *
    * @param schedProps
    *          The {@code Properties} object containing the scheduler's properties
    * @param schedName
@@ -215,12 +215,11 @@ public class SchedulerImpl {
 
   /**
    * Updates the scheduler with new configuration data. {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedService#updated(Dictionary)
    */
   //@Override
-  @SuppressWarnings("unchecked")
-  private void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary properties) throws ConfigurationException {
     log.debug("Scheduler updated.");
 
     if (properties == null) {
@@ -256,7 +255,7 @@ public class SchedulerImpl {
 
   /**
    * Convenience function which generates a new scheduler object with which one can schedule things.
-   * 
+   *
    * @param schedProps
    *          The parameters for the scheduler
    * @param immediate
@@ -273,7 +272,7 @@ public class SchedulerImpl {
 
   /**
    * Creates the schedule polling task which checks with the core to see if there is any new scheduling data
-   * 
+   *
    * @param sched
    *          The scheduler in which to create the polling tasks
    * @param immediate
@@ -291,7 +290,7 @@ public class SchedulerImpl {
 
   /**
    * Removes any of the former polling tasks that are recurring.
-   * 
+   *
    * @param sched
    *          The scheduler to remove the polling tasks from.
    */
@@ -313,7 +312,7 @@ public class SchedulerImpl {
 
   /**
    * Adds to the schedule polling the remote calendar for new jobs to add to the scheduler
-   * 
+   *
    * @param sched
    *          The scheduler add the polling tasks to.
    * @param immediate
@@ -431,7 +430,7 @@ public class SchedulerImpl {
 
   /**
    * Sets the capture agent which this scheduler should be scheduling for.
-   * 
+   *
    * @param agent
    *          The agent.
    */
@@ -441,7 +440,7 @@ public class SchedulerImpl {
 
   /**
    * Sets the trusted client this service uses to communicate with the outside work.
-   * 
+   *
    * @param client
    *          The {@code TrustedHttpClient} which is setup to communicate with the outside world.
    */
@@ -451,7 +450,7 @@ public class SchedulerImpl {
 
   /**
    * Overridden finalize function to shutdown all Quartz schedulers.
-   * 
+   *
    * @see java.lang.Object#finalize()
    */
   @Override
@@ -466,7 +465,7 @@ public class SchedulerImpl {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.Scheduler#updateCalendar()
    */
   public void updateCalendar() {
@@ -522,7 +521,7 @@ public class SchedulerImpl {
 
   /**
    * Reads in a calendar from either an HTTP or local source and turns it into a iCal4j Calendar object.
-   * 
+   *
    * @param url
    *          The {@code URL} to read the calendar data from.
    * @return A {@code Calendar} object, or null in the case of an error or to indicate that no update should be
@@ -545,7 +544,7 @@ public class SchedulerImpl {
           log.debug("File {} does not exist", url);
           return null;
         }
-      } else {
+      } else if (trustedClient != null) {
         HttpResponse response = null;
         try {
           QueryStringBuilder qsb = new QueryStringBuilder(url.toString());
@@ -581,18 +580,18 @@ public class SchedulerImpl {
     if (calendarString == null) {
       // If the calendar is null, which only happens the first time through
       // This case handles not having a network connection by just reading from the cached copy of the calendar
-    	if (calendar == null) {
-    		if (localCalendarCacheURL != null) {
-    			//The file might contain Unice characters so be sure to read in UTF8
-    			File file = new File(localCalendarCacheURL.getFile()); 
-    			try {
-    				calendarString = FileUtils.readFileToString(file, "UTF-8");
-    			} catch (IOException e) {
-    				log.warn("Error reading schedule file from disc", e);
+      if (calendar == null) {
+        if (localCalendarCacheURL != null) {
+          //The file might contain Unice characters so be sure to read in UTF8
+          File file = new File(localCalendarCacheURL.getFile());
+          try {
+            calendarString = FileUtils.readFileToString(file, "UTF-8");
+          } catch (IOException e) {
+            log.warn("Error reading schedule file from disc", e);
 
-    			} 
+          }
 
-    		} else {
+        } else {
           log.warn("Unable to read calendar from local calendar cache because location was null.");
           return null;
         }
@@ -638,7 +637,7 @@ public class SchedulerImpl {
   /**
    * Returns the name for every scheduled job. Job titles are their {@code UUID}s assigned from the scheduler, or
    * Unscheduled-$agent_name-$timestamp.
-   * 
+   *
    * @return An array of {@code String}s containing the name of every scheduled job, or null if there is an error.
    */
   public String[] getCaptureSchedule() {
@@ -655,7 +654,7 @@ public class SchedulerImpl {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.Scheduler#getSchedule()
    */
   public List<ScheduledEvent> getSchedule() {
@@ -725,7 +724,7 @@ public class SchedulerImpl {
   /**
    * Gets the maximum duration for a capture as a {@code Dur} object. If the capture length is not set correctly in the
    * capture parameters then this method will default to {@code DEFAULT_MAX_CAPTURE_LENGTH}
-   * 
+   *
    * @return The maximum duration of a capture.
    */
   public Dur getMaxDuration() {
@@ -744,7 +743,7 @@ public class SchedulerImpl {
    * Sets this machine's schedule based on the iCal data passed in as a parameter. Note that this call wipes all
    * currently scheduled captures and then schedules based on the new data. Also note that any files which are in the
    * way when this call tries to save the iCal attachments are overwritten without prompting.
-   * 
+   *
    * @param sched
    *          The scheduler to schedule the new events on
    * @param newCal
@@ -857,7 +856,7 @@ public class SchedulerImpl {
 
   /**
    * Schedules an event in the internal scheduler
-   * 
+   *
    * @param sched
    *          The scheduler to use
    * @param event
@@ -904,7 +903,7 @@ public class SchedulerImpl {
   /**
    * A helper function to wrap the configuration of an event. This function writes the attached files to disk and
    * generates the initial {@code Mediapackage}.
-   * 
+   *
    * @param attachments
    *          The {@code PropertyList} of the capture. This contains all of the attachments and such needed to setup the
    *          directory structure.
@@ -1001,7 +1000,7 @@ public class SchedulerImpl {
   /**
    * Decodes and returns a Base64 encoded attachment as a String. Note that this function does not attempt to guess what
    * the file might actually be.
-   * 
+   *
    * @param property
    *          The attachment to decode
    * @return A {@code String} representation of the attachment
@@ -1015,7 +1014,7 @@ public class SchedulerImpl {
 
   /**
    * Parses an date to build a cron-like time string.
-   * 
+   *
    * @param date
    *          The {@code Date} you want returned in a cronstring.
    * @return A cron-like scheduling string in a {@code CronExpression} object.
@@ -1036,7 +1035,7 @@ public class SchedulerImpl {
 
   /**
    * Returns the maximum length a scheduled capture can run, in milliseconds.
-   * 
+   *
    * @return The maximum length in milliseconds.
    */
   public static long getMaxScheduledCaptureLength() {
@@ -1045,7 +1044,7 @@ public class SchedulerImpl {
 
   /**
    * Schedules a {@code StopCaptureJob} to stop a capture at a given time.
-   * 
+   *
    * @param recordingID
    *          The recordingID of the recording you wish to stop.
    * @param stop
@@ -1075,7 +1074,7 @@ public class SchedulerImpl {
 
   /**
    * Schedules a {@code StopCaptureJob} to stop a capture at a given time.
-   * 
+   *
    * @param recordingID
    *          The recordingID of the recording you wish to stop.
    * @param atTime
@@ -1089,7 +1088,7 @@ public class SchedulerImpl {
   /**
    * Schedules an immediate {@code SerializeJob} for the recording. This method will manifest and zip the recording
    * before ingesting it.
-   * 
+   *
    * @param recordingID
    *          The ID of the recording to it ingest.
    * @return True if the job was scheduled correctly, false otherwise.
@@ -1136,7 +1135,7 @@ public class SchedulerImpl {
   /**
    * Schedules an immediate {@code IngestJob} for the recording. This method does not create a manifest or zip the
    * recording.
-   * 
+   *
    * @param recordingID
    *          The ID of the recording to it ingest.
    * @return True if the job was scheduled correctly, false otherwise.
@@ -1173,7 +1172,7 @@ public class SchedulerImpl {
   /**
    * Schedules the job in charge of deleting the old captures archived on disk once they age out or we run low on free
    * disk space.
-   * 
+   *
    * @param sched
    *          The scheduler in which to schedule the cleanup job.
    */
@@ -1206,7 +1205,7 @@ public class SchedulerImpl {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.Scheduler#stopScheduler()
    */
   public boolean stopScheduler() {
@@ -1230,7 +1229,7 @@ public class SchedulerImpl {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.Scheduler#startScheduler()
    */
   public boolean startScheduler() {
@@ -1239,7 +1238,7 @@ public class SchedulerImpl {
 
   /**
    * A wrapper function which starts a specific scheduler.
-   * 
+   *
    * @param sched
    *          The scheduler to start
    */
@@ -1260,19 +1259,19 @@ public class SchedulerImpl {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.Scheduler#isSchedulerEnabled()
    */
   /*
    * @Override public boolean isSchedulerEnabled() { try { if (scheduler != null && scheduler.isStarted()) { return
    * true; } } catch (SchedulerException e) { log.warn("Unable to get scheduler state!"); }
-   * 
+   *
    * return false; }
    */
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.Scheduler#enablePolling(boolean)
    */
   public void enablePolling(boolean enable) {
@@ -1296,7 +1295,7 @@ public class SchedulerImpl {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.Scheduler#getPollingTime()
    */
   public int getPollingTime() {
@@ -1305,7 +1304,7 @@ public class SchedulerImpl {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.Scheduler#getScheduleEndpoint()
    */
   public URL getScheduleEndpoint() {
@@ -1314,7 +1313,7 @@ public class SchedulerImpl {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.Scheduler#setScheduleEndpoint(URL)
    */
   public void setScheduleEndpoint(URL url) {
@@ -1327,7 +1326,7 @@ public class SchedulerImpl {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.Scheduler#isCalendarPollingEnabled()
    */
   public boolean isCalendarPollingEnabled() {
@@ -1336,7 +1335,7 @@ public class SchedulerImpl {
 
   /**
    * Checks to see if the is set to automatically poll for new scheduling data.
-   * 
+   *
    * @param sched
    *          The scheduler to check if polling is enabled
    * @see org.opencastproject.capture.api.Scheduler#isCalendarPollingEnabled()
@@ -1359,7 +1358,7 @@ public class SchedulerImpl {
 
   /**
    * Shuts down a scheduler, and waits until the schedulers have all terminated.
-   * 
+   *
    * @param sched
    *          The scheduler to shut down
    */
@@ -1508,7 +1507,7 @@ class Event {
 
   /**
    * Checks to see if a capture should be happening now.
-   * 
+   *
    * @param start
    *          The start time of the event
    * @param end
@@ -1521,7 +1520,7 @@ class Event {
 
   /**
    * Checks to see if the capture agent is current capturing.
-   * 
+   *
    * @return True if the agent exists, and its state is not idle
    */
   private boolean captureAgentIsCapturing() {
@@ -1532,7 +1531,7 @@ class Event {
   /**
    * Runs sanity checks on the the start and duration of this event. This method may change the start and/or duration
    * values if they are invalid. Note that if the sanity checks fail then isValidEvent() will also return false;
-   * 
+   *
    * @return True if the sanity checks pass, false otherwise
    */
   private boolean doSanityChecks() {
@@ -1579,13 +1578,13 @@ class Event {
   /**
    * Tests to see if there are media files on the hard drive that are evidence of an earlier capturing. This way we can
    * check to see if the there was an earlier recording and not overwrite it.
-   * 
+   *
    * @return True if there is evidence that a recording has already occurred with this UID.
    */
   private boolean mediaFilesExist() {
     try {
       XProperties properties = captureAgent.getConfigService().getAllProperties();
-      String[] deviceNames = GStreamerPipeline.getDeviceNames(properties);
+      String[] deviceNames = GStreamerPipelineTools.getDeviceNames(properties);
       if (deviceNames != null && deviceNames.length != 0 && deviceNames[0].contains("=")) {
         deviceNames[0] = deviceNames[0].split("=")[1];
       }
@@ -1595,7 +1594,7 @@ class Event {
         if (!properties.containsKey(outputProperty)) {
           // We can't check to see if this media has been created because we don't have an output location.
           return true;
-        } 
+        }
         File captureDirectory = new File(captureLocation.getAbsolutePath(), uid);
         File outputFile = new File(captureDirectory.getAbsolutePath(), properties.get(outputProperty).toString());
         if (outputFile.exists()) {
@@ -1611,14 +1610,14 @@ class Event {
       return true;
     }
     return false;
-    
-   
+
+
   }
 
   /**
    * Determines the root URL and ID from the recording's properties //TODO: What if the properties object contains a
    * character in the recording id or root url fields that is invalid for the filesystem?
-   * 
+   *
    * @throws IOException
    */
   private File determineRootURL(String uid, XProperties props) throws IOException {
@@ -1657,10 +1656,10 @@ class Event {
     }
     return baseDir;
   }
-  
+
   /**
    * Returns true if this event is valid (ie, scheduleable)
-   * 
+   *
    * @return True if the event can be scheduled, false otherwise.
    */
   public boolean isValidEvent() {

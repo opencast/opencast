@@ -243,6 +243,7 @@ opencast.episode = (function() {
     return {
       id: json.id,
       title: json.dcTitle,
+      series: json.mediapackage.series,
       seriesTitle: json.mediapackage.seriestitle,
       creators: _.pluck(A(json.mediapackage.creators), "creator").join(", "),
       date: json.mediapackage.start ? ocUtils.fromUTCDateStringToFormattedTime(json.mediapackage.start) : "?",
@@ -707,6 +708,8 @@ opencast.episode = (function() {
                   .find(".selectEpisode").each(function() {this.disabled = true})
                   .end()
                   .addClass("highlight");
+
+          opencast.episode.aclScheduler.refresh();
         }
 
         /** If an episode is currently being processed by a workflow, add the workflow information
@@ -920,7 +923,10 @@ opencast.episode = (function() {
 
       function mkWorkflow(json) {
         var started = new Date(ocUtils.first(json.operations.operation).started);
-        var completed = new Date(ocUtils.last(json.operations.operation).completed);
+        var lastOp = ocUtils.last(json.operations.operation);
+        // Not all operations have a completed field, e.g. those that are SKIPPED so we can't simply
+        // use this property.
+        var completed = new Date(!_.isUndefined(lastOp.completed) ? lastOp.completed : lastOp.started);
         return {
           id: json.id,
           title: workflowDisplayName(json),

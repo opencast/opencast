@@ -47,6 +47,7 @@ import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.impl.jmx.HostsStatistics;
 import org.opencastproject.serviceregistry.impl.jmx.JobsStatistics;
 import org.opencastproject.serviceregistry.impl.jmx.ServicesStatistics;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.jmx.JmxUtil;
@@ -144,6 +145,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the interval to check whether the hosts in the service registry are still alive [sec] **/
   protected static final String OPT_HEARTBEATINTERVAL = "heartbeat.interval";
 
+  /** Configuration key for the collection of job statistics */
+  protected static final String OPT_JOBSTATISTICS = "jobstats.collect";
+
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
 
@@ -152,6 +156,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** Default delay between job dispatching attempts, in milliseconds */
   static final long DEFAULT_DISPATCH_INTERVAL = 5000;
+
+  /** Default setting on job statistics collection */
+  static final boolean DEFAULT_JOB_STATISTICS = true;
 
   /** Default value for {@link #maxAttemptsBeforeErrorState} */
   private static final int MAX_FAILURE_BEFORE_ERROR_STATE = 1;
@@ -195,6 +202,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectoryService = null;
 
+  /** Whether to collect detailed job statistics */
+  protected boolean collectJobstats = DEFAULT_JOB_STATISTICS;
+
   protected Map<String, Object> persistenceProperties;
 
   /**
@@ -236,10 +246,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     cleanUndispatchableJobs();
 
     // Find this host's url
-    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty("org.opencastproject.server.url"))) {
+    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY))) {
       hostName = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      hostName = cc.getBundleContext().getProperty("org.opencastproject.server.url");
+      hostName = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
     }
 
     // Register JMX beans with statistics
@@ -526,6 +536,16 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         heartbeatInterval = DEFAULT_HEART_BEAT;
       } else {
         logger.info("Dispatch interval set to {} minutes", heartbeatInterval);
+      }
+    }
+
+    String jobStatsString = StringUtils.trimToNull((String) properties.get(OPT_JOBSTATISTICS));
+    if (StringUtils.isNotBlank(jobStatsString)) {
+      try {
+        collectJobstats = Boolean.valueOf(jobStatsString);
+      } catch (Exception e) {
+        logger.warn("Job statistics collection flag '{}' is malformed, setting to {}", jobStatsString, DEFAULT_JOB_STATISTICS);
+        collectJobstats = DEFAULT_JOB_STATISTICS;
       }
     }
 
@@ -1898,7 +1918,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       // Add current organization and user so they can be used during execution at the remote end
       post.addHeader(ORGANIZATION_HEADER, securityService.getOrganization().getId());
-      post.addHeader(USER_HEADER, securityService.getUser().getUserName());
+      post.addHeader(USER_HEADER, securityService.getUser().getUsername());
 
       try {
         String jobXml = JobParser.toXml(jpaJob);
@@ -1930,6 +1950,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           logger.debug("Service {} is currently refusing to accept jobs of type {}", registration, job.getOperation());
           continue;
         } else if (responseStatusCode == HttpStatus.SC_PRECONDITION_FAILED) {
+          jpaJob.setStatus(Status.FAILED);
+          updateJob(jpaJob);
           logger.debug("Service {} refused to accept {}", registration, job);
           throw new UndispatchableJobException(IOUtils.toString(response.getEntity().getContent()));
         } else {
@@ -2369,8 +2391,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         List<Job> jobsToDispatch = getDispatchableJobs(em);
         List<String> undispatchableJobTypes = new ArrayList<String>();
 
-        jobsStatistics.updateAvg(getAvgOperations(em));
-        jobsStatistics.updateJobCount(getCountPerHostService(em));
+        // FIXME: the stats are not currently used and the queries are very
+        // expense in database time.
+        if (collectJobstats) {
+          jobsStatistics.updateAvg(getAvgOperations(em));
+          jobsStatistics.updateJobCount(getCountPerHostService(em));
+        }
 
         for (Job job : jobsToDispatch) {
 

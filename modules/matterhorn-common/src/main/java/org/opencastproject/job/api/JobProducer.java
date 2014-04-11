@@ -17,6 +17,7 @@ package org.opencastproject.job.api;
 
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 
 /**
  * A service that creates jobs for long-running operations.
@@ -68,8 +69,10 @@ public interface JobProducer {
    *          the job being dispatched
    * @throws ServiceRegistryException
    *           if the producer was unable to start work as requested
+   * @throws UndispatchableJobException
+   *           if the job will never be accepted because it is unacceptable
    * @return whether the service is ready to accept the job
    */
-  boolean isReadyToAccept(Job job) throws ServiceRegistryException;
+  boolean isReadyToAccept(Job job) throws ServiceRegistryException, UndispatchableJobException;
 
 }

@@ -71,7 +71,7 @@ public class WatermarkWorkflowOperationHandler extends AbstractWorkflowOperation
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param composerService
    *          the local composer service
    */
@@ -82,7 +82,7 @@ public class WatermarkWorkflowOperationHandler extends AbstractWorkflowOperation
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -92,7 +92,7 @@ public class WatermarkWorkflowOperationHandler extends AbstractWorkflowOperation
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -102,7 +102,7 @@ public class WatermarkWorkflowOperationHandler extends AbstractWorkflowOperation
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
@@ -117,7 +117,7 @@ public class WatermarkWorkflowOperationHandler extends AbstractWorkflowOperation
 
   /**
    * Encode tracks from MediaPackage using profiles stored in properties and updates current MediaPackage.
-   * 
+   *
    * @param src
    *          The source media package
    * @param operation
@@ -146,7 +146,7 @@ public class WatermarkWorkflowOperationHandler extends AbstractWorkflowOperation
     if (watermark == null)
       throw new IllegalStateException("Watermark image must be specified");
 
-    
+
     // Find the encoding profile
     EncodingProfile profile = composerService.getProfile(encodingProfileName);
     if (profile == null) {
@@ -181,7 +181,7 @@ public class WatermarkWorkflowOperationHandler extends AbstractWorkflowOperation
       if (!waitForStatus(job).isSuccess()) {
         throw new WorkflowOperationException("Watermarking failed");
       }
-      
+
       Track composedTrack = (Track) MediaPackageElementParser.getFromXml(job.getPayload());
 
       // add this receipt's queue time to the total
@@ -228,5 +228,5 @@ public class WatermarkWorkflowOperationHandler extends AbstractWorkflowOperation
     }
   }
 
-  
+
 }

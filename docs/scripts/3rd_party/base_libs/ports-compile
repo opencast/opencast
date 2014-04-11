@@ -6,17 +6,19 @@ set -x
 source "${HOME3P}/utilx"
 [ $? -ne 0 ] && exit 1
 #
-compile jam     ports || exit 1
-compile scons   ports || exit 1
-compile yasm    ports || exit 1
-compile pthread ports || exit 1
-compile rand48  ports || exit 1
+compile jam       ports || exit 1
+compile scons     ports || exit 1
+compile yasm      ports || exit 1
+compile pthread   ports || exit 1
+compile rand48    ports || exit 1
 #
-compile zlib    ports || exit 1
-compile jpeg    ports || exit 1
+compile zlib      ports || exit 1
+compile jpeg      ports || exit 1
 # png depends on zlib
-compile png     ports || exit 1
+compile png       ports || exit 1
 # tiff depends on pthread, zlib and jpeg
-compile tiff    ports || exit 1
+compile tiff      ports || exit 1
+compile gif       ports || exit 1
+compile leptonica ports || exit 1
 #
 exit 0

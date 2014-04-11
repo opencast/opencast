@@ -15,7 +15,6 @@
  */
 package org.opencastproject.runtimeinfo.rest;
 
-
 import org.opencastproject.util.doc.DocData;
 
 import java.util.Collections;

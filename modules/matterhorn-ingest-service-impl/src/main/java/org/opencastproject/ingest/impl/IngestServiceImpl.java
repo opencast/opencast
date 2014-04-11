@@ -37,6 +37,10 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AclScope;
+import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
@@ -146,6 +150,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The opencast service registry */
   private ServiceRegistry serviceRegistry;
 
+  /** The authorization service */
+  private AuthorizationService authorizationService = null;
+
   /** The security service */
   protected SecurityService securityService = null;
 
@@ -170,7 +177,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * OSGI callback for activating this component
-   * 
+   *
    * @param cc
    *          the osgi component context
    */
@@ -193,7 +200,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * Sets the trusted http client
-   * 
+   *
    * @param httpClient
    *          the http client
    */
@@ -203,7 +210,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * Sets the service registry
-   * 
+   *
    * @param serviceRegistry
    *          the serviceRegistry to set
    */
@@ -212,8 +219,18 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   }
 
   /**
-   * {@inheritDoc}
+   * Sets the authorization service
    * 
+   * @param authorizationService
+   *          the authorization service to set
+   */
+  public void setAuthorizationService(AuthorizationService authorizationService) {
+    this.authorizationService = authorizationService;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream)
    */
   public WorkflowInstance addZippedMediaPackage(InputStream zipStream) throws IngestException, IOException,
@@ -227,7 +244,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream, java.lang.String)
    */
   public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String wd) throws MediaPackageException,
@@ -237,7 +254,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream, java.lang.String)
    */
   public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String wd, Map<String, String> workflowConfig)
@@ -251,7 +268,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream, java.lang.String,
    *      java.util.Map, java.lang.Long)
    */
@@ -294,8 +311,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       MediaPackage mp = null;
       Map<String, URI> uris = new HashMap<String, URI>();
       // Sequential number to append to file names so that, if two files have the same
-      // name, one does not overwrite the other
+      // name, one does not overwrite the other (see MH-9688)
       int seq = 1;
+      // Folder name to compare with next one to figure out if there's a root folder
+      String folderName = null;
+      // Indicates if zip has a root folder or not, initialized as true
+      boolean hasRootFolder = true;
       // While there are entries write them to a collection
       while ((entry = zis.getNextZipEntry()) != null) {
         try {
@@ -306,8 +327,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             // Build the mediapackage
             mp = loadMediaPackageFromManifest(new ZipEntryInputStream(zis, entry.getSize()));
           } else {
-            logger.info("Storing zip entry {} in working file repository collection '{}'",
-                    job.getId() + entry.getName(), wfrCollectionId);
+            logger.info("Storing zip entry {}/{} in working file repository collection '{}'",
+                    new Object[] { job.getId(), entry.getName(), wfrCollectionId });
             // Since the directory structure is not being mirrored, makes sure the file
             // name is different than the previous one(s) by adding a sequential number
             String fileName = FilenameUtils.getBaseName(entry.getName()) + "_" + seq++ + "."
@@ -315,12 +336,23 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             URI contentUri = workingFileRepository.putInCollection(wfrCollectionId, fileName, new ZipEntryInputStream(
                     zis, entry.getSize()));
             collectionFilenames.add(fileName);
-            // Each entry name starts with zip file name; discard it so that the map key will match the media package
-            // element uri
-            String key = entry.getName().substring(entry.getName().indexOf('/') + 1);
+            // Key is the zip entry name as it is
+            String key = entry.getName();
             uris.put(key, contentUri);
             ingestStatistics.add(entry.getSize());
-            logger.info("Zip entry {} stored at {}", job.getId() + entry.getName(), contentUri);
+            logger.info("Zip entry {}/{} stored at {}", new Object[] { job.getId(), entry.getName(), contentUri });
+            // Figures out if there's a root folder. Does entry name starts with a folder?
+            int pos = entry.getName().indexOf('/');
+            if (pos == -1) {
+              // No, we can conclude there's no root folder
+              hasRootFolder = false;
+            } else if (hasRootFolder && folderName != null && !folderName.equals(entry.getName().substring(0, pos))) {
+              // Folder name different from previous so there's no root folder
+              hasRootFolder = false;
+            } else if (folderName == null) {
+              // Just initialize folder name
+              folderName = entry.getName().substring(0, pos);
+            }
           }
         } catch (IOException e) {
           logger.warn("Unable to process zip entry {}: {}", entry.getName(), e);
@@ -351,7 +383,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
       // Update the element uris to point to their working file repository location
       for (MediaPackageElement element : mp.elements()) {
-        URI uri = uris.get(element.getURI().toString());
+        // Key has root folder name if there is one
+        URI uri = uris.get((hasRootFolder ? folderName + "/" : "") + element.getURI().toString());
 
         if (uri == null)
           throw new MediaPackageException("Unable to map element name '" + element.getURI() + "' to workspace uri");
@@ -464,7 +497,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#createMediaPackage()
    */
   public MediaPackage createMediaPackage() throws MediaPackageException,
@@ -482,7 +515,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#addTrack(java.net.URI,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
    */
@@ -525,7 +558,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#addTrack(java.io.InputStream, java.lang.String,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
    */
@@ -562,7 +595,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#addCatalog(java.net.URI,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
    */
@@ -603,7 +636,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * Updates the persistent representation of a series based on a potentially modified dublin core document.
-   * 
+   *
    * @param uri
    *          the URI to the dublin core document containing series metadata.
    */
@@ -633,7 +666,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#addCatalog(java.io.InputStream, java.lang.String,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
    */
@@ -673,7 +706,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#addAttachment(java.net.URI,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
    */
@@ -710,7 +743,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#addAttachment(java.io.InputStream, java.lang.String,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
    */
@@ -746,9 +779,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#ingest(org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
@@ -764,7 +797,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#ingest(org.opencastproject.mediapackage.MediaPackage,
    *      java.lang.String)
    */
@@ -779,7 +812,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#ingest(org.opencastproject.mediapackage.MediaPackage,
    *      java.lang.String, java.util.Map)
    */
@@ -795,7 +828,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#ingest(org.opencastproject.mediapackage.MediaPackage,
    *      java.lang.String, java.util.Map, java.lang.Long)
    */
@@ -833,6 +866,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
       // If the indicated workflow does not exist, start a new workflow with the given workflow definition
       if (workflow == null) {
+        setPublicAclIfEmpty(mp);
         ingestStatistics.successful();
         if (workflowDef != null) {
           logger.info("Starting new workflow with ingested mediapackage '{}' using the specified template '{}'", mp
@@ -933,6 +967,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           existingMediaPackage.add(element);
         }
 
+        setPublicAclIfEmpty(mp);
+
         // Extend the workflow operations
         workflow.extend(workflowDef);
 
@@ -973,6 +1009,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (WorkflowException e) {
       ingestStatistics.failed();
       throw new IngestException(e);
+    }
+  }
+
+  private void setPublicAclIfEmpty(MediaPackage mp) {
+    AccessControlList activeAcl = authorizationService.getActiveAcl(mp).getA();
+    if (activeAcl.getEntries().size() == 0) {
+      String anonymousRole = securityService.getOrganization().getAnonymousRole();
+      activeAcl = new AccessControlList(new AccessControlEntry(anonymousRole, "read", true));
+      authorizationService.setAcl(mp, AclScope.Series, activeAcl);
     }
   }
 
@@ -1089,9 +1134,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.ingest.api.IngestService#discardMediaPackage(org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
@@ -1167,7 +1212,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -1177,7 +1222,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -1187,7 +1232,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -1197,7 +1242,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -1207,7 +1252,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * Callback for setting the scheduler service.
-   * 
+   *
    * @param schedulerService
    *          the scheduler service to set
    */
@@ -1217,7 +1262,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -1227,7 +1272,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -1237,7 +1282,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -1247,7 +1292,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override

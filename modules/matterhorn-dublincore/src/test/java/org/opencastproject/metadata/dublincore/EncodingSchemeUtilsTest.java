@@ -43,7 +43,7 @@ import java.util.TimeZone;
  * Test cases for {@link org.opencastproject.metadata.dublincore.EncodingSchemeUtils}.
  */
 public class EncodingSchemeUtilsTest {
-  
+
   private Logger logger = LoggerFactory.getLogger(EncodingSchemeUtilsTest.class);
 
   @Test

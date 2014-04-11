@@ -17,7 +17,6 @@ package org.opencastproject.capture.pipeline.bins;
 
 import org.opencastproject.capture.CaptureParameters;
 
-import java.io.File;
 import java.util.Properties;
 
 public class ConfidenceMonitoringProperties {
@@ -31,7 +30,7 @@ public class ConfidenceMonitoringProperties {
   public ConfidenceMonitoringProperties(CaptureDevice captureDevice, Properties properties) {
     if (properties != null) {
       imageloc = properties.getProperty(CaptureParameters.CAPTURE_CONFIDENCE_VIDEO_LOCATION);
-      device = new File(captureDevice.getOutputPath()).getName();
+      device = captureDevice.getFriendlyName();
       interval = Integer.parseInt(properties.getProperty(
               CaptureParameters.CAPTURE_DEVICE_PREFIX + captureDevice.getFriendlyName()
                       + CaptureParameters.CAPTURE_DEVICE_CONFIDENCE_INTERVAL, "5"));

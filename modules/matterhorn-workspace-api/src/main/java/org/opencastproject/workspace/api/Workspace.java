@@ -17,6 +17,7 @@ package org.opencastproject.workspace.api;
 
 import org.opencastproject.storage.StorageUsage;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Option;
 
 import java.io.File;
 import java.io.IOException;
@@ -224,5 +225,14 @@ public interface Workspace extends StorageUsage {
    */
   URI copyTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
           throws NotFoundException, IOException, IllegalArgumentException;
+
+  /**
+   * Cleans up files not belonging to a mediapackage or a collection. If the optional maxAge parameter is set, only
+   * files older than the maxAge are deleted.
+   * 
+   * @param maxAge
+   *          the maximal age in seconds of a file before deletion is performed
+   */
+  void cleanup(Option<Integer> maxAge);
 
 }

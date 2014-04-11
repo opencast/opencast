@@ -15,11 +15,13 @@
  */
 package org.opencastproject.composer.api;
 
+import org.opencastproject.composer.layout.Dimension;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.util.data.Option;
 
 /**
  * Encodes media and (optionally) periodically alerts a statusService endpoint of the status of this encoding job.
@@ -60,6 +62,67 @@ public interface ComposerService {
           MediaPackageException;
 
   /**
+   * Compose two videos into one with an optional watermark.
+   * 
+   * @param compositeTrackSize
+   *          The composite track dimension
+   * @param upperTrack
+   *          the upper track of the composition
+   * @param lowerTrack
+   *          the lower track of the composition
+   * @param watermark
+   *          The optional watermark attachment
+   * @param profileId
+   *          The encoding profile to use
+   * @param background
+   *          The background color
+   * @return The receipt for this composite job
+   * @throws EncoderException
+   *           if encoding fails
+   * @throws MediaPackageException
+   *           if the mediapackage is invalid
+   */
+  Job composite(Dimension compositeTrackSize, LaidOutElement<Track> upperTrack, LaidOutElement<Track> lowerTrack,
+          Option<LaidOutElement<Attachment>> watermark, String profileId, String background) throws EncoderException,
+          MediaPackageException;
+
+  /**
+   * Concat multiple tracks having the same codec to a single track. Required ffmpeg version 1.1
+   * 
+   * @param profileId
+   *          The encoding profile to use
+   * @param outputDimension
+   *          The output dimensions
+   * @param tracks
+   *          an array of track to concat in order of the array
+   * @return The receipt for this concat job
+   * @throws EncoderException
+   *           if encoding fails
+   * @throws MediaPackageException
+   *           if the mediapackage is invalid
+   */
+  Job concat(String profileId, Dimension outputDimension, Track... tracks) throws EncoderException,
+          MediaPackageException;
+
+  /**
+   * Transforms an image attachment to a video track
+   * 
+   * @param sourceImageAttachment
+   *          The source image attachment
+   * @param profileId
+   *          The profile to use for encoding
+   * @param duration
+   *          the length of the resulting video track in seconds
+   * @return The receipt for this image to video job
+   * @throws EncoderException
+   *           if encoding fails
+   * @throws MediaPackageException
+   *           if the mediapackage is invalid
+   */
+  Job imageToVideo(Attachment sourceImageAttachment, String profileId, double duration) throws EncoderException,
+          MediaPackageException;
+
+  /**
    * Trims the given track to the given start time and duration.
    * 
    * @param sourceTrack
@@ -97,7 +160,7 @@ public interface ComposerService {
    *           if the mediapackage is invalid
    */
   // TODO revise
-  Job image(Track sourceTrack, String profileId, long... time) throws EncoderException, MediaPackageException;
+  Job image(Track sourceTrack, String profileId, double... time) throws EncoderException, MediaPackageException;
 
   /**
    * Converts the given image to a different image format using the specified image profile.
@@ -148,8 +211,8 @@ public interface ComposerService {
    * @throws MediaPackageException
    *           if the track is invalid
    */
-  Job watermark(Track mediaTrack, String watermark, String profileId) throws EncoderException, MediaPackageException;  
-  
+  Job watermark(Track mediaTrack, String watermark, String profileId) throws EncoderException, MediaPackageException;
+
   /**
    * @return All registered {@link EncodingProfile}s.
    */
