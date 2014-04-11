@@ -18,7 +18,7 @@ package org.opencastproject.engage.theodul.api;
 public abstract class AbstractEngagePlugin implements EngagePlugin, EngagePluginRestService {
 
   protected EngagePluginManager pluginManager;
-  
+
   protected void setPluginManager(EngagePluginManager pm) {
     pluginManager = pm;
   }

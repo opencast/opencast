@@ -30,5 +30,5 @@ public interface EngagePluginRegistration {
   boolean hasRestEndpoint();
 
   boolean hasStaticResources();
-  
+
 }

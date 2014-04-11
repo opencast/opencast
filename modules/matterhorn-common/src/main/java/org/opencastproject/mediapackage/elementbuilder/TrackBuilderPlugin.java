@@ -141,7 +141,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
       String transportValue = (String) xpath.evaluate("@transport", elementNode, XPathConstants.STRING);
       if (StringUtils.isNotEmpty(transportValue))
         transport = TrackImpl.StreamingProtocol.valueOf(transportValue);
-      
+
       // checksum
       String checksumValue = (String) xpath.evaluate("checksum/text()", elementNode, XPathConstants.STRING);
       String checksumType = (String) xpath.evaluate("checksum/@type", elementNode, XPathConstants.STRING);
@@ -182,7 +182,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
 
       if (flavor != null)
         track.setFlavor(flavor);
-      
+
       //set transport
       if (transport != null)
         track.setTransport(transport);

@@ -53,8 +53,8 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   public static enum StreamingProtocol {
     HTTP,HLS,DASH,SMOOTH,MMS,RTP,RTSP,RTMP,RTMPE,HDS,PNM,PNA,ICY,BITTORENTLIVE,FILE,UNKNOWN
-  } 
-  
+  }
+
   /** The duration in milliseconds */
   @XmlElement(name = "duration")
   protected Long duration = null;
@@ -64,7 +64,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   @XmlElement(name = "video")
   protected List<VideoStream> video = new ArrayList<VideoStream>();
-  
+
   @XmlAttribute(name = "transport")
   protected StreamingProtocol transport = null;
 
@@ -226,11 +226,11 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
      */
     return buf.toString().toLowerCase();
   }
-  
+
   public void setTransport(StreamingProtocol transport) {
     this.transport = transport;
   }
-  
+
   public StreamingProtocol getTransport() {
     if (transport == null) return autodetectTransport(getURI());
     return transport;
@@ -263,7 +263,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
       return mp;
     }
   }
-  
+
   private StreamingProtocol autodetectTransport(URI uri) {
     if (uri == null || uri.getScheme() == null) return null;
     if (uri.getScheme().toLowerCase().startsWith("http")) {

@@ -16,19 +16,19 @@
 package org.opencastproject.engage.theodul.api;
 
 public interface EngagePlugin {
-  
+
   /* Service property key; Plugin's human readable name */
   String PROPKEY_PLUGIN_NAME = "opencast.engage.plugin.name";
-  
+
   /* Service property key; Description of the plugin's functionality, license etc. */
   String PROPKEY_PLUGIN_DESCRIPTION = "opencast.engage.plugin.description";
-  
+
   /* Service property key; boolean wether or not the plugin provides a REST endpoint */
   String PROPKEY_PLUGIN_REST = "opencast.engage.plugin.rest";
-  
+
   /* path under which a plugin's static resources can be found */
   String STATIC_RESOURCES_PATH = "static";
-  
+
   /* path under which a plugin's REST endpoint can be found */
   String REST_ENDPOINT_PATH = "rest";
 }

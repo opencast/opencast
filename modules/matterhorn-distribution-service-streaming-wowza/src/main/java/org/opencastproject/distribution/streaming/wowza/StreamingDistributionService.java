@@ -107,7 +107,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /** The base URL for streaming */
   protected String streamingUrl = null;
-  
+
   /** The base URL for adaptive streaming */
   protected String adaptiveStreamingUrl = null;
 
@@ -155,7 +155,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.distribution.api.DistributionService#distribute(String,
    *      org.opencastproject.mediapackage.MediaPackage, String)
    */
@@ -185,7 +185,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * Distribute a Mediapackage element to the download distribution service.
-   * 
+   *
    * @param mediapackage
    *          The media package that contains the element to distribute.
    * @param elementId
@@ -205,19 +205,19 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       throw new IllegalArgumentException("Channel ID must be specified");
 
     final MediaPackageElement element = mediapackage.getElementById(elementId);
-    
+
     // Make sure the element exists
     if (element == null)
-      throw new IllegalStateException("No element " + elementId + " found in mediapackage");   
-    
+      throw new IllegalStateException("No element " + elementId + " found in mediapackage");
+
 
     // Streaming servers only deal with tracks
     if (!MediaPackageElement.Type.Track.equals(element.getElementType())) {
       logger.debug("Skipping {} {} for distribution to the streaming server", element.getElementType().toString()
               .toLowerCase(), element.getIdentifier());
       return null;
-    }   
-    
+    }
+
     try {
       File source;
       try {
@@ -253,16 +253,16 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       }
       distributedElement.setIdentifier(null);
       setTransport(distributedElement, TrackImpl.StreamingProtocol.RTMP);
-      
+
       distribution.add(distributedElement);
-     
+
       String smilFilename = getSmilFilename(distributedElement, mediapackage, channelId);
-      
+
       if (isAdaptiveStreamingFormat(distributedElement)) {
-      
+
       // Only if the Smil file does not exist we need to distribute adaptive streams
       // Otherwise the adaptive streams only were extended with new qualities
-        boolean smilExists = smilFileExists(smilFilename);  
+        boolean smilExists = smilFileExists(smilFilename);
         Document smilXml = getSmilDocument(smilFilename);
 
         addElementToSmil(smilXml, distributedElement);
@@ -276,7 +276,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
           distribution.add(createTrackforStreamingProtocol(distributedElement, smilFilename, TrackImpl.StreamingProtocol.DASH));
         }
       }
-      
+
       logger.info("Distributed file {} to Wowza Server", element);
       return distribution.toArray(new MediaPackageElement[0]);
 
@@ -289,50 +289,50 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       }
     }
   }
-  
+
   private void setTransport(MediaPackageElement element, TrackImpl.StreamingProtocol protocol) {
     if (element instanceof TrackImpl) {
       ((TrackImpl) element).setTransport(protocol);
     }
   }
-  
+
   private String getSmilFilename(MediaPackageElement distributedElement, MediaPackage mediapackage, String channelId) {
     return channelId + "_" + mediapackage.getIdentifier() + "_" + distributedElement.getFlavor().getType() + ".smil";
   }
-  
+
   private URI getSmilUri(String smilFilename)throws URISyntaxException  {
     return new URI(UrlSupport.concat(adaptiveStreamingUrl,"smil:" + smilFilename));
   }
-  
+
   private URI getHlsUri(URI smilURI) throws URISyntaxException {
     return new URI(UrlSupport.concat(smilURI.toString(),"playlist.m3u8"));
   }
-  
+
   private URI getHdsUri(URI smilURI) throws URISyntaxException {
     return new URI(UrlSupport.concat(smilURI.toString(),"manifest.f4m"));
   }
-  
+
   private URI getSmoothStreamingUri(URI smilURI) throws URISyntaxException {
     return new URI(UrlSupport.concat(smilURI.toString(),"Manifest"));
-  }  
-  
+  }
+
   private URI getDashUri(URI smilURI) throws URISyntaxException {
     return new URI(UrlSupport.concat(smilURI.toString(),"manifest_mpm4sav_mvlist.mpd"));
-  } 
-  
+  }
+
   private boolean smilFileExists(String name) {
     final String directoryName = distributionDirectory.getAbsolutePath();
     File smil = new File(path(directoryName, name));
     return smil.exists();
-      
+
   }
-  
+
   private boolean isAdaptiveStreamingFormat(MediaPackageElement element) {
     return element.getURI().toString().contains("mp4:");
   }
-  
+
   private Document getSmilDocument(String smilFilename) throws DistributionException {
-    
+
     if (!smilFileExists(smilFilename)) {
       try {
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -340,35 +340,35 @@ public class StreamingDistributionService extends AbstractJobProducer implements
         Document doc = docBuilder.newDocument();
         Element smil = doc.createElement("smil");
         doc.appendChild(smil);
-        
+
         Element head = doc.createElement("head");
         smil.appendChild(head);
-        
+
         Element body = doc.createElement("body");
         smil.appendChild(body);
-        
+
         Element switchElement = doc.createElement("switch");
         body.appendChild(switchElement);
-        
+
         return doc;
       } catch (ParserConfigurationException ex) {
         logger.error("Could not create XML file for {}.", smilFilename);
         throw new DistributionException("Could not create XML file for " + smilFilename);
       }
     }
-    
+
     try {
       final String directoryName = distributionDirectory.getAbsolutePath();
       File smil = new File(path(directoryName, smilFilename));
       DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
       Document doc = docBuilder.parse(smil);
-      
+
       if (!doc.getDocumentElement().getNodeName().equalsIgnoreCase("smil")) {
         logger.error("XML-File % is not a SMIL file.", smilFilename);
         throw new DistributionException("XML-File " + smilFilename + " is not an SMIL file.");
       }
-           
+
       return doc;
     } catch (IOException e) {
       logger.error("Could not open SMIL file {}", smilFilename);
@@ -379,9 +379,9 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     } catch (SAXException e) {
       logger.error("Could no valid XML file {}", smilFilename);
       throw new DistributionException("Could no valid XML file " + smilFilename);
-    }  
+    }
   }
-  
+
   private void saveSmilFile(String smilFilename, Document doc) throws DistributionException {
     try {
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -396,23 +396,23 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     } catch (TransformerException ex) {
       logger.error("Could not write SMIL file {} for distribution", smilFilename);
       throw new DistributionException("Could not write SMIL file " + smilFilename + " for distribution");
-    }    
+    }
   }
-  
+
   private String getStreamingPathForSmil(TrackImpl track) {
     String path = track.getURI().getPath();
     return path.substring(path.indexOf("/", 2) + 1);
   }
-  
+
   private void addElementToSmil(Document doc, MediaPackageElement element) {
     if (! (element instanceof TrackImpl)) return;
     TrackImpl track = (TrackImpl) element;
     NodeList switchElementsList = doc.getElementsByTagName("switch");
     Node switchElement = null;
-    
+
     //TODO filter for MP4 files only!!
-    
-    // There should only be one switch element in of file. If there are more we will igore this. 
+
+    // There should only be one switch element in of file. If there are more we will igore this.
     // If there is no switch element we need to create the xml first.
     if (switchElementsList.getLength() > 0) {
       switchElement = switchElementsList.item(0);
@@ -420,27 +420,27 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       if (doc.getElementsByTagName("head").getLength() < 1)
         doc.appendChild(doc.createElement("head"));
       if (doc.getElementsByTagName("body").getLength() < 1)
-        doc.appendChild(doc.createElement("body")); 
+        doc.appendChild(doc.createElement("body"));
       switchElement = doc.createElement("switch");
       doc.getElementsByTagName("body").item(0).appendChild(switchElement);
     }
-    
+
     Element video = doc.createElement("video");
-    
+
     video.setAttribute("src", getStreamingPathForSmil(track));
-    
+
     float bitrate = 0;
     for (int i = 0; i < track.getAudio().size(); i++) {
       bitrate += track.getAudio().get(i).getBitRate();
     }
     for (int i = 0; i < track.getVideo().size(); i++) {
       bitrate += track.getVideo().get(i).getBitRate();
-    }    
+    }
     video.setAttribute("system-bitrate", new Integer((int) bitrate).toString());
-    
+
     switchElement.appendChild(video);
   }
-  
+
   private void removeElementFromSmil(Document doc, MediaPackageElement element) {
     if (! (element instanceof TrackImpl)) {
       return;
@@ -451,34 +451,34 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     for (int i = 0; i < videoList.getLength(); i++) {
       if (videoList.item(i) instanceof Element) {
         if (((Element)videoList.item(i)).getAttribute("src").equalsIgnoreCase(path)) {
-          videoList.item(i).getParentNode().removeChild(videoList.item(i)); 
+          videoList.item(i).getParentNode().removeChild(videoList.item(i));
           return;
         }
       }
     }
-  } 
+  }
 
   private TrackImpl createTrackforStreamingProtocol(MediaPackageElement distributedElement, String smilFilename, TrackImpl.StreamingProtocol protocol) throws URISyntaxException {
     TrackImpl track = (TrackImpl) distributedElement.clone();
 
     switch (protocol) {
-      case HLS : 
-        track.setURI(getHlsUri(getSmilUri(smilFilename))); 
+      case HLS :
+        track.setURI(getHlsUri(getSmilUri(smilFilename)));
         track.setMimeType(MimeType.mimeType("application","x-mpegURL"));
         break;
-      case HDS : 
-        track.setURI(getHdsUri(getSmilUri(smilFilename))); 
+      case HDS :
+        track.setURI(getHdsUri(getSmilUri(smilFilename)));
         track.setMimeType(MimeType.mimeType("application","f4m+xml"));
         break;
-      case SMOOTH : 
-        track.setURI(getSmoothStreamingUri(getSmilUri(smilFilename))); 
+      case SMOOTH :
+        track.setURI(getSmoothStreamingUri(getSmilUri(smilFilename)));
         track.setMimeType(MimeType.mimeType("application","vnd.ms-sstr+xml"));
         break;
-      case DASH : 
-        track.setURI(getDashUri(getSmilUri(smilFilename))); 
+      case DASH :
+        track.setURI(getDashUri(getSmilUri(smilFilename)));
         track.setMimeType(MimeType.mimeType("application","dash+xml"));
         break;
-      default: return null;  
+      default: return null;
     }
 
     track.setIdentifier(null);
@@ -487,7 +487,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     track.setVideo(null);
     track.setChecksum(null);
 
-    return track;       
+    return track;
   }
 
   private boolean emptySmilDoc(Document doc) {
@@ -496,45 +496,45 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   private void deleteSmilFile(String smilFilename) {
     final String directoryName = distributionDirectory.getAbsolutePath();
-    File smil = new File(path(directoryName, smilFilename)); 
-    if (! FileSupport.delete(smil)) 
+    File smil = new File(path(directoryName, smilFilename));
+    if (! FileSupport.delete(smil))
       logger.info("Could not delete SMIL file {}", smilFilename);
   }
 
   /**
-   * 
+   *
    * @param distributedElement
    * @param mediapackage
    * @param channelId
    * @return true if a new SmilFile has been created
-   
+
   private boolean addTrackToSmilFile (MediaPackageElement distributedElement, MediaPackage mediapackage, String channelId) {
     String smilFilename = getSmilFilename(distributedElement, mediapackage, channelId);
     boolean smilExists = smilFileExists(smilFilename);
-    
+
     // TODO create method
-    
-    
+
+
     return !smilExists;
   }
-  
+
   /**
-   * 
+   *
    * @param retractedElement
    * @param channelId
    * @return true if the SMIL file was deleted
-   
+
   private boolean removeTrackFromSmilFile (MediaPackageElement retractedElement, MediaPackage mediapackage, String channelId) {
       String smilFilename = getSmilFilename(retractedElement, mediapackage, channelId);
-      
+
       // TODO create method
-      
+
       return ! smilFileExists(smilFilename);
   }  */
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.distribution.api.DistributionService#retract(String,
    *      org.opencastproject.mediapackage.MediaPackage, String) java.lang.String)
    */
@@ -557,7 +557,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * Retracts the mediapackage with the given identifier from the distribution channel.
-   * 
+   *
    * @param channelId
    *          the channel id
    * @param mediapackage
@@ -570,25 +570,25 @@ public class StreamingDistributionService extends AbstractJobProducer implements
           throws DistributionException {
 
 logger.info("retraction: starting");
-    
+
     if (mediapackage == null)
       throw new IllegalArgumentException("Mediapackage must be specified");
     if (elementId == null)
       throw new IllegalArgumentException("Element ID must be specified");
 
-logger.info("retraction: everything accepted");    
-    
+logger.info("retraction: everything accepted");
+
     // Make sure the element exists
     final MediaPackageElement element = mediapackage.getElementById(elementId);
     if (element == null)
       throw new IllegalStateException("No element " + elementId + " found in mediapackage");
 
     ArrayList<MediaPackageElement> distribution = new ArrayList<MediaPackageElement>();
-    
+
     // Has this element been distributed?
     if (element == null || (!(element instanceof TrackImpl)) || (!((TrackImpl)element).getTransport().equals(TrackImpl.StreamingProtocol.RTMP)))
       return null;
-    
+
     try {
       String smilFilename = getSmilFilename(element, mediapackage, channelId);
       boolean smilFileExists = smilFileExists(smilFilename);
@@ -597,22 +597,22 @@ logger.info("retraction: everything accepted");
 
       // Does the file exist? If not, the current element has not been distributed to this channel
       // or has been removed otherwise
-      if (!elementFile.exists()) {   
-        distribution.add(element);         
+      if (!elementFile.exists()) {
+        distribution.add(element);
         return distribution.toArray(new MediaPackageElement[0]);
       }
-      
+
       // Try to remove the file and - if possible - the parent folder
       FileUtils.forceDelete(elementFile);
       File elementDir = elementFile.getParentFile();
       if (elementDir.isDirectory() && elementDir.list().length == 0) {
         FileSupport.delete(elementDir);
-      }      
+      }
       if (mediapackageDir.isDirectory() && mediapackageDir.list().length == 0) {
         FileSupport.delete(mediapackageDir);
       }
       if (smilFileExists) {
-        Document smilDocument = getSmilDocument(smilFilename);     
+        Document smilDocument = getSmilDocument(smilFilename);
         removeElementFromSmil(smilDocument, element);
         saveSmilFile(smilFilename, smilDocument);
         if (emptySmilDoc(smilDocument)) { // only remove adaptive streaming URIs if the smil has been removed
@@ -625,7 +625,7 @@ logger.info("retraction: everything accepted");
           }
         }
       }
-      
+
       logger.info("Finished rectracting element {} of media package {}", elementId, mediapackage);
       distribution.add(element);
       return distribution.toArray(new MediaPackageElement[0]);
@@ -642,7 +642,7 @@ logger.info("retraction: everything accepted");
 
   /**
    * Gets the destination file to copy the contents of a mediapackage element.
-   * 
+   *
    * @return The file to copy the content to
    */
   protected File getDistributionFile(String channelId, MediaPackage mp, MediaPackageElement element) {
@@ -674,7 +674,7 @@ logger.info("retraction: everything accepted");
 
   /**
    * Gets the directory containing the distributed files for this mediapackage.
-   * 
+   *
    * @return the filesystem directory
    */
   protected File getMediaPackageDirectory(String channelId, MediaPackage mediaPackage) {
@@ -683,7 +683,7 @@ logger.info("retraction: everything accepted");
 
   /**
    * Gets the URI for the element to be distributed.
-   * 
+   *
    * @return The resulting URI after distribution
    * @throws URISyntaxException
    *           if the concrete implementation tries to create a malformed uri
@@ -703,7 +703,7 @@ logger.info("retraction: everything accepted");
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -740,7 +740,7 @@ logger.info("retraction: everything accepted");
 
   /**
    * Callback for the OSGi environment to set the workspace reference.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -750,7 +750,7 @@ logger.info("retraction: everything accepted");
 
   /**
    * Callback for the OSGi environment to set the service registry reference.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -760,7 +760,7 @@ logger.info("retraction: everything accepted");
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -770,7 +770,7 @@ logger.info("retraction: everything accepted");
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -780,7 +780,7 @@ logger.info("retraction: everything accepted");
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -790,7 +790,7 @@ logger.info("retraction: everything accepted");
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -800,7 +800,7 @@ logger.info("retraction: everything accepted");
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -810,7 +810,7 @@ logger.info("retraction: everything accepted");
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -820,7 +820,7 @@ logger.info("retraction: everything accepted");
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override
