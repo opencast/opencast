@@ -280,16 +280,9 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
         }
         logger.warn("Status code of distributed file {}: {}", uri, response.getStatusLine().getStatusCode());
         throw new DistributionException("Unable to load distributed file " + uri.toString());
+        }
       }
-<<<<<<< Updated upstream
-
-      }
-
-
-      return distributedElement;
-=======
       return new MediaPackageElement[] {distributedElement};
->>>>>>> Stashed changes
     } catch (Exception e) {
       logger.warn("Error distributing " + element, e);
       if (e instanceof DistributionException) {
