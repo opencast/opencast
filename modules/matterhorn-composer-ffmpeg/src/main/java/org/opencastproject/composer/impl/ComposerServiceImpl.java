@@ -584,7 +584,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         if (watermarkFile != null)
           params.put("watermark", watermarkOption.get().getElement().getURI().toString());
         params.put("profile", profile.getIdentifier());
-        params.put("propertes", properties.toString());
+        params.put("properties", properties.toString());
         incident().recordFailure(job, COMPOSITE_FAILED, e, params, detailsFor(e, encoderEngine));
         throw e;
       }
@@ -718,7 +718,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         }
         params.put("tracks", StringUtils.join(trackList, ","));
         params.put("profile", profile.getIdentifier());
-        params.put("propertes", properties.toString());
+        params.put("properties", properties.toString());
         incident().recordFailure(job, CONCAT_FAILED, e, params, detailsFor(e, encoderEngine));
         throw e;
       }
@@ -814,7 +814,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         Map<String, String> params = new HashMap<String, String>();
         params.put("image", sourceImage.getURI().toString());
         params.put("profile", profile.getIdentifier());
-        params.put("propertes", properties.toString());
+        params.put("properties", properties.toString());
         incident().recordFailure(job, IMAGE_TO_VIDEO_FAILED, e, params, detailsFor(e, encoderEngine));
         throw e;
       }
