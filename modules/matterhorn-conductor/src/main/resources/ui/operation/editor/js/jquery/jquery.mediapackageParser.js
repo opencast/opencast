@@ -14,7 +14,8 @@
  */
 $.mediapackageParser = function(mediapackage)
 {
-    var SMILTYPE = "smil/smil";
+    var SMILTYPE_PRESENTER = "presenter/smil";
+    var SMILTYPE_PRESENTATION = "presentation/smil";
     var SMIL = "";
 
     this.mediapackage = mediapackage;
@@ -38,11 +39,20 @@ $.mediapackageParser = function(mediapackage)
 	this.smil_url = "";
 
 	if(this.metadata.catalog) {
+	    var smil_presenter = undefined;
+	    var smil_presentation = undefined;
 	    $.each(this.metadata.catalog, function(index, value) {
-		    if(value.type.indexOf(SMILTYPE) != -1) {
-			SMIL = value;
-		    }
-		});
+		if(value.type.indexOf(SMILTYPE_PRESENTER) != -1) {
+		    smil_presenter = value;
+		} else if(value.type.indexOf(SMILTYPE_PRESENTATION) != -1) {
+		    smil_presentation = value;
+		}
+	    });
+	    if(smil_presenter != undefined) {
+		SMIL = smil_presenter;
+	    } else if(smil_presentation != undefined) {
+		SMIL = smil_presentation;
+	    }
 	    this.smil = SMIL;
 	    this.smil_id = this.smil.id;
 	    this.smil_mimetype = this.smil.mimetype;

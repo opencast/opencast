@@ -25,8 +25,10 @@ var FILE_MEDIAPACKAGE_PATH = "/mediapackage";
 
 var WORKFLOW_INSTANCE_SUFFIX_JSON = ".json";
 var WORKFLOW_INSTANCE_SUFFIX_XML = ".xml";
-var SMIL_FLAVOR = "smil/smil";
-var WAVEFORM_FLAVOR = "image/waveform";
+var SMIL_FLAVOR_PRESENTER = "presenter/smil";
+var SMIL_FLAVOR_PRESENTATION = "presentation/smil";
+var WAVEFORM_FLAVOR_PRESENTER = "presenter/waveform";
+var WAVEFORM_FLAVOR_PRESENTATION = "presentation/waveform";
 
 var PREVIOUS_FRAME = "trim.previous_frame";
 var NEXT_FRAME = "trim.next_frame";
@@ -1939,53 +1941,70 @@ function prepareUI() {
 
     // try to load waveform image
     if (editor.mediapackageParser && editor.mediapackageParser.mediapackage && editor.mediapackageParser.mediapackage.attachments) {
-        ocUtils.log("Found waveform");
+	var waveform_presenter = false;
+	var waveform_presentation = false;
+	var waveform_presenter_value;
+	var waveform_presentation_value;
         $.each(ocUtils.ensureArray(editor.mediapackageParser.mediapackage.attachments.attachment), function (key, value) {
-            if (value.type == WAVEFORM_FLAVOR) {
-                $('#waveformImage').prop("src", value.url);
-                $('#waveformImage').load(function () {
+            if (value.type == WAVEFORM_FLAVOR_PRESENTER) {
+		ocUtils.log("Found waveform presenter");
+		waveform_presenter = true;
+		waveform_presenter_value = value;
+            } else if (value.type == WAVEFORM_FLAVOR_PRESENTATION) {
+		ocUtils.log("Found waveform presentation");
+		waveform_presentation = true;
+		waveform_presentation_value = value;
+            }
+        });
+	var value = waveform_presenter ? waveform_presenter_value : (waveform_presentation ? waveform_presentation_value : undefined);
+	if(waveform_presenter || waveform_presentation) {
+            $('#waveformImage').prop("src", value.url);
+            $('#waveformImage').load(function () {
+                $('#segmentsWaveform').height($('#waveformImage').height());
+                $('#segmentsWaveform').width($('#videoHolder').width());
+                initialWaveformWidth = $('#segmentsWaveform').width();
+                currentWaveformWidth = initialWaveformWidth;
+                updateWaveformClickEvent();
+                currWaveformZoom = 1;
+                waveformImageLoadDone = true;
+                $("#slider-waveform-zoom").slider({
+                    range: "min",
+                    value: 1,
+                    min: 1,
+                    max: maxWaveformZoomSlider,
+                    slide: function (event, ui) {
+                        setWaveformWidth(ui.value);
+                    },
+                    stop: function (event, ui) {
+                        if (zoomedIn()) {
+                            editor.updateSplitList(false, false);
+                        } else {
+                            editor.updateSplitList(false, true);
+                        }
+			selectCurrentSplitItem();
+                    }
+                });
+                $("#waveformControls").show();
+		$("#slider-waveform-zoom .ui-slider-handle").unbind('keydown');
+            });
+            $(window).resize(function (evt) {
+                if (waveformImageLoadDone) {
                     $('#segmentsWaveform').height($('#waveformImage').height());
                     $('#segmentsWaveform').width($('#videoHolder').width());
                     initialWaveformWidth = $('#segmentsWaveform').width();
                     currentWaveformWidth = initialWaveformWidth;
                     updateWaveformClickEvent();
                     currWaveformZoom = 1;
-                    waveformImageLoadDone = true;
-                    $("#slider-waveform-zoom").slider({
-                        range: "min",
-                        value: 1,
-                        min: 1,
-                        max: maxWaveformZoomSlider,
-                        slide: function (event, ui) {
-                            setWaveformWidth(ui.value);
-                        },
-                        stop: function (event, ui) {
-                            if (zoomedIn()) {
-                                editor.updateSplitList(false, false);
-                            } else {
-                                editor.updateSplitList(false, true);
-                            }
-			    selectCurrentSplitItem();
-                        }
-                    });
-                    $("#waveformControls").show();
-		    $("#slider-waveform-zoom .ui-slider-handle").unbind('keydown');
-                });
-                $(window).resize(function (evt) {
-                    if (waveformImageLoadDone) {
-                        $('#segmentsWaveform').height($('#waveformImage').height());
-                        $('#segmentsWaveform').width($('#videoHolder').width());
-                        initialWaveformWidth = $('#segmentsWaveform').width();
-                        currentWaveformWidth = initialWaveformWidth;
-                        updateWaveformClickEvent();
-                        currWaveformZoom = 1;
-                        $("#slider-waveform-zoom").slider("option", "value", 1);
-                        $('.holdStateUI').height($('#segmentsWaveform').height() + $('#videoPlayer').height() + 70);
-                        setWaveformWidth(currWaveformZoom);
-                    }
-                });
-            }
-        });
+                    $("#slider-waveform-zoom").slider("option", "value", 1);
+                    $('.holdStateUI').height($('#segmentsWaveform').height() + $('#videoPlayer').height() + 70);
+                    setWaveformWidth(currWaveformZoom);
+                }
+            });
+	} else {
+            ocUtils.log("Did not find waveform");
+            $('#waveformImage').hide();
+            $('#slider-waveform-zoom').hide();
+	}
     } else {
         ocUtils.log("Did not find waveform");
         $('#waveformImage').hide();
@@ -2165,16 +2184,24 @@ function playerReady() {
         editor.smil = null;
         editor.parsedSmil = null;
         if (workflowInstance.mediapackage && workflowInstance.mediapackage.metadata && workflowInstance.mediapackage.metadata.catalog) {
+	    var presenter_smil = false;
+	    var presentation_smil = false;
             $.each(workflowInstance.mediapackage.metadata.catalog, function (key, value) {
                 // load smil if there is already one
-                if (value.type == SMIL_FLAVOR) {
-                    // download smil
-                    // mediapackage: smil/smil
-                    editor.getSmil(function () {
-                        parseInitialSMIL();
-                    });
+                if (value.type == SMIL_FLAVOR_PRESENTER) {
+		    presenter_smil = true;
+		    console.log("Found presenter smil");
+                } else if(value.type == SMIL_FLAVOR_PRESENTATION) {
+		    presentation_smil = true;
+		    console.log("Found presentation smil");
                 }
             });
+	    if(presenter_smil || presentation_smil) {
+		// download smil
+		editor.getSmil(function () {
+                    parseInitialSMIL();
+		});
+	    }
         }
     }
 }
