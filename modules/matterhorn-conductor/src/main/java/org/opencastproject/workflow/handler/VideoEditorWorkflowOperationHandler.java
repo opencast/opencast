@@ -185,6 +185,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
       elementSelector.addFlavor(flavor);
     }
     Collection<MediaPackageElement> smilCatalogs = elementSelector.select(mp, false);
+    MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
     
     if (smilCatalogs.isEmpty()) {
       if (previewTrackFlavorsProperty == null) {
@@ -205,33 +206,68 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
                 mp.getIdentifier().compact(), previewTrackFlavorsProperty));
       }
       Track[] previewTracksArr = previewTracks.toArray(new Track[previewTracks.size()]);
-
-      try {
-        SmilResponse smilResponse = smilService.createNewSmil(mp);
-        smilResponse = smilService.addParallel(smilResponse.getSmil());
-        smilResponse = smilService.addClips(smilResponse.getSmil(),
-                smilResponse.getEntity().getId(),
-                previewTracksArr, 0L, previewTracksArr[0].getDuration());
-        Smil smil = smilResponse.getSmil();
-
-        InputStream is = null;
+      MediaPackageElementFlavor smilFlavor = MediaPackageElementFlavor.parseFlavor(smilFlavorsProperty);
+      
+      for (Track previewTrack : previewTracks) {
         try {
-          // put new smil into workspace
-          is = IOUtils.toInputStream(smil.toXML(), "UTF-8");
-          URI smilURI = workspace.put(mp.getIdentifier().compact(), smil.getId(), SMIL_FILE_NAME, is);
-          MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-          MediaPackageElementFlavor targetSmilFlavor = MediaPackageElementFlavor.parseFlavor(targetSmilFlavorProperty);
-          Catalog catalog = (Catalog) mpeBuilder.elementFromURI(smilURI, MediaPackageElement.Type.Catalog, targetSmilFlavor);
-          catalog.setIdentifier(smil.getId());
-          mp.add(catalog);
-        } finally {
-          IOUtils.closeQuietly(is);
+          SmilResponse smilResponse = smilService.createNewSmil(mp);
+          smilResponse = smilService.addParallel(smilResponse.getSmil());
+          smilResponse = smilService.addClips(smilResponse.getSmil(),
+                  smilResponse.getEntity().getId(),
+                  previewTracksArr, 0L, previewTracksArr[0].getDuration());
+          Smil smil = smilResponse.getSmil();
+
+          InputStream is = null;
+          try {
+            // put new smil into workspace
+            is = IOUtils.toInputStream(smil.toXML(), "UTF-8");
+            URI smilURI = workspace.put(mp.getIdentifier().compact(), smil.getId(), SMIL_FILE_NAME, is);
+            MediaPackageElementFlavor trackSmilFlavor = previewTrack.getFlavor();
+            if (!"*".equals(smilFlavor.getType())) {
+              trackSmilFlavor = new MediaPackageElementFlavor(smilFlavor.getType(), trackSmilFlavor.getSubtype());
+            }
+            if (!"*".equals(smilFlavor.getSubtype())) {
+              trackSmilFlavor = new MediaPackageElementFlavor(trackSmilFlavor.getType(), smilFlavor.getSubtype());
+            }
+            Catalog catalog = (Catalog) mpeBuilder.elementFromURI(smilURI, MediaPackageElement.Type.Catalog, trackSmilFlavor);
+            catalog.setIdentifier(smil.getId());
+            mp.add(catalog);
+          } finally {
+            IOUtils.closeQuietly(is);
+          }
+        } catch (Exception ex) {
+          throw new WorkflowOperationException(String.format(
+                  "Failed to create smil catalog for mediapackage %s", mp.getIdentifier().compact()), ex);
         }
-      } catch (Exception ex) {
-        throw new WorkflowOperationException(String.format(
-                "Failed to create smil catalog for mediapackage %s", mp.getIdentifier().compact()), ex);
       }
     }
+    
+    // check target smil catalog exists
+    MediaPackageElementFlavor targetSmilFlavor = MediaPackageElementFlavor.parseFlavor(targetSmilFlavorProperty);
+    Catalog[] targetSmilCatalogs = mp.getCatalogs(targetSmilFlavor);
+    if (targetSmilCatalogs == null || targetSmilCatalogs.length == 0) {
+      // create new empty smil to fill it from editor UI
+      try {
+          SmilResponse smilResponse = smilService.createNewSmil(mp);
+          Smil smil = smilResponse.getSmil();
+
+          InputStream is = null;
+          try {
+            // put new smil into workspace
+            is = IOUtils.toInputStream(smil.toXML(), "UTF-8");
+            URI smilURI = workspace.put(mp.getIdentifier().compact(), smil.getId(), SMIL_FILE_NAME, is);
+            Catalog catalog = (Catalog) mpeBuilder.elementFromURI(smilURI, MediaPackageElement.Type.Catalog, targetSmilFlavor);
+            catalog.setIdentifier(smil.getId());
+            mp.add(catalog);
+          } finally {
+            IOUtils.closeQuietly(is);
+          }
+        } catch (Exception ex) {
+          throw new WorkflowOperationException(String.format(
+                  "Failed to create an initial empty smil catalog for mediapackage %s", mp.getIdentifier().compact()), ex);
+        }
+    }
+    
     logger.info("Holding for video edit...");
     return createResult(mp, Action.PAUSE);
   }
