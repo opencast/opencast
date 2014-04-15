@@ -25,6 +25,22 @@ $.workflowParser = function(workflow) {
 	this.organization = this.workflow.workflow.organization;
 	this.mediapackage = this.workflow.workflow.mediapackage;
 	this.operations = this.workflow.workflow.operations;
+	this.targetSmilFlavor = "episode/smil";
+	if(this.operations && this.operations.operation) {
+	    for(var i = 0; i < this.operations.operation.length; ++i) {
+		var op = this.operations.operation[i];
+		if(op.id == "editor") {
+		    if(op.configurations && op.configurations.configuration) {
+			for(var j = 0; j < op.configurations.configuration.length; ++j) {
+			    var config = op.configurations.configuration[j];
+			    if(config.key == "target-smil-flavor") {
+				this.targetSmilFlavor = config.$;
+			    }
+			}
+		    }
+		}
+	    }
+	}
 	this.configurations = this.workflow.workflow.configurations;
 	this.errors = this.workflow.workflow.errors;
     }

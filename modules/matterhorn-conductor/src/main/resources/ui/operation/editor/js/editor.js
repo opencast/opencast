@@ -27,6 +27,7 @@ var WORKFLOW_INSTANCE_SUFFIX_JSON = ".json";
 var WORKFLOW_INSTANCE_SUFFIX_XML = ".xml";
 var SMIL_FLAVOR_PRESENTER = "presenter/smil";
 var SMIL_FLAVOR_PRESENTATION = "presentation/smil";
+var SMIL_FLAVOR_EPISODE = "episode/smil"; // read in from configuration key "target-smil-flavor"
 var WAVEFORM_FLAVOR_PRESENTER = "presenter/waveform";
 var WAVEFORM_FLAVOR_PRESENTATION = "presentation/waveform";
 
@@ -157,7 +158,8 @@ editor.parseWorkflow = function (jsonData) {
         ocUtils.log("Parsing workflow instance...");
         try {
             editor.workflowParser = new $.workflowParser(jsonData);
-            editor.workflowParser;
+	    SMIL_FLAVOR_EPISODE = editor.workflowParser.targetSmilFlavor;
+	    console.log("Set target smil flavor to " + SMIL_FLAVOR_EPISODE);
         } catch (e) {
             ocUtils.log("Error: Could not parse workflow instance...");
             editor.error = true;
@@ -178,7 +180,7 @@ editor.parseMediapackage = function (jsonData) {
     if (!editor.error) {
         ocUtils.log("Parsing mediapackage...");
         try {
-            editor.mediapackageParser = new $.mediapackageParser(jsonData);
+            editor.mediapackageParser = new $.mediapackageParser(jsonData, SMIL_FLAVOR_EPISODE);
             editor.mediapackageParser;
         } catch (e) {
             ocUtils.log("Error: Could not parse mediapackage...");
@@ -440,19 +442,16 @@ editor.saveSplitListHelper = function (startAtIndex) {
                         if (data && data.workflow && data.workflow.state) {
                             if (data.workflow.state.toLowerCase() == "paused") {
                                 // generate a random mediapackage element ID
-                                if (editor.mediapackageParser && editor.mediapackageParser.smil_id && editor.mediapackageParser.id) {
-                                    var mpElementID = editor.mediapackageParser.smil_id; // Math.floor((Math.random()*1000)+1);
-
+                                if (editor.mediapackageParser && editor.mediapackageParser.id && editor.mediapackageParser.smil_episode_id) {
                                     // define a boundary -- stole this from Chrome
                                     var boundary = "----WebKitFormBoundaryvasZVBiO9iHRlTvY";
                                     // define the request payload
                                     var body = '--' + boundary + '\r\n' + 'Content-Disposition: form-data; name="mediaPackageID"\r\n' + '\r\n' + editor.mediapackageParser.id + '\r\n' + boundary + '\r\n';
                                     body +=
-                                        'Content-Disposition: form-data; name="mediaPackageElementID"\r\n' + '\r\n' + mpElementID + '\r\n' + '--' + boundary + '\r\n';
+                                        'Content-Disposition: form-data; name="mediaPackageElementID"\r\n' + '\r\n' + editor.mediapackageParser.smil_episode_id + '\r\n' + '--' + boundary + '\r\n';
                                     body +=
                                     // parameter name "file", local filename "smil.smil"
                                     'Content-Disposition: form-data; name="file"; filename="smil.smil"\r\n' + 'Content-Type: application/smil\r\n' + '\r\n' + editor.smil + '\r\n' + '--' + boundary + '--' + '\r\n';
-
                                     $.ajax({
                                         type: "POST",
                                         contentType: "multipart/form-data; boundary=" + boundary,
@@ -460,7 +459,7 @@ editor.saveSplitListHelper = function (startAtIndex) {
                                         url: FILE_PATH +
                                             FILE_MEDIAPACKAGE_PATH +
                                             "/" + editor.mediapackageParser.id +
-                                            "/" + mpElementID
+                                            "/" + editor.mediapackageParser.smil_episode_id
                                     }).done(function (data) {
                                         ocUtils.log("Done");
                                         ocUtils.log("Continuing workflow...");
@@ -2186,6 +2185,7 @@ function playerReady() {
         if (workflowInstance.mediapackage && workflowInstance.mediapackage.metadata && workflowInstance.mediapackage.metadata.catalog) {
 	    var presenter_smil = false;
 	    var presentation_smil = false;
+	    var episode_smil = false;
             $.each(workflowInstance.mediapackage.metadata.catalog, function (key, value) {
                 // load smil if there is already one
                 if (value.type == SMIL_FLAVOR_PRESENTER) {
@@ -2194,9 +2194,12 @@ function playerReady() {
                 } else if(value.type == SMIL_FLAVOR_PRESENTATION) {
 		    presentation_smil = true;
 		    console.log("Found presentation smil");
+                } else if(value.type == SMIL_FLAVOR_EPISODE) {
+		    episode_smil = true;
+		    console.log("Found episode smil");
                 }
             });
-	    if(presenter_smil || presentation_smil) {
+	    if(presenter_smil || presentation_smil || episode_smil) {
 		// download smil
 		editor.getSmil(function () {
                     parseInitialSMIL();
