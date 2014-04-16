@@ -12,10 +12,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-$.mediapackageParser = function(mediapackage)
+$.mediapackageParser = function(mediapackage, smiltype_episode)
 {
-    var SMILTYPE = "smil/smil";
+    var SMILTYPE_PRESENTER = "presenter/smil";
+    var SMILTYPE_PRESENTATION = "presentation/smil";
+    var SMILTYPE_EPISODE = smiltype_episode || "episode/smil";
     var SMIL = "";
+    var SMIL_EPISODE = "";
 
     this.mediapackage = mediapackage;
 	
@@ -31,20 +34,43 @@ $.mediapackageParser = function(mediapackage)
 	this.attachments = this.mediapackage.attachments;
 	
 	this.smil = "";
+	this.smil_episode = "";
 	this.smil_id = -1;
+	this.smil_episode_id = -1;
 	this.smil_mimetype = "";
 	this.smil_tags = "";
 	this.smil_type = "";
 	this.smil_url = "";
 
 	if(this.metadata.catalog) {
+	    var smil_presenter = undefined;
+	    var smil_presentation = undefined;
+	    var smil_episode = undefined;
 	    $.each(this.metadata.catalog, function(index, value) {
-		    if(value.type.indexOf(SMILTYPE) != -1) {
-			SMIL = value;
-		    }
-		});
+		if(value.type.indexOf(SMILTYPE_PRESENTER) != -1) {
+		    smil_presenter = value;
+		} else if(value.type.indexOf(SMILTYPE_PRESENTATION) != -1) {
+		    smil_presentation = value;
+		} else if(value.type.indexOf(SMILTYPE_EPISODE) != -1) {
+		    smil_episode = value;
+		}
+	    });
+	    if(smil_presenter != undefined) {
+		SMIL = smil_presenter;
+	    } else if(smil_presentation != undefined) {
+		SMIL = smil_presentation;
+	    }
+	    if(smil_episode != undefined) {
+		SMIL_EPISODE = smil_episode;
+	    }
 	    this.smil = SMIL;
-	    this.smil_id = this.smil.id;
+	    this.smil_episode = SMIL_EPISODE;
+	    if(this.smil.id) {
+		this.smil_id = this.smil.id;
+	    }
+	    if(this.smil_episode.id) {
+		this.smil_episode_id = this.smil_episode.id;
+	    }
 	    this.smil_mimetype = this.smil.mimetype;
 	    this.smil_tags = this.smil.tags;
 	    this.smil_type = this.smil.type;
