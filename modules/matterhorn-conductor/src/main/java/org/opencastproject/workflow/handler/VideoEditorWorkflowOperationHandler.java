@@ -373,6 +373,26 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     try {
       smilFile = workspace.get(smilCatalogs[0].getURI());
       smil = smilService.fromXml(smilFile).getSmil();
+      smil = replaceAllTracksWith(smil, sourceTracks.toArray(new Track[sourceTracks.size()]));
+      
+      InputStream is = null;
+      try {
+        is = IOUtils.toInputStream(smil.toXML());
+        // remove old smil
+        workspace.delete(mp.getIdentifier().compact(), smilCatalogs[0].getIdentifier());
+        mp.remove(smilCatalogs[0]);
+        // put modified smil into workspace
+        URI newSmilUri = workspace.put(mp.getIdentifier().compact(), smil.getId(), SMIL_FILE_NAME, is);
+        Catalog catalog = (Catalog) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
+                .elementFromURI(newSmilUri, MediaPackageElement.Type.Catalog, smilCatalogs[0].getFlavor());
+        catalog.setIdentifier(smil.getId());
+        mp.add(catalog);
+      } catch (Exception ex) {
+        throw new WorkflowOperationException(ex);
+      } finally {
+        IOUtils.closeQuietly(is);
+      }
+      
     } catch (NotFoundException ex) {
       throw new WorkflowOperationException(String.format(
               "Failed to get smil catalog %s from mediapackage %s.", 
