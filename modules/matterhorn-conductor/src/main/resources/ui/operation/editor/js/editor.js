@@ -46,6 +46,8 @@ var NEXT_MARKER = "trim.next_marker";
 var PREVIOUS_MARKER = "trim.previous_marker";
 var PLAY_ENDING_OF_CURRENT_SEGMENT = "trim.play_ending_of_current_segment";
 
+var parElementTimeoutTime = 10; // ms
+
 // key codes
 var KEY_ENTER = 13;
 var KEY_SPACE = 32;
@@ -387,7 +389,9 @@ editor.addPar = function (currParIndex) {
                 }
                 if (!error) {
                     ocUtils.log("Continuing with next par element...");
-                    editor.saveSplitListHelper(currParIndex + 1);
+		    window.setTimeout(function() {
+			editor.saveSplitListHelper(currParIndex + 1);
+		    }, parElementTimeoutTime);
                 }
             }).fail(function (e) {
                 ocUtils.log("Error: Could not get workflow instance");
