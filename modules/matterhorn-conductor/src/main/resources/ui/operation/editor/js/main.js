@@ -134,13 +134,11 @@ $(document)
                     workflowInstance = data.workflow;
                     data = data.workflow.mediapackage.media.track;
                     var singleFile = true;
-		    var index;
                     for (i = 0; i < data.length; i++) {
-			index = (data[i].type.indexOf("presentation") != -1) ? 1 : 0;
                         if (data[i].type.indexOf("work") != -1) {
-			    tracks.tracks[index] = data[i];
+			    tracks.tracks.push(data[i]);
                         } else if (data[i].type.indexOf("preview") != -1) {
-			    previewTracks[index] = data[i];
+			    previewTracks.push(data[i]);
                         }
                     }
 
