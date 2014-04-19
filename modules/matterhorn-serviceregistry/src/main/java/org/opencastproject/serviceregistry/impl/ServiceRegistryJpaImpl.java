@@ -1392,7 +1392,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Gets jobs of all types that are in the {@value Status#QUEUED} state and are dispatchable.
+   * Gets jobs of all types that are in the {@value Status#QUEUED} and {@value Status#RESTART} state.
    * 
    * @param em
    *          the entity manager
@@ -2398,6 +2398,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           jobsStatistics.updateJobCount(getCountPerHostService(em));
         }
 
+        // Make sure dispatching is happening in an ideal order
+        Collections.sort(jobsToDispatch, new DispatchableComparator());
+
         for (Job job : jobsToDispatch) {
 
           // Remember the job type
@@ -2451,8 +2454,25 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               // That's ok
             }
 
-            if (parentJob == null || TYPE_WORKFLOW.equals(jobType)) {
-              logger.trace("Using limited list of services for dispatching of {} to a service of type '{}'", job,
+            // When a job A starts a series of child jobs, then those child jobs should only be dispatched at the
+            // same time if there is processing capacity available.
+            boolean parentHasRunningChildren = false;
+            if (parentJob != null) {
+              List<Job> childJobs = getChildJobs(parentJob.getId());
+              if (childJobs != null) {
+                for (Job child : childJobs) {
+                  if (Job.Status.RUNNING.equals(child.getStatus())) {
+                    parentHasRunningChildren = true;
+                    break;
+                  }
+                }
+              }
+            }
+
+            // If this is a root job (a new workflow or a new workflow operation), then only dispatch if there is
+            // capacity, i. e. the workflow service is ok dispatching the next workflow or the next workflow operation.
+            if (parentJob == null || TYPE_WORKFLOW.equals(jobType) || parentHasRunningChildren) {
+              logger.trace("Using available capacity only for dispatching of {} to a service of type '{}'", job,
                       jobType);
               candidateServices = getServiceRegistrationsWithCapacity(jobType, services, hosts, hostLoads);
             } else {
@@ -2624,6 +2644,35 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           return -1;
       }
       return loadByHost.get(hostA) - loadByHost.get(hostB);
+    }
+
+  }
+
+  /**
+   * Comparator that will sort jobs according to their status. Those that were restarted are on top, those that are
+   * queued are next.
+   */
+  private static final class DispatchableComparator implements Comparator<Job> {
+
+    @Override
+    public int compare(Job jobA, Job jobB) {
+
+      // Jobs that are in "restart" mode should be handled first
+      if (Job.Status.RESTART.equals(jobA.getStatus())) {
+        return 1;
+      } else if (Job.Status.RESTART.equals(jobB.getStatus())) {
+        return -1;
+      }
+
+      // Regular jobs should be processed prior to workflow and workflow operation jobs
+      if (TYPE_WORKFLOW.equals(jobA.getJobType()) && !TYPE_WORKFLOW.equals(jobB.getJobType())) {
+        return -1;
+      } else if (TYPE_WORKFLOW.equals(jobB.getJobType()) && !TYPE_WORKFLOW.equals(jobA.getJobType())) {
+        return 1;
+      }
+
+      // undecided
+      return 0;
     }
 
   }
