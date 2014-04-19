@@ -424,7 +424,8 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
           try {
             Job job = serviceRegistry.getJob(j.getId());
             catalog = (Catalog) MediaPackageElementParser.getFromXml(job.getPayload());
-            workspace.delete(catalog.getURI());
+            if (catalog != null)
+              workspace.delete(catalog.getURI());
           } catch (Exception e) {
             logger.warn("Unable to delete temporary text file {}: {}", catalog.getURI(), e);
           }
