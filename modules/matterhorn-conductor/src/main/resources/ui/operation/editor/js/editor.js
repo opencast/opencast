@@ -25,8 +25,11 @@ var FILE_MEDIAPACKAGE_PATH = "/mediapackage";
 
 var WORKFLOW_INSTANCE_SUFFIX_JSON = ".json";
 var WORKFLOW_INSTANCE_SUFFIX_XML = ".xml";
-var SMIL_FLAVOR = "smil/smil";
-var WAVEFORM_FLAVOR = "image/waveform";
+var SMIL_FLAVOR_PRESENTER = "presenter/smil";
+var SMIL_FLAVOR_PRESENTATION = "presentation/smil";
+var SMIL_FLAVOR_EPISODE = "episode/smil"; // read in from configuration key "target-smil-flavor"
+var WAVEFORM_FLAVOR_PRESENTER = "presenter/waveform";
+var WAVEFORM_FLAVOR_PRESENTATION = "presentation/waveform";
 
 var PREVIOUS_FRAME = "trim.previous_frame";
 var NEXT_FRAME = "trim.next_frame";
@@ -42,6 +45,8 @@ var DELETE_SELECTED_ITEM = "trim.delete_selected_segment";
 var NEXT_MARKER = "trim.next_marker";
 var PREVIOUS_MARKER = "trim.previous_marker";
 var PLAY_ENDING_OF_CURRENT_SEGMENT = "trim.play_ending_of_current_segment";
+
+var parElementTimeoutTime = 10; // ms
 
 // key codes
 var KEY_ENTER = 13;
@@ -155,7 +160,8 @@ editor.parseWorkflow = function (jsonData) {
         ocUtils.log("Parsing workflow instance...");
         try {
             editor.workflowParser = new $.workflowParser(jsonData);
-            editor.workflowParser;
+	    SMIL_FLAVOR_EPISODE = editor.workflowParser.targetSmilFlavor;
+	    console.log("Set target smil flavor to " + SMIL_FLAVOR_EPISODE);
         } catch (e) {
             ocUtils.log("Error: Could not parse workflow instance...");
             editor.error = true;
@@ -176,7 +182,7 @@ editor.parseMediapackage = function (jsonData) {
     if (!editor.error) {
         ocUtils.log("Parsing mediapackage...");
         try {
-            editor.mediapackageParser = new $.mediapackageParser(jsonData);
+            editor.mediapackageParser = new $.mediapackageParser(jsonData, SMIL_FLAVOR_EPISODE);
             editor.mediapackageParser;
         } catch (e) {
             ocUtils.log("Error: Could not parse mediapackage...");
@@ -383,7 +389,9 @@ editor.addPar = function (currParIndex) {
                 }
                 if (!error) {
                     ocUtils.log("Continuing with next par element...");
-                    editor.saveSplitListHelper(currParIndex + 1);
+		    window.setTimeout(function() {
+			editor.saveSplitListHelper(currParIndex + 1);
+		    }, parElementTimeoutTime);
                 }
             }).fail(function (e) {
                 ocUtils.log("Error: Could not get workflow instance");
@@ -438,19 +446,16 @@ editor.saveSplitListHelper = function (startAtIndex) {
                         if (data && data.workflow && data.workflow.state) {
                             if (data.workflow.state.toLowerCase() == "paused") {
                                 // generate a random mediapackage element ID
-                                if (editor.mediapackageParser && editor.mediapackageParser.smil_id && editor.mediapackageParser.id) {
-                                    var mpElementID = editor.mediapackageParser.smil_id; // Math.floor((Math.random()*1000)+1);
-
+                                if (editor.mediapackageParser && editor.mediapackageParser.id && editor.mediapackageParser.smil_episode_id) {
                                     // define a boundary -- stole this from Chrome
                                     var boundary = "----WebKitFormBoundaryvasZVBiO9iHRlTvY";
                                     // define the request payload
                                     var body = '--' + boundary + '\r\n' + 'Content-Disposition: form-data; name="mediaPackageID"\r\n' + '\r\n' + editor.mediapackageParser.id + '\r\n' + boundary + '\r\n';
                                     body +=
-                                        'Content-Disposition: form-data; name="mediaPackageElementID"\r\n' + '\r\n' + mpElementID + '\r\n' + '--' + boundary + '\r\n';
+                                        'Content-Disposition: form-data; name="mediaPackageElementID"\r\n' + '\r\n' + editor.mediapackageParser.smil_episode_id + '\r\n' + '--' + boundary + '\r\n';
                                     body +=
                                     // parameter name "file", local filename "smil.smil"
                                     'Content-Disposition: form-data; name="file"; filename="smil.smil"\r\n' + 'Content-Type: application/smil\r\n' + '\r\n' + editor.smil + '\r\n' + '--' + boundary + '--' + '\r\n';
-
                                     $.ajax({
                                         type: "POST",
                                         contentType: "multipart/form-data; boundary=" + boundary,
@@ -458,7 +463,7 @@ editor.saveSplitListHelper = function (startAtIndex) {
                                         url: FILE_PATH +
                                             FILE_MEDIAPACKAGE_PATH +
                                             "/" + editor.mediapackageParser.id +
-                                            "/" + mpElementID
+                                            "/" + editor.mediapackageParser.smil_episode_id
                                     }).done(function (data) {
                                         ocUtils.log("Done");
                                         ocUtils.log("Continuing workflow...");
@@ -1939,53 +1944,70 @@ function prepareUI() {
 
     // try to load waveform image
     if (editor.mediapackageParser && editor.mediapackageParser.mediapackage && editor.mediapackageParser.mediapackage.attachments) {
-        ocUtils.log("Found waveform");
+	var waveform_presenter = false;
+	var waveform_presentation = false;
+	var waveform_presenter_value;
+	var waveform_presentation_value;
         $.each(ocUtils.ensureArray(editor.mediapackageParser.mediapackage.attachments.attachment), function (key, value) {
-            if (value.type == WAVEFORM_FLAVOR) {
-                $('#waveformImage').prop("src", value.url);
-                $('#waveformImage').load(function () {
+            if (value.type == WAVEFORM_FLAVOR_PRESENTER) {
+		ocUtils.log("Found waveform presenter");
+		waveform_presenter = true;
+		waveform_presenter_value = value;
+            } else if (value.type == WAVEFORM_FLAVOR_PRESENTATION) {
+		ocUtils.log("Found waveform presentation");
+		waveform_presentation = true;
+		waveform_presentation_value = value;
+            }
+        });
+	var value = waveform_presenter ? waveform_presenter_value : (waveform_presentation ? waveform_presentation_value : undefined);
+	if(waveform_presenter || waveform_presentation) {
+            $('#waveformImage').prop("src", value.url);
+            $('#waveformImage').load(function () {
+                $('#segmentsWaveform').height($('#waveformImage').height());
+                $('#segmentsWaveform').width($('#videoHolder').width());
+                initialWaveformWidth = $('#segmentsWaveform').width();
+                currentWaveformWidth = initialWaveformWidth;
+                updateWaveformClickEvent();
+                currWaveformZoom = 1;
+                waveformImageLoadDone = true;
+                $("#slider-waveform-zoom").slider({
+                    range: "min",
+                    value: 1,
+                    min: 1,
+                    max: maxWaveformZoomSlider,
+                    slide: function (event, ui) {
+                        setWaveformWidth(ui.value);
+                    },
+                    stop: function (event, ui) {
+                        if (zoomedIn()) {
+                            editor.updateSplitList(false, false);
+                        } else {
+                            editor.updateSplitList(false, true);
+                        }
+			selectCurrentSplitItem();
+                    }
+                });
+                $("#waveformControls").show();
+		$("#slider-waveform-zoom .ui-slider-handle").unbind('keydown');
+            });
+            $(window).resize(function (evt) {
+                if (waveformImageLoadDone) {
                     $('#segmentsWaveform').height($('#waveformImage').height());
                     $('#segmentsWaveform').width($('#videoHolder').width());
                     initialWaveformWidth = $('#segmentsWaveform').width();
                     currentWaveformWidth = initialWaveformWidth;
                     updateWaveformClickEvent();
                     currWaveformZoom = 1;
-                    waveformImageLoadDone = true;
-                    $("#slider-waveform-zoom").slider({
-                        range: "min",
-                        value: 1,
-                        min: 1,
-                        max: maxWaveformZoomSlider,
-                        slide: function (event, ui) {
-                            setWaveformWidth(ui.value);
-                        },
-                        stop: function (event, ui) {
-                            if (zoomedIn()) {
-                                editor.updateSplitList(false, false);
-                            } else {
-                                editor.updateSplitList(false, true);
-                            }
-			    selectCurrentSplitItem();
-                        }
-                    });
-                    $("#waveformControls").show();
-		    $("#slider-waveform-zoom .ui-slider-handle").unbind('keydown');
-                });
-                $(window).resize(function (evt) {
-                    if (waveformImageLoadDone) {
-                        $('#segmentsWaveform').height($('#waveformImage').height());
-                        $('#segmentsWaveform').width($('#videoHolder').width());
-                        initialWaveformWidth = $('#segmentsWaveform').width();
-                        currentWaveformWidth = initialWaveformWidth;
-                        updateWaveformClickEvent();
-                        currWaveformZoom = 1;
-                        $("#slider-waveform-zoom").slider("option", "value", 1);
-                        $('.holdStateUI').height($('#segmentsWaveform').height() + $('#videoPlayer').height() + 70);
-                        setWaveformWidth(currWaveformZoom);
-                    }
-                });
-            }
-        });
+                    $("#slider-waveform-zoom").slider("option", "value", 1);
+                    $('.holdStateUI').height($('#segmentsWaveform').height() + $('#videoPlayer').height() + 70);
+                    setWaveformWidth(currWaveformZoom);
+                }
+            });
+	} else {
+            ocUtils.log("Did not find waveform");
+            $('#waveformImage').hide();
+            $('#slider-waveform-zoom').hide();
+	}
     } else {
         ocUtils.log("Did not find waveform");
         $('#waveformImage').hide();
@@ -2165,16 +2187,28 @@ function playerReady() {
         editor.smil = null;
         editor.parsedSmil = null;
         if (workflowInstance.mediapackage && workflowInstance.mediapackage.metadata && workflowInstance.mediapackage.metadata.catalog) {
+	    var presenter_smil = false;
+	    var presentation_smil = false;
+	    var episode_smil = false;
             $.each(workflowInstance.mediapackage.metadata.catalog, function (key, value) {
                 // load smil if there is already one
-                if (value.type == SMIL_FLAVOR) {
-                    // download smil
-                    // mediapackage: smil/smil
-                    editor.getSmil(function () {
-                        parseInitialSMIL();
-                    });
+                if (value.type == SMIL_FLAVOR_PRESENTER) {
+		    presenter_smil = true;
+		    console.log("Found presenter smil");
+                } else if(value.type == SMIL_FLAVOR_PRESENTATION) {
+		    presentation_smil = true;
+		    console.log("Found presentation smil");
+                } else if(value.type == SMIL_FLAVOR_EPISODE) {
+		    episode_smil = true;
+		    console.log("Found episode smil");
                 }
             });
+	    if(presenter_smil || presentation_smil || episode_smil) {
+		// download smil
+		editor.getSmil(function () {
+                    parseInitialSMIL();
+		});
+	    }
         }
     }
 }

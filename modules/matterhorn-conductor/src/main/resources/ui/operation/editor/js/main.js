@@ -136,9 +136,9 @@ $(document)
                     var singleFile = true;
                     for (i = 0; i < data.length; i++) {
                         if (data[i].type.indexOf("work") != -1) {
-                            tracks.tracks.push(data[i]);
+			    tracks.tracks.push(data[i]);
                         } else if (data[i].type.indexOf("preview") != -1) {
-                            previewTracks.push(data[i]);
+			    previewTracks.push(data[i]);
                         }
                     }
 
