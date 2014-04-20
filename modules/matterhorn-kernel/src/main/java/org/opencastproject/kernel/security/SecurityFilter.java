@@ -107,7 +107,15 @@ public final class SecurityFilter implements Filter {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
           ServletException {
+
+    // Make sure we have an organization
     Organization org = securityService.getOrganization();
+    if (org == null) {
+      ((HttpServletResponse) response).sendError(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    }
+
+    // Get a hold of the security filter for that organization
     Filter filter = orgSecurityFilters.get(org.getId());
     if (filter == null) {
       ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
