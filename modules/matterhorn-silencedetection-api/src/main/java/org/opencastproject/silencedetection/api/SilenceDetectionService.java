@@ -23,21 +23,21 @@ import org.opencastproject.mediapackage.Track;
  * SilenceDetectionService detect silent seqences in audio tracks.
  */
 public interface SilenceDetectionService {
-  
+
   /**
    * ServiceRegistry job type.
    */
   String JOB_TYPE = "org.opencastproject.silencedetection";
-  
+
   /**
    * Run silence detection on audio (visual) file.
    * 
    * @param sourceTrack track to detect non silent segments from
    * @return Job detection job
    * @throws SilenceDetectionFailedException if fails
-   */ 
+   */
   Job detect(Track sourceTrack) throws SilenceDetectionFailedException;
-  
+
   /**
    * Run silence detection on audio (visual) file.
    * 
@@ -45,6 +45,6 @@ public interface SilenceDetectionService {
    * @param referenceTracks tracks to reference in smil file instead of sourceTrack
    * @return Job detection job
    * @throws SilenceDetectionFailedException if fails
-   */ 
+   */
   Job detect(Track sourceTrack, Track[] referenceTracks) throws SilenceDetectionFailedException;
 }

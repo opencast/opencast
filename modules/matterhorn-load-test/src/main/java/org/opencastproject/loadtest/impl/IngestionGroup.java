@@ -34,7 +34,7 @@ public class IngestionGroup {
 
   /**
    * This is a collection of ingests that will all be run at the same time.
-   * 
+   *
    * @param numberOfIngests
    *          The number of ingests that we will be executing at the same time.
    * @param delayToIngest
@@ -57,11 +57,11 @@ public class IngestionGroup {
       thread.start();
     }
   }
-  
-  
+
+
   /**
-   * 
-   * @return The ingest jobs that will be executed at the same time.  
+   *
+   * @return The ingest jobs that will be executed at the same time.
    */
   public Collection<IngestJob> getJobs() {
     return ingestJobs;

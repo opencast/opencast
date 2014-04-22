@@ -44,7 +44,7 @@ public final class Param {
 
   /**
    * Create a parameter for this endpoint, the thing you are adding it to indicates if required or optional
-   * 
+   *
    * @param name
    *          the parameter name (this is the parameter itself)
    * @param type
@@ -60,7 +60,7 @@ public final class Param {
 
   /**
    * Create a parameter for this endpoint, the thing you are adding it to indicates if required or optional
-   * 
+   *
    * @param name
    *          the parameter name (this is the parameter itself)
    * @param type
@@ -110,7 +110,7 @@ public final class Param {
 
   /**
    * Attributes are used for adjusting rendering of form elements related to this parameter
-   * 
+   *
    * @param key
    *          the attribute key (e.g. size)
    * @param value
@@ -174,7 +174,7 @@ public final class Param {
   public boolean isPath() {
     return path;
   }
-  
+
   public void setPath(boolean path) {
     this.path = path;
   }

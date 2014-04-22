@@ -6,15 +6,17 @@ set -x
 source "${HOME3P}/utilx"
 [ $? -ne 0 ] && exit 1
 #
-cleanup .       "$1" || exit 1
-cleanup jam     "$1" || exit 1
-cleanup yasm    "$1" || exit 1
-cleanup pthread "$1" || exit 1
-cleanup rand48  "$1" || exit 1
-cleanup scons   "$1" || exit 1
-cleanup zlib    "$1" || exit 1
-cleanup jpeg    "$1" || exit 1
-cleanup png     "$1" || exit 1
-cleanup tiff    "$1" || exit 1
+cleanup .         "$1" || exit 1
+cleanup jam       "$1" || exit 1
+cleanup yasm      "$1" || exit 1
+cleanup pthread   "$1" || exit 1
+cleanup rand48    "$1" || exit 1
+cleanup scons     "$1" || exit 1
+cleanup zlib      "$1" || exit 1
+cleanup jpeg      "$1" || exit 1
+cleanup png       "$1" || exit 1
+cleanup tiff      "$1" || exit 1
+cleanup gif       "$1" || exit 1
+cleanup leptonica "$1" || exit 1
 #
 exit 0

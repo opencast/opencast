@@ -32,11 +32,11 @@ import org.slf4j.LoggerFactory;
  * @author wsmirnow
  */
 public class SilenceDetectorTest extends GstreamerAbstractTest {
-  
+
   private static final Logger logger = LoggerFactory.getLogger(SilenceDetectorTest.class);
-  
+
   private static boolean gstreamerInstalled = true;
-  
+
   @BeforeClass
   public static void setUpClass() throws Exception {
     try {
@@ -45,11 +45,11 @@ public class SilenceDetectorTest extends GstreamerAbstractTest {
       gstreamerInstalled = false;
       logger.info("Unable to initialize gstreamer: {}", e.getMessage());
     }
-        
+
     /* gstreamer-core */
     if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.FILESRC)) {
       gstreamerInstalled = false;
-      
+
       logger.info("Skip tests because gstreamer-base is not installed!");
       return;
     }
@@ -62,27 +62,27 @@ public class SilenceDetectorTest extends GstreamerAbstractTest {
     /* gstreamer-plugins-good */
     if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.CUTTER)) {
       gstreamerInstalled = false;
-      
+
       logger.info("Skip tests because gstreamer-plugins-good is not installed!");
       return;
     }
   }
-  
+
   @Test
   public void detectorTest() {
     if (!gstreamerInstalled) return;
-    
+
     logger.info("segmenting audio file '{}'...", audioFilePath);
     try {
       GstreamerSilenceDetector silenceDetector = new GstreamerSilenceDetector(new Properties(), "track-1", audioFilePath);
       Assert.assertNull(silenceDetector.getMediaSegments());
-      
+
       silenceDetector.runDetection();
-      
+
       MediaSegments segments = silenceDetector.getMediaSegments();
       Assert.assertNotNull(segments);
       Assert.assertTrue(segments.getMediaSegments().size() > 0);
-      
+
       logger.info("segments found:");
       for (MediaSegment segment : segments.getMediaSegments()) {
         Assert.assertTrue(segment.getSegmentStart() < segment.getSegmentStop());
@@ -93,34 +93,34 @@ public class SilenceDetectorTest extends GstreamerAbstractTest {
           Long.toString(segment.getSegmentStop())
         });
       }
-      
+
     } catch (SilenceDetectionFailedException ex) {
       Assert.fail();
     } catch (PipelineBuildException ex) {
       Assert.fail();
     }
   }
-  
+
   @Test
   public void detectorSingleSegmentTest() {
     if (!gstreamerInstalled) return;
-    
+
     logger.info("segmenting audio file '{}' with minimum silence length of 30 sec...", audioFilePath);
-    
+
     Properties properties = new Properties();
     properties.setProperty(SilenceDetectionProperties.SILENCE_MIN_LENGTH, "30");
     // properties.setProperty(SilenceDetectionProperties.SILENCE_THRESHOLD_DB, "-75");
-    
+
     try {
       GstreamerSilenceDetector silenceDetector = new GstreamerSilenceDetector(properties, "track-1", audioFilePath);
       Assert.assertNull(silenceDetector.getMediaSegments());
-      
+
       silenceDetector.runDetection();
-      
+
       MediaSegments segments = silenceDetector.getMediaSegments();
       Assert.assertNotNull(segments);
       Assert.assertTrue(segments.getMediaSegments().size() == 1);
-      
+
       MediaSegment segment = segments.getMediaSegments().get(0);
       Assert.assertTrue(segment.getSegmentStart() < segment.getSegmentStop());
       logger.info("segments found:");
@@ -130,14 +130,14 @@ public class SilenceDetectorTest extends GstreamerAbstractTest {
         ClockTime.fromMillis(segment.getSegmentStop()).toString(),
         Long.toString(segment.getSegmentStop())
       });
-            
+
     } catch (SilenceDetectionFailedException ex) {
       Assert.fail();
     } catch (PipelineBuildException ex) {
       Assert.fail();
     }
   }
-  
+
   @Test(expected = SilenceDetectionFailedException.class)
   public void detectorFailTest() throws SilenceDetectionFailedException {
     if (!gstreamerInstalled) return;
@@ -146,10 +146,10 @@ public class SilenceDetectorTest extends GstreamerAbstractTest {
     try {
       GstreamerSilenceDetector silenceDetector = new GstreamerSilenceDetector(new Properties(), "track-1", videoFilePath);
       Assert.assertNull(silenceDetector.getMediaSegments());
-      
+
       silenceDetector.runDetection();
       Assert.fail();
-      
+
     } catch (PipelineBuildException ex) {
       Assert.fail();
     }

@@ -15,8 +15,9 @@
  */
 package org.opencastproject.composer.impl;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EmbedderEngine;
 import org.opencastproject.composer.api.EmbedderEngineFactory;
@@ -25,6 +26,10 @@ import org.opencastproject.composer.api.EncoderEngine;
 import org.opencastproject.composer.api.EncoderEngineFactory;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
+import org.opencastproject.composer.api.LaidOutElement;
+import org.opencastproject.composer.layout.Dimension;
+import org.opencastproject.composer.layout.Layout;
+import org.opencastproject.composer.layout.Serializer;
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -46,10 +51,16 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +71,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -67,9 +80,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 /** FFMPEG based implementation of the composer service api. */
 public class ComposerServiceImpl extends AbstractJobProducer implements ComposerService {
@@ -82,7 +92,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /** List of available operations on jobs */
   private enum Operation {
-    Caption, Encode, Image, ImageConversion, Mux, Trim, Watermark
+    Caption, Encode, Image, ImageConversion, Mux, Trim, Watermark, Composite, Concat, ImageToVideo
   }
 
   /** Encoding profile manager */
@@ -227,25 +237,20 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           returnURL = workspace.putInCollection(COLLECTION,
                   job.getId() + "." + FilenameUtils.getExtension(encodingOutput.getAbsolutePath()), in);
           logger.info("Copied the encoded file to the workspace at {}", returnURL);
-          if (encodingOutput.delete()) {
-            logger.info("Deleted the local copy of the encoded file at {}", encodingOutput.getAbsolutePath());
-          } else {
-            logger.warn("Unable to delete the encoding output at {}", encodingOutput);
-          }
         } catch (Exception e) {
+          cleanup(encodingOutput);
+          cleanupWorkspace(returnURL);
           throw new EncoderException("Unable to put the encoded file into the workspace", e);
         } finally {
           IOUtils.closeQuietly(in);
         }
 
+        cleanup(encodingOutput);
+
         // Have the encoded track inspected and return the result
         Job inspectionJob = null;
         try {
-          inspectionJob = inspectionService.inspect(returnURL);
-          JobBarrier barrier = new JobBarrier(serviceRegistry, inspectionJob);
-          if (!barrier.waitForJobs().isSuccess()) {
-            throw new EncoderException("Media inspection of " + returnURL + " failed");
-          }
+          inspectionJob = inspect(returnURL);
         } catch (MediaInspectionException e) {
           throw new EncoderException("Media inspection of " + returnURL + " failed", e);
         }
@@ -301,9 +306,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param profileId
    *          the encoding profile identifier
    * @param start
-   *          the trimming in-point
+   *          the trimming in-point in millis
    * @param duration
-   *          the trimming duration
+   *          the trimming duration in millis
    * @return the trimmed track or none if the operation does not return a track. This may happen for example when doing
    *         two pass encodings where the first pass only creates metadata for the second one
    * @throws EncoderException
@@ -346,27 +351,22 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           returnURL = workspace.putInCollection(COLLECTION,
                   job.getId() + "." + FilenameUtils.getExtension(encodingOutput.getAbsolutePath()), in);
           logger.info("Copied the trimmed file to the workspace at {}", returnURL);
-          encodingOutput.delete();
-          logger.info("Deleted the local copy of the trimmed file at {}", encodingOutput.getAbsolutePath());
         } catch (FileNotFoundException e) {
           throw new EncoderException("Encoded file " + encodingOutput + " not found", e);
         } catch (IOException e) {
+          cleanup(encodingOutput);
+          cleanupWorkspace(returnURL);
           throw new EncoderException("Error putting " + encodingOutput + " into the workspace", e);
         } finally {
           IOUtils.closeQuietly(in);
         }
-        if (encodingOutput != null)
-          encodingOutput.delete(); // clean up the encoding output, since the file is now safely stored in the file
-        // repo
+
+        cleanup(encodingOutput);
 
         // Have the encoded track inspected and return the result
         Job inspectionJob = null;
         try {
-          inspectionJob = inspectionService.inspect(returnURL);
-          JobBarrier barrier = new JobBarrier(serviceRegistry, inspectionJob);
-          if (!barrier.waitForJobs().isSuccess()) {
-            throw new EncoderException("Media inspection of " + returnURL + " failed");
-          }
+          inspectionJob = inspect(returnURL);
         } catch (MediaInspectionException e) {
           throw new EncoderException("Media inspection of " + returnURL + " failed", e);
         }
@@ -405,6 +405,502 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.composer.api.ComposerService#composite(Dimension, LaidOutElement, LaidOutElement, Option,
+   *      String, Option)
+   */
+  @Override
+  public Job composite(Dimension compositeTrackSize, LaidOutElement<Track> upperTrack,
+          LaidOutElement<Track> lowerTrack, Option<LaidOutElement<Attachment>> watermark, String profileId,
+          String background) throws EncoderException, MediaPackageException {
+    List<String> arguments = new ArrayList<String>();
+    arguments.add(0, MediaPackageElementParser.getAsXml(lowerTrack.getElement()));
+    arguments.add(1, Serializer.json(lowerTrack.getLayout()).toJson());
+    arguments.add(2, MediaPackageElementParser.getAsXml(upperTrack.getElement()));
+    arguments.add(3, Serializer.json(upperTrack.getLayout()).toJson());
+    arguments.add(4, Serializer.json(compositeTrackSize).toJson());
+    arguments.add(5, profileId);
+    arguments.add(6, background);
+    if (watermark.isSome()) {
+      LaidOutElement<Attachment> watermarkLaidOutElement = watermark.get();
+      arguments.add(7, MediaPackageElementParser.getAsXml(watermarkLaidOutElement.getElement()));
+      arguments.add(8, Serializer.json(watermarkLaidOutElement.getLayout()).toJson());
+    }
+    try {
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Composite.toString(), arguments);
+    } catch (ServiceRegistryException e) {
+      throw new EncoderException("Unable to create composite job", e);
+    }
+  }
+
+  protected Option<Track> composite(Job job, Dimension compositeTrackSize, LaidOutElement<Track> lowerLaidOutElement,
+          LaidOutElement<Track> upperLaiedOutElement, Option<LaidOutElement<Attachment>> watermarkOption,
+          String profileId, String backgroundColor) throws EncoderException, MediaPackageException {
+    if (job == null)
+      throw new EncoderException("The Job parameter must not be null");
+    if (compositeTrackSize == null)
+      throw new EncoderException("The composite track size parameter must not be null");
+    if (lowerLaidOutElement == null)
+      throw new EncoderException("The lower laid out element parameter must not be null");
+    if (upperLaiedOutElement == null)
+      throw new EncoderException("The upper laid out element parameter must not be null");
+    if (watermarkOption == null)
+      throw new EncoderException("The optional watermark laid out element parameter must not be null");
+    if (profileId == null)
+      throw new EncoderException("The profileId parameter must not be null");
+    if (backgroundColor == null)
+      throw new EncoderException("The background color parameter must not be null");
+
+    // Create the engine
+    final EncodingProfile profile = profileScanner.getProfile(profileId);
+    if (profile == null)
+      throw new EncoderException(null, "Profile '" + profileId + " is unknown");
+
+    final EncoderEngine encoderEngine = encoderEngineFactory.newEncoderEngine(profile);
+    if (encoderEngine == null)
+      throw new EncoderException(null, "No encoder engine available for profile '" + profileId + "'");
+
+    final String targetTrackId = idBuilder.createNew().toString();
+    try {
+      // Get the tracks and make sure they exist
+      final File lowerVideoFile;
+      try {
+        lowerVideoFile = workspace.get(lowerLaidOutElement.getElement().getURI());
+      } catch (NotFoundException e) {
+        throw new EncoderException("Requested lower video track " + lowerLaidOutElement.getElement() + " is not found");
+      } catch (IOException e) {
+        throw new EncoderException("Unable to access lower video track " + lowerLaidOutElement.getElement());
+      }
+
+      final File upperVideoFile;
+      try {
+        upperVideoFile = workspace.get(upperLaiedOutElement.getElement().getURI());
+      } catch (NotFoundException e) {
+        throw new EncoderException("Requested upper video track " + upperLaiedOutElement.getElement() + " is not found");
+      } catch (IOException e) {
+        throw new EncoderException("Unable to access upper video track " + upperLaiedOutElement.getElement());
+      }
+
+      File watermarkFile = null;
+      if (watermarkOption.isSome()) {
+        try {
+          watermarkFile = workspace.get(watermarkOption.get().getElement().getURI());
+        } catch (NotFoundException e) {
+          throw new EncoderException("Requested watermark image " + watermarkOption.get().getElement()
+                  + " is not found");
+        } catch (IOException e) {
+          throw new EncoderException("Unable to access right watermark image " + watermarkOption.get().getElement());
+        }
+        logger.info("Compositing lower video track {} and upper video track {} including watermark {} into {}",
+                new String[] { lowerLaidOutElement.getElement().getIdentifier(),
+                        upperLaiedOutElement.getElement().getIdentifier(),
+                        watermarkOption.get().getElement().getIdentifier(), targetTrackId });
+      } else {
+        logger.info("Compositing lower video track {} and upper video track {} into {}", new String[] {
+                lowerLaidOutElement.getElement().getIdentifier(), upperLaiedOutElement.getElement().getIdentifier(),
+                targetTrackId });
+      }
+
+      // Creating video filter command
+      String compositeCommand = buildCompositeCommand(compositeTrackSize, lowerLaidOutElement, upperLaiedOutElement,
+              watermarkOption, upperVideoFile, watermarkFile, backgroundColor);
+
+      Map<String, String> properties = new HashMap<String, String>();
+      properties.put("compositeCommand", compositeCommand);
+
+      for (File compoundFile : encoderEngine.mux(upperVideoFile, lowerVideoFile, profile, properties)) {
+        // Put the file in the workspace
+        URI returnURL = null;
+        InputStream in = null;
+        try {
+          in = new FileInputStream(compoundFile);
+          returnURL = workspace.putInCollection(COLLECTION,
+                  job.getId() + "." + FilenameUtils.getExtension(compoundFile.getAbsolutePath()), in);
+          logger.info("Copied the compound file to the workspace at {}", returnURL);
+        } catch (Exception e) {
+          cleanup(compoundFile);
+          cleanupWorkspace(returnURL);
+          throw new EncoderException("Unable to put the compound file into the workspace", e);
+        } finally {
+          IOUtils.closeQuietly(in);
+        }
+
+        cleanup(compoundFile);
+
+        // Have the compound track inspected and return the result
+        Job inspectionJob = null;
+        try {
+          inspectionJob = inspect(returnURL);
+        } catch (MediaInspectionException e) {
+          throw new EncoderException("Media inspection of " + returnURL + " failed", e);
+        }
+
+        Track inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
+        inspectedTrack.setIdentifier(targetTrackId);
+
+        if (profile.getMimeType() != null)
+          inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
+
+        return some(inspectedTrack);
+      }
+      // composite did not return a file
+      return none();
+    } catch (Exception e) {
+      logger.warn(
+              "Error compositing " + lowerLaidOutElement.getElement() + " and " + upperLaiedOutElement.getElement(), e);
+      if (e instanceof EncoderException) {
+        throw (EncoderException) e;
+      } else {
+        throw new EncoderException(e);
+      }
+    }
+  }
+
+  private String buildCompositeCommand(Dimension compositeTrackSize, LaidOutElement<Track> lowerLaidOutElement,
+          LaidOutElement<Track> upperLaiedOutElement, Option<LaidOutElement<Attachment>> watermarkOption,
+          File upperVideoFile, File watermarkFile, String backgroundColor) {
+
+    Layout lowerLayout = lowerLaidOutElement.getLayout();
+    Layout upperLayout = upperLaiedOutElement.getLayout();
+
+    String upperPosition = upperLayout.getOffset().getX() + ":" + upperLayout.getOffset().getY();
+    String lowerPosition = lowerLayout.getOffset().getX() + ":" + lowerLayout.getOffset().getY();
+
+    String scaleUpper = upperLayout.getDimension().getWidth() + ":" + upperLayout.getDimension().getHeight();
+    String scaleLower = lowerLayout.getDimension().getWidth() + ":" + lowerLayout.getDimension().getHeight();
+
+    StringBuilder sb = new StringBuilder().append("[in]scale=").append(scaleLower).append(",pad=")
+            .append(compositeTrackSize.getWidth()).append(":").append(compositeTrackSize.getHeight()).append(":")
+            .append(lowerPosition).append(":").append(backgroundColor).append("[lower];movie=")
+            .append(upperVideoFile.getAbsolutePath()).append(",scale=").append(scaleUpper).append("[upper];");
+
+    if (watermarkOption.isSome()) {
+      Layout watermarkLayout = watermarkOption.get().getLayout();
+      String watermarkPosition = watermarkLayout.getOffset().getX() + ":" + watermarkLayout.getOffset().getY();
+      // TODO scaleWatermark
+      String scaleWaterMark = watermarkLayout.getDimension().getWidth() + ":"
+              + watermarkLayout.getDimension().getHeight();
+      sb.append("movie=").append(watermarkFile.getAbsolutePath()).append("[watermark];[lower][upper]overlay=")
+              .append(upperPosition).append("[video];[video][watermark]overlay=main_w-overlay_w-")
+              .append(watermarkPosition).append("[out]");
+    } else {
+      sb.append("[lower][upper]overlay=").append(upperPosition).append("[out]");
+    }
+    return sb.toString();
+  }
+
+  private String buildConcatCommand(boolean onlyAudio, Dimension dimension, List<File> files, List<Track> tracks) {
+    StringBuilder sb = new StringBuilder();
+
+    // Add input file paths
+    for (File f : files) {
+      sb.append("-i ").append(f.getAbsolutePath()).append(" ");
+    }
+    sb.append("-filter_complex ");
+
+    boolean hasAudio = false;
+    if (!onlyAudio) {
+      // Add video scaling and check for audio
+      for (int i = 0; i < files.size(); i++) {
+        sb.append("[").append(i).append(":v]scale=iw*min(").append(dimension.getWidth()).append("/iw\\,")
+                .append(dimension.getHeight()).append("/ih):ih*min(").append(dimension.getWidth()).append("/iw\\,")
+                .append(dimension.getHeight()).append("/ih),pad=").append(dimension.getWidth()).append(":")
+                .append(dimension.getHeight()).append(":(ow-iw)/2:(oh-ih)/2").append(",setdar=")
+                .append((float) dimension.getWidth() / (float) dimension.getHeight()).append("[")
+                .append((char) ('a' + i + 1)).append("];");
+        if (tracks.get(i).hasAudio())
+          hasAudio = true;
+      }
+
+      // Add silent audio streams if at least one audio stream is available
+      if (hasAudio) {
+        for (int i = 0; i < files.size(); i++) {
+          if (!tracks.get(i).hasAudio())
+            sb.append("aevalsrc=0::d=1[silent").append(i + 1).append("];");
+        }
+      }
+    }
+
+    // Add concat segments
+    for (int i = 0; i < files.size(); i++) {
+      if (!onlyAudio)
+        sb.append("[").append((char) ('a' + i + 1)).append("]");
+
+      if (tracks.get(i).hasAudio()) {
+        sb.append("[").append(i).append(":a]");
+      } else if (hasAudio) {
+        sb.append("[silent").append(i + 1).append("]");
+      }
+    }
+
+    // Add concat command and output mapping
+    sb.append("concat=n=").append(files.size()).append(":v=");
+    if (onlyAudio) {
+      sb.append("0");
+    } else {
+      sb.append("1");
+    }
+    sb.append(":a=");
+
+    if (!onlyAudio) {
+      if (hasAudio) {
+        sb.append("1[v][a] -map [v] -map [a] ");
+      } else {
+        sb.append("0[v] -map [v] ");
+      }
+    } else {
+      sb.append("1[a] -map [a]");
+    }
+    return sb.toString();
+  }
+
+  @Override
+  public Job concat(String profileId, Dimension outputDimension, Track... tracks) throws EncoderException,
+          MediaPackageException {
+    ArrayList<String> arguments = new ArrayList<String>();
+    arguments.add(0, profileId);
+    if (outputDimension != null) {
+      arguments.add(1, Serializer.json(outputDimension).toJson());
+    } else {
+      arguments.add(1, "");
+    }
+    for (int i = 0; i < tracks.length; i++) {
+      arguments.add(i + 2, MediaPackageElementParser.getAsXml(tracks[i]));
+    }
+    try {
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Concat.toString(), arguments);
+    } catch (ServiceRegistryException e) {
+      throw new EncoderException("Unable to create concat job", e);
+    }
+  }
+
+  protected Option<Track> concat(Job job, List<Track> tracks, String profileId, Dimension outputDimension)
+          throws EncoderException, MediaPackageException {
+    if (job == null)
+      throw new EncoderException("The job parameter must not be null");
+    if (tracks == null || tracks.size() < 2)
+      throw new EncoderException("The track parameter must not be null and at least two tracks must be present");
+    if (profileId == null)
+      throw new EncoderException("The profile id parameter must not be null");
+
+    boolean onlyAudio = true;
+    for (Track t : tracks) {
+      if (t.hasVideo()) {
+        onlyAudio = false;
+        break;
+      }
+    }
+
+    if (!onlyAudio && outputDimension == null)
+      throw new EncoderException("The output dimension id parameter must not be null when concating video");
+
+    // Create the engine
+    final EncodingProfile profile = profileScanner.getProfile(profileId);
+    if (profile == null)
+      throw new EncoderException(null, "Profile '" + profileId + " is unknown");
+
+    InputStream in = null;
+    final String targetTrackId = idBuilder.createNew().toString();
+    try {
+      // Get the tracks and make sure they exist
+      List<File> trackFiles = new ArrayList<File>();
+      int i = 0;
+      for (Track track : tracks) {
+        try {
+          trackFiles.add(i++, workspace.get(track.getURI()));
+        } catch (NotFoundException e) {
+          throw new EncoderException("Requested track " + track + " is not found");
+        } catch (IOException e) {
+          throw new EncoderException("Unable to access track " + track);
+        }
+      }
+
+      final EncoderEngine encoderEngine = encoderEngineFactory.newEncoderEngine(profile);
+      if (encoderEngine == null)
+        throw new EncoderException(null, "No encoder engine available for profile '" + profileId + "'");
+
+      if (onlyAudio) {
+        logger.info("Concating audio tracks {} into {}", new String[] { trackFiles.toString(), targetTrackId });
+      } else {
+        logger.info("Concating video tracks {} into {}", new String[] { trackFiles.toString(), targetTrackId });
+      }
+
+      // Creating video filter command for concat
+      String concatCommand = buildConcatCommand(onlyAudio, outputDimension, trackFiles, tracks);
+
+      Map<String, String> properties = new HashMap<String, String>();
+      properties.put("concatCommand", concatCommand);
+
+      for (File concatFile : encoderEngine.encode(trackFiles.get(0), profile, properties)) {
+        // Put the file in the workspace
+        URI returnURL = null;
+        try {
+          in = new FileInputStream(concatFile);
+          returnURL = workspace.putInCollection(COLLECTION,
+                  job.getId() + "." + FilenameUtils.getExtension(concatFile.getAbsolutePath()), in);
+          logger.info("Copied the concat file to the workspace at {}", returnURL);
+        } catch (Exception e) {
+          cleanup(concatFile);
+          cleanupWorkspace(returnURL);
+          throw new EncoderException("Unable to put the concat file into the workspace", e);
+        } finally {
+          IOUtils.closeQuietly(in);
+        }
+
+        cleanup(concatFile);
+
+        // Have the concat track inspected and return the result
+        Job inspectionJob = null;
+        try {
+          inspectionJob = inspect(returnURL);
+        } catch (MediaInspectionException e) {
+          throw new EncoderException("Media inspection of " + returnURL + " failed", e);
+        }
+
+        Track inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
+        inspectedTrack.setIdentifier(targetTrackId);
+
+        if (profile.getMimeType() != null)
+          inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
+
+        return some(inspectedTrack);
+      }
+      // concat did not return a file
+      return none();
+    } catch (Exception e) {
+      logger.warn("Error concating tracks {}: {}", tracks, e);
+      if (e instanceof EncoderException) {
+        throw (EncoderException) e;
+      } else {
+        throw new EncoderException(e);
+      }
+    } finally {
+      IoSupport.closeQuietly(in);
+    }
+  }
+
+  @Override
+  public Job imageToVideo(Attachment sourceImageAttachment, String profileId, double time) throws EncoderException,
+          MediaPackageException {
+    try {
+      return serviceRegistry.createJob(JOB_TYPE, Operation.ImageToVideo.toString(), Arrays.asList(
+              MediaPackageElementParser.getAsXml(sourceImageAttachment), profileId, Double.toString(time)));
+    } catch (ServiceRegistryException e) {
+      throw new EncoderException("Unable to create image to video job", e);
+    }
+  }
+
+  protected Option<Track> imageToVideo(Job job, Attachment sourceImage, String profileId, Double time)
+          throws EncoderException, MediaPackageException {
+    if (job == null)
+      throw new EncoderException("The Job parameter must not be null");
+    if (sourceImage == null)
+      throw new EncoderException("The sourceImage attachment parameter must not be null");
+    if (profileId == null)
+      throw new EncoderException("The profileId parameter must not be null");
+    if (time == null)
+      throw new EncoderException("The time parameter must not be null");
+
+    // Create the engine
+    final EncodingProfile profile = profileScanner.getProfile(profileId);
+    if (profile == null) {
+      final String msg = "Profile " + profileId + " is unknown";
+      logger.error(msg);
+      throw new EncoderException(msg);
+    }
+
+    final String targetTrackId = idBuilder.createNew().toString();
+    try {
+      // Get the attachment and make sure it exist
+      File imageFile = null;
+      try {
+        imageFile = workspace.get(sourceImage.getURI());
+      } catch (NotFoundException e) {
+        throw new EncoderException("Requested source image " + sourceImage + " is not found");
+      } catch (IOException e) {
+        throw new EncoderException("Unable to access source image " + sourceImage);
+      }
+
+      final EncoderEngine encoderEngine = encoderEngineFactory.newEncoderEngine(profile);
+      if (encoderEngine == null)
+        throw new EncoderException(null, "No encoder engine available for profile '" + profileId + "'");
+
+      logger.info("Converting image attachment {} into video {}", new String[] { sourceImage.getIdentifier(),
+              targetTrackId });
+
+      Map<String, String> properties = new HashMap<String, String>();
+      if (time == null || time == -1)
+        time = 0D;
+
+      DecimalFormatSymbols ffmpegFormat = new DecimalFormatSymbols();
+      ffmpegFormat.setDecimalSeparator('.');
+      DecimalFormat df = new DecimalFormat("0.000", ffmpegFormat);
+      properties.put("time", df.format(time));
+      // Do the work
+      for (File conversionOutput : encoderEngine.encode(imageFile, profile, properties)) {
+        // check for validity of output
+        if (conversionOutput == null || !conversionOutput.isFile()) {
+          throw new EncoderException("Image conversion failed: no video was produced");
+        }
+
+        // Put the file in the workspace
+        URI workspaceURI = null;
+        InputStream in = null;
+        try {
+          in = new FileInputStream(conversionOutput);
+          workspaceURI = workspace.putInCollection(COLLECTION,
+                  job.getId() + "." + FilenameUtils.getExtension(conversionOutput.getAbsolutePath()), in);
+          logger.debug("Copied video file to the workspace at {}", workspaceURI);
+        } catch (Exception e) {
+          cleanup(conversionOutput);
+          cleanupWorkspace(workspaceURI);
+          throw new EncoderException("Unable to put video file into the workspace", e);
+        } finally {
+          IOUtils.closeQuietly(in);
+        }
+
+        // cleanup
+        cleanup(conversionOutput);
+
+        // Have the compound track inspected and return the result
+        Job inspectionJob = null;
+        try {
+          inspectionJob = inspect(workspaceURI);
+        } catch (MediaInspectionException e) {
+          throw new EncoderException("Media inspection of " + workspaceURI + " failed", e);
+        }
+
+        Track inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
+        inspectedTrack.setIdentifier(targetTrackId);
+
+        if (profile.getMimeType() != null)
+          inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
+
+        return some(inspectedTrack);
+      }
+      // encoding did not return a file
+      return none();
+    } catch (Exception e) {
+      logger.warn("Error converting " + sourceImage, e);
+      if (e instanceof EncoderException) {
+        throw (EncoderException) e;
+      } else {
+        throw new EncoderException(e);
+      }
+    }
+  }
+
+  protected Job inspect(URI workspaceURI) throws MediaInspectionException, EncoderException {
+    Job inspectionJob = inspectionService.inspect(workspaceURI);
+    JobBarrier barrier = new JobBarrier(serviceRegistry, inspectionJob);
+    if (!barrier.waitForJobs().isSuccess()) {
+      throw new EncoderException("Media inspection of " + workspaceURI + " failed");
+    }
+    return inspectionJob;
   }
 
   /**
@@ -453,11 +949,10 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.composer.api.ComposerService#image(org.opencastproject.mediapackage.Track, String,
-   *      long...)
+   * @see org.opencastproject.composer.api.ComposerService#image(Track, String, double...)
    */
   @Override
-  public Job image(Track sourceTrack, String profileId, long... times) throws EncoderException, MediaPackageException {
+  public Job image(Track sourceTrack, String profileId, double... times) throws EncoderException, MediaPackageException {
 
     if (sourceTrack == null)
       throw new IllegalArgumentException("SourceTrack cannot be null");
@@ -469,7 +964,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     parameters[0] = MediaPackageElementParser.getAsXml(sourceTrack);
     parameters[1] = profileId;
     for (int i = 0; i < times.length; i++) {
-      parameters[i + 2] = Long.toString(times[i]);
+      parameters[i + 2] = Double.toString(times[i]);
     }
 
     // TODO: This is unfortunate, since ffmpeg is slow on single images and it would be nice to be able to start a
@@ -491,12 +986,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param profileId
    *          the identifer of the encoding profile to use
    * @param times
-   *          (one or more) times in miliseconds
+   *          (one or more) times in seconds
    * @return the image as an attachment element
    * @throws EncoderException
    *           if extracting the image fails
    */
-  protected List<Attachment> image(Job job, Track sourceTrack, String profileId, long... times)
+  protected List<Attachment> image(Job job, Track sourceTrack, String profileId, double... times)
           throws EncoderException, MediaPackageException {
 
     if (sourceTrack == null)
@@ -523,11 +1018,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       }
 
       // The time should not be outside of the track's duration
-      for (long time : times) {
+      for (double time : times) {
         if (sourceTrack.getDuration() == null)
           throw new EncoderException("Unable to extract an image from a track with unknown duration");
-        if (time < 0 || time > sourceTrack.getDuration()) {
-          throw new EncoderException("Can not extract an image at time " + Long.valueOf(time)
+        if (time < 0 || time * 1000 > sourceTrack.getDuration()) {
+          throw new EncoderException("Can not extract an image at time " + Double.valueOf(time)
                   + " from a track with duration " + Long.valueOf(sourceTrack.getDuration()));
         }
       }
@@ -823,23 +1318,19 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
                 job.getId() + "." + FilenameUtils.getExtension(output.getAbsolutePath()), in);
         logger.info("Copied the encoded file to the workspace at {}", returnURL);
       } catch (Exception e) {
+        cleanup(output);
+        cleanupWorkspace(returnURL);
         throw new EmbedderException("Unable to put the encoded file into the workspace", e);
       } finally {
         IOUtils.closeQuietly(in);
-        logger.info("Deleting the local copy of the embedded file at {}", output.getAbsolutePath());
-        if (!output.delete()) {
-          logger.warn("Could not delete local copy of file at {}", output.getAbsolutePath());
-        }
       }
+
+      cleanup(output);
 
       // Have the encoded track inspected and return the result
       Job inspectionJob;
       try {
-        inspectionJob = inspectionService.inspect(returnURL);
-        JobBarrier barrier = new JobBarrier(serviceRegistry, inspectionJob);
-        if (!barrier.waitForJobs().isSuccess()) {
-          throw new EncoderException("Media inspection of " + returnURL + " failed");
-        }
+        inspectionJob = inspect(returnURL);
       } catch (MediaInspectionException e) {
         throw new EmbedderException("Media inspection of " + returnURL + " failed", e);
       }
@@ -885,9 +1376,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       if (file != null && file.isFile()) {
         String path = file.getAbsolutePath();
         if (file.delete()) {
-          logger.info("Deleted local copy of image file at {}", path);
+          logger.info("Deleted local copy of encoding file at {}", path);
         } else {
-          logger.warn("Could not delete local copy of image file at {}", path);
+          logger.warn("Could not delete local copy of encoding file at {}", path);
         }
       }
     }
@@ -938,9 +1429,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         case Image:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
           encodingProfile = arguments.get(1);
-          long[] times = new long[arguments.size() - 2];
+          double[] times = new double[arguments.size() - 2];
           for (int i = 2; i < arguments.size(); i++) {
-            times[i - 2] = Long.parseLong(arguments.get(i));
+            times[i - 2] = Double.parseDouble(arguments.get(i));
           }
           List<Attachment> resultingElements = image(job, firstTrack, encodingProfile, times);
           serialized = MediaPackageElementParser.getArrayAsXml(resultingElements);
@@ -972,6 +1463,49 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           encodingProfile = arguments.get(2);
           serialized = watermark(job, firstTrack, watermark, encodingProfile).map(
                   MediaPackageElementParser.<Track> getAsXml()).getOrElse("");
+          break;
+        case Composite:
+          Attachment watermarkAttachment = null;
+          firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
+          Layout lowerLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(1)));
+          LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>(firstTrack, lowerLayout);
+
+          secondTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(2));
+          Layout upperLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(3)));
+          LaidOutElement<Track> upperLaiedOutElement = new LaidOutElement<Track>(secondTrack, upperLayout);
+
+          Dimension compositeTrackSize = Serializer.dimension(JsonObj.jsonObj(arguments.get(4)));
+          encodingProfile = arguments.get(5);
+          String backgroundColor = arguments.get(6);
+
+          Option<LaidOutElement<Attachment>> watermarkOption = Option.<LaidOutElement<Attachment>> none();
+          if (arguments.size() == 9) {
+            watermarkAttachment = (Attachment) MediaPackageElementParser.getFromXml(arguments.get(7));
+            Layout watermarkLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(8)));
+            watermarkOption = Option.some(new LaidOutElement<Attachment>(watermarkAttachment, watermarkLayout));
+          }
+          serialized = composite(job, compositeTrackSize, lowerLaidOutElement, upperLaiedOutElement, watermarkOption,
+                  encodingProfile, backgroundColor).map(MediaPackageElementParser.<Track> getAsXml()).getOrElse("");
+          break;
+        case Concat:
+          encodingProfile = arguments.get(0);
+          String dimensionString = arguments.get(1);
+          Dimension outputDimension = null;
+          if (StringUtils.isNotBlank(dimensionString))
+            outputDimension = Serializer.dimension(JsonObj.jsonObj(dimensionString));
+          List<Track> tracks = new ArrayList<Track>();
+          for (int i = 2; i < arguments.size(); i++) {
+            tracks.add(i - 2, (Track) MediaPackageElementParser.getFromXml(arguments.get(i)));
+          }
+          serialized = concat(job, tracks, encodingProfile, outputDimension).map(
+                  MediaPackageElementParser.<Track> getAsXml()).getOrElse("");
+          break;
+        case ImageToVideo:
+          Attachment image = (Attachment) MediaPackageElementParser.getFromXml(arguments.get(0));
+          encodingProfile = arguments.get(1);
+          double time = Double.parseDouble(arguments.get(2));
+          serialized = imageToVideo(job, image, encodingProfile, time)
+                  .map(MediaPackageElementParser.<Track> getAsXml()).getOrElse("");
           break;
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");

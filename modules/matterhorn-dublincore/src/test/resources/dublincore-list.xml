@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dublincorelist totalCount="2">
 	<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
-	            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance/"
-	            xsi:schemaLocation="http://www.opencastproject.org http://www.opencastproject.org/schema.xsd"
-	            xmlns:dc="http://purl.org/dc/elements/1.1/"
-	            xmlns:dcterms="http://purl.org/dc/terms/" xmlns:oc="http://www.opencastproject.org/matterhorn/">
+	            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:dcterms="http://purl.org/dc/terms/" xmlns:oc="http://www.opencastproject.org/matterhorn/">
 	  <dcterms:title>Land 1</dcterms:title>
 	  <dcterms:title xml:lang="de">Land und Vegetation: Key Player in der Klima-Szene</dcterms:title>
 	  <dcterms:subject>climate, land, vegetation</dcterms:subject>
@@ -30,11 +28,8 @@
 	    true
 	  </oc:promoted>
 	</dublincore>
-	<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
-	            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance/"
-	            xsi:schemaLocation="http://www.opencastproject.org http://www.opencastproject.org/schema.xsd"
-	            xmlns:dc="http://purl.org/dc/elements/1.1/"
-	            xmlns:dcterms="http://purl.org/dc/terms/" xmlns:oc="http://www.opencastproject.org/matterhorn/">
+  <dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:dcterms="http://purl.org/dc/terms/" xmlns:oc="http://www.opencastproject.org/matterhorn/">
 	  <dcterms:title>Land 2</dcterms:title>
 	  <dcterms:title xml:lang="de">Land und Vegetation: Key Player in der Klima-Szene</dcterms:title>
 	  <dcterms:subject>climate, land, vegetation</dcterms:subject>

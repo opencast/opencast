@@ -36,7 +36,7 @@ public class SourceBinsFactory {
 
   /**
    * Create Gnonlin source bins for each media type from source file.
-   * 
+   *
    * @param inputFilePath source file
    * @param mediaStartMillis sequence start position
    * @param durationMillis sequence duration
@@ -57,7 +57,7 @@ public class SourceBinsFactory {
       }
       audioSourceBin.addFileSource(inputFilePath, mediaStartMillis, durationMillis);
     }
-    
+
     if (typeFinder.isVideoFile()) {
       if (videoSourceBin == null) {
         videoSourceBin = new GnonlinSourceBin(GnonlinSourceBin.SourceType.Video, typeFinder.getRawVideoCaps());
@@ -81,7 +81,7 @@ public class SourceBinsFactory {
   public boolean hasVideoSource() {
     return videoSourceBin != null;
   }
-  
+
   /**
    * Returns the output file path.
    * @return output file path
@@ -89,7 +89,7 @@ public class SourceBinsFactory {
   public String getOutputFilePath() {
     return outputFilePath;
   }
-  
+
   /**
    * Returns audio source bin.
    * @return audio source bin
@@ -97,7 +97,7 @@ public class SourceBinsFactory {
   public Bin getAudioSourceBin() {
     return audioSourceBin.getBin();
   }
-  
+
   /**
    * Returns video source bin.
    * @return video source bin

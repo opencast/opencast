@@ -51,7 +51,7 @@ public class SilenceDetectionServiceRemote extends RemoteBase implements Silence
   public Job detect(Track sourceTrack) throws SilenceDetectionFailedException {
     return detect(sourceTrack, null);
   }
-  
+
   @Override
   public Job detect(Track sourceTrack, Track[] referencedTracks) throws SilenceDetectionFailedException {
     HttpPost post = new HttpPost("/detect");

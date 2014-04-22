@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 
 /**
  * An extension to the {@code Properties} class which performs the following when you call getProperty:
- * 
+ *
  * 1. Checks to see if there are any variables in the property 2. If so it replaces the variable with with the first
  * match it finds in the following order - The java properties (java -Dkey=value) - The component context properties
  * (set using setBundleContext) - The properties set in the object itself - The container's environment variables This
@@ -54,7 +54,7 @@ public class XProperties extends Properties {
 
   /**
    * {@inheritDoc} See the class description for more details.
-   * 
+   *
    * @see java.util.Properties#getProperty(java.lang.String)
    */
   @Override
@@ -84,7 +84,7 @@ public class XProperties extends Properties {
   /**
    * Wrapper around the actual search and replace functionality. This function will value with all of the instances of
    * subkey replaced.
-   * 
+   *
    * @param value
    *          The original string you wish to replace.
    * @param subkey
@@ -120,7 +120,7 @@ public class XProperties extends Properties {
    * This goes through the customString provided by the client and checks for any properties that they may wish
    * substituted by ConfigurationManager properties such as ${capture.filesystem.cache.capture.url} would be replaced by
    * the actual location of the capture cache.
-   * 
+   *
    * @param customString
    *          The String that you want to substitute the properties into
    * @return The customString with all of the ${property} it was able to substitute.
@@ -150,10 +150,10 @@ public class XProperties extends Properties {
       return null;
     }
   }
-  
+
   /**
    * Returns the value of a variable with the same priority replacement scheme as getProperty.
-   * 
+   *
    * @param variable
    *          The variable you need the replacement for.
    * @return The value for variable.
@@ -165,7 +165,7 @@ public class XProperties extends Properties {
 
   /**
    * A wrapper around the old getProperty behaviour, this method does not do any variable expansion.
-   * 
+   *
    * @param key
    *          The key of the property
    * @return The property exactly as it appears in the properties list without any variable expansion
@@ -176,7 +176,7 @@ public class XProperties extends Properties {
 
   /**
    * Merges the properties from p into this properties object
-   * 
+   *
    * @param p
    *          The {@code Dictionary} you wish to add to this object
    */
@@ -191,7 +191,7 @@ public class XProperties extends Properties {
   /**
    * Sets the {@code BundleContext} for this object. Set this to null if you wish to skip checking the context for a
    * property.
-   * 
+   *
    * @param ctx
    *          The {@code BundleContext} for this instance.
    */
@@ -204,7 +204,7 @@ public class XProperties extends Properties {
 
   /**
    * Return the current {@code BundleContext} that's in use by this object.
-   * 
+   *
    * @return The current {@code BundleContext}
    */
   public BundleContext getBundleContext() {

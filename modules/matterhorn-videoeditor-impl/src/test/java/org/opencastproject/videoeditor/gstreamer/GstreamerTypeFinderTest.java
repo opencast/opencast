@@ -27,14 +27,14 @@ import org.slf4j.LoggerFactory;
  * @author wsmirnow
  */
 public class GstreamerTypeFinderTest extends GstreamerAbstractTest {
-  
+
   /**
    * The logging instance
    */
   private static final Logger logger = LoggerFactory.getLogger(GstreamerTypeFinderTest.class);
-  
+
   private static boolean gstreamerInstalled = true;
-  
+
   @BeforeClass
   public static void setUpClass() throws Exception {
     try {
@@ -43,61 +43,61 @@ public class GstreamerTypeFinderTest extends GstreamerAbstractTest {
       gstreamerInstalled = false;
       logger.info("Unable to initialize gstreamer: {}", e.getMessage());
     }
-    
+
     /* gstreamer-core */
     if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.FILESRC)) {
       gstreamerInstalled = false;
-      
+
       logger.info("Skip tests because gstreamer-base is not installed!");
       return;
     }
     /* gstreamer-plugins-base */
     if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.DECODEBIN2)) {
       gstreamerInstalled = false;
-      
+
       logger.info("Skip tests because gstreamer-plugins-base is not installed!");
       return;
     }
   }
-  
+
   @Test
   public void typefinderAudioTest() {
     if (!gstreamerInstalled) return;
-    
+
     GstreamerTypeFinder typeFinder = new GstreamerTypeFinder(audioFilePath);
     Assert.assertTrue(typeFinder.isAudioFile());
     Assert.assertFalse(typeFinder.isVideoFile());
-    
+
     logger.info("audiocaps: " + typeFinder.getAudioCaps().toString());
   }
-  
+
   @Test
   public void typefinderVideoTest() {
     if (!gstreamerInstalled) return;
-    
+
     GstreamerTypeFinder typeFinder = new GstreamerTypeFinder(videoFilePath);
     Assert.assertTrue(typeFinder.isVideoFile());
     Assert.assertFalse(typeFinder.isAudioFile());
-    
+
     logger.info("videocaps: " + typeFinder.getVideoCaps().toString());
   }
-  
+
   @Test
   public void typefinderMuxedTest() {
     if (!gstreamerInstalled) return;
-    
+
     GstreamerTypeFinder typeFinder = new GstreamerTypeFinder(muxedFilePath);
     Assert.assertTrue(typeFinder.isAudioFile());
     Assert.assertTrue(typeFinder.isVideoFile());
-    
+
     logger.info("audiocaps: " + typeFinder.getAudioCaps().toString());
     logger.info("videocaps: " + typeFinder.getVideoCaps().toString());
   }
-  
+
   @Test
   public void typefinderFailTest() {
     if (!gstreamerInstalled) return;
-    
+
     GstreamerTypeFinder typeFinder = new GstreamerTypeFinder("foo");
     Assert.assertFalse(typeFinder.isAudioFile());
     Assert.assertFalse(typeFinder.isVideoFile());

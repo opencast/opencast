@@ -96,7 +96,7 @@ public class DublinCoreExtensionTest {
         Assert.assertEquals(instance.getType(), result);
 
     }
-    
+
     /**
      * Tests for the List Properties ans Subclass Subject
      */

@@ -19,12 +19,13 @@ import org.apache.commons.io.IOUtils;
 import org.opencastproject.util.data.Function;
 import org.w3c.dom.Document;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * Convenience implementation that supports serializing and deserializing media package elements.

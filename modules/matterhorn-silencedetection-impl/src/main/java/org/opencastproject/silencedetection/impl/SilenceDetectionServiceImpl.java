@@ -101,7 +101,7 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
   public Job detect(Track sourceTrack) throws SilenceDetectionFailedException {
     return detect(sourceTrack, null);
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -117,12 +117,12 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
       List<String> arguments = new LinkedList<String>();
       // put source track as job argument
       arguments.add(0, MediaPackageElementParser.getAsXml(sourceTrack));
-      
+
       // put reference tracks as second argument
       if (referenceTracks != null) {
         arguments.add(1, MediaPackageElementParser.getArrayAsXml(Arrays.asList(referenceTracks)));
       }
-      
+
       return serviceRegistry.createJob(
               getJobType(),
               Operation.SILENCE_DETECTION.toString(),
@@ -144,10 +144,10 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
         throw new SilenceDetectionFailedException("Track not set!");
       }
       Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
-      
+
       // run detection on source track
       MediaSegments segments = runDetection(sourceTrack);
-      
+
       // get reference tracks if any
       List<Track> referenceTracks = null;
       if (job.getArguments().size() > 1) {
@@ -156,11 +156,11 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
           referenceTracks = (List<Track>) MediaPackageElementParser.getArrayFromXml(referenceTracksXml);
         }
       }
-      
+
       if (referenceTracks == null) {
         referenceTracks = Arrays.asList(sourceTrack);
       }
-      
+
       // create smil XML as result
       try {
         return generateSmil(segments, referenceTracks).toXML();
@@ -171,7 +171,7 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
 
     throw new SilenceDetectionFailedException("Can't handle this operation: " + job.getOperation());
   }
-  
+
   /**
    * Run silence detection on the source track and returns 
    * {@see org.opencastproject.silencedetection.api.MediaSegments}   
@@ -208,11 +208,11 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
   protected Smil generateSmil(MediaSegments segments, List<Track> referenceTracks) throws SmilException {
     SmilResponse smilResponse = smilService.createNewSmil();
     Track[] referenceTracksArr = referenceTracks.toArray(new Track[referenceTracks.size()]);
-    
+
     for (MediaSegment segment : segments.getMediaSegments()) {
       smilResponse = smilService.addParallel(smilResponse.getSmil());
       String parId = smilResponse.getEntity().getId();
-      
+
       smilResponse = smilService.addClips(smilResponse.getSmil(), parId, referenceTracksArr,
               segment.getSegmentStart(), segment.getSegmentStop() - segment.getSegmentStart());
     }

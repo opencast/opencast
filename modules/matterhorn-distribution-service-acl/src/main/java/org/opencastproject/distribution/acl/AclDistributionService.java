@@ -63,7 +63,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /** List of available operations on jobs */
   private enum Operation {
-    Distribute, Retract 
+    Distribute, Retract
   };
 
   /** Receipt type */
@@ -102,7 +102,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * Activate method for this OSGi service implementation.
-   * 
+   *
    * @param cc
    *          the OSGi component context
    */
@@ -159,17 +159,17 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
       } catch (IOException e) {
         throw new DistributionException("Unable to copy " + source + " to " + destination, e);
       }
-      
+
       return (MediaPackageElement)getAclXmlAttachment(mediaPackage);
     } catch (Exception e) {
       logger.warn("Could not distribute acl XML with " + elementId + " from " + mediaPackage.getIdentifier().compact(), e);
       return null;
     }
   }
-  
+
   /**
-   * @param mediaPackage The media package to find the attachment that has an ACL. 
-   * @return Returns the attachment if possible or null. 
+   * @param mediaPackage The media package to find the attachment that has an ACL.
+   * @return Returns the attachment if possible or null.
    */
   private Attachment getAclXmlAttachment(MediaPackage mediaPackage) {
     Attachment[] aclAttachments = mediaPackage.getAttachments(new MediaPackageElementFlavor("text", "acl"));
@@ -180,8 +180,8 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
       return null;
     }
   }
-  
-  
+
+
   /**
    * @param mediaPackage
    *          The media package to find the acl xml.
@@ -221,7 +221,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * Retracts the mediapackage with the given identifier from the distribution channel.
-   * 
+   *
    * @param job
    *          the associated job
    * @param mediapackage
@@ -237,7 +237,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -271,7 +271,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * Gets the destination file to copy the contents of a mediapackage element.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @param element
@@ -289,7 +289,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * Gets the URI for the element to be distributed.
-   * 
+   *
    * @param mediaPackageId
    *          the mediapackage identifier
    * @param element
@@ -307,7 +307,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * Gets the directory containing the distributed files for this mediapackage.
-   * 
+   *
    * @param mediaPackageId
    *          the mediapackage ID
    * @return the filesystem directory
@@ -318,7 +318,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * Callback for the OSGi environment to set the workspace reference.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -328,7 +328,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * Callback for the OSGi environment to set the service registry reference.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -338,7 +338,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -348,7 +348,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -358,7 +358,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -368,7 +368,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -378,7 +378,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -388,7 +388,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -398,7 +398,7 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override

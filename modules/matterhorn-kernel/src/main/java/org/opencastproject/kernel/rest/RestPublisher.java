@@ -18,6 +18,7 @@ package org.opencastproject.kernel.rest;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.rest.StaticResource;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.cxf.Bus;
@@ -114,7 +115,7 @@ public class RestPublisher implements RestConstants {
   @SuppressWarnings("unchecked")
   protected void activate(ComponentContext componentContext) {
     logger.debug("activate()");
-    this.baseServerUri = componentContext.getBundleContext().getProperty("org.opencastproject.server.url");
+    this.baseServerUri = componentContext.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
     this.componentContext = componentContext;
     this.fourOhFour = "The resource you requested does not exist."; // TODO: Replace this with something a little nicer
     this.servletRegistrationMap = new ConcurrentHashMap<String, ServiceRegistration>();
@@ -158,7 +159,7 @@ public class RestPublisher implements RestConstants {
 
   /**
    * Creates a REST endpoint for the JAX-RS annotated service.
-   * 
+   *
    * @param ref
    *          the osgi service reference
    * @param service
@@ -193,13 +194,19 @@ public class RestPublisher implements RestConstants {
       logger.debug("Waiting for the servlet at '{}' to be initialized", servicePath);
       try {
         Thread.sleep(100);
-        count ++;
+        count++;
       } catch (InterruptedException e) {
         logger.warn("Interrupt while waiting for RestServlet initialization");
         break;
       }
     }
-    
+
+    // Was initialization successful
+    if (!cxf.isInitialized()) {
+      logger.error("Whiteboard implemenation failed to pick up REST endpoint declaration {}", serviceType);
+      return;
+    }
+
     // Was initialization successful
     if (!cxf.isInitialized()) {
       logger.error("Whiteboard implemenation failed to pick up REST endpoint declaration {}", serviceType);
@@ -229,11 +236,14 @@ public class RestPublisher implements RestConstants {
       Thread.currentThread().setContextClassLoader(bundleClassLoader);
     }
     logger.info("Registered REST endpoint at " + servicePath);
+    if (service instanceof RestEndpoint) {
+      ((RestEndpoint) service).endpointPublished();
+    }
   }
 
   /**
    * Removes an endpoint
-   * 
+   *
    * @param alias
    *          The URL space to reclaim
    */
@@ -252,7 +262,7 @@ public class RestPublisher implements RestConstants {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.apache.cxf.jaxrs.provider.JSONProvider#createWriter(java.lang.Object, java.lang.Class,
      *      java.lang.reflect.Type, java.lang.String, java.io.OutputStream, boolean)
      */
@@ -347,7 +357,7 @@ public class RestPublisher implements RestConstants {
 
     /**
      * Creates a new StaticResourceBundleTracker.
-     * 
+     *
      * @param context
      *          the bundle context
      */
@@ -357,7 +367,7 @@ public class RestPublisher implements RestConstants {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.osgi.util.tracker.BundleTracker#addingBundle(org.osgi.framework.Bundle, org.osgi.framework.BundleEvent)
      */
     @Override
@@ -396,7 +406,7 @@ public class RestPublisher implements RestConstants {
 
     /**
      * Whether the http service has initialized this servlet.
-     * 
+     *
      * @return the initialization state
      */
     public boolean isInitialized() {
@@ -413,7 +423,7 @@ public class RestPublisher implements RestConstants {
   public class RestDocRedirector implements RequestHandler {
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.apache.cxf.jaxrs.ext.RequestHandler#handleRequest(org.apache.cxf.message.Message,
      *      org.apache.cxf.jaxrs.model.ClassResourceInfo)
      */

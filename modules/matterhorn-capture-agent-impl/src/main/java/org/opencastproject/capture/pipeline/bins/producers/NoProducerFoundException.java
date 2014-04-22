@@ -17,7 +17,7 @@ package org.opencastproject.capture.pipeline.bins.producers;
 
 /** If ProducerFactory cannot find a Producer to match the ProducerType this exception is thrown. **/
 public class NoProducerFoundException extends Exception {
-  
+
   private static final long serialVersionUID = -1480090927345059045L;
   private String message;
 
@@ -29,5 +29,5 @@ public class NoProducerFoundException extends Exception {
   public String getMessage() {
     return message;
   }
-  
+
 }

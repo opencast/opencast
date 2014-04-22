@@ -22,26 +22,26 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlJavaTypeAdapter(ScheduledEventImpl.Adapter.class)
 public interface ScheduledEvent {
-  
+
   /**
    * Get the duration of the event in seconds.
-   * 
+   *
    * @return The duration of the event in seconds.
    */
   Long getDuration();
 
   /**
    * Get the start time of the scheduled event as a Unix timestamp.
-   * 
+   *
    * @return The start time of the event as a Unix timestamp.
    */
   Long getStartTime();
 
   /**
    * Get the title of the scheduled event.
-   * 
+   *
    * @return The title of the scheduled event.
    */
   String getTitle();
-  
+
 }

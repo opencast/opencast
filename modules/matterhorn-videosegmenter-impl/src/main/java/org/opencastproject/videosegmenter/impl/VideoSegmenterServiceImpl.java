@@ -85,9 +85,9 @@ import javax.media.protocol.DataSource;
 /**
  * Media analysis plugin that takes a video stream and extracts video segments by trying to detect slide and/or scene
  * changes.
- * 
+ *
  * Videos that can be used by this segmenter need to be created using this commandline:
- * 
+ *
  * <pre>
  * ffmpeg -i &lt;inputfile&gt; -deinterlace -r 1 -vcodec mjpeg -qscale 1 -an &lt;outputfile&gt;
  * </pre>
@@ -165,7 +165,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @SuppressWarnings("unchecked")
@@ -198,7 +198,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.videosegmenter.api.VideoSegmenterService#segment(org.opencastproject.mediapackage.Track)
    */
   public Job segment(Track track) throws VideoSegmenterException, MediaPackageException {
@@ -213,7 +213,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
   /**
    * Starts segmentation on the video track identified by <code>mediapackageId</code> and <code>elementId</code> and
    * returns a receipt containing the final result in the form of anMpeg7Catalog.
-   * 
+   *
    * @param track
    *          the element to analyze
    * @return a receipt containing the resulting mpeg-7 catalog
@@ -363,7 +363,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -392,7 +392,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * Returns the segments for the movie accessible through the frame grabbing control.
-   * 
+   *
    * @param video
    *          the mpeg-7 video representation
    * @param dsh
@@ -556,7 +556,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * Fills the look ahead buffer with the next <code>STABILITY_THRESHOLD</code> images.
-   * 
+   *
    * @param queue
    *          the buffer
    * @param currentBuffer
@@ -584,7 +584,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
    * the usage of the <code>JMF 2.1.1e</code> framework, the list is rather limited, see Sun's <a
    * href="http://java.sun.com/javase/technologies/desktop/media/jmf/2.1.1/formats.html">supported formats in JMF
    * 2.1.1</a>.
-   * 
+   *
    * @param track
    *          the track identifier
    * @return the encoded track
@@ -630,7 +630,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * Sets the composer service.
-   * 
+   *
    * @param composerService
    */
   protected void setComposerService(ComposerService composerService) {
@@ -639,7 +639,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * Sets the workspace
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -649,7 +649,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * Sets the mpeg7CatalogService
-   * 
+   *
    * @param mpeg7CatalogService
    *          an instance of the mpeg7 catalog service
    */
@@ -659,7 +659,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * Sets the receipt service
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -669,7 +669,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -679,7 +679,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -689,7 +689,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -699,7 +699,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -709,7 +709,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -719,17 +719,17 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements Vi
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
   protected UserDirectoryService getUserDirectoryService() {
     return userDirectoryService;
   }
-  
+
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override

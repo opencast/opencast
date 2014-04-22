@@ -19,7 +19,7 @@ package org.opencastproject.silencedetection.impl;
  * SilenceDetectionService properties.
  */
 public interface SilenceDetectionProperties {
-  
+
   /** Timespan in milliseconds before silece cut begin. */
   String SILENCE_PRE_LENGTH = "silence.pre.length";
   /** Minimum length in milliseconds to accept silence sequence. */

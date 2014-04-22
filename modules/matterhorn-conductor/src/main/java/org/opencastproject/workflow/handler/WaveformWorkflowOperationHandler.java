@@ -118,35 +118,35 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
 
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     logger.info("Start waveform workflow operation for mediapackage {}", mediaPackage.getIdentifier().compact());
-    
+
     String sourceFlavorProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVOR_PROPERTY));
     if (sourceFlavorProperty == null) {
       throw new WorkflowOperationException(String.format("Required property %s not set", SOURCE_FLAVOR_PROPERTY));
     }
-    
+
     String targetFlavorProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(TARGET_FLAVOR_PROPERTY));
     if (targetFlavorProperty == null) {
       throw new WorkflowOperationException(String.format("Required property %s not set", TARGET_FLAVOR_PROPERTY));
     }
-    
+
     TrackSelector trackSelector = new TrackSelector();
     for (String flavor : asList(sourceFlavorProperty)) {
       trackSelector.addFlavor(flavor);
     }
     Collection<Track> sourceTracks = trackSelector.select(mediaPackage, false);
     if (sourceTracks.isEmpty()) {
-      logger.warn("No tracks found in mediapackage {} with specified {} {}", new String[] { 
+      logger.warn("No tracks found in mediapackage {} with specified {} {}", new String[] {
               mediaPackage.getIdentifier().compact(),
               SOURCE_FLAVOR_PROPERTY,
               sourceFlavorProperty});
       createResult(mediaPackage, Action.SKIP);
     }
-    
+
     MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
     for (Track sourceTrack : sourceTracks) {
       // generate waveform
       logger.info("Generating waveform png for track {}", sourceTrack.getIdentifier());
-    
+
       WaveUtils waveUtils = null;
       BufferedImage bufferedImage = null;
       ByteArrayOutputStream os = null;
@@ -164,7 +164,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
           sourceTrack.getIdentifier(), mediaPackage.getIdentifier().compact()});
         String elementId = UUID.randomUUID().toString();
         URI waveformUri = workspace.put(mediaPackage.getIdentifier().compact(), elementId, WAVEFORM_FILE_NAME, is);
-        
+
         MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorProperty);
         if ("*".equals(targetFlavor.getType())) {
           targetFlavor = new MediaPackageElementFlavor(sourceTrack.getFlavor().getType(), targetFlavor.getSubtype());
@@ -185,7 +185,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
                 "Can't get source file %s from workspace", sourceTrack.getURI()), ex);
       } catch (IOException ex) {
         throw new WorkflowOperationException(String.format(
-                "IO exception occures while generation waveform image for track %s", 
+                "IO exception occures while generation waveform image for track %s",
                 sourceTrack.getIdentifier()), ex);
       } finally {
         IOUtils.closeQuietly(is);

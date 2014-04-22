@@ -20,16 +20,16 @@ package org.opencastproject.silencedetection.gstreamer;
  * Gstreamer elements.
  */
 public interface GstreamerElements {
-  
+
   // gstreamer-core
   String FAKESINK = "fakesink";
   String FILESRC = "filesrc";
-  
+
   // gstreamer-plugins-base
   String AUDIOCONVERT = "audioconvert";
   String DECODEBIN = "decodebin";
-  
+
   // gstreamer-plugins-good
   String CUTTER = "cutter";
-  
+
 }

@@ -112,7 +112,7 @@ public class ComposeWorkflowOperationHandlerTest {
     EasyMock.expect(profile.getIdentifier()).andReturn(PROFILE_ID);
     EasyMock.expect(profile.getApplicableMediaType()).andReturn(MediaType.Stream);
     EasyMock.expect(profile.getOutputType()).andReturn(MediaType.AudioVisual);
-    EasyMock.expect(profile.getMimeType()).andReturn(MimeTypes.MPEG4.asString()).times(2);
+    EasyMock.expect(profile.getMimeType()).andReturn(MimeTypes.MPEG4.toString()).times(2);
     profileList = new EncodingProfile[] { profile };
     EasyMock.replay(profile);
 
@@ -149,7 +149,7 @@ public class ComposeWorkflowOperationHandlerTest {
     EasyMock.expect(profile.getIdentifier()).andReturn(PROFILE_ID);
     EasyMock.expect(profile.getApplicableMediaType()).andReturn(MediaType.Stream);
     EasyMock.expect(profile.getOutputType()).andReturn(MediaType.Stream);
-    EasyMock.expect(profile.getMimeType()).andReturn(MimeTypes.MPEG4.asString()).times(2);
+    EasyMock.expect(profile.getMimeType()).andReturn(MimeTypes.MPEG4.toString()).times(2);
     profileList = new EncodingProfile[] { profile };
     EasyMock.replay(profile);
 

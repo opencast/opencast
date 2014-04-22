@@ -19,7 +19,7 @@ package org.opencastproject.smil.api;
  * Will be thrown, if editing {@link Smil} fail.
  */
 public class SmilException extends Exception {
-  
+
   public SmilException(String message) {
     super(message);
   }

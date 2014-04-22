@@ -81,7 +81,7 @@ public class AnnotationRestService {
 
   /**
    * Method to set the service this REST endpoint uses
-   * 
+   *
    * @param service
    *          the annotation service implementation
    */
@@ -91,7 +91,7 @@ public class AnnotationRestService {
 
   /**
    * The method that is called, when the service is activated
-   * 
+   *
    * @param cc
    *          The ComponentContext of this service
    */
@@ -174,7 +174,7 @@ public class AnnotationRestService {
           @RestParameter(name = "value", description = "The value of the annotation", isRequired = true, type = Type.TEXT),
           @RestParameter(name = "in", description = "The time, or inpoint, of the annotation", isRequired = true, type = Type.STRING),
           @RestParameter(name = "out", description = "The optional outpoint of the annotation", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "isPrivate", description = "True if the annotation is private", isRequired = false, type = Type.BOOLEAN) }, 
+          @RestParameter(name = "isPrivate", description = "True if the annotation is private", isRequired = false, type = Type.BOOLEAN) },
         reponses = { @RestResponse(responseCode = SC_CREATED, description = "The URL to this annotation is returned in the Location header, and an XML representation of the annotation itelf is returned in the response body.") })
   public Response add(@FormParam("episode") String mediapackageId, @FormParam("in") int inpoint,
           @FormParam("out") int outpoint, @FormParam("type") String type, @FormParam("value") String value, @FormParam("isPrivate") boolean isPrivate,
@@ -202,7 +202,7 @@ public class AnnotationRestService {
   @PUT
   @Path("{id}")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "change", description = "Changes the value of an annotation specified by its identifier ", returnDescription = "The user annotation.", 
+  @RestQuery(name = "change", description = "Changes the value of an annotation specified by its identifier ", returnDescription = "The user annotation.",
           pathParameters = {@RestParameter(name = "id", description = "The annotation identifier", isRequired = true, type = Type.STRING) },
           restParameters = {@RestParameter(name = "value", description = "The value of the annotation", isRequired = true, type = Type.TEXT) },
           reponses = { @RestResponse(responseCode = SC_CREATED, description = "The URL to this annotation is returned in the Location header, and an XML representation of the annotation itelf is returned in the response body.") })
@@ -251,11 +251,11 @@ public class AnnotationRestService {
 
   @DELETE
   @Path("{id}")
-  @RestQuery(name = "remove", description = "Remove an annotation", returnDescription = "Return status code", 
+  @RestQuery(name = "remove", description = "Remove an annotation", returnDescription = "Return status code",
   pathParameters = { @RestParameter(name = "id", description = "The annotation identifier", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "Annotation deleted."), @RestResponse(responseCode = SC_NO_CONTENT, description = "Annotation not found.") })
   public Response removeAnnotation(@PathParam("id") String idAsString) throws NotFoundException {
     Long id = null;
-    Annotation a; 
+    Annotation a;
     try {
       id = Long.parseLong(idAsString);
     } catch (NumberFormatException e) {
@@ -263,7 +263,7 @@ public class AnnotationRestService {
     }
     a = (AnnotationImpl) annotationService.getAnnotation(id);
     boolean removed = annotationService.removeAnnotation(a);
-    if (removed) {    
+    if (removed) {
         return Response.status(Status.OK).build();
     }
     else {

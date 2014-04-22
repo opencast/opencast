@@ -33,15 +33,15 @@ import org.slf4j.LoggerFactory;
  * Gstreamer source bin factory class using Gnonlin elements.
  */
 public class GnonlinSourceBin {
-  
+
   /** Media source types */
   public static enum SourceType {
     Audio, Video
   }
-  
+
   /** The logging instance */
   private static final Logger logger = LoggerFactory.getLogger(VideoEditorPipeline.class);
-  
+
   /** Media source type */
   private final SourceType type;
   /** Gstreamer source bin */
@@ -50,21 +50,21 @@ public class GnonlinSourceBin {
   private final Bin gnlComposition;
   /** Source media caps */
   private final Caps caps;
-  
+
   /** Bin's max duration in millisecond */
   private long maxLengthMillis = 0L;
-  
+
   /**
    * Creates Gstreamer source bin with Gnonlin composition inside.
-   * 
+   *
    * @param type source media type
    * @param sourceCaps source media caps
    * @throws UnknownSourceTypeException if mediatype can't be processed
-   * @throws PipelineBuildException 
+   * @throws PipelineBuildException
    */
   GnonlinSourceBin(SourceType type, Caps sourceCaps) throws PipelineBuildException {
     this.type = type;
-    
+
     bin = new Bin();
     gnlComposition = (Bin) ElementFactory.make(GstreamerElements.GNL_COMPOSITION, null);
     final Element identity = ElementFactory.make(GstreamerElements.IDENTITY, null);
@@ -72,41 +72,41 @@ public class GnonlinSourceBin {
     final Element converter;
     final Element rate;
     switch(type) {
-      case Audio: 
+      case Audio:
         converter = ElementFactory.make(GstreamerElements.AUDIOCONVERT, null);
         rate = ElementFactory.make(GstreamerElements.AUDIORESAMPLE, null);
         if (sourceCaps != null)
           caps = sourceCaps;
-        else 
+        else
           caps = Caps.fromString("audio/x-raw-int; audio/x-raw-float");
-        
+
         break;
-      case Video: 
+      case Video:
         converter = ElementFactory.make(GstreamerElements.FFMPEGCOLORSPACE, null);
         rate = ElementFactory.make(GstreamerElements.VIDEORATE, null);
         if (sourceCaps != null)
           caps = sourceCaps;
-        else 
+        else
           caps = Caps.fromString("video/x-raw-yuv; video/x-raw-rgb");
         break;
       default:
         // can't pass
         throw new PipelineBuildException();
     }
-    
+
     bin.addMany(gnlComposition, identity, converter, rate, queue);
     if (!Element.linkMany(identity, converter, rate, queue)) {
       throw new PipelineBuildException();
     }
-    
+
     if (type == SourceType.Video)
       identity.set("single-segment", true);
 //    identity.set("check-imperfect-timestamp", true);
 //    identity.set("check-imperfect-offset", true);
-    
+
     Pad srcPad = queue.getSrcPads().get(0);
     bin.addPad(new GhostPad(srcPad.getName(), srcPad));
-    
+
     gnlComposition.connect(new Element.PAD_ADDED() {
 
       @Override
@@ -124,7 +124,7 @@ public class GnonlinSourceBin {
         });
       }
     });
-    
+
     gnlComposition.connect(new Element.NO_MORE_PADS() {
 
       @Override
@@ -132,12 +132,12 @@ public class GnonlinSourceBin {
         if (!identity.getSinkPads().get(0).isLinked()) {
           logger.error(identity.getName() + " has no peer!");
           getBin().sendEvent(new EOSEvent());
-          
+
         }
       }
     });
   }
-  
+
   /**
    * Add new segment.
    * @param filePath source file
@@ -145,20 +145,20 @@ public class GnonlinSourceBin {
    * @param mediaDurationMillis segment duration (in milliseconds)
    */
   void addFileSource(String filePath, long mediaStartMillis, long mediaDurationMillis) {
-    
+
     Bin gnlsource = (Bin) ElementFactory.make(GstreamerElements.GNL_FILESOURCE, null);
     gnlComposition.add(gnlsource);
-        
+
     gnlsource.set("location", filePath);
     gnlsource.set("caps", caps);
     gnlsource.set("start", TimeUnit.MILLISECONDS.toNanos(maxLengthMillis));
     gnlsource.set("duration", TimeUnit.MILLISECONDS.toNanos(mediaDurationMillis));
     gnlsource.set("media-start", TimeUnit.MILLISECONDS.toNanos(mediaStartMillis));
     gnlsource.set("media-duration", TimeUnit.MILLISECONDS.toNanos(mediaDurationMillis));
-    
+
     maxLengthMillis += mediaDurationMillis;
   }
-  
+
   /**
    * Returns source Pad.
    * @return source pad
@@ -166,7 +166,7 @@ public class GnonlinSourceBin {
   public Pad getSrcPad() {
     return getBin().getSrcPads().get(0);
   }
-  
+
   /**
    * Returns the Gstreamer source bin.
    * @return source bin
@@ -174,7 +174,7 @@ public class GnonlinSourceBin {
   public Bin getBin() {
     return bin;
   }
-  
+
   /**
    * Returns the length of producing media file in milliseconds.
    * @return length of producing media file in milliseconds.
@@ -182,7 +182,7 @@ public class GnonlinSourceBin {
   public long getLengthMilliseconds() {
     return maxLengthMillis;
   }
-  
+
   /**
    * Returns the input source type (audio or video).
    * @return producing source type

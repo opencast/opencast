@@ -24,7 +24,7 @@ public class ProcessFailedException extends Exception {
   public ProcessFailedException(String message) {
     super(message);
   }
-  
+
   public ProcessFailedException(String message, Throwable throwable) {
     super(message, throwable);
   }
