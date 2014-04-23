@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Mpeg7 xmlns="urn:mpeg:mpeg7:schema:2001" xmlns:mpeg7="urn:mpeg7:schema:2001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance/">
+<Mpeg7 xmlns="urn:mpeg:mpeg7:schema:2001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Description xsi:type="ContentEntityType">
         <MultimediaContent xsi:type="AudioType">
             <Audio id="captions">

@@ -57,12 +57,12 @@ public class StatsImpl implements Stats {
   @Override
   public void setMediapackageId(String mediapackageId) {
     this.mediapackageId = mediapackageId;
-    
+
   }
 
   @Override
   public void setViews(int views) {
     this.views = views;
-    
+
   }
 }

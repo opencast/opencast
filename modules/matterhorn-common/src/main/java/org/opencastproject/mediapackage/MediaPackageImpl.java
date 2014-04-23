@@ -428,7 +428,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
     List<MediaPackageElement> elements = new ArrayList<MediaPackageElement>();
     for (MediaPackageElement element : getElements()) {
-      if (flavor.equals(element.getFlavor()))
+      if (flavor.matches(element.getFlavor()))
         elements.add(element);
     }
     return elements.toArray(new MediaPackageElement[elements.size()]);
@@ -725,7 +725,7 @@ public final class MediaPackageImpl implements MediaPackage {
     Collection<Track> tracks = loadTracks();
     List<Track> candidates = new ArrayList<Track>(tracks);
     for (Track a : tracks) {
-      if (!flavor.equals(a.getFlavor())) {
+      if (a.getFlavor() == null || !a.getFlavor().matches(flavor)) {
         candidates.remove(a);
       }
     }
@@ -970,7 +970,7 @@ public final class MediaPackageImpl implements MediaPackage {
     Collection<Attachment> attachments = loadAttachments();
     List<Attachment> candidates = new ArrayList<Attachment>(attachments);
     for (Attachment a : attachments) {
-      if (!flavor.equals(a.getFlavor())) {
+      if (a.getFlavor() == null || !a.getFlavor().matches(flavor)) {
         candidates.remove(a);
       }
     }

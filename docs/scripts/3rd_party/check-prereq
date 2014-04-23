@@ -9,7 +9,7 @@ install_rpms() {
   name_ver=`echo "$1" | awk '{
     sub("\\\.(i386|i686|x86_64|noarch)\\\.rpm$", "", $1); print $1; exit 0}'`
   case `os` in
-    CentOS | RHEL )
+    CentOS | RHEL | SciL )
       installed=`rpm -q --last "$name" | awk '{
         sub("\\\.(i386|i686|x86_64|noarch)$", "", $1); print $1; exit 0}'`
       if [ ! "$installed" = "$name_ver" ]; then
@@ -119,6 +119,16 @@ enable_atomic() {
   done
   install_rpms $rpms
   [ $? -ne 0 ] && return 1
+  case `os` in
+    SciL )
+      TMPFILE=`mktemp /tmp/${0##*/}-atomic.repo.XXXXX`
+      sudox sed 's/$releasever/'${V}'/g' /etc/yum.repos.d/atomic.repo > $TMPFILE
+      [ $? -ne 0 ] && return 1
+      sudox cp $TMPFILE /etc/yum.repos.d/atomic.repo
+      [ $? -ne 0 ] && return 1
+      sudox rm -f $TMPFILE
+      ;;
+  esac
   return 0
 }
 #
@@ -232,6 +242,52 @@ enable_rpmfusion() {
   return 0
 }
 #
+enable_atrpms() {
+  cd "$HOME3P"
+  [ $? -ne 0 ] && return 1
+  mkdir -p packages
+  [ $? -ne 0 ] && return 1
+  cd packages
+  [ $? -ne 0 ] && return 1
+  #
+  case `os_ver` in
+    5.* ) V=5 ;;
+    6.* ) V=6 ;;
+    * ) V="" ;;
+  esac
+  rpms=""
+  case `arch` in
+    i386 )
+      URLS=`getmcfg atrpms${V}_x86_url:`
+      rpms=`getmcfg atrpms${V}_x86_pkgs:`
+      ;;
+    x86_64 )
+      URLS=`getmcfg atrpms${V}_x64_url:`
+      rpms=`getmcfg atrpms${V}_x64_pkgs:`
+      ;;
+  esac
+  for rpm in $rpms; do
+    if [ ! -s "$rpm" ]; then
+      copypkg "$rpm"
+      if [ $? -ne 0 ]; then
+        ok=1
+        for URL in $URLS; do
+          wget -t 5 -4 -O "$rpm" "$URL/$rpm"
+          ok=$?
+          [ $ok -eq 0 ] && break
+        done
+        if [ $ok -ne 0 ]; then
+          rm -f "$rpm"
+          return 1
+        fi
+      fi
+    fi
+  done
+  install_rpms $rpms
+  [ $? -ne 0 ] && return 1
+  return 0
+}
+#
 install_prog() {
   cd "$HOME3P"
   [ $? -ne 0 ] && return 1
@@ -241,7 +297,7 @@ install_prog() {
   [ $? -ne 0 ] && return 1
   #
   case `os` in
-    CentOS | RHEL )
+    CentOS | RHEL | SciL )
       case `os_ver` in
         5.* ) V=5 ;;
         6.* ) V=6 ;;
@@ -598,7 +654,7 @@ install_prog() {
         git ) prog=git-core ;;
         ImageMagick ) prog=imagemagick ;;
         gsl-devel ) prog=libgsl0-dev ;;
-        gmp ) prog=libgmp3c2 ;;
+        gmp ) if [ `os_ver` < "13.04" ] ; then prog=libgmp3c2; else prog=libgmp10; fi ;;
         zlib-devel ) prog=zlib1g-dev ;;
         Xext-devel ) prog="libx11-dev libxpm-dev x11proto-xext-dev libxext-dev" ;;
         * ) prog="$1" ;;
@@ -634,13 +690,17 @@ install_macports() {
   [ $? -ne 0 ] && return 1
   #
   case `os_ver` in
-    10.6* )
-      URLS=`getmcfg MacPorts_Snow_url:`
-      dmgs=`getmcfg MacPorts_Snow_pkgs:`
-      ;;
     10.7* )
       URLS=`getmcfg MacPorts_Lion_url:`
       dmgs=`getmcfg MacPorts_Lion_pkgs:`
+      ;;
+    10.8* )
+      URLS=`getmcfg MacPorts_Moun_url:`
+      dmgs=`getmcfg MacPorts_Moun_pkgs:`
+      ;;
+    10.9* )
+      URLS=`getmcfg MacPorts_Maver_url:`
+      dmgs=`getmcfg MacPorts_Maver_pkgs:`
       ;;
   esac
   MPVER="${dmgs##MacPorts-}"
@@ -732,10 +792,11 @@ install_git() {
   if [ "$dmg" != "${dmg%.dmg}" ]; then
     sudox hdiutil attach "$dmg"
     [ $? -ne 0 ] && return 1
-    # mounted to /Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard
-    sudox installer -pkg "/Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard/git-1.6.5.1-UNIVERSALbinary-leopard.pkg" -target /
+    path=`getmcfg git_mac_path:`
+    # mounted to /Volumes/<path>
+    sudox installer -pkg "/Volumes/$path/${dmg%.dmg}.pkg" -target /
     [ $? -ne 0 ] && return 1
-    sudox hdiutil detach "/Volumes/Git 1.6.5.1 UNIVERSAL binary Leopard"
+    sudox hdiutil detach "/Volumes/$path"
     [ $? -ne 0 ] && return 1
   elif [ "$dmg" != "${dmg%.pkg}" ]; then
     sudox installer -pkg "$dmg" -target /
@@ -771,7 +832,7 @@ preinstall_scons() {
   [ $? -ne 0 ] && return 1
   #
   case `os` in
-    CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | Amazon )
+    CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | SciL | Amazon )
       download .
       [ $? -ne 0 ] && return 1
       ./linux-compile
@@ -785,11 +846,12 @@ preinstall_scons() {
 #
 check_prereq() {
   case `os` in
-    CentOS | RHEL )
+    CentOS | RHEL | SciL )
       chkrepo epel      || enable_epel         || return 1
       chkrepo atomic    || enable_atomic       || return 1
       chkrepo rpmforge  || enable_rpmforge     || return 1
       chkrepo rpmfusion || enable_rpmfusion    || return 1
+      #chkrepo atrpms    || enable_atrpms       || return 1
       #
       chkprog wget    || install_prog wget     || return 1
       chkprog zip     || install_prog zip      || return 1
@@ -882,8 +944,8 @@ check_prereq() {
       ;;
     MacOS )
       chkprog port  || install_macports   || return 1
-      if [ `macports_version` -lt 10902 ]; then
-        echo "Mac ports version is too old - should be at least 1.9.2 or greater" 1>&2
+      if [ `macports_version` -lt 20200 ]; then
+        echo "Mac ports version is too old - should be at least 2.2.0 or greater" 1>&2
         return 1
       fi
       #
@@ -924,7 +986,7 @@ install_mingw32() {
   [ $? -ne 0 ] && return 1
   #
   case `os` in
-    CentOS | RHEL )
+    CentOS | RHEL | SciL )
       case `os_ver` in
         5.* ) V=5 ;;
         6.* ) V=6 ;;
@@ -1192,7 +1254,7 @@ fix_libs() {
   [ $? -ne 0 ] && return 1
   #
   case `os` in
-    CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | Amazon )
+    CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | SciL | Amazon )
       #
       # Install patchelf 0.5
       #
@@ -1233,7 +1295,7 @@ fix_libs() {
   esac
   #
   case `os` in
-    CentOS | RHEL )
+    CentOS | RHEL | SciL )
       # Check & set /usr/local/lib in LD_LIBRARY_PATH
       grep '/usr/local/lib' /etc/ld.so.conf.d/* >/dev/null
       if [ $? -ne 0 ]; then
@@ -1376,7 +1438,7 @@ EOF
 }
 #
 case `os` in
-  CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | Amazon | MacOS )
+  CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | SciL | Amazon | MacOS )
     ;;
   * )
     echo "Unsupported operating system: `os`" 1>&2

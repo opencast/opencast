@@ -26,14 +26,14 @@ public interface Enclosure {
 
   /**
    * Returns the enclosure URL.
-   * 
+   *
    * @return the enclosure URL, <b>null</b> if none
    */
   String getUrl();
 
   /**
    * Sets the enclosure URL.
-   * 
+   *
    * @param url
    *          the enclosure URL to set, <b>null</b> if none
    */
@@ -41,14 +41,14 @@ public interface Enclosure {
 
   /**
    * Returns the enclosure length.
-   * 
+   *
    * @return the enclosure length, <b>null</b> if none
    */
   long getLength();
 
   /**
    * Sets the enclosure length.
-   * 
+   *
    * @param length
    *          the enclosure length to set, <b>null</b> if none
    */
@@ -56,32 +56,32 @@ public interface Enclosure {
 
   /**
    * Returns the enclosure type.
-   * 
+   *
    * @return the enclosure type, <b>null</b> if none
    */
   String getType();
 
   /**
    * Sets the enclosure type.
-   * 
+   *
    * @param type
    *          the enclosure type to set, <b>null</b> if none
    */
   void setType(String type);
- 
+
   /**
    * Returns the enclosure mediapackage element flavor.
-   * 
+   *
    * @return the enclosure flavor, <b>null</b> if none
    */
   String getFlavor();
-    
+
   /**
    * Sets the enclosure mediapackage element flavor.
-   * 
+   *
    * @param flavor
    *          the enclosure type to set, <b>null</b> if none
    */
-  void setFlavor(String flavor);  
+  void setFlavor(String flavor);
 
 }

@@ -19,7 +19,7 @@ package org.opencastproject.silencedetection.api;
  * Silence detection on audio track failed.
  */
 public class SilenceDetectionFailedException extends Exception {
-  
+
   /**
    * Constructor.
    * @param message describtion why silence detection is failed
@@ -27,7 +27,7 @@ public class SilenceDetectionFailedException extends Exception {
   public SilenceDetectionFailedException(String message) {
     super(message);
   }
-  
+
   /**
    * Constructor.
    * @param message describtion why silence detection is failed

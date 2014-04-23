@@ -1,0 +1,5 @@
+URL: http://heanet.dl.sourceforge.net/project/sox/sox/14.4.1 ${USASK_MIRROR} ${ETH_MIRROR}
+PKG: sox-14.4.1.tar.gz
+SHA: 71f05afc51e3d9b03376b2f98fd452d3a274d595
+DIR: sox-14.4.1
+PCP1: pc-sox.zip

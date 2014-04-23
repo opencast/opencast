@@ -16,21 +16,26 @@
 
 package org.opencastproject.composer.impl;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.composer.api.EncoderEngine;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncoderListener;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.data.Option;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -40,8 +45,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
+import javax.activation.MimetypesFileTypeMap;
 
 /**
  * Wrapper around any kind of command line controllable encoder.
@@ -97,19 +101,19 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
    *      org.opencastproject.composer.api.EncodingProfile, java.util.Map)
    */
   @Override
-  public Option<File> encode(File mediaSource, EncodingProfile format, Map<String, String> properties) throws EncoderException {
+  public Option<File> encode(File mediaSource, EncodingProfile format, Map<String, String> properties)
+          throws EncoderException {
     return process(null, mediaSource, format, properties);
   }
 
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.composer.api.EncoderEngine#trim(java.io.File,
-   *      org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
+   * @see org.opencastproject.composer.api.EncoderEngine#trim(File, EncodingProfile, double, double, Map)
    */
   @Override
-  public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
-          throws EncoderException {
+  public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration,
+          Map<String, String> properties) throws EncoderException {
     return process(null, mediaSource, format, properties);
   }
 
@@ -128,20 +132,23 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
   /**
    * (non-Javadoc)
    * 
-   * @see org.opencastproject.composer.api.EncoderEngine#extract(java.io.File,
-   *      org.opencastproject.composer.api.EncodingProfile, java.util.Map, long[])
+   * @see org.opencastproject.composer.api.EncoderEngine#extract(File, EncodingProfile, Map, double...)
    */
   @Override
-  public List<File> extract(File mediaSource, EncodingProfile format, Map<String, String> properties, long... times)
+  public List<File> extract(File mediaSource, EncodingProfile format, Map<String, String> properties, double... times)
           throws EncoderException {
 
     List<File> extractedImages = new LinkedList<File>();
-    for (long time : times) {
+    for (double time : times) {
       Map<String, String> params = new HashMap<String, String>();
       if (properties != null) {
         params.putAll(properties);
       }
-      params.put("time", Long.toString(time));
+
+      DecimalFormatSymbols ffmpegFormat = new DecimalFormatSymbols();
+      ffmpegFormat.setDecimalSeparator('.');
+      DecimalFormat df = new DecimalFormat("0.000", ffmpegFormat);
+      params.put("time", df.format(time));
       try {
         for (File image : process(null, mediaSource, format, params)) {
           extractedImages.add(image);
@@ -175,8 +182,8 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
    * @throws EncoderException
    *           if processing fails
    */
-  protected Option<File> process(File audioSource, File videoSource, EncodingProfile profile, Map<String, String> properties)
-          throws EncoderException {
+  protected Option<File> process(File audioSource, File videoSource, EncodingProfile profile,
+          Map<String, String> properties) throws EncoderException {
     // Fist, update the parameters
     if (properties != null)
       params.putAll(properties);
@@ -364,6 +371,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       for (Map.Entry<String, String> e : params.entrySet()) {
         result = result.replace("#{" + e.getKey() + "}", e.getValue());
       }
+      result = result.replace("#{space}", " ");
       command.add(result);
     }
     return command;
@@ -384,7 +392,8 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
   }
 
   /**
-   * @param commandline Never null
+   * @param commandline
+   *          Never null
    * @return Split string on spaces, except if between quotes (i.e. treat \“hello world\” as one token)
    */
   private List<String> splitCommandArgsWithCare(final String commandline) {

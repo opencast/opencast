@@ -19,26 +19,26 @@ package org.opencastproject.videoeditor.impl;
  * VideoEditorService properties that can be used to modify default processing values.
  */
 public interface VideoEditorProperties {
-  
+
   /** Custom audio (pre encoder) caps */
   String AUDIO_CAPS = "audio.caps";
   /** Custom audio encoder (gstreamer element) */
   String AUDIO_ENCODER = "audio.encoder";
   /** Custom audio encoder settings */
   String AUDIO_ENCODER_PROPERTIES = "audio.encoder.properties";
-  
+
   /** Custom video (pre encoder) caps */
   String VIDEO_CAPS = "video.caps";
   /** Custom video encoder (gstreamer element) */
   String VIDEO_ENCODER = "video.encoder";
   /** Custom video encoder settings */
   String VIDEO_ENCODER_PROPERTIES = "video.encoder.properties";
-  
+
   /** Custom muxer */
   String MUX = "mux";
   /** Custom muxer settings */
   String MUX_PROPERTIES = "mux.properties";
-  
+
   /** Custom output file extension */
   String OUTPUT_FILE_EXTENSION = "outputfile.extension";
 }

@@ -23,14 +23,14 @@ import static org.junit.Assert.*;
 
 
 public class CategoryImplTest {
-    
+
     private static CategoryImpl instance;
     @Before
     public void setUp() {
     instance  = new CategoryImpl("name", "uri");
-    
+
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -43,7 +43,7 @@ public class CategoryImplTest {
         String expResult = "name";
         String result = instance.getName();
         assertEquals(expResult, result);
-    
+
     }
 
     /**

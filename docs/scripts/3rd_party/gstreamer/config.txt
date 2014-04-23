@@ -1,24 +1,24 @@
-URL1: http://gstreamer.freedesktop.org/src/gstreamer ${USASK_MIRROR}
+URL1: http://gstreamer.freedesktop.org/src/gstreamer ${USASK_MIRROR} ${ETH_MIRROR}
 PKG1: gstreamer-0.11.90.tar.gz
 SHA1: 1d849a90f714460b2a5c2a63962ffc5aecc5b43e
 DIR1: gstreamer-0.11.90
-URL2: http://gstreamer.freedesktop.org/src/gst-plugins-base ${USASK_MIRROR}
+URL2: http://gstreamer.freedesktop.org/src/gst-plugins-base ${USASK_MIRROR} ${ETH_MIRROR}
 PKG2: gst-plugins-base-0.11.90.tar.gz
 SHA2: e5fc1a47ea74664c0a0470c2893cbf07a59976ae
 DIR2: gst-plugins-base-0.11.90
-URL3: http://gstreamer.freedesktop.org/src/gst-plugins-good ${USASK_MIRROR}
+URL3: http://gstreamer.freedesktop.org/src/gst-plugins-good ${USASK_MIRROR} ${ETH_MIRROR}
 PKG3: gst-plugins-good-0.11.90.tar.gz
 SHA3: 7abbaa4d997d8625994b97a0085c099c0b33d4ee
 DIR3: gst-plugins-good-0.11.90
-URL4: http://gstreamer.freedesktop.org/src/gst-plugins-bad ${USASK_MIRROR}
+URL4: http://gstreamer.freedesktop.org/src/gst-plugins-bad ${USASK_MIRROR} ${ETH_MIRROR}
 PKG4: gst-plugins-bad-0.11.90.tar.gz
 SHA4: 19bfac0eed750efe08dba34b404236de4744fded
 DIR4: gst-plugins-bad-0.11.90
-URL5: http://gstreamer.freedesktop.org/src/gst-plugins-ugly ${USASK_MIRROR}
+URL5: http://gstreamer.freedesktop.org/src/gst-plugins-ugly ${USASK_MIRROR} ${ETH_MIRROR}
 PKG5: gst-plugins-ugly-0.11.90.tar.gz
 SHA5: 079cde76bd5045df7466f07a8efe4bccf5301ad5
 DIR5: gst-plugins-ugly-0.11.90
-URL6: http://gstreamer.freedesktop.org/src/gst-ffmpeg ${USASK_MIRROR}
+URL6: http://gstreamer.freedesktop.org/src/gst-ffmpeg ${USASK_MIRROR} ${ETH_MIRROR}
 PKG6: gst-ffmpeg-0.11.2.tar.gz
 SHA6: 6a0ec84d78b6f62f479a62923bf5bc259656199d
 DIR6: gst-ffmpeg-0.11.2

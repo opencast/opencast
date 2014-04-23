@@ -11,11 +11,11 @@ download .            || exit 1
 download base_libs    || exit 1
 download ffmpeg_libs  || exit 1
 download ffmpeg       || exit 1
+download sox_libs     || exit 1
+download sox          || exit 1
 download gstreamer    || exit 1
 download mediainfo    || exit 1
 download tesseract    || exit 1
-download ocropus_libs || exit 1
-download ocropus      || exit 1
 download qtembedder   || exit 1
 #
 exit 0

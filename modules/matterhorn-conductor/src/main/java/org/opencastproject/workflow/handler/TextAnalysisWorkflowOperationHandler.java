@@ -396,7 +396,12 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
         catalog.setURI(workspaceURI);
 
         // Since we've enriched and stored the mpeg7 catalog, remove the original
-        mediaPackage.remove(segmentCatalog);
+        try {
+          mediaPackage.remove(segmentCatalog);
+          workspace.delete(segmentCatalog.getURI());
+        } catch (Exception e) {
+          logger.warn("Unable to delete segment catalog {}: {}", segmentCatalog.getURI(), e);
+        }
 
         // Add flavor and target tags
         catalog.setFlavor(MediaPackageElements.TEXTS);
@@ -404,11 +409,6 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
           catalog.addTag(tag);
         }
       } finally {
-        try {
-          workspace.delete(segmentCatalog.getURI());
-        } catch (Exception e) {
-          logger.warn("Unable to delete segment catalog {}: {}", segmentCatalog.getURI(), e);
-        }
         // Remove images that were created for text extraction
         logger.debug("Removing temporary images");
         for (Attachment image : images) {

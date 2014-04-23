@@ -55,7 +55,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * Reads the search result from the input stream.
-   * 
+   *
    * @param xml
    *          the input stream
    * @return the deserialized search result
@@ -71,7 +71,7 @@ public class SearchResultImpl implements SearchResult {
       IOUtils.closeQuietly(xml);
     }
   }
-  
+
   /** A list of search items. */
   @XmlElement(name = "result")
   private List<SearchResultItemImpl> resultSet = null;
@@ -105,7 +105,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * Creates a new and empty search result.
-   * 
+   *
    * @param query
    *          the query
    */
@@ -118,7 +118,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResult#getItems()
    */
   public SearchResultItem[] getItems() {
@@ -127,7 +127,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * Adds an item to the result set.
-   * 
+   *
    * @param item
    *          the item to add
    */
@@ -139,7 +139,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResult#getQuery()
    */
   public String getQuery() {
@@ -148,7 +148,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResult#size()
    */
   public long size() {
@@ -157,7 +157,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResult#getOffset()
    */
   public long getOffset() {
@@ -166,7 +166,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * Set the offset.
-   * 
+   *
    * @param offset
    *          The offset.
    */
@@ -176,7 +176,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResult#getLimit()
    */
   public long getLimit() {
@@ -185,7 +185,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * Set the limit.
-   * 
+   *
    * @param limit
    *          The limit.
    */
@@ -195,7 +195,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResult#getSearchTime()
    */
   public long getSearchTime() {
@@ -204,7 +204,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * Set the search time.
-   * 
+   *
    * @param searchTime
    *          The time in ms.
    */
@@ -214,7 +214,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * Sets the total hit count.
-   * 
+   *
    * @param total
    *          the total hit count
    */
@@ -224,7 +224,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResult#getTotalSize()
    */
   public long getTotalSize() {
@@ -233,7 +233,7 @@ public class SearchResultImpl implements SearchResult {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResult#getPage()
    */
   public long getPage() {

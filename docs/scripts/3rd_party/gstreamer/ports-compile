@@ -8,12 +8,12 @@ source "${HOME3P}/utilx"
 #
 [ -f .done-ports ] && exit 0
 #
-sudox port -f install gstreamer || exit 1
-sudox port -f install gst-plugins-base || exit 1
-sudox port -f install gst-plugins-good || exit 1
-sudox port -f install gst-plugins-bad || exit 1
-sudox port -f install gst-plugins-ugly || exit 1
-sudox port -f install gst-ffmpeg || exit 1
+sudox port -f install gstreamer010 || exit 1
+sudox port -f install gstreamer010-gst-plugins-base || exit 1
+sudox port -f install gstreamer010-gst-plugins-good || exit 1
+sudox port -f install gstreamer010-gst-plugins-bad || exit 1
+sudox port -f install gstreamer010-gst-plugins-ugly || exit 1
+sudox port -f install gstreamer010-gst-ffmpeg || exit 1
 #
 # Fix gst launch, if version independent launcher is not installed
 #

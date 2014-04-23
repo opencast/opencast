@@ -46,7 +46,7 @@ public class RecordingTest {
     Assert.assertEquals("test", recording.getID());
     Assert.assertEquals(RecordingState.CAPTURING, recording.getState());
   }
-  
+
   @Test
   public void changedInformation() throws InterruptedException {
     Assert.assertEquals("test", recording.getID());
@@ -62,5 +62,5 @@ public class RecordingTest {
     if (recording.getLastCheckinTime() <= time || recording.getLastCheckinTime() >= System.currentTimeMillis()) {
       Assert.fail("Invalid checkin time");
     }
-  }  
+  }
 }

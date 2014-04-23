@@ -63,7 +63,7 @@ public class UserSummaryListImpl implements UserSummaryList {
       add((UserSummaryImpl)userSummary);
     }
   }
-  
+
   /**
    * A no-arg constructor needed by JAXB
    */
@@ -74,7 +74,7 @@ public class UserSummaryListImpl implements UserSummaryList {
   public int getTotal() {
     return total;
   }
-  
+
   public List<UserSummary> getUserSummaries() {
     List<UserSummary> result = new LinkedList<UserSummary>();
     for (UserSummaryImpl userActionImpl : userSummaries) {

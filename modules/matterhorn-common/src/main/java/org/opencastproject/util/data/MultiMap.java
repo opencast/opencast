@@ -29,7 +29,8 @@ public abstract class MultiMap<A, B> {
 
   public static <A, B> MultiMap<A, B> multiHashMapWithArrayList() {
     return new MultiMap<A, B>(new HashMap<A, List<B>>()) {
-      @Override protected List<B> newList() {
+      @Override
+      protected List<B> newList() {
         return new ArrayList<B>();
       }
     };

@@ -41,9 +41,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AudioMonitoringConsumerTest {
-  
+
   private static final String testPath = "./target/monitoringTest";
-  
+
   /** Audiotestsrc Capture Device created for unit testing **/
   private CaptureDevice captureDevice = null;
   /** Pipeline created for unit testing **/
@@ -78,16 +78,16 @@ public class AudioMonitoringConsumerTest {
   public void setUp() throws ConfigurationException, IOException, URISyntaxException {
     if (!gstreamerInstalled)
       return;
-    
+
     new File(testPath).mkdir();
-    Properties captureDeviceProperties = PipelineTestHelpers.createCaptureDeviceProperties(captureDevice, 
+    Properties captureDeviceProperties = PipelineTestHelpers.createCaptureDeviceProperties(captureDevice,
             null, null, null, null, null, null);
     captureDevice = PipelineTestHelpers.createCaptureDevice(null, ProducerType.AUDIOTESTSRC, "audiotestsrc", testPath, captureDeviceProperties);
-    
+
     pipeline = new Pipeline();
     Element audiotestsrc = ElementFactory.make("audiotestsrc", null);
     Element queue = ElementFactory.make("queue", null);
-    
+
     pipeline.addMany(audiotestsrc, queue);
     if (!audiotestsrc.link(queue)) {
       captureDevice = null;
@@ -95,13 +95,13 @@ public class AudioMonitoringConsumerTest {
       gstreamerInstalled = false;
     }
   }
-  
+
   @After
   public void tearDown() {
     captureDevice = null;
     new File(testPath).delete();
   }
-  
+
   private boolean addConsumerBinToPipeline(AudioMonitoringConsumer consumerBin) {
     Element queue = null;
     for (Element elem : pipeline.getElements()) {
@@ -113,7 +113,7 @@ public class AudioMonitoringConsumerTest {
     pipeline.add(consumerBin.getBin());
     return Element.linkPads(queue, "src", consumerBin.getBin(), consumerBin.GHOST_PAD_NAME);
   }
-  
+
   private void hookUpBus() {
     pipeline.getBus().connect("element", new Bus.MESSAGE() {
 
@@ -146,7 +146,7 @@ public class AudioMonitoringConsumerTest {
         Assert.fail("can not link audio monitoring bin");
       }
       hookUpBus();
-      
+
       // start pipeline
       pipeline.play();
       if (pipeline.getState(3 * 1000000000L) != State.PLAYING) {
@@ -154,18 +154,18 @@ public class AudioMonitoringConsumerTest {
         pipeline = null;
         Assert.fail("audio monitoring pipeline not started");
       }
-      
+
       // wait 3 sec
       Thread.sleep(3000);
       // stop pipeline
       pipeline.setState(State.NULL);
       pipeline = null;
-      
+
       // test rms-valu-list is not empty
       if (!gotRmsMessage) {
         Assert.fail("Does not got any RMS vlaue messages on pipeline");
       }
-            
+
     } catch (Exception ex) {
       Assert.fail(ex.getMessage());
     }

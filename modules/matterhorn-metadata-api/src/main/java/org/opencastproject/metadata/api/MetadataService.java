@@ -29,21 +29,21 @@ public interface MetadataService<A> {
 
   /**
    * The priority of this MetadataService compared to others when more than one is registered in the system.
-   * 
+   *
    * When more than one MetadataService is registered, the {@link #getMetadata(MediaPackage)} method may be
    * called on each service in order of priority. Metadata objects returned by higher priority
    * MetadataServices should override those returned by lower priority services.
-   * 
+   *
    * The lowest number is the highest priority (i.e. 1 is a higher priority than 2).
-   * 
+   *
    * @return The priority
    */
   int getPriority();
-  
+
   /**
    * Gets the metadata for a {@link MediaPackage} if possible.  If no metadata can be extracted
    * from the catalogs in the {@link MediaPackage}, this returns null;
-   * 
+   *
    * @param mediaPackage The mediapackage to inspect for catalogs
    * @return The metadata extracted from the media package
    */

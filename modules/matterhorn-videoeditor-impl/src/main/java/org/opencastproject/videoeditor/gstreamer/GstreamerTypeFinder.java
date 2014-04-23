@@ -38,28 +38,28 @@ public class GstreamerTypeFinder {
    * The logging instance
    */
   private static final Logger logger = LoggerFactory.getLogger(GstreamerTypeFinder.class);
-  
+
   private final Pipeline pipeline;
   private final MainLoop mainLoop = new MainLoop();
-  
+
   private final List<Caps> capsFound = new LinkedList<Caps>();
   private Caps audioCaps = null;
   private Caps videoCaps = null;
-  
+
   /**
    * Run media type detection on source file.
-   * 
+   *
    * @param filePath source file to determine media type
    */
   public GstreamerTypeFinder(String filePath) {
     pipeline = new Pipeline();
-    
+
     Element filesrc = ElementFactory.make(GstreamerElements.FILESRC, null);
     DecodeBin2 decodebin = new DecodeBin2("dec");
-    
+
     pipeline.addMany(filesrc, decodebin);
     filesrc.link(decodebin);
-    
+
     filesrc.set("location", filePath);
     decodebin.set("expose-all-streams", true);
     decodebin.connect(new DecodeBin2.AUTOPLUG_CONTINUE() {
@@ -80,7 +80,7 @@ public class GstreamerTypeFinder {
         else if (pad.getCaps().isAlwaysCompatible(Caps.fromString("video/x-raw-rgb; video/x-raw-yuv")))
           videoCaps = pad.getCaps();
         else capsFound.add(pad.getCaps());
-        
+
         logger.debug("found final caps: " + pad.getCaps());
       }
     });
@@ -101,7 +101,7 @@ public class GstreamerTypeFinder {
         mainLoop.quit();
       }
     });
-    
+
     pipeline.getBus().connect(new Bus.EOS() {
 
       @Override
@@ -110,7 +110,7 @@ public class GstreamerTypeFinder {
         mainLoop.quit();
       }
     });
-    
+
     pipeline.getBus().connect(new Bus.ERROR() {
 
       @Override
@@ -118,10 +118,10 @@ public class GstreamerTypeFinder {
         mainLoop.quit();
       }
     });
-    
+
     filesrc.disown();
     decodebin.disown();
-    
+
     pipeline.play();
     mainLoop.run();
     pipeline.stop();
@@ -135,7 +135,7 @@ public class GstreamerTypeFinder {
   public List<Caps> getFoundCaps() {
     return capsFound;
   }
-  
+
   /**
    * Returns true if source file has an audio stream.
    * @return true if source file has an audio stream, false otherwise
@@ -143,7 +143,7 @@ public class GstreamerTypeFinder {
   public boolean isAudioFile() {
     return audioCaps != null;
   }
-  
+
   /**
    * Returns true if source file has an video stream.
    * @return true if source file has an video stream, false otherwise
@@ -151,7 +151,7 @@ public class GstreamerTypeFinder {
   public boolean isVideoFile() {
     return videoCaps != null;
   }
-  
+
   /**
    * Returns found audio caps.
    * @return found audio caps
@@ -165,10 +165,10 @@ public class GstreamerTypeFinder {
         return c;
       }
     }
-    
+
     return audioCaps;
   }
-  
+
   /**
    * Returns raw (final) audio caps.
    * @return raw (final) audio caps
@@ -176,7 +176,7 @@ public class GstreamerTypeFinder {
   public Caps getRawAudioCaps() {
     return audioCaps;
   }
-  
+
   /**
    * Returns found video caps.
    * @return found video caps
@@ -190,10 +190,10 @@ public class GstreamerTypeFinder {
         return c;
       }
     }
-    
+
     return videoCaps;
   }
-  
+
   /**
    * Returns raw (final) video caps.
    * @return raw (final) video caps
@@ -201,7 +201,7 @@ public class GstreamerTypeFinder {
   public Caps getRawVideoCaps() {
     return videoCaps;
   }
-  
+
   /**
    * Returns true, if caps describe an container format.
    * @param caps caps to detect container or not
@@ -218,19 +218,19 @@ public class GstreamerTypeFinder {
             || "application/ogg".equals(capsName)
             || "video/quicktime".equals(capsName)
             || "application/vnd.rn-realmedia".equals(capsName)
-            || "audio/x-wav".equals(capsName)) 
+            || "audio/x-wav".equals(capsName))
       return true;
-    
-    if ("video/mpeg".equals(capsName) 
+
+    if ("video/mpeg".equals(capsName)
             && caps.getStructure(0).hasField("systemstream")
             && caps.getStructure(0).getBoolean("systemstream"))
       return true;
-    
+
     if ("video/x-dv".equals(capsName)
             && caps.getStructure(0).hasField("systemstream")
             && caps.getStructure(0).getBoolean("systemstream"))
       return true;
-    
+
     return false;
   }
 }

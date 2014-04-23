@@ -9,7 +9,7 @@ source "${HOME3P}/utilx"
 [ -f .done-linux ] && exit 0
 #
 case `os` in
-  CentOS | RHEL )
+  CentOS | SciL )
     sudox yum -y install gstreamer        # gst-launch-0.10
     [ $? -ne 0 ] && exit 1
     sudox yum -y install gstreamer-tools  # gst-launch
@@ -20,16 +20,24 @@ case `os` in
     [ $? -ne 0 ] && exit 1
     sudox yum -y install gstreamer-plugins-bad
     [ $? -ne 0 ] && exit 1
-    case `os_ver` in
-      5.* )
-        ./install-plugins-ugly-centos-5.x
-        [ $? -ne 0 ] && exit 1
-        ;;
-      * )
-        sudox yum -y install gstreamer-plugins-ugly
-        [ $? -ne 0 ] && exit 1
-        ;;
-    esac
+    sudox yum -y install gstreamer-plugins-ugly
+    [ $? -ne 0 ] && exit 1
+    sudox yum -y install gstreamer-ffmpeg
+    [ $? -ne 0 ] && exit 1
+    ;;
+  RHEL )
+    sudox yum -y install gstreamer        # gst-launch-0.10
+    [ $? -ne 0 ] && exit 1
+    sudox yum -y install gstreamer-tools  # gst-launch
+    [ $? -ne 0 ] && exit 1
+    sudox yum -y install gstreamer-plugins-base
+    [ $? -ne 0 ] && exit 1
+    sudox yum -y install gstreamer-plugins-good
+    [ $? -ne 0 ] && exit 1
+    ./install-plugins-bad-rhel-6.x
+    [ $? -ne 0 ] && exit 1
+    ./install-plugins-ugly-rhel-6.x
+    [ $? -ne 0 ] && exit 1
     sudox yum -y install gstreamer-ffmpeg
     [ $? -ne 0 ] && exit 1
     ;;
@@ -47,14 +55,14 @@ case `os` in
     sudox apt-get -y install gstreamer0.10-ffmpeg
     [ $? -ne 0 ] && exit 1
     ;;
-   openSUSE )
-    sudox zypper  --non-interactive install gstreamer        # gst-launch-0.10
+  openSUSE )
+    sudox zypper --non-interactive install gstreamer  # gst-launch-0.10
     [ $? -ne 0 ] && exit 1
-    sudox zypper  --non-interactive install gstreamer-plugins-base
+    sudox zypper --non-interactive install gstreamer-plugins-base
     [ $? -ne 0 ] && exit 1
-    sudox zypper  --non-interactive install gstreamer-plugins-good
+    sudox zypper --non-interactive install gstreamer-plugins-good
     [ $? -ne 0 ] && exit 1
-    sudox zypper  --non-interactive install gstreamer-plugins-bad
+    sudox zypper --non-interactive install gstreamer-plugins-bad
     [ $? -ne 0 ] && exit 1
     ;;
   * )

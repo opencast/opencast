@@ -78,7 +78,7 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -88,7 +88,7 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -190,7 +190,7 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
    * <p>
    * If <code>publishedMp</code> is <code>null</code>, this method returns the updated mediapackage without any
    * modifications.
-   * 
+   *
    * @param updatedMp
    *          the updated media package
    * @param publishedMp
@@ -216,7 +216,7 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
   /**
    * Creates a clone of the mediapackage and removes those elements that do not match the flavor and tags filter
    * criteria.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @param flavors
@@ -253,7 +253,7 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
     // If no filter has been supplied, take all elements
     if (flavors.size() == 0 && tags.size() == 0)
       keep.addAll(Arrays.asList(mediaPackage.getElements()));
-    
+
     // Fix references and flavors
     for (MediaPackageElement element : filteredMediaPackage.getElements()) {
 
@@ -305,7 +305,7 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
 
   /**
    * Media package must have a title and contain tracks in order to be published.
-   * 
+   *
    * @param mp
    *          the media package
    * @return <code>true</code> if the mediapackage can be published
@@ -317,7 +317,7 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
   /**
    * Callback for declarative services configuration that will introduce us to the search service. Implementation
    * assumes that the reference is configured as being static.
-   * 
+   *
    * @param searchService
    *          an instance of the search service
    */

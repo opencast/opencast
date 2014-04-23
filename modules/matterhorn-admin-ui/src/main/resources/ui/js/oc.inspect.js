@@ -4,7 +4,8 @@ Opencast.WorkflowInspect = (function() {
 
   this.WORKFLOW_INSTANCE_URL = '../workflow/instance/';
   this.SCHEDULER_URL = '../recordings/';
-
+  var JOB_URL = '../services/job/';
+  
   var $container;       // id of the target container
   var templateId;
   var instanceView;     // view of the workflow instance data
@@ -230,6 +231,31 @@ Opencast.WorkflowInspect = (function() {
       if (!unfolded) {
         $content.show('fast');
       }
+      
+      if(unfolded) return;
+      var ops = Opencast.RenderUtils.ensureArray(workflow.workflow.operations);
+      var jobId = ops[$(this).index()].job;
+      if(!$.isEmptyObject(jobId)) {
+          $.ajax({
+        	  url : JOB_URL + jobId + '/children.json',
+              type : 'GET',
+              dataType : 'json',
+              success : $.proxy(function(data) {
+            	  var jobs = Opencast.RenderUtils.ensureArray(data.jobs.job);
+            	  if(jobs.length == 0) return;
+            	  var contentDiv = $(this).find('div.unfoldable-content');
+            	  contentDiv.find('table.subtable.jobs').prev().remove();
+            	  contentDiv.find('table.subtable.jobs').remove();
+            	  contentDiv.append('<h4>Jobs</h4>');
+            	  contentDiv.append('<table class="subtable jobs"><tbody></tbody></table>');
+            	  var jobsTable = $(this).find('table.subtable.jobs tbody');
+            	  $.each(jobs, function(i, job) {
+            		  var host = job.processingHost == null ? job.createdHost  : job.processingHost;
+            		  $(jobsTable).append('<tr><td class="td-key">' + job.id + '</td><td class="td-value">' + host + ' (' + job.status.toLowerCase() + ')</td></tr>');
+            	  });
+              }, this)
+          });
+      }
     });
 //    Temporary removed since the highcharts license is not supported
 //    renderWorkflowPerformance(workflow);
@@ -407,7 +433,7 @@ Opencast.WorkflowInspect = (function() {
     });
     return out;
   }
-
+  
   return this;
 }());
 
