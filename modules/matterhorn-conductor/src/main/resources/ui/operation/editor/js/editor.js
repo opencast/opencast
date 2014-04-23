@@ -47,6 +47,13 @@ var PREVIOUS_MARKER = "trim.previous_marker";
 var PLAY_ENDING_OF_CURRENT_SEGMENT = "trim.play_ending_of_current_segment";
 
 var parElementTimeoutTime = 10; // ms
+var parFailureTimeoutTime = 50; // ms
+var parTimeoutsUntilFailureDefault = 3;
+var parTimeoutsUntilFailure = parTimeoutsUntilFailureDefault;
+var clipElementTimeoutTime = 10; // ms
+var clipFailureTimeoutTime = 50; // ms
+var clipTimeoutsUntilFailureDefault = 3;
+var clipTimeoutsUntilFailure = clipTimeoutsUntilFailureDefault;
 
 // key codes
 var KEY_ENTER = 13;
@@ -322,6 +329,48 @@ editor.createNewSmil = function (func) {
     return !editor.error;
 }
 
+editor.addClips = function (strs, i, parID, start, duration, func) {
+    ocUtils.log("Adding track no " + (i + 1) + " / " + strs.length);
+    $.ajax({
+        type: "POST",
+        async: false,
+        dataType: "text", // get it as "text", don't use jQuery smart guess!
+        url: SMIL_PATH + SMIL_ADDCLIP_PATH,
+        data: {
+            parentId: parID,
+            smil: editor.smil,
+            track: strs[i],
+            start: start,
+            duration: duration
+        }
+    }).done(function (xml_response_data) {
+        editor.parseSmilResponse(xml_response_data);
+        if (editor.smilResponseParser.smil) {
+            editor.parseSmil(editor.smilResponseParser.smil);
+        }
+
+	if((i + 1) < strs.length) {
+	    window.setTimeout(function() {
+		editor.addClips(strs, i + 1, parID, start, duration, func);
+	    }, clipElementTimeoutTime);
+	} else {
+	    func();
+	}
+    }).fail(function (e) {
+        ocUtils.log("Error: Could not add clip");
+        ocUtils.log(e);
+	if(clipTimeoutsUntilFailure > 0) {
+	    ocUtils.log("Trying again...");
+	    --clipTimeoutsUntilFailure;
+	    window.setTimeout(function() {
+		editor.addClips(strs, i, parID, start, duration, func);
+	    }, clipFailureTimeoutTime);
+	} else {
+	    displayError("Could not add clip.", "Error");
+	}
+    });
+}
+
 /**
  * add a par element to the smil
  *
@@ -357,54 +406,49 @@ editor.addPar = function (currParIndex) {
                 ocUtils.log("Done");
                 var strs = getAllStringsOf(wfXML, "<ns3:track", "</ns3:track>");
                 var error = false;
-                for (var i = 0; i < strs.length && !error; ++i) {
-                    var start = parseFloat(editor.splitData.splits[currParIndex].clipBegin) * 1000;
-                    var duration = (parseFloat(editor.splitData.splits[currParIndex].clipEnd) * 1000) - start;
-
-                    ocUtils.log("Adding track no " + (i + 1) + " / " + strs.length);
-                    $.ajax({
-                        type: "POST",
-                        async: false,
-                        dataType: "text", // get it as "text", don't use jQuery smart guess!
-                        url: SMIL_PATH + SMIL_ADDCLIP_PATH,
-                        data: {
-                            parentId: par.parID,
-                            smil: editor.smil,
-                            track: strs[i],
-                            start: start,
-                            duration: duration
-                        }
-                    }).done(function (xml_response_data) {
-                        editor.parseSmilResponse(xml_response_data);
-                        if (editor.smilResponseParser.smil) {
-                            editor.parseSmil(editor.smilResponseParser.smil);
-                        }
-
-                    }).fail(function (e) {
-                        ocUtils.log("Error: Could not add clip");
-                        ocUtils.log(e);
-                        error = true;
-                        displayError("Could not add clip. Aborting operation.", "Error");
-                    });
-                }
-                if (!error) {
+		
+                var start = parseFloat(editor.splitData.splits[currParIndex].clipBegin) * 1000;
+                var duration = (parseFloat(editor.splitData.splits[currParIndex].clipEnd) * 1000) - start;
+		editor.addClips(strs, 0, par.parID, start, duration, function() {
                     ocUtils.log("Continuing with next par element...");
 		    window.setTimeout(function() {
 			editor.saveSplitListHelper(currParIndex + 1);
-		    }, parElementTimeoutTime);
-                }
+		    }, clipElementTimeoutTime);
+		});
             }).fail(function (e) {
                 ocUtils.log("Error: Could not get workflow instance");
                 ocUtils.log(e);
-                displayError("Could not get workflow instance.", "Error");
+                displayError("Could not get workflow instance. Please try again.", "Error");
+		editor.enableContinueProcessingButton(true);
             });
         }).fail(function (e) {
-            ocUtils.log("Error: Could not add par element");
-            ocUtils.log(e);
-            displayError("Could not add par element.", "Error");
+	    ocUtils.log("Error: Could not add par element");
+	    ocUtils.log(e);
+	    if(parTimeoutsUntilFailure > 0) {
+		ocUtils.log("Trying again...");
+		--parTimeoutsUntilFailure;
+		window.setTimeout(function() {
+		    editor.addPar(currParIndex);
+		}, parFailureTimeoutTime);
+	    } else {
+		displayError("Could not add par element. Please try again.", "Error");
+		editor.enableContinueProcessingButton(true);
+	    }
         });
     }
     return !editor.error;
+}
+
+editor.enableContinueProcessingButton = function(enable) {
+    if(enable) {
+	$('#continueButton').removeAttr("disabled");
+	$('#continueButton').button("refresh");
+	editor.error = false;
+	parTimeoutsUntilFailure = parTimeoutsUntilFailureDefault;
+	clipTimeoutsUntilFailure = clipTimeoutsUntilFailureDefault;
+    } else {
+	$('#continueButton').attr("disabled", "disabled");
+    }
 }
 
 /**
@@ -471,7 +515,8 @@ editor.saveSplitListHelper = function (startAtIndex) {
                                     }).fail(function (e) {
                                         ocUtils.log("Error: Error submitting smil file: ");
                                         ocUtils.log(e);
-                                        displayError("Error submitting smil file.", "Error");
+                                        displayError("Error submitting smil file. Please try again.", "Error");
+					editor.enableContinueProcessingButton(true);
                                     });
                                 }
                             } else {
@@ -496,7 +541,7 @@ editor.saveSplitListHelper = function (startAtIndex) {
 editor.saveSplitList = function (func) {
     editor.continueWorkflowFunction = func;
     if (!editor.error) {
-        $('#continueButton').attr("disabled", "disabled");
+        editor.enableContinueProcessingButton(false);
         editor.createNewSmil(function () {
             editor.saveSplitListHelper(0);
         });
