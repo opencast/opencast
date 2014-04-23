@@ -37,25 +37,25 @@ public class RestDocsAnnotationTest {
       testMethod = TestServletSample.class.getMethod("methodA");
       if (testMethod != null) {
         RestQuery annotation = (RestQuery) testMethod.getAnnotation(RestQuery.class);
-        
-        Assert.assertEquals("Starts a capture using the default devices as appropriate.", annotation.description());      
+
+        Assert.assertEquals("Starts a capture using the default devices as appropriate.", annotation.description());
         Assert.assertEquals("A list of capture agent things", annotation.returnDescription());
 
         Assert.assertTrue(annotation.pathParameters().length == 1);
         Assert.assertEquals("location", annotation.pathParameters()[0].name());
         Assert.assertEquals("The room of the capture agent", annotation.pathParameters()[0].description());
         Assert.assertFalse(annotation.pathParameters()[0].isRequired());
-        
+
         Assert.assertTrue(annotation.restParameters().length == 1);
         Assert.assertEquals("id", annotation.restParameters()[0].name());
         Assert.assertEquals("The ID of the capture to start", annotation.restParameters()[0].description());
-        Assert.assertTrue(annotation.restParameters()[0].isRequired());        
-        
+        Assert.assertTrue(annotation.restParameters()[0].isRequired());
+
         Assert.assertTrue(annotation.reponses().length == 2);
 
         Assert.assertEquals(200, annotation.reponses()[0].responseCode());
         Assert.assertEquals("When the capture started correctly", annotation.reponses()[0].description());
-        
+
         Assert.assertEquals(400, annotation.reponses()[1].responseCode());
         Assert.assertEquals("When there are no media devices", annotation.reponses()[1].description());
       }
@@ -70,7 +70,7 @@ public class RestDocsAnnotationTest {
    * This sample class simulates a annotated REST service class.
    */
   private class TestServletSample {
-   
+
     @SuppressWarnings("unused")
     @RestQuery(
             name = "something",
@@ -80,7 +80,7 @@ public class RestDocsAnnotationTest {
             restParameters = { @RestParameter(name = "id", description = "The ID of the capture to start", isRequired = true, type = Type.STRING, defaultValue = "") },
             reponses = { @RestResponse(responseCode = 200, description = "When the capture started correctly"),
                          @RestResponse(responseCode = 400, description = "When there are no media devices") }
-            )            
+            )
     public int methodA()
     {
       return 0;

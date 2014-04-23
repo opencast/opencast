@@ -1,0 +1,145 @@
+#!/bin/sh
+#
+# matterhorn   Start/Stop the Opencast Matterhorn system
+#
+# chkconfig:   - 60 40
+# description: Matterhorn is a free, open-source platform to support the \
+#              management of educational audio and video content. Institutions \
+#              will use Matterhorn to produce lecture recordings, manage \
+#              existing video, serve designated distribution channels, and \
+#              provide user interfaces to engage students with educational \
+#              videos.
+
+### BEGIN INIT INFO
+# Provides: matterhorn
+# Required-Start: $local_fs $remote_fs $syslog $network
+# Required-Stop:
+# Default-Start:
+# Default-Stop:
+# Short-Description: run matterhorn
+# Description: Matterhorn is a free, open-source platform to support the
+#              management of educational audio and video content. Institutions
+#              will use Matterhorn to produce lecture recordings, manage
+#              existing video, serve designated distribution channels, and
+#              provide user interfaces to engage students with educational
+#              videos.
+### END INIT INFO
+
+matterhorn="/usr/sbin/matterhorn"
+prog="matterhorn"
+lockfile=/var/lock/subsys/matterhorn
+[ -d "/var/lock/subsys" ] || lockfile="/var/lock/LCK.${prog}"
+pidfile="/var/run/${prog}.pid"
+
+killdelay=7
+
+# Load configuration files
+[ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
+
+success() {
+	printf "\r%-58s [\033[32m  OK  \033[0m]\n" "$1"
+}
+
+failed() {
+	printf "\r%-58s [\033[31mFAILED\033[0m]\n" "$1"
+}
+
+start() {
+	smsg="Starting $prog: "
+	echo -n $smsg
+
+	# Start matterhorn and create a lockfile
+	( flock -n 9 && $matterhorn --daemon ) 9> $lockfile
+	retval=$?
+
+	# If we failed with retval=1 matterhorn might be already up and running. In
+	# that case we still want to return a success:
+	[ $retval -eq 1 ] && rh_status_q && echo && exit 1
+
+	# If we failed to start matterhorn but a lock was created, we want to remove
+	# the file (flock does not remove the file automatically):
+	[ ! $retval -eq 0 ] && rm -f $lockfile
+
+	[ $retval -eq 0 ] && success "$smsg" || failed "$smsg"
+	return $retval
+}
+
+stop() {
+	smsg="Stopping $prog: "
+	echo -n $smsg
+	[ -f $lockfile ] && $matterhorn --quit
+	retval=$?
+	if [ $retval -eq 0 ]
+	then
+		rm -f $lockfile
+		success "$smsg"
+	else
+		failed "$smsg"
+	fi
+	return $retval
+}
+
+restart() {
+	stop
+	start
+}
+
+reload() {
+	restart
+}
+
+force_reload() {
+	restart
+}
+
+rh_status() {
+	# run checks to determine if the service is running or use generic status
+	if [ -f $lockfile ] && [ -f $pidfile ]
+	then
+		pid="$(cat $pidfile)"
+		ps p $pid &> /dev/null && echo $"${prog} (pid $pid) is running..." && return 0
+		echo $"${prog} dead but pid file exists"
+		return 1
+	fi
+	[ -f $pidfile ] && echo "pidfile exists but subsys not locked" && return 4
+	[ -f $lockfile ] && echo "${prog} dead but subsys locked" && return 2
+	echo "${prog} is stopped"
+	return 3
+}
+
+rh_status_q() {
+	rh_status >/dev/null 2>&1
+}
+
+
+case "$1" in
+	start)
+		rh_status_q && exit 0
+		$1
+		;;
+	stop)
+		rh_status_q || exit 0
+		$1
+		;;
+	restart)
+		$1
+		;;
+	reload)
+		rh_status_q || exit 7
+		$1
+		;;
+	force-reload)
+		force_reload
+		;;
+	status)
+		rh_status
+		;;
+	condrestart|try-restart)
+		rh_status_q || exit 0
+		restart
+		;;
+	*)
+		echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+		exit 2
+esac
+exit $?

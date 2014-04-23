@@ -1,5 +1,5 @@
-URL: http://www.tortall.net/projects/yasm/releases ${USASK_MIRROR}
-PKG: yasm-1.1.0.tar.gz
-SHA: 8b252d2a50f6d0d8fe13997183596c3cd7589db9
-DIR: yasm-1.1.0
+URL: http://www.tortall.net/projects/yasm/releases ${USASK_MIRROR} ${ETH_MIRROR}
+PKG: yasm-1.2.0.tar.gz
+SHA: 773d28f27f83c44ac35079add0d3167ca6c1def8
+DIR: yasm-1.2.0
 PCP: pc-yasm.zip

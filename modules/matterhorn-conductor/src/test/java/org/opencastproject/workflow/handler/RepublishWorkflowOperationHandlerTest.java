@@ -155,7 +155,7 @@ public class RepublishWorkflowOperationHandlerTest {
     // Make sure that the merged mediapackage contains the published track
     Assert.assertEquals("Merge picked the wrong track", "track-1-published",
             mp.getElementsByFlavor(MediaPackageElementFlavor.parseFlavor("presentation/delivery"))[0].getIdentifier());
-    
+
     // Make sure that the merged mediapackage contains the updated catalog
     Assert.assertEquals("Merge picked the wrong catalog", "catalog-1",
             mp.getElementsByFlavor(MediaPackageElements.EPISODE)[0].getIdentifier());

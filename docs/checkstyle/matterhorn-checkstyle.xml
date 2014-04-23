@@ -312,7 +312,7 @@
       <property name="severity" value="error" />
     </module>
     <module name="Regexp">
-      <property name="format" value="\s+\\n" />
+      <property name="format" value="[ \t]+$" />
       <property name="message" value="Line has trailing spaces." />
       <property name="illegalPattern" value="true" />
       <property name="ignoreComments" value="true" />

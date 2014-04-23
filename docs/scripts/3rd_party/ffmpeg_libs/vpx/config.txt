@@ -1,5 +1,5 @@
-URL: http://webm.googlecode.com/files ${USASK_MIRROR}
-PKG: libvpx-v0.9.7.tar.bz2
-SHA: 639596df7182a93db83f61af8f5bb5b6a13dcf63
-DIR: libvpx-v0.9.7
+URL: http://webm.googlecode.com/files ${USASK_MIRROR} ${ETH_MIRROR}
+PKG: libvpx-v1.3.0.tar.bz2
+SHA: 191b95817aede8c136cc3f3745fb1b8c50e6d5dc
+DIR: libvpx-v1.3.0
 PCP: pc-vpx.zip

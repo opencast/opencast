@@ -23,56 +23,56 @@ public interface SearchResult {
 
   /**
    * The search item list
-   * 
+   *
    * @return Item list.
    */
   SearchResultItem[] getItems();
 
   /**
    * Get the user query.
-   * 
+   *
    * @return The user query.
    */
   String getQuery();
 
   /**
    * Get the total number of items found, limited by the value returned by {@link #getLimit()}.
-   * 
+   *
    * @return The number.
    */
   long size();
-  
+
   /**
    * Returns the number of hits for this query, regardless of the limit that has been defined.
-   * 
+   *
    * @return the total number of hits.
    */
   long getTotalSize();
 
   /**
    * Get the offset.
-   * 
+   *
    * @return The offset.
    */
   long getOffset();
 
   /**
    * Get the limit.
-   * 
+   *
    * @return The limit.
    */
   long getLimit();
 
   /**
    * Get the search time.
-   * 
+   *
    * @return The time in ms.
    */
   long getSearchTime();
 
   /**
    * Get the page of the current result.
-   * 
+   *
    * @return The page.
    */
   long getPage();

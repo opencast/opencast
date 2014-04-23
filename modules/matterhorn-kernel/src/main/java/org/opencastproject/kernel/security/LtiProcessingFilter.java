@@ -32,7 +32,7 @@ public class LtiProcessingFilter extends ProtectedResourceProcessingFilter {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LtiProcessingFilter.class);
-  
+
   /**
    * {@inheritDoc}
    *

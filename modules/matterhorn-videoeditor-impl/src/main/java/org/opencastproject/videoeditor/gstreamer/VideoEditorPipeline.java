@@ -56,7 +56,7 @@ public class VideoEditorPipeline {
   public static final String DEFAULT_MUX = GstreamerElements.MP4MUX;
   public static final String DEFAULT_MUX_PROPERTIES = "";
   public static final String DEFAULT_OUTPUT_FILE_EXTENSION = ".mp4";
-  
+
   private Properties properties;
   private Pipeline pipeline;
   private MainLoop mainLoop = new MainLoop();

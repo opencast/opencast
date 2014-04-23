@@ -20,7 +20,7 @@ package org.opencastproject.videoeditor.gstreamer;
  * Gstreamer elements.
  */
 public interface GstreamerElements {
-  
+
   // gstreamer-core
   String CAPSFILTER = "capsfilter";
   String FAKESINK = "fakesink";
@@ -28,7 +28,7 @@ public interface GstreamerElements {
   String FILESRC = "filesrc";
   String IDENTITY = "identity";
   String QUEUE = "queue";
-  
+
   // gstreamer-plugins-base
   String AUDIOCONVERT = "audioconvert";
   String AUDIORATE = "audiorate";
@@ -37,19 +37,19 @@ public interface GstreamerElements {
   String DECODEBIN2 = "decodebin2";
   String FFMPEGCOLORSPACE = "ffmpegcolorspace";
   String VIDEORATE = "videorate";
-  
+
   // gstreamer-plugins-good
   String AUTOAUDIOSINK = "autoaudiosink";
   String AUTOVIDEOSINK = "autovideosink";
   String CUTTER = "cutter";
   String MP4MUX = "mp4mux";
-  
+
   // gstreamer-plugins-bad
   String FAAC = "faac";
-  
+
   // gstreamer-plugins ugly
   String X264ENC = "x264enc";
-  
+
   // gstreamer-gnonlin
   String GNL_COMPOSITION = "gnlcomposition";
   String GNL_FILESOURCE = "gnlfilesource";

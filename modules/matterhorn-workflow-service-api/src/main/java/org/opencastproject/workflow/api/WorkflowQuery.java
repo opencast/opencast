@@ -62,7 +62,7 @@ public class WorkflowQuery {
 
   public WorkflowQuery() {
   }
-  
+
   public WorkflowQuery withId(String id) {
     this.id = id;
     return this;
@@ -90,7 +90,7 @@ public class WorkflowQuery {
   /**
    * Limit results to workflow instances in a specific state. This method overrides and will be overridden by future
    * calls to {@link #withoutState(String)}
-   * 
+   *
    * @param state
    *          the workflow state
    * @return this query
@@ -104,7 +104,7 @@ public class WorkflowQuery {
   /**
    * Limit results to workflow instances not in a specific state. This method overrides and will be overridden by future
    * calls to {@link #withState(String)}
-   * 
+   *
    * @param state
    *          the workflow state
    * @return this query
@@ -117,7 +117,7 @@ public class WorkflowQuery {
 
   /**
    * Limit results to workflow instances with a specific series title
-   * 
+   *
    * @param seriesTitle
    *          the series title
    */
@@ -129,7 +129,7 @@ public class WorkflowQuery {
 
   /**
    * Limit results to workflow instances for a specific series
-   * 
+   *
    * @param seriesId
    *          the series identifier
    */
@@ -141,7 +141,7 @@ public class WorkflowQuery {
 
   /**
    * Limit results to workflow instances for a specific media package
-   * 
+   *
    * @param mediaPackageId
    *          the media package identifier
    */
@@ -154,7 +154,7 @@ public class WorkflowQuery {
   /**
    * Limit results to workflow instances that are currently handling the specified operation. This method overrides and
    * will be overridden by future calls to {@link #withoutCurrentOperation(String)}
-   * 
+   *
    * @param currentOperation
    *          the current operation
    * @return this query
@@ -168,7 +168,7 @@ public class WorkflowQuery {
   /**
    * Limit results to workflow instances to those that are not currently in the specified operation. This method
    * overrides and will be overridden by future calls to {@link #withCurrentOperation(String)}
-   * 
+   *
    * @param currentOperation
    *          the current operation
    * @return this query
@@ -181,7 +181,7 @@ public class WorkflowQuery {
 
   /**
    * Limit results to workflow instances with a specific workflow definition.
-   * 
+   *
    * @param workflowDefinitionId
    *          the workflow identifier
    */
@@ -193,7 +193,7 @@ public class WorkflowQuery {
 
   /**
    * Limit the results to workflow instances with a creation date starting with <code>fromDate</code>.
-   * 
+   *
    * @param fromDate
    *          the starting date
    */
@@ -204,7 +204,7 @@ public class WorkflowQuery {
 
   /**
    * Limit the results to workflow instances with a creation date no later than <code>fromDate</code>.
-   * 
+   *
    * @param toDate
    *          the ending date
    */
@@ -215,7 +215,7 @@ public class WorkflowQuery {
 
   /**
    * Limit results to workflow instances with a specific mediapackage creator.
-   * 
+   *
    * @param creator
    *          the mediapackage creator
    */
@@ -227,7 +227,7 @@ public class WorkflowQuery {
 
   /**
    * Limit results to workflow instances with a specific mediapackage contributor.
-   * 
+   *
    * @param contributor
    *          the mediapackage contributor
    */
@@ -239,7 +239,7 @@ public class WorkflowQuery {
 
   /**
    * Limit results to workflow instances with a specific mediapackage language.
-   * 
+   *
    * @param language
    *          the mediapackage language
    */
@@ -251,7 +251,7 @@ public class WorkflowQuery {
 
   /**
    * Limit results to workflow instances with a specific mediapackage license.
-   * 
+   *
    * @param license
    *          the mediapackage license
    */
@@ -263,7 +263,7 @@ public class WorkflowQuery {
 
   /**
    * Limit results to workflow instances with a specific mediapackage title.
-   * 
+   *
    * @param title
    *          the mediapackage title
    */
@@ -275,7 +275,7 @@ public class WorkflowQuery {
 
   /**
    * Limit results to workflow instances with a specific mediapackage subject.
-   * 
+   *
    * @param subject
    *          the mediapackage subject
    */
@@ -287,7 +287,7 @@ public class WorkflowQuery {
 
   /**
    * Sort the results by the specified field in ascending order.
-   * 
+   *
    * @param sort
    *          the sort field
    */
@@ -297,7 +297,7 @@ public class WorkflowQuery {
 
   /**
    * Sort the results by the specified field, either ascending or descending.
-   * 
+   *
    * @param sort
    *          the sort field
    * @param ascending
@@ -308,10 +308,10 @@ public class WorkflowQuery {
     this.sortAscending = ascending;
     return this;
   }
-  
+
   /**
    * Return the field to use in sorting the results of the query.
-   * 
+   *
    * @return the sort field
    */
   public Sort getSort() {
@@ -320,7 +320,7 @@ public class WorkflowQuery {
 
   /**
    * Return whether to sort the results in ascending order.
-   * 
+   *
    * @return whether the search results should be sorted in ascending order
    */
   public boolean isSortAscending() {
@@ -330,10 +330,10 @@ public class WorkflowQuery {
   public String getId() {
     return id;
   }
-  
+
   /**
    * Returns the number of result items to return.
-   * 
+   *
    * @return the number of result items
    */
   public long getCount() {
@@ -342,7 +342,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the number of the first page within the full result set.
-   * 
+   *
    * @return the first page
    */
   public long getStartPage() {
@@ -351,7 +351,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the text that workflow instances need to match by any metadata field (fulltext).
-   * 
+   *
    * @return the text
    */
   public String getText() {
@@ -360,7 +360,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the list of states that workflow instances need to match.
-   * 
+   *
    * @return the states
    */
   public List<QueryTerm> getStates() {
@@ -369,7 +369,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the list of current operations that workflow instances need to match.
-   * 
+   *
    * @return the current operations
    */
   public List<QueryTerm> getCurrentOperations() {
@@ -378,7 +378,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the media package series identifier that workflow instances need to match.
-   * 
+   *
    * @return the media package series identifier
    */
   public String getSeriesId() {
@@ -387,7 +387,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the media package title that workflow instances need to match.
-   * 
+   *
    * @return the media package title
    */
   public String getSeriesTitle() {
@@ -396,7 +396,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the media package identifier that workflow instances need to match.
-   * 
+   *
    * @return the media package identifier
    */
   public String getMediaPackageId() {
@@ -405,7 +405,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the workflow defintions that workflow instances need to match.
-   * 
+   *
    * @return the workflow definition identifier
    */
   public String getWorkflowDefinitionId() {
@@ -414,7 +414,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the selection start date for workflow instances.
-   * 
+   *
    * @return the start date
    */
   public Date getFromDate() {
@@ -423,7 +423,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the selection end date for workflow instances.
-   * 
+   *
    * @return the end date
    */
   public Date getToDate() {
@@ -432,7 +432,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the media package creator that workflow instances need to match.
-   * 
+   *
    * @return the media package creator
    */
   public String getCreator() {
@@ -441,7 +441,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the media package contributor that workflow instances need to match.
-   * 
+   *
    * @return the media package contributor
    */
   public String getContributor() {
@@ -450,7 +450,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the media package language that workflow instances need to match.
-   * 
+   *
    * @return the media package language
    */
   public String getLanguage() {
@@ -459,7 +459,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the media package license that workflow instances need to match.
-   * 
+   *
    * @return the media package license
    */
   public String getLicense() {
@@ -468,7 +468,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the media package title that workflow instances need to match.
-   * 
+   *
    * @return the media package title
    */
   public String getTitle() {
@@ -477,7 +477,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the media package subject that workflow instances need to match.
-   * 
+   *
    * @return the media package subject
    */
   public String getSubject() {
@@ -486,7 +486,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the search terms for operations. A term can either mean to include or exclude the specified operation.
-   * 
+   *
    * @return the operation search terms
    */
   public List<QueryTerm> getCurrentOperationTerms() {
@@ -495,7 +495,7 @@ public class WorkflowQuery {
 
   /**
    * Returns the search terms for workflow states. A term can either mean to include or exclude the specified state.
-   * 
+   *
    * @return the state search terms
    */
   public List<QueryTerm> getStateTerms() {

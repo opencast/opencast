@@ -17,6 +17,7 @@
 package org.opencastproject.mediapackage;
 
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.mediapackage.MediaPackageElements.AUDIENCE_SOURCE;
 import static org.opencastproject.mediapackage.MediaPackageElements.PRESENTATION_SOURCE;
 import static org.opencastproject.mediapackage.MediaPackageElements.PRESENTER_SOURCE;
 
@@ -47,8 +48,62 @@ public class TrackSelectorTest extends SimpleElementSelectorTest {
    * .
    */
   @Test
+  @Override
   public void testSelect() {
     assertEquals(2, selector.select(mediaPackage, true).size());
+  }
+
+  @Test
+  public void testOnlyFlavorOrSelect() {
+    assertEquals(2, selector.select(mediaPackage, false).size());
+  }
+
+  @Test
+  public void testOnlyTagsAndSelect() {
+    TrackSelector tagsSelector = new TrackSelector();
+    tagsSelector.addTag(tag);
+    assertEquals(1, tagsSelector.select(mediaPackage, true).size());
+  }
+
+  @Test
+  public void testOnlyTagsOrSelect() {
+    TrackSelector tagsSelector = new TrackSelector();
+    tagsSelector.addTag(tag);
+    assertEquals(1, tagsSelector.select(mediaPackage, false).size());
+  }
+
+  @Test
+  public void testTagsOrFlavorSelect() {
+    TrackSelector tagsSelector = new TrackSelector();
+    tagsSelector.addTag(tag);
+    tagsSelector.addFlavor(PRESENTATION_SOURCE);
+    assertEquals(2, tagsSelector.select(mediaPackage, false).size());
+  }
+
+  @Test
+  public void testTagsOrFlavorSelect2() {
+    TrackSelector tagsSelector = new TrackSelector();
+    tagsSelector.addTag(tag);
+    tagsSelector.addFlavor(AUDIENCE_SOURCE);
+    assertEquals(2, tagsSelector.select(mediaPackage, false).size());
+  }
+
+  @Test
+  public void testTagsAndFlavorSelect() {
+    TrackSelector tagsSelector = new TrackSelector();
+    tagsSelector.addTag(tag);
+    tagsSelector.addFlavor(PRESENTATION_SOURCE);
+    assertEquals(1, tagsSelector.select(mediaPackage, true).size());
+  }
+
+  @Test
+  public void testNoTagsOrFlavorSelect() {
+    assertEquals(0, new TrackSelector().select(mediaPackage, false).size());
+  }
+
+  @Test
+  public void testNoTagsAndFlavorSelect() {
+    assertEquals(0, new TrackSelector().select(mediaPackage, true).size());
   }
 
 }

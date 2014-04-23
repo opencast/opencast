@@ -844,10 +844,6 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
       if (namespace == null)
         throw new IllegalArgumentException("Namespace must not be empty");
 
-      // Strip trailing slash to make sure lookups are not failing because of this
-      if (namespace.endsWith("/"))
-        namespace = namespace.substring(0, namespace.length() - 1);
-
       if (!allowRebind) {
         String namespaceCurrent = prefix2Namespace.get(prefix);
         if (namespaceCurrent != null && !namespaceCurrent.equals(namespace)) {
@@ -885,8 +881,6 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
      *           if the namespace is not bound
      */
     public String lookupPrefix(String namespace) {
-      if (namespace.endsWith("/"))
-        namespace = namespace.substring(0, namespace.length() - 1);
       String prefix = namespace2prefix.get(namespace);
       if (prefix == null) {
         throw new NamespaceBindingException("Namespace '" + namespace + "' is not bound");

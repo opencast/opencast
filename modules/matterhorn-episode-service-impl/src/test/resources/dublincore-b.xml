@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance/"
-  xsi:schemaLocation="http://www.opencastproject.org http://www.opencastproject.org/schema.xsd"
-  xmlns:dcterms="http://purl.org/dc/terms/">
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:dcterms="http://purl.org/dc/terms/">
   <dcterms:title>Brighton Rock</dcterms:title>
   <dcterms:creator>Graham Greene</dcterms:creator>
   <dcterms:created xsi:type="dcterms:W3CDTF">1938-01-01</dcterms:created>

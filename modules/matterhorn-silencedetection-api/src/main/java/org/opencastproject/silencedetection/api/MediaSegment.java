@@ -31,22 +31,22 @@ public class MediaSegment {
    */
   @XmlAttribute(name = "start", required = true)
   private final long segmentStart;
-  
+
   /**
    * Stop position.
    */
   @XmlAttribute(name = "stop", required = true)
   private final long segmentStop;
-  
+
   public MediaSegment() {
     this(-1, -1);
   }
-  
+
   public MediaSegment(long segmentStart, long segmentStop) {
     this.segmentStart = segmentStart;
     this.segmentStop = segmentStop;
   }
-  
+
   /**
    * Returns segment start position.
    * @return start position
@@ -54,7 +54,7 @@ public class MediaSegment {
   public long getSegmentStart() {
     return segmentStart;
   }
-  
+
   /**
    * Returns segment stop position.
    * @return stop position

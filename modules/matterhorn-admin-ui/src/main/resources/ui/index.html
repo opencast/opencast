@@ -14,6 +14,7 @@
     <!-- SCRIPTS -->
     <script type="text/javascript" src="/admin/js/jquery/jquery.js"></script>
     <script type="text/javascript" src="/admin/js/jquery/jquery-ui.js"></script>
+    <script type="text/javascript" src="/admin/js/jquery/plugins/jquery-ui-timepicker-addon.js"></script>
     <script type="text/javascript" src="/admin/js/jquery/plugins/jquery.tablesorter.min.js"></script>
     <script type="text/javascript" src="/admin/js/jquery/plugins/jquery.i18n.properties-min.js"></script>
     <script type="text/javascript" src="/admin/js/jquery.jqote2.js"></script>
@@ -49,6 +50,8 @@
     <script type="text/javascript" src="/admin/js/oc.inspect.js"></script>
     <script type="text/javascript" src="/admin/js/oc.security.js"></script>
     <script type="text/javascript" src="/admin/js/oc.episode.js"></script>
+    <script type="text/javascript" src="/admin/js/oc.episode.acl-manager.js"></script>
+    <script type="text/javascript" src="/admin/js/oc.series.acl-manager.js"></script>
     <script type="text/javascript" src="/admin/js/oc.users.js"></script>
     <script type="text/javascript" src="/admin/js/oc.mediapackage.js"></script>
 
@@ -78,6 +81,9 @@
           <a href="#metrics" title="Metrics" id="i18n_tab_metrics">Metrics</a>
         </li>
 -->
+        <li>
+          <a href="#security" title="Security" id="i18n_tab_security">Security</a>
+        </li>
       </ul>
     </script>
 
@@ -200,6 +206,13 @@
                 document.title = "Metrics" + matterhorn;
               },
               tab: "i18n_tab_metrics"
+            },
+            "/security": {
+              init: function() {
+                ocSecurity.init();
+                document.title = "Security" + matterhorn;
+              },
+              tab: "i18n_tab_security"
             }
       };
       

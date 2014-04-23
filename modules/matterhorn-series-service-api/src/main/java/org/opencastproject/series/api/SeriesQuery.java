@@ -21,7 +21,7 @@ import java.util.Date;
 
 /**
  * Query object used for storing search parameters.
- * 
+ *
  */
 public class SeriesQuery {
 
@@ -75,10 +75,10 @@ public class SeriesQuery {
   public enum Sort {
     TITLE, SUBJECT, CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, TEMPORAL, IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE
   }
-  
+
   /**
    * Set search by license
-   * 
+   *
    * @param license
    * @return
    */
@@ -91,7 +91,7 @@ public class SeriesQuery {
 
   /**
    * Set search by abstract
-   * 
+   *
    * @param seriesAbstract
    * @return
    */
@@ -104,7 +104,7 @@ public class SeriesQuery {
 
   /**
    * Set maximum number of results
-   * 
+   *
    * @param count
    * @return
    */
@@ -115,7 +115,7 @@ public class SeriesQuery {
 
   /**
    * Set start page
-   * 
+   *
    * @param startPage
    * @return
    */
@@ -126,7 +126,7 @@ public class SeriesQuery {
 
   /**
    * Set search by created from
-   * 
+   *
    * @param createdFrom
    * @return
    */
@@ -137,7 +137,7 @@ public class SeriesQuery {
 
   /**
    * Set search by created to
-   * 
+   *
    * @param createdTo
    * @return
    */
@@ -148,7 +148,7 @@ public class SeriesQuery {
 
   /**
    * Set search over all text fields
-   * 
+   *
    * @param text
    * @return
    */
@@ -161,7 +161,7 @@ public class SeriesQuery {
 
   /**
    * Set search by series id
-   * 
+   *
    * @param seriesId
    * @return
    */
@@ -174,7 +174,7 @@ public class SeriesQuery {
 
   /**
    * Set search by series title
-   * 
+   *
    * @param seriesTitle
    * @return
    */
@@ -187,7 +187,7 @@ public class SeriesQuery {
 
   /**
    * Set search by creator
-   * 
+   *
    * @param creator
    * @return
    */
@@ -200,7 +200,7 @@ public class SeriesQuery {
 
   /**
    * Set search by contributor
-   * 
+   *
    * @param contributor
    * @return
    */
@@ -213,7 +213,7 @@ public class SeriesQuery {
 
   /**
    * Set search by language
-   * 
+   *
    * @param language
    * @return
    */
@@ -226,7 +226,7 @@ public class SeriesQuery {
 
   /**
    * Set search by subject
-   * 
+   *
    * @param subject
    * @return
    */
@@ -239,7 +239,7 @@ public class SeriesQuery {
 
   /**
    * Set search by publisher
-   * 
+   *
    * @param publisher
    * @return
    */
@@ -252,7 +252,7 @@ public class SeriesQuery {
 
   /**
    * Set search by description
-   * 
+   *
    * @param description
    * @return
    */
@@ -265,7 +265,7 @@ public class SeriesQuery {
 
   /**
    * Set search by available from
-   * 
+   *
    * @param availableFrom
    * @return
    */
@@ -276,7 +276,7 @@ public class SeriesQuery {
 
   /**
    * Set search by available to
-   * 
+   *
    * @param availableTo
    * @return
    */
@@ -287,7 +287,7 @@ public class SeriesQuery {
 
   /**
    * Set search by rights holder
-   * 
+   *
    * @param rightsHolder
    * @return
    */
@@ -300,7 +300,7 @@ public class SeriesQuery {
 
   /**
    * Set sort field with ascending order
-   * 
+   *
    * @param sort
    * @return
    */
@@ -310,7 +310,7 @@ public class SeriesQuery {
 
   /**
    * Set sort field with sort order
-   * 
+   *
    * @param sort
    * @param ascending
    * @return
@@ -323,7 +323,7 @@ public class SeriesQuery {
 
   /**
    * Get sort field
-   * 
+   *
    * @return
    */
   public Sort getSort() {
@@ -332,7 +332,7 @@ public class SeriesQuery {
 
   /**
    * Whether sort order is ascending
-   * 
+   *
    * @return
    */
   public boolean isSortAscending() {
@@ -341,7 +341,7 @@ public class SeriesQuery {
 
   /**
    * Get result count
-   * 
+   *
    * @return
    */
   public long getCount() {
@@ -350,7 +350,7 @@ public class SeriesQuery {
 
   /**
    * Get start page
-   * 
+   *
    * @return
    */
   public long getStartPage() {
@@ -359,7 +359,7 @@ public class SeriesQuery {
 
   /**
    * Get text
-   * 
+   *
    * @return
    */
   public String getText() {
@@ -368,7 +368,7 @@ public class SeriesQuery {
 
   /**
    * Get series id
-   * 
+   *
    * @return
    */
   public String getSeriesId() {
@@ -377,7 +377,7 @@ public class SeriesQuery {
 
   /**
    * Get series title
-   * 
+   *
    * @return
    */
   public String getSeriesTitle() {
@@ -386,7 +386,7 @@ public class SeriesQuery {
 
   /**
    * Get creator
-   * 
+   *
    * @return
    */
   public String getCreator() {
@@ -395,7 +395,7 @@ public class SeriesQuery {
 
   /**
    * Get contributor
-   * 
+   *
    * @return
    */
   public String getContributor() {
@@ -404,7 +404,7 @@ public class SeriesQuery {
 
   /**
    * Get language
-   * 
+   *
    * @return
    */
   public String getLanguage() {
@@ -413,7 +413,7 @@ public class SeriesQuery {
 
   /**
    * Get license
-   * 
+   *
    * @return
    */
   public String getLicense() {
@@ -422,7 +422,7 @@ public class SeriesQuery {
 
   /**
    * Get subject
-   * 
+   *
    * @return
    */
   public String getSubject() {
@@ -431,7 +431,7 @@ public class SeriesQuery {
 
   /**
    * Get publisher
-   * 
+   *
    * @return
    */
   public String getPublisher() {
@@ -440,7 +440,7 @@ public class SeriesQuery {
 
   /**
    * Get abstract
-   * 
+   *
    * @return
    */
   public String getAbstract() {
@@ -449,7 +449,7 @@ public class SeriesQuery {
 
   /**
    * Get description
-   * 
+   *
    * @return
    */
   public String getDescription() {
@@ -458,7 +458,7 @@ public class SeriesQuery {
 
   /**
    * Get created from
-   * 
+   *
    * @return
    */
   public Date getCreatedFrom() {
@@ -467,7 +467,7 @@ public class SeriesQuery {
 
   /**
    * Get created to
-   * 
+   *
    * @return
    */
   public Date getCreatedTo() {
@@ -476,7 +476,7 @@ public class SeriesQuery {
 
   /**
    * Get available from
-   * 
+   *
    * @return
    */
   public Date getAvailableFrom() {
@@ -485,7 +485,7 @@ public class SeriesQuery {
 
   /**
    * Get available to
-   * 
+   *
    * @return
    */
   public Date getAvailableTo() {
@@ -494,7 +494,7 @@ public class SeriesQuery {
 
   /**
    * Get rights holder
-   * 
+   *
    * @return
    */
   public String getRightsHolder() {
@@ -503,7 +503,7 @@ public class SeriesQuery {
 
   /**
    * Whether the results for this query should contain only series that the current user can edit.
-   * 
+   *
    * @return
    */
   public boolean isEdit() {
@@ -512,7 +512,7 @@ public class SeriesQuery {
 
   /**
    * Set the edit flag.
-   * 
+   *
    * @param edit
    */
   public void setEdit(boolean edit) {

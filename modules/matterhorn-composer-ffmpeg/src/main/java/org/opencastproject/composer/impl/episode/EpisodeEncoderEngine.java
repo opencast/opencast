@@ -22,6 +22,7 @@ import org.opencastproject.composer.impl.AbstractEncoderEngine;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Option;
+
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -270,11 +271,10 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
   /**
    * (non-Javadoc)
    * 
-   * @see org.opencastproject.composer.api.EncoderEngine#extract(java.io.File,
-   *      org.opencastproject.composer.api.EncodingProfile, java.util.Map, long[])
+   * @see org.opencastproject.composer.api.EncoderEngine#extract(File, EncodingProfile, Map, double...)
    */
   @Override
-  public List<File> extract(File mediaSource, EncodingProfile format, Map<String, String> properties, long... time)
+  public List<File> extract(File mediaSource, EncodingProfile format, Map<String, String> properties, double... time)
           throws EncoderException {
     throw new UnsupportedOperationException("Operation is not supported by episode encoder engine");
   }

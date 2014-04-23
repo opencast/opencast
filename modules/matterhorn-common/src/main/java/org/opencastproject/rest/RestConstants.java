@@ -44,7 +44,7 @@ public interface RestConstants {
 
   /** The bundle header used to find the static resource welcome file */
   String HTTP_WELCOME = "Http-Welcome";
-  
+
   /**
    * The amount of time in seconds to wait for a session to be inactive before deallocating it. Applied to all sessions
    * with the last filter in the chain.

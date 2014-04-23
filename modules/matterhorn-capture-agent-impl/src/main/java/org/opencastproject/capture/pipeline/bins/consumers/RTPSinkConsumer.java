@@ -35,14 +35,14 @@ import org.opencastproject.capture.pipeline.bins.UnableToSetElementPropertyBecau
 
 /**
  * RTPSinkConsumer send an audio and/or video stream as RTP/RTCP over network.
- * 
+ *
  * Please note, the gstreamer RTP plugind are currently under devellopment and may be not stable.
  */
 public class RTPSinkConsumer extends ConsumerBin {
-  
+
   protected String configPrefix;
   /**
-   * Hostname to send stream(s) to (streaming server name like Wowza). 
+   * Hostname to send stream(s) to (streaming server name like Wowza).
    */
   protected String host;
   /**
@@ -59,7 +59,7 @@ public class RTPSinkConsumer extends ConsumerBin {
    * Please note, these ports may not be used by other Application!
    */
   protected String videoRtpPort;
-  
+
   protected Element decodebin;
   protected Element rtpbin;
 
@@ -68,7 +68,7 @@ public class RTPSinkConsumer extends ConsumerBin {
   protected Element audioPayloader;
   protected Element audioRtpSink;
   protected Element audioRtcpSink;
-  
+
   protected Element videoColorspacePre;
   protected Element videoDeinterlace;
   protected Element videoColorspacePost;
@@ -78,47 +78,47 @@ public class RTPSinkConsumer extends ConsumerBin {
   protected Element videoPayloader;
   protected Element videoRtpSink;
   protected Element videoRtcpSink;
-  
-  public RTPSinkConsumer(CaptureDevice captureDevice, Properties properties) 
-          throws UnableToLinkGStreamerElementsException, 
-          UnableToCreateGhostPadsForBinException, 
-          UnableToSetElementPropertyBecauseElementWasNullException, 
+
+  public RTPSinkConsumer(CaptureDevice captureDevice, Properties properties)
+          throws UnableToLinkGStreamerElementsException,
+          UnableToCreateGhostPadsForBinException,
+          UnableToSetElementPropertyBecauseElementWasNullException,
           CaptureDeviceNullPointerException, UnableToCreateElementException {
-    
+
     super(captureDevice, properties);
     encoder = null;
     muxer = null;
     filesink = null;
-    
+
     getBin().setName(captureDevice.getName() + "_RTP_SINK");
     getBin().debugToDotFile(Bin.DEBUG_GRAPH_SHOW_ALL, getBin().getName());
   }
-  
+
   /**
    * Creates all the needed Gstreamer Elements.
    * <br>
    * All shared elements: queue, decodebin, rtpbin.<br>
    * All audio elements: capsfilter, encoder, payloader, (rtp)udpsink, (rtcp)udpsink.<br>
-   * All video elements: 2 * colorspace, deinterlace, videorate, capsfilter, 
+   * All video elements: 2 * colorspace, deinterlace, videorate, capsfilter,
    * encoder, payloader, (rtp)udpsink, (rtcp)udpsink.<br>
-   * 
-   * @throws UnableToCreateElementException 
+   *
+   * @throws UnableToCreateElementException
    *   Thrown if the Element cannot be created because the Element doesn't exist on this machine.
    */
   @Override
   protected void createElements() throws UnableToCreateElementException {
     super.createElements();
-    
+
     decodebin = GStreamerElementFactory.getInstance().createElement(captureDevice.getFriendlyName(),
             GStreamerElements.DECODEBIN, null);
     rtpbin = GStreamerElementFactory.getInstance().createElement(captureDevice.getFriendlyName(),
             GStreamerElements.RTPBIN, captureDevice.getFriendlyName() + "_rtpbin");
-    
+
     configPrefix = CaptureParameters.CAPTURE_DEVICE_PREFIX + captureDevice.getFriendlyName();
     host = properties.getProperty(configPrefix + CaptureParameters.CAPTURE_RTP_CONSUMER_HOST, "127.0.0.1");
     audioRtpPort = properties.getProperty(configPrefix + CaptureParameters.CAPTURE_RTP_AUDIO_CONSUMER_RTP_PORT);
     videoRtpPort = properties.getProperty(configPrefix + CaptureParameters.CAPTURE_RTP_VIDEO_CONSUMER_RTP_PORT);
-    
+
     if (audioRtpPort != null) {
       createAudioElements();
     }
@@ -134,10 +134,10 @@ public class RTPSinkConsumer extends ConsumerBin {
             GStreamerElements.UDPSINK, captureDevice.getFriendlyName() + "_audio_rtpsink");
     audioRtcpSink = GStreamerElementFactory.getInstance().createElement(captureDevice.getFriendlyName(),
             GStreamerElements.UDPSINK, captureDevice.getFriendlyName() + "_audio_rtcpsink");
-    
+
     String encoderProp = properties.getProperty(configPrefix + CaptureParameters.CAPTURE_RTP_AUDIO_CONSUMER_ENCODER, GStreamerElements.FAAC);
     String payloaderProp = properties.getProperty(configPrefix + CaptureParameters.CAPTURE_RTP_AUDIO_CONSUMER_PAYLOADER, GStreamerElements.RTPMP4GPAY);
-    
+
     audioEncoder = GStreamerElementFactory.getInstance().createElement(captureDevice.getFriendlyName(), encoderProp, null);
     audioPayloader = GStreamerElementFactory.getInstance().createElement(captureDevice.getFriendlyName(), payloaderProp, null);
   }
@@ -157,31 +157,31 @@ public class RTPSinkConsumer extends ConsumerBin {
             GStreamerElements.UDPSINK, captureDevice.getFriendlyName() + "_video_rtpsink");
     videoRtcpSink = GStreamerElementFactory.getInstance().createElement(captureDevice.getFriendlyName(),
             GStreamerElements.UDPSINK, captureDevice.getFriendlyName() + "_video_rtcpsink");
-    
+
     String encoderProp = properties.getProperty(configPrefix + CaptureParameters.CAPTURE_RTP_VIDEO_CONSUMER_ENCODER, GStreamerElements.X264ENC);
     String payloaderProp = properties.getProperty(configPrefix + CaptureParameters.CAPTURE_RTP_VIDEO_CONSUMER_PAYLOADER, GStreamerElements.RTPH264PAY);
-    
+
     videoEncoder = GStreamerElementFactory.getInstance().createElement(captureDevice.getFriendlyName(), encoderProp, null);
     videoPayloader = GStreamerElementFactory.getInstance().createElement(captureDevice.getFriendlyName(), payloaderProp, null);
   }
-  
+
   /**
    * Sets the properties on the elements specified in the capture agent's property file.
    * <br>
-   * To create an audio/video RTP stream the 
+   * To create an audio/video RTP stream the
    * {@see CaptureParameters#CAPTURE_RTP_AUDIO_CONSUMER_RTP_PORT}/{@see CaptureParameters#CAPTURE_RTP_VIDEO_CONSUMER_RTP_PORT}
    * property should set for each device!
    * <br>
-   * To set a different encoder (default: {@value GStreamerElements#FAAC} for audio 
-   * and {@value GStreamerElements#X264ENC} for video) use the 
+   * To set a different encoder (default: {@value GStreamerElements#FAAC} for audio
+   * and {@value GStreamerElements#X264ENC} for video) use the
    * {@see CaptureParameters#CAPTURE_RTP_AUDIO_CONSUMER_ENCODER}/{@see CaptureParameters#CAPTURE_RTP_VIDEO_CONSUMER_ENCODER}
    * property.
    * <br>
-   * To set a different payloader (default: {@value GStreamerElements#RTPMP4APAY} for audio 
-   * and {@value GStreamerElements#RTPH264PAY} for video) use the 
+   * To set a different payloader (default: {@value GStreamerElements#RTPMP4APAY} for audio
+   * and {@value GStreamerElements#RTPH264PAY} for video) use the
    * {@see CaptureParameters#CAPTURE_RTP_AUDIO_CONSUMER_PAYLOADER}/{@see CaptureParameters#CAPTURE_RTP_VIDEO_CONSUMER_PAYLOADER}
    * property.
-   * 
+   *
    * @throws IllegalArgumentException
    *           If one of the settings is invalid (e.g. misspelling, number instead of string, empty String etc.) this
    *           Exception is thrown.
@@ -192,13 +192,13 @@ public class RTPSinkConsumer extends ConsumerBin {
   protected void setElementProperties() throws IllegalArgumentException,
           UnableToSetElementPropertyBecauseElementWasNullException {
     super.setElementProperties();
-    
+
     if (audioRtpPort == null && videoRtpPort == null) {
       throw new IllegalArgumentException("Audio and/or video RTP port should set to use the RTPSinkConsumer!"
               + " Check your device configuration file for this settings on capturedevice '"
               + captureDevice.getFriendlyName() + "'.");
     }
-    
+
     if (audioRtpPort != null) {
       setAudioElementProperties();
     }
@@ -209,12 +209,12 @@ public class RTPSinkConsumer extends ConsumerBin {
 
   private void setAudioElementProperties() throws IllegalArgumentException,
           UnableToSetElementPropertyBecauseElementWasNullException {
-    
+
     // rtp properties
     audioRtpSink.set("sync", "false");
     audioRtpSink.set("async", "false");
     audioRtpSink.set("port", audioRtpPort);
-    
+
     // rtcp properties
     audioRtcpSink.set("sync", "false");
     audioRtcpSink.set("async", "false");
@@ -224,9 +224,9 @@ public class RTPSinkConsumer extends ConsumerBin {
       audioRtpSink.set("host", host);
       audioRtcpSink.set("host", host);
     }
-    
+
     audioCapsfilter.setCaps(Caps.fromString(GStreamerProperties.AUDIO_X_RAW_INT));
-    
+
     // encoder properties
     for (Object key : properties.keySet()) {
       if (key.toString().startsWith(configPrefix + CaptureParameters.CAPTURE_RTP_AUDIO_CONSUMER_ENCODER + ".")) {
@@ -237,7 +237,7 @@ public class RTPSinkConsumer extends ConsumerBin {
         }
       }
     }
-    
+
     // payloader properties
     for (Object key : properties.keySet()) {
       if (key.toString().startsWith(configPrefix + CaptureParameters.CAPTURE_RTP_AUDIO_CONSUMER_PAYLOADER + ".")) {
@@ -252,12 +252,12 @@ public class RTPSinkConsumer extends ConsumerBin {
 
   private void setVideoElementProperties() throws IllegalArgumentException,
           UnableToSetElementPropertyBecauseElementWasNullException {
-    
+
     // rtp properties
     videoRtpSink.set("sync", "false");
     videoRtpSink.set("async", "false");
     videoRtpSink.set("port", videoRtpPort);
-    
+
     // rtcp properties
     videoRtcpSink.set("sync", "false");
     videoRtcpSink.set("async", "false");
@@ -267,9 +267,9 @@ public class RTPSinkConsumer extends ConsumerBin {
       videoRtpSink.set("host", host);
       videoRtcpSink.set("host", host);
     }
-    
+
     videoCapsfilter.setCaps(Caps.fromString(GStreamerProperties.VIDEO_X_RAW_YUV));
-    
+
     // set framerate if configured
     String framerate = properties.getProperty(configPrefix + CaptureParameters.CAPTURE_RTP_VIDEO_CONSUMER_FRAMERATE);
     if (framerate != null) {
@@ -287,7 +287,7 @@ public class RTPSinkConsumer extends ConsumerBin {
         logger.error("Can not parse framerate!", e);
       }
     }
-    
+
     // encoder properties (H264)
     if (videoEncoder.getName().contains("264")) {
       String bitrate = captureDeviceProperties.getBitrate();
@@ -301,7 +301,7 @@ public class RTPSinkConsumer extends ConsumerBin {
       videoEncoder.set("rc-lookahead", "5");
       videoEncoder.set("profile", "1");
     }
-    
+
     // encoder properties
     for (Object key : properties.keySet()) {
       if (key.toString().startsWith(configPrefix + CaptureParameters.CAPTURE_RTP_VIDEO_CONSUMER_ENCODER + ".")) {
@@ -312,7 +312,7 @@ public class RTPSinkConsumer extends ConsumerBin {
         }
       }
     }
-    
+
     // payloader properties
     for (Object key : properties.keySet()) {
       if (key.toString().startsWith(configPrefix + CaptureParameters.CAPTURE_RTP_VIDEO_CONSUMER_PAYLOADER + ".")) {
@@ -324,11 +324,11 @@ public class RTPSinkConsumer extends ConsumerBin {
       }
     }
   }
-  
+
   @Override
   protected void addElementsToBin() {
     bin.addMany(queue, decodebin, rtpbin);
-    
+
     if (audioRtpPort != null) {
       addAudioElementsToBin();
     }
@@ -342,34 +342,34 @@ public class RTPSinkConsumer extends ConsumerBin {
   }
 
   private void addVideoElementsToBin() {
-    bin.addMany(videoVideorate, videoCapsfilter, videoColorspacePre, videoDeinterlace, 
+    bin.addMany(videoVideorate, videoCapsfilter, videoColorspacePre, videoDeinterlace,
             videoColorspacePost, videoEncoder, videoPayloader, videoRtpSink, videoRtcpSink);
   }
-  
+
   /**
-   * Link all the Elements. 
-   * 
-   * @throws UnableToLinkGStreamerElementsException 
+   * Link all the Elements.
+   *
+   * @throws UnableToLinkGStreamerElementsException
    *  If any of these links fail this Exception is thrown.
    */
   @Override
   protected void linkElements() throws UnableToLinkGStreamerElementsException {
     // RTP Pipeline:
     //
-    // queue -> decodebin 
+    // queue -> decodebin
     //   if audio { -> (audio)capsfilter -> encoder -> (audio) payloader -> }
-    //   if video { -> colorspace -> deinterlace -> colorspace -> 
+    //   if video { -> colorspace -> deinterlace -> colorspace ->
     //              -> videorate -> capsfilter -> encoder -> payloader -> }
-    // rtpbin 
-    //   if audio { -> (audio rtp) udpsink 
+    // rtpbin
+    //   if audio { -> (audio rtp) udpsink
     //              -> (audio rtpc) udpsink }
-    //   if video { -> (video rtp) udpsink 
+    //   if video { -> (video rtp) udpsink
     //              -> (video rtpc) udpsink }
-    
+
     if (!queue.link(decodebin)) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, queue, decodebin);
     }
-    
+
     if (audioRtpPort != null) {
       linkAudioElements();
     }
@@ -379,7 +379,7 @@ public class RTPSinkConsumer extends ConsumerBin {
   }
 
   private void linkAudioElements() throws UnableToLinkGStreamerElementsException {
-    
+
     rtpbin.connect(new Element.PAD_ADDED() {
 
       @Override
@@ -388,18 +388,18 @@ public class RTPSinkConsumer extends ConsumerBin {
         if (pad.getDirection() == PadDirection.SRC
                 && pad.getName().startsWith("send_rtp_src_")
                 && !audioRtpSink.getStaticPad(GStreamerProperties.SINK).isLinked()) {
-          
+
           pad.link(audioRtpSink.getStaticPad(GStreamerProperties.SINK));
         }
       }
     });
-    
+
     decodebin.connect(new Element.PAD_ADDED() {
 
       @Override
       public void padAdded(Element src, Pad pad) {
         Pad audioCapsfilterPad = audioCapsfilter.getStaticPad(GStreamerProperties.SINK);
-        if (pad.getDirection() == PadDirection.SRC 
+        if (pad.getDirection() == PadDirection.SRC
               && pad.acceptCaps(audioCapsfilterPad.getCaps())) {
 
           if (pad.link(audioCapsfilterPad) != PadLinkReturn.OK) {
@@ -410,26 +410,26 @@ public class RTPSinkConsumer extends ConsumerBin {
         }
       }
     });
-    
+
     if (!audioCapsfilter.link(audioEncoder)) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, audioCapsfilter, audioEncoder);
     }
-    
+
     if (!audioEncoder.link(audioPayloader)) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, audioEncoder, audioPayloader);
     }
-    
+
     if (!Element.linkPads(audioPayloader, GStreamerProperties.SRC, rtpbin, "send_rtp_sink_%d")) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, audioPayloader, rtpbin);
     }
-    
+
     if (!Element.linkPads(rtpbin, "send_rtcp_src_%d", audioRtcpSink, GStreamerProperties.SINK)) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, rtpbin, audioRtcpSink);
     }
   }
 
   private void linkVideoElements() throws UnableToLinkGStreamerElementsException {
-    
+
     rtpbin.connect(new Element.PAD_ADDED() {
 
       @Override
@@ -443,16 +443,16 @@ public class RTPSinkConsumer extends ConsumerBin {
         }
       }
     });
-    
+
     decodebin.connect(new Element.PAD_ADDED() {
 
       @Override
       public void padAdded(Element src, Pad pad) {
-        
+
         // use caps from capsfilter element because it was set before
-        if (pad.getDirection() == PadDirection.SRC 
+        if (pad.getDirection() == PadDirection.SRC
               && pad.acceptCaps(videoCapsfilter.getStaticPad(GStreamerProperties.SRC).getCaps())) {
-          
+
           Pad videoColorspacePrePad = videoColorspacePre.getStaticPad(GStreamerProperties.SINK);
           if (pad.link(videoColorspacePrePad) != PadLinkReturn.OK) {
             logger.error("Can not link {} to {}!", new Object[] {
@@ -462,35 +462,35 @@ public class RTPSinkConsumer extends ConsumerBin {
         }
       }
     });
-    
+
     if (!videoColorspacePre.link(videoDeinterlace)) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, videoColorspacePre, videoDeinterlace);
     }
-    
+
     if (!videoDeinterlace.link(videoColorspacePost)) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, videoDeinterlace, videoColorspacePost);
     }
-    
+
     if (!videoColorspacePost.link(videoVideorate)) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, videoColorspacePost, videoVideorate);
     }
-    
+
     if (!videoVideorate.link(videoCapsfilter)) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, videoVideorate, videoCapsfilter);
     }
-    
+
     if (!videoCapsfilter.link(videoEncoder)) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, videoCapsfilter, videoEncoder);
     }
-    
+
     if (!videoEncoder.link(videoPayloader)) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, videoEncoder, videoPayloader);
     }
-    
+
     if (!Element.linkPads(videoPayloader, GStreamerProperties.SRC, rtpbin, "send_rtp_sink_%d")) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, videoPayloader, rtpbin);
     }
-    
+
     if (!Element.linkPads(rtpbin, "send_rtcp_src_%d", videoRtcpSink, GStreamerProperties.SINK)) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, rtpbin, videoRtcpSink);
     }
@@ -500,12 +500,12 @@ public class RTPSinkConsumer extends ConsumerBin {
   public Element getSrc() {
     return queue;
   }
-  
+
   @Override
   public boolean isAudioDevice() {
     return audioRtpPort != null;
   }
-  
+
   @Override
   public boolean isVideoDevice() {
     return videoRtpPort != null;

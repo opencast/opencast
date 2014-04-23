@@ -735,7 +735,7 @@ ocUpload.Ingest = (function() {
 
   function createSeries(name) {
     var id = false;
-    var seriesXml = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn"><dcterms:title xmlns="">' + name + '</dcterms:title></dublincore>';
+    var seriesXml = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn/"><dcterms:title xmlns="">' + name + '</dcterms:title></dublincore>';
     var anonymous_role = 'anonymous';
 
     ocUpload.UI.setProgress("Creating Series " + name);

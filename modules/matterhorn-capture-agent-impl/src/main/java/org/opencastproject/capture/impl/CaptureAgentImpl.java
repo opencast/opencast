@@ -174,19 +174,19 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /** The last properties the CaptureAgentImpl was updated by felix with. **/
   private Dictionary<String, String> cachedProperties = new Hashtable<String, String>();
-  
+
   /** Collection with running monitoring devices and their type (audio, video or av). **/
   protected Map<String, String> monitoringDeviceFriendlyNames = new Hashtable<String, String>();
-  
+
   protected Map<String, String> monitoringDevicesVideoLocation = new Hashtable<String, String>();
   /** Synchronized collection for audio RMS values at specific time (unix timestamp). **/
   protected Map<String, SortedMap<Long, Double>> monitoringDevicesRmsValues = new Hashtable<String, SortedMap<Long, Double>>();
-    
+
   private int maxRmsValuesPerDevice = 60;
 
   /**
    * Sets the configuration service form which this capture agent should draw its configuration data.
-   * 
+   *
    * @param cfg
    *          The configuration service.
    * @throws ConfigurationException
@@ -196,10 +196,10 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
     agentName = configService.getItem(CaptureParameters.AGENT_NAME);
     configService.registerListener(this);
   }
-  
+
   /**
    * Returns the configuration service form which this capture agent should draw its configuration data.
-   * 
+   *
    * @return The configuration service.
    */
   public ConfigurationManager getConfigService() {
@@ -212,7 +212,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Sets the http client which this service uses to communicate with the core.
-   * 
+   *
    * @param c
    *          The client object.
    */
@@ -225,7 +225,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * OSGi callback that sets a reference to the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the registry
    */
@@ -235,7 +235,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.CaptureAgent#startCapture()
    */
   @Override
@@ -260,7 +260,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.CaptureAgent#startCapture(MediaPackage)
    */
   @Override
@@ -271,7 +271,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.CaptureAgent#startCapture(Properties)
    */
   @Override
@@ -294,7 +294,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.CaptureAgent#startCapture(MediaPackage, Properties)
    */
   @Override
@@ -302,7 +302,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
     logger.debug("startCapture(mediaPackage, properties): {} {}", mediaPackage, properties);
     // Stop the confidence monitoring if its pipeline is running.
     // stopMonitoring();
-    
+
     // Check to make sure we're not already capturing something
     if (currentRecID != null || !agentState.equals(AgentState.IDLE)) {
       logger.warn("Unable to start capture, a different capture is still in progress in {}.",
@@ -380,7 +380,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
   /**
    * Creates a RecordingImpl instance used in a capture. Also adds the recording to the agent's internal list of
    * upcoming recordings.
-   * 
+   *
    * @param mediaPackage
    *          The media package to create the recording around
    * @param properties
@@ -413,7 +413,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Convenience method to reset an agent when a capture fails to start.
-   * 
+   *
    * @param recordingID
    *          The recordingID of the capture which failed to start.
    */
@@ -426,7 +426,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Schedules a stopCapture call for unscheduled captures.
-   * 
+   *
    * @param recordingID
    *          The recordingID to stop.
    * @return true if the stop was scheduled, false otherwise.
@@ -461,7 +461,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.CaptureAgent#stopCapture(boolean)
    */
   @Override
@@ -520,7 +520,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.CaptureAgent#stopCapture(java.lang.String, boolean)
    */
   @Override
@@ -539,7 +539,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Generates the manifest.xml file from the files specified in the properties
-   * 
+   *
    * @param recID
    *          The ID for the recording whose manifest will be created
    * @return A state boolean
@@ -640,7 +640,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
     FileOutputStream fos = null;
     try {
       logger.debug("Serializing metadata and MediaPackage...");
-      
+
       // Gets the manifest.xml as a Document object and writes it to a file
       MediaPackageSerializer serializer = new DefaultMediaPackageSerializerImpl(recording.getBaseDir());
       File manifestFile = new File(recording.getBaseDir(), CaptureParameters.MANIFEST_NAME);
@@ -676,7 +676,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Compresses the files contained in the output directory
-   * 
+   *
    * @param recID
    *          The ID for the recording whose files are going to be zipped
    * @return A File reference to the file zip created
@@ -738,27 +738,27 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   }
 
-  /** 
+  /**
    * Removes the zip file associated with a recording.
-   * @param recording 
+   * @param recording
    *          The recording to remove the zip file from.
    */
   public void removeZipFile(AgentRecording recording) {
     File outputZip = new File(recording.getBaseDir(), CaptureParameters.ZIP_NAME);
     FileUtils.deleteQuietly(outputZip);
   }
-  
+
   // FIXME: Replace HTTP-based ingest with remote implementation of the Ingest Service. (jt)
   // See the ComposerServiceRemoteImpl to get an idea of the approach
   // The idea is to get the details of the HTTP interaction out of the client code
   /**
    * Sends a file to the REST ingest service.
-   * 
+   *
    * @param recID
    *          The ID for the recording to be ingested.
    * @return The status code for the http post, or one of a number of error values. The error values are as follows: -1:
    *         Unable to ingest because the recording id does not exist -2: Invalid ingest url -3: Invalid ingest url -4:
-   *         Invalid ingest url -5: Unable to open media package
+   *         Invalid ingest url -5: Unable to open media package -6: Service registry not found
    */
   public int ingest(String recID) {
     logger.info("Ingesting recording: {}", recID);
@@ -773,6 +773,10 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
     List<ServiceRegistration> ingestServices = null;
     URL url = null;
     try {
+      if (serviceRegistry == null) {
+        logger.warn("Service registry was null, this is probably a test.  If you see this during operations please file a bug!");
+        return -6;
+      }
       ingestServices = serviceRegistry.getServiceRegistrationsByLoad("org.opencastproject.ingest");
       if (ingestServices.size() == 0) {
         logger.warn("Unable to ingest media because no ingest service is available");
@@ -788,6 +792,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
     } catch (MalformedURLException e) {
       logger.warn("Malformed URL for ingest target.");
       return -3;
+
     }
 
     File fileDesc = new File(recording.getBaseDir(), CaptureParameters.ZIP_NAME);
@@ -868,7 +873,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Returns the number of captures that the capture agent is aware of that are upcoming.
-   * 
+   *
    * @return The number of captures that are waiting to fire.
    */
   public int getPendingRecordingSize() {
@@ -877,7 +882,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.StateService#getAgentName()
    */
   public String getAgentName() {
@@ -892,7 +897,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
    * Sets the state of the agent. Note that this should not change the *actual* state of the agent, only update the
    * StateService's record of its state. This is taking a string so that inter-version compatibility it maintained (eg,
    * a version 2 agent talking to a version 1 core)
-   * 
+   *
    * @param state
    *          The state of the agent. Should be defined in AgentState.
    * @see org.opencastproject.capture.admin.api.AgentState
@@ -903,7 +908,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.CaptureAgent#getAgentState()
    */
   public String getAgentState() {
@@ -912,7 +917,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Serializes a recording to disk
-   * 
+   *
    * @param newRec
    *          The recording object. The output object will be written to the recording's directory and will be named
    *          $recordingID.recording.
@@ -948,7 +953,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Deserializes a recording from disk.
-   * 
+   *
    * @param recording
    *          The directory containing the serialized recording and all of its files.
    * @return The deserialized {@code RecordingImpl}, or null in the case of an error.
@@ -979,7 +984,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Sets a pending recording's current state.
-   * 
+   *
    * @param recordingID
    *          The ID of the recording.
    * @param state
@@ -1011,7 +1016,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.StateService#getRecordingState(java.lang.String)
    */
   public Recording getRecordingState(String recID) {
@@ -1020,7 +1025,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Removes a recording from the completed recording table.
-   * 
+   *
    * @param recID
    *          The ID of the recording to remove.
    */
@@ -1030,7 +1035,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.StateService#getKnownRecordings()
    */
   public Map<String, AgentRecording> getKnownRecordings() {
@@ -1042,7 +1047,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.CaptureAgent#getAgentCapabilities()
    */
   public Properties getAgentCapabilities() {
@@ -1054,7 +1059,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.CaptureAgent#getDefaultAgentProperties()
    */
   public Properties getDefaultAgentProperties() {
@@ -1066,7 +1071,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.CaptureAgent#getDefaultAgentPropertiesAsString()
    */
   @Deprecated
@@ -1089,7 +1094,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.CaptureAgent#getAgentSchedule()
    */
   public List<ScheduledEvent> getAgentSchedule() {
@@ -1103,7 +1108,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @SuppressWarnings("unchecked")
@@ -1139,7 +1144,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
         logger.error(e.getMessage());
       }
     }
-    
+
     // update confidence monitoring properties
     confidence = Boolean.valueOf(configService.getItem(CaptureParameters.CAPTURE_CONFIDENCE_ENABLE));
     if (confidence) {
@@ -1152,11 +1157,11 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
           if (maxRmsValuesPerDevice > 0) {
             this.maxRmsValuesPerDevice = maxRmsValuesPerDevice;
           } else {
-            logger.warn("Config property value for {} should be positive integer", 
+            logger.warn("Config property value for {} should be positive integer",
                     CaptureParameters.CAPTURE_CONFIDENCE_AUDIO_LENGTH);
           }
         } catch (NumberFormatException ex) {
-          logger.warn("Can't parse configuration value for '{}'", 
+          logger.warn("Can't parse configuration value for '{}'",
                   CaptureParameters.CAPTURE_CONFIDENCE_AUDIO_LENGTH);
         }
       }
@@ -1224,7 +1229,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Callback from the OSGi container once this service is started. This is where we register our shell commands.
-   * 
+   *
    * @param ctx
    *          the component context
    */
@@ -1268,7 +1273,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
             agentScheduler.deleteJob(jobname, groupname);
           }
         }
-        agentScheduler.shutdown(true);
+        agentScheduler.shutdown();
       }
     } catch (SchedulerException e) {
       logger.warn("Finalize for scheduler did not execute cleanly: {}.", e);
@@ -1353,13 +1358,13 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Creates the agent's scheduler
-   * 
+   *
    * @param schedulerProps
    * @param jobname
    * @param jobtype
    */
   private void createScheduler(Properties schedulerProps, String jobname, String jobtype) {
-    // Either create the scheduler or empty out the existing one
+    // Create a scheduler, and if necessary shut down the old one.
     try {
       if (agentScheduler != null) {
         // Clear the existing jobs and reschedule everything
@@ -1368,18 +1373,18 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
             agentScheduler.deleteJob(name, JobParameters.RECURRING_TYPE);
           }
         }
-      } else {
-        StdSchedulerFactory scheduleFactory = null;
-        if (schedulerProps.size() > 0) {
-          scheduleFactory = new StdSchedulerFactory(schedulerProps);
-        } else {
-          scheduleFactory = new StdSchedulerFactory();
-        }
-
-        // Create and start the scheduler
-        agentScheduler = scheduleFactory.getScheduler();
-        agentScheduler.start();
+        agentScheduler.shutdown();
       }
+      StdSchedulerFactory scheduleFactory = null;
+      if (schedulerProps.size() > 0) {
+        scheduleFactory = new StdSchedulerFactory(schedulerProps);
+      } else {
+        scheduleFactory = new StdSchedulerFactory();
+      }
+
+      // Create and start the scheduler
+      agentScheduler = scheduleFactory.getScheduler();
+      agentScheduler.start();
     } catch (SchedulerException e) {
       logger.error("Scheduler exception in State Service: {}.", e);
       return;
@@ -1388,7 +1393,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Creates the Quartz task which loads the recordings from disk.
-   * 
+   *
    * @param schedulerProps
    *          The properties of the scheduler, used to create the scheduler if it doesn't already exist
    * @param delay
@@ -1426,7 +1431,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Creates the Quartz task which pushes the agent's state to the state server.
-   * 
+   *
    * @param schedulerProps
    *          The properties for the Quartz scheduler
    */
@@ -1504,7 +1509,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
 
   /**
    * Determines if the current agent state is idle.
-   * 
+   *
    * @return returns true if the capture agent is idle.
    */
   public boolean isIdle() {
@@ -1517,9 +1522,9 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.CaptureAgent#updateCalendar()
    */
   public void updateSchedule() {
@@ -1529,13 +1534,13 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
   }
 
   /**
-   * 
+   *
    * @param friendlyName
-   * @return 
+   * @return
    */
   @Override
   public byte[] grabFrame(String friendlyName) {
-    if (pipeline != null && pipeline.isMonitoringEnabled() 
+    if (pipeline != null && pipeline.isMonitoringEnabled()
             && monitoringDevicesVideoLocation.get(friendlyName) != null
             && new File(monitoringDevicesVideoLocation.get(friendlyName)).exists()) {
       try {
@@ -1548,7 +1553,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
   }
 
   /**
-   * 
+   *
    * @param friendlyName
    * @param timestamp
    * @return
@@ -1559,27 +1564,27 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
   public List<Double> getRMSValues(String friendlyName, double timestamp) {
     return getRMSValues(friendlyName, Math.round(timestamp));
   }
-  
+
   /**
-   * 
+   *
    * @param friendlyName
    * @param timestamp
-   * @return 
+   * @return
    */
   @Override
   public List<Double> getRMSValues(String friendlyName, long timestamp) {
     SortedMap<Long, Double> deviceValues = monitoringDevicesRmsValues.get(friendlyName);
     if (deviceValues == null)
       return new LinkedList<Double>();
-    
+
     synchronized (deviceValues) {
       return new LinkedList<Double>(deviceValues.tailMap(timestamp).values());
     }
   }
 
   /**
-   * 
-   * @return 
+   *
+   * @return
    */
   @Override
   public List<String> getFriendlyNames() {
@@ -1587,22 +1592,22 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
     for (String name : monitoringDeviceFriendlyNames.keySet()) {
       deviceList.add(name + "," + monitoringDeviceFriendlyNames.get(name));
     }
-    
+
     return deviceList;
   }
 
   /**
-   * 
-   * @return 
+   *
+   * @return
    */
   @Override
   public String getCoreUrl() {
     if (configService != null)
       return configService.getAllProperties().getProperty(CaptureParameters.CAPTURE_CORE_URL);
-    
+
     return null;
   }
-  
+
   /**
    * Remove video monitoring image files and clear audio values.
    */
@@ -1619,24 +1624,24 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
   }
 
   /**
-   * 
-   * @return 
+   *
+   * @return
    */
   @Override
   public boolean startMonitoring() {
     if (confidence) {
       logger.info("Confidence monitoring enabled.");
-      
+
       if (pipeline != null) {
         logger.warn("Abort start monitoring pipeline, because there is another pipeline running.");
         return false;
       }
-      
+
       cleanupMonitoring();
-     
+
       pipeline = new GStreamerMonitoringPipeline();
       pipeline.setMonitoringListener(this);
-      
+
       try {
         ((GStreamerMonitoringPipeline)pipeline).start(configService.getAllProperties());
         logger.info("Confidence Monitoring is starting");
@@ -1649,29 +1654,29 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
   }
 
   /**
-   * 
+   *
    */
   @Override
   public void stopMonitoring() {
     if (pipeline != null && pipeline.isMonitoringOnly()) {
      pipeline.stop();
      pipeline = null;
-     
+
      cleanupMonitoring();
     }
   }
 
   /**
-   * 
+   *
    * @param deviceFriendlyName
-   * @param type 
+   * @param type
    */
   @Override
   public void registerDevice(String deviceFriendlyName, DeviceType type) {
     if (monitoringDeviceFriendlyNames.get(deviceFriendlyName) == null) {
       monitoringDeviceFriendlyNames.put(deviceFriendlyName, type.toString().toLowerCase());
     }
-    
+
     if (type == DeviceType.AUDIO || type == DeviceType.AV
             && monitoringDevicesRmsValues.get(deviceFriendlyName) == null) {
       monitoringDevicesRmsValues.put(deviceFriendlyName, new TreeMap<Long, Double>());
@@ -1679,9 +1684,9 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
   }
 
   /**
-   * 
+   *
    * @param deviceFriendlyName
-   * @param monitoringVideoLocation 
+   * @param monitoringVideoLocation
    */
   @Override
   public void setMonitoringVideoLocation(String deviceFriendlyName, String monitoringVideoLocation) {
@@ -1689,10 +1694,10 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
   }
 
   /**
-   * 
+   *
    * @param deviceFriendlyName
    * @param timestamp
-   * @param rmsValue 
+   * @param rmsValue
    */
   @Override
   public void addRmsValue(String deviceFriendlyName, long timestamp, double rmsValue) {

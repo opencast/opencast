@@ -26,14 +26,14 @@ public interface Link {
 
   /**
    * Returns the link rel.
-   * 
+   *
    * @return the link rel, <b>null</b> if none
    */
   String getRel();
 
   /**
    * Sets the link rel.
-   * 
+   *
    * @param rel
    *          the link rel, <b>null</b> if none
    */
@@ -41,14 +41,14 @@ public interface Link {
 
   /**
    * Returns the link type.
-   * 
+   *
    * @return the link type, <b>null</b> if none
    */
   String getType();
 
   /**
    * Sets the link type.
-   * 
+   *
    * @param type
    *          the link type, <b>null</b> if none
    */
@@ -56,14 +56,14 @@ public interface Link {
 
   /**
    * Returns the link href.
-   * 
+   *
    * @return the link href, <b>null</b> if none
    */
   String getHref();
 
   /**
    * Sets the link href.
-   * 
+   *
    * @param href
    *          the link href, <b>null</b> if none
    */
@@ -71,14 +71,14 @@ public interface Link {
 
   /**
    * Returns the link title.
-   * 
+   *
    * @return the link title, <b>null</b> if none
    */
   String getTitle();
 
   /**
    * Sets the link title.
-   * 
+   *
    * @param title
    *          the link title, <b>null</b> if none
    */
@@ -86,14 +86,14 @@ public interface Link {
 
   /**
    * Returns the hreflang.
-   * 
+   *
    * @return Returns the hreflang
    */
   String getHreflang();
 
   /**
    * Set the hreflang.
-   * 
+   *
    * @param hreflang
    *          The hreflang to set
    */
@@ -101,32 +101,32 @@ public interface Link {
 
   /**
    * Returns the length.
-   * 
+   *
    * @return Returns the length
    */
   long getLength();
 
   /**
    * Set the length.
-   * 
+   *
    * @param length
    *          The length to set
    */
   void setLength(long length);
-  
+
   /**
    * Returns the link mediapackage element flavour.
-   * 
+   *
    * @return the link flavour, <b>null</b> if none
    */
   String getFlavour();
-    
+
   /**
    * Sets the link mediapackage element flavour.
-   * 
+   *
    * @param flavour
    *          the link flavour to set, <b>null</b> if none
    */
-  void setFlavour(String flavor);  
+  void setFlavour(String flavor);
 
 }

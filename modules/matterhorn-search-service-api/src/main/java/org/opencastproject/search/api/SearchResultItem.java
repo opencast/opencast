@@ -41,18 +41,18 @@ public interface SearchResultItem {
 
   /**
    * Returns the media package that was used to create the entry in the search index.
-   * 
+   *
    * @return the media package
    */
   MediaPackage getMediaPackage();
 
   /**
    * Returns the organization that produced this item.
-   * 
+   *
    * @return the organization identifier
    */
   String getOrganization();
-  
+
   /**
    * @return the dcExtent
    */
@@ -185,7 +185,7 @@ public interface SearchResultItem {
 
   /**
    * Get the result item segment list.
-   * 
+   *
    * @return The segment list.
    */
   MediaSegment[] getSegments();

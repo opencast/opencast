@@ -29,14 +29,14 @@ import org.slf4j.LoggerFactory;
  * @author wsmirnow
  */
 public abstract class GstreamerAbstractTest {
-  
+
   /** The logging instance */
   private static final org.slf4j.Logger logger = LoggerFactory.getLogger(GstreamerAbstractTest.class);
-  
+
   public static final int WAIT_SEC = 3;
-  
+
   protected String audioFilePath;
-    
+
   public GstreamerAbstractTest() {
       try {
       audioFilePath = new File(getClass().getResource("/testresources/testvideo-a.mp4").toURI()).getAbsolutePath();
@@ -44,19 +44,19 @@ public abstract class GstreamerAbstractTest {
       logger.error(ex.getMessage());
     }
   }
-  
+
   @BeforeClass
   public static void setUpClass() throws Exception {
     Gst.setUseDefaultContext(true);
     Gst.init();
   }
-  
+
   @Before
   public void bla() throws FileNotFoundException {
     if (!new File(audioFilePath).exists())
       throw new FileNotFoundException("Audio test file does not exist");
   }
-  
+
   /**
    * Test if Gstreamer {@code ElementFactory} can find element with given name.
    * @param factoryName Gstreamer Element factory name

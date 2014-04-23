@@ -15,6 +15,8 @@
  */
 package org.opencastproject.webconsole;
 
+import org.opencastproject.systems.MatterhornConstans;
+
 import org.apache.felix.webconsole.AbstractWebConsolePlugin;
 import org.apache.felix.webconsole.BrandingPlugin;
 import org.apache.felix.webconsole.internal.servlet.OsgiManager;
@@ -40,7 +42,7 @@ public class WebConsole extends OsgiManager {
   public WebConsole(BundleContext bundleContext) {
     super(bundleContext);
     AbstractWebConsolePlugin.setBrandingPlugin(new MatterhornBrandingPlugin(bundleContext
-            .getProperty("org.opencastproject.server.url")));
+            .getProperty(MatterhornConstans.SERVER_URL_PROPERTY)));
     logger.debug("The matterhorn web console will use the {} branding plugin",
             AbstractWebConsolePlugin.getBrandingPlugin());
   }

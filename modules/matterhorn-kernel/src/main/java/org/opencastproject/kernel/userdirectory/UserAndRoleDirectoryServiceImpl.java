@@ -18,7 +18,11 @@ package org.opencastproject.kernel.userdirectory;
 import static org.opencastproject.security.api.UserProvider.ALL_ORGANIZATIONS;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.security.api.JaxbOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleDirectoryService;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
@@ -30,6 +34,7 @@ import org.opencastproject.util.Caches;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -40,10 +45,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * Federates user and role providers, and exposes a spring UserDetailsService so user lookups can be used by spring
@@ -115,26 +119,48 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.security.api.RoleDirectoryService#getRoles()
+   * @see org.opencastproject.security.api.UserDirectoryService#getUsers()
    */
   @Override
-  public String[] getRoles() {
+  @SuppressWarnings("unchecked")
+  public Iterator<User> getUsers() {
     Organization org = securityService.getOrganization();
     if (org == null) {
       throw new IllegalStateException("No organization is set");
     }
-    SortedSet<String> roles = new TreeSet<String>();
-    for (RoleProvider roleProvider : roleProviders) {
-      for (String role : roleProvider.getRoles()) {
-        String currentOrgId = org.getId();
-        String providerOrgId = roleProvider.getOrganization();
-        if (!currentOrgId.equals(providerOrgId) && !ALL_ORGANIZATIONS.equals(providerOrgId)) {
-          continue;
-        }
-        roles.add(role);
-      }
+
+    // Find all users from the user providers
+    Set<User> users = new HashSet<User>();
+    for (UserProvider userProvider : userProviders) {
+      String providerOrgId = userProvider.getOrganization();
+      if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !org.getId().equals(providerOrgId))
+        continue;
+
+      users.addAll(IteratorUtils.toList(userProvider.getUsers()));
     }
-    return roles.toArray(new String[roles.size()]);
+    return users.iterator();
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.security.api.RoleDirectoryService#getRoles()
+   */
+  @Override
+  @SuppressWarnings("unchecked")
+  public Iterator<Role> getRoles() {
+    Organization org = securityService.getOrganization();
+    if (org == null) {
+      throw new IllegalStateException("No organization is set");
+    }
+    Set<Role> roles = new HashSet<Role>();
+    for (RoleProvider roleProvider : roleProviders) {
+      String providerOrgId = roleProvider.getOrganization();
+      if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !org.getId().equals(providerOrgId))
+        continue;
+      roles.addAll(IteratorUtils.toList(roleProvider.getRoles()));
+    }
+    return roles.iterator();
   }
 
   /**
@@ -189,23 +215,23 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       throw new UsernameNotFoundException(userName);
     } else {
       Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-      for (String role : user.getRoles()) {
-        authorities.add(new SimpleGrantedAuthority(role));
+      for (Role role : user.getRoles()) {
+        authorities.add(new SimpleGrantedAuthority(role.getName()));
       }
 
       // Add additional roles from role providers
       for (RoleProvider roleProvider : roleProviders) {
-        String[] rolesForUser = roleProvider.getRolesForUser(userName);
-        for (String role : rolesForUser)
-          authorities.add(new SimpleGrantedAuthority(role));
+        List<Role> rolesForUser = roleProvider.getRolesForUser(userName);
+        for (Role role : rolesForUser)
+          authorities.add(new SimpleGrantedAuthority(role.getName()));
       }
 
       authorities.add(new SimpleGrantedAuthority(securityService.getOrganization().getAnonymousRole()));
       // need a non null password to instantiate org.springframework.security.core.userdetails.User
       // but CAS authenticated users have no password
       String password = user.getPassword() == null ? DEFAULT_PASSWORD : user.getPassword();
-      return new org.springframework.security.core.userdetails.User(user.getUserName(), password, true, true, true,
-          true, authorities);
+      return new org.springframework.security.core.userdetails.User(user.getUsername(), password, user.canLogin(),
+              true, true, true, authorities);
     }
   }
 
@@ -220,17 +246,16 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    * @return a user with a merged set of roles
    */
   protected User mergeUsers(User user1, User user2) {
-    String[] roles1 = user1.getRoles();
-    String[] roles2 = user2.getRoles();
-
-    String[] roles = new String[(roles1.length + roles2.length)];
-    for (int i = 0; i < roles.length; i++) {
-      roles[i] = i < roles1.length ? roles1[i] : roles2[i - roles1.length];
+    HashSet<JaxbRole> mergedRoles = new HashSet<JaxbRole>();
+    for (Role role : user1.getRoles()) {
+      mergedRoles.add(JaxbRole.fromRole(role));
     }
-    String userName = user1.getUserName();
-    String organization = user1.getOrganization();
+    for (Role role : user2.getRoles()) {
+      mergedRoles.add(JaxbRole.fromRole(role));
+    }
+    JaxbOrganization organization = JaxbOrganization.fromOrganization(user1.getOrganization());
     String password = user1.getPassword() == null ? user2.getPassword() : user1.getPassword();
-    return new User(userName, password, organization, roles);
+    return new JaxbUser(user1.getUsername(), password, organization, mergedRoles);
   }
 
   /**
@@ -241,6 +266,61 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Iterator<User> findUsers(String query, int offset, int limit) {
+    if (query == null)
+      throw new IllegalArgumentException("Query must be set");
+    Organization org = securityService.getOrganization();
+    if (org == null) {
+      throw new IllegalStateException("No organization is set");
+    }
+
+    // Find all users from the user providers
+    HashSet<User> users = new HashSet<User>();
+    for (UserProvider userProvider : userProviders) {
+      String providerOrgId = userProvider.getOrganization();
+      if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !org.getId().equals(providerOrgId))
+        continue;
+      users.addAll(IteratorUtils.toList(userProvider.findUsers(query, 0, 0)));
+    }
+    return offsetLimitCollection(offset, limit, users).iterator();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Iterator<Role> findRoles(String query, int offset, int limit) {
+    if (query == null)
+      throw new IllegalArgumentException("Query must be set");
+    Organization org = securityService.getOrganization();
+    if (org == null) {
+      throw new IllegalStateException("No organization is set");
+    }
+
+    // Find all roles from the role providers
+    HashSet<Role> roles = new HashSet<Role>();
+    for (RoleProvider roleProvider : roleProviders) {
+      String providerOrgId = roleProvider.getOrganization();
+      if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !org.getId().equals(providerOrgId))
+        continue;
+      roles.addAll(IteratorUtils.toList(roleProvider.findRoles(query, 0, 0)));
+    }
+    return offsetLimitCollection(offset, limit, roles).iterator();
+  }
+
+  private <T> HashSet<T> offsetLimitCollection(int offset, int limit, HashSet<T> entries) {
+    HashSet<T> result = new HashSet<T>();
+    int i = 0;
+    for (T entry : entries) {
+      if (limit != 0 && result.size() >= limit)
+        break;
+      if (i >= offset)
+        result.add(entry);
+      i++;
+    }
+    return result;
   }
 
 }
