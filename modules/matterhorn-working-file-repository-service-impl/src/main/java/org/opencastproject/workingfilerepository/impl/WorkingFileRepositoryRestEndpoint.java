@@ -44,6 +44,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.tika.metadata.HttpHeaders;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
@@ -87,8 +88,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   private final MimetypesFileTypeMap mimeMap = new MimetypesFileTypeMap(getClass().getClassLoader()
           .getResourceAsStream("mimetypes"));
 
-  /** The Apache Tika parser */
-  private Parser tikaParser;
+  /** The tika parser */
+  private final Parser tikaParser = new AutoDetectParser();
 
   /**
    * Callback from OSGi that is called when this service is activated.
@@ -98,15 +99,6 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
    */
   public void activate(ComponentContext cc) throws IOException {
     super.activate(cc);
-  }
-
-  /**
-   * Sets the Apache Tika parser.
-   * 
-   * @param tikaParser
-   */
-  public void setTikaParser(Parser tikaParser) {
-    this.tikaParser = tikaParser;
   }
 
   @POST

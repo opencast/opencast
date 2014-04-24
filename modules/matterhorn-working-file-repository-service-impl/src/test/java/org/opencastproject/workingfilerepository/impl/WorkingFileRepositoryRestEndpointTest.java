@@ -23,7 +23,6 @@ import junit.framework.Assert;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.tika.parser.AutoDetectParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +45,6 @@ public class WorkingFileRepositoryRestEndpointTest {
     FileUtils.forceMkdir(new File(endpoint.rootDirectory));
     endpoint.serverUrl = UrlSupport.DEFAULT_BASE_URL;
     endpoint.serviceUrl = new URI("http://localhost/files");
-    endpoint.setTikaParser(new AutoDetectParser());
   }
 
   @After

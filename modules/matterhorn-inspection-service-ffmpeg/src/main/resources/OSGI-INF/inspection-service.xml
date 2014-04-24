@@ -19,8 +19,6 @@
       cardinality="1..1" policy="static" bind="setUserDirectoryService" />
     <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
       cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
-    <reference name="tikaOSGIParser" interface="org.apache.tika.parser.Parser"
-      cardinality="1..1" policy="static" bind="setTikaParser" />
   </scr:component>
 
   <scr:component activate="activate" immediate="true"
