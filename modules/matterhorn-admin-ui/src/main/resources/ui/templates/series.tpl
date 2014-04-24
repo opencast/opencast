@@ -99,7 +99,6 @@
             <th>Role</th>
             <th>View</th>
             <th>Administer</th>
-            <th>Analyze</th>
             <th></th>
           </tr>
         </thead>
@@ -107,8 +106,7 @@
           <tr>
             <td>Public (no authorization required)</td>
             <td class="privilege_edit"><input type="checkbox" id="anonymous_view" /></td>
-            <td class="privilege_edit"><input type="checkbox" disabled="disabled" /></td>
-            <td></td>
+            <td class="privilege_edit"></td>
           </tr>
         </tbody>
       </table>
