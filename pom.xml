@@ -774,6 +774,7 @@
       </activation>
       <modules>
         <module>modules/matterhorn-inspection-service-ffmpeg</module>
+        <module>modules/matterhorn-dictionary-none</module>
       </modules>
     </profile>
 
