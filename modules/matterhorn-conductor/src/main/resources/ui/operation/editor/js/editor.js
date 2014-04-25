@@ -692,7 +692,7 @@ function getTimefieldTimeEnd() {
 function setEnabled(uuid, enabled) {
     if (editor.splitData && editor.splitData.splits) {
         editor.splitData.splits[uuid].enabled = enabled;
-        editor.updateSplitList(false, true);
+        editor.updateSplitList(false, !zoomedIn());
     }
 }
 
@@ -980,7 +980,7 @@ function okButtonClick() {
                     }
                 }
 
-                editor.updateSplitList(true, true);
+                editor.updateSplitList(true, !zoomedIn());
                 $('#videoPlayer').focus();
                 selectSegmentListElement(id);
             } else {
@@ -1031,34 +1031,36 @@ function splitRemoverClick() {
             $('#splitRemover-' + id).hide();
             $('#splitAdder-' + id).show();
             $('.splitItem').removeClass('splitItemSelected');
-            setEnabled(id, false);
-            if (getCurrentSplitItem().id == id) {
-                // if current split item is being deleted:
-                // try to select the next enabled segment, if that fails try to select the previous enabled item
-                var sthSelected = false;
-                for (var i = id; i < editor.splitData.splits.length; ++i) {
-                    if (editor.splitData.splits[i].enabled) {
-                        sthSelected = true;
-                        selectSegmentListElement(i, true);
-                        break;
-                    }
-                }
-                if (!sthSelected) {
-                    for (var i = id; i >= 0; --i) {
-                        if (editor.splitData.splits[i].enabled) {
+	    setEnabled(id, false);
+	    if(!zoomedIn()) {
+		if (getCurrentSplitItem().id == id) {
+                    // if current split item is being deleted:
+                    // try to select the next enabled segment, if that fails try to select the previous enabled item
+                    var sthSelected = false;
+                    for (var i = id; i < editor.splitData.splits.length; ++i) {
+			if (editor.splitData.splits[i].enabled) {
                             sthSelected = true;
                             selectSegmentListElement(i, true);
                             break;
-                        }
+			}
                     }
-                }
-            }
-            selectCurrentSplitItem();
+                    if (!sthSelected) {
+			for (var i = id; i >= 0; --i) {
+                            if (editor.splitData.splits[i].enabled) {
+				sthSelected = true;
+				selectSegmentListElement(i, true);
+				break;
+                            }
+			}
+                    }
+		}
+		selectCurrentSplitItem();
+	    }
         } else {
             $('#splitItemDiv-' + id).removeClass('disabled');
             $('#splitRemover-' + id).show();
             $('#splitAdder-' + id).hide();
-            setEnabled(id, true);
+	    setEnabled(id, true);
         }
     }
     cancelButtonClick();
@@ -1928,7 +1930,7 @@ function initPlayButtons() {
                 clipEnd: parseFloat(workflowInstance.mediapackage.duration) / 1000,
                 enabled: true
             });
-            editor.updateSplitList(false, true);
+            editor.updateSplitList(false, !zoomedIn());
             selectSegmentListElement(0);
         }
     });
@@ -1984,7 +1986,7 @@ function updateWaveformClickEvent() {
  */
 function prepareUI() {
     // update split list and enable the editor
-    editor.updateSplitList(false, true);
+    editor.updateSplitList(false, !zoomedIn());
     $('#editor').removeClass('disabled');
 
     // try to load waveform image
@@ -2024,11 +2026,7 @@ function prepareUI() {
                         setWaveformWidth(ui.value);
                     },
                     stop: function (event, ui) {
-                        if (zoomedIn()) {
-                            editor.updateSplitList(false, false);
-                        } else {
-                            editor.updateSplitList(false, true);
-                        }
+                        editor.updateSplitList(false, !zoomedIn());
 			selectCurrentSplitItem();
                     }
                 });
@@ -2394,7 +2392,7 @@ $(document).ready(function () {
 
     $(window).bind('resizeEnd', function () {
         // window has not been resized in windowResizeMS ms
-        editor.updateSplitList(false, true);
+        editor.updateSplitList(false, !zoomedIn());
         selectCurrentSplitItem();
     });
 });
