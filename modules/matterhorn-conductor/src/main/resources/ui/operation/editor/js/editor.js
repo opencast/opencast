@@ -560,7 +560,9 @@ editor.updateSplitList = function (dontClickCancel, segmentsClickable) {
 
         var tmpTime = 0;
         $.each(editor.splitData.splits, function (index, value) {
-            if (value.enabled && value.clipEnd && value.clipBegin) {
+	    value.clipEnd = parseFloat(value.clipEnd);
+	    value.clipBegin = parseFloat(value.clipBegin);
+            if (value.enabled && (value.clipEnd != undefined) && (value.clipBegin != undefined)) {
                 tmpTime += value.clipEnd - value.clipBegin;
             }
         });
