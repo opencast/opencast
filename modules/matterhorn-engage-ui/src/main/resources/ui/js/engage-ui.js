@@ -18,11 +18,15 @@ $(document).ready(function(){
 	var visited = 1;
 
 	$(window).load(function(){
+		$.enableLogging(true);
+
 		getInfo();
 		registerHandler();
+
 		var retrievedObject = sessionStorage.getItem('historyStack');
 		if (retrievedObject != null) {
 			stack = JSON.parse(retrievedObject);
+			$.log('Retrieved History Stack from Session Storage');
 		}else{
 			stack.push({"page":1, "active":"episodes", "rest":null});
 		}
@@ -33,14 +37,14 @@ $(document).ready(function(){
 
 		if (window.history.state == null && stack.length == 1) {return};
 
-		console.log(window.history.state);
-
 		var choose = window.history.state - 1;
 		if (choose < 0) {
 			choose = 0;
 		}; 
 
 		var dest = stack[choose];
+
+		if (dest == undefined) {return};
 
 		page = dest.page;
 		restData = dest.rest;
@@ -74,6 +78,8 @@ $(document).ready(function(){
 			url: '/info/me.json',
 			dataType: 'json',
 			success: function (data) {
+				$.log("Info loaded");
+
 				var logo = data.org.properties.logo_large;
 				var player = data.org.properties.player;
 
@@ -89,7 +95,7 @@ $(document).ready(function(){
 				else{
 					playerEndpoint = playerEndpoint + "ui/watch.html?id=";
 				}
-			
+				$.log("Choosen Player: " + player);
 			}
 		})
 	}
@@ -182,6 +188,7 @@ $(document).ready(function(){
 			}
 
 		});
+		$.log("Handler registered");
 	}
 
 	function loadEpisodes (data) {
@@ -190,7 +197,6 @@ $(document).ready(function(){
 			url: requestUrl,
 			dataType: "json",
 			success: function(data){
-
 				// Clear Main Grid
 				$('#main-container').empty();
 
@@ -302,7 +308,8 @@ $(document).ready(function(){
 			$(this).css("background", "linear-gradient(to bottom, #"+color+" 10%,#FFFFFF 10%, #FFFFFF 50%,#FFFFFF 100%)");
 		});
 
-		registerMobileEvents();
+		/* TODO: Swipe Events etc. for mobile Devices */
+		//registerMobileEvents();
 	}
 
 	function createSeriesGrid (data) {
@@ -336,7 +343,6 @@ $(document).ready(function(){
 			url: requestUrl,
 			dataType: "json",
 			success: function(data){
-
 				// Clear Main Grid
 				$('#main-container').empty();
 
@@ -375,8 +381,6 @@ $(document).ready(function(){
 	}
 
 	function registerMobileEvents() {
-		$('.tile').on('taphold', function(){
-			alert("Alarm");
-		});
+		/* TODO */
 	}
 });
