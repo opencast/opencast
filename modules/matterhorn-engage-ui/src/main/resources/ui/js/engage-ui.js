@@ -192,7 +192,7 @@ $(document).ready(function(){
 	}
 
 	function loadEpisodes (data) {
-		var requestUrl = restEndpoint + "episode.json?limit=6&offset="+(page-1)*6+"&" + restData;
+		var requestUrl = restEndpoint + "episode.json?limit=6&offset="+((page-1))*6+"&" + restData;
 		$.ajax({
 			url: requestUrl,
 			dataType: "json",
@@ -202,6 +202,11 @@ $(document).ready(function(){
 
 				// Number of total Search Results
 				var total = data["search-results"]["total"];
+				if (data["search-results"] == undefined || total == undefined) {
+					$.log("Unexpected Error: Search-Results (total) undefined");
+					$('#main-container').append("<h2> Something went wront. Try again! </h2>");
+					return;
+				};
 
 				// Keine Episoden vorhanden
 				if (total == 0) {
@@ -235,7 +240,15 @@ $(document).ready(function(){
 	}
 
 	function buildGrid (data) {
-		var tile = mediaContainer + '<div class="tile" id="'+data["id"]+'">';
+
+		var serID = data["id"];
+
+		if (data["id"] == undefined) {
+			$.log("Unexpected Error: Episode with no ID.")
+			serID = "0";
+		};
+
+		var tile = mediaContainer + '<div class="tile" id="'+serID+'">';
 
 		tile = tile + '<h4 class="title">' + data.dcTitle + "</h4>";
 
@@ -243,9 +256,9 @@ $(document).ready(function(){
 		var thumb = "";
 		var time = 0;
 		var color = "A6A6A6";
-		var creator = "\n";
-		var seriestitle = "\n";
-		var date = "\n";
+		var creator = "<br>";
+		var seriestitle = "<br>";
+		var date = "<br>";
 
 
 		if(data.mediapackage.attachments.attachment[1].url){
@@ -257,18 +270,18 @@ $(document).ready(function(){
 
 		if (data["dcCreator"]) {
 			creator = data["dcCreator"];
-			tile = tile + "<div class='creator'>"+creator+"</div>";
 		};
+		tile = tile + "<div class='creator'>"+creator+"</div>";
 
 		if (data.mediapackage.seriestitle) {
 			seriestitle = data.mediapackage.seriestitle;
-			tile = tile + "<div class='seriestitle'>"+seriestitle+"</div>";
 		};
+		tile = tile + "<div class='seriestitle'>"+seriestitle+"</div>";
 
 		if (data.mediapackage["start"]) {
 			date = new Date(data.mediapackage["start"]);
-			tile = tile + "<div class='date'>"+date.toLocaleDateString()+"</div>";
 		};
+		tile = tile + "<div class='date'>"+date.toLocaleDateString()+"</div>";
 
 		if(data["mediapackage"]["duration"]){
 			time = data["mediapackage"]["duration"];
