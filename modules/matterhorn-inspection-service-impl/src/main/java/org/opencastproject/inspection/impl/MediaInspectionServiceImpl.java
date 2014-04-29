@@ -15,6 +15,8 @@
  */
 package org.opencastproject.inspection.impl;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.tika.parser.Parser;
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -28,10 +30,6 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.workspace.api.Workspace;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.parser.Parser;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -57,9 +55,18 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   private SecurityService securityService = null;
   private UserDirectoryService userDirectoryService = null;
   private OrganizationDirectoryService organizationDirectoryService = null;
-  private final Parser tikaParser = new AutoDetectParser();
+  private Parser tikaParser;
 
   private volatile MediaInspector inspector;
+
+  /**
+   * Sets the Apache Tika parser.
+   *
+   * @param tikaParser
+   */
+  public void setTikaParser(Parser tikaParser) {
+    this.tikaParser = tikaParser;
+  }
 
   /** Creates a new media inspection service instance. */
   public MediaInspectionServiceImpl() {
@@ -72,7 +79,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
     final String mediaInfoBinary;
     if (path == null) {
       logger.debug("DEFAULT " + MediaInfoAnalyzer.MEDIAINFO_BINARY_CONFIG + ": "
-              + MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT);
+                           + MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT);
       mediaInfoBinary = MediaInfoAnalyzer.MEDIAINFO_BINARY_DEFAULT;
     } else {
       logger.debug("Mediainfo config binary: {}", path);
@@ -83,7 +90,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @Override
@@ -100,7 +107,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -136,7 +143,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.inspection.api.MediaInspectionService#inspect(java.net.URI)
    */
   @Override
@@ -150,7 +157,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.inspection.api.MediaInspectionService#enrich(org.opencastproject.mediapackage.MediaPackageElement,
    *      boolean)
    */
@@ -159,7 +166,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
           MediaPackageException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Enrich.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)));
+                                       Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)));
     } catch (ServiceRegistryException e) {
       throw new MediaInspectionException(e);
     }
@@ -176,7 +183,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -186,9 +193,9 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
-   *          the securityService to set
+   *         the securityService to set
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
@@ -196,9 +203,9 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
-   *          the userDirectoryService to set
+   *         the userDirectoryService to set
    */
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
@@ -206,9 +213,9 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
-   *          the organization directory
+   *         the organization directory
    */
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
@@ -216,7 +223,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -226,7 +233,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -236,7 +243,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override
