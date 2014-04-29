@@ -1250,7 +1250,9 @@ function selectCurrentSplitItem(excludeDeletedSegments) {
             }
             if (idFound) {
                 currSplitItemClickedViaJQ = true;
-                $('#splitSegmentItem-' + id).click();
+		if(!zoomedIn()) {
+                    $('#splitSegmentItem-' + id).click();
+		}
                 lastId = -1;
                 $('#descriptionCurrentTime').html(formatTime(getCurrentTime()));
             } else {
