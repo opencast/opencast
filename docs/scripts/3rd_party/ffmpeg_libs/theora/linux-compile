@@ -23,7 +23,7 @@ cd "${dir}-linux"
 #
 ./configure --prefix=$LOCAL_PREFIX \
 CPPFLAGS=-I${LOCAL_PREFIX}/include \
-LDFLAGS=-L${LOCAL_PREFIX}/lib
+LDFLAGS="-L${LOCAL_PREFIX}/lib -Wl,-rpath,${LOCAL_PREFIX}/lib"
 [ $? -ne 0 ] && exit 1
 make
 [ $? -ne 0 ] && exit 1
