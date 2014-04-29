@@ -1,0 +1,33 @@
+#!/bin/bash
+echo "------------------------------------------------------------------------"
+echo `cd "${0%/*}" 2>/dev/null; echo $PWD/${0##*/}`
+echo "------------------------------------------------------------------------"
+set -x
+source "${HOME3P}/utilx"
+[ $? -ne 0 ] && exit 1
+#
+[ -f .done-mac ] && exit 0
+pkg=`getcfg PKG:`
+chkpkg "$pkg" || exit 1
+dir=`getcfg DIR:`
+[ -z "$dir" -o "$dir" = "/" ] && exit 1
+#
+rm -fr "$dir" "${dir}-mac"
+[ $? -ne 0 ] && exit 1
+xz -dc "$pkg" | tar -xv
+[ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ] && exit 1
+mv "$dir" "${dir}-mac"
+[ $? -ne 0 ] && exit 1
+cd "${dir}-mac"
+[ $? -ne 0 ] && exit 1
+#
+./configure
+[ $? -ne 0 ] && exit 1
+make
+[ $? -ne 0 ] && exit 1
+sudox make install
+[ $? -ne 0 ] && exit 1
+#
+touch ../.done-mac
+[ $? -ne 0 ] && exit 1
+exit 0

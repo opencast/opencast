@@ -96,6 +96,13 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String STREAMING_TARGET_SUBFLAVOR = "streaming-target-subflavor";
   private static final String CHECK_AVAILABILITY = "check-availability";
 
+  //itbwpdk start
+  /** Distribution delay between elements for engage */
+  private static final String DISTRIBUTION_DELAY__PROPERTY = "org.opencastproject.distribution.delay";
+
+  /** Distribution delay between elements for engage */
+  private int distributionDelay = 0;
+  //itbwpdk end
   /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;
 
@@ -113,7 +120,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param streamingDistributionService
    *          the streaming distribution service
    */
@@ -123,7 +130,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param downloadDistributionService
    *          the download distribution service
    */
@@ -134,7 +141,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * Callback for declarative services configuration that will introduce us to the search service. Implementation
    * assumes that the reference is configured as being static.
-   * 
+   *
    * @param searchService
    *          an instance of the search service
    */
@@ -172,6 +179,13 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     super.activate(cc);
     BundleContext bundleContext = cc.getBundleContext();
 
+    // Get element distribution delay
+    if (StringUtils.isNotBlank(bundleContext.getProperty(DISTRIBUTION_DELAY__PROPERTY))) {
+      distributionDelay = Integer.parseInt(bundleContext.getProperty(DISTRIBUTION_DELAY__PROPERTY));
+    } else {
+      distributionDelay = 0;
+    }
+
     serverUrl = UrlSupport.url(bundleContext.getProperty(SERVER_URL_PROPERTY));
 
     if (StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY)))
@@ -180,7 +194,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -190,7 +204,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -296,6 +310,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       List<Job> jobs = new ArrayList<Job>();
       try {
         for (String elementId : downloadElementIds) {
+          logger.info("Element distribution delay, sleeping for " +  Integer.toString(distributionDelay));
+          Thread.sleep(distributionDelay);
           Job job = downloadDistributionService.distribute(CHANNEL_ID, mediaPackage, elementId, checkAvailability);
           if (job != null)
             jobs.add(job);
@@ -386,7 +402,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * Returns a mediapackage that only contains elements that are marked for distribution.
-   * 
+   *
    * @param current
    *          the current mediapackage
    * @param jobs

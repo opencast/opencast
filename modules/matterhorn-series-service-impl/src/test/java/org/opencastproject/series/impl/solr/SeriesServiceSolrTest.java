@@ -47,7 +47,7 @@ import java.util.List;
 
 /**
  * Tests indexing: indexing, removing, retrieving, merging and searching.
- * 
+ *
  */
 public class SeriesServiceSolrTest {
 

@@ -1,11 +1,13 @@
---- sources.conf.default	2010-12-13 12:43:25.000000000 +0100
-+++ sources.conf	2010-12-13 12:42:52.000000000 +0100
-@@ -17,7 +17,7 @@
- #  NOTE: The port command parses source URLs in order and installs the
- #        first occurrance when a port appears in multiple repositories.
- #        So keep "file://" URLs above other URL types.
--
-+file:///Users/Shared/dports [nosync]
- 
- #  To get the ports tree from the master MacPorts server in California, USA use:
- #      rsync://rsync.macports.org/release/ports/
+*** sources.conf.default	Fri Oct 25 17:12:36 2013
+--- sources.conf	Tue Feb 11 13:13:40 2014
+***************
+*** 18,23 ****
+--- 18,25 ----
+  # multiple sources, it installs the first occurrence. For local sources
+  # to shadow remote ones, "file://" URLs must come before other URLs.
+  
++ file:///Users/Shared/dports [nosync]
++ 
+  # A list of rsync mirrors is available at
+  # https://trac.macports.org/wiki/Mirrors#Portfiles.
+  #

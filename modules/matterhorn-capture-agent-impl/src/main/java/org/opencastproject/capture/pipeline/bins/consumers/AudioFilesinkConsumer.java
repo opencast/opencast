@@ -39,7 +39,7 @@ public class AudioFilesinkConsumer extends ConsumerBin {
    * AudioFilesinkConsumer transfers the audio source into a file. It is used when a Producer has the isAudioFlag set to
    * true. The main difference between this class and the VideoFilesinkConsumer is the defaults for the encoder
    * (default=twolame) and muxer(default=capsfilter).
-   * 
+   *
    * @param captureDevice
    *          The settings for codec, bitrate, container, confidence monitoring etc.
    * @param properties
@@ -59,7 +59,7 @@ public class AudioFilesinkConsumer extends ConsumerBin {
    *           If GStreamer is installed but the module that this element comes from is not (please see
    *           {@code GStreamerElements} for which modules Elements are from) or the Element is platform specific to
    *           another OS (e.g. XVImageSink is available only on Linux) this Exception is thrown.
-   * 
+   *
    */
   public AudioFilesinkConsumer(CaptureDevice captureDevice, Properties properties)
           throws UnableToLinkGStreamerElementsException, UnableToCreateGhostPadsForBinException,
@@ -70,7 +70,7 @@ public class AudioFilesinkConsumer extends ConsumerBin {
 
   /**
    * Creates the encoder and muxer required to put audio data into a file.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the current machine doesn't have the required module to support the codec or container specified this
    *           Exception is throw. If no codec or container is specified that means your system needs to specify one
@@ -87,7 +87,7 @@ public class AudioFilesinkConsumer extends ConsumerBin {
   /**
    * Creates a user specified encoder if a codec is specified otherwise it uses the default codec in the constant
    * DEFAULT_ENCODER
-   * 
+   *
    * @throws UnableToCreateElementException
    *           This Exception is thrown because you don't have the GStreamer module required for the codec (e.g. bad or
    *           ugly plugins). Please specify one that your system does support. For a list of all supported Elements
@@ -109,7 +109,7 @@ public class AudioFilesinkConsumer extends ConsumerBin {
   /**
    * Creates a user specified muxer if a container is specified otherwise it uses the default muxer in the constant
    * DEFAULT_MUXER
-   * 
+   *
    * @throws UnableToCreateElementException
    *           This Exception is thrown because you don't have the GStreamer module required for the muxer (e.g. bad or
    *           ugly plugins). Please specify one that your system does support. For a list of all supported Elements
@@ -143,7 +143,7 @@ public class AudioFilesinkConsumer extends ConsumerBin {
 
   /**
    * Sets the properties on the elements specified in the capture agent's property file.
-   * 
+   *
    * @throws IllegalArgumentException
    *           If one of the settings is invalid (e.g. misspelling, number instead of string, empty String etc.) this
    *           Exception is thrown.
@@ -168,14 +168,14 @@ public class AudioFilesinkConsumer extends ConsumerBin {
 
   /**
    * Sets the filesink's location to put the data.
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           We need a place to store the audio data coming in and no way to know where to place it by default so an
    *           exception is thrown when the location to send it is null.
    * @throws IllegalArgumentException
    *           If the filesink location is an empty String an IllegalArgumentException is thrown because we do not know
    *           where to put audio data by defauilt.
-   * 
+   *
    * **/
   private synchronized void setFileSinkProperties() throws UnableToSetElementPropertyBecauseElementWasNullException,
           IllegalArgumentException {

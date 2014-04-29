@@ -30,7 +30,7 @@ public interface ServiceStatistics {
 
   /** The number of jobs that this service has successfully finished**/
   int getFinishedJobs();
-  
+
   /** The number of job that this service is currently running **/
   int getRunningJobs();
 

@@ -38,12 +38,14 @@ public interface GStreamerElements {
   String V4LSRC = "v4lsrc";
   String VIDEORATE = "videorate";
   String VIDEOTESTSRC = "videotestsrc";
+  String VOLUME = "volume";
   // Available only in Linux
   String ALSASRC = "alsasrc";
   String XVIMAGESINK = "xvimagesink";
 
   /** Source Module: gst-plugins-good **/
   String DEINTERLACE = "deinterlace";
+  String DEINTERLEAVE = "deinterleave";
   String DV1394SRC = "dv1394src";
   String DVDEC = "dvdec";
   String DVDEMUX = "dvdemux";
@@ -62,7 +64,7 @@ public interface GStreamerElements {
   String UDPSINK = "udpsink";
   String UDPSRC = "udpsrc";
   String V4L2SRC = "v4l2src";
-  
+
   /** Source Module: gst-plugins-bad **/
   String FAAC = "faac";
   String INPUT_SELECTOR = "input-selector";

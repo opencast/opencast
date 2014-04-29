@@ -136,7 +136,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -146,7 +146,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Sets the workflow service
-   * 
+   *
    * @param service
    *          the workflow service instance
    */
@@ -156,7 +156,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the workspace.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -166,7 +166,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * OSGI callback for component activation
-   * 
+   *
    * @param cc
    *          the OSGI declarative services component context
    */
@@ -319,7 +319,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Returns the workflow configuration panel HTML snippet for the workflow definition specified by
-   * 
+   *
    * @param definitionId
    * @return config panel HTML snippet
    */
@@ -853,7 +853,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -867,7 +867,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override

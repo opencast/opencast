@@ -64,18 +64,19 @@ arch() {
 }
 #
 # os
-#  CentOS, RHEL, Ubuntu, Debian, openSUSE, SLES, Amazon, MacOS, <unknown>
+#  CentOS, RHEL, Ubuntu, Debian, openSUSE, SLES, SciL, Amazon, MacOS, <unknown>
 #
 os() {
   set +x
   case `uname` in
     Linux )
-      # CentOS, RHEL, Ubuntu, Debian, openSUSE, SLES, Amazon
+      # CentOS, RHEL, Ubuntu, Debian, openSUSE, SLES, SciL, Amazon
       awk '{
   if (length($0) == 0) next;
   sub("Welcome to",""); # Appears in openSUSE and SLES
   if (match($0, "Red Hat Enterprise Linux")) { print "RHEL"; }
   else if (match($0, "SUSE Linux Enterprise Server")) { print "SLES"; }
+  else if (match($0, "Scientific Linux")) { print "SciL"; }
   else { print $1; }
   exit 0
 }' /etc/issue
@@ -102,7 +103,7 @@ os_ver() {
   set +x
   case `uname` in
     Linux )
-      # CentOS, RHEL, Ubuntu, Debian, openSUSE, SLES, Amazon
+      # CentOS, RHEL, Ubuntu, Debian, openSUSE, SLES, SciL, Amazon
       awk '{
   if (length($0) == 0) next;
   sub("^[^0-9.]*", "");
@@ -152,7 +153,7 @@ chkprog() {
 #   $1 = library to check (short form)
 #
 # Default library path:
-#   CentOS, RHEL:
+#   CentOS, RHEL, SciL:
 #     /lib:/usr/lib:/lib/i686:/usr/lib/sse2:/usr/lib/tls
 #   Ubuntu:
 #     /lib:/usr/lib:/lib/tls:/lib/i686:/usr/lib/sse2:/lib/tls/i686
@@ -205,7 +206,7 @@ chklib() {
 #   $1 = include file to check
 #
 # Default include path:
-#   CentOS, RHEL, Ubuntu:
+#   CentOS, RHEL, SciL, Ubuntu:
 #     /usr/local/include:/usr/lib/gcc/*/*/include:/usr/lib/gcc/*/*/include-fixed:/usr/include
 #   Ubuntu x64:
 #     /usr/local/include:/usr/lib/*-linux-gnu/gcc/*/*/include:/usr/lib/*-linux-gnu/gcc/*/*/include-fixed:/usr/include/*-linux-gnu:/usr/include
@@ -609,8 +610,11 @@ export CENTOS_MIRROR=`getmcfg CENTOS_MIRROR:`
 export EPEL_MIRROR=`getmcfg EPEL_MIRROR:`
 export ATOMIC_MIRROR=`getmcfg ATOMIC_MIRROR:`
 export RPMFORGE_MIRROR=`getmcfg RPMFORGE_MIRROR:`
+export RPMFUSION_MIRROR=`getmcfg RPMFUSION_MIRROR:`
+export ATRPMS_MIRROR=`getmcfg ATRPMS_MIRROR:`
 export GNU_MIRROR=`getmcfg GNU_MIRROR:`
 export USASK_MIRROR=`getmcfg USASK_MIRROR:`
+export ETH_MIRROR=`getmcfg ETH_MIRROR:`
 export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`
 #
 [ "$XTRACE" = "on" ] && set -x

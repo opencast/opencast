@@ -2,17 +2,16 @@ ocRecordings = new (function() {
 
   var WORKFLOW_URL = '../workflow';
   var WORKFLOW_LIST_URL = '../workflow/instances.json';          // URL of workflow instances list endpoint
-  var WORKFLOW_INSTANCE_URL = '';                                // URL of workflow instance endpoint
+  var WORKFLOW_INSTANCE_URL = '../workflow/instance/';           // URL of workflow instance endpoint
   var WORKFLOW_STATISTICS_URL = '../workflow/statistics.json';   // URL of workflow instances statistics endpoint
   var SERIES_URL = '/series';
   var SEARCH_URL = '../search';
   var ENGAGE_URL = '';
 
-  var STATISTICS_DELAY = 3000;     // time interval for statistics update
+  var STATISTICS_DELAY = 9000;     // time interval for statistics update
 
   var UPCOMMING_EVENTS_GRACE_PERIOD = 30 * 1000;
-  var END_OF_CAPTURE_GRACE_PERIOD = 3600 * 1000;
-  
+  var END_OF_CAPTURE_GRACE_PERIOD = 3600 * 1000;  
   
 
   var SORT_FIELDS = {
@@ -27,7 +26,7 @@ ocRecordings = new (function() {
     q : 'Any fields',
     title : 'Title',
     creator : 'Presenter',
-    seriestitle : 'Course/Series'
+    seriestitle : 'Course/Series',
   },
   {
     contributor : 'Contributor',
@@ -183,8 +182,10 @@ ocRecordings = new (function() {
    */
   function getRefreshParams() {
 	  var params = [];
-	  params.push('compact=true');
-	  // 'state' to display
+	  // false returns the full workflow object, true just a subset (e.g. no capture agent)
+	  params.push('compact=false');
+	  
+	  // filter workflows by state - this determines what's in a tab
 	  var state = ocRecordings.Configuration.state;
 	  params.push('state=-stopped');
 	  if (state == 'upcoming') {
@@ -209,6 +210,14 @@ ocRecordings = new (function() {
 	  }
 	  else if (state == 'hold') {
 	    params.push('state=paused');
+	    params.push('op=-schedule');
+	    params.push('op=-capture');
+	    params.push('op=-ingest');
+	  }
+	  else if (state == 'ignored') {
+	    params.pop();
+	    params.push('state=stopped');
+	    params.push('state=failed');
 	    params.push('op=-schedule');
 	    params.push('op=-capture');
 	    params.push('op=-ingest');
@@ -324,7 +333,7 @@ ocRecordings = new (function() {
    *  - capturing: definition=capturing, state=running
    *  - processing: definition:all other than scheduling,capture, state=running
    *  - finished: definition:all other than scheduling,capture, state=succeeded
-   *  - on hold: definition:all other than scheduling,capture, state=paused
+   *  - on hold: definition:all other than scheduling,capture, state=paused, publish-delayed
    *  - failed: from summary -> failed  (assuming that scheduling goes into
    *      FAILED when recording was not started, capture goes into FAILED when
    *      the capture error occured etc.)
@@ -340,6 +349,7 @@ ocRecordings = new (function() {
       processing:0,
       finished:0,
       hold:0,
+      ignored:0,
       failed:0
     };
 
@@ -352,8 +362,7 @@ ocRecordings = new (function() {
         addStatistics(data.statistics.definitions.definition, stats);
       }
     }
-    
-    stats.all = stats.instantiated + stats.upcoming + stats.capturing + stats.processing + stats.finished + stats.failed + stats.hold;
+    stats.all = stats.instantiated + stats.upcoming + stats.capturing + stats.processing + stats.finished + stats.failed + stats.hold + stats.ignored;
     if (ocRecordings.statistics != null
       && ocRecordings.statistics[ocRecordings.Configuration.state] != stats[ocRecordings.Configuration.state]) {
       refresh();
@@ -362,7 +371,7 @@ ocRecordings = new (function() {
     displayStatistics();
   }
 
-  /** Called by updateStatistics to add the numbers form one definition statistic
+  /** Called by updateStatistics to add the numbers from one definition statistic
    *  to the statistics summary
    */
   function addStatistics(definition, stats) {
@@ -380,7 +389,7 @@ ocRecordings = new (function() {
       stats.instantiated += parseInt(definition.instantiated);
       stats.processing += parseInt(definition.running);
       stats.finished += parseInt(definition.finished);
-      stats.hold += parseInt(definition.paused);
+      stats.ignored += parseInt(definition.stopped);
       stats.failed += parseInt(definition.failed) + parseInt(definition.failing);
     }
   }
@@ -405,9 +414,8 @@ ocRecordings = new (function() {
     }
   }
 
-  /** Construct an object representing a row in the recording table from a
-   *  workflow instance object delivered by the workflow endpoint.
-   */
+  // Construct an object representing a row in the recording table from a
+  //  workflow instance object delivered by the workflow endpoint.
   function Recording(wf) {
     this.id = wf.id;
     this.state = '';
@@ -424,7 +432,8 @@ ocRecordings = new (function() {
 
     var self = this;    // ie for $.each
 
-    // ensure workflow.configuration.configurations is an array / search for capture agent name
+    // ensure workflow.configuration.configurations is an array 
+    // search for capture agent name and schedule start
     if (wf.configurations && wf.configurations.configuration) {
       wf.configurations.configuration = ocUtils.ensureArray(wf.configurations.configuration);
       $.each(wf.configurations.configuration, function(index, elm) {
@@ -453,52 +462,69 @@ ocRecordings = new (function() {
     if (wf.mediapackage.start) {
       this.start = ocUtils.fromUTCDateStringToFormattedTime(wf.mediapackage.start, wf.mediapackage.duration);
     }
-
+    
     // Status
     var op = false;
     if (wf.operations !== undefined && wf.operations.operation !== undefined) {
       op = wf.operations.operation;
+    } else {
+    	ocUtils.log('Warning: no operations found for workflow id = ' + wf.id );
     }
     if (wf.state == 'SUCCEEDED') {
       this.state = 'Finished';
+      var finishedOp = ocRecordings.findLastOperation(wf, 'SUCCEEDED');
+      this.end = ocUtils.fromTimestampToFormattedTime(finishedOp.completed);
     } else if (wf.state == 'FAILING' || wf.state == 'FAILED') {
-      this.state = 'Failed';
-      if (wf.errors === '') {
-        if (op) {
-          this.error = 'Failed in operation ' + op.description;
-        } else {
-          this.error = 'No error message available';
-        }
-      } else {
-        this.error = ocUtils.ensureArray(wf.errors.error).join(', ');
-      }
+    	this.state = 'Failed';
+    	var wf = ocRecordings.getWorkflow(wf.id);
+    	var failedOp = ocRecordings.findFirstOperation(wf, 'FAILED');
+	this.state = 'Failed' + failedOp.description;
+	this.end = ocUtils.fromTimestampToFormattedTime(failedOp.completed);
+	if (wf.errors === '') {
+		if (op) {
+			this.error = 'Failed in operation ' + op.description;
+		} else {
+			this.error = 'No error message available';
+		}
+	} else {
+		this.error = ocUtils.ensureArray(wf.errors.error).join(', ');
+	}
     } else if (wf.state == 'PAUSED') {
-      if (op) {
-        if (op.id == 'schedule') {
+    	var pausedOp = ocRecordings.findFirstOperation(wf, 'PAUSED');
+      if (pausedOp) {
+        if (pausedOp.id == 'schedule') {
           this.state = 'Upcoming';
-        } else if (op.id == 'capture')  {
+        } else if (pausedOp.id == 'capture')  {
           this.state = 'Capturing';
-        } else if (op.id == 'ingest') {
+        } else if (pausedOp.id == 'ingest') {
           this.state = 'Captured';
           this.operation = 'Sending recording to processing';
-        } else if (op.holdurl) {
-          this.state = 'On Hold';
-          this.operation = op.description;
-          this.holdAction = {
-            url : op.holdurl,
-            title : op['hold-action-title']
+        } else if (pausedOp.holdurl) {
+            this.state = 'On Hold';
+      	    this.end = ocUtils.fromTimestampToFormattedTime(pausedOp.started);
+            this.operation = pausedOp.description;
+            this.holdAction = {
+              url : pausedOp.holdurl,
+              title : pausedOp['hold-action-title']
           };
-        }
       } else {
-        ocUtils.log('No current operation for workflow ' + wf.id);
         this.state = 'Paused';
+      	}
       }
     } else if (wf.state == 'RUNNING') {
-      if (op) {
+    	var runningOp = ocRecordings.findFirstOperation(wf, 'RUNNING');
+      if (runningOp) {
         this.state = 'Processing';
-        this.operation = op.description;
+        this.operation = runningOp.description;
+        if(runningOp.started) {
+        	this.end = ocUtils.fromTimestampToFormattedTime(runningOp.started);
+        } else {
+        	this.end = 'Starting...';
+        }
+        
       } else {
         this.state = 'Running';
+        this.end = 'Starting...';
       }
     } else if (wf.state == 'INSTANTIATED') {
       this.state = 'Initializing...';
@@ -543,14 +569,11 @@ ocRecordings = new (function() {
     } else if (this.state == 'Finished') {
       if(wf.template != "retract")
         this.actions.push('play');
-    //this.actions.push('publish');
-    //this.actions.push('unpublish');
-    } else if (this.state == 'Failed') {
-      this.actions.push('stop');
+    } else if (this.state.indexOf("Failed") != -1) {
+        this.actions.push('stop');
     } else if (this.state == 'On Hold') {
       this.actions.push('ignore');
     }
-
     return this;
   }
 
@@ -719,6 +742,7 @@ ocRecordings = new (function() {
     
   }
   
+  
   /** Returns the workflow with the specified id from the currently loaded
    *  workflow data or false if workflow with given Id was not found.
    */
@@ -756,7 +780,7 @@ ocRecordings = new (function() {
   this.displayHoldUI = function(wfId) {
     var workflow = ocRecordings.getWorkflow(wfId);
     if (workflow) {
-      var operation = workflow.operations.operation;  // ocRecordings.findFirstOperation(workflow, 'PAUSED');
+      var operation = ocRecordings.findFirstOperation(workflow, 'PAUSED');
       if (operation !== false && operation.holdurl !== undefined) {
         this.Hold.workflow = workflow;
         this.Hold.operation = operation;
@@ -782,7 +806,8 @@ ocRecordings = new (function() {
     var data = {
       id : ocRecordings.Hold.workflow.id
     };
-
+    var def = $.Deferred();
+    
     // add properties for workflow resum if provided by hold operation
     if (postData !== undefined) {
       data.properties = "";
@@ -810,11 +835,15 @@ ocRecordings = new (function() {
         } else {
           alert('Could not resume Workflow: ' + status);
         }
+        def.resolve();
       },
       success    : function(data) {
         ocRecordings.reload();
+        def.resolve();
       }
     });
+    
+    return def.promise();
   }
 
   this.hideHoldActionUI = function() {
@@ -938,7 +967,7 @@ ocRecordings = new (function() {
     
     $.datepicker.setDefaults( {
     	showOn: 'both',
-    	buttonImage: 'img/icons/calendar.gif',
+    	buttonImage: '/admin/img/icons/calendar.gif',
     	buttonImageOnly: true,
     	showOtherMonths: true,
     	selectOtherMonths: true,
@@ -1133,7 +1162,7 @@ ocRecordings = new (function() {
       }
     }
   }
-
+  
   this.publishRecording = function(wfId) {
     var workflow = ocRecordings.getWorkflow(id);
     if (workflow) {
@@ -1467,7 +1496,7 @@ ocRecordings = new (function() {
         var series, seriesComponent, seriesId;
         var creationSucceeded = false;
         if(this.fields.seriesSelect !== ''){
-          series = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn"><dcterms:title xmlns="">' + this.fields.seriesSelect.val() + '</dcterms:title></dublincore>'
+          series = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn/"><dcterms:title xmlns="">' + this.fields.seriesSelect.val() + '</dcterms:title></dublincore>'
           seriesComponent = this;
           $.ajax({
             async: false,
@@ -1483,8 +1512,12 @@ ocRecordings = new (function() {
               creationSucceeded = true;
               seriesComponent.fields.series.val($('dcterms|identifier',data).text());
             },
-            error: function() {
-              creationSucceeded = false;
+            error: function(jqXHR, exception) {
+          	  if (jqXHR.status === 400) {
+          		  ocUpload.Listener.ingestError('Could not create Series ' + name + ": " + jqXHR.responseText);
+          	  } else { 
+          		  ocUpload.Listener.ingestError('Could not create Series ' + name);
+          	  }
             }
           });
         }

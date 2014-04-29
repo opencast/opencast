@@ -176,7 +176,7 @@
             </div>
             <div id="mpe-editor"></div>
 
-            <input title="Continue processing this recording with any edits (metadata, trim points)" style="margin-left: 65px; margin-right: 16px; width: 160px;" onclick="continueWorkflow(); leave();" id="continueBtn" type="button" class="ui-button ui-corner-all" value="Continue processing" />
+            <input title="Continue processing this recording with any edits (metadata, trim points)" style="margin-left: 65px; margin-right: 16px; width: 160px;" onclick="$.when(continueWorkflow()).then(leave); " id="continueBtn" type="button" class="ui-button ui-corner-all" value="Continue processing" />
 
             <a onclick="leave()" title="Cancel" class="secondaryButton">Cancel</a>
         </div>

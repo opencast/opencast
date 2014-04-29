@@ -40,7 +40,7 @@ public class DocRestData extends DocData {
 
   /**
    * Create the base data object for creating REST documents
-   * 
+   *
    * @param name
    *          the name of the set of rest enpoints (must be alphanumeric (includes _) and no spaces or special chars)
    * @param title
@@ -166,7 +166,7 @@ public class DocRestData extends DocData {
 
   /**
    * Creates an abstract section which is displayed at the top of the doc
-   * 
+   *
    * @param abstractText
    *          any text to place at the top of the document, can be html markup but must be valid
    */
@@ -181,7 +181,7 @@ public class DocRestData extends DocData {
   /**
    * Validates paths: VALID: /sample , /sample/{thing} , /{my}/{path}.xml , /my/fancy_path/is/{awesome}.{FORMAT}
    * INVALID: sample, /sample/, /sa#$%mple/path
-   * 
+   *
    * @param path
    *          the path value to check
    * @return true if this path is valid, false otherwise

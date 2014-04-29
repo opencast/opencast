@@ -219,8 +219,7 @@ public class SchedulerImpl {
    * @see org.osgi.service.cm.ManagedService#updated(Dictionary)
    */
   //@Override
-  @SuppressWarnings("unchecked")
-  private void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary properties) throws ConfigurationException {
     log.debug("Scheduler updated.");
 
     if (properties == null) {
@@ -545,7 +544,7 @@ public class SchedulerImpl {
           log.debug("File {} does not exist", url);
           return null;
         }
-      } else {
+      } else if (trustedClient != null) {
         HttpResponse response = null;
         try {
           QueryStringBuilder qsb = new QueryStringBuilder(url.toString());

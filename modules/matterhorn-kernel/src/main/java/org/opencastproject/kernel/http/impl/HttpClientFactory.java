@@ -31,11 +31,11 @@ import java.util.Dictionary;
 public class HttpClientFactory implements ManagedService {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(HttpClientFactory.class);
-  
-  
+
+
   /**
    * Callback from the OSGi container once this service is started. This is where we register our shell commands.
-   * 
+   *
    * @param ctx
    *          the component context
    */
@@ -49,14 +49,14 @@ public class HttpClientFactory implements ManagedService {
   public void deactivate() {
     logger.debug("Shutting down");
   }
-  
+
   /** Updates the properties for this service. */
   @SuppressWarnings("rawtypes")
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
-    
+
   }
-  
+
   /** Creates a new HttpClient to make requests.*/
   public HttpClient makeHttpClient() {
     return new HttpClientImpl();

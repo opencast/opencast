@@ -23,7 +23,7 @@ mv "$dir" "${dir}-win32"
 cd "${dir}-win32"
 [ $? -ne 0 ] && exit 1
 #
-patch -p0 < ../mp4v2r355.patch
+patch -p0 < ../mp4v2-1.9.1.patch
 [ $? -ne 0 ] && exit 1
 ./configure \
 --host=${MINGW32}

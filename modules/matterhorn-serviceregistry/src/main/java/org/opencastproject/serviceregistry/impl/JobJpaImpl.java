@@ -398,7 +398,7 @@ public class JobJpaImpl extends JaxbJob {
    * @see org.opencastproject.job.api.JaxbJob#getPayload()
    */
   @Lob
-  @Column(name = "payload", length = 65535)
+  @Column(name = "payload", length = 16777215)
   @XmlElement
   @Override
   public String getPayload() {
