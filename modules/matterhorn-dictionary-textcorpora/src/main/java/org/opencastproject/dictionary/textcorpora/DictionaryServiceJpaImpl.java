@@ -527,7 +527,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
     if (this.getLanguages().length == 0) {
       logger.warn("There are no language packs installed. "
           + "All text extracted from video will be considered valid.");
-      if ("".equals(text)) {
+      if (StringUtils.trimToNull(text) == null) {
         return null;
       }
       return new TextualImpl(text);
@@ -553,7 +553,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
       }
     }
     String result = StringUtils.join(cleanLine.toArray(), " ");
-    if ("".equals(result)) {
+    if (StringUtils.trimToNull(text) == null) {
       return null;
     }
     return new TextualImpl(result, language);
