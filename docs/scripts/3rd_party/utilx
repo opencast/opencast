@@ -617,12 +617,9 @@ fix_scons() {
 /usr/lib/scons-1.2.0/SCons/Tool/mingw.py
 /usr/lib/scons-2.0.1/SCons/Tool/mingw.py
 /usr/lib/scons/SCons/Tool/mingw.py
-/usr/local/lib/scons-1.2.0/SCons/Tool/mingw.py
-/usr/local/lib/scons-2.0.1/SCons/Tool/mingw.py
-/usr/local/lib/scons/SCons/Tool/mingw.py
-/opt/local/lib/scons-1.2.0/SCons/Tool/mingw.py
-/opt/local/lib/scons-2.0.1/SCons/Tool/mingw.py
-/opt/local/lib/scons/SCons/Tool/mingw.py
+$LOCAL_PREFIX/lib/scons-1.2.0/SCons/Tool/mingw.py
+$LOCAL_PREFIX/lib/scons-2.0.1/SCons/Tool/mingw.py
+$LOCAL_PREFIX/lib/scons/SCons/Tool/mingw.py
 EOF
   [ $? -ne 0 ] && return 1
   for file in `cat files.lst`; do
