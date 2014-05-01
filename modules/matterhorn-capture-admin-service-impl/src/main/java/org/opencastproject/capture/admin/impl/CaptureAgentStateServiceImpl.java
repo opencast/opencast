@@ -29,7 +29,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Tuple;
+import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -161,7 +161,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
         } catch (NotFoundException e) {
           return nullToken;
         }
-        return agent == null ? nullToken : Tuple.tuple(agent.getState(), agent.getConfiguration());
+        return Tuple3.tuple3(agent.getState(), agent.getConfiguration(), agent.getLastHeardFrom());
       }
     });
   }
@@ -179,7 +179,9 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    */
   @Override
   public Agent getAgent(String name) throws NotFoundException {
-    return getAgent(name, securityService.getOrganization().getId());
+    String org = securityService.getOrganization().getId();
+    Agent agent = getAgent(name, org);
+    return updateCachedLastHeardFrom(agent, org);
   }
 
   /**
@@ -238,13 +240,31 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   }
 
   /**
+   * Mix in the last-seen timestamp from the agent cache
+   * 
+   * @param agent
+   *          The Agent you wish to update
+   * @param org
+   *          the organization
+   * @return the agent
+   */
+  protected Agent updateCachedLastHeardFrom(Agent agent, String org) {
+    String agentKey = agent.getName().concat(DELIMITER).concat(org);
+    Tuple3<String, Properties, Long> cachedAgent = (Tuple3) agentCache.get(agentKey);
+    if (cachedAgent != null) {
+      agent.setLastHeardFrom(cachedAgent.getC());
+    }
+    return agent;
+  }
+
+  /**
    * {@inheritDoc}
    * 
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getAgentState(java.lang.String)
    */
   public String getAgentState(String agentName) throws NotFoundException {
     String orgId = securityService.getOrganization().getId();
-    Tuple<String, Properties> agent = getAgentFromCache(agentName, orgId);
+    Tuple3<String, Properties, Long> agent = getAgentFromCache(agentName, orgId);
     return agent.getA();
   }
 
@@ -267,8 +287,12 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     String orgId = securityService.getOrganization().getId();
     try {
       String agentState = getAgentFromCache(agentName, orgId).getA();
-      if (agentState.equals(state))
+      if (agentState.equals(state)) {
+        Properties config = getAgentConfiguration(agentName);
+        agentCache.put(agentName.concat(DELIMITER).concat(orgId),
+                Tuple3.tuple3(getAgentState(agentName), config, Long.valueOf(System.currentTimeMillis())));
         return false;
+      }
 
       agent = (AgentImpl) getAgent(agentName);
 
@@ -350,7 +374,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       // Build the map that the API defines as agent name->agent
       Map<String, Agent> map = new TreeMap<String, Agent>();
       for (AgentImpl agent : agents) {
-        map.put(agent.getName(), agent);
+        map.put(agent.getName(), updateCachedLastHeardFrom(agent, org.getId()));
       }
       return map;
     } finally {
@@ -375,17 +399,17 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    */
   public Properties getAgentConfiguration(String agentName) throws NotFoundException {
     String orgId = securityService.getOrganization().getId();
-    Tuple<String, Properties> agent = getAgentFromCache(agentName, orgId);
+    Tuple3<String, Properties, Long> agent = getAgentFromCache(agentName, orgId);
     return agent.getB();
   }
 
   @SuppressWarnings("unchecked")
-  private Tuple<String, Properties> getAgentFromCache(String agentName, String orgId) throws NotFoundException {
+  private Tuple3<String, Properties, Long> getAgentFromCache(String agentName, String orgId) throws NotFoundException {
     Object agent = agentCache.get(agentName.concat(DELIMITER).concat(orgId));
     if (agent == nullToken) {
       throw new NotFoundException();
     } else {
-      return (Tuple<String, Properties>) agent;
+      return (Tuple3<String, Properties, Long>) agent;
     }
   }
 
@@ -402,8 +426,11 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     AgentImpl agent;
     try {
       Properties agentConfig = getAgentFromCache(agentName, orgId).getB();
-      if (agentConfig.equals(configuration))
+      if (agentConfig.equals(configuration)) {
+        agentCache.put(agentName.concat(DELIMITER).concat(orgId),
+                Tuple3.tuple3(getAgentState(agentName), agentConfig, Long.valueOf(System.currentTimeMillis())));
         return false;
+      }
 
       agent = (AgentImpl) getAgent(agentName);
       logger.debug("Setting Agent {}'s capabilities", agentName);
@@ -413,6 +440,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       logger.debug("Creating Agent {} with state {}.", agentName, UNKNOWN);
       agent = new AgentImpl(agentName, orgId, UNKNOWN, "", configuration);
     }
+
     updateAgentInDatabase(agent);
     return true;
   }
@@ -431,6 +459,20 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       tx = em.getTransaction();
       tx.begin();
       AgentImpl existing = getAgentEntity(agent.getName(), agent.getOrganization(), em);
+
+      // Update the last seen property from the agent cache
+      if (existing != null) {
+        try {
+          Tuple3<String, Properties, Long> cachedAgent = getAgentFromCache(existing.getName(),
+                  existing.getOrganization());
+          if (agent != null && cachedAgent != null) {
+            agent.setLastHeardFrom(cachedAgent.getC());
+          }
+        } catch (NotFoundException e) {
+          // That's fine
+        }
+      }
+
       if (existing == null) {
         em.persist(agent);
       } else {
@@ -443,7 +485,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       }
       tx.commit();
       agentCache.put(agent.getName().concat(DELIMITER).concat(agent.getOrganization()),
-              Tuple.tuple(agent.getState(), agent.getConfiguration()));
+              Tuple3.tuple3(agent.getState(), agent.getConfiguration(), Long.valueOf(System.currentTimeMillis())));
     } catch (RollbackException e) {
       logger.warn("Unable to commit to DB in updateAgent.");
       throw e;
