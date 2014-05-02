@@ -1377,7 +1377,7 @@ function clearEvents2() {
     editor.player.on("play", {
         duration: 0,
         endTime: getDuration()
-    }, onPlay);
+    }, function(){});
     clearEvents();
 }
 
@@ -1436,7 +1436,9 @@ function onTimeout() {
  * play the video
  */
 function playVideo() {
-    editor.player[0].play();
+    if(getPlayerPaused()) {
+	editor.player[0].play();
+    }
 }
 
 /**
@@ -1873,11 +1875,11 @@ function addShortcuts() {
         disable_in_input: true,
     });
     shortcut.add(default_config[PLAY_PAUSE], function () {
-        if (getPlayerPaused()) {
+	if (getPlayerPaused()) {
             playVideo();
-        } else {
+	} else {
             pauseVideo();
-        }
+	}
     }, {
         disable_in_input: true,
     });
@@ -1917,12 +1919,6 @@ function addShortcuts() {
  * init the playbuttons in the editing box
  */
 function initPlayButtons() {
-    $('#shortcuts').button();
-    $('#shortcuts').click(function () {
-        $("#rightBoxDescription").toggle();
-        $("#rightBox").toggle();
-    });
-
     $('#clearList').button();
 
     $('#clearList').click(function () {
@@ -2165,10 +2161,6 @@ function parseInitialSMIL() {
     editor.splitData.splits[editor.splitData.splits.length - 1].enabled = !insertedLastItem;
 
     window.setTimeout(function () {
-        // if (!isBrowser("ie")) {
-        // playVideo();
-        // pauseVideo();
-        // }
         if (!insertedFirstItem) {
             if (editor.splitData.splits.length == 1) {
                 $('#splitSegmentItem-0').css('width', '100%');
