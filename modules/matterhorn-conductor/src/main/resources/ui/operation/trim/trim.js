@@ -57,9 +57,35 @@ $(document).ready(function () {
         url: WORKFLOW_RESTSERVICE + id + ".json",
         async:false,
         success: function(data) {
+            var sourceFlavor = null;
+            operations = data.workflow.operations.operation;
+            for (var i = 0; i < operations.length; i++) {
+              /* Find the trim operation */
+              if (operations[i].id === 'trim' && operations[i].state === 'PAUSED'
+                && !sourceFlavor) {
+                var cfg = operations[i].configurations.configuration;
+                for (var j = 0; j < cfg.length; j++) {
+                  if (cfg[j].key === 'source-flavor') {
+                    sourceFlavor = cfg[j]['$'];
+                    break;
+                  }
+                }
+              }
+            }
+
+            /* Stop if we did not get any source-flavor */
+            if (!sourceFlavor) {
+              return False;
+            }
+
+            /* Build regular expression */
+            sourceFlavor = '^' + sourceFlavor.replace(/\*/g, '.*').replace(/\//, '\\/') + '$';
+            r = new RegExp(sourceFlavor);
+
+            /* Find matching tracks */
             data = data.workflow.mediapackage.media.track;
-            for (i = 0; i < data.length; i++) {
-                if (data[i].type.indexOf("work") !== -1) {
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].type.match(r)) {
                     tracks.tracks.push(data[i]);
                 }
             }
