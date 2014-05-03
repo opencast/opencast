@@ -81,17 +81,6 @@ CREATE TABLE mh_capture_agent_state (
   CONSTRAINT FK_mh_capture_agent_state_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-CREATE TABLE mh_dictionary (
-  text VARCHAR(255) NOT NULL,
-  language VARCHAR(5) NOT NULL,
-  weight DOUBLE,
-  count BIGINT,
-  stop_word TINYINT(1) DEFAULT 0,
-  PRIMARY KEY (text, language)
-) ENGINE=InnoDB;
-
-CREATE INDEX IX_mh_dictionary_weight ON mh_dictionary (weight);
-
 CREATE TABLE mh_host_registration (
   id BIGINT NOT NULL,
   host VARCHAR(255) NOT NULL,

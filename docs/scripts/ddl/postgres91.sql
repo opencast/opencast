@@ -81,17 +81,6 @@ CREATE TABLE "mh_capture_agent_state" (
   CONSTRAINT "FK_mh_capture_agent_state_organization" FOREIGN KEY ("organization") REFERENCES "mh_organization" ("id") ON DELETE CASCADE
 );
 
-CREATE TABLE "mh_dictionary" (
-  "text" character varying(255) NOT NULL,
-  "language" character varying(5) NOT NULL,
-  "weight" numeric(8,2),
-  "count" bigint,
-  "stop_word" boolean,
-  PRIMARY KEY ("text", "language")
-);
-
-CREATE INDEX "IX_mh_dictionary_weight" ON "mh_dictionary" ("weight");
-
 CREATE TABLE "mh_host_registration" (
   "id" bigint NOT NULL,
   "host" character varying(255) NOT NULL,
