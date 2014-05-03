@@ -198,7 +198,21 @@ public class LtiLaunchAuthenticationHandler implements
       if (roles != null) {
         List<String> roleList = Arrays.asList(roles.split(","));
         for (int i = 0; i < roleList.size(); i++) {
-          String role = context + "_" + roleList.get(i);
+
+          /* Use a generic context and learner if none is given: */
+          context = StringUtils.trimToNull(context) == null ? "LTI" : context;
+          String learner = StringUtils.trimToNull(roleList.get(i)) == null
+            ? "USER" : roleList.get(i);
+
+          /* Build the role */
+          String role = context + "_" + learner;
+
+          /* Make sure to not accept ROLE_… */
+          if (role.trim().toUpperCase().startsWith("ROLE_")) {
+            continue;
+          }
+
+          /* Add this role */
           logger.debug("adding role: {}", role);
           userAuthorities.add(new GrantedAuthorityImpl(role));
         }
