@@ -327,6 +327,7 @@
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-webconsole</module>
+        <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
       </modules>
     </profile>
@@ -364,6 +365,7 @@
         <module>modules/matterhorn-usertracking-api</module>
         <module>modules/matterhorn-usertracking-impl</module>
         <module>modules/matterhorn-webconsole</module>
+        <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
       </modules>
     </profile>
@@ -401,6 +403,7 @@
         <module>modules/matterhorn-usertracking-api</module>
         <module>modules/matterhorn-usertracking-impl</module>
         <module>modules/matterhorn-webconsole</module>
+        <module>modules/matterhorn-workflow-service-api</module>        
         <module>modules/matterhorn-workspace-api</module>
       </modules>
     </profile>
@@ -433,6 +436,7 @@
         <module>modules/matterhorn-search-service-remote</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-webconsole</module>
+        <module>modules/matterhorn-workflow-service-api</module>        
         <module>modules/matterhorn-workspace-api</module>
       </modules>
     </profile>
@@ -477,6 +481,7 @@
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-impl</module>
         <module>modules/matterhorn-webconsole</module>
+        <module>modules/matterhorn-workflow-service-api</module>        
         <module>modules/matterhorn-workspace-api</module>
       </modules>
     </profile>
@@ -555,6 +560,7 @@
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-remote</module>
         <module>modules/matterhorn-webconsole</module>
+        <module>modules/matterhorn-workflow-service-api</module>        
         <module>modules/matterhorn-workspace-api</module>
       </modules>
     </profile>
@@ -609,6 +615,7 @@
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-serviceregistry</module>
+        <module>modules/matterhorn-workflow-service-api</module>
       </modules>
     </profile>
 
@@ -625,6 +632,7 @@
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-serviceregistry-remote</module>
+        <module>modules/matterhorn-workflow-service-api</module>        
       </modules>
     </profile>
 
@@ -748,6 +756,7 @@
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-static</module>
         <module>modules/matterhorn-webconsole</module>
+        <module>modules/matterhorn-workflow-service-api</module>        
       </modules>
     </profile>
 
@@ -883,6 +892,7 @@
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-static</module>
         <module>modules/matterhorn-webconsole</module>
+        <module>modules/matterhorn-workflow-service-api</module>        
       </modules>
     </profile>
 
