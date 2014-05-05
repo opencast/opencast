@@ -55,6 +55,9 @@ var clipFailureTimeoutTime = 50; // ms
 var clipTimeoutsUntilFailureDefault = 3;
 var clipTimeoutsUntilFailure = clipTimeoutsUntilFailureDefault;
 
+var isBuffering = false;
+var continueProcessing = false;
+
 // key codes
 var KEY_ENTER = 13;
 var KEY_SPACE = 32;
@@ -132,6 +135,8 @@ var insertedLastItem = false;
 // editor
 /******************************************************************************/
 
+editor.continueWorkflowFunction = null;
+
 /**
  * get the workflow ID
  *
@@ -147,7 +152,7 @@ editor.getWorkflowID = function () {
         ocUtils.log("Error: Could not retrieve workflow instance ID...");
         editor.error = true;
         editor.workflowID = -1;
-        displayError("Could not retrieve workflow instance ID. " +
+        displayMsg("Could not retrieve workflow instance ID. " +
             "Without it the editor won't work. " +
             "This should not happen, please ask your Matterhorn administrator.", "Error");
     } else {
@@ -172,7 +177,7 @@ editor.parseWorkflow = function (jsonData) {
         } catch (e) {
             ocUtils.log("Error: Could not parse workflow instance...");
             editor.error = true;
-            displayError("Could not parse workflow instance.", "Error");
+            displayMsg("Could not parse workflow instance.", "Error");
         }
         ocUtils.log("Done");
     }
@@ -194,7 +199,7 @@ editor.parseMediapackage = function (jsonData) {
         } catch (e) {
             ocUtils.log("Error: Could not parse mediapackage...");
             editor.error = true;
-            displayError("Could not parse mediapackage.", "Error");
+            displayMsg("Could not parse mediapackage.", "Error");
         }
         ocUtils.log("Done");
     }
@@ -217,7 +222,7 @@ editor.parseSmil = function (xmlData) {
         } catch (e) {
             ocUtils.log("Error: Could not parse smil...");
             // editor.error = true;
-            displayError("Could not parse smil.", "Error");
+            displayMsg("Could not parse smil.", "Error");
         }
         ocUtils.log("Done");
     }
@@ -242,7 +247,7 @@ editor.downloadSmil = function (func) {
             func();
         }).fail(function (error) {
             ocUtils.log("Error: Could not retrieve workflow instance");
-            displayError("Could not retrieve workflow instance.", "Error");
+            displayMsg("Could not retrieve workflow instance.", "Error");
         });
     }
 }
@@ -275,7 +280,7 @@ editor.getSmil = function (func) {
             }
         }).fail(function (error) {
             ocUtils.log("Error: Could not retrieve smil");
-            displayError("Could not retrieve smil.", "Error");
+            displayMsg("Could not retrieve smil.", "Error");
         });
     }
 }
@@ -323,7 +328,7 @@ editor.createNewSmil = function (func) {
         }).fail(function (e) {
             ocUtils.log("Error: Error creating smil: ");
             ocUtils.log(e);
-            displayError("Error creating smil.", "Error");
+            displayMsg("Error creating smil.", "Error");
         });
     }
     return !editor.error;
@@ -366,7 +371,7 @@ editor.addClips = function (strs, i, parID, start, duration, func) {
 		editor.addClips(strs, i, parID, start, duration, func);
 	    }, clipFailureTimeoutTime);
 	} else {
-	    displayError("Could not add clip.", "Error");
+	    displayMsg("Could not add clip.", "Error");
 	}
     });
 }
@@ -418,8 +423,8 @@ editor.addPar = function (currParIndex) {
             }).fail(function (e) {
                 ocUtils.log("Error: Could not get workflow instance");
                 ocUtils.log(e);
-                displayError("Could not get workflow instance. Please try again.", "Error");
-		editor.enableContinueProcessingButton(true);
+                displayMsg("Could not get workflow instance. Please try again.", "Error");
+		editor.enableContinueProcessing(true);
             });
         }).fail(function (e) {
 	    ocUtils.log("Error: Could not add par element");
@@ -431,15 +436,15 @@ editor.addPar = function (currParIndex) {
 		    editor.addPar(currParIndex);
 		}, parFailureTimeoutTime);
 	    } else {
-		displayError("Could not add par element. Please try again.", "Error");
-		editor.enableContinueProcessingButton(true);
+		displayMsg("Could not add par element. Please try again.", "Error");
+		editor.enableContinueProcessing(true);
 	    }
         });
     }
     return !editor.error;
 }
 
-editor.enableContinueProcessingButton = function(enable) {
+editor.enableContinueProcessing = function(enable) {
     if(enable) {
 	$('#continueButton').removeAttr("disabled");
 	$('#continueButton').button("refresh");
@@ -447,6 +452,7 @@ editor.enableContinueProcessingButton = function(enable) {
 	parTimeoutsUntilFailure = parTimeoutsUntilFailureDefault;
 	clipTimeoutsUntilFailure = clipTimeoutsUntilFailureDefault;
     } else {
+	pauseVideo();
 	$('#continueButton').attr("disabled", "disabled");
     }
 }
@@ -511,21 +517,23 @@ editor.saveSplitListHelper = function (startAtIndex) {
                                     }).done(function (data) {
                                         ocUtils.log("Done");
                                         ocUtils.log("Continuing workflow...");
-                                        editor.continueWorkflowFunction();
+					if(editor.continueWorkflowFunction != null) {
+                                            editor.continueWorkflowFunction();
+					}
                                     }).fail(function (e) {
                                         ocUtils.log("Error: Error submitting smil file: ");
                                         ocUtils.log(e);
-                                        displayError("Error submitting smil file. Please try again.", "Error");
-					editor.enableContinueProcessingButton(true);
+                                        displayMsg("Error submitting smil file. Please try again.", "Error");
+					editor.enableContinueProcessing(true);
                                     });
                                 }
                             } else {
-                                displayError("The video has already been edited and is being processed. Please cancel editing.",
+                                displayMsg("The video has already been edited and is being processed. Please cancel editing.",
                                     "Cancel editing");
                             }
                         }
                     }).fail(function (error) {
-                        displayError("Could not get the workflow state. Please cancel editing.",
+                        displayMsg("Could not get the workflow state. Please cancel editing.",
                             "Cancel editing");
                     });
                 }
@@ -539,12 +547,20 @@ editor.saveSplitListHelper = function (startAtIndex) {
  * save smil
  */
 editor.saveSplitList = function (func) {
-    editor.continueWorkflowFunction = func;
-    if (!editor.error) {
-        editor.enableContinueProcessingButton(false);
+    if(func && (func != null)) {
+	editor.continueWorkflowFunction = func;
+    }
+    var continueProcessing_tmp = continueProcessing;
+    continueProcessing = true;
+    editor.enableContinueProcessing(true);
+    if (!editor.error && !isBuffering) {
+	displayMsg("Continuing processing. This may take a while.\nPlease wait...", "Continuing processing.");
+        editor.enableContinueProcessing(false);
         editor.createNewSmil(function () {
             editor.saveSplitListHelper(0);
         });
+    } else if(!continueProcessing_tmp && isBuffering) {
+	displayMsg("The player is currently buffering. After that the processing will continue.\nPlease wait...", "Wait for continue processing.");
     }
     return !editor.error;
 }
@@ -692,7 +708,7 @@ function getTimefieldTimeEnd() {
  *          whether enabled or not
  */
 function setEnabled(uuid, enabled) {
-    if (editor.splitData && editor.splitData.splits) {
+    if (!continueProcessing && editor.splitData && editor.splitData.splits) {
         editor.splitData.splits[uuid].enabled = enabled;
         editor.updateSplitList(false, !zoomedIn());
     }
@@ -702,7 +718,7 @@ function setEnabled(uuid, enabled) {
  * set current time as the new inpoint of selected item
  */
 function setCurrentTimeAsNewInpoint() {
-    if (editor.selectedSplit != null) {
+    if (!continueProcessing && (editor.selectedSplit != null)) {
         setTimefieldTimeBegin(getCurrentTime());
     }
 }
@@ -711,7 +727,7 @@ function setCurrentTimeAsNewInpoint() {
  * set current time as the new outpoint of selected item
  */
 function setCurrentTimeAsNewOutpoint() {
-    if (editor.selectedSplit != null) {
+    if (!continueProcessing && (editor.selectedSplit != null)) {
         setTimefieldTimeEnd(getCurrentTime());
     }
 }
@@ -722,10 +738,12 @@ function setCurrentTimeAsNewOutpoint() {
  * @param time time to set
  */
 function setCurrentTime(time) {
-    time = isNaN(time) ? 0 : time;
-    var duration = getDuration();
-    time = (time > duration) ? duration : time;
-    editor.player.prop("currentTime", time);
+    if(!continueProcessing) {
+	time = isNaN(time) ? 0 : time;
+	var duration = getDuration();
+	time = (time > duration) ? duration : time;
+	editor.player.prop("currentTime", time);
+    }
 }
 
 /**
@@ -734,7 +752,9 @@ function setCurrentTime(time) {
  * @param time time to set
  */
 function setTimefieldTimeBegin(time) {
-    $('#clipBegin').timefield('option', 'value', time);
+    if(!continueProcessing) {
+	$('#clipBegin').timefield('option', 'value', time);
+    }
 }
 
 /**
@@ -743,7 +763,9 @@ function setTimefieldTimeBegin(time) {
  * @param time time to set
  */
 function setTimefieldTimeEnd(time) {
-    $('#clipEnd').timefield('option', 'value', time);
+    if(!continueProcessing) {
+	$('#clipEnd').timefield('option', 'value', time);
+    }
 }
 
 /******************************************************************************/
@@ -827,112 +849,118 @@ function isInInterval(toCheck, lower, upper) {
  * check whether clipBegin is in the right format
  */
 function checkClipBegin() {
-    var clipBegin = getTimefieldTimeBegin();
-    if (isNaN(clipBegin) || (clipBegin < 0)) {
-        displayError("The inpoint is too low or the format is not correct. Correct format: hh:MM:ss.mm. Please check.",
-            "Check inpoint");
-        return false;
+    if(!continueProcessing) {
+	var clipBegin = getTimefieldTimeBegin();
+	if (isNaN(clipBegin) || (clipBegin < 0)) {
+            displayMsg("The inpoint is too low or the format is not correct. Correct format: hh:MM:ss.mm. Please check.",
+		       "Check inpoint");
+            return false;
+	}
+	return true;
     }
-    return true;
 }
 
 /**
  * check whether clipEnd is in the right format
  */
 function checkClipEnd() {
-    var clipEnd = getTimefieldTimeEnd();
-    var duration = getDuration();
-    if (isNaN(clipEnd) || (clipEnd > duration)) {
-        displayError("The outpoint is too high or the format is not correct. Correct format: hh:MM:ss.mm. Please check.",
-            "Check outpoint");
-        return false;
+    if(!continueProcessing) {
+	var clipEnd = getTimefieldTimeEnd();
+	var duration = getDuration();
+	if (isNaN(clipEnd) || (clipEnd > duration)) {
+            displayMsg("The outpoint is too high or the format is not correct. Correct format: hh:MM:ss.mm. Please check.",
+		       "Check outpoint");
+            return false;
+	}
+	return true;
     }
-    return true;
 }
 
 /**
  * checks previous and next segments
  */
 function checkPrevAndNext(id, checkTimefields) {
-    checkTimefields = checkTimefields || false;
-    var duration = getDuration();
-    var current = editor.splitData.splits[id];
-    var inserted = false;
-    if (editor.splitData && editor.splitData.splits) {
-        // new first item
-        if (id == 0) {
-            if (editor.splitData.splits.length > 1) {
-                var next = editor.splitData.splits[1];
-                next.clipBegin = parseFloat(current.clipEnd);
-            }
-            if ((!checkTimefields || (checkTimefields && (getTimefieldTimeBegin() != 0))) && (current.clipBegin > minSegmentLength)) {
-                ocUtils.log("Inserting a first split element (auto): (" + 0 + " - " + current.clipBegin + ")");
-                var newSplitItem = {
-                    clipBegin: 0,
-                    clipEnd: parseFloat(current.clipBegin),
-                    enabled: true
-                };
-                inserted = true;
+    if(!continueProcessing) {
+	checkTimefields = checkTimefields || false;
+	var duration = getDuration();
+	var current = editor.splitData.splits[id];
+	var inserted = false;
+	if (editor.splitData && editor.splitData.splits) {
+            // new first item
+            if (id == 0) {
+		if (editor.splitData.splits.length > 1) {
+                    var next = editor.splitData.splits[1];
+                    next.clipBegin = parseFloat(current.clipEnd);
+		}
+		if ((!checkTimefields || (checkTimefields && (getTimefieldTimeBegin() != 0))) && (current.clipBegin > minSegmentLength)) {
+                    ocUtils.log("Inserting a first split element (auto): (" + 0 + " - " + current.clipBegin + ")");
+                    var newSplitItem = {
+			clipBegin: 0,
+			clipEnd: parseFloat(current.clipBegin),
+			enabled: true
+                    };
+                    inserted = true;
 
-                // add new item to front
-                editor.splitData.splits.splice(0, 0, newSplitItem);
-                insertedFirstItem = true;
-            } else {
-                ocUtils.log("Extending the first split element from (auto): (" + 0 + " - " + current.clipBegin + ")");
-                current.clipBegin = 0;
+                    // add new item to front
+                    editor.splitData.splits.splice(0, 0, newSplitItem);
+                    insertedFirstItem = true;
+		} else {
+                    ocUtils.log("Extending the first split element from (auto): (" + 0 + " - " + current.clipBegin + ")");
+                    current.clipBegin = 0;
+		}
             }
-        }
-        // new last item
-        else if ((editor.splitData.splits.length > 0) && (id == editor.splitData.splits.length - 1)) {
-            if ((!checkTimefields || (checkTimefields && (getTimefieldTimeEnd() != duration))) && (current.clipEnd < (duration - minSegmentLength))) {
-                ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
-                var newLastItem = {
-                    clipBegin: parseFloat(current.clipEnd),
-                    clipEnd: parseFloat(duration),
-                    enabled: true
-                };
-                inserted = true;
+            // new last item
+            else if ((editor.splitData.splits.length > 0) && (id == editor.splitData.splits.length - 1)) {
+		if ((!checkTimefields || (checkTimefields && (getTimefieldTimeEnd() != duration))) && (current.clipEnd < (duration - minSegmentLength))) {
+                    ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
+                    var newLastItem = {
+			clipBegin: parseFloat(current.clipEnd),
+			clipEnd: parseFloat(duration),
+			enabled: true
+                    };
+                    inserted = true;
 
-                // add the new item to the end
-                editor.splitData.splits.push(newLastItem);
-                var prev = editor.splitData.splits[id - 1];
-                prev.clipEnd = parseFloat(current.clipBegin);
-                insertedLastItem = true;
-            } else {
-                ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
-                current.clipEnd = parseFloat(duration);
+                    // add the new item to the end
+                    editor.splitData.splits.push(newLastItem);
+                    var prev = editor.splitData.splits[id - 1];
+                    prev.clipEnd = parseFloat(current.clipBegin);
+                    insertedLastItem = true;
+		} else {
+                    ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
+                    current.clipEnd = parseFloat(duration);
+		}
             }
-        }
-        // in the middle
-        else if ((id > 0) && (id < (editor.splitData.splits.length - 1))) {
-            var prev = editor.splitData.splits[id - 1];
-            var next = editor.splitData.splits[id + 1];
+            // in the middle
+            else if ((id > 0) && (id < (editor.splitData.splits.length - 1))) {
+		var prev = editor.splitData.splits[id - 1];
+		var next = editor.splitData.splits[id + 1];
 
-            if (checkTimefields && (getTimefieldTimeBegin() <= prev.clipBegin)) {
-                displayError("The inpoint is lower than the begin of the last segment. Please check.",
-                    "Check inpoint");
-                return {
-                    ok: false,
-                    inserted: false
-                };
-            }
-            if (checkTimefields && (getTimefieldTimeEnd() >= next.clipEnd)) {
-                displayError("The outpoint is bigger than the end of the next segment. Please check.",
-                    "Check outpoint");
-                return {
-                    ok: false,
-                    inserted: false
-                };
-            }
+		if (checkTimefields && (getTimefieldTimeBegin() <= prev.clipBegin)) {
+                    displayMsg("The inpoint is lower than the begin of the last segment. Please check.",
+			       "Check inpoint");
+                    return {
+			ok: false,
+			inserted: false
+                    };
+		}
+		if (checkTimefields && (getTimefieldTimeEnd() >= next.clipEnd)) {
+                    displayMsg("The outpoint is bigger than the end of the next segment. Please check.",
+			       "Check outpoint");
+                    return {
+			ok: false,
+			inserted: false
+                    };
+		}
 
-            prev.clipEnd = parseFloat(current.clipBegin);
-            next.clipBegin = parseFloat(current.clipEnd);
-        }
+		prev.clipEnd = parseFloat(current.clipBegin);
+		next.clipBegin = parseFloat(current.clipEnd);
+            }
+	}
+	return {
+            ok: true,
+            inserted: inserted
+	};
     }
-    return {
-        ok: true,
-        inserted: inserted
-    };
 }
 
 /******************************************************************************/
@@ -943,7 +971,7 @@ function checkPrevAndNext(id, checkTimefields) {
  * click handler for saving data in editing box
  */
 function okButtonClick() {
-    if (checkClipBegin() && checkClipEnd()) {
+    if (!continueProcessing && checkClipBegin() && checkClipEnd()) {
         id = $('#splitUUID').val();
         if (id != "") {
             var current = editor.splitData.splits[id];
@@ -952,7 +980,7 @@ function okButtonClick() {
             var duration = getDuration();
             id = parseInt(id);
             if (getTimefieldTimeBegin() > getTimefieldTimeEnd()) {
-                displayError("The inpoint is bigger than the outpoint. Please check and correct it.",
+                displayMsg("The inpoint is bigger than the outpoint. Please check and correct it.",
                     "Check and correct inpoint and outpoint");
                 selectSegmentListElement(id);
                 return;
@@ -1000,173 +1028,181 @@ function okButtonClick() {
  * click handler for canceling editing
  */
 function cancelButtonClick() {
-    $('#splitUUID').val('');
-    $('#splitDescription').val("");
-    setTimefieldTimeBegin(0);
-    setTimefieldTimeEnd(0);
-    $('#splitIndex').html('#');
-    $('.splitItem').removeClass('splitItemSelected');
-    $('.splitSegmentItem').removeClass('splitSegmentItemSelected');
-    editor.selectedSplit = null;
+    if(!continueProcessing) {
+	$('#splitUUID').val('');
+	$('#splitDescription').val("");
+	setTimefieldTimeBegin(0);
+	setTimefieldTimeEnd(0);
+	$('#splitIndex').html('#');
+	$('.splitItem').removeClass('splitItemSelected');
+	$('.splitSegmentItem').removeClass('splitSegmentItemSelected');
+	editor.selectedSplit = null;
+    }
 }
 
 /**
  * click/shortcut handler for removing current split item
  */
 function splitRemoverClick() {
-    item = $(this);
-    var id = item.prop('id');
-    if (id != undefined) {
-        id = id.replace("splitItem-", "");
-        id = id.replace("splitRemover-", "");
-        id = id.replace("splitAdder-", "");
-    } else {
-        id = "";
-    }
-    if (id == "" || id == "deleteButton") {
-        id = $('#splitUUID').val();
-    }
-    id = parseInt(id);
-    if (editor.splitData && editor.splitData.splits && editor.splitData.splits[id]) {
-        if (editor.splitData.splits[id].enabled) {
-            $('#splitItemDiv-' + id).addClass('disabled');
-            $('#splitRemover-' + id).hide();
-            $('#splitAdder-' + id).show();
-            $('.splitItem').removeClass('splitItemSelected');
-	    setEnabled(id, false);
-	    if(!zoomedIn()) {
-		if (getCurrentSplitItem().id == id) {
-                    // if current split item is being deleted:
-                    // try to select the next enabled segment, if that fails try to select the previous enabled item
-                    var sthSelected = false;
-                    for (var i = id; i < editor.splitData.splits.length; ++i) {
-			if (editor.splitData.splits[i].enabled) {
-                            sthSelected = true;
-                            selectSegmentListElement(i, true);
-                            break;
-			}
-                    }
-                    if (!sthSelected) {
-			for (var i = id; i >= 0; --i) {
-                            if (editor.splitData.splits[i].enabled) {
+    if(!continueProcessing) {
+	item = $(this);
+	var id = item.prop('id');
+	if (id != undefined) {
+            id = id.replace("splitItem-", "");
+            id = id.replace("splitRemover-", "");
+            id = id.replace("splitAdder-", "");
+	} else {
+            id = "";
+	}
+	if (id == "" || id == "deleteButton") {
+            id = $('#splitUUID').val();
+	}
+	id = parseInt(id);
+	if (editor.splitData && editor.splitData.splits && editor.splitData.splits[id]) {
+            if (editor.splitData.splits[id].enabled) {
+		$('#splitItemDiv-' + id).addClass('disabled');
+		$('#splitRemover-' + id).hide();
+		$('#splitAdder-' + id).show();
+		$('.splitItem').removeClass('splitItemSelected');
+		setEnabled(id, false);
+		if(!zoomedIn()) {
+		    if (getCurrentSplitItem().id == id) {
+			// if current split item is being deleted:
+			// try to select the next enabled segment, if that fails try to select the previous enabled item
+			var sthSelected = false;
+			for (var i = id; i < editor.splitData.splits.length; ++i) {
+			    if (editor.splitData.splits[i].enabled) {
 				sthSelected = true;
 				selectSegmentListElement(i, true);
 				break;
-                            }
+			    }
 			}
-                    }
+			if (!sthSelected) {
+			    for (var i = id; i >= 0; --i) {
+				if (editor.splitData.splits[i].enabled) {
+				    sthSelected = true;
+				    selectSegmentListElement(i, true);
+				    break;
+				}
+			    }
+			}
+		    }
+		    selectCurrentSplitItem();
 		}
-		selectCurrentSplitItem();
-	    }
-        } else {
-            $('#splitItemDiv-' + id).removeClass('disabled');
-            $('#splitRemover-' + id).show();
-            $('#splitAdder-' + id).hide();
-	    setEnabled(id, true);
-        }
+            } else {
+		$('#splitItemDiv-' + id).removeClass('disabled');
+		$('#splitRemover-' + id).show();
+		$('#splitAdder-' + id).hide();
+		setEnabled(id, true);
+            }
+	}
+	cancelButtonClick();
     }
-    cancelButtonClick();
 }
 
 function setSplitListItemButtonHandler() {
-    $('.clipItem').timefield();
+    if(!continueProcessing) {
+	$('.clipItem').timefield();
 
-    // add evtl handler for enter in editing fields
-    $('#clipBegin input').focus(function (e) {
-        inputFocused = true;
-    });
-    $('#clipEnd input').focus(function (e) {
-        inputFocused = true;
-    });
-    $('#clipBegin input').blur(function (e) {
-        inputFocused = false;
-        okButtonClick();
-    });
-    $('#clipEnd input').blur(function (e) {
-        inputFocused = false;
-        okButtonClick();
-    });
-    $('#clipBegin input').keyup(function (e) {
-        var keyCode = e.keyCode || e.which();
-        if (keyCode == KEY_ENTER) {
+	// add evtl handler for enter in editing fields
+	$('#clipBegin input').focus(function (e) {
+            inputFocused = true;
+	});
+	$('#clipEnd input').focus(function (e) {
+            inputFocused = true;
+	});
+	$('#clipBegin input').blur(function (e) {
             inputFocused = false;
             okButtonClick();
-        }
-    });
-    $('#clipEnd input').keyup(function (e) {
-        var keyCode = e.keyCode || e.which();
-        if (keyCode == KEY_ENTER) {
+	});
+	$('#clipEnd input').blur(function (e) {
             inputFocused = false;
             okButtonClick();
-        }
-    });
+	});
+	$('#clipBegin input').keyup(function (e) {
+            var keyCode = e.keyCode || e.which();
+            if (keyCode == KEY_ENTER) {
+		inputFocused = false;
+		okButtonClick();
+            }
+	});
+	$('#clipEnd input').keyup(function (e) {
+            var keyCode = e.keyCode || e.which();
+            if (keyCode == KEY_ENTER) {
+		inputFocused = false;
+		okButtonClick();
+            }
+	});
+    }
 }
 
 /**
  * click handler for selecting a split item in segment bar or list
  */
 function splitItemClick() {
-    if (!isSeeking || (isSeeking && ($(this).prop('id').indexOf('Div-') == -1))) {
-        now = new Date();
-    }
+    if(!continueProcessing) {
+	if (!isSeeking || (isSeeking && ($(this).prop('id').indexOf('Div-') == -1))) {
+            now = new Date();
+	}
 
-    if ((now - lastTimeSplitItemClick) > 80) {
-        lastTimeSplitItemClick = now;
+	if ((now - lastTimeSplitItemClick) > 80) {
+            lastTimeSplitItemClick = now;
 
-        if (editor.splitData && editor.splitData.splits) {
-            // if not seeking
-            if ((isSeeking && ($(this).prop('id').indexOf('Div-') == -1)) || !isSeeking) {
-                // get the id of the split item
-                id = $(this).prop('id');
-                id = id.replace('splitItem-', '');
-                id = id.replace('splitItemDiv-', '');
-                id = id.replace('splitSegmentItem-', '');
-                $('#splitUUID').val(id);
+            if (editor.splitData && editor.splitData.splits) {
+		// if not seeking
+		if ((isSeeking && ($(this).prop('id').indexOf('Div-') == -1)) || !isSeeking) {
+                    // get the id of the split item
+                    id = $(this).prop('id');
+                    id = id.replace('splitItem-', '');
+                    id = id.replace('splitItemDiv-', '');
+                    id = id.replace('splitSegmentItem-', '');
+                    $('#splitUUID').val(id);
 
-                if (id != lastId) {
-                    if (!inputFocused) {
-                        lastId = id;
+                    if (id != lastId) {
+			if (!inputFocused) {
+                            lastId = id;
 
-                        // remove all selected classes
-                        $('.splitSegmentItem').removeClass('splitSegmentItemSelected');
-                        $('.splitItem').removeClass('splitItemSelected');
-                        $('.splitItemDiv').removeClass('splitSegmentItemSelected');
+                            // remove all selected classes
+                            $('.splitSegmentItem').removeClass('splitSegmentItemSelected');
+                            $('.splitItem').removeClass('splitItemSelected');
+                            $('.splitItemDiv').removeClass('splitSegmentItemSelected');
 
-                        $('#clipItemSpacer').remove();
-                        $('#clipBegin').remove();
-                        $('#clipEnd').remove();
+                            $('#clipItemSpacer').remove();
+                            $('#clipBegin').remove();
+                            $('#clipEnd').remove();
 
-                        $('.segmentButtons', '#splitItem-' + id).append('<span class="clipItem" id="clipBegin"></span><span id="clipItemSpacer"> - </span><span class="clipItem" id="clipEnd"></span>');
-                        setSplitListItemButtonHandler();
+                            $('.segmentButtons', '#splitItem-' + id).append('<span class="clipItem" id="clipBegin"></span><span id="clipItemSpacer"> - </span><span class="clipItem" id="clipEnd"></span>');
+                            setSplitListItemButtonHandler();
 
-                        $('#splitSegmentItem-' + id).removeClass('hover');
+                            $('#splitSegmentItem-' + id).removeClass('hover');
 
-                        // load data into the segment
-                        var splitItem = editor.splitData.splits[id];
-                        editor.selectedSplit = splitItem;
-                        editor.selectedSplit.id = parseInt(id);
-                        setTimefieldTimeBegin(splitItem.clipBegin);
-                        setTimefieldTimeEnd(splitItem.clipEnd);
-                        $('#splitIndex').html(parseInt(id) + 1);
+                            // load data into the segment
+                            var splitItem = editor.splitData.splits[id];
+                            editor.selectedSplit = splitItem;
+                            editor.selectedSplit.id = parseInt(id);
+                            setTimefieldTimeBegin(splitItem.clipBegin);
+                            setTimefieldTimeEnd(splitItem.clipEnd);
+                            $('#splitIndex').html(parseInt(id) + 1);
 
-                        // add the selected class to the corresponding items
-                        $('#splitSegmentItem-' + id).addClass('splitSegmentItemSelected');
-                        $('#splitItem-' + id).addClass('splitItemSelected');
-                        $('#splitItemDiv-' + id).addClass('splitSegmentItemSelected');
+                            // add the selected class to the corresponding items
+                            $('#splitSegmentItem-' + id).addClass('splitSegmentItemSelected');
+                            $('#splitItem-' + id).addClass('splitItemSelected');
+                            $('#splitItemDiv-' + id).addClass('splitSegmentItemSelected');
 
-                        currSplitItem = splitItem;
+                            currSplitItem = splitItem;
 
-                        if (!timeoutUsed) {
-                            if (!currSplitItemClickedViaJQ) {
-                                setCurrentTime(splitItem.clipBegin);
+                            if (!timeoutUsed) {
+				if (!currSplitItemClickedViaJQ) {
+                                    setCurrentTime(splitItem.clipBegin);
+				}
+				// update the current time of the player
+				$('.video-timer').html(formatTime(getCurrentTime()) + "/" + formatTime(getDuration()));
                             }
-                            // update the current time of the player
-                            $('.video-timer').html(formatTime(getCurrentTime()) + "/" + formatTime(getDuration()));
-                        }
+			}
                     }
-                }
+		}
             }
-        }
+	}
     }
 }
 
@@ -1174,7 +1210,7 @@ function splitItemClick() {
  * click/shortcut handler for adding a split item at current time
  */
 function splitButtonClick() {
-    if (editor.splitData && editor.splitData.splits) {
+    if (!continueProcessing && editor.splitData && editor.splitData.splits) {
         var currentTime = getCurrentTime();
         for (var i = 0; i < editor.splitData.splits.length; ++i) {
             var splitItem = editor.splitData.splits[i];
@@ -1214,7 +1250,7 @@ function splitButtonClick() {
  * select the split segment at the current time
  */
 function selectCurrentSplitItem(excludeDeletedSegments) {
-    if (!isSeeking) {
+    if (!continueProcessing && !isSeeking) {
         excludeDeletedSegments = excludeDeletedSegments || false;
 
         var splitItem = getCurrentSplitItem();
@@ -1267,7 +1303,7 @@ function selectCurrentSplitItem(excludeDeletedSegments) {
  */
 function selectSegmentListElement(number, dblClick) {
     dblClick = dblClick ? dblClick : false;
-    if (editor.splitData && editor.splitData.splits) {
+    if (!continueProcessing && editor.splitData && editor.splitData.splits) {
         var spltItem = editor.splitData.splits[number];
         if (spltItem) {
             setCurrentTime(spltItem.clipBegin);
@@ -1288,11 +1324,11 @@ function selectSegmentListElement(number, dblClick) {
 /******************************************************************************/
 
 /**
- * displays a graphical error
+ * displays a graphical message
  */
-function displayError(errorMsg, errorTitle) {
-    $('<div />').html(errorMsg).dialog({
-        title: errorTitle,
+function displayMsg(msg, title) {
+    $('<div />').html(msg).dialog({
+        title: title,
         resizable: false,
         buttons: {
             OK: function () {
@@ -2285,14 +2321,14 @@ function renewSessionID() {
                 if (data.workflow.state.toLowerCase() == "paused") {
                     renewSessionID();
                 } else {
-                    displayError("The video has already been edited and is being processed. Please cancel editing.",
+                    displayMsg("The video has already been edited and is being processed. Please cancel editing.",
                         "Cancel editing");
                 }
             }
         }).fail(function (error) {
             ocUtils.log("Failed renewing session ID.");
 
-            displayError("Could not renew the session ID. Please cancel editing.",
+            displayMsg("Could not renew the session ID. Please cancel editing.",
                 "Cancel editing");
 
             renewSessionID();
@@ -2375,6 +2411,22 @@ $(document).ready(function () {
             clearEvents2();
         }
         currSplitItemClickedViaJQ = false;
+    });
+
+    $(document).on("sjs:buffering", function (event) {
+        isBuffering = true;
+    });
+    $(document).on("sjs:bufferedAndAutoplaying", function (event) {
+        isBuffering = false;
+	if(continueProcessing) {
+	    editor.saveSplitList(null);
+	}
+    });
+    $(document).on("sjs:bufferedButNotAutoplaying", function (event) {
+        isBuffering = false;
+	if(continueProcessing) {
+	    editor.saveSplitList(null);
+	}
     });
 
     $(window).resize(function () {
