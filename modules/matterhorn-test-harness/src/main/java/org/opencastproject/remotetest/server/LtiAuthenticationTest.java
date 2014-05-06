@@ -91,6 +91,7 @@ public class LtiAuthenticationTest {
     httpClient.getConnectionManager().shutdown();
   }
 
+  @Ignore
   @Test
   public void testLtiLaunch() throws Exception {
     // Construct a POST message with the oauth parameters
@@ -183,6 +184,7 @@ public class LtiAuthenticationTest {
 
   }
 
+  @Ignore
   @Test
   public void testLtiLaunchFromUnknownUser() throws Exception {
     // Construct a POST message with the oauth parameters
