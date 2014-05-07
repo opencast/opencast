@@ -37,6 +37,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
