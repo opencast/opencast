@@ -292,7 +292,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     if (job == null) {
       throw new EncoderException("The Job parameter must not be null");
     }
-    final String targetTrackId = idBuilder.createNew().toString();
     try {
       // Get the tracks and make sure they exist
       final File mediaFile;
@@ -326,6 +325,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         // Put the file in the workspace
         URI returnURL = null;
         InputStream in = null;
+        final String targetTrackId = idBuilder.createNew().toString();
         
         try {
           in = new FileInputStream(encodingOutput);
@@ -1069,8 +1069,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
           break;
         case ParallelEncode:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
-          encodingProfile = arguments.get(1);
-logger.info("processing parallel encoding with profile {}", encodingProfile);          
+          encodingProfile = arguments.get(1);         
           serialized = MediaPackageElementParser.getArrayAsXml(parralelEncode(job, firstTrack, encodingProfile, null));
           break;
         case Image:
