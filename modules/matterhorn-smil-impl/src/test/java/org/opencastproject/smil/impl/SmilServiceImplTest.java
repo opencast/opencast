@@ -16,14 +16,15 @@
 package org.opencastproject.smil.impl;
 
 import java.net.URI;
+import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.track.AudioStreamImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
+import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
 import org.opencastproject.smil.entity.api.Smil;
@@ -230,6 +231,43 @@ public class SmilServiceImplTest {
     assertEquals(15000L, mediaElement.getClipBeginMS());
     // start + duration = 15s + 1s = 16s
     assertEquals(16000L, mediaElement.getClipEndMS());
+  }
+
+  @Test(expected = SmilException.class)
+  public void testAddClipWithInvalidTrack() throws Exception {
+    TrackImpl videoTrack = new TrackImpl();
+
+    SmilResponse smilResponse = smilService.createNewSmil();
+    smilResponse = smilService.addClip(smilResponse.getSmil(), null, videoTrack, 0, 10);
+    fail("SmilException schould be thrown if you try to add an invalid track.");
+  }
+
+  @Test(expected = SmilException.class)
+  public void testAddClipWithInvalidTrackDuration() throws Exception {
+    TrackImpl videoTrack = new TrackImpl();
+    videoTrack.setIdentifier("track-1");
+    videoTrack.setFlavor(new MediaPackageElementFlavor("source", "presentation"));
+    videoTrack.setURI(new URI("http://hostname/video.mp4"));
+    videoTrack.addStream(new VideoStreamImpl());
+    // no track duration set
+
+    SmilResponse smilResponse = smilService.createNewSmil();
+    smilResponse = smilService.addClip(smilResponse.getSmil(), null, videoTrack, 0, 10);
+    fail("SmilException schould be thrown if you try to add an invalid track.");
+  }
+
+  @Test(expected = SmilException.class)
+  public void testAddClipWithInvalidTrackURI() throws Exception {
+    TrackImpl videoTrack = new TrackImpl();
+    videoTrack.setIdentifier("track-1");
+    videoTrack.setFlavor(new MediaPackageElementFlavor("source", "presentation"));
+    videoTrack.addStream(new VideoStreamImpl());
+    videoTrack.setDuration(Long.MAX_VALUE);
+    // no track URI set
+
+    SmilResponse smilResponse = smilService.createNewSmil();
+    smilResponse = smilService.addClip(smilResponse.getSmil(), null, videoTrack, 0, 10);
+    fail("SmilException schould be thrown if you try to add an invalid track.");
   }
 
   /**

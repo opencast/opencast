@@ -127,7 +127,7 @@ public class SmilResponseImpl implements SmilResponse {
   @Override
   public SmilObject getEntity() throws SmilException {
     if (entities.length == 0) {
-      throw new SmilException("The is no entity.");
+      throw new SmilException("There is no entity.");
     }
     if (entities.length > 1) {
       throw new SmilException("There is more than one entity.");
