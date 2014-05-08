@@ -41,18 +41,11 @@ import org.opencastproject.smil.entity.media.element.SmilMediaVideoImpl;
 import org.opencastproject.smil.entity.media.param.SmilMediaParamGroupImpl;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implement {@link SmilService} interface.
  */
 public class SmilServiceImpl implements SmilService {
-
-  /**
-   * Logger
-   */
-  private static final Logger logger = LoggerFactory.getLogger(SmilServiceImpl.class);
 
   /**
    * {@inheritDoc}
@@ -120,6 +113,18 @@ public class SmilServiceImpl implements SmilService {
     }
     if (duration < 0) {
       throw new SmilException("Duration should be positive.");
+    }
+    if (track.getURI() == null) {
+      throw new SmilException("Track URI isn't set.");
+    }
+    if (track.getFlavor() == null) {
+      throw new SmilException("Track flavor isn't set.");
+    }
+    if (track.getDuration() == null) {
+      throw new SmilException("Track duration not set");
+    }
+    if (!track.hasAudio() && !track.hasVideo()) {
+      throw new SmilException("Track should have at least one audio or video stream.");
     }
     if (start + duration > track.getDuration()) {
       duration = track.getDuration() - start;
