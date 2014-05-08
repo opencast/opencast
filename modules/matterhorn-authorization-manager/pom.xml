@@ -97,7 +97,7 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-distribution-service-download</artifactId>
-      <version>${project.version}</version>
+      <version>1.4.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>

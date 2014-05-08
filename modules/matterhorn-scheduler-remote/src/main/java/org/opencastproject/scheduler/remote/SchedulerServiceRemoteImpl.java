@@ -29,7 +29,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -53,19 +52,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import javax.ws.rs.Path;
-
 /**
  * A proxy to a remote series service.
  */
-@Path("/")
-@RestService(name = "schedulerservice", title = "Scheduler Service Remote", abstractText = "Scheduler service manages events (creates new, updates already existing and removes events).", notes = {
-        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-        "If the service is down or not working it will return a status 503, this means the the underlying service is "
-                + "not working and is either restarting or has failed",
-        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerService {
 
   private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceRemoteImpl.class);

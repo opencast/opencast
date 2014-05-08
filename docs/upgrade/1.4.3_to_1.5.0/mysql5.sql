@@ -138,3 +138,6 @@ CREATE TABLE mh_user_ref_role (
   CONSTRAINT FK_mh_user_ref_role_role_id FOREIGN KEY (role_id) REFERENCES mh_role (id),
   CONSTRAINT FK_mh_user_ref_role_user_id FOREIGN KEY (user_id) REFERENCES mh_user_ref (id)
 ) ENGINE=InnoDB;
+
+-- Change type of field 'payload' in table 'mh_job' from TEXT to MEDIUMTEXT, see MH-10139
+ALTER TABLE mh_job MODIFY COLUMN payload MEDIUMTEXT;

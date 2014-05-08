@@ -1,4 +1,4 @@
-URL: http://heanet.dl.sourceforge.net/project/lame/lame/3.99 ${USASK_MIRROR}
+URL: http://heanet.dl.sourceforge.net/project/lame/lame/3.99 ${USASK_MIRROR} ${ETH_MIRROR}
 PKG: lame-3.99.5.tar.gz
 SHA: 03a0bfa85713adcc6b3383c12e2cc68a9cfbf4c4
 DIR: lame-3.99.5

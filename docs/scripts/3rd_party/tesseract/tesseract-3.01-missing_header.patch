@@ -1,0 +1,10 @@
+--- a/viewer/svutil.cpp	2011-10-22 03:21:21.000000000 +0100
++++ b/viewer/svutil.cpp	2014-03-24 15:42:14.932604029 +0000
+@@ -32,6 +32,7 @@
+ #else
+ #include <arpa/inet.h>
+ #include <netinet/in.h>
++#include <unistd.h>
+ #include <pthread.h>
+ #include <semaphore.h>
+ #include <signal.h>
