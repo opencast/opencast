@@ -16,11 +16,6 @@
  *
  */
 (function ($) {
-    /*****************************************************************************
-     * Synchronize two Matterhorn html5 players
-     ****************************************************************************/
-    var lastSynch = Date.now();
-
     function getDuration(id) {
         if (id) {
             return $(id).get(0).duration;

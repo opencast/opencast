@@ -48,12 +48,16 @@ var PLAY_ENDING_OF_CURRENT_SEGMENT = "trim.play_ending_of_current_segment";
 
 var parElementTimeoutTime = 10; // ms
 var parFailureTimeoutTime = 50; // ms
+var bufferingTimeoutMS = 20000;
 var parTimeoutsUntilFailureDefault = 3;
 var parTimeoutsUntilFailure = parTimeoutsUntilFailureDefault;
 var clipElementTimeoutTime = 10; // ms
 var clipFailureTimeoutTime = 50; // ms
 var clipTimeoutsUntilFailureDefault = 3;
 var clipTimeoutsUntilFailure = clipTimeoutsUntilFailureDefault;
+
+var isBuffering = false;
+var continueProcessing = false;
 
 // key codes
 var KEY_ENTER = 13;
@@ -132,6 +136,8 @@ var insertedLastItem = false;
 // editor
 /******************************************************************************/
 
+editor.continueWorkflowFunction = null;
+
 /**
  * get the workflow ID
  *
@@ -147,7 +153,7 @@ editor.getWorkflowID = function () {
         ocUtils.log("Error: Could not retrieve workflow instance ID...");
         editor.error = true;
         editor.workflowID = -1;
-        displayError("Could not retrieve workflow instance ID. " +
+        displayMsg("Could not retrieve workflow instance ID. " +
             "Without it the editor won't work. " +
             "This should not happen, please ask your Matterhorn administrator.", "Error");
     } else {
@@ -167,12 +173,12 @@ editor.parseWorkflow = function (jsonData) {
         ocUtils.log("Parsing workflow instance...");
         try {
             editor.workflowParser = new $.workflowParser(jsonData);
-	    SMIL_FLAVOR_EPISODE = editor.workflowParser.targetSmilFlavor;
-	    console.log("Set target smil flavor to " + SMIL_FLAVOR_EPISODE);
+            SMIL_FLAVOR_EPISODE = editor.workflowParser.targetSmilFlavor;
+            console.log("Set target smil flavor to " + SMIL_FLAVOR_EPISODE);
         } catch (e) {
             ocUtils.log("Error: Could not parse workflow instance...");
             editor.error = true;
-            displayError("Could not parse workflow instance.", "Error");
+            displayMsg("Could not parse workflow instance.", "Error");
         }
         ocUtils.log("Done");
     }
@@ -194,7 +200,7 @@ editor.parseMediapackage = function (jsonData) {
         } catch (e) {
             ocUtils.log("Error: Could not parse mediapackage...");
             editor.error = true;
-            displayError("Could not parse mediapackage.", "Error");
+            displayMsg("Could not parse mediapackage.", "Error");
         }
         ocUtils.log("Done");
     }
@@ -217,7 +223,7 @@ editor.parseSmil = function (xmlData) {
         } catch (e) {
             ocUtils.log("Error: Could not parse smil...");
             // editor.error = true;
-            displayError("Could not parse smil.", "Error");
+            displayMsg("Could not parse smil.", "Error");
         }
         ocUtils.log("Done");
     }
@@ -242,7 +248,7 @@ editor.downloadSmil = function (func) {
             func();
         }).fail(function (error) {
             ocUtils.log("Error: Could not retrieve workflow instance");
-            displayError("Could not retrieve workflow instance.", "Error");
+            displayMsg("Could not retrieve workflow instance.", "Error");
         });
     }
 }
@@ -275,7 +281,7 @@ editor.getSmil = function (func) {
             }
         }).fail(function (error) {
             ocUtils.log("Error: Could not retrieve smil");
-            displayError("Could not retrieve smil.", "Error");
+            displayMsg("Could not retrieve smil.", "Error");
         });
     }
 }
@@ -323,7 +329,7 @@ editor.createNewSmil = function (func) {
         }).fail(function (e) {
             ocUtils.log("Error: Error creating smil: ");
             ocUtils.log(e);
-            displayError("Error creating smil.", "Error");
+            displayMsg("Error creating smil.", "Error");
         });
     }
     return !editor.error;
@@ -349,25 +355,25 @@ editor.addClips = function (strs, i, parID, start, duration, func) {
             editor.parseSmil(editor.smilResponseParser.smil);
         }
 
-	if((i + 1) < strs.length) {
-	    window.setTimeout(function() {
-		editor.addClips(strs, i + 1, parID, start, duration, func);
-	    }, clipElementTimeoutTime);
-	} else {
-	    func();
-	}
+        if ((i + 1) < strs.length) {
+            window.setTimeout(function () {
+                editor.addClips(strs, i + 1, parID, start, duration, func);
+            }, clipElementTimeoutTime);
+        } else {
+            func();
+        }
     }).fail(function (e) {
         ocUtils.log("Error: Could not add clip");
         ocUtils.log(e);
-	if(clipTimeoutsUntilFailure > 0) {
-	    ocUtils.log("Trying again...");
-	    --clipTimeoutsUntilFailure;
-	    window.setTimeout(function() {
-		editor.addClips(strs, i, parID, start, duration, func);
-	    }, clipFailureTimeoutTime);
-	} else {
-	    displayError("Could not add clip.", "Error");
-	}
+        if (clipTimeoutsUntilFailure > 0) {
+            ocUtils.log("Trying again...");
+            --clipTimeoutsUntilFailure;
+            window.setTimeout(function () {
+                editor.addClips(strs, i, parID, start, duration, func);
+            }, clipFailureTimeoutTime);
+        } else {
+            displayMsg("Could not add clip.", "Error");
+        }
     });
 }
 
@@ -406,48 +412,49 @@ editor.addPar = function (currParIndex) {
                 ocUtils.log("Done");
                 var strs = getAllStringsOf(wfXML, "<ns3:track", "</ns3:track>");
                 var error = false;
-		
+
                 var start = parseFloat(editor.splitData.splits[currParIndex].clipBegin) * 1000;
                 var duration = (parseFloat(editor.splitData.splits[currParIndex].clipEnd) * 1000) - start;
-		editor.addClips(strs, 0, par.parID, start, duration, function() {
+                editor.addClips(strs, 0, par.parID, start, duration, function () {
                     ocUtils.log("Continuing with next par element...");
-		    window.setTimeout(function() {
-			editor.saveSplitListHelper(currParIndex + 1);
-		    }, clipElementTimeoutTime);
-		});
+                    window.setTimeout(function () {
+                        editor.saveSplitListHelper(currParIndex + 1);
+                    }, clipElementTimeoutTime);
+                });
             }).fail(function (e) {
                 ocUtils.log("Error: Could not get workflow instance");
                 ocUtils.log(e);
-                displayError("Could not get workflow instance. Please try again.", "Error");
-		editor.enableContinueProcessingButton(true);
+                displayMsg("Could not get workflow instance. Please try again.", "Error");
+                editor.enableContinueProcessing(true);
             });
         }).fail(function (e) {
-	    ocUtils.log("Error: Could not add par element");
-	    ocUtils.log(e);
-	    if(parTimeoutsUntilFailure > 0) {
-		ocUtils.log("Trying again...");
-		--parTimeoutsUntilFailure;
-		window.setTimeout(function() {
-		    editor.addPar(currParIndex);
-		}, parFailureTimeoutTime);
-	    } else {
-		displayError("Could not add par element. Please try again.", "Error");
-		editor.enableContinueProcessingButton(true);
-	    }
+            ocUtils.log("Error: Could not add par element");
+            ocUtils.log(e);
+            if (parTimeoutsUntilFailure > 0) {
+                ocUtils.log("Trying again...");
+                --parTimeoutsUntilFailure;
+                window.setTimeout(function () {
+                    editor.addPar(currParIndex);
+                }, parFailureTimeoutTime);
+            } else {
+                displayMsg("Could not add par element. Please try again.", "Error");
+                editor.enableContinueProcessing(true);
+            }
         });
     }
     return !editor.error;
 }
 
-editor.enableContinueProcessingButton = function(enable) {
-    if(enable) {
-	$('#continueButton').removeAttr("disabled");
-	$('#continueButton').button("refresh");
-	editor.error = false;
-	parTimeoutsUntilFailure = parTimeoutsUntilFailureDefault;
-	clipTimeoutsUntilFailure = clipTimeoutsUntilFailureDefault;
+editor.enableContinueProcessing = function (enable) {
+    if (enable) {
+        $('#continueButton').removeAttr("disabled");
+        $('#continueButton').button("refresh");
+        editor.error = false;
+        parTimeoutsUntilFailure = parTimeoutsUntilFailureDefault;
+        clipTimeoutsUntilFailure = clipTimeoutsUntilFailureDefault;
     } else {
-	$('#continueButton').attr("disabled", "disabled");
+        pauseVideo();
+        $('#continueButton').attr("disabled", "disabled");
     }
 }
 
@@ -511,21 +518,23 @@ editor.saveSplitListHelper = function (startAtIndex) {
                                     }).done(function (data) {
                                         ocUtils.log("Done");
                                         ocUtils.log("Continuing workflow...");
-                                        editor.continueWorkflowFunction();
+                                        if (editor.continueWorkflowFunction != null) {
+                                            editor.continueWorkflowFunction();
+                                        }
                                     }).fail(function (e) {
                                         ocUtils.log("Error: Error submitting smil file: ");
                                         ocUtils.log(e);
-                                        displayError("Error submitting smil file. Please try again.", "Error");
-					editor.enableContinueProcessingButton(true);
+                                        displayMsg("Error submitting smil file. Please try again.", "Error");
+                                        editor.enableContinueProcessing(true);
                                     });
                                 }
                             } else {
-                                displayError("The video has already been edited and is being processed. Please cancel editing.",
+                                displayMsg("The video has already been edited and is being processed. Please cancel editing.",
                                     "Cancel editing");
                             }
                         }
                     }).fail(function (error) {
-                        displayError("Could not get the workflow state. Please cancel editing.",
+                        displayMsg("Could not get the workflow state. Please cancel editing.",
                             "Cancel editing");
                     });
                 }
@@ -539,12 +548,20 @@ editor.saveSplitListHelper = function (startAtIndex) {
  * save smil
  */
 editor.saveSplitList = function (func) {
-    editor.continueWorkflowFunction = func;
-    if (!editor.error) {
-        editor.enableContinueProcessingButton(false);
+    if (func && (func != null)) {
+        editor.continueWorkflowFunction = func;
+    }
+    var continueProcessing_tmp = continueProcessing;
+    continueProcessing = true;
+    editor.enableContinueProcessing(true);
+    if (!editor.error && !isBuffering) {
+        displayMsg("Continuing processing. This may take a while.\nPlease wait...", "Continuing processing.");
+        editor.enableContinueProcessing(false);
         editor.createNewSmil(function () {
             editor.saveSplitListHelper(0);
         });
+    } else if (!continueProcessing_tmp && isBuffering) {
+        displayMsg("The player is currently buffering. After that the processing will continue.\nPlease wait...", "Wait for continue processing.");
     }
     return !editor.error;
 }
@@ -560,8 +577,8 @@ editor.updateSplitList = function (dontClickCancel, segmentsClickable) {
 
         var tmpTime = 0;
         $.each(editor.splitData.splits, function (index, value) {
-	    value.clipEnd = parseFloat(value.clipEnd);
-	    value.clipBegin = parseFloat(value.clipBegin);
+            value.clipEnd = parseFloat(value.clipEnd);
+            value.clipBegin = parseFloat(value.clipBegin);
             if (value.enabled && (value.clipEnd != undefined) && (value.clipBegin != undefined)) {
                 tmpTime += value.clipEnd - value.clipBegin;
             }
@@ -692,7 +709,7 @@ function getTimefieldTimeEnd() {
  *          whether enabled or not
  */
 function setEnabled(uuid, enabled) {
-    if (editor.splitData && editor.splitData.splits) {
+    if (!continueProcessing && editor.splitData && editor.splitData.splits) {
         editor.splitData.splits[uuid].enabled = enabled;
         editor.updateSplitList(false, !zoomedIn());
     }
@@ -702,7 +719,7 @@ function setEnabled(uuid, enabled) {
  * set current time as the new inpoint of selected item
  */
 function setCurrentTimeAsNewInpoint() {
-    if (editor.selectedSplit != null) {
+    if (!continueProcessing && (editor.selectedSplit != null)) {
         setTimefieldTimeBegin(getCurrentTime());
     }
 }
@@ -711,7 +728,7 @@ function setCurrentTimeAsNewInpoint() {
  * set current time as the new outpoint of selected item
  */
 function setCurrentTimeAsNewOutpoint() {
-    if (editor.selectedSplit != null) {
+    if (!continueProcessing && (editor.selectedSplit != null)) {
         setTimefieldTimeEnd(getCurrentTime());
     }
 }
@@ -722,10 +739,12 @@ function setCurrentTimeAsNewOutpoint() {
  * @param time time to set
  */
 function setCurrentTime(time) {
-    time = isNaN(time) ? 0 : time;
-    var duration = getDuration();
-    time = (time > duration) ? duration : time;
-    editor.player.prop("currentTime", time);
+    if (!continueProcessing) {
+        time = isNaN(time) ? 0 : time;
+        var duration = getDuration();
+        time = (time > duration) ? duration : time;
+        editor.player.prop("currentTime", time);
+    }
 }
 
 /**
@@ -734,7 +753,9 @@ function setCurrentTime(time) {
  * @param time time to set
  */
 function setTimefieldTimeBegin(time) {
-    $('#clipBegin').timefield('option', 'value', time);
+    if (!continueProcessing) {
+        $('#clipBegin').timefield('option', 'value', time);
+    }
 }
 
 /**
@@ -743,7 +764,9 @@ function setTimefieldTimeBegin(time) {
  * @param time time to set
  */
 function setTimefieldTimeEnd(time) {
-    $('#clipEnd').timefield('option', 'value', time);
+    if (!continueProcessing) {
+        $('#clipEnd').timefield('option', 'value', time);
+    }
 }
 
 /******************************************************************************/
@@ -827,112 +850,118 @@ function isInInterval(toCheck, lower, upper) {
  * check whether clipBegin is in the right format
  */
 function checkClipBegin() {
-    var clipBegin = getTimefieldTimeBegin();
-    if (isNaN(clipBegin) || (clipBegin < 0)) {
-        displayError("The inpoint is too low or the format is not correct. Correct format: hh:MM:ss.mm. Please check.",
-            "Check inpoint");
-        return false;
+    if (!continueProcessing) {
+        var clipBegin = getTimefieldTimeBegin();
+        if (isNaN(clipBegin) || (clipBegin < 0)) {
+            displayMsg("The inpoint is too low or the format is not correct. Correct format: hh:MM:ss.mm. Please check.",
+                "Check inpoint");
+            return false;
+        }
+        return true;
     }
-    return true;
 }
 
 /**
  * check whether clipEnd is in the right format
  */
 function checkClipEnd() {
-    var clipEnd = getTimefieldTimeEnd();
-    var duration = getDuration();
-    if (isNaN(clipEnd) || (clipEnd > duration)) {
-        displayError("The outpoint is too high or the format is not correct. Correct format: hh:MM:ss.mm. Please check.",
-            "Check outpoint");
-        return false;
+    if (!continueProcessing) {
+        var clipEnd = getTimefieldTimeEnd();
+        var duration = getDuration();
+        if (isNaN(clipEnd) || (clipEnd > duration)) {
+            displayMsg("The outpoint is too high or the format is not correct. Correct format: hh:MM:ss.mm. Please check.",
+                "Check outpoint");
+            return false;
+        }
+        return true;
     }
-    return true;
 }
 
 /**
  * checks previous and next segments
  */
 function checkPrevAndNext(id, checkTimefields) {
-    checkTimefields = checkTimefields || false;
-    var duration = getDuration();
-    var current = editor.splitData.splits[id];
-    var inserted = false;
-    if (editor.splitData && editor.splitData.splits) {
-        // new first item
-        if (id == 0) {
-            if (editor.splitData.splits.length > 1) {
-                var next = editor.splitData.splits[1];
+    if (!continueProcessing) {
+        checkTimefields = checkTimefields || false;
+        var duration = getDuration();
+        var current = editor.splitData.splits[id];
+        var inserted = false;
+        if (editor.splitData && editor.splitData.splits) {
+            // new first item
+            if (id == 0) {
+                if (editor.splitData.splits.length > 1) {
+                    var next = editor.splitData.splits[1];
+                    next.clipBegin = parseFloat(current.clipEnd);
+                }
+                if ((!checkTimefields || (checkTimefields && (getTimefieldTimeBegin() != 0))) && (current.clipBegin > minSegmentLength)) {
+                    ocUtils.log("Inserting a first split element (auto): (" + 0 + " - " + current.clipBegin + ")");
+                    var newSplitItem = {
+                        clipBegin: 0,
+                        clipEnd: parseFloat(current.clipBegin),
+                        enabled: true
+                    };
+                    inserted = true;
+
+                    // add new item to front
+                    editor.splitData.splits.splice(0, 0, newSplitItem);
+                    insertedFirstItem = true;
+                } else {
+                    ocUtils.log("Extending the first split element from (auto): (" + 0 + " - " + current.clipBegin + ")");
+                    current.clipBegin = 0;
+                }
+            }
+            // new last item
+            else if ((editor.splitData.splits.length > 0) && (id == editor.splitData.splits.length - 1)) {
+                if ((!checkTimefields || (checkTimefields && (getTimefieldTimeEnd() != duration))) && (current.clipEnd < (duration - minSegmentLength))) {
+                    ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
+                    var newLastItem = {
+                        clipBegin: parseFloat(current.clipEnd),
+                        clipEnd: parseFloat(duration),
+                        enabled: true
+                    };
+                    inserted = true;
+
+                    // add the new item to the end
+                    editor.splitData.splits.push(newLastItem);
+                    var prev = editor.splitData.splits[id - 1];
+                    prev.clipEnd = parseFloat(current.clipBegin);
+                    insertedLastItem = true;
+                } else {
+                    ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
+                    current.clipEnd = parseFloat(duration);
+                }
+            }
+            // in the middle
+            else if ((id > 0) && (id < (editor.splitData.splits.length - 1))) {
+                var prev = editor.splitData.splits[id - 1];
+                var next = editor.splitData.splits[id + 1];
+
+                if (checkTimefields && (getTimefieldTimeBegin() <= prev.clipBegin)) {
+                    displayMsg("The inpoint is lower than the begin of the last segment. Please check.",
+                        "Check inpoint");
+                    return {
+                        ok: false,
+                        inserted: false
+                    };
+                }
+                if (checkTimefields && (getTimefieldTimeEnd() >= next.clipEnd)) {
+                    displayMsg("The outpoint is bigger than the end of the next segment. Please check.",
+                        "Check outpoint");
+                    return {
+                        ok: false,
+                        inserted: false
+                    };
+                }
+
+                prev.clipEnd = parseFloat(current.clipBegin);
                 next.clipBegin = parseFloat(current.clipEnd);
             }
-            if ((!checkTimefields || (checkTimefields && (getTimefieldTimeBegin() != 0))) && (current.clipBegin > minSegmentLength)) {
-                ocUtils.log("Inserting a first split element (auto): (" + 0 + " - " + current.clipBegin + ")");
-                var newSplitItem = {
-                    clipBegin: 0,
-                    clipEnd: parseFloat(current.clipBegin),
-                    enabled: true
-                };
-                inserted = true;
-
-                // add new item to front
-                editor.splitData.splits.splice(0, 0, newSplitItem);
-                insertedFirstItem = true;
-            } else {
-                ocUtils.log("Extending the first split element from (auto): (" + 0 + " - " + current.clipBegin + ")");
-                current.clipBegin = 0;
-            }
         }
-        // new last item
-        else if ((editor.splitData.splits.length > 0) && (id == editor.splitData.splits.length - 1)) {
-            if ((!checkTimefields || (checkTimefields && (getTimefieldTimeEnd() != duration))) && (current.clipEnd < (duration - minSegmentLength))) {
-                ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
-                var newLastItem = {
-                    clipBegin: parseFloat(current.clipEnd),
-                    clipEnd: parseFloat(duration),
-                    enabled: true
-                };
-                inserted = true;
-
-                // add the new item to the end
-                editor.splitData.splits.push(newLastItem);
-                var prev = editor.splitData.splits[id - 1];
-                prev.clipEnd = parseFloat(current.clipBegin);
-                insertedLastItem = true;
-            } else {
-                ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
-                current.clipEnd = parseFloat(duration);
-            }
-        }
-        // in the middle
-        else if ((id > 0) && (id < (editor.splitData.splits.length - 1))) {
-            var prev = editor.splitData.splits[id - 1];
-            var next = editor.splitData.splits[id + 1];
-
-            if (checkTimefields && (getTimefieldTimeBegin() <= prev.clipBegin)) {
-                displayError("The inpoint is lower than the begin of the last segment. Please check.",
-                    "Check inpoint");
-                return {
-                    ok: false,
-                    inserted: false
-                };
-            }
-            if (checkTimefields && (getTimefieldTimeEnd() >= next.clipEnd)) {
-                displayError("The outpoint is bigger than the end of the next segment. Please check.",
-                    "Check outpoint");
-                return {
-                    ok: false,
-                    inserted: false
-                };
-            }
-
-            prev.clipEnd = parseFloat(current.clipBegin);
-            next.clipBegin = parseFloat(current.clipEnd);
-        }
+        return {
+            ok: true,
+            inserted: inserted
+        };
     }
-    return {
-        ok: true,
-        inserted: inserted
-    };
 }
 
 /******************************************************************************/
@@ -943,7 +972,7 @@ function checkPrevAndNext(id, checkTimefields) {
  * click handler for saving data in editing box
  */
 function okButtonClick() {
-    if (checkClipBegin() && checkClipEnd()) {
+    if (!continueProcessing && checkClipBegin() && checkClipEnd()) {
         id = $('#splitUUID').val();
         if (id != "") {
             var current = editor.splitData.splits[id];
@@ -952,7 +981,7 @@ function okButtonClick() {
             var duration = getDuration();
             id = parseInt(id);
             if (getTimefieldTimeBegin() > getTimefieldTimeEnd()) {
-                displayError("The inpoint is bigger than the outpoint. Please check and correct it.",
+                displayMsg("The inpoint is bigger than the outpoint. Please check and correct it.",
                     "Check and correct inpoint and outpoint");
                 selectSegmentListElement(id);
                 return;
@@ -1000,168 +1029,176 @@ function okButtonClick() {
  * click handler for canceling editing
  */
 function cancelButtonClick() {
-    $('#splitUUID').val('');
-    $('#splitDescription').val("");
-    setTimefieldTimeBegin(0);
-    setTimefieldTimeEnd(0);
-    $('#splitIndex').html('#');
-    $('.splitItem').removeClass('splitItemSelected');
-    $('.splitSegmentItem').removeClass('splitSegmentItemSelected');
-    editor.selectedSplit = null;
+    if (!continueProcessing) {
+        $('#splitUUID').val('');
+        $('#splitDescription').val("");
+        setTimefieldTimeBegin(0);
+        setTimefieldTimeEnd(0);
+        $('#splitIndex').html('#');
+        $('.splitItem').removeClass('splitItemSelected');
+        $('.splitSegmentItem').removeClass('splitSegmentItemSelected');
+        editor.selectedSplit = null;
+    }
 }
 
 /**
  * click/shortcut handler for removing current split item
  */
 function splitRemoverClick() {
-    item = $(this);
-    var id = item.prop('id');
-    if (id != undefined) {
-        id = id.replace("splitItem-", "");
-        id = id.replace("splitRemover-", "");
-        id = id.replace("splitAdder-", "");
-    } else {
-        id = "";
-    }
-    if (id == "" || id == "deleteButton") {
-        id = $('#splitUUID').val();
-    }
-    id = parseInt(id);
-    if (editor.splitData && editor.splitData.splits && editor.splitData.splits[id]) {
-        if (editor.splitData.splits[id].enabled) {
-            $('#splitItemDiv-' + id).addClass('disabled');
-            $('#splitRemover-' + id).hide();
-            $('#splitAdder-' + id).show();
-            $('.splitItem').removeClass('splitItemSelected');
-	    setEnabled(id, false);
-	    if(!zoomedIn()) {
-		if (getCurrentSplitItem().id == id) {
-                    // if current split item is being deleted:
-                    // try to select the next enabled segment, if that fails try to select the previous enabled item
-                    var sthSelected = false;
-                    for (var i = id; i < editor.splitData.splits.length; ++i) {
-			if (editor.splitData.splits[i].enabled) {
-                            sthSelected = true;
-                            selectSegmentListElement(i, true);
-                            break;
-			}
-                    }
-                    if (!sthSelected) {
-			for (var i = id; i >= 0; --i) {
-                            if (editor.splitData.splits[i].enabled) {
-				sthSelected = true;
-				selectSegmentListElement(i, true);
-				break;
-                            }
-			}
-                    }
-		}
-		selectCurrentSplitItem();
-	    }
+    if (!continueProcessing) {
+        item = $(this);
+        var id = item.prop('id');
+        if (id != undefined) {
+            id = id.replace("splitItem-", "");
+            id = id.replace("splitRemover-", "");
+            id = id.replace("splitAdder-", "");
         } else {
-            $('#splitItemDiv-' + id).removeClass('disabled');
-            $('#splitRemover-' + id).show();
-            $('#splitAdder-' + id).hide();
-	    setEnabled(id, true);
+            id = "";
         }
+        if (id == "" || id == "deleteButton") {
+            id = $('#splitUUID').val();
+        }
+        id = parseInt(id);
+        if (editor.splitData && editor.splitData.splits && editor.splitData.splits[id]) {
+            if (editor.splitData.splits[id].enabled) {
+                $('#splitItemDiv-' + id).addClass('disabled');
+                $('#splitRemover-' + id).hide();
+                $('#splitAdder-' + id).show();
+                $('.splitItem').removeClass('splitItemSelected');
+                setEnabled(id, false);
+                if (!zoomedIn()) {
+                    if (getCurrentSplitItem().id == id) {
+                        // if current split item is being deleted:
+                        // try to select the next enabled segment, if that fails try to select the previous enabled item
+                        var sthSelected = false;
+                        for (var i = id; i < editor.splitData.splits.length; ++i) {
+                            if (editor.splitData.splits[i].enabled) {
+                                sthSelected = true;
+                                selectSegmentListElement(i, true);
+                                break;
+                            }
+                        }
+                        if (!sthSelected) {
+                            for (var i = id; i >= 0; --i) {
+                                if (editor.splitData.splits[i].enabled) {
+                                    sthSelected = true;
+                                    selectSegmentListElement(i, true);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    selectCurrentSplitItem();
+                }
+            } else {
+                $('#splitItemDiv-' + id).removeClass('disabled');
+                $('#splitRemover-' + id).show();
+                $('#splitAdder-' + id).hide();
+                setEnabled(id, true);
+            }
+        }
+        cancelButtonClick();
     }
-    cancelButtonClick();
 }
 
 function setSplitListItemButtonHandler() {
-    $('.clipItem').timefield();
+    if (!continueProcessing) {
+        $('.clipItem').timefield();
 
-    // add evtl handler for enter in editing fields
-    $('#clipBegin input').focus(function (e) {
-        inputFocused = true;
-    });
-    $('#clipEnd input').focus(function (e) {
-        inputFocused = true;
-    });
-    $('#clipBegin input').blur(function (e) {
-        inputFocused = false;
-        okButtonClick();
-    });
-    $('#clipEnd input').blur(function (e) {
-        inputFocused = false;
-        okButtonClick();
-    });
-    $('#clipBegin input').keyup(function (e) {
-        var keyCode = e.keyCode || e.which();
-        if (keyCode == KEY_ENTER) {
+        // add evtl handler for enter in editing fields
+        $('#clipBegin input').focus(function (e) {
+            inputFocused = true;
+        });
+        $('#clipEnd input').focus(function (e) {
+            inputFocused = true;
+        });
+        $('#clipBegin input').blur(function (e) {
             inputFocused = false;
             okButtonClick();
-        }
-    });
-    $('#clipEnd input').keyup(function (e) {
-        var keyCode = e.keyCode || e.which();
-        if (keyCode == KEY_ENTER) {
+        });
+        $('#clipEnd input').blur(function (e) {
             inputFocused = false;
             okButtonClick();
-        }
-    });
+        });
+        $('#clipBegin input').keyup(function (e) {
+            var keyCode = e.keyCode || e.which();
+            if (keyCode == KEY_ENTER) {
+                inputFocused = false;
+                okButtonClick();
+            }
+        });
+        $('#clipEnd input').keyup(function (e) {
+            var keyCode = e.keyCode || e.which();
+            if (keyCode == KEY_ENTER) {
+                inputFocused = false;
+                okButtonClick();
+            }
+        });
+    }
 }
 
 /**
  * click handler for selecting a split item in segment bar or list
  */
 function splitItemClick() {
-    if (!isSeeking || (isSeeking && ($(this).prop('id').indexOf('Div-') == -1))) {
-        now = new Date();
-    }
+    if (!continueProcessing) {
+        if (!isSeeking || (isSeeking && ($(this).prop('id').indexOf('Div-') == -1))) {
+            now = new Date();
+        }
 
-    if ((now - lastTimeSplitItemClick) > 80) {
-        lastTimeSplitItemClick = now;
+        if ((now - lastTimeSplitItemClick) > 80) {
+            lastTimeSplitItemClick = now;
 
-        if (editor.splitData && editor.splitData.splits) {
-            // if not seeking
-            if ((isSeeking && ($(this).prop('id').indexOf('Div-') == -1)) || !isSeeking) {
-                // get the id of the split item
-                id = $(this).prop('id');
-                id = id.replace('splitItem-', '');
-                id = id.replace('splitItemDiv-', '');
-                id = id.replace('splitSegmentItem-', '');
-                $('#splitUUID').val(id);
+            if (editor.splitData && editor.splitData.splits) {
+                // if not seeking
+                if ((isSeeking && ($(this).prop('id').indexOf('Div-') == -1)) || !isSeeking) {
+                    // get the id of the split item
+                    id = $(this).prop('id');
+                    id = id.replace('splitItem-', '');
+                    id = id.replace('splitItemDiv-', '');
+                    id = id.replace('splitSegmentItem-', '');
+                    $('#splitUUID').val(id);
 
-                if (id != lastId) {
-                    if (!inputFocused) {
-                        lastId = id;
+                    if (id != lastId) {
+                        if (!inputFocused) {
+                            lastId = id;
 
-                        // remove all selected classes
-                        $('.splitSegmentItem').removeClass('splitSegmentItemSelected');
-                        $('.splitItem').removeClass('splitItemSelected');
-                        $('.splitItemDiv').removeClass('splitSegmentItemSelected');
+                            // remove all selected classes
+                            $('.splitSegmentItem').removeClass('splitSegmentItemSelected');
+                            $('.splitItem').removeClass('splitItemSelected');
+                            $('.splitItemDiv').removeClass('splitSegmentItemSelected');
 
-                        $('#clipItemSpacer').remove();
-                        $('#clipBegin').remove();
-                        $('#clipEnd').remove();
+                            $('#clipItemSpacer').remove();
+                            $('#clipBegin').remove();
+                            $('#clipEnd').remove();
 
-                        $('.segmentButtons', '#splitItem-' + id).append('<span class="clipItem" id="clipBegin"></span><span id="clipItemSpacer"> - </span><span class="clipItem" id="clipEnd"></span>');
-                        setSplitListItemButtonHandler();
+                            $('.segmentButtons', '#splitItem-' + id).append('<span class="clipItem" id="clipBegin"></span><span id="clipItemSpacer"> - </span><span class="clipItem" id="clipEnd"></span>');
+                            setSplitListItemButtonHandler();
 
-                        $('#splitSegmentItem-' + id).removeClass('hover');
+                            $('#splitSegmentItem-' + id).removeClass('hover');
 
-                        // load data into the segment
-                        var splitItem = editor.splitData.splits[id];
-                        editor.selectedSplit = splitItem;
-                        editor.selectedSplit.id = parseInt(id);
-                        setTimefieldTimeBegin(splitItem.clipBegin);
-                        setTimefieldTimeEnd(splitItem.clipEnd);
-                        $('#splitIndex').html(parseInt(id) + 1);
+                            // load data into the segment
+                            var splitItem = editor.splitData.splits[id];
+                            editor.selectedSplit = splitItem;
+                            editor.selectedSplit.id = parseInt(id);
+                            setTimefieldTimeBegin(splitItem.clipBegin);
+                            setTimefieldTimeEnd(splitItem.clipEnd);
+                            $('#splitIndex').html(parseInt(id) + 1);
 
-                        // add the selected class to the corresponding items
-                        $('#splitSegmentItem-' + id).addClass('splitSegmentItemSelected');
-                        $('#splitItem-' + id).addClass('splitItemSelected');
-                        $('#splitItemDiv-' + id).addClass('splitSegmentItemSelected');
+                            // add the selected class to the corresponding items
+                            $('#splitSegmentItem-' + id).addClass('splitSegmentItemSelected');
+                            $('#splitItem-' + id).addClass('splitItemSelected');
+                            $('#splitItemDiv-' + id).addClass('splitSegmentItemSelected');
 
-                        currSplitItem = splitItem;
+                            currSplitItem = splitItem;
 
-                        if (!timeoutUsed) {
-                            if (!currSplitItemClickedViaJQ) {
-                                setCurrentTime(splitItem.clipBegin);
+                            if (!timeoutUsed) {
+                                if (!currSplitItemClickedViaJQ) {
+                                    setCurrentTime(splitItem.clipBegin);
+                                }
+                                // update the current time of the player
+                                $('.video-timer').html(formatTime(getCurrentTime()) + "/" + formatTime(getDuration()));
                             }
-                            // update the current time of the player
-                            $('.video-timer').html(formatTime(getCurrentTime()) + "/" + formatTime(getDuration()));
                         }
                     }
                 }
@@ -1174,7 +1211,7 @@ function splitItemClick() {
  * click/shortcut handler for adding a split item at current time
  */
 function splitButtonClick() {
-    if (editor.splitData && editor.splitData.splits) {
+    if (!continueProcessing && editor.splitData && editor.splitData.splits) {
         var currentTime = getCurrentTime();
         for (var i = 0; i < editor.splitData.splits.length; ++i) {
             var splitItem = editor.splitData.splits[i];
@@ -1196,7 +1233,7 @@ function splitButtonClick() {
 
                 splitItem.clipEnd = currentTime;
                 editor.splitData.splits.splice(i + 1, 0, newItem);
-		// TODO Make splitSegments clickable when zoomed in
+                // TODO Make splitSegments clickable when zoomed in
                 editor.updateSplitList(false, !zoomedIn());
                 selectSegmentListElement(i + 1);
                 return;
@@ -1214,7 +1251,7 @@ function splitButtonClick() {
  * select the split segment at the current time
  */
 function selectCurrentSplitItem(excludeDeletedSegments) {
-    if (!isSeeking) {
+    if (!continueProcessing && !isSeeking) {
         excludeDeletedSegments = excludeDeletedSegments || false;
 
         var splitItem = getCurrentSplitItem();
@@ -1250,9 +1287,9 @@ function selectCurrentSplitItem(excludeDeletedSegments) {
             }
             if (idFound) {
                 currSplitItemClickedViaJQ = true;
-		if(!zoomedIn()) {
+                if (!zoomedIn()) {
                     $('#splitSegmentItem-' + id).click();
-		}
+                }
                 lastId = -1;
                 $('#descriptionCurrentTime').html(formatTime(getCurrentTime()));
             } else {
@@ -1267,7 +1304,7 @@ function selectCurrentSplitItem(excludeDeletedSegments) {
  */
 function selectSegmentListElement(number, dblClick) {
     dblClick = dblClick ? dblClick : false;
-    if (editor.splitData && editor.splitData.splits) {
+    if (!continueProcessing && editor.splitData && editor.splitData.splits) {
         var spltItem = editor.splitData.splits[number];
         if (spltItem) {
             setCurrentTime(spltItem.clipBegin);
@@ -1288,11 +1325,11 @@ function selectSegmentListElement(number, dblClick) {
 /******************************************************************************/
 
 /**
- * displays a graphical error
+ * displays a graphical message
  */
-function displayError(errorMsg, errorTitle) {
-    $('<div />').html(errorMsg).dialog({
-        title: errorTitle,
+function displayMsg(msg, title) {
+    $('<div />').html(msg).dialog({
+        title: title,
         resizable: false,
         buttons: {
             OK: function () {
@@ -1377,7 +1414,7 @@ function clearEvents2() {
     editor.player.on("play", {
         duration: 0,
         endTime: getDuration()
-    }, onPlay);
+    }, function () {});
     clearEvents();
 }
 
@@ -1436,7 +1473,9 @@ function onTimeout() {
  * play the video
  */
 function playVideo() {
-    editor.player[0].play();
+    if (getPlayerPaused()) {
+        editor.player[0].play();
+    }
 }
 
 /**
@@ -1917,12 +1956,6 @@ function addShortcuts() {
  * init the playbuttons in the editing box
  */
 function initPlayButtons() {
-    $('#shortcuts').button();
-    $('#shortcuts').click(function () {
-        $("#rightBoxDescription").toggle();
-        $("#rightBox").toggle();
-    });
-
     $('#clearList').button();
 
     $('#clearList').click(function () {
@@ -1965,22 +1998,22 @@ function updateWaveformClickEvent() {
     $('#segmentsWaveform').click(function (evt) {
         if (zoomedIn()) {
             if (evt) {
-		var offsetX = 0;
-		if(evt.offsetX != undefined) {
-		    offsetX = evt.offsetX;
-		}
-		// in firefox offsetX == undefined...
-		else {
-		    offsetX = evt.pageX - $('#segmentsWaveform').offset().left;
-		}
+                var offsetX = 0;
+                if (evt.offsetX != undefined) {
+                    offsetX = evt.offsetX;
+                }
+                // in firefox offsetX == undefined...
+                else {
+                    offsetX = evt.pageX - $('#segmentsWaveform').offset().left;
+                }
                 var currentTime = getCurrentTime();
                 var duration = getDuration();
                 var imgWidth = $('#waveformImage').width();
-		
+
                 var segLength = duration / imgWidth;
                 var nrSeg = segLength * offsetX;
                 setCurrentTime(nrSeg);
-	    }
+            }
         }
     });
 }
@@ -1995,23 +2028,23 @@ function prepareUI() {
 
     // try to load waveform image
     if (editor.mediapackageParser && editor.mediapackageParser.mediapackage && editor.mediapackageParser.mediapackage.attachments) {
-	var waveform_presenter = false;
-	var waveform_presentation = false;
-	var waveform_presenter_value;
-	var waveform_presentation_value;
+        var waveform_presenter = false;
+        var waveform_presentation = false;
+        var waveform_presenter_value;
+        var waveform_presentation_value;
         $.each(ocUtils.ensureArray(editor.mediapackageParser.mediapackage.attachments.attachment), function (key, value) {
             if (value.type == WAVEFORM_FLAVOR_PRESENTER) {
-		ocUtils.log("Found waveform presenter");
-		waveform_presenter = true;
-		waveform_presenter_value = value;
+                ocUtils.log("Found waveform presenter");
+                waveform_presenter = true;
+                waveform_presenter_value = value;
             } else if (value.type == WAVEFORM_FLAVOR_PRESENTATION) {
-		ocUtils.log("Found waveform presentation");
-		waveform_presentation = true;
-		waveform_presentation_value = value;
+                ocUtils.log("Found waveform presentation");
+                waveform_presentation = true;
+                waveform_presentation_value = value;
             }
         });
-	var value = waveform_presenter ? waveform_presenter_value : (waveform_presentation ? waveform_presentation_value : undefined);
-	if(waveform_presenter || waveform_presentation) {
+        var value = waveform_presenter ? waveform_presenter_value : (waveform_presentation ? waveform_presentation_value : undefined);
+        if (waveform_presenter || waveform_presentation) {
             $('#waveformImage').prop("src", value.url);
             $('#waveformImage').load(function () {
                 $('#segmentsWaveform').height($('#waveformImage').height());
@@ -2031,11 +2064,11 @@ function prepareUI() {
                     },
                     stop: function (event, ui) {
                         editor.updateSplitList(false, !zoomedIn());
-			selectCurrentSplitItem();
+                        selectCurrentSplitItem();
                     }
                 });
                 $("#waveformControls").show();
-		$("#slider-waveform-zoom .ui-slider-handle").unbind('keydown');
+                $("#slider-waveform-zoom .ui-slider-handle").unbind('keydown');
             });
             $(window).resize(function (evt) {
                 if (waveformImageLoadDone) {
@@ -2050,11 +2083,11 @@ function prepareUI() {
                     setWaveformWidth(currWaveformZoom);
                 }
             });
-	} else {
+        } else {
             ocUtils.log("Did not find waveform");
             $('#waveformImage').hide();
             $('#slider-waveform-zoom').hide();
-	}
+        }
     } else {
         ocUtils.log("Did not find waveform");
         $('#waveformImage').hide();
@@ -2165,10 +2198,6 @@ function parseInitialSMIL() {
     editor.splitData.splits[editor.splitData.splits.length - 1].enabled = !insertedLastItem;
 
     window.setTimeout(function () {
-        // if (!isBrowser("ie")) {
-        // playVideo();
-        // pauseVideo();
-        // }
         if (!insertedFirstItem) {
             if (editor.splitData.splits.length == 1) {
                 $('#splitSegmentItem-0').css('width', '100%');
@@ -2234,28 +2263,28 @@ function playerReady() {
         editor.smil = null;
         editor.parsedSmil = null;
         if (workflowInstance.mediapackage && workflowInstance.mediapackage.metadata && workflowInstance.mediapackage.metadata.catalog) {
-	    var presenter_smil = false;
-	    var presentation_smil = false;
-	    var episode_smil = false;
+            var presenter_smil = false;
+            var presentation_smil = false;
+            var episode_smil = false;
             $.each(workflowInstance.mediapackage.metadata.catalog, function (key, value) {
                 // load smil if there is already one
                 if (value.type == SMIL_FLAVOR_PRESENTER) {
-		    presenter_smil = true;
-		    console.log("Found presenter smil");
-                } else if(value.type == SMIL_FLAVOR_PRESENTATION) {
-		    presentation_smil = true;
-		    console.log("Found presentation smil");
-                } else if(value.type == SMIL_FLAVOR_EPISODE) {
-		    episode_smil = true;
-		    console.log("Found episode smil");
+                    presenter_smil = true;
+                    console.log("Found presenter smil");
+                } else if (value.type == SMIL_FLAVOR_PRESENTATION) {
+                    presentation_smil = true;
+                    console.log("Found presentation smil");
+                } else if (value.type == SMIL_FLAVOR_EPISODE) {
+                    episode_smil = true;
+                    console.log("Found episode smil");
                 }
             });
-	    if(presenter_smil || presentation_smil || episode_smil) {
-		// download smil
-		editor.getSmil(function () {
+            if (presenter_smil || presentation_smil || episode_smil) {
+                // download smil
+                editor.getSmil(function () {
                     parseInitialSMIL();
-		});
-	    }
+                });
+            }
         }
     }
 }
@@ -2272,7 +2301,7 @@ function isBrowser(browser) {
     case "safari":
         return Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
     case "ie":
-        return /*@cc_on!@*/ false || !! document.documentMode;
+        return /*@cc_on!@*/ false || !!document.documentMode;
     default:
         return false;
     }
@@ -2293,14 +2322,14 @@ function renewSessionID() {
                 if (data.workflow.state.toLowerCase() == "paused") {
                     renewSessionID();
                 } else {
-                    displayError("The video has already been edited and is being processed. Please cancel editing.",
+                    displayMsg("The video has already been edited and is being processed. Please cancel editing.",
                         "Cancel editing");
                 }
             }
         }).fail(function (error) {
             ocUtils.log("Failed renewing session ID.");
 
-            displayError("Could not renew the session ID. Please cancel editing.",
+            displayMsg("Could not renew the session ID. Please cancel editing.",
                 "Cancel editing");
 
             renewSessionID();
@@ -2383,6 +2412,31 @@ $(document).ready(function () {
             clearEvents2();
         }
         currSplitItemClickedViaJQ = false;
+    });
+
+    $(document).on("sjs:buffering", function (event) {
+        isBuffering = true;
+        this.bufferingTimeout = setTimeout(function () {
+            $(document).trigger("sjs:bufferedButNotAutoplaying", []);
+        }, bufferingTimeoutMS);
+    });
+    $(document).on("sjs:bufferedAndAutoplaying", function (event) {
+        isBuffering = false;
+        if (this.bufferingTimeout) {
+            clearTimeout(this.bufferingTimeout);
+        }
+        if (continueProcessing) {
+            editor.saveSplitList(null);
+        }
+    });
+    $(document).on("sjs:bufferedButNotAutoplaying", function (event) {
+        isBuffering = false;
+        if (this.bufferingTimeout) {
+            clearTimeout(this.bufferingTimeout);
+        }
+        if (continueProcessing) {
+            editor.saveSplitList(null);
+        }
     });
 
     $(window).resize(function () {
