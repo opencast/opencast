@@ -25,9 +25,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-       <groupId>org.opencastproject</groupId>
-       <artifactId>matterhorn-workflow-service-api</artifactId>
-       <version>${project.version}</version>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-workflow-service-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -326,7 +326,8 @@
               org.springframework.security.oauth.provider.token;version=1.0.0.M1,
             </Export-Package>
             <Service-Component>
-              OSGI-INF/cleansessions.xml, 
+              OSGI-INF/cleansessions.xml,
+              OSGI-INF/email-template-scanner.xml, 
               OSGI-INF/http-client-factory.xml,
               OSGI-INF/http-client.xml,
               OSGI-INF/http-context.xml,
@@ -340,7 +341,6 @@
               OSGI-INF/pingback.xml,
               OSGI-INF/rest.xml,
               OSGI-INF/security-service.xml,
-              OSGI-INF/email-template-scanner.xml,
               OSGI-INF/smtp-service.xml,
               OSGI-INF/remote-user-and-role-filter.xml,
               OSGI-INF/security-config-scanner.xml,
