@@ -8,5 +8,7 @@ source "${HOME3P}/utilx"
 #
 download .      || exit 1
 download flac   || exit 1
+download mad    || exit 1
+download id3tag || exit 1
 #
 exit 0

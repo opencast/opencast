@@ -1,4 +1,4 @@
-URL: http://heanet.dl.sourceforge.net/project/faac/faac-src/faac-1.28 ${USASK_MIRROR}
+URL: http://heanet.dl.sourceforge.net/project/faac/faac-src/faac-1.28 ${USASK_MIRROR} ${ETH_MIRROR}
 PKG: faac-1.28.tar.gz
 SHA: d00b023a3642f81bb1fb13d962a65079121396ee
 DIR: faac-1.28

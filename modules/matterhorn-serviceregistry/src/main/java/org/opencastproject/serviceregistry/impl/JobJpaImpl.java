@@ -327,7 +327,7 @@ public class JobJpaImpl extends JaxbJob {
   }
 
   @Lob
-  @Column(name = "payload", length = 65535)
+  @Column(name = "payload", length = 16777215)
   @XmlElement
   @Override
   public String getPayload() {

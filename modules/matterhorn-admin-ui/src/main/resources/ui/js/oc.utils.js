@@ -126,7 +126,7 @@ ocUtils.getDateString = function(date, compact) {
   var yearSeparator = " ";
   var d = date;
   var datestring = "";
-  if (typeof compact === "undefined" || !compact) {
+  if (compact == undefined || !compact) {
     datestring += days[d.getDay()];
     datestring += daySeparator;
   }
@@ -228,6 +228,17 @@ ocUtils.fromUTCDateStringToFormattedTime = function(UTCDate, duration) {
   return duration!=null ? (ocUtils.getDateString(date) + dateTimeSeparator + ocUtils.getTimeString(date) + ocUtils.getDuration(duration)) : (ocUtils.getDateString(date) + dateTimeSeparator + ocUtils.getTimeString(date)) ;
 }
 
+/** converts a timestamp to a human readable date and time string
+ * @param timestamp
+ * @return formatted date and time string
+ */
+ocUtils.fromTimestampToFormattedTime = function(timestamp) {
+	var dateTimeSeparator = " - ";
+	var dt = new Date(); 
+	dt.setTime(timestamp);
+	return ocUtils.getDateString(dt) + dateTimeSeparator + ocUtils.getTimeString(dt); 
+}
+
 /* Convert Date object to yyyy-MM-dd'T'HH:mm:ss'Z' string.
  *
  */
@@ -270,6 +281,7 @@ ocUtils.log = function(){
   if(window.console){
     try{
       window.console && console.log.apply(console,Array.prototype.slice.call(arguments));
+      $('#console').append(arguments[0] + " <br/>");
     }catch(e){
       console.log(e);
     }

@@ -47,6 +47,10 @@ cp ../configure.ac .
 LDFLAGS='-L${LOCAL_PREFIX}/lib -Wl,-rpath,${LOCAL_PREFIX}/lib' \
 LIBS=-lgif
 [ $? -ne 0 ] && exit 1
+#
+patch -p 1 < ../tesseract-3.01-missing_header.patch
+[ $? -ne 0 ] && exit 1
+#
 make
 [ $? -ne 0 ] && exit 1
 #

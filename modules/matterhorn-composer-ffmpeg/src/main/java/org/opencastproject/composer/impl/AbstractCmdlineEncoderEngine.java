@@ -357,6 +357,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       for (Map.Entry<String, String> e : params.entrySet()) {
         result = result.replace("#{" + e.getKey() + "}", e.getValue());
       }
+      result = result.replace("#{space}", " ");
       command.add(result);
     }
     return command;
