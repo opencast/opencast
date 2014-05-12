@@ -212,6 +212,7 @@
               OSGI-INF/operations/error-handler.xml,
               OSGI-INF/operations/error-resolution.xml,
               OSGI-INF/operations/failing.xml,
+              OSGI-INF/operations/http-notify.xml,
               OSGI-INF/operations/image.xml,
               OSGI-INF/operations/image-to-video.xml,
               OSGI-INF/operations/ingest.xml,
