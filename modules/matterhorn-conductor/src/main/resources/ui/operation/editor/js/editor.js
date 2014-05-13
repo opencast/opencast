@@ -721,6 +721,7 @@ function setEnabled(uuid, enabled) {
 function setCurrentTimeAsNewInpoint() {
     if (!continueProcessing && (editor.selectedSplit != null)) {
         setTimefieldTimeBegin(getCurrentTime());
+	okButtonClick();
     }
 }
 
@@ -730,6 +731,7 @@ function setCurrentTimeAsNewInpoint() {
 function setCurrentTimeAsNewOutpoint() {
     if (!continueProcessing && (editor.selectedSplit != null)) {
         setTimefieldTimeEnd(getCurrentTime());
+	okButtonClick();
     }
 }
 
@@ -883,10 +885,10 @@ function checkClipEnd() {
 function checkPrevAndNext(id, checkTimefields) {
     if (!continueProcessing) {
         checkTimefields = checkTimefields || false;
-        var duration = getDuration();
-        var current = editor.splitData.splits[id];
         var inserted = false;
         if (editor.splitData && editor.splitData.splits) {
+            var duration = getDuration();
+            var current = editor.splitData.splits[id];
             // new first item
             if (id == 0) {
                 if (editor.splitData.splits.length > 1) {
@@ -991,6 +993,17 @@ function okButtonClick() {
                 if (editor.splitData && editor.splitData.splits) {
                     current.clipBegin = getTimefieldTimeBegin();
                     current.clipEnd = getTimefieldTimeEnd();
+		    if(id > 0) {
+			if(current.clipBegin > editor.splitData.splits[id - 1].clipBegin) {
+			    editor.splitData.splits[id - 1].clipEnd = current.clipBegin;
+			} else {
+			    displayMsg("The inpoint is bigger than the inpoint of the segment before this segment. Please check and correct it.",
+				       "Check and correct inpoint");
+			    setTimefieldTimeBegin(editor.splitData.splits[id - 1].clipEnd);
+			    selectSegmentListElement(id);
+			    return;
+			}
+		    }
 
                     var last = editor.splitData.splits[editor.splitData.splits.length - 1];
                     if (last.clipEnd < duration) {
