@@ -721,7 +721,6 @@ function setEnabled(uuid, enabled) {
 function setCurrentTimeAsNewInpoint() {
     if (!continueProcessing && (editor.selectedSplit != null)) {
         setTimefieldTimeBegin(getCurrentTime());
-	var id = $('#splitUUID').val();
 	okButtonClick();
     }
 }
