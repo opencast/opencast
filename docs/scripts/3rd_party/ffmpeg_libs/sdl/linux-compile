@@ -26,7 +26,7 @@ patch -p 1 < ../libsdl-1.2.15-const-xdata32.patch
 ./autogen.sh
 [ $? -ne 0 ] && exit 1
 #
-./configure
+./configure --prefix=$LOCAL_PREFIX
 [ $? -ne 0 ] && exit 1
 make
 [ $? -ne 0 ] && exit 1

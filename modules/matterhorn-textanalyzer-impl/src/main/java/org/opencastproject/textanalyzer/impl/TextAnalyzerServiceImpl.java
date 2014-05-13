@@ -51,6 +51,7 @@ import org.opencastproject.textextractor.api.TextFrame;
 import org.opencastproject.textextractor.api.TextLine;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
+import org.opencastproject.metadata.mpeg7.Textual;
 
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -310,8 +311,11 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
       if (line.getText() != null) {
         VideoText videoText = new VideoTextImpl(id + "-" + i++);
         videoText.setBoundary(line.getBoundaries());
-        videoText.setText(dictionaryService.cleanUpText(line.getText()));
-        videoTexts.add(videoText);
+        Textual text = dictionaryService.cleanUpText(line.getText());
+        if (text != null) {
+          videoText.setText(text);
+          videoTexts.add(videoText);
+        }
       }
     }
 
