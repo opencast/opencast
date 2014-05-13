@@ -1085,8 +1085,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     boolean authorized = currentUser.hasRole(GLOBAL_ADMIN_ROLE)
             || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(workflowOrgId))
             || currentUser.equals(workflowCreator)
-            || (authorizationService.hasPermission(mediapackage, WRITE_PERMISSION) && currentOrgId
-                    .equals(workflowOrgId));
+            || (authorizationService.hasPermission(mediapackage, action) && currentOrgId.equals(workflowOrgId));
 
     if (!authorized) {
       throw new UnauthorizedException(currentUser, action);

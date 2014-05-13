@@ -39,8 +39,8 @@ public class TesseractTextFrameTest {
   /** The test frame */
   protected TextFrame textFrame = null;
 
-  /** The text without punctuation */
-  protected String text = "Land and Vegetation Key players on the";
+  /** The text used for the tests */
+  protected String text = "Land and Vegetation: Key players on the";
 
   /** Number of lines on the frame */
   protected int linesOnFrame = 2;

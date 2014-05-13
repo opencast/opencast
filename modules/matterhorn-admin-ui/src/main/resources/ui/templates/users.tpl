@@ -15,8 +15,7 @@
             <%= user.username %>
           </td>
           <td class="ui-state-active">
-            <input type="text" disabled="disabled" id="text_<%= user.username %>" size="50" value="<%= user.roles %>"/>
-            <!-- <input type="button" class="roleButton" id="button_<%= user.username %>" value="update"/> -->
+            <%= user.roles %>
           </td>
         </tr>
         <% }); %>

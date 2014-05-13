@@ -24,9 +24,12 @@ target/
 */.svn/*
 
 # Ignore all temporary editor files
-.*.swp
+*.swp
 
 # Ignore Maven files and local repository
 /.m2/
 /settings.xml
 
+# Ignore Makefiles
+# Sometimes they help, but they should never be tracked
+Makefile
