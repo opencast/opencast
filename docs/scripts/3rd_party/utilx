@@ -35,6 +35,35 @@ echox() {
   echo $ECHO
 }
 #
+# Clean-up PATH (remove double entries, ...)
+#
+cleanpath() {
+  echo "$1" | awk 'BEGIN { colon = 0; } {
+  n = split($0, a, ":");
+  for (ii = 1; ii <= n; ii++) {
+    gsub("/+", "/", a[ii]);
+    if (a[ii] != "/") { sub("/$", "", a[ii]); }
+    if (a[ii] == ".") { a[ii] = ""; }
+    curr = a[ii];
+    if (f[curr] == 0) {
+      if (ii == 1) {
+        if (length(curr) == 0) {
+          printf(":"); colon = 1;
+        }
+        else { printf("%s", curr); }
+      }
+      else {
+        if (colon) {
+          printf("%s", curr); colon = 0;
+        }
+        else { printf(":%s", curr); }
+      }
+      f[curr] = 1;
+    }
+  }
+}'
+}
+#
 # full path of file(s)
 #
 fullpath() {
@@ -588,9 +617,9 @@ fix_scons() {
 /usr/lib/scons-1.2.0/SCons/Tool/mingw.py
 /usr/lib/scons-2.0.1/SCons/Tool/mingw.py
 /usr/lib/scons/SCons/Tool/mingw.py
-/usr/local/lib/scons-1.2.0/SCons/Tool/mingw.py
-/usr/local/lib/scons-2.0.1/SCons/Tool/mingw.py
-/usr/local/lib/scons/SCons/Tool/mingw.py
+$LOCAL_PREFIX/lib/scons-1.2.0/SCons/Tool/mingw.py
+$LOCAL_PREFIX/lib/scons-2.0.1/SCons/Tool/mingw.py
+$LOCAL_PREFIX/lib/scons/SCons/Tool/mingw.py
 EOF
   [ $? -ne 0 ] && return 1
   for file in `cat files.lst`; do
@@ -616,6 +645,8 @@ export GNU_MIRROR=`getmcfg GNU_MIRROR:`
 export USASK_MIRROR=`getmcfg USASK_MIRROR:`
 export ETH_MIRROR=`getmcfg ETH_MIRROR:`
 export MACPORTS_SVN=`getmcfg MACPORTS_SVN:`
+#
+export PATH=`cleanpath "${LOCAL_PREFIX}/bin:$PATH"`
 #
 [ "$XTRACE" = "on" ] && set -x
 return 0

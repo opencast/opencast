@@ -7,6 +7,8 @@ source "${HOME3P}/utilx"
 [ $? -ne 0 ] && exit 1
 #
 [ -f .done-mac ] && exit 0
+TMPFILE=`mktemp /tmp/${0##*/}.XXXXX`
+trap 'rm -f $TMPFILE' 0
 pkg=`getcfg PKG:`
 chkpkg "$pkg" || exit 1
 dir=`getcfg DIR:`
@@ -21,13 +23,19 @@ cd "${dir}-mac"
 unzip -ao "../$pkg"
 [ $? -ne 0 ] && exit 1
 #
+chmod 644 Jambase Jamfile
+[ $? -ne 0 ] && exit 1
+sed 's|$LOCAL_PREFIX|'$LOCAL_PREFIX'|' ../Jambase > $TMPFILE
+[ $? -ne 0 ] && exit 1
+cp $TMPFILE Jambase
+[ $? -ne 0 ] && exit 1
 cp ../Jamfile .
 [ $? -ne 0 ] && exit 1
 make
 [ $? -ne 0 ] && exit 1
 #
 # Copy bin.linuxx86/jam to ${LOCAL_PREFIX}/bin
-sudox ./jam0 install
+sudox ./jam0 -sBINDIR=${LOCAL_PREFIX}/bin -sLIBDIR=${LOCAL_PREFIX}/bin -sMANDIR=${LOCAL_PREFIX}/share/man install
 [ $? -ne 0 ] && exit 1
 #
 touch ../.done-mac
