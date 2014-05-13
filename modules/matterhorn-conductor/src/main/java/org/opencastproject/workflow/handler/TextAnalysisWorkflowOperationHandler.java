@@ -423,10 +423,17 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
           Catalog catalog = null;
           try {
             Job job = serviceRegistry.getJob(j.getId());
+            if (!Job.Status.FINISHED.equals(job.getStatus()))
+              continue;
             catalog = (Catalog) MediaPackageElementParser.getFromXml(job.getPayload());
-            workspace.delete(catalog.getURI());
+            if (catalog != null)
+              workspace.delete(catalog.getURI());
           } catch (Exception e) {
-            logger.warn("Unable to delete temporary text file {}: {}", catalog.getURI(), e);
+            if (catalog != null) {
+              logger.warn("Unable to delete temporary text file {}: {}", catalog.getURI(), e);
+            } else {
+              logger.warn("Unable to parse textextraction payload of job {}", j.getId());
+            }
           }
         }
       }
@@ -455,11 +462,6 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
       throw new IOException("Unable to open catalog " + catalog + ": " + e.getMessage());
     } finally {
       IOUtils.closeQuietly(in);
-      try {
-        workspace.delete(catalog.getURI());
-      } catch (NotFoundException e) {
-        throw new IOException(e);
-      }
     }
   }
 

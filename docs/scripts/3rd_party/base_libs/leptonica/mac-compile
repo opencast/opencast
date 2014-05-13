@@ -21,8 +21,7 @@ mv "$dir" "${dir}-mac"
 cd "${dir}-mac"
 [ $? -ne 0 ] && exit 1
 #
-./configure \
---prefix=${LOCAL_PREFIX}
+./configure --prefix=$LOCAL_PREFIX
 [ $? -ne 0 ] && exit 1
 make
 [ $? -ne 0 ] && exit 1
