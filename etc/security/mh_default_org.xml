@@ -154,6 +154,8 @@
     <property name="welcomePages">
       <map>
         <entry key="ROLE_ADMIN" value="/welcome.html" />
+        <entry key="ROLE_COURSE_ADMIN" value="/welcome.html" />
+        <entry key="ROLE_INSTRUCTOR" value="/welcome.html" />
         <entry key="ROLE_USER" value="/engage/ui/index.html" />
         <entry key="*" value="/engage/ui/index.html" /> <!-- Any role not listed explicitly will redirect here -->
       </map>
