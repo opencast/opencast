@@ -121,7 +121,7 @@ a.secondaryButton:hover,a.secondaryButton:focus {
 }
 
 #splitElementsHolder {
-  height: 340px;
+  height: 600px;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -140,7 +140,7 @@ a.secondaryButton:hover,a.secondaryButton:focus {
   float: left;
   border: 1px solid black;
   width: 69%;
-  height: 400px;
+  height: 600px;
   overflow-y: hidden;
   overflow-x: hidden;
 }
