@@ -63,7 +63,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new SearchException("Unable to assemble a remote search request for mediapackage " + mediaPackage, e);
     }
