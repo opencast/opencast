@@ -44,7 +44,7 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
   /** The ffmpeg commandline suffix */
   public static final String CMD_SUFFIX = "ffmpeg.command";
 
-  private static final String CONFIG_FFMPEG_PATH = "org.opencastproject.composer.ffmpegpath";
+  private static final String CONFIG_FFMPEG_PATH = "org.opencastproject.composer.ffmpeg.path";
 
   /** Format for trim times */
   private static final String TIME_FORMAT = "%02d:%02d:";
