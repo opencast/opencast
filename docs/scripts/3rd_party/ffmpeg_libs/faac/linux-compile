@@ -27,7 +27,7 @@ sed 's/external_mp4v2=no/external_mp4v2=yes/' configure > $TMPFILE
 [ $? -ne 0 ] && exit 1
 cp $TMPFILE configure
 [ $? -ne 0 ] && exit 1
-./configure
+./configure --prefix=$LOCAL_PREFIX
 [ $? -ne 0 ] && exit 1
 make
 [ $? -ne 0 ] && exit 1

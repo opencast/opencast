@@ -65,9 +65,9 @@ import java.util.UUID;
  */
 public class GStreamerServiceImpl extends AbstractJobProducer implements GStreamerService {
   /** If no specific location is configured for the gstreamer command this location is used by default. **/
-  public static final String DEFAULT_GSTREAMER_LOCATION = "/usr/bin/gst-launch";
+  public static final String DEFAULT_GSTREAMER_LOCATION = "gst-launch";
   /** The key defining a custom gstreamer location.  **/
-  public static final String CONFIG_GSTREAMER_LOCATION_KEY = "org.opencastproject.export.gstreamerpath";
+  public static final String CONFIG_GSTREAMER_LOCATION_KEY = "org.opencastproject.export.gstreamer.path";
   /** The location of the gstreamer binary for running commands. **/
   private String gstreamerLocation = DEFAULT_GSTREAMER_LOCATION;
 
