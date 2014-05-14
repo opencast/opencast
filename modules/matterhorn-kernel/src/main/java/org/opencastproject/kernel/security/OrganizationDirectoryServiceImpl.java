@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -141,6 +142,12 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
 
   @Override
   public List<Organization> getOrganizations() {
+    if (persistence == null) {
+      logger.debug("No persistence available: Returning only default organization");
+      List<Organization> orgs = new ArrayList<Organization>();
+      orgs.add(defaultOrganization);
+      return orgs;
+    }
     return cache.getAll();
   }
 
