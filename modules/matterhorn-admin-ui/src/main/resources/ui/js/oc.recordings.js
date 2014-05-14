@@ -8,12 +8,8 @@ ocRecordings = new (function() {
   var SEARCH_URL = '../search';
   var ENGAGE_URL = '';
 
-  var STATISTICS_DELAY = 3000;     // time interval for statistics update
-
   var UPCOMMING_EVENTS_GRACE_PERIOD = 30 * 1000;
   var END_OF_CAPTURE_GRACE_PERIOD = 3600 * 1000;
-  
-  
 
   var SORT_FIELDS = {
     'Title' : 'TITLE',
@@ -394,7 +390,7 @@ ocRecordings = new (function() {
   this.startStatisticsUpdate = function() {
     refreshStatistics();
     if(ocRecordings.statsInterval == null) {
-      ocRecordings.statsInterval = window.setInterval(refreshStatistics, STATISTICS_DELAY);
+      ocRecordings.statsInterval = window.setInterval(refreshStatistics, ocRecordings.Configuration.refresh * 1000);
     }
   }
 
@@ -839,9 +835,11 @@ ocRecordings = new (function() {
     ocUtils.log('Setting Refresh to ' + enable + " - " + delay + " sec");
     ocRecordings.Configuration.doRefresh = enable;
     ocRecordings.disableRefresh();
+    ocRecordings.stopStatisticsUpdate();
     if (enable) {
       ocRecordings.refreshInterval = window.setInterval(refresh, delay * 1000);
     }
+    ocRecordings.startStatisticsUpdate();
   }
 
   /** $(document).ready()

@@ -133,19 +133,23 @@ ocStatistics = new (function() {
 		          url: SERVERS_STATS_URL,
 		          dataType: 'json',
 		          success: function (data) {
-		            var servicesInWarningState = 0;
-		            var badge = $('#statistics_badge');
-		            $.each(data.statistics.service, function(index, serviceInstance) {
-                        var serviceState = serviceInstance.serviceRegistration.service_state;
-                        if (serviceState != null && serviceState != 'NORMAL') {
-		                  servicesInWarningState ++;
-		         		}
-		            });
-		            if (servicesInWarningState > 0) {
-		                badge.html(servicesInWarningState);
-		            } else {
-		          	  badge.empty();
-		            }
+		        	//TODO: This should really just call the same function in the init html...
+	        	    var url = '/services/servicewarnings';
+	                $.ajax(
+	                {
+  	                  url: url,
+	                  dataType: 'json',
+	                  success: function (data)
+                      {
+	                    var servicesInWarningState = data;
+	                    var badge = $('#statistics_badge');
+	                    if (servicesInWarningState > 0) {
+	                      badge.html(data);
+	                    } else {
+	                      badge.empty();
+	                    }
+                      }
+                    });
 		          }
 		        });
     		}, this)
