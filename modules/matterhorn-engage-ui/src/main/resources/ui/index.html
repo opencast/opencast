@@ -1,240 +1,65 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html lang="en">
-  <!------------------------- HEAD ------------------------->
-  <head>
-    <title>Search Media | Opencast Matterhorn</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="shortcut icon" href="/engage/ui/img/favicon.ico">
-    <!-- styles -->
-    <link rel="stylesheet" type="text/css" href="/engage/ui/css/player-multi-hybrid/opencast-reset.css" />
-    <link rel="stylesheet" type="text/css" href="/engage/ui/css/oc.search.browse.css" />
-    <link rel="stylesheet" type="text/css" href="/engage/ui/css/oc.pager.css" />
-    <link rel="stylesheet" type="text/css" href="/engage/ui/css/player/shared.css">
-    <!-- scripts -->
-    <script type="text/javascript" src="/engage/ui/js/jquery/jquery.js"></script>
-    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.utils.js"></script>
-    <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.xslt.new.js"></script>
-    <script type="text/javascript" src="/engage/ui/js/oc-pager.js"></script>
-    <script type="text/javascript" src="/engage/ui/js/engage-ui.js"></script>
-    <script type="text/javascript" src="/engage/ui/js/ext/moment.min.js"></script>
-    <script type="text/javascript" src="/engage/ui/js/ext/date.helper.js"></script>
-    <script type="text/javascript">
-      $(document).ready(function(){
-            
-        var page = Opencast.pager.getCurrentPageID();
-        var searchQuery = Opencast.pager.getCurrentSearchQuery();
-        var restEndpoint = "../../search/episode.xml?";
-                
-        var keywordString = "";
-                
-        if (searchQuery != null && searchQuery != "") {
-          restEndpoint = restEndpoint + "q=" + searchQuery + "&";
-                    
-          // replace all occurences of + by a space
-          searchQuery = searchQuery.replace(/\+/g, " ");
-                    
-          keywordString = " for “" + unescape(searchQuery) + "”";
-                    
-          $('#searchField').attr("value", unescape(searchQuery));
-                    
-        }
-        
-        if ($.getURLParameter('series') != "" && $.getURLParameter('series') != null) {
-          restEndpoint += "sid=" + $.getURLParameter('series') + "&";
-        }
-       
-        var org_data;
-        //check whether a user is logged in and show logout link 
-        $.ajax({
-          url: '/info/me.json',
-          type: 'GET',
-          dataType: 'json',
-          success: function(data)
-              {
-                  if (data.username != "anonymous")
-                  {
-                      $('#logout').show();
-                  }
-                  org_data=data;
-              }
-          });
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- styles -->
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/engage-ui.css">
+	
+	<!-- scripts -->
+	<script type="text/javascript" src="/engage/ui/js/jquery/jquery.js"></script>
+	<script src="js/jquery.liveSearch.js"></script>
+	<script src="js/seedrandom.js"></script>
+	<script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.utils.js"></script>
+	
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/engage-ui.js"></script>
+	<!--<script src="js/engage-ui-mobile.js"></script>-->
+	<!--<script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>-->
 
-        $.ajax({
-          url: '/info/components.json',
-          type: 'GET',
-          dataType: 'json',
-          success: function(components)
-              {
-                  var admin_role = org_data.org.adminRole;
-                  if ($.inArray(admin_role, org_data.roles) == -1) {
-                    $('a#logolink').attr('href', components.engage + '/engage/ui');
-                  }
-              }
-          });
-                  
+	<!--ensure proper rendering and touch zooming-->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
+	<title>Media Module</title>
+</head>
+<body>
+	<div class="navbar navbar-default navbar-fixed-top" role="navigation">
 
-          restEndpoint = restEndpoint + "limit=10";
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	            <span class="sr-only">Toggle navigation</span>
+	            <span class="icon-bar"></span>
+	            <span class="icon-bar"></span>
+	            <span class="icon-bar"></span>
+          		</button>
 
-          restEndpoint = restEndpoint + "&offset=" + (page - 1) * 10;
+          		<a class="navbar-brand" href="/">Opencast Matterhorn</a>
+			</div>
+				<div class="collapse navbar-collapse">
+          			<ul class="nav navbar-nav" id="nav-switch">
+		            	<li id="navbarEpisodes" data-search="episodes" class="active"><a>Episodes</a></li>
+		            	<li id="navbarSeries" data-search="series"><a>Series</a></li>
+         			</ul>
 
-          restEndpoint = restEndpoint + "&_=" + new Date().getTime(); // workaround for IE ajax caching problem
+					<form id="oc-search-form" class="navbar-form navbar-right" role="search" autocomplete="off">
+			        	<div class="form-group">
+			         		<input type="text" class="form-control" placeholder="Search" name="q">
+			        	</div>
+			        	<button id="oc-search-btn" type="submit" class="btn btn-default">Search</button>
+			      	</form>
 
-          $('#stage').xslt({xmlUrl: restEndpoint, xslUrl: "xsl/episodes.xsl", dataTypeXML: true, callback: function (data)
-          {
-              Opencast.pager.renderPager();
-              var total = $('#oc-episodes-total').html();
-              var toIndex = parseInt($('#oc-episodes-limit').html()) + (page - 1) * 10;
-              var fromIndex = Math.min(parseInt($('#oc-episodes-offset').html()) + 1, toIndex);
-
-              if (total > 0)
-              {
-                  $('.title').text("Results " + fromIndex + "-" + toIndex + " of " + total + keywordString).html();
-
-                  $('.timeDate').each(function ()
-                  {
-                      var timeDate = $(this).text();
-                      if (timeDate)
-                      {
-                          var sd = Opencast.Date_Helper.dateStringToDate(timeDate);
-                          $(this).html(Opencast.Date_Helper.getDateString(sd) + ' - ' + Opencast.Date_Helper.getTimeString(sd));
-                      }
-                      else
-                      {
-                          $(this).html("n.a.");
-                      }
-                  });
-                  $(".thumb").each(function (index)
-                  {
-                      var src = $(this).attr("src");
-                      if (src === undefined || src === "")
-                      {
-                          $(this).attr("src", "/engage/ui/img/misc/thumbnail.png");
-                      }
-                  });
-                  $(".search-item").each(function (index)
-                  {
-                      if (index % 2 == 1)
-                      {
-                          $(this).css('background-color', '#F7FBFC');
-                      }
-                      else
-                      {
-                          $(this).css('background-color', '#EFF7F9');
-                      }
-                  });
-              }
-              else
-              {
-                  if (Opencast.pager.getCurrentSearchQuery() != null)
-                  {
-                      $('.title').text('No recordings found for : "' + searchQuery + '"');
-                      $('.title').last().remove();
-                  }
-                  else
-                  {
-                      $('.title').text("No recordings published yet.");
-                      $('.title').last().remove();
-
-                  }
-              }
-
-          }});
-
-          if (searchQuery != null && searchQuery != "")
-          {
-              $('#rsslink').attr("href", "/feeds/rss/2.0/search/" + searchQuery);
-              $('#atomlink').attr("href", "/feeds/atom/1.0/search/" + searchQuery);
-          }
-          else
-          {
-              $('#rsslink').attr("href", "/feeds/rss/2.0/latest");
-              $('#atomlink').attr("href", "/feeds/atom/1.0/latest");
-          }
-      });
-    </script>
-  </head>
-  <!------------------------- BODY ------------------------->
-  <body style="overflow-x: hidden;">
-    <div id="pageHeader">
-      &nbsp;<!--<div id="currentVersion"></div>
-      <div id="newestVersion" style="text-align: right; float: right;"></div>-->
-      <a id="logout" href="/j_spring_security_logout">Log out</a>
-      <div class="clear"></div>
-    </div>
-    <!-- LOGO -->
-    <div id="header">
-      <div id="logotitle">
-        <a id="logolink" href="/welcome.html" title="Back to Opencast Matterhorn Welcome page"><img src="/engage/ui/img/mh_logos/MatterhornLogo.png" alt="Matterhorn Home Page" title="Matterhorn Home Page" width="104" height="72" align="left"></a><h1>Media Module</h1>
-      </div>
-      <div id="oclogo">
-        <a href="http://www.opencastproject.org"><img src="/engage/ui/img/mh_logos/OpencastLogo.png" width="143" height="38" alt="Opencast Community Project" title="Opencast Community Project"></a>
-      </div>
-    </div><hr style="clear:both;border-style: none none solid none;height:1px; color:#CCCCCC;padding-top: 10px; margin-right:20px;margin-left:20px;">
-
-    <!-- If no Javascript is activated -->
-    <noscript>
-      <center>
-        <h2>Media Gallery</h2>
-        <div class="noJSAlert-outer">
-          <div class="noJSAlert-inner-up">
-            <div class="icon icon-error noJSAlert-inner-image">&nbsp;</div>
-            JavaScript is disabled
-          </div>
-          <div class="noJSAlert-inner-down">
-            JavaScript is turned off in your web browser, so this site won't work properly! <br />
-            <strong>
-              Please turn JavaScript on to use this site, then refresh the page.
-            </strong>
-          </div>
-        </div>
-      </center>
-    </noscript>
-
-    <!-- START: Hide when no Javascript is activated -->
-    <script type="text/javascript">
-      document.write('<div class="oc-holder">');
-      document.write('<div class="oc-search-bar-holder fl-helper-clearfix">');
-      document.write('&nbsp;');
-      document.write('<div class="oc-search-bar">');
-      document.write('<span class="subscriptions"><a id="rsslink" href="/feeds/rss/2.0/latest">RSS</a>&nbsp;|&nbsp;<a id="atomlink" href="/feeds/atom/1.0/latest">ATOM</a></span>');
-      document.write('<br/>');
-      document.write('<span style="float:right">');
-      document.write('<form action="index.html">');
-      document.write('<label class="skip" for="searchField">');
-      document.write('Search Field');
-      document.write('</label>');
-      document.write('<input id="searchField" type="text" name="q" value="" /><input id="searchSubmit" type="submit" value="Search" />');
-      document.write('</form>');
-      document.write('</span>');
-      document.write('</div>');
-      document.write('</div>');
-      document.write('<div class="oc-search-result-header">');
-      document.write('<h2>Media Gallery</h2>');
-      document.write('<div class="oc-sort-controls">');
-      document.write('</div>');
-      document.write('</div>');
-      document.write('<div style="padding-top:20px;">');
-      document.write('<span class="title" style="float:left">Results</span>');
-      document.write('<span style="float:right">');
-      document.write('<ul class="navigation">');
-      document.write('</ul>');
-      document.write('</span>');
-      document.write('</div>');
-      document.write('<div style="clear:both" class="oc-search-result-items">');
-      document.write('<div id="stage">');
-      document.write('loading results...');
-      document.write('</div>');
-      document.write('</div>');
-      document.write('<div>');
-      document.write('<span class="title" style="float:left">Results</span>');
-      document.write('<span style="float:right">');
-      document.write('<ul class="navigation">');
-      document.write('</ul>');
-      document.write('</span>');
-      document.write('</div>');
-      document.write('</div>');
-    </script>
-    <!-- END: Hide when no Javascript is activated -->
-  </body>
+        		</div>
+		</div>		
+	</div>
+	<div class="container main-grid">
+		<div class="page-header">
+			<h1>Media Module</h1>
+		</div>
+		<div class="container-fluid" id="main-container">
+		</div>
+		<ul class="pager">
+  			<li class="previous disabled"><a>&larr; Newer</a></li>
+  			<li class="next"><a>Older &rarr;</a></li>
+		</ul>
+</body>
 </html>
