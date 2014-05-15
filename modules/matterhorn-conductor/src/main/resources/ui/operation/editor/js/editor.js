@@ -45,6 +45,7 @@ var DELETE_SELECTED_ITEM = "trim.delete_selected_segment";
 var NEXT_MARKER = "trim.next_marker";
 var PREVIOUS_MARKER = "trim.previous_marker";
 var PLAY_ENDING_OF_CURRENT_SEGMENT = "trim.play_ending_of_current_segment";
+var CLEAR_SEGMENT_LIST = "trim.clear_segment_list";
 
 var parElementTimeoutTime = 10; // ms
 var parFailureTimeoutTime = 50; // ms
@@ -82,6 +83,7 @@ default_config[DELETE_SELECTED_ITEM] = "Delete";
 default_config[PREVIOUS_MARKER] = "Up";
 default_config[NEXT_MARKER] = "Down";
 default_config[PLAY_ENDING_OF_CURRENT_SEGMENT] = "n";
+default_config[CLEAR_SEGMENT_LIST] = "Backspace";
 
 editor.error = false;
 editor.workflowID = undefined;
@@ -1326,7 +1328,7 @@ function selectSegmentListElement(number, dblClick) {
                 if (dblClick) {
                     $('#splitItemDiv-' + number).dblclick();
                 } else {
-                    $('#splitItemDiv-' + number).click();
+                    $('#splitItemDiv-' + number).click(); // TODO
                 }
             }
         }
@@ -1806,7 +1808,9 @@ function nextSegment() {
         var idFound = true;
         if ((new_id < 0) || (new_id >= editor.splitData.splits.length)) {
             idFound = false;
-        } else if (!editor.splitData.splits[new_id].enabled) {
+        }
+	/*
+	else if (!editor.splitData.splits[new_id].enabled) {
             idFound = false;
             new_id = (new_id >= (editor.splitData.splits.length - 1)) ? 0 : new_id;
 
@@ -1818,13 +1822,14 @@ function nextSegment() {
                 }
             }
         }
+	*/
         if (!idFound) {
             for (var i = 0; i < new_id; ++i) {
-                if (editor.splitData.splits[i].enabled) {
-                    new_id = i;
-                    idFound = true;
-                    break;
-                }
+                // if (editor.splitData.splits[i].enabled) {
+                new_id = i;
+                idFound = true;
+                break;
+                // }
             }
         }
 
@@ -1853,7 +1858,9 @@ function previousSegment() {
         var idFound = true;
         if ((new_id < 0) || (new_id >= editor.splitData.splits.length)) {
             idFound = false;
-        } else if (!editor.splitData.splits[new_id].enabled) {
+        }
+	/*
+	else if (!editor.splitData.splits[new_id].enabled) {
             idFound = false;
             new_id = (new_id <= 0) ? editor.splitData.splits.length : new_id;
             for (var i = new_id - 1; i >= 0; --i) {
@@ -1865,13 +1872,14 @@ function previousSegment() {
                 }
             }
         }
+	*/
         if (!idFound) {
             for (var i = editor.splitData.splits.length - 1; i >= 0; --i) {
-                if (editor.splitData.splits[i].enabled) {
-                    new_id = i;
-                    idFound = true;
-                    break;
-                }
+                // if (editor.splitData.splits[i].enabled) {
+                new_id = i;
+                idFound = true;
+                break;
+                // }
             }
         }
 
@@ -1957,12 +1965,31 @@ function addShortcuts() {
     shortcut.add(default_config[PLAY_ENDING_OF_CURRENT_SEGMENT], playEnding, {
         disable_in_input: true,
     });
+    shortcut.add(default_config[CLEAR_SEGMENT_LIST], clearSegmentList, {
+        disable_in_input: true,
+    });
     shortcut.add(default_config[PLAY_CURRENT_PRE_POST], playWithoutDeleted, {
         disable_in_input: true
     });
     shortcut.add(default_config[PLAY_CURRENT_PRE_POST_FULL], playWithoutDeletedFull, {
         disable_in_input: true
     });
+}
+
+function clearSegmentList() {
+    if(editor && editor.splitData && editor.splitData.splits) {
+	editor.splitData.splits = [];
+	if (workflowInstance.mediapackage && workflowInstance.mediapackage.duration) {
+            // create standard split point
+            editor.splitData.splits.push({
+		clipBegin: 0,
+		clipEnd: parseFloat(workflowInstance.mediapackage.duration) / 1000,
+		enabled: true
+            });
+            editor.updateSplitList(false, !zoomedIn());
+            selectSegmentListElement(0);
+	}
+    }
 }
 
 /**
@@ -1972,17 +1999,7 @@ function initPlayButtons() {
     $('#clearList').button();
 
     $('#clearList').click(function () {
-        editor.splitData.splits = [];
-        if (workflowInstance.mediapackage && workflowInstance.mediapackage.duration) {
-            // create standard split point
-            editor.splitData.splits.push({
-                clipBegin: 0,
-                clipEnd: parseFloat(workflowInstance.mediapackage.duration) / 1000,
-                enabled: true
-            });
-            editor.updateSplitList(false, !zoomedIn());
-            selectSegmentListElement(0);
-        }
+	clearSegmentList();
     });
 }
 
