@@ -157,7 +157,8 @@ editor.getWorkflowID = function () {
         editor.workflowID = -1;
         displayMsg("Could not retrieve workflow instance ID. " +
             "Without it the editor won't work. " +
-            "This should not happen, please ask your Matterhorn administrator.", "Error");
+            "This should not happen, please ask your Matterhorn administrator.",
+		   "Error", false);
     } else {
         ocUtils.log("Done");
     }
@@ -416,7 +417,7 @@ editor.addPar = function (currParIndex) {
                 var error = false;
 
                 var start = parseFloat(editor.splitData.splits[currParIndex].clipBegin) * 1000;
-                var duration = (parseFloat(editor.splitData.splits[currParIndex].clipEnd) * 1000) - start;
+                var duration = ((parseFloat(editor.splitData.splits[currParIndex].clipEnd) * 1000) - start).toFixed(0);
                 editor.addClips(strs, 0, par.parID, start, duration, function () {
                     ocUtils.log("Continuing with next par element...");
                     window.setTimeout(function () {
@@ -532,12 +533,12 @@ editor.saveSplitListHelper = function (startAtIndex) {
                                 }
                             } else {
                                 displayMsg("The video has already been edited and is being processed. Please cancel editing.",
-                                    "Cancel editing");
+                                    "Cancel editing", false);
                             }
                         }
                     }).fail(function (error) {
                         displayMsg("Could not get the workflow state. Please cancel editing.",
-                            "Cancel editing");
+                            "Cancel editing", false);
                     });
                 }
             }
@@ -557,13 +558,13 @@ editor.saveSplitList = function (func) {
     continueProcessing = true;
     editor.enableContinueProcessing(true);
     if (!editor.error && !isBuffering) {
-        displayMsg("Continuing processing. This may take a while.\nPlease wait...", "Continuing processing.");
+        displayMsg("Continuing processing. This may take a while.\nPlease wait...", "Continuing processing.", false);
         editor.enableContinueProcessing(false);
         editor.createNewSmil(function () {
             editor.saveSplitListHelper(0);
         });
     } else if (!continueProcessing_tmp && isBuffering) {
-        displayMsg("The player is currently buffering. After that the processing will continue.\nPlease wait...", "Wait for continue processing.");
+        displayMsg("The player is currently buffering. After that the processing will continue.\nPlease wait...", "Wait for continue processing.", false);
     }
     return !editor.error;
 }
@@ -1342,16 +1343,26 @@ function selectSegmentListElement(number, dblClick) {
 /**
  * displays a graphical message
  */
-function displayMsg(msg, title) {
-    $('<div />').html(msg).dialog({
-        title: title,
-        resizable: false,
-        buttons: {
-            OK: function () {
-                $(this).dialog("close");
+function displayMsg(msg, title, displayOKButton) {
+    if(displayOKButton == undefined) {
+	displayOKButton = true;
+    }
+    if(displayOKButton) {
+	$('<div />').html(msg).dialog({
+            title: title,
+            resizable: false,
+            buttons: {
+		OK: function () {
+                    $(this).dialog("close");
+		}
             }
-        }
-    });
+	});
+    } else {
+	$('<div />').html(msg).dialog({
+            title: title,
+            resizable: false
+	});
+    }
 }
 
 /**
@@ -2192,7 +2203,7 @@ function parseInitialSMIL() {
                     ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
                     var newLastItem = {
                         clipBegin: parseFloat(current.clipEnd),
-                        clipEnd: parseFloat(duration),
+                        clipEnd: duration,
                         enabled: true
                     };
 
@@ -2203,7 +2214,7 @@ function parseInitialSMIL() {
                     insertedLastItem = true;
                 } else {
                     ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
-                    current.clipEnd = parseFloat(duration);
+                    current.clipEnd = duration;
                 }
             }
         }
