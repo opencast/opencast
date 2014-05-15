@@ -1326,7 +1326,7 @@ function selectSegmentListElement(number, dblClick) {
                 if (dblClick) {
                     $('#splitItemDiv-' + number).dblclick();
                 } else {
-                    $('#splitItemDiv-' + number).click();
+                    $('#splitItemDiv-' + number).click(); // TODO
                 }
             }
         }
@@ -1806,7 +1806,9 @@ function nextSegment() {
         var idFound = true;
         if ((new_id < 0) || (new_id >= editor.splitData.splits.length)) {
             idFound = false;
-        } else if (!editor.splitData.splits[new_id].enabled) {
+        }
+	/*
+	else if (!editor.splitData.splits[new_id].enabled) {
             idFound = false;
             new_id = (new_id >= (editor.splitData.splits.length - 1)) ? 0 : new_id;
 
@@ -1818,13 +1820,14 @@ function nextSegment() {
                 }
             }
         }
+	*/
         if (!idFound) {
             for (var i = 0; i < new_id; ++i) {
-                if (editor.splitData.splits[i].enabled) {
-                    new_id = i;
-                    idFound = true;
-                    break;
-                }
+                // if (editor.splitData.splits[i].enabled) {
+                new_id = i;
+                idFound = true;
+                break;
+                // }
             }
         }
 
@@ -1853,7 +1856,9 @@ function previousSegment() {
         var idFound = true;
         if ((new_id < 0) || (new_id >= editor.splitData.splits.length)) {
             idFound = false;
-        } else if (!editor.splitData.splits[new_id].enabled) {
+        }
+	/*
+	else if (!editor.splitData.splits[new_id].enabled) {
             idFound = false;
             new_id = (new_id <= 0) ? editor.splitData.splits.length : new_id;
             for (var i = new_id - 1; i >= 0; --i) {
@@ -1865,13 +1870,14 @@ function previousSegment() {
                 }
             }
         }
+	*/
         if (!idFound) {
             for (var i = editor.splitData.splits.length - 1; i >= 0; --i) {
-                if (editor.splitData.splits[i].enabled) {
-                    new_id = i;
-                    idFound = true;
-                    break;
-                }
+                // if (editor.splitData.splits[i].enabled) {
+                new_id = i;
+                idFound = true;
+                break;
+                // }
             }
         }
 
