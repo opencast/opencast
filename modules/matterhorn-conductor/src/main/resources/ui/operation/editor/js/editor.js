@@ -416,7 +416,7 @@ editor.addPar = function (currParIndex) {
                 var strs = getAllStringsOf(wfXML, "<ns3:track", "</ns3:track>");
                 var error = false;
 
-                var start = parseFloat(editor.splitData.splits[currParIndex].clipBegin) * 1000;
+                var start = (parseFloat(editor.splitData.splits[currParIndex].clipBegin) * 1000).toFixed(0);
                 var duration = ((parseFloat(editor.splitData.splits[currParIndex].clipEnd) * 1000) - start).toFixed(0);
                 editor.addClips(strs, 0, par.parID, start, duration, function () {
                     ocUtils.log("Continuing with next par element...");
