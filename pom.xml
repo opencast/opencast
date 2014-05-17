@@ -457,10 +457,7 @@
         <module>modules/matterhorn-dictionary-textcorpora</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
-        <module>modules/matterhorn-inspection-service-impl</module>
-        <!--
         <module>modules/matterhorn-inspection-service-ffmpeg</module>
-        -->
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -501,10 +498,7 @@
         <module>modules/matterhorn-dictionary-textcorpora</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
-        <module>modules/matterhorn-inspection-service-impl</module>
-        <!--
         <module>modules/matterhorn-inspection-service-ffmpeg</module>
-        -->
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -773,7 +767,7 @@
         </property>
       </activation>
       <modules>
-        <module>modules/matterhorn-inspection-service-ffmpeg</module>
+        <module>modules/matterhorn-inspection-service-impl</module>
         <module>modules/matterhorn-dictionary-none</module>
       </modules>
     </profile>
