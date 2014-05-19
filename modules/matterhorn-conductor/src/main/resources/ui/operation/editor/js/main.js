@@ -221,7 +221,7 @@ $(document)
                 $("#video_overlay_msg").html("Loading videos...").show();
                 $.synchronizeVideos(0, "videoPlayer", "videoPlayerSlave");
                 $(document).on("sjs:buffering", function (event) {
-                    $("#video_overlay_msg").html("The videos are currently buffering...").show();
+                    // $("#video_overlay_msg").html("The videos are currently buffering...").show(); // TODO: Comment in
                 });
                 $(document).on("sjs:allPlayersReady", function (event) {
                     $("#video_overlay_msg").html("").hide();
