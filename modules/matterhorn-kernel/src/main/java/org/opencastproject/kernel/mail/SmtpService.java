@@ -288,14 +288,30 @@ public class SmtpService implements ManagedService {
     send(message);
   }
 
-  public String applyTemplate(String templateName, String templateContent, WorkflowInstance workflowInstance) {
+  /**
+   * Apply the freemarker template specified.
+   * 
+   * @param templateName
+   *          the name of the template (specified when configuring the send-email operation)
+   * @param templateContent
+   *          [OPTIONAL] the template content (if specified in the send-email operation configuration). If not informed,
+   *          template will be obtained from the set of templates loaded from MH_HOME/etc/email.
+   * @param workflowInstance
+   *          the workflow instance
+   * 
+   * @return the content after the template was applied to it
+   * @throws IllegalArgumentException
+   *           if template passed it not found
+   */
+  public String applyTemplate(String templateName, String templateContent, WorkflowInstance workflowInstance)
+          throws IllegalArgumentException {
     if (templateContent == null && templateScannerRef.get() != null) {
       templateContent = templateScannerRef.get().getTemplate(templateName);
     }
 
     if (templateContent == null) {
       logger.warn("E-mail template not found: {}", templateName);
-      return "TEMPLATE NOT FOUND: " + templateName; // it's probably missing
+      throw new IllegalArgumentException("Email template not found: " + templateName);
     }
 
     // Apply the template

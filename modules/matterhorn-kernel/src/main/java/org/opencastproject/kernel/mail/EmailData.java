@@ -58,9 +58,15 @@ public class EmailData extends DocData {
   private static final String DEFAULT_DELIMITER_FOR_MULTIPLE = ",";
 
   /**
-   * Create the base data object for creating REST documentation.
+   * Create a new EmailData object, which will make workflow and media package data accessible for being displayed in an
+   * email.
    * 
    * @param name
+   *          the name of the document (must be alphanumeric (includes _) and no spaces or special chars)
+   * @param wf
+   *          the workflow instance
+   * @param ws
+   *          the workspace
    */
   public EmailData(String name, WorkflowInstance wf, Workspace ws) {
     super(name, null, null);

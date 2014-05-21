@@ -116,7 +116,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     } catch (MessagingException e) {
       throw new WorkflowOperationException(e);
     } catch (Exception e) {
-      // Freemarker exceptions (invalid template, etc)
+      // Freemarker exceptions (invalid template, etc), or template not found
       throw new WorkflowOperationException(e);
     }
 

@@ -77,6 +77,7 @@ public class SmtpServiceTest {
             "<#if failedOperation?has_content>Workflow failed in operation: ${failedOperation.template}</#if>, "
                     + "Workflow errors: <#list workflow.errorMessages as er>${er} </#list>");
     EasyMock.expect(templateScanner.getTemplate("templateSyntaxError")).andReturn("${mediaPackage");
+    EasyMock.expect(templateScanner.getTemplate("templateNotFound")).andReturn(null);
     EasyMock.replay(templateScanner);
     smtpService.bindEmailTemplateScanner(templateScanner);
 
@@ -166,6 +167,20 @@ public class SmtpServiceTest {
     }
 
     Assert.fail("Should have thrown an exception!");
+  }
+
+  @Test
+  public void testTemplateNotFound() throws Exception {
+    String templateName = "templateNotFound";
+    String templateContent = null;
+
+    try {
+      smtpService.applyTemplate(templateName, templateContent, workflowInstance);
+    } catch (IllegalArgumentException e) {
+      return;
+    }
+
+    Assert.fail("Should have thrown an IllegalArgumentException exception!");
   }
 
 }
