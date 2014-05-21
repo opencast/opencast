@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.6-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -17,8 +17,6 @@
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
     <checkstyle.skip>true</checkstyle.skip>
   </properties>
-
-  <version>1.5-SNAPSHOT</version>
 
   <dependencies>
     <dependency>
