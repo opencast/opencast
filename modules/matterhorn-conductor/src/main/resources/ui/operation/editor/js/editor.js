@@ -59,6 +59,8 @@ var clipTimeoutsUntilFailure = clipTimeoutsUntilFailureDefault;
 
 var isBuffering = false;
 var continueProcessing = false;
+var jQMsg = undefined;
+var messageShown = false;
 
 // key codes
 var KEY_ENTER = 13;
@@ -158,7 +160,7 @@ editor.getWorkflowID = function () {
         displayMsg("Could not retrieve workflow instance ID. " +
             "Without it the editor won't work. " +
             "This should not happen, please ask your Matterhorn administrator.",
-		   "Error", false);
+            "Error", false);
     } else {
         ocUtils.log("Done");
     }
@@ -724,7 +726,7 @@ function setEnabled(uuid, enabled) {
 function setCurrentTimeAsNewInpoint() {
     if (!continueProcessing && (editor.selectedSplit != null)) {
         setTimefieldTimeBegin(getCurrentTime());
-	okButtonClick();
+        okButtonClick();
     }
 }
 
@@ -734,7 +736,7 @@ function setCurrentTimeAsNewInpoint() {
 function setCurrentTimeAsNewOutpoint() {
     if (!continueProcessing && (editor.selectedSplit != null)) {
         setTimefieldTimeEnd(getCurrentTime());
-	okButtonClick();
+        okButtonClick();
     }
 }
 
@@ -996,17 +998,17 @@ function okButtonClick() {
                 if (editor.splitData && editor.splitData.splits) {
                     current.clipBegin = getTimefieldTimeBegin();
                     current.clipEnd = getTimefieldTimeEnd();
-		    if(id > 0) {
-			if(current.clipBegin > editor.splitData.splits[id - 1].clipBegin) {
-			    editor.splitData.splits[id - 1].clipEnd = current.clipBegin;
-			} else {
-			    displayMsg("The inpoint is bigger than the inpoint of the segment before this segment. Please check and correct it.",
-				       "Check and correct inpoint");
-			    setTimefieldTimeBegin(editor.splitData.splits[id - 1].clipEnd);
-			    selectSegmentListElement(id);
-			    return;
-			}
-		    }
+                    if (id > 0) {
+                        if (current.clipBegin > editor.splitData.splits[id - 1].clipBegin) {
+                            editor.splitData.splits[id - 1].clipEnd = current.clipBegin;
+                        } else {
+                            displayMsg("The inpoint is bigger than the inpoint of the segment before this segment. Please check and correct it.",
+                                "Check and correct inpoint");
+                            setTimefieldTimeBegin(editor.splitData.splits[id - 1].clipEnd);
+                            selectSegmentListElement(id);
+                            return;
+                        }
+                    }
 
                     var last = editor.splitData.splits[editor.splitData.splits.length - 1];
                     if (last.clipEnd < duration) {
@@ -1344,24 +1346,37 @@ function selectSegmentListElement(number, dblClick) {
  * displays a graphical message
  */
 function displayMsg(msg, title, displayOKButton) {
-    if(displayOKButton == undefined) {
-	displayOKButton = true;
-    }
-    if(displayOKButton) {
-	$('<div />').html(msg).dialog({
-            title: title,
-            resizable: false,
-            buttons: {
-		OK: function () {
-                    $(this).dialog("close");
-		}
-            }
-	});
+    if (!messageShown) {
+        messageShown = true;
+        if (displayOKButton == undefined) {
+            displayOKButton = true;
+        }
+        if (displayOKButton) {
+            jQMsg = $('<div />').html(msg).dialog({
+                title: title,
+                resizable: false,
+                buttons: {
+                    OK: function () {
+                        $(this).dialog("close");
+                    }
+                },
+                close: function (event, ui) {
+                    messageShown = false;
+                }
+            });
+        } else {
+            $('<div />').html(msg).dialog({
+                title: title,
+                resizable: false,
+                close: function (event, ui) {
+                    messageShown = false;
+                }
+            });
+        }
     } else {
-	$('<div />').html(msg).dialog({
-            title: title,
-            resizable: false
-	});
+        if (jQMsg != undefined) {
+            jQMsg.append("<br/>" + msg);
+        }
     }
 }
 
@@ -1820,7 +1835,7 @@ function nextSegment() {
         if ((new_id < 0) || (new_id >= editor.splitData.splits.length)) {
             idFound = false;
         }
-	/*
+        /*
 	else if (!editor.splitData.splits[new_id].enabled) {
             idFound = false;
             new_id = (new_id >= (editor.splitData.splits.length - 1)) ? 0 : new_id;
@@ -1870,7 +1885,7 @@ function previousSegment() {
         if ((new_id < 0) || (new_id >= editor.splitData.splits.length)) {
             idFound = false;
         }
-	/*
+        /*
 	else if (!editor.splitData.splits[new_id].enabled) {
             idFound = false;
             new_id = (new_id <= 0) ? editor.splitData.splits.length : new_id;
@@ -1988,18 +2003,18 @@ function addShortcuts() {
 }
 
 function clearSegmentList() {
-    if(editor && editor.splitData && editor.splitData.splits) {
-	editor.splitData.splits = [];
-	if (workflowInstance.mediapackage && workflowInstance.mediapackage.duration) {
+    if (editor && editor.splitData && editor.splitData.splits) {
+        editor.splitData.splits = [];
+        if (workflowInstance.mediapackage && workflowInstance.mediapackage.duration) {
             // create standard split point
             editor.splitData.splits.push({
-		clipBegin: 0,
-		clipEnd: parseFloat(workflowInstance.mediapackage.duration) / 1000,
-		enabled: true
+                clipBegin: 0,
+                clipEnd: parseFloat(workflowInstance.mediapackage.duration) / 1000,
+                enabled: true
             });
             editor.updateSplitList(false, !zoomedIn());
             selectSegmentListElement(0);
-	}
+        }
     }
 }
 
@@ -2010,7 +2025,7 @@ function initPlayButtons() {
     $('#clearList').button();
 
     $('#clearList').click(function () {
-	clearSegmentList();
+        clearSegmentList();
     });
 }
 
