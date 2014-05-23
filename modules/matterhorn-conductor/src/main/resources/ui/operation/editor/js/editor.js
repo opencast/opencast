@@ -2211,26 +2211,40 @@ function parseInitialSMIL() {
                 }
             }
             // check last segment
-            var current = editor.splitData.splits[editor.splitData.splits.length - 1];
             var duration = getDuration();
-            if (current.clipEnd != duration) {
-                if (current.clipEnd < (duration - minSegmentLength)) {
-                    ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
-                    var newLastItem = {
-                        clipBegin: parseFloat(current.clipEnd),
-                        clipEnd: duration,
-                        enabled: true
-                    };
+            if (editor.splitData.splits.length > 0) {
+                var current = editor.splitData.splits[editor.splitData.splits.length - 1];
+                if (current.clipEnd != duration) {
+                    if ((current.clipEnd < (duration - minSegmentLength)) || (current.clipEnd <= minSegmentLength)) {
+                        ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
+                        var newLastItem = {
+                            clipBegin: parseFloat(current.clipEnd),
+                            clipEnd: duration,
+                            enabled: true
+                        };
 
-                    // add the new item to the end
-                    editor.splitData.splits.push(newLastItem);
-                    var prev = editor.splitData.splits[id - 2];
-                    prev.clipEnd = parseFloat(current.clipBegin);
-                    insertedLastItem = true;
-                } else {
-                    ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
-                    current.clipEnd = duration;
+                        // add the new item to the end
+                        editor.splitData.splits.push(newLastItem);
+                        if (editor.splitData.splits.length > 1) {
+                            var prev = editor.splitData.splits[editor.splitData.splits.length - 2];
+                            prev.clipEnd = parseFloat(current.clipBegin);
+                        }
+                        insertedLastItem = true;
+                    } else {
+                        ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
+                        current.clipEnd = duration;
+                    }
                 }
+            } else {
+                ocUtils.log("Inserting a split element (auto): (" + 0 + " - " + duration + ")");
+                var newItem = {
+                    clipBegin: 0,
+                    clipEnd: duration,
+                    enabled: true
+                };
+
+                // add the new item
+                editor.splitData.splits.push(newItem);
             }
         }
 
