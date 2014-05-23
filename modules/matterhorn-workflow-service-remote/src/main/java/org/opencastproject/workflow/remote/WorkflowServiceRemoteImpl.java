@@ -689,7 +689,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
       throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
     }
 
-    HttpResponse response = getResponse(post, SC_OK, HttpStatus.SC_UNAUTHORIZED, HttpStatus.SC_FORBIDDEN);
+    HttpResponse response = getResponse(post, SC_OK, HttpStatus.SC_UNAUTHORIZED);
     try {
       if (response != null) {
         if (HttpStatus.SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
