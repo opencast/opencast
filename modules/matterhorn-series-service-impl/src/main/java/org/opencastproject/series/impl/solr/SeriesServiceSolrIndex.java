@@ -355,6 +355,9 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
     final SolrInputDocument inputDoc = ClientUtils.toSolrInputDocument(seriesDoc);
     inputDoc.setField(SolrFields.ACCESS_CONTROL_KEY, serializedAC);
+    inputDoc.removeField(SolrFields.ACCESS_CONTROL_CONTRIBUTE);
+    inputDoc.removeField(SolrFields.ACCESS_CONTROL_EDIT);
+    inputDoc.removeField(SolrFields.ACCESS_CONTROL_READ);
     for (AccessControlEntry ace : accessControl.getEntries()) {
       if (SeriesService.CONTRIBUTE_CONTENT_PERMISSION.equals(ace.getAction()) && ace.isAllow()) {
         inputDoc.addField(SolrFields.ACCESS_CONTROL_CONTRIBUTE, ace.getRole());
