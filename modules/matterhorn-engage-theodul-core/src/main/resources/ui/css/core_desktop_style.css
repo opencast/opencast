@@ -1,0 +1,70 @@
+/*Core desktop css rules*/
+
+body {
+  min-width: 485px;
+  font-family: Arial, sans-serif;
+}
+
+h1,h2,h3 {
+  font-weight: normal !important;
+  line-height: 22px !important;
+}
+
+#engage_tab_content {
+  padding: 0px 20px;
+}
+
+#engage_video {
+  margin-top: 110px;
+}
+
+#engage_controls {
+  width: 100%;
+  height: 97px;
+  background-color: #ffffff;
+}
+
+#engage_top_bar {
+  width: 100%;
+  height: 90px;
+  position: fixed;
+  background-color: #ffffff;
+  z-index: 1;
+}
+
+/* Expanded Header */
+
+#engage_timeline_expand_btn {
+  width: 23px;
+  height: 23px;
+  padding: 5px;
+  background: #dddddd;
+  position: fixed;
+  right: 20px;
+  border-left: 1px solid #aaa;
+  border-right: 1px solid #aaa;
+  border-bottom: 1px solid #aaa;
+  border-radius: 0px 0px 4px 4px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+
+#engage_timeline_expand_btn:hover {
+  cursor: pointer;
+}
+
+.engage_timeline_expand_btn_rotate180 {
+  -moz-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+#engage_timeline_plugin {
+  display: none;
+  width: 100%;
+  background: #f9f9f9;
+  border-top: 1px solid #e3e3e3;
+  border-bottom: 1px solid #e3e3e3;
+  padding: 10px 20px;
+}

@@ -3,10 +3,9 @@
 <head>
 	<meta charset="utf-8">
 	<title>Theodul Core</title>
-	<link rel="stylesheet" type="text/css" href="css/core_style.css" />
+	<link rel="stylesheet" type="text/css" href="css/core_global_style.css" />
 	<link rel="stylesheet" type="text/css" href="css/bootstrap/css/bootstrap.css" />
 	<link rel="stylesheet" type="text/css" href="css/bootstrap/css/bootstrap-responsive.css" />
-	<!-- <script src="js/lib/polymer/polymer.js" debug></script> -->
 	<script data-main="engage_init" src="js/lib/require.js"></script>
 </head>
 <body>
@@ -23,31 +22,6 @@
 	</div>
 
 	<!-- Global Main View -->	
-	<div id="engage_view">
-		<!-- Controls plugin container -->
-		<div id="engage_top_bar">
-		  <!-- Controls Plugin Container -->
-		  <div id="engage_controls"></div>
-		  <!-- Timeline Plugin Container -->
-	    <div id="engage_timeline_plugin"></div>
-	    <div id="engage_timeline_expand_btn">
-        <img id="engage_timeline_expand_btn_img" src="img/pulldown.png" />
-      </div>
-		</div>
-		
-		<!-- Content container -->
-		<div id="engage_content" class="container">
-			<!-- Videodisplay plugin container -->
-			<div id="engage_video"></div>
-			<div class="clear"></div>
-			<div id="information_wrapper">
-        <!-- description plugin container -->
-				<div id="engage_description"></div>
-				<!-- tab plugins container -->
-				<ul id="engage_tab_nav" class="nav nav-tabs"></ul>
-				<div id="engage_tab_content" class="tab-content"></div>		 
-			</div>	
-		</div>
-	</div>
+	<div id="engage_view"></div>
 </body>
 </html>

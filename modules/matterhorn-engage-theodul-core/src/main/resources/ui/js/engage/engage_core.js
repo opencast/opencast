@@ -67,37 +67,83 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
           engageCore.log("EventLog: " + name + " occurs!");
         }   
       });
-      // load Stream Event
+      // Core Initialize Event
       this.dispatcher.on("Core:init", function () {
-        // fetch plugin information
-        engageCore.model.get('pluginsInfo').fetch({
-          success : function (pluginInfos) {
-            // load plugin as requirejs module
-            if (pluginInfos.get('pluginlist') && pluginInfos.get('pluginlist').plugins !== undefined) {
-              if ($.isArray(pluginInfos.get('pluginlist').plugins)) {
-                $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
-                  var plugin_name = value['name'];
-                  plugins_loaded[plugin_name] = false;
-                });
-                $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
+        //switch view template and css rules for current player modus
+        //link tag for css file
+        var cssLinkTag = $("<link>");
+        var cssAttr = {
+            type : 'text/css',
+            rel : 'stylesheet'
+        };
+        //template obj
+        var core_template = "none";
+        switch(engageCore.model.get("modus")){
+        case "desktop":
+            cssAttr.href = 'css/core_desktop_style.css';
+            core_template = "templates/core_desktop.html";
+            break;
+        case "mobile":
+            cssAttr.href = 'css/core_mobile_style.css';
+            core_template = "templates/core_mobile.html";
+            break;
+        case "embed":
+            cssAttr.href = 'css/core_embed_style.css';
+            core_template = "templates/core_embed.html";
+            break;
+        }
+        cssLinkTag.attr(cssAttr);
+        //add css to DOM
+        $("head").append(cssLinkTag);          
+        //Get Core template
+        $.get(core_template, function (template) {
+          //set template, render it and add it to DOM
+          engageCore.template = template;
+          $(engageCore.el).html(_.template(template));
+          //do special ui stuff for desktop, mobile and embed versions
+          switch(engageCore.model.get("modus")){
+          case "desktop":
+
+              break;
+          case "mobile":
+
+              break;
+          case "embed":
+
+              break;
+          }
+          //build timeline plugins
+          $("#engage_timeline_expand_btn").click(function() {
+            $("#engage_timeline_plugin").slideToggle("fast");
+            $("#engage_timeline_expand_btn_img").toggleClass("engage_timeline_expand_btn_rotate180");
+          });
+          /*BEGIN LOAD PLUGINS*/
+          // fetch plugin information
+          engageCore.model.get('pluginsInfo').fetch({
+            success : function (pluginInfos) {
+              // load plugin as requirejs module
+              if (pluginInfos.get('pluginlist') && pluginInfos.get('pluginlist').plugins !== undefined) {
+                if ($.isArray(pluginInfos.get('pluginlist').plugins)) {
+                  $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
+                    var plugin_name = value['name'];
+                    plugins_loaded[plugin_name] = false;
+                  });
+                  $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
+                    // load plugin
+                    var plugin_name = value['name'];
+                    loadPlugin('../../../plugin/' + value['static-path'] + '/', plugin_name);
+                  });
+                } else {
                   // load plugin
                   var plugin_name = value['name'];
-                  loadPlugin('../../../plugin/' + value['static-path'] + '/', plugin_name);
-                });
-              } else {
-                // load plugin
-                var plugin_name = value['name'];
-                plugins_loaded[plugin_name] = false;
-                loadPlugin('../../../plugin/' + pluginInfos.get('pluginlist').plugins['static-path'] + '/', plugin_name);
+                  plugins_loaded[plugin_name] = false;
+                  loadPlugin('../../../plugin/' + pluginInfos.get('pluginlist').plugins['static-path'] + '/', plugin_name);
+                }
               }
             }
-          }
+          });
+          /*END LOAD PLUGINS*/
         });
-      });
-      //describe timeline extensions
-      $("#engage_timeline_expand_btn").click(function() {
-        $("#engage_timeline_plugin").slideToggle("fast");
-        $("#engage_timeline_expand_btn_img").toggleClass("engage_timeline_expand_btn_rotate180");
       });
       // load plugins done, hide loading and show content
       this.dispatcher.on("Core:plugin_load_done", function () {
@@ -154,7 +200,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
 
   /*
    * BEGIN Private core functions
-   */ 
+   */
+  function build
+  
   function addPluginLogic() {
     EngageTabLogic('tabs', 'engage_tab_nav');
   }
