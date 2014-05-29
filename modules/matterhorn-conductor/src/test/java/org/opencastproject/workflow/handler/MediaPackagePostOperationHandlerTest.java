@@ -89,7 +89,7 @@ public class MediaPackagePostOperationHandlerTest {
 
     /* Sending stuff to port 9 shound never return anything as the Discard
      * Protocol uses port 9 */
-    InstanceAndHandler tuple = createWorkflow("http://0.0.0.0:9", "xml");
+    InstanceAndHandler tuple = createWorkflow("http://127.0.0.1:9", "xml");
     MediaPackagePostOperationHandler handler = (MediaPackagePostOperationHandler) tuple.workflowHandler;
     tuple.workflowInstance.setMediaPackage(mp);
 
@@ -98,7 +98,7 @@ public class MediaPackagePostOperationHandlerTest {
     } catch (WorkflowOperationException e) {
       Assert.assertTrue(("org.opencastproject.workflow.api.WorkflowOperationException: "
           + "org.apache.http.conn.HttpHostConnectException: "
-          + "Connection to http://0.0.0.0:9 refused").equals(e.toString()));
+          + "Connection to http://127.0.0.1:9 refused").equals(e.toString()));
       logger.info(e.toString());
     }
 
@@ -116,7 +116,7 @@ public class MediaPackagePostOperationHandlerTest {
 
     /* Sending stuff to port 9 shound never return anything as the Discard
      * Protocol uses port 9 */
-    InstanceAndHandler tuple = createWorkflow("http://0.0.0.0:9", "json");
+    InstanceAndHandler tuple = createWorkflow("http://127.0.0.1:9", "json");
     MediaPackagePostOperationHandler handler = (MediaPackagePostOperationHandler) tuple.workflowHandler;
     tuple.workflowInstance.setMediaPackage(mp);
 
@@ -125,7 +125,7 @@ public class MediaPackagePostOperationHandlerTest {
     } catch (WorkflowOperationException e) {
       Assert.assertTrue(("org.opencastproject.workflow.api.WorkflowOperationException: "
           + "org.apache.http.conn.HttpHostConnectException: "
-          + "Connection to http://0.0.0.0:9 refused").equals(e.toString()));
+          + "Connection to http://127.0.0.1:9 refused").equals(e.toString()));
       logger.info(e.toString());
     }
 
