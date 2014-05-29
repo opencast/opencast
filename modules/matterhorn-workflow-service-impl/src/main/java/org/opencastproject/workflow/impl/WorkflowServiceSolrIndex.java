@@ -868,8 +868,8 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     append(sb, CREATED_KEY, query.getFromDate(), query.getToDate());
     appendFuzzy(sb, CREATOR_KEY, query.getCreator());
     appendFuzzy(sb, CONTRIBUTOR_KEY, query.getContributor());
-    append(sb, LANGUAGE_KEY, query.getLanguage(), true);
-    append(sb, LICENSE_KEY, query.getLicense(), true);
+    appendFuzzy(sb, LANGUAGE_KEY, query.getLanguage());
+    appendFuzzy(sb, LICENSE_KEY, query.getLicense());
     appendFuzzy(sb, TITLE_KEY, query.getTitle());
     appendFuzzy(sb, SUBJECT_KEY, query.getSubject());
     appendMap(sb, OPERATION_KEY, query.getCurrentOperations());
