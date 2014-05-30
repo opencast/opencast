@@ -44,7 +44,7 @@ public class CleanSessionsFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
    */
   @Override
@@ -53,7 +53,7 @@ public class CleanSessionsFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#destroy()
    */
   @Override
@@ -62,30 +62,30 @@ public class CleanSessionsFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse,
    *      javax.servlet.FilterChain)
    */
   @Override
   public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException,
           ServletException {
-    
+
     // Cast the request and response to HTTP versions
     HttpServletRequest request = (HttpServletRequest) req;
     if (request != null && request.getSession() != null) {
       if (request.getSession().getMaxInactiveInterval() == NO_MAX_INACTIVE_INTERVAL_SET) {
-        // There is no maxInactiveInterval set so we need to set one. 
+        // There is no maxInactiveInterval set so we need to set one.
         logger.trace("Setting maxInactiveInterval to " + RestConstants.MAX_INACTIVE_INTERVAL + " on request @" + request.getRequestURL());
         request.getSession().setMaxInactiveInterval(RestConstants.MAX_INACTIVE_INTERVAL);
       }
     }
     chain.doFilter(req, resp);
- 
+
     // This has to be run after the chain.doFilter to invalidate the sessions after Spring Security has run as it creates new sessions.
     if (request != null && HttpServletRequest.DIGEST_AUTH.equals(request.getAuthType())) {
       logger.trace("Invalidating digest request.");
       request.getSession().invalidate();
-    } 
+    }
     else if (request.getHeader("Authorization") != null) {
       logger.trace("Invalidating digest request.");
       request.getSession().invalidate();

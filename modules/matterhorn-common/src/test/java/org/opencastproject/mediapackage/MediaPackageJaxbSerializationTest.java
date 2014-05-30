@@ -15,15 +15,17 @@
  */
 package org.opencastproject.mediapackage;
 
-import junit.framework.Assert;
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
+
+import junit.framework.Assert;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -83,6 +85,10 @@ public class MediaPackageJaxbSerializationTest {
     // Serialize the media package
     String xml = MediaPackageParser.getAsXml(mp);
     Assert.assertNotNull(xml);
+
+    // Serialize the media package as JSON
+    String json = MediaPackageParser.getAsJSON(mp);
+    Assert.assertNotNull(json);
 
     // Deserialize the media package
     MediaPackage deserialized = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()

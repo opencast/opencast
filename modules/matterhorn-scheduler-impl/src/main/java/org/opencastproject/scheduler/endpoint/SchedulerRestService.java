@@ -26,6 +26,7 @@ import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerQuery;
 import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.SolrUtils;
@@ -130,7 +131,7 @@ public class SchedulerRestService {
     if (cc == null) {
       serverUrl = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      String ccServerUrl = cc.getBundleContext().getProperty("org.opencastproject.server.url");
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
       logger.debug("configured server url is {}", ccServerUrl);
       if (ccServerUrl == null) {
         serverUrl = UrlSupport.DEFAULT_BASE_URL;
@@ -978,7 +979,16 @@ public class SchedulerRestService {
    *           if parsing fails
    */
   private DublinCoreCatalog parseDublinCore(String dcXML) throws IOException {
-    return dcService.load(new ByteArrayInputStream(dcXML.getBytes("UTF-8")));
+    // Trim XML string because parsing will fail if there are any chars before XML processing instruction
+    String trimmedDcXml = StringUtils.trim(dcXML);
+    /* Warn the user if trimming was necessary as this meant that the XML
+     * string was technically invalid.
+     */
+    if (!trimmedDcXml.equals(dcXML)) {
+      logger.warn("Detected invalid XML data. Trying to fix this by "
+          + "removing spaces from beginning/end.");
+    }
+    return dcService.load(new ByteArrayInputStream(trimmedDcXml.getBytes("UTF-8")));
   }
 
   /**

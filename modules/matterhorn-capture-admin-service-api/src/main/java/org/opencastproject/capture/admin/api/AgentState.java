@@ -26,16 +26,16 @@ public interface AgentState {
 
   /** Constant <code>IDLE="idle"</code> */
   String IDLE = "idle";
-  
+
   /** Constant <code>SHUTTING_DOWN="shutting_down"</code> */
   String SHUTTING_DOWN = "shutting_down";
 
   /** Constant <code>CAPTURING="capturing"</code> */
   String CAPTURING = "capturing";
-  
+
   /** Constant <code>UPLOADING="uploading"</code> */
   String UPLOADING = "uploading";
-  
+
   /** Constant <code>UNKNOWN="unknown"</code> */
   String UNKNOWN = "unknown";
 

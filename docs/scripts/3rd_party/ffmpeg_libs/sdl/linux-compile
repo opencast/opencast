@@ -21,7 +21,12 @@ mv "$dir" "${dir}-linux"
 cd "${dir}-linux"
 [ $? -ne 0 ] && exit 1
 #
-./configure
+patch -p 1 < ../libsdl-1.2.15-const-xdata32.patch
+[ $? -ne 0 ] && exit 1
+./autogen.sh
+[ $? -ne 0 ] && exit 1
+#
+./configure --prefix=$LOCAL_PREFIX
 [ $? -ne 0 ] && exit 1
 make
 [ $? -ne 0 ] && exit 1

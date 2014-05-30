@@ -15,10 +15,12 @@
  */
 package org.opencastproject.series.remote;
 
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_CREATED;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_NO_CONTENT;
-import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 import org.opencastproject.metadata.dublincore.DublinCore;
@@ -184,12 +186,28 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       DublinCoreCatalog dc = getSeries(seriesID);
       return Response.ok(dc.toJson()).build();
     } catch (NotFoundException e) {
-      return Response.status(Response.Status.NOT_FOUND).build();
+      return Response.status(NOT_FOUND).build();
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Could not retrieve series: {}", e.getMessage());
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+      throw new WebApplicationException(INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("/{seriesID:.+}/acl.json")
+  public Response getSeriesAccessControlListJson(@PathParam("seriesID") String seriesID) {
+    logger.debug("Series ACL lookup: {}", seriesID);
+    try {
+      AccessControlList acl = getSeriesAccessControl(seriesID);
+      return Response.ok(acl).build();
+    } catch (NotFoundException e) {
+      return Response.status(NOT_FOUND).build();
+    } catch (SeriesException e) {
+      logger.error("Could not retrieve series ACL: {}", e.getMessage());
+      throw new WebApplicationException(INTERNAL_SERVER_ERROR);
     }
   }
 

@@ -49,6 +49,10 @@ on Windows.
 +----------------------------------------------------------------+
 | NOTE: Cross-compilation for Windows can be done only on Linux! |
 +----------------------------------------------------------------+
+! WARNING: New version of 3rd party tools (as of 13-Feb-2014)    |
+| wasn't tested yet for cross-compilation for Windows, so this   |
+| operation may fail.                                            |
++----------------------------------------------------------------+
 
 If you want to do some steps manually, for example if an error
 occurs during compilation, you need to define at least HOME3P
@@ -74,16 +78,17 @@ The compilation of 3rd party tools described here has been tested on
 the following newly installed operating systems:
 
 - 32-bit Linux
-  CentOS 5.5-6.0, Red Hat Enterprise Linux Server 5.5-6.0,
-  Ubuntu 10.04-11.10
+  CentOS 6.5, Red Hat Enterprise Linux Server 6.5,
+  Ubuntu 12.04 LTS
 
 - 64-bit Linux
-  CentOS 5.5-6.0, Red Hat Enterprise Linux Server 5.5-6.0,
-  Ubuntu 10.04-11.10
+  CentOS 6.5, Red Hat Enterprise Linux Server 6.5,
+  Ubuntu 12.04 LTS
 
 - Mac OS X
-  Snow Leopard 10.6.* with Xcode 3.2.*
-  Snow Lion 10.7.* with Xcode 4.1.*
+  Lion 10.7.5 with Xcode 4.6.3
+  Mountain Lion 10.8.5 with Xcode 5.0.2
+  Mavericks 10.9.1 with Xcode 5.0.2
 
 Operating systems should be installed for a developer/development,
 wherever possible.
@@ -96,7 +101,7 @@ already be installed on the system:
 - gzip
 - bzip2
 
-On Mac OS X 10.7.* java runtime is installed as soon as it's
+On Mac OS X 10.7/8/9 java runtime is installed as soon as it's
 needed for the 1st time (via an interactive window), so the 1st run
 of 3rd party scripts may fail. It can be repeated again as soon
 as the java runtime is installed.

@@ -53,16 +53,24 @@ import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Implementation of org.opencastproject.usertracking.api.UserTrackingService
- * 
+ *
  * @see org.opencastproject.usertracking.api.UserTrackingService
  */
 public class UserTrackingServiceImpl implements UserTrackingService, ManagedService {
 
   public static final String FOOTPRINT_KEY = "FOOTPRINT";
 
+  public static final String DETAILED_TRACKING = "org.opencastproject.usertracking.detailedtrack";
+  public static final String IP_LOGGING = "org.opencastproject.usertracking.log.ip";
+  public static final String USER_LOGGING = "org.opencastproject.usertracking.log.user";
+  public static final String SESSION_LOGGING = "org.opencastproject.usertracking.log.session";
+
   private static final Logger logger = LoggerFactory.getLogger(UserTrackingServiceImpl.class);
 
   private boolean detailedTracking = false;
+  private boolean logIp = true;
+  private boolean logUser = true;
+  private boolean logSession = true;
 
   /**
    * @param persistenceProvider
@@ -114,10 +122,23 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       return;
     }
 
-    Object val = props.get("org.opencastproject.usertracking.detailedtrack");
+    Object val = props.get(DETAILED_TRACKING);
     if (val != null && String.class.isInstance(val)) {
       detailedTracking = Boolean.valueOf((String) val);
     }
+    val = props.get(IP_LOGGING);
+    if (val != null && String.class.isInstance(val)) {
+      logIp = Boolean.valueOf((String) val);
+    }
+    val = props.get(USER_LOGGING);
+    if (val != null && String.class.isInstance(val)) {
+      logUser = Boolean.valueOf((String) val);
+    }
+    val = props.get(SESSION_LOGGING);
+    if (val != null && String.class.isInstance(val)) {
+      logSession = Boolean.valueOf((String) val);
+    }
+
   }
 
   public int getViews(String mediapackageId) {
@@ -136,9 +157,12 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
 
   @SuppressWarnings("unchecked")
   public UserAction addUserFootprint(UserAction a) throws UserTrackingException {
-    a.setType("FOOTPRINT");
+    a.setType(FOOTPRINT_KEY);
     EntityManager em = null;
     EntityTransaction tx = null;
+    if (!logIp) a.setUserIp("-omitted-");
+    if (!logUser) a.setUserId("-omitted-");
+    if (!logSession) a.setSessionId("-omitted-");
     try {
       em = emf.createEntityManager();
       tx = em.getTransaction();
@@ -178,6 +202,9 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
   public UserAction addUserTrackingEvent(UserAction a) throws UserTrackingException {
     EntityManager em = null;
     EntityTransaction tx = null;
+    if (!logIp) a.setUserIp("-omitted-");
+    if (!logUser) a.setUserId("-omitted-");
+    if (!logSession) a.setSessionId("-omitted-");
     try {
       em = emf.createEntityManager();
       tx = em.getTransaction();
@@ -308,7 +335,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-  
+
   @SuppressWarnings("unchecked")
   public UserActionList getUserActionsByTypeAndDay(String type, String day, int offset, int limit) {
     UserActionList result = new UserActionListImpl();
@@ -377,7 +404,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-  
+
   public UserActionList getUserActionsByTypeAndMediapackageIdByDescendingDate(String type, String mediapackageId,
           int offset, int limit) {
     UserActionList result = new UserActionListImpl();
@@ -406,7 +433,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-  
+
   @SuppressWarnings("unchecked")
   public UserSummaryListImpl getUserSummaryByTypeAndMediaPackage(String type, String mediapackageId) {
     UserSummaryListImpl result = new UserSummaryListImpl();
@@ -423,7 +450,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
         result.add(userSummary);
       }
       return result;
-    } catch (Exception e) { 
+    } catch (Exception e) {
       logger.warn("Unable to return any results from mediapackage " + mediapackageId + " of type " + type + " because of ", e);
       return result;
     }
@@ -433,7 +460,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-  
+
   private int getTotal(String type, Calendar calBegin, Calendar calEnd) {
     EntityManager em = null;
     try {
@@ -464,7 +491,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-  
+
   @SuppressWarnings("unchecked")
   public UserActionList getUserActionsByDay(String day, int offset, int limit) {
     UserActionList result = new UserActionListImpl();
@@ -600,9 +627,10 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
     }
   }
-  
+
   public FootprintList getFootprints(String mediapackageId, String userId) {
     EntityManager em = null;
+    if (! logUser) userId = null;
     try {
       em = emf.createEntityManager();
       Query q = null;
@@ -653,7 +681,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.usertracking.api.UserTrackingService#getUserAction(java.lang.Long)
    */
   @Override
@@ -679,7 +707,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.usertracking.api.UserTrackingService#getUserTrackingEnabled()
    */
   @Override

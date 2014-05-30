@@ -1,4 +1,4 @@
-URL: file://home/matjaz/3rd_party/repository ${USASK_MIRROR}
+URL: file://repository ${USASK_MIRROR} ${ETH_MIRROR}
 PKG: qt_sbtl_embedder-0.4.tar.gz
 SHA: dbed144020e3b5744d820cb41327d483186c5aff
 DIR: qt_sbtl_embedder-0.4

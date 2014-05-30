@@ -49,7 +49,7 @@ import javax.ws.rs.core.Response.Status;
  */
 @Path("/")
 @RestService(name = "localdistributionservice", title = "Local Distribution Service",
-  abstractText = "This service distributes access control lists to the Matterhorn feed and engage services.", 
+  abstractText = "This service distributes access control lists to the Matterhorn feed and engage services.",
   notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
@@ -70,7 +70,7 @@ public class AclDistributionRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -88,7 +88,7 @@ public class AclDistributionRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
@@ -145,7 +145,7 @@ public class AclDistributionRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -158,7 +158,7 @@ public class AclDistributionRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override

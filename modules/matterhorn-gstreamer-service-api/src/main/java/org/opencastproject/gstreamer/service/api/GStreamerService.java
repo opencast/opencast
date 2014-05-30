@@ -20,16 +20,16 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
 
 /**
- * Runs a gstreamer pipeline on media packages. 
+ * Runs a gstreamer pipeline on media packages.
  */
 public interface GStreamerService {
 
   String JOB_TYPE = "org.opencastproject.gstreamer";
-  
+
   /**
    * Launches a gstreamer pipeline using the syntax of the gstreamer launch command and substitutes variables from the
    * mediapackage
-   * 
+   *
    * @param mediapackage
    *          The mediapackage to substitute track variables from.
    * @param launch

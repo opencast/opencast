@@ -40,7 +40,7 @@ import javax.ws.rs.core.Response;
  * The REST endpoint for the state service on the capture device
  */
 @Path("/")
-@RestService(name = "stateservice", title = "State Service", 
+@RestService(name = "stateservice", title = "State Service",
   abstractText = "This service creates and augments Matterhorn media packages that include media tracks, metadata "
                + "catalogs and attachments.",
   notes = {
@@ -56,7 +56,7 @@ public class StateRestService {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
@@ -65,7 +65,7 @@ public class StateRestService {
 
   /**
    * Set {@link org.opencastproject.capture.api.StateService} service.
-   * 
+   *
    * @param service
    *          Service implemented {@link org.opencastproject.capture.api.StateService}
    */
@@ -75,7 +75,7 @@ public class StateRestService {
 
   /**
    * Set {@link org.opencastproject.capture.api.StateService} service.
-   * 
+   *
    * @param service
    *          Service implemented {@link org.opencastproject.capture.api.StateService}
    */
@@ -85,7 +85,7 @@ public class StateRestService {
 
   /**
    * Gets the state of the agent from the state service
-   * 
+   *
    * @return String The state of the of the agent. Will be defined in AgentState
    * @see org.opencastproject.capture.admin.api.AgentState
    */
@@ -103,7 +103,7 @@ public class StateRestService {
 
   /**
    * Gets the list of recording that the capture agent knows about.
-   * 
+   *
    * @return Response The method outputs the list to the response's output stream
    */
   @GET

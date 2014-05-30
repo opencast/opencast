@@ -50,7 +50,7 @@ public final class RestParamData {
 
   /**
    * Convenient constructor: take a RestParameter annotation and create a RestParamData from it.
-   * 
+   *
    * @param restParam
    *          the RestParameter annotation type that is to be transformed to RestParamData
    */
@@ -62,7 +62,7 @@ public final class RestParamData {
 
   /**
    * Create a parameter for this endpoint, the thing you are adding it to indicates if required or optional
-   * 
+   *
    * @param name
    *          the parameter name (this is the parameter itself)
    * @param type
@@ -105,7 +105,7 @@ public final class RestParamData {
 
   /**
    * Attributes are used for adjusting rendering of form elements related to this parameter.
-   * 
+   *
    * @param key
    *          the attribute key (e.g. size)
    * @param value
@@ -126,7 +126,7 @@ public final class RestParamData {
 
   /**
    * Get the value indexed by key in attributes.
-   * 
+   *
    * @param key
    *          the attribute key (e.g. size)
    * @return the value indexed by the key or null if that value does not exists
@@ -140,7 +140,7 @@ public final class RestParamData {
 
   /**
    * Get the name of this parameter.
-   * 
+   *
    * @return name of this parameter
    */
   public String getName() {
@@ -149,7 +149,7 @@ public final class RestParamData {
 
   /**
    * Get the default value of this parameter.
-   * 
+   *
    * @return default value of this parameter
    */
   public String getDefaultValue() {
@@ -169,10 +169,10 @@ public final class RestParamData {
   public String getEscapedXmlSchema() {
     return StringEscapeUtils.escapeXml(xmlSchema);
   }
-  
+
   /**
    * Get the type of this parameter.
-   * 
+   *
    * @return type of this parameter
    */
   public String getType() {
@@ -181,7 +181,7 @@ public final class RestParamData {
 
   /**
    * Get the description of this parameter.
-   * 
+   *
    * @return description of this parameter
    */
   public String getDescription() {
@@ -190,7 +190,7 @@ public final class RestParamData {
 
   /**
    * Get the attributes used for adjusting rendering of form elements related to this parameter.
-   * 
+   *
    * @return the attributes used for adjusting rendering of form elements related to this parameter
    */
   public Map<String, String> getAttributes() {
@@ -199,7 +199,7 @@ public final class RestParamData {
 
   /**
    * Return whether this parameter is required.
-   * 
+   *
    * @return a boolean indicating whether this parameter is required.
    */
   public boolean isRequired() {
@@ -208,7 +208,7 @@ public final class RestParamData {
 
   /**
    * Return whether this parameter is a path parameter.
-   * 
+   *
    * @return a boolean indicating whether this parameter is a path parameter.
    */
   public boolean isPath() {
@@ -217,7 +217,7 @@ public final class RestParamData {
 
   /**
    * Set whether this parameter is a path parameter.
-   * 
+   *
    * @param path
    *          a boolean specifying whether this parameter is a path parameter.
    */
@@ -227,7 +227,7 @@ public final class RestParamData {
 
   /**
    * Set whether this parameter is required.
-   * 
+   *
    * @param required
    *          if true then this parameter is require, otherwise it is optional
    */
@@ -237,7 +237,7 @@ public final class RestParamData {
 
   /**
    * Return a string representation of this RestParamData object.
-   * 
+   *
    * @return a string representation of this RestParamData object
    */
   @Override

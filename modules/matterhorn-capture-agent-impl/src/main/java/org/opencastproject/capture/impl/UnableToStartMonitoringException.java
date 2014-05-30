@@ -19,7 +19,7 @@ package org.opencastproject.capture.impl;
  * This class is used to throw exceptions while trying to start monitoring pipeline.
  */
 public class UnableToStartMonitoringException extends Exception {
-    
+
   public UnableToStartMonitoringException(String message) {
     super(message);
   }

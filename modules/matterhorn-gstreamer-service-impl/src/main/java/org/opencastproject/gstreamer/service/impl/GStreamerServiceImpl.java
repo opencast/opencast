@@ -61,13 +61,13 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * GStreamer service that runs gstreamer pipelines with the gstreamer launch command. 
+ * GStreamer service that runs gstreamer pipelines with the gstreamer launch command.
  */
 public class GStreamerServiceImpl extends AbstractJobProducer implements GStreamerService {
   /** If no specific location is configured for the gstreamer command this location is used by default. **/
-  public static final String DEFAULT_GSTREAMER_LOCATION = "/usr/bin/gst-launch";
+  public static final String DEFAULT_GSTREAMER_LOCATION = "gst-launch";
   /** The key defining a custom gstreamer location.  **/
-  public static final String CONFIG_GSTREAMER_LOCATION_KEY = "org.opencastproject.export.gstreamerpath";
+  public static final String CONFIG_GSTREAMER_LOCATION_KEY = "org.opencastproject.export.gstreamer.path";
   /** The location of the gstreamer binary for running commands. **/
   private String gstreamerLocation = DEFAULT_GSTREAMER_LOCATION;
 
@@ -91,12 +91,12 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
 
   /** The user directory service */
   protected UserDirectoryService userDirectoryService = null;
-  
+
   /** List of available operations on jobs */
   private enum Operation {
     Launch
   };
-  
+
   /**
    * Creates a new instance of the composer service.
    */
@@ -117,10 +117,10 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
       }
     }
   }
-  
+
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   protected String process(Job job) throws Exception {
@@ -133,7 +133,7 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.gstreamer.api.GStreamerService#launch(org.opencastproject.mediapackage.MediaPackage,
    *      java.lang.String, java.lang.String)
    */
@@ -188,7 +188,7 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
 
   /**
    * Launch the gstreamer pipeline from the gstreamerLine.
-   * 
+   *
    * @param gstreamerLine
    *          The gstreamer line to execute.
    * @throws GStreamerLaunchException
@@ -227,7 +227,7 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
 
   /**
    * Replace all tracks with the proper location from the mediapackage.
-   * 
+   *
    * @param mediaPackage
    *          The mediapackage to look for tracks.
    * @param stringWithSubstitions
@@ -250,7 +250,7 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
 
   /**
    * Substitutes all of the substitutions in the gstreamerCommandLine and returns the new String.
-   * 
+   *
    * @param gstreamerCommandLine
    *          The string to make the substitutions on.
    * @param substitutions
@@ -263,17 +263,17 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
     String id = UUID.randomUUID().toString();
     return DocUtil.processTextTemplate(id, gstreamerCommandLine, castedMap);
   }
-  
+
   /**
-   * @return The location that this bundle is using to run gstreamer commands. 
+   * @return The location that this bundle is using to run gstreamer commands.
    */
   public String getGStreamerLocation() {
     return gstreamerLocation;
   }
-  
+
   /**
    * Deletes any valid file in the list.
-   * 
+   *
    * @param encodingOutput
    *          list of files to be deleted
    */
@@ -312,7 +312,7 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
 
   /**
    * Sets the workspace
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -322,7 +322,7 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
 
   /**
    * Sets the service registry
-   * 
+   *
    * @param serviceManager
    */
   protected void setServiceRegistry(ServiceRegistry serviceManager) {
@@ -331,7 +331,7 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -341,7 +341,7 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -351,7 +351,7 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -361,7 +361,7 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -371,7 +371,7 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -381,7 +381,7 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -391,7 +391,7 @@ public class GStreamerServiceImpl extends AbstractJobProducer implements GStream
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override

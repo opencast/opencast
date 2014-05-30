@@ -20,15 +20,8 @@ import org.opencastproject.job.api.JaxbJobContext;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -62,6 +55,11 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A long running, asynchronously executed job. This concrete implementations adds JPA annotations to {@link JaxbJob}.
@@ -160,7 +158,7 @@ public class JobJpaImpl extends JaxbJob {
   public JobJpaImpl(User user, Organization organization, ServiceRegistrationJpaImpl creatorServiceRegistration,
           String operation, List<String> arguments, String payload, boolean dispatchable) {
     this();
-    this.creator = user.getUserName();
+    this.creator = user.getUsername();
     this.organization = organization.getId();
     this.operation = operation;
     this.context = new JaxbJobContext();
@@ -397,7 +395,7 @@ public class JobJpaImpl extends JaxbJob {
    * @see org.opencastproject.job.api.JaxbJob#getPayload()
    */
   @Lob
-  @Column(name = "payload", length = 65535)
+  @Column(name = "payload", length = 16777215)
   @XmlElement
   @Override
   public String getPayload() {

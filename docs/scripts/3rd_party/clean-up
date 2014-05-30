@@ -11,11 +11,11 @@ cleanup .            "$1" || exit 1
 cleanup base_libs    "$1" || exit 1
 cleanup ffmpeg_libs  "$1" || exit 1
 cleanup ffmpeg       "$1" || exit 1
+cleanup sox_libs     "$1" || exit 1
+cleanup sox          "$1" || exit 1
 cleanup gstreamer    "$1" || exit 1
 cleanup mediainfo    "$1" || exit 1
 cleanup tesseract    "$1" || exit 1
-cleanup ocropus_libs "$1" || exit 1
-cleanup ocropus      "$1" || exit 1
 cleanup qtembedder   "$1" || exit 1
 #
 if [ "$1" = "all" ]; then

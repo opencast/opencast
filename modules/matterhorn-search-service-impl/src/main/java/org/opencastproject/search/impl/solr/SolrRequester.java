@@ -33,6 +33,7 @@ import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchResultItem.SearchResultItemType;
 import org.opencastproject.search.api.SearchResultItemImpl;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.SolrUtils;
@@ -58,6 +59,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -666,16 +668,16 @@ public class SolrRequester {
       sb.append(" AND ").append(Schema.OC_ORGANIZATION).append(":")
               .append(SolrUtils.clean(securityService.getOrganization().getId()));
       User user = securityService.getUser();
-      String[] roles = user.getRoles();
+      Set<Role> roles = user.getRoles();
       boolean userHasAnonymousRole = false;
-      if (roles.length > 0) {
+      if (roles.size() > 0) {
         sb.append(" AND (");
         StringBuilder roleList = new StringBuilder();
-        for (String role : roles) {
+        for (Role role : roles) {
           if (roleList.length() > 0)
             roleList.append(" OR ");
-          roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":").append(SolrUtils.clean(role));
-          if (role.equalsIgnoreCase(securityService.getOrganization().getAnonymousRole())) {
+          roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":").append(SolrUtils.clean(role.getName()));
+          if (role.getName().equalsIgnoreCase(securityService.getOrganization().getAnonymousRole())) {
             userHasAnonymousRole = true;
           }
         }

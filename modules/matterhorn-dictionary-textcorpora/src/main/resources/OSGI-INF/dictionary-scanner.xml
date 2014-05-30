@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component
+  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.dictionary.textcorpora.DictionaryScanner"
+  immediate="true" activate="activate">
+
+  <implementation class="org.opencastproject.dictionary.textcorpora.DictionaryScanner" />
+  <property name="service.description" value="Dictionary Scanner" />
+  <service>
+    <provide interface="org.apache.felix.fileinstall.ArtifactInstaller" />
+  </service>
+
+  <reference name="dictionaryService"
+    interface="org.opencastproject.dictionary.textcorpora.DictionaryServiceJpaImpl"
+    cardinality="1..1"
+    policy="static"
+    bind="setDictionaryService" />
+</scr:component>

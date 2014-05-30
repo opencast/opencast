@@ -10,12 +10,11 @@ source "${HOME3P}/utilx"
 compile base_libs    mac || exit 1
 compile ffmpeg_libs  mac || exit 1
 compile ffmpeg       mac || exit 1
+compile sox_libs     mac || exit 1
+compile sox          mac || exit 1
 compile gstreamer    mac || exit 1
 compile mediainfo    mac || exit 1
-compile ocropus_libs mac || exit 1
-# tesseract depends on leptonica and gif
 compile tesseract    mac || exit 1
-compile ocropus      mac || exit 1
 compile qtembedder   mac || exit 1
 #
 exit 0

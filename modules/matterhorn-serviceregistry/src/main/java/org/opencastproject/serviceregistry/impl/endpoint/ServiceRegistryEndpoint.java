@@ -39,6 +39,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -96,7 +97,7 @@ public class ServiceRegistryEndpoint {
    *          OSGi component context
    */
   public void activate(ComponentContext cc) {
-    serverUrl = (String) cc.getBundleContext().getProperty("org.opencastproject.server.url");
+    serverUrl = (String) cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
     servicePath = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
   }
 

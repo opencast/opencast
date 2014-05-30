@@ -48,6 +48,10 @@ public final class AccessControlList {
     this.entries = new ArrayList<AccessControlEntry>(Arrays.asList(entries));
   }
 
+  public AccessControlList(List<AccessControlEntry> entries) {
+    this.entries = new ArrayList<AccessControlEntry>(entries);
+  }
+
   /**
    * @return the entries
    */

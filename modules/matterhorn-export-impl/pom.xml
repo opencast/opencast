@@ -1,21 +1,19 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.opencastproject</groupId>
   <artifactId>matterhorn-export-impl</artifactId>
   <packaging>bundle</packaging>
   <name>matterhorn-export-impl</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.4.3</version>
+    <version>1.6-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
-  <dependencies>  
+  <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-common</artifactId>
@@ -26,7 +24,7 @@
       <artifactId>matterhorn-conductor</artifactId>
       <version>${project.version}</version>
     </dependency>
-     <dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-distribution-service-api</artifactId>
       <version>${project.version}</version>
@@ -79,9 +77,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.gstreamer</groupId>
-    	<artifactId>gstreamer-java</artifactId>
-    	<version>1.4-no-tests-and-bin-launch</version>
+      <groupId>org.gstreamer</groupId>
+      <artifactId>gstreamer-java</artifactId>
+      <version>1.4-no-tests-and-bin-launch</version>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -116,14 +114,13 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.0.1</version>
         <extensions>true</extensions>
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
             <Import-Package>org.opencastproject.fsresources;version=${project.version},
 				javax.xml.namespace;version=0,*;resolution:=optional </Import-Package>
-            <Export-Package></Export-Package>
+            <Export-Package/>
             <Service-Component>
               OSGI-INF/operations/export.xml,
               OSGI-INF/export-distribution-ui.xml

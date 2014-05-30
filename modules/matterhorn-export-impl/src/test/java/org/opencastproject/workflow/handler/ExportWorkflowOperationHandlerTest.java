@@ -60,22 +60,22 @@ public class ExportWorkflowOperationHandlerTest {
   private static boolean gstreamerInstalled = true;
 
   private ExportWorkflowOperationHandler exportWorkflowOperationHandler = new ExportWorkflowOperationHandler();
-  
+
   private static Workspace workspace;
-  
+
   private MediaPackage mediaPackage;
 
   private GStreamerService gstreamerService;
-  
+
   private ServiceRegistry serviceRegistry;
-  
+
   private URI movieFileURI;
   private URI complicatedFileURI;
   private URI withoutGStreamerURI;
   private URI withGStreamerURI;
   private URI randomXMLURI;
-  
-  
+
+
   /** Make sure that gstreamer is installed and available. **/
   @BeforeClass
   public static void testGst() {
@@ -109,7 +109,7 @@ public class ExportWorkflowOperationHandlerTest {
     Track movieTrack = TrackImpl.fromURI(movieFileURI);
     movieTrack.setIdentifier("track-1");
     Track[] tracks = { movieTrack };
-    
+
     mediaPackage = EasyMock.createNiceMock(MediaPackage.class);
     EasyMock.expect(mediaPackage.clone()).andReturn(mediaPackage).anyTimes();
     EasyMock.expect(mediaPackage.getAttachments()).andReturn(attachments);
@@ -130,11 +130,11 @@ public class ExportWorkflowOperationHandlerTest {
     EasyMock.expect(job.getQueueTime()).andReturn(10L).anyTimes();
     EasyMock.expect(job.getPayload()).andReturn(getPayload()).anyTimes();
     EasyMock.replay(job);
-    
+
     gstreamerService = EasyMock.createNiceMock(GStreamerService.class);
     EasyMock.expect(gstreamerService.launch((MediaPackage)EasyMock.anyObject(), (String)EasyMock.anyObject(), (String)EasyMock.anyObject())).andReturn(job).anyTimes();
     EasyMock.replay(gstreamerService);
-    
+
     serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job).anyTimes();
     EasyMock.replay(serviceRegistry);
@@ -153,14 +153,14 @@ public class ExportWorkflowOperationHandlerTest {
 
   /**
    * Test it correctly processes attachments
-   * 
+   *
    * @throws Exception
    */
 
   @Test
   public void testAttachmentProcessing() throws Exception {
     if (!gstreamerInstalled) {
-       return; 
+       return;
     }
     exportWorkflowOperationHandler = new ExportWorkflowOperationHandler();
     exportWorkflowOperationHandler.setWorkspace(workspace);
@@ -196,7 +196,7 @@ public class ExportWorkflowOperationHandlerTest {
     exportWorkflowOperationHandler.setWorkspace(workspace);
     exportWorkflowOperationHandler.setGStreamerService(gstreamerService);
     exportWorkflowOperationHandler.setServiceRegistry(serviceRegistry);
-    
+
     WorkflowInstance workflowInstance = new WorkflowInstanceImpl();
     JaxbJobContext jobContext = new JaxbJobContext();
     workflowInstance.setMediaPackage(mediaPackage);
@@ -228,7 +228,7 @@ public class ExportWorkflowOperationHandlerTest {
     exportWorkflowOperationHandler.setWorkspace(workspace);
     exportWorkflowOperationHandler.setGStreamerService(gstreamerService);
     exportWorkflowOperationHandler.setServiceRegistry(serviceRegistry);
-    
+
     WorkflowInstance workflowInstance = new WorkflowInstanceImpl();
     JaxbJobContext jobContext = new JaxbJobContext();
     workflowInstance.setMediaPackage(mediaPackage);
@@ -264,7 +264,7 @@ public class ExportWorkflowOperationHandlerTest {
     exportWorkflowOperationHandler.setWorkspace(workspace);
     exportWorkflowOperationHandler.setGStreamerService(gstreamerService);
     exportWorkflowOperationHandler.setServiceRegistry(serviceRegistry);
-    
+
     WorkflowInstance workflowInstance = new WorkflowInstanceImpl();
     JaxbJobContext jobContext = new JaxbJobContext();
     workflowInstance.setMediaPackage(mediaPackage);

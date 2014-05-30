@@ -72,7 +72,8 @@ public class CLIWorkflowOperationHandlerTest {
    */
   @BeforeClass
   public static void textEnvironment() throws IOException {
-    File tmp = File.createTempFile("test", "txt");
+    //Create the list in the target directory to not pollute /tmp
+    File tmp = File.createTempFile("test", "txt", new File("target"));
     Map<String, String> commands = new HashMap<String, String>();
     commands.put("touch", tmp.getAbsolutePath());
     commands.put("echo", "hello");

@@ -45,7 +45,7 @@ public class HauppaugePVR350VideoProducer extends FileProducer {
 
   /**
    * Creates a Producer specifically designed to capture from the Hauppauge WinTv cards
-   * 
+   *
    * @param captureDevice
    *          The Hauppauge {@code CaptureDevice} to create pipeline around
    * @param properties
@@ -70,7 +70,7 @@ public class HauppaugePVR350VideoProducer extends FileProducer {
 
   /**
    * Create all of the Elements for the Producer.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           Thrown if an Element's GStreamer module is not present.
    **/
@@ -91,7 +91,7 @@ public class HauppaugePVR350VideoProducer extends FileProducer {
 
   /**
    * Sets the filesrc and demuxer's properties
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If filesrc or demuxer is null then this Exception is thrown.
    **/
@@ -104,7 +104,7 @@ public class HauppaugePVR350VideoProducer extends FileProducer {
 
   /**
    * Sets the filesrc location and makes sure that it can be read from.
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           Thrown if filesrc is null
    **/
@@ -113,7 +113,7 @@ public class HauppaugePVR350VideoProducer extends FileProducer {
       throw new UnableToSetElementPropertyBecauseElementWasNullException(filesrc, captureDevice.getLocation());
     }
     if (!new File(captureDevice.getLocation()).canRead()) {
-      throw new IllegalArgumentException("HauppaugePVR350VideoProducer cannot read from " 
+      throw new IllegalArgumentException("HauppaugePVR350VideoProducer cannot read from "
               + captureDevice.getLocation());
     }
     filesrc.set(GStreamerProperties.LOCATION, captureDevice.getLocation());
@@ -121,7 +121,7 @@ public class HauppaugePVR350VideoProducer extends FileProducer {
 
   /**
    * Creates the event listener to connect the sometimes pad of the mpegpsdemux to the mpegvideoparse.
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           Thrown if mpegpsdemux is null
    **/

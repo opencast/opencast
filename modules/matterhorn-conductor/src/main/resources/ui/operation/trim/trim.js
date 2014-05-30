@@ -103,7 +103,7 @@ $(document).ready(function () {
     $("#continueBtn").button("disable");
 
     $("#trimming-hint").toggle();
-
+    $("#errorMessage").hide(0);
     window.parent.$("#controlsTop").hide(0);
     window.parent.$("#searchBox").hide(0);
     window.parent.$("#tableContainer").hide(0);
@@ -167,7 +167,7 @@ $(document).ready(function () {
             $("#inPoint").val($("#player-container").contents().find("#oc_duration").text());
         }
         if (getTimeInMilliseconds($("#inPoint").val()) >= getTimeInMilliseconds($("#outPoint").val())) {
-            $("div#errorMessage").html("Out point must be later than In point");
+            $("div#errorMessage").html("WARNING: Out point must be later than In point");
             $("#trimming-hint").hide();
             $("div#errorMessage").show();
         } else {
@@ -482,6 +482,7 @@ function continueWorkflow () {
         trimFromData = $('#inPoint').val(),
         trimToData;
 
+    var def = $.Deferred();
 
     trimFromData = ((trimFromData == '') || (trimFromData == null)) ? '00:00:00' : trimFromData;
     // Format 'Trim To'
@@ -516,13 +517,17 @@ function continueWorkflow () {
                 });
                 parent.ocRecordings.Hold.changedMediaPackage = mp;
             }
-            parent.ocRecordings.continueWorkflow(postData);
+            $.when(parent.ocRecordings.continueWorkflow(postData)).then(function(){ def.resolve(); });
         } else {
-        $("div#errorMessage").html("The In-Point must not be bigger than the Out-Point");
+          $("div#errorMessage").html("ERROR: The In point is before the Out point. Please change to valid values before continuing processing.");
+          mpe.find(".loading").hide();
+          def.reject();
         }
     });
 
     mpe.submit();
+    
+    return def.promise();
 }
 
 function leave(){

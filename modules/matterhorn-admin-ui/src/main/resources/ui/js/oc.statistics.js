@@ -135,21 +135,21 @@ ocStatistics = new (function() {
 		          success: function (data) {
 		        	//TODO: This should really just call the same function in the init html...
 	        	    var url = '/services/servicewarnings';
-	                $.ajax(
-	                {
-  	                  url: url,
-	                  dataType: 'json',
-	                  success: function (data)
-                      {
-	                    var servicesInWarningState = data;
-	                    var badge = $('#statistics_badge');
-	                    if (servicesInWarningState > 0) {
-	                      badge.html(data);
-	                    } else {
-	                      badge.empty();
-	                    }
-                      }
-                    });
+                $.ajax(
+                {
+                  url: url,
+                  dataType: 'json',
+                  success: function (data)
+                  {
+                    var servicesInWarningState = data;
+                    var badge = $('#statistics_badge');
+                    if (servicesInWarningState > 0) {
+                      badge.html(data);
+                    } else {
+                      badge.empty();
+                    }
+                  }
+                });
 		          }
 		        });
     		}, this)
