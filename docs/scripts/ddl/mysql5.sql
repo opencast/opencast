@@ -164,6 +164,7 @@ CREATE INDEX IX_mh_job_date_created ON mh_job (date_created);
 CREATE INDEX IX_mh_job_date_completed ON mh_job (date_completed);
 CREATE INDEX IX_mh_job_dispatchable ON mh_job (dispatchable);
 CREATE INDEX IX_mh_job_operation ON mh_job (operation);
+CREATE INDEX IX_mh_job_statistics ON mh_job (processor_service, status, queue_time, run_time);
 
 CREATE TABLE mh_job_argument (
   id BIGINT NOT NULL,

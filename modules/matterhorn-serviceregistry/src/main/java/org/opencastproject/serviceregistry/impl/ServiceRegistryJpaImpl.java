@@ -1555,22 +1555,31 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
+      Map<Long, JaxbServiceStatistics> statsMap = new HashMap<Long, JaxbServiceStatistics>();
+
+      // Make sure we also include the services that have no processing history so far
+      List<ServiceRegistrationJpaImpl> services = em.createNamedQuery("ServiceRegistration.getAll").getResultList();
+      for (ServiceRegistrationJpaImpl s : services) {
+        statsMap.put(s.getId(), new JaxbServiceStatistics((ServiceRegistrationJpaImpl) s));
+      }
+
       Query query = em.createNamedQuery("ServiceRegistration.statistics");
-      Map<ServiceRegistration, JaxbServiceStatistics> statsMap = new HashMap<ServiceRegistration, JaxbServiceStatistics>();
       List queryResults = query.getResultList();
       for (Object result : queryResults) {
         Object[] oa = (Object[]) result;
-        ServiceRegistrationJpaImpl serviceRegistration = ((ServiceRegistrationJpaImpl) oa[0]);
-        Status status = ((Status) oa[1]);
+        Long serviceRegistrationId = ((Long) oa[0]);
+        if (serviceRegistrationId == null)
+          break;
+        Status status = (Status) oa[1];
         Number count = (Number) oa[2];
         Number meanQueueTime = (Number) oa[3];
         Number meanRunTime = (Number) oa[4];
 
         // The statistics query returns a cartesian product, so we need to iterate over them to build up the objects
-        JaxbServiceStatistics stats = statsMap.get(serviceRegistration);
+        JaxbServiceStatistics stats = statsMap.get(serviceRegistrationId);
         if (stats == null) {
-          stats = new JaxbServiceStatistics(serviceRegistration);
-          statsMap.put(serviceRegistration, stats);
+          stats = new JaxbServiceStatistics();
+          statsMap.put(serviceRegistrationId, stats);
         }
         // the status will be null if there are no jobs at all associated with this service registration
         if (status != null) {
@@ -1591,13 +1600,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               break;
           }
         }
-      }
-
-      // Make sure we also include the services that have no processing history so far
-      List<ServiceRegistration> services = em.createNamedQuery("ServiceRegistration.getAll").getResultList();
-      for (ServiceRegistration s : services) {
-        if (!statsMap.containsKey(s))
-          statsMap.put(s, new JaxbServiceStatistics((ServiceRegistrationJpaImpl) s));
       }
 
       List<ServiceStatistics> stats = new ArrayList<ServiceStatistics>(statsMap.values());
