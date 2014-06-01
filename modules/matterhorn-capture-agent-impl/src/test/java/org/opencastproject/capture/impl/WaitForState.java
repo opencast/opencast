@@ -26,7 +26,7 @@ class WaitForState {
 
   /**
    * Sleeps for a while, checks to see if a condition is made. Once it is the sleep wait ends.
-   * 
+   *
    * @param CheckState
    *          The function check will be used to check to see if the correct state has been obtained.
    **/

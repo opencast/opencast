@@ -78,7 +78,7 @@ public class GStreamerEncoderEngine extends AbstractGSEncoderEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.opencastproject.composer.gstreamer.AbstractGSEncoderEngine#createAndLaunchPipeline(org.opencastproject.composer
    * .api.EncodingProfile, java.util.Map)
@@ -103,7 +103,7 @@ public class GStreamerEncoderEngine extends AbstractGSEncoderEngine {
   /**
    * Builds string representation of gstreamer pipeline by substituting templates from pipeline template with actual
    * values from properties. Template format is #{property.name}. All unmatched properties are removed.
-   * 
+   *
    * @param profile
    *          EncodingProfile used for this encoding job
    * @param properties
@@ -131,7 +131,7 @@ public class GStreamerEncoderEngine extends AbstractGSEncoderEngine {
   /**
    * Creates GSPipeline that contains gstreamer Pipeline with its MonitorObject from string representation of pipeline.
    * Syntax is equivalent to the gstreamer command line syntax.
-   * 
+   *
    * @param pipelineDefinition
    *          String representation of gstreamer pipeline
    * @return GSPipeline that contains built Pipeline and MonitorObject
@@ -167,7 +167,7 @@ public class GStreamerEncoderEngine extends AbstractGSEncoderEngine {
   /**
    * Executes GSPipeline. Blocks until either exception occurs in processing pipeline or EOS is reached. Optionally you
    * can specify start position from where pipeline should start playing.
-   * 
+   *
    * @param gspipeline
    *          GSPipeline used for execution
    * @param startPosition
@@ -220,10 +220,10 @@ public class GStreamerEncoderEngine extends AbstractGSEncoderEngine {
       throw new EncoderException("Error occurred in processing pipeline: " + errorMessage);
     }
   }
-  
+
   /**
    * Install various listeners to Pipeline, such as: ERROR, WARNING, INFO, STATE_CHANGED and EOS.
-   * 
+   *
    * @param pipeline
    *          Pipeline to which listeners will be installed
    * @param monitorObject
@@ -277,7 +277,7 @@ public class GStreamerEncoderEngine extends AbstractGSEncoderEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.opencastproject.composer.gstreamer.AbstractGSEncoderEngine#extractMultipleImages(org.opencastproject.composer
    * .api.EncodingProfile, java.util.Map)
@@ -373,7 +373,7 @@ public class GStreamerEncoderEngine extends AbstractGSEncoderEngine {
    * Creates fixed pipeline for image extraction. Pipeline consists of filesrc, decodebin, ffmpegcolorspace and appsink
    * elements. Appsink element is named 'appsink' and by that name reference to appsink element can be obtained from the
    * pipeline.
-   * 
+   *
    * @param videoPath
    *          video on which image extraction will be performed
    * @return built and linked pipeline
@@ -416,7 +416,7 @@ public class GStreamerEncoderEngine extends AbstractGSEncoderEngine {
    * Creates image out of gstreamer buffer. Buffer should have following properties: 32 bits/pixel and color depth of 24
    * bits. Output image format is chosen based on the output file name. If width or height are equal or less than 0,
    * original image size is retained.
-   * 
+   *
    * @param buffer
    *          gstreamer buffer from which image will be constructed
    * @param width
@@ -461,7 +461,7 @@ public class GStreamerEncoderEngine extends AbstractGSEncoderEngine {
 
   /**
    * Creates new MonitorObject, which keeps information of pipelines errors, and if pipeline should be stopped.
-   * 
+   *
    * @return new MonitorObject
    */
   private MonitorObject createNewMonitorObject() {
@@ -504,7 +504,7 @@ public class GStreamerEncoderEngine extends AbstractGSEncoderEngine {
 
   /**
    * Creates new GSPipeline object that holds Pipeline and its MonitorObject.
-   * 
+   *
    * @param pipeline
    * @param monitorObject
    * @return new GSPipeline object

@@ -48,7 +48,7 @@ public class CustomFeedService extends AbstractFeedService implements FeedGenera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.api.FeedGenerator#accept(java.lang.String[])
    */
   public boolean accept(String[] query) {
@@ -61,7 +61,7 @@ public class CustomFeedService extends AbstractFeedService implements FeedGenera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#loadFeedData(org.opencastproject.feed.api.Feed.Type,
    *      java.lang.String[], int, int)
    */
@@ -97,7 +97,7 @@ public class CustomFeedService extends AbstractFeedService implements FeedGenera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.impl.AbstractFeedService#initialize(java.util.Properties)
    */
   @Override

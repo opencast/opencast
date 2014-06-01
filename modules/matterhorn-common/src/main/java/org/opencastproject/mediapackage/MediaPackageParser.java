@@ -53,7 +53,7 @@ public final class MediaPackageParser {
 
   /**
    * Serializes the media package to a string.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @return the serialized media package
@@ -74,7 +74,7 @@ public final class MediaPackageParser {
 
   /**
    * Serializes the media package to a JSON string.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @return the serialized media package
@@ -146,7 +146,7 @@ public final class MediaPackageParser {
    * todo Implementation is currently defective since it misses various properties. See
    * http://opencast.jira.com/browse/MH-9489 Use {@link #getAsXmlDocument(MediaPackage)} instead if you do not need a
    * serializer.
-   * 
+   *
    * @param mediaPackage
    *          the mediapackage
    * @param serializer
@@ -248,7 +248,7 @@ public final class MediaPackageParser {
 
   /**
    * Parses the media package and returns its object representation.
-   * 
+   *
    * @param xml
    *          the serialized media package
    * @return the media package instance
@@ -262,7 +262,7 @@ public final class MediaPackageParser {
 
   /**
    * Writes an xml representation of this MediaPackage to a stream.
-   * 
+   *
    * @param mediaPackage
    *          the mediaPackage
    * @param out

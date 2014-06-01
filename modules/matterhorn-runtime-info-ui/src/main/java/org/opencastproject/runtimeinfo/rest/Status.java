@@ -116,7 +116,7 @@ public class Status {
 
   /**
    * Allows overriding of the name which is set from the code
-   * 
+   *
    * @param name
    *          the name to display with the code
    */
@@ -145,7 +145,7 @@ public class Status {
 
   /**
    * This will resolve a human readable name for all known status codes
-   * 
+   *
    * @param code
    *          the status code
    * @return the name OR UNKNOWN if none found

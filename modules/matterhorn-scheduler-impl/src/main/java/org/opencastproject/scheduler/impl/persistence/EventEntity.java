@@ -26,7 +26,7 @@ import javax.persistence.Table;
 /**
  * Entity object for storing events in persistence storage. Event ID is stored as primary key, DUBLIN_CORE field is used
  * to store serialized Dublin core and 'CA_METADATA' is used to store capture agent specific metadata.
- * 
+ *
  */
 @Entity(name = "EventEntity")
 @NamedQueries({
@@ -59,7 +59,7 @@ public class EventEntity {
 
   /**
    * Returns event ID.
-   * 
+   *
    * @return event ID
    */
   public Long getEventId() {
@@ -68,7 +68,7 @@ public class EventEntity {
 
   /**
    * Sets event ID.
-   * 
+   *
    * @param eventId
    */
   public void setEventId(Long eventId) {
@@ -77,7 +77,7 @@ public class EventEntity {
 
   /**
    * Returns serialized Dublin core.
-   * 
+   *
    * @return serialized Dublin core
    */
   public String getEventDublinCore() {
@@ -86,7 +86,7 @@ public class EventEntity {
 
   /**
    * Sets serialized Dublin core.
-   * 
+   *
    * @param dublinCoreXML
    *          serialized Dublin core
    */
@@ -96,7 +96,7 @@ public class EventEntity {
 
   /**
    * Returns serialized capture agent metadata
-   * 
+   *
    * @return serialized metadata
    */
   public String getCaptureAgentMetadata() {
@@ -105,7 +105,7 @@ public class EventEntity {
 
   /**
    * Sets serialized capture agent metadata
-   * 
+   *
    * @param captureAgentMetadata
    *          serialized metadata
    */

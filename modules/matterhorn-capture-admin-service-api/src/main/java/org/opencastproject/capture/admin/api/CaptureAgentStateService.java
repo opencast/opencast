@@ -31,7 +31,7 @@ public interface CaptureAgentStateService {
 
   /**
    * Returns an agent by its name
-   * 
+   *
    * @param agentName
    *          The name of the agent.
    * @return The agent
@@ -42,7 +42,7 @@ public interface CaptureAgentStateService {
 
   /**
    * Updates an agent
-   * 
+   *
    * @param agent
    *          the agent to update
    */
@@ -50,7 +50,7 @@ public interface CaptureAgentStateService {
 
   /**
    * Returns the last known agent state by its name
-   * 
+   *
    * @param agentName
    *          The name of the agent.
    * @return The agent state
@@ -62,7 +62,7 @@ public interface CaptureAgentStateService {
   /**
    * Sets a given agent's state. Note that this will create the agent if it does not already exist. The state should be
    * defined in {@link org.opencastproject.capture.admin.api.AgentState}.
-   * 
+   *
    * @param agentName
    *          The name of the agent.
    * @param state
@@ -72,7 +72,7 @@ public interface CaptureAgentStateService {
   boolean setAgentState(String agentName, String state);
 
   /**
-   * 
+   *
    * @param agentName
    *          The name of the agent.
    * @param agentUrl
@@ -84,7 +84,7 @@ public interface CaptureAgentStateService {
 
   /**
    * Remove an agent from the system, if the agent exists.
-   * 
+   *
    * @param agentName
    *          The name of the agent.
    * @throws NotFoundException
@@ -94,14 +94,14 @@ public interface CaptureAgentStateService {
 
   /**
    * Returns the list of known agents that the current user is authorized to schedule.
-   * 
+   *
    * @return A {@link java.util.Map} of name-agent pairs.
    */
   Map<String, Agent> getKnownAgents();
 
   /**
    * Returns the list of known agent capabilities.
-   * 
+   *
    * @return A {@link java.util.Properties} of name-value capability pairs.
    * @throws NotFoundException
    *           if no agent with the given name has been found
@@ -110,7 +110,7 @@ public interface CaptureAgentStateService {
 
   /**
    * Returns the list of known agent configurations.
-   * 
+   *
    * @return A {@link java.util.Properties} of name-value configuration pairs.
    * @throws NotFoundException
    *           if no agent with the given name has been found
@@ -119,7 +119,7 @@ public interface CaptureAgentStateService {
 
   /**
    * Sets the capabilities for the specified agent
-   * 
+   *
    * @param agentName
    * @param capabilities
    * @return One of the constants defined in this class
@@ -128,7 +128,7 @@ public interface CaptureAgentStateService {
 
   /**
    * Gets the state of a recording, if it exists.
-   * 
+   *
    * @param id
    *          The id of the recording.
    * @return The state of the recording, or null if it does not exist. This should be defined from
@@ -141,7 +141,7 @@ public interface CaptureAgentStateService {
 
   /**
    * Updates the state of a recording with the given state, if it exists.
-   * 
+   *
    * @param id
    *          The id of the recording in the system.
    * @param state
@@ -153,7 +153,7 @@ public interface CaptureAgentStateService {
 
   /**
    * Removes a recording from the system, if the recording exists.
-   * 
+   *
    * @param id
    *          The id of the recording to remove.
    * @throws NotFoundException
@@ -163,14 +163,14 @@ public interface CaptureAgentStateService {
 
   /**
    * Gets the state of all recordings in the system.
-   * 
+   *
    * @return A map of recording-state pairs.
    */
   Map<String, Recording> getKnownRecordings();
 
   /**
    * Gets a Set of ids of all known recordings.
-   * 
+   *
    * @return Set<String> recording ids
    */
   List<String> getKnownRecordingsIds();

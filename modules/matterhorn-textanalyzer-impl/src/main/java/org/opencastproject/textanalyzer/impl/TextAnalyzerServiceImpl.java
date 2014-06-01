@@ -121,7 +121,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * OSGi callback on component activation.
-   * 
+   *
    * @param ctx
    *          the bundle context
    */
@@ -131,7 +131,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.textanalyzer.api.TextAnalyzerService#extract(org.opencastproject.mediapackage.Attachment)
    */
   @Override
@@ -147,7 +147,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   /**
    * Starts text extraction on the image and returns a receipt containing the final result in the form of an
    * Mpeg7Catalog.
-   * 
+   *
    * @param image
    *          the element to analyze
    * @param block
@@ -253,7 +253,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -282,7 +282,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * Returns the video text element for the given image.
-   * 
+   *
    * @param imageFile
    *          the image
    * @param id
@@ -351,7 +351,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * Sets the receipt service
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -361,7 +361,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -371,7 +371,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * Sets the text extractor.
-   * 
+   *
    * @param textExtractor
    *          a text extractor implementation
    */
@@ -381,7 +381,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * Sets the workspace
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -391,7 +391,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * Sets the mpeg7CatalogService
-   * 
+   *
    * @param mpeg7CatalogService
    *          an instance of the mpeg7 catalog service
    */
@@ -401,7 +401,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * Sets the dictionary service
-   * 
+   *
    * @param dictionaryService
    *          an instance of the dicitonary service
    */
@@ -411,7 +411,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * OSGi callback to set the composer service.
-   * 
+   *
    * @param composer
    *          the composer
    */
@@ -421,7 +421,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -431,7 +431,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -441,7 +441,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -451,7 +451,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -461,7 +461,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -471,7 +471,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override

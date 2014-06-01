@@ -34,7 +34,7 @@ public interface TemporalDecomposition<T extends Segment> extends XmlElement {
 
   /**
    * Set the <code>hasGap</code> property indicating that there may be gaps in between the segments.
-   * 
+   *
    * @param hasGap
    *          <code>true</code> if there are gaps
    */
@@ -42,14 +42,14 @@ public interface TemporalDecomposition<T extends Segment> extends XmlElement {
 
   /**
    * Returns <code>true</code> if the segment has a gap.
-   * 
+   *
    * @return <code>true</code> if the segment has a gap
    */
   boolean hasGap();
 
   /**
    * Set the <code>isOverlapping</code> property indicating that some segments may be overlapping.
-   * 
+   *
    * @param isOverlapping
    *          <code>true</code> if elements are overlapping
    */
@@ -57,14 +57,14 @@ public interface TemporalDecomposition<T extends Segment> extends XmlElement {
 
   /**
    * Returns <code>true</code> if the segment overlaps with another one.
-   * 
+   *
    * @return <code>true</code> if the segment overlaps
    */
   boolean isOverlapping();
 
   /**
    * Sets the decomposition criteria.
-   * 
+   *
    * @param criteria
    *          the criteria
    */
@@ -72,14 +72,14 @@ public interface TemporalDecomposition<T extends Segment> extends XmlElement {
 
   /**
    * Returns the decomposition criteria.
-   * 
+   *
    * @return the criteria
    */
   DecompositionCriteria getCriteria();
 
   /**
    * Creates a new segment and returns it.
-   * 
+   *
    * @param id
    *          the segment identifier
    * @return the new segment
@@ -88,21 +88,21 @@ public interface TemporalDecomposition<T extends Segment> extends XmlElement {
 
   /**
    * Returns <code>true</code> if the composition actually contains segments.
-   * 
+   *
    * @return <code>true</code> if there are segments
    */
   boolean hasSegments();
 
   /**
    * Returns an iteration of the video's segments.
-   * 
+   *
    * @return the video segments
    */
   Iterator<T> segments();
 
   /**
    * Returns the segment with the given identifier or <code>null</code> if the segment does not exist.
-   * 
+   *
    * @param segmentId
    *          the segment identifier
    * @return the segment

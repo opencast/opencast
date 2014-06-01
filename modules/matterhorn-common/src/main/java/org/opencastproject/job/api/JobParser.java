@@ -50,7 +50,7 @@ public final class JobParser {
 
   /**
    * Parses an xml string representing a {@link Job}
-   * 
+   *
    * @param serializedForm
    *          The serialized data
    * @return The job
@@ -61,7 +61,7 @@ public final class JobParser {
 
   /**
    * Parses a stream representing a {@link Job}
-   * 
+   *
    * @param in
    *          The serialized data
    * @param format
@@ -82,7 +82,7 @@ public final class JobParser {
 
   /**
    * Serializes the job into a string representation.
-   * 
+   *
    * @param job
    *          the job
    * @return the job's serialized form
@@ -102,7 +102,7 @@ public final class JobParser {
 
   /**
    * Parses an xml string representing a {@link JaxbJobList}
-   * 
+   *
    * @param serializedForm
    *          The serialized data
    * @return The job list
@@ -113,7 +113,7 @@ public final class JobParser {
 
   /**
    * Parses a stream representing a {@link JaxbJobList}
-   * 
+   *
    * @param content
    *          the serialized data
    * @return the job list

@@ -54,7 +54,7 @@ public class WorkflowStateListener implements WorkflowListener {
 
   /**
    * Constructs a workflow listener that notifies for any state change to a single workflow instance.
-   * 
+   *
    * @param workflowInstanceId
    *          the workflow identifier
    */
@@ -70,7 +70,7 @@ public class WorkflowStateListener implements WorkflowListener {
   /**
    * Constructs a workflow listener for a single workflow instance. The listener may be configured to be notified on
    * state changes.
-   * 
+   *
    * @param workflowInstanceId
    *          the workflow identifier
    * @param statess
@@ -84,7 +84,7 @@ public class WorkflowStateListener implements WorkflowListener {
   /**
    * Constructs a workflow listener for all workflow instances. The listener may be configured to be notified on a set
    * of specific state changes.
-   * 
+   *
    * @param states
    *          the workflow state changes that should trigger this listener. If null, any state change will trigger the
    *          listener.
@@ -96,7 +96,7 @@ public class WorkflowStateListener implements WorkflowListener {
   /**
    * Constructs a workflow listener for all workflow instances. The listener may be configured to be notified on a of
    * specific state changes.
-   * 
+   *
    * @param staet
    *          the workflow state change that should trigger this listener. If null, any state change will trigger the
    *          listener.
@@ -108,7 +108,7 @@ public class WorkflowStateListener implements WorkflowListener {
   /**
    * Constructs a workflow listener for a set of workflow instances. The listener may be configured to be notified on a
    * set of specific state changes.
-   * 
+   *
    * @param workflowInstanceIds
    *          the workflow identifiers
    * @param states
@@ -131,7 +131,7 @@ public class WorkflowStateListener implements WorkflowListener {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowListener#operationChanged(org.opencastproject.workflow.api.WorkflowInstance)
    */
   @Override
@@ -143,7 +143,7 @@ public class WorkflowStateListener implements WorkflowListener {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowListener#stateChanged(org.opencastproject.workflow.api.WorkflowInstance)
    */
   @Override
@@ -170,7 +170,7 @@ public class WorkflowStateListener implements WorkflowListener {
 
   /**
    * Returns the number of state changes that this listener has observed without ignoring.
-   * 
+   *
    * @return the counter
    */
   public int countStateChanges() {
@@ -181,7 +181,7 @@ public class WorkflowStateListener implements WorkflowListener {
 
   /**
    * Returns the number of state changes that this listener has observed without ignoring.
-   * 
+   *
    * @return the counter
    */
   public int countStateChanges(WorkflowState state) {

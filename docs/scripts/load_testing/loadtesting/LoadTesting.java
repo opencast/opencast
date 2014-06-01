@@ -20,7 +20,7 @@ public class LoadTesting {
 	// How often the timer for job checking should go
 	public static int JOB_CHECK_TIMER = 5;
 
-	
+
 	// The distribution of the number of packages to ingest
 	//public long[] packageDistribution = {1};
 	//public long[] packageDistributionTiming = {0};
@@ -28,10 +28,10 @@ public class LoadTesting {
 	// public int[] packageDistribution = {2,4,8,8,4,2};
 	// the amount of time in between each set of ingests in minutes
 	public int[] packageDistributionTiming = {0,60};//60,60,60,60,60,60};
-	
+
 	public static int MILLISECONDS_IN_SECONDS = 1000;
 	public static int SECONDS_IN_MINUTES = 60;
-	
+
 	public static void main(String args[]){
 		Logger.print("Starting Load Testing");
 		Logger.print("Create Workspace");
@@ -49,15 +49,15 @@ public class LoadTesting {
 			IngestionGroup ingestionGroup = new IngestionGroup(loadtesting.packageDistribution[i], delay);
 			ingestGroups.add(ingestionGroup);
 		}
-		
+
 		LinkedList<IngestJob> ingestJobs = new LinkedList<IngestJob>();
-		
+
 		for(IngestionGroup ingestionGroup : ingestGroups){
 			ingestJobs.addAll(ingestionGroup.getJobs());
 		}
-		
+
 		createJobChecker(ingestJobs);
-		
+
 		while(!ThreadCounter.allDone()){
 			try {
 				Thread.sleep(15 * MILLISECONDS_IN_SECONDS);
@@ -66,7 +66,7 @@ public class LoadTesting {
 			}
 			Logger.print("There are still " + ThreadCounter.getCount() + " threads that are executing.");
 		}
-		
+
 		Logger.print("Load Testing script is finished now just to wait for processing.");
 	}
 

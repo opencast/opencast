@@ -32,7 +32,7 @@ public interface ComposerService {
 
   /**
    * Encode one track, using that track's audio and video streams.
-   * 
+   *
    * @param sourceTrack
    *          The source track
    * @param profileId
@@ -45,7 +45,7 @@ public interface ComposerService {
 
   /**
    * Encode the video stream from one track and the audio stream from another, into a new Track.
-   * 
+   *
    * @param sourceVideoTrack
    *          The source video track
    * @param sourceAudioTrack
@@ -63,7 +63,7 @@ public interface ComposerService {
 
   /**
    * Compose two videos into one with an optional watermark.
-   * 
+   *
    * @param compositeTrackSize
    *          The composite track dimension
    * @param upperTrack
@@ -88,7 +88,7 @@ public interface ComposerService {
 
   /**
    * Concat multiple tracks having the same codec to a single track. Required ffmpeg version 1.1
-   * 
+   *
    * @param profileId
    *          The encoding profile to use
    * @param outputDimension
@@ -106,7 +106,7 @@ public interface ComposerService {
 
   /**
    * Transforms an image attachment to a video track
-   * 
+   *
    * @param sourceImageAttachment
    *          The source image attachment
    * @param profileId
@@ -124,7 +124,7 @@ public interface ComposerService {
 
   /**
    * Trims the given track to the given start time and duration.
-   * 
+   *
    * @param sourceTrack
    *          The source track
    * @param profileId
@@ -146,7 +146,7 @@ public interface ComposerService {
   /**
    * Extracts an image from the media package element identified by <code>sourceVideoTrackId</code>. The image is taken
    * at the timepoint <code>time</code> seconds into the movie.
-   * 
+   *
    * @param sourceTrack
    *          the source video track
    * @param profileId
@@ -164,7 +164,7 @@ public interface ComposerService {
 
   /**
    * Converts the given image to a different image format using the specified image profile.
-   * 
+   *
    * @param image
    *          the image
    * @param profileId
@@ -180,7 +180,7 @@ public interface ComposerService {
   /**
    * Insert captions in media package element identified by <code>mediaTrack</code> from catalog which contains
    * captions.
-   * 
+   *
    * @param mediaTrack
    *          media track to which captions will be embedded
    * @param captions
@@ -198,7 +198,7 @@ public interface ComposerService {
   /**
    * Insert captions in media package element identified by <code>mediaTrack</code> from catalog which contains
    * captions.
-   * 
+   *
    * @param mediaTrack
    *          media track to which captions will be embedded
    * @param watermark
@@ -220,7 +220,7 @@ public interface ComposerService {
 
   /**
    * Gets a profile by its ID
-   * 
+   *
    * @param profileId
    *          The profile ID
    * @return The encoding profile, or null if no profile is registered with that ID

@@ -67,7 +67,7 @@ public class EdgeDetector {
   /**
    * Obtains an image containing the edges detected during the last call to the process method. The buffered image is an
    * opaque image of type BufferedImage.TYPE_INT_ARGB in which edge pixels are white and all other pixels are black.
-   * 
+   *
    * @return an image containing the detected edges, or null if the process method has not yet been called.
    */
   public BufferedImage getEdgesImage() {
@@ -77,7 +77,7 @@ public class EdgeDetector {
   /**
    * Sets the edges image. Calling this method will not change the operation of the edge detector in any way. It is
    * intended to provide a means by which the memory referenced by the detector object may be reduced.
-   * 
+   *
    * @param edgesImage
    *          expected (though not required) to be null
    */
@@ -87,7 +87,7 @@ public class EdgeDetector {
 
   /**
    * The low threshold for hysteresis. The default value is 2.5.
-   * 
+   *
    * @return the low hysteresis threshold
    */
   public float getLowThreshold() {
@@ -97,7 +97,7 @@ public class EdgeDetector {
   /**
    * Sets the low threshold for hysteresis. Suitable values for this parameter must be determined experimentally for
    * each application. It is nonsensical (though not prohibited) for this value to exceed the high threshold value.
-   * 
+   *
    * @param threshold
    *          a low hysteresis threshold
    */
@@ -109,7 +109,7 @@ public class EdgeDetector {
 
   /**
    * The high threshold for hysteresis. The default value is 7.5.
-   * 
+   *
    * @return the high hysteresis threshold
    */
   public float getHighThreshold() {
@@ -119,7 +119,7 @@ public class EdgeDetector {
   /**
    * Sets the high threshold for hysteresis. Suitable values for this parameter must be determined experimentally for
    * each application. It is nonsensical (though not prohibited) for this value to be less than the low threshold value.
-   * 
+   *
    * @param threshold
    *          a high hysteresis threshold
    */
@@ -131,7 +131,7 @@ public class EdgeDetector {
 
   /**
    * The number of pixels across which the Gaussian kernel is applied. The default value is 16.
-   * 
+   *
    * @return the radius of the convolution operation in pixels
    */
   public int getGaussianKernelWidth() {
@@ -141,7 +141,7 @@ public class EdgeDetector {
   /**
    * The number of pixels across which the Gaussian kernel is applied. This implementation will reduce the radius if the
    * contribution of pixel values is deemed negligable, so this is actually a maximum radius.
-   * 
+   *
    * @param gaussianKernelWidth
    *          a radius for the convolution operation in pixels, at least 2.
    */
@@ -154,7 +154,7 @@ public class EdgeDetector {
   /**
    * The radius of the Gaussian convolution kernel used to smooth the source image prior to gradient calculation. The
    * default value is 16.
-   * 
+   *
    * @return the Gaussian kernel radius in pixels
    */
   public float getGaussianKernelRadius() {
@@ -173,7 +173,7 @@ public class EdgeDetector {
   /**
    * Whether the luminance data extracted from the source image is normalized by linearizing its histogram prior to edge
    * extraction. The default value is false.
-   * 
+   *
    * @return whether the contrast is normalized
    */
   public boolean isContrastNormalized() {
@@ -182,7 +182,7 @@ public class EdgeDetector {
 
   /**
    * Sets whether the contrast is normalized
-   * 
+   *
    * @param contrastNormalized
    *          true if the contrast should be normalized, false otherwise
    */
@@ -343,7 +343,7 @@ public class EdgeDetector {
          * "non-maximal supression" phase of the Canny edge detection in which we need to compare the gradient magnitude
          * to that in the direction of the gradient; only if the value is a local maximum do we consider the point as an
          * edge candidate.
-         * 
+         *
          * We need to break the comparison into a number of different cases depending on the gradient direction so that
          * the appropriate values can be used. To avoid computing the gradient direction, we use two simple comparisons:
          * first we check that the partial derivatives have the same sign (1) and then we check which is larger (2). As
@@ -351,7 +351,7 @@ public class EdgeDetector {
          * magnitude against the values at two points with 'identical support'; what this means is that the geometry
          * required to accurately interpolate the magnitude of gradient function at those points has an identical
          * geometry (upto right-angled-rotation/reflection).
-         * 
+         *
          * When comparing the central gradient to the two interpolated values, we avoid performing any divisions by
          * multiplying both sides of each inequality by the greater of the two partial derivatives. The common comparand
          * is stored in a temporary variable (3) and reused in the mirror case (4).
@@ -440,7 +440,7 @@ public class EdgeDetector {
 
   /**
    * Reads the luminance values from the image.
-   * 
+   *
    * @param sourceImage
    *          the source image
    */

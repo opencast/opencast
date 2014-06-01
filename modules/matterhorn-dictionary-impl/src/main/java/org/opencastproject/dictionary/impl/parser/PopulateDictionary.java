@@ -44,7 +44,7 @@ import javax.xml.parsers.SAXParserFactory;
 /**
  * Reads an unzipped wikipedia archive named [lang]wiki-latest-pages-articles.xml, producing a [lang].csv file
  * containing the words and word counts from the wikipedia archive.
- * 
+ *
  * This main class may be run from the commandline, passing the language and directory to find the wikipedia archive as
  * arguments. If these arguments are not passed, the application will request this input on the commandline.
  */
@@ -56,7 +56,7 @@ public final class PopulateDictionary {
 
   /**
    * Runs the dictionary population application.
-   * 
+   *
    * @param args
    * @throws Exception
    */
@@ -90,7 +90,7 @@ public final class PopulateDictionary {
 
   /**
    * Gets input from the commandline.
-   * 
+   *
    * @param prompt
    *          the prompt for the user
    * @param defaultValue
@@ -264,7 +264,7 @@ public final class PopulateDictionary {
 
     /**
      * Returns the words that occur in a tag's content.
-     * 
+     *
      * @return the tag content split into words
      */
     private String[] getWords(String str) {
@@ -273,7 +273,7 @@ public final class PopulateDictionary {
 
     /**
      * Fills the dictionary with words from the last encountered tag.
-     * 
+     *
      * @return the tag content split into words
      */
     private void fillDictionary(String str, BufferedWriter bw) {
@@ -320,7 +320,7 @@ public final class PopulateDictionary {
 
     /**
      * Remove nested templates.
-     * 
+     *
      * @return string without the templates
      */
     private String removeTemplates(String str, String startTag, String endTag) {
@@ -363,7 +363,7 @@ public final class PopulateDictionary {
 
     /**
      * Remove lines starting with a prefix.
-     * 
+     *
      * @return string without lines starting with a given prefix
      */
     private String removeLine(String str, String start) {

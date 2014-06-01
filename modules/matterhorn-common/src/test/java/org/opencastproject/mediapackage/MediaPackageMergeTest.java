@@ -83,7 +83,7 @@ public class MediaPackageMergeTest {
 
   /**
    * Creates the source media package.
-   * 
+   *
    * @throws IOException
    * @throws MediaPackageException
    */
@@ -129,7 +129,7 @@ public class MediaPackageMergeTest {
 
   /**
    * Creates the target media package.
-   * 
+   *
    * @throws IOException
    * @throws MediaPackageException
    * @throws URISyntaxException
@@ -175,7 +175,7 @@ public class MediaPackageMergeTest {
 
   /**
    * Checks the media package for duplicate identifier and files.
-   * 
+   *
    * @param mediaPackage
    *          the media package to test
    * @throws MediaPackageException

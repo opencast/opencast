@@ -265,10 +265,10 @@ public final class Schema {
 
   /**
    * Adds one solr document's data as unstructured, full-text searchable data to another document.
-   * 
+   *
    * @param docToEnrich
    *          the solr document to enrich with the other additional metadata
-   * 
+   *
    * @param additionalMetadata
    *          the solr document containing the additional metadata
    * @throws IllegalArgumentException

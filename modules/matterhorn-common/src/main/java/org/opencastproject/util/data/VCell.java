@@ -29,7 +29,7 @@ import static org.opencastproject.util.data.Tuple.tuple;
  * listeners via callbacks, the dependent object just holds a reference to a cell and pulls the value when needed.
  * <p/>
  * Cells must not contain null!
- * 
+ *
  * @param <A>
  *          the value type
  */

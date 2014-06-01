@@ -324,7 +324,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
 
   /**
    * Builds the a series URL.
-   * 
+   *
    * @param q
    *          the series query
    * @param admin

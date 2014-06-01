@@ -23,7 +23,7 @@ import org.osgi.service.component.ComponentContext;
 
 /**
  * Implementation of {@link EmbedderEngineFactory} that creates new {@link EmbedderEngine} instance.
- * 
+ *
  */
 public class EmbedderEngineFactoryImpl implements EmbedderEngineFactory {
 
@@ -36,9 +36,9 @@ public class EmbedderEngineFactoryImpl implements EmbedderEngineFactory {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EmbedderEngineFactory#newEmbedderEngine()
    */
   @Override

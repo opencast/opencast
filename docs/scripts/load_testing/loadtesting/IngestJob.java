@@ -55,7 +55,7 @@ public class IngestJob implements Runnable {
 		// Use curl to ingest media package
 		ingestMediaPackage(workingDirectory, workingDirectory + id + ".zip");
 		// Delete working directory for id
-		
+
 		Logger.print("Finished running " + id);
 		ThreadCounter.subtract();
 	}
@@ -66,7 +66,7 @@ public class IngestJob implements Runnable {
 		Execute.launch(extractManifestCommand);
 		changeManifestID(workingDirectory + "manifest.xml");
 	}
-	
+
 	private void changeManifestID(String filepath) {
 		try {
 			Logger.print("Filepath for changing the manifest id is " + filepath);
@@ -100,14 +100,14 @@ public class IngestJob implements Runnable {
 			sae.printStackTrace();
 		}
 	}
-	
+
 	private void updateEpisodeID(String workingDirectory) {
 		// Change id in manifest.xml
 		String extractManifestCommand = "unzip " + workingDirectory + id + ".zip" + " episode.xml " + "-d " + workingDirectory;
 		Execute.launch(extractManifestCommand);
 		changeEpisodeID(workingDirectory + "episode.xml");
 	}
-	
+
 	private void changeEpisodeID(String filepath) {
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory
@@ -136,13 +136,13 @@ public class IngestJob implements Runnable {
 			sae.printStackTrace();
 		}
 	}
-	
+
 	private void updateZip(String workingDirectory) {
 		// Inject manifest.xml and episode.xml into the media package
 		String updateManifestCommand = "zip -fj "+ workingDirectory + id + ".zip " + workingDirectory + "manifest.xml" + " " + workingDirectory + "episode.xml";
 		Execute.launch(updateManifestCommand);
 	}
-	
+
 	private void ingestMediaPackage(String workingDirectory, String mediaPackageLocation) {
 		Logger.print("Beginning Ingest of " + id);
 		String curlCommand;
@@ -162,7 +162,7 @@ public class IngestJob implements Runnable {
 		createBashFile(workingDirectory, curlCommand);
 		Execute.launch("sh " + workingDirectory + "curl.sh");
 	}
-	
+
 	private void createBashFile(String workingDirectory, String curlCommand) {
 		try {
 			// Create file
@@ -175,7 +175,7 @@ public class IngestJob implements Runnable {
 			System.err.println("Error: " + e.getMessage());
 		}
 	}
-	
+
 	public String getID(){
 		return id;
 	}

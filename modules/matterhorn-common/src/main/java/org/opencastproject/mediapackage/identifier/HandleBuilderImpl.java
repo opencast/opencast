@@ -129,7 +129,7 @@ public class HandleBuilderImpl implements HandleBuilder {
 
   /**
    * This implementation throws an {@link IllegalArgumentException}, since it cannot resolve handles.
-   * 
+   *
    * @see org.opencastproject.mediapackage.identifier.HandleBuilder#resolve(org.opencastproject.mediapackage.identifier.Handle)
    */
   public URL resolve(Handle handle) throws HandleException {
@@ -141,7 +141,7 @@ public class HandleBuilderImpl implements HandleBuilder {
 
   /**
    * This implementation always returns <code>true</code> without actually updating anything.
-   * 
+   *
    * @see org.opencastproject.mediapackage.identifier.HandleBuilder#update(org.opencastproject.mediapackage.identifier.Handle,
    *      java.net.URL)
    */
@@ -155,7 +155,7 @@ public class HandleBuilderImpl implements HandleBuilder {
 
   /**
    * This implementation always returns <code>true</code> without actually deleting anything.
-   * 
+   *
    * @see org.opencastproject.mediapackage.identifier.HandleBuilder#delete(org.opencastproject.mediapackage.identifier.Handle)
    */
   public boolean delete(Handle handle) throws HandleException {

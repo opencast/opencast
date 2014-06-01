@@ -52,7 +52,7 @@ public final class SecurityFilter implements Filter {
 
   /**
    * Construct a new security filter.
-   * 
+   *
    * @param securityService
    *          the security service
    */
@@ -63,7 +63,7 @@ public final class SecurityFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
    */
   @Override
@@ -73,7 +73,7 @@ public final class SecurityFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#destroy()
    */
   @Override
@@ -100,7 +100,7 @@ public final class SecurityFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse,
    *      javax.servlet.FilterChain)
    */

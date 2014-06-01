@@ -116,7 +116,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * Activate method for this OSGi service implementation.
-   * 
+   *
    * @param cc
    *          the OSGi component context
    */
@@ -157,7 +157,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * Distribute a Mediapackage element to the download distribution service.
-   * 
+   *
    * @param mediapackage
    *          The media package that contains the element to distribute.
    * @param elementId
@@ -268,7 +268,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
    * Retract a media package element from the distribution channel. The retracted element must not necessarily be the
    * one given as parameter <code>elementId</code>. Instead, the element's distribution URI will be calculated. This way
    * you are able to retract elements by providing the "original" element here.
-   * 
+   *
    * @param channelId
    *          the channel id
    * @param mediapackage
@@ -327,7 +327,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -363,7 +363,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * Gets the destination file to copy the contents of a mediapackage element.
-   * 
+   *
    * @return The file to copy the content to
    */
   protected File getDistributionFile(String channelId, MediaPackage mp, MediaPackageElement element) {
@@ -386,7 +386,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * Gets the directory containing the distributed files for this mediapackage.
-   * 
+   *
    * @return the filesystem directory
    */
   protected File getMediaPackageDirectory(String channelId, MediaPackage mp) {
@@ -395,7 +395,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * Gets the URI for the element to be distributed.
-   * 
+   *
    * @param mediaPackageId
    *          the mediapackage identifier
    * @param element
@@ -414,7 +414,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * Callback for the OSGi environment to set the workspace reference.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -424,7 +424,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * Callback for the OSGi environment to set the service registry reference.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -434,7 +434,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -444,7 +444,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -454,7 +454,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * Callback for setting the trusted HTTP client.
-   * 
+   *
    * @param trustedHttpClient
    *          the trusted HTTP client to set
    */
@@ -464,7 +464,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -474,7 +474,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -484,7 +484,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -494,7 +494,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -504,7 +504,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override

@@ -119,7 +119,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * OSGi callback for setting Dublin core service.
-   * 
+   *
    * @param dcService
    *          {@link DublinCoreCatalogService} object
    */
@@ -129,7 +129,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * Callback from the OSGi environment on component registration. Retrieves location of the solr index.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -168,7 +168,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * OSGi callback for deactivation.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -178,7 +178,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#activate()
    */
   @Override
@@ -207,7 +207,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * Prepares the embedded solr environment.
-   * 
+   *
    * @param solrRoot
    *          the solr root directory
    */
@@ -249,7 +249,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#deactivate()
    */
   @Override
@@ -277,7 +277,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#index(org.opencastproject.metadata.dublincore.
    * DublinCoreCatalog)
    */
@@ -288,7 +288,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#index(org.opencastproject.metadata.dublincore.
    * DublinCoreCatalog)
    */
@@ -345,7 +345,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#index(java.lang.String, java.util.Properties)
    */
   @Override
@@ -404,7 +404,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * Creates solr document for inserting into solr index.
-   * 
+   *
    * @param dc
    *          {@link DublinCoreCatalog} to be stored in index
    * @return {@link SolrInputDocument} created out of Dublin core
@@ -522,7 +522,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
   /**
    * Add field to solr document that can contain multiple values. For sorting field, those values are concatenated and
    * multivalued field delimiter is used.
-   * 
+   *
    * @param doc
    *          {@link SolrInputDocument} for fields to be added to
    * @param solrField
@@ -548,7 +548,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#count()
    */
   @Override
@@ -563,7 +563,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * Retrieves SolrDocument by specified ID. If such document does not exist, null is returned.
-   * 
+   *
    * @param id
    *          ID of document to be retrieved
    * @return matching SolrDocument or null
@@ -585,7 +585,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * Appends query parameters to a solr query
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -610,7 +610,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
   /**
    * Appends query parameters to a solr query in a way that they are found even though they are not treated as a full
    * word in solr.
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -636,7 +636,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * Appends query parameters to a solr query
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -662,7 +662,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * Builds a solr search query from a {@link org.opencastproject.series.api.SeriesQuery}.
-   * 
+   *
    * @param query
    *          the series query
    * @return the solr query string
@@ -719,7 +719,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * Returns the search index' field name that corresponds to the sort field.
-   * 
+   *
    * @param sort
    *          the sort field
    * @return the field name in the search index
@@ -771,7 +771,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.opencastproject.scheduler.impl.SchedulerServiceIndex#search(org.opencastproject.scheduler.api.SchedulerQuery)
    */
@@ -815,7 +815,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#delete(java.lang.String)
    */
   @Override
@@ -865,7 +865,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#getDublinCore(java.lang.String)
    */
   @Override
@@ -889,7 +889,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#getCaptureAgentProperties(java.lang.String)
    */
   @Override
@@ -915,7 +915,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * Touches the most recent entry by updating its last modification date.
-   * 
+   *
    * @param spatial
    *          the spatial parameter aka capture agent identifier
    * @throws SchedulerServiceDatabaseException
@@ -959,7 +959,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#getLastModifiedDate(java.lang.String)
    */
   @Override
@@ -1015,7 +1015,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * Serializes Dublin core and returns serialized string.
-   * 
+   *
    * @param dc
    *          {@link DublinCoreCatalog} to be serialized
    * @return String representation of serialized Dublin core
@@ -1033,7 +1033,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * Parses Dublin core stored as string.
-   * 
+   *
    * @param dcXML
    *          string representation of Dublin core
    * @return parsed {@link DublinCoreCatalog}
@@ -1047,7 +1047,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * Serializes Properties to String.
-   * 
+   *
    * @param caProperties
    *          Properties to be serialized
    * @return serialized properties
@@ -1062,7 +1062,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /**
    * Parses Properties represented as String.
-   * 
+   *
    * @param serializedProperties
    *          properties to be parsed.
    * @return parsed properties

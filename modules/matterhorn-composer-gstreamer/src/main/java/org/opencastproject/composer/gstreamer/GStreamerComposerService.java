@@ -114,7 +114,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   protected String process(Job job) throws Exception {
@@ -192,7 +192,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#encode(org.opencastproject.mediapackage.Track,
    *      java.lang.String)
    */
@@ -209,7 +209,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
   /**
    * Encodes audio and video track to a file. If both an audio and a video track are given, they are muxed together into
    * one movie container.
-   * 
+   *
    * @param videoTrack
    *          the video track
    * @param audioTrack
@@ -318,7 +318,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#mux(org.opencastproject.mediapackage.Track,
    *      org.opencastproject.mediapackage.Track, java.lang.String)
    */
@@ -337,7 +337,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * Muxes the audio and video track into one movie container.
-   * 
+   *
    * @param job
    *          the associated job
    * @param videoTrack
@@ -359,7 +359,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#trim(org.opencastproject.mediapackage.Track,
    *      java.lang.String, long, long)
    */
@@ -380,7 +380,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
   /**
    * Trims the given track using the encoding profile <code>profileId</code> and the given starting point and duration
    * in miliseconds.
-   * 
+   *
    * @param job
    *          the associated job
    * @param sourceTrack
@@ -468,7 +468,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#image(org.opencastproject.mediapackage.Track,
    *      java.lang.String, long)
    */
@@ -496,7 +496,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * Extracts an image from <code>sourceTrack</code> at the given point in time.
-   * 
+   *
    * @param job
    *          the associated job
    * @param sourceTrack
@@ -603,7 +603,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#convertImage(org.opencastproject.mediapackage.Attachment,
    *      java.lang.String)
    */
@@ -625,7 +625,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * Converts an image from <code>sourceImage</code> to a new format.
-   * 
+   *
    * @param job
    *          the associated job
    * @param sourceImage
@@ -644,9 +644,9 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * Supports inserting captions in QuickTime files.
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#captions(org.opencastproject.mediapackage.Track,
    *      org.opencastproject.mediapackage.Attachment, java.lang.String)
    */
@@ -667,7 +667,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * Adds the closed captions contained in the <code>captions</code> catalog collection to <code>mediaTrack</code>.
-   * 
+   *
    * @param job
    *          the associated job
    * @param mediaTrack
@@ -681,7 +681,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
   protected Track captions(Job job, Track mediaTrack, Catalog[] captions) throws EncoderException, EmbedderException {
     throw new NotImplementedException("Adding captions not implemented in gstreamer composer");
   }
-  
+
   @Override
   public Job watermark(Track mediaTrack, String watermark, String profileId) {
     // TODO: implement me
@@ -690,7 +690,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * Deletes any valid file in the list.
-   * 
+   *
    * @param encodingOutput
    *          list of files to be deleted
    */
@@ -719,7 +719,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#listProfiles()
    */
   @Override
@@ -730,7 +730,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#getProfile(java.lang.String)
    */
   @Override
@@ -750,7 +750,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * Sets the media inspection service
-   * 
+   *
    * @param mediaInspectionService
    *          an instance of the media inspection service
    */
@@ -760,7 +760,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * Sets the gstreamer encoder engine factory
-   * 
+   *
    * @param encoderEngineFactory
    *          The encoder engine factory
    */
@@ -770,7 +770,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * Sets the workspace
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -780,7 +780,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * Sets the service registry
-   * 
+   *
    * @param serviceManager
    */
   protected void setServiceRegistry(ServiceRegistry serviceManager) {
@@ -789,7 +789,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -799,7 +799,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * Sets the profile scanner
-   * 
+   *
    * @param scanner
    */
   protected void setProfileScanner(GSEncodingProfileScanner scanner) {
@@ -808,7 +808,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -818,7 +818,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -828,7 +828,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -838,7 +838,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -848,7 +848,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -858,7 +858,7 @@ public class GStreamerComposerService extends AbstractJobProducer implements Com
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override

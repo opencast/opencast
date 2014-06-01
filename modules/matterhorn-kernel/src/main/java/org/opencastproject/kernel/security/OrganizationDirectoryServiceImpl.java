@@ -146,7 +146,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
 
   /**
    * Adds the organization to the list of organizations.
-   * 
+   *
    * @param organization
    *          the organization
    */

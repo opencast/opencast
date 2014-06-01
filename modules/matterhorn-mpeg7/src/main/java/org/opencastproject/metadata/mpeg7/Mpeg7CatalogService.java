@@ -37,7 +37,7 @@ public class Mpeg7CatalogService implements CatalogService<Mpeg7Catalog> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.CatalogService#accepts(org.opencastproject.mediapackage.Catalog)
    */
   @Override
@@ -50,7 +50,7 @@ public class Mpeg7CatalogService implements CatalogService<Mpeg7Catalog> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.CatalogService#serialize(org.opencastproject.metadata.api.MetadataCatalog)
    */
   @Override
@@ -68,7 +68,7 @@ public class Mpeg7CatalogService implements CatalogService<Mpeg7Catalog> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.CatalogService#load(java.io.InputStream)
    */
   @Override
@@ -80,7 +80,7 @@ public class Mpeg7CatalogService implements CatalogService<Mpeg7Catalog> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.CatalogService#newInstance()
    */
   @Override

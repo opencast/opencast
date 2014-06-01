@@ -22,7 +22,7 @@ public final class SampleUtils {
 
   /**
    * Returns the <code>camera.mpg</code> from the workflow service samples.
-   * 
+   *
    * @param serverUrl
    *          the hostname
    * @return the track xml

@@ -36,7 +36,7 @@ public class MediaContainerMetadata extends TemporalMetadata {
 
   /**
    * Returns metadata for all contained video streams.
-   * 
+   *
    * @return the metadata or an empty list
    */
   public List<VideoStreamMetadata> getVideoStreamMetadata() {
@@ -45,7 +45,7 @@ public class MediaContainerMetadata extends TemporalMetadata {
 
   /**
    * Returns metadata for all contained audio streams.
-   * 
+   *
    * @return the metadata or an empty list
    */
   public List<AudioStreamMetadata> getAudioStreamMetadata() {

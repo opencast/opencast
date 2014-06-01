@@ -415,7 +415,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   /**
    * Get a file from the workspace.
-   * 
+   *
    * @param uri
    *          The file uri
    * @return return the file if exists otherwise <code>null</code>
@@ -434,7 +434,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   /**
    * Remove all attachments of the given flavors from media package and workspace.
-   * 
+   *
    * @return the a tuple with the mutated (!) media package as A and the deleted Attachment as B
    */
   private Tuple<MediaPackage, Attachment> removeFromMediaPackageAndWorkspace(MediaPackage mp,
@@ -507,7 +507,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.AuthorizationService#hasPolicy(org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
@@ -606,7 +606,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   /**
    * Sets the workspace to use for retrieving XACML policies
-   * 
+   *
    * @param workspace
    *          the workspace to set
    */
@@ -616,7 +616,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   /**
    * Declarative services callback to set the security service.
-   * 
+   *
    * @param securityService
    *          the security service
    */
@@ -626,7 +626,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   /**
    * Declarative services callback to set the series service.
-   * 
+   *
    * @param seriesService
    *          the series service
    */

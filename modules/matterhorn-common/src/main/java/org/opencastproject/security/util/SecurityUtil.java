@@ -51,7 +51,7 @@ public final class SecurityUtil {
 
   /**
    * Run function <code>f</code> in the context described by the given organization and user.
-   * 
+   *
    * @return the function's outcome.
    */
   public static <A> A runAs(SecurityService sec, Organization org, User user, Function0<A> f) {
@@ -72,7 +72,7 @@ public final class SecurityUtil {
    * <code>systemUserName</code> from the global config where it is stored under {@link #PROPERTY_KEY_SYS_USER}. In an
    * OSGi environment this is typically done calling
    * <code>componentContext.getBundleContext().getProperty(PROPERTY_KEY_SYS_USER)</code>.
-   * 
+   *
    * @see #createSystemUser(org.osgi.service.component.ComponentContext, org.opencastproject.security.api.Organization)
    */
   public static User createSystemUser(String systemUserName, Organization org) {
@@ -83,7 +83,7 @@ public final class SecurityUtil {
 
   /**
    * Create the global anonymous user with the given organization.
-   * 
+   *
    * @param org
    *          the organization
    * @return the global anonymous user
@@ -97,7 +97,7 @@ public final class SecurityUtil {
   /**
    * Create a system user for the given organization with global admin role. The system user name is fetched from the
    * global OSGi config.
-   * 
+   *
    * @see #createSystemUser(String, org.opencastproject.security.api.Organization)
    */
   public static User createSystemUser(ComponentContext cc, Organization org) {

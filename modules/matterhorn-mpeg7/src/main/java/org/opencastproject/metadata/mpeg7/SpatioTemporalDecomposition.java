@@ -27,7 +27,7 @@ public interface SpatioTemporalDecomposition extends XmlElement {
 
   /**
    * Set the <code>hasGap</code> property indicating that there may be gaps in between the segments.
-   * 
+   *
    * @param hasGap
    *          <code>true</code> if there are gaps
    */
@@ -35,14 +35,14 @@ public interface SpatioTemporalDecomposition extends XmlElement {
 
   /**
    * Returns <code>true</code> if the segment has a gap.
-   * 
+   *
    * @return <code>true</code> if the segment has a gap
    */
   boolean hasGap();
 
   /**
    * Set the <code>isOverlapping</code> property indicating that some segments may be overlapping.
-   * 
+   *
    * @param isOverlapping
    *          <code>true</code> if elements are overlapping
    */
@@ -50,28 +50,28 @@ public interface SpatioTemporalDecomposition extends XmlElement {
 
   /**
    * Returns <code>true</code> if the segment overlaps with another one.
-   * 
+   *
    * @return <code>true</code> if the segment overlaps
    */
   boolean isOverlapping();
 
   /**
    * Adds the specified text as a <code>VideoText</code> element to the decomposition.
-   * 
+   *
    * @param text
    *          the text
    * @param boundary
    *          the text's bounding box
    * @param time
    *          the time and duration
-   * 
+   *
    * @return the new video text element
    */
   VideoText addVideoText(Textual text, Rectangle boundary, MediaTime time);
 
   /**
    * Adds the <code>VideoText</code> element to the decomposition.
-   * 
+   *
    * @param videoText
    *          the video text
    */
@@ -79,7 +79,7 @@ public interface SpatioTemporalDecomposition extends XmlElement {
 
   /**
    * Returns all the video text elements from this decomposition.
-   * 
+   *
    * @return the video text elements
    */
   VideoText[] getVideoText();
@@ -87,7 +87,7 @@ public interface SpatioTemporalDecomposition extends XmlElement {
   /**
    * Returns the <code>VideoText</code> element with the given identifier or <code>null</code> if there is no such
    * element.
-   * 
+   *
    * @param id
    *          the video text id
    * @return the video text element

@@ -240,7 +240,7 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
 
   /**
    * Prepares the embedded solr environment.
-   * 
+   *
    * @param solrRoot
    *          the solr root directory
    */
@@ -282,7 +282,7 @@ public class EpisodeServicePublisher extends SimpleServicePublisher {
 
   /**
    * Prepares the embedded solr environment.
-   * 
+   *
    * @param url
    *          the url of the remote solr server
    */
