@@ -58,7 +58,7 @@ import java.util.TreeMap;
  * the notification fail, a retry strategy is implemented.
  * <p>
  * Requests will be send using the POST method by default, PUT is a supported alternative method.
- * 
+ *
  */
 public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
@@ -122,7 +122,7 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -208,7 +208,7 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
   /**
    * Execute the given notification request. If the target is not responding, retry as many time as the maxAttampts
    * parameter with in between each try a sleep time.
-   * 
+   *
    * @param request
    *          The request to execute
    * @param maxAttempts

@@ -83,7 +83,7 @@ public abstract class AudioProducer extends ProducerBin {
 
   /**
    * Create all the common element for audio sources an audio converter and a volume control.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the necessary module to create an audioconverter isn't present then this Exception is thrown.
    **/
