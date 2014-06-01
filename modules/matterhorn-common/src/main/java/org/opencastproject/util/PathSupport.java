@@ -39,7 +39,7 @@ public final class PathSupport {
 
   /**
    * Returns the absolute path from a path optionally starting with a tilde <code>~</code>.
-   * 
+   *
    * @param path
    *          the path
    * @return the absolute path
@@ -57,7 +57,7 @@ public final class PathSupport {
 
   /**
    * Returns the filename translated into a version that can safely be used as part of a file system path.
-   * 
+   *
    * @param fileName
    *          The file name
    * @return the safe version
@@ -84,7 +84,7 @@ public final class PathSupport {
 
   /**
    * Concatenates the two urls with respect to leading and trailing slashes.
-   * 
+   *
    * @return the concatenated url of the two arguments
    */
   public static String concat(String prefix, String suffix) {
@@ -109,7 +109,7 @@ public final class PathSupport {
 
   /**
    * Concatenates the path elements with respect to leading and trailing slashes.
-   * 
+   *
    * @param parts
    *          the parts to concat
    * @return the concatenated path
@@ -133,7 +133,7 @@ public final class PathSupport {
   /**
    * Returns the trimmed url. Trimmed means that the url is free from leading or trailing whitespace characters, and
    * that a directory url like <code>/news/</code> is closed by a slash (<code>/</code>).
-   * 
+   *
    * @param path
    *          the path to trim
    * @return the trimmed path
@@ -155,7 +155,7 @@ public final class PathSupport {
 
   /**
    * Returns the file extension. If the file does not have an extension, then <code>null</code> is returned.
-   * 
+   *
    * @param path
    *          the file path
    * @return the file extension
@@ -174,7 +174,7 @@ public final class PathSupport {
   /**
    * Removes a file extension from the end of the path. If there is no extension or the file name starts with the
    * extension separator "." <code>path</code> will be returned untouched.
-   * 
+   *
    * @return the path with the extension removed or null if <code>path</code> was null
    */
   public static String removeFileExtension(String path) {
@@ -191,7 +191,7 @@ public final class PathSupport {
 
   /**
    * Removes any existing file extension from the end of the path and replaces it with the given one.
-   * 
+   *
    * @param path
    *          path to the file
    * @param extension
@@ -222,7 +222,7 @@ public final class PathSupport {
 
   /**
    * Removes any occurence of double file separators and replaces it with a single one.
-   * 
+   *
    * @param path
    *          the path to check
    * @return the corrected path

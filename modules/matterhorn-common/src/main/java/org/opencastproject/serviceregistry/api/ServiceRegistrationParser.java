@@ -52,7 +52,7 @@ public final class ServiceRegistrationParser {
 
   /**
    * Parses an xml string representing a {@link ServiceRegistration}
-   * 
+   *
    * @param xml
    *          The serialized data
    * @return The ServiceRegistration
@@ -63,7 +63,7 @@ public final class ServiceRegistrationParser {
 
   /**
    * Parses a stream representing a {@link ServiceRegistration}
-   * 
+   *
    * @param in
    *          The serialized data
    * @param format
@@ -84,7 +84,7 @@ public final class ServiceRegistrationParser {
 
   /**
    * Gets a serialized representation of a {@link ServiceRegistration}
-   * 
+   *
    * @param registration
    *          The ServiceRegistration to marshal
    * @return the serialized ServiceRegistration
@@ -95,7 +95,7 @@ public final class ServiceRegistrationParser {
 
   /**
    * Gets an xml representation of a {@link ServiceRegistration}
-   * 
+   *
    * @param registration
    *          The service registration to marshal
    * @return the serialized registration

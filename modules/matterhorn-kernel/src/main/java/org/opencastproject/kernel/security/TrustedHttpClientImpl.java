@@ -161,7 +161,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
   /**
    * Sets the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the serviceRegistry to set
    */
@@ -171,7 +171,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
   /**
    * Sets the security service.
-   * 
+   *
    * @param securityService
    */
   public void setSecurityService(SecurityService securityService) {
@@ -180,7 +180,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
   /**
    * Extracts the number of times to retry a request after a nonce timeout.
-   * 
+   *
    * @param cc
    *          The ComponentContent to extract this property from.
    */
@@ -190,7 +190,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
   /**
    * Extracts the minimum amount of time in seconds to wait if there is a nonce timeout before retrying.
-   * 
+   *
    * @param cc
    *          The ComponentContent to extract this property from.
    */
@@ -200,7 +200,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
   /**
    * Extracts the maximum amount of time in seconds that is added to the base time after a nonce timeout.
-   * 
+   *
    * @param cc
    *          The ComponentContent to extract this property from.
    */
@@ -211,7 +211,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
   /**
    * Gets a property from the ComponentContext that is the base type int.
-   * 
+   *
    * @param cc
    *          The ComponentContext to get the property from.
    * @param key
@@ -275,7 +275,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.TrustedHttpClient#execute(org.apache.http.client.methods.HttpUriRequest)
    */
   @Override
@@ -349,7 +349,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
   /**
    * Retries a request if the nonce timed out during the request.
-   * 
+   *
    * @param httpUriRequest
    *          The request to be made that isn't a GET, those are handled automatically.
    * @param response
@@ -396,7 +396,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
   /**
    * Determines if the nonce has timed out before a request could be performed.
-   * 
+   *
    * @param response
    *          The response to test to see if it has timed out.
    * @return true if it has time out, false if it hasn't
@@ -408,7 +408,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
   /**
    * Handles the necessary handshake for digest authenticaion in the case where it isn't a GET operation.
-   * 
+   *
    * @param httpUriRequest
    *          The request location to get the digest authentication for.
    * @param httpClient
@@ -460,7 +460,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.TrustedHttpClient#close(org.apache.http.HttpResponse)
    */
   @Override
@@ -477,7 +477,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.TrustedHttpClient#execute(org.apache.http.client.methods.HttpUriRequest,
    *      org.apache.http.client.ResponseHandler)
    */
@@ -489,7 +489,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
   /**
    * Perform a request, and extract the realm and nonce values
-   * 
+   *
    * @param request
    *          The request to execute in order to obtain the realm and nonce
    * @return A String[] containing the {realm, nonce}

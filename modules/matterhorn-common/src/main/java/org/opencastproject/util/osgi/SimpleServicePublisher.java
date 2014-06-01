@@ -97,7 +97,7 @@ public abstract class SimpleServicePublisher implements ManagedService {
    * Create and register a service object. Register with the OSGi environment using
    * {@link #registerService(org.osgi.service.component.ComponentContext, Object, Class, String)} or
    * <code>cc.getBundleContext().registerService(..)</code>.
-   * 
+   *
    * @param properties
    *          a configuration object received by the {@link ManagedService#updated(java.util.Dictionary)} callback,
    *          never null

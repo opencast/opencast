@@ -27,7 +27,7 @@ import java.net.URI;
 /**
  * Provides efficient access java.io.File objects from potentially remote URIs. This helper service prevents different
  * service implementations running in the same osgi container from downloading remote files multiple times.
- * 
+ *
  * Additionally, when the system is configured to use shared storage, this performance gain is also achieved across
  * distributed osgi containers. The methods from WorkingFileRepository are also available as a convenience to clients.
  */
@@ -35,7 +35,7 @@ public interface Workspace extends StorageUsage {
 
   /**
    * Gets a locally cached {@link File} for the given URI.
-   * 
+   *
    * @param uri
    * @return The locally cached file
    * @throws NotFoundException
@@ -47,14 +47,14 @@ public interface Workspace extends StorageUsage {
 
   /**
    * Gets the base URI for files stored using this service.
-   * 
+   *
    * @return The base URI
    */
   URI getBaseUri();
 
   /**
    * Store the data stream under the given media package and element IDs, specifying a filename.
-   * 
+   *
    * @param mediaPackageID
    * @param mediaPackageElementID
    * @param fileName
@@ -69,7 +69,7 @@ public interface Workspace extends StorageUsage {
 
   /**
    * Stores the data stream in the given collection, overwriting any data with the same collection id and file name.
-   * 
+   *
    * @param collectionId
    *          The collection to use for storing this data
    * @param fileName
@@ -87,7 +87,7 @@ public interface Workspace extends StorageUsage {
 
   /**
    * Gets the URIs of the members of this collection
-   * 
+   *
    * @param collectionId
    *          the collection identifier
    * @return the URIs for each member of the collection
@@ -100,7 +100,7 @@ public interface Workspace extends StorageUsage {
 
   /**
    * Delete the file stored at the given uri.
-   * 
+   *
    * @param uri
    *          the uri
    * @throws NotFoundException
@@ -112,7 +112,7 @@ public interface Workspace extends StorageUsage {
 
   /**
    * Delete the file stored at the given media package and element IDs.
-   * 
+   *
    * @param mediaPackageID
    * @param mediaPackageElementID
    * @throws NotFoundException
@@ -124,7 +124,7 @@ public interface Workspace extends StorageUsage {
 
   /**
    * Removes a file from a collection
-   * 
+   *
    * @param collectionId
    *          the collection identifier
    * @param fileName
@@ -140,7 +140,7 @@ public interface Workspace extends StorageUsage {
    * Get the URL for a file stored under the given media package and element IDs. MediaPackages may reference elements
    * that are not yet stored in the working file repository, so this method will return a URI even if the file is not
    * yet stored.
-   * 
+   *
    * @deprecated Please use {@link #getURI(String, String, String)} instead
    * @param mediaPackageID
    *          the mediapackage identifier
@@ -156,7 +156,7 @@ public interface Workspace extends StorageUsage {
    * Get the URL for a file stored under the given media package and element IDs. MediaPackages may reference elements
    * that are not yet stored in the working file repository, so this method will return a URI even if the file is not
    * yet stored.
-   * 
+   *
    * @param mediaPackageID
    *          the mediapackage identifier
    * @param mediaPackageElementID
@@ -171,7 +171,7 @@ public interface Workspace extends StorageUsage {
 
   /**
    * Get the URL for a file stored under the given collection.
-   * 
+   *
    * @param collectionID
    *          the collection id
    * @param fileName
@@ -184,7 +184,7 @@ public interface Workspace extends StorageUsage {
 
   /**
    * Moves a file from a collection into a mediapackage
-   * 
+   *
    * @param collectionURI
    *          the uri pointing to a workspace collection
    * @param toMediaPackage
@@ -206,7 +206,7 @@ public interface Workspace extends StorageUsage {
 
   /**
    * Copies a file from a collection into a mediapackage
-   * 
+   *
    * @param collectionURI
    *          The uri pointing to a workspace collection
    * @param toMediaPackage
@@ -229,7 +229,7 @@ public interface Workspace extends StorageUsage {
   /**
    * Cleans up files not belonging to a mediapackage or a collection. If the optional maxAge parameter is set, only
    * files older than the maxAge are deleted.
-   * 
+   *
    * @param maxAge
    *          the maximal age in seconds of a file before deletion is performed
    */

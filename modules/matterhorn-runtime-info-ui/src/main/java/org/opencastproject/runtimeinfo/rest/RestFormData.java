@@ -43,7 +43,7 @@ public class RestFormData {
   /**
    * Constructor which will auto-populate the form using the data in the endpoint, this will enable the ajax submit if
    * it is possible to do so.
-   * 
+   *
    * @param endpoint
    *          a RestEndpointData object populated with all parameters it needs
    * @throws IllegalArgumentException
@@ -99,7 +99,7 @@ public class RestFormData {
 
   /**
    * Returns true if this form has no parameter in it, false if there is parameter in it.
-   * 
+   *
    * @return a boolean indicating whether this form contains any parameter
    */
   public boolean isEmpty() {
@@ -114,7 +114,7 @@ public class RestFormData {
    * Controls whether the form will be submitted via ajax and the content rendered on the page, NOTE that uploading any
    * files or downloading any content that is binary will require not using ajax submit, also note that there may be
    * other cases where ajax submission will fail to work OR where normal submission will fail to work (using PUT/DELETE)
-   * 
+   *
    * @param ajaxSubmit
    *          a boolean indicating whether ajax submit is used
    */
@@ -125,7 +125,7 @@ public class RestFormData {
   /**
    * Set this to true if the file contains a file upload control, this will be determined automatically for
    * auto-generated forms.
-   * 
+   *
    * @param fileUpload
    *          a boolean indicating whether there is file upload in this test
    */
@@ -138,7 +138,7 @@ public class RestFormData {
 
   /**
    * Returns a string representation of this form.
-   * 
+   *
    * @return a string representation of this form
    */
   @Override
@@ -151,7 +151,7 @@ public class RestFormData {
 
   /**
    * Returns whether the form submission should be an ajax submission or a normal submission.
-   * 
+   *
    * @return a boolean indicating whether the form submission should be an ajax submission or a normal submission
    */
   public boolean isAjaxSubmit() {
@@ -160,7 +160,7 @@ public class RestFormData {
 
   /**
    * Returns whether the form contains a body parameter (i.e. a file upload option).
-   * 
+   *
    * @return a boolean indicating whether the form contains a body parameter (i.e. a file upload option)
    */
   public boolean isFileUpload() {
@@ -169,7 +169,7 @@ public class RestFormData {
 
   /**
    * Returns whether this form is for a basic endpoint which has no parameters.
-   * 
+   *
    * @return a boolean indicating whether this form is for a basic endpoint which has no parameters
    */
   public boolean isBasic() {
@@ -178,7 +178,7 @@ public class RestFormData {
 
   /**
    * Returns the list of form parameters.
-   * 
+   *
    * @return a list of form parameters
    */
   public List<RestParamData> getItems() {

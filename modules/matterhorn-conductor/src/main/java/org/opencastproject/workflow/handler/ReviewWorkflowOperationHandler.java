@@ -52,7 +52,7 @@ public class ReviewWorkflowOperationHandler extends ResumableWorkflowOperationHa
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -69,7 +69,7 @@ public class ReviewWorkflowOperationHandler extends ResumableWorkflowOperationHa
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override

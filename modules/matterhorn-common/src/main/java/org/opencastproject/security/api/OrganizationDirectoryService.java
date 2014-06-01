@@ -27,7 +27,7 @@ public interface OrganizationDirectoryService {
 
   /**
    * Gets an organization by its identifier.
-   * 
+   *
    * @param id
    *          the identifier
    * @return the organization with this identifier
@@ -36,7 +36,7 @@ public interface OrganizationDirectoryService {
 
   /**
    * Gets an organization by request URL.
-   * 
+   *
    * @param url
    *          a request URL
    * @return the organization that is mapped to this URL
@@ -45,7 +45,7 @@ public interface OrganizationDirectoryService {
 
   /**
    * Gets all registered organizations.
-   * 
+   *
    * @return the organizations
    */
   List<Organization> getOrganizations();

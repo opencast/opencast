@@ -31,7 +31,7 @@ public class DigestPerformanceTest {
    * one millisecond to md5 a large javascript library, this seems like an acceptable cost to support ETags. Testing
    * concurrent md5 hashing is difficult since it seems to run so quickly, but 100 more-or-less concurrent threads still
    * seem to perform OK.
-   * 
+   *
    * @throws Exception
    */
   @Test

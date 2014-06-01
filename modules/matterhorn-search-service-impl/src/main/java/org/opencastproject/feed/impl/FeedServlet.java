@@ -48,16 +48,16 @@ import javax.servlet.http.HttpServletResponse;
  * <p>
  * Therefore, assuming that this servlet has been mounted to <code>/feeds/*</code>, a correct uri for this servlet looks
  * like this: <code>/feeds/&lt;feed type&gt;/&lt;version&gt;/&lt;query&gt;</code>, e. g.
- * 
+ *
  * <pre>
  *     http://localhost/feeds/Atom/1.0/favorites
  * </pre>
- * 
+ *
  * which would indicate a requeste to an atom 1.0 feed with <tt>favourites</tt> being the query.
- * 
- * The servlet returns a HTTP status 200 with the feed data. 
+ *
+ * The servlet returns a HTTP status 200 with the feed data.
  * If the feed could not be found because the query is unknown a HTTP error 404 is returned
- * If the feed could not be build (wrong RSS or Atom version, corrupt data, etc) an HTTP error 500 is returned. 
+ * If the feed could not be build (wrong RSS or Atom version, corrupt data, etc) an HTTP error 500 is returned.
  */
 public class FeedServlet extends HttpServlet {
 
@@ -90,9 +90,9 @@ public class FeedServlet extends HttpServlet {
 
   /**
    * Handles HTTP GET requests after the context classloader has been set.
-   * 
+   *
    * See https://issues.apache.org/jira/browse/SMX4-510 for details
-   * 
+   *
    * @param request
    *          the http request
    * @param response
@@ -172,7 +172,7 @@ public class FeedServlet extends HttpServlet {
    * <p>
    * This method throws an {@link IllegalStateException} if the information cannot be extracted from the uri.
    * </p>
-   * 
+   *
    * @param request
    *          the servlet request
    * @return the requested feed
@@ -219,7 +219,7 @@ public class FeedServlet extends HttpServlet {
 
   /**
    * Sets the http service.
-   * 
+   *
    * @param httpService
    *          the http service
    */
@@ -237,7 +237,7 @@ public class FeedServlet extends HttpServlet {
 
   /**
    * Adds the feed generator to the list of generators.
-   * 
+   *
    * @param generator
    *          the generator
    */
@@ -248,7 +248,7 @@ public class FeedServlet extends HttpServlet {
 
   /**
    * Removes the generator from the list of feed generators.
-   * 
+   *
    * @param generator
    *          the feed generator
    */

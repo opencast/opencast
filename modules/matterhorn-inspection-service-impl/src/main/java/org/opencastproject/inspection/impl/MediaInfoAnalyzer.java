@@ -119,7 +119,7 @@ public class MediaInfoAnalyzer extends CmdlineMediaAnalyzerSupport {
 
   /**
    * Allows configuration {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.inspection.impl.api.MediaAnalyzer#setConfig(java.util.Map)
    */
   @Override

@@ -17,7 +17,7 @@ package org.opencastproject.caption.api;
 
 /**
  * Represents general exception during caption converting or parsing.
- * 
+ *
  */
 public class CaptionConverterException extends Exception {
 

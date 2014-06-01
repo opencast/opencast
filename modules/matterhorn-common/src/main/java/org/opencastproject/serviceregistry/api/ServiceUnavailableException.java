@@ -25,7 +25,7 @@ public class ServiceUnavailableException extends Exception {
 
   /**
    * Creates a new service unavailable exception.
-   * 
+   *
    * @param message
    *          the error message
    * @param t
@@ -37,7 +37,7 @@ public class ServiceUnavailableException extends Exception {
 
   /**
    * Creates a new service unavailable exception.
-   * 
+   *
    * @param message
    *          the error message
    */
@@ -47,7 +47,7 @@ public class ServiceUnavailableException extends Exception {
 
   /**
    * Creates a new service unavailable exception.
-   * 
+   *
    * @param t
    *          the exception causing the error
    */

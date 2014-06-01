@@ -44,7 +44,7 @@ public class JaxbOrganizationList {
 
   /**
    * Constructs a new OrganizationList wrapper from a list of organizations.
-   * 
+   *
    * @param organizations
    *          the list or organizations
    */

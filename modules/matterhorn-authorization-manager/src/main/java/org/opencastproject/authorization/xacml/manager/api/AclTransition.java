@@ -24,35 +24,35 @@ import java.util.Date;
 public interface AclTransition {
   /**
    * Return the transition identifier.
-   * 
+   *
    * @return the transition identifier
    */
   long getTransitionId();
 
   /**
    * Return the organization identifier.
-   * 
+   *
    * @return the organization identifier
    */
   String getOrganizationId();
 
   /**
    * Return the date when the contained ACL will be applied.
-   * 
+   *
    * @return the date of application
    */
   Date getApplicationDate();
 
   /**
    * Return the workflow id and its parameters.
-   * 
+   *
    * @return the workflow definition identifier to start after application
    */
   Option<ConfiguredWorkflowRef> getWorkflow();
 
   /**
    * Returns <code>true</code> if the transition has already been applied.
-   * 
+   *
    * @return <code>true</code> if the transition has already been applied.
    */
   boolean isDone();

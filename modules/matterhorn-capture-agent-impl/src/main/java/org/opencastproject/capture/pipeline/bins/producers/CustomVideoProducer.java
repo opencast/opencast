@@ -34,7 +34,7 @@ public class CustomVideoProducer extends ProducerBin {
 
   /**
    * The GStreamer commandline syntax can be used to create a custom video Producer.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           Not thrown by this class but could be thrown by a parent.
    * @throws UnableToCreateGhostPadsForBinException

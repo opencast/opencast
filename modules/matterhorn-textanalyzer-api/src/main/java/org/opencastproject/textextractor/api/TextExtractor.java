@@ -25,7 +25,7 @@ public interface TextExtractor {
 
   /**
    * Extracts text from the image and returns it as a set of lines in the text frame.
-   * 
+   *
    * @param image
    *          the image
    * @return the text

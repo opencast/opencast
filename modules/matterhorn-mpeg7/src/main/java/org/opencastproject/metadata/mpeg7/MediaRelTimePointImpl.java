@@ -90,7 +90,7 @@ public class MediaRelTimePointImpl extends MediaTimePointImpl implements MediaTi
 
   /**
    * Creates a relative timepoint representation from the given time point string.
-   * 
+   *
    * @param text
    *          the timepoint text representation
    * @return the the timepoint
@@ -122,7 +122,7 @@ public class MediaRelTimePointImpl extends MediaTimePointImpl implements MediaTi
 
   /**
    * Parses the fractions of a time point.
-   * 
+   *
    * @param fractions
    *          the fractions
    */
@@ -133,7 +133,7 @@ public class MediaRelTimePointImpl extends MediaTimePointImpl implements MediaTi
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -143,7 +143,7 @@ public class MediaRelTimePointImpl extends MediaTimePointImpl implements MediaTi
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override

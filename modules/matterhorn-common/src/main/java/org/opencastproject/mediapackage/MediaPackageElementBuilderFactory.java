@@ -40,7 +40,7 @@ public final class MediaPackageElementBuilderFactory {
 
   /**
    * Returns an instance of a MediaPackageElementBuilderFactory.
-   * 
+   *
    * @return the media package element builder factory
    * @throws ConfigurationException
    *           if the factory cannot be instantiated
@@ -59,7 +59,7 @@ public final class MediaPackageElementBuilderFactory {
    * </li>
    * <li>Platform default implementation</li>
    * </ul>
-   * 
+   *
    * @return the media package element builder
    * @throws ConfigurationException
    *           If the builder cannot be instantiated

@@ -17,7 +17,7 @@ package org.opencastproject.usertracking.api;
 
 /**
  * A class that represents the stats of a mediapackage
- * 
+ *
  */
 public interface Stats {
 

@@ -37,6 +37,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -91,6 +92,7 @@ public class LtiAuthenticationTest {
     httpClient.getConnectionManager().shutdown();
   }
 
+  @Ignore
   @Test
   public void testLtiLaunch() throws Exception {
     // Construct a POST message with the oauth parameters
@@ -183,6 +185,7 @@ public class LtiAuthenticationTest {
 
   }
 
+  @Ignore
   @Test
   public void testLtiLaunchFromUnknownUser() throws Exception {
     // Construct a POST message with the oauth parameters

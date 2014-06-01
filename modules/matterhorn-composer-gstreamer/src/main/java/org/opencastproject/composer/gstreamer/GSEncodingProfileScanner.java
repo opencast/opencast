@@ -56,7 +56,7 @@ public class GSEncodingProfileScanner implements ArtifactInstaller {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactListener#canHandle(java.io.File)
    */
   @Override
@@ -66,7 +66,7 @@ public class GSEncodingProfileScanner implements ArtifactInstaller {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#install(java.io.File)
    */
   @Override
@@ -85,7 +85,7 @@ public class GSEncodingProfileScanner implements ArtifactInstaller {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#update(java.io.File)
    */
   @Override
@@ -96,7 +96,7 @@ public class GSEncodingProfileScanner implements ArtifactInstaller {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#uninstall(java.io.File)
    */
   @Override
@@ -112,7 +112,7 @@ public class GSEncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * Returns the encoding profile for the given identifier or <code>null</code> if no such profile has been configured.
-   * 
+   *
    * @param id
    *          the profile identifier
    * @return the profile
@@ -123,7 +123,7 @@ public class GSEncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * Returns Map containing profiles.
-   * 
+   *
    * @return the profile definitions
    */
   public Map<String, EncodingProfile> getProfiles() {
@@ -132,7 +132,7 @@ public class GSEncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * Reads the profiles from the given set of properties.
-   * 
+   *
    * @param properties
    *          the properties
    * @return the profiles found in the properties
@@ -176,7 +176,7 @@ public class GSEncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * Reads the profile from the given properties
-   * 
+   *
    * @param profile
    * @param properties
    * @param artifact
@@ -238,7 +238,7 @@ public class GSEncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * Returns the default property and registers the property key in the list.
-   * 
+   *
    * @param profile
    *          the profile identifier
    * @param keySuffix

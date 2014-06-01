@@ -33,7 +33,7 @@ public class OrganizationDatabaseException extends RuntimeException {
 
   /**
    * Create exception with a message.
-   * 
+   *
    * @param message
    */
   public OrganizationDatabaseException(String message) {
@@ -42,7 +42,7 @@ public class OrganizationDatabaseException extends RuntimeException {
 
   /**
    * Create exception with a cause.
-   * 
+   *
    * @param cause
    */
   public OrganizationDatabaseException(Throwable cause) {
@@ -51,7 +51,7 @@ public class OrganizationDatabaseException extends RuntimeException {
 
   /**
    * Create exception with a message and a cause.
-   * 
+   *
    * @param message
    * @param cause
    */

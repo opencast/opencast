@@ -343,7 +343,7 @@ public final class AclServiceImpl implements AclService {
 
   /**
    * Return media package with id <code>mpId</code> from episode service.
-   * 
+   *
    * @return single element list or empty list
    */
   private Option<MediaPackage> getFromEpisodeServiceByMpId(String mpId) {

@@ -220,7 +220,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * Sets the authorization service
-   * 
+   *
    * @param authorizationService
    *          the authorization service to set
    */

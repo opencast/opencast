@@ -35,7 +35,7 @@ public class AclServiceNoReferenceException extends AclTransitionDbException {
 
   /**
    * Create exception with a message.
-   * 
+   *
    * @param message
    */
   public AclServiceNoReferenceException(String message) {
@@ -44,7 +44,7 @@ public class AclServiceNoReferenceException extends AclTransitionDbException {
 
   /**
    * Create exception with a cause.
-   * 
+   *
    * @param cause
    */
   public AclServiceNoReferenceException(Throwable cause) {
@@ -53,7 +53,7 @@ public class AclServiceNoReferenceException extends AclTransitionDbException {
 
   /**
    * Create exception with a message and a cause.
-   * 
+   *
    * @param message
    * @param cause
    */

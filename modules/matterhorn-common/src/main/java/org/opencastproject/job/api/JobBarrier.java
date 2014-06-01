@@ -63,7 +63,7 @@ public final class JobBarrier {
   /**
    * Creates a barrier without any jobs, using <code>registry</code> to poll for the outcome of the monitored jobs using
    * the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. Use {@link #addJob(Job)} to add jobs to monitor.
-   * 
+   *
    * @param registry
    *          the registry
    */
@@ -74,7 +74,7 @@ public final class JobBarrier {
   /**
    * Creates a barrier for <code>jobs</code>, using <code>registry</code> to poll for the outcome of the monitored jobs
    * using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}.
-   * 
+   *
    * @param registry
    *          the registry
    * @param jobs
@@ -86,7 +86,7 @@ public final class JobBarrier {
 
   /**
    * Creates a wrapper for <code>job</code>, using <code>registry</code> to poll for the job outcome.
-   * 
+   *
    * @param registry
    *          the registry
    * @param pollingInterval
@@ -98,7 +98,7 @@ public final class JobBarrier {
 
   /**
    * Creates a wrapper for <code>job</code>, using <code>registry</code> to poll for the job outcome.
-   * 
+   *
    * @param jobs
    *          the job to poll
    * @param registry
@@ -120,7 +120,7 @@ public final class JobBarrier {
 
   /**
    * Waits for a status change and returns the new status.
-   * 
+   *
    * @return the status
    */
   public Result waitForJobs() {
@@ -131,7 +131,7 @@ public final class JobBarrier {
    * Waits for a status change on all jobs and returns. If waiting for the status exceeds a certain limit, the method
    * returns even if some or all of the jobs are not yet finished. The same is true if at least one of the jobs fails or
    * gets stopped or deleted.
-   * 
+   *
    * @param timeout
    *          the maximum amount of time to wait
    * @throws IllegalStateException
@@ -162,7 +162,7 @@ public final class JobBarrier {
   /**
    * Adds the job to the list of jobs to wait for. An {@link IllegalStateException} is thrown if the barrier has already
    * been asked to wait for jobs by calling {@link #waitForJobs()}.
-   * 
+   *
    * @param job
    *          the job
    * @throws IllegalStateException
@@ -176,7 +176,7 @@ public final class JobBarrier {
 
   /**
    * Sets the outcome of the various jobs that were monitored.
-   * 
+   *
    * @param status
    *          the status
    */
@@ -186,7 +186,7 @@ public final class JobBarrier {
 
   /**
    * Returns the resulting status map.
-   * 
+   *
    * @return the status of the individual jobs
    */
   public Result getStatus() {
@@ -201,7 +201,7 @@ public final class JobBarrier {
     /**
      * Creates a new status updater that will wait for finished jobs. If <code>0</code> is passed in as the work time,
      * the updater will wait as long as it takes. Otherwise, it will stop after the indicated amount of time has passed.
-     * 
+     *
      * @param workTime
      *          the work time
      */
@@ -286,7 +286,7 @@ public final class JobBarrier {
 
     /**
      * Notifies listeners about the status change.
-     * 
+     *
      * @param status
      *          the status
      */
@@ -306,7 +306,7 @@ public final class JobBarrier {
 
     /**
      * Creates a new job barrier result.
-     * 
+     *
      * @param status
      *          the barrier outcome
      */
@@ -316,7 +316,7 @@ public final class JobBarrier {
 
     /**
      * Returns the status details.
-     * 
+     *
      * @return the status details
      */
     public Map<Job, Job.Status> getStatus() {
@@ -325,7 +325,7 @@ public final class JobBarrier {
 
     /**
      * Returns <code>true</code> if all jobs are in the <code>{@link Job.Status#FINISHED}</code> state.
-     * 
+     *
      * @return <code>true</code> if all jobs are finished
      */
     public boolean isSuccess() {

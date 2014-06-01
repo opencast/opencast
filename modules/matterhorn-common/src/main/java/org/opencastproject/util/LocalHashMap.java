@@ -42,12 +42,12 @@ public class LocalHashMap {
 
   /**
    * Constructs this map from a properties list, expressed as a string:
-   * 
+   *
    * <code>
    * foo=bar
    * this=that
    * </code>
-   * 
+   *
    * @param in
    *          The properties list
    * @throws IOException

@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 
 /**
  * Abstract class for command line embedder engines.
- * 
+ *
  */
 public abstract class AbstractCmdlineEmbedderEngine implements EmbedderEngine {
 
@@ -51,7 +51,7 @@ public abstract class AbstractCmdlineEmbedderEngine implements EmbedderEngine {
 
   /**
    * Creates embedder engine with given binary.
-   * 
+   *
    * @param binary
    *          path to the binary of specific embedder
    */
@@ -64,10 +64,10 @@ public abstract class AbstractCmdlineEmbedderEngine implements EmbedderEngine {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc} Language attribute is normalized via <code>normalizeLanguage</code> method even if it is not present.
    * If normalized language returned is <code>null</code>, exception will be thrown.
-   * 
+   *
    * @see org.opencastproject.composer.api.EmbedderEngine#embed(java.io.File, java.io.File, java.util.Map)
    */
   @Override
@@ -152,7 +152,7 @@ public abstract class AbstractCmdlineEmbedderEngine implements EmbedderEngine {
    * values from properties. If for some parameter there is no matching value, parameter is removed. Parameters that are
    * set via switches are represented as #{&lt;switch&gt; &lt;key&gt;}. Arrays of parameters are represented #&lt;
    * parameters(s) &gt;
-   * 
+   *
    * @param properties
    *          map that contains key/values pairs for building command. Unused pairs are ignored.
    * @return built list that represents command
@@ -216,7 +216,7 @@ public abstract class AbstractCmdlineEmbedderEngine implements EmbedderEngine {
    * found, suffix is extracted and applied to other parameters in attempt to retrieve corresponding values for other
    * parameters. Substitution is successful if all parameters are substituted. If this is not the case this array
    * element is ignored.
-   * 
+   *
    * @param template
    * @param properties
    * @return
@@ -258,7 +258,7 @@ public abstract class AbstractCmdlineEmbedderEngine implements EmbedderEngine {
 
   /**
    * Set binary for embedder engine.
-   * 
+   *
    * @param binary
    */
   protected void setBinary(String binary) {
@@ -272,7 +272,7 @@ public abstract class AbstractCmdlineEmbedderEngine implements EmbedderEngine {
    * Set template command for embedder engine. Variables are specified in one of two ways: #{&lt;switch&gt; &lt;key&gt;}
    * or #{&lt;key&gt;}. For array parameters (those parameters that can be set multiple times) the following form is
    * used: #&lt; one_or_more_variables &gt;
-   * 
+   *
    * @param cmdTemplate
    *          template for given command line embedder engine
    */
@@ -284,7 +284,7 @@ public abstract class AbstractCmdlineEmbedderEngine implements EmbedderEngine {
    * Function that normalizes language attribute to valid language code for specific embedder engine. Should be able to
    * process any input, even <code>null</code> string and substitute it for reasonable code or return null. In this case
    * exception will be thrown.
-   * 
+   *
    * @param language
    * @return
    */
@@ -292,7 +292,7 @@ public abstract class AbstractCmdlineEmbedderEngine implements EmbedderEngine {
 
   /**
    * Method to which embedder output is directed.
-   * 
+   *
    * @param output
    *          embedder output
    * @param sourceFiles
@@ -302,7 +302,7 @@ public abstract class AbstractCmdlineEmbedderEngine implements EmbedderEngine {
 
   /**
    * Returns file resulting from embedding.
-   * 
+   *
    * @param properties
    *          properties used for initiating embedding job
    * @return resulting file

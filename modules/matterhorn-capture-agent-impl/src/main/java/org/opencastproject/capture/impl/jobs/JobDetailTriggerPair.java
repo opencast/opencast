@@ -25,7 +25,7 @@ public class JobDetailTriggerPair {
   /**
    * Basic data class used to aggregate JobDetails and CronTriggers together so that a complete job's requirements can
    * be created by a third party and scheduled easily without calling two functions.
-   * 
+   *
    * @param job
    *          The JobDetail to use.
    * @param trigger

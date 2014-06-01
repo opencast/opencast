@@ -29,7 +29,7 @@ public class UnsupportedElementException extends RuntimeException {
 
   /**
    * Creates a new exception with the given message.
-   * 
+   *
    * @param message
    *          the error message
    */
@@ -39,7 +39,7 @@ public class UnsupportedElementException extends RuntimeException {
 
   /**
    * Creates a new exception for the given element with the given message.
-   * 
+   *
    * @param element
    *          the element
    * @param message
@@ -51,7 +51,7 @@ public class UnsupportedElementException extends RuntimeException {
 
   /**
    * Returns the element.
-   * 
+   *
    * @return the element
    */
   public MediaPackageElement getElement() {

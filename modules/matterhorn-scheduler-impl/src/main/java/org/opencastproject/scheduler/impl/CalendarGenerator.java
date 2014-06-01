@@ -66,7 +66,7 @@ import javax.xml.transform.stream.StreamResult;
 
 /**
  * Create an iCalendar from the provided dublin core events.
- * 
+ *
  */
 public class CalendarGenerator {
   /** Logging utility */
@@ -79,7 +79,7 @@ public class CalendarGenerator {
 
   /**
    * Default constructor that creates a CalendarGenerator object
-   * 
+   *
    * @param seriesService
    *          Series service for retrieving series Dublin Core (if event has one)
    */
@@ -93,7 +93,7 @@ public class CalendarGenerator {
 
   /**
    * gets the iCalendar creates by this object.
-   * 
+   *
    * @return the iCalendar
    */
   public Calendar getCalendar() {
@@ -102,7 +102,7 @@ public class CalendarGenerator {
 
   /**
    * Sets an iCalender to work with
-   * 
+   *
    * @param cal
    *          the iCalendar to set
    */
@@ -112,12 +112,12 @@ public class CalendarGenerator {
 
   /**
    * Adds an SchedulerEvent as a new entry to this iCalendar
-   * 
+   *
    * @param catalog
    *          {@link DublinCoreCatalog} of event
    * @param captureAgentMetadata
    *          properties for capture agent metadata
-   * 
+   *
    * @return true if the event could be added.
    */
   public boolean addEvent(DublinCoreCatalog catalog, Properties captureAgentMetadata) {
@@ -214,7 +214,7 @@ public class CalendarGenerator {
 
   /**
    * Returns provided Dublin Core as String or null of serialization fails.
-   * 
+   *
    * @param catalog
    *          {@link DublinCoreCatalog} to be serialized
    * @return string representation of DC
@@ -244,7 +244,7 @@ public class CalendarGenerator {
   /**
    * Returns series DC associated with this event or null if {@link SeriesService} is not available or does not contain
    * entry for series with specified ID.
-   * 
+   *
    * @param seriesID
    *          {@link DublinCoreCatalog} to be retrieved
    * @return DC serialized to string or null
@@ -274,7 +274,7 @@ public class CalendarGenerator {
 
   /**
    * Returns capture agent properties as string.
-   * 
+   *
    * @param properties
    *          CA properties to be serialized to string
    * @return string representation of properties

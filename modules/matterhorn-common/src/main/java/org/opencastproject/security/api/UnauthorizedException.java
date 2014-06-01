@@ -25,7 +25,7 @@ public class UnauthorizedException extends Exception {
 
   /**
    * Constructs an UnauthorizedException using the specified message.
-   * 
+   *
    * @param message
    *          the message describing the reason for this exception
    */
@@ -35,7 +35,7 @@ public class UnauthorizedException extends Exception {
 
   /**
    * Constructs an UnauthorizedException for the specified user's attempt to take a specified action.
-   * 
+   *
    * @param user
    *          the current user
    * @param action
@@ -47,7 +47,7 @@ public class UnauthorizedException extends Exception {
 
   /**
    * Constructs an UnauthorizedException for the specified user's attempt to take a specified action.
-   * 
+   *
    * @param user
    *          the current user
    * @param action

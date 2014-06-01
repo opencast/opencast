@@ -29,7 +29,7 @@ import javax.persistence.Table;
  * Enitity object for storing series in persistence storage. Series ID is stored as primary key, DUBLIN_CORE field is
  * used to store serialized Dublin core and ACCESS_CONTROL field is used to store information about access control
  * rules.
- * 
+ *
  */
 @Entity(name = "SeriesEntity")
 @Table(name = "mh_series")
@@ -69,7 +69,7 @@ public class SeriesEntity {
 
   /**
    * Returns series ID.
-   * 
+   *
    * @return series ID
    */
   public String getSeriesId() {
@@ -78,7 +78,7 @@ public class SeriesEntity {
 
   /**
    * Sets series ID. ID length limit is 128 characters.
-   * 
+   *
    * @param seriesId
    */
   public void setSeriesId(String seriesId) {
@@ -91,7 +91,7 @@ public class SeriesEntity {
 
   /**
    * Returns serialized Dublin core.
-   * 
+   *
    * @return serialized Dublin core
    */
   public String getDublinCoreXML() {
@@ -100,7 +100,7 @@ public class SeriesEntity {
 
   /**
    * Sets serialized Dublin core.
-   * 
+   *
    * @param dublinCoreXML
    *          serialized Dublin core
    */
@@ -110,7 +110,7 @@ public class SeriesEntity {
 
   /**
    * Returns serialized access control
-   * 
+   *
    * @return serialized access control
    */
   public String getAccessControl() {
@@ -119,7 +119,7 @@ public class SeriesEntity {
 
   /**
    * Sets serialized access control.
-   * 
+   *
    * @param accessControl
    *          serialized access control
    */

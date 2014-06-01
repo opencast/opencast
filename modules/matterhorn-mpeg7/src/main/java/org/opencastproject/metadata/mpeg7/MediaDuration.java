@@ -20,7 +20,7 @@ import org.opencastproject.mediapackage.XmlElement;
 
 /**
  * This interface describes a media duration.
- * 
+ *
  * <pre>
  * &lt;simpleType name=&quot;mediaDurationType&quot;&gt;
  *   &lt;restriction base=&quot;mpeg7:basicDurationType&quot;&gt;
@@ -33,49 +33,49 @@ public interface MediaDuration extends XmlElement {
 
   /**
    * Returns the number of days.
-   * 
+   *
    * @return the days
    */
   int getDays();
 
   /**
    * Returns the fractions.
-   * 
+   *
    * @return the fractions
    */
   int getFractions();
 
   /**
    * Returns the fractions per second.
-   * 
+   *
    * @return the fractions per second
    */
   int getFractionsPerSecond();
 
   /**
    * Returns the number of hours.
-   * 
+   *
    * @return the hours
    */
   int getHours();
 
   /**
    * Returns the number of minutes.
-   * 
+   *
    * @return the minutes
    */
   int getMinutes();
 
   /**
    * Returns the number of seconds.
-   * 
+   *
    * @return the seconds
    */
   int getSeconds();
 
   /**
    * Returns the duration in milliseconds.
-   * 
+   *
    * @return the number of milliseconds
    */
   long getDurationInMilliseconds();

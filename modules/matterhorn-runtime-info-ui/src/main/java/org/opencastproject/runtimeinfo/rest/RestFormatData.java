@@ -51,13 +51,13 @@ public final class RestFormatData {
   /**
    * Constructor that accepts a format name and finds the format's corresponding default URL and description. Currently
    * only JSON and XML have a default URL.
-   * 
+   *
    * @param name
    *          the format name, the value should be a constant from <a
    *          href="http://jackson.codehaus.org/javadoc/jax-rs/1.0/javax/ws/rs/core/MediaType.html"
    *          >javax.ws.rs.core.MediaType</a> or ExtendedMediaType
    *          (org.opencastproject.util.doc.rest.ExtendedMediaType).
-   * 
+   *
    * @throws IllegalArgumentException
    *           when name is null
    */
@@ -75,7 +75,7 @@ public final class RestFormatData {
 
   /**
    * Return a string representation of this object.
-   * 
+   *
    * @return a string representation of this object
    */
   @Override
@@ -85,7 +85,7 @@ public final class RestFormatData {
 
   /**
    * Return the name of this format.
-   * 
+   *
    * @return the name of this format
    */
   public String getName() {
@@ -94,7 +94,7 @@ public final class RestFormatData {
 
   /**
    * Return the default description of this format.
-   * 
+   *
    * @return the default description of this format.
    */
   public String getDescription() {
@@ -103,7 +103,7 @@ public final class RestFormatData {
 
   /**
    * Return the default URL of this format.
-   * 
+   *
    * @return the default URL of this format.
    */
   public String getUrl() {

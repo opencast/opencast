@@ -51,7 +51,7 @@ public class AuthenticationSuccessHandler implements
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.springframework.security.web.authentication.AuthenticationSuccessHandler#onAuthenticationSuccess(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse, org.springframework.security.core.Authentication)
    */
@@ -94,7 +94,7 @@ public class AuthenticationSuccessHandler implements
 
   /**
    * Sets the security service
-   * 
+   *
    * @param securityService
    *          the security service
    */
@@ -104,7 +104,7 @@ public class AuthenticationSuccessHandler implements
 
   /**
    * Sets the welcome pages mapping.
-   * 
+   *
    * @param welcomePages
    *          the welcomePages to set
    */

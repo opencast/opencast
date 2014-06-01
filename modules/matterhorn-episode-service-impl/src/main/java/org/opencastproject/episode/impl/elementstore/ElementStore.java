@@ -34,7 +34,7 @@ public interface ElementStore extends StorageUsage {
 
   /**
    * Copy a resource to a new location.
-   * 
+   *
    * @return true, if the selected resource could be found and copied
    */
   boolean copy(StoragePath from, StoragePath to) throws ElementStoreException;
@@ -47,7 +47,7 @@ public interface ElementStore extends StorageUsage {
 
   /**
    * Delete all selected resources.
-   * 
+   *
    * @return true, if the selected resources could be found and deleted
    */
   boolean delete(DeletionSelector sel) throws ElementStoreException;

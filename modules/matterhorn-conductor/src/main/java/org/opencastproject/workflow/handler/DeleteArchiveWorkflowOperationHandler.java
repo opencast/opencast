@@ -49,7 +49,7 @@ public class DeleteArchiveWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -60,7 +60,7 @@ public class DeleteArchiveWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * Callback for declarative services configuration that will introduce us to the search service. Implementation
    * assumes that the reference is configured as being static.
-   * 
+   *
    * @param episodeService
    *          an instance of the search service
    */
@@ -70,7 +70,7 @@ public class DeleteArchiveWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(WorkflowInstance, JobContext)
    */
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)

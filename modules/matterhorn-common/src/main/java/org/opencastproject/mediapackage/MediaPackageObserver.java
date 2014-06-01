@@ -23,7 +23,7 @@ public interface MediaPackageObserver {
 
   /**
    * This method is called if an element is added to the media package.
-   * 
+   *
    * @param element
    *          the added element
    */
@@ -31,7 +31,7 @@ public interface MediaPackageObserver {
 
   /**
    * This method is called if an element is removed from a media package.
-   * 
+   *
    * @param element
    *          the removed element
    */
@@ -39,7 +39,7 @@ public interface MediaPackageObserver {
 
   /**
    * This method is called if the media package was moved to another location.
-   * 
+   *
    * @param mediaPackage
    *          the moved media package
    */

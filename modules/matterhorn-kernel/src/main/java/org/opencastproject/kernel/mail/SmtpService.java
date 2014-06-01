@@ -98,7 +98,7 @@ public class SmtpService implements ManagedService {
 
   /**
    * Callback from the OSGi <code>ConfigurationAdmin</code> on configuration changes.
-   * 
+   *
    * @param properties
    *          the configuration properties
    * @throws ConfigurationException
@@ -222,7 +222,7 @@ public class SmtpService implements ManagedService {
 
   /**
    * Returns the default mail session that can be used to create a new message.
-   * 
+   *
    * @return the default mail session
    */
   public Session getSession() {
@@ -234,7 +234,7 @@ public class SmtpService implements ManagedService {
 
   /**
    * Creates a new message.
-   * 
+   *
    * @return the new message
    */
   public MimeMessage createMessage() {
@@ -243,7 +243,7 @@ public class SmtpService implements ManagedService {
 
   /**
    * Sends <code>message</code> using the configured transport.
-   * 
+   *
    * @param message
    *          the message
    * @throws MessagingException
@@ -264,7 +264,7 @@ public class SmtpService implements ManagedService {
 
   /**
    * Method to send a test message.
-   * 
+   *
    * @throws MessagingException
    *           if sending the message failed
    */

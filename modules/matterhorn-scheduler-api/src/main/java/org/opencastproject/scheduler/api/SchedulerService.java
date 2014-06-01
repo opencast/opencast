@@ -46,7 +46,7 @@ public interface SchedulerService {
    * <li>event.series (mapped from dc:is_part_of)</li>
    * <li>event.location (mapped from dc:spatial)</li>
    * </ul>
-   * 
+   *
    * @param eventCatalog
    *          {@link DublinCoreCatalog} used for creating event
    * @param wfProperties
@@ -68,7 +68,7 @@ public interface SchedulerService {
    * <li>event.series (mapped from dc:is_part_of)</li>
    * <li>event.location (mapped from dc:spatial)</li>
    * </ul>
-   * 
+   *
    * @param eventCatalog
    *          template {@link DublinCoreCatalog} used to create events
    * @param wfProperties
@@ -89,7 +89,7 @@ public interface SchedulerService {
    * <li>event.series (mapped from dc:is_part_of)</li>
    * <li>event.location (mapped from dc:spatial)</li>
    * </ul>
-   * 
+   *
    * @param events
    *          array of events that should be updated
    * @param configuration
@@ -110,7 +110,7 @@ public interface SchedulerService {
    * <li>event.location (mapped from dc:spatial)</li>
    * </ul>
    * Please note that the dublin core's identifier property is <em>not</em> used.
-   * 
+   *
    * @param eventCatalog
    *          updated {@link DublinCoreCatalog}
    * @param wfProperties
@@ -127,7 +127,7 @@ public interface SchedulerService {
 
   /**
    * Removes event with specified ID.
-   * 
+   *
    * @param eventId
    *          event to be removed
    * @throws SchedulerException
@@ -139,7 +139,7 @@ public interface SchedulerService {
 
   /**
    * Retrieves DublinCore associated with specified event ID.
-   * 
+   *
    * @param eventId
    *          ID of event for which DublinCore will be retrieved
    * @return {@link DublinCoreCatalog} for specified event
@@ -152,7 +152,7 @@ public interface SchedulerService {
 
   /**
    * Retrieves capture agent configuration for specified event.
-   * 
+   *
    * @param eventId
    *          ID of event for which capture agent configuration should be retrieved
    * @return Properties for capture agent
@@ -165,7 +165,7 @@ public interface SchedulerService {
 
   /**
    * Retrieves all events matching given query object.
-   * 
+   *
    * @param query
    *          {@link SchedulerQuery} representing query
    * @return {@link DublinCoreCatalogList} with results matching given query
@@ -176,7 +176,7 @@ public interface SchedulerService {
 
   /**
    * Returns list of all conflicting events, i.e. all events that ends after start date and begins before end date.
-   * 
+   *
    * @param captureDeviceID
    *          capture device ID for which conflicting events are searched for
    * @param startDate
@@ -193,7 +193,7 @@ public interface SchedulerService {
   /**
    * Returns list of all conflicting events. Conflicting periods are calculated based on recurrence rule, start date,
    * end date and duration of each conflicting period.
-   * 
+   *
    * @param captureDeviceID
    *          capture device ID for which conflicting events are searched for
    * @param rrule
@@ -213,7 +213,7 @@ public interface SchedulerService {
 
   /**
    * Generates calendar for specified capture agent.
-   * 
+   *
    * @param filter
    *          filter on which calendar will be generated
    * @return generated calendar
@@ -224,7 +224,7 @@ public interface SchedulerService {
 
   /**
    * Returns date of last modification of event belonging to specified capture agent.
-   * 
+   *
    * @param filter
    *          filter for events to be checked
    * @return last modification date

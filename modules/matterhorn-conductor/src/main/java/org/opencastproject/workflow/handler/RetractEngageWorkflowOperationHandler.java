@@ -71,7 +71,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param streamingDistributionService
    *          the streaming distribution service
    */
@@ -81,7 +81,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param downloadDistributionService
    *          the download distribution service
    */
@@ -92,7 +92,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * Callback for declarative services configuration that will introduce us to the search service. Implementation
    * assumes that the reference is configured as being static.
-   * 
+   *
    * @param searchService
    *          an instance of the search service
    */
@@ -102,7 +102,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -112,7 +112,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
    */
   @Override
@@ -126,7 +126,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(WorkflowInstance, JobContext)
    */
   @Override

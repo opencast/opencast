@@ -97,7 +97,7 @@ public class EpisodesPermissionsUpdatedEventHandler {
 
   /**
    * OSGI callback for component activation.
-   * 
+   *
    * @param bundleContext
    *          the OSGI bundle context
    */
@@ -176,7 +176,7 @@ public class EpisodesPermissionsUpdatedEventHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.event.EventHandler#handleEvent(org.osgi.service.event.Event)
    */
   public void handleEvent(final Event event) {

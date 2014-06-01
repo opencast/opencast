@@ -112,7 +112,7 @@ public class JaxbJob implements Job {
 
   /**
    * Constructs a JaxbJob with a specific identifier
-   * 
+   *
    * @param id
    *          the job id
    */
@@ -123,7 +123,7 @@ public class JaxbJob implements Job {
 
   /**
    * Constructs a JaxbJob from an existing job
-   * 
+   *
    * @param job
    *          the job to use as a template for constructing this JaxbJob
    */
@@ -156,7 +156,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getId()
    */
   @XmlAttribute
@@ -167,7 +167,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getVersion()
    */
   @XmlAttribute
@@ -186,7 +186,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#setId(long)
    */
   @Override
@@ -196,7 +196,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getStatus()
    */
   @XmlAttribute
@@ -207,7 +207,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#setStatus(org.opencastproject.job.api.Job.Status)
    */
   @Override
@@ -217,7 +217,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#setStatus(org.opencastproject.job.api.Job.Status,
    *      org.opencastproject.job.api.Job.FailureReason)
    */
@@ -232,7 +232,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getFailureReason()
    */
   @XmlTransient
@@ -243,7 +243,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getType()
    */
   @XmlAttribute(name = "type")
@@ -254,7 +254,7 @@ public class JaxbJob implements Job {
 
   /**
    * Sets the job type
-   * 
+   *
    * @param jobType
    *          the job type
    */
@@ -264,7 +264,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getOperation()
    */
   @XmlElement
@@ -275,7 +275,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#setOperation(java.lang.String)
    */
   @Override
@@ -285,7 +285,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getArguments()
    */
   @XmlElement(name = "arg")
@@ -306,7 +306,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getProcessingHost()
    */
   @XmlElement
@@ -317,7 +317,7 @@ public class JaxbJob implements Job {
 
   /**
    * Sets the host url
-   * 
+   *
    * @param processingHost
    *          the host's base URL
    */
@@ -335,7 +335,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getCreatedHost()
    */
   @XmlElement
@@ -346,7 +346,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getDateCompleted()
    */
   @XmlElement
@@ -357,7 +357,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getDateCreated()
    */
   @XmlElement
@@ -368,7 +368,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getDateStarted()
    */
   @XmlElement
@@ -437,7 +437,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getPayload()
    */
   @XmlElement
@@ -448,7 +448,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#setPayload(java.lang.String)
    */
   @Override
@@ -458,7 +458,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getContext()
    */
   @XmlElement
@@ -469,7 +469,7 @@ public class JaxbJob implements Job {
 
   /**
    * Sets the job context.
-   * 
+   *
    * @param context
    *          the context to set
    */
@@ -479,7 +479,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getParentJobId()
    */
   @XmlElement
@@ -498,7 +498,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getRootJobId()
    */
   @XmlElement
@@ -517,7 +517,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#isDispatchable()
    */
   @Override
@@ -533,7 +533,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getUri()
    */
   @Override
@@ -544,7 +544,7 @@ public class JaxbJob implements Job {
 
   /**
    * Sets the URI.
-   * 
+   *
    * @param uri
    *          the uri to set
    */
@@ -554,7 +554,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getCreator()
    */
   @Override
@@ -565,7 +565,7 @@ public class JaxbJob implements Job {
 
   /**
    * Sets the user that created this job.
-   * 
+   *
    * @param creator
    *          the creator
    */
@@ -575,7 +575,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getOrganization()
    */
   @Override
@@ -586,7 +586,7 @@ public class JaxbJob implements Job {
 
   /**
    * Sets the organization that this job is associated with.
-   * 
+   *
    * @param organization
    *          the organization
    */
@@ -596,7 +596,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override
@@ -610,7 +610,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -623,7 +623,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -633,7 +633,7 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

@@ -17,7 +17,7 @@ package org.opencastproject.series.api;
 
 /**
  * Exception thrown in Series Service
- * 
+ *
  */
 public class SeriesException extends Exception {
 
@@ -34,7 +34,7 @@ public class SeriesException extends Exception {
 
   /**
    * Used to create exception with exception message.
-   * 
+   *
    * @param message
    *          exception message
    */
@@ -44,7 +44,7 @@ public class SeriesException extends Exception {
 
   /**
    * Used to create exception with a cause.
-   * 
+   *
    * @param cause
    */
   public SeriesException(Throwable cause) {
@@ -53,7 +53,7 @@ public class SeriesException extends Exception {
 
   /**
    * Used to create exception with a message and a cause
-   * 
+   *
    * @param message
    * @param cause
    */

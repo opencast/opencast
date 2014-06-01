@@ -29,7 +29,7 @@ public final class HandleSupport {
 
   /**
    * Converts the handle into a valid path name by replacing forward slashes with dots.
-   * 
+   *
    * @param handle
    *          the handle identifier
    * @return the pathname
