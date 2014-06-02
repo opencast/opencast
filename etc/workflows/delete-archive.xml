@@ -27,7 +27,7 @@
     <script type="text/javascript">           
       ocWorkflowPanel.registerComponents = function(components){
         /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
-         * into the workflow. The component's nodeKey must match the components array key.
+         * into the workflow. The new ocAdmin.Component key must match the components array key.
          *
          * Example:'org.opencastproject.workflow.config.myProperty' will be availible at ${my.property}
          */
