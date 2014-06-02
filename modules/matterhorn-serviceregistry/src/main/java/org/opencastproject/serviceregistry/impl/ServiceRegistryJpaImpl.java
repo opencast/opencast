@@ -1522,6 +1522,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#count(java.lang.String, java.lang.String,
    *      java.lang.String, org.opencastproject.job.api.Job.Status)
    */
+  @Override
   public long count(String serviceType, String host, String operation, Status status) throws ServiceRegistryException {
     if (StringUtils.isBlank(serviceType) || StringUtils.isBlank(host) || StringUtils.isBlank(operation)
             || status == null)
@@ -1793,7 +1794,15 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public Object addingService(ServiceReference reference) {
       String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
       String servicePath = (String) reference.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
-      boolean jobProducer = (Boolean) reference.getProperty(RestConstants.SERVICE_JOBPRODUCER_PROPERTY);
+      String publishFlag = (String) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
+      boolean jobProducer = Boolean.parseBoolean((String) reference.getProperty(RestConstants.SERVICE_JOBPRODUCER_PROPERTY));
+
+      // Don't register services that have the "publish" flag set to "false"
+      if ("false".equals(StringUtils.trimToEmpty(publishFlag).toLowerCase())) {
+        logger.debug("Not registering service " + serviceType + " in service registry by configuration");
+        return super.addingService(reference);
+      }
+
       try {
         registerService(serviceType, hostName, servicePath, jobProducer);
       } catch (ServiceRegistryException e) {
@@ -1805,6 +1814,15 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     @Override
     public void removedService(ServiceReference reference, Object service) {
       String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
+      String publishFlag = (String) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
+
+      // Services that have the "publish" flag set to "false" have not been registered before
+      if ("false".equals(StringUtils.trimToEmpty(publishFlag).toLowerCase())) {
+        logger.trace("Service " + reference + " was never registered");
+        super.removedService(reference, service);
+        return;
+      }
+
       try {
         unRegisterService(serviceType, hostName);
       } catch (ServiceRegistryException e) {
