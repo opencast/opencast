@@ -18,22 +18,55 @@
 define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
     "use strict"; // strict mode in all our application
     var PLUGIN_NAME = "Engage Controls",
-            PLUGIN_TYPE = "engage_controls",
-            PLUGIN_VERSION = "0.1",
-            PLUGIN_TEMPLATE = "template.html",
-            PLUGIN_STYLES = [
-        "style.css",
-        "js/bootstrap/css/bootstrap.css",
-        "js/bootstrap/css/bootstrap-responsive.css",
-        "js/jqueryui/themes/base/jquery-ui.css"
-    ];
-    var plugin = {
+        PLUGIN_TYPE = "engage_controls",
+        PLUGIN_VERSION = "0.1",
+        PLUGIN_TEMPLATE = "template.html",
+        PLUGIN_TEMPLATE_MOBILE = "template_mobile.html",
+        PLUGIN_TEMPLATE_EMBED = "template_embed.html",
+        PLUGIN_STYLES = [
+                         "style.css",
+                         "js/bootstrap/css/bootstrap.css",
+                         "js/bootstrap/css/bootstrap-responsive.css",
+                         "js/jqueryui/themes/base/jquery-ui.css"
+                         ],
+        PLUGIN_STYLES_MOBILE = [
+                                "style_mobile.css"
+                                ],
+        PLUGIN_STYLES_EMBED = [
+                                "style_embed.css"
+                              ];
+    var plugin = {};
+    //switch mobile and desktop logic
+    switch(Engage.model.get("mode")){
+    case "desktop":
+      plugin = {
+          name: PLUGIN_NAME,
+          type: PLUGIN_TYPE,
+          version: PLUGIN_VERSION,
+          styles: PLUGIN_STYLES,
+          template: PLUGIN_TEMPLATE
+      };
+      break;
+    case "mobile":
+      plugin = {
         name: PLUGIN_NAME,
         type: PLUGIN_TYPE,
         version: PLUGIN_VERSION,
-        styles: PLUGIN_STYLES,
-        template: PLUGIN_TEMPLATE
-    };
+        styles: PLUGIN_STYLES_MOBILE,
+        template: PLUGIN_TEMPLATE_MOBILE
+      };     
+      break;
+    case "embed":
+      plugin = {
+        name: PLUGIN_NAME,
+        type: PLUGIN_TYPE,
+        version: PLUGIN_VERSION,
+        styles: PLUGIN_STYLES_EMBED,
+        template: PLUGIN_TEMPLATE_EMBED
+      };
+      break;
+    }
+    
     var plugin_path = "";
 
     var initCount = 4; //init resource count

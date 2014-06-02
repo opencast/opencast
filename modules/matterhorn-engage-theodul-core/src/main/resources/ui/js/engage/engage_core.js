@@ -69,7 +69,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
       });
       // Core Initialize Event
       this.dispatcher.on("Core:init", function () {
-        //switch view template and css rules for current player modus
+        //switch view template and css rules for current player mode
         //link tag for css file
         var cssLinkTag = $("<link>");
         var cssAttr = {
@@ -78,71 +78,69 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
         };
         //template obj
         var core_template = "none";
-        switch(engageCore.model.get("modus")){
+        //path to the require module with the view logic
+        var view_logic_path = "";
+        switch(engageCore.model.get("mode")){
         case "desktop":
             cssAttr.href = 'css/core_desktop_style.css';
             core_template = "templates/core_desktop.html";
+            view_logic_path = "engage/engage_desktop_view"
             break;
         case "mobile":
             cssAttr.href = 'css/core_mobile_style.css';
             core_template = "templates/core_mobile.html";
+            view_logic_path = "engage/engage_mobile_view"
             break;
         case "embed":
             cssAttr.href = 'css/core_embed_style.css';
             core_template = "templates/core_embed.html";
+            view_logic_path = "engage/engage_embed_view"
             break;
         }
         cssLinkTag.attr(cssAttr);
         //add css to DOM
-        $("head").append(cssLinkTag);          
-        //Get Core template
-        $.get(core_template, function (template) {
-          //set template, render it and add it to DOM
-          engageCore.template = template;
-          $(engageCore.el).html(_.template(template));
-          //do special ui stuff for desktop, mobile and embed versions
-          switch(engageCore.model.get("modus")){
-          case "desktop":
-
-              break;
-          case "mobile":
-
-              break;
-          case "embed":
-
-              break;
-          }
-          //build timeline plugins
-          $("#engage_timeline_expand_btn").click(function() {
-            $("#engage_timeline_plugin").slideToggle("fast");
-            $("#engage_timeline_expand_btn_img").toggleClass("engage_timeline_expand_btn_rotate180");
-          });
-          /*BEGIN LOAD PLUGINS*/
-          // fetch plugin information
-          engageCore.model.get('pluginsInfo').fetch({
-            success : function (pluginInfos) {
-              // load plugin as requirejs module
-              if (pluginInfos.get('pluginlist') && pluginInfos.get('pluginlist').plugins !== undefined) {
-                if ($.isArray(pluginInfos.get('pluginlist').plugins)) {
-                  $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
-                    var plugin_name = value['name'];
-                    plugins_loaded[plugin_name] = false;
-                  });
-                  $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
+        $("head").append(cssLinkTag);
+        //load js view logic via require, see files engage_<mode>_view.js
+        require([view_logic_path], function(pluginView) {
+          //link view logic to the core
+          engageCore.pluginView = pluginView;
+          //Get Core template
+          $.get(core_template, function (template) {
+            //set template, render it and add it to DOM
+            engageCore.template = template;
+            $(engageCore.el).html(_.template(template));
+            //build timeline plugins
+            $("#engage_timeline_expand_btn").click(function() {
+              $("#engage_timeline_plugin").slideToggle("fast");
+              $("#engage_timeline_expand_btn_img").toggleClass("engage_timeline_expand_btn_rotate180");
+            });
+            /*BEGIN LOAD PLUGINS*/
+            // fetch plugin information
+            engageCore.model.get('pluginsInfo').fetch({
+              success : function (pluginInfos) {
+                // load plugin as requirejs module
+                if (pluginInfos.get('pluginlist') && pluginInfos.get('pluginlist').plugins !== undefined) {
+                  if ($.isArray(pluginInfos.get('pluginlist').plugins)) {
+                    $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
+                      var plugin_name = value['name'];
+                      plugins_loaded[plugin_name] = false;
+                    });
+                    $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
+                      // load plugin
+                      var plugin_name = value['name'];
+                      loadPlugin('../../../plugin/' + value['static-path'] + '/', plugin_name);
+                    });
+                  } else {
                     // load plugin
                     var plugin_name = value['name'];
-                    loadPlugin('../../../plugin/' + value['static-path'] + '/', plugin_name);
-                  });
-                } else {
-                  // load plugin
-                  var plugin_name = value['name'];
-                  plugins_loaded[plugin_name] = false;
-                  loadPlugin('../../../plugin/' + pluginInfos.get('pluginlist').plugins['static-path'] + '/', plugin_name);
+                    plugins_loaded[plugin_name] = false;
+                    loadPlugin('../../../plugin/' + pluginInfos.get('pluginlist').plugins['static-path'] + '/', plugin_name);
+                  }
                 }
               }
-            }
+            });
+            /*END LOAD PLUGINS*/
           });
-          /*END LOAD PLUGINS*/
         });
       });
       // load plugins done, hide loading and show content
@@ -201,8 +199,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
   /*
    * BEGIN Private core functions
    */
-  function build
-  
+  /*
   function addPluginLogic() {
     EngageTabLogic('tabs', 'engage_tab_nav');
   }
@@ -240,6 +237,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
     }
     return container;
   }
+  */
 
   function checkAllPluginsloaded() {
     var all_plugins_loaded = true;
@@ -293,14 +291,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
           // Process the template using underscore
           var processed_template = _.template(template, template_data);
           // Load the compiled HTML into the component
-          plugin.container = insertProcessedTemplate(processed_template, plugin.type, plugin.name);
+          plugin.container = engageCore.pluginView.insertPlugin(processed_template, plugin.type, plugin.name);
           plugin.template = template;
           plugin.pluginPath = 'engage/theodul/' + plugin_path;
           // plugin load done counter
           plugins_loaded[plugin_name] = true;
           // Check if all plugins are ready
           if (checkAllPluginsloaded() === true) {
-            addPluginLogic();
+            engageCore.pluginView.allPluginsLoaded();
             // Trigger done event
             engageCore.trigger("Core:plugin_load_done");
           }
@@ -309,7 +307,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
         plugins_loaded[plugin_name] = true;
         // Check if all plugins are ready
         if (checkAllPluginsloaded() === true) {
-          addPluginLogic();
+          engageCore.pluginView.allPluginsLoaded();
           // Trigger done event
           engageCore.trigger("Core:plugin_load_done");
         }
