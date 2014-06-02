@@ -144,12 +144,3 @@ ALTER TABLE mh_job MODIFY COLUMN payload MEDIUMTEXT;
 
 -- Create additional index on table mh_job for better performance in job statistics query, see MH-8638
 CREATE INDEX IX_mh_job_statistics ON mh_job (processor_service, status, queue_time, run_time); 
-
-CREATE TABLE mh_job_mh_service_registration (
-  Job_id BIGINT NOT NULL,
-  servicesRegistration_id BIGINT NOT NULL,
-  PRIMARY KEY (Job_id, servicesRegistration_id),
-  KEY mhjobmhservice_registrationservicesRegistration_id (servicesRegistration_id),
-  CONSTRAINT FK_mh_job_mh_service_registration_Job_id FOREIGN KEY (Job_id) REFERENCES mh_job (id) ON DELETE CASCADE,
-  CONSTRAINT mhjobmhservice_registrationservicesRegistration_id FOREIGN KEY (servicesRegistration_id) REFERENCES mh_service_registration (id) ON DELETE CASCADE
-) ENGINE=InnoDB;
