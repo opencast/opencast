@@ -3,11 +3,7 @@
 
   <id>incident</id>
   <title>Provoke a job incident</title>
-  <tags>
-    <tag>upload</tag>
-    <tag>schedule</tag>
-    <tag>archive</tag>
-  </tags>
+  <tags />
   <description>Provoke a job incident</description>
 
   <configuration_panel>
