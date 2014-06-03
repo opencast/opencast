@@ -25,7 +25,7 @@ public class ProcessExcecutorException extends Exception {
 
   /**
    * Creates a new exception.
-   * 
+   *
    * @param msg
    *          the error message
    * @param cause

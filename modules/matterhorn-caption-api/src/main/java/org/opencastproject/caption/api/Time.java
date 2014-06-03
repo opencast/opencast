@@ -22,28 +22,28 @@ public interface Time extends Comparable<Time> {
 
   /**
    * Get hours of a caption.
-   * 
+   *
    * @return hours
    */
   int getHours();
 
   /**
    * Get minutes of a caption.
-   * 
+   *
    * @return minutes
    */
   int getMinutes();
 
   /**
    * Get seconds of a caption.
-   * 
+   *
    * @return seconds
    */
   int getSeconds();
 
   /**
    * Get milliseconds of a caption.
-   * 
+   *
    * @return milliseconds
    */
   int getMilliseconds();

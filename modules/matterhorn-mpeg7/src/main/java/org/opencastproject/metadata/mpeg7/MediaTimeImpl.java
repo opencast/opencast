@@ -33,7 +33,7 @@ public class MediaTimeImpl implements MediaTime {
 
   /**
    * Creates a media time object representing the given timepoint and duration.
-   * 
+   *
    * @param timePoint
    *          the time point
    * @param duration
@@ -46,7 +46,7 @@ public class MediaTimeImpl implements MediaTime {
 
   /**
    * Creates a media time object from the given long values for timepoint and duration.
-   * 
+   *
    * @param time
    *          the time in milliseconds
    * @param duration
@@ -59,7 +59,7 @@ public class MediaTimeImpl implements MediaTime {
 
   /**
    * Creates a media time object from the given string representations for timepoint and duration.
-   * 
+   *
    * @param time
    *          the timepoint string representation
    * @param duration
@@ -86,7 +86,7 @@ public class MediaTimeImpl implements MediaTime {
 
   /**
    * Parses a media time and duration.
-   * 
+   *
    * @param time
    * @param duration
    * @return the

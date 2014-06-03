@@ -30,7 +30,7 @@ public class OpencastSolrConfig extends SolrConfig {
 
   /**
    * Overrides the {@link SolrConfig} constructor in order to pass an OSGi-safe {@link SolrResourceLoader}.
-   * 
+   *
    * @param instanceDir
    * @param name
    * @param is

@@ -48,7 +48,7 @@ public class GStreamerServiceRemoteImpl extends RemoteBase implements GStreamerS
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.gstreamer.api.GStreamerService#launch(org.opencastproject.mediapackage.MediaPackage,
    *      java.lang.String, java.lang.String)
    */

@@ -28,7 +28,7 @@ import java.util.MissingResourceException;
 
 /**
  * QT embedder engine that is capable of creating soft subtitles in QT files. Uses <code>qtsbtlembedder</code>.
- * 
+ *
  */
 public class QTSbtlEmbedderEngine extends AbstractCmdlineEmbedderEngine {
 
@@ -36,7 +36,7 @@ public class QTSbtlEmbedderEngine extends AbstractCmdlineEmbedderEngine {
   public static final String QTEMBEDDER_BINARY_DEFAULT = "qtsbtlembedder";
 
   /** Parameter name for retrieving qt embedder path */
-  private static final String CONFIG_QTEMBEDDER_PATH = "org.opencastproject.composer.qtembedderpath";
+  private static final String CONFIG_QTEMBEDDER_PATH = "org.opencastproject.composer.qtembedder.path";
 
   /** Command line template for executing job */
   // WARNING use 0.3 with multiple subtitle embedding capability
@@ -55,7 +55,7 @@ public class QTSbtlEmbedderEngine extends AbstractCmdlineEmbedderEngine {
 
   /**
    * Activates component. Retrieve binary location if it was set.
-   * 
+   *
    * @param context
    *          component context
    */
@@ -71,7 +71,7 @@ public class QTSbtlEmbedderEngine extends AbstractCmdlineEmbedderEngine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.impl.AbstractCmdlineEmbedderEngine#handleEmbedderOutput(java.lang.String,
    *      java.io.File[])
    */
@@ -89,7 +89,7 @@ public class QTSbtlEmbedderEngine extends AbstractCmdlineEmbedderEngine {
   /**
    * {@inheritDoc} Accepts ISO 639-1 language code and returns ISO 639-2 language code. If language cannot be
    * determined, returns <code>und</code>.
-   * 
+   *
    * @see org.opencastproject.composer.impl.AbstractCmdlineEmbedderEngine#normalizeLanguage(java.lang.String)
    */
   @Override
@@ -121,7 +121,7 @@ public class QTSbtlEmbedderEngine extends AbstractCmdlineEmbedderEngine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.impl.AbstractCmdlineEmbedderEngine#getOutputFile(java.util.Map)
    */
   @Override

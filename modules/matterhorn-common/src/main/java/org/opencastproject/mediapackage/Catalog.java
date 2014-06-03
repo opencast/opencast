@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * General definition for metadata catalogs.
- * 
+ *
  */
 @XmlJavaTypeAdapter(CatalogImpl.Adapter.class)
 public interface Catalog extends MediaPackageElement, Serializable {

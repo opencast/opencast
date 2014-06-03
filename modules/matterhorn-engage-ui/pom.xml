@@ -1,11 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.opencastproject</groupId>
   <artifactId>matterhorn-engage-ui</artifactId>
   <packaging>bundle</packaging>
   <name>matterhorn-engage-ui</name>
-
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -67,11 +64,10 @@
     </dependency>
   </dependencies>
   <build>
-  <plugins>
-    <plugin>
+    <plugins>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>2.4.1</version>
         <executions>
           <execution>
             <id>copy-player</id>
@@ -91,7 +87,7 @@
                     <include>preview.xml</include>
                     <include>Videodisplay.swf/</include>
                     <include>playerProductInstall.swf/</include>
-                  </includes>                  
+                  </includes>
                   <filtering>false</filtering>
                 </resource>
               </resources>
@@ -109,8 +105,8 @@
                 <resource>
                   <directory>../../shared-resources/</directory>
                   <includes>
-                     <include>js/jquery/**</include>
-                  </includes>                  
+                    <include>js/jquery/**</include>
+                  </includes>
                   <filtering>false</filtering>
                 </resource>
               </resources>
@@ -216,7 +212,6 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.0.1</version>
         <extensions>true</extensions>
         <configuration>
           <instructions>
@@ -232,8 +227,8 @@
     </plugins>
   </build>
   <reporting>
-		<plugins>
-			<!--<plugin>
+    <plugins>
+      <!--<plugin>
 				<groupId>gr.abiss.mvn.plugins</groupId>
 				<artifactId>maven-jstools-plugin</artifactId>
 				<version>0.7</version>
@@ -260,6 +255,6 @@
 					</reportSet>
 				</reportSets>
 			</plugin>-->
-		</plugins>
-	</reporting>
+    </plugins>
+  </reporting>
 </project>

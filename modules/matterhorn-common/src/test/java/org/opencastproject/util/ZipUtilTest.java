@@ -34,16 +34,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /* WARNING
- * 
+ *
  * Instead of using a single static final file for testing the destination files, we are using
  * a file with a unique name for each test. The reason is that if the tests are run so quickly
  * the filesystem is unable to erase the files on time and a test can re-create the file before
- * it was physically deleted. If those files are suppossed to be different, a test may return 
+ * it was physically deleted. If those files are suppossed to be different, a test may return
  * a false positive or negative. If the pathnames are different for each test, there's no
  * possible mistake.
- * For uniformity, all the tests declare internally it's own destination file/filename, even 
+ * For uniformity, all the tests declare internally it's own destination file/filename, even
  * though this may not be strictly necessary for all of them.
- * 
+ *
  * ruben.perez
  */
 

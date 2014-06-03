@@ -42,7 +42,7 @@ public final class JobCreator {
   /**
    * Creates a job and trigger that tries to ingest captures to the core. Please see the classes IngestJob and
    * IngestJobRetrier for more details.
-   * 
+   *
    * @throws ParseException
    *           if the cron expression can't be parsed, usually caused by an invalid pauseInterval.
    * @param cronSeconds
@@ -95,7 +95,7 @@ public final class JobCreator {
   /**
    * Try to get the pause interval between trying to ingest media to the core from the configuration manager. If it
    * can't it will use the IngestJob default pause time.
-   * 
+   *
    * @return Returns the amount of time to pause between trying to ingest.
    **/
   private static long getPauseInterval(ConfigurationManager configurationManager) {
@@ -117,7 +117,7 @@ public final class JobCreator {
   /**
    * Returns the amount of time between retries to ingest to the core. Will use IngestJobRetrier Default Retry Interval
    * if it can't load the setting from the configuration manager.
-   * 
+   *
    * @return Returns the amount of time to wait between retrying to ingest to the core in case of a failure.
    **/
   private static long getRetryInterval(ConfigurationManager configurationManager) {
@@ -135,7 +135,7 @@ public final class JobCreator {
   /**
    * Returns the number of times to try ingesting to the core before sleeping until the next set of retries. It uses the
    * IngestJobRetrier's DEFAULT_RETRIES if it can't load this number from the ConfigurationManager.
-   * 
+   *
    * @return The number of times to retry ingesting to the core before sleeping.
    **/
   private static long getRetryLimit(ConfigurationManager configurationManager) {

@@ -97,10 +97,8 @@ Opencast.Series = (function ()
     {
         $.ajax(
         {
-            url: Opencast.Watch.getSeriesSeriesURL(),
-            data: 'id=' + series_id + '&episodes=true&limit=20&offset=0',
-            dataType: 'jsonp',
-            jsonp: 'jsonp',
+            url: '/search/episode.json',
+            data: 'sid=' + series_id + '&limit=20&offset=0',
             success: function (data)
             {
                 $.log("Series AJAX call: Requesting data succeeded");

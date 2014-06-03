@@ -80,7 +80,7 @@ public class JaxbOrganization implements Organization {
 
   /**
    * Constructs an organization with its attributes.
-   * 
+   *
    * @param id
    *          the unique identifier
    * @param name
@@ -119,7 +119,7 @@ public class JaxbOrganization implements Organization {
 
   /**
    * Constructs an organization from an organization
-   * 
+   *
    * @param org
    *          the organization
    */
@@ -190,7 +190,7 @@ public class JaxbOrganization implements Organization {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override
@@ -200,7 +200,7 @@ public class JaxbOrganization implements Organization {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -212,7 +212,7 @@ public class JaxbOrganization implements Organization {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -243,7 +243,7 @@ public class JaxbOrganization implements Organization {
 
     /**
      * Constructs an organization server mapping with a server name and a port.
-     * 
+     *
      * @param name
      *          the name
      * @param port
@@ -292,7 +292,7 @@ public class JaxbOrganization implements Organization {
 
     /**
      * Constructs an organization property with a key and a value.
-     * 
+     *
      * @param key
      *          the key
      * @param value

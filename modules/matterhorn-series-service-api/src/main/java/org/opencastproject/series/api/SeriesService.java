@@ -23,7 +23,7 @@ import org.opencastproject.util.NotFoundException;
 
 /**
  * Series service API for creating, removing and searching over series.
- * 
+ *
  */
 public interface SeriesService {
 
@@ -43,7 +43,7 @@ public interface SeriesService {
 
   /**
    * Adds or updates series. IllegalArgumentException is thrown if dc argument is null.
-   * 
+   *
    * @param dc
    *          {@link DublinCoreCatalog} representing series
    * @return Dublin Core catalog of newly created series or null if series Dublin Core was just updated
@@ -57,7 +57,7 @@ public interface SeriesService {
   /**
    * Updates access control rules for specified series. Not specifying series ID or trying to update series with null
    * value will throw IllegalArgumentException.
-   * 
+   *
    * @param seriesID
    *          series to be updated
    * @param accessControl
@@ -75,7 +75,7 @@ public interface SeriesService {
 
   /**
    * Removes series
-   * 
+   *
    * @param seriesID
    *          ID of the series to be removed
    * @throws SeriesException
@@ -89,7 +89,7 @@ public interface SeriesService {
 
   /**
    * Returns Dublin core representing series by series ID.
-   * 
+   *
    * @param seriesID
    *          series to be retrieved
    * @return {@link DublinCoreCatalog} representing series
@@ -102,7 +102,7 @@ public interface SeriesService {
 
   /**
    * Returns access control rules for series with given ID.
-   * 
+   *
    * @param seriesID
    *          ID of the series for which access control rules will be retrieved
    * @return {@link AccessControlList} defining access control rules
@@ -115,7 +115,7 @@ public interface SeriesService {
 
   /**
    * Search over series
-   * 
+   *
    * @param query
    *          {@link SeriesQuery} representing query
    * @return List of all matching series

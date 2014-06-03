@@ -52,7 +52,7 @@ public class TemporalDecompositionImpl<T extends Segment> implements TemporalDec
 
   /**
    * Creates a new temporal decomposition container.
-   * 
+   *
    * @param segmentType
    *          the segment type
    */

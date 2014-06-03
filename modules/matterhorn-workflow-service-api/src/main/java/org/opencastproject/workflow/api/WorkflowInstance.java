@@ -39,7 +39,7 @@ public interface WorkflowInstance extends Configurable {
 
   /**
    * Sets the workflow identifier.
-   * 
+   *
    * @param id
    *          the identifier
    */
@@ -67,14 +67,14 @@ public interface WorkflowInstance extends Configurable {
 
   /**
    * Returns the user that created this workflow.
-   * 
+   *
    * @return the workflow's creator
    */
   User getCreator();
 
   /**
    * Returns the organization that this workflow belongs to.
-   * 
+   *
    * @return the organization
    */
   Organization getOrganization();
@@ -82,14 +82,14 @@ public interface WorkflowInstance extends Configurable {
   /**
    * Returns a copy of the {@link WorkflowOperationInstance}s that make up this workflow. In order to modify the
    * operations, call setOperations.
-   * 
+   *
    * @return the workflow operations
    */
   List<WorkflowOperationInstance> getOperations();
 
   /**
    * Sets the list of workflow operations.
-   * 
+   *
    * @param operations
    *          the new list of operations
    */
@@ -98,7 +98,7 @@ public interface WorkflowInstance extends Configurable {
   /**
    * Returns the {@link WorkflowOperationInstance} that is currently either in {@link WorkflowState#RUNNING} or
    * {@link WorkflowState#PAUSED}.
-   * 
+   *
    * @return the current operation
    * @throws IllegalStateException
    *           if the workflow instance has no operations
@@ -112,7 +112,7 @@ public interface WorkflowInstance extends Configurable {
 
   /**
    * Set the state of the workflow.
-   * 
+   *
    * @param state
    *            the new workflow state
    */
@@ -151,7 +151,7 @@ public interface WorkflowInstance extends Configurable {
 
   /**
    * Appends the operations found in the workflow definition to the end of this workflow instance.
-   * 
+   *
    * @param workflowDefinition
    *          the workflow definition
    */

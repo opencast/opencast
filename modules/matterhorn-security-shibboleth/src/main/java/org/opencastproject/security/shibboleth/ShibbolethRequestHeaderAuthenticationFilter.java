@@ -51,7 +51,7 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
    * This is called when a request is made, the returned object identifies the user and will either be Null or a String.
    * This method will throw an exception if exceptionIfHeaderMissing is set to true (default) and the required header is
    * missing.
-   * 
+   *
    * @param request
    *          the incoming request
    */
@@ -73,7 +73,7 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
 
   /**
    * Logs all request headers to the logging facility.
-   * 
+   *
    * @param request
    *          the request
    */
@@ -97,7 +97,7 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
 
   /**
    * If set to <code>true</code>, the filter will log all request headers to the logging facility.
-   * 
+   *
    * @param debug
    *          <code>true</code> to log request headers
    */
@@ -107,7 +107,7 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
 
   /**
    * Sets the user details service which allows to check whether a user is already known by the system or not.
-   * 
+   *
    * @param userDetailsService
    *          the user details service
    */
@@ -117,7 +117,7 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
 
   /**
    * Required. Used to handle creation and update of user accounts.
-   * 
+   *
    * @param loginHandler
    *          the handler
    */

@@ -58,7 +58,7 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#activate(org.osgi.service.component.ComponentContext)
    */
   @Override
@@ -74,7 +74,7 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -91,7 +91,7 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#resume(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext, java.util.Map)
    */
@@ -112,8 +112,8 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
   /**
    * Adds the operations found in the workflow defined by <code>workflowDefintionId</code> to the workflow instance and
    * returns <code>true</code> if everything worked fine, <code>false</code> otherwhise.
-   * 
-   * 
+   *
+   *
    * @param workflowInstance
    *          the instance to update
    * @param workflowDefinitionId
@@ -142,7 +142,7 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
 
   /**
    * Callback from the OSGi environment that will pass a reference to the workflow service upon component acitvation.
-   * 
+   *
    * @param service
    *          the workflow service
    */

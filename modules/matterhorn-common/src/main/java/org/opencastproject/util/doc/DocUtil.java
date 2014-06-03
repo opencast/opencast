@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * This provides methods for handling documentation generation The is mainly for generating REST documentation but it
  * could be used for other things as well
- * 
+ *
  * @see DocData
  * @see org.opencastproject.runtimeinfo.rest.DocRestData
  */
@@ -70,7 +70,7 @@ public final class DocUtil {
    * replacement)<br/>
    * NOTE: These should be compatible with Velocity (http://velocity.apache.org/) templates if you use the formal
    * notation (formal: ${variable}, shorthand: $variable)
-   * 
+   *
    * @param templateName
    *          this is the key to cache the template under
    * @param textTemplate
@@ -130,7 +130,7 @@ public final class DocUtil {
 
   /**
    * Use this method to generate the documentation using passed in document data
-   * 
+   *
    * @param data
    *          any populated DocData object
    * @return the documentation (e.g. REST html) as a string
@@ -147,7 +147,7 @@ public final class DocUtil {
   /**
    * Use this method to generate the documentation using passed in document data, allows the user to specify the
    * template that is used
-   * 
+   *
    * @param data
    *          any populated DocData object
    * @param template
@@ -167,7 +167,7 @@ public final class DocUtil {
 
   /**
    * Loads a template based on the given path
-   * 
+   *
    * @param path
    *          the path to load the template from (uses the current classloader)
    * @return the template as a string

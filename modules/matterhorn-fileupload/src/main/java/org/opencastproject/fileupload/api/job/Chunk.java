@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * A class representing the information about the current chunk in an upload job.
- * 
+ *
  */
 @XmlType(name = "chunk", namespace = "http://fileupload.opencastproject.org")
 @XmlRootElement(name = "chunk", namespace = "http://fileupload.opencastproject.org")

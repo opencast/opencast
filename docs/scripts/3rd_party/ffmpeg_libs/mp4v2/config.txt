@@ -1,4 +1,4 @@
-URL: http://mp4v2.googlecode.com/files ${USASK_MIRROR}
+URL: http://mp4v2.googlecode.com/files ${USASK_MIRROR} ${ETH_MIRROR}
 PKG: mp4v2-1.9.1.tar.bz2
 SHA: c62d00e99b65efce16accd83c501fb8a57206aa8
 DIR: mp4v2-1.9.1

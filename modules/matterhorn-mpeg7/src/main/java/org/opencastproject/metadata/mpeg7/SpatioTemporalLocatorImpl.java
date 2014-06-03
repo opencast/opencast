@@ -29,7 +29,7 @@ public class SpatioTemporalLocatorImpl implements SpatioTemporalLocator {
 
   /**
    * Creates a new spatio temporal locator.
-   * 
+   *
    * @param time
    *          the time
    */
@@ -39,7 +39,7 @@ public class SpatioTemporalLocatorImpl implements SpatioTemporalLocator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.SpatioTemporalLocator#setMediaTime(org.opencastproject.metadata.mpeg7.MediaTime)
    */
   @Override
@@ -51,7 +51,7 @@ public class SpatioTemporalLocatorImpl implements SpatioTemporalLocator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.SpatioTemporalLocator#getMediaTime()
    */
   @Override
@@ -61,7 +61,7 @@ public class SpatioTemporalLocatorImpl implements SpatioTemporalLocator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.XmlElement#toXml(org.w3c.dom.Document)
    */
   @Override

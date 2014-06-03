@@ -22,7 +22,7 @@ public interface CachingUserProviderMXBean {
 
   /**
    * Gets the ratio of cache hits to total requests.
-   * 
+   *
    * @return the hit ratio
    */
   float getCacheHitRatio();

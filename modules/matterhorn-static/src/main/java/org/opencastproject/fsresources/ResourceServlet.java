@@ -136,7 +136,7 @@ public class ResourceServlet extends HttpServlet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse)
    */

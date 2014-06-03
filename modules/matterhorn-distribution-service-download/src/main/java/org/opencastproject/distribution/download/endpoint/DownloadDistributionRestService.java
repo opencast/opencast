@@ -73,7 +73,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -91,7 +91,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
@@ -177,7 +177,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -190,7 +190,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override

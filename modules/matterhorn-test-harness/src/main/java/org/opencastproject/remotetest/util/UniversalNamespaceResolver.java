@@ -25,25 +25,25 @@ import javax.xml.namespace.NamespaceContext;
 /**
  * This is a helper class for parsing XML which has namespaces using Xpath,
  * this is done a lot in tests
- * 
+ *
  * http://www.ibm.com/developerworks/library/x-javaxpathapi.html
- * 
+ *
  * http://java.sun.com/j2se/1.5.0/docs/api/javax/xml/xpath/package-summary.html
- * 
+ *
  * Example usage:
 <xmp>
 XPath xPath = XPathFactory.newInstance().newXPath();
 xPath.setNamespaceContext(new UniversalNamespaceResolver(document));
-NodeList nodes = xPath.compile(path).evaluate(document, XPathConstants.NODESET); 
+NodeList nodes = xPath.compile(path).evaluate(document, XPathConstants.NODESET);
 </xmp>
  */
 public class UniversalNamespaceResolver implements NamespaceContext {
   private Document sourceDocument;
 
   /**
-   * 
+   *
    * Store the source document.
-   * 
+   *
    * @param document
    *          source document
    */
@@ -52,9 +52,9 @@ public class UniversalNamespaceResolver implements NamespaceContext {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see javax.xml.namespace.NamespaceContext#getNamespaceURI(java.lang.String)
    */
   public String getNamespaceURI(String prefix) {
@@ -66,9 +66,9 @@ public class UniversalNamespaceResolver implements NamespaceContext {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see javax.xml.namespace.NamespaceContext#getPrefix(java.lang.String)
    */
   public String getPrefix(String namespaceURI) {
@@ -76,9 +76,9 @@ public class UniversalNamespaceResolver implements NamespaceContext {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see javax.xml.namespace.NamespaceContext#getPrefixes(java.lang.String)
    */
   @SuppressWarnings("unchecked")

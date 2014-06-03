@@ -28,7 +28,7 @@ public interface CmdlineEncoderListener extends EncoderListener {
 
   /**
    * Notifies the listener of any console output from the encoder either to stdin or stderr.
-   * 
+   *
    * @param file
    *          the files that are being encoded
    * @param format

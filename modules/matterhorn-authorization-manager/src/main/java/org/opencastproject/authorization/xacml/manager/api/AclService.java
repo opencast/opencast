@@ -30,7 +30,7 @@ public interface AclService {
 
   /**
    * Adds an episode ACL to schedule at the given date
-   * 
+   *
    * @param episodeId
    *          the episode id
    * @param managedAclId
@@ -50,7 +50,7 @@ public interface AclService {
 
   /**
    * Adds a series ACL to schedule at the given date
-   * 
+   *
    * @param seriesId
    *          the series id
    * @param managedAclId
@@ -70,7 +70,7 @@ public interface AclService {
 
   /**
    * Updates an existing episode transition
-   * 
+   *
    * @param transitionId
    *          the transition id
    * @param managedAclId
@@ -90,7 +90,7 @@ public interface AclService {
 
   /**
    * Updates an existing series transition
-   * 
+   *
    * @param transitionId
    *          the transition id
    * @param managedAclId
@@ -113,7 +113,7 @@ public interface AclService {
 
   /**
    * Marks a series transition as completed
-   * 
+   *
    * @param transitionId
    *          the transition identifier
    * @return the completed series ACL transition
@@ -127,7 +127,7 @@ public interface AclService {
 
   /**
    * Marks an episode transition as completed
-   * 
+   *
    * @param transitionId
    *          the transition identifier
    * @return the completed episode ACL transition
@@ -141,7 +141,7 @@ public interface AclService {
 
   /**
    * Deletes a episode transition by it's transition id
-   * 
+   *
    * @param transitionId
    *          the transition id
    * @throws AclServiceException
@@ -153,7 +153,7 @@ public interface AclService {
 
   /**
    * Deletes a series transition by it's transition id
-   * 
+   *
    * @param transitionId
    *          the transition id
    * @throws AclServiceException
@@ -165,7 +165,7 @@ public interface AclService {
 
   /**
    * Deletes all transitions for a given episode.
-   * 
+   *
    * @param episodeId
    *          the episode id
    * @throws AclServiceException
@@ -177,7 +177,7 @@ public interface AclService {
 
   /**
    * Delete all transitions for a given series.
-   * 
+   *
    * @param seriesId
    *          the series id
    * @throws AclServiceException
@@ -189,7 +189,7 @@ public interface AclService {
 
   /**
    * Returns the transition result by the given transition query.
-   * 
+   *
    * @param query
    *          the transition query
    * @return the transition result
@@ -254,21 +254,21 @@ public interface AclService {
 
   /**
    * Return an ACL of an organization by its ID.
-   * 
+   *
    * @return <code>some</code> if the ACL could be found, <code>none</code> if the ACL with the given ID does not exist.
    */
   Option<ManagedAcl> getAcl(long id);
 
   /**
    * Update an existing ACL.
-   * 
+   *
    * @return true on a successful update, false if no ACL exists with the given ID.
    */
   boolean updateAcl(ManagedAcl acl);
 
   /**
    * Create a new ACL.
-   * 
+   *
    * @return <code>some</code> if the new ACL could be created successfully, <code>none</code> if an ACL with the same
    *         name already exists
    */
@@ -276,7 +276,7 @@ public interface AclService {
 
   /**
    * Delete an ACL by its ID.
-   * 
+   *
    * @return <code>true</code> if the ACL existed and could be deleted successfully, <code>false</code> if the ACL can't
    *         be deleted because it still has active references on it.
    * @throws NotFoundException

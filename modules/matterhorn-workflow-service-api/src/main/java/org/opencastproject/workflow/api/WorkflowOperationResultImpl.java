@@ -42,7 +42,7 @@ public class WorkflowOperationResultImpl implements WorkflowOperationResult {
 
   /**
    * Constructs a new WorkflowOperationResultImpl from a mediapackage and an action.
-   * 
+   *
    * @param resultingMediaPackage
    * @param action
    */
@@ -62,7 +62,7 @@ public class WorkflowOperationResultImpl implements WorkflowOperationResult {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationResult#getMediaPackage()
    */
   public MediaPackage getMediaPackage() {
@@ -71,7 +71,7 @@ public class WorkflowOperationResultImpl implements WorkflowOperationResult {
 
   /**
    * Sets the resulting media package.
-   * 
+   *
    * @param mediaPackage
    */
   public void setMediaPackage(MediaPackage mediaPackage) {
@@ -79,9 +79,9 @@ public class WorkflowOperationResultImpl implements WorkflowOperationResult {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationResult#getAction()
    */
   public Action getAction() {
@@ -90,7 +90,7 @@ public class WorkflowOperationResultImpl implements WorkflowOperationResult {
 
   /**
    * Sets the action that the workflow service should take on the workflow instance
-   * 
+   *
    * @param action
    */
   public void setAction(Action action) {
@@ -101,7 +101,7 @@ public class WorkflowOperationResultImpl implements WorkflowOperationResult {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationResult#getProperties()
    */
   @Override
@@ -111,7 +111,7 @@ public class WorkflowOperationResultImpl implements WorkflowOperationResult {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationResult#getTimeInQueue()
    */
   @Override
@@ -121,7 +121,7 @@ public class WorkflowOperationResultImpl implements WorkflowOperationResult {
 
   /**
    * Specifies whether the operation should be abortable by the user.
-   * 
+   *
    * @param isAbortable
    */
   public void setAllowsAbort(boolean isAbortable) {
@@ -130,7 +130,7 @@ public class WorkflowOperationResultImpl implements WorkflowOperationResult {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationResult#allowsAbort()
    */
   @Override
@@ -140,7 +140,7 @@ public class WorkflowOperationResultImpl implements WorkflowOperationResult {
 
   /**
    * Specifies whether the operation should be continuable by the user.
-   * 
+   *
    * @param isContinuable
    */
   public void setAllowsContinue(boolean isContinuable) {
@@ -149,7 +149,7 @@ public class WorkflowOperationResultImpl implements WorkflowOperationResult {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationResult#allowsContinue()
    */
   @Override

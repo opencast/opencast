@@ -50,7 +50,7 @@ import javax.xml.xpath.XPathFactory;
 
 /**
  * Simple class that enables storage of {@link DublinCoreCatalog} list and serializing into xml or json string.
- * 
+ *
  */
 public class DublinCoreCatalogList {
 
@@ -60,7 +60,7 @@ public class DublinCoreCatalogList {
 
   /**
    * Initialize with the given catalog list.
-   * 
+   *
    * @param catalogs
    *          the catalogs to initialize this list with.
    * @param totalCount
@@ -75,7 +75,7 @@ public class DublinCoreCatalogList {
 
   /**
    * Returns list of Dublin Core currently stored
-   * 
+   *
    * @return List of {@link DublinCoreCatalog}s
    */
   public List<DublinCoreCatalog> getCatalogList() {
@@ -84,7 +84,7 @@ public class DublinCoreCatalogList {
 
   /**
    * Get the total number of catalogs matching the creating query. Is &gt;= {@link #size()}.
-   * 
+   *
    * @return int totalCatalogCount
    */
 
@@ -101,7 +101,7 @@ public class DublinCoreCatalogList {
 
   /**
    * Serializes list to XML.
-   * 
+   *
    * @return serialized array as XML string
    * @throws IOException
    *           if serialization cannot be properly performed
@@ -133,7 +133,7 @@ public class DublinCoreCatalogList {
 
   /**
    * Parses an XML or JSON string to an dublin core catalog list.
-   * 
+   *
    * @param dcString
    *          the XML or JSON string
    * @throws IOException
@@ -195,7 +195,7 @@ public class DublinCoreCatalogList {
 
   /**
    * Serialize a node to an input stream
-   * 
+   *
    * @param node
    *          the node to serialize
    * @return the serialized input stream
@@ -216,7 +216,7 @@ public class DublinCoreCatalogList {
 
   /**
    * Serializes list to JSON array string.
-   * 
+   *
    * @return serialized array as json array string
    */
   @SuppressWarnings("unchecked")

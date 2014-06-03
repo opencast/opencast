@@ -15,6 +15,7 @@
  */
 package org.opencastproject.capture.pipeline.bins.producers;
 
+import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.pipeline.bins.CaptureDevice;
 import org.opencastproject.capture.pipeline.bins.CaptureDeviceNullPointerException;
 import org.opencastproject.capture.pipeline.bins.GStreamerElementFactory;
@@ -25,31 +26,39 @@ import org.opencastproject.capture.pipeline.bins.UnableToCreateGhostPadsForBinEx
 import org.opencastproject.capture.pipeline.bins.UnableToLinkGStreamerElementsException;
 import org.opencastproject.capture.pipeline.bins.UnableToSetElementPropertyBecauseElementWasNullException;
 
+import org.apache.commons.lang.StringUtils;
 import org.gstreamer.Element;
 import org.gstreamer.Pad;
 
 import java.util.Properties;
 
 public abstract class AudioProducer extends ProducerBin {
-
   /**
    * Audio convert is used to convert any input audio into a format usable by gstreamer. Might not be strictly
    * necessary.
    **/
   protected Element audioconvert;
+  /**
+   * Volume is used to control the volume level of the audio capture.
+   */
+  protected Element volume;
+  /**
+   * The volume level to set the volume element to.
+   */
+  private double volumeLevel = 1.0;
 
   /**
    * Super class for all audio Producers whether they are test, pulse, alsa or other. To create a descendant to create a
    * new audio Producer:
-   * 
+   *
    * 1. Override createElements to add any new Elements you might need, setElementProperties to set any specific
    * properties on the newly created Elements, addElementsToBin to add these new Elements to the Bin and finally
    * linkElements to link your new Elements together and possibly to the queue and audio converter.
-   * 
+   *
    * 2. If you are using audioconverter as the last Element in your Bin leave it as the getSrcPad target. If you have a
    * new Element as the last one in your Bin (that will act as the source for the Consumers) please return it's src pads
    * as the ones to ghost so that it can be connected to the Consumers.
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If setProperties is called before createElements this Exception is thrown because all of the Elements
    *           will be null.
@@ -73,8 +82,8 @@ public abstract class AudioProducer extends ProducerBin {
   }
 
   /**
-   * Create all the common element for audio sources an audio converter.
-   * 
+   * Create all the common element for audio sources an audio converter and a volume control.
+   *
    * @throws UnableToCreateElementException
    *           If the necessary module to create an audioconverter isn't present then this Exception is thrown.
    **/
@@ -82,6 +91,27 @@ public abstract class AudioProducer extends ProducerBin {
     super.createElements();
     audioconvert = GStreamerElementFactory.getInstance().createElement(captureDevice.getFriendlyName(),
             GStreamerElements.AUDIOCONVERT, null);
+    volume = GStreamerElementFactory.getInstance().createElement(captureDevice.getFriendlyName(),
+            GStreamerElements.VOLUME, null);
+  }
+
+  /**
+   * @see org.opencastproject.capture.pipeline.bins.PartialBin#setElementProperties()
+   **/
+  @Override
+  protected synchronized void setElementProperties() throws UnableToSetElementPropertyBecauseElementWasNullException {
+    super.setElementProperties();
+    setVolumeProperties();
+  }
+
+  private void setVolumeProperties() {
+    String volumeString = StringUtils.trimToNull(properties.getProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX
+            + captureDevice.getFriendlyName() + CaptureParameters.CAPTURE_DEVICE_VOLUME));
+    if (volumeString != null) {
+      volumeLevel = Double.parseDouble(volumeString);
+    }
+    volume.set(CaptureParameters.CAPTURE_DEVICE_VOLUME.substring(1), volumeLevel);
+    logger.debug("Using a volume level of " + volumeLevel);
   }
 
   /**

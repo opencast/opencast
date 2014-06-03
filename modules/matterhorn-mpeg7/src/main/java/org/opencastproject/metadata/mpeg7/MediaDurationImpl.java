@@ -94,7 +94,7 @@ public class MediaDurationImpl implements MediaDuration {
 
   /**
    * Parses a duration text representation.
-   * 
+   *
    * @param text
    *          the duration text representation
    * @return the media duration object
@@ -109,7 +109,7 @@ public class MediaDurationImpl implements MediaDuration {
 
   /**
    * Parses a duration text representation.
-   * 
+   *
    * @param text
    *          the duration text representation
    * @throws IllegalArgumentException
@@ -188,7 +188,7 @@ public class MediaDurationImpl implements MediaDuration {
 
   /**
    * Sets the number of days.
-   * 
+   *
    * @param days
    */
   public void setDayDuration(int days) {
@@ -197,7 +197,7 @@ public class MediaDurationImpl implements MediaDuration {
 
   /**
    * Sets the number of fractions.
-   * 
+   *
    * @param fractions
    *          the fractions
    */
@@ -207,7 +207,7 @@ public class MediaDurationImpl implements MediaDuration {
 
   /**
    * Sets the number of fractions per second.
-   * 
+   *
    * @param fractionsPerSecond
    *          the fractions per second
    */
@@ -217,7 +217,7 @@ public class MediaDurationImpl implements MediaDuration {
 
   /**
    * Sets the number of hours.
-   * 
+   *
    * @param hours
    *          the hours
    */
@@ -227,7 +227,7 @@ public class MediaDurationImpl implements MediaDuration {
 
   /**
    * Sets the number of minutes.
-   * 
+   *
    * @param minutes
    *          the number of minutes
    */
@@ -237,7 +237,7 @@ public class MediaDurationImpl implements MediaDuration {
 
   /**
    * Sets the number of seconds.
-   * 
+   *
    * @param seconds
    *          the number of seconds
    */
@@ -283,7 +283,7 @@ public class MediaDurationImpl implements MediaDuration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -293,7 +293,7 @@ public class MediaDurationImpl implements MediaDuration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override

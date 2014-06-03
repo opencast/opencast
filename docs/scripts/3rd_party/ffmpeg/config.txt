@@ -1,4 +1,4 @@
-URL: http://www.ffmpeg.org/releases ${USASK_MIRROR}
+URL: http://www.ffmpeg.org/releases ${USASK_MIRROR} ${ETH_MIRROR}
 PKG: ffmpeg-2.1.3.tar.gz
 SHA: 912033e83042515bedb87112d96ae5fdf5df50e9
 DIR: ffmpeg-2.1.3

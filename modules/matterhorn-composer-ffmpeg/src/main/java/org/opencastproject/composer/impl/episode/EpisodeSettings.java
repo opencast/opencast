@@ -46,7 +46,7 @@ class EpisodeSettings {
 
   /**
    * Creates a new settings object from the given string array.
-   * 
+   *
    * @param s
    *          the settings
    */
@@ -58,7 +58,7 @@ class EpisodeSettings {
 
   /**
    * Returns the settings name.
-   * 
+   *
    * @return the name
    */
   String getName() {
@@ -68,7 +68,7 @@ class EpisodeSettings {
   /**
    * Returns the path to the settings file, relative to the engine's root folder for settings. Usually, this is
    * <tt>/Users/Shared/Episode Engine/Settings</tt>.
-   * 
+   *
    * @return path to the settings file
    */
   String getPath() {
@@ -77,7 +77,7 @@ class EpisodeSettings {
 
   /**
    * Returns <code>true</code> if this is a settings group.
-   * 
+   *
    * @return <code>true</code> if this is a settings group
    */
   boolean isGroup() {

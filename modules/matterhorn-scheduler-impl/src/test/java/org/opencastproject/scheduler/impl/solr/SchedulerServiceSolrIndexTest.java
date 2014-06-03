@@ -40,7 +40,7 @@ import java.util.Properties;
 
 /**
  * Tests Solr index.
- * 
+ *
  */
 public class SchedulerServiceSolrIndexTest {
 

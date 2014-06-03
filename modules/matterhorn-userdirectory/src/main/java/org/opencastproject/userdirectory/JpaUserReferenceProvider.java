@@ -95,7 +95,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
 
   /**
    * Callback for activation of this component.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -117,7 +117,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override
@@ -127,7 +127,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
    */
   @Override
@@ -141,7 +141,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#findUsers(String, int, int)
    */
   @Override
@@ -158,7 +158,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleProvider#findRoles(String, int, int)
    */
   @Override
@@ -169,7 +169,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#loadUser(java.lang.String)
    */
   @Override
@@ -193,7 +193,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleDirectoryService#getRoles()
    */
   @Override
@@ -204,7 +204,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#getOrganization()
    */
   @Override
@@ -214,7 +214,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserReferenceProvider#addUserReference(org.opencastproject.security.api.User,
    *      String)
    */
@@ -281,7 +281,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
 
   /**
    * Returns the persisted user reference by the user name and organization id
-   * 
+   *
    * @param userName
    *          the user name
    * @param organizationId
@@ -294,7 +294,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
 
   /**
    * Returns the persisted user reference by the user name and organization id
-   * 
+   *
    * @param userName
    *          the user name
    * @param organizationId
@@ -322,7 +322,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
   /**
    * Returns a list of user references by a search query if set or all user references if search query is
    * <code>null</code>
-   * 
+   *
    * @param orgId
    *          the organization identifier
    * @param query
@@ -353,7 +353,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
 
   /**
    * Returns all user references
-   * 
+   *
    * @param orgId
    *          the organization identifier
    * @param limit

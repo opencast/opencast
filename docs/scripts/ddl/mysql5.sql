@@ -132,7 +132,7 @@ CREATE INDEX IX_mh_service_registration_host_registration ON mh_service_registra
 CREATE TABLE mh_job (
   id BIGINT NOT NULL,
   status INTEGER,
-  payload TEXT(65535),
+  payload MEDIUMTEXT,
   date_started DATETIME,
   run_time BIGINT,
   creator TEXT(65535) NOT NULL,

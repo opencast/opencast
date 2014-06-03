@@ -38,28 +38,28 @@ public interface Track extends MediaPackageElement {
 
   /**
    * Returns <code>true</code> if the track features an audio stream.
-   * 
+   *
    * @return <code>true</code> if the track has an audio stream
    */
   boolean hasAudio();
 
   /**
    * Returns <code>true</code> if the track features a video stream.
-   * 
+   *
    * @return <code>true</code> if the track has a video stream
    */
   boolean hasVideo();
 
   /**
    * Returns the track duration in milliseconds or <code>null</code> if the duration is not available.
-   * 
+   *
    * @return the track duration
    */
   Long getDuration();
 
   /**
    * Returns the track's description with details about framerate, codecs etc.
-   * 
+   *
    * @return the track description.
    */
   String getDescription();

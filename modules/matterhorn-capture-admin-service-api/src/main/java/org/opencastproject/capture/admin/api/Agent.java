@@ -24,14 +24,14 @@ public interface Agent {
 
   /**
    * Gets the name of the agent.
-   * 
+   *
    * @return The name of the agent.
    */
   String getName();
 
   /**
    * Sets the state of the agent, and updates the time it was last heard from.
-   * 
+   *
    * @param newState
    *          The new state of the agent. This should defined from the constants in
    *          {@link org.opencastproject.capture.admin.api.AgentState}. This can be equal to the current one if the goal
@@ -42,7 +42,7 @@ public interface Agent {
 
   /**
    * Gets the state of the agent.
-   * 
+   *
    * @return The state of the agent. This should be defined from the constants in
    *         {@link org.opencastproject.capture.admin.api.AgentState}.
    * @see AgentState
@@ -51,7 +51,7 @@ public interface Agent {
 
   /**
    * Sets the url of the agent.
-   * 
+   *
    * @param agentUrl
    *          The url of the agent as determined by the referer header field of its request while registering
    */
@@ -59,14 +59,14 @@ public interface Agent {
 
   /**
    * Gets the url of the agent.
-   * 
+   *
    * @return the url of the agent.
    */
   String getUrl();
 
   /**
    * Sets the time at which the agent last checked in.
-   * 
+   *
    * @param time
    *          The number of milliseconds since 1970 when the agent last checked in.
    */
@@ -74,28 +74,28 @@ public interface Agent {
 
   /**
    * Gets the time at which the agent last checked in.
-   * 
+   *
    * @return The number of milliseconds since 1970 when the agent last checked in.
    */
   Long getLastHeardFrom();
 
   /**
    * Gets the capture agent's capability list.
-   * 
+   *
    * @return The agent's capabilities, or null if there is an error.
    */
   Properties getCapabilities();
 
   /**
    * Gets the capture agent's full configuration list.
-   * 
+   *
    * @return The agent's configuration, or null if there is an error.
    */
   Properties getConfiguration();
 
   /**
    * Sets the capture agent's configuration list.
-   * 
+   *
    * @param configuration
    *          The agent's configuration.
    */

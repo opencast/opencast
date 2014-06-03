@@ -30,7 +30,7 @@ public interface MediaPackageBuilder {
   /**
    * Creates a new media package in the temporary directory defined by the java runtime property
    * <code>java.io.tmpdir</code>.
-   * 
+   *
    * @return the new media package
    * @throws MediaPackageException
    *           if creation of the new media package fails
@@ -43,7 +43,7 @@ public interface MediaPackageBuilder {
    * <p>
    * The name of the media package root folder will be equal to the handle value.
    * </p>
-   * 
+   *
    * @param identifier
    *          the media package identifier
    * @return the new media package
@@ -54,7 +54,7 @@ public interface MediaPackageBuilder {
 
   /**
    * Loads a media package from the manifest.
-   * 
+   *
    * @param is
    *          the media package manifest input stream
    * @return the media package
@@ -65,7 +65,7 @@ public interface MediaPackageBuilder {
 
   /**
    * Loads a media package from the manifest.
-   * 
+   *
    * @param xml
    *          the media package manifest as an xml string
    * @return the media package
@@ -88,7 +88,7 @@ public interface MediaPackageBuilder {
   /**
    * Sets the media package serializer that is used to resolve urls and helps in serialization and deserialization of
    * media package elements.
-   * 
+   *
    * @param serializer
    *          the serializer
    */
@@ -97,7 +97,7 @@ public interface MediaPackageBuilder {
   /**
    * Returns the currently active serializer. The serializer is used to resolve urls and helps in serialization and
    * deserialization of media package elements.
-   * 
+   *
    * @return the serializer
    * @see #setSerializer(MediaPackageSerializer)
    */

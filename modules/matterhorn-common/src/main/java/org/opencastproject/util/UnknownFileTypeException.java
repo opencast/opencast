@@ -31,7 +31,7 @@ public class UnknownFileTypeException extends Exception {
 
   /**
    * Creates a new exception with the given message.
-   * 
+   *
    * @param message
    *          the error message
    */
@@ -41,7 +41,7 @@ public class UnknownFileTypeException extends Exception {
 
   /**
    * Creates a new exception with the given message and a reference to the file causing the exception.
-   * 
+   *
    * @param message
    *          the error message
    * @param file
@@ -54,7 +54,7 @@ public class UnknownFileTypeException extends Exception {
 
   /**
    * Returns the file that caused the exception.
-   * 
+   *
    * @return the file
    */
   public File getFile() {
