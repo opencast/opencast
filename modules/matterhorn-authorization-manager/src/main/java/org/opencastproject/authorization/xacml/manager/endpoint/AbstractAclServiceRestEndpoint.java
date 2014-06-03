@@ -490,7 +490,7 @@ public abstract class AbstractAclServiceRestEndpoint {
 
   /**
    * Build the obj with active ACL and transitions.
-   * 
+   *
    * @param id
    *          either the episode or the series id.
    */

@@ -19,7 +19,7 @@ package org.opencastproject.metadata.mpeg7;
 /**
  * A video segment represents a temporal decomposition of the video stream that may have properties like text
  * annotations attached to it.
- * 
+ *
  * <pre>
  * &lt;complexType name=&quot;VideoSegmentType&quot;&gt;
  *   &lt;complexContent&gt;
@@ -52,14 +52,14 @@ public interface VideoSegment extends Segment {
 
   /**
    * Returns <code>true</code> if there is a spatio temporal decomposition as part of this segment.
-   * 
+   *
    * @return <code>true</code> if there is a spatio temporal decomposition
    */
   boolean hasSpatioTemporalDecomposition();
 
   /**
    * Creates a spatio temporal decomposition in this video segment.
-   * 
+   *
    * @param gap
    *          <code>true</code> if there may be gap between the elements
    * @param overlap
@@ -74,7 +74,7 @@ public interface VideoSegment extends Segment {
   /**
    * Returns the spatio temporal decomposition that contains information about elements on the segment such as text
    * elements.
-   * 
+   *
    * @return the spatio temporal decomposition
    */
   SpatioTemporalDecomposition getSpatioTemporalDecomposition();

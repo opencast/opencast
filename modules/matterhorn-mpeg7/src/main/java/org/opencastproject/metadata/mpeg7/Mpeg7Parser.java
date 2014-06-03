@@ -126,7 +126,7 @@ public class Mpeg7Parser extends DefaultHandler {
 
   /**
    * Parses the mpeg-7 catalog file and returns its object representation.
-   * 
+   *
    * @param is
    *          the input stream containing the catalog
    * @return the catalog representation
@@ -157,7 +157,7 @@ public class Mpeg7Parser extends DefaultHandler {
 
   /**
    * Read <code>type</code> attribute from track or catalog element.
-   * 
+   *
    * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String,
    *      org.xml.sax.Attributes)
    */
@@ -372,7 +372,7 @@ public class Mpeg7Parser extends DefaultHandler {
 
   /**
    * Returns the element content.
-   * 
+   *
    * @return the element content
    */
   private String getTagContent() {

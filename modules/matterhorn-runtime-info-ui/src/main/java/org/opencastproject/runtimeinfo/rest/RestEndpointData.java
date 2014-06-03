@@ -95,7 +95,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
   /**
    * Create a new basic endpoint, you should use the add methods to fill in the rest of the information about the
    * endpoint data
-   * 
+   *
    * @param returnType
    *          the endpoint's return type
    * @param name
@@ -129,7 +129,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Returns a string representation of this object.
-   * 
+   *
    * @return a string representation of this object
    */
   @Override
@@ -140,10 +140,10 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Adds a body parameter to this endpoint. Once added, the body parameter becomes a required parameter.
-   * 
+   *
    * @param restParam
    *          a RestParameter annotation object corresponding to the body parameter
-   * 
+   *
    * @return the new RestParamData object in case you want to set attributes
    */
   public RestParamData addBodyParam(RestParameter restParam, RestDocData restDocData) {
@@ -158,7 +158,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
   /**
    * Adds a path parameter for this endpoint, this would be a parameter which is passed as part of the path (e.g.
    * /my/path/{param}) and thus must use a name which is safe to be placed in a URL and does not contain a slash (/)
-   * 
+   *
    * @param param
    *          the path parameter to add
    * @throws IllegalStateException
@@ -182,7 +182,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
    * request body (commonly referred to as a post or form parameter). <br/>
    * WARNING: This should generally be reserved for endpoints which are used for processing, it is better to use path
    * params unless the required parameter is not part of an identifier for the resource.
-   * 
+   *
    * @param param
    *          the required parameter to add
    */
@@ -198,7 +198,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
   /**
    * Adds an optional parameter for this endpoint, this would be a parameter which is passed in the query string (for
    * GET) or encoded as part of the body otherwise (often referred to as a post or form parameter).
-   * 
+   *
    * @param param
    *          the optional parameter to add
    */
@@ -213,7 +213,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Adds a format for the return data for this endpoint.
-   * 
+   *
    * @param format
    *          a RestFormatData object
    */
@@ -226,7 +226,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Adds a response status for this endpoint.
-   * 
+   *
    * @param restResponse
    *          a RestResponse object containing the HTTP response code and description
    */
@@ -239,7 +239,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Adds a note for this endpoint.
-   * 
+   *
    * @param note
    *          a string providing more information about this endpoint
    * @throws IllegalArgumentException
@@ -257,7 +257,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Sets the test form for this endpoint, if this is null then no test form is rendered for this endpoint.
-   * 
+   *
    * @param form
    *          the test form object (null to clear the form)
    */
@@ -267,7 +267,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Returns whether this endpoint's HTTP method is GET
-   * 
+   *
    * @return true if this endpoint method is GET, otherwise false
    */
   public boolean isGetMethod() {
@@ -276,7 +276,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Returns the URL-encoded query string for a GET endpoint.
-   * 
+   *
    * @return the calculated query string for a GET endpoint (e.g. ?blah=1), will be urlencoded for html display
    */
   public String getQueryString() {
@@ -307,7 +307,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Gets the name of this endpoint.
-   * 
+   *
    * @return the name of this endpoint
    */
   public String getName() {
@@ -316,7 +316,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Gets the name of HTTP method used to invoke this endpoint.
-   * 
+   *
    * @return the name of HTTP method used to invoke this endpoint
    */
   public String getMethod() {
@@ -325,7 +325,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Gets the path for this endpoint.
-   * 
+   *
    * @return the path for this endpoint
    */
   public String getPath() {
@@ -334,7 +334,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Gets the description of this endpoint.
-   * 
+   *
    * @return the description of this endpoint
    */
   public String getDescription() {
@@ -343,7 +343,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Gets the body parameter of this endpoint.
-   * 
+   *
    * @return the body parameter of this endpoint
    */
   public RestParamData getBodyParam() {
@@ -352,7 +352,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Gets the list of path parameters of this endpoint.
-   * 
+   *
    * @return the list of path parameters of this endpoint
    */
   public List<RestParamData> getPathParams() {
@@ -364,7 +364,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Gets the list of required parameters of this endpoint.
-   * 
+   *
    * @return the list of required parameters of this endpoint
    */
   public List<RestParamData> getRequiredParams() {
@@ -376,7 +376,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Gets the list of optional parameters of this endpoint.
-   * 
+   *
    * @return list of optional parameters of this endpoint
    */
   public List<RestParamData> getOptionalParams() {
@@ -388,7 +388,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Gets the list of formats returned by this endpoint.
-   * 
+   *
    * @return the list of formats returned by this endpoint
    */
   public List<RestFormatData> getFormats() {
@@ -400,7 +400,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Gets the list of HTTP responses returned by this endpoint.
-   * 
+   *
    * @return the list of HTTP responses returned by this endpoint
    */
   public List<StatusData> getStatuses() {
@@ -412,7 +412,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Gets list of notes (i.e. extra information) of this endpoint.
-   * 
+   *
    * @return the list of notes (i.e. extra information) of this endpoint
    */
   public List<String> getNotes() {
@@ -424,7 +424,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Gets the form for testing this endpoint in the documentation page.
-   * 
+   *
    * @return the form for testing this endpoint in the documentation page
    */
   public RestFormData getForm() {
@@ -433,10 +433,10 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Compares two RestEndpointData by their names so that the list of endpoints can be sorted.
-   * 
+   *
    * @param otherEndpoint
    *          the other endpoint object to compare to
-   * 
+   *
    * @return a negative integer, zero, or a positive integer as the name of the supplied endpoint is greater than, equal
    *         to, or less than this endpoint, ignoring case considerations.
    */

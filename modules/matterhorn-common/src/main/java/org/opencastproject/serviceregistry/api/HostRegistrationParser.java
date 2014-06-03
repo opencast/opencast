@@ -52,7 +52,7 @@ public final class HostRegistrationParser {
 
   /**
    * Parses an xml string representing a {@link HostRegistration}
-   * 
+   *
    * @param xml
    *          The serialized data
    * @return The HostRegistration
@@ -63,7 +63,7 @@ public final class HostRegistrationParser {
 
   /**
    * Parses a stream representing a {@link HostRegistration}
-   * 
+   *
    * @param in
    *          The serialized data
    * @param format
@@ -84,7 +84,7 @@ public final class HostRegistrationParser {
 
   /**
    * Gets a serialized representation of a {@link HostRegistration}
-   * 
+   *
    * @param registration
    *          The host registration to marshal
    * @return the serialized host registration
@@ -95,7 +95,7 @@ public final class HostRegistrationParser {
 
   /**
    * Gets an xml representation of a {@link HostRegistration}
-   * 
+   *
    * @param registration
    *          The host registration to marshal
    * @return the serialized registration

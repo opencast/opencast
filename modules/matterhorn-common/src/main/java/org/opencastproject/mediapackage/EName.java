@@ -38,7 +38,7 @@ public class EName implements Serializable {
 
   /**
    * Create a new expanded name.
-   * 
+   *
    * @param namespaceName
    *          the name of the namespace this EName belongs to. If set to {@link javax.xml.XMLConstants#NULL_NS_URI},
    *          this name does not belong to any namespace. Use this option with care.
@@ -65,7 +65,7 @@ public class EName implements Serializable {
 
   /**
    * Returns the namespace name. Usually the name will be a URI.
-   * 
+   *
    * @return the namespace name or {@link javax.xml.XMLConstants#NULL_NS_URI} if the name does not belong to a namespace
    */
   public String getNamespaceName() {

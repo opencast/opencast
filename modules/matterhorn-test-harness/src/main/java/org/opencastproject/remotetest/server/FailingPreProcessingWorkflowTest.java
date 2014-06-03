@@ -117,7 +117,7 @@ public class FailingPreProcessingWorkflowTest {
 
   /**
    * Adds a new recording event to the scheduling service and returns the event id.
-   * 
+   *
    * @param start
    *          start date
    * @param end

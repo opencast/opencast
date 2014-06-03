@@ -59,7 +59,7 @@ public class LoginTest {
 
   /**
    * Constructs a new test instance. This is typically called by the junit parameterized runner.
-   * 
+   *
    * @param browser
    *          the browser to use for testing
    */
@@ -90,7 +90,7 @@ public class LoginTest {
     // try to open the welcome page
     selenium.open(welcomePage);
     selenium.waitForPageToLoad("30000");
-    
+
     // if we were redirected to the login page, we need to log in
     if(selenium.getLocation().contains(loginPage)) {
       selenium.type(usernameField, Main.USERNAME);
@@ -109,7 +109,7 @@ public class LoginTest {
     selenium.waitForPageToLoad("30000");
     // ensure we haven't been redirected
     Assert.assertTrue(selenium.getLocation().contains(welcomePage));
-    
+
     // ensure the page has the elements we expect
     Assert.assertTrue(selenium.isElementPresent("adminlink"));
     Assert.assertTrue(selenium.isElementPresent("engagelink"));

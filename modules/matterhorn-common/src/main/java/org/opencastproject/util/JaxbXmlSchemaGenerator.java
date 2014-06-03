@@ -36,7 +36,7 @@ public final class JaxbXmlSchemaGenerator {
 
   /**
    * Builds an xml schema from a JAXBContext.
-   * 
+   *
    * @param jaxbContext
    *          the jaxb context
    * @return the xml as a string
@@ -58,7 +58,7 @@ public final class JaxbXmlSchemaGenerator {
 
   /**
    * Builds an xml schema. If the class is not XmlType or XmlRootElement annotated, return null;
-   * 
+   *
    * @param clazz
    *          the jaxb annotated class
    * @return the xml as a string, or null if the class can not be transformed to a schema

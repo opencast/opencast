@@ -70,7 +70,7 @@ public class JsonpFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
    */
   @Override
@@ -79,7 +79,7 @@ public class JsonpFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#destroy()
    */
   @Override
@@ -88,7 +88,7 @@ public class JsonpFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse,
    *      javax.servlet.FilterChain)
    */
@@ -133,7 +133,7 @@ public class JsonpFilter implements Filter {
 
     /**
      * Construct a response wrapper.
-     * 
+     *
      * @param response
      *          the response
      * @param callbackValue
@@ -147,7 +147,7 @@ public class JsonpFilter implements Filter {
 
     /**
      * Flush the buffer for this response wrapper.
-     * 
+     *
      * @throws IOException
      */
     public void flushWrapper() throws IOException {
@@ -171,9 +171,9 @@ public class JsonpFilter implements Filter {
     /**
      * If we set a {@link javax.ws.rs.core.MediaType#APPLICATION_JSON} {@link JsonpFilter#CONTENT_TYPE_HEADER} header,
      * enable padding.
-     * 
+     *
      * {@inheritDoc}
-     * 
+     *
      * @see javax.servlet.http.HttpServletResponseWrapper#setHeader(java.lang.String, java.lang.String)
      */
     @Override
@@ -187,9 +187,9 @@ public class JsonpFilter implements Filter {
     /**
      * If we add a {@link javax.ws.rs.core.MediaType#APPLICATION_JSON} {@link JsonpFilter#CONTENT_TYPE_HEADER} header,
      * enable padding.
-     * 
+     *
      * {@inheritDoc}
-     * 
+     *
      * @see javax.servlet.http.HttpServletResponseWrapper#addHeader(java.lang.String, java.lang.String)
      */
     @Override
@@ -202,9 +202,9 @@ public class JsonpFilter implements Filter {
 
     /**
      * Returns the content type. If we are wrapping json with padding, return {@link JsonpFilter#JS_CONTENT_TYPE}.
-     * 
+     *
      * {@inheritDoc}
-     * 
+     *
      * @see javax.servlet.ServletResponseWrapper#getContentType()
      */
     @Override
@@ -214,9 +214,9 @@ public class JsonpFilter implements Filter {
 
     /**
      * If the content type is set to JSON, we enable wrapping. Otherwise, we leave it disabled.
-     * 
+     *
      * {@inheritDoc}
-     * 
+     *
      * @see javax.servlet.ServletResponseWrapper#setContentType(java.lang.String)
      */
     @Override
@@ -227,9 +227,9 @@ public class JsonpFilter implements Filter {
 
     /**
      * If we are wrapping json with padding, , return the wrapped buffer. Otherwise, return the original outputstream.
-     * 
+     *
      * {@inheritDoc}
-     * 
+     *
      * @see javax.servlet.ServletResponseWrapper#getOutputStream()
      */
     @Override
@@ -239,9 +239,9 @@ public class JsonpFilter implements Filter {
 
     /**
      * If we are wrapping json with padding, , return the wrapped writer. Otherwise, return the original writer.
-     * 
+     *
      * {@inheritDoc}
-     * 
+     *
      * @see javax.servlet.ServletResponseWrapper#getWriter()
      */
     @Override
@@ -258,7 +258,7 @@ public class JsonpFilter implements Filter {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see javax.servlet.ServletResponseWrapper#setBufferSize(int)
      */
     @Override
@@ -272,7 +272,7 @@ public class JsonpFilter implements Filter {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see javax.servlet.ServletResponseWrapper#getBufferSize()
      */
     @Override
@@ -282,7 +282,7 @@ public class JsonpFilter implements Filter {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see javax.servlet.ServletResponseWrapper#flushBuffer()
      */
     @Override
@@ -293,7 +293,7 @@ public class JsonpFilter implements Filter {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see javax.servlet.ServletResponseWrapper#isCommitted()
      */
     @Override
@@ -303,7 +303,7 @@ public class JsonpFilter implements Filter {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see javax.servlet.ServletResponseWrapper#reset()
      */
     @Override
@@ -314,7 +314,7 @@ public class JsonpFilter implements Filter {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see javax.servlet.ServletResponseWrapper#resetBuffer()
      */
     @Override
@@ -344,7 +344,7 @@ public class JsonpFilter implements Filter {
 
     /**
      * Creates a new buffered stream with the specified size.
-     * 
+     *
      * @param size
      *          the buffer size
      */
@@ -357,7 +357,7 @@ public class JsonpFilter implements Filter {
 
     /**
      * Returns a copy of the buffer as an array.
-     * 
+     *
      * @return the buffer as a byte array
      */
     public synchronized byte toByteArray()[] {
@@ -373,7 +373,7 @@ public class JsonpFilter implements Filter {
 
     /**
      * Gets the size of the stream
-     * 
+     *
      * @return the stream size
      */
     public synchronized int size() {
@@ -382,7 +382,7 @@ public class JsonpFilter implements Filter {
 
     /**
      * Expands the size of the stream.
-     * 
+     *
      * @param size
      *          the new size of the buffer
      */
@@ -394,7 +394,7 @@ public class JsonpFilter implements Filter {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.io.OutputStream#write(int)
      */
     @Override

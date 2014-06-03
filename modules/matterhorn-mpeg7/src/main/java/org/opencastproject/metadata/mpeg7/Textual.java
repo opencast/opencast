@@ -19,7 +19,7 @@ import org.opencastproject.mediapackage.XmlElement;
 
 /**
  * Textual is a generic text type:
- * 
+ *
  * <pre>
  * &lt;complexType name="TextualBaseType" abstract="true"&gt;
  *   &lt;simpleContent&gt;
@@ -40,7 +40,7 @@ public interface Textual extends XmlElement {
 
   /**
    * Sets the text.
-   * 
+   *
    * @param text
    *          the text
    */
@@ -48,14 +48,14 @@ public interface Textual extends XmlElement {
 
   /**
    * Returns the actual text.
-   * 
+   *
    * @return the text
    */
   String getText();
 
   /**
    * Sets the language, which must correspond to the defininition of <code>xml:lang</code>.
-   * 
+   *
    * @param language
    *          the language
    */
@@ -63,14 +63,14 @@ public interface Textual extends XmlElement {
 
   /**
    * Returns the text's language.
-   * 
+   *
    * @return the language
    */
   String getLanguage();
 
   /**
    * Sets the phonetic transcription and specifies which alphabet was used to produce it.
-   * 
+   *
    * @param transcription
    *          the transcription
    * @param alphabet
@@ -80,14 +80,14 @@ public interface Textual extends XmlElement {
 
   /**
    * Returns the optional phonetic transcription.
-   * 
+   *
    * @return the phonetic transcription
    */
   String getPhoneticTranscription();
 
   /**
    * Returns the optional phonetic alphabet or the default value <code>sampa</code> if no alphabet has been specified.
-   * 
+   *
    * @return the phonetic alphabet
    */
   String getPhoneticAlphabet();

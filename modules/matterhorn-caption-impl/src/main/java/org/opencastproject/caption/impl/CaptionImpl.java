@@ -20,7 +20,7 @@ import org.opencastproject.caption.api.Time;
 
 /**
  * Implementation of {@link Caption}. Caption text is stored in array where each element represents one caption line.
- * 
+ *
  */
 public class CaptionImpl implements Caption {
 
@@ -36,7 +36,7 @@ public class CaptionImpl implements Caption {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.caption.api.Caption#getContent()
    */
   @Override
@@ -46,7 +46,7 @@ public class CaptionImpl implements Caption {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.caption.api.Caption#getStart()
    */
   @Override
@@ -56,7 +56,7 @@ public class CaptionImpl implements Caption {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.caption.api.Caption#getStop()
    */
   @Override

@@ -50,7 +50,7 @@ public class RetractYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -60,7 +60,7 @@ public class RetractYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * OSGi declarative service configuration callback.
-   * 
+   *
    * @param publicationService
    *          the publication service
    */
@@ -70,7 +70,7 @@ public class RetractYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
    */
   @Override
@@ -80,7 +80,7 @@ public class RetractYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(WorkflowInstance, JobContext)
    */
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)

@@ -37,7 +37,7 @@ public class FlavorPrioritySelector<T extends MediaPackageElement> extends Abstr
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage,
    *      boolean)
    */

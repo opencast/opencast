@@ -55,7 +55,7 @@ import javax.xml.xpath.XPathFactory;
 
 /**
  * Test utilities
- * 
+ *
  */
 public class Utils {
 
@@ -72,7 +72,7 @@ public class Utils {
 
   /**
    * Converts the node to a string representation.
-   * 
+   *
    * @param node
    *          the node
    * @return the string representation
@@ -203,7 +203,7 @@ public class Utils {
 
   /**
    * Converts the checksum to a hex string.
-   * 
+   *
    * @param data
    *          the digest
    * @return the digest hex representation

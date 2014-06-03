@@ -41,7 +41,7 @@ public class StreamElementSelector<S extends Stream> extends AbstractMediaPackag
 
   /**
    * Creates a new selector that will restrict the result of <code>select()</code> to the given flavor.
-   * 
+   *
    * @param flavor
    *          the flavor
    */
@@ -51,7 +51,7 @@ public class StreamElementSelector<S extends Stream> extends AbstractMediaPackag
 
   /**
    * Creates a new selector that will restrict the result of <code>select()</code> to the given flavor.
-   * 
+   *
    * @param flavor
    *          the flavor
    */
@@ -63,7 +63,7 @@ public class StreamElementSelector<S extends Stream> extends AbstractMediaPackag
    * Returns all tracks from a <code>MediaPackage</code> that contain at least a <code>Stream</code> of the parametrized
    * type while optionally matching other requirements such as flavors and tags. If no such combination can be found, i.
    * g. there is no audio or video at all, an empty array is returned.
-   * 
+   *
    * @see org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage, boolean)
    */
   @SuppressWarnings("unchecked")

@@ -30,9 +30,9 @@ public interface XMLCatalog {
 
   /**
    * Serializes the catalog to a DOM.
-   * 
+   *
    * todo think about hiding technical exceptions
-   * 
+   *
    * @throws ParserConfigurationException
    *           if the xml parser environment is not correctly configured
    * @throws TransformerException
@@ -44,7 +44,7 @@ public interface XMLCatalog {
 
   /**
    * Serializes the catalog to a JSON string.
-   * 
+   *
    * @return the json string
    * @throws IOException
    *           if an error with the catalog file handling occurs
@@ -53,14 +53,14 @@ public interface XMLCatalog {
 
   /**
    * Writes an xml representation of this Catalog to a string.
-   * 
+   *
    * @return the Catalog serialized to a string
    */
   String toXmlString() throws IOException;
 
   /**
    * Writes an xml representation of this Catalog to a stream.
-   * 
+   *
    * @param out
    *          The output stream
    * @param format

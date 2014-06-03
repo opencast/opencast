@@ -64,10 +64,10 @@ import java.util.Map;
  * <code>$FELIX_HOME/load</code> named <code>&lt;inbox-scanned-pid&gt;-&lt;name&gt;.cfg</code> where <code>name</code>
  * can be arbitrarily chosen and has no further meaning. <code>inbox-scanned-pid</code> must confirm to the PID given to
  * the InboxScanner in the declarative service (DS) configuration <code>OSGI-INF/inbox-scanner-service.xml</code>.
- * 
+ *
  * <h3>Implementation notes</h3>
  * Monitoring leverages Apache FileInstall by implementing {@link ArtifactInstaller}.
- * 
+ *
  * @see Ingestor
  */
 public class InboxScannerService implements ArtifactInstaller, ManagedService {
@@ -170,7 +170,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   /**
    * Setup an Apache FileInstall configuration for the inbox folder this scanner is responsible for.
-   * 
+   *
    * see section 104.4.1 Location Binding, paragraph 4, of the OSGi Spec 4.2 The correct permissions are needed in order
    * to set configuration data for a bundle other than the calling bundle itself.
    */
@@ -259,7 +259,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   /**
    * Get a mandatory, non-blank value from a dictionary.
-   * 
+   *
    * @throws ConfigurationException
    *           key does not exist or its value is blank
    */
@@ -285,7 +285,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   /**
    * Get a mandatory integer from a dictionary.
-   * 
+   *
    * @throws ConfigurationException
    *           key does not exist or is not an integer
    */

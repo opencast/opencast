@@ -27,7 +27,7 @@ public interface FeedExtension {
 
   /**
    * Returns the URI of the module.
-   * 
+   *
    * @return URI of the module.
    */
   String getUri();

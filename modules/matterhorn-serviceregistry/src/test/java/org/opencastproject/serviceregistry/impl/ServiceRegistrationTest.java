@@ -371,7 +371,7 @@ public class ServiceRegistrationTest {
 
   /**
    * Gets the updated given service
-   * 
+   *
    * @param service
    *          The service to get
    * @return The updated servce.

@@ -57,7 +57,7 @@ public final class WorkflowUtils {
   /**
    * Loads the workflow with id <code>workflowId</code> from the workflow service and returns the workflow instance as
    * an xml string.
-   * 
+   *
    * @param workflowId
    *          the workflow identifier
    * @return the workflow instance xml
@@ -78,7 +78,7 @@ public final class WorkflowUtils {
 
   /**
    * Checks whether the given workflow is in the requested operation.
-   * 
+   *
    * @param workflowId
    *          identifier of the workflow
    * @param operation
@@ -100,7 +100,7 @@ public final class WorkflowUtils {
 
   /**
    * Checks whether the given workflow is in the requested state.
-   * 
+   *
    * @param workflowId
    *          identifier of the workflow
    * @param state
@@ -123,7 +123,7 @@ public final class WorkflowUtils {
 
   /**
    * Parses the workflow instance represented by <code>xml</code> and extracts the workflow identifier.
-   * 
+   *
    * @param xml
    *          the workflow instance
    * @return the workflow instance
@@ -141,7 +141,7 @@ public final class WorkflowUtils {
 
   /**
    * Parses the workflow instance represented by <code>xml</code> and extracts the workflow state.
-   * 
+   *
    * @param xml
    *          the workflow instance
    * @return the workflow state
@@ -174,7 +174,7 @@ public final class WorkflowUtils {
 
   /**
    * Registers a new workflow definition
-   * 
+   *
    * @param workflowDefinition
    *          the new workflow definition
    * @return the id of the workflow definition

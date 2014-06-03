@@ -99,7 +99,7 @@ public class MediaTimePointImpl implements MediaTimePoint {
 
   /**
    * Creates a new timepoint representing the given time.
-   * 
+   *
    * @param milliseconds
    *          the number of milliseconds
    */
@@ -195,7 +195,7 @@ public class MediaTimePointImpl implements MediaTimePoint {
 
   /**
    * Sets a reference time point which makes this time point relative to the given one.
-   * 
+   *
    * @param timePoint
    *          the reference time point
    */
@@ -245,7 +245,7 @@ public class MediaTimePointImpl implements MediaTimePoint {
 
   /**
    * Creates a timepoint representation from the given time point string.
-   * 
+   *
    * @param text
    *          the timepoint text representation
    * @return the the timepoint
@@ -279,7 +279,7 @@ public class MediaTimePointImpl implements MediaTimePoint {
 
   /**
    * Parses the date portion of a time point.
-   * 
+   *
    * @param date
    *          the date
    */
@@ -299,7 +299,7 @@ public class MediaTimePointImpl implements MediaTimePoint {
 
   /**
    * Parses the time portion of a time point
-   * 
+   *
    * @param time
    *          the time
    */
@@ -315,7 +315,7 @@ public class MediaTimePointImpl implements MediaTimePoint {
 
   /**
    * Parses the fractions of a time point.
-   * 
+   *
    * @param fractions
    *          the fractions
    */

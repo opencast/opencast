@@ -22,21 +22,21 @@ public interface ElementStoreMXBean {
 
   /**
    * Gets the free archive element storage space in bytes
-   * 
+   *
    * @return free space in bytes
    */
   long getFreeSpace();
 
   /**
    * Gets the used archive element storage space in bytes
-   * 
+   *
    * @return used space in bytes
    */
   long getUsedSpace();
 
   /**
    * Gets the total available archive element storage space in bytes
-   * 
+   *
    * @return total available space in bytes
    */
   long getTotalSpace();

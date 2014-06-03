@@ -29,7 +29,7 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
  * checked exception may be thrown on application. This behaviour could be nicely combined into the main function class
  * but with the cost of having no abstract method. Some IDEs such as IntelliJ support nice code folding for SAM (single
  * abstract method) classes.
- * 
+ *
  * @see X
  */
 public abstract class Function<A, B> {

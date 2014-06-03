@@ -64,7 +64,7 @@ import java.util.Map;
 
 /**
  * Test for Series Service.
- * 
+ *
  */
 public class SeriesServiceImplTest {
 

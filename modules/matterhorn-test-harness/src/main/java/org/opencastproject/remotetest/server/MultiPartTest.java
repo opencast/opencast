@@ -56,7 +56,7 @@ public class MultiPartTest {
   public void setUp() throws Exception {
     httpClient = Main.getClient();
   }
-  
+
   @After
   public void tearDown() throws Exception {
     Main.returnClient(httpClient);
@@ -66,7 +66,7 @@ public class MultiPartTest {
   public void testMultiPartPost() throws Exception {
 
     String mp = "<oc:mediapackage xmlns:oc=\"http://mediapackage.opencastproject.org\" id=\"10.0000/1\" start=\"2007-12-05T13:40:00\" duration=\"1004400000\"></oc:mediapackage>";
-    
+
     InputStream is = null;
     try {
       is = getClass().getResourceAsStream("/av.mov");
@@ -83,5 +83,5 @@ public class MultiPartTest {
       IOUtils.closeQuietly(is);
     }
   }
-  
+
 }

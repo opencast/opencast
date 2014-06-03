@@ -46,7 +46,7 @@ public class ScheduleWorkflowOperationHandler extends ResumableWorkflowOperation
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#activate(org.osgi.service.component.ComponentContext)
    */
   @Override
@@ -67,7 +67,7 @@ public class ScheduleWorkflowOperationHandler extends ResumableWorkflowOperation
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override

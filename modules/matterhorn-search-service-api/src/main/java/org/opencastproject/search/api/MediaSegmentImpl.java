@@ -76,7 +76,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * Creates a new segment that is located at position <code>sequenceId</code> within the sequence of segments.
-   * 
+   *
    * @param segment
    *          the segment number
    */
@@ -86,7 +86,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.MediaSegment#getIndex()
    */
   public int getIndex() {
@@ -95,7 +95,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.MediaSegment#getTime()
    */
   public long getTime() {
@@ -104,7 +104,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * Set the segment time.
-   * 
+   *
    * @param time
    *          The time to set
    */
@@ -114,7 +114,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.MediaSegment#getDuration()
    */
   public long getDuration() {
@@ -123,7 +123,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * Set the segment duration.
-   * 
+   *
    * @param duration
    *          The duration to set.
    */
@@ -133,7 +133,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.MediaSegment#getImageUrl()
    */
   public String getImageUrl() {
@@ -142,7 +142,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * Set the image url.
-   * 
+   *
    * @param imageUrl
    *          the image to set
    */
@@ -152,7 +152,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.MediaSegment#getText()
    */
   public String getText() {
@@ -161,7 +161,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * Set the segment text.
-   * 
+   *
    * @param text
    *          The text to set.
    */
@@ -171,7 +171,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.MediaSegment#isHit()
    */
   public boolean isHit() {
@@ -180,7 +180,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * Set the 'segment is a hit' flag.
-   * 
+   *
    * @param hit
    *          The flag.
    */
@@ -190,7 +190,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.MediaSegment#getRelevance()
    */
   public int getRelevance() {
@@ -199,7 +199,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * Set the segment relevance.
-   * 
+   *
    * @param relevance
    *          The relevance to set.
    */
@@ -209,7 +209,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.MediaSegment#addPreview(java.lang.String, java.lang.String)
    */
   @Override
@@ -219,7 +219,7 @@ public class MediaSegmentImpl implements MediaSegment, Comparable<MediaSegmentIm
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   @Override

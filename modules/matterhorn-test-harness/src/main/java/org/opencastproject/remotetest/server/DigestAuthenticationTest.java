@@ -127,7 +127,7 @@ public class DigestAuthenticationTest {
     HttpContext localContext = new BasicHttpContext();
     DigestScheme digestAuth = new DigestScheme();
     digestAuth.overrideParamter("realm", realm);
-    digestAuth.overrideParamter("nonce", nonce);        
+    digestAuth.overrideParamter("nonce", nonce);
     localContext.setAttribute("preemptive-auth", digestAuth);
 
     // Send the POST
@@ -140,5 +140,5 @@ public class DigestAuthenticationTest {
       httpclient.getConnectionManager().shutdown();
     }
   }
-  
+
 }

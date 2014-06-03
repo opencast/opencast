@@ -58,7 +58,7 @@ public abstract class AbstractElementBuilderPlugin implements MediaPackageElemen
 
   /**
    * This is a convenience implementation for subclasses doing nothing.
-   * 
+   *
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#init()
    */
   public void init() throws Exception {
@@ -66,7 +66,7 @@ public abstract class AbstractElementBuilderPlugin implements MediaPackageElemen
 
   /**
    * This is a convenience implementation for subclasses doing nothing.
-   * 
+   *
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#destroy()
    */
   public void destroy() {
@@ -85,7 +85,7 @@ public abstract class AbstractElementBuilderPlugin implements MediaPackageElemen
 
   /**
    * Returns <code>true</code> if the file's mime type could be detected, is known and supported.
-   * 
+   *
    * @param file
    *          the file
    * @param mimeTypes
@@ -119,7 +119,7 @@ public abstract class AbstractElementBuilderPlugin implements MediaPackageElemen
 
   /**
    * Returns <code>true</code> if the file's mime type could be detected, is known and supported.
-   * 
+   *
    * @param file
    *          the file
    * @return <code>true</code> if the file has a supported mime type
@@ -153,7 +153,7 @@ public abstract class AbstractElementBuilderPlugin implements MediaPackageElemen
 
   /**
    * Returns <code>true</code> if the file's name matches <code>filename</code>.
-   * 
+   *
    * @param file
    *          the file
    * @param filename
@@ -174,7 +174,7 @@ public abstract class AbstractElementBuilderPlugin implements MediaPackageElemen
 
   /**
    * Checks the file for its existence and validates it's checksum with the proviced values.
-   * 
+   *
    * @param file
    *          the file to check
    * @param checksum

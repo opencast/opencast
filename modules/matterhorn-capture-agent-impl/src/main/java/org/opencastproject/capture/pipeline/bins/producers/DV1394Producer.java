@@ -41,7 +41,7 @@ public class DV1394Producer extends VideoProducer {
 
   /**
    * Creates a Producer specifically designed to capture from a DV Camera attached by firewire
-   * 
+   *
    * @deprecated This function has not been maintained in a long time and has many problems. If you need DV support let
    *             the list know.
    * @param captureDevice
@@ -70,7 +70,7 @@ public class DV1394Producer extends VideoProducer {
 
   /**
    * Creates the Elements required to capture from a DV1394 device.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the dv1394src, dvdemux, dvdecoder or ffmpegcolorspace cannot be created this Exception is thrown.
    **/
@@ -93,7 +93,7 @@ public class DV1394Producer extends VideoProducer {
   /**
    * Creates the demuxer's pad listener because it is only available once the sink has a source. We will only be
    * capturing the video.
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If demux Element is null this Exception is thrown
    **/
@@ -128,7 +128,7 @@ public class DV1394Producer extends VideoProducer {
   /**
    * Link together all of the Elements together for this producer except for the demuxer because the pads are only on
    * sometimes.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           If any of these Elements fail to link together this Exception is thrown.
    **/

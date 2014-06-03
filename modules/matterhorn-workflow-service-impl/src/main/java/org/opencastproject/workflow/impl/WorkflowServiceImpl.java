@@ -239,7 +239,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Activate this service implementation via the OSGI service component runtime.
-   * 
+   *
    * @param componentContext
    *          the component context
    */
@@ -264,7 +264,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#addWorkflowListener(org.opencastproject.workflow.api.WorkflowListener)
    */
   @Override
@@ -274,7 +274,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#removeWorkflowListener(org.opencastproject.workflow.api.WorkflowListener)
    */
   @Override
@@ -334,7 +334,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#listAvailableWorkflowDefinitions()
    */
   @Override
@@ -370,7 +370,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Tests the workflow definition for its runnability. This method is a helper for
    * {@link #isRunnable(WorkflowDefinition)} that is suited for recursive calling.
-   * 
+   *
    * @param workflowDefinition
    *          the definition to test
    * @param availableOperations
@@ -417,7 +417,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Gets the currently registered workflow operation handlers.
-   * 
+   *
    * @return All currently registered handlers
    */
   public Set<HandlerRegistration> getRegisteredHandlers() {
@@ -451,7 +451,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Lists the names of each workflow operation. Operation names are availalbe for use if there is a registered
    * {@link WorkflowOperationHandler} with an equal {@link WorkflowServiceImpl#WORKFLOW_OPERATION_PROPERTY} property.
-   * 
+   *
    * @return The {@link List} of available workflow operation names
    */
   protected List<String> listAvailableOperationNames() {
@@ -464,7 +464,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#registerWorkflowDefinition(org.opencastproject.workflow.api.WorkflowDefinition)
    */
   @Override
@@ -481,7 +481,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#unregisterWorkflowDefinition(java.lang.String)
    */
   @Override
@@ -494,7 +494,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowById(long)
    */
   @Override
@@ -523,7 +523,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#start(org.opencastproject.workflow.api.WorkflowDefinition,
    *      org.opencastproject.mediapackage.MediaPackage)
    */
@@ -535,7 +535,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#start(org.opencastproject.workflow.api.WorkflowDefinition,
    *      org.opencastproject.mediapackage.MediaPackage)
    */
@@ -552,7 +552,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#start(org.opencastproject.workflow.api.WorkflowDefinition,
    *      org.opencastproject.mediapackage.MediaPackage, Long, java.util.Map)
    */
@@ -653,7 +653,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Replaces all occurrences of <code>${.*+}</code> with the property in the provided map, or if not available in the
    * map, from the bundle context properties, if available.
-   * 
+   *
    * @param source
    *          The source string
    * @param properties
@@ -694,7 +694,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Does a lookup of available operation handlers for the given workflow operation.
-   * 
+   *
    * @param operation
    *          the operation definition
    * @return the handler or <code>null</code>
@@ -718,7 +718,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Executes the workflow.
-   * 
+   *
    * @param workflow
    *          the workflow instance
    * @throws WorkflowException
@@ -765,7 +765,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Executes the workflow's current operation.
-   * 
+   *
    * @param workflow
    *          the workflow
    * @param properties
@@ -895,7 +895,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Returns the workflow identified by <code>id</code> or <code>null</code> if no such definition was found.
-   * 
+   *
    * @param id
    *          the workflow definition id
    * @return the workflow
@@ -910,7 +910,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#stop(long)
    */
   @Override
@@ -944,7 +944,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#remove(long)
    */
   @Override
@@ -1019,7 +1019,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#suspend(long)
    */
   @Override
@@ -1033,7 +1033,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#resume(long)
    */
   @Override
@@ -1043,7 +1043,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#resume(long, Map)
    */
   @Override
@@ -1120,7 +1120,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Asserts that the current user has permission to take the provided action on a workflow instance.
-   * 
+   *
    * @param workflow
    *          the workflow instance
    * @param action
@@ -1153,7 +1153,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#update(org.opencastproject.workflow.api.WorkflowInstance)
    */
   @Override
@@ -1273,7 +1273,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Updates the search index entries for this workflow instance.
-   * 
+   *
    * @param workflowInstance
    *          the workflow
    * @throws WorkflowDatabaseException
@@ -1286,7 +1286,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances()
    */
   @Override
@@ -1296,7 +1296,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances(org.opencastproject.workflow.api.WorkflowInstance.WorkflowState,
    *      java.lang.String)
    */
@@ -1307,7 +1307,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#getStatistics()
    */
   @Override
@@ -1317,7 +1317,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstances(org.opencastproject.workflow.api.WorkflowQuery)
    */
   @Override
@@ -1327,7 +1327,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesForAdministrativeRead(org.opencastproject.workflow.api.WorkflowQuery)
    */
   @Override
@@ -1343,7 +1343,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Callback for workflow operations that were throwing an exception. This implementation assumes that the operation
    * worker has already adjusted the current operation's state appropriately.
-   * 
+   *
    * @param workflow
    *          the workflow instance
    * @param e
@@ -1391,7 +1391,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Handles the workflow for a failing operation.
-   * 
+   *
    * @param workflow
    *          the workflow
    * @param currentOperation
@@ -1441,7 +1441,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Callback for workflow operation handlers that executed and finished without exception. This implementation assumes
    * that the operation worker has already adjusted the current operation's state appropriately.
-   * 
+   *
    * @param workflow
    *          the workflow instance
    * @param result
@@ -1542,7 +1542,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Reads the available metadata from the dublin core catalog (if there is one) and updates the mediapackage.
-   * 
+   *
    * @param mp
    *          the media package
    */
@@ -1627,9 +1627,9 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * If we are already running the maximum number of workflows, don't accept another START_WORKFLOW job.
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#isReadyToAcceptJobs(String)
    */
   @Override
@@ -1663,9 +1663,9 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * If we are already running the maximum number of workflows, don't accept another START_WORKFLOW job
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#isReadyToAccept(org.opencastproject.job.api.Job)
    */
   @Override
@@ -1741,7 +1741,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#acceptJob(org.opencastproject.job.api.Job)
    */
   @Override
@@ -1775,7 +1775,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Processes the workflow job.
-   * 
+   *
    * @param job
    *          the job
    * @return the job payload
@@ -1862,7 +1862,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Synchronizes the workflow operation's job with the operation status if the operation has a job associated with it,
    * which is determined by looking at the operation's job id.
-   * 
+   *
    * @param state
    *          the operation state
    * @param jobId
@@ -1898,7 +1898,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#countJobs(org.opencastproject.job.api.Job.Status)
    */
   @Override
@@ -1966,7 +1966,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Converts a Map<String, String> to s key=value\n string, suitable for the properties form parameter expected by the
    * workflow rest endpoint.
-   * 
+   *
    * @param props
    *          The map of strings
    * @return the string representation
@@ -1986,7 +1986,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback for the OSGi environment to register with the <code>Workspace</code>.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -1996,7 +1996,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback for the OSGi environment to register with the <code>ServiceRegistry</code>.
-   * 
+   *
    * @param registry
    *          the service registry
    */
@@ -2006,7 +2006,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -2016,7 +2016,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback for setting the authorization service.
-   * 
+   *
    * @param authorizationService
    *          the authorizationService to set
    */
@@ -2026,7 +2026,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback for setting the user directory service
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -2036,7 +2036,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -2046,7 +2046,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Sets the search indexer to use in this service.
-   * 
+   *
    * @param index
    *          The search index
    */
@@ -2056,7 +2056,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Sets the series service
-   * 
+   *
    * @param seriesService
    *          the seriesService to set
    */
@@ -2066,7 +2066,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback to set the metadata service
-   * 
+   *
    * @param service
    *          the metadata service
    */
@@ -2076,7 +2076,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback to remove a mediapackage metadata service.
-   * 
+   *
    * @param service
    *          the mediapackage metadata service to remove
    */
@@ -2086,7 +2086,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback to set the workflow definition scanner
-   * 
+   *
    * @param scanner
    *          the workflow definition scanner
    */
@@ -2096,7 +2096,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#getJobType()
    */
   @Override
@@ -2106,7 +2106,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @Override
@@ -2147,7 +2147,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -2161,7 +2161,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -2194,7 +2194,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
     /**
      * Constructs a new job runner
-     * 
+     *
      * @param job
      *          the job to run
      * @param currentJob
@@ -2207,7 +2207,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.util.concurrent.Callable#call()
      */
     @Override

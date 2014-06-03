@@ -28,9 +28,9 @@ import java.util.List;
 
 /**
  * Distribute REST resources
- * 
+ *
  * @author jamiehodge
- * 
+ *
  */
 
 public class DistributeResources {
@@ -39,10 +39,10 @@ public class DistributeResources {
   }
 
   /**
-   * 
+   *
    * @param channel
    *          Distribution channel: local, youtube, itunesu
-   * 
+   *
    */
   public static HttpResponse distribute(TrustedHttpClient client, String channel, String mediapackage, String... elementId) throws Exception {
     HttpPost post = new HttpPost(getServiceUrl() + channel.toLowerCase() + "/");

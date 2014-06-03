@@ -343,7 +343,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String)
    */
   @Override
@@ -353,7 +353,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
    *      java.util.List)
    */
@@ -364,7 +364,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
    *      java.util.List, java.lang.String)
    */
@@ -376,7 +376,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
    *      java.util.List, String, boolean)
    */
@@ -388,7 +388,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(String, String, List, String, boolean, Job)
    */
   @Override
@@ -609,7 +609,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @Override
@@ -698,7 +698,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getJob(long)
    */
   @Override
@@ -730,7 +730,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getCurrentJob()
    */
   @Override
@@ -740,7 +740,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#setCurrentJob(Job)
    */
   @Override
@@ -750,7 +750,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#updateJob(org.opencastproject.job.api.Job)
    */
   @Override
@@ -792,7 +792,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Internal method to update a job, throwing unwrapped JPA exceptions.
-   * 
+   *
    * @param em
    *          the current entity manager
    * @param job
@@ -828,7 +828,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Internal method to update the service registration state, throwing unwrapped JPA exceptions.
-   * 
+   *
    * @param em
    *          the current entity manager
    * @param registration
@@ -866,7 +866,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * Sets the queue and runtimes and other elements of a persistent job based on a job that's been modified in memory.
    * Times on both the objects must be modified, since the in-memory job must not be stale.
-   * 
+   *
    * @param fromDb
    *          The job from the database
    * @param job
@@ -918,7 +918,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Fetches a host registration from persistence.
-   * 
+   *
    * @param em
    *          an active entity manager
    * @param host
@@ -938,7 +938,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(java.lang.String, int)
    */
   @Override
@@ -975,7 +975,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#unregisterHost(java.lang.String)
    */
   @Override
@@ -1013,7 +1013,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#enableHost(String)
    */
   @Override
@@ -1058,7 +1058,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#disableHost(String)
    */
   @Override
@@ -1100,7 +1100,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerService(java.lang.String, java.lang.String,
    *      java.lang.String)
    */
@@ -1112,7 +1112,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerService(java.lang.String, java.lang.String,
    *      java.lang.String, boolean)
    */
@@ -1136,7 +1136,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Sets the online status of a service registration.
-   * 
+   *
    * @param serviceType
    *          The job type
    * @param baseUrl
@@ -1202,7 +1202,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#unRegisterService(java.lang.String, java.lang.String)
    */
   @Override
@@ -1250,7 +1250,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Find all running jobs on this service and set them to RESET or CANCELED.
-   * 
+   *
    * @param serviceType
    *          the service type
    * @param baseUrl
@@ -1311,7 +1311,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Go through all the children recursively to set them in {@link Status#CANCELED} status
-   * 
+   *
    * @param job
    *          the parent job
    * @param em
@@ -1330,7 +1330,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#setMaintenanceStatus(java.lang.String, boolean)
    */
   @Override
@@ -1362,7 +1362,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistrations()
    */
   @Override
@@ -1391,7 +1391,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Gets all service registrations.
-   * 
+   *
    * @param em
    *          the current entity manager
    * @return the list of service registrations
@@ -1403,7 +1403,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Gets all host registrations
-   * 
+   *
    * @return the list of host registrations
    */
   @Override
@@ -1420,7 +1420,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Gets all host registrations
-   * 
+   *
    * @param em
    *          the current entity manager
    * @return the list of host registrations
@@ -1432,7 +1432,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getChildJobs(long)
    */
   @SuppressWarnings("unchecked")
@@ -1479,7 +1479,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getJobs(java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */
@@ -1518,8 +1518,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Gets jobs of all types that are in the {@value Status#QUEUED} state and are dispatchable.
-   * 
+   * Gets jobs of all types that are in the {@value Status#QUEUED} and {@value Status#RESTART} state.
+   *
    * @param em
    *          the entity manager
    * @return the list of jobs waiting for dispatch
@@ -1565,7 +1565,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#count(java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */
@@ -1594,7 +1594,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countByHost(java.lang.String, java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */
@@ -1619,7 +1619,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countByOperation(java.lang.String, java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */
@@ -1644,7 +1644,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#count(java.lang.String, java.lang.String,
    *      java.lang.String, org.opencastproject.job.api.Job.Status)
    */
@@ -1672,7 +1672,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceStatistics()
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -1749,9 +1749,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * Do not look at this, it will burn your eyes! This is due to JPA's inability to do a left outer join with join
    * conditions.
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistrationsByLoad(java.lang.String)
    */
   @Override
@@ -1771,7 +1771,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Gets a map of hosts to the number of jobs currently loading that host
-   * 
+   *
    * @param em
    *          the entity manager
    * @param activeOnly
@@ -1827,7 +1827,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistrationsByType(java.lang.String)
    */
   @SuppressWarnings("unchecked")
@@ -1846,7 +1846,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistrationsByHost(java.lang.String)
    */
   @SuppressWarnings("unchecked")
@@ -1864,7 +1864,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistration(java.lang.String,
    *      java.lang.String)
    */
@@ -1897,7 +1897,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.osgi.util.tracker.ServiceTracker#open(boolean)
      */
     @Override
@@ -1942,7 +1942,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getLoad()
    */
   @Override
@@ -1952,7 +1952,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Sets the trusted http client.
-   * 
+   *
    * @param client
    *          the trusted http client
    */
@@ -1962,7 +1962,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -1972,7 +1972,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -1982,7 +1982,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -1993,7 +1993,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * Dispatches the job to the least loaded service that will accept the job, or throws a
    * <code>ServiceUnavailableException</code> if there is no such service.
-   * 
+   *
    * @param em
    *          the current entity manager
    * @param job
@@ -2111,7 +2111,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * Update the jobs failure history and the service status with the given information. All these data are then use for
    * the jobs failover strategy. Only the terminated job (with FAILED or FINISHED status) are taken into account.
-   * 
+   *
    * @param job
    *          the current job that failed/succeeded
    * @throws ServiceRegistryException
@@ -2228,7 +2228,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#sanitize(java.lang.String, java.lang.String)
    */
   @Override
@@ -2251,7 +2251,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Gets the failed jobs history for the given service registration
-   * 
+   *
    * @param serviceRegistration
    * @return the failed jobs history size
    * @throws IllegalArgumentException
@@ -2283,7 +2283,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Gets the services in WARNING state triggered by this job
-   * 
+   *
    * @param job
    *          the given job to get the related services
    * @return a list of services triggered by the job
@@ -2328,7 +2328,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Gets the services in WARNING or ERROR state triggered by this job
-   * 
+   *
    * @param job
    *          the given job to get the related services
    * @return a list of services triggered by the job
@@ -2381,7 +2381,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * Returns a filtered list of service registrations, containing only those that are online, not in maintenance mode,
    * and with a specific service type that are running on a host which is not already maxed out.
-   * 
+   *
    * @param serviceRegistrations
    *          the complete list of service registrations
    * @param hostRegistrations
@@ -2439,7 +2439,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * Returns a filtered list of service registrations, containing only those that are online, not in maintenance mode,
    * and with a specific service type, ordered by load.
-   * 
+   *
    * @param serviceRegistrations
    *          the complete list of service registrations
    * @param hostRegistrations
@@ -2479,7 +2479,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getMaxConcurrentJobs()
    */
   @Override
@@ -2506,7 +2506,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Thread#run()
      */
     @Override
@@ -2523,6 +2523,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           jobsStatistics.updateAvg(getAvgOperations(em));
           jobsStatistics.updateJobCount(getCountPerHostService(em));
         }
+
+        // Make sure dispatching is happening in an ideal order
+        Collections.sort(jobsToDispatch, new DispatchableComparator());
 
         for (Job job : jobsToDispatch) {
 
@@ -2577,8 +2580,25 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               // That's ok
             }
 
-            if (parentJob == null || TYPE_WORKFLOW.equals(jobType)) {
-              logger.trace("Using limited list of services for dispatching of {} to a service of type '{}'", job,
+            // When a job A starts a series of child jobs, then those child jobs should only be dispatched at the
+            // same time if there is processing capacity available.
+            boolean parentHasRunningChildren = false;
+            if (parentJob != null) {
+              List<Job> childJobs = getChildJobs(parentJob.getId());
+              if (childJobs != null) {
+                for (Job child : childJobs) {
+                  if (Job.Status.RUNNING.equals(child.getStatus())) {
+                    parentHasRunningChildren = true;
+                    break;
+                  }
+                }
+              }
+            }
+
+            // If this is a root job (a new workflow or a new workflow operation), then only dispatch if there is
+            // capacity, i. e. the workflow service is ok dispatching the next workflow or the next workflow operation.
+            if (parentJob == null || TYPE_WORKFLOW.equals(jobType) || parentHasRunningChildren) {
+              logger.trace("Using available capacity only for dispatching of {} to a service of type '{}'", job,
                       jobType);
               candidateServices = getServiceRegistrationsWithCapacity(jobType, services, hosts, hostLoads);
             } else {
@@ -2634,7 +2654,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Runnable#run()
      */
     @Override
@@ -2725,7 +2745,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     /**
      * Creates a new comparator which is using the given map of host names and loads.
-     * 
+     *
      * @param loadByHost
      *          the current work load by host
      */
@@ -2750,6 +2770,35 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           return -1;
       }
       return loadByHost.get(hostA) - loadByHost.get(hostB);
+    }
+
+  }
+
+  /**
+   * Comparator that will sort jobs according to their status. Those that were restarted are on top, those that are
+   * queued are next.
+   */
+  private static final class DispatchableComparator implements Comparator<Job> {
+
+    @Override
+    public int compare(Job jobA, Job jobB) {
+
+      // Jobs that are in "restart" mode should be handled first
+      if (Job.Status.RESTART.equals(jobA.getStatus())) {
+        return 1;
+      } else if (Job.Status.RESTART.equals(jobB.getStatus())) {
+        return -1;
+      }
+
+      // Regular jobs should be processed prior to workflow and workflow operation jobs
+      if (TYPE_WORKFLOW.equals(jobA.getJobType()) && !TYPE_WORKFLOW.equals(jobB.getJobType())) {
+        return -1;
+      } else if (TYPE_WORKFLOW.equals(jobB.getJobType()) && !TYPE_WORKFLOW.equals(jobA.getJobType())) {
+        return 1;
+      }
+
+      // undecided
+      return 0;
     }
 
   }

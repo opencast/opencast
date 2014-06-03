@@ -28,7 +28,7 @@ public interface CaptionConverter {
   /**
    * Imports captions to {@link List}. If caption format is capable of containing more than one language, language
    * parameter is used to define which captions are parsed.
-   * 
+   *
    * @param inputStream
    *          stream from where captions are read
    * @param language
@@ -42,7 +42,7 @@ public interface CaptionConverter {
   /**
    * Exports caption collection. Language parameter is used to set language of the captions for those caption format
    * that are capable of storing information about language.
-   * 
+   *
    * @param outputStream
    *          stream to which captions are written
    * @param captions
@@ -57,7 +57,7 @@ public interface CaptionConverter {
   /**
    * Reads captions and return information about language if such information is available. Returns empty list
    * otherwise.
-   * 
+   *
    * @param inputStream
    *          stream from where captions are read
    * @return Array containing languages in captions
@@ -68,7 +68,7 @@ public interface CaptionConverter {
 
   /**
    * Get extension of specific caption format.
-   * 
+   *
    * @return caption format extension
    */
   String getExtension();

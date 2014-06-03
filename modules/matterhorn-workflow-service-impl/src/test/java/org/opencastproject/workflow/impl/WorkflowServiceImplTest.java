@@ -663,7 +663,7 @@ public class WorkflowServiceImplTest {
 
   /**
    * Starts many concurrent workflows to test DB deadlock.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -793,7 +793,7 @@ public class WorkflowServiceImplTest {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
      *      org.opencastproject.job.api.JobContext)
      */
@@ -814,7 +814,7 @@ public class WorkflowServiceImplTest {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
      *      org.opencastproject.job.api.JobContext)
      */

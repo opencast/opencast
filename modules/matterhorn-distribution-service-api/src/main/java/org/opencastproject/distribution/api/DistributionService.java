@@ -31,12 +31,12 @@ public interface DistributionService {
 
   /**
    * Distribute a media package element.
-   * 
+   *
    * @param mediapackage
    *          the media package
    * @param elementId
    *          the element in the media package to distribute
-   * 
+   *
    * @return The job
    * @throws DistributionException
    *           if there was a problem distributing the media
@@ -47,7 +47,7 @@ public interface DistributionService {
 
   /**
    * Retract a media package element from the distribution channel.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @param elementId

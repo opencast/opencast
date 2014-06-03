@@ -53,7 +53,7 @@ public class ScheduledEventImpl implements ScheduledEvent {
 
   /**
    * Builds a scheduled event which has JAXB annotations for easy transfer over the wire.
-   * 
+   *
    * @param title
    *          The title of the event
    * @param start
@@ -69,7 +69,7 @@ public class ScheduledEventImpl implements ScheduledEvent {
 
   /**
    * Get the duration of the event in seconds.
-   * 
+   *
    * @return The duration of the event in seconds.
    */
   public Long getDuration() {
@@ -82,7 +82,7 @@ public class ScheduledEventImpl implements ScheduledEvent {
 
   /**
    * Get the start time of the scheduled event as a Unix timestamp.
-   * 
+   *
    * @return The start time of the event as a Unix timestamp.
    */
   public Long getStartTime() {
@@ -95,7 +95,7 @@ public class ScheduledEventImpl implements ScheduledEvent {
 
   /**
    * Get the title of the scheduled event.
-   * 
+   *
    * @return The title of the scheduled event.
    */
   public String getTitle() {

@@ -61,7 +61,7 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
 
   /**
    * Populates the catalog.
-   * 
+   *
    * @param in
    *          The input stream containing the content
    * @throws IllegalStateException
@@ -78,7 +78,7 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
 
   /**
    * Creates a new mpeg-7 metadata container file.
-   * 
+   *
    * @return the new mpeg-7 metadata container
    */
   public static Mpeg7CatalogImpl newInstance() {
@@ -106,7 +106,7 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
 
   /**
    * Saves the mpeg-7 metadata container to disk.
-   * 
+   *
    * @throws ParserConfigurationException
    *           if the xml parser environment is not correctly configured
    * @throws TransformerException
@@ -322,7 +322,7 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
 
   /**
    * Removes the content element of the specified type with the given identifier.
-   * 
+   *
    * @param id
    *          the content element identifier
    * @param type

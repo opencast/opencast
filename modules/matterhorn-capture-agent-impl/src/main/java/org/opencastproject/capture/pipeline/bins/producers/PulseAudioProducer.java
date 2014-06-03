@@ -39,7 +39,7 @@ public class PulseAudioProducer extends AudioProducer {
 
   /**
    * PulseAudioProducer captures from a pulse audio source such as a desktop linux distro.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           Not thrown by this Producer
    * @throws UnableToCreateGhostPadsForBinException
@@ -60,7 +60,7 @@ public class PulseAudioProducer extends AudioProducer {
 
   /**
    * Create the pulseAudioSrc
-   * 
+   *
    * @throws UnableToCreateElementException
    *           Thrown if cannot create pulsesrc
    **/

@@ -129,7 +129,7 @@ public abstract class AbstractStreamImpl implements Stream {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.ManifestContributor#toManifest(org.w3c.dom.Document,
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */

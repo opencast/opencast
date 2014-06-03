@@ -33,7 +33,7 @@ public interface TextAnalyzerService {
 
   /**
    * Takes the given image and returns a receipt that can be used to get the resulting catalog.
-   * 
+   *
    * @param image
    *          element to analyze
    * @param block

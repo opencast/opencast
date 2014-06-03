@@ -41,7 +41,7 @@ public class CaptureDevice {
 
   /**
    * Create a representation of a capture device for the PipelineFactory
-   * 
+   *
    * @param location
    *          The location of the device on the system
    * @param sourceDeviceName
@@ -83,7 +83,7 @@ public class CaptureDevice {
 
   /**
    * Returns the device properties.
-   * 
+   *
    * @return the properties
    */
   public Properties getProperties() {
