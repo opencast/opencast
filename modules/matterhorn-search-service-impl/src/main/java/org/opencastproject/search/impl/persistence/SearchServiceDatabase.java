@@ -26,13 +26,13 @@ import java.util.Iterator;
 
 /**
  * API that defines persistent storage of series.
- * 
+ *
  */
 public interface SearchServiceDatabase {
 
   /**
    * Returns all search entries in persistent storage.
-   * 
+   *
    * @return {@link Tuple} array representing stored media packages
    * @throws SearchServiceDatabaseException
    *           if exception occurs
@@ -41,7 +41,7 @@ public interface SearchServiceDatabase {
 
   /**
    * Returns the organization id of the selected media package
-   * 
+   *
    * @param mediaPackageId
    *          the media package id to select
    * @return the organization id
@@ -54,7 +54,7 @@ public interface SearchServiceDatabase {
 
   /**
    * Gets a single media package by its identifier.
-   * 
+   *
    * @param mediaPackageId
    *          the media package identifier
    * @return the media package
@@ -67,7 +67,7 @@ public interface SearchServiceDatabase {
 
   /**
    * Retrieves ACL for series with given ID.
-   * 
+   *
    * @param mediaPackageId
    *          media package for which ACL will be retrieved
    * @return {@link AccessControlList} of media package or null if media package does not have ACL associated with it
@@ -81,7 +81,7 @@ public interface SearchServiceDatabase {
 
   /**
    * Returns the modification date from the selected media package.
-   * 
+   *
    * @param mediaPackageId
    *          the media package id to select
    * @return the modification date
@@ -94,7 +94,7 @@ public interface SearchServiceDatabase {
 
   /**
    * Returns the deletion date from the selected media package.
-   * 
+   *
    * @param mediaPackageId
    *          the media package id to select
    * @return the deletion date
@@ -107,7 +107,7 @@ public interface SearchServiceDatabase {
 
   /**
    * Removes media package from persistent storage.
-   * 
+   *
    * @param mediaPackageId
    *          id of the media package to be removed
    * @param deletionDate
@@ -122,7 +122,7 @@ public interface SearchServiceDatabase {
 
   /**
    * Store (or update) media package.
-   * 
+   *
    * @param mediaPackage
    *          {@link MediaPackage} to store
    * @param acl

@@ -83,7 +83,7 @@ public final class IoSupport {
 
   /**
    * Closes a <code>Closable</code> quietly so that no exceptions are thrown.
-   * 
+   *
    * @param s
    *          maybe null
    */
@@ -101,7 +101,7 @@ public final class IoSupport {
 
   /**
    * Closes a <code>StreamHelper</code> quietly so that no exceptions are thrown.
-   * 
+   *
    * @param s
    *          maybe null
    */
@@ -119,7 +119,7 @@ public final class IoSupport {
 
   /**
    * Closes the processes input, output and error streams.
-   * 
+   *
    * @param process
    *          the process
    * @return <code>true</code> if the streams were closed
@@ -144,7 +144,7 @@ public final class IoSupport {
   /**
    * Extracts the content from the given input stream. This method is intended to faciliate handling of processes that
    * have error, input and output streams.
-   * 
+   *
    * @param is
    *          the input stream
    * @return the stream content
@@ -174,7 +174,7 @@ public final class IoSupport {
 
   /**
    * Writes the contents variable to the {@code URL}. Note that the URL must be a local {@code URL}.
-   * 
+   *
    * @param file
    *          The {@code URL} of the local file you wish to write to.
    * @param contents
@@ -191,7 +191,7 @@ public final class IoSupport {
 
   /**
    * Writes the contents variable to the {@code File}.
-   * 
+   *
    * @param file
    *          The {@code File} of the local file you wish to write to.
    * @param contents
@@ -203,7 +203,7 @@ public final class IoSupport {
 
   /**
    * Writes the contents variable to the {@code File} located at the filename.
-   * 
+   *
    * @param filename
    *          The {@code File} of the local file you wish to write to.
    * @param contents
@@ -220,7 +220,7 @@ public final class IoSupport {
 
   /**
    * Convenience method to read in a file from a local source.
-   * 
+   *
    * @param url
    *          The {@code URL} to read the source data from.
    * @return A String containing the source data or null in the case of an error.
@@ -232,7 +232,7 @@ public final class IoSupport {
 
   /**
    * Convenience method to read in a file from either a remote or local source.
-   * 
+   *
    * @param url
    *          The {@code URL} to read the source data from.
    * @param trustedClient
@@ -342,7 +342,7 @@ public final class IoSupport {
 
   /**
    * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
-   * 
+   *
    * @deprecated use {@link #withResource(java.io.Closeable, org.opencastproject.util.data.Function)} instead
    */
   public static <A> A withStream(InputStream s, Function<InputStream, A> f) {
@@ -411,7 +411,7 @@ public final class IoSupport {
    * <strong>Please note:</strong> The outcome of <code>f</code> is wrapped into a some. Therefore <code>f</code> is
    * <em>not</em> allowed to return <code>null</code>. Use an <code>Option</code> instead and
    * {@link org.opencastproject.util.data.Option#flatten() flatten} the overall result.
-   * 
+   *
    * @return none, if the file does not exist
    */
   public static <A> Option<A> withFile(File file, Function2<InputStream, File, A> f) {
@@ -428,7 +428,7 @@ public final class IoSupport {
 
   /**
    * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
-   * 
+   *
    * @param s
    *          the stream creation function
    * @param toErr
@@ -454,7 +454,7 @@ public final class IoSupport {
 
   /**
    * Handle a closeable resource inside <code>f</code> and ensure that <code>r</code> gets closed properly.
-   * 
+   *
    * @param r
    *          resource creation function
    * @param toErr
@@ -477,7 +477,7 @@ public final class IoSupport {
 
   /**
    * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
-   * 
+   *
    * @deprecated use {@link #withResource(java.io.Closeable, org.opencastproject.util.data.Function)} instead
    */
   public static <A> A withStream(OutputStream s, Function<OutputStream, A> f) {

@@ -30,7 +30,7 @@ public interface VideoSegmenterService {
 
   /**
    * Takes the given track and returns the job that can be used to get the resulting mpeg7 catalog.
-   * 
+   *
    * @param track
    *          track to segment
    * @return the job with which we can obtain the extracted metadata

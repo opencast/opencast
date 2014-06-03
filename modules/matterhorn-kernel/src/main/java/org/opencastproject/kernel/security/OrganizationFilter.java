@@ -52,7 +52,7 @@ public class OrganizationFilter implements Filter {
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -62,7 +62,7 @@ public class OrganizationFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
    */
   @Override
@@ -71,7 +71,7 @@ public class OrganizationFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#destroy()
    */
   @Override
@@ -80,7 +80,7 @@ public class OrganizationFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse,
    *      javax.servlet.FilterChain)
    */
@@ -124,7 +124,7 @@ public class OrganizationFilter implements Filter {
 
   /**
    * Sets the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */

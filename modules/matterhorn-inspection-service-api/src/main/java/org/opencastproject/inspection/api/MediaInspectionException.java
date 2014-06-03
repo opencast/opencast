@@ -30,7 +30,7 @@ public class MediaInspectionException extends Exception {
 
   /**
    * Creates a new inspection exception with the specified error message.
-   * 
+   *
    * @param message
    *          the error message
    */
@@ -40,7 +40,7 @@ public class MediaInspectionException extends Exception {
 
   /**
    * Creates a new inspection exception with the specified error message and wrapping the original exception.
-   * 
+   *
    * @param message
    *          the error message
    * @param cause
@@ -52,7 +52,7 @@ public class MediaInspectionException extends Exception {
 
   /**
    * Creates a new inspection exception by wrapping the original error .
-   * 
+   *
    * @param cause
    *          the original error
    */

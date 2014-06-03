@@ -106,7 +106,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#enableHost(String)
    */
   @Override
@@ -116,7 +116,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#disableHost(String)
    */
   @Override
@@ -126,7 +126,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(java.lang.String, int)
    */
   @Override
@@ -136,7 +136,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#unregisterHost(java.lang.String)
    */
   @Override
@@ -147,7 +147,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * Method to register locally running services.
-   * 
+   *
    * @param localService
    *          the service instance
    * @param serviceType
@@ -170,7 +170,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * Removes the job producer from the service registry.
-   * 
+   *
    * @param localService
    *          the service
    * @throws ServiceRegistryException
@@ -186,7 +186,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerService(java.lang.String, java.lang.String,
    *      java.lang.String)
    */
@@ -198,7 +198,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerService(java.lang.String, java.lang.String,
    *      java.lang.String, boolean)
    */
@@ -220,7 +220,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#unRegisterService(java.lang.String, java.lang.String)
    */
   @Override
@@ -238,7 +238,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#setMaintenanceStatus(java.lang.String, boolean)
    */
   @Override
@@ -253,7 +253,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String)
    */
   @Override
@@ -263,7 +263,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
    *      java.util.List)
    */
@@ -274,7 +274,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
    *      java.util.List, java.lang.String)
    */
@@ -286,7 +286,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
    *      java.util.List, String, boolean)
    */
@@ -298,7 +298,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(String, String, List, String, boolean, Job)
    */
   @Override
@@ -339,7 +339,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   /**
    * Dispatches the job to the least loaded service or throws a <code>ServiceUnavailableException</code> if there is no
    * such service.
-   * 
+   *
    * @param job
    *          the job to dispatch
    * @return whether the job was dispatched
@@ -373,7 +373,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#updateJob(org.opencastproject.job.api.Job)
    */
   @Override
@@ -392,7 +392,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getJob(long)
    */
   @Override
@@ -411,7 +411,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getChildJobs(long)
    */
   @Override
@@ -456,7 +456,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getJobs(java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */
@@ -485,7 +485,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistrationsByLoad(java.lang.String)
    */
   @Override
@@ -495,7 +495,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistrationsByType(java.lang.String)
    */
   @Override
@@ -512,7 +512,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistrationsByHost(java.lang.String)
    */
   @Override
@@ -527,7 +527,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistration(java.lang.String,
    *      java.lang.String)
    */
@@ -545,7 +545,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistrations()
    */
   @Override
@@ -559,7 +559,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceStatistics()
    */
   @Override
@@ -569,7 +569,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#count(java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */
@@ -580,7 +580,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countByOperation(java.lang.String, java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */
@@ -590,7 +590,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countByHost(java.lang.String, java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */
@@ -600,7 +600,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#count(java.lang.String, java.lang.String,
    *      java.lang.String, org.opencastproject.job.api.Job.Status)
    */
@@ -630,7 +630,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getLoad()
    */
   @Override
@@ -646,7 +646,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Thread#run()
      */
     @Override
@@ -724,7 +724,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getMaxConcurrentJobs()
    */
   @Override
@@ -734,7 +734,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * Sets the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */

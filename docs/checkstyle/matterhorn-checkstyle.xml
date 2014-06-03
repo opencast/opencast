@@ -324,4 +324,10 @@
 
   </module>
 
+  <!-- Check for newline character at eof -->
+  <module name="NewlineAtEndOfFile">
+    <property name="lineSeparator" value="lf"/>
+    <property name="severity" value="error" />
+  </module>
+
 </module>

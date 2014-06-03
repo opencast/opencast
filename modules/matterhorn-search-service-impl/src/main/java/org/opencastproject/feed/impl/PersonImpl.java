@@ -34,7 +34,7 @@ public class PersonImpl implements Person {
 
   /**
    * Creates a new person.
-   * 
+   *
    * @param name
    *          the person's name
    * @param email
@@ -50,7 +50,7 @@ public class PersonImpl implements Person {
 
   /**
    * Creates a new person.
-   * 
+   *
    * @param name
    *          the person's name
    * @param email
@@ -62,7 +62,7 @@ public class PersonImpl implements Person {
 
   /**
    * Creates a new person.
-   * 
+   *
    * @param name
    *          the person's name
    */

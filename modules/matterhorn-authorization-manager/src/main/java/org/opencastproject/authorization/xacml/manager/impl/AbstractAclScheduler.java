@@ -181,7 +181,7 @@ public abstract class AbstractAclScheduler {
 
   /**
    * Please remember that derived classes need a no-arg constructor in order to work with Quartz. Sample usage:
-   * 
+   *
    * <pre>
    * public class Runner extends TypedQuartzJob&lt;Scheduler&gt; {
    *   protected abstract void execute(Scheduler parameters, JobExecutionContext ctx) {
@@ -189,7 +189,7 @@ public abstract class AbstractAclScheduler {
    *     parameters.getConfig();
    *   }
    * }
-   * 
+   *
    * public class Scheduler {
    *   ...
    *   // create the job

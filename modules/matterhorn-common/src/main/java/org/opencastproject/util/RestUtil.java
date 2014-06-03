@@ -48,7 +48,7 @@ public final class RestUtil {
   /**
    * Return the endpoint's server URL and the service path by extracting the relevant parameters from the
    * ComponentContext.
-   * 
+   *
    * @return (serverUrl, servicePath)
    * @throws Error
    *           if the service path is not configured for this component
@@ -72,7 +72,7 @@ public final class RestUtil {
 
   /**
    * create a partial file response
-   * 
+   *
    * @param f
    *          the requested file
    * @param contentType

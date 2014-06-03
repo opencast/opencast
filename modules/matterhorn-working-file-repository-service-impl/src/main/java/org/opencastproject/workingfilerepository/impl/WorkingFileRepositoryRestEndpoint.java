@@ -92,7 +92,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
@@ -102,7 +102,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
 
   /**
    * Sets the Apache Tika parser.
-   * 
+   *
    * @param tikaParser
    */
   public void setTikaParser(Parser tikaParser) {
@@ -251,7 +251,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   /**
    * Determines the content type of an input stream. This method reads part of the stream, so it is typically best to
    * close the stream immediately after calling this method.
-   * 
+   *
    * @param in
    *          the input stream
    * @return the content type

@@ -139,7 +139,7 @@ public final class Strings {
 
   /**
    * Convert a string into a boolean.
-   * 
+   *
    * @see Boolean#valueOf(String)
    */
   public static final Function<String, Boolean> toBool = new Function<String, Boolean>() {
@@ -151,7 +151,7 @@ public final class Strings {
 
   /**
    * Return a string formatting function.
-   * 
+   *
    * @see String#format(String, Object...)
    */
   public static <A> Function2<String, A[], String> format() {
@@ -203,7 +203,7 @@ public final class Strings {
   /**
    * Return a function that replaces all occurrences of <code>regex</code> in the argument with <code>replacement</code>
    * .
-   * 
+   *
    * @see String#replaceAll(String, String)
    */
   public static Function<String, String> replaceAll(final String regex, final String replacement) {

@@ -72,7 +72,7 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Tests the functionality of the search env.getService().
- * 
+ *
  * todo setup scenario where gathering metadata from both the media package and the dublin core is required
  * (StaticMetadataServiceMediaPackageImpl, StaticMetadataServiceDublinCoreImpl)
  */
@@ -310,7 +310,7 @@ public class EpisodeServiceImplTest {
 
   /**
    * Ads a media package with one dublin core for the episode and one for the series.
-   * 
+   *
    * todo media package needs to return a series id for this test to work
    */
   @Test

@@ -269,7 +269,7 @@ public class SeriesServiceImpl implements SeriesService {
 
   /**
    * Sends an OSGI Event.
-   * 
+   *
    * @param topic
    *          the event topic
    * @param objectId
@@ -286,7 +286,7 @@ public class SeriesServiceImpl implements SeriesService {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.api.SeriesService#deleteSeries(java.lang.String)
    */
   @Override

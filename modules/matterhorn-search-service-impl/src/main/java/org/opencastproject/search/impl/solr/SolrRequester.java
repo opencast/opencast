@@ -85,7 +85,7 @@ public class SolrRequester {
 
   /**
    * Creates a new requester for solr that will be using the given connection object to query the search index.
-   * 
+   *
    * @param connection
    *          the solr connection
    */
@@ -98,7 +98,7 @@ public class SolrRequester {
 
   /**
    * Returns the search results for a solr query string with read access for the current user.
-   * 
+   *
    * @param q
    *          the query
    * @param limit
@@ -116,7 +116,7 @@ public class SolrRequester {
 
   /**
    * Creates a search result from a given solr response.
-   * 
+   *
    * @param query
    *          The solr query.
    * @return The search result.
@@ -152,7 +152,7 @@ public class SolrRequester {
 
         /**
          * {@inheritDoc}
-         * 
+         *
          * @see org.opencastproject.search.api.SearchResultItem#getOrganization()
          */
         @Override
@@ -350,7 +350,7 @@ public class SolrRequester {
 
   /**
    * Creates a list of <code>MediaSegment</code>s from the given result document.
-   * 
+   *
    * @param doc
    *          the result document
    * @param query
@@ -451,7 +451,7 @@ public class SolrRequester {
 
   /**
    * Modifies the query such that certain fields are being boosted (meaning they gain some weight).
-   * 
+   *
    * @param query
    *          The user query.
    * @return The boosted query
@@ -531,7 +531,7 @@ public class SolrRequester {
 
   /**
    * Simple helper method to avoid null strings.
-   * 
+   *
    * @param f
    *          object which implements <code>toString()</code> method.
    * @return The input object or empty string.
@@ -545,7 +545,7 @@ public class SolrRequester {
 
   /**
    * Converts the query object into a solr query and returns the results.
-   * 
+   *
    * @param q
    *          the query
    * @param action
@@ -736,7 +736,7 @@ public class SolrRequester {
 
   /**
    * Returns the search results, regardless of permissions. This should be used for maintenance purposes only.
-   * 
+   *
    * @param q
    *          the search query
    * @return the readable search result
@@ -749,7 +749,7 @@ public class SolrRequester {
 
   /**
    * Returns the search results that are accessible for read by the current user.
-   * 
+   *
    * @param q
    *          the search query
    * @return the readable search result
@@ -762,7 +762,7 @@ public class SolrRequester {
 
   /**
    * Returns the search results that are accessible for write by the current user.
-   * 
+   *
    * @param q
    *          the search query
    * @return the writable search result
@@ -775,7 +775,7 @@ public class SolrRequester {
 
   /**
    * Sets the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */

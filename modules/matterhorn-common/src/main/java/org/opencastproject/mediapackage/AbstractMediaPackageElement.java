@@ -100,7 +100,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
 
   /**
    * Creates a new media package element.
-   * 
+   *
    * @param elementType
    *          the type, e. g. Track, Catalog etc.
    * @param flavor
@@ -114,7 +114,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
 
   /**
    * Creates a new media package element.
-   * 
+   *
    * @param elementType
    *          the type, e. g. Track, Catalog etc.
    * @param flavor
@@ -135,7 +135,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
 
   /**
    * Creates a new media package element.
-   * 
+   *
    * @param id
    *          the element identifier withing the package
    * @param elementType
@@ -374,7 +374,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    * Sets the parent media package.
    * <p>
    * <b>Note</b> This method is only used by the media package and should not be called from elsewhere.
-   * 
+   *
    * @param mediaPackage
    *          the parent media package
    */

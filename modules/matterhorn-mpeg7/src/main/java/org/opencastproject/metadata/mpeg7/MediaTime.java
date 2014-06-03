@@ -25,14 +25,14 @@ public interface MediaTime extends XmlElement {
 
   /**
    * Returns the media time point, i. e. the starting time of the vidoe segement.
-   * 
+   *
    * @return the media time point
    */
   MediaTimePoint getMediaTimePoint();
 
   /**
    * Returns the media duration.
-   * 
+   *
    * @return the media duration
    */
   MediaDuration getMediaDuration();

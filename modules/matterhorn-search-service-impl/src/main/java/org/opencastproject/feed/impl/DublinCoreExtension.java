@@ -65,7 +65,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the title.
-   * 
+   *
    * @return the dublin core title
    */
   public String geTitles() {
@@ -74,7 +74,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the title.
-   * 
+   *
    * @return the title, <b>null</b> if none.
    */
   public String getTitle() {
@@ -83,7 +83,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Sets the title.
-   * 
+   *
    * @param title
    *          the title to set, <b>null</b> if none.
    */
@@ -93,7 +93,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the creator.
-   * 
+   *
    * @return the creator, <b>null</b> if none.
    */
   public String getCreator() {
@@ -102,7 +102,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the list of creators.
-   * 
+   *
    * @return the creators
    */
   public List<String> getCreators() {
@@ -111,7 +111,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Sets the creator.
-   * 
+   *
    * @param creator
    *          the creator to set
    */
@@ -122,7 +122,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Adds a creator to the list of creators.
-   * 
+   *
    * @param creator
    *          the creator to add
    */
@@ -132,7 +132,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the subject.
-   * 
+   *
    * @return the subject, <b>null</b> if none.
    */
   public List<Subject> getSubjects() {
@@ -141,7 +141,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Adds a subject element.
-   * 
+   *
    * @param taxonomyUri
    *          the taxonomy uri
    * @param value
@@ -153,7 +153,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the description.
-   * 
+   *
    * @return the description, <b>null</b> if none.
    */
   public String getDescription() {
@@ -162,7 +162,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Sets the description.
-   * 
+   *
    * @param description
    *          the description to set
    */
@@ -172,7 +172,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the title.
-   * 
+   *
    * @return the title, <b>null</b> if none.
    */
   public String getPublisher() {
@@ -181,7 +181,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the list of publishers.
-   * 
+   *
    * @return the publishers
    */
   public List<String> getPublishers() {
@@ -190,7 +190,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Sets the publisher.
-   * 
+   *
    * @param publisher
    *          the publisher to set
    */
@@ -201,7 +201,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Adds a publisher to the list of publishers.
-   * 
+   *
    * @param publisher
    *          the publisher to add
    */
@@ -211,7 +211,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the contributor.
-   * 
+   *
    * @return the contributor, <b>null</b> if none.
    */
   public String getContributor() {
@@ -220,7 +220,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the list of contributors.
-   * 
+   *
    * @return the contributors
    */
   public List<String> getContributors() {
@@ -229,7 +229,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Sets the contributor.
-   * 
+   *
    * @param contributor
    *          the contributor to set
    */
@@ -240,7 +240,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Adds a contributor to the list of contributors.
-   * 
+   *
    * @param contributor
    *          the contributor to add
    */
@@ -250,7 +250,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the date.
-   * 
+   *
    * @return the date, <b>null</b> if none.
    */
   public Date getDate() {
@@ -259,7 +259,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Sets the date.
-   * 
+   *
    * @param date
    *          the date to set, <b>null</b> if none.
    */
@@ -269,7 +269,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the type
-   * 
+   *
    * @return the type, <b>null</b> if none.
    */
   public String getType() {
@@ -278,7 +278,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Sets the type.
-   * 
+   *
    * @param type
    *          the type to set, <b>null</b> if none.
    */
@@ -288,7 +288,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the format
-   * 
+   *
    * @return the format, <b>null</b> if none.
    */
   public String getFormat() {
@@ -297,7 +297,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Sets the format.
-   * 
+   *
    * @param format
    *          the format to set, <b>null</b> if none.
    */
@@ -307,7 +307,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the identifier.
-   * 
+   *
    * @return the identifier, <b>null</b> if none.
    */
   public String getIdentifier() {
@@ -316,7 +316,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Sets the identifier.
-   * 
+   *
    * @param identifier
    *          the identifier to set, <b>null</b> if none.
    */
@@ -326,7 +326,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the source.
-   * 
+   *
    * @return the source, <b>null</b> if none.
    */
   public String getSource() {
@@ -335,7 +335,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Sets the source.
-   * 
+   *
    * @param source
    *          the source to set, <b>null</b> if none.
    */
@@ -345,7 +345,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the language.
-   * 
+   *
    * @return the langauge, <b>null</b> if none.
    */
   public String getLanguage() {
@@ -354,7 +354,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Sets the language.
-   * 
+   *
    * @param language
    *          the language to set, <b>null</b> if none.
    */
@@ -364,7 +364,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the relation.
-   * 
+   *
    * @return the relation, <b>null</b> if none.
    */
   public String getRelation() {
@@ -373,7 +373,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Sets the relation.
-   * 
+   *
    * @param relation
    *          the relation to set, <b>null</b> if none.
    */
@@ -383,7 +383,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the coverage.
-   * 
+   *
    * @return the coverage, <b>null</b> if none.
    */
   public String getCoverage() {
@@ -392,10 +392,10 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Sets the coverage.
-   * 
+   *
    * @param coverage
    *          the coverage to set, <b>null</b> if none.
-   * 
+   *
    */
   public void setCoverage(String coverage) {
     this.coverage = coverage;
@@ -403,7 +403,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Returns the rights.
-   * 
+   *
    * @return the rights, <b>null</b> if none.
    */
   public String getRights() {
@@ -412,7 +412,7 @@ public class DublinCoreExtension implements FeedExtension {
 
   /**
    * Sets the rights.
-   * 
+   *
    * @param rights
    *          the rights to set, <b>null</b> if none.
    */
@@ -431,7 +431,7 @@ public class DublinCoreExtension implements FeedExtension {
 
     /**
      * Creates a new subject definition.
-     * 
+     *
      * @param taxonomyUri
      *          the taxonomy uri
      * @param value
@@ -444,7 +444,7 @@ public class DublinCoreExtension implements FeedExtension {
 
     /**
      * Reutrns the taxonomy uri.
-     * 
+     *
      * @return the uri
      */
     public String getTaxonomyUri() {
@@ -453,7 +453,7 @@ public class DublinCoreExtension implements FeedExtension {
 
     /**
      * Returns the subject value.
-     * 
+     *
      * @return the value
      */
     public String getValue() {

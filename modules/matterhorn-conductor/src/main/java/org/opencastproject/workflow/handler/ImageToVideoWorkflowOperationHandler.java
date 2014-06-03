@@ -82,7 +82,7 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param composerService
    *          the local composer service
    */
@@ -93,7 +93,7 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -103,7 +103,7 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override

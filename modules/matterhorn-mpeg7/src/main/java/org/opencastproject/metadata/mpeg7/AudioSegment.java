@@ -19,7 +19,7 @@ package org.opencastproject.metadata.mpeg7;
 /**
  * An audio segment represents a temporal decomposition of the audio stream that may have properties like text
  * annotations attached to it.
- * 
+ *
  * <pre>
  * &lt;complexType name=&quot;AudioSegmentType&quot;&gt;
  *   &lt;complexContent&gt;

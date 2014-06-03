@@ -38,14 +38,14 @@ public interface JobContext {
 
   /**
    * Gets the job context identifier.
-   * 
+   *
    * @return the job context identifier
    */
   Long getId();
 
   /**
    * Returns any additional contextual data.
-   * 
+   *
    * @return the contextual data
    */
   Map<String, String> getProperties();

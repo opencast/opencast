@@ -51,7 +51,7 @@ public class DictionaryScanner implements ArtifactInstaller {
 
   /**
    * OSGi callback on component activation.
-   * 
+   *
    * @param ctx
    *          the bundle context
    */
@@ -66,7 +66,7 @@ public class DictionaryScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactListener#canHandle(java.io.File)
    */
   @Override
@@ -76,7 +76,7 @@ public class DictionaryScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#install(java.io.File)
    */
   @Override
@@ -144,7 +144,7 @@ public class DictionaryScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#uninstall(java.io.File)
    */
   @Override
@@ -156,7 +156,7 @@ public class DictionaryScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#update(java.io.File)
    */
   @Override

@@ -201,8 +201,6 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
       throw new WorkflowOperationException("Trimming duration must be a positive integer");
     else if (trimStart > recordingDuration)
       throw new WorkflowOperationException("Trimming start is outside of recording");
-    else if (trimStart + initialTrimDuration > recordingDuration)
-      throw new WorkflowOperationException("Trimming end is outside of recording");
 
     // Get the source flavor to match
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();

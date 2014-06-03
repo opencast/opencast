@@ -54,7 +54,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#add(org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
@@ -87,7 +87,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#delete(java.lang.String)
    */
   @Override
@@ -111,7 +111,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#getByQuery(org.opencastproject.search.api.SearchQuery)
    */
   @Override
@@ -131,7 +131,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#getForAdministrativeRead(org.opencastproject.search.api.SearchQuery)
    */
   @Override
@@ -152,7 +152,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#getByQuery(java.lang.String, int, int)
    */
   @Override
@@ -178,7 +178,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
 
   /**
    * Builds the a search URL.
-   * 
+   *
    * @param q
    *          the search query
    * @param admin

@@ -78,7 +78,7 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.impl.AbstractCmdlineEncoderEngine#trim(java.io.File,
    *      org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
    */
@@ -105,7 +105,7 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
 
   /**
    * Creates the arguments for the commandline.
-   * 
+   *
    * @param format
    *          the format
    * @return the argument list
@@ -145,7 +145,7 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
 
   /**
    * Handles the encoder output by analyzing it first and then firing it off to the registered listeners.
-   * 
+   *
    * @param sourceFiles
    *          the source files that are currently being encoded
    * @param format
@@ -194,7 +194,7 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.impl.AbstractEncoderEngine#getOutputFile(java.io.File,
    *      org.opencastproject.composer.api.EncodingProfile)
    */

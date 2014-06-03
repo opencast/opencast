@@ -42,7 +42,7 @@ public class MultimediaContentTypeImpl<S extends Segment> implements MultimediaC
 
   /**
    * Creates a new media content element.
-   * 
+   *
    * @param type
    *          the content element type
    * @param id
@@ -56,7 +56,7 @@ public class MultimediaContentTypeImpl<S extends Segment> implements MultimediaC
 
   /**
    * Sets the content's media time constraints.
-   * 
+   *
    * @param time
    *          the media time
    */
@@ -66,7 +66,7 @@ public class MultimediaContentTypeImpl<S extends Segment> implements MultimediaC
 
   /**
    * Sets the content's media locator.
-   * 
+   *
    * @param locator
    *          the media locator
    */
@@ -76,7 +76,7 @@ public class MultimediaContentTypeImpl<S extends Segment> implements MultimediaC
 
   /**
    * Creates a temporal decomposition for the given content type.
-   * 
+   *
    * @param contentType
    *          the content type
    * @return the temporal decomposition

@@ -26,7 +26,7 @@ public class VideoSegmenterException extends Exception {
 
   /**
    * Creates a new media analysis exception with <code>message</code> as a reason.
-   * 
+   *
    * @param message
    *          the reason of failure
    */
@@ -36,7 +36,7 @@ public class VideoSegmenterException extends Exception {
 
   /**
    * Creates a new media analysis exception where <code>cause</code> identifies the original reason of failure.
-   * 
+   *
    * @param cause
    *          the root cause for the failure
    */
@@ -47,7 +47,7 @@ public class VideoSegmenterException extends Exception {
   /**
    * Creates a new media analysis exception with <code>message</code> as a reason and <code>cause</code> as the original
    * cause of failure.
-   * 
+   *
    * @param message
    *          the reason of failure
    * @param cause

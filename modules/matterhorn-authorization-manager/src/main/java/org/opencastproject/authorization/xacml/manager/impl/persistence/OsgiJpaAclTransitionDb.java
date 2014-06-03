@@ -74,7 +74,7 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
 
   /**
    * OSGi callback to set persistence properties.
-   * 
+   *
    * @param persistenceProperties
    *          persistence properties
    */
@@ -84,7 +84,7 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
 
   /**
    * OSGi callback to set persistence provider.
-   * 
+   *
    * @param persistenceProvider
    *          {@link PersistenceProvider} object
    */
@@ -94,7 +94,7 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
 
   /**
    * Creates {@link EntityManagerFactory} using persistence provider and properties passed via OSGi.
-   * 
+   *
    * @param cc
    */
   public void activate(ComponentContext cc) {
@@ -105,7 +105,7 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
 
   /**
    * Closes entity manager factory.
-   * 
+   *
    * @param cc
    */
   public void deactivate(ComponentContext cc) {
@@ -398,7 +398,7 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
 
   /**
    * Search episode transitions with the given transition query and return it in a transition result
-   * 
+   *
    * @param query
    *          the transition query
    * @return the episode transition result
@@ -460,7 +460,7 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
 
   /**
    * Search series transitions with the given transition query and return it in a transition result
-   * 
+   *
    * @param query
    *          the transition query
    * @return the series transition result
@@ -522,7 +522,7 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
 
   /**
    * Gets all series ACL entities by the series id as a list, using the current organizational context.
-   * 
+   *
    * @param seriesId
    *          the series id
    * @param em
@@ -539,7 +539,7 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
 
   /**
    * Gets all episode ACL entities by the episode id as a list, using the current organizational context.
-   * 
+   *
    * @param episodeId
    *          the episode id
    * @param em
@@ -556,7 +556,7 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
 
   /**
    * Gets a series ACL entity by its ID, using the current organizational context.
-   * 
+   *
    * @param id
    *          the transition identifier
    * @param em
@@ -576,7 +576,7 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
 
   /**
    * Gets a episode ACL entity by its ID, using the current organizational context.
-   * 
+   *
    * @param id
    *          the transition identifier
    * @param em

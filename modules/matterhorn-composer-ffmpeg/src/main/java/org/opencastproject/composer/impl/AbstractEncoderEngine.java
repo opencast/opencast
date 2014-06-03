@@ -53,7 +53,7 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
 
   /**
    * Creates a new abstract encoder engine with or without support for multiple job submission.
-   * 
+   *
    * @param supportsMultithreading
    *          <code>true</code> if this engine supports more than one job at a time
    */
@@ -64,7 +64,7 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#addEncoderListener(org.opencastproject.composer.api.EncoderListener)
    */
   public void addEncoderListener(EncoderListener listener) {
@@ -74,7 +74,7 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#removeEncoderListener(org.opencastproject.composer.api.EncoderListener)
    */
   public void removeEncoderListener(EncoderListener listener) {
@@ -83,7 +83,7 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
 
   /**
    * Returns the location of the output file.
-   * 
+   *
    * @param source
    *          the source file
    * @param profile
@@ -94,7 +94,7 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#supportsMultithreading()
    */
   public boolean supportsMultithreading() {
@@ -104,7 +104,7 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
   /**
    * Sets the supported profiles for this encoder engine. The method is called by the corresponding factory that knows
    * about the relation between encoding engine and encoding profiles.
-   * 
+   *
    * @param profiles
    *          the supported profiles
    */
@@ -117,7 +117,7 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#supportsProfile(java.lang.String,
    *      org.opencastproject.composer.api.EncodingProfile.MediaType)
    */
@@ -133,13 +133,13 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
   /**
    * Downloads the track to the <code>java.io.tmpdir</code> directory if does not not already have a <code>file:</code>
    * url associated.
-   * 
+   *
    * @param track
    *          the track object
    * @return a file reference to the track
    * @throws IOException
    *           if downloading the file fails
-   * 
+   *
    */
   protected File download(Track track) throws IOException {
     if (track == null || track.getURI() == null) {
@@ -168,7 +168,7 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
 
   /**
    * This method is called to send the <code>formatEncoded</code> event to registered encoding listeners.
-   * 
+   *
    * @param engine
    *          the encoding engine
    * @param profile
@@ -188,7 +188,7 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
 
   /**
    * This method is called to send the <code>trackEncodingFailed</code> event to registered encoding listeners.
-   * 
+   *
    * @param engine
    *          the encoding engine
    * @param sourceFiles
@@ -210,7 +210,7 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
 
   /**
    * This method is called to send the <code>trackEncodingProgressed</code> event to registered encoding listeners.
-   * 
+   *
    * @param engine
    *          the encoding engine
    * @param sourceFile

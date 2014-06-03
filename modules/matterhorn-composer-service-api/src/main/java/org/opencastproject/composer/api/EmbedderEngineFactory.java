@@ -17,13 +17,13 @@ package org.opencastproject.composer.api;
 
 /**
  * Factory for creating new {@link EmbedderEngine} instances.
- * 
+ *
  */
 public interface EmbedderEngineFactory {
 
   /**
    * Creates new {@link EmbedderEngine} instance.
-   * 
+   *
    * @return new {@link EmbedderEngine} instance
    */
   // TODO maybe property?

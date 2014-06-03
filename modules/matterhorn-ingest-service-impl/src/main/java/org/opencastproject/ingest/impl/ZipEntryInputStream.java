@@ -28,7 +28,7 @@ public class ZipEntryInputStream extends FilterInputStream {
 
   /**
    * Creates a wrapper around the input stream <code>in</code> and reads the given number of bytes from it.
-   * 
+   *
    * @param in
    *          the input stream
    * @param length

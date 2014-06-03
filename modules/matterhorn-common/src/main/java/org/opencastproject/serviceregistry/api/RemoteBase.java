@@ -60,7 +60,7 @@ public class RemoteBase {
 
   /**
    * Creates a remote implementation for the given type of service.
-   * 
+   *
    * @param type
    *          the service type
    */
@@ -72,7 +72,7 @@ public class RemoteBase {
 
   /**
    * Sets the trusted http client
-   * 
+   *
    * @param client
    */
   public void setTrustedHttpClient(TrustedHttpClient client) {
@@ -81,7 +81,7 @@ public class RemoteBase {
 
   /**
    * Sets the remote service manager.
-   * 
+   *
    * @param remoteServiceManager
    */
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
@@ -101,7 +101,7 @@ public class RemoteBase {
   /**
    * Makes a request to all available remote services and returns the response as soon as the first of them returns the
    * {@link HttpStatus#SC_OK} as the status code.
-   * 
+   *
    * @param httpRequest
    *          the http request. If the URI is specified, it should include only the path beyond the service endpoint.
    *          For example, a request intended for http://{host}/{service}/extra/path/info.xml should include the URI
@@ -115,7 +115,7 @@ public class RemoteBase {
   /**
    * Makes a request to all available remote services and returns the response as soon as the first of them returns the
    * expected http status code.
-   * 
+   *
    * @param httpRequest
    *          the http request. If the URI is specified, it should include only the path beyond the service endpoint.
    *          For example, a request intended for http://{host}/{service}/extra/path/info.xml should include the URI
@@ -242,7 +242,7 @@ public class RemoteBase {
 
     /**
      * Constructs an HttpClientClosingInputStream from a source stream and an http response.
-     * 
+     *
      * @throws IOException
      * @throws IllegalStateException
      */
@@ -253,7 +253,7 @@ public class RemoteBase {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.io.InputStream#read()
      */
     @Override
@@ -263,7 +263,7 @@ public class RemoteBase {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.io.InputStream#available()
      */
     @Override

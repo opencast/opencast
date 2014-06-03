@@ -52,7 +52,7 @@ public class YouTubePublicationContextStrategy {
 
   /**
    * Create a single-use strategy instance for publication to youtube
-   * 
+   *
    * @param mediaPackageId
    *          the mediapackage identifier
    * @param workspace
@@ -82,7 +82,7 @@ public class YouTubePublicationContextStrategy {
 
   /**
    * Returns a series identifier of the mediapackage.
-   * 
+   *
    * @return The context ID
    */
   public String getContextId() {
@@ -91,7 +91,7 @@ public class YouTubePublicationContextStrategy {
 
   /**
    * Gets the name for a context within a publication channel.
-   * 
+   *
    * @return The playlist ID
    */
   public String getContextName() {
@@ -100,7 +100,7 @@ public class YouTubePublicationContextStrategy {
 
   /**
    * Gets the name for a context within a publication channel.
-   * 
+   *
    * @return Context description
    */
   public String getContextDescription() {
@@ -109,7 +109,7 @@ public class YouTubePublicationContextStrategy {
 
   /**
    * Gets the name for the episode of the media package
-   * 
+   *
    * @return the title of the episode
    */
   public String getEpisodeName() {
@@ -118,7 +118,7 @@ public class YouTubePublicationContextStrategy {
 
   /**
    * Gets the description for the episode of the media package
-   * 
+   *
    * @return the description of the episode
    */
   public String getEpisodeDescription() {
@@ -142,7 +142,7 @@ public class YouTubePublicationContextStrategy {
 
   /**
    * Gets the tags/keywords for the episode of the media package
-   * 
+   *
    * @return the keywords of the episode
    */
   public String[] getEpisodeKeywords() {
@@ -155,7 +155,7 @@ public class YouTubePublicationContextStrategy {
 
   /**
    * Parse Dublincore metadata from the workspace
-   * 
+   *
    * @param catalog
    *          A mediapackage's catalog file
    * @return Catalog parse from XML

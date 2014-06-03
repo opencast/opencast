@@ -190,7 +190,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
 
   /**
    * Retries a request if the nonce timed out during the request.
-   * 
+   *
    * @param httpUriRequest
    *          The request to be made that isn't a GET, those are handled automatically.
    * @param response
@@ -237,7 +237,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
 
   /**
    * Determines if the nonce has timed out before a request could be performed.
-   * 
+   *
    * @param response
    *          The response to test to see if it has timed out.
    * @return true if it has time out, false if it hasn't
@@ -249,7 +249,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
 
   /**
    * Handles the necessary handshake for digest authenticaion in the case where it isn't a GET operation.
-   * 
+   *
    * @param httpUriRequest
    *          The request location to get the digest authentication for.
    * @param httpClient
@@ -301,7 +301,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.TrustedHttpClient#close(org.apache.http.HttpResponse)
    */
   @Override
@@ -318,7 +318,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.TrustedHttpClient#execute(org.apache.http.client.methods.HttpUriRequest,
    *      org.apache.http.client.ResponseHandler)
    */
@@ -330,7 +330,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
 
   /**
    * Perform a request, and extract the realm and nonce values
-   * 
+   *
    * @param request
    *          The request to execute in order to obtain the realm and nonce
    * @return A String[] containing the {realm, nonce}

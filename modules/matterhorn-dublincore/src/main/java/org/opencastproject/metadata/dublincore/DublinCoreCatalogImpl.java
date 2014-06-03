@@ -129,7 +129,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Creates a new dublin core metadata container.
-   * 
+   *
    * @param id
    *          the element identifier withing the package
    * @param uri
@@ -150,7 +150,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Creates a new dublin core metadata container, defaulting the flavor to {@link MediaPackageElements#EPISODE}.
-   * 
+   *
    * @param uri
    *          the document location
    * @param size
@@ -164,7 +164,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Creates a new dublin core metadata container.
-   * 
+   *
    * @param id
    *          the element identifier withing the package
    */
@@ -179,7 +179,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Creates a new dublin core metadata container.
-   * 
+   *
    * @return the new dublin core metadata container
    */
   public static DublinCoreCatalogImpl newInstance() {
@@ -188,7 +188,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Reads the metadata from the specified file and returns it encapsulated in a {@link DublinCoreCatalog} object.
-   * 
+   *
    * @param in
    *          the stream containing the dublin core metadata
    */
@@ -603,7 +603,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Saves the dublin core metadata container to a dom.
-   * 
+   *
    * @throws ParserConfigurationException
    *           if the xml parser environment is not correctly configured
    * @throws TransformerException
@@ -629,7 +629,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.XMLCatalogImpl#toJson()
    */
   @Override
@@ -640,7 +640,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Reads values from a JSON object
-   * 
+   *
    * @param json
    *          the json object representing the dublin core catalog
    * @return the dublin core catalog
@@ -684,7 +684,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Converts the catalog to JSON object.
-   * 
+   *
    * @return JSON object
    */
   @SuppressWarnings("unchecked")
@@ -741,7 +741,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
   /**
    * Adds the dublin core property identified by <code>name</code> to the root node if it's value is different from
    * <code>null</code>.
-   * 
+   *
    * @param document
    *          the document
    * @param root
@@ -790,7 +790,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
     /**
      * Creates a new parser for dublin core documents. The parsed data will be added to <code>dcCatalog</code>.
-     * 
+     *
      * @param dcCatalog
      *          the catalog to populate
      */
@@ -800,7 +800,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
     /**
      * Parses the catalog and returns an object representation for it.
-     * 
+     *
      * @param is
      *          the input stream containing the dublin core catalog
      * @return the catalog representation
@@ -838,7 +838,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
     /**
      * Returns the element content.
-     * 
+     *
      * @return the element content
      */
     private String getContent() {
@@ -849,7 +849,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
     /**
      * Read <code>type</code> attribute from track or catalog element.
-     * 
+     *
      * @see org.xml.sax.helpers.DefaultHandler#startElement(String, String, String, org.xml.sax.Attributes)
      */
     @Override

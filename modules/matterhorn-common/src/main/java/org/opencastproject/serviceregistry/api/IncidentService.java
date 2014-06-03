@@ -64,8 +64,8 @@ public interface IncidentService {
    * @param jobId
    *          the job identifier
    * @param cascade
-   *          if true, return the incidents of the given job and those of of its descendants;
-   *          if false, just return the incidents of the given job, which means that the list returned by
+   *          if true, return the incidents of the given job and those of of its descendants; if false, just return the
+   *          incidents of the given job, which means that the list returned by
    *          {@link org.opencastproject.job.api.IncidentTree#getDescendants()} will always be empty
    * @return the list of incidents
    * @throws NotFoundException
@@ -76,9 +76,9 @@ public interface IncidentService {
   IncidentTree getIncidentsOfJob(long jobId, boolean cascade) throws NotFoundException, IncidentServiceException;
 
   /**
-   * Get the directly related incidents of all given jobs and return them concatenated into a single list.
-   * No incidents of any descendants will be returned.
-   *
+   * Get the directly related incidents of all given jobs and return them concatenated into a single list. No incidents
+   * of any descendants will be returned.
+   * 
    * @param jobIds
    *          the job identifiers
    * @return the concatenated list of directly related incidents

@@ -83,7 +83,7 @@ public final class XACMLUtils {
 
   /**
    * Builds an xml string containing the xacml for the mediapackage.
-   * 
+   *
    * @param mediapackage
    *          the mediapackage
    * @param accessControlList

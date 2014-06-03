@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Interface for pre-login handling. These events occur after the Id is found, and before UserManager attempts a login
  * of the user.
- * 
+ *
  * @see ShibbolethRequestHeaderAuthenticationFilter
  */
 public interface ShibbolethLoginHandler {
@@ -30,7 +30,7 @@ public interface ShibbolethLoginHandler {
 
   /**
    * Handle a new user login.
-   * 
+   *
    * @param id
    *          The identity of the user, ideally the Shibboleth persistent unique identifier
    * @param request
@@ -40,7 +40,7 @@ public interface ShibbolethLoginHandler {
 
   /**
    * Handle an existing user login.
-   * 
+   *
    * @param id
    *          The identity of the user, ideally the Shibboleth persistent unique identifier
    * @param request

@@ -29,7 +29,7 @@ public interface AuthorizationService {
 
   /**
    * Determines whether the current media package contains a security policy.
-   * 
+   *
    * @param mp
    *          the media package
    * @return whether the current media package contains a security policy
@@ -38,7 +38,7 @@ public interface AuthorizationService {
 
   /**
    * Determines whether the current user can take the specified action on the media package.
-   * 
+   *
    * @param mp
    *          the media package
    * @param action
@@ -68,7 +68,7 @@ public interface AuthorizationService {
    * {@link org.opencastproject.mediapackage.MediaPackageElement#getReference()} returns a non-null reference), the
    * returned ACL will be empty. Episode XACMLs are considered before series XACMLs.</li>
    * </ol>
-   * 
+   *
    * @param mp
    *          the media package
    * @return the set of permissions and explicit denials
@@ -77,7 +77,7 @@ public interface AuthorizationService {
 
   /**
    * Gets the permissions by its scope associated with this media package, as specified by its XACML attachment.
-   * 
+   *
    * @param mp
    *          the media package
    * @param scope
@@ -88,7 +88,7 @@ public interface AuthorizationService {
 
   /**
    * Return access control attachments of a certain scope or all.
-   * 
+   *
    * @param mp
    *          the media package
    * @param scope
@@ -100,7 +100,7 @@ public interface AuthorizationService {
   /**
    * Attaches the provided policies to a media package as a XACML attachment, replacing any previous policy element of
    * the same scope.
-   * 
+   *
    * @param mp
    *          the media package
    * @param scope
@@ -113,7 +113,7 @@ public interface AuthorizationService {
 
   /**
    * Remove the XACML of the given scope.
-   * 
+   *
    * @param mp
    *          the media package
    * @param scope

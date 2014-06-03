@@ -37,6 +37,7 @@ import java.util.Map;
 
 /** Create and record job incidents. Facade for {@link IncidentService}. */
 public final class Incidents {
+
   private static final Log log = Log.mk(Incident.class);
 
   /**

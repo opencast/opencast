@@ -11,8 +11,7 @@
       $.getJSON("/info/components.json", function(data) {
         var contentDiv = $("#content");
         var capt = false,
-        confMon = false, 
-        analytics = false;
+        confMon = false; 
         $.each(data, function(section) {
             if("rest" == section) {
                $.each(data.rest, function(i) {
@@ -30,10 +29,7 @@
 				          } else if(data.rest[i].description.toLowerCase() == "Confidence Monitoring REST Endpoint".toLowerCase()) {
 				            $('#col4m').append('<br /><a class="redbutton" id="confidenceMonitoringLink" href="/confidence-monitoring">Go to Confidence Monitoring</a>');
 				            confMon = true;
-				          } else if (data.rest[i].description.toLowerCase() == "Analytics REST Endpoint".toLowerCase()) {
-                    $('#col5m').append('<br /><a class="redbutton" id="analyticsLink" href="/analytics">Go to Analytics</a>');
-                    analytics = true;
-                  }
+				          }
                })
             } else if("engage" == section) {
                $('#engagelink').attr('href', data.engage + '/engage/ui');
@@ -113,20 +109,6 @@
           </ul>
         </div>
       </div>
-      
-      <div id="middlebanner3">
-          <div id="col5m">
-              <img src="img/welcome/confidence_monitoring_icon.png" width="80" height="61" />
-              <h2>Analytics</h2>
-              <p>These tools allows you to see the activity of the users:</p>
-              <ul>
-                  <li>View the most popular videos for a given series</li>
-                  <li>The number of accesses across a series over time</li>
-                  <li>A summary of user activity</li>
-             </ul>
-          </div>
-      </div>
-
       <div id="bottombanner">
         <div id="col1b">
           <h2>Services Documentation</h2>

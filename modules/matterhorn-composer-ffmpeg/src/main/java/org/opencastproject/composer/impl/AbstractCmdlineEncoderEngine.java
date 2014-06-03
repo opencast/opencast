@@ -85,7 +85,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#needsLocalWorkCopy()
    */
   public boolean needsLocalWorkCopy() {
@@ -94,7 +94,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#encode(java.io.File,
    *      org.opencastproject.composer.api.EncodingProfile, java.util.Map)
    */
@@ -118,7 +118,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#mux(java.io.File, java.io.File,
    *      org.opencastproject.composer.api.EncodingProfile, java.util.Map)
    */
@@ -130,7 +130,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#extract(File, EncodingProfile, Map, double...)
    */
   @Override
@@ -168,7 +168,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
   /**
    * Executes the command line encoder with the given set of files and properties and using the provided encoding
    * profile.
-   * 
+   *
    * @param audioSource
    *          the audio file (used when muxing)
    * @param videoSource
@@ -287,7 +287,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * Deletes all valid files found in a list
-   * 
+   *
    * @param outputFiles
    *          list containing files
    */
@@ -306,7 +306,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * Handles the encoder output by analyzing it first and then firing it off to the registered listeners.
-   * 
+   *
    * @param format
    *          the target media format
    * @param message
@@ -321,7 +321,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * Specifies the encoder binary.
-   * 
+   *
    * @param binary
    *          path to the binary
    */
@@ -334,7 +334,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
   /**
    * Returns the parameters that will replace the variable placeholders on the commandline, such as
    * <code>in.video.name</code> etc.
-   * 
+   *
    * @return the parameters
    */
   protected Map<String, String> getCommandlineParameters() {
@@ -343,7 +343,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * Creates the command that is sent to the commandline encoder.
-   * 
+   *
    * @return the commandline
    * @throws EncoderException
    *           in case of any error
@@ -365,7 +365,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * Creates the arguments for the commandline.
-   * 
+   *
    * @param format
    *          the encoding profile
    * @return the argument list
@@ -402,7 +402,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * Processes the command options by replacing the templates with their actual values.
-   * 
+   *
    * @return the commandline
    */
   protected String processParameters(String cmd) {
@@ -418,7 +418,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
   /**
    * Set the commandline options in a single string. Parameters in the form of <code>#{param}</code> will be
    * substituted.
-   * 
+   *
    * @see #addParam(String, String)
    */
   public void setCmdlineOptions(String cmdlineOptions) {
@@ -427,7 +427,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * Adds a command line parameter that will be substituted along with the default parameters.
-   * 
+   *
    * @see #setCmdlineOptions(String)
    */
   public void addParam(String name, String value) {
@@ -437,7 +437,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
   /**
    * Tells the registered listeners that the given track has been encoded into <code>file</code>, using the encoding
    * format <code>format</code>.
-   * 
+   *
    * @param sourceFiles
    *          the original files
    * @param format

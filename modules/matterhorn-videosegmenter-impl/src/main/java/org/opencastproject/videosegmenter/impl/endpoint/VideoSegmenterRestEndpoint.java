@@ -71,7 +71,7 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
@@ -82,7 +82,7 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -92,7 +92,7 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Sets the segmenter
-   * 
+   *
    * @param videoSegmenter
    *          the segmenter
    */
@@ -102,7 +102,7 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Segments a track.
-   * 
+   *
    * @param trackAsXml
    *          the track xml to segment
    * @return the job in the body of a JAX-RS response
@@ -144,7 +144,7 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -157,7 +157,7 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override

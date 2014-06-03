@@ -337,7 +337,7 @@ public class WorkflowStatisticsTest {
   }
 
   /**
-   * 
+   *
    * @throws Exception
    */
   @Test
