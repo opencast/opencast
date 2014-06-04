@@ -179,7 +179,7 @@ editor.parseWorkflow = function (jsonData) {
         try {
             editor.workflowParser = new $.workflowParser(jsonData);
             SMIL_FLAVOR_EPISODE = editor.workflowParser.targetSmilFlavor;
-            console.log("Set target smil flavor to " + SMIL_FLAVOR_EPISODE);
+            ocUtils.log("Set target smil flavor to " + SMIL_FLAVOR_EPISODE);
         } catch (e) {
             ocUtils.log("Error: Could not parse workflow instance...");
             editor.error = true;
@@ -896,15 +896,18 @@ function checkPrevAndNext(id, checkTimefields) {
             var current = editor.splitData.splits[id];
             // new first item
             if (id == 0) {
+		var clipBegin = parseFloat(current.clipBegin);
+		var clipEnd = parseFloat(current.clipEnd);
+
                 if (editor.splitData.splits.length > 1) {
                     var next = editor.splitData.splits[1];
-                    next.clipBegin = parseFloat(current.clipEnd);
+                    next.clipBegin = clipEnd;
                 }
-                if ((!checkTimefields || (checkTimefields && (getTimefieldTimeBegin() != 0))) && (current.clipBegin > minSegmentLength)) {
-                    ocUtils.log("Inserting a first split element (auto): (" + 0 + " - " + current.clipBegin + ")");
+                if ((!checkTimefields || (checkTimefields && (getTimefieldTimeBegin() != 0))) && (clipBegin > minSegmentLength)) {
+                    ocUtils.log("Inserting a first split element (cpan - auto): (" + 0 + " - " + clipBegin + ")");
                     var newSplitItem = {
                         clipBegin: 0,
-                        clipEnd: parseFloat(current.clipBegin),
+                        clipEnd: clipBegin,
                         enabled: true
                     };
                     inserted = true;
@@ -912,15 +915,16 @@ function checkPrevAndNext(id, checkTimefields) {
                     // add new item to front
                     editor.splitData.splits.splice(0, 0, newSplitItem);
                     insertedFirstItem = true;
-                } else {
-                    ocUtils.log("Extending the first split element from (auto): (" + 0 + " - " + current.clipBegin + ")");
+                }
+		else if(clipBegin > 0) {
+                    ocUtils.log("Extending the first split element to (cpan - auto): (" + 0 + " - " + clipEnd + ")");
                     current.clipBegin = 0;
                 }
             }
             // new last item
             else if ((editor.splitData.splits.length > 0) && (id == editor.splitData.splits.length - 1)) {
                 if ((!checkTimefields || (checkTimefields && (getTimefieldTimeEnd() != duration))) && (current.clipEnd < (duration - minSegmentLength))) {
-                    ocUtils.log("Inserting a last split element (auto): (" + current.clipEnd + " - " + duration + ")");
+                    ocUtils.log("Inserting a last split element (cpan - auto): (" + current.clipEnd + " - " + duration + ")");
                     var newLastItem = {
                         clipBegin: parseFloat(current.clipEnd),
                         clipEnd: parseFloat(duration),
@@ -934,7 +938,7 @@ function checkPrevAndNext(id, checkTimefields) {
                     prev.clipEnd = parseFloat(current.clipBegin);
                     insertedLastItem = true;
                 } else {
-                    ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
+                    ocUtils.log("Extending the last split element to (cpan - auto): (" + current.clipBegin + " - " + duration + ")");
                     current.clipEnd = parseFloat(duration);
                 }
             }
@@ -2190,17 +2194,17 @@ function parseInitialSMIL() {
                 var clipBegin = parseFloat(value.video[0].clipBegin) / 1000;
                 var clipEnd = parseFloat(value.video[0].clipEnd) / 1000;
                 if ((key > 0) && (lastEnd != clipBegin)) {
-                    ocUtils.log("Inserting a split element: (" + lastEnd + " - " + clipBegin + ")");
+                    ocUtils.log("Inserting a split element (1): (" + lastEnd + " - " + clipBegin + ")");
                     editor.splitData.splits.push({
                         clipBegin: parseFloat(lastEnd),
                         clipEnd: parseFloat(clipBegin),
                         enabled: false
                     });
                 }
-                ocUtils.log("Inserting a split element: (" + clipBegin + " - " + clipEnd + ")");
+                ocUtils.log("Inserting a split element (2): (" + clipBegin + " - " + clipEnd + ")");
                 editor.splitData.splits.push({
-                    clipBegin: parseFloat(clipBegin),
-                    clipEnd: parseFloat(clipEnd),
+                    clipBegin: clipBegin,
+                    clipEnd: clipEnd,
                     enabled: true
                 });
                 lastEnd = clipEnd;
@@ -2210,6 +2214,7 @@ function parseInitialSMIL() {
                     i = 0;
                 }
             }
+	    
             // check last segment
             var duration = getDuration();
             if (editor.splitData.splits.length > 0) {
@@ -2225,10 +2230,7 @@ function parseInitialSMIL() {
 
                         // add the new item to the end
                         editor.splitData.splits.push(newLastItem);
-                        if (editor.splitData.splits.length > 1) {
-                            var prev = editor.splitData.splits[editor.splitData.splits.length - 2];
-                            prev.clipEnd = parseFloat(current.clipBegin);
-                        }
+                        // current.clipEnd = parseFloat(current.clipBegin);
                         insertedLastItem = true;
                     } else {
                         ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
@@ -2340,13 +2342,13 @@ function playerReady() {
                 // load smil if there is already one
                 if (value.type == SMIL_FLAVOR_PRESENTER) {
                     presenter_smil = true;
-                    console.log("Found presenter smil");
+                    ocUtils.log("Found presenter smil");
                 } else if (value.type == SMIL_FLAVOR_PRESENTATION) {
                     presentation_smil = true;
-                    console.log("Found presentation smil");
+                    ocUtils.log("Found presentation smil");
                 } else if (value.type == SMIL_FLAVOR_EPISODE) {
                     episode_smil = true;
-                    console.log("Found episode smil");
+                    ocUtils.log("Found episode smil");
                 }
             });
             if (presenter_smil || presentation_smil || episode_smil) {
