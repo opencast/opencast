@@ -2230,7 +2230,6 @@ function parseInitialSMIL() {
 
                         // add the new item to the end
                         editor.splitData.splits.push(newLastItem);
-                        // current.clipEnd = parseFloat(current.clipBegin);
                         insertedLastItem = true;
                     } else {
                         ocUtils.log("Extending the last split element to (auto): (" + current.clipBegin + " - " + duration + ")");
