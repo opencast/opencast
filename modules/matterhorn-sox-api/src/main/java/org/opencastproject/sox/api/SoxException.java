@@ -25,7 +25,7 @@ public class SoxException extends Exception {
 
   /**
    * Creates a new sox exception with the given error message.
-   * 
+   *
    * @param message
    *          the error message
    */
@@ -35,7 +35,7 @@ public class SoxException extends Exception {
 
   /**
    * Creates a new sox exception with the given error message, caused by the given exception.
-   * 
+   *
    * @param message
    *          the error message
    * @param cause
@@ -47,7 +47,7 @@ public class SoxException extends Exception {
 
   /**
    * Creates a new sox exception, caused by the given exception.
-   * 
+   *
    * @param cause
    *          the error cause
    */

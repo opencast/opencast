@@ -86,7 +86,7 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param soxService
    *          the SoX service
    */
@@ -96,7 +96,7 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param composerService
    *          the composer service
    */
@@ -106,7 +106,7 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -116,7 +116,7 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -126,7 +126,7 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -248,7 +248,7 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * Extract the audio track from the given video track.
-   * 
+   *
    * @param videoTrack
    *          the track containing the audio
    * @return the extracted audio track

@@ -28,7 +28,7 @@ public interface SoxService {
 
   /**
    * Get audio statistics, using that track's audio streams.
-   * 
+   *
    * @param sourceAudioTrack
    *          The source audio track
    * @return The receipt for this audio processing job.
@@ -41,7 +41,7 @@ public interface SoxService {
 
   /**
    * Normalize the audio stream of that track.
-   * 
+   *
    * @param sourceAudioTrack
    *          The source audio track
    * @param targetRmsLevDb

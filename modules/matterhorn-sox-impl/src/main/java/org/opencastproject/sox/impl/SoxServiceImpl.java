@@ -104,7 +104,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService {
 
   /**
    * OSGi callback on component activation.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -122,7 +122,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.sox.api.SoxService#analyze(Track)
    */
   @Override
@@ -137,7 +137,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.sox.api.SoxService#normalize(Track, Float)
    */
   @Override
@@ -152,7 +152,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -367,7 +367,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService {
 
   /**
    * Sets the workspace
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -377,7 +377,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService {
 
   /**
    * Sets the service registry
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -387,7 +387,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -397,7 +397,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService {
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -407,7 +407,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService {
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -417,7 +417,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService {
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -427,7 +427,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -437,7 +437,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -447,7 +447,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override

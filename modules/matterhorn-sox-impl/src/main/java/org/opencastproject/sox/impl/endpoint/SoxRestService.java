@@ -76,7 +76,7 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -86,7 +86,7 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Sets the SoX service.
-   * 
+   *
    * @param soxService
    *          the SoX service
    */
@@ -96,7 +96,7 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
@@ -110,7 +110,7 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Analyze an audio track.
-   * 
+   *
    * @param sourceAudioTrack
    *          The source audio track
    * @return A response containing the job for this audio analyzing job in the response body.
@@ -145,7 +145,7 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Normalize an audio track.
-   * 
+   *
    * @param sourceAudioTrack
    *          The source audio track
    * @param targetRmsLevDb
@@ -187,7 +187,7 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -200,7 +200,7 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override

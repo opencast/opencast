@@ -94,7 +94,7 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param soxService
    *          the SoX service
    */
@@ -104,7 +104,7 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param composerService
    *          the composer service
    */
@@ -115,7 +115,7 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -125,7 +125,7 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -135,7 +135,7 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -340,7 +340,7 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * Extract the audio track from the given video track.
-   * 
+   *
    * @param videoTrack
    *          the track containing the audio
    * @return the extracted audio track
