@@ -366,8 +366,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   protected Response addMediaPackageElement(HttpServletRequest request, MediaPackageElement.Type type) {
     MediaPackageElementFlavor flavor = null;
+    InputStream in = null;
     try {
-      InputStream in = null;
       String fileName = null;
       MediaPackage mp = null;
       /* Only accept multipart/form-data */
@@ -422,11 +422,14 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         default:
           throw new IllegalStateException("Type must be one of track, catalog, or attachment");
       }
+      in.close();
       // ingestService.ingest(mp);
       return Response.ok(MediaPackageParser.getAsXml(mp)).build();
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    } finally {
+      IOUtils.closeQuietly(in);
     }
   }
 
@@ -570,8 +573,14 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             } else if ("episodeDCCatalog".equals(fieldName)) {
               String fileName = "episode" + episodeDCCatalogNumber + ".xml";
               episodeDCCatalogNumber += 1;
-              InputStream is = new ByteArrayInputStream(value.getBytes("UTF-8"));
-              ingestService.addCatalog(is, fileName, MediaPackageElements.EPISODE, mp);
+              InputStream is = null;
+              try {
+                is = new ByteArrayInputStream(value.getBytes("UTF-8"));
+                ingestService.addCatalog(is, fileName, MediaPackageElements.EPISODE, mp);
+                is.close();
+              } finally {
+                IOUtils.closeQuietly(is);
+              }
 
               /* Series by URL */
             } else if ("seriesDCCatalogUri".equals(fieldName)) {
@@ -588,8 +597,14 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             } else if ("seriesDCCatalog".equals(fieldName)) {
               String fileName = "series" + seriesDCCatalogNumber + ".xml";
               seriesDCCatalogNumber += 1;
-              InputStream is = new ByteArrayInputStream(value.getBytes("UTF-8"));
-              ingestService.addCatalog(is, fileName, MediaPackageElements.SERIES, mp);
+              InputStream is = null;
+              try {
+                is = new ByteArrayInputStream(value.getBytes("UTF-8"));
+                ingestService.addCatalog(is, fileName, MediaPackageElements.SERIES, mp);
+                is.close();
+              } finally {
+                IOUtils.closeQuietly(is);
+              }
 
               /* Add media files by URL */
             } else if ("mediaUri".equals(fieldName)) {
@@ -643,8 +658,14 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         if (dcc != null) {
           ByteArrayOutputStream out = new ByteArrayOutputStream();
           dcc.toXml(out, true);
-          InputStream in = new ByteArrayInputStream(out.toByteArray());
-          ingestService.addCatalog(in, "dublincore.xml", MediaPackageElements.EPISODE, mp);
+          InputStream in = null;
+          try {
+            in = new ByteArrayInputStream(out.toByteArray());
+            ingestService.addCatalog(in, "dublincore.xml", MediaPackageElements.EPISODE, mp);
+            in.close();
+          } finally {
+            IOUtils.closeQuietly(in);
+          }
 
           /* Check if we have metadata for the episode */
         } else if (episodeDCCatalogNumber == 0) {
@@ -762,6 +783,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
       WorkflowInstance workflow = ingestService.addZippedMediaPackage(in, workflowDefinitionId, workflowConfig,
               workflowInstanceIdAsLong);
+      in.close();
       return Response.ok(WorkflowParser.toXml(workflow)).build();
     } catch (MediaPackageException e) {
       logger.warn(e.getMessage());
@@ -914,6 +936,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     try {
       UploadJob job = createUploadJob();
       is = getClass().getResourceAsStream("/templates/uploadform.html");
+      is.close();
       String html = IOUtils.toString(is, "UTF-8");
       // String uploadURL = serverURL + "/ingest/addElementMonitored/" + job.getId();
       String uploadURL = "addElementMonitored/" + job.getId();
@@ -939,6 +962,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     try {
       is = getClass().getResourceAsStream("/templates/inboxform.html");
       String html = IOUtils.toString(is, "UTF-8");
+      is.close();
       return Response.ok(html).build();
     } catch (Exception ex) {
       logger.warn(ex.getMessage(), ex);
@@ -958,6 +982,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       UploadJob job = createUploadJob();
       is = getClass().getResourceAsStream("/templates/uploadform.html");
       String html = IOUtils.toString(is, "UTF-8");
+      is.close();
       // String uploadURL = serverURL + "/ingest/addElementMonitored/" + job.getId();
       String uploadURL = "/ingest/addZippedMediaPackage";
       html = html.replaceAll("\\{uploadURL\\}", uploadURL);
@@ -1042,6 +1067,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               try {
                 is = getClass().getResourceAsStream("/templates/complete.html");
                 String html = IOUtils.toString(is, "UTF-8");
+                is.close();
                 html = html.replaceAll("\\{mediaPackage\\}", MediaPackageParser.getAsXml(mp));
                 html = html.replaceAll("\\{jobId\\}", job.getId());
                 return Response.ok(html).build();
@@ -1074,6 +1100,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     try {
       is = getClass().getResourceAsStream("/templates/error.html");
       String html = IOUtils.toString(is, "UTF-8");
+      is.close();
       html = html.replaceAll("\\{jobId\\}", job.getId());
       return Response.ok(html).build();
     } catch (IOException ex) {
@@ -1130,9 +1157,11 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       return Response.serverError().status(Status.BAD_REQUEST).build();
     }
 
+    InputStream in = null;
     try {
-      mediaPackage = ingestService.addCatalog(IOUtils.toInputStream(dc, "UTF-8"), "dublincore.xml", dcFlavor,
-            mediaPackage);
+      in = IOUtils.toInputStream(dc, "UTF-8");
+      mediaPackage = ingestService.addCatalog(in, "dublincore.xml", dcFlavor, mediaPackage);
+      in.close();
     } catch (MediaPackageException e) {
       return Response.serverError().status(Status.BAD_REQUEST).build();
     } catch (IOException e) {
@@ -1142,6 +1171,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     } catch (Exception e) {
       logger.error(e.getMessage());
       return Response.serverError().build();
+    } finally {
+      IOUtils.closeQuietly(in);
     }
     return Response.ok(mediaPackage).build();
   }
